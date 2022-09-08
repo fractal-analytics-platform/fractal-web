@@ -1,16 +1,5 @@
 <script>
-  let user = null;
-
-  function get_user_info() {
-    fetch(
-      "http://127.0.0.1:8000/auth/users/me",
-      {
-        credentials: "include",
-        // mode: "no-cors"
-      }
-    ).then((answer) => answer.json())
-    .then((json) => user = json.email);
-  }
+  export let user = null;
 
   function doLogin(event) {
     const formData = new FormData(event.target);
@@ -21,7 +10,7 @@
         alert("fail");
       }
       else {
-        get_user_info();
+        window.location = "/me";
       }
     });
 
@@ -61,7 +50,7 @@
   />
 </form>
 {:else}
-  <p>{user}</p>
+  <a href="/me">{user}</a>
   <form on:submit|preventDefault={doLogout}>
   <input type="submit" value="Logout"/>
 </form>

@@ -1,4 +1,5 @@
 <script>
+  import { page } from "$app/stores";
   import Login from '$lib/login.svelte';
 </script>
 
@@ -9,7 +10,7 @@
 <nav>
   <a href="/">Home</a>
   <a href="/about">About</a>
-  <Login />
+  <Login user={$page.data.user} />
 </nav>
 
 <slot></slot>
