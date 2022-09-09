@@ -17,7 +17,6 @@ async function get_user_info() {
 
 export async function load() {
 	let userValue = await get_user_info();
-	console.log(userValue);
 	return {
 		user: userValue
 	};

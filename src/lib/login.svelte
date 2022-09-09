@@ -27,6 +27,7 @@
       }
       else {
         user = null;
+        window.location = "/";
       }
     });
 
