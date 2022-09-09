@@ -51,7 +51,7 @@
   />
 </form>
 {:else}
-  <a href="/me">{user}</a>
+  <a href="/me">{user.email}</a>
   <form on:submit|preventDefault={doLogout}>
   <input type="submit" value="Logout"/>
 </form>

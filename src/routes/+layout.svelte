@@ -2,6 +2,8 @@
   import { page } from "$app/stores";
   import Login from '$lib/login.svelte';
 
+  export let data;
+
   let home_url;
   if ($page.data.user) {
     home_url = "/me";
@@ -12,7 +14,7 @@
 
 <nav>
   <a href="{ home_url }">Fractal</a>
-  <Login user={$page.data.user} />
+  <Login user={data.user} />
 </nav>
 
 <slot></slot>

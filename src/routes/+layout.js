@@ -1,23 +1,15 @@
-async function get_user_info() {
-	let res = await fetch(
+export async function load() {
+	const res = await fetch(
 		"http://127.0.0.1:8000/auth/users/me",
 		{
 			credentials: "include",
 		}
-	)
-	if (!res.ok) {
-		return null;
+	);
+
+	if (res.ok) {
+		return {user: await res.json()};
 	}
 	else {
-		let data = await res.json();
-		return data.email;
+		return {user: null};
 	}
-}
-
-
-export async function load() {
-	let userValue = await get_user_info();
-	return {
-		user: userValue
-	};
 }
