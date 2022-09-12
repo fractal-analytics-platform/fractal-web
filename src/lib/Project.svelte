@@ -1,6 +1,4 @@
 <script>
-  import { page } from "$app/stores";
-
   export let project;
   export let projectList;
 
@@ -33,5 +31,3 @@
     margin: 20px;
   }
 </style>
-
-

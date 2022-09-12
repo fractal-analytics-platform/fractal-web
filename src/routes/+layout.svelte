@@ -1,9 +1,9 @@
 <script>
-  // import { page } from "$app/stores";
   import Login from '$lib/login.svelte';
 
   export let data;
 </script>
+
 
 <nav>
   <a href="/">Fractal</a>

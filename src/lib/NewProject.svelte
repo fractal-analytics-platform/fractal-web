@@ -1,29 +1,18 @@
 <script>
-  import { page } from "$app/stores";
+  import { ProjectCreate } from "$lib/Project.js";
   export let projectList;
-
-  $: console.log("projects: " + projectList);
 
   async function doSubmit(event) {
     var payload = {};
     const formData = new FormData(event.target);
     formData.forEach((value, key) => {payload[key] = value;});
-    console.log(page.projects);
 
-    const res = await fetch(
-      "http://127.0.0.1:8000/api/v1/project/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-		    credentials: "include",
-        body: JSON.stringify(payload),
-      }
-    );
-    if (res.status == 201) {
-      var newProject = await res.json();
+    try {
+      let newProject = await ProjectCreate(payload);
       projectList = [...projectList, newProject];
+    }
+    catch (e) {
+      alert(e.status + " - " + e.detail);
     }
   };
 </script>
