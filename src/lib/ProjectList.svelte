@@ -1,5 +1,6 @@
 <script>
   import { page } from "$app/stores";
+  import Project from "$lib/Project.svelte"
   export async function load({ data, fetch }) {
     // const res = await fetch(
     // 	"http://127.0.0.1:8000/api/v1/project/",
@@ -26,6 +27,6 @@
 {#if projects}
 <h3>Project List to become </h3>
   {#each projects as p}
-    <p>{p.id} {p.name}</p>
+    <Project project={p} />
   {/each}
 {/if}

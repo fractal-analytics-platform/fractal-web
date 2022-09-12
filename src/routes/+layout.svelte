@@ -1,19 +1,12 @@
 <script>
-  import { page } from "$app/stores";
+  // import { page } from "$app/stores";
   import Login from '$lib/login.svelte';
 
   export let data;
-
-  let home_url;
-  if ($page.data.user) {
-    home_url = "/me";
-  } else {
-    home_url = "/";
-  }
 </script>
 
 <nav>
-  <a href="{ home_url }">Fractal</a>
+  <a href="/">Fractal</a>
   <Login user={data.user} />
 </nav>
 

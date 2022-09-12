@@ -1,4 +1,4 @@
-export async function load({ fetch }) {
+export async function load() {
 	const res = await fetch(
 		"http://127.0.0.1:8000/api/v1/project/",
 		{credentials: "include"}

@@ -1,6 +1,7 @@
 <script>
   import { page } from "$app/stores";
-  import Projects from "$lib/Projects.svelte";
+  import ProjectList from "$lib/ProjectList.svelte";
+  import NewProject from "$lib/NewProject.svelte";
 
   export let data;
 </script>
@@ -8,4 +9,5 @@
 
 <h2>Projects</h2>
 
-<Projects projects={ data.projects } />
+<NewProject bind:projects={data.projects} />
+<ProjectList bind:projects={ data.projects } />
