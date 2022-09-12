@@ -25,6 +25,22 @@ export async function ProjectCreate(payload) {
 };
 
 
+export async function ProjectGet(projectId) {
+	const res = await fetch(
+		PROJECT_API + projectId,
+		{credentials: "include"}
+	);
+
+	let data = await res.json();
+	if (res.ok) {
+		return data;
+	}
+	else {
+		throw({status: res.status, detail: data.detail, url: PROJECT_API + projectId});
+	}
+};
+
+
 export async function ProjectList() {
 	const res = await fetch(
 		PROJECT_API,
