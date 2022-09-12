@@ -5,7 +5,7 @@ export async function load() {
 	);
 
 	if (res.ok) {
-		return {projects: await res.json()};
+		return {projectList: await res.json()};
 	}
 	return {
 		projects: []

@@ -1,8 +1,8 @@
 <script>
   import { page } from "$app/stores";
-  export let projects;
+  export let projectList;
 
-  $: console.log("projects: " + projects);
+  $: console.log("projects: " + projectList);
 
   async function doSubmit(event) {
     var payload = {};

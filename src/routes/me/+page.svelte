@@ -9,5 +9,5 @@
 
 <h2>Projects</h2>
 
-<NewProject bind:projects={data.projects} />
-<ProjectList bind:projects={ data.projects } />
+<NewProject bind:projectList={ data.projectList } />
+<ProjectList bind:projectList={ data.projectList } />
