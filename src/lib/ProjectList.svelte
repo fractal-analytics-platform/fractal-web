@@ -1,5 +1,4 @@
 <script>
-  import { page } from "$app/stores";
   import Project from "$lib/Project.svelte"
 
   export let projectList;
@@ -8,6 +7,6 @@
 {#if projectList}
 <h3>Project List to become </h3>
   {#each projectList as p}
-    <Project project={p} />
+    <Project bind:projectList={projectList} project={p} />
   {/each}
 {/if}

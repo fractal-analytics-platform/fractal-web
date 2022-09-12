@@ -1,9 +1,11 @@
 <script>
   import { page } from "$app/stores";
+
   export let project;
+  export let projectList;
 
   async function doDelete() {
-    const res = fetch(
+    const res = await fetch(
       "http://127.0.0.1:8000/api/v1/project/" + project.id,
       {
         method: "DELETE",
@@ -14,7 +16,7 @@
       }
     );
     if (res.ok) {
-      console.log("ok");
+      projectList = projectList.filter((prj) => prj.id !== project.id);
     }
   };
 </script>

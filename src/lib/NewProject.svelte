@@ -10,7 +10,7 @@
     formData.forEach((value, key) => {payload[key] = value;});
     console.log(page.projects);
 
-    const res = fetch(
+    const res = await fetch(
       "http://127.0.0.1:8000/api/v1/project/",
       {
         method: "POST",
@@ -22,9 +22,8 @@
       }
     );
     if (res.status == 201) {
-      console.log("i'm here!");
       var newProject = await res.json();
-      projects = [...projects, newProject];
+      projectList = [...projectList, newProject];
     }
   };
 </script>
