@@ -27,7 +27,7 @@ export async function ProjectCreate(payload) {
 
 export async function ProjectList() {
 	const res = await fetch(
-		"http://127.0.0.1:8000/api/v1/project/",
+		PROJECT_API,
 		{credentials: "include"}
 	);
 
@@ -39,3 +39,21 @@ export async function ProjectList() {
 		throw({status: res.status, detail: data.detail});
 	}
 };
+
+
+export async function ProjectDelete(project_id) {
+	const res = await fetch(
+		PROJECT_API + project_id,
+		{
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+		}
+	);
+	if (!res.ok) {
+		throw({status: res.status, detail: await res.json()});
+	}
+
+}
