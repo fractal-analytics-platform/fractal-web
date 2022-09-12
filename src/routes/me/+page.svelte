@@ -1,5 +1,4 @@
 <script>
-  import { page } from "$app/stores";
   import ProjectList from "$lib/ProjectList.svelte";
   import NewProject from "$lib/NewProject.svelte";
 

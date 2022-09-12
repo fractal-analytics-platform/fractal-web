@@ -18,7 +18,7 @@
 <h3>Project List to become </h3>
   {#each projectList as p}
     <div>
-    <p>{p.id} - {p.name}</p>
+    <a href='/me/project/{p.id}'>{p.id} - {p.name}</a>
     <button on:click|preventDefault={doDelete(p)}>delete</button>
     </div>
   {/each}
