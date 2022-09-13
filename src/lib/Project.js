@@ -71,5 +71,70 @@ export async function ProjectDelete(project_id) {
 	if (!res.ok) {
 		throw({status: res.status, detail: await res.json()});
 	}
+}
 
+
+export async function ProjectAddDataset(projectId, payload) {
+	const res = await fetch(
+		PROJECT_API + projectId,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			body: JSON.stringify(payload),
+		}
+	);
+	let data = await res.json();
+	if (res.status == 201) {
+		return data;
+	}
+	else {
+		throw({status: res.status, detail: data.detail});
+	}
+}
+
+
+export async function ProjectEditDataset(projectId, payload) {
+	const res = await fetch(
+		PROJECT_API + projectId,
+		{
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			body: JSON.stringify(payload),
+		}
+	);
+	let data = await res.json();
+	if (res.status == 200) {
+		return data;
+	}
+	else {
+		throw({status: res.status, detail: data.detail});
+	}
+}
+
+
+export async function ResourceAdd(projectId, datasetId, payload) {
+	const res = await fetch(
+		PROJECT_API + projectId + "/" + datasetId,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			body: JSON.stringify(payload),
+		}
+	);
+	let data = await res.json();
+	if (res.status == 201) {
+		return data;
+	}
+	else {
+		throw({status: res.status, detail: data.detail});
+	}
 }
