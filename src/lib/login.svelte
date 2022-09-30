@@ -1,13 +1,16 @@
-<script>
-  export let user = null;
+<script context = "module">
 
-  function doLogin(event) {
+  export let user = null;
+  let error = "";
+
+  export function doLogin(event) {
     const formData = new FormData(event.target);
     const request = new XMLHttpRequest();
 
     request.addEventListener("load", (event) => {
-      if (event.srcElement.status != 200) {
-        alert("fail");
+      if (event.target.status != 200) {
+//       alert("Fail!");
+        error = 'Incorrect username and password.'
       }
       else {
         window.location = "/me";
@@ -19,11 +22,11 @@
     request.send(formData);
   }
 
-  function doLogout() {
+  export function doLogout() {
     const request = new XMLHttpRequest();
      request.addEventListener("load", (event) => {
-      if (event.srcElement.status != 200) {
-        alert("fail");
+      if (event.target.status != 200) {
+        alert("Fail!");
       }
       else {
         user = null;
@@ -35,24 +38,31 @@
     request.open("POST", "http://127.0.0.1:8000/auth/logout");
     request.send();
   }
+
 </script>
 
 {#if !user}
-<form on:submit|preventDefault={doLogin}>
-  <label for="email">email:</label><br>
-  <input type="text" id="email" name="username"><br>
+<form on:submit|preventDefault={doLogin} style="padding-top:20%;" class="flex mx-auto col-6">
 
-  <label for="password">password:</label><br>
-  <input type="text" id="password" name="password">
 
-  <input 
-    type="submit"
-    value="Login"
-  />
+	<div class="mb-3">
+		<label for="email" class="form-label">Email</label>
+		<input type="text" class="form-control" id="email" name="username" />
+	</div>
+
+	<div class="mb-3">
+		<label for="password" class="form-label">Password</label>
+		<input type="password" class="form-control" id="password" name="password"/>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Login</button>
+	<div id="error_message" class="text-danger">
+		<small>{error}</small>
+	</div>
+
 </form>
 {:else}
-  <a href="/me">{user.email}</a>
-  <form on:submit|preventDefault={doLogout}>
-  <input type="submit" value="Logout"/>
-</form>
+
+<meta http-equiv="refresh" content="0; url='/me'" />
+
 {/if}

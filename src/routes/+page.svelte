@@ -1,2 +1,12 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import Login from '$lib/login.svelte'
+    import "/src/global.css"
+    export let data;
+</script>
+  
+<nav class="navbar navbar-expand-lg navbar-light bg-light" >
+<a href="/">Fractal</a>
+</nav>
+
+
+<Login user={data.user} />

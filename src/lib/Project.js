@@ -4,6 +4,7 @@ const PROJECT_API = env.PUBLIC_BACKEND_URL + "project/";
 
 
 export async function ProjectCreate(payload) {
+
 	const res = await fetch(
 		PROJECT_API,
 		{
@@ -16,7 +17,9 @@ export async function ProjectCreate(payload) {
 		}
 	);
 	let data = await res.json();
+//	{(console.log(res), '')}
 	if (res.status == 201) {
+		{(console.log(data), '')}
 		return data;
 	}
 	else {
@@ -46,6 +49,7 @@ export async function ProjectList() {
 		PROJECT_API,
 		{credentials: "include"}
 	);
+	{(console.log(PROJECT_API), '')}
 
 	let data = await res.json();
 	if (res.ok) {

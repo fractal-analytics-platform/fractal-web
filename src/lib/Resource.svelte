@@ -2,12 +2,22 @@
 	export let resource;
 </script>
 
-<div>
-	<h4>id: {resource.id}</h4>
-	<p>Path: {resource.path}</p>
-	<p>Glob pattern: {resource.glob_pattern}</p>
-	<button>Edit resource</button>
-	<button>Delete resource</button>
-	<hr />
-</div>
+
+<tr>
+	<th scope="row">{resource.id}</th>
+	<td>{resource.path}</td>
+	<td>*.{resource.glob_pattern}</td>
+	<td>
+		<div class="d-flex">
+		<div ><button type="button" class="btn" >
+			<i class="material-icons text-danger">Delete</i>
+		</button></div>
+	
+		<div ><button type="button" class="btn" >
+			<i class="material-icons text-info">Edit</i>
+		</button></div>
+	</div>
+	</td>
+</tr>
+
 

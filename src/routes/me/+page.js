@@ -1,4 +1,4 @@
-import { ProjectList } from "$lib/Project.js";
+import { ProjectList } from "$lib/Project.js"
 
 
 export async function load() {
