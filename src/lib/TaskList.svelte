@@ -1,11 +1,8 @@
 <script >
 	import { TaskApply } from "./Task";
-
-
-
+  import Swal from 'sweetalert2'
   export let taskList;
   let newJob = "";
-
 
   async function doJob(task_id) {
       var payload = {};
@@ -22,7 +19,17 @@
 
         formData.forEach((value, key) => {payload[key] = parseInt(value);});     
         console.log(payload)
-        newJob = await TaskApply(payload);  
+        newJob = await TaskApply(payload);
+        if (newJob.status === "submitted") {
+
+          Swal.fire(
+            'Job Submitted!',
+            '', // TODO: add job id 
+            'success'
+          )
+        }
+       // alert(JSON.stringify(newJob)) 
+
       }
       catch (e) {
         alert(JSON.stringify(e)) 
