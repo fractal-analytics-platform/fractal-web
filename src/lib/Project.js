@@ -80,7 +80,7 @@ export async function ProjectDelete(project_id) {
 
 export async function ProjectAddDataset(projectId, payload) {
 	const res = await fetch(
-		PROJECT_API + projectId,
+		PROJECT_API + projectId + "/",
 		{
 			method: "POST",
 			headers: {
@@ -92,7 +92,7 @@ export async function ProjectAddDataset(projectId, payload) {
 	);
 	let data = await res.json();
 	if (res.status == 201) {
-		return data;
+		return [data, res.status];
 	}
 	else {
 		throw({status: res.status, detail: data.detail});
@@ -100,9 +100,9 @@ export async function ProjectAddDataset(projectId, payload) {
 }
 
 
-export async function ProjectEditDataset(projectId, payload) {
+export async function ProjectEditDataset(projectId, datasetId, payload) {
 	const res = await fetch(
-		PROJECT_API + projectId,
+		PROJECT_API + projectId + "/" + datasetId ,
 		{
 			method: "PATCH",
 			headers: {
@@ -114,7 +114,7 @@ export async function ProjectEditDataset(projectId, payload) {
 	);
 	let data = await res.json();
 	if (res.status == 200) {
-		return data;
+		return [data, res.status];
 	}
 	else {
 		throw({status: res.status, detail: data.detail});
@@ -142,3 +142,20 @@ export async function ResourceAdd(projectId, datasetId, payload) {
 		throw({status: res.status, detail: data.detail});
 	}
 }
+
+
+export async function ResourceDelete(projectId, datasetId, resourceId) {
+	const res = await fetch(
+		PROJECT_API + projectId + "/" + datasetId + "/" + resourceId,
+		{
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+		}
+		);
+		if (!res.ok) {
+			throw({status: res.status, detail: await res.json()});
+		}
+	}
