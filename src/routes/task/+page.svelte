@@ -1,6 +1,6 @@
 <script>
-  import ProjectList from "$lib/ProjectList.svelte"
-  import NewProject from "$lib/NewProject.svelte"
+  import TaskNew from "$lib/TaskNew.svelte"
+  import TaskList from "$lib/TaskList.svelte"
   import { doLogout } from "$lib/login.svelte"
   import "/src/global.css"
 
@@ -13,8 +13,6 @@
 <button class="btn btn-sm btn-primary" on:click={doLogout}>Logout</button>
 </nav>
 
-
-<NewProject bind:projectList={ data.projectList } />
+<TaskNew bind:taskList={ data.taskList }></TaskNew>
 <hr>
-<ProjectList bind:projectList={ data.projectList } />
-
+<TaskList bind:taskList={ data.taskList }></TaskList>

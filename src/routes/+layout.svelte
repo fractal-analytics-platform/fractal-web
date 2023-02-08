@@ -1,27 +1,13 @@
-<script>
-  import Login from '$lib/login.svelte';
+<nav></nav>
 
-  export let data;
-</script>
+<body class="d-flex flex-column min-vh-100" style ="padding-bottom:2%;">
+<slot>
+</slot>
+</body>
 
-
-<nav>
-  <a href="/">Fractal</a>
-  <Login user={data.user} />
-</nav>
-
-<slot></slot>
-
-
-<style>
-  nav {
-    padding: 1rem;
-    box-shadow: -1px 1px 11px 4px #898989;
-  }
-
-  a {
-    text-decoration: none;
-    color: gray;
-    margin-right: 1rem;
-  }
-</style>
+<footer class="text-center mt-auto">
+<div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0.2);">
+    © 2022 Copyright:
+<a class="text-dark" href="https://github.com/fractal-analytics-platform" target="_blank">Fractal</a>  
+</div>
+</footer>

@@ -1,0 +1,13 @@
+nav a {
+    text-decoration: none;
+    color: gray;
+    margin-right: 1rem;
+  }
+
+.left{
+    margin-left: auto;
+  }
+.ds-div:hover{
+    background-color:#efefef;
+ }
+

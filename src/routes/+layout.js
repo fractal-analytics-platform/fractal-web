@@ -9,7 +9,8 @@ export async function load() {
 	);
 
 	if (res.ok) {
-		return {user: await res.json()};
+		return {user: await res.json()
+			}
 	}
 	else {
 		return {user: null};
