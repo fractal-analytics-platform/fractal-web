@@ -1,6 +1,23 @@
-export async function list_projects() {
-	return [
-		{ id: 1, name: 'Test 1', project_dir: '/dir/project/1', dataset_list: [], readonly: false },
-		{ id: 2, name: 'Test 2', project_dir: '/dir/project/2', dataset_list: [], readonly: false }
-	]
+import { PUBLIC_FRACTAL_SERVER_HOST } from '$env/static/public'
+
+export async function list_projects(fetch, cookies) {
+
+	// Set headers
+	const headers = new Headers()
+	headers.append('Authorization', cookies.get('AccessToken'))
+
+	// Compose request
+	const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/project', {
+		method: 'GET',
+		headers: headers
+	})
+		// Handle response
+		.then(response => {
+			console.log('LIST PROJECTS REQUEST', response.status)
+			return response.json()
+		})
+
+	console.log(response)
+
+	return response
 }
