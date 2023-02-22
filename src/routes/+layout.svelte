@@ -14,7 +14,7 @@
             </ul>
             <ul class='nav'>
                 <li class='nav-item'>
-                    <a href='/login' class='nav-link'>Login</a>
+                    <a href='/auth/login' class='nav-link'>Login</a>
                 </li>
             </ul>
         </div>
