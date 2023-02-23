@@ -1,6 +1,6 @@
 <script>
     import ProjectsList from '$lib/components/ProjectsList.svelte'
-	export let data
+ 	  export let data
 </script>
 
-<ProjectsList bind:projects={data.projects}/>
+<ProjectsList bind:projects={data.projects} />
