@@ -1,6 +1,14 @@
 <script>
     import { page } from '$app/stores'
+    import { modalProject } from '$lib/components/projectStores.js'
+
     export let projects = []
+
+    function setModalProject(event) {
+        const projectId = event.currentTarget.getAttribute('data-fc-project')
+        const project = projects.find(p => p.id == projectId)
+        modalProject.set(project)
+    }
 
     let errorReasons = ''
 
@@ -64,7 +72,9 @@
                     <td>{project_dir}</td>
                     <td>{read_only}</td>
                     <td class="align-right">
-                        <button class="btn"><i class="bi bi-info-circle"></i></button>
+                        <button data-fc-project="{id}" class="btn" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
+                            <i class="bi bi-info-circle"></i>
+                        </button>
                         <button class="btn">Open <i class="bi bi-arrow-up-right-square"></i></button>
                         <button class="btn btn-warning" disabled>Edit</button>
                         <button class="btn btn-danger" disabled>Delete</button>
