@@ -1,88 +1,88 @@
 <script>
-    import { page } from '$app/stores'
-    import { modalProject } from '$lib/components/projectStores.js'
+  import { page } from '$app/stores'
+  import { modalProject } from '$lib/components/projectStores.js'
 
-    export let projects = []
+  export let projects = []
 
-    function setModalProject(event) {
-        const projectId = event.currentTarget.getAttribute('data-fc-project')
-        const project = projects.find(p => p.id == projectId)
-        modalProject.set(project)
+  function setModalProject(event) {
+    const projectId = event.currentTarget.getAttribute('data-fc-project')
+    const project = projects.find(p => p.id == projectId)
+    modalProject.set(project)
+  }
+
+  let errorReasons = ''
+
+  if ($page.form && $page.form.createAction) {
+    if ($page.form.createAction.success == false) {
+      errorReasons = JSON.stringify($page.form.createAction.reason, undefined, 2)
     }
-
-    let errorReasons = ''
-
-    if ($page.form && $page.form.createAction) {
-        if ($page.form.createAction.success == false) {
-            errorReasons = JSON.stringify($page.form.createAction.reason, undefined, 2)
-        }
-    }
+  }
 
 </script>
 
 <h1>Projects</h1>
 
 <div class="container">
-    <div class="row mt-3 mb-3">
-        <div class="col-sm-12">
-            <form method="post" action="?/create" class="row justify-content-end">
-                <div class="col-auto">
-                    <div class="input-group">
-                        <div class="input-group-text">Project name</div>
-                        <input name="projectName" type="text" class="form-control">
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <div class="input-group-text">Project directory</div>
-                        <input name="projectDirectory" type="text" class="form-control">
-                    </div>
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </div>
-            </form>
-            {#if errorReasons != '' }
-                <div class="row p-4">
-                    <div class="alert alert-danger">
-                        <pre>There has been an error, reason:</pre>
-                        <pre>{errorReasons}</pre>
-                    </div>
-                </div>
-            {/if}
+  <div class="row mt-3 mb-3">
+    <div class="col-sm-12">
+      <form method="post" action="?/create" class="row justify-content-end">
+        <div class="col-auto">
+          <div class="input-group">
+            <div class="input-group-text">Project name</div>
+            <input name="projectName" type="text" class="form-control">
+          </div>
         </div>
+        <div class="col-auto">
+          <div class="input-group">
+            <div class="input-group-text">Project directory</div>
+            <input name="projectDirectory" type="text" class="form-control">
+          </div>
+        </div>
+
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+      {#if errorReasons != '' }
+        <div class="row p-4">
+          <div class="alert alert-danger">
+            <pre>There has been an error, reason:</pre>
+            <pre>{errorReasons}</pre>
+          </div>
+        </div>
+      {/if}
     </div>
-    <div class="row">
-        <table class="table table-hover">
-            <thead class="table-light">
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Directory</th>
-                <th>Readonly</th>
-                <th>Options</th>
-            </tr>
-            </thead>
-            <tbody>
-            { #each projects as { id, name, project_dir, read_only } }
-                <tr>
-                    <td>{id}</td>
-                    <td>{name}</td>
-                    <td>{project_dir}</td>
-                    <td>{read_only}</td>
-                    <td class="align-right">
-                        <button data-fc-project="{id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
-                            <i class="bi bi-info-circle"></i>
-                        </button>
-                        <button class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></button>
-                        <button class="btn btn-warning" disabled>Edit</button>
-                        <button class="btn btn-danger" disabled>Delete</button>
-                    </td>
-                </tr>
-            {/each}
-            </tbody>
-        </table>
-    </div>
+  </div>
+  <div class="row">
+    <table class="table table-hover">
+      <thead class="table-light">
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Directory</th>
+        <th>Readonly</th>
+        <th>Options</th>
+      </tr>
+      </thead>
+      <tbody>
+      { #each projects as { id, name, project_dir, read_only } }
+        <tr>
+          <td>{id}</td>
+          <td>{name}</td>
+          <td>{project_dir}</td>
+          <td>{read_only}</td>
+          <td class="align-right">
+            <button data-fc-project="{id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
+              <i class="bi bi-info-circle"></i>
+            </button>
+            <button class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></button>
+            <button class="btn btn-warning" disabled>Edit</button>
+            <button class="btn btn-danger" disabled>Delete</button>
+          </td>
+        </tr>
+      {/each}
+      </tbody>
+    </table>
+  </div>
 </div>
 
