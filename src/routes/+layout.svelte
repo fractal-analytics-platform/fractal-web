@@ -1,3 +1,14 @@
+<script>
+  import { userStore } from '$lib/stores/authStores'
+
+  // data from load function
+  export let data
+
+  if ($userStore === undefined && data.user != undefined) {
+    userStore.set(data.user)
+  }
+
+</script>
 <main>
   <nav class='bg-light border-bottom'>
     <div class='container d-flex flex-wrap'>
@@ -5,16 +16,22 @@
         <li class='nav-item'>
           <a href='/' class='nav-link'>Home</a>
         </li>
-        <li class='nav-item'>
-          <a href='/info' class='nav-link'>Info</a>
-        </li>
-        <li class='nav-item'>
-          <a href='/projects' class='nav-link'>Projects</a>
-        </li>
+        {#if $userStore !== undefined}
+          <li class='nav-item'>
+            <a href='/info' class='nav-link'>Info</a>
+          </li>
+          <li class='nav-item'>
+            <a href='/projects' class='nav-link'>Projects</a>
+          </li>
+        {/if}
       </ul>
       <ul class='nav'>
         <li class='nav-item'>
-          <a href='/auth/login' class='nav-link'>Login</a>
+          {#if $userStore === undefined }
+            <a href='/auth/login' class='nav-link'>Login</a>
+          {:else}
+            <a href='/auth/logout' class='nav-link'>Logout</a>
+          {/if}
         </li>
       </ul>
     </div>

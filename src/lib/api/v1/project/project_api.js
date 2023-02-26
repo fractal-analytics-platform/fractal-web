@@ -13,11 +13,8 @@ export async function list_projects(fetch, cookies) {
   })
     // Handle response
     .then(response => {
-      console.log('LIST PROJECTS REQUEST', response.status)
       return response.json()
     })
-
-  console.log(response)
 
   return response
 }

@@ -10,7 +10,6 @@
   // displayed in this component.
   modalProject.subscribe( projectUpdate => {
     project = projectUpdate
-    console.log(project)
   })
 
 </script>

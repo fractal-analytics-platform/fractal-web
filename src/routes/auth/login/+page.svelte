@@ -1,3 +1,14 @@
+<script>
+  import { goto } from '$app/navigation'
+  import { userStore } from '$lib/stores/authStores'
+
+  // Redirect to root page if the userStore is not undefined
+  if ($userStore !== undefined) {
+    goto('/')
+  }
+
+</script>
+
 <h1>Login</h1>
 
 <div class="container">
