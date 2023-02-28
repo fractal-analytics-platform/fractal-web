@@ -23,6 +23,9 @@
           <li class='nav-item'>
             <a href='/projects' class='nav-link'>Projects</a>
           </li>
+          <li class='nav-item'>
+            <a href='/tasks' class='nav-link'>Tasks</a>
+          </li>
         {/if}
       </ul>
       <ul class='nav'>
