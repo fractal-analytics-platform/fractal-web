@@ -40,8 +40,6 @@ export const actions = {
         }
       })
 
-    console.log('CREATE PROJECT', createActionResult)
-
     return createActionResult
   }
 }

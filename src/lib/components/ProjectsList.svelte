@@ -1,8 +1,12 @@
 <script>
+  import { enhance } from '$app/forms'
   import { page } from '$app/stores'
   import { modalProject } from '$lib/components/projectStores.js'
 
+  // List of projects to be displayed
   export let projects = []
+  // Error property to be set in order to show errors in UI
+  let errorReasons = ''
 
   function setModalProject(event) {
     const projectId = event.currentTarget.getAttribute('data-fc-project')
@@ -10,13 +14,27 @@
     modalProject.set(project)
   }
 
-  let errorReasons = ''
+  function actionResult(result) {
+    if (result) {
+      if (result.createAction && !result.createAction.success) {
+        // errorReasons = JSON.stringify(result.createAction.reason, undefined, 2)
+        setErrorReasons(result.createAction.reason)
+      }
+    }
 
-  if ($page.form && $page.form.createAction) {
-    if ($page.form.createAction.success == false) {
-      errorReasons = JSON.stringify($page.form.createAction.reason, undefined, 2)
+    if (result && result.createAction && result.createAction.success) {
+      // Success logic
     }
   }
+
+  function setErrorReasons(value) {
+    errorReasons = JSON.stringify(value, undefined, 2)
+  }
+
+  // Form action hook to handle $page.form updates
+  // Every form action comes out with an action result
+  // Every action result in $page.form is referenced by a property with the same form action name
+  $: actionResult($page.form)
 
 </script>
 
@@ -25,7 +43,7 @@
 <div class="container">
   <div class="row mt-3 mb-3">
     <div class="col-sm-12">
-      <form method="post" action="?/create" class="row justify-content-end">
+      <form method="post" action="?/create" class="row justify-content-end" use:enhance>
         <div class="col-auto">
           <div class="input-group">
             <div class="input-group-text">Project name</div>
