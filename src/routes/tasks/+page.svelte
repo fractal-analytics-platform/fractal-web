@@ -1,11 +1,15 @@
 <script>
 	import { enhance } from '$app/forms'
+	import { taskModal } from '$lib/stores/taskStores'
+	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte'
 	export let data
 	export let form
 
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = ''
+	// Tasks property updated with respect to data store
+	$: tasks = data.tasks
 
 	function actionResult(result) {
 		if (result) {
@@ -24,10 +28,18 @@
 		errorReasons = JSON.stringify(value, undefined, 2)
 	}
 
+	function setTaskModal(event) {
+		const taskId = event.currentTarget.getAttribute('data-fc-task')
+		const task = tasks.find(t => t.id == taskId)
+		taskModal.set(task)
+	}
+
 	$: actionResult(form)
 </script>
+
 <h1>Tasks page</h1>
 
+<TaskInfoModal></TaskInfoModal>
 
 <div class='container mt-4'>
 	<div class='row'>
@@ -85,23 +97,21 @@
 			<table class='table'>
 				<thead class='table-light'>
 					<tr>
-						<th>#</th>
 						<th>Name</th>
-						<th>Command</th>
 						<th>Source</th>
-						<th>Input type</th>
-						<th>Output type</th>
+						<th>Options</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.tasks as task}
+					{#each tasks as task}
 						<tr>
-							<td>{task.id}</td>
 							<td>{task.name}</td>
-							<td><code>{task.command}</code></td>
 							<td><code>{task.source}</code></td>
-							<td><pre>{task.input_type}</pre></td>
-							<td><pre>{task.output_type}</pre></td>
+							<td>
+								<button data-fc-task='{task.id}' class='btn btn-light' data-bs-toggle="modal" data-bs-target="#taskInfoModal" on:click={setTaskModal}>
+									<i class="bi bi-info-circle"></i>
+								</button>
+							</td>
 						</tr>
 					{/each}
 				</tbody>
