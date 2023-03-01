@@ -4,10 +4,13 @@
   // data from load function
   export let data
 
-  if ($userStore === undefined && data.user != undefined) {
-    userStore.set(data.user)
+  $: {
+    if (data?.user) {
+      userStore.set(data.user)
+    }
   }
 
+  $: userLoggedIn = $userStore
 </script>
 <main>
   <nav class='bg-light border-bottom'>
@@ -16,7 +19,7 @@
         <li class='nav-item'>
           <a href='/' class='nav-link'>Home</a>
         </li>
-        {#if $userStore !== undefined}
+        {#if userLoggedIn !== undefined}
           <li class='nav-item'>
             <a href='/info' class='nav-link'>Info</a>
           </li>
@@ -30,7 +33,7 @@
       </ul>
       <ul class='nav'>
         <li class='nav-item'>
-          {#if $userStore === undefined }
+          {#if userLoggedIn === undefined }
             <a href='/auth/login' class='nav-link'>Login</a>
           {:else}
             <a href='/auth/logout' class='nav-link'>Logout</a>

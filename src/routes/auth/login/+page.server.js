@@ -37,7 +37,7 @@ export const actions = {
     let status = loginResponse.status
 
     if (status !== 200) {
-      throw new Error('Error login')
+      return { loginSuccess: false }
     }
 
     await loginResponse
@@ -50,5 +50,7 @@ export const actions = {
           maxAge: 86400
         })
       })
+
+    return { loginSuccess: true }
   }
 }
