@@ -45,6 +45,8 @@ Run the application via
 npm run dev -- --open
 ```
 
+The application is now running at `http://localhost:5173`.
+
 # Contributors and license
 
 Unless otherwise stated in each individual module, all Fractal components are released according to a BSD 3-Clause License, and Copyright is with Friedrich Miescher Institute for Biomedical Research and University of Zurich.
