@@ -1,5 +1,7 @@
 <script>
+  import { PUBLIC_FRACTAL_SERVER_HOST } from '$env/static/public'
   import { userStore } from '$lib/stores/authStores'
+  import { serverInfo } from '$lib/stores/serverStores'
 
   // data from load function
   export let data
@@ -11,6 +13,22 @@
   }
 
   $: userLoggedIn = $userStore
+
+  $: server = $serverInfo
+
+  const fetchServerInfo = async () => {
+    const info = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/alive/', {
+      method: 'GET'
+    })
+      .then(async (response) => {
+        return await response.json()
+      })
+    serverInfo.set(info)
+  }
+
+  if ($serverInfo.version === undefined) {
+    fetchServerInfo()
+  }
 </script>
 <main>
   <nav class='bg-light border-bottom'>
@@ -56,6 +74,11 @@
                 <span class="mb-3 mb-md-0 text-muted">
                     <a href='https://fractal-analytics-platform.github.io'>Fractal Analytics Platform</a>
                 </span>
+      </div>
+      <div class="col-md-4 d-flex justify-content-center">
+        <div class="hstack gap-3">
+          <span class="font-monospace">{server.version}</span><div class="vr"></div><span class="font-monospace">{server.deployment_type}</span>
+        </div>
       </div>
       <ul class="nav col-md-4 justify-content-end d-flex">
         <li class="ms-2">
