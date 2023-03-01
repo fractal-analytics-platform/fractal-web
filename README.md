@@ -21,9 +21,9 @@ nvm install 19
 nvm alias default 19
 ```
 
-Install svelte via
+Install the package
 ```bash
-npm install svelte
+npm install
 ```
 
 Clone this repository and switch to the `development` branch
@@ -37,7 +37,7 @@ git checkout development
 
 Create a `.env` file where you set the relevant environment variables. At the moment this includes a single variable:
 ```
-PUBLIC_FRACTAL_SERVER_HOST=http://127.0.0.1:8000/api/v1/
+PUBLIC_FRACTAL_SERVER_HOST=http://127.0.0.1:8000
 ```
 
 Run the application via
