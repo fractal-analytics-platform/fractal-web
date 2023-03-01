@@ -29,6 +29,7 @@ npm install svelte
 Clone this repository and switch to the `development` branch
 ```bash
 git clone https://github.com/fractal-analytics-platform/fractal-web.git
+cd fractal-web
 git checkout development
 ```
 
