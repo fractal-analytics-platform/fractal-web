@@ -111,6 +111,9 @@
 								<button data-fc-task='{task.id}' class='btn btn-light' data-bs-toggle="modal" data-bs-target="#taskInfoModal" on:click={setTaskModal}>
 									<i class="bi bi-info-circle"></i>
 								</button>
+								<button class='btn btn-danger' disabled>
+									Delete
+								</button>
 							</td>
 						</tr>
 					{/each}
