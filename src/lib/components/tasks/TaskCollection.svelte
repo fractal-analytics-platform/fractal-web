@@ -91,16 +91,53 @@
     }
   }
 
+  // Component utilities
+  function statusBadge(status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'text-bg-light'
+      case 'installing':
+        return 'text-bg-primary'
+      case 'fail':
+        return 'text-bg-danger'
+      case 'ok':
+        return 'text-bg-success'
+    }
+  }
+
 </script>
 
-<p>Task collection component</p>
 <div>
-  <button class="btn btn-primary" on:click={updateTaskCollectionsState}><i class="bi bi-arrow-clockwise"></i></button>
-  <ul>
-  {#each taskCollections as { id, status, pkg }}
-    <li>{id}; {status}; {pkg}</li>
-  {/each}
-  </ul>
+  {#if taskCollections.length > 0 }
+    <div class="">
+      <table class="table caption-top">
+        <caption class="text-bg-light border-top border-bottom pe-3 ps-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="fw-normal">Task collections</span>
+            <button class="btn btn-primary" on:click={updateTaskCollectionsState}>
+              Refresh <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+        </caption>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Package</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        {#each taskCollections as { id, status, pkg }}
+          <tr>
+            <td>{id}</td>
+            <td>{pkg}</td>
+            <td><span class="badge {statusBadge(status)}">{status}</span></td>
+          </tr>
+        {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
 </div>
 <form method="post" action="?/collectTask" use:enhance>
   <div class="row g-3">
