@@ -42,6 +42,12 @@
   $: actionResult(form)
 </script>
 
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page">Tasks</li>
+  </ol>
+</nav>
+
 <TaskInfoModal></TaskInfoModal>
 
 <div class="mb-3">
@@ -55,6 +61,7 @@
     </div>
   {/if}
 </div>
+<p class="lead">Insert task</p>
 <div class="accordion">
   <div class="accordion-item">
     <h2 class="accordion-header">
@@ -122,6 +129,7 @@
 </div>
 
 <div class="row mt-4">
+  <p class="lead">Task list</p>
   <div class="col-12">
     <table class="table">
       <thead class="table-light">
