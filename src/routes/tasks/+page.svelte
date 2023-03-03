@@ -6,10 +6,11 @@
   export let data
   export let form
 
-
   // Error property to be set in order to show errors in UI
   let errorReasons = ''
   // Tasks property updated with respect to data store
+  let tasks = []
+
   $: tasks = data.tasks
 
   function actionResult(result) {
@@ -37,6 +38,14 @@
     const taskId = event.currentTarget.getAttribute('data-fc-task')
     const task = tasks.find(t => t.id == taskId)
     taskModal.set(task)
+  }
+
+  async function reloadTaskList() {
+    const updatedTaskList = await fetch('/api/task', {
+      method: 'GET'
+    })
+      .then(response => response.json())
+    tasks = updatedTaskList
   }
 
   $: actionResult(form)
@@ -131,7 +140,17 @@
 <div class="row mt-4">
   <p class="lead">Task list</p>
   <div class="col-12">
-    <table class="table">
+    <table class="table caption-top align-middle">
+      <caption class="text-bg-light border-top border-bottom pe-3 ps-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <span class="fw-normal"></span>
+          <div>
+            <button class="btn btn-outline-primary" on:click={reloadTaskList}>
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+        </div>
+      </caption>
       <thead class="table-light">
       <tr>
         <th>Name</th>
@@ -142,9 +161,9 @@
       <tbody>
       {#each tasks as task}
         <tr>
-          <td>{task.name}</td>
+          <td class="col-2">{task.name}</td>
           <td><code>{task.source}</code></td>
-          <td>
+          <td class="col-2">
             <button data-fc-task="{task.id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#taskInfoModal" on:click={setTaskModal}>
               <i class="bi bi-info-circle"></i>
             </button>

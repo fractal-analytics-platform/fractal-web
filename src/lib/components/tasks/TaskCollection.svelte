@@ -64,6 +64,15 @@
     }
   }
 
+  function clearTaskCollections() {
+    updateTaskCollections([])
+  }
+
+  function removeTaskCollection(event) {
+    const taskCollectionId = event.currentTarget.getAttribute('data-fc-tc')
+    updateTaskCollections(taskCollections.filter(tc => tc.id != taskCollectionId))
+  }
+
   function handleTaskCollection(collectActionResult) {
     if (collectActionResult.success) {
       // If the actionResult has succeeded, store the new collection task
@@ -150,28 +159,40 @@
   {#if taskCollections.length > 0 }
     <hr>
     <div class="">
-      <table class="table caption-top">
+      <table class="table table-hover caption-top align-middle">
         <caption class="text-bg-light border-top border-bottom pe-3 ps-3">
           <div class="d-flex align-items-center justify-content-between">
             <span class="fw-normal">Task collections</span>
-            <button class="btn btn-primary" on:click={updateTaskCollectionsState}>
-              Refresh <i class="bi bi-arrow-clockwise"></i>
-            </button>
+            <div>
+              <button class="btn btn-outline-secondary" on:click={clearTaskCollections}>
+                Clear
+                <i class="bi bi-trash"></i>
+              </button>
+              <button class="btn btn-primary" on:click={updateTaskCollectionsState}>
+                Refresh <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
           </div>
         </caption>
         <thead>
           <tr>
-            <th>#</th>
+            <th>Timestamp</th>
             <th>Package</th>
             <th>Status</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-        {#each taskCollections as { id, status, pkg }}
+        {#each taskCollections as { timestamp, status, pkg, id }}
           <tr>
-            <td>{id}</td>
+            <td class="col-2">{new Date(timestamp).toLocaleString()}</td>
             <td>{pkg}</td>
-            <td><span class="badge {statusBadge(status)}">{status}</span></td>
+            <td class="col-2"><span class="badge {statusBadge(status)}">{status}</span></td>
+            <td class="col-1">
+              <button class="btn btn-warning" data-fc-tc="{id}" on:click={removeTaskCollection}>
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
           </tr>
         {/each}
         </tbody>
