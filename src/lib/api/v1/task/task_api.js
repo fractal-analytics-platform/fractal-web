@@ -65,7 +65,7 @@ export async function create_task(serverFetch, cookies, formData) {
   return actionResult
 }
 
-export async function collect_task(fetch, cookies, formData) {
+export async function create_task_collection(fetch, cookies, formData) {
 
   const headers = new Headers()
   headers.append('Authorization', cookies.get('AccessToken'))
@@ -110,4 +110,23 @@ export async function collect_task(fetch, cookies, formData) {
     success: true,
     data: await response.json()
   }
+}
+
+export async function task_collection_status(fetch, cookies, task_id) {
+
+  const headers = new Headers()
+  headers.append('Authorization', cookies.get('AccessToken'))
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/task/collect/${task_id}`,{
+    method: 'GET',
+    headers
+  })
+
+  if (response.status === 200) {
+    const data = await response.json()
+    console.log(data)
+    return data
+  }
+
+  throw new Error('Unable to fetch collection operation status')
 }

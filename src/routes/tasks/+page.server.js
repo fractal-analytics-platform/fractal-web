@@ -1,4 +1,4 @@
-import { list_tasks, create_task, collect_task } from '$lib/api/v1/task/task_api'
+import { list_tasks, create_task, create_task_collection } from '$lib/api/v1/task/task_api'
 
 export async function load({ fetch, cookies}) {
   return {
@@ -16,7 +16,7 @@ export const actions = {
   collectTask: async({ fetch, cookies, request }) => {
     const formData = await request.formData()
     return {
-      collectTaskAction: await collect_task(fetch, cookies, formData)
+      collectTaskAction: await create_task_collection(fetch, cookies, formData)
     }
   }
 
