@@ -108,6 +108,46 @@
 </script>
 
 <div>
+  <form method="post" action="?/collectTask" use:enhance>
+    <div class="row g-3">
+      <div class="col-6">
+        <div class="input-group">
+          <div class="input-group-text">
+            <span class="font-monospace">Package</span>
+          </div>
+          <input name="package" type="text" class="form-control" required>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="input-group">
+          <div class="input-group-text">
+            <span class="font-monospace">Version</span>
+          </div>
+          <input name="version" type="text" class="form-control">
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="input-group">
+          <div class="input-group-text">
+            <span class="font-monospace">Python Version</span>
+          </div>
+          <input name="python_version" type="text" class="form-control">
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="input-group">
+          <div class="input-group-text">
+            <span class="font-monospace">Package extras</span>
+          </div>
+          <input name="package_extras" type="text" class="form-control">
+        </div>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Collect</button>
+      </div>
+    </div>
+  </form>
+  <hr>
   {#if taskCollections.length > 0 }
     <div class="">
       <table class="table caption-top">
@@ -139,42 +179,4 @@
     </div>
   {/if}
 </div>
-<form method="post" action="?/collectTask" use:enhance>
-  <div class="row g-3">
-    <div class="col-6">
-      <div class="input-group">
-        <div class="input-group-text">
-          <span class="font-monospace">Package</span>
-        </div>
-        <input name="package" type="text" class="form-control" required>
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="input-group">
-        <div class="input-group-text">
-          <span class="font-monospace">Version</span>
-        </div>
-        <input name="version" type="text" class="form-control">
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="input-group">
-        <div class="input-group-text">
-          <span class="font-monospace">Python Version</span>
-        </div>
-        <input name="python_version" type="text" class="form-control">
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="input-group">
-        <div class="input-group-text">
-          <span class="font-monospace">Package extras</span>
-        </div>
-        <input name="package_extras" type="text" class="form-control">
-      </div>
-    </div>
-    <div class="col-auto">
-      <button type="submit" class="btn btn-primary">Collect</button>
-    </div>
-  </div>
-</form>
+
