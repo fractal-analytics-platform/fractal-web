@@ -34,7 +34,7 @@
         case 'installing':
           {
             // Internal server call with sveltekit server routing
-            const response = await fetch('/api/collect-task/' + taskCollection.id)
+            const response = await fetch('/api/task/collect/' + taskCollection.id)
             const taskCollectionUpdate = await response.json()
             // Update a task collection status with the one fetched from the server
             taskCollection.status = taskCollectionUpdate.data.status
