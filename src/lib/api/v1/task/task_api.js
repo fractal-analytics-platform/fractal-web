@@ -124,7 +124,6 @@ export async function task_collection_status(fetch, cookies, task_id) {
 
   if (response.status === 200) {
     const data = await response.json()
-    console.log(data)
     return data
   }
 
