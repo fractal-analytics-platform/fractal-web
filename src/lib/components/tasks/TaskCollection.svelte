@@ -147,8 +147,8 @@
       </div>
     </div>
   </form>
-  <hr>
   {#if taskCollections.length > 0 }
+    <hr>
     <div class="">
       <table class="table caption-top">
         <caption class="text-bg-light border-top border-bottom pe-3 ps-3">
