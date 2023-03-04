@@ -1,15 +1,17 @@
 import { PUBLIC_FRACTAL_SERVER_HOST } from '$env/static/public'
+import { PostResourceException } from "../../../common/errors.js";
 
-export async function list_tasks(fetch, cookies) {
+export async function listTasks() {
 
   // Set headers
-  const headers = new Headers()
-  headers.append('Authorization', cookies.get('AccessToken'))
+  // const headers = new Headers()
+  // headers.append('Authorization', cookies.get('AccessToken'))
 
   // Compose request
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/task/', {
     method: 'GET',
-    headers: headers
+    credentials: 'include',
+    mode: 'cors',
   })
     // Handle response
     .then(response => {
@@ -20,17 +22,17 @@ export async function list_tasks(fetch, cookies) {
   return response
 }
 
-export async function create_task(serverFetch, cookies, formData) {
+export async function createTask(formData) {
 
   // Set headers
   const headers = new Headers()
-  headers.append('Authorization', cookies.get('AccessToken'))
+  // headers.append('Authorization', cookies.get('AccessToken'))
   headers.append('Content-Type', 'application/json')
 
   // Compose request
   // Since the api accepts application/json data format, we shall serialize data
   // into a json object. It is better to do this explicitly.
-  const task_data = {
+  const requestData = {
     name: formData.get('name'),
     command: formData.get('command'),
     source: formData.get('source'),
@@ -39,39 +41,27 @@ export async function create_task(serverFetch, cookies, formData) {
   }
   // There is an interesting thing, if we use the svelte kit fetch object the server will not
   // accept our request. If, instead, we use the default javascript fetch the server accepts it.
-  const actionResult = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/task/', {
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/task/', {
     method: 'POST',
-    headers: headers,
-    body: JSON.stringify(task_data)
+    mode: 'cors',
+    credentials: 'include',
+    headers,
+    body: JSON.stringify(requestData)
   })
-    .then(async response => {
-      // Should check that the response is successful or not
-      if (response.status !== 201) {
-        return {
-          createAction: {
-            success: false,
-            reason: await response.json()
-          }
-        }
-      }
-      return {
-        createAction: {
-          success: true
-          // Additional data if necessary
-        }
-      }
-    })
 
-  return actionResult
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
 }
 
-export async function create_task_collection(fetch, cookies, formData) {
+export async function createTaskCollection(formData) {
 
   const headers = new Headers()
-  headers.append('Authorization', cookies.get('AccessToken'))
   headers.append('Content-Type', 'application/json')
 
-  const request_data = {
+  const requestData = {
     package: formData.get('package'),
     // Optional
     version: formData.get('version'),
@@ -81,50 +71,29 @@ export async function create_task_collection(fetch, cookies, formData) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
     method: 'POST',
+    mode: 'cors',
+    credentials: 'include',
     headers: headers,
-    body: JSON.stringify(request_data) // The body must be serialized to json since the server accepts application/json
+    body: JSON.stringify(requestData) // The body must be serialized to json since the server accepts application/json
   })
 
-  const status = response.status
-
-  if (status === 500) {
-    // If there is an internal server error, no task collection has started
-    return {
-      success: false,
-      reason: 'The server faced an internal error'
-    }
+  if (response.ok) {
+    return await response.json()
   }
 
-  if (response.status !== 200 && response.status !== 201) {
-    // There is an error, let's get the details from the server
-    const data = await response.json()
-    return {
-      success: false,
-      reason: data
-    }
-  }
-
-  // If the response is successful
-  // Return an action result
-  return {
-    success: true,
-    data: await response.json()
-  }
+  throw new PostResourceException(await response.json())
 }
 
-export async function task_collection_status(fetch, cookies, task_id) {
+export async function taskCollectionStatus(taskId) {
 
-  const headers = new Headers()
-  headers.append('Authorization', cookies.get('AccessToken'))
-
-  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/task/collect/${task_id}`,{
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}`,{
     method: 'GET',
-    headers
+    mode: 'cors',
+    credentials: 'include',
   })
 
-  if (response.status === 200) {
-    const data = await response.json()
-    return data
+  if (response.ok) {
+    return await response.json()
   }
 
   throw new Error('Unable to fetch collection operation status')
