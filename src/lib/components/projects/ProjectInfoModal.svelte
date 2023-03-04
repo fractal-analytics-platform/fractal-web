@@ -1,6 +1,6 @@
 <script>
   // ProjectInfoModal component
-  import { modalProject } from './projectStores.js'
+  import { modalProject } from '$lib/stores/projectStores'
 
   // Project to be displayed
   let project = {}

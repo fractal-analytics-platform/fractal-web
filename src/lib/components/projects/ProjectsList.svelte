@@ -1,7 +1,10 @@
 <script>
+  import { createEventDispatcher } from 'svelte'
   import { enhance } from '$app/forms'
-  import { page } from '$app/stores'
-  import { modalProject } from '$lib/components/projectStores.js'
+  import { modalProject } from '$lib/stores/projectStores.js'
+  import { createProject } from '$lib/api/v1/project/project_api'
+
+  const dispatch = createEventDispatcher()
 
   // List of projects to be displayed
   export let projects = []
@@ -14,36 +17,35 @@
     modalProject.set(project)
   }
 
-  function actionResult(result) {
-    if (result) {
-      if (result.createAction && !result.createAction.success) {
-        // errorReasons = JSON.stringify(result.createAction.reason, undefined, 2)
-        setErrorReasons(result.createAction.reason)
-      }
-    }
+  async function handleCreateProject({ data, cancel, form }) {
+    // Prevent default form submit
+    cancel()
 
-    if (result && result.createAction && result.createAction.success) {
-      // Success logic
-    }
+    await createProject(data)
+      .then(() => {
+        dispatch('projectCreated')
+        form.reset()
+      })
+      .catch((error) => {
+        // Error creating project
+        console.log('No project created')
+        console.log(error)
+        setErrorReasons(error.reason)
+      })
+
   }
 
   function setErrorReasons(value) {
     errorReasons = JSON.stringify(value, undefined, 2)
   }
 
-  // Form action hook to handle $page.form updates
-  // Every form action comes out with an action result
-  // Every action result in $page.form is referenced by a property with the same form action name
-  $: actionResult($page.form)
-
 </script>
 
-<h1>Projects</h1>
-
+<p class="lead">Projects list</p>
 <div class="container">
   <div class="row mt-3 mb-3">
     <div class="col-sm-12">
-      <form method="post" action="?/create" class="row justify-content-end" use:enhance>
+      <form method="post" class="row justify-content-end" use:enhance={handleCreateProject}>
         <div class="col-auto">
           <div class="input-group">
             <div class="input-group-text">Project name</div>
