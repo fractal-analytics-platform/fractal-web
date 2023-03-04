@@ -3,8 +3,9 @@
   import { browser } from '$app/environment'
   import { enhance } from '$app/forms'
   import { collectTaskErrorStore } from '$lib/stores/errorStores'
+  import { modalTaskCollectionId } from '$lib/stores/taskStores'
   import { createTaskCollection, taskCollectionStatus } from '$lib/api/v1/task/task_api'
-  // import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte'
+  import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte'
 
   const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections'
 
@@ -23,6 +24,7 @@
   // If a collection status is collecting, the component shall fetch update
   // If a collection status is installing, the component shall fetch update
 
+  // Component properties
   let taskCollections = []
 
   // On component load set the taskCollections from the local storage
@@ -131,7 +133,14 @@
     }
   }
 
+  function setTaskCollectionLogsModal(event) {
+    const id = event.currentTarget.getAttribute('data-fc-tc')
+    modalTaskCollectionId.set(id)
+  }
+
 </script>
+
+<TaskCollectionLogsModal></TaskCollectionLogsModal>
 
 <div>
   <form method="post" use:enhance={handleTaskCollection}>
@@ -206,12 +215,14 @@
             <td>{pkg}</td>
             <td class="col-2"><span class="badge {statusBadge(status)}">{status}</span></td>
             <td class="col-1">
-              <button class="btn btn-light" data-fc-tc="{id}" on:click={null}>
-                <i class="bi bi-info-circle"></i>
-              </button>
               <button class="btn btn-warning" data-fc-tc="{id}" on:click={removeTaskCollection}>
                 <i class="bi bi-trash"></i>
               </button>
+              {#if status == 'fail' }
+                <button class="btn btn-info" data-fc-tc="{id}" data-bs-toggle="modal" data-bs-target="#collectionTaskLogsModal" on:click={setTaskCollectionLogsModal}>
+                  <i class="bi bi-info-circle"></i>
+                </button>
+              {/if}
             </td>
           </tr>
         {/each}
