@@ -28,8 +28,6 @@
       })
       .catch((error) => {
         // Error creating project
-        console.log('No project created')
-        console.log(error)
         setErrorReasons(error.reason)
       })
 
