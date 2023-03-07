@@ -1,8 +1,13 @@
 <script>
+  import { onMount } from 'svelte'
   import { browser } from '$app/environment'
   import { enhance } from '$app/forms'
-  import { page } from '$app/stores'
-  import { onMount } from 'svelte'
+  import { collectTaskErrorStore } from '$lib/stores/errorStores'
+  import { modalTaskCollectionId } from '$lib/stores/taskStores'
+  import { createTaskCollection, taskCollectionStatus } from '$lib/api/v1/task/task_api'
+  import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte'
+
+  const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections'
 
   // This component, when receives a collectTaskAction successful result
   // should store in local storage the collection request id
@@ -19,6 +24,7 @@
   // If a collection status is collecting, the component shall fetch update
   // If a collection status is installing, the component shall fetch update
 
+  // Component properties
   let taskCollections = []
 
   // On component load set the taskCollections from the local storage
@@ -27,18 +33,56 @@
     await updateTaskCollectionsState()
   })
 
+  async function handleTaskCollection({ data, form, cancel }) {
+    // Prevent form submission
+    cancel()
+
+    await createTaskCollection(data)
+      .then(taskCollection => {
+        console.log(taskCollection)
+        // Check that the taskCollection is not null
+        // If null then, the taskCollection has already been requested
+        if (taskCollection.id === null) {
+          console.log('Task collection already happened')
+        } else {
+          // Add task collection to local storage
+          storeCreatedTaskCollection(taskCollection)
+        }
+        form.reset()
+      })
+      .catch(error => {
+        collectTaskErrorStore.set(error)
+      })
+
+  }
+
+  function storeCreatedTaskCollection(taskCollection) {
+    taskCollections.push({
+      id: taskCollection.id,
+      status: taskCollection.data.status,
+      pkg: taskCollection.data.package,
+      timestamp: taskCollection.timestamp
+    })
+    updateTaskCollections(taskCollections)
+  }
+
   async function updateTaskCollectionsState() {
     const updatedTaskCollection = await Promise.all(taskCollections.map(async (taskCollection) => {
       switch (taskCollection.status){
         case 'pending':
         case 'installing':
           {
-            // Internal server call with sveltekit server routing
-            const response = await fetch('/api/task/collect/' + taskCollection.id)
-            const taskCollectionUpdate = await response.json()
-            // Update a task collection status with the one fetched from the server
-            taskCollection.status = taskCollectionUpdate.data.status
+            await taskCollectionStatus(taskCollection.id)
+              .then(taskCollectionUpdate => {
+                // Update a task collection status with the one fetched from the server
+                taskCollection.status = taskCollectionUpdate.data.status
+              })
+              .catch(error => {
+                console.error(error)
+              })
           }
+          break
+        case 'fail':
           break
         default:
           break
@@ -52,14 +96,16 @@
 
   function loadTaskCollectionsFromStorage() {
     if (browser) {
-      return JSON.parse(window.localStorage.getItem('CollectionTasks')) || []
+      // Parse local storage task collections value
+      return JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_TASK_COLLECTIONS)) || []
     }
+    // Fallback to empty task collections list
     return []
   }
 
   function updateTaskCollections(updatedCollectionTasks) {
     if (browser) {
-      window.localStorage.setItem('CollectionTasks', JSON.stringify(updatedCollectionTasks))
+      window.localStorage.setItem(LOCAL_STORAGE_TASK_COLLECTIONS, JSON.stringify(updatedCollectionTasks))
       taskCollections = updatedCollectionTasks
     }
   }
@@ -71,33 +117,6 @@
   function removeTaskCollection(event) {
     const taskCollectionId = event.currentTarget.getAttribute('data-fc-tc')
     updateTaskCollections(taskCollections.filter(tc => tc.id != taskCollectionId))
-  }
-
-  function handleTaskCollection(collectActionResult) {
-    if (collectActionResult.success) {
-      // If the actionResult has succeeded, store the new collection task
-      const taskCollection = collectActionResult.data
-      // If the collection task is null, we should not proceed with other actions since is a package already collected
-      // by the server.
-      // Check that we're in browser environment
-      if (taskCollection.id && browser) {
-        // We shall push a new object representing a collection status in the list
-        taskCollections.push({
-          id: taskCollection.id,
-          status: taskCollection.data.status,
-          pkg: taskCollection.data.package,
-          timestamp: taskCollection.timestamp
-        })
-        // Set the localStorage to updated list of collection tasks
-        updateTaskCollections(taskCollections)
-      }
-    }
-  }
-
-  $: {
-    if ($page.form && $page.form.collectTaskAction) {
-      handleTaskCollection($page.form.collectTaskAction)
-    }
   }
 
   // Component utilities
@@ -114,10 +133,17 @@
     }
   }
 
+  function setTaskCollectionLogsModal(event) {
+    const id = event.currentTarget.getAttribute('data-fc-tc')
+    modalTaskCollectionId.set(id)
+  }
+
 </script>
 
+<TaskCollectionLogsModal></TaskCollectionLogsModal>
+
 <div>
-  <form method="post" action="?/collectTask" use:enhance>
+  <form method="post" use:enhance={handleTaskCollection}>
     <div class="row g-3">
       <div class="col-6">
         <div class="input-group">
@@ -192,6 +218,11 @@
               <button class="btn btn-warning" data-fc-tc="{id}" on:click={removeTaskCollection}>
                 <i class="bi bi-trash"></i>
               </button>
+              {#if status == 'fail' }
+                <button class="btn btn-info" data-fc-tc="{id}" data-bs-toggle="modal" data-bs-target="#collectionTaskLogsModal" on:click={setTaskCollectionLogsModal}>
+                  <i class="bi bi-info-circle"></i>
+                </button>
+              {/if}
             </td>
           </tr>
         {/each}

@@ -1,21 +1,23 @@
 <script>
-  import { goto } from '$app/navigation'
   import { enhance } from '$app/forms'
+  import { goto } from '$app/navigation'
+  import { userAuthentication } from '$lib/api/v1/auth/auth_api'
   import { userStore } from '$lib/stores/authStores'
 
-  export let form
-  export let data
+  let loginError = false
 
-  $: {
-    // Redirect to root page if the userStore is not undefined
-    if ($userStore !== undefined) {
-      goto('/')
+  async function handleLogin({ data, cancel }) {
+    // Prevent form submission
+    cancel()
+    try {
+      const user = await userAuthentication(data)
+      userStore.set(user)
+      await goto('/')
+    } catch (e) {
+      console.error(e)
+      loginError = true
     }
   }
-
-  $: loginSuccess = form?.loginSuccess
-
-
 
 </script>
 
@@ -25,10 +27,10 @@
   </div>
   <div class="row">
     <div class="col-md-4">
-      <form method="POST" class="" use:enhance>
+      <form method="POST" class="" use:enhance={handleLogin}>
         <div class="mb-3">
           <label for="userEmail" class="form-label">Email address</label>
-          <input name="username" type="email" class="form-control { loginSuccess != undefined && !loginSuccess ? 'is-invalid' : '' }" id="userEmail" aria-describedby="emailHelp" required>
+          <input name="username" type="email" class="form-control { loginError ? 'is-invalid' : '' }" id="userEmail" aria-describedby="emailHelp" required>
           <div id="emailHelp" class="form-text">The email you provided to the IT manager</div>
           <div class="invalid-feedback">
             Can not perform login with the data provided

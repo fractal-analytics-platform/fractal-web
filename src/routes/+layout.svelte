@@ -1,20 +1,24 @@
 <script>
   import { PUBLIC_FRACTAL_SERVER_HOST } from '$env/static/public'
+  import { onMount } from 'svelte'
+  import { whoami } from '$lib/api/v1/auth/auth_api'
   import { userStore } from '$lib/stores/authStores'
   import { serverInfo } from '$lib/stores/serverStores'
 
-  // data from load function
-  export let data
+  $: userLoggedIn = $userStore !== undefined
+  $: server = $serverInfo || {}
 
-  $: {
-    if (data?.user) {
-      userStore.set(data.user)
+  onMount(async () => {
+    if ($userStore === undefined) {
+      const user = await whoami().catch(() => {
+        console.info('Unable to fetch user identity')
+      })
+      userStore.set(user)
     }
-  }
-
-  $: userLoggedIn = $userStore
-
-  $: server = $serverInfo
+    if ($serverInfo === undefined) {
+      fetchServerInfo()
+    }
+  })
 
   const fetchServerInfo = async () => {
     const info = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/alive/', {
@@ -26,10 +30,8 @@
     serverInfo.set(info)
   }
 
-  if ($serverInfo.version === undefined) {
-    fetchServerInfo()
-  }
 </script>
+
 <main>
   <nav class='bg-light border-bottom'>
     <div class='container d-flex flex-wrap'>
@@ -37,7 +39,7 @@
         <li class='nav-item'>
           <a href='/' class='nav-link'>Home</a>
         </li>
-        {#if userLoggedIn !== undefined}
+        {#if userLoggedIn }
           <li class='nav-item'>
             <a href='/info' class='nav-link'>Info</a>
           </li>
@@ -51,7 +53,7 @@
       </ul>
       <ul class='nav'>
         <li class='nav-item'>
-          {#if userLoggedIn === undefined }
+          {#if !userLoggedIn }
             <a href='/auth/login' class='nav-link'>Login</a>
           {:else}
             <a href='/auth/logout' class='nav-link'>Logout</a>

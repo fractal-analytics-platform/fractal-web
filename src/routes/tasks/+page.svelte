@@ -1,33 +1,32 @@
 <script>
+  import { onMount } from 'svelte'
   import { enhance } from '$app/forms'
-  import { taskModal } from '$lib/stores/taskStores'
+  import { listTasks, createTask } from '$lib/api/v1/task/task_api'
+  import { collectTaskErrorStore } from '$lib/stores/errorStores'
+  import { taskModal as taskModalStore } from '$lib/stores/taskStores'
   import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte'
   import TaskCollection from '$lib/components/tasks/TaskCollection.svelte'
-  export let data
-  export let form
 
   // Error property to be set in order to show errors in UI
-  let errorReasons = ''
+  let errorReasons = undefined
   // Tasks property updated with respect to data store
   let tasks = []
 
-  $: tasks = data.tasks
+  // Store subscriptions
+  collectTaskErrorStore.subscribe(error => {
+    if (error) setErrorReasons(error.reason)
+  })
 
-  function actionResult(result) {
-    if (result) {
-      if (result.createAction && !result.createAction.success) {
-        // errorReasons = JSON.stringify(result.createAction.reason, undefined, 2)
-        setErrorReasons(result.createAction.reason)
-      }
+  onMount(async () => {
+    await reloadTaskList()
+  })
 
-      if (result.collectTaskAction && !result.collectTaskAction.success) {
-        setErrorReasons(result.collectTaskAction.reason)
-      }
-    }
-
-    if (result && result.createAction && result.createAction.success) {
-      // Success logic
-    }
+  async function fetchTaskList() {
+    return await listTasks()
+      .catch((error) => {
+        console.error(error)
+        return []
+      })
   }
 
   function setErrorReasons(value) {
@@ -37,18 +36,27 @@
   function setTaskModal(event) {
     const taskId = event.currentTarget.getAttribute('data-fc-task')
     const task = tasks.find(t => t.id == taskId)
-    taskModal.set(task)
+    taskModalStore.set(task)
   }
 
   async function reloadTaskList() {
-    const updatedTaskList = await fetch('/api/task', {
-      method: 'GET'
-    })
-      .then(response => response.json())
-    tasks = updatedTaskList
+    tasks = await fetchTaskList()
   }
 
-  $: actionResult(form)
+  async function handleCreateTask({ data, form, cancel }) {
+    // Prevent default from action
+    cancel()
+
+    await createTask(data)
+      .then(() => {
+        form.reset()
+        reloadTaskList()
+      })
+      .catch(error => {
+        setErrorReasons(error.reason)
+      })
+  }
+
 </script>
 
 <nav aria-label="breadcrumb">
@@ -60,12 +68,12 @@
 <TaskInfoModal></TaskInfoModal>
 
 <div class="mb-3">
-  {#if errorReasons != '' }
+  {#if errorReasons }
     <div class="col-12">
       <div class="alert alert-danger alert-dismissible">
         <pre>There has been an error, reason:</pre>
         <pre>{errorReasons}</pre>
-        <button class="btn-close" data-bs-dismiss="alert" on:click={errorReasons = ''}></button>
+        <button class="btn-close" data-bs-dismiss="alert" on:click={errorReasons = undefined}></button>
       </div>
     </div>
   {/if}
@@ -92,7 +100,7 @@
     </h2>
     <div id="addTask" class="accordion-collapse collapse">
       <div class="accordion-body">
-        <form method="post" action="?/create" class="" use:enhance>
+        <form method="post" class="" use:enhance={handleCreateTask}>
           <div class="row g-3">
             <div class="col-6">
               <div class="input-group">
