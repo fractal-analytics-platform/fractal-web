@@ -58,3 +58,18 @@ export async function getProject(projectId) {
 
   throw new Error('The client was not able to fetch the project')
 }
+
+export async function deleteDataset(projectId, datasetId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    return true
+  }
+
+  throw new Error('The dataset was not deleted by the server')
+}
