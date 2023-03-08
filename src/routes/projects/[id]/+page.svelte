@@ -3,6 +3,7 @@
   import { page } from '$app/stores'
   import { getProject } from '$lib/api/v1/project/project_api'
   import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte'
+  import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte'
 
   let project = undefined
 
@@ -30,4 +31,5 @@
   <h1>Project</h1>
 
   <ProjectDatasetsList datasets={project.dataset_list}></ProjectDatasetsList>
+  <WorkflowsList workflows={[]}></WorkflowsList>
 {/if}
