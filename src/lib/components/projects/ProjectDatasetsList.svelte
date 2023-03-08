@@ -20,7 +20,7 @@
 
 <div class="container p-0">
   <p class="lead">Datasets</p>
-  <table class="table">
+  <table class="table align-middle">
     <thead class="table-light">
     <tr>
       <th>Name</th>
