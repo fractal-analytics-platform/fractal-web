@@ -23,8 +23,8 @@
   <table class="table align-middle">
     <thead class="table-light">
     <tr>
-      <th>Name</th>
-      <th>Type</th>
+      <th class="col-4">Name</th>
+      <th class="col-4">Type</th>
       <th>Options</th>
     </tr>
     </thead>
@@ -34,6 +34,7 @@
           <td>{name}</td>
           <td>{type || 'Unknown' }</td>
           <td>
+            <a class="btn btn-light" href="/projects/{project_id}/datasets/{id}">Detail</a>
             <button class="btn btn-danger" on:click={handleDatasetDelete} data-fc-project="{project_id}" data-fc-dataset="{id}">Delete</button>
           </td>
         </tr>

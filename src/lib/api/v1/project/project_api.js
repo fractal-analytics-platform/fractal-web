@@ -59,6 +59,22 @@ export async function getProject(projectId) {
   throw new Error('The client was not able to fetch the project')
 }
 
+export async function getDataset(projectId, datasetId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    // Return the dataset as json object
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to fetch the dataset')
+}
+
 export async function deleteDataset(projectId, datasetId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
