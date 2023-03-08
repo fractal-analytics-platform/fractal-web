@@ -1,7 +1,5 @@
 # Fractal Web Client
 
-[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
 Fractal is a framework to process high-content imaging data at scale and prepare it for interactive visualization.
 
 ![Fractal_Overview](https://fractal-analytics-platform.github.io/assets/fractal_overview.jpg)
@@ -57,8 +55,6 @@ The default value set by the server is 180 seconds, after that the token expires
 in order for the client request to be authorized.
 For user experience reasons, it is suggested to set the `JWT_EXPIRE_SECONDS=84600` on the server.
 
-# Contributors and license
-
-Unless otherwise stated in each individual module, all Fractal components are released according to a BSD 3-Clause License, and Copyright is with Friedrich Miescher Institute for Biomedical Research and University of Zurich.
+# Contributors
 
 Fractal was conceived in the Liberali Lab at the Friedrich Miescher Institute for Biomedical Research and in the Pelkmans Lab at the University of Zurich (both in Switzerland). The project lead is with [@gusqgm](https://github.com/gusqgm) & [@jluethi](https://github.com/jluethi). The core development is done under contract by [eXact lab S.r.l.](exact-lab.it).
