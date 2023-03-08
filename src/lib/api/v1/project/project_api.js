@@ -42,3 +42,19 @@ export async function createProject(data) {
 
   throw new PostResourceException(await response.json())
 }
+
+export async function getProject(projectId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    // Return fetched project as json object
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to fetch the project')
+}

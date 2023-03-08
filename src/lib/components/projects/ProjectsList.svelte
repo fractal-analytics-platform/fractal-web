@@ -93,7 +93,7 @@
             <button data-fc-project="{id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
               <i class="bi bi-info-circle"></i>
             </button>
-            <button class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></button>
+            <a href='{"/projects/" + id}' class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></a>
             <button class="btn btn-warning" disabled>Edit</button>
             <button class="btn btn-danger" disabled>Delete</button>
           </td>
