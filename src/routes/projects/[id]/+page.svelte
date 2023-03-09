@@ -37,5 +37,5 @@
   <h1>Project</h1>
 
   <ProjectDatasetsList datasets={project.dataset_list}></ProjectDatasetsList>
-  <WorkflowsList {workflows}></WorkflowsList>
+  <WorkflowsList {workflows} projectId={project.id}></WorkflowsList>
 {/if}
