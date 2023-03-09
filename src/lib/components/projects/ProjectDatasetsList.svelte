@@ -1,10 +1,10 @@
 <script>
   import { deleteDataset } from '$lib/api/v1/project/project_api'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+
   export let datasets = []
 
-  async function handleDatasetDelete(event) {
-    const projectId = event.currentTarget.getAttribute('data-fc-project')
-    const datasetId = event.currentTarget.getAttribute('data-fc-dataset')
+  async function handleDatasetDelete(projectId, datasetId) {
     await deleteDataset(projectId, datasetId)
       .then(() => {
         // If the request is successful, we delete the dataset entry in the datasets list
@@ -35,7 +35,12 @@
           <td>{type || 'Unknown' }</td>
           <td>
             <a class="btn btn-light" href="/projects/{project_id}/datasets/{id}">Detail</a>
-            <button class="btn btn-danger" on:click={handleDatasetDelete} data-fc-project="{project_id}" data-fc-dataset="{id}">Delete</button>
+            <ConfirmActionButton
+              style={'danger'}
+              label={'Delete'}
+              message={`Delete dataset ${name} from project ${project_id}`}
+              callbackAction={handleDatasetDelete.bind(this, project_id, id)}>
+            </ConfirmActionButton>
           </td>
         </tr>
       {/each}
