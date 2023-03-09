@@ -89,3 +89,19 @@ export async function deleteDataset(projectId, datasetId) {
 
   throw new Error('The dataset was not deleted by the server')
 }
+
+export async function getWorkflows(projectId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflows/`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    // If the response is ok, return the workflows list as json
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to fetch project workflows')
+}
