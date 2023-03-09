@@ -1,6 +1,16 @@
 <script>
+  import { onMount } from 'svelte'
   import { page } from '$app/stores'
-  // import { getWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import { getWorkflow } from '$lib/api/v1/workflow/workflow_api'
+
+  let workflow = undefined
+
+  onMount(async () => {
+    workflow = await getWorkflow($page.params.workflowId)
+      .catch(error => {
+        console.error(error)
+      })
+  })
 </script>
 
 <nav aria-label="breadcrumb">
@@ -16,9 +26,11 @@
     <li class="breadcrumb-item">
       Workflows
     </li>
-    <li class="breadcrumb-item">
-      {$page.params.workflowId}
+    {#if workflow }
+    <li class="breadcrumb-item active">
+      { workflow.name }
     </li>
+    {/if}
   </ol>
 </nav>
 

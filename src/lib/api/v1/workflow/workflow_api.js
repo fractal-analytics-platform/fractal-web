@@ -26,3 +26,18 @@ export async function createWorkflow(formData) {
 
   throw new PostResourceException(await response.json())
 }
+
+export async function getWorkflow(workflowId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to retrieve the workflow')
+}
