@@ -6,6 +6,7 @@
   import { taskModal as taskModalStore } from '$lib/stores/taskStores'
   import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte'
   import TaskCollection from '$lib/components/tasks/TaskCollection.svelte'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   // Error property to be set in order to show errors in UI
   let errorReasons = undefined
@@ -30,7 +31,13 @@
   }
 
   function setErrorReasons(value) {
-    errorReasons = JSON.stringify(value, undefined, 2)
+    errorReasons = value
+    new StandardErrorAlert({
+      target: document.getElementById('errorSection'),
+      props: {
+        error: errorReasons
+      }
+    })
   }
 
   function setTaskModal(event) {
@@ -67,16 +74,7 @@
 
 <TaskInfoModal></TaskInfoModal>
 
-<div class="mb-3">
-  {#if errorReasons }
-    <div class="col-12">
-      <div class="alert alert-danger alert-dismissible">
-        <pre>There has been an error, reason:</pre>
-        <pre>{errorReasons}</pre>
-        <button class="btn-close" data-bs-dismiss="alert" on:click={errorReasons = undefined}></button>
-      </div>
-    </div>
-  {/if}
+<div class="mb-3" id="errorSection">
 </div>
 <p class="lead">Insert task</p>
 <div class="accordion">
