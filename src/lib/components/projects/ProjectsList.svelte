@@ -3,13 +3,12 @@
   import { enhance } from '$app/forms'
   import { modalProject } from '$lib/stores/projectStores.js'
   import { createProject } from '$lib/api/v1/project/project_api'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   const dispatch = createEventDispatcher()
 
   // List of projects to be displayed
   export let projects = []
-  // Error property to be set in order to show errors in UI
-  let errorReasons = ''
 
   function setModalProject(event) {
     const projectId = event.currentTarget.getAttribute('data-fc-project')
@@ -28,15 +27,14 @@
       })
       .catch((error) => {
         // Error creating project
-        setErrorReasons(error.reason)
+        new StandardErrorAlert({
+          target: document.getElementById('createProjectErrorAlert'),
+          props: {
+            error
+          }
+        })
       })
-
   }
-
-  function setErrorReasons(value) {
-    errorReasons = JSON.stringify(value, undefined, 2)
-  }
-
 </script>
 
 <p class="lead">Projects list</p>
@@ -61,14 +59,7 @@
           <button type="submit" class="btn btn-primary">Create</button>
         </div>
       </form>
-      {#if errorReasons != '' }
-        <div class="row p-4">
-          <div class="alert alert-danger">
-            <pre>There has been an error, reason:</pre>
-            <pre>{errorReasons}</pre>
-          </div>
-        </div>
-      {/if}
+      <div id="createProjectErrorAlert" class="mt-3"></div>
     </div>
   </div>
   <div class="row">
