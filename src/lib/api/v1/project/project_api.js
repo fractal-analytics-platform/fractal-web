@@ -59,6 +59,34 @@ export async function getProject(projectId) {
   throw new Error('The client was not able to fetch the project')
 }
 
+export async function createDataset(projectId, formData) {
+
+  const requestData = {
+    name: formData.get('datasetName'),
+    project_id: projectId,
+    type: "", // formData.get('datasetType'),
+    meta: {},
+    read_only: formData.get('datasetReadonly') ? true : false
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/`,{
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestData)
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
+
 export async function getDataset(projectId, datasetId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
