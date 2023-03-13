@@ -9,7 +9,7 @@
       .then(() => {
         // If the request is successful, we delete the dataset entry in the datasets list
         datasets = datasets.filter(d => {
-          d.id !== datasetId
+          return d.id !== datasetId
         })
       })
       .catch(error => {
