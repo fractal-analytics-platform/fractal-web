@@ -41,3 +41,18 @@ export async function getWorkflow(workflowId) {
 
   throw new Error('The client was not able to retrieve the workflow')
 }
+
+export async function deleteWorkflow(workflowId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    return true
+  }
+
+  throw new Error('The client was not able to delete the workflow')
+}

@@ -3,6 +3,7 @@
   export let callbackAction = undefined
   export let style = 'primary'
   export let label = 'Button'
+  export let modalId = undefined
   export let message = ''
 
   onMount(() => {
@@ -12,7 +13,7 @@
 
 </script>
 
-<div class="modal" id="actionConfirmationModal">
+<div class="modal" id="{modalId}">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -32,4 +33,4 @@
   </div>
 </div>
 
-<button class="btn btn-{style}" data-bs-toggle="modal" data-bs-target="#actionConfirmationModal" >{label}</button>
+<button class="btn btn-{style}" data-bs-toggle="modal" data-bs-target="#{modalId}" >{label}</button>

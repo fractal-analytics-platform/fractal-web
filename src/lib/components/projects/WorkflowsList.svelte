@@ -2,7 +2,8 @@
 
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
-  import { createWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import { createWorkflow, deleteWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   // The list of workflows
@@ -10,7 +11,7 @@
   // Set the projectId prop to reference a specific project for each workflow
   export let projectId = undefined
   // Control whether the user can send or not the form
-  let enableCreateWorflow = false
+  let enableCreateWorkflow = false
   let validationError = false
 
   async function handleCreateWorkflow({ form, cancel, data }) {
@@ -38,12 +39,31 @@
       })
   }
 
+  async function handleDeleteWorkflow(workflowId) {
+    await deleteWorkflow(workflowId)
+      .then(() => {
+        // Workflow has been deleted
+        workflows = workflows.filter((wkf) => {
+          return wkf.id !== workflowId
+        })
+      })
+      .catch(error => {
+        // Instantiate a new standard error alert
+        new StandardErrorAlert({
+          target: document.getElementById('workflowDeleteAlertError'),
+          props: {
+            error: error.message
+          }
+        })
+      })
+  }
+
   function handleWorkflowNameChange(event) {
     const inputValue = event.target?.value || undefined
     if (inputValue !== undefined && inputValue !== '') {
-      enableCreateWorflow = true
+      enableCreateWorkflow = true
     } else {
-      enableCreateWorflow = false
+      enableCreateWorkflow = false
     }
   }
 
@@ -52,6 +72,7 @@
 <div class="container p-0 mt-4">
   <p class="lead">Workflows</p>
   <div id="workflowCreateAlertError"></div>
+  <div id="workflowDeleteAlertError"></div>
   <table class="table align-middle caption-top">
     <caption class="text-bg-light border-top border-bottom pe-3 ps-3">
       <div class="d-flex align-items-center justify-content-end">
@@ -64,7 +85,7 @@
                 <input type="text" class="form-control {validationError ? 'is-invalid' : ''}" placeholder="workflow name" name="workflowName" on:change={handleWorkflowNameChange}>
               </div>
             </div>
-            <button class="btn btn-primary" disabled={!enableCreateWorflow} type="submit">
+            <button class="btn btn-primary" disabled={!enableCreateWorkflow} type="submit">
               Create workflow
               <i class="bi bi-node-plus-fill"></i>
             </button>
@@ -85,6 +106,12 @@
           <td>{id}</td>
           <td>{name}</td>
           <td>
+            <ConfirmActionButton
+              modalId={"deleteConfirmModal" + id}
+              style={'danger'}
+              label={'Delete'}
+              callbackAction={handleDeleteWorkflow.bind(this, id)}>
+            </ConfirmActionButton>
             <a href="/projects/{projectId}/workflows/{id}" class="btn btn-light">
               Open
               <i class="bi bi-arrow-up-right-square"></i>
