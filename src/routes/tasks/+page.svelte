@@ -76,12 +76,12 @@
 
 <div class="mb-3" id="errorSection">
 </div>
-<p class="lead">Insert task</p>
+<p class="lead">Add tasks</p>
 <div class="accordion">
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#taskCollection">
-        Collect multiple tasks
+        Collect tasks from a package
       </button>
     </h2>
     <div id="taskCollection" class="accordion-collapse collapse">
@@ -93,7 +93,7 @@
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#addTask">
-        Add a task
+        Add a single task
       </button>
     </h2>
     <div id="addTask" class="accordion-collapse collapse">
@@ -144,7 +144,7 @@
 </div>
 
 <div class="row mt-4">
-  <p class="lead">Task list</p>
+  <p class="lead">Task List</p>
   <div class="col-12">
     <table class="table caption-top align-middle">
       <caption class="text-bg-light border-top border-bottom pe-3 ps-3">

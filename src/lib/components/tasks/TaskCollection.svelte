@@ -6,6 +6,7 @@
   import { modalTaskCollectionId } from '$lib/stores/taskStores'
   import { createTaskCollection, taskCollectionStatus } from '$lib/api/v1/task/task_api'
   import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
 
   const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections'
 
@@ -114,8 +115,7 @@
     updateTaskCollections([])
   }
 
-  function removeTaskCollection(event) {
-    const taskCollectionId = event.currentTarget.getAttribute('data-fc-tc')
+  function removeTaskCollection(taskCollectionId) {
     updateTaskCollections(taskCollections.filter(tc => tc.id != taskCollectionId))
   }
 
@@ -190,10 +190,15 @@
           <div class="d-flex align-items-center justify-content-between">
             <span class="fw-normal">Task collections</span>
             <div>
-              <button class="btn btn-outline-secondary" on:click={clearTaskCollections}>
-                Clear
-                <i class="bi bi-trash"></i>
-              </button>
+              <ConfirmActionButton
+                modalId="confirmClearTaskCollections"
+                btnStyle="outline-secondary"
+                buttonIcon="trash"
+                label="Clear"
+                message="Clear task collections requests"
+                callbackAction={clearTaskCollections}
+              >
+              </ConfirmActionButton>
               <button class="btn btn-primary" on:click={updateTaskCollectionsState}>
                 Refresh <i class="bi bi-arrow-clockwise"></i>
               </button>
@@ -215,9 +220,13 @@
             <td>{pkg}</td>
             <td class="col-2"><span class="badge {statusBadge(status)}">{status}</span></td>
             <td class="col-1">
-              <button class="btn btn-warning" data-fc-tc="{id}" on:click={removeTaskCollection}>
-                <i class="bi bi-trash"></i>
-              </button>
+              <ConfirmActionButton
+                modalId="removeTaskCollectionModal{id}"
+                btnStyle="warning"
+                buttonIcon="trash"
+                message="Remove a task collection log"
+                callbackAction={removeTaskCollection.bind(this, id)}
+              ></ConfirmActionButton>
               {#if status == 'fail' }
                 <button class="btn btn-info" data-fc-tc="{id}" data-bs-toggle="modal" data-bs-target="#collectionTaskLogsModal" on:click={setTaskCollectionLogsModal}>
                   <i class="bi bi-info-circle"></i>

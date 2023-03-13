@@ -1,8 +1,10 @@
 <script>
   import { onMount } from 'svelte'
-  export let callbackAction = undefined
+  export let callbackAction = () => {} // A default empty function
   export let style = 'primary'
-  export let label = 'Button'
+  export let btnStyle = 'primary'
+  export let label = ''
+  export let buttonIcon = undefined
   export let modalId = undefined
   export let message = ''
 
@@ -33,4 +35,9 @@
   </div>
 </div>
 
-<button class="btn btn-{style}" data-bs-toggle="modal" data-bs-target="#{modalId}" >{label}</button>
+<button class="btn btn-{btnStyle}" data-bs-toggle="modal" data-bs-target="#{modalId}" >
+  {label}
+  {#if buttonIcon }
+    <i class="bi bi-{buttonIcon}"></i>
+  {/if}
+</button>
