@@ -36,6 +36,7 @@
           <td>
             <a class="btn btn-light" href="/projects/{project_id}/datasets/{id}">Detail</a>
             <ConfirmActionButton
+              modalId="confirmDatasetDeleteModal{id}"
               style={'danger'}
               label={'Delete'}
               message={`Delete dataset ${name} from project ${project_id}`}
