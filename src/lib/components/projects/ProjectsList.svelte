@@ -2,7 +2,8 @@
   import { createEventDispatcher } from 'svelte'
   import { enhance } from '$app/forms'
   import { modalProject } from '$lib/stores/projectStores.js'
-  import { createProject } from '$lib/api/v1/project/project_api'
+  import { createProject, deleteProject } from '$lib/api/v1/project/project_api'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   const dispatch = createEventDispatcher()
@@ -34,6 +35,18 @@
           }
         })
       })
+  }
+
+  async function handleDeleteProject(projectId) {
+
+    await deleteProject(projectId)
+      .then(() => {
+        projects = projects.filter((p) => p.id != projectId)
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
   }
 </script>
 
@@ -85,8 +98,14 @@
               <i class="bi bi-info-circle"></i>
             </button>
             <a href='{"/projects/" + id}' class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></a>
-            <button class="btn btn-warning" disabled>Edit</button>
-            <button class="btn btn-danger" disabled>Delete</button>
+            <ConfirmActionButton
+              modalId={"confirmDeleteProject" + id}
+              style={'danger'}
+              btnStyle="danger"
+              message="Delete project {name}"
+              buttonIcon="trash"
+              callbackAction={handleDeleteProject.bind(this, id)}>
+            </ConfirmActionButton>
           </td>
         </tr>
       {/each}
