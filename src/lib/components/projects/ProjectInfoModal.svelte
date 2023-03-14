@@ -1,4 +1,5 @@
 <script>
+  import { goto } from '$app/navigation'
   // ProjectInfoModal component
   import { modalProject } from '$lib/stores/projectStores'
 
@@ -17,9 +18,15 @@
 <div class="modal modal-lg" id="projectInfoModal">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header d-flex justify-content-between">
         <h1 class="h5 modal-title">Project {project?.name}</h1>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-light me-3" data-bs-dismiss="modal" on:click={() => {
+            // This method is required in order to correctly dismissing the modal
+            goto('/projects/' + project.id)
+          }}>Open <i class="bi bi-arrow-up-right-square"></i></button>
+          <button class="btn-close bg-light p-2" data-bs-dismiss="modal"></button>
+        </div>
       </div>
       <div class="modal-body">
         <div class="row mb-3">
@@ -62,10 +69,6 @@
             {/if}
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" disabled>Open project</button>
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
