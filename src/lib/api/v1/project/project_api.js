@@ -64,7 +64,7 @@ export async function createDataset(projectId, formData) {
   const requestData = {
     name: formData.get('datasetName'),
     project_id: projectId,
-    type: "", // formData.get('datasetType'),
+    // type: "", Currently is not included the type to create a dataset
     meta: {},
     read_only: formData.get('datasetReadonly') ? true : false
   }
