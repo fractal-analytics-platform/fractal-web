@@ -6,6 +6,7 @@
   import { taskModal as taskModalStore } from '$lib/stores/taskStores'
   import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte'
   import TaskCollection from '$lib/components/tasks/TaskCollection.svelte'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   // Error property to be set in order to show errors in UI
   let errorReasons = undefined
@@ -30,7 +31,13 @@
   }
 
   function setErrorReasons(value) {
-    errorReasons = JSON.stringify(value, undefined, 2)
+    errorReasons = value
+    new StandardErrorAlert({
+      target: document.getElementById('errorSection'),
+      props: {
+        error: errorReasons
+      }
+    })
   }
 
   function setTaskModal(event) {
@@ -67,23 +74,14 @@
 
 <TaskInfoModal></TaskInfoModal>
 
-<div class="mb-3">
-  {#if errorReasons }
-    <div class="col-12">
-      <div class="alert alert-danger alert-dismissible">
-        <pre>There has been an error, reason:</pre>
-        <pre>{errorReasons}</pre>
-        <button class="btn-close" data-bs-dismiss="alert" on:click={errorReasons = undefined}></button>
-      </div>
-    </div>
-  {/if}
+<div class="mb-3" id="errorSection">
 </div>
-<p class="lead">Insert task</p>
+<p class="lead">Add tasks</p>
 <div class="accordion">
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#taskCollection">
-        Collect multiple tasks
+        Collect tasks from a package
       </button>
     </h2>
     <div id="taskCollection" class="accordion-collapse collapse">
@@ -95,7 +93,7 @@
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#addTask">
-        Add a task
+        Add a single task
       </button>
     </h2>
     <div id="addTask" class="accordion-collapse collapse">
@@ -146,7 +144,7 @@
 </div>
 
 <div class="row mt-4">
-  <p class="lead">Task list</p>
+  <p class="lead">Task List</p>
   <div class="col-12">
     <table class="table caption-top align-middle">
       <caption class="text-bg-light border-top border-bottom pe-3 ps-3">

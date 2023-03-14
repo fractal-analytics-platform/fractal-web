@@ -2,14 +2,14 @@
   import { createEventDispatcher } from 'svelte'
   import { enhance } from '$app/forms'
   import { modalProject } from '$lib/stores/projectStores.js'
-  import { createProject } from '$lib/api/v1/project/project_api'
+  import { createProject, deleteProject } from '$lib/api/v1/project/project_api'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   const dispatch = createEventDispatcher()
 
   // List of projects to be displayed
   export let projects = []
-  // Error property to be set in order to show errors in UI
-  let errorReasons = ''
 
   function setModalProject(event) {
     const projectId = event.currentTarget.getAttribute('data-fc-project')
@@ -28,15 +28,26 @@
       })
       .catch((error) => {
         // Error creating project
-        setErrorReasons(error.reason)
+        new StandardErrorAlert({
+          target: document.getElementById('createProjectErrorAlert'),
+          props: {
+            error
+          }
+        })
+      })
+  }
+
+  async function handleDeleteProject(projectId) {
+
+    await deleteProject(projectId)
+      .then(() => {
+        projects = projects.filter((p) => p.id != projectId)
+      })
+      .catch(error => {
+        console.error(error)
       })
 
   }
-
-  function setErrorReasons(value) {
-    errorReasons = JSON.stringify(value, undefined, 2)
-  }
-
 </script>
 
 <p class="lead">Projects list</p>
@@ -61,14 +72,7 @@
           <button type="submit" class="btn btn-primary">Create</button>
         </div>
       </form>
-      {#if errorReasons != '' }
-        <div class="row p-4">
-          <div class="alert alert-danger">
-            <pre>There has been an error, reason:</pre>
-            <pre>{errorReasons}</pre>
-          </div>
-        </div>
-      {/if}
+      <div id="createProjectErrorAlert" class="mt-3"></div>
     </div>
   </div>
   <div class="row">
@@ -88,14 +92,20 @@
           <td>{id}</td>
           <td>{name}</td>
           <td>{project_dir}</td>
-          <td>{read_only}</td>
+          <td>{read_only ? "Yes" : "No"}</td>
           <td class="align-right">
             <button data-fc-project="{id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
               <i class="bi bi-info-circle"></i>
             </button>
-            <button class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></button>
-            <button class="btn btn-warning" disabled>Edit</button>
-            <button class="btn btn-danger" disabled>Delete</button>
+            <a href='{"/projects/" + id}' class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></a>
+            <ConfirmActionButton
+              modalId={"confirmDeleteProject" + id}
+              style={'danger'}
+              btnStyle="danger"
+              message="Delete project {name}"
+              buttonIcon="trash"
+              callbackAction={handleDeleteProject.bind(this, id)}>
+            </ConfirmActionButton>
           </td>
         </tr>
       {/each}

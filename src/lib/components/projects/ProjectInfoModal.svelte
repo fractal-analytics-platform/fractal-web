@@ -31,7 +31,7 @@
               <li class="list-group-item list-group-item-light fw-bold">Directory</li>
               <li class="list-group-item">{project?.project_dir}</li>
               <li class="list-group-item list-group-item-light fw-bold">Read only</li>
-              <li class="list-group-item">{project?.read_only}</li>
+              <li class="list-group-item">{project?.read_only ? "Yes" : "No"}</li>
             </ul>
           </div>
         </div>
@@ -43,20 +43,18 @@
                 <thead class="table-light">
                 <tr>
                   <th>Name</th>
-                  <th>Metadata</th>
                   <th>Readonly</th>
-                  <th>Resources</th>
+                  <th># Resources</th>
                   <th>Type</th>
                 </tr>
                 </thead>
                 <tbody>
-                {#each project?.dataset_list as { name, meta, read_only, resource_list, type }}
+                {#each project?.dataset_list as { name, read_only, resource_list, type }}
                   <tr>
                     <td>{name}</td>
-                    <td></td>
-                    <td>{read_only}</td>
-                    <td></td>
-                    <td>{type}</td>
+                    <td>{read_only ? "Yes" : "No" }</td>
+                    <td>{resource_list.length}</td>
+                    <td>{type == "" ? "Unknown" : type}</td>
                   </tr>
                 {/each}
                 </tbody>
