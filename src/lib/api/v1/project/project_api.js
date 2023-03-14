@@ -133,3 +133,24 @@ export async function getWorkflows(projectId) {
 
   throw new Error('The client was not able to fetch project workflows')
 }
+
+export async function importWorkflow(projectId, workflowMetadata) {
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/import-workflow/`, {
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(workflowMetadata)
+  })
+
+  if (response.ok){
+    // Return a workflow item
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}

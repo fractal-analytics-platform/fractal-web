@@ -3,6 +3,7 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { createWorkflow, deleteWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
@@ -67,7 +68,27 @@
     }
   }
 
+  function handleWorkflowImported(event) {
+    const importedWorkflow = event.detail
+    workflows.push(importedWorkflow)
+    workflows = workflows
+  }
+
 </script>
+
+<div class="modal" id="importWorkflowModal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Import workflow</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <WorkflowImport on:workflowImported="{handleWorkflowImported}"></WorkflowImport>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="container p-0 mt-4">
   <p class="lead">Workflows</p>
@@ -75,8 +96,10 @@
   <div id="workflowDeleteAlertError"></div>
   <table class="table align-middle caption-top">
     <caption class="text-bg-light border-top border-bottom pe-3 ps-3">
-      <div class="d-flex align-items-center justify-content-end">
-        <span class="fw-normal"></span>
+      <div class="d-flex align-items-center justify-content-between">
+        <span class="fw-normal">
+          <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#importWorkflowModal">Import workflow</a>
+        </span>
         <div>
           <form method='post' class="row row-cols-lg-auto g-3 align-items-center" use:enhance={handleCreateWorkflow}>
             <div class="col-12">
@@ -87,7 +110,6 @@
             </div>
             <button class="btn btn-primary" disabled={!enableCreateWorkflow} type="submit">
               Create workflow
-              <i class="bi bi-node-plus-fill"></i>
             </button>
           </form>
         </div>
