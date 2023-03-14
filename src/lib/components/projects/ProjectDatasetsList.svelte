@@ -90,10 +90,11 @@
           <td>{name}</td>
           <td>{type || 'Unknown' }</td>
           <td>
-            <a class="btn btn-light" href="/projects/{project_id}/datasets/{id}">Detail</a>
+            <a class="btn btn-light" href="/projects/{project_id}/datasets/{id}">Open <i class="bi bi-arrow-up-right-square"></i></a>
             <ConfirmActionButton
               modalId="confirmDatasetDeleteModal{id}"
               style={'danger'}
+              btnStyle="danger"
               label={'Delete'}
               message={`Delete dataset ${name} from project ${project_id}`}
               callbackAction={handleDatasetDelete.bind(this, project_id, id)}>

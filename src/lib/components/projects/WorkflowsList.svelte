@@ -128,16 +128,18 @@
           <td>{id}</td>
           <td>{name}</td>
           <td>
-            <ConfirmActionButton
-              modalId={"deleteConfirmModal" + id}
-              style={'danger'}
-              label={'Delete'}
-              callbackAction={handleDeleteWorkflow.bind(this, id)}>
-            </ConfirmActionButton>
             <a href="/projects/{projectId}/workflows/{id}" class="btn btn-light">
               Open
               <i class="bi bi-arrow-up-right-square"></i>
             </a>
+            <ConfirmActionButton
+              modalId={"deleteConfirmModal" + id}
+              style={'danger'}
+              btnStyle="danger"
+              label={'Delete'}
+              message="Delete workflow {name}"
+              callbackAction={handleDeleteWorkflow.bind(this, id)}>
+            </ConfirmActionButton>
           </td>
         </tr>
       {/each}
