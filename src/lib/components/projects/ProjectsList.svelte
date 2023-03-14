@@ -76,7 +76,7 @@
     </div>
   </div>
   <div class="row">
-    <table class="table table-hover">
+    <table class="table table-hover align-middle">
       <thead class="table-light">
       <tr>
         <th>Id</th>
