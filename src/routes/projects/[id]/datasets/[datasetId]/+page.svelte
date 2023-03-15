@@ -86,9 +86,9 @@
       <table class="table table-bordered caption-top">
         <thead class="bg-light">
           <tr>
-            <th>Id</th>
-            <th>Source</th>
-            <th>Options</th>
+            <th class="col-1">Id</th>
+            <th class="col-9">Source</th>
+            <th class="col-2">Options</th>
           </tr>
         </thead>
         <tbody>
