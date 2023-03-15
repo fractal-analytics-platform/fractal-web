@@ -169,3 +169,18 @@ export async function importWorkflow(projectId, workflowMetadata) {
 
   throw new PostResourceException(await response.json())
 }
+
+export async function deleteDatasetResource(projectId, datasetId, resourceId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}/${resourceId}`,{
+    method: 'DELETE',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    return true
+  }
+
+  throw new Error('The client was not able to delete dataset resource')
+}

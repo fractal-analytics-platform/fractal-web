@@ -1,7 +1,8 @@
 <script>
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
-  import { getDataset } from '$lib/api/v1/project/project_api'
+  import { getDataset, deleteDatasetResource } from '$lib/api/v1/project/project_api'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
 
   let projectId = $page.params.id
   let datasetId = $page.params.datasetId
@@ -14,6 +15,17 @@
         console.error(error)
       })
   })
+
+  async function handleDeleteDatasetResource(resourceId) {
+
+    await deleteDatasetResource(projectId, datasetId, resourceId)
+      .then(() => {
+        dataset.resource_list = dataset.resource_list.filter(r => r.id !== resourceId)
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
 
 </script>
 
@@ -82,7 +94,7 @@
     </div>
     <div class="col-8">
       <p class="text-muted">Dataset resources</p>
-      <table class="table table-bordered caption-top">
+      <table class="table table-bordered caption-top align-middle">
         <thead class="bg-light">
           <tr>
             <th class="col-1">Id</th>
@@ -95,7 +107,17 @@
           <tr>
             <td>{resource.id}</td>
             <td><code>{resource.path}</code></td>
-            <td></td>
+            <td>
+              <ConfirmActionButton
+              modalId="confirmDeleteResource{resource.id}"
+              style="danger"
+              btnStyle="danger"
+              label="Delete"
+              message="Delete a dataset resource"
+              callbackAction={handleDeleteDatasetResource.bind(this, resource.id)}
+              buttonIcon="trash">
+              </ConfirmActionButton>
+            </td>
           </tr>
         {/each}
         </tbody>
