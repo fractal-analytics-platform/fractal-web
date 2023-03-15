@@ -170,6 +170,30 @@ export async function importWorkflow(projectId, workflowMetadata) {
   throw new PostResourceException(await response.json())
 }
 
+export async function createDatasetResource(projectId, datasetId, formData) {
+
+  const requestBody = {
+    path: formData.get('source')
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (response.ok){
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
+
 export async function deleteDatasetResource(projectId, datasetId, resourceId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}/${resourceId}`,{

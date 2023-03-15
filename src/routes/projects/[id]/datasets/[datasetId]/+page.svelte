@@ -1,13 +1,16 @@
 <script>
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
-  import { getDataset, deleteDatasetResource } from '$lib/api/v1/project/project_api'
+  import { enhance } from '$app/forms'
+  import { getDataset, deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   let projectId = $page.params.id
   let datasetId = $page.params.datasetId
 
   let dataset = undefined
+  let createResourceSuccess = false
 
   onMount(async () => {
     dataset = await getDataset(projectId, datasetId)
@@ -15,6 +18,37 @@
         console.error(error)
       })
   })
+
+  async function handleCreateDatasetResource({ form, data, cancel }) {
+    // Prevent default
+    cancel()
+
+    await createDatasetResource(projectId, datasetId, data)
+      .then(resource => {
+        dataset.resource_list.push(resource)
+        // This is required in order to trigger svelte reactivity
+        dataset.resource_list = dataset.resource_list
+        createResourceSuccess = true
+        // Get a reference to the modal
+        // eslint-disable-next-line no-undef
+        // noinspection JSUnresolvedVariable
+        const modal = bootstrap.Modal.getInstance(document.getElementById('createDatasetResourceModal'))
+        setTimeout(() => {
+          createResourceSuccess = false
+          modal.toggle()
+        }, 1200)
+        form.reset()
+      })
+      .catch(error => {
+        new StandardErrorAlert({
+          target: document.getElementById('createDatasetResourceError'),
+          props: {
+            error
+          }
+        })
+      })
+
+  }
 
   async function handleDeleteDatasetResource(resourceId) {
 
@@ -45,13 +79,15 @@
 </nav>
 
 {#if dataset}
-  <div class="container">
+  <div class="container px-0">
   <h1>Dataset {dataset.name} #{dataset.id}</h1>
 
-  <div class="row mt-3">
+  <div class="row mt-2">
 
     <div class="col-4">
-      <p class="text-muted">Dataset properties</p>
+      <div class="d-flex align-items-center justify-content-between">
+        <span class="lead py-3">Dataset properties</span>
+      </div>
       <ul class="list-group">
         <li class="list-group-item text-bg-light">
           <span>Id</span>
@@ -93,7 +129,10 @@
       {/if}
     </div>
     <div class="col-8">
-      <p class="text-muted">Dataset resources</p>
+      <div class="d-flex align-items-center justify-content-between">
+        <span class="lead py-3">Dataset resources</span>
+        <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#createDatasetResourceModal">Create resource</a>
+      </div>
       <table class="table table-bordered caption-top align-middle">
         <thead class="bg-light">
           <tr>
@@ -128,3 +167,33 @@
 
   </div>
 {/if}
+
+<div class="modal" id="createDatasetResourceModal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create dataset resource</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="createDatasetResourceError"></div>
+
+        <form method="post" use:enhance={handleCreateDatasetResource}>
+
+          <div class="mb-3">
+            <label for="source" class="form-label">Resource path</label>
+            <input class="form-control" type="text" name="source" id="source">
+          </div>
+
+          <button class="btn btn-primary">
+            Create
+          </button>
+        </form>
+
+        {#if createResourceSuccess }
+          <p class="alert alert-success mt-3">Resource created</p>
+        {/if}
+      </div>
+    </div>
+  </div>
+</div>
