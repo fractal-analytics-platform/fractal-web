@@ -13,7 +13,6 @@
       .catch(error => {
         console.error(error)
       })
-    console.log(dataset.resource_list)
   })
 
 </script>
