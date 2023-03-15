@@ -136,7 +136,7 @@
           <span>Readonly</span>
         </li>
         <li class="list-group-item">
-          <span class="badge bg-secondary">{dataset.read_only}</span>
+          <span class="badge bg-info">{dataset.read_only}</span>
         </li>
       </ul>
       {#if Object.keys(dataset.meta).length > 0 }
