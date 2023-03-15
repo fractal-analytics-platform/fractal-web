@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { enhance } from '$app/forms'
-  import { getDataset, deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
+  import { getDataset, updateDataset, deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
@@ -10,6 +10,7 @@
   let datasetId = $page.params.datasetId
 
   let dataset = undefined
+  let updateDatasetSuccess = false
   let createResourceSuccess = false
 
   onMount(async () => {
@@ -18,6 +19,29 @@
         console.error(error)
       })
   })
+
+  async function handleDatasetUpdate({ form, data, cancel }) {
+    // Prevent default
+    cancel()
+
+    await updateDataset(projectId, datasetId, data)
+      .then(updatedDataset => {
+        dataset = updatedDataset
+        updateDatasetSuccess = true
+        setTimeout(() => {
+          updateDatasetSuccess = false
+        }, 1200)
+      })
+      .catch(error => {
+        new StandardErrorAlert({
+          target: document.getElementById('updateDatasetError'),
+          props: {
+            error
+          }
+        })
+      })
+
+  }
 
   async function handleCreateDatasetResource({ form, data, cancel }) {
     // Prevent default
@@ -87,6 +111,7 @@
     <div class="col-4">
       <div class="d-flex align-items-center justify-content-between">
         <span class="lead py-3">Dataset properties</span>
+        <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDatasetModal">Edit dataset</a>
       </div>
       <ul class="list-group">
         <li class="list-group-item text-bg-light">
@@ -131,7 +156,7 @@
     <div class="col-8">
       <div class="d-flex align-items-center justify-content-between">
         <span class="lead py-3">Dataset resources</span>
-        <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#createDatasetResourceModal">Create resource</a>
+        <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createDatasetResourceModal">New resource</a>
       </div>
       <table class="table table-bordered caption-top align-middle">
         <thead class="bg-light">
@@ -197,3 +222,43 @@
     </div>
   </div>
 </div>
+
+{#if dataset }
+<div class="modal" id="updateDatasetModal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update dataset properties</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="updateDatasetError"></div>
+
+        <form method="post" use:enhance={handleDatasetUpdate}>
+
+          <div class="mb-3">
+            <label for="name" class="form-label">Dataset name</label>
+            <input class="form-control" type="text" name="name" id="name" value="{dataset.name}">
+          </div>
+          <div class="mb-3">
+            <label for="type" class="form-label">Dataset type</label>
+            <input class="form-control" type="text" name="type" id="type" value="{dataset.type}">
+          </div>
+          <div class="mb-3">
+            <input class="form-check-input" type="checkbox" name="read_only" id="read_only" checked={dataset.read_only}>
+            <label for="read_only" class="form-check-label">Readonly dataset?</label>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <button class="btn btn-primary me-3">Update</button>
+            {#if updateDatasetSuccess }
+              <span class="text-success">Dataset properties updated with success</span>
+            {/if}
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{/if}

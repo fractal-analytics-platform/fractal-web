@@ -118,6 +118,32 @@ export async function getDataset(projectId, datasetId) {
   throw new Error('The client was not able to fetch the dataset')
 }
 
+export async function updateDataset(projectId, datasetId, formData) {
+
+  const requestBody = {
+    name: formData.get('name'),
+    type: formData.get('type'),
+    read_only: formData.get('read_only') ? true : false
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`,{
+    method: 'PATCH',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
+
 export async function deleteDataset(projectId, datasetId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
