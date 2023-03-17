@@ -1,4 +1,4 @@
-1. Setup a python environment with `fractal-server`, for instance as in
+Setup a python environment with `fractal-server`, for instance as in
 ```
 python3 -m venv myenv
 source myenv/bin/activate
