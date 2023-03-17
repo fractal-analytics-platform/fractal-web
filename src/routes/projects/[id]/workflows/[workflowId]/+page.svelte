@@ -34,4 +34,6 @@
   </ol>
 </nav>
 
-<h1>Workflow - {$page.params.workflowId}</h1>
+{#if workflow }
+  <h1>Workflow {workflow.name} #{$page.params.workflowId}</h1>
+{/if}
