@@ -19,15 +19,15 @@ nvm install 19
 nvm alias default 19
 ```
 
-Install the package
-```bash
-npm install
-```
-
-Clone this repository and switch to the `development` branch
+Clone this repository
 ```bash
 git clone https://github.com/fractal-analytics-platform/fractal-web.git
 cd fractal-web
+```
+
+Install the package
+```bash
+npm install
 ```
 
 ## Web client startup
@@ -54,6 +54,8 @@ The client authenticate the user by mean of a JWT token that is received from th
 The default value set by the server is 180 seconds, after that the token expires and the user is required to login again
 in order for the client request to be authorized.
 For user experience reasons, it is suggested to set the `JWT_EXPIRE_SECONDS=84600` on the server.
+
+**Note**: The [example_server_startup folder](tests/data/example_server_startup) contains an example of how to install and startup a `fractal-server` instance.
 
 # Contributors
 
