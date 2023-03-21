@@ -10,3 +10,4 @@ FRACTAL_TASKS_DIR
 tmp
 OLD
 db
+activate_venv.sh
