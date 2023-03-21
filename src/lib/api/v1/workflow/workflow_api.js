@@ -56,3 +56,55 @@ export async function deleteWorkflow(workflowId) {
 
   throw new Error('The client was not able to delete the workflow')
 }
+
+export async function createWorkflowTask(workflowId, formData) {
+
+  const requestBody = {
+    meta: {},
+    args: {},
+    task_id: formData.get('taskId'),
+    workflow_id: workflowId
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/add-task/`,{
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
+
+export async function updateWorkflowTaskArguments(workflowId, workflowTaskId, args) {
+
+  const requestBody = {
+    args: args
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/edit-task/${workflowTaskId}`,{
+    method: 'PATCH',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (response.ok) {
+    console.log('Response successful')
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
