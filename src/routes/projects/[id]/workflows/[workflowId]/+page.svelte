@@ -33,12 +33,16 @@
     cancel()
 
     const workflowTask = await createWorkflowTask(workflow.id, data)
+      .then(async () => {
+        form.reset()
+        workflow = await getWorkflow(workflow.id)
+        // eslint-disable-next-line no-undef
+        const modal = bootstrap.Modal.getInstance(document.getElementById('insertTaskModal'))
+        modal.toggle()
+      })
       .catch(error => {
         console.error(error)
       })
-
-    console.log(workflowTask)
-
   }
 </script>
 
@@ -113,6 +117,11 @@
                 <option value="{task.id}">{task.name}</option>
               {/each}
             </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Task order in workflow</label>
+            <input type="number" name="taskOrder" class="form-control" placeholder="Leave it blank to append at the end" min="0" max="{workflow?.task_list.length}">
           </div>
 
           <button class="btn btn-primary">Insert</button>

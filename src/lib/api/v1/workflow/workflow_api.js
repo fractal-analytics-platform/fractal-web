@@ -60,6 +60,7 @@ export async function deleteWorkflow(workflowId) {
 export async function createWorkflowTask(workflowId, formData) {
 
   const requestBody = {
+    order: formData.get('taskOrder') || undefined,
     meta: {},
     args: {},
     task_id: formData.get('taskId'),
