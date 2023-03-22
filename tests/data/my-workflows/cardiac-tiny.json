@@ -36,7 +36,7 @@
       },
       "task": {
         "name": "Create OME-Zarr structure",
-        "source": "pip:fractal-tasks-core==0.9.0"
+        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
       }
     },
     {
@@ -45,7 +45,7 @@
       "args": null,
       "task": {
         "name": "Convert Yokogawa to OME-Zarr",
-        "source": "pip:fractal-tasks-core==0.9.0"
+        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
       }
     },
     {
@@ -54,7 +54,7 @@
       "args": null,
       "task": {
         "name": "Copy OME-Zarr structure",
-        "source": "pip:fractal-tasks-core==0.9.0"
+        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
       }
     },
     {
@@ -63,7 +63,7 @@
       "args": null,
       "task": {
         "name": "Maximum Intensity Projection",
-        "source": "pip:fractal-tasks-core==0.9.0"
+        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
       }
     },
     {
@@ -81,7 +81,7 @@
       },
       "task": {
         "name": "Cellpose Segmentation",
-        "source": "pip:fractal-tasks-core==0.9.0"
+        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
       }
     },
     {
@@ -112,7 +112,7 @@
       },
       "task": {
         "name": "Napari workflows wrapper",
-        "source": "pip:fractal-tasks-core==0.9.0"
+        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
       }
     }
   ]
