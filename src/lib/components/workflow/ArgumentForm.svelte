@@ -78,14 +78,28 @@
   async function addNewArgument() {
     if (newArgument.name === undefined) throw new Error('Argument name can not be undefined')
     if (newArgument.name in workflowTaskArgs) throw new Error('Argument name is already in use')
-    argsList.push(newArgument)
-    let updatedWorkflowTaskArgs = updateWorkflowTaskArgs(argsList)
+    let createArgumentPayload = {}
+
+    let argumentValue = newArgument.value
+    switch(newArgument.type){
+      case 'number':
+        argumentValue = Number.parseFloat(newArgument.value)
+        break;
+      case 'boolean':
+        argumentValue = JSON.parse(newArgument.value)
+        break;
+      case 'object':
+        argumentValue = {}
+        break;
+    }
+    createArgumentPayload[newArgument.name] = argumentValue
+
     // Save the new updatedWorkflowTaskArgs with a request to the server
     if (workflowId !== undefined && workflowTaskId !== undefined){
-      await updateWorkflowTaskArguments(workflowId, workflowTaskId, updatedWorkflowTaskArgs)
+      await updateWorkflowTaskArguments(workflowId, workflowTaskId, createArgumentPayload)
         .then(result => {
           // If the server successfully updated the workflowTask args, update them reactively
-          workflowTaskArgs = updatedWorkflowTaskArgs
+          workflowTaskArgs = result.args
           newArgument = {}
           newArgumentInput = false
         })
@@ -138,6 +152,7 @@
       // For each sub-argument within the root argument, set the updated values
       argument.value.forEach(arg => {
         let updatedValue = data.get(`${arg.name}Value`)
+        let argumentName = data.get(`${arg.name}Name`)
         switch (arg.type) {
           case 'number':
             updatedValue = Number.parseFloat(updatedValue)
@@ -146,7 +161,7 @@
             updatedValue = JSON.parse(updatedValue)
             break;
         }
-        updateArgument[argument.name][arg.name] = updatedValue
+        updateArgument[argument.name][argumentName] = updatedValue
       })
 
     } else {
@@ -177,6 +192,21 @@
         console.error(error)
       })
 
+  }
+
+  function addPropertyToEditingArgument() {
+    // This function is only valid if the editing arg value is actually a list
+    if (!Array.isArray(editingArg.value)) {
+      console.error('The editing arg is not an array')
+    }
+
+    editingArg.value.push({
+      name: "",
+      value: "",
+      type: ""
+    })
+    // Update the UI
+    editingArg = editingArg
   }
 
 </script>
@@ -244,9 +274,8 @@
                   <div class="col-10">
                     <div class="input-group">
                       <span class="input-group-text">{editingArg.name}</span>
-                      <span class="input-group-text">{listArg.name}</span>
                       <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
-                      <input type="text" class="visually-hidden" name="{listArg.name}Name" value="{listArg.name}">
+                      <input type="text" class="form-control" name="{listArg.name}Name" value="{listArg.name}">
                       {#if listArg.type == 'string' }
                         <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value"
                                name="{listArg.name}Value" value={listArg.value}>
@@ -271,6 +300,7 @@
               {/each}
             </form>
             <div>
+              <button class="btn btn-light" on:click|preventDefault={addPropertyToEditingArgument}>Add argument</button>
               <button form="updateArgGroup" class="btn btn-primary" type="submit">Update <i class="bi-check-square"></i>
               </button>
               <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
@@ -302,6 +332,7 @@
               <option value="string">String</option>
               <option value="number">Number</option>
               <option value="boolean">Boolean</option>
+              <option value="object">Object</option>
             </select>
             <button class="btn btn-success" type="submit"><i class="bi-check"></i></button>
           </div>
