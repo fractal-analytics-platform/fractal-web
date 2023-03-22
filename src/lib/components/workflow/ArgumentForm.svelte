@@ -45,9 +45,23 @@
   function workflowTaskArgsAsList(args) {
     return Object.keys(args).map(key => {
       let typeOfKey = typeof args[key]
+      let argumentValue = args[key]
+      if (typeOfKey === 'object') {
+        let argKeys = Object.keys(argumentValue)
+        let listValue = []
+        argKeys.forEach(k => {
+          listValue.push({
+            name: k,
+            value: argumentValue[k],
+            type: typeof argumentValue[k]
+          })
+        })
+        argumentValue = listValue
+      }
+
       return {
         name: key,
-        value: args[key],
+        value: argumentValue,
         type: typeOfKey
       }
     })
@@ -111,24 +125,50 @@
     let updatedValue = data.get('updatedArgValue')
     const updatedType = data.get('updatedArgType')
 
-    switch (updatedType) {
-      case 'number':
-        updatedValue = Number.parseFloat(updatedValue)
+    const argument = argsList.find(arg => arg.name === argumentName)
+    // Check if the argument is an object
+    if (argument.type === 'object') {
+      // In this case we have to behave differently
+      // We have to build an update argument that matches the structure of the updated workflow task argument
+      // "argName": { "key": { "key1": value1, "key2": value2 }
+
+      // First, set to an empty obj
+      updateArgument[argument.name] = {}
+
+      // For each sub-argument within the root argument, set the updated values
+      argument.value.forEach(arg => {
+        let updatedValue = data.get(`${arg.name}Value`)
+        switch (arg.type) {
+          case 'number':
+            updatedValue = Number.parseFloat(updatedValue)
+            break;
+          case 'boolean':
+            updatedValue = JSON.parse(updatedValue)
+            break;
+        }
+        updateArgument[argument.name][arg.name] = updatedValue
+      })
+
+    } else {
+      switch (updatedType) {
+        case 'number':
+          updatedValue = Number.parseFloat(updatedValue)
+      }
+
+      // Type conversion for server-side casting
+      switch(updatedType) {
+        case 'boolean':
+          updateArgument[argumentName] = JSON.parse(updatedValue)
+          break
+        default:
+          updateArgument[argumentName] = updatedValue
+      }
     }
 
-    // Type conversion for server-side casting
-    switch(updatedType) {
-      case 'boolean':
-        updateArgument[argumentName] = JSON.parse(updatedValue)
-        break
-      default:
-        updateArgument[argumentName] = updatedValue
-    }
+
 
     await updateWorkflowTaskArguments(workflowId, workflowTaskId, updateArgument)
       .then((response) => {
-        console.log('updated success')
-        console.log(response)
         workflowTaskArgs = response.args
         editingKey = undefined
         form.reset()
@@ -147,43 +187,96 @@
     <div class="d-flex justify-content-center align-items-center mb-3">
       {#if arg.name !== editingKey }
         <div class="col-8 me-3">
+          {#if arg.type !== 'object' }
             <div class="input-group">
               <span class="input-group-text col-4">{arg.name} ({typeof arg.value})</span>
               <span class="input-group-text text-monospace bg-light col-8">{arg.value}</span>
             </div>
+          {:else}
+            <div class="bg-light py-3 pe-3 rounded">
+              {#each arg.value as listArg }
+                <div class="input-group ms-3 pe-3 pb-2">
+                  <span class="input-group-text col-4">{listArg.name} ({listArg.type})</span>
+                  <span class="input-group-text text-monospace bg-light col-8">{listArg.value}</span>
+                </div>
+              {/each}
+            </div>
+          {/if}
         </div>
         <div>
           <button class="btn btn-secondary" on:click|preventDefault={setEditingKey.bind(this, arg.name)}><i class="bi-pencil-square"></i></button>
           <!--<button class="btn btn-danger" disabled><i class="bi-trash"></i></button>-->
         </div>
       {:else}
-        <div class="col-8 me-3">
-          <form id="updateArgumentForm" method='post' use:enhance={updateWorkflowTaskArgument}>
-            <div class="input-group">
-              <span class="input-group-text col-3">{editingArg.name}</span>
-              <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
-              {#if editingArg.type == 'string' }
-                <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value" name="updatedArgValue" value={editingArg.value}>
-              {:else if editingArg.type == 'number' }
-                <input type="number" class="form-control w-50 font-monospace" placeholder="Argument default value" name="updatedArgValue" value={editingArg.value} step="0.01">
-              {:else if editingArg.type == 'boolean' }
-                <select class="form-select" name="updatedArgValue">
-                  <option value=true selected={editingArg.value ? true : false}><code>true</code></option>
-                  <option value=false selected={editingArg.value ? false : true}><code>false</code></option>
+        {#if editingArg.type !== 'object' }
+          <div class="col-8 me-3">
+            <form id="updateArgumentForm" method='post' use:enhance={updateWorkflowTaskArgument}>
+              <div class="input-group">
+                <span class="input-group-text col-3">{editingArg.name}</span>
+                <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
+                {#if editingArg.type == 'string' }
+                  <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value" name="updatedArgValue" value={editingArg.value}>
+                {:else if editingArg.type == 'number' }
+                  <input type="number" class="form-control w-50 font-monospace" placeholder="Argument default value" name="updatedArgValue" value={editingArg.value} step="0.01">
+                {:else if editingArg.type == 'boolean' }
+                  <select class="form-select" name="updatedArgValue">
+                    <option value=true selected={editingArg.value ? true : false}><code>true</code></option>
+                    <option value=false selected={editingArg.value ? false : true}><code>false</code></option>
+                  </select>
+                {/if}
+                <select name="updatedArgType" class="form-select col-2" bind:value={editingArg.type}>
+                  <option value="string">String</option>
+                  <option value="number">Number</option>
+                  <option value="boolean">Boolean</option>
                 </select>
-              {/if}
-              <select name="updatedArgType" class="form-select col-2" bind:value={editingArg.type}>
-                <option value="string">String</option>
-                <option value="number">Number</option>
-                <option value="boolean">Boolean</option>
-              </select>
+              </div>
+            </form>
+          </div>
+          <div>
+            <button form="updateArgumentForm" class="btn btn-primary" type="submit"><i class="bi-check-square"></i></button>
+            <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
+          </div>
+        {:else if editingArg.type === 'object'}
+          <div class="col-8 me-3 p-3">
+            <form id="updateArgGroup" method="post" use:enhance={updateWorkflowTaskArgument}>
+              {#each editingArg.value as listArg }
+                <div class="d-flex justify-content-between mb-2">
+                  <div class="col-10">
+                    <div class="input-group">
+                      <span class="input-group-text">{editingArg.name}</span>
+                      <span class="input-group-text">{listArg.name}</span>
+                      <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
+                      <input type="text" class="visually-hidden" name="{listArg.name}Name" value="{listArg.name}">
+                      {#if listArg.type == 'string' }
+                        <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value"
+                               name="{listArg.name}Value" value={listArg.value}>
+                      {:else if listArg.type == 'number' }
+                        <input type="number" class="form-control w-50 font-monospace"
+                               placeholder="Argument default value" name="{listArg.name}Value" value={listArg.value}
+                               step="0.01">
+                      {:else if listArg.type == 'boolean' }
+                        <select class="form-select" name="{listArg.name}Value">
+                          <option value="true" selected={listArg.value ? true : false}><code>true</code></option>
+                          <option value="false" selected={listArg.value ? false : true}><code>false</code></option>
+                        </select>
+                      {/if}
+                      <select name="{listArg.name}Type" class="form-select col-2" bind:value={listArg.type}>
+                        <option value="string">String</option>
+                        <option value="number">Number</option>
+                        <option value="boolean">Boolean</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              {/each}
+            </form>
+            <div>
+              <button form="updateArgGroup" class="btn btn-primary" type="submit">Update <i class="bi-check-square"></i>
+              </button>
+              <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
             </div>
-          </form>
-        </div>
-        <div>
-          <button form="updateArgumentForm" class="btn btn-primary" type="submit"><i class="bi-check-square"></i></button>
-          <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
-        </div>
+          </div>
+        {/if}
       {/if}
     </div>
   {/each}
