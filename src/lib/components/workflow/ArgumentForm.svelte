@@ -1,4 +1,5 @@
 <script>
+  import { enhance } from '$app/forms'
   import { updateWorkflowTaskArguments } from "$lib/api/v1/workflow/workflow_api";
 
   // This component shall handle a form which the user can use to specify arguments of a workflow-task
@@ -86,33 +87,104 @@
     newArgumentInput = false
   }
 
+  // Arguments editing
+  let editingKey = undefined
+  let editingArg = undefined
+
+  function setEditingKey(key) {
+    // Key is the key of the argument within the workflowTaskArgs obj
+    editingKey = key
+    let argument = argsList.find(arg => arg.name === key)
+    editingArg = {
+      name: argument.name,
+      value: argument.value,
+      type: argument.type
+    }
+  }
+
+  async function updateWorkflowTaskArgument({ form, data, cancel }){
+    // Prevent default
+    cancel()
+
+    let updateArgument = {}
+    const argumentName = data.get('argumentName')
+    let updatedValue = data.get('updatedArgValue')
+    const updatedType = data.get('updatedArgType')
+
+    switch (updatedType) {
+      case 'number':
+        updatedValue = Number.parseFloat(updatedValue)
+    }
+
+    // Type conversion for server-side casting
+    switch(updatedType) {
+      case 'boolean':
+        updateArgument[argumentName] = JSON.parse(updatedValue)
+        break
+      default:
+        updateArgument[argumentName] = updatedValue
+    }
+
+    await updateWorkflowTaskArguments(workflowId, workflowTaskId, updateArgument)
+      .then((response) => {
+        console.log('updated success')
+        console.log(response)
+        workflowTaskArgs = response.args
+        editingKey = undefined
+        form.reset()
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+  }
+
 </script>
 <form>
   <p class="lead">Task arguments</p>
 
   {#each argsList as arg }
     <div class="d-flex justify-content-center align-items-center mb-3">
-      <div class="col-8 me-3">
-        {#if arg.type == 'string' }
-          <div class="input-group">
-            <span class="input-group-text">{arg.name} ({typeof arg.value})</span>
-            <input type="text" class="form-control font-monospace" value="{arg.value}">
-          </div>
-        {:else if arg.type == 'number'}
-          <div class="input-group">
-            <span class="input-group-text">{arg.name} ({typeof arg.value})</span>
-            <input type="number" class="form-control font-monospace" value="{arg.value}" lang="en" step="0.01">
-          </div>
-        {:else if arg.type == 'boolean'}
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" checked={arg.value} id="{arg.name}">
-            <label class="form-check-label" for="{arg.name}"><code>{arg.name}</code></label>
-          </div>
-        {/if}
-      </div>
-      <div>
-        <button class="btn btn-danger" disabled><i class="bi-trash"></i></button>
-      </div>
+      {#if arg.name !== editingKey }
+        <div class="col-8 me-3">
+            <div class="input-group">
+              <span class="input-group-text col-4">{arg.name} ({typeof arg.value})</span>
+              <span class="input-group-text text-monospace bg-light col-8">{arg.value}</span>
+            </div>
+        </div>
+        <div>
+          <button class="btn btn-secondary" on:click|preventDefault={setEditingKey.bind(this, arg.name)}><i class="bi-pencil-square"></i></button>
+          <!--<button class="btn btn-danger" disabled><i class="bi-trash"></i></button>-->
+        </div>
+      {:else}
+        <div class="col-8 me-3">
+          <form id="updateArgumentForm" method='post' use:enhance={updateWorkflowTaskArgument}>
+            <div class="input-group">
+              <span class="input-group-text col-3">{editingArg.name}</span>
+              <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
+              {#if editingArg.type == 'string' }
+                <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value" name="updatedArgValue" value={editingArg.value}>
+              {:else if editingArg.type == 'number' }
+                <input type="number" class="form-control w-50 font-monospace" placeholder="Argument default value" name="updatedArgValue" value={editingArg.value} step="0.01">
+              {:else if editingArg.type == 'boolean' }
+                <select class="form-select" name="updatedArgValue">
+                  <option value=true selected={editingArg.value ? true : false}><code>true</code></option>
+                  <option value=false selected={editingArg.value ? false : true}><code>false</code></option>
+                </select>
+              {/if}
+              <select name="updatedArgType" class="form-select col-2" bind:value={editingArg.type}>
+                <option value="string">String</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div>
+          <button form="updateArgumentForm" class="btn btn-primary" type="submit"><i class="bi-check-square"></i></button>
+          <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
+        </div>
+      {/if}
     </div>
   {/each}
 
