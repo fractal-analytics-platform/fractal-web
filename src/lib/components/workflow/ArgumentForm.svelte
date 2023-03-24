@@ -153,6 +153,7 @@
       argument.value.forEach(arg => {
         let updatedValue = data.get(`${arg.name}Value`)
         let argumentName = data.get(`${arg.name}Name`)
+        if (updatedValue === null) return
         switch (arg.type) {
           case 'number':
             updatedValue = Number.parseFloat(updatedValue)
@@ -206,6 +207,14 @@
       type: 'string'
     })
     // Update the UI
+    editingArg = editingArg
+  }
+
+  function removeArgumentProperty(event) {
+    const argName = event.currentTarget.getAttribute('data-fc-target')
+    console.log(editingArg.value)
+    editingArg.value = editingArg.value.filter(arg => arg.name !== argName)
+    console.log(editingArg.value)
     editingArg = editingArg
   }
 
@@ -276,7 +285,7 @@
             <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
           </div>
         {:else if editingArg.type === 'object'}
-          <div class="col-12 me-3 p-3 bg-light">
+          <div class="col-12 p-2 bg-light">
             {#if editingArg.value == '' }
               <p>No property yet, add a new one.</p>
             {/if}
@@ -284,7 +293,7 @@
               {#each editingArg.value as listArg }
                 <div class="d-flex justify-content-between mb-2">
 
-                  <div class="col-12">
+                  <div class="flex-fill">
                     <div class="input-group">
                       <span class="input-group-text">{editingArg.name}</span>
                       <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
@@ -308,6 +317,11 @@
                         <option value="boolean">Boolean</option>
                       </select>
                     </div>
+                  </div>
+                  <div class="">
+                    <button class="btn btn-danger ms-1" data-fc-target="{listArg.name}" on:click|preventDefault={removeArgumentProperty}>
+                      <i class="bi-eraser-fill" ></i>
+                    </button>
                   </div>
                 </div>
               {/each}
