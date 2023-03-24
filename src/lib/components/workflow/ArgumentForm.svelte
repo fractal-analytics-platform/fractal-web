@@ -248,7 +248,7 @@
         </div>
       {:else}
         {#if editingArg.type !== 'object' }
-          <div class="col-8 me-3">
+          <div class="col-10 me-3">
             <form id="updateArgumentForm" method='post' use:enhance={updateWorkflowTaskArgument}>
               <div class="input-group">
                 <span class="input-group-text col-3">{editingArg.name}</span>
@@ -276,12 +276,12 @@
             <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
           </div>
         {:else if editingArg.type === 'object'}
-          <div class="col-8 me-3 p-3">
+          <div class="col-12 me-3 p-3">
             <form id="updateArgGroup" method="post" use:enhance={updateWorkflowTaskArgument}>
               {#each editingArg.value as listArg }
                 <div class="d-flex justify-content-between mb-2">
 
-                  <div class="col-10">
+                  <div class="col-12">
                     <div class="input-group">
                       <span class="input-group-text">{editingArg.name}</span>
                       <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
