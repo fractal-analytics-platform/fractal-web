@@ -109,3 +109,17 @@ export async function updateWorkflowTaskArguments(workflowId, workflowTaskId, ar
 
   throw new PostResourceException(await response.json())
 }
+
+export async function deleteWorkflowTask(workflowId, workflowTaskId){
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/rm-task/${workflowTaskId}`,{
+    method: 'DELETE',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok)
+    return true
+
+  throw new Error('The client was not able to delete the workflow task')
+}

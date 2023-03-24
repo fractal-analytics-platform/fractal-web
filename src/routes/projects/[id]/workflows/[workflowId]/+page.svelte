@@ -3,9 +3,10 @@
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getWorkflow, createWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
+  import { getWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
+  import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
 
   let workflow = undefined
   // List of available tasks to be inserted into workflow
@@ -15,13 +16,15 @@
 
   let workflowTabContextId = 0
 
-  onMount(async () => {
+  async function loadWorkflow() {
     workflow = await getWorkflow($page.params.workflowId)
       .catch(error => {
-        console.error(error)
-      })
+        console.error(error);
+      });
+  }
 
-    console.log(workflow)
+  onMount(async () => {
+    await loadWorkflow();
   })
 
   async function getAvailableTasks() {
@@ -44,6 +47,18 @@
         // eslint-disable-next-line no-undef
         const modal = bootstrap.Modal.getInstance(document.getElementById('insertTaskModal'))
         modal.toggle()
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
+
+  async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
+    await deleteWorkflowTask(workflowId, workflowTaskId)
+      .then(() => {
+        // Succesffully deleted task
+        loadWorkflow()
+        workflowTaskContext.set(undefined)
       })
       .catch(error => {
         console.error(error)
@@ -92,24 +107,37 @@
             Workflow sequence
           </div>
 
-          <ul class="list-group list-group-flush">
-            {#each workflow.task_list as workflowTask }
-              <li style="cursor: pointer"
-                  class="list-group-item list-group-item-action {$workflowTaskContext !== undefined && $workflowTaskContext.id == workflowTask.id ? 'active' : ''}"
-                  data-fs-target={workflowTask.id}
-                  on:click|preventDefault={setActiveWorkflowTaskContext}>
-                {workflowTask.task.name} #{workflowTask.id}
-              </li>
-            {/each}
-          </ul>
+          {#if workflow.task_list.length == 0 }
+            <p class="text-center mt-3">No workflow tasks yet, add one.</p>
+          {:else}
+            <ul class="list-group list-group-flush">
+              {#each workflow.task_list as workflowTask }
+                <li style="cursor: pointer"
+                    class="list-group-item list-group-item-action {$workflowTaskContext !== undefined && $workflowTaskContext.id == workflowTask.id ? 'active' : ''}"
+                    data-fs-target={workflowTask.id}
+                    on:click|preventDefault={setActiveWorkflowTaskContext}>
+                  {workflowTask.task.name} #{workflowTask.id}
+                </li>
+              {/each}
+            </ul>
+          {/if}
         </div>
       </div>
       <div class="col-8">
         <div class="card">
           <div class="card-header">
             {#if $workflowTaskContext}
-              <div class="mb-3">
-                Workflow task {$workflowTaskContext.task.name}
+              <div class="d-flex mb-3 justify-content-between align-items-center">
+                <div>
+                  Workflow task {$workflowTaskContext.task.name}
+                </div>
+                <ConfirmActionButton
+                  modalId="confirmDeleteWorkflowTask"
+                  btnStyle="danger"
+                  buttonIcon="trash"
+                  message="Delete a workflow task {$workflowTaskContext.task.name}"
+                  callbackAction={handleDeleteWorkflowTask.bind(this, workflow.id, $workflowTaskContext.id)}
+                ></ConfirmActionButton>
               </div>
               <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
