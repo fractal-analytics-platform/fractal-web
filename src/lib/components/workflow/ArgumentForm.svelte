@@ -43,6 +43,7 @@
   }
 
   function workflowTaskArgsAsList(args) {
+    if (args === null) return [];
     return Object.keys(args).map(key => {
       let typeOfKey = typeof args[key]
       let argumentValue = args[key]
