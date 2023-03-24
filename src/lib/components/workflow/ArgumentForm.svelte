@@ -201,9 +201,9 @@
     }
 
     editingArg.value.push({
-      name: "",
-      value: "",
-      type: ""
+      name: '',
+      value: '',
+      type: 'string'
     })
     // Update the UI
     editingArg = editingArg
@@ -276,7 +276,10 @@
             <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
           </div>
         {:else if editingArg.type === 'object'}
-          <div class="col-12 me-3 p-3">
+          <div class="col-12 me-3 p-3 bg-light">
+            {#if editingArg.value == '' }
+              <p>No property yet, add a new one.</p>
+            {/if}
             <form id="updateArgGroup" method="post" use:enhance={updateWorkflowTaskArgument}>
               {#each editingArg.value as listArg }
                 <div class="d-flex justify-content-between mb-2">
@@ -285,7 +288,7 @@
                     <div class="input-group">
                       <span class="input-group-text">{editingArg.name}</span>
                       <input type="text" class="visually-hidden" name="argumentName" value="{editingArg.name}">
-                      <input type="text" class="form-control" name="{listArg.name}Name" value="{listArg.name}">
+                      <input type="text" class="form-control" name="{listArg.name}Name" bind:value="{listArg.name}">
                       {#if listArg.type == 'string' }
                         <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value"
                                name="{listArg.name}Value" value={listArg.value}>
@@ -309,9 +312,9 @@
                 </div>
               {/each}
             </form>
-            <div>
-              <button class="btn btn-light" on:click|preventDefault={addPropertyToEditingArgument}>Add argument</button>
-              <button form="updateArgGroup" class="btn btn-primary" type="submit">Update <i class="bi-check-square"></i>
+            <div class="mt-3">
+              <button class="btn btn-secondary" on:click|preventDefault={addPropertyToEditingArgument}>Add property</button>
+              <button form="updateArgGroup" class="btn btn-primary" type="submit">Save <i class="bi-check-square"></i>
               </button>
               <button class="btn btn-danger" on:click|preventDefault={null} disabled><i class="bi-trash"></i></button>
             </div>
