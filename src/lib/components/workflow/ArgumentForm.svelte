@@ -211,8 +211,6 @@
 
 </script>
 <form>
-  <p class="lead">Task arguments</p>
-
   {#each argsList as arg }
     <div class="d-flex justify-content-center align-items-center mb-3">
       {#if arg.name !== editingKey }

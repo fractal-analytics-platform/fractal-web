@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
   import { getWorkflow, createWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
@@ -9,6 +10,10 @@
   let workflow = undefined
   // List of available tasks to be inserted into workflow
   let availableTasks = []
+
+  let workflowTaskContext = writable(undefined)
+
+  let workflowTabContextId = 0
 
   onMount(async () => {
     workflow = await getWorkflow($page.params.workflowId)
@@ -44,6 +49,13 @@
         console.error(error)
       })
   }
+
+  async function setActiveWorkflowTaskContext(event) {
+    const workflowTaskId = event.currentTarget.getAttribute('data-fs-target')
+    const wft = workflow.task_list.find(task => task.id == workflowTaskId)
+    workflowTaskContext.set(wft)
+  }
+
 </script>
 
 <nav aria-label="breadcrumb">
@@ -68,32 +80,58 @@
 </nav>
 
 {#if workflow }
-  <div class="d-flex justify-content-between align-items-center">
-    <h1>Workflow {workflow.name} #{$page.params.workflowId}</h1>
-    <button class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#insertTaskModal" on:click={getAvailableTasks}>New workflow task</button>
-  </div>
-  <div class="container m-0 ps-0">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1>Workflow {workflow.name} #{$page.params.workflowId}</h1>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#insertTaskModal" on:click={getAvailableTasks}>New workflow task</button>
+    </div>
     <div class="row">
-      <div class="accordion" id="workflowList">
-
-        {#each workflow.task_list as workflowTask }
-          <div class="accordion-item">
-
-            <div class="accordion-header">
-              <div></div>
-              <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#workflowItem-{workflowTask.id}">
-                Order{workflowTask.order} #{workflowTask.id} - {workflowTask.task.name}
-              </button>
-            </div>
-            <div id="workflowItem-{workflowTask.id}" class="accordion-collapse collapse">
-              <div class="accordion-body">
-                <ArgumentForm workflowTaskArgs={workflowTask.args} workflowId={workflow.id} workflowTaskId={workflowTask.id}></ArgumentForm>
-              </div>
-            </div>
-
+      <div class="col-4">
+        <div class="card">
+          <div class="card-header">
+            Workflow sequence
           </div>
-        {/each}
 
+          <ul class="list-group list-group-flush">
+            {#each workflow.task_list as workflowTask }
+              <li style="cursor: pointer"
+                  class="list-group-item list-group-item-action {$workflowTaskContext !== undefined && $workflowTaskContext.id == workflowTask.id ? 'active' : ''}"
+                  data-fs-target={workflowTask.id}
+                  on:click|preventDefault={setActiveWorkflowTaskContext}>
+                {workflowTask.task.name} #{workflowTask.id}
+              </li>
+            {/each}
+          </ul>
+        </div>
+      </div>
+      <div class="col-8">
+        <div class="card">
+          <div class="card-header">
+            {#if $workflowTaskContext}
+              <div class="mb-3">
+                Workflow task {$workflowTaskContext.task.name}
+              </div>
+              <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                  <a class="nav-link {workflowTabContextId === 0 ? 'active' : ''}" aria-current="true" href="#" on:click|preventDefault={null}>Arguments</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {workflowTabContextId === 1 ? 'active' : ''}" href="#" on:click|preventDefault={null}>Meta</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link disabled">Info</a>
+                </li>
+              </ul>
+            {:else}
+              Select a workflow task from the list
+            {/if}
+          </div>
+          <div class="card-body">
+            {#if $workflowTaskContext }
+              <ArgumentForm workflowTaskArgs={$workflowTaskContext.args} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></ArgumentForm>
+            {/if}
+          </div>
+        </div>
       </div>
     </div>
   </div>
