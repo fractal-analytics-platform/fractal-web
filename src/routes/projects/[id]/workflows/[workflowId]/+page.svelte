@@ -3,7 +3,7 @@
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
+  import { getWorkflow, updateWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
@@ -33,6 +33,22 @@
       .catch(error => {
         console.error(error)
         return []
+      })
+  }
+
+  async function handleWorkflowUpdate({ form, data, cancel }) {
+    // Prevent default
+    cancel()
+
+    await updateWorkflow(workflow.id, data)
+      .then(() => {
+        loadWorkflow()
+        // eslint-disable-next-line no-undef
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowModal'))
+        modal.toggle()
+      })
+      .catch(error => {
+        console.error(error)
       })
   }
 
@@ -73,38 +89,46 @@
 
 </script>
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item" aria-current="page">
-      <a href="/projects">Projects</a>
-    </li>
-    {#if $page.params.id}
+<div class="d-flex justify-content-between align-items-center">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
       <li class="breadcrumb-item" aria-current="page">
-        <a href="/projects/{$page.params.id}">{$page.params.id}</a>
+        <a href="/projects">Projects</a>
       </li>
-    {/if}
-    <li class="breadcrumb-item">
-      Workflows
-    </li>
-    {#if workflow }
-    <li class="breadcrumb-item active">
-      { workflow.name }
-    </li>
-    {/if}
-  </ol>
-</nav>
+      {#if $page.params.id}
+        <li class="breadcrumb-item" aria-current="page">
+          <a href="/projects/{$page.params.id}">{$page.params.id}</a>
+        </li>
+      {/if}
+      <li class="breadcrumb-item">
+        Workflows
+      </li>
+      {#if workflow }
+        <li class="breadcrumb-item active">
+          { workflow.name }
+        </li>
+      {/if}
+    </ol>
+  </nav>
+  <div>
+    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"><i class="bi-gear-wide-connected"></i></button>
+  </div>
+</div>
+
 
 {#if workflow }
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center my-3">
       <h1>Workflow {workflow.name} #{$page.params.workflowId}</h1>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#insertTaskModal" on:click={getAvailableTasks}>New workflow task</button>
     </div>
     <div class="row">
       <div class="col-4">
         <div class="card">
           <div class="card-header">
-            Workflow sequence
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Workflow sequence</span>
+              <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#insertTaskModal" on:click={getAvailableTasks}><i class="text-secondary bi-plus-square"></i></button>
+            </div>
           </div>
 
           {#if workflow.task_list.length == 0 }
@@ -195,4 +219,34 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal" id="editWorkflowModal">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Workflow properties</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        {#if workflow}
+        <form id="updateWorkflow" method="post" use:enhance={handleWorkflowUpdate}>
+
+          <div class="mb-3">
+            <label for="workflowName" class="form-label">Workflow name</label>
+            <input type="text" class="form-control" name="workflowName" id="workflowName" value="{workflow.name}">
+          </div>
+
+        </form>
+        {/if}
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" form="updateWorkflow">Save</button>
+      </div>
+    </div>
+  </div>
+
 </div>
