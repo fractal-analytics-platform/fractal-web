@@ -324,8 +324,8 @@
   {#if newArgumentInput }
 
     <div class="d-flex justify-content-center">
-      <div class="col-8 me-3">
-        <form on:submit|preventDefault={addNewArgument}>
+      <div class="col-10 me-3">
+        <form id="newArgumentForm" on:submit|preventDefault={addNewArgument}>
           <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Arg name" name="argumentName" bind:value={newArgument.name} required>
             {#if newArgument.type == 'string' }
@@ -344,11 +344,11 @@
               <option value="boolean">Boolean</option>
               <option value="object">Object</option>
             </select>
-            <button class="btn btn-success" type="submit"><i class="bi-check"></i></button>
           </div>
         </form>
       </div>
       <div>
+        <button class="btn btn-primary" type="submit" form="newArgumentForm"><i class="bi-check-square"></i></button>
         <button class="btn btn-danger" on:click={cancelNewArgument}><i class="bi-trash"></i></button>
       </div>
     </div>
