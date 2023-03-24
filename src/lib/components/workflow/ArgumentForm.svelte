@@ -214,20 +214,31 @@
   {#each argsList as arg }
     <div class="d-flex justify-content-center align-items-center mb-3">
       {#if arg.name !== editingKey }
-        <div class="col-8 me-3">
+        <div class="col-10 me-3">
           {#if arg.type !== 'object' }
             <div class="input-group">
               <span class="input-group-text col-4">{arg.name} ({typeof arg.value})</span>
               <span class="input-group-text text-monospace bg-light col-8">{arg.value}</span>
             </div>
           {:else}
-            <div class="bg-light py-3 pe-3 rounded">
-              {#each arg.value as listArg }
-                <div class="input-group ms-3 pe-3 pb-2">
-                  <span class="input-group-text col-4">{listArg.name} ({listArg.type})</span>
-                  <span class="input-group-text text-monospace bg-light col-8">{listArg.value}</span>
+            <div class="accordion">
+              <div class="accordion-item">
+                <div class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{arg.name}">
+                    {arg.name} ({typeof arg.value})
+                  </button>
                 </div>
-              {/each}
+                <div id="{arg.name}" class="accordion-collapse collapse">
+                  <div class="accordion-body p-2">
+                    {#each arg.value as listArg }
+                      <div class="input-group mt-2">
+                        <span class="input-group-text col-4">{listArg.name} ({listArg.type})</span>
+                        <span class="input-group-text text-monospace bg-light col-8">{listArg.value}</span>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              </div>
             </div>
           {/if}
         </div>
@@ -269,6 +280,7 @@
             <form id="updateArgGroup" method="post" use:enhance={updateWorkflowTaskArgument}>
               {#each editingArg.value as listArg }
                 <div class="d-flex justify-content-between mb-2">
+
                   <div class="col-10">
                     <div class="input-group">
                       <span class="input-group-text">{editingArg.name}</span>
