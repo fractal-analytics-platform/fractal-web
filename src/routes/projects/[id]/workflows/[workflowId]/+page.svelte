@@ -3,12 +3,13 @@
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getWorkflow, updateWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
+  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
 
   let workflow = undefined
+  $: updatableWorkflowList = workflow ? workflow.task_list : []
   // List of available tasks to be inserted into workflow
   let availableTasks = []
 
@@ -108,6 +109,39 @@
     workflowTaskContext.set(wft)
   }
 
+  function moveWorkflowTask(index, direction) {
+    const wftList = updatableWorkflowList
+
+    let replaceId
+    switch (direction) {
+      case 'up':
+        if (index === 0) break
+        replaceId = index - 1
+        break
+      case 'down':
+        if (index === wftList.length - 1) break
+        replaceId = index + 1
+    }
+
+    const replaceTask = wftList[replaceId]
+    wftList[replaceId] = wftList[index]
+    wftList[index] = replaceTask
+    updatableWorkflowList = wftList
+  }
+
+  async function handleWorkflowOrderUpdate(event) {
+
+    await reorderWorkflow(workflow.id, updatableWorkflowList.map(t => t.id))
+      .then((updatedWorkflow) => {
+        workflow = updatedWorkflow
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowTasksOrderModal'))
+        modal.toggle()
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
+
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -150,7 +184,10 @@
           <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
               <span>Workflow sequence</span>
-              <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#insertTaskModal" on:click={getAvailableTasks}><i class="text-secondary bi-plus-square"></i></button>
+              <div>
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#insertTaskModal" on:click={getAvailableTasks}><i class="bi-plus-lg"></i></button>
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowTasksOrderModal"><i class="bi-gear-wide-connected"></i></button>
+              </div>
             </div>
           </div>
 
@@ -163,7 +200,7 @@
                     class="list-group-item list-group-item-action {$workflowTaskContext !== undefined && $workflowTaskContext.id == workflowTask.id ? 'active' : ''}"
                     data-fs-target={workflowTask.id}
                     on:click|preventDefault={setActiveWorkflowTaskContext}>
-                  {workflowTask.task.name} #{workflowTask.id}
+                    {workflowTask.task.name} #{workflowTask.id}
                 </li>
               {/each}
             </ul>
@@ -268,6 +305,45 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" form="updateWorkflow">Save</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal" id="editWorkflowTasksOrderModal">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit workflow tasks order</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        {#if workflow != undefined && updatableWorkflowList.length == 0 }
+          <p class="text-center mt-3">No workflow tasks yet, add one.</p>
+        {:else if workflow != undefined}
+          <ul class="list-group list-group-flush">
+            {#each updatableWorkflowList as workflowTask, i }
+              <li class="list-group-item" data-fs-target={workflowTask.id}>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    {workflowTask.task.name} #{workflowTask.id}
+                  </div>
+                  <div>
+                    <button class="btn btn-light" on:click|preventDefault={moveWorkflowTask.bind(this, i, 'up')}><i class="bi-arrow-up"></i></button>
+                    <button class="btn btn-light" on:click|preventDefault={moveWorkflowTask.bind(this, i, 'down')}><i class="bi-arrow-down"></i></button>
+                  </div>
+                </div>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>Save</button>
       </div>
     </div>
   </div>

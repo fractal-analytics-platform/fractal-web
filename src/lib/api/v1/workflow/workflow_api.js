@@ -66,6 +66,30 @@ export async function updateWorkflow(workflowId, formData) {
   return PostResourceException(await response.json())
 }
 
+export async function reorderWorkflow(workflowId, workflowTasksOrder) {
+
+  const patchData = {
+    "reordered_workflowtask_ids": workflowTasksOrder
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`,{
+    method: 'PATCH',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(patchData)
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to update the workflow order')
+}
+
 export async function deleteWorkflow(workflowId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
