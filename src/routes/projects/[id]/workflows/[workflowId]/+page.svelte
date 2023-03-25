@@ -3,7 +3,7 @@
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getWorkflow, updateWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
+  import { getWorkflow, updateWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
@@ -26,6 +26,27 @@
   onMount(async () => {
     await loadWorkflow();
   })
+
+  async function handleExportWorkflow(event) {
+
+    const workflowData = await exportWorkflow(workflow.id)
+      .catch(error => {
+        console.error(error);
+        return null
+      })
+
+    if (workflowData !== null) {
+      const file = new File([JSON.stringify(workflowData)], `workflow-export-${workflow.name}-${Date.now().toString()}.json`, {
+        type: `application/json`,
+      })
+      const fileUrl = URL.createObjectURL(file)
+      const linkElement = document.getElementById('downloadWorkflowButton')
+      linkElement.download = `workflow-export-${workflow.name}-${Date.now().toString()}.json`
+      linkElement.href = fileUrl
+      linkElement.click()
+    }
+
+  }
 
   async function getAvailableTasks() {
     // Get available tasks from the server
@@ -111,7 +132,9 @@
     </ol>
   </nav>
   <div>
-    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"><i class="bi-gear-wide-connected"></i></button>
+    <button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}><i class="bi-box-arrow-up"></i></button>
+    <a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
+    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"><i class="bi-gear-wide-connected"></i></button>
   </div>
 </div>
 

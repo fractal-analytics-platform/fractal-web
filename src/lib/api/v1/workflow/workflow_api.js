@@ -81,6 +81,21 @@ export async function deleteWorkflow(workflowId) {
   throw new Error('The client was not able to delete the workflow')
 }
 
+export async function exportWorkflow(workflowId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/export`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to retrieve the workflow export data from the server')
+}
+
 export async function createWorkflowTask(workflowId, formData) {
 
   const requestBody = {
