@@ -22,20 +22,29 @@
 
 </script>
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item" aria-current="page">
-      <a href="/projects">Projects</a>
-    </li>
-    {#if project}
-      <li class="breadcrumb-item active" aria-current="page">{project.name}</li>
-    {/if}
-  </ol>
-</nav>
+
+<div class="d-flex justify-content-between align-items-center">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item" aria-current="page">
+        <a href="/projects">Projects</a>
+      </li>
+      {#if project}
+        <li class="breadcrumb-item active" aria-current="page">{project.name}</li>
+      {/if}
+    </ol>
+  </nav>
+  <div>
+  </div>
+</div>
 
 {#if project}
-  <h1>Project</h1>
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center my-3">
+      <h1>Project {project.name} #{project.id}</h1>
+    </div>
 
-  <ProjectDatasetsList datasets={project.dataset_list}></ProjectDatasetsList>
-  <WorkflowsList {workflows} projectId={project.id}></WorkflowsList>
+    <ProjectDatasetsList datasets={project.dataset_list}></ProjectDatasetsList>
+    <WorkflowsList {workflows} projectId={project.id}></WorkflowsList>
+  </div>
 {/if}

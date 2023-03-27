@@ -30,6 +30,8 @@
   </ol>
 </nav>
 
-<ProjectInfoModal></ProjectInfoModal>
+<div class="container">
+  <ProjectInfoModal></ProjectInfoModal>
 
-<ProjectsList bind:projects on:projectCreated={updateProjectsList} />
+  <ProjectsList bind:projects on:projectCreated={updateProjectsList} />
+</div>

@@ -87,108 +87,114 @@
 
 </script>
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item" aria-current="page">
-      <a href="/projects">Projects</a>
-    </li>
-    <li class="breadcrumb-item" aria-current="page">
-      <a href="/projects/{projectId}">Project</a>
-    </li>
-    <li class="breadcrumb-item" aria-current="page">Datasets</li>
-    {#if dataset}
-      <li class="breadcrumb-item active" aria-current="page">{dataset.name}</li>
-    {/if}
-  </ol>
-</nav>
+<div class="d-flex justify-content-between align-items-center">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item" aria-current="page">
+        <a href="/projects">Projects</a>
+      </li>
+      <li class="breadcrumb-item" aria-current="page">
+        <a href="/projects/{projectId}">Project</a>
+      </li>
+      <li class="breadcrumb-item" aria-current="page">Datasets</li>
+      {#if dataset}
+        <li class="breadcrumb-item active" aria-current="page">{dataset.name}</li>
+      {/if}
+    </ol>
+  </nav>
+</div>
 
 {#if dataset}
-  <div class="container px-0">
-  <h1>Dataset {dataset.name} #{dataset.id}</h1>
-
-  <div class="row mt-2">
-
-    <div class="col-4">
-      <div class="d-flex align-items-center justify-content-between">
-        <span class="lead py-3">Dataset properties</span>
-        <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDatasetModal">Edit dataset</a>
-      </div>
-      <ul class="list-group">
-        <li class="list-group-item text-bg-light">
-          <span>Id</span>
-        </li>
-        <li class="list-group-item">
-          <span>{dataset.id}</span>
-        </li>
-        <li class="list-group-item text-bg-light">
-          <span>Name</span>
-        </li>
-        <li class="list-group-item">
-          <span>{dataset.name}</span>
-        </li>
-        <li class="list-group-item text-bg-light">
-          <span>Type</span>
-        </li>
-        <li class="list-group-item">
-          <span>{dataset.type}</span>
-        </li>
-        <li class="list-group-item text-bg-light">
-          <span>Readonly</span>
-        </li>
-        <li class="list-group-item">
-          <span class="badge bg-info">{dataset.read_only}</span>
-        </li>
-      </ul>
-      {#if Object.keys(dataset.meta).length > 0 }
-        <p class="text-muted mt-3">Meta properties</p>
-        <ul class="list-group">
-          {#each Object.entries(dataset.meta) as [key, value] }
-            <li class="list-group-item text-bg-light">
-              <span class="text-capitalize">{key}</span>
-            </li>
-            <li class="list-group-item">
-              <span class="">{value}</span>
-            </li>
-          {/each}
-        </ul>
-      {/if}
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center my-3">
+      <h1>Dataset {dataset.name} #{dataset.id}</h1>
     </div>
-    <div class="col-8">
-      <div class="d-flex align-items-center justify-content-between">
-        <span class="lead py-3">Dataset resources</span>
-        <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createDatasetResourceModal">New resource</a>
+
+    <div class="row mt-2">
+
+      <div class="col-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <span class="lead py-3">Dataset properties</span>
+          <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDatasetModal">Edit
+            dataset</a>
+        </div>
+        <ul class="list-group">
+          <li class="list-group-item text-bg-light">
+            <span>Id</span>
+          </li>
+          <li class="list-group-item">
+            <span>{dataset.id}</span>
+          </li>
+          <li class="list-group-item text-bg-light">
+            <span>Name</span>
+          </li>
+          <li class="list-group-item">
+            <span>{dataset.name}</span>
+          </li>
+          <li class="list-group-item text-bg-light">
+            <span>Type</span>
+          </li>
+          <li class="list-group-item">
+            <span>{dataset.type}</span>
+          </li>
+          <li class="list-group-item text-bg-light">
+            <span>Readonly</span>
+          </li>
+          <li class="list-group-item">
+            <span class="badge bg-info">{dataset.read_only}</span>
+          </li>
+        </ul>
+        {#if Object.keys(dataset.meta).length > 0 }
+          <p class="text-muted mt-3">Meta properties</p>
+          <ul class="list-group">
+            {#each Object.entries(dataset.meta) as [key, value] }
+              <li class="list-group-item text-bg-light">
+                <span class="text-capitalize">{key}</span>
+              </li>
+              <li class="list-group-item">
+                <span class="">{value}</span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
       </div>
-      <table class="table table-bordered caption-top align-middle">
-        <thead class="bg-light">
+      <div class="col-8">
+        <div class="d-flex align-items-center justify-content-between">
+          <span class="lead py-3">Dataset resources</span>
+          <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+             data-bs-target="#createDatasetResourceModal">New resource</a>
+        </div>
+        <table class="table table-bordered caption-top align-middle">
+          <thead class="bg-light">
           <tr>
             <th class="col-1">Id</th>
             <th class="col-9">Source</th>
             <th class="col-2">Options</th>
           </tr>
-        </thead>
-        <tbody>
-        {#each dataset.resource_list as resource }
-          <tr>
-            <td>{resource.id}</td>
-            <td><code>{resource.path}</code></td>
-            <td>
-              <ConfirmActionButton
-              modalId="confirmDeleteResource{resource.id}"
-              style="danger"
-              btnStyle="danger"
-              label="Delete"
-              message="Delete a dataset resource"
-              callbackAction={handleDeleteDatasetResource.bind(this, resource.id)}
-              buttonIcon="trash">
-              </ConfirmActionButton>
-            </td>
-          </tr>
-        {/each}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+          {#each dataset.resource_list as resource }
+            <tr>
+              <td>{resource.id}</td>
+              <td><code>{resource.path}</code></td>
+              <td>
+                <ConfirmActionButton
+                  modalId="confirmDeleteResource{resource.id}"
+                  style="danger"
+                  btnStyle="danger"
+                  label="Delete"
+                  message="Delete a dataset resource"
+                  callbackAction={handleDeleteDatasetResource.bind(this, resource.id)}
+                  buttonIcon="trash">
+                </ConfirmActionButton>
+              </td>
+            </tr>
+          {/each}
+          </tbody>
+        </table>
+      </div>
 
-  </div>
+    </div>
 
   </div>
 {/if}
