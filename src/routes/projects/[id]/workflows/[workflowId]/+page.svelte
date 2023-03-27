@@ -225,23 +225,35 @@
               </div>
               <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
-                  <a class="nav-link {workflowTabContextId === 0 ? 'active' : ''}" aria-current="true" href="#" on:click|preventDefault={null}>Arguments</a>
+                  <a data-bs-toggle="tab" data-bs-target="#args-tab" class="nav-link {workflowTabContextId === 0 ? 'active' : ''}" aria-current="true" href="#" >Arguments</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link {workflowTabContextId === 1 ? 'active' : ''}" href="#" on:click|preventDefault={null}>Meta</a>
+                  <a data-bs-toggle="tab" data-bs-target="#meta-tab" class="nav-link {workflowTabContextId === 1 ? 'active' : ''}" href="#" >Meta</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link disabled">Info</a>
+                  <a  class="nav-link disabled">Info</a>
                 </li>
               </ul>
             {:else}
               Select a workflow task from the list
             {/if}
           </div>
-          <div class="card-body">
-            {#if $workflowTaskContext }
-              <ArgumentForm workflowTaskArgs={$workflowTaskContext.args} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></ArgumentForm>
-            {/if}
+          <div class="tab-content">
+            <div id="args-tab" class="tab-pane show active">
+              <div class="card-body">
+                {#if $workflowTaskContext }
+                  <ArgumentForm workflowTaskArgs={$workflowTaskContext.args} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></ArgumentForm>
+                {/if}
+              </div>
+            </div>
+            <div id="meta-tab" class="tab-pane">
+              <div class="card-body">
+                {#if $workflowTaskContext }
+                  <!--<MetaForm workflowTaskMeta={$workflowTaskContext.meta} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></MetaForm>-->
+                  <p>Testing</p>
+                {/if}
+              </div>
+            </div>
           </div>
         </div>
       </div>
