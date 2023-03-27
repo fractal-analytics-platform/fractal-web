@@ -89,11 +89,13 @@
       <tbody>
       { #each projects as { id, name, project_dir, read_only } }
         <tr>
-          <td>{id}</td>
-          <td>{name}</td>
-          <td>{project_dir}</td>
-          <td>{read_only ? "Yes" : "No"}</td>
-          <td class="align-right">
+          <td class="col-1">{id}</td>
+          <td class="col-1">{name}</td>
+          <td class="col-7">
+            <code>{project_dir}</code>
+          </td>
+          <td class="col-1">{read_only ? "Yes" : "No"}</td>
+          <td class="col-2 align-right">
             <button data-fc-project="{id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
               <i class="bi bi-info-circle"></i>
             </button>
