@@ -37,7 +37,7 @@
       })
 
     if (workflowData !== null) {
-      const file = new File([JSON.stringify(workflowData)], `workflow-export-${workflow.name}-${Date.now().toString()}.json`, {
+      const file = new File([JSON.stringify(workflowData, '', 2)], `workflow-export-${workflow.name}-${Date.now().toString()}.json`, {
         type: `application/json`,
       })
       const fileUrl = URL.createObjectURL(file)
