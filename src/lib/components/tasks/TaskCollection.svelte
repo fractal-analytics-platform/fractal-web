@@ -40,12 +40,16 @@
 
     await createTaskCollection(data)
       .then(taskCollection => {
-        console.log(taskCollection)
         // Check that the taskCollection is not null
         // If null then, the taskCollection has already been requested
         if (taskCollection.id === null) {
-          console.log('Task collection already happened')
+          console.info('Task collection already happened')
         } else {
+          // If a version is specified, add it to taskCollection result
+          const version = data.get('version')
+          if (version !== undefined) {
+            taskCollection.data.version = version
+          }
           // Add task collection to local storage
           storeCreatedTaskCollection(taskCollection)
         }
@@ -62,6 +66,7 @@
       id: taskCollection.id,
       status: taskCollection.data.status,
       pkg: taskCollection.data.package,
+      version: taskCollection.data.version,
       timestamp: taskCollection.timestamp
     })
     updateTaskCollections(taskCollections)
@@ -209,17 +214,21 @@
           <tr>
             <th>Timestamp</th>
             <th>Package</th>
+            <th>Version</th>
             <th>Status</th>
-            <th></th>
+            <th>Options</th>
           </tr>
         </thead>
         <tbody>
-        {#each taskCollections as { timestamp, status, pkg, id }}
+        {#each taskCollections as { timestamp, status, version, pkg, id }}
           <tr>
             <td class="col-2">{new Date(timestamp).toLocaleString()}</td>
             <td>{pkg}</td>
-            <td class="col-2"><span class="badge {statusBadge(status)}">{status}</span></td>
             <td class="col-1">
+              <code>{version ? version : 'Unspecified' }</code>
+            </td>
+            <td class="col-1"><span class="badge {statusBadge(status)}">{status}</span></td>
+            <td class="col-2">
               <ConfirmActionButton
                 modalId="removeTaskCollectionModal{id}"
                 btnStyle="warning"
