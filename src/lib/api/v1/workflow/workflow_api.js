@@ -56,6 +56,7 @@ export async function updateWorkflow(workflowId, formData) {
     method: 'PATCH',
     credentials: 'include',
     mode: 'cors',
+    headers,
     body: JSON.stringify(requestData)
   })
 
