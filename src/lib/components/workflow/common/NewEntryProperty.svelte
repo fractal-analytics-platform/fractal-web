@@ -8,9 +8,12 @@
 
   export let activateInput = false
 
-  const uuid = Date.now().valueOf()
-
-  console.log(uuid)
+  let uuid = undefined
+  $: {
+    if (activateInput) {
+      uuid = Date.now().valueOf()
+    }
+  }
 
   function handleSubmitEntry() {
 
