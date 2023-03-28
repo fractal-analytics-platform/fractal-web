@@ -7,6 +7,7 @@
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+  import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
   let workflow = undefined
   $: updatableWorkflowList = workflow ? workflow.task_list : []
@@ -248,9 +249,8 @@
             </div>
             <div id="meta-tab" class="tab-pane">
               <div class="card-body">
-                {#if $workflowTaskContext }
-                  <!--<MetaForm workflowTaskMeta={$workflowTaskContext.meta} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></MetaForm>-->
-                  <p>Testing</p>
+                {#if $workflowTaskContext && $workflowTaskContext.meta}
+                  <MetaPropertiesForm metaProperties={$workflowTaskContext.meta}></MetaPropertiesForm>
                 {/if}
               </div>
             </div>
