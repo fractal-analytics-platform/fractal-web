@@ -16,7 +16,24 @@
   }
 
   function handleSubmitEntry() {
+    switch (propertyType) {
 
+      case 'object':
+        propertyValue = {}
+        break
+      case 'array':
+        propertyValue = []
+        break
+      case 'boolean':
+        propertyValue = JSON.parse(propertyValue)
+        break
+      case 'number':
+        propertyValue = Number.parseFloat(propertyValue)
+        break
+
+    }
+
+    console.log(propertyName, propertyValue, typeof propertyValue, propertyType, entry)
   }
 
 </script>
