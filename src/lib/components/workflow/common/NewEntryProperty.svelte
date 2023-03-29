@@ -49,12 +49,17 @@
     // Submit the new entry
     submitNewEntry(entry)
     // Log submitted entry data
-    console.log(propertyName, propertyValue, typeof propertyValue, propertyType, entry)
+    console.debug(propertyName, propertyValue, typeof propertyValue, propertyType, entry)
     // If submitNewEntry is successful
     activateInput = false
     // Reset the form
     const form = event.target
     form.reset()
+    resetComponent()
+  }
+
+  function resetComponent() {
+    activateInput = false
     propertyName = ''
     propertyValue = null
     propertyType = 'string'
@@ -66,7 +71,7 @@
 {#if activateInput }
 
   <div class="d-flex justify-content-center">
-    <div class="col-10 me-3">
+    <div class="flex-fill me-2">
       <form id={uuid} on:submit|preventDefault={handleSubmitEntry}>
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Arg name" bind:value={propertyName} required>
@@ -92,7 +97,7 @@
     </div>
     <div>
       <button class="btn btn-primary" type="submit" form={uuid}><i class="bi-check-square"></i></button>
-      <button class="btn btn-danger" on:click={null}><i class="bi-trash"></i></button>
+      <button class="btn btn-danger" on:click={resetComponent}><i class="bi-trash"></i></button>
     </div>
   </div>
 
