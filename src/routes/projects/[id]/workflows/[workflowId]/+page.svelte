@@ -250,7 +250,7 @@
             <div id="meta-tab" class="tab-pane">
               <div class="card-body">
                 {#if $workflowTaskContext && $workflowTaskContext.meta}
-                  <MetaPropertiesForm metaProperties={$workflowTaskContext.meta}></MetaPropertiesForm>
+                  <MetaPropertiesForm workflowId={workflow.id} taskId={$workflowTaskContext.id} metaProperties={$workflowTaskContext.meta}></MetaPropertiesForm>
                 {/if}
               </div>
             </div>
