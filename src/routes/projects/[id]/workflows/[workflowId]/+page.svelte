@@ -243,7 +243,7 @@
             <div id="args-tab" class="tab-pane show active">
               <div class="card-body">
                 {#if $workflowTaskContext }
-                  <ArgumentForm workflowTaskArgs={$workflowTaskContext.args} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></ArgumentForm>
+                  <ArgumentForm workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id} workflowTaskArgs={$workflowTaskContext.args}></ArgumentForm>
                 {/if}
               </div>
             </div>
