@@ -4,16 +4,17 @@
 
   export let entry
 
-  let newEntryProperty = false
+  const submitNewEntry = (newEntry) => {
+    entry = newEntry
+  }
+
+  $: {
+    console.log(entry)
+  }
 
 </script>
 
 <div>
-  <FormStructure {entry}></FormStructure>
-
-  <NewEntryProperty {entry} activateInput={newEntryProperty}></NewEntryProperty>
-
-  <div class="d-flex justify-content-center align-items-center mt-3">
-    <button class="btn btn-secondary" on:click={() => newEntryProperty = true}>Add property <i class="text-bi-plus-square-fill"></i></button>
-  </div>
+  <FormStructure {entry} on:entryUpdated={(event) => console.log(event.detail.value)}></FormStructure>
+  <NewEntryProperty {entry} {submitNewEntry}></NewEntryProperty>
 </div>

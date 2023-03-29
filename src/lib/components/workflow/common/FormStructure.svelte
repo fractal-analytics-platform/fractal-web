@@ -4,11 +4,19 @@
   // sub-components that will manipulate the entry
   import { createEventDispatcher } from 'svelte'
   import FormBaseEntry from "./FormBaseEntry.svelte";
+  import NewEntryProperty from './NewEntryProperty.svelte';
 
   const dispatcher = createEventDispatcher()
 
   export let entry
   export let entryName = undefined
+  export let entryId = undefined
+
+  // TODO: This is a temporary solution to the problem of having multiple entries with the same name
+  if (entryId === undefined) {
+    entryId = entryName + '-' + Date.now().toString()
+  }
+
   let entryType = typeof entry
   let isArray = Array.isArray(entry)
 
@@ -46,8 +54,6 @@
       })
 
     } else {
-      // TODO: There is a problem with the format of boolean values it should be checked at a deeper level
-      //  Probably should be checked at FormBaseEntry-level
       dispatcher('entryUpdated', {
         name: entryName,
         type: event.detail.type,
@@ -67,15 +73,16 @@
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryName}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryId}">
               {entryName} (obj)
             </button>
           </div>
-          <div id="{entryName}" class="accordion-collapse collapse">
+          <div id="{entryId}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
               {#each Object.entries(entry) as [key, value]}
                 <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate}/>
               {/each}
+              <NewEntryProperty {entry} submitNewEntry={(newEntry) => entry = newEntry}></NewEntryProperty>
             </div>
           </div>
         </div>
@@ -91,20 +98,21 @@
 
   {#if isArray}
     <!-- Should build an accordion, but one for each element in the list -->
+    <!-- Each element in the list is an object! -->
     {#if entryName}
-      {@debug entryName}
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryName}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryId}">
               {entryName} (list)
             </button>
           </div>
-          <div id="{entryName}" class="accordion-collapse collapse">
+          <div id="{entryId}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
-              {#each entry as listItem}
-                <svelte:self entry={listItem} on:entryUpdated={handleEntryUpdate} />
+              {#each entry as listItem, index}
+                <svelte:self entry={listItem} entryName={entryName + '-list-item'} on:entryUpdated={handleEntryUpdate} />
               {/each}
+              <NewEntryProperty {entry} submitNewEntry={(newEntry) => entry = newEntry}></NewEntryProperty>
             </div>
           </div>
         </div>

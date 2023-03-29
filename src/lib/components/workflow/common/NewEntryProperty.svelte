@@ -6,7 +6,9 @@
   export let propertyValue = null
   export let propertyType = 'string' // string | number | boolean | object | array
 
-  export let activateInput = false
+  let activateInput = false
+
+  export let submitNewEntry = undefined
 
   let uuid = undefined
   $: {
@@ -15,25 +17,47 @@
     }
   }
 
-  function handleSubmitEntry() {
+  function handleSubmitEntry(event) {
+    // Set default value for propertyValue based on propertyType
     switch (propertyType) {
-
       case 'object':
         propertyValue = {}
         break
       case 'array':
         propertyValue = []
         break
+      case 'string':
+        propertyValue = propertyValue || ''
+        break
       case 'boolean':
-        propertyValue = JSON.parse(propertyValue)
+        propertyValue = JSON.parse(propertyValue) || false
         break
       case 'number':
-        propertyValue = Number.parseFloat(propertyValue)
+        propertyValue = Number.parseFloat(propertyValue) || 0
         break
-
     }
 
+    // Add the new property to the entry
+    const entryType = typeof entry
+    const isArray = Array.isArray(entry)
+    if (entryType === 'object' && !isArray) {
+      entry[propertyName] = propertyValue
+    } else if (isArray) {
+      entry.push(propertyValue)
+    }
+
+    // Submit the new entry
+    submitNewEntry(entry)
+    // Log submitted entry data
     console.log(propertyName, propertyValue, typeof propertyValue, propertyType, entry)
+    // If submitNewEntry is successful
+    activateInput = false
+    // Reset the form
+    const form = event.target
+    form.reset()
+    propertyName = ''
+    propertyValue = null
+    propertyType = 'string'
   }
 
 </script>
@@ -73,3 +97,7 @@
   </div>
 
 {/if}
+
+<div class="d-flex justify-content-center align-items-center mt-3">
+  <button class="btn btn-secondary" on:click={() => activateInput = true}>Add property <i class="text-bi-plus-square-fill"></i></button>
+</div>
