@@ -5,16 +5,22 @@
   export let entry
 
   const submitNewEntry = (newEntry) => {
-    entry = newEntry
+    updateEntry(newEntry)
   }
 
-  $: {
-    console.log(entry)
+  export let updateEntry
+
+  function handleEntryUpdateEvent(event) {
+    updateEntry(event.detail.value)
+  }
+
+  function handleEntryInserted(event) {
+    updateEntry(event.detail)
   }
 
 </script>
 
 <div>
-  <FormStructure {entry} on:entryUpdated={(event) => console.log(event.detail.value)}></FormStructure>
+  <FormStructure {entry} on:entryUpdated={handleEntryUpdateEvent} on:entryInserted={handleEntryInserted}></FormStructure>
   <NewEntryProperty {entry} {submitNewEntry}></NewEntryProperty>
 </div>

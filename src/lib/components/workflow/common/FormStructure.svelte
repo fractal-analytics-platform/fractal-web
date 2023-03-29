@@ -62,6 +62,19 @@
     }
   }
 
+  function newEntryInserted(newEntry) {
+    entry = newEntry
+    dispatchEntryInserted()
+  }
+
+  function handleNewEntryInserted(event) {
+    dispatchEntryInserted()
+  }
+
+  function dispatchEntryInserted() {
+    dispatcher('entryInserted', entry)
+  }
+
 </script>
 
 <div class="mb-2">
@@ -80,9 +93,9 @@
           <div id="{entryId}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
               {#each Object.entries(entry) as [key, value]}
-                <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate}/>
+                <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted}/>
               {/each}
-              <NewEntryProperty {entry} submitNewEntry={(newEntry) => entry = newEntry}></NewEntryProperty>
+              <NewEntryProperty {entry} submitNewEntry={newEntryInserted}></NewEntryProperty>
             </div>
           </div>
         </div>
@@ -91,7 +104,7 @@
     {:else}
       <!-- Should build a sequence of components that will enable the editing of each object properties -->
       {#each Object.entries(entry) as [key, value]}
-        <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate}/>
+        <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted}/>
       {/each}
     {/if}
   {/if}
@@ -110,9 +123,9 @@
           <div id="{entryId}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
               {#each entry as listItem, index}
-                <svelte:self entry={listItem} entryName={entryName + '-list-item'} on:entryUpdated={handleEntryUpdate} />
+                <svelte:self entry={listItem} entryName={entryName + '-list-item'} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted} />
               {/each}
-              <NewEntryProperty {entry} submitNewEntry={(newEntry) => entry = newEntry}></NewEntryProperty>
+              <NewEntryProperty {entry} submitNewEntry={newEntryInserted}></NewEntryProperty>
             </div>
           </div>
         </div>
