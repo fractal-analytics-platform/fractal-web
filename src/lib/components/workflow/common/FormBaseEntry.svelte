@@ -44,9 +44,9 @@
   {#if !editingEntry }
     <div class="d-flex align-items-center">
       {#if !isListEntry}
-        <ul class="list-group list-group-horizontal flex-fill">
+        <ul class="list-group list-group-horizontal flex-fill overflow-hidden">
           <li class="list-group-item">{entryName}</li>
-          <li class="list-group-item text-monospace bg-light flex-fill"><code>{entryValue}</code></li>
+          <li class="list-group-item text-monospace bg-light flex-fill overflow-hidden"><code>{entryValue}</code></li>
         </ul>
       {:else}
         <div class="input-group">
