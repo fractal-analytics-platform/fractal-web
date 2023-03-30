@@ -7,6 +7,7 @@
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+  import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
   let workflow = undefined
   $: updatableWorkflowList = workflow ? workflow.task_list : []
@@ -16,6 +17,12 @@
   let workflowTaskContext = writable(undefined)
 
   let workflowTabContextId = 0
+
+  let selectedWorkflowTask = undefined
+
+  workflowTaskContext.subscribe((value) => {
+    selectedWorkflowTask = value
+  })
 
   async function loadWorkflow() {
     workflow = await getWorkflow($page.params.workflowId)
@@ -210,38 +217,53 @@
       <div class="col-8">
         <div class="card">
           <div class="card-header">
-            {#if $workflowTaskContext}
+            {#if selectedWorkflowTask}
               <div class="d-flex mb-3 justify-content-between align-items-center">
                 <div>
-                  Workflow task {$workflowTaskContext.task.name}
+                  Workflow task {selectedWorkflowTask.task.name}
                 </div>
                 <ConfirmActionButton
                   modalId="confirmDeleteWorkflowTask"
                   btnStyle="danger"
                   buttonIcon="trash"
-                  message="Delete a workflow task {$workflowTaskContext.task.name}"
-                  callbackAction={handleDeleteWorkflowTask.bind(this, workflow.id, $workflowTaskContext.id)}
+                  message="Delete a workflow task {selectedWorkflowTask.task.name}"
+                  callbackAction={handleDeleteWorkflowTask.bind(this, workflow.id, selectedWorkflowTask.id)}
                 ></ConfirmActionButton>
               </div>
               <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
-                  <a class="nav-link {workflowTabContextId === 0 ? 'active' : ''}" aria-current="true" href="#" on:click|preventDefault={null}>Arguments</a>
+                  <a data-bs-toggle="tab" data-bs-target="#args-tab" class="nav-link {workflowTabContextId === 0 ? 'active' : ''}" aria-current="true" href="#" >Arguments</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link {workflowTabContextId === 1 ? 'active' : ''}" href="#" on:click|preventDefault={null}>Meta</a>
+                  <a data-bs-toggle="tab" data-bs-target="#meta-tab" class="nav-link {workflowTabContextId === 1 ? 'active' : ''}" href="#" >Meta</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link disabled">Info</a>
+                  <a  class="nav-link disabled">Info</a>
                 </li>
               </ul>
             {:else}
               Select a workflow task from the list
             {/if}
           </div>
-          <div class="card-body">
-            {#if $workflowTaskContext }
-              <ArgumentForm workflowTaskArgs={$workflowTaskContext.args} workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id}></ArgumentForm>
-            {/if}
+          <div class="tab-content">
+            <div id="args-tab" class="tab-pane show active">
+              <div class="card-body">
+                {#if selectedWorkflowTask}
+                  {#key selectedWorkflowTask}
+                    <ArgumentForm workflowId={workflow.id} workflowTaskId={selectedWorkflowTask.id} workflowTaskArgs={selectedWorkflowTask.args}></ArgumentForm>
+                  {/key}
+                {/if}
+              </div>
+            </div>
+            <div id="meta-tab" class="tab-pane">
+              <div class="card-body">
+                {#if selectedWorkflowTask}
+                  {#key selectedWorkflowTask}
+                    <MetaPropertiesForm workflowId={workflow.id} taskId={selectedWorkflowTask.id} metaProperties={selectedWorkflowTask.meta}></MetaPropertiesForm>
+                  {/key}
+                {/if}
+              </div>
+            </div>
           </div>
         </div>
       </div>
