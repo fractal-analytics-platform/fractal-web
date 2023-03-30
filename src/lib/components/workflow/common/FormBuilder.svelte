@@ -24,9 +24,7 @@
 
 </script>
 
-{#key entry}
-  <div>
-    <FormStructure {entry} on:entryUpdated={handleEntryUpdateEvent} on:entryInserted={handleEntryInserted}></FormStructure>
-    <NewEntryProperty {entry} {submitNewEntry}></NewEntryProperty>
-  </div>
-{/key}
+<div>
+  <FormStructure {entry} on:entryUpdated={handleEntryUpdateEvent} on:entryInserted={handleEntryInserted}></FormStructure>
+  <NewEntryProperty {entry} {submitNewEntry}></NewEntryProperty>
+</div>

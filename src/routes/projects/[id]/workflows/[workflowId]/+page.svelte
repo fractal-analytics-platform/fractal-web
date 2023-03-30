@@ -249,14 +249,18 @@
             <div id="args-tab" class="tab-pane show active">
               <div class="card-body">
                 {#if selectedWorkflowTask}
-                  <ArgumentForm workflowId={workflow.id} workflowTaskId={selectedWorkflowTask.id} workflowTaskArgs={selectedWorkflowTask.args}></ArgumentForm>
+                  {#key selectedWorkflowTask}
+                    <ArgumentForm workflowId={workflow.id} workflowTaskId={selectedWorkflowTask.id} workflowTaskArgs={selectedWorkflowTask.args}></ArgumentForm>
+                  {/key}
                 {/if}
               </div>
             </div>
             <div id="meta-tab" class="tab-pane">
               <div class="card-body">
                 {#if selectedWorkflowTask}
-                  <MetaPropertiesForm workflowId={workflow.id} taskId={selectedWorkflowTask.id} metaProperties={selectedWorkflowTask.meta}></MetaPropertiesForm>
+                  {#key selectedWorkflowTask}
+                    <MetaPropertiesForm workflowId={workflow.id} taskId={selectedWorkflowTask.id} metaProperties={selectedWorkflowTask.meta}></MetaPropertiesForm>
+                  {/key}
                 {/if}
               </div>
             </div>
