@@ -42,18 +42,18 @@
 <div class="mb-2">
 
   {#if !editingEntry }
-    <div class="d-flex">
+    <div class="d-flex align-items-center">
       {#if !isListEntry}
-        <div class="input-group">
-          <span class="input-group-text col-4">{entryName}</span>
-          <span class="input-group-text text-monospace bg-light col-8">{entryValue}</span>
-        </div>
+        <ul class="list-group list-group-horizontal flex-fill">
+          <li class="list-group-item">{entryName}</li>
+          <li class="list-group-item text-monospace bg-light flex-fill"><code>{entryValue}</code></li>
+        </ul>
       {:else}
         <div class="input-group">
           <span class="input-group-text text-monospace bg-light flex-fill">{entryValue}</span>
         </div>
       {/if}
-      <div class="ps-1">
+      <div class="ps-2">
         <button class="btn btn-secondary" on:click={() => editingEntry = true}><i class="bi-pencil-square"></i></button>
       </div>
     </div>
