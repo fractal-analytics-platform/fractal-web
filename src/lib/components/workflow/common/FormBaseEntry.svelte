@@ -45,7 +45,11 @@
     <div class="d-flex align-items-center">
       {#if !isListEntry}
         <ul class="list-group list-group-horizontal flex-fill overflow-hidden">
-          <li class="list-group-item">{entryName}</li>
+          <li class="list-group-item">
+            <div class="d-flex h-100 align-items-center">
+              <span class="">{entryName}</span>
+            </div>
+          </li>
           <li class="list-group-item text-monospace bg-light flex-fill overflow-hidden"><code>{entryValue}</code></li>
         </ul>
       {:else}
