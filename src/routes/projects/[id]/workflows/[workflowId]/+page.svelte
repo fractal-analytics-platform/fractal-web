@@ -18,6 +18,12 @@
 
   let workflowTabContextId = 0
 
+  let selectedWorkflowTask = undefined
+
+  workflowTaskContext.subscribe((value) => {
+    selectedWorkflowTask = value
+  })
+
   async function loadWorkflow() {
     workflow = await getWorkflow($page.params.workflowId)
       .catch(error => {
@@ -211,17 +217,17 @@
       <div class="col-8">
         <div class="card">
           <div class="card-header">
-            {#if $workflowTaskContext}
+            {#if selectedWorkflowTask}
               <div class="d-flex mb-3 justify-content-between align-items-center">
                 <div>
-                  Workflow task {$workflowTaskContext.task.name}
+                  Workflow task {selectedWorkflowTask.task.name}
                 </div>
                 <ConfirmActionButton
                   modalId="confirmDeleteWorkflowTask"
                   btnStyle="danger"
                   buttonIcon="trash"
-                  message="Delete a workflow task {$workflowTaskContext.task.name}"
-                  callbackAction={handleDeleteWorkflowTask.bind(this, workflow.id, $workflowTaskContext.id)}
+                  message="Delete a workflow task {selectedWorkflowTask.task.name}"
+                  callbackAction={handleDeleteWorkflowTask.bind(this, workflow.id, selectedWorkflowTask.id)}
                 ></ConfirmActionButton>
               </div>
               <ul class="nav nav-tabs card-header-tabs">
@@ -242,15 +248,15 @@
           <div class="tab-content">
             <div id="args-tab" class="tab-pane show active">
               <div class="card-body">
-                {#if $workflowTaskContext }
-                  <ArgumentForm workflowId={workflow.id} workflowTaskId={$workflowTaskContext.id} workflowTaskArgs={$workflowTaskContext.args}></ArgumentForm>
+                {#if selectedWorkflowTask}
+                  <ArgumentForm workflowId={workflow.id} workflowTaskId={selectedWorkflowTask.id} workflowTaskArgs={selectedWorkflowTask.args}></ArgumentForm>
                 {/if}
               </div>
             </div>
             <div id="meta-tab" class="tab-pane">
               <div class="card-body">
-                {#if $workflowTaskContext && $workflowTaskContext.meta}
-                  <MetaPropertiesForm workflowId={workflow.id} taskId={$workflowTaskContext.id} metaProperties={$workflowTaskContext.meta}></MetaPropertiesForm>
+                {#if selectedWorkflowTask}
+                  <MetaPropertiesForm workflowId={workflow.id} taskId={selectedWorkflowTask.id} metaProperties={selectedWorkflowTask.meta}></MetaPropertiesForm>
                 {/if}
               </div>
             </div>

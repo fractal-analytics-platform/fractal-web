@@ -4,6 +4,10 @@
 
   export let entry
 
+  if (entry == null || entry === undefined) {
+    entry = {}
+  }
+
   const submitNewEntry = (newEntry) => {
     updateEntry(newEntry)
   }
@@ -20,7 +24,9 @@
 
 </script>
 
-<div>
-  <FormStructure {entry} on:entryUpdated={handleEntryUpdateEvent} on:entryInserted={handleEntryInserted}></FormStructure>
-  <NewEntryProperty {entry} {submitNewEntry}></NewEntryProperty>
-</div>
+{#key entry}
+  <div>
+    <FormStructure {entry} on:entryUpdated={handleEntryUpdateEvent} on:entryInserted={handleEntryInserted}></FormStructure>
+    <NewEntryProperty {entry} {submitNewEntry}></NewEntryProperty>
+  </div>
+{/key}

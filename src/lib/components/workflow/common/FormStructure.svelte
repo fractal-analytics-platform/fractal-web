@@ -22,6 +22,10 @@
   let entryType = typeof entry
   let isArray = Array.isArray(entry)
 
+  // Set default entry value to an empty object if none is provided
+  if (entry == null || entry === undefined) {
+    entry = {}
+  }
 
   function handleEntryUpdate(event) {
     const updatedEntryName = event.detail.name
@@ -113,9 +117,11 @@
 
     {:else}
       <!-- Should build a sequence of components that will enable the editing of each object properties -->
-      {#each Object.entries(entry) as [key, value]}
-        <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted}/>
-      {/each}
+      {#if entry}
+        {#each Object.entries(entry) as [key, value]}
+          <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted}/>
+        {/each}
+      {/if}
     {/if}
   {/if}
 

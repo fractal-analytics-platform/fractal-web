@@ -16,6 +16,9 @@
   // Workflow task meta properties
   export let metaProperties = {}
 
+  if (metaProperties == null || metaProperties === undefined) {
+    metaProperties = {}
+  }
 
   async function handleEntryUpdate(updatedEntry) {
     await updateWorkflowTaskMetadata(workflowId, taskId, updatedEntry)

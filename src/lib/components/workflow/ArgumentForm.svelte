@@ -16,6 +16,10 @@
   // The main property managed by this component
   export let workflowTaskArgs = {}
 
+  if (workflowTaskArgs == null || workflowTaskArgs === undefined) {
+    workflowTaskArgs = {}
+  }
+
   async function handleEntryUpdate(updatedEntry) {
     await updateWorkflowTaskArguments(workflowId, workflowTaskId, updatedEntry)
       .then((response) => {
