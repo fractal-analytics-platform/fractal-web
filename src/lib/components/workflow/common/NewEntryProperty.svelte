@@ -5,6 +5,7 @@
   export let propertyName = ''
   export let propertyValue = null
   export let propertyType = 'string' // string | number | boolean | object | array
+  export let isListItem = false
 
   let activateInput = false
 
@@ -74,7 +75,9 @@
     <div class="flex-fill me-2">
       <form id={uuid} on:submit|preventDefault={handleSubmitEntry}>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Arg name" bind:value={propertyName} required>
+          {#if !isListItem}
+            <input type="text" class="form-control" placeholder="Arg name" bind:value={propertyName} required>
+          {/if}
           {#if propertyType === 'string' }
             <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value" bind:value={propertyValue}>
           {:else if propertyType === 'number' }

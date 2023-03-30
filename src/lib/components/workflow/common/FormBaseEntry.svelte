@@ -8,13 +8,16 @@
 
   export let entryName
   export let entryValue
+  export let isListEntry = false
+  export let listEntryIndex = undefined
+
   let entryType = typeof entryValue
 
   let editingEntry = false
 
   function saveEdits() {
     // This function signals that the user wants to save the edits made to the entry
-    console.log(entryName, entryValue, entryType)
+    console.log(entryName, entryValue, entryType, isListEntry)
 
     if (entryType === 'number') {
       entryValue = Number.parseFloat(entryValue)
@@ -27,7 +30,9 @@
     dispatch('entryUpdated', {
       name: entryName,
       type: entryType,
-      value: entryValue
+      value: entryValue,
+      listEntry: isListEntry,
+      index: listEntryIndex
     })
     editingEntry = false
   }
@@ -38,10 +43,16 @@
 
   {#if !editingEntry }
     <div class="d-flex">
-      <div class="input-group">
-        <span class="input-group-text col-4">{entryName}</span>
-        <span class="input-group-text text-monospace bg-light col-8">{entryValue}</span>
-      </div>
+      {#if !isListEntry}
+        <div class="input-group">
+          <span class="input-group-text col-4">{entryName}</span>
+          <span class="input-group-text text-monospace bg-light col-8">{entryValue}</span>
+        </div>
+      {:else}
+        <div class="input-group">
+          <span class="input-group-text text-monospace bg-light flex-fill">{entryValue}</span>
+        </div>
+      {/if}
       <div class="ps-1">
         <button class="btn btn-secondary" on:click={() => editingEntry = true}><i class="bi-pencil-square"></i></button>
       </div>

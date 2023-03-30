@@ -26,6 +26,8 @@
       })
   }
 
+  console.log(workflowTaskArgs)
+
 </script>
 
 <div>

@@ -1,7 +1,7 @@
 <script>
   // This component is responsible to build the infrastructure of a form
   // Basically, given a property (entry) in input, based on its kind, this component will build a structure of
-  // sub-components that will manipulate the entry
+  // subcomponents that will manipulate the entry
   import { createEventDispatcher } from 'svelte'
   import FormBaseEntry from "./FormBaseEntry.svelte";
   import NewEntryProperty from './NewEntryProperty.svelte';
@@ -11,6 +11,8 @@
   export let entry
   export let entryName = undefined
   export let entryId = undefined
+  export let isListEntry = false
+  export let entryIndex = undefined
 
   // TODO: This is a temporary solution to the problem of having multiple entries with the same name
   if (entryId === undefined) {
@@ -47,6 +49,12 @@
       // The following could be optional then
       // entry[event.detail.index] = updatedValue
 
+      // The following is required when a list item is not an object.
+      // In such case we have to intercept the value and update the entry, which is a list.
+      if (event.detail.listEntry) {
+        entry[event.detail.index] = event.detail.value
+      }
+
       dispatcher('entryUpdated', {
         name: entryName,
         type: entryType,
@@ -57,7 +65,9 @@
       dispatcher('entryUpdated', {
         name: entryName,
         type: event.detail.type,
-        value: event.detail.value
+        value: event.detail.value,
+        listEntry: event.detail.listEntry,
+        index: event.detail.index
       })
     }
   }
@@ -87,7 +97,7 @@
         <div class="accordion-item">
           <div class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryId}">
-              {entryName} (obj)
+              {!isListEntry? entryName : ''} (obj)
             </button>
           </div>
           <div id="{entryId}" class="accordion-collapse collapse">
@@ -116,16 +126,16 @@
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryId}">
-              {entryName} (list)
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryName}">
+              {!isListEntry ? entryName : ''} (list)
             </button>
           </div>
-          <div id="{entryId}" class="accordion-collapse collapse">
+          <div id="{entryName}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
               {#each entry as listItem, index}
-                <svelte:self entry={listItem} entryName={entryName + '-list-item'} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted} />
+                <svelte:self isListEntry={true} entry={listItem} entryIndex={index} entryId={entryName + '-' + index + '-' + 'list-item' } entryName={entryName + '-' + index + '-' + 'list-item' } on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted} />
               {/each}
-              <NewEntryProperty {entry} submitNewEntry={newEntryInserted}></NewEntryProperty>
+              <NewEntryProperty {entry} submitNewEntry={newEntryInserted} isListItem={true}></NewEntryProperty>
             </div>
           </div>
         </div>
@@ -136,7 +146,7 @@
   {#if entryType !== 'object'}
     <!-- If it is neither an object, nor a list, just display base entry components -->
     {#if entryName}
-      <FormBaseEntry {entryName} entryValue={entry} on:entryUpdated={handleEntryUpdate}></FormBaseEntry>
+      <FormBaseEntry listEntryIndex={entryIndex} {isListEntry} {entryName} entryValue={entry} on:entryUpdated={handleEntryUpdate}></FormBaseEntry>
     {/if}
   {/if}
 </div>
