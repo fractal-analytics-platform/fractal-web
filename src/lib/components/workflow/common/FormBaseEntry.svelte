@@ -62,7 +62,9 @@
     <div class="d-flex">
       <form class="flex-fill">
         <div class="input-group">
-          <div class="input-group-text col-3">{entryName}</div>
+          {#if !isListEntry}
+            <div class="input-group-text col-3">{entryName}</div>
+          {/if}
           {#if entryType === 'string' }
             <input type="text" class="form-control w-50 font-monospace" placeholder="Default value" bind:value={entryValue}>
           {:else if entryType === 'number' }
