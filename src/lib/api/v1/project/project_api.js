@@ -59,6 +59,30 @@ export async function getProject(projectId) {
   throw new Error('The client was not able to fetch the project')
 }
 
+export async function updateProject(projectId, formData) {
+
+  const requestBody = {
+    name: formData.get('projectName')
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
+
 export async function deleteProject(projectId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
