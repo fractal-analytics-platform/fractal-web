@@ -93,7 +93,7 @@ export async function createTaskCollection(formData) {
 
 export async function taskCollectionStatus(taskId) {
 
-  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}`,{
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}?verbose=True`,{
     method: 'GET',
     mode: 'cors',
     credentials: 'include',

@@ -99,6 +99,21 @@
         case 'fail':
           break
         default:
+          // When the status is ok
+          // Only if the taskCollection logs are undefined
+          if (taskCollection.logs === undefined) {
+            // Shall fetch the verbose log of the task collection
+            await taskCollectionStatus(taskCollection.id)
+              .then(taskCollectionUpdate => {
+                // Update a task collection status with the one fetched from the server
+                taskCollection.status = taskCollectionUpdate.data.status
+                taskCollection.logs = taskCollectionUpdate.data.log
+                console.log(taskCollectionUpdate)
+              })
+              .catch(error => {
+                console.error(error)
+              })
+          }
           break
       }
       // Return the updated taskCollection object
@@ -234,7 +249,7 @@
           </tr>
         </thead>
         <tbody>
-        {#each taskCollections as { timestamp, status, version, pkg, id }}
+        {#each taskCollections as { timestamp, status, version, pkg, id, logs }}
           <tr>
             <td class="col-2">{new Date(timestamp).toLocaleString()}</td>
             <td>{pkg}</td>
@@ -250,7 +265,7 @@
                 message="Remove a task collection log"
                 callbackAction={removeTaskCollection.bind(this, id)}
               ></ConfirmActionButton>
-              {#if status == 'fail' }
+              {#if status == 'fail' || (status == 'OK' && logs !== '') }
                 <button class="btn btn-info" data-fc-tc="{id}" data-bs-toggle="modal" data-bs-target="#collectionTaskLogsModal" on:click={setTaskCollectionLogsModal}>
                   <i class="bi bi-info-circle"></i>
                 </button>
