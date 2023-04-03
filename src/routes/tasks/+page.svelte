@@ -173,8 +173,10 @@
             <td class="col-2">
               <button data-fc-task="{task.id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#taskInfoModal" on:click={setTaskModal}>
                 <i class="bi bi-info-circle"></i>
+                Info
               </button>
               <button class="btn btn-danger" disabled>
+                <i class="bi bi-trash"></i>
                 Delete
               </button>
             </td>

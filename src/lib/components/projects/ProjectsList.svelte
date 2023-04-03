@@ -87,19 +87,20 @@
       <tbody>
       { #each projects as { id, name } }
         <tr>
-          <td class="col-1">{id}</td>
-          <td class="col-8">{name}</td>
-          <td class="col-2 align-right">
+          <td class="col-2">{id}</td>
+          <td class="col-6">{name}</td>
+          <td class="col-4 ">
             <button data-fc-project="{id}" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#projectInfoModal" on:click={setModalProject}>
-              <i class="bi bi-info-circle"></i>
+              <i class="bi bi-info-circle"></i> Info
             </button>
-            <a href='{"/projects/" + id}' class="btn btn-light">Open <i class="bi bi-arrow-up-right-square"></i></a>
+            <a href='{"/projects/" + id}' class="btn btn-light"><i class="bi bi-arrow-up-right-square"></i> Open</a>
             <ConfirmActionButton
               modalId={"confirmDeleteProject" + id}
               style={'danger'}
               btnStyle="danger"
               message="Delete project {name}"
               buttonIcon="trash"
+              label="Delete"
               callbackAction={handleDeleteProject.bind(this, id)}>
             </ConfirmActionButton>
           </td>

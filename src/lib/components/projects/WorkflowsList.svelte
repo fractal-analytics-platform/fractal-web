@@ -129,13 +129,14 @@
           <td>{name}</td>
           <td>
             <a href="/projects/{projectId}/workflows/{id}" class="btn btn-light">
-              Open
               <i class="bi bi-arrow-up-right-square"></i>
+              Open
             </a>
             <ConfirmActionButton
               modalId={"deleteConfirmModal" + id}
               style={'danger'}
               btnStyle="danger"
+              buttonIcon="trash"
               label={'Delete'}
               message="Delete workflow {name}"
               callbackAction={handleDeleteWorkflow.bind(this, id)}>

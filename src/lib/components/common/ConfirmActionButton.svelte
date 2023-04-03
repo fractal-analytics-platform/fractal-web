@@ -36,8 +36,8 @@
 </div>
 
 <button class="btn btn-{btnStyle}" data-bs-toggle="modal" data-bs-target="#{modalId}" >
-  {label}
   {#if buttonIcon }
     <i class="bi bi-{buttonIcon}"></i>
   {/if}
+  {label}
 </button>
