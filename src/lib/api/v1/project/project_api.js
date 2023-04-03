@@ -126,6 +126,13 @@ export async function updateDataset(projectId, datasetId, formData) {
     read_only: formData.get('read_only') ? true : false
   }
 
+  // Should prevent requestBody null or empty values
+  Object.keys(requestBody).forEach(key => {
+    if (requestBody[key] === null || requestBody[key] === '') {
+      delete requestBody[key]
+    }
+  })
+
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
