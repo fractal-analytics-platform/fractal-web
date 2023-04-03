@@ -27,6 +27,7 @@
 
   // Component properties
   let taskCollections = []
+  let taskCollectionAlreadyPresent = undefined
 
   // On component load set the taskCollections from the local storage
   onMount(async () => {
@@ -38,12 +39,19 @@
     // Prevent form submission
     cancel()
 
+    const packageName = data.get('package')
+
     await createTaskCollection(data)
       .then(taskCollection => {
         // Check that the taskCollection is not null
         // If null then, the taskCollection has already been requested
-        if (taskCollection.id === null) {
-          console.info('Task collection already happened')
+        if (taskCollection.status === 200) {
+          // taskCollection.info = packageName.concat(': ', taskCollection.info)
+          taskCollectionAlreadyPresent = taskCollection
+          taskCollectionAlreadyPresent.package = packageName
+          setTimeout(() => {
+            taskCollectionAlreadyPresent = undefined
+          }, 5500)
         } else {
           // If a version is specified, add it to taskCollection result
           const version = data.get('version')
@@ -148,6 +156,12 @@
 <TaskCollectionLogsModal></TaskCollectionLogsModal>
 
 <div>
+  {#if taskCollectionAlreadyPresent }
+    <div id="task-collection-already-present" class="alert alert-success">
+      <div>{taskCollectionAlreadyPresent.package}</div>
+      <div class="mt-2 fw-bold">{taskCollectionAlreadyPresent.info}</div>
+    </div>
+  {/if}
   <form method="post" use:enhance={handleTaskCollection}>
     <div class="row g-3">
       <div class="col-6">

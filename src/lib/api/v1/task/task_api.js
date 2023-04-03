@@ -78,7 +78,14 @@ export async function createTaskCollection(formData) {
   })
 
   if (response.ok) {
-    return await response.json()
+    const responseData = await response.json()
+    if (response.status === 200) {
+      return {
+        info: responseData.data.info,
+        status: response.status
+      }
+    }
+    return responseData
   }
 
   throw new PostResourceException(await response.json())
