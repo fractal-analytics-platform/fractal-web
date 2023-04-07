@@ -4,3 +4,6 @@ import { writable } from 'svelte/store'
 // within a ProjectInfoModal. Every component that will update the project
 // inside the store, will also update the to-be-displayed project in a modal.
 export const modalProject = writable({})
+
+// Context project store
+export const contextProject = writable({})
