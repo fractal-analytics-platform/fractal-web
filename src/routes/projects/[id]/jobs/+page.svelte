@@ -9,19 +9,19 @@
   import Th from '$lib/components/common/filterable/Th.svelte'
 
   // Component properties
-  let project
-  let workflows
-  let datasets
+  let project = undefined
+  let workflows = []
+  let datasets = []
 
-  // Load project context
+  // Project context properties
   $: project = $contextProject.project
   $: workflows = $contextProject.workflows
-  $: datasets = $contextProject.project.dataset_list
+  $: datasets = $contextProject.datasets
 
   onMount(async () => {
     // Load project context
     // If $contextProject is not empty, it means that the user has already loaded the project context
-    // and we don't need to load it again
+    // we don't need to load it again
     if ($contextProject.project) return
     await loadProjectContext($page.params.id)
   })
@@ -175,99 +175,101 @@
   </div>
 </div>
 
-<div class="container">
+{#if project}
+  <div class="container">
 
-  <div class="d-flex justify-content-between align-items-center my-3">
-    <h1>Project's Jobs</h1>
+    <div class="d-flex justify-content-between align-items-center my-3">
+      <h1>Project's Jobs</h1>
+    </div>
+
+    <table class="table">
+
+      <thead class="table-light">
+      <tr>
+        <Th handler={tableHandler} key="id" label="Id"></Th>
+        <Th handler={tableHandler} key="start_timestamp" label="Timestamp"></Th>
+        <Th handler={tableHandler} key="workflow_id" label="Workflow"></Th>
+        <Th handler={tableHandler} key="input_dataset_id" label="Input dataset"></Th>
+        <Th handler={tableHandler} key="output_dataset_id" label="Output dataset"></Th>
+        <Th handler={tableHandler} key="status" label="Status"></Th>
+      </tr>
+      <tr>
+        <th class="col-3">
+          <input type="number" class="form-control"
+                 on:change|preventDefault={(event) => {tableHandler.filter(event.target.value, 'id')}}>
+        </th>
+        <th></th>
+        <th>
+          {#if workflows}
+            <select class="form-control"
+                    on:change={(event) => {tableHandler.filter(event.target.value, 'workflow_id')}}>
+            <option value="">All</option>
+              {#each workflows as workflow}
+                <option value={workflow.id}>{workflow.name}</option>
+              {/each}
+            </select>
+          {/if}
+        </th>
+        <th>
+          <select class="form-control"
+                  on:change={(event) => {tableHandler.filter(event.target.value, 'input_dataset_id')}}>
+          <option value="">All</option>
+            {#each datasets as dataset}
+              <option value={dataset.id}>{dataset.name}</option>
+            {/each}
+          </select>
+        </th>
+        <th>
+          <select class="form-control"
+                  on:change={(event) => {tableHandler.filter(event.target.value, 'output_dataset_id')}}>
+          <option value="">All</option>
+            {#each datasets as dataset}
+              <option value={dataset.id}>{dataset.name}</option>
+            {/each}
+          </select>
+        </th>
+        <th>
+          <select class="form-control" on:change={(event) => {tableHandler.filter(event.target.value, 'status')}}>
+          <option value="">All</option>
+            <option value="running">Running</option>
+            <option value="done">Done</option>
+            <option value="failed">Failed</option>
+            <option value="submitted">Submitted</option>
+          </select>
+        </th>
+      </tr>
+      </thead>
+
+      <tbody>
+      {#each $rows as row }
+        {#key row}
+          <tr>
+            <td>{row.id}</td>
+            <td>
+              <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>
+            </td>
+            <td>
+              {#if workflows}
+                { workflows.find(workflow => workflow.id === row.workflow_id).name }
+              {/if}
+            </td>
+            <td>
+              {#if datasets}
+                { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
+              {/if}
+            </td>
+            <td>
+              {#if datasets}
+                { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
+              {/if}
+            </td>
+            <td>
+              <StatusBadge status={row.status}></StatusBadge>
+            </td>
+          </tr>
+        {/key}
+      {/each}
+      </tbody>
+    </table>
   </div>
-
-  <table class="table">
-
-    <thead class="table-light">
-    <tr>
-      <Th handler={tableHandler} key="id" label="Id"></Th>
-      <Th handler={tableHandler} key="start_timestamp" label="Timestamp"></Th>
-      <th>Workflow name</th>
-      <th>Input dataset</th>
-      <th>Output dataset</th>
-      <Th handler={tableHandler} key="status" label="Status"></Th>
-    </tr>
-    <tr>
-      <th class="col-3">
-        <input type="number" class="form-control" on:change|preventDefault={(event) => {
-          tableHandler.filter(event.target.value, 'id')
-        }}>
-      </th>
-      <th></th>
-      <th>
-        <select class="form-control" on:change={(event) => {
-          tableHandler.filter(event.target.value, 'workflow_id')
-        }}>
-          <option value="">All</option>
-          {#each workflows as workflow}
-            <option value={workflow.id}>{workflow.name}</option>
-          {/each}
-        </select>
-      </th>
-      <th>
-        <select class="form-control" on:change={(event) => {
-          tableHandler.filter(event.target.value, 'input_dataset_id')
-        }}>
-          <option value="">All</option>
-          {#each datasets as dataset}
-            <option value={dataset.id}>{dataset.name}</option>
-          {/each}
-        </select>
-      </th>
-      <th>
-        <select class="form-control" on:change={(event) => {
-          tableHandler.filter(event.target.value, 'output_dataset_id')
-        }}>
-          <option value="">All</option>
-          {#each datasets as dataset}
-            <option value={dataset.id}>{dataset.name}</option>
-          {/each}
-        </select>
-      </th>
-      <th>
-        <select class="form-control" on:change={(event) => {
-          tableHandler.filter(event.target.value, 'status')
-        }}>
-          <option value="">All</option>
-          <option value="running">Running</option>
-          <option value="done">Done</option>
-          <option value="failed">Failed</option>
-          <option value="submitted">Submitted</option>
-        </select>
-      </th>
-    </tr>
-    </thead>
-
-    <tbody>
-    {#each $rows as row }
-      {#key row}
-        <tr>
-          <td>{row.id}</td>
-          <td><TimestampBadge timestamp={row.start_timestamp}></TimestampBadge></td>
-          <td>
-            {#if workflows}
-              { workflows.find(workflow => workflow.id === row.workflow_id).name }
-            {/if}
-          </td>
-          <td>
-            {#if datasets}
-              { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
-            {/if}
-          </td>
-          <td>
-            {#if datasets}
-              { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
-            {/if}
-          </td>
-          <td><StatusBadge status={row.status}></StatusBadge></td>
-        </tr>
-      {/key}
-    {/each}
-    </tbody>
-  </table>
-</div>
+{/if}

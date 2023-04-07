@@ -6,6 +6,7 @@ export async function loadProjectContext(projectId) {
     .then((project) => {
       contextProject.update(context => {
         context.project = project
+        context.datasets = project.dataset_list
         return context
       });
     })
