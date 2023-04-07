@@ -143,6 +143,9 @@
     <tr>
       <Th handler={tableHandler} key="id" label="Id"></Th>
       <Th handler={tableHandler} key="start_timestamp" label="Timestamp"></Th>
+      <th>Workflow name</th>
+      <th>Input dataset</th>
+      <th>Output dataset</th>
       <Th handler={tableHandler} key="status" label="Status"></Th>
     </tr>
     <tr>
@@ -151,8 +154,10 @@
           tableHandler.filter(event.target.value, 'id')
         }}>
       </th>
-      <th>
-      </th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
       <th>
         <select class="form-control" on:change={(event) => {
           tableHandler.filter(event.target.value, 'status')
@@ -173,6 +178,9 @@
       <tr>
         <td>{row.id}</td>
         <td><TimestampBadge timestamp={row.start_timestamp}></TimestampBadge></td>
+        <td>{row.workflow_id}</td>
+        <td>{row.input_dataset_id}</td>
+        <td>{row.output_dataset_id}</td>
         <td><StatusBadge status={row.status}></StatusBadge></td>
       </tr>
       {/key}
