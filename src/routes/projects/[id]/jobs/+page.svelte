@@ -31,7 +31,7 @@
       "overwrite_input": false,
       "worker_init": "string",
       "id": 1,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "start_timestamp": "2023-04-05T12:55:39.657Z",
       "status": "done",
       "log": "string",
       "history": [
@@ -48,7 +48,7 @@
       "overwrite_input": false,
       "worker_init": "string",
       "id": 2,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "start_timestamp": "2023-04-05T12:56:39.657Z",
       "status": "failed",
       "log": "string",
       "history": [
@@ -65,7 +65,7 @@
       "overwrite_input": false,
       "worker_init": "string",
       "id": 3,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "start_timestamp": "2023-04-05T12:57:39.657Z",
       "status": "running",
       "log": "string",
       "history": [
@@ -82,8 +82,8 @@
       "overwrite_input": false,
       "worker_init": "string",
       "id": 4,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
-      "status": "running",
+      "start_timestamp": "2023-04-05T12:58:39.657Z",
+      "status": "failed",
       "log": "string",
       "history": [
         "string"
@@ -99,7 +99,7 @@
       "overwrite_input": false,
       "worker_init": "string",
       "id": 5,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "start_timestamp": "2023-04-05T12:59:39.657Z",
       "status": "running",
       "log": "string",
       "history": [
@@ -116,7 +116,7 @@
       "overwrite_input": false,
       "worker_init": "string",
       "id": 6,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "start_timestamp": "2023-04-05T12:59:49.657Z",
       "status": "submitted",
       "log": "string",
       "history": [
@@ -139,7 +139,7 @@
 
 <table class="table">
 
-  <thead>
+  <thead class="table-light">
     <tr>
       <Th handler={tableHandler} key="id" label="Id"></Th>
       <Th handler={tableHandler} key="start_timestamp" label="Timestamp"></Th>
