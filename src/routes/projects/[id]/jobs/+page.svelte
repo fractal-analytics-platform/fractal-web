@@ -11,10 +11,12 @@
   // Component properties
   let project
   let workflows
+  let datasets
 
   // Load project context
   $: project = $contextProject.project
   $: workflows = $contextProject.workflows
+  $: datasets = $contextProject.project.dataset_list
 
   onMount(async () => {
     // Load project context
@@ -27,8 +29,8 @@
   const jobs = [
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 1,
+      "output_dataset_id": 3,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -44,8 +46,8 @@
     },
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 3,
+      "output_dataset_id": 1,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -61,8 +63,8 @@
     },
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 1,
+      "output_dataset_id": 3,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -78,8 +80,8 @@
     },
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 1,
+      "output_dataset_id": 3,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -95,8 +97,8 @@
     },
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 1,
+      "output_dataset_id": 3,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -112,8 +114,8 @@
     },
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 1,
+      "output_dataset_id": 3,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -129,8 +131,8 @@
     },
     {
       "project_id": 0,
-      "input_dataset_id": 0,
-      "output_dataset_id": 0,
+      "input_dataset_id": 3,
+      "output_dataset_id": 1,
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
@@ -197,9 +199,36 @@
         }}>
       </th>
       <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th>
+        <select class="form-control" on:change={(event) => {
+          tableHandler.filter(event.target.value, 'workflow_id')
+        }}>
+          <option value="">All</option>
+          {#each workflows as workflow}
+            <option value={workflow.id}>{workflow.name}</option>
+          {/each}
+        </select>
+      </th>
+      <th>
+        <select class="form-control" on:change={(event) => {
+          tableHandler.filter(event.target.value, 'input_dataset_id')
+        }}>
+          <option value="">All</option>
+          {#each datasets as dataset}
+            <option value={dataset.id}>{dataset.name}</option>
+          {/each}
+        </select>
+      </th>
+      <th>
+        <select class="form-control" on:change={(event) => {
+          tableHandler.filter(event.target.value, 'output_dataset_id')
+        }}>
+          <option value="">All</option>
+          {#each datasets as dataset}
+            <option value={dataset.id}>{dataset.name}</option>
+          {/each}
+        </select>
+      </th>
       <th>
         <select class="form-control" on:change={(event) => {
           tableHandler.filter(event.target.value, 'status')
@@ -225,8 +254,16 @@
               { workflows.find(workflow => workflow.id === row.workflow_id).name }
             {/if}
           </td>
-          <td>{row.input_dataset_id}</td>
-          <td>{row.output_dataset_id}</td>
+          <td>
+            {#if datasets}
+              { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
+            {/if}
+          </td>
+          <td>
+            {#if datasets}
+              { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
+            {/if}
+          </td>
           <td><StatusBadge status={row.status}></StatusBadge></td>
         </tr>
       {/key}
