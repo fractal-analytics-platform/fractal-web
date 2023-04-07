@@ -145,6 +145,26 @@
       <Th handler={tableHandler} key="start_timestamp" label="Timestamp"></Th>
       <Th handler={tableHandler} key="status" label="Status"></Th>
     </tr>
+    <tr>
+      <th class="col-3">
+        <input type="number" class="form-control" on:change|preventDefault={(event) => {
+          tableHandler.filter(event.target.value, 'id')
+        }}>
+      </th>
+      <th>
+      </th>
+      <th>
+        <select class="form-control" on:change={(event) => {
+          tableHandler.filter(event.target.value, 'status')
+        }}>
+          <option value="">All</option>
+          <option value="running">Running</option>
+          <option value="done">Done</option>
+          <option value="failed">Failed</option>
+          <option value="submitted">Submitted</option>
+        </select>
+      </th>
+    </tr>
   </thead>
 
   <tbody>
