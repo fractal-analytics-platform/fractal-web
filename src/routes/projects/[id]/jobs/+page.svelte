@@ -1,6 +1,9 @@
 <script>
 
   import { DataHandler } from '@vincjo/datatables'
+  import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
+  import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
+  import Th from '$lib/components/common/filterable/Th.svelte'
 
   const jobs = [
     {
@@ -29,7 +32,7 @@
       "worker_init": "string",
       "id": 1,
       "start_timestamp": "2023-04-05T12:54:39.657Z",
-      "status": "completed",
+      "status": "done",
       "log": "string",
       "history": [
         "string"
@@ -46,7 +49,75 @@
       "worker_init": "string",
       "id": 2,
       "start_timestamp": "2023-04-05T12:54:39.657Z",
-      "status": "cancelled",
+      "status": "failed",
+      "log": "string",
+      "history": [
+        "string"
+      ],
+      "working_dir": "string",
+      "working_dir_user": "string"
+    },
+    {
+      "project_id": 0,
+      "input_dataset_id": 0,
+      "output_dataset_id": 0,
+      "workflow_id": 0,
+      "overwrite_input": false,
+      "worker_init": "string",
+      "id": 3,
+      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "status": "running",
+      "log": "string",
+      "history": [
+        "string"
+      ],
+      "working_dir": "string",
+      "working_dir_user": "string"
+    },
+    {
+      "project_id": 0,
+      "input_dataset_id": 0,
+      "output_dataset_id": 0,
+      "workflow_id": 0,
+      "overwrite_input": false,
+      "worker_init": "string",
+      "id": 4,
+      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "status": "running",
+      "log": "string",
+      "history": [
+        "string"
+      ],
+      "working_dir": "string",
+      "working_dir_user": "string"
+    },
+    {
+      "project_id": 0,
+      "input_dataset_id": 0,
+      "output_dataset_id": 0,
+      "workflow_id": 0,
+      "overwrite_input": false,
+      "worker_init": "string",
+      "id": 5,
+      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "status": "running",
+      "log": "string",
+      "history": [
+        "string"
+      ],
+      "working_dir": "string",
+      "working_dir_user": "string"
+    },
+    {
+      "project_id": 0,
+      "input_dataset_id": 0,
+      "output_dataset_id": 0,
+      "workflow_id": 0,
+      "overwrite_input": false,
+      "worker_init": "string",
+      "id": 6,
+      "start_timestamp": "2023-04-05T12:54:39.657Z",
+      "status": "submitted",
       "log": "string",
       "history": [
         "string"
@@ -56,21 +127,11 @@
     }
   ]
 
+  // Table handler
   const tableHandler = new DataHandler(jobs)
 
   // Table data
   const rows = tableHandler.getRows()
-
-  // Filtering properties
-  let filterColumn = undefined
-
-  function toggleFilterColumn(columnKey) {
-    filterColumn = columnKey
-  }
-
-  $: {
-    tableHandler.sort(filterColumn)
-  }
 
 </script>
 
@@ -80,19 +141,21 @@
 
   <thead>
     <tr>
-      <th on:click={toggleFilterColumn.bind(this,'id')}>Id</th>
-      <th on:click={toggleFilterColumn.bind(this,'start_timestamp')}>Timestamp</th>
-      <th on:click={toggleFilterColumn.bind(this,'status')}>Status</th>
+      <Th handler={tableHandler} key="id" label="Id"></Th>
+      <Th handler={tableHandler} key="start_timestamp" label="Timestamp"></Th>
+      <Th handler={tableHandler} key="status" label="Status"></Th>
     </tr>
   </thead>
 
   <tbody>
     {#each $rows as row }
+      {#key row}
       <tr>
         <td>{row.id}</td>
-        <td>{row.start_timestamp}</td>
-        <td>{row.status}</td>
+        <td><TimestampBadge timestamp={row.start_timestamp}></TimestampBadge></td>
+        <td><StatusBadge status={row.status}></StatusBadge></td>
       </tr>
+      {/key}
     {/each}
   </tbody>
 </table>
