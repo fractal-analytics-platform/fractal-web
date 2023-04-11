@@ -2,24 +2,24 @@
   import { onMount } from 'svelte'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getProject, updateProject, getWorkflows } from '$lib/api/v1/project/project_api'
+  import { loadProjectContext } from '$lib/components/projects/controller'
+  import { contextProject } from '$lib/stores/projectStores'
+  import { updateProject } from '$lib/api/v1/project/project_api'
   import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte'
   import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte'
 
-  let project = undefined
+  // Component properties
+  let project
+  let workflows
   let projectUpdatesSuccess = undefined
-  let workflows = []
+
+  $: project = $contextProject.project
+  $: workflows = $contextProject.workflows
 
   onMount(async () => {
-    project = await getProject($page.params.id)
-      .catch(error => {
-        console.error(error)
-      })
-
-    workflows = await getWorkflows($page.params.id)
-      .catch(error => {
-        console.error(error)
-      })
+    project = undefined
+    workflows = []
+    await loadProjectContext($page.params.id)
   })
 
   function handleProjectPropertiesUpdate({ data, cancel }) {
@@ -57,6 +57,7 @@
   </nav>
   <div>
     <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProjectModal"><i class="bi-gear-wide-connected"></i></button>
+    <a href={`/projects/${project?.id}/jobs`}>Workflow jobs</a>
   </div>
 </div>
 
