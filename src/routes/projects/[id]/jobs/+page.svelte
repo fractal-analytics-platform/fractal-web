@@ -24,6 +24,32 @@
     // we don't need to load it again
     if ($contextProject.project) return
     await loadProjectContext($page.params.id)
+
+    // Set filters
+    const idFilter = $page.url.searchParams.get('id')
+    if (idFilter) {
+      tableHandler.filter(idFilter, 'id')
+    }
+
+    const workflowFilter = $page.url.searchParams.get('workflow')
+    if (workflowFilter) {
+      tableHandler.filter(workflowFilter, 'workflow_id')
+    }
+
+    const inputDatasetFilter = $page.url.searchParams.get('input_dataset')
+    if (inputDatasetFilter) {
+      tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
+    }
+
+    const outputDatasetFilter = $page.url.searchParams.get('output_dataset')
+    if (outputDatasetFilter) {
+      tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+    }
+
+    const statusFilter = $page.url.searchParams.get('status')
+    if (statusFilter) {
+      tableHandler.filter(statusFilter, 'status')
+    }
   })
 
   const jobs = [
@@ -136,7 +162,7 @@
       "workflow_id": 1,
       "overwrite_input": false,
       "worker_init": "string",
-      "id": 6,
+      "id": 11,
       "start_timestamp": "2023-04-05T12:59:49.657Z",
       "status": "submitted",
       "log": "string",
