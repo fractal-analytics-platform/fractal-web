@@ -4,6 +4,7 @@
   import { DataHandler } from '@vincjo/datatables'
   import { loadProjectContext } from  '$lib/components/projects/controller'
   import { contextProject } from '$lib/stores/projectStores'
+  import { getJobs } from '$lib/api/v1/project/project_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
   import Th from '$lib/components/common/filterable/Th.svelte'
@@ -12,6 +13,9 @@
   let project = undefined
   let workflows = []
   let datasets = []
+  let jobs = []
+  let tableHandler = undefined
+  let rows = undefined
 
   // Project context properties
   $: project = $contextProject.project
@@ -50,135 +54,29 @@
     if (statusFilter) {
       tableHandler.filter(statusFilter, 'status')
     }
+
   })
 
-  const jobs = [
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 0,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
-      "status": "running",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 3,
-      "output_dataset_id": 1,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 1,
-      "start_timestamp": "2023-04-05T12:55:39.657Z",
-      "status": "done",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 2,
-      "start_timestamp": "2023-04-05T12:56:39.657Z",
-      "status": "failed",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 3,
-      "start_timestamp": "2023-04-05T12:57:39.657Z",
-      "status": "running",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 4,
-      "start_timestamp": "2023-04-05T12:58:39.657Z",
-      "status": "failed",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 5,
-      "start_timestamp": "2023-04-05T12:59:39.657Z",
-      "status": "running",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 3,
-      "output_dataset_id": 1,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 11,
-      "start_timestamp": "2023-04-05T12:59:49.657Z",
-      "status": "submitted",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    }
-  ]
+  async function loadProjectJobs() {
+    // Load project jobs
+    jobs = await getJobs($page.params.id)
+      .then((response) => {
+        return response
+      })
+      .catch((error) => {
+        console.error(error)
+        return []
+      })
 
-  // Table handler
-  const tableHandler = new DataHandler(jobs)
+    console.log(jobs)
 
-  // Table data
-  const rows = tableHandler.getRows()
+    // Table handler
+    tableHandler = new DataHandler(jobs)
+    // Table data
+    rows = tableHandler.getRows()
+  }
+
+  loadProjectJobs()
 
 </script>
 
@@ -208,6 +106,7 @@
       <h1>Project's Jobs</h1>
     </div>
 
+    {#if tableHandler }
     <table class="table">
 
       <thead class="table-light">
@@ -267,35 +166,38 @@
       </thead>
 
       <tbody>
-      {#each $rows as row }
-        {#key row}
-          <tr>
-            <td>{row.id}</td>
-            <td>
-              <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>
-            </td>
-            <td>
-              {#if workflows}
-                { workflows.find(workflow => workflow.id === row.workflow_id).name }
-              {/if}
-            </td>
-            <td>
-              {#if datasets}
-                { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
-              {/if}
-            </td>
-            <td>
-              {#if datasets}
-                { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
-              {/if}
-            </td>
-            <td>
-              <StatusBadge status={row.status}></StatusBadge>
-            </td>
-          </tr>
-        {/key}
-      {/each}
+      {#if rows }
+        {#each $rows as row }
+          {#key row}
+            <tr>
+              <td>{row.id}</td>
+              <td>
+                <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>
+              </td>
+              <td>
+                {#if workflows}
+                  { workflows.find(workflow => workflow.id === row.workflow_id).name }
+                {/if}
+              </td>
+              <td>
+                {#if datasets}
+                  { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
+                {/if}
+              </td>
+              <td>
+                {#if datasets}
+                  { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
+                {/if}
+              </td>
+              <td>
+                <StatusBadge status={row.status}></StatusBadge>
+              </td>
+            </tr>
+          {/key}
+        {/each}
+      {/if}
       </tbody>
     </table>
+    {/if}
   </div>
 {/if}
