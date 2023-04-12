@@ -1,0 +1,25 @@
+{
+  "name": "mywf",
+  "task_list": [
+    {
+      "meta": {},
+      "args": {
+        "num_components": 4
+      },
+      "task": {
+        "name": "prepare_metadata",
+        "source": "pip-local:fractal_tasks_stresstest-1.0.0-py3-none-any.whl"
+      }
+    },
+    {
+      "meta": {},
+      "args": {
+        "sleep_time": 1
+      },
+      "task": {
+        "name": "sleep_task",
+        "source": "pip-local:fractal_tasks_stresstest-1.0.0-py3-none-any.whl"
+      }
+    }
+  ]
+}
