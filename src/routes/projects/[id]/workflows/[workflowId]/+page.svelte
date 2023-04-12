@@ -3,13 +3,17 @@
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
+  import { contextProject } from '$lib/stores/projectStores'
+  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
   let workflow = undefined
+  let project = $contextProject.project
+  let datasets = $contextProject.datasets || []
+
   $: updatableWorkflowList = workflow ? workflow.task_list : []
   // List of available tasks to be inserted into workflow
   let availableTasks = []
@@ -149,6 +153,22 @@
       })
   }
 
+  async function handleApplyWorkflow({ form, data, cancel}) {
+    // Prevent default
+    cancel()
+
+    await applyWorkflow(project.id, workflow.id, data)
+      .then(() => {
+        // eslint-disable-next-line no-undef
+        const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
+        modal.toggle()
+        form.reset()
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
+
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -176,6 +196,7 @@
     <button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}><i class="bi-box-arrow-up"></i></button>
     <a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
     <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"><i class="bi-gear-wide-connected"></i></button>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#runWorkflowModal"><i class="bi-play-fill"></i> Run workflow</button>
   </div>
 </div>
 
@@ -370,4 +391,44 @@
     </div>
   </div>
 
+</div>
+
+<div class="modal" id="runWorkflowModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Run workflow</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="runWorkflowForm" method="post" use:enhance={handleApplyWorkflow}>
+          <div class="mb-3">
+            <label for="inputDataset" class="form-label">Input dataset</label>
+            <select name="inputDataset" id="inputDataset" class="form-control">
+              <option value="">Select an input dataset</option>
+              {#each datasets as dataset}
+                <option value="{dataset.id}">{dataset.name}</option>
+              {/each}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="outputDataset" class="form-label">Output dataset</label>
+            <select name="outputDataset" id="outputDataset" class="form-control">
+              <option value="">Select an output dataset</option>
+              {#each datasets as dataset}
+                <option value="{dataset.id}">{dataset.name}</option>
+              {/each}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="workerInit" class="form-label">Input data</label>
+            <textarea name="workerInit" id="workerInit" class="form-control font-monospace" rows="5"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" form="runWorkflowForm">Run</button>
+      </div>
+    </div>
+  </div>
 </div>
