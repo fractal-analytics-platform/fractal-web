@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { contextProject } from '$lib/stores/projectStores'
   import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
@@ -159,11 +160,19 @@
     cancel()
 
     await applyWorkflow(project.id, workflow.id, data)
-      .then(() => {
+      .then((job) => {
         // eslint-disable-next-line no-undef
         const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
         modal.toggle()
         form.reset()
+        // Navigate to project jobs page
+        // Define URL to navigate to
+        const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
+        // Set jobsUrl search params
+        jobsUrl.searchParams.set('workflow', workflow.id)
+        jobsUrl.searchParams.set('id', job.id)
+        // Trigger navigation
+        goto(jobsUrl)
       })
       .catch(error => {
         console.error(error)
