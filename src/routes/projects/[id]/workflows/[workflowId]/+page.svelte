@@ -8,6 +8,7 @@
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
   import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
   let workflow = undefined
@@ -166,6 +167,13 @@
       })
       .catch(error => {
         console.error(error)
+        // Set an error message on the component
+        new StandardErrorAlert({
+          target: document.getElementById('applyWorkflowError'),
+          props: {
+            error
+          }
+        })
       })
   }
 
@@ -401,6 +409,7 @@
         <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <div id="applyWorkflowError"></div>
         <form id="runWorkflowForm" method="post" use:enhance={handleApplyWorkflow}>
           <div class="mb-3">
             <label for="inputDataset" class="form-label">Input dataset</label>
