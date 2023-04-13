@@ -57,7 +57,7 @@
   </nav>
   <div>
     <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProjectModal"><i class="bi-gear-wide-connected"></i></button>
-    <a href={`/projects/${project?.id}/jobs`}>Workflow jobs</a>
+    <a href={`/projects/${project?.id}/jobs`} class="btn btn-light"><i class="bi-journal-code"></i> Jobs</a>
   </div>
 </div>
 
