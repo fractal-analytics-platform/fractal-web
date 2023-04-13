@@ -10,12 +10,12 @@
     sorted = handler.getSorted()
     if ($sorted.identifier === key) {
       if ($sorted.direction === 'asc') {
-        filterLabel = label + ' ▲'
+        filterLabel = label + ' ↑'
       } else {
-        filterLabel = label + ' ▼'
+        filterLabel = label + ' ↓'
       }
     } else {
-      filterLabel = label
+      filterLabel = label + ' ⇅'
     }
   }
 
@@ -23,4 +23,5 @@
 
 <th
   on:click={handler.sort(key)}
+  style="cursor: pointer"
 >{filterLabel}</th>

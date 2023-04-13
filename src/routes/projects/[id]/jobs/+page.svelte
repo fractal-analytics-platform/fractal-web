@@ -95,7 +95,6 @@
     </ol>
   </nav>
   <div>
-    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProjectModal"><i class="bi-gear-wide-connected"></i></button>
   </div>
 </div>
 
@@ -120,8 +119,6 @@
       </tr>
       <tr>
         <th class="col-3">
-          <input type="number" class="form-control"
-                 on:change|preventDefault={(event) => {tableHandler.filter(event.target.value, 'id')}}>
         </th>
         <th></th>
         <th>
