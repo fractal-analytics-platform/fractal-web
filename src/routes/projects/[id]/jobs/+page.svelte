@@ -24,10 +24,14 @@
 
   onMount(async () => {
     // Load project context
+    console.log('Loading project context...')
     // If $contextProject is not empty, it means that the user has already loaded the project context
     // we don't need to load it again
-    if ($contextProject.project) return
-    await loadProjectContext($page.params.id)
+    if ($contextProject.project === undefined) {
+      await loadProjectContext($page.params.id)
+    }
+
+    await loadProjectJobs()
 
     // Set filters
     const idFilter = $page.url.searchParams.get('id')
@@ -59,6 +63,7 @@
 
   async function loadProjectJobs() {
     // Load project jobs
+    console.log('Loading project jobs...')
     jobs = await getJobs($page.params.id)
       .then((response) => {
         return response
@@ -68,15 +73,11 @@
         return []
       })
 
-    console.log(jobs)
-
     // Table handler
     tableHandler = new DataHandler(jobs)
     // Table data
     rows = tableHandler.getRows()
   }
-
-  loadProjectJobs()
 
 </script>
 
