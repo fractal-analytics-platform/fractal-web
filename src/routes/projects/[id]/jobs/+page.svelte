@@ -22,6 +22,12 @@
   $: workflows = $contextProject.workflows
   $: datasets = $contextProject.datasets
 
+  // Filters
+  let workflowFilter = ''
+  let inputDatasetFilter = ''
+  let outputDatasetFilter = ''
+  let statusFilter = ''
+
   onMount(async () => {
     // Load project context
     console.log('Loading project context...')
@@ -39,27 +45,35 @@
       tableHandler.filter(idFilter, 'id')
     }
 
-    const workflowFilter = $page.url.searchParams.get('workflow')
-    if (workflowFilter) {
-      tableHandler.filter(workflowFilter, 'workflow_id')
+    let workflowQueryFilter = $page.url.searchParams.get('workflow')
+    if (workflowQueryFilter) {
+      workflowFilter = workflowQueryFilter
     }
 
-    const inputDatasetFilter = $page.url.searchParams.get('input_dataset')
-    if (inputDatasetFilter) {
-      tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
+    let inputDatasetQueryFilter = $page.url.searchParams.get('input_dataset')
+    if (inputDatasetQueryFilter) {
+      inputDatasetFilter = inputDatasetQueryFilter
     }
 
-    const outputDatasetFilter = $page.url.searchParams.get('output_dataset')
-    if (outputDatasetFilter) {
-      tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+    let outputDatasetQueryFilter = $page.url.searchParams.get('output_dataset')
+    if (outputDatasetQueryFilter) {
+      outputDatasetFilter = outputDatasetQueryFilter
     }
 
-    const statusFilter = $page.url.searchParams.get('status')
-    if (statusFilter) {
-      tableHandler.filter(statusFilter, 'status')
+    let statusQueryFilter = $page.url.searchParams.get('status')
+    if (statusQueryFilter) {
+      statusFilter = statusQueryFilter
     }
 
   })
+
+  setupTableHandler()
+
+  // Filters
+  $: tableHandler.filter(workflowFilter, 'workflow_id')
+  $: tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
+  $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+  $: tableHandler.filter(statusFilter, 'status')
 
   async function loadProjectJobs() {
     // Load project jobs
@@ -72,7 +86,10 @@
         console.error(error)
         return []
       })
+    tableHandler.setRows(jobs)
+  }
 
+  function setupTableHandler() {
     // Table handler
     tableHandler = new DataHandler(jobs)
     // Table data
@@ -107,6 +124,26 @@
     </div>
 
     {#if tableHandler }
+    <div class="d-flex justify-content-end align-items-center my-3">
+      <div>
+        <button class="btn btn-warning" on:click={
+          () => {
+            tableHandler.clearFilters()
+            workflowFilter = ''
+            inputDatasetFilter = ''
+            outputDatasetFilter = ''
+            statusFilter = ''
+          }
+        }>
+          <i class="bi-x-square"></i>
+          Clear filters
+        </button>
+        <button class="btn btn-primary" on:click={() => {
+          // Refresh jobs list
+          loadProjectJobs()
+        }}><i class="bi-arrow-clockwise"></i> Refresh</button>
+      </div>
+    </div>
     <table class="table">
 
       <thead class="table-light">
@@ -124,8 +161,7 @@
         <th></th>
         <th>
           {#if workflows}
-            <select class="form-control"
-                    on:change={(event) => {tableHandler.filter(event.target.value, 'workflow_id')}}>
+            <select class="form-control" bind:value={workflowFilter}>
             <option value="">All</option>
               {#each workflows as workflow}
                 <option value={workflow.id}>{workflow.name}</option>
@@ -134,25 +170,25 @@
           {/if}
         </th>
         <th>
-          <select class="form-control"
-                  on:change={(event) => {tableHandler.filter(event.target.value, 'input_dataset_id')}}>
-          <option value="">All</option>
+          {#key inputDatasetFilter}
+            <select class="form-control" bind:value={inputDatasetFilter}>
+              <option value="">All</option>
+              {#each datasets as dataset}
+                <option value={dataset.id}>{dataset.name}</option>
+              {/each}
+            </select>
+          {/key}
+        </th>
+        <th>
+          <select class="form-control" bind:value={outputDatasetFilter}>
+            <option value="">All</option>
             {#each datasets as dataset}
               <option value={dataset.id}>{dataset.name}</option>
             {/each}
           </select>
         </th>
         <th>
-          <select class="form-control"
-                  on:change={(event) => {tableHandler.filter(event.target.value, 'output_dataset_id')}}>
-          <option value="">All</option>
-            {#each datasets as dataset}
-              <option value={dataset.id}>{dataset.name}</option>
-            {/each}
-          </select>
-        </th>
-        <th>
-          <select class="form-control" on:change={(event) => {tableHandler.filter(event.target.value, 'status')}}>
+          <select class="form-control" bind:value={statusFilter}>
           <option value="">All</option>
             <option value="running">Running</option>
             <option value="done">Done</option>
@@ -166,7 +202,7 @@
       <tbody>
       {#if rows }
         {#each $rows as row }
-          {#key row}
+          {#key row }
             <tr>
               <td>{row.id}</td>
               <td>
