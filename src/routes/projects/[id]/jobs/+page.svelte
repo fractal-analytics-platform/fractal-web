@@ -7,6 +7,7 @@
   import { getJobs } from '$lib/api/v1/project/project_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
+  import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte'
   import Th from '$lib/components/common/filterable/Th.svelte'
 
   // Component properties
@@ -16,6 +17,7 @@
   let jobs = []
   let tableHandler = undefined
   let rows = undefined
+  let workflowJobInfoId = undefined
 
   // Project context properties
   $: project = $contextProject.project
@@ -154,6 +156,7 @@
         <Th handler={tableHandler} key="input_dataset_id" label="Input dataset"></Th>
         <Th handler={tableHandler} key="output_dataset_id" label="Output dataset"></Th>
         <Th handler={tableHandler} key="status" label="Status"></Th>
+        <th>Options</th>
       </tr>
       <tr>
         <th class="col-3">
@@ -196,6 +199,7 @@
             <option value="submitted">Submitted</option>
           </select>
         </th>
+        <th></th>
       </tr>
       </thead>
 
@@ -226,6 +230,13 @@
               <td>
                 <StatusBadge status={row.status}></StatusBadge>
               </td>
+              <td>
+                <button class="btn btn-info" on:click={() => {
+                  workflowJobInfoId = row.id
+                  const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'),{})
+                  infoModal.show()
+                }}><i class="bi-info-circle"></i> Info</button>
+              </td>
             </tr>
           {/key}
         {/each}
@@ -235,3 +246,5 @@
     {/if}
   </div>
 {/if}
+
+<JobInfoModal workflowJobId={workflowJobInfoId}></JobInfoModal>

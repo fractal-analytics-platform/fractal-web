@@ -1,7 +1,14 @@
+import { get } from 'svelte/store'
 import { getProject, getWorkflows } from '$lib/api/v1/project/project_api'
 import { contextProject } from '$lib/stores/projectStores'
 
 export async function loadProjectContext(projectId) {
+
+  const context = get(contextProject)
+
+  // If the context is already loaded, do not reload it
+  if (context.project !== undefined) return
+
   await getProject(projectId)
     .then((project) => {
       contextProject.update(context => {
