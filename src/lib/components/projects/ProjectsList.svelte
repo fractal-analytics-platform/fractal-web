@@ -62,13 +62,6 @@
           </div>
         </div>
         <div class="col-auto">
-          <div class="input-group">
-            <div class="input-group-text">Project directory</div>
-            <input name="projectDirectory" type="text" class="form-control">
-          </div>
-        </div>
-
-        <div class="col-auto">
           <button type="submit" class="btn btn-primary">Create</button>
         </div>
       </form>
