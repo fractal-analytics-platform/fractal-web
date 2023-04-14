@@ -25,6 +25,10 @@
   let workflowTabContextId = 0
 
   let selectedWorkflowTask = undefined
+  let checkingConfiguration = false
+  let inputDatasetControl = ''
+  let outputDatasetControl = ''
+  let workerInitControl = ''
 
   workflowTaskContext.subscribe((value) => {
     selectedWorkflowTask = value
@@ -155,16 +159,18 @@
       })
   }
 
-  async function handleApplyWorkflow({ form, data, cancel}) {
-    // Prevent default
-    cancel()
+  async function handleApplyWorkflow() {
+    // Build a FormData object
+    const data = new FormData()
+    data.append('inputDataset', inputDatasetControl)
+    data.append('outputDataset', outputDatasetControl)
+    data.append('workerInit', workerInitControl)
 
     await applyWorkflow(project.id, workflow.id, data)
       .then((job) => {
         // eslint-disable-next-line no-undef
         const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
         modal.toggle()
-        form.reset()
         // Navigate to project jobs page
         // Define URL to navigate to
         const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
@@ -419,10 +425,10 @@
       </div>
       <div class="modal-body">
         <div id="applyWorkflowError"></div>
-        <form id="runWorkflowForm" method="post" use:enhance={handleApplyWorkflow}>
+        <form id="runWorkflowForm">
           <div class="mb-3">
             <label for="inputDataset" class="form-label">Input dataset</label>
-            <select name="inputDataset" id="inputDataset" class="form-control">
+            <select name="inputDataset" id="inputDataset" class="form-control" disabled={checkingConfiguration} bind:value={inputDatasetControl}>
               <option value="">Select an input dataset</option>
               {#each datasets as dataset}
                 <option value="{dataset.id}">{dataset.name}</option>
@@ -431,7 +437,7 @@
           </div>
           <div class="mb-3">
             <label for="outputDataset" class="form-label">Output dataset</label>
-            <select name="outputDataset" id="outputDataset" class="form-control">
+            <select name="outputDataset" id="outputDataset" class="form-control" disabled={checkingConfiguration} bind:value={outputDatasetControl}>
               <option value="">Select an output dataset</option>
               {#each datasets as dataset}
                 <option value="{dataset.id}">{dataset.name}</option>
@@ -440,12 +446,21 @@
           </div>
           <div class="mb-3">
             <label for="workerInit" class="form-label">Input data</label>
-            <textarea name="workerInit" id="workerInit" class="form-control font-monospace" rows="5"></textarea>
+            <textarea name="workerInit" id="workerInit" class="form-control font-monospace" rows="5" disabled={checkingConfiguration} bind:value={workerInitControl}></textarea>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" form="runWorkflowForm">Run</button>
+        {#if checkingConfiguration }
+          <button class="btn btn-warning" on:click={() => {
+            checkingConfiguration = false
+          }}>Cancel</button>
+          <button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>Confirm</button>
+        {:else}
+          <button class="btn btn-primary" on:click={() => {
+            checkingConfiguration = true
+          }}>Run</button>
+        {/if}
       </div>
     </div>
   </div>
