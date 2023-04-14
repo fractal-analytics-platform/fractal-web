@@ -132,6 +132,7 @@
               <i class="bi bi-arrow-up-right-square"></i>
               Open
             </a>
+            <a href="/projects/{projectId}/jobs?workflow={id}" class="btn btn-light"><i class="bi-journal-code"></i> List jobs</a>
             <ConfirmActionButton
               modalId={"deleteConfirmModal" + id}
               style={'danger'}

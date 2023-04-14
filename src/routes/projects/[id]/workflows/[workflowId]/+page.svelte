@@ -2,14 +2,20 @@
   import { onMount } from 'svelte'
   import { writable } from 'svelte/store'
   import { enhance } from '$app/forms'
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask } from '$lib/api/v1/workflow/workflow_api'
+  import { contextProject } from '$lib/stores/projectStores'
+  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
+  import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
   import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
   let workflow = undefined
+  let project = $contextProject.project
+  let datasets = $contextProject.datasets || []
+
   $: updatableWorkflowList = workflow ? workflow.task_list : []
   // List of available tasks to be inserted into workflow
   let availableTasks = []
@@ -19,6 +25,10 @@
   let workflowTabContextId = 0
 
   let selectedWorkflowTask = undefined
+  let checkingConfiguration = false
+  let inputDatasetControl = ''
+  let outputDatasetControl = ''
+  let workerInitControl = ''
 
   workflowTaskContext.subscribe((value) => {
     selectedWorkflowTask = value
@@ -149,6 +159,39 @@
       })
   }
 
+  async function handleApplyWorkflow() {
+    // Build a FormData object
+    const data = new FormData()
+    data.append('inputDataset', inputDatasetControl)
+    data.append('outputDataset', outputDatasetControl)
+    data.append('workerInit', workerInitControl)
+
+    await applyWorkflow(project.id, workflow.id, data)
+      .then((job) => {
+        // eslint-disable-next-line no-undef
+        const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
+        modal.toggle()
+        // Navigate to project jobs page
+        // Define URL to navigate to
+        const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
+        // Set jobsUrl search params
+        jobsUrl.searchParams.set('workflow', workflow.id)
+        jobsUrl.searchParams.set('id', job.id)
+        // Trigger navigation
+        goto(jobsUrl)
+      })
+      .catch(error => {
+        console.error(error)
+        // Set an error message on the component
+        new StandardErrorAlert({
+          target: document.getElementById('applyWorkflowError'),
+          props: {
+            error
+          }
+        })
+      })
+  }
+
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -176,6 +219,7 @@
     <button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}><i class="bi-box-arrow-up"></i></button>
     <a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
     <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"><i class="bi-gear-wide-connected"></i></button>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#runWorkflowModal"><i class="bi-play-fill"></i> Run workflow</button>
   </div>
 </div>
 
@@ -370,4 +414,54 @@
     </div>
   </div>
 
+</div>
+
+<div class="modal" id="runWorkflowModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Run workflow</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="applyWorkflowError"></div>
+        <form id="runWorkflowForm">
+          <div class="mb-3">
+            <label for="inputDataset" class="form-label">Input dataset</label>
+            <select name="inputDataset" id="inputDataset" class="form-control" disabled={checkingConfiguration} bind:value={inputDatasetControl}>
+              <option value="">Select an input dataset</option>
+              {#each datasets as dataset}
+                <option value="{dataset.id}">{dataset.name}</option>
+              {/each}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="outputDataset" class="form-label">Output dataset</label>
+            <select name="outputDataset" id="outputDataset" class="form-control" disabled={checkingConfiguration} bind:value={outputDatasetControl}>
+              <option value="">Select an output dataset</option>
+              {#each datasets as dataset}
+                <option value="{dataset.id}">{dataset.name}</option>
+              {/each}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="workerInit" class="form-label">Input data</label>
+            <textarea name="workerInit" id="workerInit" class="form-control font-monospace" rows="5" disabled={checkingConfiguration} bind:value={workerInitControl}></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        {#if checkingConfiguration }
+          <button class="btn btn-warning" on:click={() => {
+            checkingConfiguration = false
+          }}>Cancel</button>
+          <button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>Confirm</button>
+        {:else}
+          <button class="btn btn-primary" on:click={() => {
+            checkingConfiguration = true
+          }}>Run</button>
+        {/if}
+      </div>
+    </div>
+  </div>
 </div>

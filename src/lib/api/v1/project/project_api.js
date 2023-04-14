@@ -265,3 +265,19 @@ export async function deleteDatasetResource(projectId, datasetId, resourceId) {
 
   throw new Error('The client was not able to delete dataset resource')
 }
+
+// Get the jobs list for a project
+export async function getJobs(projectId) {
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/jobs/`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to fetch project jobs')
+}

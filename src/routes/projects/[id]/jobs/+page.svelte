@@ -4,6 +4,7 @@
   import { DataHandler } from '@vincjo/datatables'
   import { loadProjectContext } from  '$lib/components/projects/controller'
   import { contextProject } from '$lib/stores/projectStores'
+  import { getJobs } from '$lib/api/v1/project/project_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
   import Th from '$lib/components/common/filterable/Th.svelte'
@@ -12,18 +13,31 @@
   let project = undefined
   let workflows = []
   let datasets = []
+  let jobs = []
+  let tableHandler = undefined
+  let rows = undefined
 
   // Project context properties
   $: project = $contextProject.project
   $: workflows = $contextProject.workflows
   $: datasets = $contextProject.datasets
 
+  // Filters
+  let workflowFilter = ''
+  let inputDatasetFilter = ''
+  let outputDatasetFilter = ''
+  let statusFilter = ''
+
   onMount(async () => {
     // Load project context
+    console.log('Loading project context...')
     // If $contextProject is not empty, it means that the user has already loaded the project context
     // we don't need to load it again
-    if ($contextProject.project) return
-    await loadProjectContext($page.params.id)
+    if ($contextProject.project === undefined) {
+      await loadProjectContext($page.params.id)
+    }
+
+    await loadProjectJobs()
 
     // Set filters
     const idFilter = $page.url.searchParams.get('id')
@@ -31,154 +45,56 @@
       tableHandler.filter(idFilter, 'id')
     }
 
-    const workflowFilter = $page.url.searchParams.get('workflow')
-    if (workflowFilter) {
-      tableHandler.filter(workflowFilter, 'workflow_id')
+    let workflowQueryFilter = $page.url.searchParams.get('workflow')
+    if (workflowQueryFilter) {
+      workflowFilter = workflowQueryFilter
     }
 
-    const inputDatasetFilter = $page.url.searchParams.get('input_dataset')
-    if (inputDatasetFilter) {
-      tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
+    let inputDatasetQueryFilter = $page.url.searchParams.get('input_dataset')
+    if (inputDatasetQueryFilter) {
+      inputDatasetFilter = inputDatasetQueryFilter
     }
 
-    const outputDatasetFilter = $page.url.searchParams.get('output_dataset')
-    if (outputDatasetFilter) {
-      tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+    let outputDatasetQueryFilter = $page.url.searchParams.get('output_dataset')
+    if (outputDatasetQueryFilter) {
+      outputDatasetFilter = outputDatasetQueryFilter
     }
 
-    const statusFilter = $page.url.searchParams.get('status')
-    if (statusFilter) {
-      tableHandler.filter(statusFilter, 'status')
+    let statusQueryFilter = $page.url.searchParams.get('status')
+    if (statusQueryFilter) {
+      statusFilter = statusQueryFilter
     }
+
   })
 
-  const jobs = [
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 0,
-      "start_timestamp": "2023-04-05T12:54:39.657Z",
-      "status": "running",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 3,
-      "output_dataset_id": 1,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 1,
-      "start_timestamp": "2023-04-05T12:55:39.657Z",
-      "status": "done",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 2,
-      "start_timestamp": "2023-04-05T12:56:39.657Z",
-      "status": "failed",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 3,
-      "start_timestamp": "2023-04-05T12:57:39.657Z",
-      "status": "running",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 4,
-      "start_timestamp": "2023-04-05T12:58:39.657Z",
-      "status": "failed",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 1,
-      "output_dataset_id": 3,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 5,
-      "start_timestamp": "2023-04-05T12:59:39.657Z",
-      "status": "running",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    },
-    {
-      "project_id": 0,
-      "input_dataset_id": 3,
-      "output_dataset_id": 1,
-      "workflow_id": 1,
-      "overwrite_input": false,
-      "worker_init": "string",
-      "id": 11,
-      "start_timestamp": "2023-04-05T12:59:49.657Z",
-      "status": "submitted",
-      "log": "string",
-      "history": [
-        "string"
-      ],
-      "working_dir": "string",
-      "working_dir_user": "string"
-    }
-  ]
+  setupTableHandler()
 
-  // Table handler
-  const tableHandler = new DataHandler(jobs)
+  // Filters
+  $: tableHandler.filter(workflowFilter, 'workflow_id')
+  $: tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
+  $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+  $: tableHandler.filter(statusFilter, 'status')
 
-  // Table data
-  const rows = tableHandler.getRows()
+  async function loadProjectJobs() {
+    // Load project jobs
+    console.log('Loading project jobs...')
+    jobs = await getJobs($page.params.id)
+      .then((response) => {
+        return response
+      })
+      .catch((error) => {
+        console.error(error)
+        return []
+      })
+    tableHandler.setRows(jobs)
+  }
+
+  function setupTableHandler() {
+    // Table handler
+    tableHandler = new DataHandler(jobs)
+    // Table data
+    rows = tableHandler.getRows()
+  }
 
 </script>
 
@@ -197,7 +113,6 @@
     </ol>
   </nav>
   <div>
-    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProjectModal"><i class="bi-gear-wide-connected"></i></button>
   </div>
 </div>
 
@@ -208,6 +123,27 @@
       <h1>Project's Jobs</h1>
     </div>
 
+    {#if tableHandler }
+    <div class="d-flex justify-content-end align-items-center my-3">
+      <div>
+        <button class="btn btn-warning" on:click={
+          () => {
+            tableHandler.clearFilters()
+            workflowFilter = ''
+            inputDatasetFilter = ''
+            outputDatasetFilter = ''
+            statusFilter = ''
+          }
+        }>
+          <i class="bi-x-square"></i>
+          Clear filters
+        </button>
+        <button class="btn btn-primary" on:click={() => {
+          // Refresh jobs list
+          loadProjectJobs()
+        }}><i class="bi-arrow-clockwise"></i> Refresh</button>
+      </div>
+    </div>
     <table class="table">
 
       <thead class="table-light">
@@ -221,14 +157,11 @@
       </tr>
       <tr>
         <th class="col-3">
-          <input type="number" class="form-control"
-                 on:change|preventDefault={(event) => {tableHandler.filter(event.target.value, 'id')}}>
         </th>
         <th></th>
         <th>
           {#if workflows}
-            <select class="form-control"
-                    on:change={(event) => {tableHandler.filter(event.target.value, 'workflow_id')}}>
+            <select class="form-control" bind:value={workflowFilter}>
             <option value="">All</option>
               {#each workflows as workflow}
                 <option value={workflow.id}>{workflow.name}</option>
@@ -237,25 +170,25 @@
           {/if}
         </th>
         <th>
-          <select class="form-control"
-                  on:change={(event) => {tableHandler.filter(event.target.value, 'input_dataset_id')}}>
-          <option value="">All</option>
+          {#key inputDatasetFilter}
+            <select class="form-control" bind:value={inputDatasetFilter}>
+              <option value="">All</option>
+              {#each datasets as dataset}
+                <option value={dataset.id}>{dataset.name}</option>
+              {/each}
+            </select>
+          {/key}
+        </th>
+        <th>
+          <select class="form-control" bind:value={outputDatasetFilter}>
+            <option value="">All</option>
             {#each datasets as dataset}
               <option value={dataset.id}>{dataset.name}</option>
             {/each}
           </select>
         </th>
         <th>
-          <select class="form-control"
-                  on:change={(event) => {tableHandler.filter(event.target.value, 'output_dataset_id')}}>
-          <option value="">All</option>
-            {#each datasets as dataset}
-              <option value={dataset.id}>{dataset.name}</option>
-            {/each}
-          </select>
-        </th>
-        <th>
-          <select class="form-control" on:change={(event) => {tableHandler.filter(event.target.value, 'status')}}>
+          <select class="form-control" bind:value={statusFilter}>
           <option value="">All</option>
             <option value="running">Running</option>
             <option value="done">Done</option>
@@ -267,35 +200,38 @@
       </thead>
 
       <tbody>
-      {#each $rows as row }
-        {#key row}
-          <tr>
-            <td>{row.id}</td>
-            <td>
-              <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>
-            </td>
-            <td>
-              {#if workflows}
-                { workflows.find(workflow => workflow.id === row.workflow_id).name }
-              {/if}
-            </td>
-            <td>
-              {#if datasets}
-                { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
-              {/if}
-            </td>
-            <td>
-              {#if datasets}
-                { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
-              {/if}
-            </td>
-            <td>
-              <StatusBadge status={row.status}></StatusBadge>
-            </td>
-          </tr>
-        {/key}
-      {/each}
+      {#if rows }
+        {#each $rows as row }
+          {#key row }
+            <tr>
+              <td>{row.id}</td>
+              <td>
+                <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>
+              </td>
+              <td>
+                {#if workflows}
+                  { workflows.find(workflow => workflow.id === row.workflow_id).name }
+                {/if}
+              </td>
+              <td>
+                {#if datasets}
+                  { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
+                {/if}
+              </td>
+              <td>
+                {#if datasets}
+                  { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
+                {/if}
+              </td>
+              <td>
+                <StatusBadge status={row.status}></StatusBadge>
+              </td>
+            </tr>
+          {/key}
+        {/each}
+      {/if}
       </tbody>
     </table>
+    {/if}
   </div>
 {/if}

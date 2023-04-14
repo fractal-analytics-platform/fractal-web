@@ -6,4 +6,8 @@ import { writable } from 'svelte/store'
 export const modalProject = writable({})
 
 // Context project store
-export const contextProject = writable({})
+export const contextProject = writable({
+  project: undefined,
+  workflows: undefined,
+  datasets: undefined
+})

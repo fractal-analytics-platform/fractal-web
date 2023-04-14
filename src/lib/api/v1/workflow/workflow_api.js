@@ -212,3 +212,42 @@ export async function deleteWorkflowTask(workflowId, workflowTaskId){
 
   throw new Error('The client was not able to delete the workflow task')
 }
+
+// Apply a workflow
+export async function applyWorkflow(projectId, workflowId, formData) {
+
+  const requestBody = {
+    workflow_id: workflowId,
+    project_id: projectId,
+  }
+
+  // Set input dataset if provided
+  if (formData.get('inputDataset')) {
+    requestBody.input_dataset_id = formData.get('inputDataset')
+  }
+  // Set output dataset if provided
+  if (formData.get('outputDataset')) {
+    requestBody.output_dataset_id = formData.get('outputDataset')
+  }
+  // Set worker_init if provided
+  if (formData.get('workerInit')) {
+    requestBody.worker_init = formData.get('workerInit')
+  }
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/apply/`, {
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (response.ok) {
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
