@@ -7,6 +7,8 @@
   import { getJobs } from '$lib/api/v1/project/project_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
+  import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte'
+  import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte'
   import Th from '$lib/components/common/filterable/Th.svelte'
 
   // Component properties
@@ -16,6 +18,7 @@
   let jobs = []
   let tableHandler = undefined
   let rows = undefined
+  let workflowJobInfoId = undefined
 
   // Project context properties
   $: project = $contextProject.project
@@ -154,6 +157,7 @@
         <Th handler={tableHandler} key="input_dataset_id" label="Input dataset"></Th>
         <Th handler={tableHandler} key="output_dataset_id" label="Output dataset"></Th>
         <Th handler={tableHandler} key="status" label="Status"></Th>
+        <th>Options</th>
       </tr>
       <tr>
         <th class="col-3">
@@ -196,6 +200,7 @@
             <option value="submitted">Submitted</option>
           </select>
         </th>
+        <th></th>
       </tr>
       </thead>
 
@@ -203,7 +208,7 @@
       {#if rows }
         {#each $rows as row }
           {#key row }
-            <tr>
+            <tr class="align-middle">
               <td>{row.id}</td>
               <td>
                 <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>
@@ -226,6 +231,23 @@
               <td>
                 <StatusBadge status={row.status}></StatusBadge>
               </td>
+              <td>
+                <button class="btn btn-info" on:click={() => {
+                  workflowJobInfoId = row.id
+                  const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'),{})
+                  infoModal.show()
+                }}><i class="bi-info-circle"></i> Info</button>
+                {#if row.status === 'failed' || row.status === 'done'}
+                  <button class="btn btn-light" on:click={() => {
+                    workflowJobInfoId = row.id
+                    const logsModal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'),{})
+                    logsModal.show()
+                  }}>
+                    <i class="bi-list-columns-reverse"></i>
+                    Logs
+                  </button>
+                {/if}
+              </td>
             </tr>
           {/key}
         {/each}
@@ -235,3 +257,6 @@
     {/if}
   </div>
 {/if}
+
+<JobInfoModal workflowJobId={workflowJobInfoId}></JobInfoModal>
+<JobLogsModal workflowJobId={workflowJobInfoId}></JobLogsModal>
