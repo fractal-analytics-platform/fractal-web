@@ -4,6 +4,7 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
+  import { loadProjectContext } from '$lib/components/projects/controller'
   import { contextProject } from '$lib/stores/projectStores'
   import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
@@ -13,15 +14,13 @@
   import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
   let workflow = undefined
-  let project = $contextProject.project
-  let datasets = $contextProject.datasets || []
-
-  $: updatableWorkflowList = workflow ? workflow.task_list : []
   // List of available tasks to be inserted into workflow
   let availableTasks = []
+  // Project context properties
+  let project
+  let datasets = []
 
   let workflowTaskContext = writable(undefined)
-
   let workflowTabContextId = 0
 
   let selectedWorkflowTask = undefined
@@ -29,6 +28,14 @@
   let inputDatasetControl = ''
   let outputDatasetControl = ''
   let workerInitControl = ''
+
+  $: updatableWorkflowList = workflow?.task_list || []
+
+
+  contextProject.subscribe((context) => {
+    project = context.project
+    datasets = context.datasets
+  })
 
   workflowTaskContext.subscribe((value) => {
     selectedWorkflowTask = value
@@ -42,7 +49,8 @@
   }
 
   onMount(async () => {
-    await loadWorkflow();
+    await loadWorkflow()
+    await loadProjectContext($page.params.id)
   })
 
   async function handleExportWorkflow(event) {
@@ -387,9 +395,9 @@
       </div>
       <div class="modal-body">
 
-        {#if workflow != undefined && updatableWorkflowList.length == 0 }
+        {#if workflow !== undefined && updatableWorkflowList.length == 0 }
           <p class="text-center mt-3">No workflow tasks yet, add one.</p>
-        {:else if workflow != undefined}
+        {:else if workflow !== undefined}
           <ul class="list-group list-group-flush">
             {#each updatableWorkflowList as workflowTask, i }
               <li class="list-group-item" data-fs-target={workflowTask.id}>

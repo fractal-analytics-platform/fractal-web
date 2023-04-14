@@ -8,6 +8,6 @@ export const modalProject = writable({})
 // Context project store
 export const contextProject = writable({
   project: undefined,
-  workflows: undefined,
-  datasets: undefined
+  workflows: [],
+  datasets: []
 })

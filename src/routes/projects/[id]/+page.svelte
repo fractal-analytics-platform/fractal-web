@@ -13,12 +13,13 @@
   let workflows
   let projectUpdatesSuccess = undefined
 
-  $: project = $contextProject.project
-  $: workflows = $contextProject.workflows
+  // Subscribe to the project context store
+  contextProject.subscribe((context) => {
+    project = context.project
+    workflows = context.workflows
+  })
 
   onMount(async () => {
-    project = undefined
-    workflows = []
     await loadProjectContext($page.params.id)
   })
 
