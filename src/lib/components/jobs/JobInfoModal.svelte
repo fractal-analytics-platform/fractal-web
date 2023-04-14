@@ -59,7 +59,7 @@
       <div class="modal-header d-flex justify-content-between">
         <h1 class="h5 modal-title">Workflow Job #{workflowJobId}</h1>
         <div class="d-flex align-items-center">
-          <button class="btn btn-light me-3"><i class="bi-arrow-clockwise" on:click={fetchJob}></i></button>
+          <button class="btn btn-light me-3" on:click={fetchJob}><i class="bi-arrow-clockwise"></i></button>
           <button class="btn-close bg-light p-2" data-bs-dismiss="modal"></button>
         </div>
       </div>

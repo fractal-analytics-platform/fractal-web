@@ -8,6 +8,7 @@
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
   import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte'
+  import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte'
   import Th from '$lib/components/common/filterable/Th.svelte'
 
   // Component properties
@@ -236,6 +237,16 @@
                   const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'),{})
                   infoModal.show()
                 }}><i class="bi-info-circle"></i> Info</button>
+                {#if row.status === 'failed' || row.status === 'done'}
+                  <button class="btn btn-light" on:click={() => {
+                    workflowJobInfoId = row.id
+                    const logsModal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'),{})
+                    logsModal.show()
+                  }}>
+                    <i class="bi-list-columns-reverse"></i>
+                    Logs
+                  </button>
+                {/if}
               </td>
             </tr>
           {/key}
@@ -248,3 +259,4 @@
 {/if}
 
 <JobInfoModal workflowJobId={workflowJobInfoId}></JobInfoModal>
+<JobLogsModal workflowJobId={workflowJobInfoId}></JobLogsModal>
