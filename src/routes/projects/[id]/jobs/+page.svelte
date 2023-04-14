@@ -207,7 +207,7 @@
       {#if rows }
         {#each $rows as row }
           {#key row }
-            <tr>
+            <tr class="align-middle">
               <td>{row.id}</td>
               <td>
                 <TimestampBadge timestamp={row.start_timestamp}></TimestampBadge>

@@ -82,6 +82,10 @@
               {#key jobStatus }
                 <li class="list-group-item"><StatusBadge status={jobStatus}></StatusBadge></li>
               {/key}
+              <li class="list-group-item list-group-item-light fw-bold">Working directory</li>
+              <li class="list-group-item"><code>{job?.working_dir}</code></li>
+              <li class="list-group-item list-group-item-light fw-bold">User Working directory</li>
+              <li class="list-group-item"><code>{job?.working_dir_user}</code></li>
             </ul>
           </div>
         </div>
