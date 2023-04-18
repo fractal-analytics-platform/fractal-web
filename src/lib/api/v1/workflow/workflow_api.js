@@ -251,3 +251,42 @@ export async function applyWorkflow(projectId, workflowId, formData) {
 
   throw new PostResourceException(await response.json())
 }
+
+// Download a workflow job log as zip file
+export async function downloadWorkflowJobLog(workflowJobId) {
+
+    const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/job/download/${workflowJobId}`, {
+      method: 'GET',
+      credentials: 'include',
+      mode: 'cors'
+    })
+
+    if (response.ok) {
+      // The API uses a StreamResponse to stream the zip file to the client
+      // Get a stream reader from the body
+      const reader = response.body.getReader()
+      // Read the stream and create a blob
+      const readableStream = new ReadableStream({
+        start(controller) {
+          return pump()
+          function pump() {
+            return reader.read().then(({ done, value }) => {
+              // When no more data needs to be consumed, close the stream
+              if (done) {
+                controller.close()
+                return
+              }
+              // Enqueue the next data chunk into our target stream
+              controller.enqueue(value)
+              return pump()
+            })
+          }
+        }
+      })
+      // Create a blob from the stream
+      const blob = await new Response(readableStream).blob()
+      return blob
+    }
+
+    throw new Error('The client was not able to retrieve the workflow job log from the server')
+}
