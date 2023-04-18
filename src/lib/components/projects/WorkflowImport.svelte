@@ -17,14 +17,16 @@
     cancel()
 
     const workflowFile = data.get('workflowFile')
-    console.log(workflowFile)
 
     if (workflowFile.name == '') {
       throw new Error('No workflow file specified')
     }
 
-    const workflowMetadata = await workflowFile.text().then(data => JSON.parse(data))
-    console.log(workflowMetadata)
+    const workflowMetadata = await workflowFile.text()
+      .then(data => JSON.parse(data))
+      .catch(() => {
+        throw new Error('The format of the selected file is not valid. Please select a valid workflow file.')
+      })
 
     // Request workflow import
     importing = true
@@ -58,7 +60,7 @@
 
   <div class="mb-3">
     <label for="workflowFile" class="form-label">Select a workflow file</label>
-    <input class="form-control" type="file" name="workflowFile" id="workflowFile">
+    <input class="form-control" accept="application/json" type="file" name="workflowFile" id="workflowFile">
   </div>
 
   <button class="btn btn-primary" disabled={importing}>
