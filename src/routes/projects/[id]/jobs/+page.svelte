@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
-  import { DataHandler } from '@vincjo/datatables'
+  import { DataHandler, check } from '@vincjo/datatables'
   import { loadProjectContext } from  '$lib/components/projects/controller'
   import { contextProject } from '$lib/stores/projectStores'
   import { getJobs } from '$lib/api/v1/project/project_api'
@@ -45,27 +45,27 @@
     // Set filters
     const idFilter = $page.url.searchParams.get('id')
     if (idFilter) {
-      tableHandler.filter(idFilter, 'id')
+      tableHandler.filter(idFilter, 'id', check.isEqualTo)
     }
 
     let workflowQueryFilter = $page.url.searchParams.get('workflow')
     if (workflowQueryFilter) {
-      workflowFilter = workflowQueryFilter
+      tableHandler.filter(workflowQueryFilter, 'workflow_id', check.isEqualTo)
     }
 
     let inputDatasetQueryFilter = $page.url.searchParams.get('input_dataset')
     if (inputDatasetQueryFilter) {
-      inputDatasetFilter = inputDatasetQueryFilter
+      tableHandler.filter(inputDatasetQueryFilter, 'input_dataset_id', check.isEqualTo)
     }
 
     let outputDatasetQueryFilter = $page.url.searchParams.get('output_dataset')
     if (outputDatasetQueryFilter) {
-      outputDatasetFilter = outputDatasetQueryFilter
+      tableHandler.filter(outputDatasetQueryFilter, 'output_dataset_id', check.isEqualTo)
     }
 
     let statusQueryFilter = $page.url.searchParams.get('status')
     if (statusQueryFilter) {
-      statusFilter = statusQueryFilter
+      tableHandler.filter(statusQueryFilter, 'status', check.isEqualTo)
     }
 
   })

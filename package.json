@@ -28,7 +28,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@vincjo/datatables": "^1.5.2",
+		"@vincjo/datatables": "^1.6.0",
 		"sweetalert2": "^11.4.37"
 	}
 }
