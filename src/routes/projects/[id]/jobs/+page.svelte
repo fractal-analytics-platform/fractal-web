@@ -74,9 +74,9 @@
   setupTableHandler()
 
   // Filters
-  $: tableHandler.filter(workflowFilter, 'workflow_id')
-  $: tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
-  $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+  $: tableHandler.filter(workflowFilter, 'workflow_id', check.isEqualTo)
+  $: tableHandler.filter(inputDatasetFilter, 'input_dataset_id', check.isEqualTo)
+  $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo)
   $: tableHandler.filter(statusFilter, 'status')
 
   async function loadProjectJobs() {
