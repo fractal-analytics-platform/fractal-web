@@ -398,21 +398,27 @@
         {#if workflow !== undefined && updatableWorkflowList.length == 0 }
           <p class="text-center mt-3">No workflow tasks yet, add one.</p>
         {:else if workflow !== undefined}
-          <ul class="list-group list-group-flush">
-            {#each updatableWorkflowList as workflowTask, i }
-              <li class="list-group-item" data-fs-target={workflowTask.id}>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    {workflowTask.task.name} #{workflowTask.id}
+          {#key updatableWorkflowList }
+            <ul class="list-group list-group-flush">
+              {#each updatableWorkflowList as workflowTask, i }
+                <li class="list-group-item" data-fs-target={workflowTask.id}>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      {workflowTask.task.name} #{workflowTask.id}
+                    </div>
+                    <div>
+                      {#if i !== 0 }
+                        <button class="btn btn-light" on:click|preventDefault={moveWorkflowTask.bind(this, i, 'up')}><i class="bi-arrow-up"></i></button>
+                      {/if}
+                      {#if i !== updatableWorkflowList.length - 1 }
+                        <button class="btn btn-light" on:click|preventDefault={moveWorkflowTask.bind(this, i, 'down')}><i class="bi-arrow-down"></i></button>
+                      {/if}
+                    </div>
                   </div>
-                  <div>
-                    <button class="btn btn-light" on:click|preventDefault={moveWorkflowTask.bind(this, i, 'up')}><i class="bi-arrow-up"></i></button>
-                    <button class="btn btn-light" on:click|preventDefault={moveWorkflowTask.bind(this, i, 'down')}><i class="bi-arrow-down"></i></button>
-                  </div>
-                </div>
-              </li>
-            {/each}
-          </ul>
+                </li>
+              {/each}
+            </ul>
+          {/key}
         {/if}
 
       </div>
