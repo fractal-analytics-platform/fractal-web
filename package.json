@@ -28,6 +28,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-node": "^1.2.3",
 		"@vincjo/datatables": "^1.6.0",
 		"sweetalert2": "^11.4.37"
 	}
