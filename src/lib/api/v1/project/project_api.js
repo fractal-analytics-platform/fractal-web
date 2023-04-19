@@ -21,7 +21,6 @@ export async function createProject(data) {
 
   const requestData = {
     name: data.get('projectName'),
-    project_dir: data.get('projectDirectory')
   }
 
   const headers = new Headers()

@@ -7,7 +7,15 @@ export async function loadProjectContext(projectId) {
   const context = get(contextProject)
 
   // If the context is already loaded, do not reload it
-  if (context.project !== undefined) return
+  if (context.project !== undefined) {
+    const currentProjectId = context.project.id
+
+    // If the project loaded is the same as the one we want to load, do not reload it
+    if (currentProjectId === projectId) {
+      return
+    }
+
+  }
 
   await getProject(projectId)
     .then((project) => {

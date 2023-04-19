@@ -35,8 +35,6 @@
             <ul class="list-group">
               <li class="list-group-item list-group-item-light fw-bold">Name</li>
               <li class="list-group-item">{project?.name}</li>
-              <li class="list-group-item list-group-item-light fw-bold">Directory</li>
-              <li class="list-group-item">{project?.project_dir}</li>
               <li class="list-group-item list-group-item-light fw-bold">Read only</li>
               <li class="list-group-item">{project?.read_only ? "Yes" : "No"}</li>
             </ul>

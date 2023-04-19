@@ -1,10 +1,11 @@
 <script>
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
-  import { DataHandler } from '@vincjo/datatables'
+  import { DataHandler, check } from '@vincjo/datatables'
   import { loadProjectContext } from  '$lib/components/projects/controller'
   import { contextProject } from '$lib/stores/projectStores'
   import { getJobs } from '$lib/api/v1/project/project_api'
+  import { downloadWorkflowJobLog } from '$lib/api/v1/workflow/workflow_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
   import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte'
@@ -45,27 +46,27 @@
     // Set filters
     const idFilter = $page.url.searchParams.get('id')
     if (idFilter) {
-      tableHandler.filter(idFilter, 'id')
+      tableHandler.filter(idFilter, 'id', check.isEqualTo)
     }
 
     let workflowQueryFilter = $page.url.searchParams.get('workflow')
     if (workflowQueryFilter) {
-      workflowFilter = workflowQueryFilter
+      tableHandler.filter(workflowQueryFilter, 'workflow_id', check.isEqualTo)
     }
 
     let inputDatasetQueryFilter = $page.url.searchParams.get('input_dataset')
     if (inputDatasetQueryFilter) {
-      inputDatasetFilter = inputDatasetQueryFilter
+      tableHandler.filter(inputDatasetQueryFilter, 'input_dataset_id', check.isEqualTo)
     }
 
     let outputDatasetQueryFilter = $page.url.searchParams.get('output_dataset')
     if (outputDatasetQueryFilter) {
-      outputDatasetFilter = outputDatasetQueryFilter
+      tableHandler.filter(outputDatasetQueryFilter, 'output_dataset_id', check.isEqualTo)
     }
 
     let statusQueryFilter = $page.url.searchParams.get('status')
     if (statusQueryFilter) {
-      statusFilter = statusQueryFilter
+      tableHandler.filter(statusQueryFilter, 'status', check.isEqualTo)
     }
 
   })
@@ -73,9 +74,9 @@
   setupTableHandler()
 
   // Filters
-  $: tableHandler.filter(workflowFilter, 'workflow_id')
-  $: tableHandler.filter(inputDatasetFilter, 'input_dataset_id')
-  $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id')
+  $: tableHandler.filter(workflowFilter, 'workflow_id', check.isEqualTo)
+  $: tableHandler.filter(inputDatasetFilter, 'input_dataset_id', check.isEqualTo)
+  $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo)
   $: tableHandler.filter(statusFilter, 'status')
 
   async function loadProjectJobs() {
@@ -97,6 +98,30 @@
     tableHandler = new DataHandler(jobs)
     // Table data
     rows = tableHandler.getRows()
+  }
+
+  async function handleJobLogsDownload(jobId) {
+    console.log('Download job')
+
+    const downloadUrl = await downloadWorkflowJobLog(jobId)
+      .then(blob => {
+        // Create a download URL for the file
+        return URL.createObjectURL(blob)
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    // Create a hidden link within the page to trigger the download of the file
+    const link = document.createElement('a')
+    // Append the link to the body
+    document.body.appendChild(link)
+    // Set the href of the link to the download URL
+    link.href = downloadUrl
+    link.download = `${jobId}_logs.zip`
+    // Trigger the download
+    link.click()
+    document.body.removeChild(link)
   }
 
 </script>
@@ -246,6 +271,7 @@
                     <i class="bi-list-columns-reverse"></i>
                     Logs
                   </button>
+                  <button class="btn btn-light" on:click={handleJobLogsDownload.bind(this, row.id)}><i class="bi-arrow-down-circle"></i></button>
                 {/if}
               </td>
             </tr>
