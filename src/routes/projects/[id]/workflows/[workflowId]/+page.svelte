@@ -210,7 +210,7 @@
       </li>
       {#if $page.params.id}
         <li class="breadcrumb-item" aria-current="page">
-          <a href="/projects/{$page.params.id}">{$page.params.id}</a>
+          <a href="/projects/{$page.params.id}">{project?.name}</a>
         </li>
       {/if}
       <li class="breadcrumb-item">
