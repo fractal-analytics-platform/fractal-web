@@ -3,21 +3,30 @@
   import { page } from '$app/stores'
   import { enhance } from '$app/forms'
   import { getDataset, updateDataset, deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
+  import { loadProjectContext } from '$lib/components/projects/controller'
+  import { contextProject } from '$lib/stores/projectStores'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   let projectId = $page.params.id
   let datasetId = $page.params.datasetId
 
+  let project = undefined
   let dataset = undefined
   let updateDatasetSuccess = false
   let createResourceSuccess = false
+
+
+  contextProject.subscribe((context) => {
+    project = context.project
+  })
 
   onMount(async () => {
     dataset = await getDataset(projectId, datasetId)
       .catch(error => {
         console.error(error)
       })
+    await loadProjectContext(projectId)
   })
 
   async function handleDatasetUpdate({ form, data, cancel }) {
@@ -94,7 +103,7 @@
         <a href="/projects">Projects</a>
       </li>
       <li class="breadcrumb-item" aria-current="page">
-        <a href="/projects/{projectId}">Project</a>
+        <a href="/projects/{projectId}">{project?.name}</a>
       </li>
       <li class="breadcrumb-item" aria-current="page">Datasets</li>
       {#if dataset}

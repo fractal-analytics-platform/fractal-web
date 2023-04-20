@@ -13,6 +13,9 @@
   export let entryId = undefined
   export let isListEntry = false
   export let entryIndex = undefined
+  // Set a random guid to the entry
+  let entryEscapedName = 'entry-' + entryName
+  // Generate a random string
 
   // TODO: This is a temporary solution to the problem of having multiple entries with the same name
   if (entryId === undefined) {
@@ -100,11 +103,11 @@
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryId}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryEscapedName}">
               {!isListEntry? entryName : ''} (obj)
             </button>
           </div>
-          <div id="{entryId}" class="accordion-collapse collapse">
+          <div id="{entryEscapedName}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
               {#each Object.entries(entry) as [key, value]}
                 <svelte:self entry={value} entryName={key} on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted}/>
@@ -132,11 +135,11 @@
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryName}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{entryEscapedName}">
               {!isListEntry ? entryName : ''} (list)
             </button>
           </div>
-          <div id="{entryName}" class="accordion-collapse collapse">
+          <div id="{entryEscapedName}" class="accordion-collapse collapse">
             <div class="accordion-body p-2">
               {#each entry as listItem, index}
                 <svelte:self isListEntry={true} entry={listItem} entryIndex={index} entryId={entryName + '-' + index + '-' + 'list-item' } entryName={entryName + '-' + index + '-' + 'list-item' } on:entryUpdated={handleEntryUpdate} on:entryInserted={handleNewEntryInserted} />

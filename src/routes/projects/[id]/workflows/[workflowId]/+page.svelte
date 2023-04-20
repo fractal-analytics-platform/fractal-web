@@ -210,7 +210,7 @@
       </li>
       {#if $page.params.id}
         <li class="breadcrumb-item" aria-current="page">
-          <a href="/projects/{$page.params.id}">{$page.params.id}</a>
+          <a href="/projects/{$page.params.id}">{project?.name}</a>
         </li>
       {/if}
       <li class="breadcrumb-item">
@@ -224,6 +224,7 @@
     </ol>
   </nav>
   <div>
+    <a href="/projects/{project?.id}/jobs?workflow={workflow?.id}" class="btn btn-light"><i class="bi-journal-code"></i> List jobs</a>
     <button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}><i class="bi-box-arrow-up"></i></button>
     <a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
     <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"><i class="bi-gear-wide-connected"></i></button>

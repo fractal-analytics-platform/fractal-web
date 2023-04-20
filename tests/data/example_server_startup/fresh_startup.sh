@@ -20,6 +20,7 @@ JWT_EXPIRE_SECONDS=84600
 
 rm test.db
 rm -r /tmp/FRACTAL_TASKS_DIR
+rm -r artifacts
 
 # Create an empty db
 fractalctl set-db

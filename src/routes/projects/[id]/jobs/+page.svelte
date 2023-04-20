@@ -52,21 +52,25 @@
     let workflowQueryFilter = $page.url.searchParams.get('workflow')
     if (workflowQueryFilter) {
       tableHandler.filter(workflowQueryFilter, 'workflow_id', check.isEqualTo)
+      workflowFilter = Number.parseInt(workflowQueryFilter)
     }
 
     let inputDatasetQueryFilter = $page.url.searchParams.get('input_dataset')
     if (inputDatasetQueryFilter) {
       tableHandler.filter(inputDatasetQueryFilter, 'input_dataset_id', check.isEqualTo)
+      inputDatasetFilter = Number.parseInt(inputDatasetQueryFilter)
     }
 
     let outputDatasetQueryFilter = $page.url.searchParams.get('output_dataset')
     if (outputDatasetQueryFilter) {
       tableHandler.filter(outputDatasetQueryFilter, 'output_dataset_id', check.isEqualTo)
+      outputDatasetFilter = Number.parseInt(outputDatasetQueryFilter)
     }
 
     let statusQueryFilter = $page.url.searchParams.get('status')
     if (statusQueryFilter) {
       tableHandler.filter(statusQueryFilter, 'status', check.isEqualTo)
+      statusFilter = statusQueryFilter
     }
 
   })
