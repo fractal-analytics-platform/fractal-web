@@ -185,7 +185,7 @@
           {#each dataset.resource_list as resource }
             <tr>
               <td>{resource.id}</td>
-              <td><code>{resource.path}</code></td>
+              <td class="text-break"><code>{resource.path}</code></td>
               <td>
                 <ConfirmActionButton
                   modalId="confirmDeleteResource{resource.id}"
