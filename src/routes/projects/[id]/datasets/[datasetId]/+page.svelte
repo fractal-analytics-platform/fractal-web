@@ -111,6 +111,14 @@
       {/if}
     </ol>
   </nav>
+  <div>
+    {#if dataset && Object.keys(dataset.meta).length > 0 }
+      <button class="btn btn-light" data-bs-target="#datasetMetaModal" data-bs-toggle="modal"><i class="bi-arrow-up-right-square"></i> Show meta properties</button>
+    {/if}
+    {#if dataset}
+    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#updateDatasetModal"><i class="bi-gear-wide-connected"></i></button>
+    {/if}
+  </div>
 </div>
 
 {#if dataset}
@@ -124,8 +132,6 @@
       <div class="col-4">
         <div class="d-flex align-items-center justify-content-between">
           <span class="lead py-3">Dataset properties</span>
-          <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDatasetModal">Edit
-            dataset</a>
         </div>
         <ul class="list-group">
           <li class="list-group-item text-bg-light">
@@ -153,19 +159,6 @@
             <span class="badge bg-info">{dataset.read_only}</span>
           </li>
         </ul>
-        {#if Object.keys(dataset.meta).length > 0 }
-          <p class="text-muted mt-3">Meta properties</p>
-          <ul class="list-group">
-            {#each Object.entries(dataset.meta) as [key, value] }
-              <li class="list-group-item text-bg-light">
-                <span class="text-capitalize">{key}</span>
-              </li>
-              <li class="list-group-item">
-                <span class="">{value}</span>
-              </li>
-            {/each}
-          </ul>
-        {/if}
       </div>
       <div class="col-8">
         <div class="d-flex align-items-center justify-content-between">
@@ -272,6 +265,31 @@
           </div>
         </form>
 
+      </div>
+    </div>
+  </div>
+</div>
+{/if}
+
+{#if dataset && Object.keys(dataset.meta).length > 0 }
+<div class="modal" id="datasetMetaModal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Dataset meta properties</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          {#each Object.entries(dataset.meta) as [key, value] }
+            <li class="list-group-item text-bg-light">
+              <span class="text-capitalize">{key}</span>
+            </li>
+            <li class="list-group-item text-break">
+              <span class="">{value}</span>
+            </li>
+          {/each}
+        </ul>
       </div>
     </div>
   </div>
