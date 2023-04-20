@@ -460,7 +460,7 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="workerInit" class="form-label">Input data</label>
+            <label for="workerInit" class="form-label">Worker initialization (Optional)</label>
             <textarea name="workerInit" id="workerInit" class="form-control font-monospace" rows="5" disabled={checkingConfiguration} bind:value={workerInitControl}></textarea>
           </div>
         </form>
