@@ -42,6 +42,14 @@
     const entryType = typeof entry
     const isArray = Array.isArray(entry)
     if (entryType === 'object' && !isArray) {
+      // Check that the property name is not already used
+      if (Object.hasOwn(entry, propertyName)) {
+        const error = document.getElementById('submitEntryError')
+        error.textContent = `Property name "${propertyName}" is already used`
+        const input = document.getElementById('submitEntryName')
+        input.classList.add('is-invalid')
+        return
+      }
       entry[propertyName] = propertyValue
     } else if (isArray) {
       entry.push(propertyValue)
@@ -76,7 +84,7 @@
       <form id={uuid} on:submit|preventDefault={handleSubmitEntry}>
         <div class="input-group mb-3">
           {#if !isListItem}
-            <input type="text" class="form-control" placeholder="Arg name" bind:value={propertyName} required>
+            <input id="submitEntryName" type="text" class="form-control" placeholder="Arg name" bind:value={propertyName} required>
           {/if}
           {#if propertyType === 'string' }
             <input type="text" class="form-control w-50 font-monospace" placeholder="Argument default value" bind:value={propertyValue}>
@@ -95,6 +103,8 @@
             <option value="object">Object</option>
             <option value="array">Array</option>
           </select>
+          <div id="submitEntryError" class="invalid-feedback">
+          </div>
         </div>
       </form>
     </div>
