@@ -4,7 +4,7 @@
   import { whoami } from '$lib/api/v1/auth/auth_api'
   import { userStore } from '$lib/stores/authStores'
   import { serverInfo } from '$lib/stores/serverStores'
-
+  
   $: userLoggedIn = $userStore !== undefined
   $: server = $serverInfo || {}
 
@@ -21,13 +21,13 @@
   })
 
   const fetchServerInfo = async () => {
-    const info = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/alive/', {
+    const response = await fetch('http://localhost:5173/api/alive/', {
       method: 'GET'
-    })
-      .then(async (response) => {
-        return await response.json()
-      })
-    serverInfo.set(info)
+    }).then(async (res) => await res.json()
+    )  
+
+    serverInfo.set(response)
+ 
   }
 
 </script>
