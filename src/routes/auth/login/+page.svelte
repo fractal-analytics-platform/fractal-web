@@ -1,23 +1,8 @@
 <script>
-  import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
-  import { userAuthentication } from '$lib/api/v1/auth/auth_api'
   import { userStore } from '$lib/stores/authStores'
 
   let loginError = false
-
-  async function handleLogin({ data, cancel }) {
-    // Prevent form submission
-    cancel()
-    try {
-      const user = await userAuthentication(data)
-      userStore.set(user)
-      await goto('/')
-    } catch (e) {
-      console.error(e)
-      loginError = true
-    }
-  }
 
 </script>
 
@@ -27,7 +12,7 @@
   </div>
   <div class="row">
     <div class="col-md-4">
-      <form method="POST" class="" use:enhance={handleLogin}>
+      <form method="POST">
         <div class="mb-3">
           <label for="userEmail" class="form-label">Email address</label>
           <input name="username" type="email" class="form-control { loginError ? 'is-invalid' : '' }" id="userEmail" aria-describedby="emailHelp" required>

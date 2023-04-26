@@ -1,8 +1,7 @@
 <script>
   import { page } from '$app/stores'
-  import { userStore } from '$lib/stores/authStores'
 
-  $: userLoggedIn = $userStore !== undefined
+  $: userLoggedIn = !!$page.data.userInfo
   $: server = $page.data.serverInfo || {}
 
 </script>
