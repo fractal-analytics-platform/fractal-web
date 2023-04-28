@@ -1,7 +1,6 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
-import { fetchContext as fetch } from '$lib/server/common/fetchContext'
 
-export async function userAuthentication(data) {
+export async function userAuthentication(fetch, data) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/login', {
     method: 'POST',
@@ -17,7 +16,7 @@ export async function userAuthentication(data) {
   return await response.json()
 }
 
-export async function whoami() {
+export async function whoami(fetch) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + '/auth/whoami', {
     method: 'GET',

@@ -1,10 +1,9 @@
-import { fetchContext as fetch } from '$lib/server/common/fetchContext'
 import { PUBLIC_FRACTAL_SERVER_HOST } from '$env/static/public'
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
 import { PostResourceException } from '$lib/common/errors'
 
 
-export async function listProjects() {
+export async function listProjects(fetch) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project', {
     method: 'GET',
@@ -19,7 +18,7 @@ export async function listProjects() {
   throw new Error('Unable to list projects')
 }
 
-export async function createProject(data) {
+export async function createProject(fetch, data) {
   // Data is a FormData object
 
   const requestData = {
@@ -45,7 +44,7 @@ export async function createProject(data) {
   throw new PostResourceException(await response.json())
 }
 
-export async function getProject(projectId) {
+export async function getProject(fetch, projectId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
     method: 'GET',
@@ -61,7 +60,7 @@ export async function getProject(projectId) {
   throw new Error('The client was not able to fetch the project')
 }
 
-export async function updateProject(projectId, formData) {
+export async function updateProject(fetch, projectId, formData) {
 
   const requestBody = {
     name: formData.get('projectName')
@@ -85,7 +84,7 @@ export async function updateProject(projectId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function deleteProject(projectId) {
+export async function deleteProject(fetch, projectId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
     method: 'DELETE',
@@ -100,7 +99,7 @@ export async function deleteProject(projectId) {
   throw new Error('The client was not able to delete the project')
 }
 
-export async function createDataset(projectId, formData) {
+export async function createDataset(fetch, projectId, formData) {
 
   const requestData = {
     name: formData.get('datasetName'),
@@ -128,7 +127,7 @@ export async function createDataset(projectId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function getDataset(projectId, datasetId) {
+export async function getDataset(fetch, projectId, datasetId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
     method: 'GET',
@@ -144,7 +143,7 @@ export async function getDataset(projectId, datasetId) {
   throw new Error('The client was not able to fetch the dataset')
 }
 
-export async function updateDataset(projectId, datasetId, formData) {
+export async function updateDataset(fetch, projectId, datasetId, formData) {
 
   const requestBody = {
     name: formData.get('name'),
@@ -177,7 +176,7 @@ export async function updateDataset(projectId, datasetId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function deleteDataset(projectId, datasetId) {
+export async function deleteDataset(fetch, projectId, datasetId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
     method: 'DELETE',
@@ -192,7 +191,7 @@ export async function deleteDataset(projectId, datasetId) {
   throw new Error('The dataset was not deleted by the server')
 }
 
-export async function getWorkflows(projectId) {
+export async function getWorkflows(fetch, projectId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflows/`, {
     method: 'GET',
@@ -208,7 +207,7 @@ export async function getWorkflows(projectId) {
   throw new Error('The client was not able to fetch project workflows')
 }
 
-export async function importWorkflow(projectId, workflowMetadata) {
+export async function importWorkflow(fetch, projectId, workflowMetadata) {
 
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
@@ -229,7 +228,7 @@ export async function importWorkflow(projectId, workflowMetadata) {
   throw new PostResourceException(await response.json())
 }
 
-export async function createDatasetResource(projectId, datasetId, formData) {
+export async function createDatasetResource(fetch, projectId, datasetId, formData) {
 
   const requestBody = {
     path: formData.get('source')
@@ -253,7 +252,7 @@ export async function createDatasetResource(projectId, datasetId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function deleteDatasetResource(projectId, datasetId, resourceId) {
+export async function deleteDatasetResource(fetch, projectId, datasetId, resourceId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}/${resourceId}`,{
     method: 'DELETE',
@@ -269,7 +268,7 @@ export async function deleteDatasetResource(projectId, datasetId, resourceId) {
 }
 
 // Get the jobs list for a project
-export async function getJobs(projectId) {
+export async function getJobs(fetch, projectId) {
 
   const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/jobs/`, {
     method: 'GET',

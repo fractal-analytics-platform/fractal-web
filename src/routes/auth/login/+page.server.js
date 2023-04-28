@@ -2,13 +2,13 @@ import { userAuthentication } from '$lib/server/api/v1/auth_api'
 
 export const actions = {
   // Default page action / Handles POST requests
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, fetch }) => {
     // TODO: Handle login request
     console.log('Login action')
 
     // Get form data
     const formData = await request.formData()
-    const authData = await userAuthentication(formData)
+    const authData = await userAuthentication(fetch, formData)
 
     cookies.set('fastapiusersauth', authData.access_token, {
       path: '/',
