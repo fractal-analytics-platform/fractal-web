@@ -2,25 +2,16 @@
   import { onMount } from 'svelte'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { loadProjectContext } from '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
   import { updateProject } from '$lib/api/v1/project/project_api'
   import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte'
   import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte'
 
   // Component properties
-  let project
-  let workflows
+  let project = $page.data.project
+  let workflows = $page.data.workflows
   let projectUpdatesSuccess = undefined
 
-  // Subscribe to the project context store
-  contextProject.subscribe((context) => {
-    project = context.project
-    workflows = context.workflows
-  })
-
   onMount(async () => {
-    await loadProjectContext($page.params.id)
   })
 
   function handleProjectPropertiesUpdate({ data, cancel }) {
