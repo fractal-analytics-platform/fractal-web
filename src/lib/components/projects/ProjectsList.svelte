@@ -29,15 +29,21 @@
   }
 
   async function handleDeleteProject(projectId) {
+    console.log('Client request project delete')
 
-    await deleteProject(projectId)
+    await fetch('/projects?project=' + projectId, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
       .then(() => {
-        projects = projects.filter((p) => p.id != projectId)
+        console.log('Project deleted successfully')
+        // If the response is successful
+        projects = projects.filter((p) => p.id !== projectId)
       })
       .catch(error => {
+        // TODO: Notify the user there has been an error in the deletion of the project
         console.error(error)
       })
-
   }
 </script>
 

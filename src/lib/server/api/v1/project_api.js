@@ -86,17 +86,12 @@ export async function updateProject(fetch, projectId, formData) {
 
 export async function deleteProject(fetch, projectId) {
 
-  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
+  return await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
     method: 'DELETE',
     credentials: 'include',
     mode: 'cors'
   })
 
-  if (response.ok){
-    return true
-  }
-
-  throw new Error('The client was not able to delete the project')
 }
 
 export async function createDataset(fetch, projectId, formData) {

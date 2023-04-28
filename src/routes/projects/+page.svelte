@@ -1,9 +1,15 @@
 <script>
   import { page } from '$app/stores'
+  import { onMount } from 'svelte'
   import ProjectsList from '$lib/components/projects/ProjectsList.svelte'
   import ProjectInfoModal from '$lib/components/projects/ProjectInfoModal.svelte'
 
-  $: projects = $page.data.projects || []
+  let projects = []
+
+  onMount(() => {
+    projects = $page.data.projects
+  })
+
 
 </script>
 
