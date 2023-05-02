@@ -1,4 +1,5 @@
-import { getProject, getWorkflows } from '$lib/server/api/v1/project_api'
+import { fail } from '@sveltejs/kit'
+import { getProject, getWorkflows, updateProject } from '$lib/server/api/v1/project_api'
 
 export async function load({ fetch, params }) {
   console.log('Load project page')
@@ -14,5 +15,25 @@ export async function load({ fetch, params }) {
     project: project || undefined,
     workflows: workflows || []
   }
+
+}
+
+
+export const actions = {
+
+  update: async ({ fetch, request, params }) => {
+    console.log('Update project resource action')
+
+    const projectId = params.id
+    const formData = await request.formData()
+
+    const updatedProjectResponse = await updateProject(fetch, projectId, formData)
+      .catch(error => {
+        return fail(400, error.reason)
+      })
+
+    return updatedProjectResponse
+  }
+
 
 }
