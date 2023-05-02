@@ -32,15 +32,20 @@
   }
 
   async function handleDatasetDelete(projectId, datasetId) {
-    await deleteDataset(projectId, datasetId)
-      .then(() => {
-        // If the request is successful, we delete the dataset entry in the datasets list
-        datasets = datasets.filter(d => {
-          return d.id !== datasetId
-        })
-      })
-      .catch(error => {
-        console.error(error)
+    await fetch(`/projects/${projectId}/datasets/${datasetId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+      .then(async (response) => {
+        if (response.ok) {
+          console.log('Dataset deleted')
+          // If the request is successful, we delete the dataset entry in the datasets list
+          datasets = datasets.filter(d => {
+            return d.id !== datasetId
+          })
+        } else {
+          console.error('Error while deleting dataset:', await response.text())
+        }
       })
   }
 </script>
