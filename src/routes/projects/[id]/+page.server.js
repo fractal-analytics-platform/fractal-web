@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit'
 import { getProject, getWorkflows, updateProject, createDataset } from '$lib/server/api/v1/project_api'
+import { createWorkflow } from '$lib/server/api/v1/workflow_api'
 
 export async function load({ fetch, params }) {
   console.log('Load project page')
@@ -46,7 +47,22 @@ export const actions = {
       })
 
     return dataset
-  }
+  },
 
+  createWorkflow: async ({ fetch, request, params }) => {
+
+    const projectId = params.id
+    const formData = await request.formData()
+
+    console.log('Create workflow action', projectId, formData)
+
+    const workflow = await createWorkflow(fetch, projectId, formData)
+      .catch(error => {
+        console.error('Error creating workflow', error)
+        return fail(400, error.reason)
+      })
+
+    return workflow
+  }
 
 }
