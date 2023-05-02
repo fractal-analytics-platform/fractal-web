@@ -1,7 +1,7 @@
 <script>
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { createDataset, deleteDataset } from '$lib/api/v1/project/project_api'
+  import { deleteDataset } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
@@ -9,28 +9,26 @@
 
   let currentProjectId = $page.params.id
 
-  async function handleCreateDataset({ form, data, cancel }) {
-    // Prevent default post form
-    cancel()
-
-    const createdDataset = await createDataset(currentProjectId, data)
-      .then(dataset => {
+  async function handleCreateDataset({ form }) {
+    return async ({ result }) => {
+      // If the result is successful, update datasets with result.data
+      if (result.type !== 'failure') {
+        console.log('Dataset created', result.data)
+        const dataset = result.data // Dataset created
+        datasets.push(dataset)
+        datasets = datasets
         form.reset()
-        return dataset
-      })
-      .catch(error => {
-        console.error(error)
+      } else {
+        console.log('Dataset creation failed', result.data)
+        // If the result is a failure, we display the error
         new StandardErrorAlert({
           target: document.getElementById('datasetCreateErrorAlert'),
           props: {
-            error
+            error: result.data
           }
         })
-      })
-
-    datasets.push(createdDataset)
-    // An assign should trigger the reload of UI trough svelte lifecycle hooks
-    datasets = datasets
+      }
+    }
   }
 
   async function handleDatasetDelete(projectId, datasetId) {
@@ -55,7 +53,7 @@
       <div class="d-flex align-items-center justify-content-end">
         <span class="fw-normal"></span>
         <div>
-          <form method='post' class="row row-cols-lg-auto g-3 align-items-center" use:enhance={handleCreateDataset}>
+          <form method="post" action="?/createDataset" class="row row-cols-lg-auto g-3 align-items-center" use:enhance={handleCreateDataset}>
             <div class="col-12">
               <div class="input-group">
                 <div class="input-group-text">Name</div>
