@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { enhance } from '$app/forms'
-  import { updateDataset, deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
+  import { deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
@@ -17,27 +17,24 @@
   onMount(async () => {
   })
 
-  async function handleDatasetUpdate({ form, data, cancel }) {
-    // Prevent default
-    cancel()
-
-    await updateDataset(projectId, datasetId, data)
-      .then(updatedDataset => {
+  async function handleDatasetUpdate() {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
+        const updatedDataset = result.data
         dataset = updatedDataset
         updateDatasetSuccess = true
         setTimeout(() => {
           updateDatasetSuccess = false
         }, 1200)
-      })
-      .catch(error => {
+      } else {
         new StandardErrorAlert({
           target: document.getElementById('updateDatasetError'),
           props: {
-            error
+            error: result.data
           }
         })
-      })
-
+      }
+    }
   }
 
   async function handleCreateDatasetResource({ form, data, cancel }) {
