@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit'
-import { getProject, getWorkflows, updateProject, createDataset } from '$lib/server/api/v1/project_api'
+import { getProject, getWorkflows, updateProject, createDataset, importWorkflow } from '$lib/server/api/v1/project_api'
 import { createWorkflow } from '$lib/server/api/v1/workflow_api'
+import { PostResourceException } from "../../../lib/common/errors.js";
 
 export async function load({ fetch, params }) {
   console.log('Load project page')
@@ -63,6 +64,32 @@ export const actions = {
       })
 
     return workflow
+  },
+
+  importWorkflow: async ({ fetch, request, params }) => {
+    console.log('Import workflow action')
+
+    const formData = await request.formData()
+
+    const workflowFile = formData.get('workflowFile')
+    try {
+      const workflowMetadata = await workflowFile.text()
+        .then(text => JSON.parse(text))
+        .catch(error => {
+          throw new Error('The workflow file is not a valid JSON file', error)
+        })
+
+      const workflow = await importWorkflow(fetch, params.id, workflowMetadata)
+        .catch(error => {
+          console.error('Error importing workflow', error)
+          throw new Error(JSON.stringify(error.reason))
+        })
+
+      return workflow
+    }
+    catch (error) {
+      return fail(400, error.message)
+    }
   }
 
 }
