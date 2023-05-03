@@ -1,7 +1,6 @@
 <script>
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
-  import { deleteWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
@@ -62,22 +61,27 @@
   }
 
   async function handleDeleteWorkflow(workflowId) {
-    await deleteWorkflow(workflowId)
-      .then(() => {
-        // Workflow has been deleted
-        workflows = workflows.filter((wkf) => {
-          return wkf.id !== workflowId
-        })
+    const result = await fetch('/projects/' + projectId + '/workflows/' + workflowId, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+
+    if (result.ok) {
+      console.log('Workflow deleted')
+      // Workflow has been deleted
+      workflows = workflows.filter((wkf) => {
+        return wkf.id !== workflowId
       })
-      .catch(error => {
-        // Instantiate a new standard error alert
-        new StandardErrorAlert({
-          target: document.getElementById('workflowDeleteAlertError'),
-          props: {
-            error: error.message
-          }
-        })
+    } else {
+      console.error('Workflow not deleted', result.statusText)
+      // Instantiate a new standard error alert
+      new StandardErrorAlert({
+        target: document.getElementById('workflowDeleteAlertError'),
+        props: {
+          error: result.statusText
+        }
       })
+    }
   }
 
   function handleWorkflowNameChange(event) {

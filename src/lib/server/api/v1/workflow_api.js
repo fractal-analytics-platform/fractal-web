@@ -91,7 +91,7 @@ export async function reorderWorkflow(workflowId, workflowTasksOrder) {
   throw new Error('The client was not able to update the workflow order')
 }
 
-export async function deleteWorkflow(workflowId) {
+export async function deleteWorkflow(fetch, workflowId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
     method: 'DELETE',
