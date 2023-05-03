@@ -4,7 +4,7 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import { reorderWorkflow, exportWorkflow, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
@@ -22,6 +22,7 @@
   let workflowTaskContext = writable(undefined)
   let workflowTabContextId = 0
   let workflowUpdated = false
+  let workflowTaskCreated = false
   let selectedWorkflowTask = undefined
   let checkingConfiguration = false
   let inputDatasetControl = ''
@@ -85,21 +86,23 @@
     }
   }
 
-  async function handleCreateWorkflowTask({ form, data, cancel }) {
-    // Prevent default
-    cancel()
-
-    const workflowTask = await createWorkflowTask(workflow.id, data)
-      .then(async () => {
+  async function handleCreateWorkflowTask({ form }) {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
+        // Workflow task created
+        console.log('Workflow task created')
+        // Update workflow
+        workflow = result.data
+        // UI Feedback
+        workflowTaskCreated = true
+        setTimeout(() => {
+          workflowTaskCreated = false
+        }, 3000)
         form.reset()
-        workflow = await getWorkflow(workflow.id)
-        // eslint-disable-next-line no-undef
-        const modal = bootstrap.Modal.getInstance(document.getElementById('insertTaskModal'))
-        modal.toggle()
-      })
-      .catch(error => {
-        console.error(error)
-      })
+      } else {
+        console.error('Error creating new workflow task', result.data)
+      }
+    }
   }
 
   async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
@@ -318,7 +321,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="post" use:enhance={handleCreateWorkflowTask}>
+        <form method="post" action="?/createWorkflowTask" use:enhance={handleCreateWorkflowTask}>
 
           <div class="mb-3">
             <label for="taskId" class="form-label">Select task</label>
@@ -337,6 +340,11 @@
 
           <button class="btn btn-primary">Insert</button>
         </form>
+      </div>
+      <div class="modal-footer d-flex">
+        {#if workflowTaskCreated}
+          <span class="w-100 alert alert-success">Workflow task created</span>
+        {/if}
       </div>
     </div>
   </div>

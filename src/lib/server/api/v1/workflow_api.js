@@ -121,7 +121,7 @@ export async function exportWorkflow(workflowId) {
   throw new Error('The client was not able to retrieve the workflow export data from the server')
 }
 
-export async function createWorkflowTask(workflowId, formData) {
+export async function createWorkflowTask(fetch, workflowId, formData) {
 
   const requestBody = {
     order: formData.get('taskOrder') || undefined,
