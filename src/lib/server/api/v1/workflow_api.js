@@ -199,7 +199,7 @@ export async function updateWorkflowTaskMetadata(workflowId, workflowTaskId, met
   throw new PostResourceException(await response.json())
 }
 
-export async function deleteWorkflowTask(workflowId, workflowTaskId){
+export async function deleteWorkflowTask(fetch, workflowId, workflowTaskId){
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/rm-task/${workflowTaskId}`,{
     method: 'DELETE',

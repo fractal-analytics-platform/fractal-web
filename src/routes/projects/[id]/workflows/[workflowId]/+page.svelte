@@ -4,7 +4,7 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { reorderWorkflow, exportWorkflow, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import { reorderWorkflow, exportWorkflow, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
@@ -106,15 +106,18 @@
   }
 
   async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
-    await deleteWorkflowTask(workflowId, workflowTaskId)
-      .then(() => {
-        // Succesffully deleted task
-        loadWorkflow()
-        workflowTaskContext.set(undefined)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const response = await fetch(`/projects/${project.id}/workflows/${workflowId}/task/${workflowTaskId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      // Successfully deleted task
+      workflow = await response.json()
+      workflowTaskContext.set(undefined)
+    } else {
+      console.error(response)
+    }
   }
 
   async function setActiveWorkflowTaskContext(event) {
