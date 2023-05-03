@@ -2,7 +2,6 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { enhance } from '$app/forms'
-  import { deleteDatasetResource } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
@@ -63,14 +62,17 @@
   }
 
   async function handleDeleteDatasetResource(resourceId) {
+    const response = await fetch('/projects/' + projectId + '/datasets/' + datasetId + '/resource/' + resourceId, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
 
-    await deleteDatasetResource(projectId, datasetId, resourceId)
-      .then(() => {
-        dataset.resource_list = dataset.resource_list.filter(r => r.id !== resourceId)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    if (response.ok) {
+      console.log('Dataset resource deleted')
+      dataset.resource_list = dataset.resource_list.filter(r => r.id !== resourceId)
+    } else {
+      console.error(response.statusText)
+    }
   }
 
 </script>
