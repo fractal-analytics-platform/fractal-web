@@ -4,8 +4,6 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { loadProjectContext } from '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
   import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
@@ -13,12 +11,13 @@
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
   import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
+  // Workflow
   let workflow = undefined
+  // Project context properties
+  let project = undefined
+  let datasets = []
   // List of available tasks to be inserted into workflow
   let availableTasks = []
-  // Project context properties
-  let project
-  let datasets = []
 
   let workflowTaskContext = writable(undefined)
   let workflowTabContextId = 0
@@ -31,26 +30,14 @@
 
   $: updatableWorkflowList = workflow?.task_list || []
 
-
-  contextProject.subscribe((context) => {
-    project = context.project
-    datasets = context.datasets
-  })
-
   workflowTaskContext.subscribe((value) => {
     selectedWorkflowTask = value
   })
 
-  async function loadWorkflow() {
-    workflow = await getWorkflow($page.params.workflowId)
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
   onMount(async () => {
-    await loadWorkflow()
-    await loadProjectContext($page.params.id)
+    workflow = $page.data.workflow
+    project = $page.data.project
+    datasets = $page.data.datasets
   })
 
   async function handleExportWorkflow(event) {

@@ -27,7 +27,7 @@ export async function createWorkflow(fetch, projectId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function getWorkflow(workflowId) {
+export async function getWorkflow(fetch, workflowId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
     method: 'GET',
