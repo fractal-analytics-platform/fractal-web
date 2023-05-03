@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { enhance } from '$app/forms'
-  import { deleteDatasetResource, createDatasetResource } from '$lib/api/v1/project/project_api'
+  import { deleteDatasetResource } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
@@ -10,11 +10,12 @@
   let datasetId = $page.params.datasetId
 
   $: project = $page.data.project
-  $: dataset = $page.data.dataset
+  let dataset = undefined
   let updateDatasetSuccess = false
   let createResourceSuccess = false
 
   onMount(async () => {
+    dataset = await $page.data.dataset
   })
 
   async function handleDatasetUpdate() {
@@ -37,35 +38,28 @@
     }
   }
 
-  async function handleCreateDatasetResource({ form, data, cancel }) {
-    // Prevent default
-    cancel()
+  async function handleCreateDatasetResource({ form }) {
+    return async ({ result }) =>  {
 
-    await createDatasetResource(projectId, datasetId, data)
-      .then(resource => {
-        dataset.resource_list.push(resource)
+      if (result.type !== 'failure') {
+        const datasetResource = result.data
+        dataset.resource_list.push(datasetResource)
         // This is required in order to trigger svelte reactivity
         dataset.resource_list = dataset.resource_list
         createResourceSuccess = true
-        // Get a reference to the modal
-        // eslint-disable-next-line no-undef
-        // noinspection JSUnresolvedVariable
-        const modal = bootstrap.Modal.getInstance(document.getElementById('createDatasetResourceModal'))
         setTimeout(() => {
           createResourceSuccess = false
-          modal.toggle()
         }, 1200)
         form.reset()
-      })
-      .catch(error => {
+      } else {
         new StandardErrorAlert({
           target: document.getElementById('createDatasetResourceError'),
           props: {
-            error
+            error: result.data
           }
         })
-      })
-
+      }
+    }
   }
 
   async function handleDeleteDatasetResource(resourceId) {
@@ -196,7 +190,7 @@
       <div class="modal-body">
         <div id="createDatasetResourceError"></div>
 
-        <form method="post" use:enhance={handleCreateDatasetResource}>
+        <form method="post" action="?/createDatasetResource" use:enhance={handleCreateDatasetResource}>
 
           <div class="mb-3">
             <label for="source" class="form-label">Resource path</label>
@@ -227,7 +221,7 @@
       <div class="modal-body">
         <div id="updateDatasetError"></div>
 
-        <form method="post" use:enhance={handleDatasetUpdate}>
+        <form method="post" action="?/updateDatasetProperties" use:enhance={handleDatasetUpdate}>
 
           <div class="mb-3">
             <label for="name" class="form-label">Dataset name</label>

@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit'
-import { getProject, getDataset, updateDataset } from '$lib/server/api/v1/project_api'
+import { getProject, getDataset, updateDataset, createDatasetResource } from '$lib/server/api/v1/project_api'
 
 export async function load({ fetch, request, params }){
   console.log('Load Dataset Page')
@@ -27,7 +27,7 @@ export async function load({ fetch, request, params }){
 export const actions = {
 
   // Default action - Update dataset properties
-  default: async ({ fetch, request, params }) => {
+  updateDatasetProperties: async ({ fetch, request, params }) => {
 
     console.log('Update Dataset Properties')
 
@@ -49,6 +49,21 @@ export const actions = {
       return fail(500, error.reason)
     }
 
+  },
+
+  createDatasetResource: async ({ fetch, request, params }) => {
+    console.log('Create Dataset Resource')
+
+    const { id, datasetId } = params
+    const formData = await request.formData()
+
+    try {
+      return await createDatasetResource(fetch, id, datasetId, formData)
+    }
+    catch (error) {
+      console.error(error)
+      return fail(500, error.reason)
+    }
   }
 
 }
