@@ -42,7 +42,7 @@ export async function getWorkflow(fetch, workflowId) {
   throw new Error('The client was not able to retrieve the workflow')
 }
 
-export async function updateWorkflow(workflowId, formData) {
+export async function updateWorkflow(fetch, workflowId, formData) {
 
   // This method should patch some properties of a workflow resource
   const requestData = {

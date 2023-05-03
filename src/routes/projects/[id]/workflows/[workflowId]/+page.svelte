@@ -21,7 +21,7 @@
 
   let workflowTaskContext = writable(undefined)
   let workflowTabContextId = 0
-
+  let workflowUpdated = false
   let selectedWorkflowTask = undefined
   let checkingConfiguration = false
   let inputDatasetControl = ''
@@ -70,20 +70,19 @@
       })
   }
 
-  async function handleWorkflowUpdate({ form, data, cancel }) {
-    // Prevent default
-    cancel()
-
-    await updateWorkflow(workflow.id, data)
-      .then(() => {
-        loadWorkflow()
-        // eslint-disable-next-line no-undef
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowModal'))
-        modal.toggle()
-      })
-      .catch(error => {
-        console.error(error)
-      })
+  async function handleWorkflowUpdate() {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
+        const updatedWorkflow = result.data
+        workflow = updatedWorkflow
+        workflowUpdated = true
+        setTimeout(() => {
+          workflowUpdated = false
+        }, 3000)
+      } else {
+        console.error('Error updating workflow properties', result.data)
+      }
+    }
   }
 
   async function handleCreateWorkflowTask({ form, data, cancel }) {
@@ -354,7 +353,7 @@
       <div class="modal-body">
 
         {#if workflow}
-        <form id="updateWorkflow" method="post" use:enhance={handleWorkflowUpdate}>
+        <form id="updateWorkflow" method="post" action="?/updateWorkflow" use:enhance={handleWorkflowUpdate}>
 
           <div class="mb-3">
             <label for="workflowName" class="form-label">Workflow name</label>
@@ -366,6 +365,9 @@
 
       </div>
       <div class="modal-footer">
+        {#if workflowUpdated }
+          <span class="alert alert-success">Workflow updated correctly</span>
+        {/if}
         <button class="btn btn-primary" form="updateWorkflow">Save</button>
       </div>
     </div>
