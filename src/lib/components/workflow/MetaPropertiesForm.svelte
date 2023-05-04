@@ -6,7 +6,8 @@
   //
   // This component also manages the overall form structure of meta properties.
   // The form should be structured in multiple levels of depth, and support complex structure.
-  import { updateWorkflowTaskMetadata } from '$lib/api/v1/workflow/workflow_api'
+  import { page } from '$app/stores'
+  import { updateFormEntry } from '$lib/components/workflow/task_form_utils'
   import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte'
 
   // Workflow id
@@ -21,14 +22,13 @@
   }
 
   async function handleEntryUpdate(updatedEntry) {
-    await updateWorkflowTaskMetadata(workflowId, taskId, updatedEntry)
-      .then((response) => {
-        metaProperties = response.meta
-        console.log(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+		const projectId = $page.params.id
+    try {
+      const updatedMetaProperties = await updateFormEntry(projectId, workflowId, taskId, updatedEntry, 'meta')
+      metaProperties = updatedMetaProperties.meta
+    } catch (error) {
+      console.log(error)
+    }
   }
 
 </script>

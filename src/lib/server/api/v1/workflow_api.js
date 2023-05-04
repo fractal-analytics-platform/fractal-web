@@ -149,7 +149,7 @@ export async function createWorkflowTask(fetch, workflowId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function updateWorkflowTaskArguments(workflowId, workflowTaskId, args) {
+export async function updateWorkflowTaskArguments(fetch, workflowId, workflowTaskId, args) {
 
   const requestBody = {
     args: args
@@ -174,7 +174,7 @@ export async function updateWorkflowTaskArguments(workflowId, workflowTaskId, ar
   throw new PostResourceException(await response.json())
 }
 
-export async function updateWorkflowTaskMetadata(workflowId, workflowTaskId, meta) {
+export async function updateWorkflowTaskMetadata(fetch, workflowId, workflowTaskId, meta) {
 
   const requestBody = {
     meta: meta
