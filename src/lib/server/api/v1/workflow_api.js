@@ -67,7 +67,7 @@ export async function updateWorkflow(fetch, workflowId, formData) {
   return PostResourceException(await response.json())
 }
 
-export async function reorderWorkflow(workflowId, workflowTasksOrder) {
+export async function reorderWorkflow(fetch, workflowId, workflowTasksOrder) {
 
   const patchData = {
     "reordered_workflowtask_ids": workflowTasksOrder

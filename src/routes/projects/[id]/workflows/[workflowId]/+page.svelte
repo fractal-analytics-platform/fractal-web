@@ -4,7 +4,7 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { reorderWorkflow, exportWorkflow, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
+  import { exportWorkflow, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
@@ -148,15 +148,29 @@
 
   async function handleWorkflowOrderUpdate(event) {
 
-    await reorderWorkflow(workflow.id, updatableWorkflowList.map(t => t.id))
-      .then((updatedWorkflow) => {
-        workflow = updatedWorkflow
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowTasksOrderModal'))
-        modal.toggle()
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const requestData = {
+			tasksOrder: updatableWorkflowList.map(t => t.id)
+    }
+
+    // Patch workflow task order
+    const request = await fetch(`/projects/${project.id}/workflows/${workflow.id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    })
+
+    if (request.ok) {
+			console.log('Workflow task order updated')
+      // Successfully updated workflow task order
+      workflow = await request.json()
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowTasksOrderModal'))
+      modal.toggle()
+    } else {
+      console.error('Workflow task order not updated', request.statusText)
+    }
   }
 
   async function handleApplyWorkflow() {
