@@ -106,7 +106,7 @@ export async function deleteWorkflow(fetch, workflowId) {
   throw new Error('The client was not able to delete the workflow')
 }
 
-export async function exportWorkflow(workflowId) {
+export async function exportWorkflow(fetch, workflowId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/export`, {
     method: 'GET',

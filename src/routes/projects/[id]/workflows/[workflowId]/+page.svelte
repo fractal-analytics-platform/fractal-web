@@ -43,11 +43,17 @@
 
   async function handleExportWorkflow(event) {
 
-    const workflowData = await exportWorkflow(workflow.id)
-      .catch(error => {
-        console.error(error);
-        return null
-      })
+    const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/export`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      console.error(await response.json())
+      return
+    }
+
+		const workflowData = await response.json()
 
     if (workflowData !== null) {
       const file = new File([JSON.stringify(workflowData, '', 2)], `workflow-export-${workflow.name}-${Date.now().toString()}.json`, {
