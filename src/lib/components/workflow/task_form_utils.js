@@ -4,7 +4,7 @@ export async function updateFormEntry(projectId, workflowId, workflowTaskId, upd
 	requestData[groupName] = updatingWorkflowTaskProperties
 
 	// Should make a PATCH request to the server to update the workflow task properties
-	const response = await fetch(`/projects/${projectId}/workflows/${workflowId}/task/${workflowTaskId}`, {
+	const response = await fetch(`/projects/${projectId}/workflows/${workflowId}/tasks/${workflowTaskId}`, {
 		method: 'PATCH',
 		headers: {
 			'Content-Type': 'application/json'

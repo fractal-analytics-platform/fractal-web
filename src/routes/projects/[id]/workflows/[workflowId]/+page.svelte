@@ -69,11 +69,17 @@
 
   async function getAvailableTasks() {
     // Get available tasks from the server
-    availableTasks = await listTasks()
-      .catch(error => {
-        console.error(error)
-        return []
-      })
+    const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/tasks`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      availableTasks = await response.json()
+    } else {
+      console.error(response)
+      availableTasks = []
+    }
   }
 
   async function handleWorkflowUpdate() {
@@ -111,7 +117,7 @@
   }
 
   async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
-    const response = await fetch(`/projects/${project.id}/workflows/${workflowId}/task/${workflowTaskId}`, {
+    const response = await fetch(`/projects/${project.id}/workflows/${workflowId}/tasks/${workflowTaskId}`, {
       method: 'DELETE',
       credentials: 'include'
     })
