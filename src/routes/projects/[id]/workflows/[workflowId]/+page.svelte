@@ -4,7 +4,6 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { exportWorkflow, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
@@ -186,30 +185,36 @@
     data.append('outputDataset', outputDatasetControl)
     data.append('workerInit', workerInitControl)
 
-    await applyWorkflow(project.id, workflow.id, data)
-      .then((job) => {
-        // eslint-disable-next-line no-undef
-        const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
-        modal.toggle()
-        // Navigate to project jobs page
-        // Define URL to navigate to
-        const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
-        // Set jobsUrl search params
-        jobsUrl.searchParams.set('workflow', workflow.id)
-        jobsUrl.searchParams.set('id', job.id)
-        // Trigger navigation
-        goto(jobsUrl)
+    const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
+      method: 'POST',
+      credentials: 'include',
+      body: data
+    })
+
+    if (response.ok) {
+      // Successfully applied workflow
+      const job = await response.json()
+      const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
+      modal.toggle()
+      // Navigate to project jobs page
+      // Define URL to navigate to
+      const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
+      // Set jobsUrl search params
+      jobsUrl.searchParams.set('workflow', workflow.id)
+      jobsUrl.searchParams.set('id', job.id)
+      // Trigger navigation
+      goto(jobsUrl)
+    } else {
+      console.error(response)
+      // Set an error message on the component
+      new StandardErrorAlert({
+        target: document.getElementById('applyWorkflowError'),
+        props: {
+          error: await response.json()
+        }
       })
-      .catch(error => {
-        console.error(error)
-        // Set an error message on the component
-        new StandardErrorAlert({
-          target: document.getElementById('applyWorkflowError'),
-          props: {
-            error
-          }
-        })
-      })
+    }
+
   }
 
 </script>

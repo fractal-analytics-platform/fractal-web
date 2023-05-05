@@ -214,7 +214,7 @@ export async function deleteWorkflowTask(fetch, workflowId, workflowTaskId){
 }
 
 // Apply a workflow
-export async function applyWorkflow(projectId, workflowId, formData) {
+export async function applyWorkflow(fetch, projectId, workflowId, formData) {
 
   const requestBody = {
     workflow_id: workflowId,
