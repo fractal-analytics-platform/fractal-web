@@ -27,7 +27,7 @@
 
   onMount(async () => {
 
-    await loadProjectJobs()
+    await setTableHandler()
 
     // Set filters
     const idFilter = $page.url.searchParams.get('id')
@@ -69,9 +69,7 @@
   $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo)
   $: tableHandler.filter(statusFilter, 'status')
 
-  async function loadProjectJobs() {
-    // Load project jobs
-    console.log('Loading project jobs...')
+  async function setTableHandler() {
     tableHandler.setRows(jobs)
   }
 
@@ -149,8 +147,8 @@
           Clear filters
         </button>
         <button class="btn btn-primary" on:click={() => {
-          // Refresh jobs list
-          loadProjectJobs()
+          // Refresh page
+          window.location.reload()
         }}><i class="bi-arrow-clockwise"></i> Refresh</button>
       </div>
     </div>
