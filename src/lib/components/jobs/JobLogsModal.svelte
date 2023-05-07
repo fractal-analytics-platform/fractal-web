@@ -1,21 +1,34 @@
 <script>
   import { afterUpdate } from 'svelte'
-  import { getJob } from '$lib/api/v1/monitoring/monitoring_api'
+  import { page } from "$app/stores";
 
   export let workflowJobId = undefined
   let logs = ''
 
   afterUpdate(() => {
     if (workflowJobId) {
-      getJob(workflowJobId)
-        .then((data) => {
-          logs = data.log
+      fetchJob()
+        .then((job) => {
+          logs = job.log
         })
         .catch(error => {
           console.log(error)
         })
     }
   })
+
+  async function fetchJob() {
+    const request = await fetch(`/projects/${$page.params.id}/jobs/${workflowJobId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (request.status === 200) {
+      return await request.json()
+    } else {
+      throw new Error('Failed to fetch job')
+    }
+  }
 
 </script>
 
