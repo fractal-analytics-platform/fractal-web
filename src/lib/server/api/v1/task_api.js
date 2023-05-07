@@ -1,11 +1,8 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
-import { PostResourceException } from "../../../common/errors.js";
+import { PostResourceException } from "$lib/common/errors.js";
 
 export async function listTasks(fetch) {
-
-  // Set headers
-  // const headers = new Headers()
-  // headers.append('Authorization', cookies.get('AccessToken'))
+  console.log('Server fetching tasks')
 
   // Compose request
   const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/', {

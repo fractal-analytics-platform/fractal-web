@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { page } from '$app/stores'
   import { enhance } from '$app/forms'
   import { listTasks, createTask } from '$lib/api/v1/task/task_api'
   import { collectTaskErrorStore } from '$lib/stores/errorStores'
@@ -11,7 +12,7 @@
   // Error property to be set in order to show errors in UI
   let errorReasons = undefined
   // Tasks property updated with respect to data store
-  let tasks = []
+  let tasks = $page.data.tasks
 
   // Store subscriptions
   collectTaskErrorStore.subscribe(error => {
@@ -19,7 +20,6 @@
   })
 
   onMount(async () => {
-    await reloadTaskList()
   })
 
   async function fetchTaskList() {
