@@ -53,7 +53,7 @@ export async function createTask(fetch, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function createTaskCollection(formData) {
+export async function createTaskCollection(fetch, formData) {
 
   const headers = new Headers()
   headers.append('Content-Type', 'application/json')
@@ -66,7 +66,7 @@ export async function createTaskCollection(formData) {
     package_extras: formData.get('package_extras')
   }
 
-  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
+  const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
     method: 'POST',
     mode: 'cors',
     credentials: 'include',
@@ -88,9 +88,9 @@ export async function createTaskCollection(formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function taskCollectionStatus(taskId) {
+export async function taskCollectionStatus(fetch, taskId) {
 
-  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}?verbose=True`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}?verbose=True`,{
     method: 'GET',
     mode: 'cors',
     credentials: 'include',

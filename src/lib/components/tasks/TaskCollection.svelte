@@ -4,7 +4,7 @@
   import { enhance } from '$app/forms'
   import { collectTaskErrorStore } from '$lib/stores/errorStores'
   import { modalTaskCollectionId } from '$lib/stores/taskStores'
-  import { createTaskCollection, taskCollectionStatus } from '$lib/api/v1/task/task_api'
+  import { taskCollectionStatus } from '$lib/api/v1/task/task_api'
   import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
 
@@ -35,20 +35,15 @@
     await updateTaskCollectionsState()
   })
 
-  async function handleTaskCollection({ data, form, cancel }) {
-    // Prevent form submission
-    cancel()
+  async function handleTaskCollection({ data, form }) {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
+        console.log('Task collection request successful')
+        const taskCollectionData = result.data.taskCollection
 
-    const packageName = data.get('package')
-
-    await createTaskCollection(data)
-      .then(taskCollection => {
-        // Check that the taskCollection is not null
-        // If null then, the taskCollection has already been requested
-        if (taskCollection.status === 200) {
-          // taskCollection.info = packageName.concat(': ', taskCollection.info)
-          taskCollectionAlreadyPresent = taskCollection
-          taskCollectionAlreadyPresent.package = packageName
+        if (taskCollectionData.status === 200){
+          taskCollectionAlreadyPresent = taskCollectionData
+          taskCollectionAlreadyPresent.package = data.get('package')
           setTimeout(() => {
             taskCollectionAlreadyPresent = undefined
           }, 5500)
@@ -56,17 +51,20 @@
           // If a version is specified, add it to taskCollection result
           const version = data.get('version')
           if (version !== undefined) {
-            taskCollection.data.version = version
+            taskCollectionData.data.version = version
           }
           // Add task collection to local storage
-          storeCreatedTaskCollection(taskCollection)
+          storeCreatedTaskCollection(taskCollectionData)
         }
-        form.reset()
-      })
-      .catch(error => {
-        collectTaskErrorStore.set(error)
-      })
 
+        // Clear form
+        form.reset()
+
+      } else {
+        console.error('Task collection request failed: ', result.data)
+        collectTaskErrorStore.set(result.data)
+      }
+    }
   }
 
   function storeCreatedTaskCollection(taskCollection) {
@@ -177,7 +175,7 @@
       <div class="mt-2 fw-bold">{taskCollectionAlreadyPresent.info}</div>
     </div>
   {/if}
-  <form method="post" use:enhance={handleTaskCollection}>
+  <form method="post" action="?/createTaskCollection" use:enhance={handleTaskCollection}>
     <div class="row g-3">
       <div class="col-6">
         <div class="input-group">

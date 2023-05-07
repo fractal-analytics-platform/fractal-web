@@ -16,7 +16,8 @@
 
   // Store subscriptions
   collectTaskErrorStore.subscribe(error => {
-    if (error) setErrorReasons(error.reason)
+    if (error)
+      setErrorReasons(error)
   })
 
   onMount(async () => {
