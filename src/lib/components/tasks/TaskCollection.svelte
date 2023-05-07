@@ -4,7 +4,6 @@
   import { enhance } from '$app/forms'
   import { collectTaskErrorStore } from '$lib/stores/errorStores'
   import { modalTaskCollectionId } from '$lib/stores/taskStores'
-  import { taskCollectionStatus } from '$lib/api/v1/task/task_api'
   import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
 

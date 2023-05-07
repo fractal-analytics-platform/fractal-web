@@ -1,13 +1,11 @@
 <script>
   import { modalTaskCollectionId } from '$lib/stores/taskStores'
-  import { taskCollectionStatus } from '$lib/api/v1/task/task_api'
-
 
   let logs = ''
 
   modalTaskCollectionId.subscribe(async taskCollectionId => {
     if (taskCollectionId !== undefined) {
-      await taskCollectionStatus(taskCollectionId)
+      fetchTaskCollectionStatus(taskCollectionId)
         .then(status => {
           getTaskCollectionLogs(status.data.log)
         })
@@ -20,6 +18,21 @@
   async function getTaskCollectionLogs(collectionLogs) {
     logs = collectionLogs
   }
+
+  async function fetchTaskCollectionStatus(collectionId) {
+
+    const request = await fetch(`/tasks/collections/${collectionId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (request.ok) {
+      return await request.json()
+    }
+
+    throw new Error(`Failed to fetch task collection status: ${request.status}`)
+  }
+
 </script>
 
 <div class="modal" id="collectionTaskLogsModal">
