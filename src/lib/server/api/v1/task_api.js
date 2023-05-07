@@ -19,7 +19,7 @@ export async function listTasks(fetch) {
   return await response.json()
 }
 
-export async function createTask(formData) {
+export async function createTask(fetch, formData) {
 
   // Set headers
   const headers = new Headers()
@@ -38,7 +38,7 @@ export async function createTask(formData) {
   }
   // There is an interesting thing, if we use the svelte kit fetch object the server will not
   // accept our request. If, instead, we use the default javascript fetch the server accepts it.
-  const response = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/v1/task/', {
+  const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/', {
     method: 'POST',
     mode: 'cors',
     credentials: 'include',
