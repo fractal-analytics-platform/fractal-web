@@ -78,20 +78,26 @@
     updateTaskCollections(taskCollections)
   }
 
+  async function updateTaskCollectionStatus(taskCollection) {
+    await fetchTaskCollectionStatus(taskCollection.id)
+      .then(taskCollectionUpdate => {
+        // Update a task collection status with the one fetched from the server
+        taskCollection.status = taskCollectionUpdate.data.status;
+        taskCollection.logs = taskCollectionUpdate.data.log;
+        console.log(taskCollectionUpdate);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
   async function updateTaskCollectionsState() {
     const updatedTaskCollection = await Promise.all(taskCollections.map(async (taskCollection) => {
       switch (taskCollection.status){
         case 'pending':
         case 'installing':
           {
-            await taskCollectionStatus(taskCollection.id)
-              .then(taskCollectionUpdate => {
-                // Update a task collection status with the one fetched from the server
-                taskCollection.status = taskCollectionUpdate.data.status
-              })
-              .catch(error => {
-                console.error(error)
-              })
+              await updateTaskCollectionStatus(taskCollection)
           }
           break
         case 'fail':
@@ -101,16 +107,7 @@
           // Only if the taskCollection logs are undefined
           if (taskCollection.logs === undefined) {
             // Shall fetch the verbose log of the task collection
-            await taskCollectionStatus(taskCollection.id)
-              .then(taskCollectionUpdate => {
-                // Update a task collection status with the one fetched from the server
-                taskCollection.status = taskCollectionUpdate.data.status
-                taskCollection.logs = taskCollectionUpdate.data.log
-                console.log(taskCollectionUpdate)
-              })
-              .catch(error => {
-                console.error(error)
-              })
+            await updateTaskCollectionStatus(taskCollection)
           }
           break
       }
@@ -162,6 +159,20 @@
   function setTaskCollectionLogsModal(event) {
     const id = event.currentTarget.getAttribute('data-fc-tc')
     modalTaskCollectionId.set(id)
+  }
+
+  async function fetchTaskCollectionStatus(collectionId) {
+
+    const request = await fetch(`/tasks/collections/${collectionId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (request.ok) {
+      return await request.json()
+    }
+
+    throw new Error(`Failed to fetch task collection status: ${request.status}`)
   }
 
 </script>
