@@ -2,9 +2,6 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { DataHandler, check } from '@vincjo/datatables'
-  import { loadProjectContext } from  '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
-  import { getJobs } from '$lib/api/v1/project/project_api'
   import { downloadWorkflowJobLog } from '$lib/api/v1/workflow/workflow_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
@@ -13,18 +10,14 @@
   import Th from '$lib/components/common/filterable/Th.svelte'
 
   // Component properties
-  let project = undefined
-  let workflows = []
-  let datasets = []
-  let jobs = []
+  let project = $page.data.project
+  let workflows = $page.data.workflows || []
+  let datasets = $page.data.datasets
+  let jobs = $page.data.jobs || []
   let tableHandler = undefined
   let rows = undefined
   let workflowJobInfoId = undefined
 
-  // Project context properties
-  $: project = $contextProject.project
-  $: workflows = $contextProject.workflows
-  $: datasets = $contextProject.datasets
 
   // Filters
   let workflowFilter = ''
@@ -33,13 +26,6 @@
   let statusFilter = ''
 
   onMount(async () => {
-    // Load project context
-    console.log('Loading project context...')
-    // If $contextProject is not empty, it means that the user has already loaded the project context
-    // we don't need to load it again
-    if ($contextProject.project === undefined) {
-      await loadProjectContext($page.params.id)
-    }
 
     await loadProjectJobs()
 
@@ -86,14 +72,6 @@
   async function loadProjectJobs() {
     // Load project jobs
     console.log('Loading project jobs...')
-    jobs = await getJobs($page.params.id)
-      .then((response) => {
-        return response
-      })
-      .catch((error) => {
-        console.error(error)
-        return []
-      })
     tableHandler.setRows(jobs)
   }
 
@@ -244,17 +222,17 @@
               </td>
               <td>
                 {#if workflows}
-                  { workflows.find(workflow => workflow.id === row.workflow_id).name }
+                  { workflows.find(workflow => workflow.id === row.workflow_id)?.name }
                 {/if}
               </td>
               <td>
                 {#if datasets}
-                  { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
+                  { datasets.find(dataset => dataset.id === row.input_dataset_id)?.name }
                 {/if}
               </td>
               <td>
                 {#if datasets}
-                  { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
+                  { datasets.find(dataset => dataset.id === row.output_dataset_id)?.name }
                 {/if}
               </td>
               <td>
@@ -288,5 +266,5 @@
   </div>
 {/if}
 
-<JobInfoModal workflowJobId={workflowJobInfoId}></JobInfoModal>
+<JobInfoModal workflowJobId={workflowJobInfoId} projectName={project.name} workflows={workflows} datasets={datasets}></JobInfoModal>
 <JobLogsModal workflowJobId={workflowJobInfoId}></JobLogsModal>
