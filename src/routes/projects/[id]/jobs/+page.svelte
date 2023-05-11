@@ -83,25 +83,27 @@
   async function handleJobLogsDownload(jobId) {
     console.log('Download job')
 
-    const downloadUrl = await downloadWorkflowJobLog(jobId)
-      .then(blob => {
-        // Create a download URL for the file
-        return URL.createObjectURL(blob)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const response = await fetch(`/projects/${project.id}/jobs/${jobId}/logs`, {
+			method: 'GET',
+      credentials: 'include'
+    })
 
-    // Create a hidden link within the page to trigger the download of the file
-    const link = document.createElement('a')
-    // Append the link to the body
-    document.body.appendChild(link)
-    // Set the href of the link to the download URL
-    link.href = downloadUrl
-    link.download = `${jobId}_logs.zip`
-    // Trigger the download
-    link.click()
-    document.body.removeChild(link)
+    if (response.ok) {
+			// The response body is a blob
+      const blob = await response.blob()
+      const downloadUrl = URL.createObjectURL(blob)
+			// Create a hidden link within the page to trigger the download of the file
+			const link = document.createElement('a')
+			// Append the link to the body
+			document.body.appendChild(link)
+			// Set the href of the link to the download URL
+			link.href = downloadUrl
+			link.download = `${jobId}_logs.zip`
+			// Trigger the download
+			link.click()
+			document.body.removeChild(link)
+    }
+
   }
 
 </script>

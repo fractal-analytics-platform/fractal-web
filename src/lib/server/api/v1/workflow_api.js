@@ -253,7 +253,7 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
 }
 
 // Download a workflow job log as zip file
-export async function downloadWorkflowJobLog(workflowJobId) {
+export async function downloadWorkflowJobLog(fetch, workflowJobId) {
 
     const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/download/${workflowJobId}`, {
       method: 'GET',
