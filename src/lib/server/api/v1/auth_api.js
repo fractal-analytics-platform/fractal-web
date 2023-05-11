@@ -30,3 +30,17 @@ export async function whoami(fetch) {
 
   throw new Error('Unable to fetch user identity')
 }
+
+export async function logout(fetch) {
+
+  const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/logout', {
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (!response.ok) {
+    throw new Error('Logout failed')
+  }
+
+}
