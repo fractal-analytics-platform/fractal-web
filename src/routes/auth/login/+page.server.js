@@ -1,3 +1,4 @@
+import { redirect } from '@sveltejs/kit'
 import { userAuthentication } from '$lib/server/api/v1/auth_api'
 
 export const actions = {
@@ -17,5 +18,7 @@ export const actions = {
       secure: true,
       httpOnly: true
     })
+
+    throw redirect(302, '/')
   }
 }
