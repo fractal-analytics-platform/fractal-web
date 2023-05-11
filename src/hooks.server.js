@@ -7,14 +7,13 @@ export async function handle({ event, resolve }) {
 	}
 
 	// Authentication guard
-	if (event.cookies) {
-		// const token = cookie
-		const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami`)
-		if (whoami.ok) {
-			return await resolve(event)
-		} else {
-			return new Response(null, { status: 302, headers: { location: '/auth/login' } })
-		}
+	const fastApiUsersAuth = event.cookies.get('fastapiusersauth')
+	if (!fastApiUsersAuth) {
+		return new Response(null, { status: 302, headers: { location: '/auth/login' } })
+	}
+	const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami`)
+	if (whoami.ok) {
+		return await resolve(event)
 	} else {
 		return new Response(null, { status: 302, headers: { location: '/auth/login' } })
 	}
