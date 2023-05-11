@@ -1,13 +1,9 @@
 <script>
   import { enhance } from '$app/forms'
-  import { page } from '$app/stores'
-  import { deleteDataset } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
   export let datasets = []
-
-  let currentProjectId = $page.params.id
 
   async function handleCreateDataset({ form }) {
     return async ({ result }) => {

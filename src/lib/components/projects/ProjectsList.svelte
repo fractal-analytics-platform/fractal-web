@@ -2,7 +2,6 @@
   import { page } from '$app/stores'
   import { enhance } from '$app/forms'
   import { modalProject } from '$lib/stores/projectStores.js'
-  import { deleteProject } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 

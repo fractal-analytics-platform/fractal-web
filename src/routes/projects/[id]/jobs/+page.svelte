@@ -2,7 +2,6 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { DataHandler, check } from '@vincjo/datatables'
-  import { downloadWorkflowJobLog } from '$lib/api/v1/workflow/workflow_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
   import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte'

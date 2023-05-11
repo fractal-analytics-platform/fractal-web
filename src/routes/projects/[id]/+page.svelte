@@ -2,7 +2,6 @@
   import { onMount } from 'svelte'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { updateProject } from '$lib/api/v1/project/project_api'
   import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte'
   import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte'
 
