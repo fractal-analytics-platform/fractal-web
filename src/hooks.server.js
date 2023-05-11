@@ -12,6 +12,7 @@ export async function handle({ event, resolve }) {
 		const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami`)
 		if (whoami.ok) {
 			console.log('Authorized')
+			return await resolve(event)
 		} else {
 			console.log('Not authorized')
 			return new Response(null, { status: 302, headers: { location: '/auth/login' } })
