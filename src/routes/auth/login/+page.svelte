@@ -1,8 +1,10 @@
 <script>
-  import { goto } from '$app/navigation'
-  import { userStore } from '$lib/stores/authStores'
-
+  export let form
   let loginError = false
+
+  if (form?.invalid) {
+		loginError = true
+  }
 
 </script>
 
@@ -18,7 +20,7 @@
           <input name="username" type="email" class="form-control { loginError ? 'is-invalid' : '' }" id="userEmail" aria-describedby="emailHelp" required>
           <div id="emailHelp" class="form-text">The email you provided to the IT manager</div>
           <div class="invalid-feedback">
-            Can not perform login with the data provided
+            { form?.invalidMessage }
           </div>
         </div>
         <div class="mb-3">
