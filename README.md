@@ -32,12 +32,20 @@ npm install
 
 ## Web client startup
 
-Create a `.env` file where you set the relevant environment variables. At the moment this includes a single variable:
+The project comes with a default `.env.development` development environment file.
+In this file are present a set of default values for the environment variables that are used by the application.
+The default values are set to work with a local instance of a fractal-server.
+
+Specifically, a fractal server is expected to run on `http://localhost:8000` as stated by the `FRACTAL_SERVER_HOST` variable.
+
+If you want to run the application with a different fractal server instance, you can create a `.env.development.local` file
+and override, for instance, the `FRACTAL_SERVER_HOST` variable with the address of your server instance, e.g.
+
 ```
-PUBLIC_FRACTAL_SERVER_HOST=http://127.0.0.1:8000
+FRACTAL_SERVER_HOST=http://localhost:8888
 ```
 
-Run the application via
+Run the client application via
 ```bash
 npm run dev -- --open
 ```
@@ -56,6 +64,12 @@ in order for the client request to be authorized.
 For user experience reasons, it is suggested to set the `JWT_EXPIRE_SECONDS=84600` on the server.
 
 **Note**: The [example_server_startup folder](tests/data/example_server_startup) contains an example of how to install and startup a `fractal-server` instance.
+
+# Client architecture
+
+The client is a Svelte application that uses [SvelteKit](https://kit.svelte.dev) as a framework.
+The application is composed of a set of pages that are rendered by a node server and served to a client browser.
+The node server acts as a proxy to the fractal server, forwarding the requests to the server and returning the responses to the client.
 
 # Contributors
 
