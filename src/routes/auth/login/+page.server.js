@@ -1,6 +1,14 @@
 import { fail, redirect } from '@sveltejs/kit'
 import * as jose from 'jose'
 import { userAuthentication } from '$lib/server/api/v1/auth_api'
+import {
+  AUTH_COOKIE_NAME,
+  AUTH_COOKIE_DOMAIN,
+  AUTH_COOKIE_PATH,
+  AUTH_COOKIE_SAME_SITE,
+  AUTH_COOKIE_SECURE,
+  AUTH_COOKIE_HTTP_ONLY
+} from '$env/static/private'
 
 export const actions = {
   // Default page action / Handles POST requests
@@ -23,13 +31,16 @@ export const actions = {
     const tokenClaims = jose.decodeJwt(authToken)
 
     // Set the authentication cookie
-    cookies.set('fastapiusersauth', authData.access_token, {
-      path: '/',
+    const cookieOptions = {
+      domain: `${AUTH_COOKIE_DOMAIN}`,
+      path: `${AUTH_COOKIE_PATH}`,
       expires: new Date(tokenClaims.exp * 1000),
-      sameSite: 'lax',
-      secure: true,
-      httpOnly: true
-    })
+      sameSite: `${AUTH_COOKIE_SAME_SITE}`,
+      secure: `${AUTH_COOKIE_SECURE}` === 'true',
+      httpOnly: `${AUTH_COOKIE_HTTP_ONLY}` === 'true'
+    }
+    console.log(cookieOptions)
+    cookies.set(AUTH_COOKIE_NAME, authData.access_token, cookieOptions)
 
     throw redirect(302, '/')
   }
