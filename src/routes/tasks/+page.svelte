@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
+  import { page } from '$app/stores'
   import { enhance } from '$app/forms'
-  import { listTasks, createTask } from '$lib/api/v1/task/task_api'
   import { collectTaskErrorStore } from '$lib/stores/errorStores'
   import { taskModal as taskModalStore } from '$lib/stores/taskStores'
   import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte'
@@ -11,24 +11,17 @@
   // Error property to be set in order to show errors in UI
   let errorReasons = undefined
   // Tasks property updated with respect to data store
-  let tasks = []
+  let tasks = $page.data.tasks
+  let taskCreateSuccess = false
 
   // Store subscriptions
   collectTaskErrorStore.subscribe(error => {
-    if (error) setErrorReasons(error.reason)
+    if (error)
+      setErrorReasons(error)
   })
 
   onMount(async () => {
-    await reloadTaskList()
   })
-
-  async function fetchTaskList() {
-    return await listTasks()
-      .catch((error) => {
-        console.error(error)
-        return []
-      })
-  }
 
   function setErrorReasons(value) {
     errorReasons = value
@@ -47,21 +40,26 @@
   }
 
   async function reloadTaskList() {
-    tasks = await fetchTaskList()
+    window.location.reload()
   }
 
-  async function handleCreateTask({ data, form, cancel }) {
-    // Prevent default from action
-    cancel()
-
-    await createTask(data)
-      .then(() => {
+  async function handleCreateTask({ form }) {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
         form.reset()
-        reloadTaskList()
-      })
-      .catch(error => {
-        setErrorReasons(error.reason)
-      })
+        // Add created task to the list
+        const task = result.data.task
+        tasks = [...tasks, task]
+        taskCreateSuccess = true
+        setTimeout(() => {
+          taskCreateSuccess = false
+        }, 3000)
+      } else {
+        const error = result.data
+        console.error(error)
+        setErrorReasons(error)
+      }
+    }
   }
 
 </script>
@@ -99,7 +97,12 @@
       </h2>
       <div id="addTask" class="accordion-collapse collapse">
         <div class="accordion-body">
-          <form method="post" class="" use:enhance={handleCreateTask}>
+          {#if taskCreateSuccess}
+            <div class="alert alert-success" role="alert">
+              Task created successfully
+            </div>
+          {/if}
+          <form method="post" action="?/createTask" use:enhance={handleCreateTask}>
             <div class="row g-3">
               <div class="col-6">
                 <div class="input-group">

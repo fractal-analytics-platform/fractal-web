@@ -2,10 +2,6 @@
   import { onMount } from 'svelte'
   import { page } from '$app/stores'
   import { DataHandler, check } from '@vincjo/datatables'
-  import { loadProjectContext } from  '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
-  import { getJobs } from '$lib/api/v1/project/project_api'
-  import { downloadWorkflowJobLog } from '$lib/api/v1/workflow/workflow_api'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
   import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte'
   import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte'
@@ -13,18 +9,14 @@
   import Th from '$lib/components/common/filterable/Th.svelte'
 
   // Component properties
-  let project = undefined
-  let workflows = []
-  let datasets = []
-  let jobs = []
+  let project = $page.data.project
+  let workflows = $page.data.workflows || []
+  let datasets = $page.data.datasets
+  let jobs = $page.data.jobs || []
   let tableHandler = undefined
   let rows = undefined
   let workflowJobInfoId = undefined
 
-  // Project context properties
-  $: project = $contextProject.project
-  $: workflows = $contextProject.workflows
-  $: datasets = $contextProject.datasets
 
   // Filters
   let workflowFilter = ''
@@ -33,15 +25,8 @@
   let statusFilter = ''
 
   onMount(async () => {
-    // Load project context
-    console.log('Loading project context...')
-    // If $contextProject is not empty, it means that the user has already loaded the project context
-    // we don't need to load it again
-    if ($contextProject.project === undefined) {
-      await loadProjectContext($page.params.id)
-    }
 
-    await loadProjectJobs()
+    await setTableHandler()
 
     // Set filters
     const idFilter = $page.url.searchParams.get('id')
@@ -83,17 +68,7 @@
   $: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo)
   $: tableHandler.filter(statusFilter, 'status')
 
-  async function loadProjectJobs() {
-    // Load project jobs
-    console.log('Loading project jobs...')
-    jobs = await getJobs($page.params.id)
-      .then((response) => {
-        return response
-      })
-      .catch((error) => {
-        console.error(error)
-        return []
-      })
+  async function setTableHandler() {
     tableHandler.setRows(jobs)
   }
 
@@ -107,25 +82,27 @@
   async function handleJobLogsDownload(jobId) {
     console.log('Download job')
 
-    const downloadUrl = await downloadWorkflowJobLog(jobId)
-      .then(blob => {
-        // Create a download URL for the file
-        return URL.createObjectURL(blob)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const response = await fetch(`/projects/${project.id}/jobs/${jobId}/logs`, {
+			method: 'GET',
+      credentials: 'include'
+    })
 
-    // Create a hidden link within the page to trigger the download of the file
-    const link = document.createElement('a')
-    // Append the link to the body
-    document.body.appendChild(link)
-    // Set the href of the link to the download URL
-    link.href = downloadUrl
-    link.download = `${jobId}_logs.zip`
-    // Trigger the download
-    link.click()
-    document.body.removeChild(link)
+    if (response.ok) {
+			// The response body is a blob
+      const blob = await response.blob()
+      const downloadUrl = URL.createObjectURL(blob)
+			// Create a hidden link within the page to trigger the download of the file
+			const link = document.createElement('a')
+			// Append the link to the body
+			document.body.appendChild(link)
+			// Set the href of the link to the download URL
+			link.href = downloadUrl
+			link.download = `${jobId}_logs.zip`
+			// Trigger the download
+			link.click()
+			document.body.removeChild(link)
+    }
+
   }
 
 </script>
@@ -171,8 +148,8 @@
           Clear filters
         </button>
         <button class="btn btn-primary" on:click={() => {
-          // Refresh jobs list
-          loadProjectJobs()
+          // Refresh page
+          window.location.reload()
         }}><i class="bi-arrow-clockwise"></i> Refresh</button>
       </div>
     </div>
@@ -244,17 +221,17 @@
               </td>
               <td>
                 {#if workflows}
-                  { workflows.find(workflow => workflow.id === row.workflow_id).name }
+                  { workflows.find(workflow => workflow.id === row.workflow_id)?.name }
                 {/if}
               </td>
               <td>
                 {#if datasets}
-                  { datasets.find(dataset => dataset.id === row.input_dataset_id).name }
+                  { datasets.find(dataset => dataset.id === row.input_dataset_id)?.name }
                 {/if}
               </td>
               <td>
                 {#if datasets}
-                  { datasets.find(dataset => dataset.id === row.output_dataset_id).name }
+                  { datasets.find(dataset => dataset.id === row.output_dataset_id)?.name }
                 {/if}
               </td>
               <td>
@@ -288,5 +265,5 @@
   </div>
 {/if}
 
-<JobInfoModal workflowJobId={workflowJobInfoId}></JobInfoModal>
+<JobInfoModal workflowJobId={workflowJobInfoId} projectName={project.name} workflows={workflows} datasets={datasets}></JobInfoModal>
 <JobLogsModal workflowJobId={workflowJobInfoId}></JobLogsModal>

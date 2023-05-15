@@ -1,34 +1,8 @@
 <script>
-  import { PUBLIC_FRACTAL_SERVER_HOST } from '$env/static/public'
-  import { onMount } from 'svelte'
-  import { whoami } from '$lib/api/v1/auth/auth_api'
-  import { userStore } from '$lib/stores/authStores'
-  import { serverInfo } from '$lib/stores/serverStores'
+  import { page } from '$app/stores'
 
-  $: userLoggedIn = $userStore !== undefined
-  $: server = $serverInfo || {}
-
-  onMount(async () => {
-    if ($userStore === undefined) {
-      const user = await whoami().catch(() => {
-        console.info('Unable to fetch user identity')
-      })
-      userStore.set(user)
-    }
-    if ($serverInfo === undefined) {
-      fetchServerInfo()
-    }
-  })
-
-  const fetchServerInfo = async () => {
-    const info = await fetch(PUBLIC_FRACTAL_SERVER_HOST + '/api/alive/', {
-      method: 'GET'
-    })
-      .then(async (response) => {
-        return await response.json()
-      })
-    serverInfo.set(info)
-  }
+  $: userLoggedIn = !!$page.data.userInfo
+  $: server = $page.data.serverInfo || {}
 
 </script>
 

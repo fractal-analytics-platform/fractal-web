@@ -1,29 +1,19 @@
 <script>
-  import { afterUpdate, onMount } from 'svelte'
   import { page } from '$app/stores'
-  import { loadProjectContext } from '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
-  import { getJob } from '$lib/api/v1/monitoring/monitoring_api'
+  import { afterUpdate, onMount } from 'svelte'
   import StatusBadge from '$lib/components/jobs/StatusBadge.svelte'
 
   export let workflowJobId = undefined
   let job = undefined
-  let projectName = undefined
-  let datasets = undefined
-  let workflows = undefined
+  export let projectName = undefined
+  export let datasets = undefined
+  export let workflows = undefined
   let jobWorkflowName = undefined
   let jobInputDatasetName = undefined
   let jobOutputDatasetName = undefined
   let jobStatus = undefined
 
-  contextProject.subscribe((value) => {
-    projectName = value.project?.name
-    datasets = value.datasets
-    workflows = value.workflows
-  })
-
   onMount(async () => {
-    await loadProjectContext($page.params.id)
   })
 
   afterUpdate(async () => {
@@ -32,23 +22,26 @@
     // Should fetch job info from server
     if (job === undefined) await fetchJob()
     // Should update jobWorkflowName
-    jobWorkflowName = workflows.find((workflow) => workflow.id === job.workflow_id).name
+    jobWorkflowName = workflows.find((workflow) => workflow.id === job.workflow_id)?.name
     // Should update jobInputDatasetName
-    jobInputDatasetName = datasets.find((dataset) => dataset.id === job.input_dataset_id).name
+    jobInputDatasetName = datasets.find((dataset) => dataset.id === job.input_dataset_id)?.name
     // Should update jobOutputDatasetName
-    jobOutputDatasetName = datasets.find((dataset) => dataset.id === job.output_dataset_id).name
+    jobOutputDatasetName = datasets.find((dataset) => dataset.id === job.output_dataset_id)?.name
     // Should update jobStatus
     jobStatus = job.status
   })
 
   async function fetchJob() {
-    await getJob(workflowJobId)
-      .then((data) => {
-        job = data
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const request = await fetch(`/projects/${$page.params.id}/jobs/${workflowJobId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (request.status === 200) {
+      job = await request.json()
+    } else {
+      console.error(request)
+    }
   }
 
 </script>

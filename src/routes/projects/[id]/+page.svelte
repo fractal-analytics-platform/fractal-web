@@ -2,44 +2,31 @@
   import { onMount } from 'svelte'
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { loadProjectContext } from '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
-  import { updateProject } from '$lib/api/v1/project/project_api'
   import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte'
   import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte'
 
   // Component properties
-  let project
-  let workflows
+  let project = $page.data.project
+  let workflows = $page.data.workflows
   let projectUpdatesSuccess = undefined
 
-  // Subscribe to the project context store
-  contextProject.subscribe((context) => {
-    project = context.project
-    workflows = context.workflows
-  })
-
   onMount(async () => {
-    await loadProjectContext($page.params.id)
   })
 
-  function handleProjectPropertiesUpdate({ data, cancel }) {
-    // Prevent the form from submitting
-    cancel()
-
-    // Update the project
-    updateProject($page.params.id, data)
-      .then((updatedProject) => {
-        project = updatedProject
+  function handleProjectPropertiesUpdate() {
+    return async ({ result }) => {
+      if (result.type !== 'failure' ) {
+        console.log('Project updated successfully')
         projectUpdatesSuccess = true
         setTimeout(() => {
           projectUpdatesSuccess = undefined
         }, 3000)
-      })
-      .catch(error => {
-        console.error(error)
+        project.name = result.data.name
+      } else {
+        console.error('Error while updating project', result.data)
         projectUpdatesSuccess = false
-      })
+      }
+    }
   }
 
 </script>
@@ -84,7 +71,7 @@
       <div class="modal-body">
 
         {#if project}
-          <form id="updateProject" method="post" use:enhance={handleProjectPropertiesUpdate}>
+          <form id="updateProject" method="post" action="?/update" use:enhance={handleProjectPropertiesUpdate}>
 
             <div class="mb-3">
               <label for="projectName" class="form-label">Project name</label>

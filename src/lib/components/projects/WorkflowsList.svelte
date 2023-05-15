@@ -1,8 +1,6 @@
 <script>
-
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
-  import { createWorkflow, deleteWorkflow } from '$lib/api/v1/workflow/workflow_api'
   import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
@@ -16,6 +14,7 @@
   let validationError = false
 
   async function handleCreateWorkflow({ form, cancel, data }) {
+    /*
     // Prevent default
     cancel()
 
@@ -38,25 +37,51 @@
           }
         })
       })
+
+     */
+    return async ({ result }) => {
+      // If the result type is not failure, then a new workflow resource has been created
+      if (result.type !== 'failure') {
+        // Reset the form
+        form.reset()
+        // Workflow resource
+        const workflow = result.data
+        // Go to the new workflow page
+        goto(`/projects/${projectId}/workflows/${workflow.id}`)
+      } else {
+        // Instantiate a new standard error alert
+        new StandardErrorAlert({
+          target: document.getElementById('workflowCreateAlertError'),
+          props: {
+            error: result.data
+          }
+        })
+      }
+    }
   }
 
   async function handleDeleteWorkflow(workflowId) {
-    await deleteWorkflow(workflowId)
-      .then(() => {
-        // Workflow has been deleted
-        workflows = workflows.filter((wkf) => {
-          return wkf.id !== workflowId
-        })
+    const result = await fetch('/projects/' + projectId + '/workflows/' + workflowId, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+
+    if (result.ok) {
+      console.log('Workflow deleted')
+      // Workflow has been deleted
+      workflows = workflows.filter((wkf) => {
+        return wkf.id !== workflowId
       })
-      .catch(error => {
-        // Instantiate a new standard error alert
-        new StandardErrorAlert({
-          target: document.getElementById('workflowDeleteAlertError'),
-          props: {
-            error: error.message
-          }
-        })
+    } else {
+      console.error('Workflow not deleted', result.statusText)
+      // Instantiate a new standard error alert
+      new StandardErrorAlert({
+        target: document.getElementById('workflowDeleteAlertError'),
+        props: {
+          error: result.statusText
+        }
       })
+    }
   }
 
   function handleWorkflowNameChange(event) {
@@ -101,7 +126,7 @@
           <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#importWorkflowModal">Import workflow</a>
         </span>
         <div>
-          <form method='post' class="row row-cols-lg-auto g-3 align-items-center" use:enhance={handleCreateWorkflow}>
+          <form method="post" action="?/createWorkflow" class="row row-cols-lg-auto g-3 align-items-center" use:enhance={handleCreateWorkflow}>
             <div class="col-12">
               <div class="input-group">
                 <div class="input-group-text">Name</div>

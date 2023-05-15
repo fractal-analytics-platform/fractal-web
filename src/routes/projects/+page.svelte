@@ -1,26 +1,15 @@
 <script>
+  import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { listProjects } from '$lib/api/v1/project/project_api'
   import ProjectsList from '$lib/components/projects/ProjectsList.svelte'
   import ProjectInfoModal from '$lib/components/projects/ProjectInfoModal.svelte'
 
   let projects = []
 
-  onMount(async () => {
-    await updateProjectsList()
+  onMount(() => {
+    projects = $page.data.projects
   })
 
-  async function getServerProjects() {
-    return await listProjects()
-      .catch(() => {
-        // If there is an error, return an empty list
-        return []
-      })
-  }
-
-  async function updateProjectsList() {
-    projects = await getServerProjects()
-  }
 
 </script>
 
@@ -33,5 +22,5 @@
 <div class="container">
   <ProjectInfoModal></ProjectInfoModal>
 
-  <ProjectsList bind:projects on:projectCreated={updateProjectsList} />
+  <ProjectsList bind:projects />
 </div>

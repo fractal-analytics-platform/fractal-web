@@ -4,25 +4,23 @@
   import { enhance } from '$app/forms'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-  import { loadProjectContext } from '$lib/components/projects/controller'
-  import { contextProject } from '$lib/stores/projectStores'
-  import { getWorkflow, updateWorkflow, reorderWorkflow, exportWorkflow, createWorkflowTask, deleteWorkflowTask, applyWorkflow } from '$lib/api/v1/workflow/workflow_api'
-  import { listTasks } from '$lib/api/v1/task/task_api'
   import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
   import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte'
 
+  // Workflow
   let workflow = undefined
+  // Project context properties
+  let project = undefined
+  let datasets = []
   // List of available tasks to be inserted into workflow
   let availableTasks = []
-  // Project context properties
-  let project
-  let datasets = []
 
   let workflowTaskContext = writable(undefined)
   let workflowTabContextId = 0
-
+  let workflowUpdated = false
+  let workflowTaskCreated = false
   let selectedWorkflowTask = undefined
   let checkingConfiguration = false
   let inputDatasetControl = ''
@@ -31,35 +29,29 @@
 
   $: updatableWorkflowList = workflow?.task_list || []
 
-
-  contextProject.subscribe((context) => {
-    project = context.project
-    datasets = context.datasets
-  })
-
   workflowTaskContext.subscribe((value) => {
     selectedWorkflowTask = value
   })
 
-  async function loadWorkflow() {
-    workflow = await getWorkflow($page.params.workflowId)
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
   onMount(async () => {
-    await loadWorkflow()
-    await loadProjectContext($page.params.id)
+    workflow = $page.data.workflow
+    project = $page.data.project
+    datasets = $page.data.datasets
   })
 
   async function handleExportWorkflow(event) {
 
-    const workflowData = await exportWorkflow(workflow.id)
-      .catch(error => {
-        console.error(error);
-        return null
-      })
+    const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/export`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      console.error(await response.json())
+      return
+    }
+
+		const workflowData = await response.json()
 
     if (workflowData !== null) {
       const file = new File([JSON.stringify(workflowData, '', 2)], `workflow-export-${workflow.name}-${Date.now().toString()}.json`, {
@@ -76,56 +68,66 @@
 
   async function getAvailableTasks() {
     // Get available tasks from the server
-    availableTasks = await listTasks()
-      .catch(error => {
-        console.error(error)
-        return []
-      })
+    const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/tasks`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      availableTasks = await response.json()
+    } else {
+      console.error(response)
+      availableTasks = []
+    }
   }
 
-  async function handleWorkflowUpdate({ form, data, cancel }) {
-    // Prevent default
-    cancel()
-
-    await updateWorkflow(workflow.id, data)
-      .then(() => {
-        loadWorkflow()
-        // eslint-disable-next-line no-undef
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowModal'))
-        modal.toggle()
-      })
-      .catch(error => {
-        console.error(error)
-      })
+  async function handleWorkflowUpdate() {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
+        const updatedWorkflow = result.data
+        workflow = updatedWorkflow
+        workflowUpdated = true
+        setTimeout(() => {
+          workflowUpdated = false
+        }, 3000)
+      } else {
+        console.error('Error updating workflow properties', result.data)
+      }
+    }
   }
 
-  async function handleCreateWorkflowTask({ form, data, cancel }) {
-    // Prevent default
-    cancel()
-
-    const workflowTask = await createWorkflowTask(workflow.id, data)
-      .then(async () => {
+  async function handleCreateWorkflowTask({ form }) {
+    return async ({ result }) => {
+      if (result.type !== 'failure') {
+        // Workflow task created
+        console.log('Workflow task created')
+        // Update workflow
+        workflow = result.data
+        // UI Feedback
+        workflowTaskCreated = true
+        setTimeout(() => {
+          workflowTaskCreated = false
+        }, 3000)
         form.reset()
-        workflow = await getWorkflow(workflow.id)
-        // eslint-disable-next-line no-undef
-        const modal = bootstrap.Modal.getInstance(document.getElementById('insertTaskModal'))
-        modal.toggle()
-      })
-      .catch(error => {
-        console.error(error)
-      })
+      } else {
+        console.error('Error creating new workflow task', result.data)
+      }
+    }
   }
 
   async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
-    await deleteWorkflowTask(workflowId, workflowTaskId)
-      .then(() => {
-        // Succesffully deleted task
-        loadWorkflow()
-        workflowTaskContext.set(undefined)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const response = await fetch(`/projects/${project.id}/workflows/${workflowId}/tasks/${workflowTaskId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      // Successfully deleted task
+      workflow = await response.json()
+      workflowTaskContext.set(undefined)
+    } else {
+      console.error(response)
+    }
   }
 
   async function setActiveWorkflowTaskContext(event) {
@@ -156,15 +158,29 @@
 
   async function handleWorkflowOrderUpdate(event) {
 
-    await reorderWorkflow(workflow.id, updatableWorkflowList.map(t => t.id))
-      .then((updatedWorkflow) => {
-        workflow = updatedWorkflow
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowTasksOrderModal'))
-        modal.toggle()
-      })
-      .catch(error => {
-        console.error(error)
-      })
+    const requestData = {
+			tasksOrder: updatableWorkflowList.map(t => t.id)
+    }
+
+    // Patch workflow task order
+    const request = await fetch(`/projects/${project.id}/workflows/${workflow.id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    })
+
+    if (request.ok) {
+			console.log('Workflow task order updated')
+      // Successfully updated workflow task order
+      workflow = await request.json()
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editWorkflowTasksOrderModal'))
+      modal.toggle()
+    } else {
+      console.error('Workflow task order not updated', request.statusText)
+    }
   }
 
   async function handleApplyWorkflow() {
@@ -174,30 +190,36 @@
     data.append('outputDataset', outputDatasetControl)
     data.append('workerInit', workerInitControl)
 
-    await applyWorkflow(project.id, workflow.id, data)
-      .then((job) => {
-        // eslint-disable-next-line no-undef
-        const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
-        modal.toggle()
-        // Navigate to project jobs page
-        // Define URL to navigate to
-        const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
-        // Set jobsUrl search params
-        jobsUrl.searchParams.set('workflow', workflow.id)
-        jobsUrl.searchParams.set('id', job.id)
-        // Trigger navigation
-        goto(jobsUrl)
+    const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
+      method: 'POST',
+      credentials: 'include',
+      body: data
+    })
+
+    if (response.ok) {
+      // Successfully applied workflow
+      const job = await response.json()
+      const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'))
+      modal.toggle()
+      // Navigate to project jobs page
+      // Define URL to navigate to
+      const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin)
+      // Set jobsUrl search params
+      jobsUrl.searchParams.set('workflow', workflow.id)
+      jobsUrl.searchParams.set('id', job.id)
+      // Trigger navigation
+      goto(jobsUrl)
+    } else {
+      console.error(response)
+      // Set an error message on the component
+      new StandardErrorAlert({
+        target: document.getElementById('applyWorkflowError'),
+        props: {
+          error: await response.json()
+        }
       })
-      .catch(error => {
-        console.error(error)
-        // Set an error message on the component
-        new StandardErrorAlert({
-          target: document.getElementById('applyWorkflowError'),
-          props: {
-            error
-          }
-        })
-      })
+    }
+
   }
 
 </script>
@@ -332,7 +354,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="post" use:enhance={handleCreateWorkflowTask}>
+        <form method="post" action="?/createWorkflowTask" use:enhance={handleCreateWorkflowTask}>
 
           <div class="mb-3">
             <label for="taskId" class="form-label">Select task</label>
@@ -352,6 +374,11 @@
           <button class="btn btn-primary">Insert</button>
         </form>
       </div>
+      <div class="modal-footer d-flex">
+        {#if workflowTaskCreated}
+          <span class="w-100 alert alert-success">Workflow task created</span>
+        {/if}
+      </div>
     </div>
   </div>
 </div>
@@ -367,7 +394,7 @@
       <div class="modal-body">
 
         {#if workflow}
-        <form id="updateWorkflow" method="post" use:enhance={handleWorkflowUpdate}>
+        <form id="updateWorkflow" method="post" action="?/updateWorkflow" use:enhance={handleWorkflowUpdate}>
 
           <div class="mb-3">
             <label for="workflowName" class="form-label">Workflow name</label>
@@ -379,6 +406,9 @@
 
       </div>
       <div class="modal-footer">
+        {#if workflowUpdated }
+          <span class="alert alert-success">Workflow updated correctly</span>
+        {/if}
         <button class="btn btn-primary" form="updateWorkflow">Save</button>
       </div>
     </div>

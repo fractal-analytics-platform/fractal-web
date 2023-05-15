@@ -1,15 +1,25 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
+  import { page } from '$app/stores'
   import { enhance } from '$app/forms'
   import { modalProject } from '$lib/stores/projectStores.js'
-  import { createProject, deleteProject } from '$lib/api/v1/project/project_api'
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
-  const dispatch = createEventDispatcher()
 
   // List of projects to be displayed
   export let projects = []
+
+  $: {
+    if ($page.form?.error) {
+      // Error creating project
+      new StandardErrorAlert({
+        target: document.getElementById('createProjectErrorAlert'),
+        props: {
+          error: $page.form.error
+        }
+      })
+    }
+  }
 
   function setModalProject(event) {
     const projectId = event.currentTarget.getAttribute('data-fc-project')
@@ -17,36 +27,22 @@
     modalProject.set(project)
   }
 
-  async function handleCreateProject({ data, cancel, form }) {
-    // Prevent default form submit
-    cancel()
-
-    await createProject(data)
-      .then(() => {
-        dispatch('projectCreated')
-        form.reset()
-      })
-      .catch((error) => {
-        // Error creating project
-        new StandardErrorAlert({
-          target: document.getElementById('createProjectErrorAlert'),
-          props: {
-            error
-          }
-        })
-      })
-  }
-
   async function handleDeleteProject(projectId) {
+    console.log('Client request project delete')
 
-    await deleteProject(projectId)
+    await fetch('/projects?project=' + projectId, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
       .then(() => {
-        projects = projects.filter((p) => p.id != projectId)
+        console.log('Project deleted successfully')
+        // If the response is successful
+        projects = projects.filter((p) => p.id !== projectId)
       })
       .catch(error => {
+        // TODO: Notify the user there has been an error in the deletion of the project
         console.error(error)
       })
-
   }
 </script>
 
@@ -54,7 +50,7 @@
 <div class="container">
   <div class="row mt-3 mb-3">
     <div class="col-sm-12">
-      <form method="post" class="row justify-content-end" use:enhance={handleCreateProject}>
+      <form method="post" class="row justify-content-end" use:enhance>
         <div class="col-auto">
           <div class="input-group">
             <div class="input-group-text">Project name</div>
