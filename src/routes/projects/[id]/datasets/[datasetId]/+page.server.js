@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit'
 import { getProject, getDataset, updateDataset, createDatasetResource } from '$lib/server/api/v1/project_api'
 
-export async function load({ fetch, request, params }){
+export async function load({ fetch, params }){
   console.log('Load Dataset Page')
 
   const { id, datasetId } = params
