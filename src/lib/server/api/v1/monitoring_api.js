@@ -1,9 +1,9 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
 
-export async function getJob(fetch, jobId) {
+export async function getJob(fetch, projectId, jobId) {
   console.log('Fetching job from server')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/${jobId}`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/{projectId}job/${jobId}`, {
     method: 'GET',
     credentials: 'include',
     mode: 'cors'

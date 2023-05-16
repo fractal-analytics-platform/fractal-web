@@ -4,7 +4,7 @@ import { PostResourceException } from '$lib/common/errors'
 
 export async function listProjects(fetch) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project', {
+  const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project/', {
     method: 'GET',
     credentials: 'include'
   })
@@ -27,7 +27,7 @@ export async function createProject(fetch, data) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project', {
+  const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project/', {
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -97,7 +97,6 @@ export async function createDataset(fetch, projectId, formData) {
 
   const requestData = {
     name: formData.get('datasetName'),
-    project_id: projectId,
     // type: "", Currently is not included the type to create a dataset
     meta: {},
     read_only: formData.get('datasetReadonly') ? true : false
@@ -106,7 +105,7 @@ export async function createDataset(fetch, projectId, formData) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/`,{
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -123,7 +122,7 @@ export async function createDataset(fetch, projectId, formData) {
 
 export async function getDataset(fetch, projectId, datasetId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}`, {
     method: 'GET',
     credentials: 'include',
     mode: 'cors'
@@ -155,7 +154,7 @@ export async function updateDataset(fetch, projectId, datasetId, formData) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}`,{
     method: 'PATCH',
     credentials: 'include',
     mode: 'cors',
@@ -172,7 +171,7 @@ export async function updateDataset(fetch, projectId, datasetId, formData) {
 
 export async function deleteDataset(fetch, projectId, datasetId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}`, {
     method: 'DELETE',
     credentials: 'include',
     mode: 'cors'
@@ -187,7 +186,7 @@ export async function deleteDataset(fetch, projectId, datasetId) {
 
 export async function getWorkflows(fetch, projectId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflows/`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
     method: 'GET',
     credentials: 'include',
     mode: 'cors'
@@ -206,7 +205,7 @@ export async function importWorkflow(fetch, projectId, workflowMetadata) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/import-workflow/`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/import/`, {
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -231,7 +230,7 @@ export async function createDatasetResource(fetch, projectId, datasetId, formDat
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}/resource/`, {
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -248,7 +247,7 @@ export async function createDatasetResource(fetch, projectId, datasetId, formDat
 
 export async function deleteDatasetResource(fetch, projectId, datasetId, resourceId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/${datasetId}/${resourceId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,{
     method: 'DELETE',
     credentials: 'include',
     mode: 'cors'
@@ -264,7 +263,7 @@ export async function deleteDatasetResource(fetch, projectId, datasetId, resourc
 // Get the jobs list for a project
 export async function getJobs(fetch, projectId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/jobs/`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/`, {
     method: 'GET',
     credentials: 'include',
     mode: 'cors'
