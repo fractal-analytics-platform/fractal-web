@@ -1,7 +1,6 @@
 import { fail } from '@sveltejs/kit'
 import { getProject, getWorkflows, updateProject, createDataset, importWorkflow } from '$lib/server/api/v1/project_api'
 import { createWorkflow } from '$lib/server/api/v1/workflow_api'
-import { PostResourceException } from "../../../lib/common/errors.js";
 
 export async function load({ fetch, params }) {
   console.log('Load project page')
