@@ -22,7 +22,7 @@
   }
 
   async function handleEntryUpdate(updatedEntry) {
-    const projectId = $page.params.id
+    const projectId = $page.params.projectId
     try {
       const response = await updateFormEntry(projectId, workflowId, workflowTaskId, updatedEntry, 'args')
       workflowTaskArgs = response.args

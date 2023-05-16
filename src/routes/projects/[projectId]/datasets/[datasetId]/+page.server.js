@@ -1,18 +1,18 @@
 import { fail } from '@sveltejs/kit'
 import { getProject, getDataset, updateDataset, createDatasetResource } from '$lib/server/api/v1/project_api'
 
-export async function load({ fetch, request, params }){
+export async function load({ fetch, params }){
   console.log('Load Dataset Page')
 
-  const { id, datasetId } = params
+  const { projectId, datasetId } = params
 
-  const project = await getProject(fetch, id)
+  const project = await getProject(fetch, projectId)
     .catch(error => {
       console.error(error)
       return null
     })
 
-  const dataset = await getDataset(fetch, id, datasetId)
+  const dataset = await getDataset(fetch, projectId, datasetId)
     .catch(error => {
       console.error(error)
       return null
@@ -31,7 +31,7 @@ export const actions = {
 
     console.log('Update Dataset Properties')
 
-    const { id, datasetId } = params
+    const { projectId, datasetId } = params
     const formData = await request.formData()
 
     // Validation
@@ -41,7 +41,7 @@ export const actions = {
     }
 
     try {
-      const dataset = await updateDataset(fetch, id, datasetId, formData)
+      const dataset = await updateDataset(fetch, projectId, datasetId, formData)
       return dataset
     }
     catch (error) {
@@ -54,11 +54,11 @@ export const actions = {
   createDatasetResource: async ({ fetch, request, params }) => {
     console.log('Create Dataset Resource')
 
-    const { id, datasetId } = params
+    const { projectId, datasetId } = params
     const formData = await request.formData()
 
     try {
-      return await createDatasetResource(fetch, id, datasetId, formData)
+      return await createDatasetResource(fetch, projectId, datasetId, formData)
     }
     catch (error) {
       console.error(error)

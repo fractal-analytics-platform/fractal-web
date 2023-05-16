@@ -2,13 +2,15 @@ import { getProject, getWorkflows, getJobs } from '$lib/server/api/v1/project_ap
 
 export async function load({ fetch, params }) {
 
-  const project = await getProject(fetch, params.id)
+  const { projectId } = params
+
+  const project = await getProject(fetch, projectId)
     .catch(error => console.error(error))
 
-  const workflows = await getWorkflows(fetch, params.id)
+  const workflows = await getWorkflows(fetch, projectId)
     .catch(error => console.error(error))
 
-  const jobs = await getJobs(fetch, params.id)
+  const jobs = await getJobs(fetch, projectId)
     .catch(error => console.error(error))
 
   return {

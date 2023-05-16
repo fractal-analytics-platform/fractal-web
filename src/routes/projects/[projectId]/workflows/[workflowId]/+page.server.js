@@ -5,17 +5,17 @@ import { getProject } from '$lib/server/api/v1/project_api'
 export async function load({ fetch, params }) {
   console.log('Load workflow page')
 
-  const { id, workflowId } = params
+  const { projectId, workflowId } = params
 
   // Get the project
-  const project = await getProject(fetch, id)
+  const project = await getProject(fetch, projectId)
     .catch(error => {
       console.error('Error getting project', error)
       return null
     })
 
   // Get the workflow
-  const workflow = await getWorkflow(fetch, workflowId) // FIXME: needs projectID
+  const workflow = await getWorkflow(fetch, projectId, workflowId)
     .catch(error => {
       console.error('Error getting workflow', error)
       return null
@@ -37,11 +37,11 @@ export const actions = {
   updateWorkflow: async ({ fetch, request, params }) => {
     console.log('Update workflow')
 
-    const { id, workflowId } = params
+    const { projectId, workflowId } = params
     const formData = await request.formData()
 
     try {
-      const updatedWorkflow = await updateWorkflow(fetch, workflowId, formData) // FIXME: needs projectID
+      const updatedWorkflow = await updateWorkflow(fetch, projectId, workflowId, formData)
       return updatedWorkflow
     } catch (error) {
       console.error(error.reason)
@@ -53,13 +53,13 @@ export const actions = {
   createWorkflowTask: async ({ fetch, request, params }) => {
     console.log('Create workflow task')
 
-    const { workflowId } = params
+    const { projectId, workflowId } = params
     const formData = await request.formData()
 
     try {
-      await createWorkflowTask(fetch, workflowId, formData) // FIXME: needs projectID
+      await createWorkflowTask(fetch, projectId, workflowId, formData)
       // Get updated workflow with created task
-      return await getWorkflow(fetch, workflowId)  // FIXME: needs projectID
+      return await getWorkflow(fetch, projectId, workflowId)
     } catch (error) {
       console.error(error.reason)
       return fail(500, error.reason)

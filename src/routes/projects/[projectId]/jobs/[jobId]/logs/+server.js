@@ -1,12 +1,13 @@
 import { downloadWorkflowJobLog } from '$lib/server/api/v1/workflow_api'
 
 export async function GET({ fetch, params }) {
-	console.log('GET logs for job', params.jobId)
 
-	const { jobId } = params
+	const { projectId, jobId } = params
+
+	console.log('GET logs for job', jobId)
 
 	try {
-		const logsBlob = await downloadWorkflowJobLog(fetch, jobId)  // FIXME: needs projectID
+		const logsBlob = await downloadWorkflowJobLog(fetch, projectId, jobId)
 		return new Response(logsBlob, { status: 200 })
 	} catch (error) {
 		console.error(error)
