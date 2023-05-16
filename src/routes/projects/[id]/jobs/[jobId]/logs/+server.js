@@ -6,7 +6,7 @@ export async function GET({ fetch, params }) {
 	const { jobId } = params
 
 	try {
-		const logsBlob = await downloadWorkflowJobLog(fetch, jobId)
+		const logsBlob = await downloadWorkflowJobLog(fetch, jobId)  // FIXME: needs projectID
 		return new Response(logsBlob, { status: 200 })
 	} catch (error) {
 		console.error(error)

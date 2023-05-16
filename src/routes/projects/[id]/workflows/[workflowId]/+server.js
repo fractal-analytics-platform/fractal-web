@@ -7,7 +7,7 @@ export async function DELETE({ fetch, params }) {
   const { workflowId } = params
 
   try {
-    await deleteWorkflow(fetch, workflowId)
+    await deleteWorkflow(fetch, workflowId)  // FIXME: needs projectID
     return new Response(null, { status: 204})
   }
   catch (error) {

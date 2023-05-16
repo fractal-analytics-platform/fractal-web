@@ -15,7 +15,7 @@ export async function load({ fetch, params }) {
     })
 
   // Get the workflow
-  const workflow = await getWorkflow(fetch, workflowId)
+  const workflow = await getWorkflow(fetch, workflowId) // FIXME: needs projectID
     .catch(error => {
       console.error('Error getting workflow', error)
       return null
@@ -41,7 +41,7 @@ export const actions = {
     const formData = await request.formData()
 
     try {
-      const updatedWorkflow = await updateWorkflow(fetch, workflowId, formData)
+      const updatedWorkflow = await updateWorkflow(fetch, workflowId, formData) // FIXME: needs projectID
       return updatedWorkflow
     } catch (error) {
       console.error(error.reason)
@@ -57,9 +57,9 @@ export const actions = {
     const formData = await request.formData()
 
     try {
-      await createWorkflowTask(fetch, workflowId, formData)
+      await createWorkflowTask(fetch, workflowId, formData) // FIXME: needs projectID
       // Get updated workflow with created task
-      return await getWorkflow(fetch, workflowId)
+      return await getWorkflow(fetch, workflowId)  // FIXME: needs projectID
     } catch (error) {
       console.error(error.reason)
       return fail(500, error.reason)

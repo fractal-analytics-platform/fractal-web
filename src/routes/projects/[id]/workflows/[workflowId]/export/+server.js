@@ -7,7 +7,7 @@ export async function GET({ fetch, params }) {
 	const { workflowId } = params
 
 	try {
-		const workflowExport = await exportWorkflow(fetch, workflowId)
+		const workflowExport = await exportWorkflow(fetch, workflowId)  // FIXME: needs projectID
 		return new Response(JSON.stringify(workflowExport), {	status: 200 })
 	} catch (error) {
 		console.error(error.reason)

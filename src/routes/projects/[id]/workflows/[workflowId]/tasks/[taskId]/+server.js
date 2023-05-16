@@ -7,9 +7,9 @@ export async function DELETE({ fetch, params }) {
   const { workflowId, taskId } = params
 
   try {
-    await deleteWorkflowTask(fetch, workflowId, taskId)
+    await deleteWorkflowTask(fetch, workflowId, taskId)  // FIXME: needs projectID
     // Get updated workflow with created task
-    const workflow = await getWorkflow(fetch, workflowId)
+    const workflow = await getWorkflow(fetch, workflowId)  // FIXME: needs projectID
     return new Response(JSON.stringify(workflow), { status: 200 })
   } catch (error) {
     console.error(error)
@@ -29,9 +29,9 @@ export async function PATCH({ fetch, params, request }){
   try {
     let updatedWorkflowTask
     if (updateArgs) {
-      updatedWorkflowTask = await updateWorkflowTaskArguments(fetch, workflowId, taskId, updateArgs)
+      updatedWorkflowTask = await updateWorkflowTaskArguments(fetch, workflowId, taskId, updateArgs)  // FIXME: needs projectID
     } else if (updateMeta) {
-      updatedWorkflowTask = await updateWorkflowTaskMetadata(fetch, workflowId, taskId, updateMeta)
+      updatedWorkflowTask = await updateWorkflowTaskMetadata(fetch, workflowId, taskId, updateMeta)  // FIXME: needs projectID
     }
     return new Response(JSON.stringify(updatedWorkflowTask), { status: 200 })
   } catch (error) {
