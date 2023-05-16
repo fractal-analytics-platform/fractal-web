@@ -3,6 +3,11 @@ import { PostResourceException } from '$lib/common/errors'
 
 // PROJECT ENDPOINTS
 
+/**
+ * Fetches the list of projects from the server
+ * @param fetch
+ * @returns {Promise<*>}
+ */
 export async function listProjects(fetch) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project/', {
@@ -18,6 +23,12 @@ export async function listProjects(fetch) {
   throw new Error('Unable to list projects')
 }
 
+/**
+ * Creates a new project in the server
+ * @param fetch
+ * @param data
+ * @returns {Promise<*>}
+ */
 export async function createProject(fetch, data) {
   // Data is a FormData object
 
@@ -44,6 +55,12 @@ export async function createProject(fetch, data) {
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Fetches a project from the server
+ * @param fetch
+ * @param projectId
+ * @returns {Promise<*>}
+ */
 export async function getProject(fetch, projectId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
@@ -60,6 +77,13 @@ export async function getProject(fetch, projectId) {
   throw new Error('The client was not able to fetch the project')
 }
 
+/**
+ * Updates a project in the server
+ * @param fetch
+ * @param projectId
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function updateProject(fetch, projectId, formData) {
 
   const requestBody = {
@@ -84,6 +108,12 @@ export async function updateProject(fetch, projectId, formData) {
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Deletes a project from the server
+ * @param fetch
+ * @param projectId
+ * @returns {Promise<*>}
+ */
 export async function deleteProject(fetch, projectId) {
 
   return await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
@@ -96,6 +126,13 @@ export async function deleteProject(fetch, projectId) {
 
 // DATASET ENDPOINTS
 
+/**
+ * Creates a project's dataset in the server
+ * @param fetch
+ * @param projectId
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function createDataset(fetch, projectId, formData) {
 
   const requestData = {
@@ -123,6 +160,13 @@ export async function createDataset(fetch, projectId, formData) {
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Fetches a project's dataset from the server
+ * @param fetch
+ * @param projectId
+ * @param datasetId
+ * @returns {Promise<*>}
+ */
 export async function getDataset(fetch, projectId, datasetId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}`, {
@@ -139,6 +183,14 @@ export async function getDataset(fetch, projectId, datasetId) {
   throw new Error('The client was not able to fetch the dataset')
 }
 
+/**
+ * Updates a project's dataset in the server
+ * @param fetch
+ * @param projectId
+ * @param datasetId
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function updateDataset(fetch, projectId, datasetId, formData) {
 
   const requestBody = {
@@ -172,6 +224,13 @@ export async function updateDataset(fetch, projectId, datasetId, formData) {
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Deletes a project's dataset from the server
+ * @param fetch
+ * @param projectId
+ * @param datasetId
+ * @returns {Promise<boolean>}
+ */
 export async function deleteDataset(fetch, projectId, datasetId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}`, {
@@ -187,6 +246,16 @@ export async function deleteDataset(fetch, projectId, datasetId) {
   throw new Error('The dataset was not deleted by the server')
 }
 
+// DATASET RESOURCE ENDPOINTS
+
+/**
+ * Creates a project's dataset resource in the server
+ * @param fetch
+ * @param projectId
+ * @param datasetId
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function createDatasetResource(fetch, projectId, datasetId, formData) {
 
   const requestBody = {
@@ -211,6 +280,14 @@ export async function createDatasetResource(fetch, projectId, datasetId, formDat
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Deletes a project's dataset resource from the server
+ * @param fetch
+ * @param projectId
+ * @param datasetId
+ * @param resourceId
+ * @returns {Promise<boolean>}
+ */
 export async function deleteDatasetResource(fetch, projectId, datasetId, resourceId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,{
@@ -228,6 +305,12 @@ export async function deleteDatasetResource(fetch, projectId, datasetId, resourc
 
 // WORKFLOW ENDPOINTS
 
+/**
+ * Fetches the list of workflows of a project from the server
+ * @param fetch
+ * @param projectId
+ * @returns {Promise<*>}
+ */
 export async function getWorkflows(fetch, projectId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
@@ -244,6 +327,13 @@ export async function getWorkflows(fetch, projectId) {
   throw new Error('The client was not able to fetch project workflows')
 }
 
+/**
+ * Request the import of a project's workflow to the server
+ * @param fetch
+ * @param projectId
+ * @param workflowMetadata
+ * @returns {Promise<*>}
+ */
 export async function importWorkflow(fetch, projectId, workflowMetadata) {
 
   const headers = new Headers()
@@ -267,6 +357,12 @@ export async function importWorkflow(fetch, projectId, workflowMetadata) {
 
 // JOB ENDPOINTS
 
+/**
+ * Fetches the list of jobs of a project from the server
+ * @param fetch
+ * @param projectId
+ * @returns {Promise<*>}
+ */
 export async function getJobs(fetch, projectId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/`, {
