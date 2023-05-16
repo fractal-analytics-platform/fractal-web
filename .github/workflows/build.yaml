@@ -30,6 +30,9 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        env:
+          FRACTAL_SERVER_HOST:
+            http://localhost:8000
         run: npm install
 
       - name: Build site
