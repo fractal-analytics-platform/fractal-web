@@ -1,6 +1,11 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
 import { PostResourceException } from "$lib/common/errors.js";
 
+/**
+ * Fetches a list of tasks from the server
+ * @param fetch
+ * @returns {Promise<*>}
+ */
 export async function listTasks(fetch) {
   console.log('Server fetching tasks')
 
@@ -19,6 +24,12 @@ export async function listTasks(fetch) {
   return await response.json()
 }
 
+/**
+ * Creates a new task in the server
+ * @param fetch
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function createTask(fetch, formData) {
 
   // Set headers
@@ -53,6 +64,12 @@ export async function createTask(fetch, formData) {
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Requests a task collection to the server
+ * @param fetch
+ * @param formData
+ * @returns {Promise<{info, status}|*>}
+ */
 export async function createTaskCollection(fetch, formData) {
 
   const headers = new Headers()
@@ -88,6 +105,12 @@ export async function createTaskCollection(fetch, formData) {
   throw new PostResourceException(await response.json())
 }
 
+/**
+ * Fetches a task collection status from the server
+ * @param fetch
+ * @param taskId
+ * @returns {Promise<*>}
+ */
 export async function taskCollectionStatus(fetch, taskId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}?verbose=True`,{
