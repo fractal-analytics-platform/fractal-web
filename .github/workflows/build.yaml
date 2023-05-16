@@ -34,6 +34,6 @@ jobs:
 
       - name: Build site
         env:
-          FRACTAL_SERVER_HOST:
-            http://localhost:8000
+          FRACTAL_SERVER_HOST: http://localhost:8000
+          AUTH_COOKIE_NAME: cookiename
         run: npm run build
