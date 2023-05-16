@@ -127,12 +127,12 @@ export async function createWorkflowTask(fetch, projectId, workflowId, formData)
     meta: {},
     args: {},
   }
-  task_id = formData.get('taskId')
+  const taskId = formData.get('taskId')
 
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/wftask/?task_id=${task_id}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/wftask/?task_id=${taskId}`,{
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -217,8 +217,8 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
   const requestBody = {}
 
   // Set input/output dataset (both required)
-  inputDatasetId = formData.get('inputDataset')
-  outputDatasetId = formData.get('outputDataset')
+  const inputDatasetId = formData.get('inputDataset')
+  const outputDatasetId = formData.get('outputDataset')
 
   // Set worker_init if provided
   if (formData.get('workerInit')) {
