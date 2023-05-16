@@ -13,7 +13,7 @@
   let enableCreateWorkflow = false
   let validationError = false
 
-  async function handleCreateWorkflow({ form, cancel, data }) {
+  async function handleCreateWorkflow({ form }) {
     /*
     // Prevent default
     cancel()
