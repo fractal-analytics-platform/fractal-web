@@ -1,6 +1,7 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
 import { PostResourceException } from '$lib/common/errors'
 
+// PROJECT ENDPOINTS
 
 export async function listProjects(fetch) {
 
@@ -93,6 +94,8 @@ export async function deleteProject(fetch, projectId) {
 
 }
 
+// DATASET ENDPOINTS
+
 export async function createDataset(fetch, projectId, formData) {
 
   const requestData = {
@@ -184,43 +187,6 @@ export async function deleteDataset(fetch, projectId, datasetId) {
   throw new Error('The dataset was not deleted by the server')
 }
 
-export async function getWorkflows(fetch, projectId) {
-
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
-    method: 'GET',
-    credentials: 'include',
-    mode: 'cors'
-  })
-
-  if (response.ok) {
-    // If the response is ok, return the workflows list as json
-    return await response.json()
-  }
-
-  throw new Error('The client was not able to fetch project workflows')
-}
-
-export async function importWorkflow(fetch, projectId, workflowMetadata) {
-
-  const headers = new Headers()
-  headers.set('Content-Type', 'application/json')
-
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/import/`, {
-    method: 'POST',
-    credentials: 'include',
-    mode: 'cors',
-    headers,
-    body: JSON.stringify(workflowMetadata)
-  })
-
-  if (response.ok){
-    // Return a workflow item
-    return await response.json()
-  }
-
-  throw new PostResourceException(await response.json())
-}
-
 export async function createDatasetResource(fetch, projectId, datasetId, formData) {
 
   const requestBody = {
@@ -260,7 +226,47 @@ export async function deleteDatasetResource(fetch, projectId, datasetId, resourc
   throw new Error('The client was not able to delete dataset resource')
 }
 
-// Get the jobs list for a project
+// WORKFLOW ENDPOINTS
+
+export async function getWorkflows(fetch, projectId) {
+
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'cors'
+  })
+
+  if (response.ok) {
+    // If the response is ok, return the workflows list as json
+    return await response.json()
+  }
+
+  throw new Error('The client was not able to fetch project workflows')
+}
+
+export async function importWorkflow(fetch, projectId, workflowMetadata) {
+
+  const headers = new Headers()
+  headers.set('Content-Type', 'application/json')
+
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/import/`, {
+    method: 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body: JSON.stringify(workflowMetadata)
+  })
+
+  if (response.ok){
+    // Return a workflow item
+    return await response.json()
+  }
+
+  throw new PostResourceException(await response.json())
+}
+
+// JOB ENDPOINTS
+
 export async function getJobs(fetch, projectId) {
 
   const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/`, {
