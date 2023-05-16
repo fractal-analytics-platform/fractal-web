@@ -9,3 +9,5 @@ repos:
   rev: v8.40.0
   hooks:
     -   id: eslint
+        files: \.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
+        types: [file]
