@@ -1,6 +1,6 @@
 import { getJob } from '$lib/server/api/v1/monitoring_api'
 
-export async function GET({ fetch, params }) { // FIXME: needs projectID
+export async function GET({ fetch, params }) {
 
   // Get the job from the server
   try {
