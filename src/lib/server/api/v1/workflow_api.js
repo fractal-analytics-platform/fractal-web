@@ -335,6 +335,8 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
 	// Set input/output dataset (both required)
 	const inputDatasetId = formData.get('inputDataset');
 	const outputDatasetId = formData.get('outputDataset');
+	console.log('inputDatasetId', inputDatasetId);
+	console.log('outputDatasetId', outputDatasetId);
 
 	// Set worker_init if provided
 	if (formData.get('workerInit')) {
@@ -346,7 +348,7 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
 
 	const response = await fetch(
 		FRACTAL_SERVER_HOST +
-			`/api/v1/project/${projectId}/workflow/${workflowId}/apply/?input_dataset_id=${inputDatasetId}&output_dataset_id=${outputDatasetId}}`,
+		`/api/v1/project/${projectId}/workflow/${workflowId}/apply/?input_dataset_id=${inputDatasetId}&output_dataset_id=${outputDatasetId}`,
 		{
 			method: 'POST',
 			credentials: 'include',
