@@ -53,6 +53,10 @@ defined in `package.json`, and points to
 written in `.lintstagedrc.json`, and it lists the checks to perform on each
 kind of file (e.g. `eslint` and then `prettier`).
 
+
+
+
+
 ## Web client startup
 
 The project comes with a default `.env.development` development environment file.
