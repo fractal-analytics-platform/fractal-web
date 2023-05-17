@@ -2,21 +2,19 @@ name: Check&Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
-    branches: ["main"]
-
+    branches: ['main']
 
 jobs:
-
   check_and_build:
-    name: "Node ${{ matrix.node-version }}"
+    name: 'Node ${{ matrix.node-version }}'
     runs-on: ubuntu-20.04
     timeout-minutes: 10
 
     strategy:
       matrix:
-        node-version: ["16", "18"]
+        node-version: ['16', '18']
 
     steps:
       - name: Check out repo

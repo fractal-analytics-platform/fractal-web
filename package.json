@@ -8,10 +8,9 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
-		"test": "playwright test",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"pre-commit": "lint-staged"
+		"pre-commit": "lint-staged && prettier --write ."
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.32.3",
