@@ -1,0 +1,8 @@
+{
+	"*.js": ["eslint", "prettier"],
+	"*.ts": ["eslint", "prettier"],
+	"*.svelte": "prettier",
+	"*.md": "prettier",
+	"*.json": "prettier",
+	"*.yaml": "prettier"
+}
