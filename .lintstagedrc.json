@@ -1,5 +1,8 @@
 {
-	"*.js": ["eslint"],
-	"*.ts": ["eslint"],
-	"*": ["prettier --write"]
+	"*.js": ["eslint", "prettier --list-different --write"],
+	"*.ts": ["eslint", "prettier --list-different --write"],
+	"*.svelte": "prettier --list-different --write",
+	"*.md": "prettier --list-different --write",
+	"*.json": "prettier --list-different --write",
+	"*.yaml": "prettier --list-different --write"
 }
