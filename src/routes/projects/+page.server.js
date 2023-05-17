@@ -1,3 +1,4 @@
+import { redirect, fail } from '@sveltejs/kit'
 import { listProjects, createProject } from '$lib/server/api/v1/project_api';
 
 async function loadProjects(fetch) {
@@ -26,15 +27,12 @@ export const actions = {
 
 		// Create project
 		const data = await request.formData();
+		let project
 		try {
-			const project = await createProject(fetch, data);
-			return {
-				project
-			};
+			project = await createProject(fetch, data);
 		} catch (error) {
-			return {
-				error: error.reason
-			};
+			return fail(422, { error: error.reason })
 		}
+		throw redirect(302, `/projects/${project.id}`)
 	}
 };
