@@ -1,94 +1,94 @@
-import { fail } from '@sveltejs/kit'
-import { getProject, getWorkflows, updateProject, createDataset, importWorkflow } from '$lib/server/api/v1/project_api'
-import { createWorkflow } from '$lib/server/api/v1/workflow_api'
+import { fail } from '@sveltejs/kit';
+import {
+	getProject,
+	getWorkflows,
+	updateProject,
+	createDataset,
+	importWorkflow
+} from '$lib/server/api/v1/project_api';
+import { createWorkflow } from '$lib/server/api/v1/workflow_api';
 
 export async function load({ fetch, params }) {
-  console.log('Load project page')
+	console.log('Load project page');
 
-  // Load project from Server
-  const project = await getProject(fetch, params.projectId)
-    .catch(error => console.error(error))
+	// Load project from Server
+	const project = await getProject(fetch, params.projectId).catch((error) => console.error(error));
 
-  const workflows = await getWorkflows(fetch, params.projectId)
-    .catch(error => console.error(error))
+	const workflows = await getWorkflows(fetch, params.projectId).catch((error) =>
+		console.error(error)
+	);
 
-  return {
-    project: project || undefined,
-    workflows: workflows || []
-  }
-
+	return {
+		project: project || undefined,
+		workflows: workflows || []
+	};
 }
-
 
 export const actions = {
+	update: async ({ fetch, request, params }) => {
+		console.log('Update project resource action');
 
-  update: async ({ fetch, request, params }) => {
-    console.log('Update project resource action')
+		const projectId = params.projectId;
+		const formData = await request.formData();
 
-    const projectId = params.projectId
-    const formData = await request.formData()
+		const updatedProjectResponse = await updateProject(fetch, projectId, formData).catch(
+			(error) => {
+				return fail(400, error.reason);
+			}
+		);
 
-    const updatedProjectResponse = await updateProject(fetch, projectId, formData)
-      .catch(error => {
-        return fail(400, error.reason)
-      })
+		return updatedProjectResponse;
+	},
 
-    return updatedProjectResponse
-  },
+	createDataset: async ({ fetch, request, params }) => {
+		const projectId = params.projectId;
+		const formData = await request.formData();
 
-  createDataset: async ({ fetch, request, params }) => {
+		const dataset = await createDataset(fetch, projectId, formData).catch((error) => {
+			return fail(400, error.reason);
+		});
 
-    const projectId = params.projectId
-    const formData = await request.formData()
+		return dataset;
+	},
 
-    const dataset = await createDataset(fetch, projectId, formData)
-      .catch(error => {
-        return fail(400, error.reason)
-      })
+	createWorkflow: async ({ fetch, request, params }) => {
+		const projectId = params.projectId;
+		const formData = await request.formData();
 
-    return dataset
-  },
+		console.log('Create workflow action', projectId, formData);
 
-  createWorkflow: async ({ fetch, request, params }) => {
+		const workflow = await createWorkflow(fetch, projectId, formData).catch((error) => {
+			console.error('Error creating workflow', error);
+			return fail(400, error.reason);
+		});
 
-    const projectId = params.projectId
-    const formData = await request.formData()
+		return workflow;
+	},
 
-    console.log('Create workflow action', projectId, formData)
+	importWorkflow: async ({ fetch, request, params }) => {
+		console.log('Import workflow action');
 
-    const workflow = await createWorkflow(fetch, projectId, formData)
-      .catch(error => {
-        console.error('Error creating workflow', error)
-        return fail(400, error.reason)
-      })
+		const formData = await request.formData();
 
-    return workflow
-  },
+		const workflowFile = formData.get('workflowFile');
+		try {
+			const workflowMetadata = await workflowFile
+				.text()
+				.then((text) => JSON.parse(text))
+				.catch((error) => {
+					throw new Error('The workflow file is not a valid JSON file', error);
+				});
 
-  importWorkflow: async ({ fetch, request, params }) => {
-    console.log('Import workflow action')
+			const workflow = await importWorkflow(fetch, params.projectId, workflowMetadata).catch(
+				(error) => {
+					console.error('Error importing workflow', error);
+					throw new Error(JSON.stringify(error.reason));
+				}
+			);
 
-    const formData = await request.formData()
-
-    const workflowFile = formData.get('workflowFile')
-    try {
-      const workflowMetadata = await workflowFile.text()
-        .then(text => JSON.parse(text))
-        .catch(error => {
-          throw new Error('The workflow file is not a valid JSON file', error)
-        })
-
-      const workflow = await importWorkflow(fetch, params.projectId, workflowMetadata)
-        .catch(error => {
-          console.error('Error importing workflow', error)
-          throw new Error(JSON.stringify(error.reason))
-        })
-
-      return workflow
-    }
-    catch (error) {
-      return fail(400, error.message)
-    }
-  }
-
-}
+			return workflow;
+		} catch (error) {
+			return fail(400, error.message);
+		}
+	}
+};

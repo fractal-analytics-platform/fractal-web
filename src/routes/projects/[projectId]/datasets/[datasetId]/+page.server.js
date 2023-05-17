@@ -1,69 +1,66 @@
-import { fail } from '@sveltejs/kit'
-import { getProject, getDataset, updateDataset, createDatasetResource } from '$lib/server/api/v1/project_api'
+import { fail } from '@sveltejs/kit';
+import {
+	getProject,
+	getDataset,
+	updateDataset,
+	createDatasetResource
+} from '$lib/server/api/v1/project_api';
 
-export async function load({ fetch, params }){
-  console.log('Load Dataset Page')
+export async function load({ fetch, params }) {
+	console.log('Load Dataset Page');
 
-  const { projectId, datasetId } = params
+	const { projectId, datasetId } = params;
 
-  const project = await getProject(fetch, projectId)
-    .catch(error => {
-      console.error(error)
-      return null
-    })
+	const project = await getProject(fetch, projectId).catch((error) => {
+		console.error(error);
+		return null;
+	});
 
-  const dataset = await getDataset(fetch, projectId, datasetId)
-    .catch(error => {
-      console.error(error)
-      return null
-    })
+	const dataset = await getDataset(fetch, projectId, datasetId).catch((error) => {
+		console.error(error);
+		return null;
+	});
 
-  return {
-    dataset,
-    project
-  }
+	return {
+		dataset,
+		project
+	};
 }
 
 export const actions = {
+	// Default action - Update dataset properties
+	updateDatasetProperties: async ({ fetch, request, params }) => {
+		console.log('Update Dataset Properties');
 
-  // Default action - Update dataset properties
-  updateDatasetProperties: async ({ fetch, request, params }) => {
+		const { projectId, datasetId } = params;
+		const formData = await request.formData();
 
-    console.log('Update Dataset Properties')
+		// Validation
+		const name = formData.get('name');
+		if (name === null || name === '') {
+			return fail(400, 'The dataset name can not be empty');
+		}
 
-    const { projectId, datasetId } = params
-    const formData = await request.formData()
+		try {
+			const dataset = await updateDataset(fetch, projectId, datasetId, formData);
+			return dataset;
+		} catch (error) {
+			console.error(error);
+			return fail(500, error.reason);
+		}
+	},
 
-    // Validation
-    const name = formData.get('name')
-    if (name === null || name === '') {
-      return fail(400, 'The dataset name can not be empty')
-    }
+	createDatasetResource: async ({ fetch, request, params }) => {
+		console.log('Create Dataset Resource');
 
-    try {
-      const dataset = await updateDataset(fetch, projectId, datasetId, formData)
-      return dataset
-    }
-    catch (error) {
-      console.error(error)
-      return fail(500, error.reason)
-    }
+		const { projectId, datasetId } = params;
+		const formData = await request.formData();
 
-  },
-
-  createDatasetResource: async ({ fetch, request, params }) => {
-    console.log('Create Dataset Resource')
-
-    const { projectId, datasetId } = params
-    const formData = await request.formData()
-
-    try {
-      return await createDatasetResource(fetch, projectId, datasetId, formData)
-    }
-    catch (error) {
-      console.error(error)
-      return fail(500, error.reason)
-    }
-  }
-
-}
+		try {
+			return await createDatasetResource(fetch, projectId, datasetId, formData);
+		} catch (error) {
+			console.error(error);
+			return fail(500, error.reason);
+		}
+	}
+};

@@ -1,9 +1,7 @@
 <script>
-
-  export let timestamp
-
+	export let timestamp;
 </script>
 
 <span>
-  {timestamp ? new Date(timestamp).toLocaleString() : 'No timestamp'}
+	{timestamp ? new Date(timestamp).toLocaleString() : 'No timestamp'}
 </span>
