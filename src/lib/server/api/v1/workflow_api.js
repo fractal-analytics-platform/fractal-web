@@ -1,17 +1,23 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private'
 import { PostResourceException } from '$lib/common/errors'
 
+/**
+ * Creates a new workflow in the server
+ * @param fetch
+ * @param projectId
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function createWorkflow(fetch, projectId, formData) {
 
   const requestData = {
     name: formData.get('workflowName'),
-    project_id: projectId
   }
 
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -27,9 +33,16 @@ export async function createWorkflow(fetch, projectId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function getWorkflow(fetch, workflowId) {
+/**
+ * Fetches a project's workflow from the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @returns {Promise<*>}
+ */
+export async function getWorkflow(fetch, projectId, workflowId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`, {
     method: 'GET',
     credentials: 'include',
     mode: 'cors'
@@ -42,7 +55,15 @@ export async function getWorkflow(fetch, workflowId) {
   throw new Error('The client was not able to retrieve the workflow')
 }
 
-export async function updateWorkflow(fetch, workflowId, formData) {
+/**
+ * Updates a project's workflow in the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param formData
+ * @returns {Promise<*|void>}
+ */
+export async function updateWorkflow(fetch, projectId, workflowId, formData) {
 
   // This method should patch some properties of a workflow resource
   const requestData = {
@@ -52,7 +73,7 @@ export async function updateWorkflow(fetch, workflowId, formData) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,{
     method: 'PATCH',
     credentials: 'include',
     mode: 'cors',
@@ -67,7 +88,15 @@ export async function updateWorkflow(fetch, workflowId, formData) {
   return PostResourceException(await response.json())
 }
 
-export async function reorderWorkflow(fetch, workflowId, workflowTasksOrder) {
+/**
+ * Reorders a project's workflow in the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param workflowTasksOrder
+ * @returns {Promise<*>}
+ */
+export async function reorderWorkflow(fetch, projectId, workflowId, workflowTasksOrder) {
 
   const patchData = {
     "reordered_workflowtask_ids": workflowTasksOrder
@@ -76,7 +105,7 @@ export async function reorderWorkflow(fetch, workflowId, workflowTasksOrder) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,{
     method: 'PATCH',
     credentials: 'include',
     mode: 'cors',
@@ -91,9 +120,16 @@ export async function reorderWorkflow(fetch, workflowId, workflowTasksOrder) {
   throw new Error('The client was not able to update the workflow order')
 }
 
-export async function deleteWorkflow(fetch, workflowId) {
+/**
+ * Deletes a project's workflow from the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @returns {Promise<boolean>}
+ */
+export async function deleteWorkflow(fetch, projectId, workflowId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`, {
     method: 'DELETE',
     credentials: 'include',
     mode: 'cors'
@@ -106,9 +142,16 @@ export async function deleteWorkflow(fetch, workflowId) {
   throw new Error('The client was not able to delete the workflow')
 }
 
-export async function exportWorkflow(fetch, workflowId) {
+/**
+ * Exports a project's workflow from the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @returns {Promise<*>}
+ */
+export async function exportWorkflow(fetch, projectId, workflowId) {
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/export`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/export`, {
     method: 'GET',
     credentials: 'include',
     mode: 'cors'
@@ -121,20 +164,27 @@ export async function exportWorkflow(fetch, workflowId) {
   throw new Error('The client was not able to retrieve the workflow export data from the server')
 }
 
-export async function createWorkflowTask(fetch, workflowId, formData) {
+/**
+ * Creates a new project's workflow task in the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param formData
+ * @returns {Promise<*>}
+ */
+export async function createWorkflowTask(fetch, projectId, workflowId, formData) {
 
   const requestBody = {
     order: formData.get('taskOrder') || undefined,
     meta: {},
     args: {},
-    task_id: formData.get('taskId'),
-    workflow_id: workflowId
   }
+  const taskId = formData.get('taskId')
 
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/add-task/`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/wftask/?task_id=${taskId}`,{
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -149,7 +199,16 @@ export async function createWorkflowTask(fetch, workflowId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-export async function updateWorkflowTaskArguments(fetch, workflowId, workflowTaskId, args) {
+/**
+ * Updates a project's workflow task in the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param workflowTaskId
+ * @param args
+ * @returns {Promise<*>}
+ */
+export async function updateWorkflowTaskArguments(fetch, projectId, workflowId, workflowTaskId, args) {
 
   const requestBody = {
     args: args
@@ -158,7 +217,7 @@ export async function updateWorkflowTaskArguments(fetch, workflowId, workflowTas
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/edit-task/${workflowTaskId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,{
     method: 'PATCH',
     credentials: 'include',
     mode: 'cors',
@@ -174,7 +233,16 @@ export async function updateWorkflowTaskArguments(fetch, workflowId, workflowTas
   throw new PostResourceException(await response.json())
 }
 
-export async function updateWorkflowTaskMetadata(fetch, workflowId, workflowTaskId, meta) {
+/**
+ * Updates a project's workflow task in the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param workflowTaskId
+ * @param meta
+ * @returns {Promise<*>}
+ */
+export async function updateWorkflowTaskMetadata(fetch, projectId, workflowId, workflowTaskId, meta) {
 
   const requestBody = {
     meta: meta
@@ -183,7 +251,7 @@ export async function updateWorkflowTaskMetadata(fetch, workflowId, workflowTask
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/edit-task/${workflowTaskId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,{
     method: 'PATCH',
     credentials: 'include',
     mode: 'cors',
@@ -199,9 +267,17 @@ export async function updateWorkflowTaskMetadata(fetch, workflowId, workflowTask
   throw new PostResourceException(await response.json())
 }
 
-export async function deleteWorkflowTask(fetch, workflowId, workflowTaskId){
+/**
+ * Deletes a project's workflow task from the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param workflowTaskId
+ * @returns {Promise<boolean>}
+ */
+export async function deleteWorkflowTask(fetch, projectId, workflowId, workflowTaskId){
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/workflow/${workflowId}/rm-task/${workflowTaskId}`,{
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,{
     method: 'DELETE',
     credentials: 'include',
     mode: 'cors'
@@ -213,22 +289,22 @@ export async function deleteWorkflowTask(fetch, workflowId, workflowTaskId){
   throw new Error('The client was not able to delete the workflow task')
 }
 
-// Apply a workflow
+/**
+ * Requests the server to apply a project's workflow (i.e. run it)
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @param formData
+ * @returns {Promise<*>}
+ */
 export async function applyWorkflow(fetch, projectId, workflowId, formData) {
 
-  const requestBody = {
-    workflow_id: workflowId,
-    project_id: projectId,
-  }
+  const requestBody = {}
 
-  // Set input dataset if provided
-  if (formData.get('inputDataset')) {
-    requestBody.input_dataset_id = formData.get('inputDataset')
-  }
-  // Set output dataset if provided
-  if (formData.get('outputDataset')) {
-    requestBody.output_dataset_id = formData.get('outputDataset')
-  }
+  // Set input/output dataset (both required)
+  const inputDatasetId = formData.get('inputDataset')
+  const outputDatasetId = formData.get('outputDataset')
+
   // Set worker_init if provided
   if (formData.get('workerInit')) {
     requestBody.worker_init = formData.get('workerInit')
@@ -237,7 +313,7 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
   const headers = new Headers()
   headers.set('Content-Type', 'application/json')
 
-  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/apply/`, {
+  const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/apply/?input_dataset_id=${inputDatasetId}&output_dataset_id=${outputDatasetId}}`, {
     method: 'POST',
     credentials: 'include',
     mode: 'cors',
@@ -252,10 +328,16 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
   throw new PostResourceException(await response.json())
 }
 
-// Download a workflow job log as zip file
-export async function downloadWorkflowJobLog(fetch, workflowJobId) {
+/**
+ * Downloads a project's workflow job log as zip file
+ * @param fetch
+ * @param projectId
+ * @param workflowJobId
+ * @returns {Promise<*|Blob>}
+ */
+export async function downloadWorkflowJobLog(fetch, projectId, workflowJobId) {
 
-    const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/download/${workflowJobId}`, {
+    const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/${workflowJobId}/download/`, {
       method: 'GET',
       credentials: 'include',
       mode: 'cors'
