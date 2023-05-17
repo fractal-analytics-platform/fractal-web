@@ -2,12 +2,10 @@ import { redirect, fail } from '@sveltejs/kit'
 import { listProjects, createProject } from '$lib/server/api/v1/project_api';
 
 async function loadProjects(fetch) {
-	const projects = await listProjects(fetch).catch((error) => {
+	return await listProjects(fetch).catch((error) => {
 		console.error(error);
 		return [];
 	});
-
-	return projects;
 }
 
 export async function load({ fetch }) {
