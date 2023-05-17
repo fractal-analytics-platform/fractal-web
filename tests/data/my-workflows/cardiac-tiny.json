@@ -1,119 +1,119 @@
 {
-  "name": "Workflow cardiac-tiny",
-  "task_list": [
-    {
-      "order": 0,
-      "meta": {
-        "executor": "cpu-mid"
-      },
-      "args": {
-        "allowed_channels": [
-          {
-            "colormap": "00FFFF",
-            "wavelength_id": "A01_C01",
-            "end": 800,
-            "label": "DAPI",
-            "start": 110
-          },
-          {
-            "colormap": "FF00FF",
-            "end": 290,
-            "wavelength_id": "A01_C02",
-            "label": "nanog",
-            "start": 110
-          },
-          {
-            "colormap": "FFFF00",
-            "end": 1600,
-            "wavelength_id": "A02_C03",
-            "label": "Lamin B1",
-            "start": 110
-          }
-        ],
-        "coarsening_xy": 2,
-        "num_levels": 5,
-        "image_extension": "png"
-      },
-      "task": {
-        "name": "Create OME-Zarr structure",
-        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
-      }
-    },
-    {
-      "order": 1,
-      "meta": null,
-      "args": null,
-      "task": {
-        "name": "Convert Yokogawa to OME-Zarr",
-        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
-      }
-    },
-    {
-      "order": 2,
-      "meta": null,
-      "args": null,
-      "task": {
-        "name": "Copy OME-Zarr structure",
-        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
-      }
-    },
-    {
-      "order": 3,
-      "meta": null,
-      "args": null,
-      "task": {
-        "name": "Maximum Intensity Projection",
-        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
-      }
-    },
-    {
-      "order": 4,
-      "meta": {
-        "executor": "cpu-mid"
-      },
-      "args": {
-        "level": 2,
-        "wavelength_id": "A01_C01",
-        "output_label_name": "nuclei",
-        "input_ROI_table": "well_ROI_table",
-        "model_type": "nuclei",
-        "diameter_level0": 60
-      },
-      "task": {
-        "name": "Cellpose Segmentation",
-        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
-      }
-    },
-    {
-      "order": 5,
-      "meta": {
-        "executor": "cpu-mid"
-      },
-      "args": {
-        "level": 0,
-        "input_ROI_table": "well_ROI_table",
-        "workflow_file": "/home/tommaso/Fractal/fractal-demos/examples/01_cardio_tiny_dataset/regionprops_from_existing_labels_feature.yaml",
-        "input_specs": {
-          "dapi_img": {
-            "type": "image",
-            "wavelength_id": "A01_C01"
-          },
-          "label_img": {
-            "type": "label",
-            "label_name": "nuclei"
-          }
-        },
-        "output_specs": {
-          "regionprops_DAPI": {
-            "type": "dataframe",
-            "table_name": "nuclei"
-          }
-        }
-      },
-      "task": {
-        "name": "Napari workflows wrapper",
-        "source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
-      }
-    }
-  ]
+	"name": "Workflow cardiac-tiny",
+	"task_list": [
+		{
+			"order": 0,
+			"meta": {
+				"executor": "cpu-mid"
+			},
+			"args": {
+				"allowed_channels": [
+					{
+						"colormap": "00FFFF",
+						"wavelength_id": "A01_C01",
+						"end": 800,
+						"label": "DAPI",
+						"start": 110
+					},
+					{
+						"colormap": "FF00FF",
+						"end": 290,
+						"wavelength_id": "A01_C02",
+						"label": "nanog",
+						"start": 110
+					},
+					{
+						"colormap": "FFFF00",
+						"end": 1600,
+						"wavelength_id": "A02_C03",
+						"label": "Lamin B1",
+						"start": 110
+					}
+				],
+				"coarsening_xy": 2,
+				"num_levels": 5,
+				"image_extension": "png"
+			},
+			"task": {
+				"name": "Create OME-Zarr structure",
+				"source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
+			}
+		},
+		{
+			"order": 1,
+			"meta": null,
+			"args": null,
+			"task": {
+				"name": "Convert Yokogawa to OME-Zarr",
+				"source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
+			}
+		},
+		{
+			"order": 2,
+			"meta": null,
+			"args": null,
+			"task": {
+				"name": "Copy OME-Zarr structure",
+				"source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
+			}
+		},
+		{
+			"order": 3,
+			"meta": null,
+			"args": null,
+			"task": {
+				"name": "Maximum Intensity Projection",
+				"source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
+			}
+		},
+		{
+			"order": 4,
+			"meta": {
+				"executor": "cpu-mid"
+			},
+			"args": {
+				"level": 2,
+				"wavelength_id": "A01_C01",
+				"output_label_name": "nuclei",
+				"input_ROI_table": "well_ROI_table",
+				"model_type": "nuclei",
+				"diameter_level0": 60
+			},
+			"task": {
+				"name": "Cellpose Segmentation",
+				"source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
+			}
+		},
+		{
+			"order": 5,
+			"meta": {
+				"executor": "cpu-mid"
+			},
+			"args": {
+				"level": 0,
+				"input_ROI_table": "well_ROI_table",
+				"workflow_file": "/home/tommaso/Fractal/fractal-demos/examples/01_cardio_tiny_dataset/regionprops_from_existing_labels_feature.yaml",
+				"input_specs": {
+					"dapi_img": {
+						"type": "image",
+						"wavelength_id": "A01_C01"
+					},
+					"label_img": {
+						"type": "label",
+						"label_name": "nuclei"
+					}
+				},
+				"output_specs": {
+					"regionprops_DAPI": {
+						"type": "dataframe",
+						"table_name": "nuclei"
+					}
+				}
+			},
+			"task": {
+				"name": "Napari workflows wrapper",
+				"source": "pip-local:fractal_tasks_core-0.9.0-py3-none-any.whl"
+			}
+		}
+	]
 }

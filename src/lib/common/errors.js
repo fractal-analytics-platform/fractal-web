@@ -1,3 +1,3 @@
 export function PostResourceException(response) {
-  this.reason = response
+	this.reason = response;
 }

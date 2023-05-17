@@ -14,18 +14,21 @@ This is the repository that contains the **Fractal web client**. Find more infor
 
 Version 18 or 19 of Node.js is needed (check your version with `node -v`).
 If these versions are not available via your favorite package installer, you can install them from [this link](https://nodejs.org/en/download) for your specific platform. Another option is to use [nvm](https://github.com/nvm-sh/nvm), e.g. via
+
 ```bash
 nvm install 19
 nvm alias default 19
 ```
 
 Clone this repository
+
 ```bash
 git clone https://github.com/fractal-analytics-platform/fractal-web.git
 cd fractal-web
 ```
 
 Install the package
+
 ```bash
 npm install
 ```
@@ -46,6 +49,7 @@ FRACTAL_SERVER_HOST=http://localhost:8888
 ```
 
 Run the client application via
+
 ```bash
 npm run dev -- --open
 ```
