@@ -32,6 +32,7 @@
 	"dependencies": {
 		"@vincjo/datatables": "^1.6.0",
 		"jose": "^4.14.4",
+		"pre-commit": "^1.2.2",
 		"sweetalert2": "^11.4.37"
 	}
 }
