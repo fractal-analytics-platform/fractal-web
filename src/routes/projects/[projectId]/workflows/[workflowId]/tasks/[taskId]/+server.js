@@ -4,12 +4,12 @@ import { getWorkflow, deleteWorkflowTask, updateWorkflowTaskArguments, updateWor
 export async function DELETE({ fetch, params }) {
   console.log('Delete workflow task')
 
-  const { workflowId, taskId } = params
+  const { projectId, workflowId, taskId } = params
 
   try {
-    await deleteWorkflowTask(fetch, workflowId, taskId)
+    await deleteWorkflowTask(fetch, projectId, workflowId, taskId)
     // Get updated workflow with created task
-    const workflow = await getWorkflow(fetch, workflowId)
+    const workflow = await getWorkflow(fetch, projectId, workflowId)
     return new Response(JSON.stringify(workflow), { status: 200 })
   } catch (error) {
     console.error(error)
@@ -24,14 +24,14 @@ export async function PATCH({ fetch, params, request }){
   const updateArgs = data.args
   const updateMeta = data.meta
 
-  const { workflowId, taskId } = params
+  const { projectId, workflowId, taskId } = params
 
   try {
     let updatedWorkflowTask
     if (updateArgs) {
-      updatedWorkflowTask = await updateWorkflowTaskArguments(fetch, workflowId, taskId, updateArgs)
+      updatedWorkflowTask = await updateWorkflowTaskArguments(fetch, projectId, workflowId, taskId, updateArgs)
     } else if (updateMeta) {
-      updatedWorkflowTask = await updateWorkflowTaskMetadata(fetch, workflowId, taskId, updateMeta)
+      updatedWorkflowTask = await updateWorkflowTaskMetadata(fetch, projectId, workflowId, taskId, updateMeta)
     }
     return new Response(JSON.stringify(updatedWorkflowTask), { status: 200 })
   } catch (error) {

@@ -5,7 +5,7 @@
   import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte'
   import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte'
 
-  let projectId = $page.params.id
+  let projectId = $page.params.projectId
   let datasetId = $page.params.datasetId
 
   $: project = $page.data.project

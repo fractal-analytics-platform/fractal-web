@@ -22,7 +22,7 @@
   }
 
   async function handleEntryUpdate(updatedEntry) {
-		const projectId = $page.params.id
+		const projectId = $page.params.projectId
     try {
       const updatedMetaProperties = await updateFormEntry(projectId, workflowId, taskId, updatedEntry, 'meta')
       metaProperties = updatedMetaProperties.meta

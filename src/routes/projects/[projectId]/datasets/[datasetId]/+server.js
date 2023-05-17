@@ -2,11 +2,11 @@ import { deleteDataset } from '$lib/server/api/v1/project_api'
 
 export async function DELETE({ fetch, params }) {
 
-  const { id, datasetId } = params;
+  const { projectId, datasetId } = params;
 
-  console.log('DELETE project, dataset:', id, datasetId)
+  console.log('DELETE project, dataset:', projectId, datasetId)
 
-  return await deleteDataset(fetch, id, datasetId)
+  return await deleteDataset(fetch, projectId, datasetId)
     .then(() => {
       return new Response(null, { status: 200 })
     })
