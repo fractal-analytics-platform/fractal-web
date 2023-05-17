@@ -18,7 +18,7 @@
 	});
 
 	async function fetchJob() {
-		const request = await fetch(`/projects/${$page.params.id}/jobs/${workflowJobId}`, {
+		const request = await fetch(`/projects/${$page.params.projectId}/jobs/${workflowJobId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
