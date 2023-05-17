@@ -10,7 +10,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"pre-commit": "lint-staged && prettier --write ."
+		"pre-commit": "lint-staged"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.32.3",
