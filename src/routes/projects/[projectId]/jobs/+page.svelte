@@ -7,6 +7,7 @@
 	import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
+	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
 	// Component properties
 	let project = $page.data.project;
@@ -100,6 +101,30 @@
 			document.body.removeChild(link);
 		}
 	}
+
+	async function handleJobCancel(jobId) {
+		console.log('Stop running job');
+
+		const response = await fetch(`/projects/${project.id}/jobs/${jobId}?action=stop`, {
+			method: 'PATCH',
+			credentials: 'include'
+		});
+
+		if (response.ok) {
+			// Refresh page
+			window.location.reload();
+		} else {
+			console.error('Error stopping job');
+			const errorResponse = await response.json();
+			new StandardErrorAlert({
+				target: document.getElementById('jobUpdatesError'),
+				props: {
+					error: errorResponse.error
+				}
+			});
+		}
+
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -150,6 +175,7 @@
 					>
 				</div>
 			</div>
+			<div id='jobUpdatesError' />
 			<table class="table">
 				<thead class="table-light">
 					<tr>
@@ -256,13 +282,21 @@
 													logsModal.show();
 												}}
 											>
-												<i class="bi-list-columns-reverse" />
+												<i class='bi-list-columns-reverse' />
 												Logs
 											</button>
 											<button
-												class="btn btn-light"
+												class='btn btn-light'
 												on:click={handleJobLogsDownload.bind(this, row.id)}
-												><i class="bi-arrow-down-circle" /></button
+											><i class='bi-arrow-down-circle' /></button
+											>
+										{/if}
+										{#if row.status === 'running' }
+											<button
+												class='btn btn-danger'
+												on:click={handleJobCancel.bind(this, row.id)}
+											><i class='bi-x-circle' /> Cancel
+											</button
 											>
 										{/if}
 									</td>
