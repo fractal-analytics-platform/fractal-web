@@ -1,7 +1,7 @@
 <script>
 	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
 
-	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"x": {"title": "X", "description": "This is the description of argument x", "type": "integer"}, "y": {"title": "Y", "type": "string"}}, "required": ["x"], "additionalProperties": false}\n';
+	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"x": {"title": "X", "description": "This is the description of argument x", "default": 3, "type": "integer"}, "y": {"title": "Y", "type": "string"}}, "additionalProperties": false}';
 	const parsedSchema = JSON.parse(jsonTaskSchema);
 
 	const schemaProperties = parsedSchema.properties;
@@ -11,7 +11,7 @@
 	for (const [key, value] of Object.entries(schemaProperties)) {
 		value.key = key;
 		taskArguments.push(value);
-		taskArgumentsValues[key] = schemaProperties[key].defaultValue || 'something';
+		taskArgumentsValues[key] = schemaProperties[key].default;
 	}
 
 	console.log(taskArgumentsValues);
