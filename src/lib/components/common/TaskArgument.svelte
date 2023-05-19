@@ -1,0 +1,60 @@
+<script>
+	/**
+	 * TaskArgument svelte component renders a dom element with information about a task argument.
+	 *
+	 * This component shall allow a user to specify a new value for the property it's been displayed
+	 * within the dom.
+	 */
+
+	import { createEventDispatcher } from 'svelte';
+
+	// Task argument key within task schema or object schema property
+	export let key;
+
+	// Task argument index within a task schema list property
+	export let index;
+
+	// The title of this task argument
+	export let title;
+
+	// The type of this task argument
+	export let type;
+
+	// The description of this task argument
+	export let description = 'No description provided';
+
+	// The value of this task argument
+	export let value;
+
+	// The default value of this task argument
+	export let defaultValue;
+
+	// TODO: Check value and default value
+	// If a given value is undefined, then value should be assigned defaultValue.
+	// If no defaultValue is given, then value should be undefined.
+
+	// Event dispatcher
+	const dispatch = createEventDispatcher();
+
+	function handleTaskArgumentUpdate(event) {
+		dispatch('argumentUpdated', { key, index, value });
+	}
+
+</script>
+
+<div id='{key}' class='card'>
+  <div class='card-body'>
+    <h1>{title}</h1>
+    <div>
+      <p>{type}</p>
+      <p>{description}</p>
+    </div>
+    <div>
+      <span class='bg-light'><code>{defaultValue}</code></span>
+      <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+        <input type='text' bind:value={value}>
+        <button class='btn btn-primary'>Update</button>
+      </form>
+    </div>
+  </div>
+</div>
