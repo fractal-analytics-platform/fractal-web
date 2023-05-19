@@ -91,7 +91,8 @@ The default value set by the server is 180 seconds, after that the token expires
 in order for the client request to be authorized.
 For user experience reasons, it is suggested to set the `JWT_EXPIRE_SECONDS=84600` on the server.
 
-**Note**: The [example_server_startup folder](tests/data/example_server_startup) contains an example of how to install and startup a `fractal-server` instance.
+**Note**: The [example_server_startup folder](lib/data/example_server_startup) contains an example of how to install and
+startup a `fractal-server` instance.
 
 # Client architecture
 
