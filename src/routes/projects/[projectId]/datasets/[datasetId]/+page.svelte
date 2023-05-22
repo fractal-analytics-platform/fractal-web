@@ -145,23 +145,23 @@
 					</li>
 				</ul>
 			</div>
-			<div class="col-8">
-				<div class="d-flex align-items-center justify-content-between">
-					<span class="lead py-3">Dataset resources</span>
-					<a
-						href="#"
-						class="btn btn-primary btn-sm"
-						data-bs-toggle="modal"
-						data-bs-target="#createDatasetResourceModal">New resource</a
+			<div class='col-8'>
+				<div class='d-flex align-items-center justify-content-between'>
+					<span class='lead py-3'>Dataset resources</span>
+					<button
+						class='btn btn-primary btn-sm'
+						data-bs-toggle='modal'
+						data-bs-target='#createDatasetResourceModal'>New resource
+					</button
 					>
 				</div>
-				<table class="table table-bordered caption-top align-middle">
-					<thead class="bg-light">
-						<tr>
-							<th class="col-1">Id</th>
-							<th class="col-9">Source</th>
-							<th class="col-2">Options</th>
-						</tr>
+				<table class='table table-bordered caption-top align-middle'>
+					<thead class='bg-light'>
+					<tr>
+						<th class='col-1'>Id</th>
+						<th class='col-9'>Source</th>
+						<th class='col-2'>Options</th>
+					</tr>
 					</thead>
 					<tbody>
 						{#each dataset.resource_list as resource}

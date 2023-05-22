@@ -123,8 +123,22 @@
 				}
 			});
 		}
-
 	}
+
+	function openWorkflowJobInfoModal(jobId) {
+		workflowJobInfoId = jobId;
+		// eslint-disable-next-line
+		const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'), {});
+		infoModal.show();
+	}
+
+	function openWorkflowJobLogsModal(jobId) {
+		workflowJobInfoId = jobId;
+		// eslint-disable-next-line
+		const logsModal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'), {});
+		logsModal.show();
+	}
+
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -260,27 +274,15 @@
 									</td>
 									<td>
 										<button
-											class="btn btn-info"
-											on:click={() => {
-												workflowJobInfoId = row.id;
-												const infoModal = new bootstrap.Modal(
-													document.getElementById('workflowJobInfoModal'),
-													{}
-												);
-												infoModal.show();
-											}}><i class="bi-info-circle" /> Info</button
-										>
+											class='btn btn-info'
+											on:click|preventDefault={() => openWorkflowJobInfoModal(row.id)}>
+											<i class='bi-info-circle' />
+											Info
+										</button>
 										{#if row.status === 'failed' || row.status === 'done'}
 											<button
-												class="btn btn-light"
-												on:click={() => {
-													workflowJobInfoId = row.id;
-													const logsModal = new bootstrap.Modal(
-														document.getElementById('workflowJobLogsModal'),
-														{}
-													);
-													logsModal.show();
-												}}
+												class='btn btn-light'
+												on:click|preventDefault={() => openWorkflowJobLogsModal(row.id)}
 											>
 												<i class='bi-list-columns-reverse' />
 												Logs

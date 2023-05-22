@@ -82,7 +82,7 @@
 		dispatchEntryInserted();
 	}
 
-	function handleNewEntryInserted(event) {
+	function handleNewEntryInserted() {
 		dispatchEntryInserted();
 	}
 
