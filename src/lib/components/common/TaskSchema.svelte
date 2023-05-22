@@ -1,7 +1,7 @@
 <script>
 	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
 
-	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"x": {"title": "X", "description": "This is the description of argument x", "default": 3, "type": "integer"}, "y": {"title": "Y", "type": "string"}}, "additionalProperties": false}';
+	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"x": {"title": "X", "description": "This is the description of argument x", "default": 0, "type": "integer"}, "y": {"title": "Y", "type": "string"}, "z": {"title": "Z", "description": "A boolean field", "default": true, "type": "boolean"}}, "additionalProperties": false}\n';
 	const parsedSchema = JSON.parse(jsonTaskSchema);
 
 	const schemaProperties = parsedSchema.properties;
@@ -17,6 +17,7 @@
 	console.log(taskArgumentsValues);
 
 	function taskArgumentValueUpdated(event) {
+		console.debug(event.detail.value);
 		console.log('The task argument has updated', event.detail.key, event.detail.value);
 		taskArgumentsValues[event.detail.key] = event.detail.value;
 		console.log(taskArgumentsValues);

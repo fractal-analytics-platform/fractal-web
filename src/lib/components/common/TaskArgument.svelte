@@ -12,7 +12,7 @@
 	export let key;
 
 	// Task argument index within a task schema list property
-	export let index;
+	export let index = undefined;
 
 	// The title of this task argument
 	export let title;
@@ -25,6 +25,10 @@
 
 	// The value of this task argument
 	export let value;
+
+	if (type !== undefined && type === 'boolean') {
+		value = Boolean(value);
+	}
 
 	// The default value of this task argument
 	export let defaultValue;
@@ -51,10 +55,26 @@
     </div>
     <div>
       <span class='bg-light'><code>{defaultValue}</code></span>
-      <form on:submit|preventDefault={handleTaskArgumentUpdate}>
-        <input type='text' bind:value={value}>
-        <button class='btn btn-primary'>Update</button>
-      </form>
+      {#if type === 'number' || type === 'integer' }
+        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+          <input type='number' bind:value={value}>
+          <button class='btn btn-primary'>Update</button>
+        </form>
+      {/if}
+
+      {#if type === 'string' }
+        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+          <input type='text' bind:value={value}>
+          <button class='btn btn-primary'>Update</button>
+        </form>
+      {/if}
+
+      {#if type === 'boolean' }
+        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+          <input type='checkbox' bind:checked={value}>
+          <button class='btn btn-primary'>Update</button>
+        </form>
+      {/if}
     </div>
   </div>
 </div>
