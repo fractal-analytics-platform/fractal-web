@@ -39,7 +39,7 @@
 		datasets = $page.data.datasets;
 	});
 
-	async function handleExportWorkflow(event) {
+	async function handleExportWorkflow() {
 		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/export`, {
 			method: 'GET',
 			credentials: 'include'
@@ -161,7 +161,7 @@
 		updatableWorkflowList = wftList;
 	}
 
-	async function handleWorkflowOrderUpdate(event) {
+	async function handleWorkflowOrderUpdate() {
 		const requestData = {
 			tasksOrder: updatableWorkflowList.map((t) => t.id)
 		};
@@ -180,6 +180,7 @@
 			console.log('Workflow task order updated');
 			// Successfully updated workflow task order
 			workflow = await request.json();
+			// eslint-disable-next-line
 			const modal = bootstrap.Modal.getInstance(
 				document.getElementById('editWorkflowTasksOrderModal')
 			);
@@ -205,6 +206,7 @@
 		if (response.ok) {
 			// Successfully applied workflow
 			const job = await response.json();
+			// eslint-disable-next-line
 			const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'));
 			modal.toggle();
 			// Navigate to project jobs page
@@ -298,13 +300,16 @@
 						<ul class="list-group list-group-flush">
 							{#each workflow.task_list as workflowTask}
 								<li
-									style="cursor: pointer"
+									style='cursor: pointer'
 									class="list-group-item list-group-item-action {$workflowTaskContext !==
 										undefined && $workflowTaskContext.id == workflowTask.id
 										? 'active'
 										: ''}"
 									data-fs-target={workflowTask.id}
 									on:click|preventDefault={setActiveWorkflowTaskContext}
+									on:keydown|preventDefault
+									on:keyup|preventDefault
+									on:keypress|preventDefault
 								>
 									{workflowTask.task.name} #{workflowTask.id}
 								</li>
@@ -333,26 +338,26 @@
 									)}
 								/>
 							</div>
-							<ul class="nav nav-tabs card-header-tabs">
-								<li class="nav-item">
-									<a
-										data-bs-toggle="tab"
-										data-bs-target="#args-tab"
+							<ul class='nav nav-tabs card-header-tabs'>
+								<li class='nav-item'>
+									<button
+										data-bs-toggle='tab'
+										data-bs-target='#args-tab'
 										class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-										aria-current="true"
-										href="#">Arguments</a
-									>
+										aria-current='true'
+									>Arguments
+									</button>
 								</li>
-								<li class="nav-item">
-									<a
-										data-bs-toggle="tab"
-										data-bs-target="#meta-tab"
+								<li class='nav-item'>
+									<button
+										data-bs-toggle='tab'
+										data-bs-target='#meta-tab'
 										class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
-										href="#">Meta</a
-									>
+									>Meta
+									</button>
 								</li>
-								<li class="nav-item">
-									<a class="nav-link disabled">Info</a>
+								<li class='nav-item'>
+									<span class='nav-link disabled'>Info</span>
 								</li>
 							</ul>
 						{:else}
@@ -413,13 +418,14 @@
 					</div>
 
 					<div class="mb-3">
-						<label class="form-label">Task order in workflow</label>
+						<label for='taskOrder' class='form-label'>Task order in workflow</label>
 						<input
-							type="number"
-							name="taskOrder"
-							class="form-control"
-							placeholder="Leave it blank to append at the end"
-							min="0"
+							id='taskOrder'
+							type='number'
+							name='taskOrder'
+							class='form-control'
+							placeholder='Leave it blank to append at the end'
+							min='0'
 							max={workflow?.task_list.length}
 						/>
 					</div>

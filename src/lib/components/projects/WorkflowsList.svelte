@@ -13,32 +13,7 @@
 	let enableCreateWorkflow = false;
 	let validationError = false;
 
-	async function handleCreateWorkflow({ form, cancel, data }) {
-		/*
-    // Prevent default
-    cancel()
-
-    // Set the form data projectId to the referenced project id
-    data.set('projectId', projectId)
-
-    await createWorkflow(data)
-      .then(workflow => {
-        console.log(workflow)
-        form.reset()
-        goto(`/projects/${projectId}/workflows/${workflow.id}`)
-      })
-      .catch(error => {
-        console.error(error)
-        validationError = true
-        new StandardErrorAlert({
-          target: document.getElementById('workflowCreateAlertError'),
-          props: {
-            error
-          }
-        })
-      })
-
-     */
+	async function handleCreateWorkflow({ form }) {
 		return async ({ result }) => {
 			// If the result type is not failure, then a new workflow resource has been created
 			if (result.type !== 'failure') {
@@ -119,31 +94,31 @@
 	<div id="workflowCreateAlertError" />
 	<div id="workflowDeleteAlertError" />
 	<table class="table align-middle caption-top">
-		<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
-			<div class="d-flex align-items-center justify-content-between">
-				<span class="fw-normal">
-					<a
-						href="#"
-						class="text-decoration-none"
-						data-bs-toggle="modal"
-						data-bs-target="#importWorkflowModal">Import workflow</a
+		<caption class='text-bg-light border-top border-bottom pe-3 ps-3'>
+			<div class='d-flex align-items-center justify-content-between'>
+				<span class='fw-normal'>
+					<span
+						role='button'
+						class='text-decoration-none'
+						data-bs-toggle='modal'
+						data-bs-target='#importWorkflowModal'>Import workflow</span
 					>
 				</span>
 				<div>
 					<form
-						method="post"
-						action="?/createWorkflow"
-						class="row row-cols-lg-auto g-3 align-items-center"
+						method='post'
+						action='?/createWorkflow'
+						class='row row-cols-lg-auto g-3 align-items-center'
 						use:enhance={handleCreateWorkflow}
 					>
-						<div class="col-12">
-							<div class="input-group">
-								<div class="input-group-text">Name</div>
+						<div class='col-12'>
+							<div class='input-group'>
+								<div class='input-group-text'>Name</div>
 								<input
-									type="text"
+									type='text'
 									class="form-control {validationError ? 'is-invalid' : ''}"
-									placeholder="workflow name"
-									name="workflowName"
+									placeholder='workflow name'
+									name='workflowName'
 									on:change={handleWorkflowNameChange}
 								/>
 							</div>
