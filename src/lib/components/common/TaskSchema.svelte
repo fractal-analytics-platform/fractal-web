@@ -75,7 +75,7 @@
       type={taskSchema.type}
       items={taskSchema.items}
       propertiesSchema={taskSchema.properties}
-      value={taskArgumentsValues[taskSchema.key]}
+      bind:value={taskArgumentsValues[taskSchema.key]}
       defaultValue={taskSchema.default}
       on:argumentUpdated={taskArgumentValueUpdated}
     />

@@ -20,7 +20,7 @@
 	export let title;
 
 	// The type of this task argument
-	export let type;
+	export let type = undefined;
 	// Argument items definition - set if the argument has items in its schema
 	export let items = undefined;
 	// Argument properties definition - set if the argument has properties in its schema
@@ -36,7 +36,7 @@
 		value = Boolean(value);
 	}
 
-	if (type !== undefined && type === 'object' && propertiesSchema !== undefined) {
+	if (type !== undefined && type === 'object' && propertiesSchema !== undefined && value === undefined) {
 		value = {};
 		Object.keys(propertiesSchema).forEach(key => {
 			value[key] = undefined;
