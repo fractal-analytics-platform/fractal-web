@@ -1,18 +1,59 @@
 <script>
 	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
 
-	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "b": {"title": "B", "type": "string"}, "c": {"title": "C", "description": "A boolean field", "default": true, "type": "boolean"}, "d": {"title": "D", "description": "A list of numbers", "default": [0, 1, 2], "type": "array", "items": {"type": "integer"}}, "e": {"title": "E", "description": "A list of strings", "default": ["hello", "this", "test"], "type": "array", "items": {"type": "string"}}, "f": {"title": "F", "description": "A list of bools", "default": [true, false, false], "type": "array", "items": {"type": "boolean"}}, "g": {"title": "G", "description": "A nested list of integers", "default": [[1, 2], [3, 4], [5], [6]], "type": "array", "items": {"type": "array", "items": {"type": "integer"}}}, "h": {"title": "H", "description": "A nested list of strings", "default": [["this", "is"], ["a", "list"], ["of"], ["strings"]], "type": "array", "items": {"type": "array", "items": {"type": "string"}}}, "i": {"title": "I", "description": "A nested list of bools", "type": "array", "items": {"type": "array", "items": {"type": "boolean"}}}}, "required": ["i"], "additionalProperties": false}\n';
+	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}}, "required": ["obj2", "obj3"], "definitions": {"Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}}}}}\n';
 	const parsedSchema = JSON.parse(jsonTaskSchema);
 
 	const schemaProperties = parsedSchema.properties;
+	const schemaDefinitions = parsedSchema.definitions;
 
 	const taskArgumentsValues = {};
-	const taskArguments = [];
-	for (const [key, value] of Object.entries(schemaProperties)) {
-		value.key = key;
-		taskArguments.push(value);
-		taskArgumentsValues[key] = schemaProperties[key].default;
+	const taskArgumentsSchema = [];
+	for (const [key, propSchema] of Object.entries(schemaProperties)) {
+		let taskArgumentSchema = {};
+		// Should check whether this schema property has a reference value
+		// The reference value could be nested within a 'allOf' key
+		// Check allOf key presence
+		const hasAllOf = Object.keys(schemaProperties[key]).includes('allOf');
+		// Check that has a $ref key
+		const hasRef = Object.keys(schemaProperties[key]).includes('$ref');
+
+		if (hasAllOf || hasRef) {
+			console.log('The schema property has an external definition');
+			// Retrieve the schema definition
+			if (hasAllOf) {
+				// Get the definition reference from hasAllOf
+				const defReference = schemaProperties[key]['allOf'][0]['$ref'];
+				console.log(defReference);
+				const definitionKey = defReference.split('/').pop(-1);
+				console.log(definitionKey);
+				console.log(schemaDefinitions[definitionKey]);
+				const objectSchema = schemaDefinitions[definitionKey];
+				taskArgumentSchema = propSchema;
+				taskArgumentSchema.type = objectSchema.type;
+				taskArgumentSchema.properties = objectSchema.properties;
+			}
+
+			if (hasRef) {
+				// Get the definition reference from hasRef
+				const defReference = schemaProperties[key]['$ref'];
+				console.log(defReference);
+				const definitionKey = defReference.split('/').pop(-1);
+				console.log(definitionKey);
+				console.log(schemaDefinitions[definitionKey]);
+			} else {
+				taskArgumentSchema = propSchema;
+			}
+
+			// Add the taskArgumentSchema to the list
+			taskArgumentSchema.key = key;
+			taskArgumentsSchema.push(taskArgumentSchema);
+			taskArgumentsValues[key] = schemaProperties[key].default;
+		}
+
 	}
+
+	console.log(taskArgumentsValues);
 
 	function taskArgumentValueUpdated(event) {
 		console.debug('The task argument has updated', event.detail.key, event.detail.value);
@@ -24,16 +65,17 @@
 
 <div>
 
-  {#each taskArguments as taskProperty }
+  {#each taskArgumentsSchema as taskSchema }
 
     <TaskArgument
-      key={taskProperty.key}
-      title={taskProperty.title}
-      description={taskProperty.description}
-      type={taskProperty.type}
-      items={taskProperty.items}
-      value={taskArgumentsValues[taskProperty.key]}
-      defaultValue={taskProperty.default}
+      key={taskSchema.key}
+      title={taskSchema.title}
+      description={taskSchema.description}
+      type={taskSchema.type}
+      items={taskSchema.items}
+      propertiesSchema={taskSchema.properties}
+      value={taskArgumentsValues[taskSchema.key]}
+      defaultValue={taskSchema.default}
       on:argumentUpdated={taskArgumentValueUpdated}
     />
 

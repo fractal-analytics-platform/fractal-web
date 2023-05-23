@@ -8,6 +8,7 @@
 
 	import { createEventDispatcher } from 'svelte';
 	import TaskArgumentIterableValue from '$lib/components/common/TaskArgumentIterableValue.svelte';
+	import TaskArgumentProperty from '$lib/components/common/TaskArgumentProperty.svelte';
 
 	// Task argument key within task schema or object schema property
 	export let key;
@@ -20,8 +21,10 @@
 
 	// The type of this task argument
 	export let type;
-	// Inner type of task argument
+	// Argument items definition - set if the argument has items in its schema
 	export let items = undefined;
+	// Argument properties definition - set if the argument has properties in its schema
+	export let propertiesSchema = undefined;
 
 	// The description of this task argument
 	export let description = 'No description provided';
@@ -31,6 +34,13 @@
 
 	if (type !== undefined && type === 'boolean') {
 		value = Boolean(value);
+	}
+
+	if (type !== undefined && type === 'object' && propertiesSchema !== undefined) {
+		value = {};
+		Object.keys(propertiesSchema).forEach(key => {
+			value[key] = undefined;
+		});
 	}
 
 	// The default value of this task argument
@@ -45,6 +55,7 @@
 
 	function handleTaskArgumentUpdate() {
 		dispatch('argumentUpdated', { key, index, value });
+		console.log('Argument updated', value);
 	}
 
 </script>
@@ -85,6 +96,19 @@
         <form on:submit|preventDefault={handleTaskArgumentUpdate}>
           <span>Current value: {value}</span>
           <TaskArgumentIterableValue iterableValue={value} iterableSchema={items} />
+          <button class='btn btn-primary'>Update</button>
+        </form>
+      {/if}
+
+      {#if type === 'object'}
+        <p>{JSON.stringify(propertiesSchema)}</p>
+        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+          {#each Object.keys(propertiesSchema) as taskArgumentKey}
+            <TaskArgumentProperty
+              propertySchema={propertiesSchema[taskArgumentKey]}
+              bind:propertyValue={value[taskArgumentKey]}
+            ></TaskArgumentProperty>
+          {/each}
           <button class='btn btn-primary'>Update</button>
         </form>
       {/if}
