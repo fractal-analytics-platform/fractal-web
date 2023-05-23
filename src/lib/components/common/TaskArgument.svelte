@@ -43,7 +43,7 @@
 	// Event dispatcher
 	const dispatch = createEventDispatcher();
 
-	function handleTaskArgumentUpdate(event) {
+	function handleTaskArgumentUpdate() {
 		dispatch('argumentUpdated', { key, index, value });
 	}
 
