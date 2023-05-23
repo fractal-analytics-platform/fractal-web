@@ -21,7 +21,7 @@
 	// The type of this task argument
 	export let type;
 	// Inner type of task argument
-	export let itemsType = undefined;
+	export let items = undefined;
 
 	// The description of this task argument
 	export let description = 'No description provided';
@@ -56,7 +56,7 @@
     <div>
       <p>Type: {type}</p>
       <p>Description: {description}</p>
-      <p>ItemsType: {itemsType}</p>
+      <p>ItemsType: {items?.type}</p>
     </div>
     <div>
       <span class='bg-light'>Default value: <code>{defaultValue}</code></span>
@@ -84,7 +84,7 @@
       {#if type === 'array'}
         <form on:submit|preventDefault={handleTaskArgumentUpdate}>
           <span>Current value: {value}</span>
-          <TaskArgumentIterableValue iterableValue={value} iterableType={itemsType} />
+          <TaskArgumentIterableValue iterableValue={value} iterableSchema={items} />
           <button class='btn btn-primary'>Update</button>
         </form>
       {/if}

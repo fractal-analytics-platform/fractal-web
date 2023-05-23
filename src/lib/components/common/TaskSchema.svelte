@@ -1,7 +1,7 @@
 <script>
 	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
 
-	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "b": {"title": "B", "type": "string"}, "c": {"title": "C", "description": "A boolean field", "default": true, "type": "boolean"}, "d": {"title": "D", "description": "A list of numbers", "default": [0, 1, 2], "type": "array", "items": {"type": "integer"}}, "e": {"title": "E", "description": "A list of strings", "default": ["hello", "this", "test"], "type": "array", "items": {"type": "string"}}, "f": {"title": "F", "description": "A list of bools", "default": [true, false, false], "type": "array", "items": {"type": "boolean"}}, "g": {"title": "G", "description": "A list of anything", "type": "array", "items": {"type": "object", "additionalProperties": {"type": "integer"}}}}, "required": ["g"], "additionalProperties": false}\n';
+	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "b": {"title": "B", "type": "string"}, "c": {"title": "C", "description": "A boolean field", "default": true, "type": "boolean"}, "d": {"title": "D", "description": "A list of numbers", "default": [0, 1, 2], "type": "array", "items": {"type": "integer"}}, "e": {"title": "E", "description": "A list of strings", "default": ["hello", "this", "test"], "type": "array", "items": {"type": "string"}}, "f": {"title": "F", "description": "A list of bools", "default": [true, false, false], "type": "array", "items": {"type": "boolean"}}, "g": {"title": "G", "description": "A nested list of integers", "default": [[1, 2], [3, 4], [5], [6]], "type": "array", "items": {"type": "array", "items": {"type": "integer"}}}, "h": {"title": "H", "description": "A nested list of strings", "default": [["this", "is"], ["a", "list"], ["of"], ["strings"]], "type": "array", "items": {"type": "array", "items": {"type": "string"}}}, "i": {"title": "I", "description": "A nested list of bools", "type": "array", "items": {"type": "array", "items": {"type": "boolean"}}}}, "required": ["i"], "additionalProperties": false}\n';
 	const parsedSchema = JSON.parse(jsonTaskSchema);
 
 	const schemaProperties = parsedSchema.properties;
@@ -31,7 +31,7 @@
       title={taskProperty.title}
       description={taskProperty.description}
       type={taskProperty.type}
-      itemsType={taskProperty.items?.type}
+      items={taskProperty.items}
       value={taskArgumentsValues[taskProperty.key]}
       defaultValue={taskProperty.default}
       on:argumentUpdated={taskArgumentValueUpdated}

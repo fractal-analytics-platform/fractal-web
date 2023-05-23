@@ -1,11 +1,17 @@
 <script>
 
 	export let iterableValue = [];
-	export let iterableType = undefined;
+	export let iterableSchema = undefined;
+
+	let iterableType = undefined;
+	if (iterableSchema !== undefined) {
+		iterableType = iterableSchema.type;
+	}
 
 </script>
 
 <div>
+  <p>{iterableType}</p>
   {#each iterableValue as iterValue, index }
     <p>#{index} - {iterValue}</p>
 
@@ -19,6 +25,10 @@
 
     {#if iterableType === 'boolean' || iterableType === 'bool'}
       <input type='checkbox' bind:checked={iterValue}>
+    {/if}
+
+    {#if iterableType === 'array' || iterableType === 'list'}
+      <svelte:self iterableValue={iterValue} iterableSchema={iterableSchema.items}></svelte:self>
     {/if}
 
   {/each}
