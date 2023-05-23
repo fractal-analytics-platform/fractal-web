@@ -7,6 +7,7 @@
 	 */
 
 	import { createEventDispatcher } from 'svelte';
+	import TaskArgumentIterableValue from '$lib/components/common/TaskArgumentIterableValue.svelte';
 
 	// Task argument key within task schema or object schema property
 	export let key;
@@ -19,12 +20,14 @@
 
 	// The type of this task argument
 	export let type;
+	// Inner type of task argument
+	export let itemsType = undefined;
 
 	// The description of this task argument
 	export let description = 'No description provided';
 
 	// The value of this task argument
-	export let value;
+	export let value = undefined;
 
 	if (type !== undefined && type === 'boolean') {
 		value = Boolean(value);
@@ -49,12 +52,14 @@
 <div id='{key}' class='card'>
   <div class='card-body'>
     <h1>{title}</h1>
+    <p>Index: {index}</p>
     <div>
-      <p>{type}</p>
-      <p>{description}</p>
+      <p>Type: {type}</p>
+      <p>Description: {description}</p>
+      <p>ItemsType: {itemsType}</p>
     </div>
     <div>
-      <span class='bg-light'><code>{defaultValue}</code></span>
+      <span class='bg-light'>Default value: <code>{defaultValue}</code></span>
       {#if type === 'number' || type === 'integer' }
         <form on:submit|preventDefault={handleTaskArgumentUpdate}>
           <input type='number' bind:value={value}>
@@ -72,6 +77,14 @@
       {#if type === 'boolean' }
         <form on:submit|preventDefault={handleTaskArgumentUpdate}>
           <input type='checkbox' bind:checked={value}>
+          <button class='btn btn-primary'>Update</button>
+        </form>
+      {/if}
+
+      {#if type === 'array'}
+        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+          <span>Current value: {value}</span>
+          <TaskArgumentIterableValue iterableValue={value} iterableType={itemsType} />
           <button class='btn btn-primary'>Update</button>
         </form>
       {/if}
