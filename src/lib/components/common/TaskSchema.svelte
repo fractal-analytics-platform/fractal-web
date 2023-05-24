@@ -100,7 +100,10 @@
 
 </script>
 
-<div>
+<div class='card'>
+  <div class='card-header'>
+    Task Schema
+  </div>
 
   {#each taskArgumentsSchema as taskSchema }
 
