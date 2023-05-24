@@ -1,7 +1,7 @@
 <script>
 	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
 
-	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}}, "required": ["obj2", "obj3"], "definitions": {"Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}}}}}\n';
+	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}}, "required": ["obj2", "obj3"], "definitions": {"Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}, "c": {"title": "C", "type": "boolean"}, "d": {"title": "D", "default": [1, 2, 3], "type": "array", "items": {"type": "integer"}}}, "required": ["c"]}}}\n';
 	const parsedSchema = JSON.parse(jsonTaskSchema);
 
 	const schemaProperties = parsedSchema.properties;
@@ -41,6 +41,10 @@
 				const definitionKey = defReference.split('/').pop(-1);
 				console.log(definitionKey);
 				console.log(schemaDefinitions[definitionKey]);
+				const objectSchema = schemaDefinitions[definitionKey];
+				taskArgumentSchema = propSchema;
+				taskArgumentSchema.type = objectSchema.type;
+				taskArgumentSchema.properties = objectSchema.properties;
 			}
 
 		} else {

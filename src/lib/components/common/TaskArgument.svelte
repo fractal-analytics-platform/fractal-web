@@ -62,7 +62,7 @@
 
 <div id='{key}' class='card'>
   <div class='card-body'>
-    <h1>{title}</h1>
+    <h1>{title ?? key}</h1>
     <p>Index: {index}</p>
     <div>
       <p>Type: {type}</p>
@@ -103,10 +103,11 @@
       {#if type === 'object'}
         <p>{JSON.stringify(propertiesSchema)}</p>
         <form on:submit|preventDefault={handleTaskArgumentUpdate}>
-          {#each Object.keys(propertiesSchema) as taskArgumentKey}
+          {#each Object.keys(propertiesSchema) as propertyArgumentKey}
             <TaskArgumentProperty
-              propertySchema={propertiesSchema[taskArgumentKey]}
-              bind:propertyValue={value[taskArgumentKey]}
+              propertyKey={propertyArgumentKey}
+              propertySchema={propertiesSchema[propertyArgumentKey]}
+              bind:propertyValue={value[propertyArgumentKey]}
             ></TaskArgumentProperty>
           {/each}
           <button class='btn btn-primary'>Update</button>
