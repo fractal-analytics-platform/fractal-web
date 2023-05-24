@@ -4,5 +4,7 @@
 
 <div>
   <h1>Workflow arguments list</h1>
-  <TaskSchema />
+  <TaskSchema
+    taskSchema={undefined}
+  />
 </div>
