@@ -1,7 +1,12 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
 	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
 
+	// Dispatcher
+	const dispatcher = new createEventDispatcher();
+
 	export let taskSchema = undefined;
+	export let argsValues = undefined;
 
 	// const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}}, "required": ["obj2", "obj3"], "definitions": {"Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}, "c": {"title": "C", "type": "boolean"}, "d": {"title": "D", "default": [1, 2, 3], "type": "array", "items": {"type": "integer"}}}, "required": ["c"]}}}\n';
 	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"input_paths": {"title": "Input Paths", "description": "This is the arg description", "type": "array", "default": ["/tmp", "/tmp2"], "items": {"type": "string"}}, "output_path": {"title": "Output Path", "type": "string"}, "component": {"title": "Component", "type": "string"}}, "required": ["input_paths", "output_path", "metadata", "component"], "additionalProperties": false}';
@@ -90,6 +95,7 @@
 		console.debug('The task argument has updated', event.detail.key, event.detail.value);
 		taskArgumentsValues[event.detail.key] = event.detail.value;
 		console.debug(taskArgumentsValues);
+		dispatcher('argumentsUpdated', taskArgumentsValues);
 	}
 
 </script>
