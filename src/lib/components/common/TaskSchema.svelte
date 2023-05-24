@@ -18,7 +18,18 @@
 	const schemaProperties = parsedSchema.properties;
 	const schemaDefinitions = parsedSchema.definitions;
 
+	// Internal object that keeps track of each value of each task argument based on the given schema
 	const taskArgumentsValues = {};
+	// TODO: Check if a given argsValues object is given
+	// If argsValues is not undefined, taskArgumentsValues should set its starting properties by
+	// merging with the ones from argsValues
+	if (argsValues !== undefined) {
+		console.log(argsValues);
+		Object.keys(argsValues).forEach(key => {
+			taskArgumentsValues[key] = argsValues[key];
+		});
+	}
+
 	const taskArgumentsSchema = [];
 	for (const [key, propSchema] of Object.entries(schemaProperties)) {
 		let taskArgumentSchema = {};
@@ -65,7 +76,11 @@
 		// Add the taskArgumentSchema to the list
 		taskArgumentSchema.key = key;
 		taskArgumentsSchema.push(taskArgumentSchema);
-		taskArgumentsValues[key] = schemaProperties[key].default;
+		// If taskArgumentsValues[key] is undefined, then set to default schema value
+		// If taskArgumentsValues[key] is undefined, it means that there is no value coming from server
+		if (taskArgumentsValues[key] === undefined) {
+			taskArgumentsValues[key] = schemaProperties[key].default;
+		}
 
 	}
 
