@@ -6,8 +6,7 @@
 	 */
 
 	import { createEventDispatcher } from 'svelte';
-	import TaskArgumentIterableValue from '$lib/components/common/TaskArgumentIterableValue.svelte';
-	import TaskArgumentProperty from '$lib/components/common/TaskArgumentProperty.svelte';
+	import TaskSchemaPropertyItems from '$lib/components/common/TaskSchemaPropertyItems.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -79,6 +78,52 @@
 		}
 	}
 
+	const deserializeSubSchema = function(schema, referenceSchema) {
+		// If schema has a $ref property, resolve it against the reference schema
+		if (schema.$ref !== undefined) {
+			// Store key in a variable
+			schema = resolveReference(schema.$ref, referenceSchema);
+		}
+		// If schema has a allOf property, resolve it against the reference schema
+		if (schema.allOf !== undefined) {
+			// Should keep the schemaProperty initial properties
+			const initialSchemaProperty = schema;
+			// Resolve the first reference
+			schema = resolveReference(schema.allOf[0].$ref, referenceSchema);
+			// Merge the initial schemaProperty with the resolved one
+			schema = { ...schema, ...initialSchemaProperty };
+		}
+
+		// If the schemaProperty is of type array, resolve the items property
+		// The items property can be a nested array of items
+		if (schema.type === 'array') {
+			schema.items = deserializeSubSchema(schema.items, referenceSchema);
+		}
+
+		if (schema.type === 'object' && schema.properties !== undefined) {
+			// Resolve each property
+			for (const [key, property] of Object.entries(schema.properties)) {
+				// If property has a reference, resolve it
+				if (property.$ref !== undefined) {
+					// Store key in a variable
+					schema.properties[key] = resolveReference(property.$ref, referenceSchema);
+				}
+
+				// If property has an allOf, resolve it
+				if (property.allOf !== undefined) {
+					// Should keep the schemaProperty initial properties
+					const initialSchemaProperty = property;
+					// Resolve the first reference
+					schema.properties[key] = resolveReference(property.allOf[0].$ref, referenceSchema);
+					// Merge the initial schemaProperty with the resolved one
+					schema.properties[key] = { ...schema.properties[key], ...initialSchemaProperty };
+				}
+			}
+		}
+
+		return schema;
+	};
+
 
 	// Resolve all json references within schemaProperty
 	const deserializeSchemaReferences = function() {
@@ -98,66 +143,12 @@
 			schemaProperty = { ...schemaProperty, ...initialSchemaProperty };
 		}
 
-
+		// Resolve references in schemaProperty items recursively
 		// If the schemaProperty is of type array, resolve the items property
+		// The items property can be a nested array of items
 		if (schemaProperty.type === 'array') {
-			// If items is a reference, resolve it
-			if (schemaProperty.items.$ref !== undefined) {
-				// Store key in a variable
-				schemaProperty.items = resolveReference(schemaProperty.items.$ref, referenceSchema);
-			}
-
-			// If items is an allOf, resolve it
-			if (schemaProperty.items.allOf !== undefined) {
-				// Should keep the schemaProperty initial properties
-				const initialSchemaProperty = schemaProperty.items;
-				// Resolve the first reference
-				schemaProperty.items = resolveReference(schemaProperty.items.allOf[0].$ref, referenceSchema);
-				// Merge the initial schemaProperty with the resolved one
-				schemaProperty.items = { ...schemaProperty.items, ...initialSchemaProperty };
-			}
-
-			// If items is an object, resolve its properties
-			if (schemaProperty.items.type === 'object') {
-				// Resolve each property
-				for (const [key, value] of Object.entries(schemaProperty.items.properties)) {
-					// If property is a reference, resolve it
-					if (value.$ref !== undefined) {
-						// Store key in a variable
-						schemaProperty.items.properties[key] = resolveReference(value.$ref, referenceSchema);
-					}
-					// If property is an allOf, resolve it
-					if (value.allOf !== undefined) {
-						// Should keep the schemaProperty initial properties
-						const initialSchemaProperty = schemaProperty.items.properties[key];
-						// Resolve the first reference
-						schemaProperty.items.properties[key] = resolveReference(value.allOf[0].$ref, referenceSchema);
-						// Merge the initial schemaProperty with the resolved one
-						schemaProperty.items.properties[key] = { ...schemaProperty.items.properties[key], ...initialSchemaProperty };
-					}
-				}
-			}
-
-			// If items is an array, resolve its items
-			if (schemaProperty.items.type === 'array') {
-				// If items is a reference, resolve it
-				if (schemaProperty.items.items.$ref !== undefined) {
-					// Store key in a variable
-					schemaProperty.items.items = resolveReference(schemaProperty.items.items.$ref, referenceSchema);
-				}
-				// If items is an allOf, resolve it
-				if (schemaProperty.items.items.allOf !== undefined) {
-					// Should keep the schemaProperty initial properties
-					const initialSchemaProperty = schemaProperty.items.items;
-					// Resolve the first reference
-					schemaProperty.items.items = resolveReference(schemaProperty.items.items.allOf[0].$ref, referenceSchema);
-					// Merge the initial schemaProperty with the resolved one
-					schemaProperty.items.items = { ...schemaProperty.items.items, ...initialSchemaProperty };
-				}
-			}
+			schemaProperty.items = deserializeSubSchema(schemaProperty.items, referenceSchema);
 		}
-
-		return schemaProperty;
 	};
 
 	// Resolve and update all json references within schemaProperty
@@ -207,7 +198,7 @@
       {#if type === 'array'}
         <form on:submit|preventDefault={handleTaskArgumentUpdate}>
           <span>Current value: {propertyValue}</span>
-          <TaskArgumentIterableValue value={propertyValue} itemsSchema={schemaProperty.items} />
+          <TaskSchemaPropertyItems value={propertyValue} itemsSchema={schemaProperty.items} />
           <button class='btn btn-primary'>Update</button>
         </form>
       {/if}
