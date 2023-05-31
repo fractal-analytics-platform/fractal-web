@@ -155,9 +155,8 @@
 	deserializeSchemaReferences();
 	updateMainProperties();
 
-	const handleTaskArgumentUpdate = function() {
-		dispatch('argumentUpdated', { schemaPropertyKey, propertyValue });
-		console.log('Argument updated', propertyValue);
+	const handlePropertyChanged = function() {
+		dispatch('propertyChanged', { schemaPropertyKey, propertyValue });
 	};
 
 	console.log(schemaProperty);
@@ -175,32 +174,28 @@
     <div>
       <span class='bg-light'>Default value: <code>{defaultValue}</code></span>
       {#if type === 'number' || type === 'integer' }
-        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
-          <input type='number' bind:value={propertyValue}>
-          <button class='btn btn-primary'>Update</button>
-        </form>
+        <div>
+          <input type='number' bind:value={propertyValue} on:change={handlePropertyChanged}>
+        </div>
       {/if}
 
       {#if type === 'string' }
-        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
-          <input type='text' bind:value={propertyValue}>
-          <button class='btn btn-primary'>Update</button>
-        </form>
+        <div>
+          <input type='text' bind:value={propertyValue} on:change={handlePropertyChanged}>
+        </div>
       {/if}
 
       {#if type === 'boolean' }
-        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
-          <input type='checkbox' bind:checked={propertyValue}>
-          <button class='btn btn-primary'>Update</button>
-        </form>
+        <div>
+          <input type='checkbox' bind:checked={propertyValue} on:change={handlePropertyChanged}>
+        </div>
       {/if}
 
       {#if type === 'array'}
-        <form on:submit|preventDefault={handleTaskArgumentUpdate}>
+        <div>
           <span>Current value: {propertyValue}</span>
           <TaskSchemaPropertyItems value={propertyValue} itemsSchema={schemaProperty.items} />
-          <button class='btn btn-primary'>Update</button>
-        </form>
+        </div>
       {/if}
 
       <!--{#if type === 'object'}
