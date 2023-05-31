@@ -8,6 +8,14 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
+	import TaskSchema from '$lib/components/common/TaskSchema.svelte';
+
+	// Experimental components data
+	let taskSchemaFromApi = '{title:"Something"}';
+	const printTaskSchemaUpdates = async function(event) {
+		console.log(event);
+		// TODO: Send the updated arguments to the server
+	};
 
 	// Workflow
 	let workflow = undefined;
@@ -359,6 +367,15 @@
 								<li class='nav-item'>
 									<span class='nav-link disabled'>Info</span>
 								</li>
+								<li class='nav-item'>
+									<button
+										data-bs-toggle='tab'
+										data-bs-target='#experimental-tab'
+										class='nav-link'
+									>
+										Experimental
+									</button>
+								</li>
 							</ul>
 						{:else}
 							Select a workflow task from the list
@@ -389,6 +406,15 @@
 										/>
 									{/key}
 								{/if}
+							</div>
+						</div>
+						<div id='experimental-tab' class='tab-pane'>
+							<div class='card-body'>
+								<TaskSchema
+									taskSchema={taskSchemaFromApi}
+									argsValues={{}}
+									on:taskSchemaChange={printTaskSchemaUpdates}
+								></TaskSchema>
 							</div>
 						</div>
 					</div>
