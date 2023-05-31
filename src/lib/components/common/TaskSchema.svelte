@@ -25,7 +25,7 @@
 	 */
 
 	import Ajv from 'ajv';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import TaskSchemaProperty from '$lib/components/common/TaskSchemaProperty.svelte';
 
 	// Another json validator
@@ -36,6 +36,8 @@
 
 	// General properties
 	let errorMessage = undefined;
+	let propertyChanged = false;
+	let schemaProperties = [];
 
 	// The json schema, should either be a valid json schema or a string to be parsed as json schema
 	export let taskSchema = undefined;
@@ -69,37 +71,41 @@
 		}
 
 		if (typeof taskSchema === 'string') {
-			taskSchema = JSON.parse(taskSchema);
-			compileAjvSchema();
+			try {
+				taskSchema = JSON.parse(taskSchema);
+				compileAjvSchema();
+			} catch {
+				errorMessage = 'The given schema is not a valid JSON string';
+				console.error(errorMessage);
+			}
 		}
 	}
 
-	// Validate the value object against the schema
-	// argsValues is the given value object
-	const argsValid = compiledSchema(argsValues);
-	if (!argsValid) {
-		errorMessage = 'The argument values do not respect the task schema:';
-		compiledSchema.errors.forEach(error => {
-			errorMessage += '\n\t - ' + error.message + ' | ' + error.schemaPath;
-		});
-	}
+	onMount(() => {
+		console.log('Schema is valid?', validSchema);
+		if (validSchema) {
+			// Validate the value object against the schema
+			// argsValues is the given value object
+			const argsValid = compiledSchema(argsValues);
+			if (!argsValid) {
+				errorMessage = 'The argument values do not respect the task schema:';
+				compiledSchema.errors.forEach(error => {
+					errorMessage += '\n\t - ' + error.message + ' | ' + error.schemaPath;
+				});
+			}
 
-	console.log('Default values', argsValues);
 
+			for (const [key, value] of Object.entries(taskSchema.properties)) {
+				schemaProperties.push({
+					key: key,
+					schema: value,
+					value: argsValues[key]
+				});
+			}
+		}
+	});
 
-	function taskArgumentValueUpdated(event) {
-		console.debug('The task argument has updated', event.detail.schemaPropertyKey, event.detail.propertyValue);
-		console.log(schemaProperties);
-	}
-
-	let schemaProperties = [];
-	for (const [key, value] of Object.entries(taskSchema.properties)) {
-		schemaProperties.push({
-			key: key,
-			schema: value,
-			value: argsValues[key]
-		});
-	}
+	console.debug('Default values', argsValues);
 
 </script>
 
@@ -116,6 +122,10 @@
   <div class='card'>
     <div class='card-header'>
       Task Schema
+
+      <button class='btn btn-success {propertyChanged ? "" : "disabled"}'
+              on:click|preventDefault={() => {console.log(schemaProperties)}}>Update
+      </button>
     </div>
 
     {#each schemaProperties as schemaProperty}
@@ -124,7 +134,7 @@
         schemaPropertyKey={schemaProperty.key}
         bind:schemaProperty={schemaProperty.schema}
         bind:propertyValue={schemaProperty.value}
-        on:argumentUpdated={taskArgumentValueUpdated}
+        on:propertyChanged={() => { propertyChanged = true }}
       />
 
     {/each}
