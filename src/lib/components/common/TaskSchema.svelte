@@ -87,96 +87,9 @@
 	console.log('Default values', argsValues);
 
 
-	// By traversing the schema, the component should build its reference objects
-	// Those objects will be used as a reference to render UI components and their data
-	// Let's use json-schema-traverse
-	/* traverse(taskSchema, {}, (currentSchema, path, rootSchema, parentPath, parentKeyword, parentSchema, keyIndex) => {
-    if (!path.includes('properties') || path.includes('definitions')) return
-    if (keyIndex !== undefined && typeof keyIndex !== 'number') {
-      // console.log(parentPath, parentKeyword)
-      // console.log(path, keyIndex)
-      // console.log(currentSchema)
-    }
-  }) */
-
-	// Internal object that keeps track of each value of each task argument based on the given schema
-	/* const taskArgumentsValues = {};
-	// TODO: Check if a given argsValues object is given
-	// If argsValues is not undefined, taskArgumentsValues should set its starting properties by
-	// merging with the ones from argsValues
-	if (argsValues !== undefined) {
-		// console.log(argsValues);
-		Object.keys(argsValues).forEach(key => {
-			taskArgumentsValues[key] = argsValues[key];
-		});
-	} */
-
-	// The code to build an iterable argumentSchema
-	/* function buildIterableArgumentSchema() {
-    const taskArgumentsSchema = [];
-    for (const [key, propSchema] of Object.entries(schemaProperties)) {
-      let taskArgumentSchema = {};
-      // Should check whether this schema property has a reference value
-      // The reference value could be nested within a 'allOf' key
-      // Check allOf key presence
-      const hasAllOf = Object.keys(schemaProperties[key]).includes('allOf');
-      // Check that has a $ref key
-      const hasRef = Object.keys(schemaProperties[key]).includes('$ref');
-
-      if (hasAllOf || hasRef) {
-        console.log('The schema property has an external definition');
-        // Retrieve the schema definition
-        if (hasAllOf) {
-          // Get the definition reference from hasAllOf
-          const defReference = schemaProperties[key]['allOf'][0]['$ref'];
-          console.log(defReference);
-          const definitionKey = defReference.split('/').pop(-1);
-          console.log(definitionKey);
-          console.log(schemaDefinitions[definitionKey]);
-          const objectSchema = schemaDefinitions[definitionKey];
-          taskArgumentSchema = propSchema;
-          taskArgumentSchema.type = objectSchema.type;
-          taskArgumentSchema.properties = objectSchema.properties;
-        }
-
-        if (hasRef) {
-          // Get the definition reference from hasRef
-          const defReference = schemaProperties[key]['$ref'];
-          console.log(defReference);
-          const definitionKey = defReference.split('/').pop(-1);
-          console.log(definitionKey);
-          console.log(schemaDefinitions[definitionKey]);
-          const objectSchema = schemaDefinitions[definitionKey];
-          taskArgumentSchema = propSchema;
-          taskArgumentSchema.type = objectSchema.type;
-          taskArgumentSchema.properties = objectSchema.properties;
-        }
-
-      } else {
-        taskArgumentSchema = propSchema;
-      }
-
-      // Add the taskArgumentSchema to the list
-      taskArgumentSchema.key = key;
-      taskArgumentsSchema.push(taskArgumentSchema);
-      // If taskArgumentsValues[key] is undefined, then set to default schema value
-      // If taskArgumentsValues[key] is undefined, it means that there is no value coming from server
-      if (taskArgumentsValues[key] === undefined) {
-        taskArgumentsValues[key] = schemaProperties[key].default;
-      }
-    }
-
-    return taskArgumentsSchema;
-  } */
-
-	// console.log(taskArgumentsValues);
-
 	function taskArgumentValueUpdated(event) {
 		console.debug('The task argument has updated', event.detail.schemaPropertyKey, event.detail.propertyValue);
 		console.log(schemaProperties);
-		// taskArgumentsValues[event.detail.key] = event.detail.value;
-		// console.debug(taskArgumentsValues);
-		// dispatcher('argumentsUpdated', taskArgumentsValues);
 	}
 
 	let schemaProperties = [];
