@@ -1,126 +1,220 @@
 <script>
+	/**
+	 * This component should take as an input a JSON Schema object and an object with given values
+	 * The value object would be validated against the schema.
+	 * If the value object is undefined or has not been set, a default value object from the schema
+	 * will be used instead.
+	 * Every edit to the value object, through forms, will be validated against the given schema.
+	 *
+	 * If this component does not recognize a valid json schema, an error should be thrown.
+	 * If this component is not able to render a meaningful interface for the user, an error should
+	 * be used as a feedback. The client should be able to redirect the user to a meaningful page.
+	 *
+	 *
+	 * The rendering of this component should proceed as described:
+	 * - Take a json schema
+	 * - Take a value object
+	 * - Validate the json schema
+	 * - Validate the value object against the schema; consider set default values;
+	 * - Render the page structure through iteration with json-schema-traverse
+	 * - Await user inputs and edits
+	 * - React to inputs and validate the updated value object against the json schema
+	 * - If the updated value object is valid, emit an event with the updated value object
+	 * - If the updated value object is not valid, display an error feedback in the interface.
+	 *
+	 */
+
+	import Ajv from 'ajv';
 	import { createEventDispatcher } from 'svelte';
-	import TaskArgument from '$lib/components/common/TaskArgument.svelte';
+	import TaskSchemaProperty from '$lib/components/common/TaskSchemaProperty.svelte';
+
+	// Another json validator
+	const ajv = new Ajv({ useDefaults: true });
 
 	// Dispatcher
 	const dispatcher = new createEventDispatcher();
 
+	// General properties
+	let errorMessage = undefined;
+
+	// The json schema, should either be a valid json schema or a string to be parsed as json schema
 	export let taskSchema = undefined;
+	let compiledSchema = undefined;
+	let validSchema = false;
+
+	// The value object
 	export let argsValues = undefined;
 
-	// const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}}, "required": ["obj2", "obj3"], "definitions": {"Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}, "c": {"title": "C", "type": "boolean"}, "d": {"title": "D", "default": [1, 2, 3], "type": "array", "items": {"type": "integer"}}}, "required": ["c"]}}}\n';
-	const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"input_paths": {"title": "Input Paths", "description": "This is the arg description", "type": "array", "default": ["/tmp", "/tmp2"], "items": {"type": "string"}}, "output_path": {"title": "Output Path", "type": "string"}, "component": {"title": "Component", "type": "string"}}, "required": ["input_paths", "output_path", "metadata", "component"], "additionalProperties": false}';
-	// const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"input_paths": {"title": "Input Paths", "type": "array", "items": {"type": "string"}}, "output_path": {"title": "Output Path", "type": "string"}, "component": {"title": "Component", "type": "string"}, "channel_label": {"title": "Channel Label", "type": "string"}, "channel_label_c2": {"title": "Channel Label C2", "type": "string"}, "wavelength_id": {"title": "Wavelength Id", "type": "string"}, "wavelength_id_c2": {"title": "Wavelength Id C2", "type": "string"}, "level": {"title": "Level", "type": "integer"}, "relabeling": {"title": "Relabeling", "default": true, "type": "boolean"}, "input_ROI_table": {"title": "Input Roi Table", "type": "string"}, "output_ROI_table": {"title": "Output Roi Table", "type": "string"}, "output_label_name": {"title": "Output Label Name", "type": "string"}, "use_gpu": {"title": "Use Gpu", "type": "boolean"}, "anisotropy": {"title": "Anisotropy", "type": "number"}, "diameter_level0": {"title": "Diameter Level0", "type": "number"}, "cellprob_threshold": {"title": "Cellprob Threshold", "type": "number"}, "flow_threshold": {"title": "Flow Threshold", "type": "number"}, "model_type": {"title": "Model Type", "type": "string"}, "pretrained_model": {"title": "Pretrained Model", "type": "string"}, "min_size": {"title": "Min Size", "type": "integer"}, "augment": {"title": "Augment", "type": "boolean"}, "net_avg": {"title": "Net Avg", "type": "boolean"}, "use_masks": {"title": "Use Masks", "type": "boolean"}}, "required": ["input_paths", "output_path", "component", "metadata", "level"], "additionalProperties": false}'
-	// const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"input_paths": {"title": "Input Paths", "description": "TBD", "type": "array", "default": ["/tmp1", "/tmp2"], "items": {"type": "string"}}, "output_path": {"title": "Output Path", "description": "TBD", "type": "string"}, "image_extension": {"title": "Image Extension", "default": "tif", "type": "string"}, "image_glob_patterns": {"title": "Image Glob Patterns", "description": "TBD", "type": "array", "items": {"type": "string"}}, "allowed_channels": {"title": "Allowed Channels", "type": "array", "items": {"type": "object"}}, "num_levels": {"title": "Num Levels", "description": "TBD", "default": 2, "type": "integer"}, "coarsening_xy": {"title": "Coarsening Xy", "description": "TBD", "default": 2, "type": "integer"}, "metadata_table": {"title": "Metadata Table", "description": "TBD", "default": "mrf_mlf", "type": "string"}}, "required": ["input_paths", "output_path", "metadata", "allowed_channels"], "additionalProperties": false}'
-	// const jsonTaskSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "b": {"title": "B", "type": "string"}, "c": {"title": "C", "description": "A boolean field", "default": true, "type": "boolean"}, "d": {"title": "D", "description": "A list of numbers", "default": [0, 1, 2], "type": "array", "items": {"type": "integer"}}, "e": {"title": "E", "description": "A list of strings", "default": ["hello", "this", "test"], "type": "array", "items": {"type": "string"}}, "f": {"title": "F", "description": "A list of bools", "default": [true, false, false], "type": "array", "items": {"type": "boolean"}}, "g": {"title": "G", "description": "A nested list of integers", "default": [[1, 2], [3, 4], [5], [6]], "type": "array", "items": {"type": "array", "items": {"type": "integer"}}}, "h": {"title": "H", "description": "A nested list of strings", "default": [["this", "is"], ["a", "list"], ["of"], ["strings"]], "type": "array", "items": {"type": "array", "items": {"type": "string"}}}, "i": {"title": "I", "description": "A nested list of bools", "type": "array", "items": {"type": "array", "items": {"type": "boolean"}}}, "l": {"title": "L", "description": "An infinite nesting of lists", "default": [[[0]]], "type": "array", "items": {"type": "array", "items": {"type": "array", "items": {"type": "integer"}}}}, "obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}}, "required": ["i", "obj2", "obj3"], "definitions": {"Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}, "c": {"title": "C", "type": "boolean"}, "d": {"title": "D", "default": [1, 2, 3], "type": "array", "items": {"type": "integer"}}}, "required": ["c"]}}}'
+
+	// Compile Ajv schema and set an ajv instance within compiledSchema
+	const compileAjvSchema = function() {
+		try {
+			compiledSchema = ajv.compile(taskSchema);
+			validSchema = true;
+		} catch {
+			errorMessage = 'The given schema is invalid';
+			console.error(errorMessage);
+		}
+	};
 
 	if (taskSchema === undefined) {
-		taskSchema = jsonTaskSchema;
+		// taskSchema could not be undefined - that is an error
+		errorMessage = 'Task schema object could not be undefined';
+		console.error(errorMessage);
+	} else {
+		// Validate the taskSchema
+		if (typeof taskSchema === 'object') {
+			// The task schema is a valid object, validate it
+			compileAjvSchema();
+		}
+
+		if (typeof taskSchema === 'string') {
+			taskSchema = JSON.parse(taskSchema);
+			compileAjvSchema();
+		}
 	}
 
-	const parsedSchema = JSON.parse(taskSchema);
+	// Validate the value object against the schema
+	// argsValues is the given value object
+	const argsValid = compiledSchema(argsValues);
+	if (!argsValid) {
+		errorMessage = 'The argument values do not respect the task schema:';
+		compiledSchema.errors.forEach(error => {
+			errorMessage += '\n\t - ' + error.message + ' | ' + error.schemaPath;
+		});
+	}
 
-	const schemaProperties = parsedSchema.properties;
-	const schemaDefinitions = parsedSchema.definitions;
+	console.log('Default values', argsValues);
+
+
+	// By traversing the schema, the component should build its reference objects
+	// Those objects will be used as a reference to render UI components and their data
+	// Let's use json-schema-traverse
+	/* traverse(taskSchema, {}, (currentSchema, path, rootSchema, parentPath, parentKeyword, parentSchema, keyIndex) => {
+    if (!path.includes('properties') || path.includes('definitions')) return
+    if (keyIndex !== undefined && typeof keyIndex !== 'number') {
+      // console.log(parentPath, parentKeyword)
+      // console.log(path, keyIndex)
+      // console.log(currentSchema)
+    }
+  }) */
 
 	// Internal object that keeps track of each value of each task argument based on the given schema
-	const taskArgumentsValues = {};
+	/* const taskArgumentsValues = {};
 	// TODO: Check if a given argsValues object is given
 	// If argsValues is not undefined, taskArgumentsValues should set its starting properties by
 	// merging with the ones from argsValues
 	if (argsValues !== undefined) {
-		console.log(argsValues);
+		// console.log(argsValues);
 		Object.keys(argsValues).forEach(key => {
 			taskArgumentsValues[key] = argsValues[key];
 		});
-	}
+	} */
 
-	const taskArgumentsSchema = [];
-	for (const [key, propSchema] of Object.entries(schemaProperties)) {
-		let taskArgumentSchema = {};
-		// Should check whether this schema property has a reference value
-		// The reference value could be nested within a 'allOf' key
-		// Check allOf key presence
-		const hasAllOf = Object.keys(schemaProperties[key]).includes('allOf');
-		// Check that has a $ref key
-		const hasRef = Object.keys(schemaProperties[key]).includes('$ref');
+	// The code to build an iterable argumentSchema
+	/* function buildIterableArgumentSchema() {
+    const taskArgumentsSchema = [];
+    for (const [key, propSchema] of Object.entries(schemaProperties)) {
+      let taskArgumentSchema = {};
+      // Should check whether this schema property has a reference value
+      // The reference value could be nested within a 'allOf' key
+      // Check allOf key presence
+      const hasAllOf = Object.keys(schemaProperties[key]).includes('allOf');
+      // Check that has a $ref key
+      const hasRef = Object.keys(schemaProperties[key]).includes('$ref');
 
-		if (hasAllOf || hasRef) {
-			console.log('The schema property has an external definition');
-			// Retrieve the schema definition
-			if (hasAllOf) {
-				// Get the definition reference from hasAllOf
-				const defReference = schemaProperties[key]['allOf'][0]['$ref'];
-				console.log(defReference);
-				const definitionKey = defReference.split('/').pop(-1);
-				console.log(definitionKey);
-				console.log(schemaDefinitions[definitionKey]);
-				const objectSchema = schemaDefinitions[definitionKey];
-				taskArgumentSchema = propSchema;
-				taskArgumentSchema.type = objectSchema.type;
-				taskArgumentSchema.properties = objectSchema.properties;
-			}
+      if (hasAllOf || hasRef) {
+        console.log('The schema property has an external definition');
+        // Retrieve the schema definition
+        if (hasAllOf) {
+          // Get the definition reference from hasAllOf
+          const defReference = schemaProperties[key]['allOf'][0]['$ref'];
+          console.log(defReference);
+          const definitionKey = defReference.split('/').pop(-1);
+          console.log(definitionKey);
+          console.log(schemaDefinitions[definitionKey]);
+          const objectSchema = schemaDefinitions[definitionKey];
+          taskArgumentSchema = propSchema;
+          taskArgumentSchema.type = objectSchema.type;
+          taskArgumentSchema.properties = objectSchema.properties;
+        }
 
-			if (hasRef) {
-				// Get the definition reference from hasRef
-				const defReference = schemaProperties[key]['$ref'];
-				console.log(defReference);
-				const definitionKey = defReference.split('/').pop(-1);
-				console.log(definitionKey);
-				console.log(schemaDefinitions[definitionKey]);
-				const objectSchema = schemaDefinitions[definitionKey];
-				taskArgumentSchema = propSchema;
-				taskArgumentSchema.type = objectSchema.type;
-				taskArgumentSchema.properties = objectSchema.properties;
-			}
+        if (hasRef) {
+          // Get the definition reference from hasRef
+          const defReference = schemaProperties[key]['$ref'];
+          console.log(defReference);
+          const definitionKey = defReference.split('/').pop(-1);
+          console.log(definitionKey);
+          console.log(schemaDefinitions[definitionKey]);
+          const objectSchema = schemaDefinitions[definitionKey];
+          taskArgumentSchema = propSchema;
+          taskArgumentSchema.type = objectSchema.type;
+          taskArgumentSchema.properties = objectSchema.properties;
+        }
 
-		} else {
-			taskArgumentSchema = propSchema;
-		}
+      } else {
+        taskArgumentSchema = propSchema;
+      }
 
-		// Add the taskArgumentSchema to the list
-		taskArgumentSchema.key = key;
-		taskArgumentsSchema.push(taskArgumentSchema);
-		// If taskArgumentsValues[key] is undefined, then set to default schema value
-		// If taskArgumentsValues[key] is undefined, it means that there is no value coming from server
-		if (taskArgumentsValues[key] === undefined) {
-			taskArgumentsValues[key] = schemaProperties[key].default;
-		}
+      // Add the taskArgumentSchema to the list
+      taskArgumentSchema.key = key;
+      taskArgumentsSchema.push(taskArgumentSchema);
+      // If taskArgumentsValues[key] is undefined, then set to default schema value
+      // If taskArgumentsValues[key] is undefined, it means that there is no value coming from server
+      if (taskArgumentsValues[key] === undefined) {
+        taskArgumentsValues[key] = schemaProperties[key].default;
+      }
+    }
 
-	}
+    return taskArgumentsSchema;
+  } */
 
-	console.log(taskArgumentsValues);
+	// console.log(taskArgumentsValues);
 
 	function taskArgumentValueUpdated(event) {
-		console.debug('The task argument has updated', event.detail.key, event.detail.value);
-		taskArgumentsValues[event.detail.key] = event.detail.value;
-		console.debug(taskArgumentsValues);
-		dispatcher('argumentsUpdated', taskArgumentsValues);
+		console.debug('The task argument has updated', event.detail.schemaPropertyKey, event.detail.propertyValue);
+		console.log(schemaProperties);
+		// taskArgumentsValues[event.detail.key] = event.detail.value;
+		// console.debug(taskArgumentsValues);
+		// dispatcher('argumentsUpdated', taskArgumentsValues);
+	}
+
+	let schemaProperties = [];
+	for (const [key, value] of Object.entries(taskSchema.properties)) {
+		schemaProperties.push({
+			key: key,
+			schema: value,
+			value: argsValues[key]
+		});
 	}
 
 </script>
 
-<div class='card'>
-  <div class='card-header'>
-    Task Schema
+{#if validSchema === false}
+
+  <pre>
+    <p class='alert alert-danger'>
+      {errorMessage}
+    </p>
+  </pre>
+
+{:else}
+
+  <div class='card'>
+    <div class='card-header'>
+      Task Schema
+    </div>
+
+    {#each schemaProperties as schemaProperty}
+      <TaskSchemaProperty
+        referenceSchema={taskSchema}
+        schemaPropertyKey={schemaProperty.key}
+        bind:schemaProperty={schemaProperty.schema}
+        bind:propertyValue={schemaProperty.value}
+        on:argumentUpdated={taskArgumentValueUpdated}
+      />
+
+    {/each}
   </div>
 
-  {#each taskArgumentsSchema as taskSchema }
-
-    <TaskArgument
-      key={taskSchema.key}
-      title={taskSchema.title}
-      description={taskSchema.description}
-      type={taskSchema.type}
-      items={taskSchema.items}
-      propertiesSchema={taskSchema.properties}
-      bind:value={taskArgumentsValues[taskSchema.key]}
-      defaultValue={taskSchema.default}
-      on:argumentUpdated={taskArgumentValueUpdated}
-    />
-
-  {/each}
-
-</div>
-
-
+{/if}
