@@ -16,11 +16,6 @@
 		values = arraySchema.value;
 	}
 
-	console.log('Array schema', arraySchema);
-	console.log('Array schema type', arraySchema.items?.type);
-	console.log(arraySchema.key, arraySchema.value, arraySchema.default);
-	console.log(values);
-
 	function getNestedArraySchema(index) {
 		return {
 			key: arraySchema.key,
@@ -30,12 +25,18 @@
 		};
 	}
 
+	function addValue() {
+		values.push(undefined);
+		values = values;
+	}
+
 </script>
 
 {#if arraySchema || arraySchema.items !== undefined}
 
   <div style='background-color: rosybrown'>
     <p>Array property</p>
+    <button class='btn btn-primary' on:click={addValue}>Add</button>
 
     {#if values}
       {#each values as propertyValue, index}
