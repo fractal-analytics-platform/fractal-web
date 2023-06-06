@@ -41,7 +41,7 @@
       </div>
       <div id='ref-{key}' class='accordion-collapse collapse' data-bs-parent='#root-{key}'>
         <div class='accordion-body'>
-          <div class='d-flex justify-content-between m-3'>
+          <div class='d-flex justify-content-between'>
             <div>
               <h2>{propertyData.title}</h2>
               <p>
@@ -49,7 +49,7 @@
                 <code>{propertyData.default}</code>
               </p>
             </div>
-            <div>
+            <div class='w-100'>
               {#if propertyData.type === 'integer'}
                 <NumberProperty
                   propertyKey={propertyData.key}
