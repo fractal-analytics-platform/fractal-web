@@ -9,6 +9,7 @@
 	import ObjectProperty from '$lib/components/common/jschema/ObjectProperty.svelte';
 
 	export let propertyData = undefined;
+	export let propertyValue = undefined;
 
 	const context = getContext('jsonSchema');
 
@@ -30,15 +31,28 @@
 
 {#if propertyData && propertyData.type }
 
+  <h2>{propertyData.title}</h2>
   <div>
     {#if propertyData.type === 'integer'}
-      <NumberProperty></NumberProperty>
+      <NumberProperty
+        propertyKey={propertyData.key}
+        propertyValue={propertyValue || propertyData.value}
+        defaultValue={propertyData.default}
+      />
     {/if}
     {#if propertyData.type === 'string'}
-      <StringProperty></StringProperty>
+      <StringProperty
+        propertyKey={propertyData.key}
+        propertyValue={propertyValue || propertyData.value}
+        defaultValue={propertyData.default}
+      />
     {/if}
     {#if propertyData.type === 'boolean'}
-      <BooleanProperty></BooleanProperty>
+      <BooleanProperty
+        propertyKey={propertyData.key}
+        propertyValue={propertyValue || propertyData.value}
+        defaultValue={propertyData.default}
+      />
     {/if}
     {#if propertyData.type === 'array'}
       <ArrayProperty arraySchema={propertyData}></ArrayProperty>
@@ -46,6 +60,10 @@
     {#if propertyData.type === 'object'}
       <ObjectProperty objectSchema={propertyData}></ObjectProperty>
     {/if}
+    <p>
+      Default value
+      <code>{propertyData.default}</code>
+    </p>
   </div>
 
 {:else}
