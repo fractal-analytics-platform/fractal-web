@@ -27,44 +27,63 @@
 		}
 	});
 
+	const key = crypto.randomUUID();
+
 </script>
 
 {#if propertyData && propertyData.type }
 
-  <h2>{propertyData.title}</h2>
-  <div>
-    {#if propertyData.type === 'integer'}
-      <NumberProperty
-        propertyKey={propertyData.key}
-        propertyValue={propertyValue || propertyData.value}
-        defaultValue={propertyData.default}
-      />
-    {/if}
-    {#if propertyData.type === 'string'}
-      <StringProperty
-        propertyKey={propertyData.key}
-        propertyValue={propertyValue || propertyData.value}
-        defaultValue={propertyData.default}
-      />
-    {/if}
-    {#if propertyData.type === 'boolean'}
-      <BooleanProperty
-        propertyKey={propertyData.key}
-        propertyValue={propertyValue || propertyData.value}
-        defaultValue={propertyData.default}
-      />
-    {/if}
-    {#if propertyData.type === 'array'}
-      <ArrayProperty arraySchema={propertyData}></ArrayProperty>
-    {/if}
-    {#if propertyData.type === 'object'}
-      <ObjectProperty objectSchema={propertyData}></ObjectProperty>
-    {/if}
-    <p>
-      Default value
-      <code>{propertyData.default}</code>
-    </p>
+  <div id='root-{key}' class='accordion accordion-flush'>
+    <div class='accordion-item'>
+      <div class='accordion-header'>
+        <button class='accordion-button collapsed' data-bs-toggle='collapse'
+                data-bs-target='#ref-{key}'>{propertyData.key} - {propertyData.title}</button>
+      </div>
+      <div id='ref-{key}' class='accordion-collapse collapse' data-bs-parent='#root-{key}'>
+        <div class='accordion-body'>
+          <div class='d-flex justify-content-between m-3'>
+            <div>
+              <h2>{propertyData.title}</h2>
+              <p>
+                Default value
+                <code>{propertyData.default}</code>
+              </p>
+            </div>
+            <div>
+              {#if propertyData.type === 'integer'}
+                <NumberProperty
+                  propertyKey={propertyData.key}
+                  propertyValue={propertyValue || propertyData.value}
+                  defaultValue={propertyData.default}
+                />
+              {/if}
+              {#if propertyData.type === 'string'}
+                <StringProperty
+                  propertyKey={propertyData.key}
+                  propertyValue={propertyValue || propertyData.value}
+                  defaultValue={propertyData.default}
+                />
+              {/if}
+              {#if propertyData.type === 'boolean'}
+                <BooleanProperty
+                  propertyKey={propertyData.key}
+                  propertyValue={propertyValue || propertyData.value}
+                  defaultValue={propertyData.default}
+                />
+              {/if}
+              {#if propertyData.type === 'array'}
+                <ArrayProperty arraySchema={propertyData}></ArrayProperty>
+              {/if}
+              {#if propertyData.type === 'object'}
+                <ObjectProperty objectSchema={propertyData}></ObjectProperty>
+              {/if}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
 
 {:else}
 
