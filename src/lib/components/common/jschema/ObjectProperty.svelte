@@ -6,7 +6,7 @@
 
 	export let objectSchema = undefined;
 
-	context.setDefaultValue(objectSchema.key, {});
+	context.setDefaultValue(objectSchema.key, { ...objectSchema.value });
 
 </script>
 
