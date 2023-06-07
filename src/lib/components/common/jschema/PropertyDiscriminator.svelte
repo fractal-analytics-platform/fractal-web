@@ -18,9 +18,16 @@
 		if (propertyData && propertyData.type === undefined) {
 			// The propertyData.type should not be undefined
 			if (propertyData.$ref !== undefined) {
+				// Resolve a value from the context
+				const objectPropertiesValues = context.getValue(propertyData.key);
 				const resolvedSchema = resolveSchemaReference(propertyData.$ref, context.getSchema());
 				// Intersect the resolved schema with the propertyData
 				propertyData = { ...propertyData, ...resolvedSchema };
+				if (objectPropertiesValues !== undefined) {
+					Object.keys(objectPropertiesValues).forEach((key) => {
+						propertyData.properties[key].value = objectPropertiesValues[key];
+					});
+				}
 			}
 		}
 	});
