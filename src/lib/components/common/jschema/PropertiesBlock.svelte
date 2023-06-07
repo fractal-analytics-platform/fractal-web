@@ -8,8 +8,6 @@
 
 	const context = getContext('jsonSchema');
 
-	console.log(context.getSchema());
-
 	onMount(() => {
 		// Make properties object into an array
 		parsedProperties = Object.keys(properties).map(key => {
@@ -22,7 +20,6 @@
 			if (!props.value) props.value = context.getValue(props.key);
 			return props;
 		});
-		console.log('Parsed properties', parsedProperties);
 	});
 
 

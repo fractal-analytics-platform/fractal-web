@@ -19,7 +19,6 @@
 			// The propertyData.type should not be undefined
 			if (propertyData.$ref !== undefined) {
 				const resolvedSchema = resolveSchemaReference(propertyData.$ref, context.getSchema());
-				console.log('Resolving reference', resolvedSchema);
 				// Intersect the resolved schema with the propertyData
 				propertyData = { ...propertyData, ...resolvedSchema };
 			}
