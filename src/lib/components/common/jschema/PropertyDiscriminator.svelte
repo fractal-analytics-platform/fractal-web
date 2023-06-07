@@ -23,11 +23,14 @@
 				// Intersect the resolved schema with the propertyData
 				propertyData = { ...propertyData, ...resolvedSchema };
 			}
-
 		}
 	});
 
 	const key = crypto.randomUUID();
+
+	if (propertyValue !== undefined) {
+		propertyData.value = propertyValue;
+	}
 
 </script>
 
@@ -37,7 +40,7 @@
     <div class='accordion-item'>
       <div class='accordion-header'>
         <button class='accordion-button collapsed' data-bs-toggle='collapse'
-                data-bs-target='#ref-{key}'>{propertyData.key} - {propertyData.title}</button>
+                data-bs-target='#ref-{key}'>{propertyData.title || 'Sub property'}</button>
       </div>
       <div id='ref-{key}' class='accordion-collapse collapse' data-bs-parent='#root-{key}'>
         <div class='accordion-body'>
@@ -53,21 +56,21 @@
               {#if propertyData.type === 'integer'}
                 <NumberProperty
                   propertyKey={propertyData.key}
-                  propertyValue={propertyValue || propertyData.value}
+                  propertyValue={propertyData.value}
                   defaultValue={propertyData.default}
                 />
               {/if}
               {#if propertyData.type === 'string'}
                 <StringProperty
                   propertyKey={propertyData.key}
-                  propertyValue={propertyValue || propertyData.value}
+                  propertyValue={propertyData.value}
                   defaultValue={propertyData.default}
                 />
               {/if}
               {#if propertyData.type === 'boolean'}
                 <BooleanProperty
                   propertyKey={propertyData.key}
-                  propertyValue={propertyValue || propertyData.value}
+                  propertyValue={propertyData.value}
                   defaultValue={propertyData.default}
                 />
               {/if}

@@ -17,7 +17,7 @@
 			// If blockKey is undefined, set it to the key
 			if (blockKey === undefined) props.key = key;
 			// If blockKey is defined, set it to the blockKey
-			else props.key = blockKey + '-' + key;
+			else props.key = blockKey + '###' + key;
 			// If props value is undefined then set it to the value
 			if (!props.value) props.value = context.getValue(props.key);
 			return props;

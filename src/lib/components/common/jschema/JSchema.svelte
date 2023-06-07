@@ -4,13 +4,14 @@
 
 	let valid = undefined;
 	let validatedSchema = undefined;
-	let data = undefined;
+	let data = {};
+	let unsavedChanges = false;
 
 	// Define context
 	setContext('jsonSchema', {
 		getSchema: () => validatedSchema,
 		getValue: (key) => {
-			const keys = key.split('.');
+			const keys = key.split('###');
 			let value = data;
 			keys.forEach(k => {
 				// Unless value is undefined, set value to value[k]
@@ -18,6 +19,37 @@
 					value = value[k];
 			});
 			return value;
+		},
+		updateValue: (key, value) => {
+			// Split key into keys
+			const keys = key.split('###');
+			// Get the last key
+			const lastKey = keys.pop();
+			// Get the object at the key
+			let object = data;
+			keys.forEach(k => {
+				// Unless k is #.#, set object to object[k]
+				if (k !== '###')
+					object = object[k];
+			});
+			// Set the value at the last key
+			object[lastKey] = value;
+			unsavedChanges = true;
+		},
+		setDefaultValue: (key, value) => {
+			// Split key into keys
+			const keys = key.split('###');
+			// Get the last key
+			const lastKey = keys.pop();
+			// Get the object at the key
+			let object = data;
+			keys.forEach(k => {
+				// Unless k is #.#, set object to object[k]
+				if (k !== '###')
+					object = object[k];
+			});
+			// Set the value at the last key
+			object[lastKey] = value;
 		}
 	});
 
@@ -86,7 +118,16 @@
     <input class='form-control' type='text' placeholder='JSON Schema as JSON string' on:change={handleJsonSchemaInput}>
     <input class='form-control' type='text' placeholder='Default JSON values as JSON string'
            on:change={handleJsonDataInput}>
+    <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={() => {
+			console.log(data)
+    }}>Save changes
+    </button>
   </div>
+</div>
+
+<div>
+  <p>Status</p>
+  <p>Unsaved changes: {unsavedChanges}</p>
 </div>
 
 {#if valid && validatedSchema !== undefined}

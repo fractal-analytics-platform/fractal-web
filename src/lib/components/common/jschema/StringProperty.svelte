@@ -1,4 +1,7 @@
 <script>
+	import { getContext } from 'svelte';
+
+	const context = getContext('jsonSchema');
 
 	export let propertyKey = undefined;
 	export let propertyValue = undefined;
@@ -8,10 +11,16 @@
 		propertyValue = defaultValue;
 	}
 
+	context.setDefaultValue(propertyKey, propertyValue);
+
+	function handleValueChange() {
+		context.updateValue(propertyKey, propertyValue);
+	}
+
 </script>
 
 <div style='background-color: lawngreen'>
   <p>String property {propertyKey}</p>
 
-  <input type='text' bind:value={propertyValue}>
+  <input type='text' bind:value={propertyValue} on:change={handleValueChange}>
 </div>

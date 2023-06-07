@@ -1,6 +1,8 @@
 <script>
-
+	import { getContext } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
+
+	const context = getContext('jsonSchema');
 
 	export let arraySchema = undefined;
 	let values = undefined;
@@ -9,6 +11,7 @@
 	if (arraySchema.value === undefined) {
 		if (arraySchema.default !== undefined) {
 			values = arraySchema.default;
+			context.setDefaultValue(arraySchema.key, values);
 		} else {
 			values = [];
 		}
@@ -18,7 +21,7 @@
 
 	function getNestedArraySchema(index) {
 		return {
-			key: arraySchema.key,
+			key: arraySchema.key.concat('###', index),
 			items: arraySchema.items?.items,
 			type: arraySchema.items?.type,
 			value: values[index]
@@ -40,8 +43,8 @@
 
     {#if values}
       {#each values as propertyValue, index}
-        <p style='background-color: black; color: white'>{propertyValue}</p>
-        <PropertyDiscriminator propertyData={getNestedArraySchema(index)}></PropertyDiscriminator>
+        <PropertyDiscriminator propertyData={getNestedArraySchema(index)}
+                               propertyValue={propertyValue}></PropertyDiscriminator>
       {/each}
     {/if}
   </div>
