@@ -19,7 +19,10 @@ export function resolveSchemaReference(reference, schema) {
 			referenceParts.shift();
 
 			// Resolve the reference against the schema
-			let resolvedReference = schema;
+			// NOTE: We need to stringify and parse the schema to avoid mutating it
+			const jschema = JSON.stringify(schema);
+			let resolvedReference = JSON.parse(jschema);
+			// Resolve the reference against a new schema object
 			for (const referencePart of referenceParts) {
 				resolvedReference = resolvedReference[referencePart];
 			}
