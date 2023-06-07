@@ -20,7 +20,7 @@
 </script>
 
 <div style='background-color: red'>
-  <p>Number property {propertyKey}</p>
+  <p>Number property</p>
 
   <input type='number' bind:value={propertyValue} on:change={handleValueChange}>
 

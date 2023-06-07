@@ -57,6 +57,7 @@
                 Default value
                 <code>{propertyData.default}</code>
               </p>
+              <p>{propertyData.description || 'No description'}</p>
             </div>
             <div class='w-100'>
               {#if propertyData.type === 'integer'}
