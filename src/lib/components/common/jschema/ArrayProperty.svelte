@@ -19,6 +19,8 @@
 		values = arraySchema.value;
 	}
 
+	context.setDefaultValue(arraySchema.key, values);
+
 	function getNestedArraySchema(index) {
 		return {
 			key: arraySchema.key.concat('###', index),
