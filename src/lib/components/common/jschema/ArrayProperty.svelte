@@ -11,7 +11,6 @@
 	if (arraySchema.value === undefined) {
 		if (arraySchema.default !== undefined) {
 			values = arraySchema.default;
-			context.setDefaultValue(arraySchema.key, values);
 		} else {
 			values = [];
 		}
@@ -22,12 +21,14 @@
 	context.setDefaultValue(arraySchema.key, values);
 
 	function getNestedArraySchema(index) {
-		return {
+		const arrayItemSchema = {
 			key: arraySchema.key.concat('###', index),
 			items: arraySchema.items?.items,
 			type: arraySchema.items?.type,
+			$ref: arraySchema.items?.$ref,
 			value: values[index]
 		};
+		return arrayItemSchema;
 	}
 
 	function addValue() {
