@@ -42,14 +42,14 @@
 			// Get the last key
 			const lastKey = keys.pop();
 			// Get the object at the key
-			let object = data;
+			let dataProperty = data;
 			keys.forEach(k => {
 				// Unless k is #.#, set object to object[k]
 				if (k !== '###')
-					object = object[k];
+					dataProperty = dataProperty[k];
 			});
 			// Set the value at the last key
-			object[lastKey] = value;
+			dataProperty[lastKey] = value;
 		}
 	});
 
@@ -93,7 +93,7 @@
 		const value = event.target.value;
 		// Try to parse the value as JSON
 		if (value === '') {
-			data = undefined;
+			data = {};
 			return;
 		}
 		try {
