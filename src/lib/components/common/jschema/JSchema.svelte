@@ -24,11 +24,18 @@
 	 */
 
 	import { onMount, setContext } from 'svelte';
+	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
-	let valid = undefined;
+	const validator = new SchemaValidator();
+	export let schema = undefined;
+	export let schemaData = undefined;
+
 	let validatedSchema = undefined;
-	let data = {};
+	let isSchemaValid = undefined;
+	let data = undefined;
+	let isDataValid = undefined;
+
 	let unsavedChanges = false;
 
 	// Define context
@@ -88,7 +95,7 @@
 		}
 		// Load schema and data from server
 		// Validate schema
-		if (valid) {
+		if (isSchemaValid && isDataValid) {
 			// Create component structures
 			// Setup svelte context
 			// Add event listeners
@@ -120,7 +127,7 @@
   </ul>
 </div>
 
-{#if valid && validatedSchema !== undefined}
+{#if validatedSchema !== undefined && isSchemaValid && isDataValid}
 
   <!-- Start rendering the schema structure -->
   <div id='json-schema'>
@@ -131,17 +138,31 @@
     {/key}
   </div>
 
-{:else if valid === undefined}
+{:else if validatedSchema === undefined}
 
   <div>
     <p>Loading schema</p>
   </div>
 
-{:else}
+{:else if !isSchemaValid}
 
   <div class='alert alert-danger'>
     <p>Invalid schema or undefined parsed schema</p>
     <p>Something is wrong</p>
+  </div>
+
+{:else if !isDataValid && data !== undefined}
+
+
+  <div class='alert alert-danger'>
+    <div>Data object is invalid</div>
+    <div>Something is wrong</div>
+  </div>
+
+{:else if data === undefined}
+
+  <div class='alert alert-warning'>
+    <span>Data object is missing</span>
   </div>
 
 {/if}
