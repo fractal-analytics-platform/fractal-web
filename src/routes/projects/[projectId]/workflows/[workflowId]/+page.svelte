@@ -8,7 +8,6 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
-	import TaskSchema from '$lib/components/common/TaskSchema.svelte';
 
 	// Workflow
 	let workflow = undefined;
