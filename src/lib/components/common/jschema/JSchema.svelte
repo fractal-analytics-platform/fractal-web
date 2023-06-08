@@ -1,4 +1,28 @@
 <script>
+	/**
+	 * This component should take as an input a JSON Schema object and an object with given values
+	 * The value object would be validated against the schema.
+	 * If the value object is undefined or has not been set, a default value object from the schema
+	 * will be used instead.
+	 * Every edit to the value object, through forms, will be validated against the given schema.
+	 *
+	 * If this component does not recognize a valid json schema, an error should be thrown.
+	 * If this component is not able to render a meaningful interface for the user, an error should
+	 * be used as a feedback. The client should be able to redirect the user to a meaningful page.
+	 *
+	 *
+	 * The rendering of this component should proceed as described:
+	 * - Take a json schema
+	 * - Take a value object
+	 * - Validate the json schema
+	 * - Validate the value object against the schema; consider set default values;
+	 * - Await user inputs and edits
+	 * - React to inputs and validate the updated value object against the json schema
+	 * - If the updated value object is valid, emit an event with the updated value object
+	 * - If the updated value object is not valid, display an error feedback in the interface.
+	 *
+	 */
+
 	import { onMount, setContext } from 'svelte';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
@@ -120,6 +144,7 @@
            on:change={handleJsonDataInput}>
     <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={() => {
 			console.log(data)
+			console.log(JSON.stringify(data))
     }}>Save changes
     </button>
   </div>
