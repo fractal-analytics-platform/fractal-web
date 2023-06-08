@@ -10,13 +10,6 @@
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
 	import TaskSchema from '$lib/components/common/TaskSchema.svelte';
 
-	// Experimental components data
-	let taskSchemaFromApi = '{title:"Something"}';
-	const printTaskSchemaUpdates = async function(event) {
-		console.log(event);
-		// TODO: Send the updated arguments to the server
-	};
-
 	// Workflow
 	let workflow = undefined;
 	// Project context properties
@@ -410,11 +403,6 @@
 						</div>
 						<div id='experimental-tab' class='tab-pane'>
 							<div class='card-body'>
-								<TaskSchema
-									taskSchema={taskSchemaFromApi}
-									argsValues={{}}
-									on:taskSchemaChange={printTaskSchemaUpdates}
-								></TaskSchema>
 							</div>
 						</div>
 					</div>
