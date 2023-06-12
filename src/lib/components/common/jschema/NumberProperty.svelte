@@ -7,6 +7,8 @@
 	export let propertyValue = undefined;
 	export let defaultValue = null;
 
+	let hasChanged = false;
+
 	if (propertyValue === undefined) {
 		propertyValue = defaultValue;
 	}
@@ -15,11 +17,12 @@
 
 	function handleValueChange() {
 		context.updateValue(propertyKey, propertyValue);
+		hasChanged = true;
 	}
 
 </script>
 
-<div style='background-color: red'>
+<div style='background-color: red' class='{hasChanged ? "border border-primary" : ""}'>
   <p>Number property</p>
 
   <input type='number' bind:value={propertyValue} on:change={handleValueChange}>
