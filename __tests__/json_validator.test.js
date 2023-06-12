@@ -69,3 +69,39 @@ it('should reject an invalid data object against a valid schema', () => {
 	expect(validationResult).toBe(false);
 	expect(validator.getErrors()).toBeDefined();
 });
+
+it('should accept an empty data object against a valid schema without required properties', () => {
+	// Load the json schema definition from file
+	let jsonSchema = fs.readFileSync('./lib/test/DefaultSchema.json', 'utf8');
+	jsonSchema = JSON.parse(jsonSchema);
+
+	// Load the json data from file
+	const jsonData = {};
+
+	const validator = new SchemaValidator();
+	const result = validator.loadSchema(jsonSchema);
+
+	expect(result).toBe(true);
+
+	const validationResult = validator.isValid(jsonData);
+	expect(validationResult).toBe(true);
+	expect(validator.getErrors()).toBeNull();
+});
+
+it('should reject an empty data object against a valid schema with required properties', () => {
+	// Load the json schema definition from file
+	let jsonSchema = fs.readFileSync('./lib/test/ChannelJsonSchema.json', 'utf8');
+	jsonSchema = JSON.parse(jsonSchema);
+
+	// Load the json data from file
+	const jsonData = {};
+
+	const validator = new SchemaValidator();
+	const result = validator.loadSchema(jsonSchema);
+
+	expect(result).toBe(true);
+
+	const validationResult = validator.isValid(jsonData);
+	expect(validationResult).toBe(false);
+	expect(validator.getErrors()).toBeDefined();
+});
