@@ -36,6 +36,12 @@
 		values = values;
 	}
 
+	function removeValue(index) {
+		values.splice(index, 1);
+		values = values;
+		context.updateValue(arraySchema.key, values);
+	}
+
 </script>
 
 {#if arraySchema || arraySchema.items !== undefined}
@@ -45,9 +51,12 @@
     <button class='btn btn-primary' on:click={addValue}>Add</button>
 
     {#if values}
-      {#each values as propertyValue, index}
-        <PropertyDiscriminator propertyData={getNestedArraySchema(index)}
-                               propertyValue={propertyValue}></PropertyDiscriminator>
+      {#each values as propertyValue, index (Symbol())}
+        <div>
+          <button class='btn btn-warning' on:click={removeValue(index)}>Remove</button>
+          <PropertyDiscriminator propertyData={getNestedArraySchema(index)}
+                                 propertyValue={propertyValue}></PropertyDiscriminator>
+        </div>
       {/each}
     {/if}
   </div>
