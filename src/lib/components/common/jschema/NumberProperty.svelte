@@ -1,7 +1,7 @@
 <script>
 	import { getContext } from 'svelte';
 
-	const context = getContext('jsonSchema');
+	const schemaManager = getContext('schemaManager');
 
 	export let propertyKey = undefined;
 	export let propertyValue = undefined;
@@ -13,10 +13,10 @@
 		propertyValue = defaultValue;
 	}
 
-	context.setDefaultValue(propertyKey, propertyValue);
+	schemaManager.setDefaultValue(propertyKey, propertyValue);
 
 	function handleValueChange() {
-		context.updateValue(propertyKey, propertyValue);
+		schemaManager.updateValue(propertyKey, propertyValue);
 		hasChanged = true;
 	}
 

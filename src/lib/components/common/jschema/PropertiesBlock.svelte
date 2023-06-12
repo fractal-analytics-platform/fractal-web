@@ -6,7 +6,7 @@
 	export let blockKey = undefined;
 	let parsedProperties = undefined;
 
-	const context = getContext('jsonSchema');
+	const schemaManager = getContext('schemaManager');
 
 	onMount(() => {
 		// Make properties object into an array
@@ -17,7 +17,7 @@
 			// If blockKey is defined, set it to the blockKey
 			else props.key = blockKey + '###' + key;
 			// If props value is undefined then set it to the value
-			if (!props.value) props.value = context.getValue(props.key);
+			if (!props.value) props.value = schemaManager.getValue(props.key);
 			return props;
 		});
 	});

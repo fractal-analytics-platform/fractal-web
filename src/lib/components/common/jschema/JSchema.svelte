@@ -24,6 +24,7 @@
 	 */
 
 	import { onMount, setContext } from 'svelte';
+	import { SchemaManager } from '$lib/components/common/jschema/utils.js';
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
@@ -36,53 +37,8 @@
 	let data = undefined;
 	let isDataValid = undefined;
 
+	let schemaManager = undefined;
 	let unsavedChanges = false;
-
-	// Define context
-	setContext('jsonSchema', {
-		getSchema: () => validatedSchema,
-		getValue: (key) => {
-			const keys = key.split('###');
-			let value = data;
-			keys.forEach(k => {
-				// Unless value is undefined, set value to value[k]
-				if (value !== undefined)
-					value = value[k];
-			});
-			return value;
-		},
-		updateValue: (key, value) => {
-			// Split key into keys
-			const keys = key.split('###');
-			// Get the last key
-			const lastKey = keys.pop();
-			// Get the object at the key
-			let object = data;
-			keys.forEach(k => {
-				// Unless k is #.#, set object to object[k]
-				if (k !== '###')
-					object = object[k];
-			});
-			// Set the value at the last key
-			object[lastKey] = value;
-			unsavedChanges = true;
-		},
-		setDefaultValue: (key, value) => {
-			// Split key into keys
-			const keys = key.split('###');
-			// Get the last key
-			const lastKey = keys.pop();
-			// Get the object at the key
-			let dataProperty = data;
-			keys.forEach(k => {
-				// Unless k is #.#, set object to object[k]
-				if (k !== '###')
-					dataProperty = dataProperty[k];
-			});
-			// Set the value at the last key
-			dataProperty[lastKey] = value;
-		}
-	});
 
 	onMount(() => {
 		// Load a default schema
@@ -107,6 +63,7 @@
 			validatedSchema = schema;
 			isSchemaValid = validator.loadSchema(validatedSchema);
 			console.log('Validator loaded schema', validator.getErrors());
+			initializeSchemaContext();
 		}
 	}
 
@@ -115,6 +72,14 @@
 			data = schemaData;
 			isDataValid = validator.isValid(data);
 			console.log('Validator loaded data', validator.getErrors());
+			initializeSchemaContext();
+		}
+	}
+
+	function initializeSchemaContext() {
+		if (validatedSchema !== undefined && isSchemaValid && isDataValid) {
+			schemaManager = new SchemaManager(validatedSchema, data);
+			setContext('schemaManager', schemaManager);
 		}
 	}
 

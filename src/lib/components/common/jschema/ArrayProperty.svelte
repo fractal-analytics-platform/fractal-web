@@ -2,7 +2,7 @@
 	import { getContext } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
 
-	const context = getContext('jsonSchema');
+	const schemaManager = getContext('schemaManager');
 
 	export let arraySchema = undefined;
 	let values = undefined;
@@ -18,7 +18,7 @@
 		values = arraySchema.value;
 	}
 
-	context.setDefaultValue(arraySchema.key, values);
+	schemaManager.setDefaultValue(arraySchema.key, values);
 
 	function getNestedArraySchema(index) {
 		const arrayItemSchema = {
@@ -39,7 +39,7 @@
 	function removeValue(index) {
 		values.splice(index, 1);
 		values = values;
-		context.updateValue(arraySchema.key, values);
+		schemaManager.updateValue(arraySchema.key, values);
 	}
 
 </script>

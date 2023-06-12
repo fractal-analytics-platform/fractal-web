@@ -11,7 +11,7 @@
 	export let propertyData = undefined;
 	export let propertyValue = undefined;
 
-	const context = getContext('jsonSchema');
+	const schemaManager = getContext('schemaManager');
 
 	onMount(() => {
 		// Discriminate the property if required
@@ -19,8 +19,8 @@
 			// The propertyData.type should not be undefined
 			if (propertyData.$ref !== undefined) {
 				// Resolve a value from the context
-				const objectPropertiesValues = context.getValue(propertyData.key);
-				const resolvedSchema = resolveSchemaReference(propertyData.$ref, context.getSchema());
+				const objectPropertiesValues = schemaManager.getValue(propertyData.key);
+				const resolvedSchema = resolveSchemaReference(propertyData.$ref, schemaManager.schema);
 				// Intersect the resolved schema with the propertyData
 				propertyData = { ...propertyData, ...resolvedSchema };
 				if (objectPropertiesValues !== undefined) {

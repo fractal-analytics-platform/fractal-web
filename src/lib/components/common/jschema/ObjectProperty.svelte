@@ -2,11 +2,11 @@
 	import { getContext } from 'svelte';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
-	const context = getContext('jsonSchema');
+	const schemaManager = getContext('schemaManager');
 
 	export let objectSchema = undefined;
 
-	context.setDefaultValue(objectSchema.key, { ...objectSchema.value });
+	schemaManager.setDefaultValue(objectSchema.key, { ...objectSchema.value });
 
 </script>
 
