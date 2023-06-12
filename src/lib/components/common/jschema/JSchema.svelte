@@ -110,6 +110,14 @@
 		}
 	}
 
+	$: {
+		if (schemaData !== undefined) {
+			data = schemaData;
+			isDataValid = validator.isValid(data);
+			console.log('Validator loaded data', validator.getErrors());
+		}
+	}
+
 </script>
 
 <div>

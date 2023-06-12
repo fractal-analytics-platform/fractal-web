@@ -16,4 +16,5 @@
 
 <JSchema
   {schema}
+  {schemaData}
 ></JSchema>
