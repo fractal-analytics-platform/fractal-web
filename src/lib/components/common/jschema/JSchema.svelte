@@ -118,6 +118,12 @@
 		}
 	}
 
+	function saveChanges() {
+		console.log(data);
+		console.log(JSON.stringify(data));
+		unsavedChanges = false;
+	}
+
 </script>
 
 <div>
@@ -125,10 +131,7 @@
   <ul>
     <li>Unsaved changes: {unsavedChanges}</li>
     <li>
-      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={() => {
-        console.log(data)
-        console.log(JSON.stringify(data))
-      }}>
+      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
         Save changes
       </button>
     </li>
