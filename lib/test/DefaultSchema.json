@@ -10,7 +10,8 @@
     },
     "b": {
       "title": "B",
-      "type": "string"
+      "type": "string",
+      "default": "string property"
     },
     "c": {
       "title": "C",
