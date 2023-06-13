@@ -76,10 +76,12 @@ export async function createTaskCollection(fetch, formData) {
 	const requestData = {
 		package: formData.get('package'),
 		// Optional
-		version: formData.get('version'),
+		package_version: formData.get('package_version'),
 		python_version: formData.get('python_version'),
 		package_extras: formData.get('package_extras')
 	};
+
+    console.log(requestData) // FIXME This is to debug https://github.com/fractal-analytics-platform/fractal-web/issues/162
 
 	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
 		method: 'POST',

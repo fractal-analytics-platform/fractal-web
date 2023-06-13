@@ -49,10 +49,10 @@
 						taskCollectionAlreadyPresent = undefined;
 					}, 5500);
 				} else {
-					// If a version is specified, add it to taskCollection result
-					const version = data.get('version');
-					if (version !== undefined) {
-						taskCollectionData.data.version = version;
+					// If a package_version is specified, add it to taskCollection result
+					const package_version = data.get('package_version');
+					if (package_version !== undefined) {
+						taskCollectionData.data.package_version = package_version;
 					}
 					// Add task collection to local storage
 					storeCreatedTaskCollection(taskCollectionData);
@@ -72,7 +72,7 @@
 			id: taskCollection.id,
 			status: taskCollection.data.status,
 			pkg: taskCollection.data.package,
-			version: taskCollection.data.version,
+			package_version: taskCollection.data.package_version,
 			timestamp: taskCollection.timestamp
 		});
 		updateTaskCollections(taskCollections);
@@ -202,9 +202,9 @@
 			<div class="col-6">
 				<div class="input-group">
 					<div class="input-group-text">
-						<span class="font-monospace">Version</span>
+						<span class="font-monospace">Package Version</span>
 					</div>
-					<input name="version" type="text" class="form-control" />
+					<input name="package_version" type="text" class="form-control" />
 				</div>
 			</div>
 			<div class="col-6">
