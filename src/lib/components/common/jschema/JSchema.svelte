@@ -24,7 +24,7 @@
 	 */
 
 	import { onMount, setContext } from 'svelte';
-	import { SchemaManager } from '$lib/components/common/jschema/utils.js';
+	import SchemaManager from '$lib/components/common/jschema/schema_management.js';
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 

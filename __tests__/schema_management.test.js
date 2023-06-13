@@ -1,5 +1,5 @@
 import { it, expect, vi } from 'vitest';
-import { SchemaManager } from '$lib/components/common/jschema/utils.js';
+import { SchemaManager } from '$lib/components/common/jschema/schema_management.js';
 import { SchemaValidator } from '$lib/common/jschema_validation.js';
 
 // Helper functions
