@@ -147,13 +147,7 @@
     "m": {
       "title": "M",
       "description": "An infinite nesting of lists",
-      "default": [
-        [
-          [
-            0
-          ]
-        ]
-      ],
+      "default": null,
       "type": "array",
       "items": {
         "type": "array",
