@@ -6,7 +6,7 @@
 	import ArrayProperty from '$lib/components/common/jschema/ArrayProperty.svelte';
 	import ObjectProperty from '$lib/components/common/jschema/ObjectProperty.svelte';
 
-	export let propertyData = undefined;
+	export let schemaProperty = undefined;
 	export let propertyValue = undefined;
 
 	const schemaManager = getContext('schemaManager');
@@ -17,57 +17,57 @@
 	const key = crypto.randomUUID();
 
 	if (propertyValue !== undefined) {
-		propertyData.value = propertyValue;
+		schemaProperty.value = propertyValue;
 	}
 
 </script>
 
-{#if propertyData && propertyData.type }
+{#if schemaProperty && schemaProperty.type }
 
   <div id='root-{key}' class='accordion accordion-flush'>
     <div class='accordion-item'>
       <div class='accordion-header'>
         <button class='accordion-button collapsed' data-bs-toggle='collapse'
-                data-bs-target='#ref-{key}'>{propertyData.title || 'Sub property'}</button>
+                data-bs-target='#ref-{key}'>{schemaProperty.title || 'Sub property'}</button>
       </div>
       <div id='ref-{key}' class='accordion-collapse collapse' data-bs-parent='#root-{key}'>
         <div class='accordion-body'>
           <div class='d-flex justify-content-between'>
             <div>
-              <h2>{propertyData.title}</h2>
+              <h2>{schemaProperty.title}</h2>
               <p>
                 Default value
-                <code>{propertyData.defaultValue}</code>
+                <code>{schemaProperty.defaultValue}</code>
               </p>
-              <p>{propertyData.description || 'No description'}</p>
+              <p>{schemaProperty.description || 'No description'}</p>
             </div>
             <div class='w-100'>
-              {#if propertyData.type === 'integer'}
+              {#if schemaProperty.type === 'integer'}
                 <NumberProperty
-                  propertyKey={propertyData.key}
-                  propertyValue={propertyData.value}
-                  defaultValue={propertyData.defaultValue}
+                  propertyKey={schemaProperty.key}
+                  propertyValue={schemaProperty.value}
+                  defaultValue={schemaProperty.defaultValue}
                 />
               {/if}
-              {#if propertyData.type === 'string'}
+              {#if schemaProperty.type === 'string'}
                 <StringProperty
-                  propertyKey={propertyData.key}
-                  propertyValue={propertyData.value}
-                  defaultValue={propertyData.defaultValue}
+                  propertyKey={schemaProperty.key}
+                  propertyValue={schemaProperty.value}
+                  defaultValue={schemaProperty.defaultValue}
                 />
               {/if}
-              {#if propertyData.type === 'boolean'}
+              {#if schemaProperty.type === 'boolean'}
                 <BooleanProperty
-                  propertyKey={propertyData.key}
-                  propertyValue={propertyData.value}
-                  defaultValue={propertyData.defaultValue}
+                  propertyKey={schemaProperty.key}
+                  propertyValue={schemaProperty.value}
+                  defaultValue={schemaProperty.defaultValue}
                 />
               {/if}
-              {#if propertyData.type === 'array'}
-                <ArrayProperty arraySchema={propertyData}></ArrayProperty>
+              {#if schemaProperty.type === 'array'}
+                <ArrayProperty arraySchema={schemaProperty}></ArrayProperty>
               {/if}
-              {#if propertyData.type === 'object'}
-                <ObjectProperty objectSchema={propertyData}></ObjectProperty>
+              {#if schemaProperty.type === 'object'}
+                <ObjectProperty objectSchema={schemaProperty}></ObjectProperty>
               {/if}
             </div>
           </div>
