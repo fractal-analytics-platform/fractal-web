@@ -6,8 +6,6 @@
 
 	export let objectSchema = undefined;
 
-	schemaManager.setDefaultValue(objectSchema.key, { ...objectSchema.value });
-
 </script>
 
 {#if objectSchema}
