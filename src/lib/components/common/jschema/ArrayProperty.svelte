@@ -9,8 +9,8 @@
 
 
 	if (arraySchema.value === undefined) {
-		if (arraySchema.default !== undefined) {
-			values = arraySchema.default;
+		if (arraySchema.defaultValue !== undefined) {
+			values = arraySchema.defaultValue;
 		} else {
 			values = [];
 		}

@@ -1,7 +1,5 @@
 <script>
 	import { onMount, getContext } from 'svelte';
-	import { resolveSchemaReference } from '$lib/components/common/jschema/utils.js';
-
 	import NumberProperty from '$lib/components/common/jschema/NumberProperty.svelte';
 	import StringProperty from '$lib/components/common/jschema/StringProperty.svelte';
 	import BooleanProperty from '$lib/components/common/jschema/BooleanProperty.svelte';
@@ -14,22 +12,6 @@
 	const schemaManager = getContext('schemaManager');
 
 	onMount(() => {
-		// Discriminate the property if required
-		if (propertyData && propertyData.type === undefined) {
-			// The propertyData.type should not be undefined
-			if (propertyData.$ref !== undefined) {
-				// Resolve a value from the context
-				const objectPropertiesValues = schemaManager.getValue(propertyData.key);
-				const resolvedSchema = resolveSchemaReference(propertyData.$ref, schemaManager.schema);
-				// Intersect the resolved schema with the propertyData
-				propertyData = { ...propertyData, ...resolvedSchema };
-				if (objectPropertiesValues !== undefined) {
-					Object.keys(objectPropertiesValues).forEach((key) => {
-						propertyData.properties[key].value = objectPropertiesValues[key];
-					});
-				}
-			}
-		}
 	});
 
 	const key = crypto.randomUUID();
@@ -55,7 +37,7 @@
               <h2>{propertyData.title}</h2>
               <p>
                 Default value
-                <code>{propertyData.default}</code>
+                <code>{propertyData.defaultValue}</code>
               </p>
               <p>{propertyData.description || 'No description'}</p>
             </div>
@@ -64,21 +46,21 @@
                 <NumberProperty
                   propertyKey={propertyData.key}
                   propertyValue={propertyData.value}
-                  defaultValue={propertyData.default}
+                  defaultValue={propertyData.defaultValue}
                 />
               {/if}
               {#if propertyData.type === 'string'}
                 <StringProperty
                   propertyKey={propertyData.key}
                   propertyValue={propertyData.value}
-                  defaultValue={propertyData.default}
+                  defaultValue={propertyData.defaultValue}
                 />
               {/if}
               {#if propertyData.type === 'boolean'}
                 <BooleanProperty
                   propertyKey={propertyData.key}
                   propertyValue={propertyData.value}
-                  defaultValue={propertyData.default}
+                  defaultValue={propertyData.defaultValue}
                 />
               {/if}
               {#if propertyData.type === 'array'}

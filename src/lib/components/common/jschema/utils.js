@@ -36,6 +36,7 @@ export function resolveSchemaReference(reference, schema) {
 
 export class SchemaManager {
 	keySeparator = '###';
+	propertiesMap = new Map();
 
 	constructor(schema, schemaData) {
 		this.loadSchema(schema);
@@ -106,5 +107,63 @@ export class SchemaManager {
 		});
 		// Set the value at the last key
 		dataProperty[lastKey] = value;
+	}
+
+	addProperty(propertySchema) {
+		const schemaPropertyKey = propertySchema.key;
+		const schemaProperty = new SchemaProperty(propertySchema, this.schema, this.getValue(schemaPropertyKey));
+		this.propertiesMap.set(propertySchema.key, schemaProperty);
+		schemaProperty.value = this.getValue(schemaProperty.key);
+		return schemaProperty;
+	}
+}
+
+class SchemaProperty {
+
+	constructor(propertySchema, globalSchema, currentValue) {
+		this.discriminatePropertyType(propertySchema, globalSchema, currentValue);
+		// this.type = propertySchema.type;
+		console.log('after discriminate property type', propertySchema);
+
+		// Default properties
+		this.type = propertySchema.type;
+		this.key = propertySchema.key;
+		this.title = propertySchema.title;
+		this.description = propertySchema.description;
+		this.properties = propertySchema.properties;
+		this.items = propertySchema.items;
+		this.$ref = propertySchema.$ref;
+
+		console.log('default value', propertySchema.default);
+
+		if (propertySchema.default === undefined) {
+			this.defaultValue = null;
+		} else {
+			this.defaultValue = propertySchema.default;
+		}
+
+		if (propertySchema.value === undefined) {
+			this.value = this.defaultValue;
+		}
+	}
+
+	discriminatePropertyType(schema, globalSchema, currentValue) {
+		// Discriminate the property if required
+		if (schema && schema.type === undefined) {
+			// The propertyData.type should not be undefined
+			if (schema.$ref !== undefined) {
+				// Resolve a value from the context
+				const objectPropertiesValues = currentValue;
+				const resolvedSchema = resolveSchemaReference(schema.$ref, globalSchema);
+				console.log('resolvedSchema', resolvedSchema);
+				// Intersect the resolved schema with the propertyData
+				schema = { ...schema, ...resolvedSchema };
+				if (objectPropertiesValues !== undefined) {
+					Object.keys(objectPropertiesValues).forEach((key) => {
+						schema.properties[key].value = objectPropertiesValues[key];
+					});
+				}
+			}
+		}
 	}
 }

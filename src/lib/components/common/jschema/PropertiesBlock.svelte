@@ -28,7 +28,7 @@
 <div class='d-flex flex-column properties-block'>
   {#if parsedProperties}
     {#each parsedProperties as prop}
-      <PropertyDiscriminator propertyData={prop}></PropertyDiscriminator>
+      <PropertyDiscriminator propertyData={schemaManager.addProperty(prop)}></PropertyDiscriminator>
     {/each}
   {/if}
 </div>
