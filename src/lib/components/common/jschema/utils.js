@@ -166,7 +166,7 @@ class SchemaProperty {
 
 	}
 
-	addNestedSchemaProperty(value, index) {
+	addNestedSchemaProperty(value) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
 			throw new Error('Schema property is not of type array');

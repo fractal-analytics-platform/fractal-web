@@ -7,14 +7,14 @@
 
 
 	onMount(() => {
-		schemaProperty.value.forEach((nestedValue, index) => {
-			schemaProperty.addNestedSchemaProperty(nestedValue, index);
+		schemaProperty.value?.forEach((nestedValue) => {
+			schemaProperty.addNestedSchemaProperty(nestedValue);
 		});
 		nestedProperties = schemaProperty.nestedProperties;
 	});
 
 	function addNestedProperty() {
-		schemaProperty.addNestedSchemaProperty(undefined, schemaProperty.value.length);
+		schemaProperty.addNestedSchemaProperty(undefined);
 		nestedProperties = schemaProperty.nestedProperties;
 	}
 
