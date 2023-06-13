@@ -43,18 +43,10 @@
             </div>
             <div class='w-100'>
               {#if schemaProperty.type === 'integer'}
-                <NumberProperty
-                  propertyKey={schemaProperty.key}
-                  propertyValue={schemaProperty.value}
-                  defaultValue={schemaProperty.defaultValue}
-                />
+                <NumberProperty {schemaProperty} />
               {/if}
               {#if schemaProperty.type === 'string'}
-                <StringProperty
-                  propertyKey={schemaProperty.key}
-                  propertyValue={schemaProperty.value}
-                  defaultValue={schemaProperty.defaultValue}
-                />
+                <StringProperty {schemaProperty} />
               {/if}
               {#if schemaProperty.type === 'boolean'}
                 <BooleanProperty

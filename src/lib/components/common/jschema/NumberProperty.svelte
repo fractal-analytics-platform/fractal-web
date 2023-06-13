@@ -3,28 +3,24 @@
 
 	const schemaManager = getContext('schemaManager');
 
-	export let propertyKey = undefined;
-	export let propertyValue = undefined;
-	export let defaultValue = null;
+	export let schemaProperty = undefined;
 
 	let hasChanged = false;
 
-	if (propertyValue === undefined) {
-		propertyValue = defaultValue;
-	}
-
-	schemaManager.setDefaultValue(propertyKey, propertyValue);
+	schemaManager.setDefaultValue(schemaProperty.key, schemaProperty.value);
 
 	function handleValueChange() {
-		schemaManager.updateValue(propertyKey, propertyValue);
+		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
 		hasChanged = true;
 	}
 
 </script>
 
-<div style='background-color: red' class='{hasChanged ? "border border-primary" : ""}'>
-  <p>Number property</p>
+{#if schemaProperty }
+  <div style='background-color: red' class='{hasChanged ? "border border-primary" : ""}'>
+    <p>Number property</p>
 
-  <input type='number' bind:value={propertyValue} on:change={handleValueChange}>
+    <input type='number' bind:value={schemaProperty.value} on:change={handleValueChange}>
 
-</div>
+  </div>
+{/if}
