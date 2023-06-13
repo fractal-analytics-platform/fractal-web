@@ -33,7 +33,7 @@ export const actions = {
 	},
 
 	createTaskCollection: async ({ fetch, request }) => {
-		console.log('Create task colleciton action');
+		console.log('Create task collection action');
 
 		// Data to be sent to the server to request a task collection
 		const formData = await request.formData();
