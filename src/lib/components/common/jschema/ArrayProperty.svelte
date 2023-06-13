@@ -1,64 +1,44 @@
 <script>
-	import { getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
 
-	const schemaManager = getContext('schemaManager');
-
-	export let arraySchema = undefined;
-	let values = undefined;
+	export let schemaProperty = undefined;
+	let nestedProperties = [];
 
 
-	if (arraySchema.value === undefined) {
-		if (arraySchema.defaultValue !== undefined) {
-			values = arraySchema.defaultValue;
-		} else {
-			values = [];
-		}
-	} else {
-		values = arraySchema.value;
+	onMount(() => {
+		schemaProperty.value.forEach((nestedValue, index) => {
+			schemaProperty.addNestedSchemaProperty(nestedValue, index);
+		});
+		console.log('component nested properties', schemaProperty.nestedProperties);
+		nestedProperties = schemaProperty.nestedProperties;
+	});
+
+	function addNestedProperty() {
+		schemaProperty.addNestedSchemaProperty(undefined, schemaProperty.value.length);
+		nestedProperties = schemaProperty.nestedProperties;
 	}
 
-	schemaManager.setDefaultValue(arraySchema.key, values);
-
-	function getNestedArraySchema(index) {
-		const arrayItemSchema = {
-			key: arraySchema.key.concat('###', index),
-			items: arraySchema.items?.items,
-			type: arraySchema.items?.type,
-			$ref: arraySchema.items?.$ref,
-			value: values[index]
-		};
-		return arrayItemSchema;
-	}
-
-	function addValue() {
-		values.push(undefined);
-		values = values;
-	}
-
-	function removeValue(index) {
-		values.splice(index, 1);
-		values = values;
-		schemaManager.updateValue(arraySchema.key, values);
+	function removeNestedProperty(index) {
+		schemaProperty.removeNestedSchemaProperty(index);
+		nestedProperties = schemaProperty.nestedProperties;
 	}
 
 </script>
 
-{#if arraySchema || arraySchema.items !== undefined}
+{#if schemaProperty }
 
   <div style='background-color: rosybrown'>
     <p>Array property</p>
-    <button class='btn btn-primary' on:click={addValue}>Add</button>
+    <button class='btn btn-primary' on:click={addNestedProperty}>Add</button>
 
-    {#if values}
-      {#each values as propertyValue, index (Symbol())}
-        <div>
-          <button class='btn btn-warning' on:click={removeValue(index)}>Remove</button>
-          <PropertyDiscriminator propertyData={getNestedArraySchema(index)}
-                                 propertyValue={propertyValue}></PropertyDiscriminator>
-        </div>
-      {/each}
-    {/if}
+    {#each nestedProperties as nestedProperty, index (nestedProperty.key)}
+      <div>
+        <button class='btn btn-warning' on:click={removeNestedProperty(index)}>Remove</button>
+        <PropertyDiscriminator schemaProperty={nestedProperty} />
+      </div>
+    {/each}
+
   </div>
 
 {:else}

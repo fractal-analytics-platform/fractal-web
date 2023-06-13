@@ -88,12 +88,10 @@ export class SchemaManager {
 		});
 		// Set the value at the last key
 		object[lastKey] = value;
-		// unsavedChanges = true;
 	}
 
 	setDefaultValue(key, value) {
 		console.log('setDefaultValue', key, value);
-		console.log(this.data);
 		// Split key into keys
 		const keys = key.split(this.keySeparator);
 		// Get the last key
@@ -113,17 +111,17 @@ export class SchemaManager {
 		const schemaPropertyKey = propertySchema.key;
 		const schemaProperty = new SchemaProperty(propertySchema, this.schema, this.getValue(schemaPropertyKey));
 		this.propertiesMap.set(propertySchema.key, schemaProperty);
-		schemaProperty.value = this.getValue(schemaProperty.key);
+		this.setDefaultValue(schemaPropertyKey, schemaProperty.value);
 		return schemaProperty;
 	}
 }
 
 class SchemaProperty {
+	keySeparator = '###';
+	nestedProperties = [];
 
 	constructor(propertySchema, globalSchema, currentValue) {
-		this.discriminatePropertyType(propertySchema, globalSchema, currentValue);
-		// this.type = propertySchema.type;
-		console.log('after discriminate property type', propertySchema);
+		// this.discriminatePropertyType(propertySchema, globalSchema, currentValue);
 
 		// Default properties
 		this.type = propertySchema.type;
@@ -134,17 +132,63 @@ class SchemaProperty {
 		this.items = propertySchema.items;
 		this.$ref = propertySchema.$ref;
 
-		console.log('default value', propertySchema.default);
-
 		if (propertySchema.default === undefined) {
 			this.defaultValue = null;
+			if (this.type === 'array') this.defaultValue = [];
 		} else {
 			this.defaultValue = propertySchema.default;
 		}
 
 		if (propertySchema.value === undefined) {
 			this.value = this.defaultValue;
+		} else {
+			this.value = propertySchema.value;
 		}
+
+		if (currentValue !== undefined) {
+			this.value = currentValue;
+		}
+
+	}
+
+	addNestedSchemaProperty(value, index) {
+		// Should check that this schema property is of type array and has items
+		if (this.type !== 'array') {
+			throw new Error('Schema property is not of type array');
+		}
+		if (this.items === undefined) {
+			throw new Error('Schema property does not have items');
+		}
+		// Define the nested property schema
+		const propertySchema = {};
+
+		// Set the nested property schema key
+		propertySchema.key = `${this.key}${this.keySeparator}${index}`;
+		// Set the nested property schema type
+		propertySchema.type = this.items.type;
+		// Set the nested property schema title
+		propertySchema.title = this.items.title;
+		// Set the nested property schema description
+		propertySchema.description = this.items.description;
+		// Set the nested property schema properties
+		propertySchema.properties = this.items.properties;
+		// Set the nested property schema items
+		propertySchema.items = this.items.items;
+		// Set the nested property schema $ref
+		propertySchema.$ref = this.items.$ref;
+		// Set the nested property schema default
+		propertySchema.default = this.items.default;
+		// Set the nested property schema value
+		propertySchema.value = value;
+
+
+		const nestedProperty = new SchemaProperty(propertySchema);
+		this.nestedProperties.push(nestedProperty);
+		return nestedProperty;
+	}
+
+	removeNestedSchemaProperty(index) {
+		this.nestedProperties.splice(index, 1);
 	}
 
 	discriminatePropertyType(schema, globalSchema, currentValue) {
@@ -155,7 +199,6 @@ class SchemaProperty {
 				// Resolve a value from the context
 				const objectPropertiesValues = currentValue;
 				const resolvedSchema = resolveSchemaReference(schema.$ref, globalSchema);
-				console.log('resolvedSchema', resolvedSchema);
 				// Intersect the resolved schema with the propertyData
 				schema = { ...schema, ...resolvedSchema };
 				if (objectPropertiesValues !== undefined) {
