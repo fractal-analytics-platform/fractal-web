@@ -16,8 +16,8 @@
 
   <div id='root-{key}' class='accordion accordion-flush'>
     <div class='accordion-item'>
-      <div class='accordion-header'>
-        <button class='accordion-button collapsed' data-bs-toggle='collapse'
+      <div class='accordion-header' style='background-color: {schemaProperty.isRequired() ? "red" : "transparent" }'>
+        <button style='background-color: transparent' class='accordion-button collapsed' data-bs-toggle='collapse'
                 data-bs-target='#ref-{key}'>{schemaProperty.title || 'Sub property'}</button>
       </div>
       <div id='ref-{key}' class='accordion-collapse collapse' data-bs-parent='#root-{key}'>
