@@ -232,3 +232,16 @@ export function resolveSchemaReference(reference, schema) {
 		}
 	}
 }
+
+export function mapSchemaProperties(properties, propertiesKey) {
+	// Make properties object into an array
+	const mapProperties = Object.keys(properties).map(key => {
+		const props = { ...properties[key] };
+		// If blockKey is undefined, set it to the key
+		if (propertiesKey === undefined) props.key = key;
+		// If blockKey is defined, set it to the blockKey
+		else props.key = propertiesKey + '###' + key;
+		return props;
+	});
+	return mapProperties;
+}

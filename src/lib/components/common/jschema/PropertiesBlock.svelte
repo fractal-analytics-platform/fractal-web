@@ -1,6 +1,7 @@
 <script>
 	import { onMount, getContext } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
+	import { mapSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
 
 	export let properties = undefined;
 	export let blockKey = undefined;
@@ -10,14 +11,7 @@
 
 	onMount(() => {
 		// Make properties object into an array
-		parsedProperties = Object.keys(properties).map(key => {
-			const props = { ...properties[key] };
-			// If blockKey is undefined, set it to the key
-			if (blockKey === undefined) props.key = key;
-			// If blockKey is defined, set it to the blockKey
-			else props.key = blockKey + '###' + key;
-			return props;
-		});
+		parsedProperties = mapSchemaProperties(properties, blockKey);
 	});
 
 
