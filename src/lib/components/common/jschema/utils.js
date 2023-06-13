@@ -108,7 +108,7 @@ export class SchemaManager {
 
 	addProperty(propertySchema) {
 		const schemaPropertyKey = propertySchema.key;
-		const schemaProperty = new SchemaProperty(propertySchema, this.schema, this.getValue(schemaPropertyKey));
+		const schemaProperty = new SchemaProperty(propertySchema, this, this.getValue(schemaPropertyKey));
 		this.propertiesMap.set(propertySchema.key, schemaProperty);
 		this.setDefaultValue(schemaPropertyKey, schemaProperty.value);
 		return schemaProperty;
@@ -116,11 +116,14 @@ export class SchemaManager {
 }
 
 class SchemaProperty {
+	manager = {};
+	globalSchema = {};
 	keySeparator = '###';
 	nestedProperties = [];
 
-	constructor(propertySchema, globalSchema, currentValue) {
-		// this.discriminatePropertyType(propertySchema, globalSchema, currentValue);
+	constructor(propertySchema, manager, currentValue) {
+		this.manager = manager;
+		this.globalSchema = this.manager.schema;
 
 		// Default properties
 		this.type = propertySchema.type;
@@ -131,13 +134,26 @@ class SchemaProperty {
 		this.items = propertySchema.items;
 		this.$ref = propertySchema.$ref;
 
+		// Resolve the schema type by reference
+		if (this.type === undefined && this.$ref !== undefined) {
+			const resolvedSchema = resolveSchemaReference(this.$ref, this.globalSchema);
+			Object.keys(resolvedSchema).forEach(schemaKey => {
+				this[schemaKey] = resolvedSchema[schemaKey];
+			});
+		}
+
+		// Resolve the schema default value
 		if (propertySchema.default === undefined) {
 			this.defaultValue = null;
-			if (this.type === 'array') this.defaultValue = [];
 		} else {
 			this.defaultValue = propertySchema.default;
 		}
+		if (this.defaultValue === null) {
+			if (this.type === 'array') this.defaultValue = [];
+			if (this.type === 'object') this.defaultValue = {};
+		}
 
+		// Resolve the schema value
 		if (propertySchema.value === undefined) {
 			this.value = this.defaultValue;
 		} else {
@@ -181,7 +197,8 @@ class SchemaProperty {
 		propertySchema.value = value;
 
 
-		const nestedProperty = new SchemaProperty(propertySchema);
+		const nestedProperty = new SchemaProperty(propertySchema, this.manager);
+		this.manager.setDefaultValue(nestedProperty.key, nestedProperty.value);
 		this.nestedProperties.push(nestedProperty);
 		return nestedProperty;
 	}
