@@ -6,7 +6,6 @@
 	import ObjectProperty from '$lib/components/common/jschema/ObjectProperty.svelte';
 
 	export let schemaProperty = undefined;
-	export let propertyValue = undefined;
 
 	const key = crypto.randomUUID();
 

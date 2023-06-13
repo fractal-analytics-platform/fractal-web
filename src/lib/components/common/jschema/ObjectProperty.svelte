@@ -1,8 +1,5 @@
 <script>
-	import { getContext } from 'svelte';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
-
-	const schemaManager = getContext('schemaManager');
 
 	export let objectSchema = undefined;
 
