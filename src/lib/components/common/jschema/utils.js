@@ -91,7 +91,6 @@ export class SchemaManager {
 	}
 
 	setDefaultValue(key, value) {
-		console.log('setDefaultValue', key, value);
 		// Split key into keys
 		const keys = key.split(this.keySeparator);
 		// Get the last key

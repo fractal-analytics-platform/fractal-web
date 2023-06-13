@@ -10,7 +10,6 @@
 		schemaProperty.value.forEach((nestedValue, index) => {
 			schemaProperty.addNestedSchemaProperty(nestedValue, index);
 		});
-		console.log('component nested properties', schemaProperty.nestedProperties);
 		nestedProperties = schemaProperty.nestedProperties;
 	});
 
