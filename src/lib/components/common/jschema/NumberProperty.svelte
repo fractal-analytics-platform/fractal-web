@@ -7,8 +7,6 @@
 
 	let hasChanged = false;
 
-	schemaManager.setDefaultValue(schemaProperty.key, schemaProperty.value);
-
 	function handleValueChange() {
 		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
 		hasChanged = true;

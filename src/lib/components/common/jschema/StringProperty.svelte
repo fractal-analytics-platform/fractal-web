@@ -5,8 +5,6 @@
 
 	export let schemaProperty = undefined;
 
-	schemaManager.setDefaultValue(schemaProperty.key, schemaProperty.value);
-
 	function handleValueChange() {
 		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
 	}

@@ -3,23 +3,16 @@
 
 	const schemaManager = getContext('schemaManager');
 
-	export let propertyKey = undefined;
-	export let propertyValue = undefined;
-	export let defaultValue = null;
-
-	if (propertyValue === undefined) {
-		propertyValue = defaultValue;
-	}
-
-	schemaManager.setDefaultValue(propertyKey, propertyValue);
+	export let schemaProperty = undefined;
 
 	function handleValueChange() {
-		schemaManager.updateValue(propertyKey, propertyValue);
+		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
 	}
+
 </script>
 
 <div style='background-color: deepskyblue'>
   <p>Boolean property</p>
 
-  <input type='checkbox' bind:checked={propertyValue} on:change={handleValueChange}>
+  <input type='checkbox' bind:checked={schemaProperty.value} on:change={handleValueChange}>
 </div>

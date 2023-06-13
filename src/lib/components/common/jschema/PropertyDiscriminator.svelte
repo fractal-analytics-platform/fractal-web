@@ -1,5 +1,4 @@
 <script>
-	import { onMount, getContext } from 'svelte';
 	import NumberProperty from '$lib/components/common/jschema/NumberProperty.svelte';
 	import StringProperty from '$lib/components/common/jschema/StringProperty.svelte';
 	import BooleanProperty from '$lib/components/common/jschema/BooleanProperty.svelte';
@@ -9,20 +8,11 @@
 	export let schemaProperty = undefined;
 	export let propertyValue = undefined;
 
-	const schemaManager = getContext('schemaManager');
-
-	onMount(() => {
-	});
-
 	const key = crypto.randomUUID();
-
-	if (propertyValue !== undefined) {
-		schemaProperty.value = propertyValue;
-	}
 
 </script>
 
-{#if schemaProperty && schemaProperty.type }
+{#if schemaProperty }
 
   <div id='root-{key}' class='accordion accordion-flush'>
     <div class='accordion-item'>
@@ -49,14 +39,10 @@
                 <StringProperty {schemaProperty} />
               {/if}
               {#if schemaProperty.type === 'boolean'}
-                <BooleanProperty
-                  propertyKey={schemaProperty.key}
-                  propertyValue={schemaProperty.value}
-                  defaultValue={schemaProperty.defaultValue}
-                />
+                <BooleanProperty {schemaProperty} />
               {/if}
               {#if schemaProperty.type === 'array'}
-                <ArrayProperty arraySchema={schemaProperty}></ArrayProperty>
+                <ArrayProperty {schemaProperty}></ArrayProperty>
               {/if}
               {#if schemaProperty.type === 'object'}
                 <ObjectProperty objectSchema={schemaProperty}></ObjectProperty>
