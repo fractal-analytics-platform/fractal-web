@@ -166,6 +166,13 @@ class SchemaProperty {
 
 	}
 
+	isRequired() {
+		if (this.globalSchema.required)
+			return this.globalSchema.required.includes(this.key);
+		else
+			return false;
+	}
+
 	addNestedSchemaProperty(value, index) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
