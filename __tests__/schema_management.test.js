@@ -1,5 +1,5 @@
 import { it, expect, vi } from 'vitest';
-import { SchemaManager } from '$lib/components/common/jschema/schema_management.js';
+import SchemaManager from '$lib/components/common/jschema/schema_management.js';
 import { SchemaValidator } from '$lib/common/jschema_validation.js';
 
 // Helper functions
@@ -13,11 +13,13 @@ const managerInitialization = (...args) => {
 
 it('should create a new instance of the schema manager', () => {
 	const schema = {};
+	const schemaData = {};
 
-
-	const schemaManager = new SchemaManager(schema);
+	const schemaManager = new SchemaManager(schema, schemaData);
 	expect(schemaManager).toBeDefined();
 	expect(schemaManager.schema).toBeDefined();
+	expect(schemaManager.schema).toStrictEqual({});
+	expect(schemaManager.data).toBeDefined();
 });
 
 it('should create an instance of the schema manager with a valid schema', () => {
