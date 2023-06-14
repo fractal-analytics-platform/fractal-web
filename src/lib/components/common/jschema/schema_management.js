@@ -245,3 +245,15 @@ export function mapSchemaProperties(properties, propertiesKey) {
 	});
 	return mapProperties;
 }
+
+export function stripeSchemaProperties(schema) {
+	const ignoreProperties = ['input_paths', 'output_path', 'metadata', 'component'];
+	Object.keys(schema.properties).forEach((k) => {
+		if (ignoreProperties.includes(k)) {
+			delete schema.properties[k];
+		}
+	});
+	if (schema.required) {
+		schema.required = schema.required.filter((k) => !ignoreProperties.includes(k));
+	}
+}
