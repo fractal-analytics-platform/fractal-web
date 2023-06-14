@@ -194,7 +194,8 @@
 				<thead class="table-light">
 					<tr>
 						<Th handler={tableHandler} key="id" label="Id" />
-						<Th handler={tableHandler} key="start_timestamp" label="Timestamp" />
+						<Th handler={tableHandler} key="start_timestamp" label="Start" />
+						<Th handler={tableHandler} key="end_timestamp" label="End" />
 						<Th handler={tableHandler} key="workflow_id" label="Workflow" />
 						<Th handler={tableHandler} key="input_dataset_id" label="Input dataset" />
 						<Th handler={tableHandler} key="output_dataset_id" label="Output dataset" />
@@ -202,8 +203,9 @@
 						<th>Options</th>
 					</tr>
 					<tr>
-						<th class="col-3" />
-						<th />
+						<th class="col-3"></th>
+						<th> </th>
+						<th> </th>
 						<th>
 							{#if workflows}
 								<select class="form-control" bind:value={workflowFilter}>
@@ -253,6 +255,9 @@
 									<td>{row.id}</td>
 									<td>
 										<TimestampBadge timestamp={row.start_timestamp} />
+									</td>
+									<td>
+										<TimestampBadge timestamp={row.end_timestamp} />
 									</td>
 									<td>
 										{#if workflows}
