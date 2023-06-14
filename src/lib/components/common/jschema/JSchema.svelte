@@ -24,7 +24,7 @@
 	 */
 
 	import { onMount, setContext } from 'svelte';
-	import SchemaManager, { stripeSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
+	import SchemaManager, { stripSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
@@ -43,7 +43,7 @@
 	onMount(() => {
 		// Load a default schema
 		if (schema !== undefined) {
-			stripeSchemaProperties(schema);
+			stripSchemaProperties(schema);
 			validatedSchema = schema;
 		}
 
@@ -61,7 +61,7 @@
 
 	$: {
 		if (schema !== undefined) {
-			stripeSchemaProperties(schema);
+			stripSchemaProperties(schema);
 			validatedSchema = schema;
 			isSchemaValid = validator.loadSchema(validatedSchema);
 			console.log('Validator loaded schema', validator.getErrors());

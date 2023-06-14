@@ -270,7 +270,7 @@ export function mapSchemaProperties(properties, propertiesKey) {
 	return mapProperties;
 }
 
-export function stripeSchemaProperties(schema) {
+export function stripSchemaProperties(schema) {
 	const ignoreProperties = ['input_paths', 'output_path', 'metadata', 'component'];
 	Object.keys(schema.properties).forEach((k) => {
 		if (ignoreProperties.includes(k)) {
