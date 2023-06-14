@@ -193,6 +193,13 @@ class SchemaProperty {
 
 	removeNestedSchemaProperty(index) {
 		this.nestedProperties.splice(index, 1);
+		// Should update the keys of nested properties and update the value of the property
+		const updatedValues = this.nestedProperties.map((nestedProperty, index) => {
+			nestedProperty.key = `${this.key}${this.keySeparator}${index}`;
+			return nestedProperty.value;
+		});
+		this.manager.updateValue(this.key, updatedValues);
+		// this.manager.updateValue(this.key, this.value)
 	}
 
 	discriminatePropertyType(schema, globalSchema, currentValue) {

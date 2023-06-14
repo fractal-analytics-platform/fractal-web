@@ -168,3 +168,72 @@ it('should handle a schema with nested objects within arrays', () => {
 	expect(schemaManager.data['m'][0][0][0]['a']).toBeDefined();
 	expect(schemaManager.data['m'][0][0][0]['a']).toBe(3);
 });
+
+it('should be able to handle array properties correctly', () => {
+	const schema = fs.readFileSync('./lib/test/ArraySchema.json', 'utf8');
+	const schemaData = {};
+
+	const schemaManager = new SchemaManager(schema, schemaData);
+	const properties = mapSchemaProperties(schemaManager.schema.properties);
+
+	properties.forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+
+	// The array property should be defined
+	expect(schemaManager.data['d']).toBeDefined();
+
+	// The array property should be an array
+	expect(Array.isArray(schemaManager.data['d'])).toBe(true);
+
+	// The array property should be empty
+	expect(schemaManager.data['d'].length).toBe(3);
+
+	// The array property should have nested properties
+	const d = schemaManager.propertiesMap.get('d');
+	// Initialize the nested properties
+	d.value.forEach((nestedValue, index) => {
+		d.addNestedSchemaProperty(nestedValue, index);
+	});
+	expect(d.nestedProperties.length).toBe(3);
+
+	// TO TEST: Should be able to add a new item to the array and remove it
+	// Data managed by the schema manager should be updated accordingly, moreover, upon a new addition
+	// of a nested property it should not throw an error
+
+	// Should be able to add a new item to the array
+	const newNestedSchemaProperty = d.addNestedSchemaProperty(undefined, d.nestedProperties.length);
+	expect(d.nestedProperties.length).toBe(4);
+
+	expect(newNestedSchemaProperty.type).toBe('integer');
+	expect(newNestedSchemaProperty.value).toBeDefined();
+
+	// Expect the schema manager data to be correctly updated
+	// By default the newly added item will be null
+	expect(schemaManager.data['d']).toStrictEqual([0, 1, 2, null]);
+
+	// Should be able to remove the first item from the nested properties
+	d.removeNestedSchemaProperty(0);
+
+	expect(d.nestedProperties.length).toBe(3);
+	expect(d.nestedProperties[0].value).toBe(1);
+
+	// Expect the schema manager data to be correctly updated
+	expect(schemaManager.data['d']).toStrictEqual([1, 2, null]);
+
+	// Should be able to add a new item to the array
+	const newNestedSchemaProperty2 = d.addNestedSchemaProperty(undefined, d.nestedProperties.length);
+	expect(d.nestedProperties.length).toBe(4);
+
+	// The key of the newly inserted nested property should be different from any of the other nested properties
+	// This is also important to correctly update the values in the data managed by the schema manager
+	expect(newNestedSchemaProperty2.key).not.to.equal(newNestedSchemaProperty.key);
+
+	expect(schemaManager.data['d']).toStrictEqual([1, 2, null, null]);
+
+	// Remove a nested property from inside the array
+	d.removeNestedSchemaProperty(1);
+
+	expect(d.nestedProperties.length).toBe(3);
+	expect(schemaManager.data['d']).toStrictEqual([1, null, null]);
+});
