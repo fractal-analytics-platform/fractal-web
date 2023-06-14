@@ -1,6 +1,9 @@
 export default class SchemaManager {
 	keySeparator = '###';
 	propertiesMap = new Map();
+	hasUnsavedChanges = false;
+	onPropertyChanges = () => {
+	};
 
 	constructor(schema, schemaData) {
 		this.loadSchema(schema);
@@ -52,6 +55,9 @@ export default class SchemaManager {
 		});
 		// Set the value at the last key
 		object[lastKey] = value;
+
+		// Mark changes as unsaved
+		this.changesNotSaved();
 	}
 
 	setDefaultValue(key, value) {
@@ -77,6 +83,17 @@ export default class SchemaManager {
 		this.setDefaultValue(schemaPropertyKey, schemaProperty.value);
 		return schemaProperty;
 	}
+
+	changesSaved() {
+		this.hasUnsavedChanges = false;
+		this.onPropertyChanges.call(this, this.hasUnsavedChanges);
+	}
+
+	changesNotSaved() {
+		this.hasUnsavedChanges = true;
+		this.onPropertyChanges.call(this, this.hasUnsavedChanges);
+	}
+
 }
 
 class SchemaProperty {

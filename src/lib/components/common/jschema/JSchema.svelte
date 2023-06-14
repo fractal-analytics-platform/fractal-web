@@ -86,13 +86,15 @@
 		if (validatedSchema !== undefined && isSchemaValid && isDataValid) {
 			schemaManager = new SchemaManager(validatedSchema, data);
 			setContext('schemaManager', schemaManager);
+			schemaManager.onPropertyChanges = (hasChanges) => {
+				unsavedChanges = hasChanges;
+			};
 		}
 	}
 
 	function saveChanges() {
 		console.log(data);
-		console.log(JSON.stringify(data));
-		unsavedChanges = false;
+		schemaManager.changesSaved();
 	}
 
 </script>
@@ -100,12 +102,14 @@
 <div>
   <p>Component status</p>
   <ul>
-    <li>Unsaved changes: {unsavedChanges}</li>
-    <li>
-      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-        Save changes
-      </button>
-    </li>
+    {#if unsavedChanges}
+      <li>Unsaved changes: {unsavedChanges}</li>
+      <li>
+        <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
+          Save changes
+        </button>
+      </li>
+    {/if}
   </ul>
 </div>
 
