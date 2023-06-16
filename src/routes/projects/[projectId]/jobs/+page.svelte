@@ -203,9 +203,9 @@
 						<th>Options</th>
 					</tr>
 					<tr>
-						<th class="col-3"></th>
-						<th> </th>
-						<th> </th>
+						<th class="col-2"></th>
+						<th></th>
+						<th></th>
 						<th>
 							{#if workflows}
 								<select class="form-control" bind:value={workflowFilter}>
