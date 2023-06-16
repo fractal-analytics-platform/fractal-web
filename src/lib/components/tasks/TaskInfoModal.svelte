@@ -43,7 +43,7 @@
 							<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
 							<li class="list-group-item">{task?.args_schema_version}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
-							<li class="list-group-item">{JSON.stringify(task?.args_schema, 2)}</li> <!-- FIXME: this is not rendered nicely-->
+							<li class="list-group-item">{JSON.stringify(task?.args_schema, null, 2)}</li> <!-- FIXME: this is not rendered nicely-->
 						</ul>
 					</div>
 				</div>
