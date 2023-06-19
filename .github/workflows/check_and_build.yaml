@@ -32,6 +32,9 @@ jobs:
       - name: Run static code analysis
         run: npx eslint .
 
+      - name: Run vitest tests
+        run: npm run test
+
       - name: Build site
         env:
           FRACTAL_SERVER_HOST: http://localhost:8000

@@ -359,6 +359,15 @@
 								<li class='nav-item'>
 									<span class='nav-link disabled'>Info</span>
 								</li>
+								<li class='nav-item'>
+									<button
+										data-bs-toggle='tab'
+										data-bs-target='#experimental-tab'
+										class='nav-link'
+									>
+										Experimental
+									</button>
+								</li>
 							</ul>
 						{:else}
 							Select a workflow task from the list
@@ -389,6 +398,10 @@
 										/>
 									{/key}
 								{/if}
+							</div>
+						</div>
+						<div id='experimental-tab' class='tab-pane'>
+							<div class='card-body'>
 							</div>
 						</div>
 					</div>
