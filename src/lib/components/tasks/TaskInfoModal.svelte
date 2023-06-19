@@ -33,17 +33,25 @@
 							<li class="list-group-item list-group-item-light fw-bold">Owner</li>
 							<li class="list-group-item">{task?.owner}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Command</li>
-							<li class="list-group-item"><code>{task?.command}</code></li>
-							<li class="list-group-item list-group-item-light fw-bold">Source</li>
-							<li class="list-group-item"><code>{task?.source}</code></li>
-							<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
-							<li class="list-group-item"><pre>{task?.input_type}</pre></li>
-							<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
-							<li class="list-group-item"><pre>{task?.output_type}</pre></li>
-							<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
-							<li class="list-group-item">{task?.args_schema_version}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
-							<li class="list-group-item">{JSON.stringify(task?.args_schema, null, 2)}</li> <!-- FIXME: this is not rendered nicely-->
+							<li class='list-group-item'><code>{task?.command}</code></li>
+							<li class='list-group-item list-group-item-light fw-bold'>Source</li>
+							<li class='list-group-item'><code>{task?.source}</code></li>
+							<li class='list-group-item list-group-item-light fw-bold'>Input Type</li>
+							<li class='list-group-item'>
+								<pre>{task?.input_type}</pre>
+							</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Output Type</li>
+							<li class='list-group-item'>
+								<pre>{task?.output_type}</pre>
+							</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
+							<li class='list-group-item'>{task?.args_schema_version}</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
+							<li class='list-group-item'>
+								<code>
+									<pre>{JSON.stringify(task?.args_schema, null, 2)}</pre>
+								</code>
+							</li>
 						</ul>
 					</div>
 				</div>
