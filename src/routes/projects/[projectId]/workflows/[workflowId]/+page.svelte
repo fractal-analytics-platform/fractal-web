@@ -191,41 +191,66 @@
 	}
 
 	async function handleApplyWorkflow() {
-		// Build a FormData object
-		const data = new FormData();
-		data.append('inputDataset', inputDatasetControl);
-		data.append('outputDataset', outputDatasetControl);
-		data.append('workerInit', workerInitControl);
 
-		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
-			method: 'POST',
-			credentials: 'include',
-			body: data
-		});
-
-		if (response.ok) {
-			// Successfully applied workflow
-			const job = await response.json();
-			// eslint-disable-next-line
-			const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'));
-			modal.toggle();
-			// Navigate to project jobs page
-			// Define URL to navigate to
-			const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin);
-			// Set jobsUrl search params
-			jobsUrl.searchParams.set('workflow', workflow.id);
-			jobsUrl.searchParams.set('id', job.id);
-			// Trigger navigation
-			goto(jobsUrl);
-		} else {
-			console.error(response);
-			// Set an error message on the component
+		if (inputDatasetControl === ''){
+			// Preliminary check: if inputDatasetControl is not set, raise an error
+			let message = 'Input dataset is required. Select one from the list.';
+			console.error(message);
 			new StandardErrorAlert({
 				target: document.getElementById('applyWorkflowError'),
-				props: {
-					error: await response.json()
-				}
+				props: { error: message }
 			});
+		}
+		else if (outputDatasetControl === '') {
+			// Preliminary check: if outputDatasetControl is not set, raise an error
+			let message = 'Output dataset is required. Select one from the list.';
+			console.error(message);
+			new StandardErrorAlert({
+				target: document.getElementById('applyWorkflowError'),
+				props: { error: message }
+			});
+		}
+		else {
+			// Both inputDatasetControl and outputDatasetControl are set, continue
+
+			// Build a FormData object
+			const data = new FormData();
+			data.append('inputDataset', inputDatasetControl);
+			data.append('outputDataset', outputDatasetControl);
+			data.append('workerInit', workerInitControl);
+
+			// Make API call
+			const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
+				method: 'POST',
+				credentials: 'include',
+				body: data
+			});
+
+			// Handle API response
+			if (response.ok) {
+				// Successfully applied workflow
+				const job = await response.json();
+				// eslint-disable-next-line
+				const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'));
+				modal.toggle();
+				// Navigate to project jobs page
+				// Define URL to navigate to
+				const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin);
+				// Set jobsUrl search params
+				jobsUrl.searchParams.set('workflow', workflow.id);
+				jobsUrl.searchParams.set('id', job.id);
+				// Trigger navigation
+				await goto(jobsUrl);
+			} else {
+				console.error(response);
+				// Set an error message on the component
+				new StandardErrorAlert({
+					target: document.getElementById('applyWorkflowError'),
+					props: {
+						error: await response.json()
+					}
+				});
+			}
 		}
 	}
 </script>
