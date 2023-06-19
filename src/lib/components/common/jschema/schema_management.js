@@ -163,7 +163,7 @@ export class SchemaProperty {
 			return false;
 	}
 
-	addNestedSchemaProperty(value, index, namedKey) {
+	addNestedSchemaProperty(value, index) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
 			throw new Error('Schema property is not of type array');
@@ -218,7 +218,6 @@ export class SchemaProperty {
 			this.properties[namedKey] = this.globalSchema.properties[this.key].additionalProperties;
 			this.properties[namedKey].value = propertyValue;
 		}
-		console.log('addProperty', this.properties);
 	}
 
 	removeNestedSchemaProperty(index) {
