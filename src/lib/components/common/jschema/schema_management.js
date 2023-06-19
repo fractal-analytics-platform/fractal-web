@@ -96,11 +96,12 @@ export default class SchemaManager {
 
 }
 
-class SchemaProperty {
+export class SchemaProperty {
 	manager = {};
 	globalSchema = {};
 	keySeparator = '###';
 	nestedProperties = [];
+	hasCustomKeyValues = false;
 
 	constructor(propertySchema, manager, currentValue) {
 		this.manager = manager;
@@ -145,6 +146,14 @@ class SchemaProperty {
 			this.value = currentValue;
 		}
 
+		// Check if the schema property is of type object
+		if (this.type === 'object') {
+			// Check if the property schema has additional properties
+			if (propertySchema.additionalProperties !== undefined) {
+				this.hasCustomKeyValues = true;
+			}
+		}
+
 	}
 
 	isRequired() {
@@ -154,7 +163,7 @@ class SchemaProperty {
 			return false;
 	}
 
-	addNestedSchemaProperty(value, index) {
+	addNestedSchemaProperty(value, index, namedKey) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
 			throw new Error('Schema property is not of type array');
@@ -189,6 +198,27 @@ class SchemaProperty {
 		this.manager.setDefaultValue(nestedProperty.key, nestedProperty.value);
 		this.nestedProperties.push(nestedProperty);
 		return nestedProperty;
+	}
+
+	addProperty(namedKey, propertyValue) {
+		if (this.type !== 'object') {
+			throw new Error('Schema property is not of type object');
+		}
+
+		if (this.properties && Object.keys(this.properties).includes(namedKey)) {
+			throw new Error('Schema property already has a property with the same name');
+		}
+
+		if (this.hasCustomKeyValues) {
+			// The schema property has additional properties
+			if (this.properties === undefined) {
+				this.properties = {};
+			}
+
+			this.properties[namedKey] = this.globalSchema.properties[this.key].additionalProperties;
+			this.properties[namedKey].value = propertyValue;
+		}
+		console.log('addProperty', this.properties);
 	}
 
 	removeNestedSchemaProperty(index) {

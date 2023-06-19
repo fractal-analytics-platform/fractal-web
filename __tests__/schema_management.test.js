@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { it, expect, vi } from 'vitest';
-import SchemaManager from '$lib/components/common/jschema/schema_management.js';
+import SchemaManager, { SchemaProperty } from '$lib/components/common/jschema/schema_management.js';
 import { mapSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
 import { SchemaValidator } from '$lib/common/jschema_validation.js';
 
@@ -236,4 +236,54 @@ it('should be able to handle array properties correctly', () => {
 
 	expect(d.nestedProperties.length).toBe(3);
 	expect(schemaManager.data['d']).toStrictEqual([1, null, null]);
+});
+
+it('should support additionalProperties schema definition', () => {
+	const schema = fs.readFileSync('./lib/test/NapariJsonSchemaExample.json', 'utf8');
+	const schemaData = {};
+
+	const schemaManager = new SchemaManager(schema, schemaData);
+	const properties = mapSchemaProperties(schemaManager.schema.properties);
+
+	properties.forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+
+	// Expect that property with key input_specs is defined
+	const schemaProperty = schemaManager.propertiesMap.get('input_specs');
+	expect(schemaProperty).toBeDefined();
+	// Expect that the property input_specs value is an empty object
+	expect(schemaManager.data['input_specs']).toStrictEqual({});
+
+	// Expect that schema property allows custom key properties
+	expect(schemaProperty.hasCustomKeyValues).toBe(true);
+
+	// schemaProperty.addNestedSchemaProperty(undefined, undefined, 'test');
+	schemaProperty.addProperty('testKey');
+	// expect(schemaProperty.nestedProperties.length).toBe(1);
+	expect(schemaProperty.properties).toBeDefined();
+	expect(schemaProperty.properties['testKey']).toBeDefined();
+	expect(schemaProperty.properties['testKey'].type).toBe(undefined);
+
+	// Add another property to schemaProperty
+	schemaProperty.addProperty('testKey2');
+	expect(schemaProperty.properties['testKey2']).toBeDefined();
+	expect(schemaProperty.properties['testKey2'].type).toBe(undefined);
+});
+
+it('should be possible to initialize a schema property with just type definition', () => {
+	const schemaManager = new SchemaManager({}, {});
+	let property = new SchemaProperty({ type: 'string' }, schemaManager, null);
+
+	expect(property.type).toBe('string');
+	expect(property.value).toStrictEqual(null);
+
+	property = new SchemaProperty({ type: 'integer' }, schemaManager);
+	expect(property.type).toBe('integer');
+	expect(property.value).toStrictEqual(null);
+
+	property = new SchemaProperty({ type: 'object' }, schemaManager);
+	expect(property.type).toBe('object');
+	expect(property.value).toStrictEqual({});
+	expect(property.properties).toBe(undefined);
 });
