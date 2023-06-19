@@ -65,12 +65,11 @@ export async function createTask(fetch, formData) {
 
 // Replace empty string value with undefined, so that it will be ignored in JSON.stringify (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description)
 function replaceEmptyString(key, value) {
-  if (value === '') {
-    return undefined;
-  }
-  else {
-	  return value;
-  }
+	if (typeof value === 'string' && value === '') {
+		return null;
+	} else {
+		return value;
+	}
 }
 
 
