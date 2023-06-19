@@ -66,7 +66,7 @@ export async function createTask(fetch, formData) {
 // Replace empty string value with undefined, so that it will be ignored in JSON.stringify (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description)
 function replaceEmptyString(key, value) {
 	if (typeof value === 'string' && value === '') {
-		return null;
+		return undefined;
 	} else {
 		return value;
 	}
@@ -90,6 +90,7 @@ export async function createTaskCollection(fetch, formData) {
 		python_version: formData.get('python_version'),
 		package_extras: formData.get('package_extras')
 	};
+
 
 	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
 		method: 'POST',
