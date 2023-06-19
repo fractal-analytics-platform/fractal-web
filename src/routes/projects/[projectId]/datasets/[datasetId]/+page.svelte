@@ -159,7 +159,7 @@
 					<thead class='bg-light'>
 					<tr>
 						<th class='col-1'>Id</th>
-						<th class='col-9'>Source</th>
+						<th class='col-9'>Path</th>
 						<th class='col-2'>Options</th>
 					</tr>
 					</thead>

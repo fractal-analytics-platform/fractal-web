@@ -14,7 +14,7 @@
 	$: task = $taskModal;
 </script>
 
-<div class="modal modal-lg" id="taskInfoModal">
+<div class="modal modal-xl" id="taskInfoModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -28,14 +28,30 @@
 						<ul class="list-group">
 							<li class="list-group-item list-group-item-light fw-bold">Name</li>
 							<li class="list-group-item">{task?.name}</li>
+							<li class="list-group-item list-group-item-light fw-bold">Version</li>
+							<li class="list-group-item">{task?.version}</li>
+							<li class="list-group-item list-group-item-light fw-bold">Owner</li>
+							<li class="list-group-item">{task?.owner}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Command</li>
-							<li class="list-group-item"><code>{task?.command}</code></li>
-							<li class="list-group-item list-group-item-light fw-bold">Source</li>
-							<li class="list-group-item"><code>{task?.source}</code></li>
-							<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
-							<li class="list-group-item"><pre>{task?.input_type}</pre></li>
-							<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
-							<li class="list-group-item"><pre>{task?.output_type}</pre></li>
+							<li class='list-group-item'><code>{task?.command}</code></li>
+							<li class='list-group-item list-group-item-light fw-bold'>Source</li>
+							<li class='list-group-item'><code>{task?.source}</code></li>
+							<li class='list-group-item list-group-item-light fw-bold'>Input Type</li>
+							<li class='list-group-item'>
+								<pre>{task?.input_type}</pre>
+							</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Output Type</li>
+							<li class='list-group-item'>
+								<pre>{task?.output_type}</pre>
+							</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
+							<li class='list-group-item'>{task?.args_schema_version}</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
+							<li class='list-group-item'>
+								<code>
+									<pre>{JSON.stringify(task?.args_schema, null, 2)}</pre>
+								</code>
+							</li>
 						</ul>
 					</div>
 				</div>

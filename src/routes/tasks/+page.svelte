@@ -164,15 +164,17 @@
 				<thead class="table-light">
 					<tr>
 						<th>Name</th>
-						<th>Source</th>
+						<th>Version</th>
+						<th>Owner</th>
 						<th>Options</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each tasks as task}
 						<tr>
-							<td class="col-2">{task.name}</td>
-							<td><code>{task.source}</code></td>
+							<td class="col-3">{task.name}</td>
+							<td class="col-1">{task.version}</td>
+							<td class="col-1">{task.owner}</td>
 							<td class="col-2">
 								<button
 									data-fc-task={task.id}
