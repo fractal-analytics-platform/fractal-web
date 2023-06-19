@@ -194,8 +194,7 @@
 
 		if (inputDatasetControl === ''){
 			// Preliminary check: if inputDatasetControl is not set, raise an error
-			console.log(`inputDatasetControl=${inputDatasetControl}`);
-		    let message = "Input dataset is required.";
+			let message = 'Input dataset is required. Select one from the list.';
 			console.error(message);
 			new StandardErrorAlert({
 				target: document.getElementById('applyWorkflowError'),
@@ -204,8 +203,7 @@
 		}
 		else if (outputDatasetControl === '') {
 			// Preliminary check: if outputDatasetControl is not set, raise an error
-			console.log(`outputDatasetControl=${outputDatasetControl}`);
-		    let message = "Output dataset is required.";
+			let message = 'Output dataset is required. Select one from the list.';
 			console.error(message);
 			new StandardErrorAlert({
 				target: document.getElementById('applyWorkflowError'),
@@ -242,7 +240,7 @@
 				jobsUrl.searchParams.set('workflow', workflow.id);
 				jobsUrl.searchParams.set('id', job.id);
 				// Trigger navigation
-				goto(jobsUrl);
+				await goto(jobsUrl);
 			} else {
 				console.error(response);
 				// Set an error message on the component
