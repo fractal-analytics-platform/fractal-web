@@ -83,7 +83,7 @@
 	}
 
 	function initializeSchemaContext() {
-		if (validatedSchema !== undefined && isSchemaValid && isDataValid) {
+		if (validatedSchema !== undefined && isSchemaValid && isDataValid !== undefined) {
 			schemaManager = new SchemaManager(validatedSchema, data);
 			setContext('schemaManager', schemaManager);
 			schemaManager.onPropertyChanges = (hasChanges) => {
@@ -94,6 +94,7 @@
 
 	function saveChanges() {
 		console.log(data);
+		// TODO: Add validation here
 		schemaManager.changesSaved();
 	}
 
@@ -102,18 +103,16 @@
 <div>
   <p>Component status</p>
   <ul>
-    {#if unsavedChanges}
-      <li>Unsaved changes: {unsavedChanges}</li>
-      <li>
-        <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-          Save changes
-        </button>
-      </li>
-    {/if}
+    <li>Unsaved changes: {unsavedChanges}</li>
+    <li>
+      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
+        Save changes
+      </button>
+    </li>
   </ul>
 </div>
 
-{#if validatedSchema !== undefined && isSchemaValid && isDataValid}
+{#if validatedSchema !== undefined && isSchemaValid && isDataValid !== undefined}
 
   <!-- Start rendering the schema structure -->
   <div id='json-schema'>

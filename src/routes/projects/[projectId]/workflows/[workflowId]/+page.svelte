@@ -8,6 +8,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
+	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
 
 	// Workflow
 	let workflow = undefined;
@@ -26,6 +27,7 @@
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
 	let workerInitControl = '';
+	let argsSchemaAvailable = undefined;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -139,6 +141,8 @@
 		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
 		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
 		workflowTaskContext.set(wft);
+		// Check if args schema is available
+		argsSchemaAvailable = wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
 	}
 
 	function moveWorkflowTask(index, direction) {
@@ -427,6 +431,14 @@
 						</div>
 						<div id='experimental-tab' class='tab-pane'>
 							<div class='card-body'>
+								{#if argsSchemaAvailable}
+									<JSchema
+										schema={selectedWorkflowTask.task.args_schema}
+										schemaData={{}}
+									></JSchema>
+								{:else}
+									<p class='alert alert-warning text-center'>No schema is available for this task</p>
+								{/if}
 							</div>
 						</div>
 					</div>
