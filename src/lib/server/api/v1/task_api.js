@@ -63,6 +63,16 @@ export async function createTask(fetch, formData) {
 	throw new PostResourceException(await response.json());
 }
 
+// Replace empty string value with undefined, so that it will be ignored in JSON.stringify (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description)
+function replaceEmptyString(key, value) {
+	if (typeof value === 'string' && value === '') {
+		return null;
+	} else {
+		return value;
+	}
+}
+
+
 /**
  * Requests a task collection to the server
  * @param fetch
@@ -81,14 +91,12 @@ export async function createTaskCollection(fetch, formData) {
 		package_extras: formData.get('package_extras')
 	};
 
-    console.log(requestData) // FIXME This is to debug https://github.com/fractal-analytics-platform/fractal-web/issues/162
-
 	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
 		method: 'POST',
 		mode: 'cors',
 		credentials: 'include',
 		headers: headers,
-		body: JSON.stringify(requestData) // The body must be serialized to json since the server accepts application/json
+		body: JSON.stringify(requestData, replaceEmptyString)
 	});
 
 	if (response.ok) {
