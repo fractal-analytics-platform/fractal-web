@@ -70,6 +70,8 @@
 
 	$: {
 		if (schemaData !== undefined) {
+			// Check if schema data is null
+			if (schemaData === null) schemaData = {};
 			data = schemaData;
 			isDataValid = validator.isValid(data);
 			console.log('Validator loaded data', validator.getErrors());

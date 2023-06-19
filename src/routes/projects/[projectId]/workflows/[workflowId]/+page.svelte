@@ -434,7 +434,7 @@
 								{#if argsSchemaAvailable}
 									<JSchema
 										schema={selectedWorkflowTask.task.args_schema}
-										schemaData={{}}
+										schemaData={selectedWorkflowTask.args}
 									></JSchema>
 								{:else}
 									<p class='alert alert-warning text-center'>No schema is available for this task</p>
