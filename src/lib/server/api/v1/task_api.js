@@ -46,8 +46,6 @@ export async function createTask(fetch, formData) {
 		input_type: formData.get('input_type'),
 		output_type: formData.get('output_type')
 	};
-
-
 	// There is an interesting thing, if we use the svelte kit fetch object the server will not
 	// accept our request. If, instead, we use the default javascript fetch the server accepts it.
 	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/', {
