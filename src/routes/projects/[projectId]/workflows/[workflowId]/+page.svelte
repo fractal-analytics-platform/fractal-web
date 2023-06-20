@@ -431,16 +431,18 @@
 						</div>
 						<div id='experimental-tab' class='tab-pane'>
 							<div class='card-body'>
-								{#if argsSchemaAvailable}
-                  <ArgumentsSchema
-                    workflowId={workflow.id}
-                    workflowTaskId={selectedWorkflowTask.id}
-                    argumentsSchema={selectedWorkflowTask.task.args_schema}
-                    args={selectedWorkflowTask.args}
-                  ></ArgumentsSchema>
-                {:else}
-									<p class='alert alert-warning text-center'>No schema is available for this task</p>
-								{/if}
+								{#key selectedWorkflowTask }
+									{#if argsSchemaAvailable}
+										<ArgumentsSchema
+											workflowId={workflow.id}
+											workflowTaskId={selectedWorkflowTask.id}
+											argumentsSchema={selectedWorkflowTask.task.args_schema}
+											args={selectedWorkflowTask.args}
+										></ArgumentsSchema>
+									{:else}
+										<p class='alert alert-warning text-center'>No schema is available for this task</p>
+									{/if}
+								{/key}
 							</div>
 						</div>
 					</div>
