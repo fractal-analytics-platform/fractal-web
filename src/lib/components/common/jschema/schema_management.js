@@ -26,7 +26,8 @@ export default class SchemaManager {
 		if (schemaData === undefined) {
 			throw new Error('Schema data is undefined');
 		}
-		this.data = schemaData;
+		// Deep copy the schema data
+		this.data = JSON.parse(JSON.stringify(schemaData));
 	}
 
 	getValue(key) {
