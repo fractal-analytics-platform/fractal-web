@@ -93,7 +93,10 @@
 
 	function saveChanges() {
 		const data = schemaManager.data;
-		const isDataValid = validator.isValid(data);
+		// The following is required to remove all null values from the data object
+		// We suppose that null values are not valid, hence we remove them
+		const strippedNullData = Object.fromEntries(Object.entries(data).filter(([, v]) => v != null));
+		const isDataValid = validator.isValid(strippedNullData);
 		if (!isDataValid) {
 			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
 				handleValidationErrors(validator.getErrors());
@@ -103,7 +106,7 @@
 		}
 
 		if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
-			handleSaveChanges(data)
+			handleSaveChanges(strippedNullData)
 				.then(() => {
 					schemaManager.changesSaved();
 				})
