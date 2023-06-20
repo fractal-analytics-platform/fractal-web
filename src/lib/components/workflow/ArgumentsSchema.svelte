@@ -8,6 +8,7 @@
 	export let workflowTaskId = undefined;
 	export let argumentsSchema = undefined;
 	export let args = undefined;
+	let schemaComponent = undefined;
 
 	function handleSaveChanges(newArgs) {
 		return new Promise((resolve, reject) => {
@@ -45,5 +46,7 @@
 
 <div>
   <div id='json-schema-validation-errors'></div>
-  <JSchema schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors} />
+  <button on:click={() => { schemaComponent.resetChanges(args) }}>Reset</button>
+  <JSchema schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
+           bind:this={schemaComponent} />
 </div>

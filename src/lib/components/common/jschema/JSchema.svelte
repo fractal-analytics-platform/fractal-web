@@ -115,6 +115,14 @@
 		}
 	}
 
+	export function resetChanges(args) {
+		// Set schemaData to incoming args value
+		schemaData = args;
+		// Mark changes as unsaved
+		unsavedChanges = true;
+	}
+
+
 </script>
 
 <div>
@@ -133,7 +141,7 @@
 
   <!-- Start rendering the schema structure -->
   <div id='json-schema'>
-    {#key parsedSchema}
+    {#key schemaManager}
       <PropertiesBlock
         properties={parsedSchema.properties}
       />
