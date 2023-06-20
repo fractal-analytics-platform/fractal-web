@@ -1,0 +1,14 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "sleep_time": {
+      "description": "Interval to sleep, in seconds.",
+      "title": "Sleep Time",
+      "type": "integer"
+    }
+  },
+  "required": [
+  ],
+  "title": "DummyParallel",
+  "type": "object"
+}
