@@ -388,15 +388,6 @@
 								<li class='nav-item'>
 									<span class='nav-link disabled'>Info</span>
 								</li>
-								<li class='nav-item'>
-									<button
-										data-bs-toggle='tab'
-										data-bs-target='#experimental-tab'
-										class='nav-link'
-									>
-										Experimental
-									</button>
-								</li>
 							</ul>
 						{:else}
 							Select a workflow task from the list
@@ -407,11 +398,20 @@
 							<div class="card-body">
 								{#if selectedWorkflowTask}
 									{#key selectedWorkflowTask}
-										<ArgumentForm
-											workflowId={workflow.id}
-											workflowTaskId={selectedWorkflowTask.id}
-											workflowTaskArgs={selectedWorkflowTask.args}
-										/>
+										{#if argsSchemaAvailable}
+											<ArgumentsSchema
+												workflowId={workflow.id}
+												workflowTaskId={selectedWorkflowTask.id}
+												argumentsSchema={selectedWorkflowTask.task.args_schema}
+												args={selectedWorkflowTask.args}
+											></ArgumentsSchema>
+										{:else}
+											<ArgumentForm
+												workflowId={workflow.id}
+												workflowTaskId={selectedWorkflowTask.id}
+												workflowTaskArgs={selectedWorkflowTask.args}
+											/>
+										{/if}
 									{/key}
 								{/if}
 							</div>
@@ -427,22 +427,6 @@
 										/>
 									{/key}
 								{/if}
-							</div>
-						</div>
-						<div id='experimental-tab' class='tab-pane'>
-							<div class='card-body'>
-								{#key selectedWorkflowTask }
-									{#if argsSchemaAvailable}
-										<ArgumentsSchema
-											workflowId={workflow.id}
-											workflowTaskId={selectedWorkflowTask.id}
-											argumentsSchema={selectedWorkflowTask.task.args_schema}
-											args={selectedWorkflowTask.args}
-										></ArgumentsSchema>
-									{:else}
-										<p class='alert alert-warning text-center'>No schema is available for this task</p>
-									{/if}
-								{/key}
 							</div>
 						</div>
 					</div>
