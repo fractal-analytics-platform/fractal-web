@@ -31,6 +31,8 @@
 	const validator = new SchemaValidator();
 	export let schema = undefined;
 	export let schemaData = undefined;
+	export let handleSaveChanges = undefined;
+	export let handleValidationErrors = undefined;
 
 	let validatedSchema = undefined;
 	let isSchemaValid = undefined;
@@ -95,9 +97,25 @@
 	}
 
 	function saveChanges() {
-		console.log(data);
-		// TODO: Add validation here
-		schemaManager.changesSaved();
+		const data = schemaManager.data;
+		const isDataValid = validator.isValid(data);
+		if (!isDataValid) {
+			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
+				handleValidationErrors(validator.getErrors());
+			}
+			console.error('Could not save changes. Data is invalid', validator.getErrors());
+			return;
+		}
+
+		if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
+			handleSaveChanges(data)
+				.then(() => {
+					schemaManager.changesSaved();
+				})
+				.catch((err) => {
+					console.error(err);
+				});
+		}
 	}
 
 </script>

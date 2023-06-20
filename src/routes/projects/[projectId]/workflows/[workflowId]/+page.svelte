@@ -8,7 +8,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
-	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
+	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 
 	// Workflow
 	let workflow = undefined;
@@ -432,11 +432,13 @@
 						<div id='experimental-tab' class='tab-pane'>
 							<div class='card-body'>
 								{#if argsSchemaAvailable}
-									<JSchema
-										schema={selectedWorkflowTask.task.args_schema}
-										schemaData={selectedWorkflowTask.args}
-									></JSchema>
-								{:else}
+                  <ArgumentsSchema
+                    workflowId={workflow.id}
+                    workflowTaskId={selectedWorkflowTask.id}
+                    argumentsSchema={selectedWorkflowTask.task.args_schema}
+                    args={selectedWorkflowTask.args}
+                  ></ArgumentsSchema>
+                {:else}
 									<p class='alert alert-warning text-center'>No schema is available for this task</p>
 								{/if}
 							</div>
