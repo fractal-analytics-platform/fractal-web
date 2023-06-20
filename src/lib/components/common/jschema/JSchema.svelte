@@ -48,8 +48,6 @@
 			parsedSchema = schema;
 		}
 
-		if (schemaData !== undefined) {
-		}
 		// Load schema and data from server
 		// Validate schema
 		if (isSchemaValid && isDataValid) {
