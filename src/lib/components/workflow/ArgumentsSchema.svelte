@@ -4,10 +4,15 @@
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 
+	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
+
 	export let workflowId = undefined;
 	export let workflowTaskId = undefined;
 	export let argumentsSchema = undefined;
+	export let argumentsSchemaVersion = undefined;
+	export let validSchema = undefined;
 	export let args = undefined;
+
 	let schemaComponent = undefined;
 
 	function handleSaveChanges(newArgs) {
@@ -40,6 +45,14 @@
 				error: errors
 			}
 		});
+	}
+
+	$: {
+		if (argumentsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argumentsSchemaVersion)) {
+			validSchema = true;
+		} else {
+			validSchema = false;
+		}
 	}
 
 </script>

@@ -28,6 +28,7 @@
 	let outputDatasetControl = '';
 	let workerInitControl = '';
 	let argsSchemaAvailable = undefined;
+	let argsSchemaValid = undefined;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -143,6 +144,8 @@
 		workflowTaskContext.set(wft);
 		// Check if args schema is available
 		argsSchemaAvailable = wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
+		// Suppose args schema is valid
+		argsSchemaValid = true;
 	}
 
 	function moveWorkflowTask(index, direction) {
@@ -398,12 +401,14 @@
 							<div class="card-body">
 								{#if selectedWorkflowTask}
 									{#key selectedWorkflowTask}
-										{#if argsSchemaAvailable}
+										{#if argsSchemaAvailable && argsSchemaValid}
 											<ArgumentsSchema
 												workflowId={workflow.id}
 												workflowTaskId={selectedWorkflowTask.id}
 												argumentsSchema={selectedWorkflowTask.task.args_schema}
+												argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
 												args={selectedWorkflowTask.args}
+												bind:validSchema={argsSchemaValid}
 											></ArgumentsSchema>
 										{:else}
 											<ArgumentForm
