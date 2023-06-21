@@ -31,10 +31,11 @@
 	const validator = new SchemaValidator();
 	export let schema = undefined;
 	export let schemaData = undefined;
+	export let handleSaveChanges = undefined;
+	export let handleValidationErrors = undefined;
 
-	let validatedSchema = undefined;
+	let parsedSchema = undefined;
 	let isSchemaValid = undefined;
-	let data = undefined;
 	let isDataValid = undefined;
 
 	let schemaManager = undefined;
@@ -44,12 +45,9 @@
 		// Load a default schema
 		if (schema !== undefined) {
 			stripSchemaProperties(schema);
-			validatedSchema = schema;
+			parsedSchema = schema;
 		}
 
-		if (schemaData !== undefined) {
-			data = schemaData;
-		}
 		// Load schema and data from server
 		// Validate schema
 		if (isSchemaValid && isDataValid) {
@@ -62,17 +60,18 @@
 	$: {
 		if (schema !== undefined) {
 			stripSchemaProperties(schema);
-			validatedSchema = schema;
-			isSchemaValid = validator.loadSchema(validatedSchema);
-			console.log('Validator loaded schema', validator.getErrors());
+			parsedSchema = schema;
+			isSchemaValid = validator.loadSchema(parsedSchema);
+			console.log('Validator loaded schema. Is valid schema?', isSchemaValid);
 		}
 	}
 
 	$: {
 		if (schemaData !== undefined) {
-			data = schemaData;
-			isDataValid = validator.isValid(data);
-			console.log('Validator loaded data', validator.getErrors());
+			// Check if schema data is null
+			if (schemaData === null) schemaData = {};
+			isDataValid = validator.isValid(schemaData);
+			console.log('Validator loaded data. Errors?', validator.getErrors());
 		}
 	}
 
@@ -83,8 +82,8 @@
 	}
 
 	function initializeSchemaContext() {
-		if (validatedSchema !== undefined && isSchemaValid && isDataValid) {
-			schemaManager = new SchemaManager(validatedSchema, data);
+		if (parsedSchema !== undefined && isSchemaValid && isDataValid !== undefined) {
+			schemaManager = new SchemaManager(parsedSchema, schemaData);
 			setContext('schemaManager', schemaManager);
 			schemaManager.onPropertyChanges = (hasChanges) => {
 				unsavedChanges = hasChanges;
@@ -93,38 +92,64 @@
 	}
 
 	function saveChanges() {
-		console.log(data);
-		schemaManager.changesSaved();
+		const data = schemaManager.data;
+		// The following is required to remove all null values from the data object
+		// We suppose that null values are not valid, hence we remove them
+		const strippedNullData = Object.fromEntries(Object.entries(data).filter(([, v]) => v != null));
+		const isDataValid = validator.isValid(strippedNullData);
+		if (!isDataValid) {
+			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
+				handleValidationErrors(validator.getErrors());
+			}
+			console.error('Could not save changes. Data is invalid', validator.getErrors());
+			return;
+		}
+
+		if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
+			handleSaveChanges(strippedNullData)
+				.then(() => {
+					schemaManager.changesSaved();
+				})
+				.catch((err) => {
+					console.error(err);
+				});
+		}
 	}
+
+	export function resetChanges(args) {
+		// Set schemaData to incoming args value
+		schemaData = args;
+		// Mark changes as unsaved
+		unsavedChanges = true;
+	}
+
 
 </script>
 
 <div>
   <p>Component status</p>
   <ul>
-    {#if unsavedChanges}
-      <li>Unsaved changes: {unsavedChanges}</li>
-      <li>
-        <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-          Save changes
-        </button>
-      </li>
-    {/if}
+    <li>Unsaved changes: {unsavedChanges}</li>
+    <li>
+      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
+        Save changes
+      </button>
+    </li>
   </ul>
 </div>
 
-{#if validatedSchema !== undefined && isSchemaValid && isDataValid}
+{#if parsedSchema !== undefined && isSchemaValid && isDataValid !== undefined}
 
   <!-- Start rendering the schema structure -->
   <div id='json-schema'>
-    {#key validatedSchema}
+    {#key schemaManager}
       <PropertiesBlock
-        properties={validatedSchema.properties}
+        properties={parsedSchema.properties}
       />
     {/key}
   </div>
 
-{:else if validatedSchema === undefined}
+{:else if parsedSchema === undefined}
 
   <div>
     <p>Loading schema</p>
@@ -137,7 +162,7 @@
     <p>Something is wrong</p>
   </div>
 
-{:else if !isDataValid && data !== undefined}
+{:else if !isDataValid && schemaData !== undefined}
 
 
   <div class='alert alert-danger'>
@@ -145,7 +170,7 @@
     <div>Something is wrong</div>
   </div>
 
-{:else if data === undefined}
+{:else if schemaData === undefined}
 
   <div class='alert alert-warning'>
     <span>Data object is missing</span>

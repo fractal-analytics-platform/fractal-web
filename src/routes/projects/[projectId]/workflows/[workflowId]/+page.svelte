@@ -8,6 +8,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
+	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 
 	// Workflow
 	let workflow = undefined;
@@ -26,6 +27,8 @@
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
 	let workerInitControl = '';
+	let argsSchemaAvailable = undefined;
+	let argsSchemaValid = undefined;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -139,6 +142,10 @@
 		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
 		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
 		workflowTaskContext.set(wft);
+		// Check if args schema is available
+		argsSchemaAvailable = wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
+		// Suppose args schema is valid
+		argsSchemaValid = true;
 	}
 
 	function moveWorkflowTask(index, direction) {
@@ -384,15 +391,6 @@
 								<li class='nav-item'>
 									<span class='nav-link disabled'>Info</span>
 								</li>
-								<li class='nav-item'>
-									<button
-										data-bs-toggle='tab'
-										data-bs-target='#experimental-tab'
-										class='nav-link'
-									>
-										Experimental
-									</button>
-								</li>
 							</ul>
 						{:else}
 							Select a workflow task from the list
@@ -403,11 +401,22 @@
 							<div class="card-body">
 								{#if selectedWorkflowTask}
 									{#key selectedWorkflowTask}
-										<ArgumentForm
-											workflowId={workflow.id}
-											workflowTaskId={selectedWorkflowTask.id}
-											workflowTaskArgs={selectedWorkflowTask.args}
-										/>
+										{#if argsSchemaAvailable && argsSchemaValid}
+											<ArgumentsSchema
+												workflowId={workflow.id}
+												workflowTaskId={selectedWorkflowTask.id}
+												argumentsSchema={selectedWorkflowTask.task.args_schema}
+												argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
+												args={selectedWorkflowTask.args}
+												bind:validSchema={argsSchemaValid}
+											></ArgumentsSchema>
+										{:else}
+											<ArgumentForm
+												workflowId={workflow.id}
+												workflowTaskId={selectedWorkflowTask.id}
+												workflowTaskArgs={selectedWorkflowTask.args}
+											/>
+										{/if}
 									{/key}
 								{/if}
 							</div>
@@ -423,10 +432,6 @@
 										/>
 									{/key}
 								{/if}
-							</div>
-						</div>
-						<div id='experimental-tab' class='tab-pane'>
-							<div class='card-body'>
 							</div>
 						</div>
 					</div>
