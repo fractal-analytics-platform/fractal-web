@@ -39,7 +39,7 @@
 	let isDataValid = undefined;
 
 	let schemaManager = undefined;
-	let unsavedChanges = false;
+	export let unsavedChanges = false;
 
 	onMount(() => {
 		// Load a default schema
@@ -91,7 +91,7 @@
 		}
 	}
 
-	function saveChanges() {
+	export function saveChanges() {
 		const data = schemaManager.data;
 		// The following is required to remove all null values from the data object
 		// We suppose that null values are not valid, hence we remove them
@@ -125,18 +125,6 @@
 
 
 </script>
-
-<div>
-  <p>Component status</p>
-  <ul>
-    <li>Unsaved changes: {unsavedChanges}</li>
-    <li>
-      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-        Save changes
-      </button>
-    </li>
-  </ul>
-</div>
 
 {#if parsedSchema !== undefined && isSchemaValid && isDataValid !== undefined}
 
