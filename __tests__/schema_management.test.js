@@ -271,6 +271,23 @@ it('should support additionalProperties schema definition', () => {
 	expect(schemaProperty.properties['testKey2'].type).toBe(undefined);
 });
 
+it.fails('should not allow additionalProperties with empty key', () => {
+	const schema = fs.readFileSync('./lib/test/NapariJsonSchemaExample.json', 'utf8');
+	const schemaData = {};
+
+	const schemaManager = new SchemaManager(schema, schemaData);
+	const properties = mapSchemaProperties(schemaManager.schema.properties);
+
+	properties.forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+
+	// Get a schema property
+	const schemaProperty = schemaManager.propertiesMap.get('input_specs');
+	// Add a property with empty key
+	schemaProperty.addProperty('');
+});
+
 it('should be possible to initialize a schema property with just type definition', () => {
 	const schemaManager = new SchemaManager({}, {});
 	let property = new SchemaProperty({ type: 'string' }, schemaManager, null);

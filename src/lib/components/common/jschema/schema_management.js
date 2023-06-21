@@ -206,6 +206,10 @@ export class SchemaProperty {
 			throw new Error('Schema property is not of type object');
 		}
 
+		if (namedKey === '' || namedKey === undefined) {
+			throw new Error('Schema property has no name');
+		}
+
 		if (this.properties && Object.keys(this.properties).includes(namedKey)) {
 			throw new Error('Schema property already has a property with the same name');
 		}
