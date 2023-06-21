@@ -61,10 +61,16 @@
 </script>
 
 <style>
-    #workflow-arguments-schema-panel {
+    #workflow-arguments-schema-panel .args-list {
         overflow-y: auto;
         max-height: 60vh;
+        position: relative;
     }
+
+    .jschema-controls-bar {
+        background-color: #9e9e9e;
+    }
+
 </style>
 
 <div id='workflow-arguments-schema-panel'>

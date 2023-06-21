@@ -24,7 +24,10 @@
 	 */
 
 	import { onMount, setContext } from 'svelte';
-	import SchemaManager, { stripSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
+	import SchemaManager, {
+		stripSchemaProperties,
+		stripNullAndEmptyObjectsAndArrays
+	} from '$lib/components/common/jschema/schema_management.js';
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
@@ -95,7 +98,7 @@
 		const data = schemaManager.data;
 		// The following is required to remove all null values from the data object
 		// We suppose that null values are not valid, hence we remove them
-		const strippedNullData = Object.fromEntries(Object.entries(data).filter(([, v]) => v != null));
+		const strippedNullData = stripNullAndEmptyObjectsAndArrays(data);
 		const isDataValid = validator.isValid(strippedNullData);
 		if (!isDataValid) {
 			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
