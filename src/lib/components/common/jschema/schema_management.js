@@ -85,6 +85,38 @@ export default class SchemaManager {
 		return schemaProperty;
 	}
 
+	deleteNestedPropertyData(propertyKey, namedKey) {
+		// Check if the property key is defined
+		if (propertyKey === undefined) {
+			throw new Error('Property key is undefined');
+		}
+		// Check if the named key is defined
+		if (namedKey === undefined) {
+			throw new Error('Named key is undefined');
+		}
+		// Check if the property key exists
+		if (!this.propertiesMap.has(propertyKey)) {
+			throw new Error('Property key does not exist');
+		}
+
+		// Delete nested property from propertiesMap
+		const nestedMapKey = propertyKey + this.keySeparator + namedKey;
+		this.propertiesMap.delete(nestedMapKey);
+
+		// Delete nested property from data
+		// Should traverse the data object to find the property
+		const keys = propertyKey.split(this.keySeparator);
+		const lastKey = keys.pop();
+		let dataProperty = this.data;
+		keys.forEach(k => {
+			if (k !== this.keySeparator)
+				dataProperty = dataProperty[k];
+		});
+
+		if (dataProperty[lastKey] !== undefined)
+			delete dataProperty[lastKey][namedKey];
+	}
+
 	changesSaved() {
 		this.hasUnsavedChanges = false;
 		this.onPropertyChanges.call(this, this.hasUnsavedChanges);
@@ -107,6 +139,7 @@ export class SchemaProperty {
 	constructor(propertySchema, manager, currentValue) {
 		this.manager = manager;
 		this.globalSchema = this.manager.schema;
+		this.referenceSchema = propertySchema;
 
 		// Default properties
 		this.type = propertySchema.type;
@@ -220,8 +253,26 @@ export class SchemaProperty {
 				this.properties = {};
 			}
 
-			this.properties[namedKey] = this.globalSchema.properties[this.key].additionalProperties;
+			// This should resolve the reference to the inner schema within the global schema
+			this.properties[namedKey] = this.referenceSchema.additionalProperties;
 			this.properties[namedKey].value = propertyValue;
+		}
+	}
+
+	removeProperty(namedKey) {
+		if (this.type !== 'object') {
+			throw new Error('Schema property is not of type object');
+		}
+
+		if (namedKey === '' || namedKey === undefined) {
+			throw new Error('Schema property has no name');
+		}
+
+		if (this.properties && Object.keys(this.properties).includes(namedKey)) {
+			delete this.properties[namedKey];
+			this.manager.deleteNestedPropertyData(this.key, namedKey);
+		} else {
+			throw new Error('Schema property does not have a property with the same name');
 		}
 	}
 

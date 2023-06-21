@@ -288,6 +288,69 @@ it.fails('should not allow additionalProperties with empty key', () => {
 	schemaProperty.addProperty('');
 });
 
+it('should enable to add and remove nested properties from objects', () => {
+	const schema = fs.readFileSync('./lib/test/NapariJsonSchemaExample.json', 'utf8');
+	const schemaData = {};
+
+	const schemaManager = new SchemaManager(schema, schemaData);
+	const properties = mapSchemaProperties(schemaManager.schema.properties);
+
+	properties.forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+
+	// Expect that property with key input_specs is defined
+	const schemaProperty = schemaManager.propertiesMap.get('input_specs');
+
+	// Add a nested property
+	schemaProperty.addProperty('testKey');
+
+	// Expect that the nested property is defined
+	expect(schemaProperty.properties['testKey']).toBeDefined();
+
+	// Expect that the nested property is defined in the schema manager data
+	let mappedProperties = mapSchemaProperties(schemaProperty.properties, schemaProperty.key);
+	schemaManager.addProperty(mappedProperties[0]);
+	schemaManager.updateValue('input_specs###testKey###type', 'testValue');
+	expect(schemaManager.data['input_specs']['testKey']).toBeDefined();
+	expect(schemaManager.propertiesMap.has('input_specs###testKey')).toBe(true);
+
+	// Now remove the nested property
+	schemaProperty.removeProperty('testKey');
+	expect(schemaProperty.properties['testKey']).toBeUndefined();
+
+	// Expect that the nested property is removed from the schema manager data
+	expect(schemaManager.data['input_specs']['testKey']).toBeUndefined();
+	expect(schemaManager.propertiesMap.has('input_specs###testKey')).toBe(false);
+
+
+	// Should also work with nested properties of nested properties
+	schemaProperty.addProperty('testKey');
+	mappedProperties = mapSchemaProperties(schemaProperty.properties, schemaProperty.key);
+	const napariSchemaProperty = schemaManager.addProperty(mappedProperties[0]);
+	expect(schemaManager.propertiesMap.has('input_specs###testKey')).toBe(true);
+	mapSchemaProperties(napariSchemaProperty.properties, napariSchemaProperty.key).forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+
+	const nestedSchemaProperty = schemaManager.propertiesMap.get('input_specs###testKey###nestedObject');
+	expect(schemaManager.propertiesMap.has('input_specs###testKey###nestedObject')).toBe(true);
+
+	// Add a nested property to the nested property
+	nestedSchemaProperty.addProperty('testKey2', 'string value');
+	// Add nested property in the schema manager
+	mapSchemaProperties(nestedSchemaProperty.properties, nestedSchemaProperty.key).forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+	expect(schemaManager.propertiesMap.has('input_specs###testKey###nestedObject###testKey2')).toBe(true);
+	console.log(schemaManager.propertiesMap.keys());
+
+	nestedSchemaProperty.removeProperty('testKey2');
+	expect(nestedSchemaProperty.properties['testKey2']).toBeUndefined();
+	expect(schemaManager.propertiesMap.has('input_specs###testKey###nestedObject###testKey2')).toBe(false);
+	expect(schemaManager.data['input_specs']['testKey']['nestedObject']['testKey2']).toBeUndefined();
+});
+
 it('should be possible to initialize a schema property with just type definition', () => {
 	const schemaManager = new SchemaManager({}, {});
 	let property = new SchemaProperty({ type: 'string' }, schemaManager, null);

@@ -29,15 +29,22 @@
         <input type='text' bind:value={customObjectPropertyKey} placeholder='Key'>
         <button on:click={addNestedObjectProperty}>Add property</button>
       </form>
+      {#if objectSchema.properties}
+        {#key objectSchema.properties }
+          <PropertiesBlock blockKey={objectSchema.key} properties={objectSchema.properties} removePropertyBlock={(propertyKey) => {
+						propertyKey = propertyKey.split(objectSchema.manager.keySeparator).pop();
+						objectSchema.removeProperty(propertyKey);
+            objectSchema = objectSchema;
+          }} />
+        {/key}
+      {/if}
+    {:else}
+      {#if objectSchema.properties}
+        {#key objectSchema.properties }
+          <PropertiesBlock blockKey={objectSchema.key} properties={objectSchema.properties} />
+        {/key}
+      {/if}
     {/if}
-
-    {#if objectSchema.properties}
-      {#key objectSchema.properties }
-        <PropertiesBlock blockKey={objectSchema.key} properties={objectSchema.properties} />
-      {/key}
-    {/if}
-
-
   </div>
 
 {:else}

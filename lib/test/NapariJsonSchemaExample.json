@@ -102,6 +102,13 @@
             "description": "A value of the ``input_specs`` argument in ``napari_workflows_wrapper``.",
             "type": "object",
             "properties": {
+              "nestedObject": {
+                "title": "Nested Object",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
               "type": {
                 "title": "Type",
                 "enum": [
