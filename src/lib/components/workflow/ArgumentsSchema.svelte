@@ -57,7 +57,14 @@
 
 </script>
 
-<div>
+<style>
+    #workflow-arguments-schema-panel {
+        overflow-y: auto;
+        max-height: 60vh;
+    }
+</style>
+
+<div id='workflow-arguments-schema-panel'>
   <div id='json-schema-validation-errors'></div>
   <button on:click={() => { schemaComponent.resetChanges(args) }}>Reset</button>
   <JSchema schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
