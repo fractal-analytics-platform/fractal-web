@@ -14,6 +14,9 @@
 	export let args = undefined;
 
 	let schemaComponent = undefined;
+	let unsavedChanges = false;
+	let resetChanges = undefined;
+	let saveChanges = undefined;
 
 	function handleSaveChanges(newArgs) {
 		return new Promise((resolve, reject) => {
@@ -57,9 +60,36 @@
 
 </script>
 
-<div>
+<style>
+    #workflow-arguments-schema-panel .args-list {
+        overflow-y: auto;
+        max-height: 60vh;
+        position: relative;
+    }
+
+    .jschema-controls-bar {
+        background-color: #9e9e9e;
+    }
+
+</style>
+
+<div id='workflow-arguments-schema-panel'>
   <div id='json-schema-validation-errors'></div>
-  <button on:click={() => { schemaComponent.resetChanges(args) }}>Reset</button>
-  <JSchema schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
-           bind:this={schemaComponent} />
+  <div class='d-flex justify-content-end jschema-controls-bar py-2'>
+    <div>
+      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
+        Save arguments
+      </button>
+    </div>
+    <div>
+      <button class='btn btn-warning' on:click={resetChanges.bind(this, args)}>
+        Reset arguments
+      </button>
+    </div>
+  </div>
+  <div class='args-list'>
+    <JSchema bind:unsavedChanges={unsavedChanges} bind:resetChanges={resetChanges} bind:saveChanges={saveChanges}
+             schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
+             bind:this={schemaComponent} />
+  </div>
 </div>

@@ -1,6 +1,9 @@
 import fs from 'fs';
 import { it, expect, vi } from 'vitest';
-import SchemaManager, { SchemaProperty } from '$lib/components/common/jschema/schema_management.js';
+import SchemaManager, {
+	SchemaProperty,
+	stripNullAndEmptyObjectsAndArrays
+} from '$lib/components/common/jschema/schema_management.js';
 import { mapSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
 import { SchemaValidator } from '$lib/common/jschema_validation.js';
 
@@ -366,4 +369,53 @@ it('should be possible to initialize a schema property with just type definition
 	expect(property.type).toBe('object');
 	expect(property.value).toStrictEqual({});
 	expect(property.properties).toBe(undefined);
+});
+
+it('should strip data objects correctly', () => {
+
+	const obj = {
+		'valid_bool': true,
+		'valid_number': 1,
+		'valid_string': 'test',
+
+		'empty_string': '',
+		'empty_list': [],
+		'empty_object': {},
+		'null_value': null,
+
+		'object_with_list': {
+			'list': []
+		},
+		'object_with_object': {
+			'object': {}
+		},
+		'object_with_null': {
+			'property': {
+				'null': null
+			},
+			'null': null
+		},
+		'object_with_empty_string': {
+			'list_property': ['', null, 0]
+		}
+	};
+
+	expect(stripNullAndEmptyObjectsAndArrays(obj)).toStrictEqual({
+		'valid_bool': true,
+		'valid_number': 1,
+		'valid_string': 'test',
+		'object_with_list': {
+			'list': []
+		},
+		'object_with_object': {
+			'object': {}
+		},
+		'object_with_null': {
+			'property': {}
+		},
+		'object_with_empty_string': {
+			'list_property': [0]
+		}
+	});
+
 });
