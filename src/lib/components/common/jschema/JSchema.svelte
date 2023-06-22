@@ -98,7 +98,9 @@
 		const data = schemaManager.data;
 		// The following is required to remove all null values from the data object
 		// We suppose that null values are not valid, hence we remove them
-		const strippedNullData = stripNullAndEmptyObjectsAndArrays(data);
+		// Deep copy the data object
+		const toStripData = JSON.parse(JSON.stringify(data));
+		const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
 		const isDataValid = validator.isValid(strippedNullData);
 		if (!isDataValid) {
 			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
