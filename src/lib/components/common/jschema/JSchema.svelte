@@ -112,7 +112,8 @@
 
 		if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
 			handleSaveChanges(strippedNullData)
-				.then(() => {
+				.then((updated_args) => {
+					schemaManager.data = updated_args;
 					schemaManager.changesSaved();
 				})
 				.catch((err) => {
