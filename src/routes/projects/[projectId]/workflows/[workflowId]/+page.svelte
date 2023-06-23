@@ -398,7 +398,7 @@
 					</div>
 					<div class="tab-content">
 						<div id="args-tab" class="tab-pane show active">
-							<div class="card-body">
+							<div class='card-body p-0'>
 								{#if selectedWorkflowTask}
 									{#key selectedWorkflowTask}
 										{#if argsSchemaAvailable && argsSchemaValid}
