@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
 	export let objectSchema = undefined;
@@ -8,6 +9,16 @@
 
 	let accordionParentKey = objectSchema.key.replaceAll('#', '');
 	let collapseSymbol = accordionParentKey + '-collapse';
+
+	onMount(() => {
+		if (objectSchema.hasCustomKeyValues) {
+			const keys = Object.keys(objectSchema.value);
+			keys.forEach((key) => {
+				objectSchema.addProperty(key, objectSchema.value[key]);
+			});
+			objectSchema = objectSchema;
+		}
+	});
 
 	function addNestedObjectProperty() {
 		try {
