@@ -14,9 +14,9 @@
 {#if schemaProperty}
   <div class='d-flex align-items-center p-2'>
     <div class='property-metadata d-flex flex-column align-self-center w-50'>
-      <span class='fs-4'>{ schemaProperty.title || 'Boolean argument' }</span>
+      <span class='fs-5'>{ schemaProperty.title || 'Boolean argument' }</span>
       {#if schemaProperty.description }
-        <span>{ schemaProperty.description }</span>
+        <span class='small'>{ schemaProperty.description }</span>
       {/if}
     </div>
     <div class='property-input ms-auto w-25'>

@@ -29,9 +29,9 @@
 
 {#if schemaProperty }
   <div class='d-flex flex-column p-2'>
-    <div class='property-metadata d-flex flex-column w-50'>
-      <span class='fs-4 {schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title }</span>
-      <span>{schemaProperty.description }</span>
+    <div class='property-metadata d-flex flex-column w-100'>
+      <span class='fs-5 {schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title }</span>
+      <span class='small'>{schemaProperty.description }</span>
     </div>
     <div class='array-items my-2'>
 
@@ -40,7 +40,7 @@
         <div class='accordion-item'>
           <div class='accordion-header'>
             <button class='accordion-button' type='button' data-bs-toggle='collapse'
-                    data-bs-target='#{collapseSymbol}'>List arguments
+                    data-bs-target='#{collapseSymbol}'>Arguments list
             </button>
           </div>
           <div id='{collapseSymbol}' class='accordion-collapse collapse show' data-bs-parent='#{accordionParentKey}'>
