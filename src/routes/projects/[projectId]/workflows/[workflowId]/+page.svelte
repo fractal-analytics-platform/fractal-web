@@ -265,6 +265,7 @@
 		// Event detail is the updated arguments object
 		// Update the current selected workflow task
 		selectedWorkflowTask.args = event.detail.args;
+		selectedWorkflowTask = selectedWorkflowTask;
 	}
 </script>
 
