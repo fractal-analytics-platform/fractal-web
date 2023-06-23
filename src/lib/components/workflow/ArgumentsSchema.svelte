@@ -68,17 +68,19 @@
     }
 
     .jschema-controls-bar {
-        background-color: #9e9e9e;
+        background-color: whitesmoke;
+        margin-top: 5px;
+        border-top: 1px solid lightgray;
     }
 
 </style>
 
 <div id='workflow-arguments-schema-panel'>
   <div id='json-schema-validation-errors'></div>
-  <div class='d-flex justify-content-end jschema-controls-bar py-2'>
+  <div class='d-flex justify-content-end jschema-controls-bar p-3'>
     <div>
       <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-        Save arguments
+        Save changes
       </button>
     </div>
     <div>

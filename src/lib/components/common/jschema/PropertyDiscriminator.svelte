@@ -11,15 +11,10 @@
 
 </script>
 
-<style>
-    .property-container {
-        border-top: 1px solid #e0e0e0;
-    }
-</style>
 
 {#if schemaProperty }
 
-  <div id='block-{key}'>
+  <div id='block-{key}' class='property-block'>
     <div class='property-container'>
       {#if schemaProperty.type === 'integer'}
         <NumberProperty {schemaProperty} />
