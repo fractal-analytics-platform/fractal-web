@@ -36,7 +36,7 @@
     <div class='array-items my-2'>
 
 
-      <div class='accordion accordion-flush' id='{accordionParentKey}'>
+      <div class='accordion' id='{accordionParentKey}'>
         <div class='accordion-item'>
           <div class='accordion-header'>
             <button class='accordion-button' type='button' data-bs-toggle='collapse'
