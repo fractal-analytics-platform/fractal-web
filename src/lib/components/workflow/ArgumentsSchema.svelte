@@ -29,6 +29,7 @@
 				'args'
 			).then(response => {
 				resolve(response.args);
+				args = response.args;
 			}).catch(err => {
 				new StandardErrorAlert({
 					target: document.getElementById('json-schema-validation-errors'),
@@ -84,13 +85,13 @@
       </button>
     </div>
     <div>
-      <button class='btn btn-warning' on:click={resetChanges.bind(this, args)}>
+      <button class='btn btn-warning {unsavedChanges ? "" : "disabled"}' on:click={resetChanges.bind(this, args)}>
         Reset arguments
       </button>
     </div>
   </div>
   <div class='args-list'>
-    <JSchema bind:unsavedChanges={unsavedChanges} bind:resetChanges={resetChanges} bind:saveChanges={saveChanges}
+    <JSchema bind:unsavedChanges={unsavedChanges} bind:discardChanges={resetChanges} bind:saveChanges={saveChanges}
              schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
              bind:this={schemaComponent} />
   </div>
