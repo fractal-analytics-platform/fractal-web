@@ -29,6 +29,7 @@
 	let workerInitControl = '';
 	let argsSchemaAvailable = undefined;
 	let argsSchemaValid = undefined;
+	let argsChangesSaved = false;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -264,6 +265,10 @@
 	function handleArgsSaved(event) {
 		selectedWorkflowTask.args = event.detail.args;
 		selectedWorkflowTask = selectedWorkflowTask;
+		argsChangesSaved = true;
+		setTimeout(() => {
+			argsChangesSaved = false;
+		}, 3000);
 	}
 
 </script>
@@ -408,6 +413,11 @@
 								{#if selectedWorkflowTask}
 									{#key selectedWorkflowTask}
 										{#if argsSchemaAvailable && argsSchemaValid}
+											{#if argsChangesSaved }
+												<div class='alert alert-success m-3' role='alert'>
+													Arguments changes saved successfully
+												</div>
+											{/if}
 											<ArgumentsSchema
 												workflowId={workflow.id}
 												workflowTaskId={selectedWorkflowTask.id}

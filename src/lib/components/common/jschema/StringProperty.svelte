@@ -15,9 +15,9 @@
   <div class='d-flex align-items-center p-2'>
     <div class='property-metadata d-flex flex-column align-self-center w-50'>
       <span
-        class='fs-4 {schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title || 'String argument' }</span>
+        class='fs-5 {schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title || 'String argument' }</span>
       {#if schemaProperty.description}
-        <span>{ schemaProperty.description }</span>
+        <span class='small'>{ schemaProperty.description }</span>
       {/if}
     </div>
     <div class='property-input ms-auto w-25'>
