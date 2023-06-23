@@ -88,7 +88,7 @@
         Save changes
       </button>
     </div>
-    <div>
+    <div class='ms-1'>
       <button class='btn btn-warning {unsavedChanges ? "" : "disabled"}' on:click={resetChanges.bind(this, args)}>
         Discard changes
       </button>
