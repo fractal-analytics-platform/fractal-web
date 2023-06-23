@@ -261,6 +261,11 @@
 		}
 	}
 
+	function handleArgsSaved(event) {
+		selectedWorkflowTask.args = event.detail.args;
+		selectedWorkflowTask = selectedWorkflowTask;
+	}
+
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -410,6 +415,7 @@
 												argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
 												args={selectedWorkflowTask.args}
 												bind:validSchema={argsSchemaValid}
+												on:argsSaved={handleArgsSaved}
 											></ArgumentsSchema>
 										{:else}
 											<ArgumentForm
