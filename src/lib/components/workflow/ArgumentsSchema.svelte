@@ -86,7 +86,7 @@
     </div>
     <div>
       <button class='btn btn-warning {unsavedChanges ? "" : "disabled"}' on:click={resetChanges.bind(this, args)}>
-        Reset arguments
+        Discard changes
       </button>
     </div>
   </div>
