@@ -394,7 +394,7 @@ function removeEmptyObjectsAndArrays(obj) {
 	Object.keys(obj).forEach(key => {
 		if (obj[key] && typeof obj[key] === 'object') {
 			// Next line would enable removing empty objects and arrays from nested objects
-			// removeEmptyObjectsAndArrays(obj[key]);
+			removeEmptyObjectsAndArrays(obj[key]);
 			if (Object.keys(obj[key]).length === 0) delete obj[key];
 		}
 	});
