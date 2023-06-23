@@ -34,15 +34,38 @@
         <div class='accordion-item'>
           <div class='accordion-header'>
             <button class='accordion-button collapsed' type='button' data-bs-toggle='collapse'
-                    data-bs-target='#{collapseSymbol}'>Properties
+                    data-bs-target='#{collapseSymbol}'>Argument Properties
             </button>
           </div>
           <div id='{collapseSymbol}' class='accordion-collapse collapse' data-bs-parent='#{accordionParentKey}'>
             <div class='accordion-body'>
-              {#if objectSchema.properties}
-                {#key objectSchema.properties }
-                  <PropertiesBlock blockKey={objectSchema.key} properties={objectSchema.properties} />
-                {/key}
+              {#if objectSchema.hasCustomKeyValues}
+                <div class='d-flex justify-content-center'>
+                  <form class='row row-cols-auto g-3 align-items-center p-2'>
+                    <div class='col-6'>
+                      <input type='text' bind:value={customObjectPropertyKey} placeholder='Key' class='form-control'>
+                    </div>
+                    <div class='col-6'>
+                      <button class='btn btn-primary' on:click={addNestedObjectProperty}>Add property</button>
+                    </div>
+                  </form>
+                </div>
+                {#if objectSchema.properties}
+                  {#key objectSchema.properties }
+                    <PropertiesBlock blockKey={objectSchema.key} properties={objectSchema.properties}
+                                     removePropertyBlock={(propertyKey) => {
+              propertyKey = propertyKey.split(objectSchema.manager.keySeparator).pop();
+              objectSchema.removeProperty(propertyKey);
+              objectSchema = objectSchema;
+            }} />
+                  {/key}
+                {/if}
+              {:else}
+                {#if objectSchema.properties}
+                  {#key objectSchema.properties }
+                    <PropertiesBlock blockKey={objectSchema.key} properties={objectSchema.properties} />
+                  {/key}
+                {/if}
               {/if}
             </div>
           </div>
