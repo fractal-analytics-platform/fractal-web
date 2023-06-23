@@ -31,12 +31,12 @@
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
-	const validator = new SchemaValidator();
 	export let schema = undefined;
 	export let schemaData = undefined;
 	export let handleSaveChanges = undefined;
 	export let handleValidationErrors = undefined;
 
+	let validator = undefined;
 	let parsedSchema = undefined;
 	let isSchemaValid = undefined;
 	let isDataValid = undefined;
@@ -62,8 +62,10 @@
 
 	$: {
 		if (schema !== undefined) {
+			validator = new SchemaValidator();
 			stripSchemaProperties(schema);
-			parsedSchema = schema;
+			parsedSchema = JSON.parse(JSON.stringify(schema));
+			console.log('Schema parsed', parsedSchema);
 			isSchemaValid = validator.loadSchema(parsedSchema);
 			console.log('Validator loaded schema. Is valid schema?', isSchemaValid);
 		}
