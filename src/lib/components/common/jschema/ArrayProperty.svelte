@@ -5,6 +5,8 @@
 	export let schemaProperty = undefined;
 	let nestedProperties = [];
 
+	let accordionParentKey = schemaProperty.key.replaceAll('#', '');
+	let collapseSymbol = accordionParentKey + '-collapse';
 
 	onMount(() => {
 		schemaProperty.value?.forEach((nestedValue, index) => {
@@ -26,18 +28,45 @@
 </script>
 
 {#if schemaProperty }
+  <div class='d-flex flex-column p-2'>
+    <div class='property-metadata d-flex flex-column w-50'>
+      <span class='fs-4 {schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title }</span>
+      <span>{schemaProperty.description }</span>
+    </div>
+    <div class='array-items my-2'>
 
-  <div style='background-color: rosybrown'>
-    <p>Array property</p>
-    <button class='btn btn-primary' on:click={addNestedProperty}>Add</button>
 
-    {#each nestedProperties as nestedProperty, index (nestedProperty.key)}
-      <div>
-        <button class='btn btn-warning' on:click={removeNestedProperty(index)}>Remove</button>
-        <PropertyDiscriminator schemaProperty={nestedProperty} />
+      <div class='accordion' id='{accordionParentKey}'>
+        <div class='accordion-item'>
+          <div class='accordion-header'>
+            <button class='accordion-button' type='button' data-bs-toggle='collapse'
+                    data-bs-target='#{collapseSymbol}'>List arguments
+            </button>
+          </div>
+          <div id='{collapseSymbol}' class='accordion-collapse collapse show' data-bs-parent='#{accordionParentKey}'>
+            <div class='accordion-body p-1'>
+              <div class='d-flex justify-content-center p-2'>
+                <button class='btn btn-primary' on:click={addNestedProperty}>Add argument to list</button>
+              </div>
+              <div>
+                {#each nestedProperties as nestedProperty, index (nestedProperty.key)}
+                  <div class='d-flex'>
+                    <div class='align-self-center m-2'>
+                      <button class='btn btn-warning' on:click={removeNestedProperty(index)}>Remove</button>
+                    </div>
+                    <div class='flex-fill'>
+                      <PropertyDiscriminator schemaProperty={nestedProperty} />
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    {/each}
 
+
+    </div>
   </div>
 
 {:else}

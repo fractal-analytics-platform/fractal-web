@@ -419,3 +419,64 @@ it('should strip data objects correctly', () => {
 	});
 
 });
+
+it('should load nested object properties in schema manager data correctly', () => {
+
+	const schema = fs.readFileSync('./lib/test/ProblematicSchema.json', 'utf8');
+	const schemaData = {
+		'allowed_channels': {
+			'key': [
+				{
+					'wavelength_id': '1',
+					'window': {
+						'start': 1,
+						'end': 1
+					},
+					'active': true,
+					'coefficient': 1,
+					'inverted': false
+				}
+			],
+			'test': [
+				{
+					'wavelength_id': '1',
+					'window': {
+						'start': 1,
+						'end': 1
+					},
+					'active': true,
+					'coefficient': 1,
+					'inverted': false
+				}
+			]
+		}
+	};
+
+	const schemaManager = new SchemaManager(schema, schemaData);
+
+	const properties = mapSchemaProperties(schemaManager.schema.properties);
+	properties.forEach((property) => {
+		schemaManager.addProperty(property);
+	});
+
+	console.log(schemaManager.data);
+	console.log(schemaManager.propertiesMap.keys());
+	const schemaProperty = schemaManager.propertiesMap.get('allowed_channels');
+	console.log(schemaProperty.hasCustomKeyValues);
+	console.log(schemaProperty.properties);
+
+	console.log(schemaProperty);
+	console.log(schemaProperty.referenceSchema.additionalProperties);
+	expect(schemaProperty.value).toStrictEqual(schemaData['allowed_channels']);
+
+	// Inside the svelte component the nested properties are added from values?
+	const keys = Object.keys(schemaProperty.value);
+	keys.forEach((key) => {
+		schemaProperty.addProperty(key, schemaProperty.value[key]);
+	});
+
+	expect(schemaProperty.properties).toBeDefined();
+
+	expect(schemaProperty.properties['key']).toBeDefined();
+	expect(schemaProperty.properties['key'].value).toStrictEqual(schemaData['allowed_channels']['key']);
+});

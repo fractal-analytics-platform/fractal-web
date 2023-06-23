@@ -122,11 +122,11 @@
 		}
 	}
 
-	export function resetChanges(args) {
+	export function discardChanges(args) {
 		// Set schemaData to incoming args value
 		schemaData = args;
 		// Mark changes as unsaved
-		unsavedChanges = true;
+		unsavedChanges = false;
 	}
 
 
