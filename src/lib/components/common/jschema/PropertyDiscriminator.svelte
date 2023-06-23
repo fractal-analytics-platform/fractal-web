@@ -16,7 +16,7 @@
 
   <div id='block-{key}' class='property-block'>
     <div class='property-container'>
-      {#if schemaProperty.type === 'integer'}
+      {#if schemaProperty.type === 'integer' || schemaProperty.type === 'number'}
         <NumberProperty {schemaProperty} />
       {/if}
       {#if schemaProperty.type === 'string'}
