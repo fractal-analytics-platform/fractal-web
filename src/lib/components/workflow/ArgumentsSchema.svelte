@@ -1,13 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import { createEventDispatcher } from 'svelte';
 	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
-
-	const dispatch = createEventDispatcher();
 
 	export let workflowId = undefined;
 	export let workflowTaskId = undefined;
@@ -33,7 +30,6 @@
 			).then(response => {
 				resolve(response.args);
 				args = response.args;
-				dispatch('argsSaved', { args: response.args });
 			}).catch(err => {
 				new StandardErrorAlert({
 					target: document.getElementById('json-schema-validation-errors'),
