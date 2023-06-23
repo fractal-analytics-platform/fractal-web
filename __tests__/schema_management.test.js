@@ -404,15 +404,6 @@ it('should strip data objects correctly', () => {
 		'valid_bool': true,
 		'valid_number': 1,
 		'valid_string': 'test',
-		'object_with_list': {
-			'list': []
-		},
-		'object_with_object': {
-			'object': {}
-		},
-		'object_with_null': {
-			'property': {}
-		},
 		'object_with_empty_string': {
 			'list_property': [0]
 		}
