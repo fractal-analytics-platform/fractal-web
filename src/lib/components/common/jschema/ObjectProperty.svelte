@@ -38,7 +38,7 @@
             </button>
           </div>
           <div id='{collapseSymbol}' class='accordion-collapse collapse' data-bs-parent='#{accordionParentKey}'>
-            <div class='accordion-body'>
+            <div class='accordion-body p-1'>
               {#if objectSchema.hasCustomKeyValues}
                 <div class='d-flex justify-content-center'>
                   <form class='row row-cols-auto g-3 align-items-center p-2'>
