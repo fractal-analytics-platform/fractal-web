@@ -11,8 +11,35 @@
 
 </script>
 
+<style>
+    .property-container {
+
+    }
+</style>
+
 {#if schemaProperty }
 
+  <div id='block-{key}'>
+    <div class='property-container'>
+      {#if schemaProperty.type === 'integer'}
+        <NumberProperty {schemaProperty} />
+      {/if}
+      {#if schemaProperty.type === 'string'}
+        <StringProperty {schemaProperty} />
+      {/if}
+      {#if schemaProperty.type === 'boolean'}
+        <BooleanProperty {schemaProperty} />
+      {/if}
+      {#if schemaProperty.type === 'array'}
+        <ArrayProperty {schemaProperty}></ArrayProperty>
+      {/if}
+      {#if schemaProperty.type === 'object'}
+        <ObjectProperty objectSchema={schemaProperty}></ObjectProperty>
+      {/if}
+    </div>
+  </div>
+
+  <!--
   <div id='root-{key}' class='accordion accordion-flush'>
     <div class='accordion-item'>
       <div class='accordion-header' style='background-color: {schemaProperty.isRequired() ? "red" : "transparent" }'>
@@ -52,6 +79,7 @@
       </div>
     </div>
   </div>
+  -->
 
 
 {:else}
