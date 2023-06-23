@@ -12,7 +12,7 @@
 </script>
 
 {#if schemaProperty}
-  <div style='background-color: deepskyblue' class='d-flex align-items-center p-2'>
+  <div class='d-flex align-items-center p-2'>
     <div class='property-metadata d-flex flex-column align-self-center w-50'>
       <span class='fs-4'>{ schemaProperty.title || 'Boolean argument' }</span>
       {#if schemaProperty.description }

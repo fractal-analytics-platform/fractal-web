@@ -24,7 +24,7 @@
 
 {#if objectSchema}
 
-  <div style='background-color: #9e9e9e' class='d-flex flex-column p-2'>
+  <div class='d-flex flex-column p-2'>
     <div class='property-metadata d-flex flex-column w-50'>
       <span class='fs-4 {objectSchema.isRequired() ? "fw-bold" : ""}'>{ objectSchema.title }</span>
       <span>{ objectSchema.description }</span>

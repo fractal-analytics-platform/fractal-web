@@ -28,7 +28,7 @@
 </script>
 
 {#if schemaProperty }
-  <div style='background-color: rosybrown' class='d-flex flex-column p-2'>
+  <div class='d-flex flex-column p-2'>
     <div class='property-metadata d-flex flex-column w-50'>
       <span class='fs-4 {schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title }</span>
       <span>{schemaProperty.description }</span>
