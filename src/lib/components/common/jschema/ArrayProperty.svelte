@@ -40,7 +40,7 @@
         <div class='accordion-item'>
           <div class='accordion-header'>
             <button class='accordion-button' type='button' data-bs-toggle='collapse'
-                    data-bs-target='#{collapseSymbol}'>List aruments
+                    data-bs-target='#{collapseSymbol}'>List arguments
             </button>
           </div>
           <div id='{collapseSymbol}' class='accordion-collapse collapse show' data-bs-parent='#{accordionParentKey}'>
