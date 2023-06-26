@@ -279,9 +279,9 @@
 			<li class="breadcrumb-item" aria-current="page">
 				<a href="/projects">Projects</a>
 			</li>
-			{#if $page.params.id}
+			{#if $page.params.projectId}
 				<li class="breadcrumb-item" aria-current="page">
-					<a href="/projects/{$page.params.id}">{project?.name}</a>
+					<a href='/projects/{$page.params.projectId}'>{project?.name}</a>
 				</li>
 			{/if}
 			<li class="breadcrumb-item">Workflows</li>
@@ -310,20 +310,17 @@
 </div>
 
 {#if workflow}
-	<div class="container">
-		<div class="d-flex justify-content-between align-items-center my-3">
-			<h1>Workflow {workflow.name} #{$page.params.workflowId}</h1>
-		</div>
-		<div class="row">
-			<div class="col-4">
-				<div class="card">
-					<div class="card-header">
-						<div class="d-flex justify-content-between align-items-center">
+	<div class='container py-4'>
+		<div class='row'>
+			<div class='col-4'>
+				<div class='card'>
+					<div class='card-header'>
+						<div class='d-flex justify-content-between align-items-center'>
 							<span>Workflow sequence</span>
 							<div>
 								<button
-									class="btn btn-light"
-									data-bs-toggle="modal"
+									class='btn btn-light'
+									data-bs-toggle='modal'
 									data-bs-target="#insertTaskModal"
 									on:click={getAvailableTasks}><i class="bi-plus-lg" /></button
 								>
