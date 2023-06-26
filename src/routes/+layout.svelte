@@ -35,12 +35,7 @@
 			</ul>
 		</div>
 	</nav>
-	<header class="py-4 mb-4 border-bottom">
-		<div class="container">
-			<h1 class="h4">Fractal web client</h1>
-		</div>
-	</header>
-	<div class="container">
+	<div class='container p-4'>
 		<slot />
 	</div>
 	<div class="container">
