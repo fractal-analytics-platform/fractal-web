@@ -154,7 +154,8 @@ export class SchemaProperty {
 		if (this.type === undefined && this.$ref !== undefined) {
 			const resolvedSchema = resolveSchemaReference(this.$ref, this.globalSchema);
 			Object.keys(resolvedSchema).forEach(schemaKey => {
-				this[schemaKey] = resolvedSchema[schemaKey];
+				if (this[schemaKey] === undefined)
+					this[schemaKey] = resolvedSchema[schemaKey];
 			});
 		}
 
@@ -254,7 +255,8 @@ export class SchemaProperty {
 			}
 
 			// This should resolve the reference to the inner schema within the global schema
-			this.properties[namedKey] = this.referenceSchema.additionalProperties;
+			this.properties[namedKey] = JSON.parse(JSON.stringify(this.referenceSchema.additionalProperties));
+			this.properties[namedKey].title = namedKey;
 			this.properties[namedKey].value = propertyValue;
 		}
 	}
