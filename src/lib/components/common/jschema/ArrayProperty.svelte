@@ -39,11 +39,11 @@
       <div class='accordion' id='{accordionParentKey}'>
         <div class='accordion-item'>
           <div class='accordion-header'>
-            <button class='accordion-button' type='button' data-bs-toggle='collapse'
+            <button class='accordion-button collapsed' type='button' data-bs-toggle='collapse'
                     data-bs-target='#{collapseSymbol}'>Arguments list
             </button>
           </div>
-          <div id='{collapseSymbol}' class='accordion-collapse collapse show' data-bs-parent='#{accordionParentKey}'>
+          <div id='{collapseSymbol}' class='accordion-collapse collapse' data-bs-parent='#{accordionParentKey}'>
             <div class='accordion-body p-1'>
               <div class='d-flex justify-content-center p-2'>
                 <button class='btn btn-primary' on:click={addNestedProperty}>Add argument to list</button>
