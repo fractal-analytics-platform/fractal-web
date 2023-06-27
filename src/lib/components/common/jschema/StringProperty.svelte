@@ -19,7 +19,7 @@
       {#if schemaProperty.description}
       {/if}
     </div>
-    <div class='property-input ms-auto w-25'>
+    <div class='property-input ms-auto w-50'>
       <input type='text' bind:value={schemaProperty.value} on:change={handleValueChange} class='form-control'>
     </div>
   </div>
