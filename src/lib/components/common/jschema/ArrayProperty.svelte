@@ -31,7 +31,6 @@
   <div class='d-flex flex-column p-2'>
     <div class='property-metadata d-flex flex-column w-100'>
       <span class='{schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title || "" }</span>
-      <span class='small fw-light'>{schemaProperty.description || "" }</span>
     </div>
     <div class='array-items my-2'>
 

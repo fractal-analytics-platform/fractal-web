@@ -38,7 +38,6 @@
   <div class='d-flex flex-column p-2'>
     <div class='property-metadata d-flex flex-column w-100'>
       <span class='{objectSchema.isRequired() ? "fw-bold" : ""}'>{ objectSchema.title }</span>
-      <span class='small fw-light'>{ objectSchema.description || "" }</span>
     </div>
     <div class='object-properties my-2'>
       <div class='accordion' id='{accordionParentKey}'>

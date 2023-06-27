@@ -17,7 +17,6 @@
       <span
         class='{schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title || 'String argument' }</span>
       {#if schemaProperty.description}
-        <span class='small fw-light'>{ schemaProperty.description }</span>
       {/if}
     </div>
     <div class='property-input ms-auto w-25'>
