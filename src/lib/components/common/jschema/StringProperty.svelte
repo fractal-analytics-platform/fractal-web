@@ -1,5 +1,6 @@
 <script>
 	import { getContext } from 'svelte';
+	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 
 	const schemaManager = getContext('schemaManager');
 
@@ -13,11 +14,10 @@
 
 {#if schemaProperty }
   <div class='d-flex align-items-center p-2'>
-    <div class='property-metadata d-flex flex-column align-self-center w-50'>
+    <div class='property-metadata d-flex flex-row align-self-center w-50'>
       <span
         class='{schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title || 'String argument' }</span>
-      {#if schemaProperty.description}
-      {/if}
+      <PropertyDescription description={schemaProperty.description} />
     </div>
     <div class='property-input ms-auto w-50'>
       <input type='text' bind:value={schemaProperty.value} on:change={handleValueChange} class='form-control'>

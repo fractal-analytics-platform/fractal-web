@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
+	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 
 	export let schemaProperty = undefined;
 	let nestedProperties = [];
@@ -29,8 +30,9 @@
 
 {#if schemaProperty }
   <div class='d-flex flex-column p-2'>
-    <div class='property-metadata d-flex flex-column w-100'>
+    <div class='property-metadata d-flex flex-row w-100'>
       <span class='{schemaProperty.isRequired() ? "fw-bold" : ""}'>{ schemaProperty.title || "" }</span>
+      <PropertyDescription description={schemaProperty.description} />
     </div>
     <div class='array-items my-2'>
 
