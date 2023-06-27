@@ -1,3 +1,7 @@
 #json-schema > .properties-block > .property-block {
-    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+}
+
+#json-schema > .properties-block > .property-block:last-child {
+    border-bottom: none;
 }
