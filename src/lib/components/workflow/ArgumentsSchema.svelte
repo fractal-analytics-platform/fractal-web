@@ -82,6 +82,11 @@
 
 <div id='workflow-arguments-schema-panel'>
   <div id='json-schema-validation-errors'></div>
+  <div class='args-list'>
+    <JSchema bind:unsavedChanges={unsavedChanges} bind:discardChanges={resetChanges} bind:saveChanges={saveChanges}
+             schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
+             bind:this={schemaComponent} />
+  </div>
   <div class='d-flex justify-content-end jschema-controls-bar p-3'>
     <div>
       <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
@@ -93,10 +98,5 @@
         Discard changes
       </button>
     </div>
-  </div>
-  <div class='args-list'>
-    <JSchema bind:unsavedChanges={unsavedChanges} bind:discardChanges={resetChanges} bind:saveChanges={saveChanges}
-             schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
-             bind:this={schemaComponent} />
   </div>
 </div>

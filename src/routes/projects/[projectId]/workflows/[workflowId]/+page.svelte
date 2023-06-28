@@ -310,7 +310,7 @@
 </div>
 
 {#if workflow}
-	<div class='container py-4'>
+	<div class='container py-4 px-0'>
 		<div class='row'>
 			<div class='col-4'>
 				<div class='card'>
@@ -360,17 +360,36 @@
 			</div>
 			<div class="col-8">
 				<div class="card">
-					<div class="card-header">
+					<div class='card-header py-1'>
 						{#if selectedWorkflowTask}
-							<div class="d-flex mb-3 justify-content-between align-items-center">
-								<div>
-									Workflow task {selectedWorkflowTask.task.name}
-								</div>
+							<div class='d-flex justify-content-between'>
+								<ul class='nav nav-tabs card-header-tabs'>
+									<li class='nav-item'>
+										<button
+											data-bs-toggle='tab'
+											data-bs-target='#args-tab'
+											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
+											aria-current='true'
+										>Arguments
+										</button>
+									</li>
+									<li class='nav-item'>
+										<button
+											data-bs-toggle='tab'
+											data-bs-target='#meta-tab'
+											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
+										>Meta
+										</button>
+									</li>
+									<li class='nav-item'>
+										<span class='nav-link disabled'>Info</span>
+									</li>
+								</ul>
 								<ConfirmActionButton
-									modalId="confirmDeleteWorkflowTask"
-									btnStyle="danger"
-									buttonIcon="trash"
-									message="Delete a workflow task {selectedWorkflowTask.task.name}"
+									modalId='confirmDeleteWorkflowTask'
+									btnStyle='danger'
+									buttonIcon='trash'
+									message='Delete a workflow task {selectedWorkflowTask.task.name}'
 									callbackAction={handleDeleteWorkflowTask.bind(
 										this,
 										workflow.id,
@@ -378,28 +397,7 @@
 									)}
 								/>
 							</div>
-							<ul class='nav nav-tabs card-header-tabs'>
-								<li class='nav-item'>
-									<button
-										data-bs-toggle='tab'
-										data-bs-target='#args-tab'
-										class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-										aria-current='true'
-									>Arguments
-									</button>
-								</li>
-								<li class='nav-item'>
-									<button
-										data-bs-toggle='tab'
-										data-bs-target='#meta-tab'
-										class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
-									>Meta
-									</button>
-								</li>
-								<li class='nav-item'>
-									<span class='nav-link disabled'>Info</span>
-								</li>
-							</ul>
+
 						{:else}
 							Select a workflow task from the list
 						{/if}
