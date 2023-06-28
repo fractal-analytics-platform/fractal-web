@@ -14,6 +14,6 @@
 <span class='ms-2'>
   {#if description }
     <a tabindex='0' role='button' data-bs-trigger='focus' class='bi bi-info-circle' data-bs-toggle='popover'
-       data-bs-title='Argument description' data-bs-content={description}></a>
+       data-bs-content={description}></a>
   {/if}
 </span>
