@@ -7,7 +7,7 @@
 
 	export let schemaProperty = undefined;
 
-	const key = crypto.randomUUID();
+	const key = schemaProperty.key;
 
 </script>
 
