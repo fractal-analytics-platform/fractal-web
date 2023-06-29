@@ -322,8 +322,8 @@
 		><i class='bi-gear-wide-connected' /></button
 		>
 		<button class='btn btn-success' on:click|preventDefault={() => {
-			// eslint-disable-next-line
 			if (argumentsWithUnsavedChanges === false) {
+				// eslint-disable-next-line no-undef
 				const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
 				modal.toggle();
 			} else {
