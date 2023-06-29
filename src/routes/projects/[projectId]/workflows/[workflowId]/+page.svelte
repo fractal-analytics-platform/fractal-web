@@ -9,6 +9,7 @@
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
+	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
 
 	// Workflow
 	let workflow = undefined;
@@ -461,18 +462,12 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
-				<form method="post" action="?/createWorkflowTask" use:enhance={handleCreateWorkflowTask}>
-					<div class="mb-3">
-						<label for="taskId" class="form-label">Select task</label>
-						<select name="taskId" id="taskId" class="form-select">
-							<option selected>Select an available task</option>
-							{#each availableTasks as task}
-								<option value={task.id}>{task.name}</option>
-							{/each}
-						</select>
+				<form method='post' action='?/createWorkflowTask' use:enhance={handleCreateWorkflowTask}>
+					<div class='mb-3'>
+						<WorkflowTaskSelection tasks={availableTasks}></WorkflowTaskSelection>
 					</div>
 
-					<div class="mb-3">
+					<div class='mb-3'>
 						<label for='taskOrder' class='form-label'>Task order in workflow</label>
 						<input
 							id='taskOrder'
