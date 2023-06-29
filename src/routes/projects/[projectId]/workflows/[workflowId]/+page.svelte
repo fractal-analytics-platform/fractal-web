@@ -146,13 +146,17 @@
 		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
 		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
 		if (argumentsWithUnsavedChanges === true) {
-			// eslint-disable-next-line no-undef
-			const modal = new bootstrap.Modal(document.getElementById('changes-unsaved-dialog'), {});
-			modal.toggle();
+			toggleUnsavedChangesModal();
 			preventedTaskContextChange = wft;
 			throw new Error('Cannot change workflow task context while there are unsaved changes');
 		}
 		setWorkflowTaskContext(wft);
+	}
+
+	function toggleUnsavedChangesModal() {
+		// eslint-disable-next-line no-undef
+		const modal = new bootstrap.Modal(document.getElementById('changes-unsaved-dialog'), {});
+		modal.toggle();
 	}
 
 	function setWorkflowTaskContext(wft) {
@@ -307,18 +311,27 @@
 		</ol>
 	</nav>
 	<div>
-		<a href="/projects/{project?.id}/jobs?workflow={workflow?.id}" class="btn btn-light"
-			><i class="bi-journal-code" /> List jobs</a
+		<a href='/projects/{project?.id}/jobs?workflow={workflow?.id}' class='btn btn-light'
+		><i class='bi-journal-code' /> List jobs</a
 		>
-		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}
-			><i class="bi-box-arrow-up" /></button
+		<button class='btn btn-light' on:click|preventDefault={handleExportWorkflow}
+		><i class='bi-box-arrow-up' /></button
 		>
-		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-		<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"
-			><i class="bi-gear-wide-connected" /></button
+		<a id='downloadWorkflowButton' class='d-none'>Download workflow link</a>
+		<button class='btn btn-light' data-bs-toggle='modal' data-bs-target='#editWorkflowModal'
+		><i class='bi-gear-wide-connected' /></button
 		>
-		<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#runWorkflowModal"
-			><i class="bi-play-fill" /> Run workflow</button
+		<button class='btn btn-success' on:click|preventDefault={() => {
+			// eslint-disable-next-line
+			if (argumentsWithUnsavedChanges === false) {
+				const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
+				modal.toggle();
+			} else {
+				toggleUnsavedChangesModal()
+			}
+		}}
+		><i class='bi-play-fill' /> Run workflow
+		</button
 		>
 	</div>
 </div>
