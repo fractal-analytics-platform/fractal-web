@@ -17,9 +17,9 @@
 	export let args = undefined;
 
 	let schemaComponent = undefined;
-	let unsavedChanges = false;
+	export let unsavedChanges = false;
 	let resetChanges = undefined;
-	let saveChanges = undefined;
+	export let saveChanges = undefined;
 
 	function handleSaveChanges(newArgs) {
 		return new Promise((resolve, reject) => {
