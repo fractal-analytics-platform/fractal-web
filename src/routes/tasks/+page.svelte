@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-	import semver from 'semver';
+	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { taskModal as taskModalStore } from '$lib/stores/taskStores';
 	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte';
@@ -23,42 +23,8 @@
 	onMount(async () => {
 	});
 
-	// Sort tasks by owner, by name and by version
-	tasks.sort((t1, t2) => {
-		if (t1.owner === null) {
-			// If t1 owner is null, t1 should go before t2 if t2 owner is null
-			// Should check if t2 owner is null too
-			if (t2.owner === null) {
-				// Both owners are null, sort by name
-				if (t1.name < t2.name) return -1;
-				if (t1.name > t2.name) return 1;
-				// Names are equal, sort by version
-				const t1Version = semver.coerce(t1.version);
-				const t2Version = semver.coerce(t2.version);
-				const t1VersionLt = semver.lte(t1Version, t2Version);
-				if (t1VersionLt) return -1;
-				if (!t1VersionLt) return 1;
-			} else {
-				// t1 owner is null, t2 owner is not null, t1 should go before t2
-				return -1;
-			}
-		} else {
-			// t1 owner is not null, t2 owner is null, t2 should go before t1
-			if (t2.owner === null) return 1;
-			// Both owners are not null, sort by owner
-			if (t1.owner < t2.owner) return -1;
-			if (t1.owner > t2.owner) return 1;
-			// Owners are equal, sort by name
-			if (t1.name < t2.name) return -1;
-			if (t1.name > t2.name) return 1;
-			// Names are equal, sort by version
-			const t1Version = semver.coerce(t1.version);
-			const t2Version = semver.coerce(t2.version);
-			const t1VersionLt = semver.lte(t1Version, t2Version);
-			if (t1VersionLt) return -1;
-			if (!t1VersionLt) return 1;
-		}
-	});
+	// Sort tasks
+	tasks = orderTasksByOwnerThenByNameThenByVersion(tasks);
 
 	function setErrorReasons(value) {
 		errorReasons = value;
