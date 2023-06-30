@@ -36,10 +36,6 @@
 
 	}
 
-	function handleGroupSelection(event) {
-		selectedTypeOfTask = event.target.value;
-	}
-
 	function setSelectedGroup(group) {
 		console.log(group);
 		selectedTypeOfTask = group;
