@@ -30,8 +30,10 @@ it('should sort versions correctly', () => {
 	const versions = [
 		{ version: '0.10.0c0' },
 		{ version: '0.10.0b4' },
+		{ version: '0.10.0' },
 		{ version: '0.10.0alpha3' },
 		{ version: '0.10.0a2' },
+		{ version: '1.0.0' },
 		{ version: '0.10.0a0' },
 		{ version: '1.0.0rc4.dev7' },
 		{ version: '0.10.0beta5' },
@@ -48,6 +50,8 @@ it('should sort versions correctly', () => {
 		{ version: '0.10.0b4' },
 		{ version: '0.10.0beta5' },
 		{ version: '0.10.0c0' },
-		{ version: '1.0.0rc4.dev7' }
+		{ version: '0.10.0' },
+		{ version: '1.0.0rc4.dev7' },
+		{ version: '1.0.0' }
 	]);
 });
