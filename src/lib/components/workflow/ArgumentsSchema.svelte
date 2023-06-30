@@ -89,13 +89,13 @@
   </div>
   <div class='d-flex justify-content-end jschema-controls-bar p-3'>
     <div>
-      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-        Save changes
+      <button class='btn btn-warning {unsavedChanges ? "" : "disabled"}' on:click={resetChanges.bind(this, args)}>
+        Discard changes
       </button>
     </div>
     <div class='ms-1'>
-      <button class='btn btn-warning {unsavedChanges ? "" : "disabled"}' on:click={resetChanges.bind(this, args)}>
-        Discard changes
+      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
+        Save changes
       </button>
     </div>
   </div>
