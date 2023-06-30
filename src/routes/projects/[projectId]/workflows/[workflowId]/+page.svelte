@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -46,15 +46,12 @@
 		datasets = $page.data.datasets;
 	});
 
-	// Add an event listener for the 'beforeunload' event
-	window.addEventListener('beforeunload', function(e) {
+	beforeNavigate((navigation) => {
 		if (argumentsWithUnsavedChanges === true) {
-			// Cancel the event
-			e.preventDefault();
+			// Prevent navigation
+			navigation.cancel();
 			// Toggle the modal
 			toggleUnsavedChangesModal();
-			// Chrome requires returnValue to be set
-			e.returnValue = '';
 		}
 	});
 
