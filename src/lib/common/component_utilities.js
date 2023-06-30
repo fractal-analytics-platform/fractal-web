@@ -5,11 +5,15 @@ export function greatestVersionAsc(t1, t2) {
 		loose: true,
 		includePrerelease: true
 	};
-	const t1Version = semver.valid(t1.version, semverValidationOptions);
-	const t2Version = semver.valid(t2.version, semverValidationOptions);
-	const t1VersionLt = semver.lte(t1Version, t2Version);
-	if (t1VersionLt) return -1;
-	if (!t1VersionLt) return 1;
+	try {
+		const t1Version = semver.valid(t1.version, semverValidationOptions);
+		const t2Version = semver.valid(t2.version, semverValidationOptions);
+		const t1VersionLt = semver.lte(t1Version, t2Version);
+		if (t1VersionLt) return -1;
+		if (!t1VersionLt) return 1;
+	} catch {
+		return 0;
+	}
 }
 
 export function greatestVersionDesc(t1, t2) {
@@ -17,11 +21,15 @@ export function greatestVersionDesc(t1, t2) {
 		loose: true,
 		includePrerelease: true
 	};
-	const t1Version = semver.valid(t1.version, semverValidationOptions);
-	const t2Version = semver.valid(t2.version, semverValidationOptions);
-	const t1VersionGt = semver.gte(t1Version, t2Version);
-	if (t1VersionGt) return -1;
-	if (!t1VersionGt) return 1;
+	try {
+		const t1Version = semver.valid(t1.version, semverValidationOptions);
+		const t2Version = semver.valid(t2.version, semverValidationOptions);
+		const t1VersionGt = semver.gte(t1Version, t2Version);
+		if (t1VersionGt) return -1;
+		if (!t1VersionGt) return 1;
+	} catch {
+		return 0;
+	}
 }
 
 function compareTaskNameAndVersion(t1, t2) {

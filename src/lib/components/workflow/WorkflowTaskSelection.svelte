@@ -86,7 +86,7 @@
             <label for='taskId' class='form-label'>Select task version</label>
             <select name='taskId' id='taskId' class='form-select'>
               {#each selectionTasks.get(selectedMapKey) as task}
-                <option value={task.id}>{task.version ? 'v' + task.version : 'not specified'}</option>
+                <option value={task.id}>{task.version ? 'v' + task.version : 'Not specified'}</option>
               {/each}
             </select>
           {/if}
