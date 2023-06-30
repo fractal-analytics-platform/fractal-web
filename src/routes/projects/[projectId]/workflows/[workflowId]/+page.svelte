@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -31,6 +31,9 @@
 	let argsSchemaAvailable = undefined;
 	let argsSchemaValid = undefined;
 	let argsChangesSaved = false;
+	let argumentsWithUnsavedChanges = false;
+	let saveArgumentsChanges = undefined;
+	let preventedTaskContextChange = undefined;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -42,6 +45,15 @@
 		workflow = $page.data.workflow;
 		project = $page.data.project;
 		datasets = $page.data.datasets;
+	});
+
+	beforeNavigate((navigation) => {
+		if (argumentsWithUnsavedChanges === true) {
+			// Prevent navigation
+			navigation.cancel();
+			// Toggle the modal
+			toggleUnsavedChangesModal();
+		}
 	});
 
 	async function handleExportWorkflow() {
@@ -143,6 +155,21 @@
 	async function setActiveWorkflowTaskContext(event) {
 		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
 		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
+		if (argumentsWithUnsavedChanges === true) {
+			toggleUnsavedChangesModal();
+			preventedTaskContextChange = wft;
+			throw new Error('Cannot change workflow task context while there are unsaved changes');
+		}
+		setWorkflowTaskContext(wft);
+	}
+
+	function toggleUnsavedChangesModal() {
+		// eslint-disable-next-line no-undef
+		const modal = new bootstrap.Modal(document.getElementById('changes-unsaved-dialog'), {});
+		modal.toggle();
+	}
+
+	function setWorkflowTaskContext(wft) {
 		workflowTaskContext.set(wft);
 		// Check if args schema is available
 		argsSchemaAvailable = wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
@@ -294,18 +321,27 @@
 		</ol>
 	</nav>
 	<div>
-		<a href="/projects/{project?.id}/jobs?workflow={workflow?.id}" class="btn btn-light"
-			><i class="bi-journal-code" /> List jobs</a
+		<a href='/projects/{project?.id}/jobs?workflow={workflow?.id}' class='btn btn-light'
+		><i class='bi-journal-code' /> List jobs</a
 		>
-		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}
-			><i class="bi-box-arrow-up" /></button
+		<button class='btn btn-light' on:click|preventDefault={handleExportWorkflow}
+		><i class='bi-box-arrow-up' /></button
 		>
-		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-		<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"
-			><i class="bi-gear-wide-connected" /></button
+		<a id='downloadWorkflowButton' class='d-none'>Download workflow link</a>
+		<button class='btn btn-light' data-bs-toggle='modal' data-bs-target='#editWorkflowModal'
+		><i class='bi-gear-wide-connected' /></button
 		>
-		<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#runWorkflowModal"
-			><i class="bi-play-fill" /> Run workflow</button
+		<button class='btn btn-success' on:click|preventDefault={() => {
+			if (argumentsWithUnsavedChanges === false) {
+				// eslint-disable-next-line no-undef
+				const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
+				modal.toggle();
+			} else {
+				toggleUnsavedChangesModal()
+			}
+		}}
+		><i class='bi-play-fill' /> Run workflow
+		</button
 		>
 	</div>
 </div>
@@ -420,7 +456,9 @@
 												argumentsSchema={selectedWorkflowTask.task.args_schema}
 												argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
 												args={selectedWorkflowTask.args}
+												bind:saveChanges={saveArgumentsChanges}
 												bind:validSchema={argsSchemaValid}
+												bind:unsavedChanges={argumentsWithUnsavedChanges}
 												on:argsSaved={handleArgsSaved}
 											></ArgumentsSchema>
 										{:else}
@@ -653,6 +691,31 @@
 						}}>Run</button
 					>
 				{/if}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class='modal' tabindex='-1' id='changes-unsaved-dialog'>
+	<div class='modal-dialog'>
+		<div class='modal-content'>
+			<div class='modal-header'>
+				<h5 class='modal-title'>There are argument changes unsaved</h5>
+				<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+			</div>
+			<div class='modal-body'>
+				<p>Do you want to save the changes made to the arguments of the current selected workflow task?</p>
+			</div>
+			<div class='modal-footer'>
+				<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Cancel</button>
+				<button type='button' class='btn btn-warning' on:click={ () => {
+					argumentsWithUnsavedChanges = false
+					setWorkflowTaskContext(preventedTaskContextChange)
+				}} data-bs-dismiss='modal'>Discard changes
+				</button>
+				<button type='button' class='btn btn-success' on:click={saveArgumentsChanges} data-bs-dismiss='modal'>Save
+					changes
+				</button>
 			</div>
 		</div>
 	</div>
