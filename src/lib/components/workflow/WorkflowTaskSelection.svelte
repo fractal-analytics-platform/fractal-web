@@ -1,18 +1,21 @@
 <script>
 	// import { page } from '$app/stores';
-	import semver from 'semver';
+	import { greatestVersionDesc } from '$lib/common/component_utilities.js';
 
 	export let tasks = undefined;
 
 	let selectedTypeOfTask = 'common';
 	let selectionTasks = new Map();
 	let selectionTasksNames = [];
-	let selectedMapKey = undefined;
+	let selectedMapKey;
+	let selectedMapTaskVersions = undefined;
 
 
 	function setSelectionTasks(group, tasks) {
 		selectionTasks = new Map();
-		selectedMapKey = undefined;
+		selectionTasksNames = [];
+		selectedMapKey = null;
+		selectedMapTaskVersions = undefined;
 
 		let filteredTasks = [];
 
@@ -30,7 +33,6 @@
 			} else {
 				selectionTasks.get(task.name).push({ id: task.id, version: task.version });
 			}
-			selectionTasks.get(task.name).sort(sortTasksByDescendingVersion);
 		});
 		selectionTasksNames = Array.from(selectionTasks.keys());
 
@@ -43,12 +45,8 @@
 
 	function handleSelectedTaskKey(event) {
 		selectedMapKey = event.target.value;
-	}
-
-	function sortTasksByDescendingVersion(t1, t2) {
-		const v1 = semver.coerce(t1.version);
-		const v2 = semver.coerce(t2.version);
-		return semver.rcompare(v1, v2);
+		selectedMapTaskVersions = selectionTasks.get(selectedMapKey);
+		selectedMapTaskVersions.sort(greatestVersionDesc);
 	}
 
 	$: setSelectionTasks(selectedTypeOfTask, tasks);
@@ -73,52 +71,26 @@
         </div>
       </div>
       <div class='card-body'>
-        <div class='tab-content'>
-          <div class='tab-pane show active' id='common-tasks-tab'>
-            <label for='taskId' class='form-label'>Select task</label>
-            {#if selectedTypeOfTask }
-              <select on:change={handleSelectedTaskKey} class='form-select'>
-                <option selected>Select available task</option>
-                {#each selectionTasksNames as taskName}
-                  <option value={taskName}>{taskName}</option>
-                {/each}
-              </select>
-            {/if}
-            <br>
-            {#if selectedMapKey && selectedTypeOfTask === 'common'}
-              <label for='taskId' class='form-label'>{selectedMapKey}</label>
-              <select name='taskId' id='taskId' class='form-select'>
-                {#each selectionTasks.get(selectedMapKey) as task}
-                  <option value={task.id}>v{task.version}</option>
-                {/each}
-              </select>
-            {/if}
-          </div>
-          <div class='tab-pane' id='user-tasks-tab'>
-            <div class='d-flex flex-row align-items-center'>
-              <label for='taskId' class='form-label m-0 flex-grow-1 me-2'>Select task</label>
-              {#if selectedTypeOfTask }
-                <select on:change={handleSelectedTaskKey} class='form-select w-75'>
-                  <option selected>Select available task</option>
-                  {#each selectionTasksNames as taskName}
-                    <option value={taskName}>{taskName}</option>
-                  {/each}
-                </select>
-              {/if}
-            </div>
-            <br>
-            {#if selectedMapKey && selectedTypeOfTask === 'user'}
-              <div class='d-flex flex-row align-items-center'>
-                <span for='taskId' class='form-label flex-grow-1 m-0'>Select task version</span>
-                <select name='taskId' id='taskId' style='width:auto' class='form-select'>
-                  {#each selectionTasks.get(selectedMapKey) as task}
-                    <option value={task.id}>v{task.version}</option>
-                  {/each}
-                </select>
-              </div>
-            {/if}
-          </div>
-        </div>
+        <label for='taskId' class='form-label'>Select task</label>
+        {#if selectedTypeOfTask }
+          <select on:change={handleSelectedTaskKey} class='form-select' bind:value={selectedMapKey}>
+            <option selected value={null}>Select available task</option>
+            {#each selectionTasksNames as taskName}
+              <option value={taskName}>{taskName}</option>
+            {/each}
+          </select>
+        {/if}
+        <br>
+        {#if selectedMapKey && selectedMapTaskVersions }
+          {#if selectedMapTaskVersions.length > 0}
+            <label for='taskId' class='form-label'>Select task version</label>
+            <select name='taskId' id='taskId' class='form-select'>
+              {#each selectionTasks.get(selectedMapKey) as task}
+                <option value={task.id}>{task.version ? 'v' + task.version : 'not specified'}</option>
+              {/each}
+            </select>
+          {/if}
+        {/if}
       </div>
     </div>
 
