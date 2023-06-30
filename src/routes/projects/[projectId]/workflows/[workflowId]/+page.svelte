@@ -46,6 +46,18 @@
 		datasets = $page.data.datasets;
 	});
 
+	// Add an event listener for the 'beforeunload' event
+	window.addEventListener('beforeunload', function(e) {
+		if (argumentsWithUnsavedChanges === true) {
+			// Cancel the event
+			e.preventDefault();
+			// Toggle the modal
+			toggleUnsavedChangesModal();
+			// Chrome requires returnValue to be set
+			e.returnValue = '';
+		}
+	});
+
 	async function handleExportWorkflow() {
 		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/export`, {
 			method: 'GET',
