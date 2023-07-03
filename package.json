@@ -34,8 +34,6 @@
 	"dependencies": {
 		"@vincjo/datatables": "^1.6.0",
 		"ajv": "^8.12.0",
-		"jose": "^4.14.4",
-		"json-schema-traverse": "^1.0.0",
-		"sweetalert2": "^11.4.8"
+		"jose": "^4.14.4"
 	}
 }
