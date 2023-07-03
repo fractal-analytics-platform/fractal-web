@@ -23,6 +23,7 @@ More details can be found at:
 3. [Project structure](docs/structure.md)
 4. [Dependencies](docs/dependencies.md)
 5. [JSON Schemas for WorkflowTask arguments](docs/json_schemas.md)
+6. [CHANGELOG](CHANGELOG.md)
 
 
 
