@@ -39,9 +39,21 @@ function compareTaskNameAndVersion(t1, t2) {
 	return greatestVersionAsc(t1, t2);
 }
 
-export function orderTasksByOwnerThenByNameThenByVersion(tasks) {
+export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null) {
 	// Sort tasks by owner, by name and by version
 	return tasks.sort((t1, t2) => {
+		// If ownerName is not null, filter tasks by owner
+		if (ownerName !== null) {
+			// If t1 owner is same as ownerName, t1 should go before t2
+			if (t1.owner === ownerName) {
+				if (t2.owner !== ownerName) return -1;
+				// Both owners are same, sort by name and version
+				return compareTaskNameAndVersion(t1, t2);
+			} else {
+				// t1 owner is not same as ownerName, t2 should go before t1
+				if (t2.owner === ownerName) return 1;
+			}
+		}
 		if (t1.owner === null) {
 			// If t1 owner is null, t1 should go before t2 if t2 owner is null
 			// Should check if t2 owner is null too
