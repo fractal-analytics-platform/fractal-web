@@ -1,5 +1,7 @@
 <script>
 	// import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import SlimSelect from 'slim-select';
 	import { greatestVersionDesc } from '$lib/common/component_utilities.js';
 
 	export let tasks = undefined;
@@ -9,7 +11,25 @@
 	let selectionTasksNames = [];
 	let selectedMapKey;
 	let selectedMapTaskVersions = undefined;
+	let selectionControl = undefined;
+	let filteredTasks = [];
 
+
+	onMount(() => {
+		selectionControl = new SlimSelect({
+			select: '#advanced-select',
+			events: {
+				afterChange: (selection) => {
+					const selectedOption = selection[0];
+					if (!selectedOption.placeholder) {
+						selectedMapKey = selectedOption.value;
+						selectedMapTaskVersions = selectionTasks.get(selectedMapKey);
+						selectedMapTaskVersions.sort(greatestVersionDesc);
+					}
+				}
+			}
+		});
+	});
 
 	function setSelectionTasks(group, tasks) {
 		selectionTasks = new Map();
@@ -17,7 +37,7 @@
 		selectedMapKey = null;
 		selectedMapTaskVersions = undefined;
 
-		let filteredTasks = [];
+		filteredTasks = [];
 
 		if (group === 'common') {
 			filteredTasks = tasks.filter(task => task.owner === null); // .filter((task, index, self) => self.findIndex(t => t.name === task.name) === index);
@@ -36,17 +56,49 @@
 		});
 		selectionTasksNames = Array.from(selectionTasks.keys());
 
+		setSelectionControlData();
+	}
+
+	function setSelectionControlData() {
+		let optionsMap = [];
+
+		if (selectedTypeOfTask === 'common') {
+			// Group filtered tasks by source
+			optionsMap = filteredTasks.reduce((dataOptions, task) => {
+				const source = task.source.split(':')[1]; // Package name
+				const sourceIndex = dataOptions.findIndex(d => d.label === source);
+				if (sourceIndex === -1) {
+					dataOptions.push({ label: source, options: [{ text: task.name, value: task.name }] });
+				} else {
+					// If task name already exists in options, don't add it again
+					if (!dataOptions[sourceIndex].options.find(o => o.text === task.name))
+						dataOptions[sourceIndex].options.push({ text: task.name, value: task.name });
+				}
+				return dataOptions;
+			}, []);
+		}
+
+		if (selectedTypeOfTask === 'user') {
+			optionsMap = filteredTasks.reduce((dataOptions, task) => {
+				const source = task.owner;
+				const sourceIndex = dataOptions.findIndex(d => d.label === source);
+				if (sourceIndex === -1) {
+					dataOptions.push({ label: source, options: [{ text: task.name, value: task.name }] });
+				} else {
+					// If task name already exists in options, don't add it again
+					if (!dataOptions[sourceIndex].options.find(o => o.text === task.name))
+						dataOptions[sourceIndex].options.push({ text: task.name, value: task.name });
+				}
+				return dataOptions;
+			}, []);
+		}
+
+		optionsMap = [{ text: 'Task selection', placeholder: true }, ...optionsMap];
+		selectionControl?.setData(optionsMap);
 	}
 
 	function setSelectedGroup(group) {
-		console.log(group);
 		selectedTypeOfTask = group;
-	}
-
-	function handleSelectedTaskKey(event) {
-		selectedMapKey = event.target.value;
-		selectedMapTaskVersions = selectionTasks.get(selectedMapKey);
-		selectedMapTaskVersions.sort(greatestVersionDesc);
 	}
 
 	$: setSelectionTasks(selectedTypeOfTask, tasks);
@@ -73,11 +125,7 @@
       <div class='card-body'>
         <label for='taskId' class='form-label'>Select task</label>
         {#if selectedTypeOfTask }
-          <select on:change={handleSelectedTaskKey} class='form-select' bind:value={selectedMapKey}>
-            <option selected value={null}>Select available task</option>
-            {#each selectionTasksNames as taskName}
-              <option value={taskName}>{taskName}</option>
-            {/each}
+          <select id='advanced-select' class='' bind:value={selectedMapKey}>
           </select>
         {/if}
         <br>
