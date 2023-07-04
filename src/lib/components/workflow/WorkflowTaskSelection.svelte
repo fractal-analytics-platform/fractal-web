@@ -1,8 +1,8 @@
 <script>
-	// import { page } from '$app/stores';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import SlimSelect from 'slim-select';
-	import { greatestVersionDesc } from '$lib/common/component_utilities.js';
+	import { greatestVersionDesc, orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 
 	export let tasks = undefined;
 
@@ -79,6 +79,7 @@
 		}
 
 		if (selectedTypeOfTask === 'user') {
+			filteredTasks = orderTasksByOwnerThenByNameThenByVersion(filteredTasks, $page.data.userInfo.username);
 			optionsMap = filteredTasks.reduce((dataOptions, task) => {
 				const source = task.owner;
 				const sourceIndex = dataOptions.findIndex(d => d.label === source);
