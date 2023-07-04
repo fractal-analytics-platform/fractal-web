@@ -8,7 +8,6 @@
 
 	let selectedTypeOfTask = 'common';
 	let selectionTasks = new Map();
-	let selectionTasksNames = [];
 	let selectedMapKey;
 	let selectedMapTaskVersions = undefined;
 	let selectionControl = undefined;
@@ -24,6 +23,9 @@
 					if (!selectedOption.placeholder) {
 						selectedMapKey = selectedOption.value;
 						selectedMapTaskVersions = selectionTasks.get(selectedMapKey);
+						if (selectedOption.data.owner !== undefined) {
+							selectedMapTaskVersions = selectedMapTaskVersions.filter(t => t.owner === selectedOption.data.owner);
+						}
 						selectedMapTaskVersions.sort(greatestVersionDesc);
 					}
 				}
@@ -33,7 +35,6 @@
 
 	function setSelectionTasks(group, tasks) {
 		selectionTasks = new Map();
-		selectionTasksNames = [];
 		selectedMapKey = null;
 		selectedMapTaskVersions = undefined;
 
@@ -49,12 +50,16 @@
 
 		filteredTasks.forEach(task => {
 			if (!selectionTasks.has(task.name)) {
-				selectionTasks.set(task.name, [{ id: task.id, version: task.version }]);
+				selectionTasks.set(task.name, [{ id: task.id, version: task.version, source: task.source, owner: task.owner }]);
 			} else {
-				selectionTasks.get(task.name).push({ id: task.id, version: task.version });
+				const taskVersions = selectionTasks.get(task.name);
+				if (!taskVersions.find(t => t.version === task.version)) {
+					taskVersions.push({ id: task.id, version: task.version, source: task.source, owner: task.owner });
+				} else {
+					taskVersions.push({ id: task.id, version: null, source: task.source, owner: task.owner });
+				}
 			}
 		});
-		selectionTasksNames = Array.from(selectionTasks.keys());
 
 		setSelectionControlData();
 	}
@@ -84,11 +89,14 @@
 				const source = task.owner;
 				const sourceIndex = dataOptions.findIndex(d => d.label === source);
 				if (sourceIndex === -1) {
-					dataOptions.push({ label: source, options: [{ text: task.name, value: task.name }] });
+					dataOptions.push({
+						label: source,
+						options: [{ text: task.name, value: task.name, data: { owner: task.owner } }]
+					});
 				} else {
 					// If task name already exists in options, don't add it again
 					if (!dataOptions[sourceIndex].options.find(o => o.text === task.name))
-						dataOptions[sourceIndex].options.push({ text: task.name, value: task.name });
+						dataOptions[sourceIndex].options.push({ text: task.name, value: task.name, data: { owner: task.owner } });
 				}
 				return dataOptions;
 			}, []);
@@ -134,8 +142,8 @@
           {#if selectedMapTaskVersions.length > 0}
             <label for='taskId' class='form-label'>Select task version</label>
             <select name='taskId' id='taskId' class='form-select'>
-              {#each selectionTasks.get(selectedMapKey) as task}
-                <option value={task.id}>{task.version ? 'v' + task.version : 'Not specified'}</option>
+              {#each selectedMapTaskVersions as task}
+                <option value={task.id}>{task.version ? 'v' + task.version : task.source}</option>
               {/each}
             </select>
           {/if}
