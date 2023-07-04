@@ -26,6 +26,9 @@
 						if (selectedOption.data.owner !== undefined) {
 							selectedMapTaskVersions = selectedMapTaskVersions.filter(t => t.owner === selectedOption.data.owner);
 						}
+						if (selectedOption.data.package !== undefined) {
+							selectedMapTaskVersions = selectedMapTaskVersions.filter(t => t.package === selectedOption.data.package);
+						}
 						selectedMapTaskVersions.sort(greatestVersionDesc);
 					}
 				}
@@ -42,24 +45,56 @@
 
 		if (group === 'common') {
 			filteredTasks = tasks.filter(task => task.owner === null); // .filter((task, index, self) => self.findIndex(t => t.name === task.name) === index);
+			filteredTasks.forEach(task => {
+				let taskPackage = task.source.split(':')[1];
+				if (!selectionTasks.has(task.name)) {
+					selectionTasks.set(task.name, [{
+						id: task.id,
+						version: task.version,
+						source: task.source,
+						package: taskPackage
+					}]);
+				} else {
+					const taskVersions = selectionTasks.get(task.name);
+
+					if (taskVersions.find(t => t.version === task.version && t.package === taskPackage)) {
+						// Set the version to null of previous tasks within taskVersions
+						taskVersions.forEach(t => {
+							if (t.package === taskPackage) {
+								t.version = null;
+							}
+						});
+
+						taskVersions.push({ id: task.id, version: null, source: task.source, package: taskPackage });
+					} else {
+						taskVersions.push({ id: task.id, version: task.version, source: task.source, package: taskPackage });
+					}
+
+				}
+			});
 		}
 
 		if (group === 'user') {
 			filteredTasks = tasks.filter(task => task.owner !== null);
+			filteredTasks.forEach(task => {
+				if (!selectionTasks.has(task.name)) {
+					selectionTasks.set(task.name, [{
+						id: task.id,
+						version: task.version,
+						source: task.source,
+						owner: task.owner
+					}]);
+				} else {
+					const taskVersions = selectionTasks.get(task.name);
+					if (!taskVersions.find(t => t.version === task.version)) {
+						taskVersions.push({ id: task.id, version: task.version, source: task.source, owner: task.owner });
+					} else {
+						taskVersions.push({ id: task.id, version: null, source: task.source, owner: task.owner });
+					}
+				}
+			});
 		}
 
-		filteredTasks.forEach(task => {
-			if (!selectionTasks.has(task.name)) {
-				selectionTasks.set(task.name, [{ id: task.id, version: task.version, source: task.source, owner: task.owner }]);
-			} else {
-				const taskVersions = selectionTasks.get(task.name);
-				if (!taskVersions.find(t => t.version === task.version)) {
-					taskVersions.push({ id: task.id, version: task.version, source: task.source, owner: task.owner });
-				} else {
-					taskVersions.push({ id: task.id, version: null, source: task.source, owner: task.owner });
-				}
-			}
-		});
 
 		setSelectionControlData();
 	}
@@ -70,10 +105,13 @@
 		if (selectedTypeOfTask === 'common') {
 			// Group filtered tasks by source
 			optionsMap = filteredTasks.reduce((dataOptions, task) => {
-				const source = task.source.split(':')[1]; // Package name
-				const sourceIndex = dataOptions.findIndex(d => d.label === source);
+				const taskPackage = task.source.split(':')[1]; // Package name
+				const sourceIndex = dataOptions.findIndex(d => d.label === taskPackage);
 				if (sourceIndex === -1) {
-					dataOptions.push({ label: source, options: [{ text: task.name, value: task.name }] });
+					dataOptions.push({
+						label: taskPackage,
+						options: [{ text: task.name, value: task.name, data: { package: taskPackage } }]
+					});
 				} else {
 					// If task name already exists in options, don't add it again
 					if (!dataOptions[sourceIndex].options.find(o => o.text === task.name))
