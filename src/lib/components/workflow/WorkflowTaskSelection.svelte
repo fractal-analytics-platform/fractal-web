@@ -17,6 +17,9 @@
 	onMount(() => {
 		selectionControl = new SlimSelect({
 			select: '#advanced-select',
+			settings: {
+				showSearch: false
+			},
 			events: {
 				afterChange: (selection) => {
 					const selectedOption = selection[0];
@@ -178,8 +181,7 @@
       <div class='card-body'>
         <label for='taskId' class='form-label'>Select task</label>
         {#if selectedTypeOfTask }
-          <select id='advanced-select' class='' bind:value={selectedMapKey}>
-          </select>
+          <select id='advanced-select'></select>
         {/if}
         <br>
         {#if selectedMapKey && selectedMapTaskVersions }
