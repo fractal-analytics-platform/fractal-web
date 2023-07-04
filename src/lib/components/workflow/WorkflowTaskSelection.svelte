@@ -86,16 +86,22 @@
 					}]);
 				} else {
 					const taskVersions = selectionTasks.get(task.name);
-					if (!taskVersions.find(t => t.version === task.version)) {
-						taskVersions.push({ id: task.id, version: task.version, source: task.source, owner: task.owner });
-					} else {
+
+					if (taskVersions.find(t => t.version === task.version && t.owner === task.owner)) {
+						// Set the version to null of previous tasks within taskVersions
+						taskVersions.forEach(t => {
+							if (t.owner === task.owner) {
+								t.version = null;
+							}
+						});
+
 						taskVersions.push({ id: task.id, version: null, source: task.source, owner: task.owner });
+					} else {
+						taskVersions.push({ id: task.id, version: task.version, source: task.source, owner: task.owner });
 					}
 				}
 			});
 		}
-
-
 		setSelectionControlData();
 	}
 
