@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { taskModal as taskModalStore } from '$lib/stores/taskStores';
 	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte';
@@ -19,7 +20,11 @@
 		if (error) setErrorReasons(error);
 	});
 
-	onMount(async () => {});
+	onMount(async () => {
+	});
+
+	// Sort tasks
+	tasks = orderTasksByOwnerThenByNameThenByVersion(tasks);
 
 	function setErrorReasons(value) {
 		errorReasons = value;
@@ -174,7 +179,7 @@
 						<tr>
 							<td class="col-3">{task.name}</td>
 							<td class="col-1">{task.version}</td>
-							<td class="col-1">{task.owner}</td>
+							<td class='col-1'>{task.owner || "–"}</td>
 							<td class="col-2">
 								<button
 									data-fc-task={task.id}
