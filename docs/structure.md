@@ -219,3 +219,25 @@ makes when a user sends an HTML from, for completion, the one defined in:
   </div>
 </div>
 ```
+
+## Application library
+
+While the `src/routes` is the public-facing side of the client application, `src/lib` contains the client internals.
+
+Within the lib are present four main sections: `common`, `components`, `server` and `stores`.
+
+_Common_ contains client modules that export shared functionalities for both browser and server side parts of the
+app.
+
+_Components_ contains all the svelte components definitions that are used within the client app.
+Components are organized by resources defined and managed by the fractal server.
+
+_Server_ this is a special section as it is never shared and bundled into the package that a user receives in the
+browser.
+More info about this could be found in the svelte kit doc
+about [server-only modules](https://kit.svelte.dev/docs/server-only-modules)
+
+_Stores_ are modules that export svelte store objects that are used by components to manage the state of the
+application.
+> Note that stores are currently not well-organized or used due to the youth of the client.
+
