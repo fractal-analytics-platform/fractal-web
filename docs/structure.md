@@ -175,7 +175,7 @@ In this case, we briefly described the authentication flow of the svelte client 
 The default action within the `+page.server.js` is requested through an HTTP request that the browser-side client app
 makes when a user sends an HTML from, for completion, the one defined in:
 
-```sveltehtml
+```html
 <!-- src/routes/auth/login/+page.svelte -->
 
 <script>
