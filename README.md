@@ -17,7 +17,7 @@ The node server acts as a proxy to the fractal server, forwarding the requests t
 
 More details can be found at:
 
-1. [How to contribute](docs/contribute.md)
+1. [How to run/develop fractal-web](docs/contribute.md)
 2. [How to run fractal-server](docs/fractal_server.md)
 3. [Deployment examples](docs/examples.md)
 3. [Project structure](docs/structure.md)
