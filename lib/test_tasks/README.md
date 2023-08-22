@@ -1,1 +1,1 @@
-These are resourced that are useful to manually test task-collection features.
+These are resources that are useful to manually test task-collection features.
