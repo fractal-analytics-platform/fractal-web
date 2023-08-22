@@ -1,8 +1,8 @@
 # Basic guide for fractal-server startup
 
-The `../lib/fractal-server/` folder describes the basic steps to install and
-run a local `fractal-server` instance, that can be then accessed through
-`fractal-web`.
+The [`lib/fractal-server`](../lib/fractal-server/) folder describes the basic
+steps to install and run a local `fractal-server` instance, that can be then
+accessed through `fractal-web`.
 
 Briefly, one should:
 * Install fractal-server (`pip install fractal-server`);
@@ -18,3 +18,5 @@ Notes:
 3. It is useful to set the fractal-server environment variable
    `JWT_EXPIRE_SECONDS` to a relevant value for the user to persist its session
    on the client (e.g. `JWT_EXPIRE_SECONDS=84600`).
+4. The configuration env file also defines some default credentials for an
+   admin user, that can be used for testing.
