@@ -19,3 +19,5 @@ fractalctl set-db
 ```console
 fractalctl start --port 8000
 ```
+
+To cleanup the database it is sufficient to remove `test.db`.
