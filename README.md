@@ -25,8 +25,6 @@ More details can be found at:
 5. [JSON Schemas for WorkflowTask arguments](docs/json_schemas.md)
 6. [CHANGELOG](CHANGELOG.md)
 
-
-
 # Contributors
 
 Fractal was conceived in the Liberali Lab at the Friedrich Miescher Institute for Biomedical Research and in the Pelkmans Lab at the University of Zurich (both in Switzerland). The project lead is with [@gusqgm](https://github.com/gusqgm) & [@jluethi](https://github.com/jluethi). The core development is done under contract by [eXact lab S.r.l.](https://exact-lab.it).

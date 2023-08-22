@@ -1,18 +1,24 @@
 # Basic guide for fractal-server startup
 
-A brief description on how to startup fractal-server, to experiment with fractal-web.
-This is in principle already self-contained in a given example repo folder (now in `../lib/fractal-server/example_server_startup`), but we can perhaps summarize here the key steps (how to install, what should go in a `.fractal_server.env` file, and what commands are needed).
-## Notes on fractal server configuration
+The [`lib/fractal-server`](../lib/fractal-server/) folder describes the basic
+steps to install and run a local `fractal-server` instance, that can be then
+accessed through `fractal-web`.
 
-It is necessary that the fractal server instance is reachable by the client by network connection.
+Briefly, one should:
+* Install fractal-server (`pip install fractal-server`);
+* Set up the database (`fractalctl set-db`);
+* Startup an instance (`fractalctl start`).
 
-It is also important to set the server environment variable `JWT_EXPIRE_SECONDS` to a relevant value
-for the user to persist its session on the client.
-The client authenticate the user by mean of a JWT token that is received from the fractal server.
-The default value set by the server is 180 seconds, after that the token expires and the user is required to login again
-in order for the client request to be authorized.
-For user experience reasons, it is suggested to set the `JWT_EXPIRE_SECONDS=84600` on the server.
-
-**Note**: The [example_server_startup
-folder](../lib/fractal-server/example_server_startup) contains an example of
-how to install and startup a `fractal-server` instance.
+Notes:
+1. There must exist a `.fractal_server.env` file (see example in
+   `../lib/fractal-server/`), with some configuration variables.
+2. It is necessary that the fractal-server instance is reachable from the
+   client by network connection (this is typically trivial, if fractal-server
+   is run locally e.g. at http://localhost:8000). This address also needs to match
+   the one in the `fractal-web` configuration file (either `.env` or
+   `.env.development`, depending on how you are running `fractal-web`).
+3. It is useful to set the fractal-server environment variable
+   `JWT_EXPIRE_SECONDS` to a relevant value for the user to persist its session
+   on the client (e.g. `JWT_EXPIRE_SECONDS=84600`).
+4. The configuration env file also defines some default credentials for an
+   admin user, that can be used for testing.
