@@ -14,7 +14,9 @@ Notes:
    `../lib/fractal-server/`), with some configuration variables.
 2. It is necessary that the fractal-server instance is reachable from the
    client by network connection (this is typically trivial, if fractal-server
-   is run locally e.g. at http://localhost:8000).
+   is run locally e.g. at http://localhost:8000). This address also needs to match
+   the one in the `fractal-web` configuration file (either `.env` or
+   `.env.development`, depending on how you are running `fractal-web`).
 3. It is useful to set the fractal-server environment variable
    `JWT_EXPIRE_SECONDS` to a relevant value for the user to persist its session
    on the client (e.g. `JWT_EXPIRE_SECONDS=84600`).
