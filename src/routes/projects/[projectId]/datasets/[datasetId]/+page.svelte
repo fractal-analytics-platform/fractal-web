@@ -4,12 +4,14 @@
 	import { enhance } from '$app/forms';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { fieldHasValue } from '$lib/common/component_utilities';
 
 	let projectId = $page.params.projectId;
 	let datasetId = $page.params.datasetId;
 
 	$: project = $page.data.project;
 	let dataset = undefined;
+	let enableCreateResource = false;
 	let updateDatasetSuccess = false;
 	let createResourceSuccess = false;
 
@@ -49,6 +51,7 @@
 					createResourceSuccess = false;
 				}, 1200);
 				form.reset();
+				enableCreateResource = false;
 			} else {
 				new StandardErrorAlert({
 					target: document.getElementById('createDatasetResourceError'),
@@ -205,10 +208,15 @@
 				>
 					<div class="mb-3">
 						<label for="source" class="form-label">Resource path</label>
-						<input class="form-control" type="text" name="source" id="source" />
+						<input
+							class="form-control"
+							type="text"
+							name="source"
+							id="source"
+							on:input={(event) => {enableCreateResource = fieldHasValue(event)}} />
 					</div>
 
-					<button class="btn btn-primary"> Create </button>
+					<button class="btn btn-primary" disabled={!enableCreateResource}>Create resource</button>
 				</form>
 
 				{#if createResourceSuccess}
