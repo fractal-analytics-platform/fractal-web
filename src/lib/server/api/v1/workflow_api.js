@@ -342,6 +342,12 @@ export async function applyWorkflow(fetch, projectId, workflowId, formData) {
 	if (formData.get('workerInit')) {
 		requestBody.worker_init = formData.get('workerInit');
 	}
+	if (formData.get('firstTaskIndex')) {
+		requestBody.first_task_index = formData.get('firstTaskIndex');
+	}
+	if (formData.get('lastTaskIndex')) {
+		requestBody.last_task_index = formData.get('lastTaskIndex');
+	}
 
 	const headers = new Headers();
 	headers.set('Content-Type', 'application/json');

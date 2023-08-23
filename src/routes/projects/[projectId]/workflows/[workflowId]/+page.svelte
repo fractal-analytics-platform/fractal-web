@@ -28,6 +28,8 @@
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
 	let workerInitControl = '';
+	let firstTaskIndexControl = '';
+	let lastTaskIndexControl = '';
 	let argsSchemaAvailable = undefined;
 	let argsSchemaValid = undefined;
 	let argsChangesSaved = false;
@@ -254,6 +256,8 @@
 			data.append('inputDataset', inputDatasetControl);
 			data.append('outputDataset', outputDatasetControl);
 			data.append('workerInit', workerInitControl);
+			data.append('firstTaskIndex', firstTaskIndexControl);
+			data.append('lastTaskIndex', lastTaskIndexControl);
 
 			// Make API call
 			const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
@@ -297,6 +301,12 @@
 		setTimeout(() => {
 			argsChangesSaved = false;
 		}, 3000);
+	}
+
+	function resetLastTask() {
+		if (lastTaskIndexControl !== '' && firstTaskIndexControl > lastTaskIndexControl) {
+			lastTaskIndexControl = '';
+		}
 	}
 
 </script>
@@ -656,6 +666,39 @@
 							<option value="">Select an output dataset</option>
 							{#each datasets as dataset}
 								<option value={dataset.id}>{dataset.name}</option>
+							{/each}
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="firstTaskIndex" class="form-label">First task (Optional)</label>
+						<select
+							name="firstTaskIndex"
+							id="firstTaskIndex"
+							class="form-control"
+							disabled={checkingConfiguration}
+							bind:value={firstTaskIndexControl}
+							on:change={resetLastTask}
+						>
+							<option value="">Select first task</option>
+							{#each updatableWorkflowList as wft}
+								<option value={wft.order}>{wft.task.name}</option>
+							{/each}
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
+						<select
+							name="lastTaskIndex"
+							id="lastTaskIndex"
+							class="form-control"
+							disabled={checkingConfiguration || firstTaskIndexControl === ''}
+							bind:value={lastTaskIndexControl}
+						>
+							<option value="">Select last task</option>
+							{#each updatableWorkflowList as wft}
+								{#if wft.order >= firstTaskIndexControl}
+									<option value={wft.order}>{wft.task.name}</option>
+								{/if}
 							{/each}
 						</select>
 					</div>
