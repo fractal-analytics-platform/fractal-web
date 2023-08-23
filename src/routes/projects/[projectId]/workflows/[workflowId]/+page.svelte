@@ -691,12 +691,12 @@
 							name="lastTaskIndex"
 							id="lastTaskIndex"
 							class="form-control"
-							disabled={checkingConfiguration || firstTaskIndexControl === ''}
+							disabled={checkingConfiguration}
 							bind:value={lastTaskIndexControl}
 						>
 							<option value="">Select last task</option>
 							{#each updatableWorkflowList as wft}
-								{#if wft.order >= firstTaskIndexControl}
+								{#if firstTaskIndexControl === '' || wft.order >= firstTaskIndexControl}
 									<option value={wft.order}>{wft.task.name}</option>
 								{/if}
 							{/each}
