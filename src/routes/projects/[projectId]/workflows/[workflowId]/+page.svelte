@@ -28,6 +28,8 @@
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
 	let workerInitControl = '';
+	let firstTaskIndexControl = '';
+	let lastTaskIndexControl = '';
 	let argsSchemaAvailable = undefined;
 	let argsSchemaValid = undefined;
 	let argsChangesSaved = false;
@@ -254,6 +256,8 @@
 			data.append('inputDataset', inputDatasetControl);
 			data.append('outputDataset', outputDatasetControl);
 			data.append('workerInit', workerInitControl);
+			data.append('firstTaskIndex', firstTaskIndexControl);
+			data.append('lastTaskIndex', lastTaskIndexControl);
 
 			// Make API call
 			const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
@@ -658,6 +662,24 @@
 								<option value={dataset.id}>{dataset.name}</option>
 							{/each}
 						</select>
+					</div>
+					<div class="mb-3">
+						<label for="firstTaskIndex" class="form-label">First task index (Optional)</label>
+						<input
+							name="firstTaskIndex"
+							id="firstTaskIndex"
+							class="form-control font-monospace"
+							bind:value={firstTaskIndexControl}
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="lastTaskIndex" class="form-label">Last task index (Optional)</label>
+						<input
+							name="lastTaskIndex"
+							id="lastTaskIndex"
+							class="form-control font-monospace"
+							bind:value={lastTaskIndexControl}
+						/>
 					</div>
 					<div class="mb-3">
 						<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
