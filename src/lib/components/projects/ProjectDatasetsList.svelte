@@ -1,9 +1,11 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { fieldHasValue } from '$lib/common/component_utilities';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
 	export let datasets = [];
+	let enableCreateDataset = false;
 
 	async function handleCreateDataset({ form }) {
 		return async ({ result }) => {
@@ -67,7 +69,7 @@
 									class="form-control"
 									placeholder="dataset name"
 									name="datasetName"
-									on:change={null}
+									on:input={(event) => {enableCreateDataset = fieldHasValue(event)}}
 								/>
 							</div>
 						</div>
@@ -79,7 +81,7 @@
 								</div>
 							</div>
 						</div>
-						<button class="btn btn-primary" type="submit"> Create dataset </button>
+						<button class="btn btn-primary" type="submit" disabled={!enableCreateDataset}> Create dataset </button>
 					</form>
 				</div>
 			</div>

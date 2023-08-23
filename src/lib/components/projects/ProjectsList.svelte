@@ -4,9 +4,11 @@
 	import { modalProject } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { fieldHasValue } from '$lib/common/component_utilities';
 
 	// List of projects to be displayed
 	export let projects = [];
+	let enableCreateProject = false;
 
 	$: {
 		if ($page.form?.error) {
@@ -53,11 +55,15 @@
 				<div class="col-auto">
 					<div class="input-group">
 						<div class="input-group-text">Project name</div>
-						<input name="projectName" type="text" class="form-control" />
+						<input
+							name="projectName"
+							type="text"
+							class="form-control"
+							on:input={(event) => {enableCreateProject = fieldHasValue(event)}} />
 					</div>
 				</div>
 				<div class="col-auto">
-					<button type="submit" class="btn btn-primary">Create</button>
+					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}>Create project</button>
 				</div>
 			</form>
 			<div id="createProjectErrorAlert" class="mt-3" />

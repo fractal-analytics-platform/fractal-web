@@ -5,6 +5,7 @@
 
 * Bump `word-wrap` from 1.2.3 to 1.2.5 (\#251).
 * Implemented A to B workflow execution (\#254).
+* Improved enable/disable button state (\#257).
 
 # 0.5.2
 

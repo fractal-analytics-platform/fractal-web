@@ -75,3 +75,8 @@ export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null
 		}
 	});
 }
+
+export function fieldHasValue(event) {
+	const inputValue = event.target?.value || undefined;
+	return inputValue !== undefined && inputValue !== '';
+}

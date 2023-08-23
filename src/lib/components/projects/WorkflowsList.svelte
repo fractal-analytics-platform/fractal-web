@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { fieldHasValue } from '$lib/common/component_utilities';
 	import { goto } from '$app/navigation';
 	import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -59,15 +60,6 @@
 		}
 	}
 
-	function handleWorkflowNameChange(event) {
-		const inputValue = event.target?.value || undefined;
-		if (inputValue !== undefined && inputValue !== '') {
-			enableCreateWorkflow = true;
-		} else {
-			enableCreateWorkflow = false;
-		}
-	}
-
 	function handleWorkflowImported(event) {
 		const importedWorkflow = event.detail;
 		workflows.push(importedWorkflow);
@@ -119,7 +111,7 @@
 									class="form-control {validationError ? 'is-invalid' : ''}"
 									placeholder='workflow name'
 									name='workflowName'
-									on:change={handleWorkflowNameChange}
+									on:input={(event) => {enableCreateWorkflow = fieldHasValue(event)}}
 								/>
 							</div>
 						</div>
