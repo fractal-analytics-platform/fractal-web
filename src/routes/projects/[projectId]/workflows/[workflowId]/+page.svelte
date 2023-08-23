@@ -303,6 +303,12 @@
 		}, 3000);
 	}
 
+	function resetLastTask() {
+		if (lastTaskIndexControl !== '' && firstTaskIndexControl > lastTaskIndexControl) {
+			lastTaskIndexControl = '';
+		}
+	}
+
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -664,22 +670,37 @@
 						</select>
 					</div>
 					<div class="mb-3">
-						<label for="firstTaskIndex" class="form-label">First task index (Optional)</label>
-						<input
+						<label for="firstTaskIndex" class="form-label">First task (Optional)</label>
+						<select
 							name="firstTaskIndex"
 							id="firstTaskIndex"
-							class="form-control font-monospace"
+							class="form-control"
+							disabled={checkingConfiguration}
 							bind:value={firstTaskIndexControl}
-						/>
+							on:change={resetLastTask}
+						>
+							<option value="">Select first task</option>
+							{#each updatableWorkflowList as wft}
+								<option value={wft.order}>{wft.task.name}</option>
+							{/each}
+						</select>
 					</div>
 					<div class="mb-3">
-						<label for="lastTaskIndex" class="form-label">Last task index (Optional)</label>
-						<input
+						<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
+						<select
 							name="lastTaskIndex"
 							id="lastTaskIndex"
-							class="form-control font-monospace"
+							class="form-control"
+							disabled={checkingConfiguration || firstTaskIndexControl === ''}
 							bind:value={lastTaskIndexControl}
-						/>
+						>
+							<option value="">Select last task</option>
+							{#each updatableWorkflowList as wft}
+								{#if wft.order >= firstTaskIndexControl}
+									<option value={wft.order}>{wft.task.name}</option>
+								{/if}
+							{/each}
+						</select>
 					</div>
 					<div class="mb-3">
 						<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
