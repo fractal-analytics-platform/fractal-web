@@ -14,9 +14,6 @@
 				</li>
 				{#if userLoggedIn}
 					<li class="nav-item">
-						<a href="/info" class="nav-link">Info</a>
-					</li>
-					<li class="nav-item">
 						<a href="/projects" class="nav-link">Projects</a>
 					</li>
 					<li class="nav-item">
