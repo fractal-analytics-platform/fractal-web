@@ -26,7 +26,7 @@
 		originalMetaProperties = {};
 	}
 
-	async function handleEntryUpdate(updatedEntry) {
+	async function handleEntryUpdate() {
 		const projectId = $page.params.projectId;
 		try {
 			const updatedMetaProperties = await updateFormEntry(
