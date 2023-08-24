@@ -31,28 +31,23 @@ export async function PATCH({ fetch, params, request }) {
 
 	const { projectId, workflowId, taskId } = params;
 
-	try {
-		let updatedWorkflowTask;
-		if (updateArgs) {
-			updatedWorkflowTask = await updateWorkflowTaskArguments(
-				fetch,
-				projectId,
-				workflowId,
-				taskId,
-				updateArgs
-			);
-		} else if (updateMeta) {
-			updatedWorkflowTask = await updateWorkflowTaskMetadata(
-				fetch,
-				projectId,
-				workflowId,
-				taskId,
-				updateMeta
-			);
-		}
-		return new Response(JSON.stringify(updatedWorkflowTask), { status: 200 });
-	} catch (error) {
-		console.error(error);
-		return fail(500, error.reason);
+	let updatedWorkflowTask;
+	if (updateArgs) {
+		updatedWorkflowTask = await updateWorkflowTaskArguments(
+			fetch,
+			projectId,
+			workflowId,
+			taskId,
+			updateArgs
+		);
+	} else if (updateMeta) {
+		updatedWorkflowTask = await updateWorkflowTaskMetadata(
+			fetch,
+			projectId,
+			workflowId,
+			taskId,
+			updateMeta
+		);
 	}
+	return new Response(JSON.stringify(updatedWorkflowTask), { status: 200 });
 }

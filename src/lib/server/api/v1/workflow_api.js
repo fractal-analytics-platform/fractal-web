@@ -1,5 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException } from '$lib/common/errors';
+import { PostResourceException, responseError } from '$lib/common/errors';
 
 /**
  * Creates a new workflow in the server
@@ -294,7 +294,7 @@ export async function updateWorkflowTaskMetadata(
 		return await response.json();
 	}
 
-	throw new PostResourceException(await response.json());
+	await responseError(response);
 }
 
 /**
