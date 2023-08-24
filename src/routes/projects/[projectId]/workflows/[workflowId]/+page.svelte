@@ -24,6 +24,7 @@
 	let workflowUpdated = false;
 	let workflowTaskCreated = false;
 	let selectedWorkflowTask = undefined;
+	let originalMetaProperties = {};
 	let checkingConfiguration = false;
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
@@ -41,6 +42,12 @@
 
 	workflowTaskContext.subscribe((value) => {
 		selectedWorkflowTask = value;
+		originalMetaProperties = {};
+		if (value && value.meta) {
+			for (let key in value.meta) {
+				originalMetaProperties[key] = value.meta[key];
+			}
+		}
 	});
 
 	onMount(async () => {
@@ -490,6 +497,7 @@
 											workflowId={workflow.id}
 											taskId={selectedWorkflowTask.id}
 											metaProperties={selectedWorkflowTask.meta}
+											originalMetaProperties={originalMetaProperties}
 										/>
 									{/key}
 								{/if}
