@@ -39,11 +39,6 @@
 		<footer
 			class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
 		>
-			<div class="col-md-4 d-flex align-items-center">
-				<span class="mb-3 mb-md-0 text-muted">
-					<a href="https://fractal-analytics-platform.github.io">Fractal Analytics Platform</a>
-				</span>
-			</div>
 			<div class="col-md-4 d-flex justify-content-center">
 				<div class="hstack gap-3">
 					<span class="font-monospace">{server.version}</span>
@@ -51,13 +46,6 @@
 					<span class="font-monospace">{server.deployment_type}</span>
 				</div>
 			</div>
-			<ul class="nav col-md-4 justify-content-end d-flex">
-				<li class="ms-2">
-					<a class="text-muted fs-4" href="https://github.com/fractal-analytics-platform">
-						<i class="bi bi-github" />
-					</a>
-				</li>
-			</ul>
 		</footer>
 	</div>
 </main>
