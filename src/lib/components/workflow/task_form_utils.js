@@ -1,3 +1,5 @@
+import { PostResourceException } from "$lib/common/errors";
+
 export async function updateFormEntry(
 	projectId,
 	workflowId,
@@ -28,5 +30,5 @@ export async function updateFormEntry(
 	}
 
 	console.error('Update form entry response not ok');
-	throw new Error(response.statusText);
+	throw new PostResourceException(await response.json());
 }
