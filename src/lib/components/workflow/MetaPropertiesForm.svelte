@@ -10,6 +10,7 @@
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { getOnlyModifiedProperties } from '$lib/common/component_utilities';
 
 	// Workflow id
 	export let workflowId;
@@ -29,11 +30,12 @@
 	async function handleEntryUpdate() {
 		const projectId = $page.params.projectId;
 		try {
+			const modifiedProperties = getOnlyModifiedProperties(originalMetaProperties, metaProperties);
 			const updatedMetaProperties = await updateFormEntry(
 				projectId,
 				workflowId,
 				taskId,
-				getOnlyModifiedProperties(),
+				modifiedProperties,
 				'meta'
 			);
 			metaProperties = updatedMetaProperties.meta;
@@ -50,16 +52,6 @@
 				}
 			});
 		}
-	}
-
-	function getOnlyModifiedProperties() {
-		const modifiedProperties = {};
-		for (let key in metaProperties) {
-			if (metaProperties[key] !== originalMetaProperties[key]) {
-				modifiedProperties[key] = metaProperties[key];
-			}
-		}
-		return modifiedProperties;
 	}
 </script>
 

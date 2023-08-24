@@ -42,6 +42,7 @@ export async function createTask(fetch, formData) {
 	const requestData = {
 		name: formData.get('name'),
 		command: formData.get('command'),
+		version: formData.get('version'),
 		source: formData.get('source'),
 		input_type: formData.get('input_type'),
 		output_type: formData.get('output_type')
@@ -151,6 +152,35 @@ export async function deleteTask(fetch, taskId) {
 			method: 'DELETE',
 			credentials: 'include',
 			mode: 'cors'
+		}
+	);
+
+	if (response.ok) {
+		return new Response(null, { status: response.status });
+	}
+
+	await responseError(response);
+}
+
+
+/**
+ * Edits a task on the server
+ * @param fetch
+ * @param taskId
+ * @returns {Promise<*>}
+ */
+export async function editTask(fetch, taskId, task) {
+	const headers = new Headers();
+	headers.append('Content-Type', 'application/json');
+
+	const response = await fetch(
+		FRACTAL_SERVER_HOST + `/api/v1/task/${taskId}`,
+		{
+			method: 'PATCH',
+			credentials: 'include',
+			mode: 'cors',
+			headers,
+			body: JSON.stringify(task)
 		}
 	);
 

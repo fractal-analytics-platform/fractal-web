@@ -1,6 +1,6 @@
 <script>
 	// TaskInfoModal component
-	import { taskModal } from '$lib/stores/taskStores';
+	import { taskStore } from '$lib/stores/taskStores';
 
 	// Task to be displayed
 	// let task = {}
@@ -11,7 +11,7 @@
 	// taskModal.subscribe( taskId => {
 	// 	project =
 	// })
-	$: task = $taskModal;
+	$: task = $taskStore;
 </script>
 
 <div class="modal modal-xl" id="taskInfoModal">
