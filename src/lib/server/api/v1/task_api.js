@@ -1,5 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException } from '$lib/common/errors.js';
+import { PostResourceException, responseError } from '$lib/common/errors.js';
 
 /**
  * Fetches a list of tasks from the server
@@ -135,4 +135,28 @@ export async function taskCollectionStatus(fetch, taskId) {
 	}
 
 	throw new Error('Unable to fetch collection operation status');
+}
+
+
+/**
+ * Deletes a task from the server
+ * @param fetch
+ * @param taskId
+ * @returns {Promise<*>}
+ */
+export async function deleteTask(fetch, taskId) {
+	const response = await fetch(
+		FRACTAL_SERVER_HOST + `/api/v1/task/${taskId}`,
+		{
+			method: 'DELETE',
+			credentials: 'include',
+			mode: 'cors'
+		}
+	);
+
+	if (response.ok) {
+		return new Response(null, { status: response.status });
+	}
+
+	await responseError(response);
 }

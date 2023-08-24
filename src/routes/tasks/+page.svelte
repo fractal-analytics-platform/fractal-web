@@ -64,6 +64,26 @@
 			}
 		};
 	}
+
+	async function handleDeleteTask(taskId) {
+		const response = await fetch('/tasks/' + taskId, {
+			method: 'DELETE',
+			credentials: 'include'
+		});
+
+		if (response.ok) {
+			console.log('Task deleted successfully');
+			tasks = tasks.filter((t) => t.id !== taskId);
+		} else {
+			console.error('Error deleting the task');
+			new StandardErrorAlert({
+				target: document.getElementById('taskErrorAlert'),
+				props: {
+					error: await response.json()
+				}
+			});
+		}
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -155,6 +175,7 @@
 	<div class="row mt-4">
 		<p class="lead">Task List</p>
 		<div class="col-12">
+			<span id="taskErrorAlert"></span>
 			<table class="table caption-top align-middle">
 				<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
 					<div class="d-flex align-items-center justify-content-between">
@@ -191,7 +212,7 @@
 									<i class="bi bi-info-circle" />
 									Info
 								</button>
-								<button class="btn btn-danger" disabled>
+								<button class="btn btn-danger" on:click={() => handleDeleteTask(task.id)}>
 									<i class="bi bi-trash" />
 									Delete
 								</button>
