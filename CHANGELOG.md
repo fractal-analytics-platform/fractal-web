@@ -3,6 +3,7 @@
 
 # Unreleased
 
+* Added confirmation dialog for delete task operation (\#272).
 * Enabled task info tab and rendered docs info from markdown (\#271).
 * Update import-workflow feature (\#269).
 * Revamp home page and user-related layout (\#259).
