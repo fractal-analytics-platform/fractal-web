@@ -10,6 +10,7 @@
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
+	import { formatMarkdown } from '$lib/common/component_utilities';
 
 	// Workflow
 	let workflow = undefined;
@@ -436,7 +437,12 @@
 										</button>
 									</li>
 									<li class='nav-item'>
-										<span class='nav-link disabled'>Info</span>
+										<button
+											data-bs-toggle='tab'
+											data-bs-target='#info-tab'
+											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
+										>Info
+										</button>
 									</li>
 								</ul>
 								<ConfirmActionButton
@@ -500,6 +506,60 @@
 											originalMetaProperties={originalMetaProperties}
 										/>
 									{/key}
+								{/if}
+							</div>
+						</div>
+						<div id="info-tab" class="tab-pane">
+							<div class="card-body">
+								{#if selectedWorkflowTask}
+								<ul class="list-group">
+									<li class="list-group-item list-group-item-light fw-bold">Name</li>
+									<li class="list-group-item">{selectedWorkflowTask.task.name}</li>
+									<li class="list-group-item list-group-item-light fw-bold">Version</li>
+									<li class="list-group-item">{selectedWorkflowTask.task.version || '-'}</li>
+									<li class='list-group-item list-group-item-light fw-bold'>Docs Link</li>
+									<li class='list-group-item'>
+										{#if selectedWorkflowTask.task.docs_link}
+											<a href="{selectedWorkflowTask.task.docs_link}" target="_blank">{selectedWorkflowTask.task.docs_link}</a>
+										{:else}
+										-
+										{/if}
+									</li>
+									<li class='list-group-item list-group-item-light fw-bold'>Docs Info</li>
+									<li class='list-group-item'>
+										{#if selectedWorkflowTask.task.docs_info}
+											{@html formatMarkdown(selectedWorkflowTask.task.docs_info)}
+										{:else}
+										-
+										{/if}
+									</li>
+									<li class="list-group-item list-group-item-light fw-bold">Owner</li>
+									<li class="list-group-item">{selectedWorkflowTask.task.owner || '-'}</li>
+									<li class="list-group-item list-group-item-light fw-bold">Command</li>
+									<li class='list-group-item'><code>{selectedWorkflowTask.task.command}</code></li>
+									<li class='list-group-item list-group-item-light fw-bold'>Source</li>
+									<li class='list-group-item'><code>{selectedWorkflowTask.task.source}</code></li>
+									<li class='list-group-item list-group-item-light fw-bold'>Input Type</li>
+									<li class='list-group-item'>
+										<code>{selectedWorkflowTask.task.input_type}</code>
+									</li>
+									<li class='list-group-item list-group-item-light fw-bold'>Output Type</li>
+									<li class='list-group-item'>
+										<code>{selectedWorkflowTask.task.output_type}</code>
+									</li>
+									<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
+									<li class='list-group-item'>{selectedWorkflowTask.task.args_schema_version || '-'}</li>
+									<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
+									<li class='list-group-item'>
+										{#if selectedWorkflowTask.task.args_schema}
+										<code>
+											<pre>{JSON.stringify(selectedWorkflowTask.task.args_schema, null, 2)}</pre>
+										</code>
+										{:else}
+										-
+										{/if}
+									</li>
+								</ul>
 								{/if}
 							</div>
 						</div>
@@ -755,7 +815,7 @@
 				<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
 			</div>
 			<div class='modal-body'>
-				<p>Do you want to save the changes made to the arguments of the current selected workflow task?</p>
+				<p>Do you want to save the changes made to the arguments of the current selected workflow selectedWorkflowTask.task</p>
 			</div>
 			<div class='modal-footer'>
 				<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Cancel</button>

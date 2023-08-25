@@ -3,6 +3,7 @@
 
 # Unreleased
 
+* Enabled task info tab and rendered docs info from markdown (\#271).
 * Update import-workflow feature (\#269).
 * Revamp home page and user-related layout (\#259).
 * Review logout action (\#259).

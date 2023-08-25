@@ -1,4 +1,6 @@
 <script>
+	import { formatMarkdown } from '$lib/common/component_utilities';
+
 	// TaskInfoModal component
 	import { taskStore } from '$lib/stores/taskStores';
 
@@ -38,11 +40,11 @@
 							<li class='list-group-item'><code>{task?.source}</code></li>
 							<li class='list-group-item list-group-item-light fw-bold'>Input Type</li>
 							<li class='list-group-item'>
-								<pre>{task?.input_type}</pre>
+								<code>{task?.input_type}</code>
 							</li>
 							<li class='list-group-item list-group-item-light fw-bold'>Output Type</li>
 							<li class='list-group-item'>
-								<pre>{task?.output_type}</pre>
+								<code>{task?.output_type}</code>
 							</li>
 							<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
 							<li class='list-group-item'>{task?.args_schema_version || '-'}</li>
@@ -67,9 +69,7 @@
 							<li class='list-group-item list-group-item-light fw-bold'>Docs Info</li>
 							<li class='list-group-item'>
 								{#if task?.docs_info}
-								<code>
-									<pre>{task?.docs_info}</pre>
-								</code>
+									{@html formatMarkdown(task?.docs_info)}
 								{:else}
 								-
 								{/if}
