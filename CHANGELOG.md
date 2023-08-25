@@ -3,6 +3,7 @@
 
 # Unreleased
 
+* Update import-workflow feature (\#269).
 * Revamp home page and user-related layout (\#259).
 * Review logout action (\#259).
 * Implemented editing and deletion of tasks (\#207, \#268). 
