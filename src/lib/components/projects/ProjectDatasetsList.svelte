@@ -81,7 +81,7 @@
 								</div>
 							</div>
 						</div>
-						<button class="btn btn-primary" type="submit" disabled={!enableCreateDataset}> Create dataset </button>
+						<button class="btn btn-primary" type="submit" disabled={!enableCreateDataset}>Create new dataset</button>
 					</form>
 				</div>
 			</div>
