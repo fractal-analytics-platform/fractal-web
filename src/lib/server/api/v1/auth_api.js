@@ -1,4 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { responseError } from '$lib/common/errors';
 
 /**
  * Request to authenticate user
@@ -52,7 +53,11 @@ export async function logout(fetch) {
 		mode: 'cors'
 	});
 
-	if (!response.ok) {
-		throw new Error('Logout failed');
+	if (response.ok) {
+		console.log('Logout successful');
+		return await response.json();
 	}
+
+	console.error('Logout failed');
+	await responseError(response);
 }

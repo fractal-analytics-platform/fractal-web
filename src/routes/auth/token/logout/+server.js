@@ -1,4 +1,3 @@
-import { error } from '@sveltejs/kit';
 import { logout } from '$lib/server/api/v1/auth_api';
 import {
 	AUTH_COOKIE_NAME,
@@ -9,13 +8,9 @@ import {
 	AUTH_COOKIE_HTTP_ONLY
 } from '$env/static/private';
 
-export async function GET({ fetch, cookies }) {
-	try {
-		await logout(fetch);
-	} catch (e) {
-		console.error(e);
-		throw error(500, { message: e.message });
-	}
+export async function POST({fetch, cookies}) {
+	
+	await logout(fetch);
 
 	// Set the fastapiusersauth cookie to expire in the past
 	// This will delete the cookie
@@ -28,9 +23,5 @@ export async function GET({ fetch, cookies }) {
 		httpOnly: `${AUTH_COOKIE_HTTP_ONLY}` === 'true'
 	});
 
-	const headers = new Headers();
-	// Set a redirect header to index
-	headers.set('Location', '/');
-
-	return new Response('', { headers, status: 302 });
+	return new Response(null, { status: 204 });
 }
