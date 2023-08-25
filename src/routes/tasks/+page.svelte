@@ -9,6 +9,7 @@
 	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte';
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
@@ -242,10 +243,15 @@
 									<i class="bi bi-pencil" />
 									Edit
 								</button>
-								<button class="btn btn-danger" on:click={() => handleDeleteTask(task.id)}>
-									<i class="bi bi-trash" />
-									Delete
-								</button>
+								<ConfirmActionButton
+									modalId="confirmTaskDeleteModal{task.id}"
+									style={'danger'}
+									btnStyle="danger"
+									buttonIcon="trash"
+									label={'Delete'}
+									message={`Delete task ${task.name}`}
+									callbackAction={() => handleDeleteTask(task.id)}
+								/>
 							</td>
 						</tr>
 					{/each}
