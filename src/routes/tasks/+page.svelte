@@ -219,7 +219,7 @@
 					{#each tasks as task}
 						<tr>
 							<td class="col-3">{task.name}</td>
-							<td class="col-1">{task.version || "-"}</td>
+							<td class="col-1">{task.version || "–"}</td>
 							<td class='col-1'>{task.owner || "–"}</td>
 							<td class="col-2">
 								<button

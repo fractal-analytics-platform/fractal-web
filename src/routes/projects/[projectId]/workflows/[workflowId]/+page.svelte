@@ -516,7 +516,7 @@
 									<li class="list-group-item list-group-item-light fw-bold">Name</li>
 									<li class="list-group-item">{selectedWorkflowTask.task.name}</li>
 									<li class="list-group-item list-group-item-light fw-bold">Version</li>
-									<li class="list-group-item">{selectedWorkflowTask.task.version || '-'}</li>
+									<li class="list-group-item">{selectedWorkflowTask.task.version || '–'}</li>
 									<li class='list-group-item list-group-item-light fw-bold'>Docs Link</li>
 									<li class='list-group-item'>
 										{#if selectedWorkflowTask.task.docs_link}
@@ -534,7 +534,7 @@
 										{/if}
 									</li>
 									<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-									<li class="list-group-item">{selectedWorkflowTask.task.owner || '-'}</li>
+									<li class="list-group-item">{selectedWorkflowTask.task.owner || '–'}</li>
 									<li class="list-group-item list-group-item-light fw-bold">Command</li>
 									<li class='list-group-item'><code>{selectedWorkflowTask.task.command}</code></li>
 									<li class='list-group-item list-group-item-light fw-bold'>Source</li>
@@ -548,7 +548,7 @@
 										<code>{selectedWorkflowTask.task.output_type}</code>
 									</li>
 									<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
-									<li class='list-group-item'>{selectedWorkflowTask.task.args_schema_version || '-'}</li>
+									<li class='list-group-item'>{selectedWorkflowTask.task.args_schema_version || '–'}</li>
 									<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
 									<li class='list-group-item'>
 										{#if selectedWorkflowTask.task.args_schema}
