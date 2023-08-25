@@ -8,6 +8,7 @@
 	// Component properties
 	let importing = false;
 	let importSuccess = undefined;
+	let workflowName = undefined;
 
 	async function handleWorkflowImportForm({ form }) {
 		importing = true;
@@ -32,6 +33,7 @@
 						error
 					}
 				});
+				importing = false;
 			}
 		};
 	}
@@ -52,7 +54,12 @@
 		/>
 	</div>
 
-	<button class="btn btn-primary" disabled={importing}>
+	<div class="mb-2">
+		<label for="workflowName" class="form-label">Override workflow name (optional)</label>
+		<input id="workflowName" name="workflowName" type="text" bind:value={workflowName} class="form-control">
+	</div>
+
+	<button class="btn btn-primary mt-2" disabled={importing}>
 		{#if importing}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 		{/if}

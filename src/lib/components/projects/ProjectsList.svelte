@@ -63,7 +63,7 @@
 					</div>
 				</div>
 				<div class="col-auto">
-					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}>Create project</button>
+					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}>Create new project</button>
 				</div>
 			</form>
 			<div id="createProjectErrorAlert" class="mt-3" />

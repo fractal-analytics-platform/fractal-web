@@ -216,7 +216,7 @@
 							on:input={(event) => {enableCreateResource = fieldHasValue(event)}} />
 					</div>
 
-					<button class="btn btn-primary" disabled={!enableCreateResource}>Create resource</button>
+					<button class="btn btn-primary" disabled={!enableCreateResource}>Create new resource</button>
 				</form>
 
 				{#if createResourceSuccess}

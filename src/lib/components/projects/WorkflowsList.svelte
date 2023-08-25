@@ -89,12 +89,13 @@
 		<caption class='text-bg-light border-top border-bottom pe-3 ps-3'>
 			<div class='d-flex align-items-center justify-content-between'>
 				<span class='fw-normal'>
-					<span
-						role='button'
-						class='text-decoration-none'
-						data-bs-toggle='modal'
-						data-bs-target='#importWorkflowModal'>Import workflow</span
-					>
+					<button
+						type="button"
+						class="btn btn-primary"
+						data-bs-toggle="modal"
+						data-bs-target="#importWorkflowModal">
+						Import workflow
+					</button>
 				</span>
 				<div>
 					<form
@@ -116,7 +117,7 @@
 							</div>
 						</div>
 						<button class="btn btn-primary" disabled={!enableCreateWorkflow} type="submit">
-							Create workflow
+							Create new workflow
 						</button>
 					</form>
 				</div>
