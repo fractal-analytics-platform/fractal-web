@@ -4,7 +4,8 @@
 	import { enhance } from '$app/forms';
 	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
-	import { taskModal as taskModalStore } from '$lib/stores/taskStores';
+	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
+	import TaskEditModal from '$lib/components/tasks/TaskEditModal.svelte';
 	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte';
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
@@ -39,7 +40,19 @@
 	function setTaskModal(event) {
 		const taskId = event.currentTarget.getAttribute('data-fc-task');
 		const task = tasks.find((t) => t.id == taskId);
-		taskModalStore.set(task);
+		taskStore.set(task);
+		originalTaskStore.set({ ...task });
+	}
+
+	// Updates the tasks list after a task is edited in the modal
+	async function updateEditedTask(editedTask) {
+		tasks = tasks.filter(t => {
+			if (t.id === editedTask.id) {
+				return editedTask;
+			} else {
+				return t;
+			}
+		});
 	}
 
 	async function reloadTaskList() {
@@ -63,6 +76,26 @@
 				setErrorReasons(error);
 			}
 		};
+	}
+
+	async function handleDeleteTask(taskId) {
+		const response = await fetch('/tasks/' + taskId, {
+			method: 'DELETE',
+			credentials: 'include'
+		});
+
+		if (response.ok) {
+			console.log('Task deleted successfully');
+			tasks = tasks.filter((t) => t.id !== taskId);
+		} else {
+			console.error('Error deleting the task');
+			new StandardErrorAlert({
+				target: document.getElementById('taskErrorAlert'),
+				props: {
+					error: await response.json()
+				}
+			});
+		}
 	}
 </script>
 
@@ -129,6 +162,12 @@
 									<input name="source" type="text" class="form-control" />
 								</div>
 							</div>
+							<div class="col-6">
+								<div class="input-group">
+									<div class="input-group-text">Version</div>
+									<input name="version" type="text" class="form-control" />
+								</div>
+							</div>
 							<div class="row" />
 							<div class="col-6">
 								<div class="input-group">
@@ -155,6 +194,7 @@
 	<div class="row mt-4">
 		<p class="lead">Task List</p>
 		<div class="col-12">
+			<span id="taskErrorAlert"></span>
 			<table class="table caption-top align-middle">
 				<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
 					<div class="d-flex align-items-center justify-content-between">
@@ -178,7 +218,7 @@
 					{#each tasks as task}
 						<tr>
 							<td class="col-3">{task.name}</td>
-							<td class="col-1">{task.version}</td>
+							<td class="col-1">{task.version || "-"}</td>
 							<td class='col-1'>{task.owner || "–"}</td>
 							<td class="col-2">
 								<button
@@ -191,7 +231,18 @@
 									<i class="bi bi-info-circle" />
 									Info
 								</button>
-								<button class="btn btn-danger" disabled>
+								<button
+									on:click={() => {}}
+									data-fc-task={task.id}
+									class="btn btn-primary"
+									data-bs-toggle="modal"
+									data-bs-target="#taskEditModal"
+									on:click={setTaskModal}
+								>
+									<i class="bi bi-pencil" />
+									Edit
+								</button>
+								<button class="btn btn-danger" on:click={() => handleDeleteTask(task.id)}>
 									<i class="bi bi-trash" />
 									Delete
 								</button>
@@ -205,3 +256,4 @@
 </div>
 
 <TaskInfoModal />
+<TaskEditModal updateEditedTask={updateEditedTask} />

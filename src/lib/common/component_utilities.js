@@ -80,3 +80,25 @@ export function fieldHasValue(event) {
 	const inputValue = event.target?.value || undefined;
 	return inputValue !== undefined && inputValue !== '';
 }
+
+export function getOnlyModifiedProperties(oldProperties, newProperties) {
+	const modifiedProperties = {};
+	for (let key in newProperties) {
+		if (newProperties[key] !== oldProperties[key]) {
+			modifiedProperties[key] = newProperties[key];
+		}
+	}
+	return modifiedProperties;
+}
+
+export function unsetEmptyStrings(inputValues) {
+	const clearedValues = {};
+	for (let key in inputValues) {
+		if (typeof(inputValues[key]) === 'string' && inputValues[key].trim() === '') {
+			clearedValues[key] = null;
+		} else {
+			clearedValues[key] = inputValues[key];
+		}
+	}
+	return clearedValues;
+}
