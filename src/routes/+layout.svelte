@@ -22,6 +22,9 @@
 				{/if}
 			</ul>
 			<ul class="nav">
+				{#if userLoggedIn}
+					<span class="navbar-text">{$page.data.userInfo.email}</span>
+				{/if}
 				<li class="nav-item">
 					{#if !userLoggedIn}
 						<a href="/auth/login" class="nav-link">Login</a>
