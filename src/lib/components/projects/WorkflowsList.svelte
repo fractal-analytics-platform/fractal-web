@@ -95,7 +95,7 @@
 						data-bs-toggle="modal"
 						data-bs-target="#importWorkflowModal">
 						Import workflow
-				</button>
+					</button>
 				</span>
 				<div>
 					<form
