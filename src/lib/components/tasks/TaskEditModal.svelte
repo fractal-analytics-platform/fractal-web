@@ -6,6 +6,7 @@
 	export let updateEditedTask;
 	$: task = $taskStore;
 	$: originalTask = $originalTaskStore;
+	$: updateEnabled = task && task.name && task.command && task.input_type && task.output_type;
 
 	async function handleEditTask() {
 
@@ -154,7 +155,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button class="btn btn-primary" on:click={handleEditTask}>Update</button>
+					<button class="btn btn-primary" on:click={handleEditTask} disabled={!updateEnabled}>Update</button>
 					<button class="btn btn-secondary" on:click={undoChangesAndClose}>Close</button>
 				</div>
 			</div>
