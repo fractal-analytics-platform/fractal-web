@@ -44,6 +44,7 @@
 		originalTaskStore.set({ ...task });
 	}
 
+	// Updates the tasks list after a task is edited in the modal
 	async function updateEditedTask(editedTask) {
 		tasks = tasks.filter(t => {
 			if (t.id === editedTask.id) {
