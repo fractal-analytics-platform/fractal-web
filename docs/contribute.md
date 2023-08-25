@@ -32,6 +32,26 @@ Environment variables are set either in `.env` or `.env.development` files, see
 [vite documentation](https://vitejs.dev/guide/env-and-mode.html#env-files)
 (briefly: `.env.development` is the relevant file when using `npm run dev`).
 
+Here is an example of a `.env` file:
+```bash
+FRACTAL_SERVER_HOST=http://localhost:8000
+
+# AUTH COOKIE
+AUTH_COOKIE_NAME=fastapiusersauth
+AUTH_COOKIE_SECURE=false
+AUTH_COOKIE_DOMAIN=localhost
+AUTH_COOKIE_PATH=/
+AUTH_COOKIE_MAX_AGE=1800
+AUTH_COOKIE_SAME_SITE=lax
+AUTH_COOKIE_HTTP_ONLY=true
+
+# PUBLIC VARIABLES (accessible from client side)
+PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL=help@localhost
+```
+
+Some relevant environment variables are:
+* 
+
 ## Web client startup
 
 The project comes with a default `.env.development` development environment file.
