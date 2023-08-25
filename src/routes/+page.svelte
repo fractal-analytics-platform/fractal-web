@@ -1,5 +1,5 @@
 <script>
-    import { PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL } from '$env/static/public';
+    import { env } from '$env/dynamic/public';
 </script>
 
 <h1>Welcome to Fractal web client.</h1>
@@ -20,10 +20,10 @@
     <a href="/tasks" class="btn btn-primary">Tasks</a>
 </div>
 
-{#if PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
+{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 <h3>Where to get support</h3>
 <p>
-    <a href="mailto:{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}</a>
+    <a href="mailto:{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}</a>
 </p>
 {/if}
 
