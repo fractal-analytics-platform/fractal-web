@@ -71,6 +71,7 @@ export const actions = {
 		const formData = await request.formData();
 
 		const workflowFile = formData.get('workflowFile');
+		const workflowName = formData.get('workflowName');
 		try {
 			const workflowMetadata = await workflowFile
 				.text()
@@ -78,6 +79,11 @@ export const actions = {
 				.catch((error) => {
 					throw new Error('The workflow file is not a valid JSON file', error);
 				});
+
+			if (workflowName) {
+				console.log(`Overriding workflow name from ${workflowMetadata.name} to ${workflowName}`);
+				workflowMetadata.name = workflowName;
+			}
 
 			const workflow = await importWorkflow(fetch, params.projectId, workflowMetadata).catch(
 				(error) => {
