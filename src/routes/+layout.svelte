@@ -39,7 +39,7 @@
 		<footer
 			class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
 		>
-			<div class="col-md-4 d-flex justify-content-center">
+			<div class="col d-flex justify-content-center">
 				<div class="hstack gap-3">
 					<span class="font-monospace">{server.version}</span>
 					<div class="vr" />
