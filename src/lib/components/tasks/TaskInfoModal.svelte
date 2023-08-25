@@ -29,9 +29,9 @@
 							<li class="list-group-item list-group-item-light fw-bold">Name</li>
 							<li class="list-group-item">{task?.name}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Version</li>
-							<li class="list-group-item">{task?.version}</li>
+							<li class="list-group-item">{task?.version || '-'}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-							<li class="list-group-item">{task?.owner}</li>
+							<li class="list-group-item">{task?.owner || '-'}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Command</li>
 							<li class='list-group-item'><code>{task?.command}</code></li>
 							<li class='list-group-item list-group-item-light fw-bold'>Source</li>
@@ -45,12 +45,34 @@
 								<pre>{task?.output_type}</pre>
 							</li>
 							<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
-							<li class='list-group-item'>{task?.args_schema_version}</li>
+							<li class='list-group-item'>{task?.args_schema_version || '-'}</li>
 							<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
 							<li class='list-group-item'>
+								{#if task?.args_schema}
 								<code>
 									<pre>{JSON.stringify(task?.args_schema, null, 2)}</pre>
 								</code>
+								{:else}
+								-
+								{/if}
+							</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Docs Link</li>
+							<li class='list-group-item'>
+								{#if task?.docs_link}
+									<a href="{task?.docs_link}" target="_blank">{task?.docs_link}</a>
+								{:else}
+								-
+								{/if}
+							</li>
+							<li class='list-group-item list-group-item-light fw-bold'>Docs Info</li>
+							<li class='list-group-item'>
+								{#if task?.docs_info}
+								<code>
+									<pre>{task?.docs_info}</pre>
+								</code>
+								{:else}
+								-
+								{/if}
 							</li>
 						</ul>
 					</div>
