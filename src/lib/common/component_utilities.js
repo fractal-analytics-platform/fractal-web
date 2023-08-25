@@ -1,3 +1,5 @@
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import semver from 'semver';
 
 export function greatestVersionAsc(t1, t2) {
@@ -101,4 +103,11 @@ export function unsetEmptyStrings(inputValues) {
 		}
 	}
 	return clearedValues;
+}
+
+export function formatMarkdown(markdownValue) {
+	if (!markdownValue) {
+		return '';
+	}
+	return DOMPurify.sanitize(marked.parse(markdownValue));
 }
