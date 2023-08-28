@@ -78,10 +78,14 @@ The application is now running at `http://localhost:5173`.
 An alternative way to start fractal-web is
 ```
 npm run build    # corresponding to `vite build`, which creates a `build` folder
-node build
+ORIGIN=http://localhost:5173 PORT=5173 node build
 ```
-note that the `node` command can include additional options, as described in https://kit.svelte.dev/docs/adapter-node#environment-variables.
-
+note that the `node` command relies on some environment variables, and
+especially on `ORIGIN`:
+> HTTP doesn't give SvelteKit a reliable way to know the URL that is currently
+> being requested. The simplest way to tell SvelteKit where the app is being
+> served is to set the `ORIGIN` environment variable.
+> (https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-and-hostheader)
 
 ## How to run static code analysis
 
