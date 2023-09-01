@@ -23,3 +23,13 @@ export async function handle({ event, resolve }) {
 		return new Response(null, { status: 302, headers: { location: '/auth/login' } });
 	}
 }
+
+
+/** @type {import('@sveltejs/kit').HandleFetch} */
+export async function handleFetch({ event, request, fetch }) {
+    if (request.url.startsWith(FRACTAL_SERVER_HOST)) {
+        console.log(`Modifying request to ${request.url}, via handleFetch`);
+        request.headers.set('cookie', event.request.headers.get('cookie'));
+    }
+    return fetch(request);
+}
