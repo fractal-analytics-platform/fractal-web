@@ -33,11 +33,7 @@ export async function handleFetch({ event, request, fetch }) {
 	2. https://kit.svelte.dev/docs/hooks#server-hooks-handlefetch
 	*/
 	
-    if (
-		request.url.startsWith(FRACTAL_SERVER_HOST) &&
-		'headers' in request &&
-		'cookie' in request.headers
-	) {
+    if (request.url.startsWith(FRACTAL_SERVER_HOST)) {
         console.log(`Including cookie into request to ${request.url}, via handleFetch`);
         request.headers.set('cookie', event.request.headers.get('cookie'));
     }
