@@ -1,6 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
 
+# 0.5.4
+
+* Always propagate cookie for API calls to `FRACTAL_SERVER_HOST`, even for different domains (\#275).
+
 # 0.5.3
 
 * Add confirmation dialog for delete-task operation (\#272).
