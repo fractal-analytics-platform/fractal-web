@@ -21,13 +21,9 @@
 		workflowTaskArgs = {};
 	}
 
-	console.log("I WILL NOW DEFINE handleEntryUpdate");
-
 	async function handleEntryUpdate(updatedEntry) {
-		console.log("I AM IN handleEntryUpdate");
 		const projectId = $page.params.projectId;
 		try {
-			// This call has the wrong value of updatedEntry (the second time!)
 			const response = await updateFormEntry(
 				projectId,
 				workflowId,

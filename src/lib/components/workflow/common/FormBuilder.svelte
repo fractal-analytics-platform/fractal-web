@@ -1,11 +1,8 @@
 <script>
-	import { compute_rest_props } from 'svelte/internal';
 	import FormStructure from './FormStructure.svelte';
 	import NewEntryProperty from './NewEntryProperty.svelte';
 
 	export let entry;
-
-	console.log("I AM IN FormBuilder")
 
 	if (entry == null || entry === undefined) {
 		entry = {};

@@ -306,7 +306,6 @@
 		selectedWorkflowTask.args = event.detail.args;
 		selectedWorkflowTask = selectedWorkflowTask;
 		argsChangesSaved = true;
-		console.log("NOW IN handleArgsSaved")
 		setTimeout(() => {
 			argsChangesSaved = false;
 		}, 3000);

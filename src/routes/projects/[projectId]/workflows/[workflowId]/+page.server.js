@@ -19,7 +19,7 @@ export async function load({ fetch, params }) {
 		return null;
 	});
 
-	// Get available datasets
+	// Get available tasks
 	const datasets = project ? project.dataset_list : [];
 
 	return {

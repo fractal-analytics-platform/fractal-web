@@ -24,9 +24,6 @@
 	function handleSaveChanges(newArgs) {
 		return new Promise((resolve, reject) => {
 			const projectId = $page.params.projectId;
-			console.log("I AM IN handleSaveChanges")
-			// HERE: newArgs is sometimes wrong
-			console.log(`newArgs: ${JSON.stringify(newArgs)}`);
 			updateFormEntry(
 				projectId,
 				workflowId,
@@ -35,9 +32,7 @@
 				'args'
 			).then(response => {
 				resolve(response.args);
-				console.log(`updateFormEntry WAS SUCCESSFUL; response.args: ${JSON.stringify(response.args)}`);
 				args = response.args;
-				console.log(`NOW SETTING args: ${JSON.stringify(args)}`);
 				dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
 			}).catch(err => {
 				new StandardErrorAlert({
