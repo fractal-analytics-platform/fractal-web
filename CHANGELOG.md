@@ -1,5 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 0.5.5
+
+* Fix bug in `JSchema.svelte` (\#279).
 
 # 0.5.4
 

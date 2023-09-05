@@ -97,35 +97,33 @@
 		}
 	}
 
-	if (saveChanges === null || saveChanges === undefined) {
-		saveChanges = function() {
-			const data = schemaManager.data;
-			// The following is required to remove all null values from the data object
-			// We suppose that null values are not valid, hence we remove them
-			// Deep copy the data object
-			const toStripData = JSON.parse(JSON.stringify(data));
-			const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
-			const isDataValid = validator.isValid(strippedNullData);
-			if (!isDataValid) {
-				if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
-					handleValidationErrors(validator.getErrors());
-				}
-				console.error('Could not save changes. Data is invalid', validator.getErrors());
-				return;
-			}
+    saveChanges = function() {
+        const data = schemaManager.data;
+        // The following is required to remove all null values from the data object
+        // We suppose that null values are not valid, hence we remove them
+        // Deep copy the data object
+        const toStripData = JSON.parse(JSON.stringify(data));
+        const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
+        const isDataValid = validator.isValid(strippedNullData);
+        if (!isDataValid) {
+            if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
+                handleValidationErrors(validator.getErrors());
+            }
+            console.error('Could not save changes. Data is invalid', validator.getErrors());
+            return;
+        }
 
-			if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
-				handleSaveChanges(strippedNullData)
-					.then((updated_args) => {
-						schemaManager.data = updated_args;
-						schemaManager.changesSaved();
-					})
-					.catch((err) => {
-						console.error(err);
-					});
-			}
-		}
-	}
+        if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
+            handleSaveChanges(strippedNullData)
+                .then((updated_args) => {
+                    schemaManager.data = updated_args;
+                    schemaManager.changesSaved();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+    }
 
 	export function discardChanges(args) {
 		// Set schemaData to incoming args value
