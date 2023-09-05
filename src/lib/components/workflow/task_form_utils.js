@@ -10,6 +10,8 @@ export async function updateFormEntry(
 	const requestData = {};
 	requestData[groupName] = updatingWorkflowTaskProperties;
 
+	console.log(`In updateFormEntry, requestData is ${JSON.stringify(requestData)}`);
+
 	// Should make a PATCH request to the server to update the workflow task properties
 	const response = await fetch(
 		`/projects/${projectId}/workflows/${workflowId}/tasks/${workflowTaskId}`,
@@ -26,6 +28,7 @@ export async function updateFormEntry(
 		console.log('Update form entry response successful');
 		// Should return the updated form entry
 		const updatedFormEntry = await response.json();
+		console.log(`In updateFormEntry, updatedFormEntry is ${JSON.stringify(updatedFormEntry)}`);
 		return updatedFormEntry;
 	}
 
