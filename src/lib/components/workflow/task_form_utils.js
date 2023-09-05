@@ -28,7 +28,7 @@ export async function updateFormEntry(
 		console.log('Update form entry response successful');
 		// Should return the updated form entry
 		const updatedFormEntry = await response.json();
-		console.log(`In updateFormEntry, updatedFormEntry is ${JSON.stringify(updatedFormEntry)}`);
+		console.log(`In updateFormEntry, updatedFormEntry.args is ${JSON.stringify(updatedFormEntry.args)}`);
 		return updatedFormEntry;
 	}
 
