@@ -287,13 +287,9 @@
 							</li>
 							<li class="list-group-item text-break">
 								{#if typeof value == "object" && Object.keys(value).length > 1}
-								<code>
-									<pre>{JSON.stringify(value, null, 2)}</pre>
-								</code>
+									<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
 								{:else}
-								<code>
-									{value}
-								</code>
+									<code>{value}</code>
 								{/if}
 							</li>
 						{/each}
