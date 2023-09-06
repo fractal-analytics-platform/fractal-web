@@ -1,3 +1,7 @@
+<style type='text/css'>
+	pre {display: inline;}
+</style>
+
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -286,7 +290,17 @@
 								<span class="text-capitalize">{key}</span>
 							</li>
 							<li class="list-group-item text-break">
-								<span class="">{value}</span>
+								{#if value === null}
+									<span>-</span>
+								{:else if typeof value == "object"}
+									{#if Object.keys(value).length > 1}
+										<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
+									{:else}
+										<code><pre>{JSON.stringify(value, null)}</pre></code>
+									{/if}
+								{:else}
+									<code>{value}</code>
+								{/if}
 							</li>
 						{/each}
 					</ul>

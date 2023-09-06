@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Improve displaying of `Dataset.meta` properties (\#281).
+
 # 0.5.5
 
 * Fix bug in `JSchema.svelte` (\#279).
