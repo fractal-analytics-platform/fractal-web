@@ -286,7 +286,15 @@
 								<span class="text-capitalize">{key}</span>
 							</li>
 							<li class="list-group-item text-break">
-								<span class="">{value}</span>
+								{#if typeof value == "object" && Object.keys(value).length > 1}
+								<code>
+									<pre>{JSON.stringify(value, null, 2)}</pre>
+								</code>
+								{:else}
+								<code>
+									{value}
+								</code>
+								{/if}
 							</li>
 						{/each}
 					</ul>
