@@ -3,6 +3,7 @@
 # Unreleased
 
 * Improve displaying of `Dataset.meta` properties (\#281).
+* Remove obsolete file `src/routes/api/alive/+server.js` (\#283).
 
 # 0.5.5
 
