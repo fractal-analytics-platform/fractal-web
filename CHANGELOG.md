@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.5.6
 
 * Improve displaying of `Dataset.meta` properties (\#281).
 * Remove obsolete file `src/routes/api/alive/+server.js` (\#283).
