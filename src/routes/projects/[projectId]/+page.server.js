@@ -3,7 +3,6 @@ import {
 	getProject,
 	getWorkflows,
 	updateProject,
-	createDataset,
 	importWorkflow
 } from '$lib/server/api/v1/project_api';
 import { createWorkflow } from '$lib/server/api/v1/workflow_api';
@@ -38,17 +37,6 @@ export const actions = {
 		);
 
 		return updatedProjectResponse;
-	},
-
-	createDataset: async ({ fetch, request, params }) => {
-		const projectId = params.projectId;
-		const formData = await request.formData();
-
-		const dataset = await createDataset(fetch, projectId, formData).catch((error) => {
-			return fail(400, error.reason);
-		});
-
-		return dataset;
 	},
 
 	createWorkflow: async ({ fetch, request, params }) => {

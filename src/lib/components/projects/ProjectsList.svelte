@@ -1,31 +1,46 @@
 <script>
-	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
 	import { modalProject } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
-	import { fieldHasValue } from '$lib/common/component_utilities';
 
 	// List of projects to be displayed
 	export let projects = [];
-	let enableCreateProject = false;
 
-	$: {
-		if ($page.form?.error) {
-			// Error creating project
-			new StandardErrorAlert({
-				target: document.getElementById('createProjectErrorAlert'),
-				props: {
-					error: $page.form.error
-				}
-			});
-		}
-	}
+	let newProjectName = '';
+	$: enableCreateProject = !!newProjectName;
 
 	function setModalProject(event) {
 		const projectId = event.currentTarget.getAttribute('data-fc-project');
 		const project = projects.find((p) => p.id == projectId);
 		modalProject.set(project);
+	}
+
+	async function handleCreateProject() {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch('/api/v1/project', {
+			method: 'POST',
+			credentials: 'include',
+			mode: 'cors',
+			headers,
+			body: JSON.stringify({
+				name: newProjectName
+			})
+		});
+
+		if (response.ok) {
+			newProjectName = '';
+			projects = [...projects, await response.json()]
+		} else {
+			new StandardErrorAlert({
+				// @ts-ignore
+				target: document.getElementById('createProjectErrorAlert'),
+				props: {
+					error: await response.json()
+				}
+			});
+		}
 	}
 
 	async function handleDeleteProject(projectId) {
@@ -51,7 +66,11 @@
 <div class="container">
 	<div class="row mt-3 mb-3">
 		<div class="col-sm-12">
-			<form method="post" class="row justify-content-end" use:enhance>
+			<form
+				method="post"
+				class="row justify-content-end"
+				on:submit|preventDefault={handleCreateProject}
+			>
 				<div class="col-auto">
 					<div class="input-group">
 						<div class="input-group-text">Project name</div>
@@ -59,11 +78,14 @@
 							name="projectName"
 							type="text"
 							class="form-control"
-							on:input={(event) => {enableCreateProject = fieldHasValue(event)}} />
+							bind:value={newProjectName}
+						/>
 					</div>
 				</div>
 				<div class="col-auto">
-					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}>Create new project</button>
+					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}
+						>Create new project</button
+					>
 				</div>
 			</form>
 			<div id="createProjectErrorAlert" class="mt-3" />
@@ -103,7 +125,7 @@
 								message="Delete project {name}"
 								buttonIcon="trash"
 								label="Delete"
-								callbackAction={handleDeleteProject.bind(this, id)}
+								callbackAction={() => handleDeleteProject(id)}
 							/>
 						</td>
 					</tr>

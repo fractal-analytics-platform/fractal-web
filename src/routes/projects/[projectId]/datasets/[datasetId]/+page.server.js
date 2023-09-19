@@ -1,9 +1,6 @@
-import { fail } from '@sveltejs/kit';
 import {
 	getProject,
-	getDataset,
-	updateDataset,
-	createDatasetResource
+	getDataset
 } from '$lib/server/api/v1/project_api';
 
 export async function load({ fetch, params }) {
@@ -11,56 +8,11 @@ export async function load({ fetch, params }) {
 
 	const { projectId, datasetId } = params;
 
-	const project = await getProject(fetch, projectId).catch((error) => {
-		console.error(error);
-		return null;
-	});
-
-	const dataset = await getDataset(fetch, projectId, datasetId).catch((error) => {
-		console.error(error);
-		return null;
-	});
+	const project = await getProject(fetch, projectId);
+	const dataset = await getDataset(fetch, projectId, datasetId);
 
 	return {
 		dataset,
 		project
 	};
 }
-
-export const actions = {
-	// Default action - Update dataset properties
-	updateDatasetProperties: async ({ fetch, request, params }) => {
-		console.log('Update Dataset Properties');
-
-		const { projectId, datasetId } = params;
-		const formData = await request.formData();
-
-		// Validation
-		const name = formData.get('name');
-		if (name === null || name === '') {
-			return fail(400, 'The dataset name can not be empty');
-		}
-
-		try {
-			const dataset = await updateDataset(fetch, projectId, datasetId, formData);
-			return dataset;
-		} catch (error) {
-			console.error(error);
-			return fail(500, error.reason);
-		}
-	},
-
-	createDatasetResource: async ({ fetch, request, params }) => {
-		console.log('Create Dataset Resource');
-
-		const { projectId, datasetId } = params;
-		const formData = await request.formData();
-
-		try {
-			return await createDatasetResource(fetch, projectId, datasetId, formData);
-		} catch (error) {
-			console.error(error);
-			return fail(500, error.reason);
-		}
-	}
-};

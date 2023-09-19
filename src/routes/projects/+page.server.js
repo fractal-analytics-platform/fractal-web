@@ -8,6 +8,7 @@ async function loadProjects(fetch) {
 	});
 }
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch }) {
 	console.log('Load projects page');
 
@@ -28,7 +29,7 @@ export const actions = {
 		let project
 		try {
 			project = await createProject(fetch, data);
-		} catch (error) {
+		} catch (/** @type {any} */ error) {
 			return fail(422, { error: error.reason })
 		}
 		throw redirect(302, `/projects/${project.id}`)

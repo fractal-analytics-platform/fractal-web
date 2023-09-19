@@ -1,11 +1,8 @@
 <script>
 	export let error = undefined;
 
+	/** @type {string | undefined} */
 	$: errorString = JSON.stringify(error, undefined, 2);
-
-	if (errorString) {
-		console.log('error string');
-	}
 </script>
 
 {#if errorString}

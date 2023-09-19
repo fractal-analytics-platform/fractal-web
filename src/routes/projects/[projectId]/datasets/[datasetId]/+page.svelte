@@ -1,75 +1,133 @@
-<style type='text/css'>
-	pre {display: inline;}
-</style>
-
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { AlertError } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
-	import { fieldHasValue } from '$lib/common/component_utilities';
 
 	let projectId = $page.params.projectId;
 	let datasetId = $page.params.datasetId;
 
 	$: project = $page.data.project;
+
 	let dataset = undefined;
-	let enableCreateResource = false;
+
+	// for updating the dataset
+	let name = '';
+	let type = '';
+	let read_only = false;
 	let updateDatasetSuccess = false;
+
+	// for creating a new resource
+	let source = '';
 	let createResourceSuccess = false;
 
 	onMount(async () => {
 		dataset = await $page.data.dataset;
+		// working on a copy
+		({ name, type, read_only } = dataset);
 	});
 
+	/**
+	 * Updates a project's dataset in the server
+	 * @returns {Promise<*>}
+	 */
 	async function handleDatasetUpdate() {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				const updatedDataset = result.data;
-				dataset = updatedDataset;
-				updateDatasetSuccess = true;
-				setTimeout(() => {
-					updateDatasetSuccess = false;
-				}, 1200);
-			} else {
+		updateDatasetSuccess = false;
+
+		if (!dataset || !name) {
+			return;
+		}
+
+		const requestBody = {
+			name,
+			type,
+			read_only
+		};
+
+		// Should prevent requestBody null or empty values
+		Object.keys(requestBody).forEach((key) => {
+			if (requestBody[key] === null || requestBody[key] === '') {
+				delete requestBody[key];
+			}
+		});
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(requestBody)
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			dataset = result;
+			updateDatasetSuccess = true;
+		} else {
+			const errorAlert = document.getElementById('updateDatasetError');
+			if (errorAlert) {
 				new StandardErrorAlert({
-					target: document.getElementById('updateDatasetError'),
+					target: errorAlert,
 					props: {
-						error: result.data
+						error: result
 					}
 				});
 			}
-		};
+		}
 	}
 
-	async function handleCreateDatasetResource({ form }) {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				const datasetResource = result.data;
-				dataset.resource_list.push(datasetResource);
-				// This is required in order to trigger svelte reactivity
-				dataset.resource_list = dataset.resource_list;
-				createResourceSuccess = true;
-				setTimeout(() => {
-					createResourceSuccess = false;
-				}, 1200);
-				form.reset();
-				enableCreateResource = false;
-			} else {
+	/**
+	 * Creates a project's dataset resource in the server
+	 * @returns {Promise<*>}
+	 */
+	async function handleCreateDatasetResource() {
+		createResourceSuccess = false;
+		if (!source) {
+			return;
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}/resource/`, {
+			method: 'POST',
+			credentials: 'include',
+			mode: 'cors',
+			headers,
+			body: JSON.stringify({
+				path: source
+			})
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			dataset.resource_list = [...dataset.resource_list, result];
+			createResourceSuccess = true;
+			source = '';
+		} else {
+			const errorAlert = document.getElementById('createDatasetResourceError');
+			if (errorAlert) {
 				new StandardErrorAlert({
-					target: document.getElementById('createDatasetResourceError'),
+					target: errorAlert,
 					props: {
-						error: result.data
+						error: result
 					}
 				});
 			}
-		};
+		}
 	}
 
+	/**
+	 * Deletes a project's dataset resource from the server
+	 * @param {number} resourceId
+	 * @returns {Promise<*>}
+	 */
 	async function handleDeleteDatasetResource(resourceId) {
 		const response = await fetch(
-			'/projects/' + projectId + '/datasets/' + datasetId + '/resource/' + resourceId,
+			`/api/v1/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
@@ -80,7 +138,9 @@
 			console.log('Dataset resource deleted');
 			dataset.resource_list = dataset.resource_list.filter((r) => r.id !== resourceId);
 		} else {
-			console.error(response.statusText);
+			const error = await response.json();
+			console.error('Error deleting dataset resource', error);
+			throw new AlertError(error);
 		}
 	}
 </script>
@@ -107,9 +167,14 @@
 			>
 		{/if}
 		{#if dataset}
-			<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#updateDatasetModal"
-				><i class="bi-gear-wide-connected" /></button
+			<button
+				class="btn btn-light"
+				data-bs-toggle="modal"
+				data-bs-target="#updateDatasetModal"
+				on:click={() => (updateDatasetSuccess = false)}
 			>
+				<i class="bi-gear-wide-connected" />
+			</button>
 		{/if}
 	</div>
 </div>
@@ -152,23 +217,23 @@
 					</li>
 				</ul>
 			</div>
-			<div class='col-8'>
-				<div class='d-flex align-items-center justify-content-between'>
-					<span class='lead py-3'>Dataset resources</span>
+			<div class="col-8">
+				<div class="d-flex align-items-center justify-content-between">
+					<span class="lead py-3">Dataset resources</span>
 					<button
-						class='btn btn-primary btn-sm'
-						data-bs-toggle='modal'
-						data-bs-target='#createDatasetResourceModal'>New resource
-					</button
-					>
+						class="btn btn-primary btn-sm"
+						data-bs-toggle="modal"
+						data-bs-target="#createDatasetResourceModal"
+						>New resource
+					</button>
 				</div>
-				<table class='table table-bordered caption-top align-middle'>
-					<thead class='bg-light'>
-					<tr>
-						<th class='col-1'>Id</th>
-						<th class='col-9'>Path</th>
-						<th class='col-2'>Options</th>
-					</tr>
+				<table class="table table-bordered caption-top align-middle">
+					<thead class="bg-light">
+						<tr>
+							<th class="col-1">Id</th>
+							<th class="col-9">Path</th>
+							<th class="col-2">Options</th>
+						</tr>
 					</thead>
 					<tbody>
 						{#each dataset.resource_list as resource}
@@ -182,7 +247,7 @@
 										btnStyle="danger"
 										label="Delete"
 										message="Delete a dataset resource"
-										callbackAction={handleDeleteDatasetResource.bind(this, resource.id)}
+										callbackAction={() => handleDeleteDatasetResource(resource.id)}
 										buttonIcon="trash"
 									/>
 								</td>
@@ -203,29 +268,19 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
-				<div id="createDatasetResourceError" />
-
-				<form
-					method="post"
-					action="?/createDatasetResource"
-					use:enhance={handleCreateDatasetResource}
-				>
+				<form on:submit|preventDefault={handleCreateDatasetResource}>
+					<div id="createDatasetResourceError" />
 					<div class="mb-3">
 						<label for="source" class="form-label">Resource path</label>
-						<input
-							class="form-control"
-							type="text"
-							name="source"
-							id="source"
-							on:input={(event) => {enableCreateResource = fieldHasValue(event)}} />
+						<input class="form-control" type="text" name="source" id="source" bind:value={source} />
 					</div>
-
-					<button class="btn btn-primary" disabled={!enableCreateResource}>Create new resource</button>
+					<button class="btn btn-primary" disabled={!source} type="submit">
+						Create new resource
+					</button>
+					{#if createResourceSuccess}
+						<p class="alert alert-success mt-3">Resource created</p>
+					{/if}
 				</form>
-
-				{#if createResourceSuccess}
-					<p class="alert alert-success mt-3">Resource created</p>
-				{/if}
 			</div>
 		</div>
 	</div>
@@ -241,34 +296,48 @@
 				</div>
 				<div class="modal-body">
 					<div id="updateDatasetError" />
+					<div class="mb-3">
+						<label for="name" class="form-label">Dataset name</label>
+						<input
+							class="form-control"
+							type="text"
+							name="name"
+							id="name"
+							class:is-invalid={!name}
+							bind:value={name}
+						/>
+						{#if !name}
+							<div class="invalid-feedback">The dataset name can not be empty</div>
+						{/if}
+					</div>
+					<div class="mb-3">
+						<label for="type" class="form-label">Dataset type</label>
+						<input class="form-control" type="text" name="type" id="type" bind:value={type} />
+					</div>
+					<div class="mb-3">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							name="read_only"
+							id="read_only"
+							bind:checked={read_only}
+						/>
+						<label for="read_only" class="form-check-label">Readonly dataset?</label>
+					</div>
 
-					<form method="post" action="?/updateDatasetProperties" use:enhance={handleDatasetUpdate}>
-						<div class="mb-3">
-							<label for="name" class="form-label">Dataset name</label>
-							<input class="form-control" type="text" name="name" id="name" value={dataset.name} />
-						</div>
-						<div class="mb-3">
-							<label for="type" class="form-label">Dataset type</label>
-							<input class="form-control" type="text" name="type" id="type" value={dataset.type} />
-						</div>
-						<div class="mb-3">
-							<input
-								class="form-check-input"
-								type="checkbox"
-								name="read_only"
-								id="read_only"
-								checked={dataset.read_only}
-							/>
-							<label for="read_only" class="form-check-label">Readonly dataset?</label>
-						</div>
-
-						<div class="d-flex align-items-center">
-							<button class="btn btn-primary me-3">Update</button>
-							{#if updateDatasetSuccess}
-								<span class="text-success">Dataset properties updated with success</span>
-							{/if}
-						</div>
-					</form>
+					<div class="d-flex align-items-center">
+						<button
+							class="btn btn-primary me-3"
+							type="button"
+							on:click={handleDatasetUpdate}
+							disabled={!name}
+						>
+							Update
+						</button>
+						{#if updateDatasetSuccess}
+							<span class="text-success">Dataset properties updated with success</span>
+						{/if}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -292,7 +361,7 @@
 							<li class="list-group-item text-break">
 								{#if value === null}
 									<span>-</span>
-								{:else if typeof value == "object"}
+								{:else if typeof value == 'object'}
 									{#if Object.keys(value).length > 1}
 										<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
 									{:else}
@@ -309,3 +378,9 @@
 		</div>
 	</div>
 {/if}
+
+<style type="text/css">
+	pre {
+		display: inline;
+	}
+</style>

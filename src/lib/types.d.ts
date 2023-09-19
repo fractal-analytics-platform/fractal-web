@@ -1,0 +1,1 @@
+export type GetHeaders = (originalHeaders: Headers | undefined) => Headers
