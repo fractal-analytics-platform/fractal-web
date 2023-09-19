@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added proxy endpoints and refactored error propagation on projects
+
 # 0.5.6
 
 * Improve displaying of `Dataset.meta` properties (\#281).
