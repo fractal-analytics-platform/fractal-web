@@ -1,6 +1,9 @@
 <script>
 	import { page } from '$app/stores';
-	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
+	import {
+		orderTasksByOwnerThenByNameThenByVersion,
+		replaceEmptyStrings
+	} from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
 	import TaskEditModal from '$lib/components/tasks/TaskEditModal.svelte';
@@ -8,7 +11,6 @@
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { unsetEmptyOrNullValues } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 
 	// Error property to be set in order to show errors in UI
@@ -83,14 +85,15 @@
 			credentials: 'include',
 			headers,
 			body: JSON.stringify(
-				unsetEmptyOrNullValues({
+				{
 					name,
 					command,
 					version,
 					source,
 					input_type,
 					output_type
-				})
+				},
+				replaceEmptyStrings
 			)
 		});
 

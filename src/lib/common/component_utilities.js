@@ -111,23 +111,18 @@ export function nullifyEmptyStrings(inputValues) {
 }
 
 /**
- * Transform an object deleting all the keys having null or empty string as value
- * @param {object} inputValues
- * @returns {object}
+ * Replacer function to ignore empty strings when using JSON.stringify().
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description}
+ * @param {string} _key 
+ * @param {any} value 
+ * @returns {any}
  */
-export function unsetEmptyOrNullValues(inputValues) {
-	const clearedValues = {};
-	for (let key in inputValues) {
-		if (
-			inputValues[key] === null ||
-			(typeof inputValues[key] === 'string' && inputValues[key].trim() === '')
-		) {
-			delete clearedValues[key];
-		} else {
-			clearedValues[key] = inputValues[key];
-		}
+export function replaceEmptyStrings(_key, value) {
+	if (typeof value === 'string' && value.trim() === '') {
+		return undefined;
+	} else {
+		return value;
 	}
-	return clearedValues;
 }
 
 export function formatMarkdown(markdownValue) {
