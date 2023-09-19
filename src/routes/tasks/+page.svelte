@@ -1,7 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { enhance } from '$app/forms';
 	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
@@ -10,6 +8,8 @@
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { unsetEmptyOrNullValues } from '$lib/common/component_utilities';
+	import { AlertError } from '$lib/common/errors';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
@@ -17,12 +17,17 @@
 	let tasks = $page.data.tasks;
 	let taskCreateSuccess = false;
 
+	// Add a single task fields
+	let name = '';
+	let command = '';
+	let source = '';
+	let version = '';
+	let input_type = '';
+	let output_type = '';
+
 	// Store subscriptions
 	collectTaskErrorStore.subscribe((error) => {
 		if (error) setErrorReasons(error);
-	});
-
-	onMount(async () => {
 	});
 
 	// Sort tasks
@@ -30,12 +35,15 @@
 
 	function setErrorReasons(value) {
 		errorReasons = value;
-		new StandardErrorAlert({
-			target: document.getElementById('errorSection'),
-			props: {
-				error: errorReasons
-			}
-		});
+		const errorAlert = document.getElementById('errorSection');
+		if (errorAlert) {
+			new StandardErrorAlert({
+				target: errorAlert,
+				props: {
+					error: errorReasons
+				}
+			});
+		}
 	}
 
 	function setTaskModal(event) {
@@ -47,7 +55,7 @@
 
 	// Updates the tasks list after a task is edited in the modal
 	async function updateEditedTask(editedTask) {
-		tasks = tasks.filter(t => {
+		tasks = tasks.filter((t) => {
 			if (t.id === editedTask.id) {
 				return editedTask;
 			} else {
@@ -60,42 +68,61 @@
 		window.location.reload();
 	}
 
-	async function handleCreateTask({ form }) {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				form.reset();
-				// Add created task to the list
-				const task = result.data.task;
-				tasks = [...tasks, task];
-				taskCreateSuccess = true;
-				setTimeout(() => {
-					taskCreateSuccess = false;
-				}, 3000);
-			} else {
-				const error = result.data;
-				console.error(error);
-				setErrorReasons(error);
-			}
-		};
+	/**
+	 * Creates a new task in the server
+	 * @returns {Promise<*>}
+	 */
+	async function handleCreateTask() {
+		taskCreateSuccess = false;
+
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		const response = await fetch('/api/v1/task', {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(
+				unsetEmptyOrNullValues({
+					name,
+					command,
+					version,
+					source,
+					input_type,
+					output_type
+				})
+			)
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			// Add created task to the list
+			console.log('Task created', result);
+			tasks = [...tasks, result];
+			taskCreateSuccess = true;
+		} else {
+			console.error('Unable to create task', result);
+			setErrorReasons(result);
+		}
 	}
 
+	/**
+	 * Deletes a task from the server
+	 * @param {number} taskId
+	 * @returns {Promise<*>}
+	 */
 	async function handleDeleteTask(taskId) {
-		const response = await fetch('/tasks/' + taskId, {
+		const response = await fetch(`/api/v1/task/${taskId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});
-
 		if (response.ok) {
 			console.log('Task deleted successfully');
 			tasks = tasks.filter((t) => t.id !== taskId);
 		} else {
-			console.error('Error deleting the task');
-			new StandardErrorAlert({
-				target: document.getElementById('taskErrorAlert'),
-				props: {
-					error: await response.json()
-				}
-			});
+			const result = await response.json();
+			console.error('Error deleting the task', result);
+			throw new AlertError(result);
 		}
 	}
 </script>
@@ -143,43 +170,53 @@
 					{#if taskCreateSuccess}
 						<div class="alert alert-success" role="alert">Task created successfully</div>
 					{/if}
-					<form method="post" action="?/createTask" use:enhance={handleCreateTask}>
+					<form on:submit|preventDefault={handleCreateTask}>
 						<div class="row g-3">
 							<div class="col-6">
 								<div class="input-group">
 									<div class="input-group-text">Task name</div>
-									<input name="name" type="text" class="form-control" />
+									<input name="name" type="text" class="form-control" bind:value={name} />
 								</div>
 							</div>
 							<div class="col-12">
 								<div class="input-group">
 									<div class="input-group-text">Command</div>
-									<input name="command" type="text" class="form-control" />
+									<input name="command" type="text" class="form-control" bind:value={command} />
 								</div>
 							</div>
 							<div class="col-6">
 								<div class="input-group">
 									<div class="input-group-text">Source</div>
-									<input name="source" type="text" class="form-control" />
+									<input name="source" type="text" class="form-control" bind:value={source} />
 								</div>
 							</div>
 							<div class="col-6">
 								<div class="input-group">
 									<div class="input-group-text">Version</div>
-									<input name="version" type="text" class="form-control" />
+									<input name="version" type="text" class="form-control" bind:value={version} />
 								</div>
 							</div>
 							<div class="row" />
 							<div class="col-6">
 								<div class="input-group">
 									<div class="input-group-text">Input type</div>
-									<input name="input_type" type="text" class="form-control" />
+									<input
+										name="input_type"
+										type="text"
+										class="form-control"
+										bind:value={input_type}
+									/>
 								</div>
 							</div>
 							<div class="col-6">
 								<div class="input-group">
 									<div class="input-group-text">Output type</div>
-									<input name="output_type" type="text" class="form-control" />
+									<input
+										name="output_type"
+										type="text"
+										class="form-control"
+										bind:value={output_type}
+									/>
 								</div>
 							</div>
 							<div class="col-auto">
@@ -195,7 +232,6 @@
 	<div class="row mt-4">
 		<p class="lead">Task List</p>
 		<div class="col-12">
-			<span id="taskErrorAlert"></span>
 			<table class="table caption-top align-middle">
 				<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
 					<div class="d-flex align-items-center justify-content-between">
@@ -219,8 +255,8 @@
 					{#each tasks as task}
 						<tr>
 							<td class="col-3">{task.name}</td>
-							<td class="col-1">{task.version || "–"}</td>
-							<td class='col-1'>{task.owner || "–"}</td>
+							<td class="col-1">{task.version || '–'}</td>
+							<td class="col-1">{task.owner || '–'}</td>
 							<td class="col-2">
 								<button
 									data-fc-task={task.id}
@@ -262,4 +298,4 @@
 </div>
 
 <TaskInfoModal />
-<TaskEditModal updateEditedTask={updateEditedTask} />
+<TaskEditModal {updateEditedTask} />

@@ -93,11 +93,36 @@ export function getOnlyModifiedProperties(oldProperties, newProperties) {
 	return modifiedProperties;
 }
 
-export function unsetEmptyStrings(inputValues) {
+/**
+ * Transform an object setting to null all the keys having empty string as value
+ * @param {object} inputValues
+ * @returns {object}
+ */
+export function nullifyEmptyStrings(inputValues) {
 	const clearedValues = {};
 	for (let key in inputValues) {
-		if (typeof(inputValues[key]) === 'string' && inputValues[key].trim() === '') {
+		if (typeof inputValues[key] === 'string' && inputValues[key].trim() === '') {
 			clearedValues[key] = null;
+		} else {
+			clearedValues[key] = inputValues[key];
+		}
+	}
+	return clearedValues;
+}
+
+/**
+ * Transform an object deleting all the keys having null or empty string as value
+ * @param {object} inputValues
+ * @returns {object}
+ */
+export function unsetEmptyOrNullValues(inputValues) {
+	const clearedValues = {};
+	for (let key in inputValues) {
+		if (
+			inputValues[key] === null ||
+			(typeof inputValues[key] === 'string' && inputValues[key].trim() === '')
+		) {
+			delete clearedValues[key];
 		} else {
 			clearedValues[key] = inputValues[key];
 		}

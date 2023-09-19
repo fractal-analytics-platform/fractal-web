@@ -24,46 +24,6 @@ export async function listTasks(fetch) {
 	return await response.json();
 }
 
-/**
- * Creates a new task in the server
- * @param fetch
- * @param formData
- * @returns {Promise<*>}
- */
-export async function createTask(fetch, formData) {
-	// Set headers
-	const headers = new Headers();
-	// headers.append('Authorization', cookies.get('AccessToken'))
-	headers.append('Content-Type', 'application/json');
-
-	// Compose request
-	// Since the api accepts application/json data format, we shall serialize data
-	// into a json object. It is better to do this explicitly.
-	const requestData = {
-		name: formData.get('name'),
-		command: formData.get('command'),
-		version: formData.get('version'),
-		source: formData.get('source'),
-		input_type: formData.get('input_type'),
-		output_type: formData.get('output_type')
-	};
-	// There is an interesting thing, if we use the svelte kit fetch object the server will not
-	// accept our request. If, instead, we use the default javascript fetch the server accepts it.
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/', {
-		method: 'POST',
-		mode: 'cors',
-		credentials: 'include',
-		headers,
-		body: JSON.stringify(requestData)
-	});
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
-}
-
 // Replace empty string value with undefined, so that it will be ignored in JSON.stringify (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description)
 function replaceEmptyString(key, value) {
 	if (typeof value === 'string' && value === '') {
@@ -137,31 +97,6 @@ export async function taskCollectionStatus(fetch, taskId) {
 
 	throw new Error('Unable to fetch collection operation status');
 }
-
-
-/**
- * Deletes a task from the server
- * @param fetch
- * @param taskId
- * @returns {Promise<*>}
- */
-export async function deleteTask(fetch, taskId) {
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/task/${taskId}`,
-		{
-			method: 'DELETE',
-			credentials: 'include',
-			mode: 'cors'
-		}
-	);
-
-	if (response.ok) {
-		return new Response(null, { status: response.status });
-	}
-
-	await responseError(response);
-}
-
 
 /**
  * Edits a task on the server

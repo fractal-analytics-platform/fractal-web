@@ -1,7 +1,7 @@
 <script>
 	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
-	import { getOnlyModifiedProperties, unsetEmptyStrings } from '$lib/common/component_utilities';
+	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
 
 	export let updateEditedTask;
 	$: task = $taskStore;
@@ -10,7 +10,7 @@
 
 	async function handleEditTask() {
 
-		let taskProperties = unsetEmptyStrings(task);
+		let taskProperties = nullifyEmptyStrings(task);
 		taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
 
 		const response = await fetch('/tasks/' + task.id, {
