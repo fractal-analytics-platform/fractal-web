@@ -25,30 +25,6 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 }
 
 /**
- * Exports a project's workflow from the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @returns {Promise<*>}
- */
-export async function exportWorkflow(fetch, projectId, workflowId) {
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/export`,
-		{
-			method: 'GET',
-			credentials: 'include',
-			mode: 'cors'
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new Error('The client was not able to retrieve the workflow export data from the server');
-}
-
-/**
  * Downloads a project's workflow job log as zip file
  * @param fetch
  * @param projectId

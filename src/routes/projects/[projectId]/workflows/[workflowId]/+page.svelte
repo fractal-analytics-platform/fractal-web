@@ -75,8 +75,12 @@
 		}
 	});
 
+	/**
+	 * Exports a project's workflow from the server
+	 * @returns {Promise<void>}
+	 */
 	async function handleExportWorkflow() {
-		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/export`, {
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/export`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -90,13 +94,14 @@
 
 		if (workflowData !== null) {
 			const file = new File(
-				[JSON.stringify(workflowData, '', 2)],
+				[JSON.stringify(workflowData, null, 2)],
 				`workflow-export-${workflow.name}-${Date.now().toString()}.json`,
 				{
 					type: `application/json`
 				}
 			);
 			const fileUrl = URL.createObjectURL(file);
+			/** @type {any} */
 			const linkElement = document.getElementById('downloadWorkflowButton');
 			linkElement.download = `workflow-export-${workflow.name}-${Date.now().toString()}.json`;
 			linkElement.href = fileUrl;
