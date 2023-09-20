@@ -3,7 +3,7 @@ import { responseError } from '$lib/common/errors.js';
 
 /**
  * Fetches a list of tasks from the server
- * @param fetch
+ * @param {typeof fetch} fetch
  * @returns {Promise<*>}
  */
 export async function listTasks(fetch) {
