@@ -1,0 +1,95 @@
+{
+	"name": "Example Workflow",
+	"task_list": [
+		{
+			"meta": {
+				"cpus_per_task": 1,
+				"mem": 4000
+			},
+			"args": {
+				"num_levels": 5,
+				"coarsening_xy": 2,
+				"image_extension": "png",
+				"allowed_channels": [
+					{
+						"color": "00FFFF",
+						"wavelength_id": "A01_C01",
+						"label": "DAPI",
+						"window": {
+							"start": 110,
+							"end": 800
+						}
+					}
+				]
+			},
+			"task": {
+				"source": "pip_remote:fractal_tasks_core:0.11.0:fractal-tasks::create_ome-zarr_structure"
+			}
+		},
+		{
+			"meta": {
+				"cpus_per_task": 1,
+				"mem": 4000,
+				"parallelization_level": "image"
+			},
+			"args": null,
+			"task": {
+				"source": "pip_remote:fractal_tasks_core:0.11.0:fractal-tasks::convert_yokogawa_to_ome-zarr"
+			}
+		},
+		{
+			"meta": {
+				"cpus_per_task": 1,
+				"mem": 1000
+			},
+			"args": {
+				"project_to_2D": true,
+				"suffix": "mip",
+				"ROI_table_names": ["FOV_ROI_table", "well_ROI_table"]
+			},
+			"task": {
+				"source": "pip_remote:fractal_tasks_core:0.11.0:fractal-tasks::copy_ome-zarr_structure"
+			}
+		},
+		{
+			"meta": {
+				"cpus_per_task": 1,
+				"mem": 4000,
+				"parallelization_level": "image"
+			},
+			"args": null,
+			"task": {
+				"source": "pip_remote:fractal_tasks_core:0.11.0:fractal-tasks::maximum_intensity_projection"
+			}
+		},
+		{
+			"meta": {
+				"cpus_per_task": 4,
+				"mem": 16000,
+				"needs_gpu": true,
+				"parallelization_level": "image"
+			},
+			"args": {
+				"input_ROI_table": "well_ROI_table",
+				"use_masks": true,
+				"relabeling": true,
+				"diameter_level0": 60,
+				"model_type": "nuclei",
+				"cellprob_threshold": 0,
+				"flow_threshold": 0.4,
+				"min_size": 15,
+				"augment": false,
+				"net_avg": false,
+				"use_gpu": true,
+				"level": 2,
+				"channel": {
+					"wavelength_id": "A01_C01"
+				},
+				"output_label_name": "nuclei"
+			},
+			"task": {
+				"source": "pip_remote:fractal_tasks_core:0.11.0:fractal-tasks::cellpose_segmentation"
+			}
+		}
+	]
+}
