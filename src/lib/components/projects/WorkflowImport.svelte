@@ -2,6 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { enhance } from '$app/forms';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	const dispatch = createEventDispatcher();
 
@@ -27,12 +28,7 @@
 				// The form submission failed
 				const error = JSON.parse(result.data);
 				console.error('Import workflow failed', error);
-				new StandardErrorAlert({
-					target: document.getElementById('importWorkflowError'),
-					props: {
-						error
-					}
-				});
+				displayStandardErrorAlert(error, 'importWorkflowError');
 				importing = false;
 			}
 		};

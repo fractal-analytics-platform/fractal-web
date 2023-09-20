@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
 	let projectId = $page.params.projectId;
@@ -67,15 +67,7 @@
 			dataset = result;
 			updateDatasetSuccess = true;
 		} else {
-			const errorAlert = document.getElementById('updateDatasetError');
-			if (errorAlert) {
-				new StandardErrorAlert({
-					target: errorAlert,
-					props: {
-						error: result
-					}
-				});
-			}
+			displayStandardErrorAlert(result, 'updateDatasetError');
 		}
 	}
 
@@ -108,15 +100,7 @@
 			createResourceSuccess = true;
 			source = '';
 		} else {
-			const errorAlert = document.getElementById('createDatasetResourceError');
-			if (errorAlert) {
-				new StandardErrorAlert({
-					target: errorAlert,
-					props: {
-						error: result
-					}
-				});
-			}
+			displayStandardErrorAlert(result, 'createDatasetResourceError');
 		}
 	}
 

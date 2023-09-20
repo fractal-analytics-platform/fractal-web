@@ -4,6 +4,7 @@
 	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -35,29 +36,13 @@
 			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
 			return args;
 		} catch (err) {
-			const errorAlert = document.getElementById('json-schema-validation-errors');
-			if (errorAlert) {
-				new StandardErrorAlert({
-					target: errorAlert,
-					props: {
-						error: err
-					}
-				});
-			}
+			displayStandardErrorAlert(err, 'json-schema-validation-errors');
 			throw err;
 		}
 	}
 
 	function handleValidationErrors(errors) {
-		const errorAlert = document.getElementById('json-schema-validation-errors');
-		if (errorAlert) {
-			new StandardErrorAlert({
-				target: errorAlert,
-				props: {
-					error: errors
-				}
-			});
-		}
+		displayStandardErrorAlert(errors, 'json-schema-validation-errors');
 	}
 
 	$: {

@@ -11,6 +11,7 @@
 	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { getOnlyModifiedProperties } from '$lib/common/component_utilities';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Workflow id
 	export let workflowId;
@@ -45,15 +46,7 @@
 			}
 		} catch (error) {
 			console.log(error);
-			const alertError = document.getElementById('metaPropertiesFormError');
-			if (alertError) {
-				new StandardErrorAlert({
-					target: alertError,
-					props: {
-						error
-					}
-				});
-			}
+			displayStandardErrorAlert(error, 'metaPropertiesFormError');
 		}
 	}
 </script>

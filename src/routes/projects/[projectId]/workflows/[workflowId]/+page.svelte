@@ -251,18 +251,12 @@
 			// Preliminary check: if inputDatasetControl is not set, raise an error
 			let message = 'Input dataset is required. Select one from the list.';
 			console.error(message);
-			new StandardErrorAlert({
-				target: document.getElementById('applyWorkflowError'),
-				props: { error: message }
-			});
+			displayStandardErrorAlert(message, 'applyWorkflowError');
 		} else if (outputDatasetControl === '') {
 			// Preliminary check: if outputDatasetControl is not set, raise an error
 			let message = 'Output dataset is required. Select one from the list.';
 			console.error(message);
-			new StandardErrorAlert({
-				target: document.getElementById('applyWorkflowError'),
-				props: { error: message }
-			});
+			displayStandardErrorAlert(message, 'applyWorkflowError');
 		} else {
 			// Both inputDatasetControl and outputDatasetControl are set, continue
 
@@ -285,6 +279,7 @@
 			if (response.ok) {
 				// Successfully applied workflow
 				const job = await response.json();
+				// @ts-ignore
 				// eslint-disable-next-line
 				const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'));
 				modal.toggle();
@@ -299,12 +294,7 @@
 			} else {
 				console.error(response);
 				// Set an error message on the component
-				new StandardErrorAlert({
-					target: document.getElementById('applyWorkflowError'),
-					props: {
-						error: await response.json()
-					}
-				});
+				displayStandardErrorAlert(await response.json(), 'applyWorkflowError');
 			}
 		}
 	}

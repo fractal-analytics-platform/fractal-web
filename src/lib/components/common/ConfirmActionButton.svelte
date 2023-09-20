@@ -1,6 +1,6 @@
 <script>
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 
 	export let callbackAction = async () => {}; // A default empty function
 	export let style = 'primary';
@@ -31,15 +31,7 @@
 			await callbackAction();
 			modal.hide();
 		} catch (/** @type {any} */ error) {
-			const errorAlert = document.getElementById(`errorAlert-${modalId}`);
-			if (errorAlert) {
-				new StandardErrorAlert({
-					target: errorAlert,
-					props: {
-						error
-					}
-				});
-			}
+			displayStandardErrorAlert(error, `errorAlert-${modalId}`);
 		}
 	};
 </script>

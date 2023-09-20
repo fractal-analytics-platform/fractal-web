@@ -2,6 +2,7 @@
 	import { modalProject } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// List of projects to be displayed
 	export let projects = [];
@@ -29,17 +30,12 @@
 			})
 		});
 
+		const result = await response.json();
 		if (response.ok) {
 			newProjectName = '';
-			projects = [...projects, await response.json()]
+			projects = [...projects, result]
 		} else {
-			new StandardErrorAlert({
-				// @ts-ignore
-				target: document.getElementById('createProjectErrorAlert'),
-				props: {
-					error: await response.json()
-				}
-			});
+			displayStandardErrorAlert(result, 'createProjectErrorAlert');
 		}
 	}
 

@@ -8,6 +8,7 @@
 	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Component properties
 	let project = $page.data.project;
@@ -116,12 +117,7 @@
 		} else {
 			console.error('Error stopping job');
 			const errorResponse = await response.json();
-			new StandardErrorAlert({
-				target: document.getElementById('jobUpdatesError'),
-				props: {
-					error: errorResponse.error
-				}
-			});
+			displayStandardErrorAlert(errorResponse.error, 'jobUpdatesError');
 		}
 	}
 

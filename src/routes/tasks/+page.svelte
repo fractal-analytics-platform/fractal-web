@@ -11,7 +11,7 @@
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
@@ -37,15 +37,7 @@
 
 	function setErrorReasons(value) {
 		errorReasons = value;
-		const errorAlert = document.getElementById('errorSection');
-		if (errorAlert) {
-			new StandardErrorAlert({
-				target: errorAlert,
-				props: {
-					error: errorReasons
-				}
-			});
-		}
+		displayStandardErrorAlert(errorReasons, 'errorSection');
 	}
 
 	function setTaskModal(event) {

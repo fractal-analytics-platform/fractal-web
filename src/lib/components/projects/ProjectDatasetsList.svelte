@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
 	export let datasets = [];
@@ -38,15 +38,7 @@
 			newDatasetReadonly = false;
 		} else {
 			console.log('Dataset creation failed', result);
-			const errorAlert = document.getElementById('datasetCreateErrorAlert');
-			if (errorAlert) {
-				new StandardErrorAlert({
-					target: errorAlert,
-					props: {
-						error: result
-					}
-				});
-			}
+			displayStandardErrorAlert(result, 'datasetCreateErrorAlert');
 		}
 	}
 
