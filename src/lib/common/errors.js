@@ -1,10 +1,6 @@
 import { error } from '@sveltejs/kit';
 import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
-export function PostResourceException(response) {
-	this.reason = response;
-}
-
 /**
  * Propagates an error response.
  * @param {Response} response

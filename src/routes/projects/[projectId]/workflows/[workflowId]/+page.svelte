@@ -8,7 +8,7 @@
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
-	import { formatMarkdown } from '$lib/common/component_utilities';
+	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Workflow
@@ -187,7 +187,7 @@
 
 		// Creating workflow task
 		const workflowTaskResponse = await fetch(
-			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask/?task_id=${taskId}`,
+			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
 			{
 				method: 'POST',
 				credentials: 'include',
@@ -355,6 +355,10 @@
 		}
 	}
 
+	/**
+	 * Requests the server to apply a project's workflow (i.e. run it)
+	 * @returns {Promise<void>}
+	 */
 	async function handleApplyWorkflow() {
 		if (inputDatasetControl === '') {
 			// Preliminary check: if inputDatasetControl is not set, raise an error
@@ -368,21 +372,24 @@
 			displayStandardErrorAlert(message, 'applyWorkflowError');
 		} else {
 			// Both inputDatasetControl and outputDatasetControl are set, continue
+			const requestBody = {
+				worker_init: workerInitControl,
+				first_task_index: firstTaskIndexControl,
+				lastTaskIndex: lastTaskIndexControl
+			};
 
-			// Build a FormData object
-			const data = new FormData();
-			data.append('inputDataset', inputDatasetControl);
-			data.append('outputDataset', outputDatasetControl);
-			data.append('workerInit', workerInitControl);
-			data.append('firstTaskIndex', firstTaskIndexControl);
-			data.append('lastTaskIndex', lastTaskIndexControl);
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
 
-			// Make API call
-			const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
-				method: 'POST',
-				credentials: 'include',
-				body: data
-			});
+			const response = await fetch(
+				`/api/v1/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${inputDatasetControl}&output_dataset_id=${outputDatasetControl}`,
+				{
+					method: 'POST',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify(requestBody, replaceEmptyStrings)
+				}
+			);
 
 			// Handle API response
 			if (response.ok) {
@@ -562,11 +569,8 @@
 									btnStyle="danger"
 									buttonIcon="trash"
 									message="Delete a workflow task {selectedWorkflowTask.task.name}"
-									callbackAction={handleDeleteWorkflowTask.bind(
-										this,
-										workflow.id,
-										selectedWorkflowTask.id
-									)}
+									callbackAction={() =>
+										handleDeleteWorkflowTask(workflow.id, selectedWorkflowTask.id)}
 								/>
 							</div>
 						{:else}
@@ -916,9 +920,9 @@
 							checkingConfiguration = false;
 						}}>Cancel</button
 					>
-					<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}
-						>Confirm</button
-					>
+					<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>
+						Confirm
+					</button>
 				{:else}
 					<button
 						class="btn btn-primary"

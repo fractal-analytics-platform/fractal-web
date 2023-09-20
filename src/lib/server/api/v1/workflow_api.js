@@ -1,5 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException, responseError } from '$lib/common/errors';
+import { responseError } from '$lib/common/errors';
 
 /**
  * Fetches a project's workflow from the server
@@ -46,56 +46,6 @@ export async function exportWorkflow(fetch, projectId, workflowId) {
 	}
 
 	throw new Error('The client was not able to retrieve the workflow export data from the server');
-}
-
-/**
- * Requests the server to apply a project's workflow (i.e. run it)
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param formData
- * @returns {Promise<*>}
- */
-export async function applyWorkflow(fetch, projectId, workflowId, formData) {
-	const requestBody = {};
-
-	// Set input/output dataset (both required)
-	const inputDatasetId = formData.get('inputDataset');
-	const outputDatasetId = formData.get('outputDataset');
-	console.log('inputDatasetId', inputDatasetId);
-	console.log('outputDatasetId', outputDatasetId);
-
-	// Set worker_init if provided
-	if (formData.get('workerInit')) {
-		requestBody.worker_init = formData.get('workerInit');
-	}
-	if (formData.get('firstTaskIndex')) {
-		requestBody.first_task_index = formData.get('firstTaskIndex');
-	}
-	if (formData.get('lastTaskIndex')) {
-		requestBody.last_task_index = formData.get('lastTaskIndex');
-	}
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST +
-		`/api/v1/project/${projectId}/workflow/${workflowId}/apply/?input_dataset_id=${inputDatasetId}&output_dataset_id=${outputDatasetId}`,
-		{
-			method: 'POST',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(requestBody)
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
 }
 
 /**
