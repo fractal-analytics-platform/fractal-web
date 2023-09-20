@@ -9,7 +9,7 @@ const baseApiUrl = `${FRACTAL_SERVER_HOST}/api`;
 /** @type {import('./$types').RequestHandler} */
 export function GET({ params, url, request }) {
 	try {
-		return fetch(`${baseApiUrl}/${params.path + url.search}`, {
+		return fetch(`${baseApiUrl}/${params.path}/${url.search}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: filterHeaders(request.headers)
@@ -23,7 +23,7 @@ export function GET({ params, url, request }) {
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ params, url, request }) {
 	try {
-		return await fetch(`${baseApiUrl}/${params.path + url.search}/`, {
+		return await fetch(`${baseApiUrl}/${params.path}/${url.search}`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: filterHeaders(request.headers),
@@ -38,7 +38,7 @@ export async function POST({ params, url, request }) {
 /** @type {import('./$types').RequestHandler} */
 export async function PATCH({ params, url, request }) {
 	try {
-		return await fetch(`${baseApiUrl}/${params.path + url.search}/`, {
+		return await fetch(`${baseApiUrl}/${params.path}/${url.search}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: filterHeaders(request.headers),
@@ -53,7 +53,7 @@ export async function PATCH({ params, url, request }) {
 /** @type {import('./$types').RequestHandler} */
 export async function DELETE({ params, url, request }) {
 	try {
-		return await fetch(`${baseApiUrl}/${params.path + url.search}/`, {
+		return await fetch(`${baseApiUrl}/${params.path}/${url.search}`, {
 			method: 'DELETE',
 			credentials: 'include',
 			headers: filterHeaders(request.headers)

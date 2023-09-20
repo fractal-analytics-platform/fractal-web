@@ -49,44 +49,6 @@ export async function exportWorkflow(fetch, projectId, workflowId) {
 }
 
 /**
- * Creates a new project's workflow task in the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param formData
- * @returns {Promise<*>}
- */
-export async function createWorkflowTask(fetch, projectId, workflowId, formData) {
-	const requestBody = {
-		order: formData.get('taskOrder') || undefined,
-		meta: {},
-		args: {}
-	};
-	const taskId = formData.get('taskId');
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST +
-			`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/?task_id=${taskId}`,
-		{
-			method: 'POST',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(requestBody)
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
-}
-
-/**
  * Deletes a project's workflow task from the server
  * @param fetch
  * @param projectId

@@ -1,7 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { enhance } from '$app/forms';
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
@@ -38,6 +37,12 @@
 	let argumentsWithUnsavedChanges = false;
 	let saveArgumentsChanges = undefined;
 	let preventedTaskContextChange = undefined;
+
+	// Create workflow task modal
+	/** @type {number|undefined} */
+	let taskOrder = undefined;
+	let workflowTaskSelectionComponent = undefined;
+	let workflowTaskErrorAlert = undefined;
 
 	// Update workflow modal
 	let updatedWorkflowName = '';
@@ -100,6 +105,8 @@
 	}
 
 	async function getAvailableTasks() {
+		resetCreateWorkflowTaskModal();
+
 		// Get available tasks from the server
 		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/tasks`, {
 			method: 'GET',
@@ -152,23 +159,78 @@
 		}
 	}
 
-	async function handleCreateWorkflowTask({ form }) {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				// Workflow task created
-				console.log('Workflow task created');
-				// Update workflow
-				workflow = result.data;
-				// UI Feedback
-				workflowTaskCreated = true;
-				setTimeout(() => {
-					workflowTaskCreated = false;
-				}, 3000);
-				form.reset();
-			} else {
-				console.error('Error creating new workflow task', result.data);
+	function resetCreateWorkflowTaskModal() {
+		taskOrder = undefined;
+		if (workflowTaskErrorAlert) {
+			workflowTaskErrorAlert.hide();
+		}
+		workflowTaskSelectionComponent.reset();
+	}
+
+	/**
+	 * Creates a new project's workflow task in the server.
+	 * @returns {Promise<void>}
+	 */
+	async function handleCreateWorkflowTask() {
+		const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
+		if (taskId === undefined) {
+			return;
+		}
+
+		// Remove previous errors
+		if (workflowTaskErrorAlert) {
+			workflowTaskErrorAlert.hide();
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		// Creating workflow task
+		const workflowTaskResponse = await fetch(
+			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask/?task_id=${taskId}`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify({
+					order: taskOrder,
+					meta: {},
+					args: {}
+				})
 			}
-		};
+		);
+
+		const workflowTaskResult = await workflowTaskResponse.json();
+
+		if (!workflowTaskResponse.ok) {
+			console.error('Error while creating workflow task', workflowTaskResult);
+			workflowTaskErrorAlert = displayStandardErrorAlert(workflowTaskResult, 'workflowTaskError');
+			return;
+		}
+		console.log('Workflow task created');
+
+		// Get updated workflow with created task
+		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const workflowResult = await workflowResponse.json();
+
+		if (!workflowResponse.ok) {
+			console.error('Error while retrieving workflow', workflowResult);
+			workflowTaskErrorAlert = displayStandardErrorAlert(workflowResult, 'workflowTaskError');
+			return;
+		}
+
+		// Update workflow
+		workflow = workflowResult;
+		// UI Feedback
+		workflowTaskCreated = true;
+		setTimeout(() => {
+			workflowTaskCreated = false;
+		}, 3000);
+		resetCreateWorkflowTaskModal();
 	}
 
 	async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
@@ -618,9 +680,13 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
-				<form method="post" action="?/createWorkflowTask" use:enhance={handleCreateWorkflowTask}>
+				<div id="workflowTaskError" />
+				<form on:submit|preventDefault={handleCreateWorkflowTask}>
 					<div class="mb-3">
-						<WorkflowTaskSelection tasks={availableTasks} />
+						<WorkflowTaskSelection
+							tasks={availableTasks}
+							bind:this={workflowTaskSelectionComponent}
+						/>
 					</div>
 
 					<div class="mb-3">
@@ -633,10 +699,11 @@
 							placeholder="Leave it blank to append at the end"
 							min="0"
 							max={workflow?.task_list.length}
+							bind:value={taskOrder}
 						/>
 					</div>
 
-					<button class="btn btn-primary">Insert</button>
+					<button class="btn btn-primary" type="submit">Insert</button>
 				</form>
 			</div>
 			<div class="modal-footer d-flex">
