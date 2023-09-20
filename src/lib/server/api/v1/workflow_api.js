@@ -1,42 +1,11 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException } from '$lib/common/errors';
-
-/**
- * Creates a new workflow in the server
- * @param fetch
- * @param projectId
- * @param formData
- * @returns {Promise<*>}
- */
-export async function createWorkflow(fetch, projectId, formData) {
-	const requestData = {
-		name: formData.get('workflowName')
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
-		method: 'POST',
-		credentials: 'include',
-		mode: 'cors',
-		headers,
-		body: JSON.stringify(requestData)
-	});
-
-	if (response.ok) {
-		// Return the created workflow object as json
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
-}
+import { PostResourceException, responseError } from '$lib/common/errors';
 
 /**
  * Fetches a project's workflow from the server
- * @param fetch
- * @param projectId
- * @param workflowId
+ * @param {typeof fetch} fetch
+ * @param {number} projectId
+ * @param {number} workflowId
  * @returns {Promise<*>}
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
@@ -44,8 +13,7 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,
 		{
 			method: 'GET',
-			credentials: 'include',
-			mode: 'cors'
+			credentials: 'include'
 		}
 	);
 
@@ -53,7 +21,7 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 		return await response.json();
 	}
 
-	throw new Error('The client was not able to retrieve the workflow');
+	await responseError(response);
 }
 
 /**
@@ -89,64 +57,6 @@ export async function updateWorkflow(fetch, projectId, workflowId, formData) {
 	}
 
 	return PostResourceException(await response.json());
-}
-
-/**
- * Reorders a project's workflow in the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param workflowTasksOrder
- * @returns {Promise<*>}
- */
-export async function reorderWorkflow(fetch, projectId, workflowId, workflowTasksOrder) {
-	const patchData = {
-		reordered_workflowtask_ids: workflowTasksOrder
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,
-		{
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(patchData)
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new Error('The client was not able to update the workflow order');
-}
-
-/**
- * Deletes a project's workflow from the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @returns {Promise<boolean>}
- */
-export async function deleteWorkflow(fetch, projectId, workflowId) {
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,
-		{
-			method: 'DELETE',
-			credentials: 'include',
-			mode: 'cors'
-		}
-	);
-
-	if (response.ok) {
-		return true;
-	}
-
-	throw new Error('The client was not able to delete the workflow');
 }
 
 /**
