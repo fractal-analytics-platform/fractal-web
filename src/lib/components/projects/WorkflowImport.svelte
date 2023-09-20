@@ -10,6 +10,7 @@
 	let importSuccess = undefined;
 	let workflowName = undefined;
 
+	let errorAlert;
 	/** @type {FileList|null} */
 	let files = null;
 	/** @type {HTMLInputElement|undefined} */
@@ -24,6 +25,9 @@
 			fileInput.value = '';
 		}
 		workflowName = undefined;
+		if (errorAlert) {
+			errorAlert.hide();
+		}
 	}
 
 	/**
@@ -44,7 +48,7 @@
 		} catch (err) {
 			console.error(err);
 			importing = false;
-			displayStandardErrorAlert(
+			errorAlert = displayStandardErrorAlert(
 				'The workflow file is not a valid JSON file',
 				'importWorkflowError'
 			);
@@ -80,7 +84,7 @@
 			dispatch('workflowImported', workflow);
 		} else {
 			console.error('Import workflow failed', result);
-			displayStandardErrorAlert(result, 'importWorkflowError');
+			errorAlert = displayStandardErrorAlert(result, 'importWorkflowError');
 		}
 	}
 </script>

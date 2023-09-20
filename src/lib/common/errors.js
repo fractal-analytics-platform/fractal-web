@@ -31,11 +31,12 @@ export class AlertError extends Error {
  * Display a standard error alert on the desired HTML element.
  * @param {any} error
  * @param {string} targetElementId
+ * @returns {StandardErrorAlert|undefined}
  */
 export function displayStandardErrorAlert(error, targetElementId) {
 	const errorAlert = document.getElementById(targetElementId);
 	if (errorAlert) {
-		new StandardErrorAlert({
+		return new StandardErrorAlert({
 			target: errorAlert,
 			props: {
 				error
