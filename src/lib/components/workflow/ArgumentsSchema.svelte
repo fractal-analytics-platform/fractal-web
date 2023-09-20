@@ -21,38 +21,43 @@
 	let resetChanges = undefined;
 	export let saveChanges = undefined;
 
-	function handleSaveChanges(newArgs) {
-		return new Promise((resolve, reject) => {
-			const projectId = $page.params.projectId;
-			updateFormEntry(
+	async function handleSaveChanges(newArgs) {
+		const projectId = $page.params.projectId;
+		try {
+			const response = await updateFormEntry(
 				projectId,
 				workflowId,
 				workflowTaskId,
 				newArgs,
 				'args'
-			).then(response => {
-				resolve(response.args);
-				args = response.args;
-				dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
-			}).catch(err => {
+			);
+			args = response.args;
+			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
+			return args;
+		} catch (err) {
+			const errorAlert = document.getElementById('json-schema-validation-errors');
+			if (errorAlert) {
 				new StandardErrorAlert({
-					target: document.getElementById('json-schema-validation-errors'),
+					target: errorAlert,
 					props: {
 						error: err
 					}
 				});
-				reject(err);
-			});
-		});
+			}
+			throw err;
+		}
 	}
 
 	function handleValidationErrors(errors) {
-		new StandardErrorAlert({
-			target: document.getElementById('json-schema-validation-errors'),
-			props: {
-				error: errors
-			}
-		});
+		const errorAlert = document.getElementById('json-schema-validation-errors');
+		if (errorAlert) {
+			new StandardErrorAlert({
+				target: errorAlert,
+				props: {
+					error: errors
+				}
+			});
+		}
 	}
 
 	$: {
@@ -62,41 +67,49 @@
 			validSchema = false;
 		}
 	}
-
 </script>
 
-<style>
-    #workflow-arguments-schema-panel .args-list {
-        overflow-y: auto;
-        max-height: 60vh;
-        position: relative;
-    }
-
-    .jschema-controls-bar {
-        background-color: whitesmoke;
-        margin-top: 5px;
-        border-top: 1px solid lightgray;
-    }
-
-</style>
-
-<div id='workflow-arguments-schema-panel'>
-  <div id='json-schema-validation-errors'></div>
-  <div class='args-list'>
-    <JSchema bind:unsavedChanges={unsavedChanges} bind:discardChanges={resetChanges} bind:saveChanges={saveChanges}
-             schema={argumentsSchema} schemaData={args} {handleSaveChanges} {handleValidationErrors}
-             bind:this={schemaComponent} />
-  </div>
-  <div class='d-flex justify-content-end jschema-controls-bar p-3'>
-    <div>
-      <button class='btn btn-warning {unsavedChanges ? "" : "disabled"}' on:click={resetChanges.bind(this, args)}>
-        Discard changes
-      </button>
-    </div>
-    <div class='ms-1'>
-      <button class='btn btn-success {unsavedChanges ? "" : "disabled"}' on:click={saveChanges}>
-        Save changes
-      </button>
-    </div>
-  </div>
+<div id="workflow-arguments-schema-panel">
+	<div id="json-schema-validation-errors" />
+	<div class="args-list">
+		<JSchema
+			bind:unsavedChanges
+			bind:discardChanges={resetChanges}
+			bind:saveChanges
+			schema={argumentsSchema}
+			schemaData={args}
+			{handleSaveChanges}
+			{handleValidationErrors}
+			bind:this={schemaComponent}
+		/>
+	</div>
+	<div class="d-flex justify-content-end jschema-controls-bar p-3">
+		<div>
+			<button
+				class="btn btn-warning {unsavedChanges ? '' : 'disabled'}"
+				on:click={() => resetChanges(args)}
+			>
+				Discard changes
+			</button>
+		</div>
+		<div class="ms-1">
+			<button class="btn btn-success {unsavedChanges ? '' : 'disabled'}" on:click={saveChanges}>
+				Save changes
+			</button>
+		</div>
+	</div>
 </div>
+
+<style>
+	#workflow-arguments-schema-panel .args-list {
+		overflow-y: auto;
+		max-height: 60vh;
+		position: relative;
+	}
+
+	.jschema-controls-bar {
+		background-color: whitesmoke;
+		margin-top: 5px;
+		border-top: 1px solid lightgray;
+	}
+</style>

@@ -45,17 +45,20 @@
 			}
 		} catch (error) {
 			console.log(error);
-			new StandardErrorAlert({
-				target: document.getElementById('metaPropertiesFormError'),
-				props: {
-					error
-				}
-			});
+			const alertError = document.getElementById('metaPropertiesFormError');
+			if (alertError) {
+				new StandardErrorAlert({
+					target: alertError,
+					props: {
+						error
+					}
+				});
+			}
 		}
 	}
 </script>
 
 <div>
-	<span id="metaPropertiesFormError"></span>
+	<span id="metaPropertiesFormError" />
 	<FormBuilder entry={metaProperties} updateEntry={handleEntryUpdate} />
 </div>

@@ -6,7 +6,6 @@
 	import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import StandardErrorAlert from '../common/StandardErrorAlert.svelte';
 
 	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections';
 

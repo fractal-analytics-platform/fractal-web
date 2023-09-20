@@ -1,5 +1,14 @@
-import { PostResourceException } from "$lib/common/errors";
+import { AlertError } from "$lib/common/errors";
 
+/**
+ * Updates the workflow task properties.
+ * @param {string} projectId 
+ * @param {string} workflowId 
+ * @param {string} workflowTaskId 
+ * @param {any} updatingWorkflowTaskProperties 
+ * @param {string} groupName 
+ * @returns 
+ */
 export async function updateFormEntry(
 	projectId,
 	workflowId,
@@ -10,28 +19,105 @@ export async function updateFormEntry(
 	const requestData = {};
 	requestData[groupName] = updatingWorkflowTaskProperties;
 
+	const updateArgs = requestData.args;
+	const updateMeta = requestData.meta;
+
 	console.log(`In updateFormEntry, requestData is ${JSON.stringify(requestData)}`);
 
-	// Should make a PATCH request to the server to update the workflow task properties
+	if (updateArgs) {
+		return await updateWorkflowTaskArguments(
+			projectId,
+			workflowId,
+			workflowTaskId,
+			updateArgs
+		);
+	} else if (updateMeta) {
+		return await updateWorkflowTaskMetadata(
+			projectId,
+			workflowId,
+			workflowTaskId,
+			updateMeta
+		);
+	}
+	throw new AlertError('Invalid request data: args or meta are required');
+}
+
+/**
+ * Updates a project's workflow task in the server
+ * @param {string} projectId
+ * @param {string} workflowId
+ * @param {string} workflowTaskId
+ * @param {any} args
+ * @returns {Promise<*>}
+ */
+async function updateWorkflowTaskArguments(
+	projectId,
+	workflowId,
+	workflowTaskId,
+	args
+) {
+	const requestBody = {
+		args: args
+	};
+
+	const headers = new Headers();
+	headers.set('Content-Type', 'application/json');
+
 	const response = await fetch(
-		`/projects/${projectId}/workflows/${workflowId}/tasks/${workflowTaskId}`,
+		`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 		{
 			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(requestData)
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(requestBody)
 		}
 	);
 
+	const result = await response.json();
 	if (response.ok) {
-		console.log('Update form entry response successful');
-		// Should return the updated form entry
-		const updatedFormEntry = await response.json();
-		console.log(`In updateFormEntry, updatedFormEntry is ${JSON.stringify(updatedFormEntry)}`);
-		return updatedFormEntry;
+		console.log('workflow task arguments updated successfully', result);
+		return result
 	}
 
-	console.error('Update form entry response not ok');
-	throw new PostResourceException(await response.json());
+	throw new AlertError(result);
+}
+
+/**
+ * Updates a project's workflow task in the server
+ * @param {string} projectId
+ * @param {string} workflowId
+ * @param {string} workflowTaskId
+ * @param {any} meta
+ * @returns {Promise<*>}
+ */
+async function updateWorkflowTaskMetadata(
+	projectId,
+	workflowId,
+	workflowTaskId,
+	meta
+) {
+	const requestBody = {
+		meta: meta
+	};
+
+	const headers = new Headers();
+	headers.set('Content-Type', 'application/json');
+
+	const response = await fetch(
+		`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
+		{
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(requestBody)
+		}
+	);
+
+	const result = await response.json();
+	if (response.ok) {
+		console.log('workflow task metadata updated successfully', result);
+		return result
+	}
+
+	throw new AlertError(result);
 }

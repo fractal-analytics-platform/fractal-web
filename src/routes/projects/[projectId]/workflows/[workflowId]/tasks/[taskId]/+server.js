@@ -2,8 +2,6 @@ import { fail } from '@sveltejs/kit';
 import {
 	getWorkflow,
 	deleteWorkflowTask,
-	updateWorkflowTaskArguments,
-	updateWorkflowTaskMetadata
 } from '$lib/server/api/v1/workflow_api';
 
 export async function DELETE({ fetch, params }) {
@@ -20,34 +18,4 @@ export async function DELETE({ fetch, params }) {
 		console.error(error);
 		return fail(500, error.reason);
 	}
-}
-
-export async function PATCH({ fetch, params, request }) {
-	console.log('PATCH Update workflow task properties');
-
-	const data = await request.json();
-	const updateArgs = data.args;
-	const updateMeta = data.meta;
-
-	const { projectId, workflowId, taskId } = params;
-
-	let updatedWorkflowTask;
-	if (updateArgs) {
-		updatedWorkflowTask = await updateWorkflowTaskArguments(
-			fetch,
-			projectId,
-			workflowId,
-			taskId,
-			updateArgs
-		);
-	} else if (updateMeta) {
-		updatedWorkflowTask = await updateWorkflowTaskMetadata(
-			fetch,
-			projectId,
-			workflowId,
-			taskId,
-			updateMeta
-		);
-	}
-	return new Response(JSON.stringify(updatedWorkflowTask), { status: 200 });
 }

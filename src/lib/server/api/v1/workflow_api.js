@@ -1,5 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException, responseError } from '$lib/common/errors';
+import { PostResourceException } from '$lib/common/errors';
 
 /**
  * Creates a new workflow in the server
@@ -209,92 +209,6 @@ export async function createWorkflowTask(fetch, projectId, workflowId, formData)
 	}
 
 	throw new PostResourceException(await response.json());
-}
-
-/**
- * Updates a project's workflow task in the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param workflowTaskId
- * @param args
- * @returns {Promise<*>}
- */
-export async function updateWorkflowTaskArguments(
-	fetch,
-	projectId,
-	workflowId,
-	workflowTaskId,
-	args
-) {
-	const requestBody = {
-		args: args
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST +
-			`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
-		{
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(requestBody)
-		}
-	);
-
-	if (response.ok) {
-		console.log('Response successful');
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
-}
-
-/**
- * Updates a project's workflow task in the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param workflowTaskId
- * @param meta
- * @returns {Promise<*>}
- */
-export async function updateWorkflowTaskMetadata(
-	fetch,
-	projectId,
-	workflowId,
-	workflowTaskId,
-	meta
-) {
-	const requestBody = {
-		meta: meta
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST +
-			`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
-		{
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(requestBody)
-		}
-	);
-
-	if (response.ok) {
-		console.log('Response successful');
-		return await response.json();
-	}
-
-	await responseError(response);
 }
 
 /**

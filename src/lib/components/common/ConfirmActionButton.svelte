@@ -30,8 +30,7 @@
 			const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
 			await callbackAction();
 			modal.hide();
-		} catch (/** @type {any} */ err) {
-			const error = err instanceof AlertError ? err.reason : err;
+		} catch (/** @type {any} */ error) {
 			const errorAlert = document.getElementById(`errorAlert-${modalId}`);
 			if (errorAlert) {
 				new StandardErrorAlert({
