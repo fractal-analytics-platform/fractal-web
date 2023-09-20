@@ -39,6 +39,10 @@
 	let saveArgumentsChanges = undefined;
 	let preventedTaskContextChange = undefined;
 
+	// Update workflow modal
+	let updatedWorkflowName = '';
+	let updatedWorkflowErrorAlert = undefined;
+
 	$: updatableWorkflowList = workflow?.task_list || [];
 
 	workflowTaskContext.subscribe((value) => {
@@ -110,19 +114,42 @@
 		}
 	}
 
+	function resetWorkflowUpdateModal() {
+		updatedWorkflowName = workflow.name;
+		workflowUpdated = false;
+		if (updatedWorkflowErrorAlert) {
+			updatedWorkflowErrorAlert.hide();
+		}
+	}
+
+	/**
+	 * Updates a project's workflow in the server
+	 * @returns {Promise<void>}
+	 */
 	async function handleWorkflowUpdate() {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				const updatedWorkflow = result.data;
-				workflow = updatedWorkflow;
-				workflowUpdated = true;
-				setTimeout(() => {
-					workflowUpdated = false;
-				}, 3000);
-			} else {
-				console.error('Error updating workflow properties', result.data);
-			}
-		};
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				name: updatedWorkflowName
+			})
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			workflow = result;
+			workflowUpdated = true;
+			setTimeout(() => {
+				workflowUpdated = false;
+			}, 3000);
+		} else {
+			console.error('Error updating workflow properties', result);
+			updatedWorkflowErrorAlert = displayStandardErrorAlert(result, 'updatedWorkflowError');
+		}
 	}
 
 	async function handleCreateWorkflowTask({ form }) {
@@ -341,13 +368,19 @@
 			><i class="bi-box-arrow-up" /></button
 		>
 		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-		<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editWorkflowModal"
-			><i class="bi-gear-wide-connected" /></button
+		<button
+			class="btn btn-light"
+			data-bs-toggle="modal"
+			data-bs-target="#editWorkflowModal"
+			on:click={resetWorkflowUpdateModal}
 		>
+			<i class="bi-gear-wide-connected" />
+		</button>
 		<button
 			class="btn btn-success"
 			on:click|preventDefault={() => {
 				if (argumentsWithUnsavedChanges === false) {
+					// @ts-ignore
 					// eslint-disable-next-line no-undef
 					const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
 					modal.toggle();
@@ -623,13 +656,9 @@
 				<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
+				<div id="updatedWorkflowError" />
 				{#if workflow}
-					<form
-						id="updateWorkflow"
-						method="post"
-						action="?/updateWorkflow"
-						use:enhance={handleWorkflowUpdate}
-					>
+					<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
 						<div class="mb-3">
 							<label for="workflowName" class="form-label">Workflow name</label>
 							<input
@@ -637,7 +666,7 @@
 								class="form-control"
 								name="workflowName"
 								id="workflowName"
-								value={workflow.name}
+								bind:value={updatedWorkflowName}
 							/>
 						</div>
 					</form>
@@ -661,7 +690,7 @@
 				<button class="btn-close" data-bs-dismiss="modal" />
 			</div>
 			<div class="modal-body">
-				<div id="workflowTasksOrderError"></div>
+				<div id="workflowTasksOrderError" />
 				{#if workflow !== undefined && updatableWorkflowList.length == 0}
 					<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 				{:else if workflow !== undefined}

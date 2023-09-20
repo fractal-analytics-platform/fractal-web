@@ -4,8 +4,8 @@ import { PostResourceException, responseError } from '$lib/common/errors';
 /**
  * Fetches a project's workflow from the server
  * @param {typeof fetch} fetch
- * @param {number} projectId
- * @param {number} workflowId
+ * @param {string} projectId
+ * @param {string} workflowId
  * @returns {Promise<*>}
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
@@ -22,41 +22,6 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 	}
 
 	await responseError(response);
-}
-
-/**
- * Updates a project's workflow in the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param formData
- * @returns {Promise<*|void>}
- */
-export async function updateWorkflow(fetch, projectId, workflowId, formData) {
-	// This method should patch some properties of a workflow resource
-	const requestData = {
-		name: formData.get('workflowName')
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,
-		{
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(requestData)
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	return PostResourceException(await response.json());
 }
 
 /**
