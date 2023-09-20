@@ -19,8 +19,11 @@
 	let workflowJobInfoId = undefined;
 
 	// Filters
+	/** @type {number|string} */
 	let workflowFilter = '';
+	/** @type {number|string} */
 	let inputDatasetFilter = '';
+	/** @type {number|string} */
 	let outputDatasetFilter = '';
 	let statusFilter = '';
 
@@ -102,11 +105,16 @@
 		}
 	}
 
+	/**
+	 * Requests the server to stop a job execution
+	 * @param {number} jobId
+	 * @returns {Promise<void>}
+	 */
 	async function handleJobCancel(jobId) {
 		console.log('Stop running job');
 
-		const response = await fetch(`/projects/${project.id}/jobs/${jobId}?action=stop`, {
-			method: 'PATCH',
+		const response = await fetch(`/api/v1/project/${project.id}/job/${jobId}/stop`, {
+			method: 'GET',
 			credentials: 'include'
 		});
 
@@ -116,12 +124,13 @@
 		} else {
 			console.error('Error stopping job');
 			const errorResponse = await response.json();
-			displayStandardErrorAlert(errorResponse.error, 'jobUpdatesError');
+			displayStandardErrorAlert(errorResponse, 'jobUpdatesError');
 		}
 	}
 
 	function openWorkflowJobInfoModal(jobId) {
 		workflowJobInfoId = jobId;
+		// @ts-ignore
 		// eslint-disable-next-line
 		const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'), {});
 		infoModal.show();
@@ -129,11 +138,11 @@
 
 	function openWorkflowJobLogsModal(jobId) {
 		workflowJobInfoId = jobId;
+		// @ts-ignore
 		// eslint-disable-next-line
 		const logsModal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'), {});
 		logsModal.show();
 	}
-
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -184,7 +193,7 @@
 					>
 				</div>
 			</div>
-			<div id='jobUpdatesError' />
+			<div id="jobUpdatesError" />
 			<table class="table">
 				<thead class="table-light">
 					<tr>
@@ -198,9 +207,9 @@
 						<th>Options</th>
 					</tr>
 					<tr>
-						<th class="col-2"></th>
-						<th></th>
-						<th></th>
+						<th class="col-2" />
+						<th />
+						<th />
 						<th>
 							{#if workflows}
 								<select class="form-control" bind:value={workflowFilter}>
@@ -274,32 +283,28 @@
 									</td>
 									<td>
 										<button
-											class='btn btn-info'
-											on:click|preventDefault={() => openWorkflowJobInfoModal(row.id)}>
-											<i class='bi-info-circle' />
+											class="btn btn-info"
+											on:click|preventDefault={() => openWorkflowJobInfoModal(row.id)}
+										>
+											<i class="bi-info-circle" />
 											Info
 										</button>
 										{#if row.status === 'failed' || row.status === 'done'}
 											<button
-												class='btn btn-light'
+												class="btn btn-light"
 												on:click|preventDefault={() => openWorkflowJobLogsModal(row.id)}
 											>
-												<i class='bi-list-columns-reverse' />
+												<i class="bi-list-columns-reverse" />
 												Logs
 											</button>
-											<button
-												class='btn btn-light'
-												on:click={handleJobLogsDownload.bind(this, row.id)}
-											><i class='bi-arrow-down-circle' /></button
-											>
+											<button class="btn btn-light" on:click={() => handleJobLogsDownload(row.id)}>
+												<i class="bi-arrow-down-circle" />
+											</button>
 										{/if}
-										{#if row.status === 'running' }
-											<button
-												class='btn btn-danger'
-												on:click={handleJobCancel.bind(this, row.id)}
-											><i class='bi-x-circle' /> Cancel
-											</button
-											>
+										{#if row.status === 'running'}
+											<button class="btn btn-danger" on:click={() => handleJobCancel(row.id)}>
+												<i class="bi-x-circle" /> Cancel
+											</button>
 										{/if}
 									</td>
 								</tr>
