@@ -1,7 +1,7 @@
 <script>
 	import { modalProject } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
 
 	// List of projects to be displayed
@@ -33,29 +33,35 @@
 		const result = await response.json();
 		if (response.ok) {
 			newProjectName = '';
-			projects = [...projects, result]
+			projects = [...projects, result];
 			goto(`/projects/${result.id}`);
 		} else {
 			displayStandardErrorAlert(result, 'createProjectErrorAlert');
 		}
 	}
 
+	/**
+	 * Deletes a project from the server
+	 * @param {number} projectId
+	 * @returns {Promise<*>}
+	 */
 	async function handleDeleteProject(projectId) {
 		console.log('Client request project delete');
 
-		await fetch('/projects?project=' + projectId, {
+		const response = await fetch(`/api/v1/project/${projectId}`, {
 			method: 'DELETE',
 			credentials: 'include'
-		})
-			.then(() => {
-				console.log('Project deleted successfully');
-				// If the response is successful
-				projects = projects.filter((p) => p.id !== projectId);
-			})
-			.catch((error) => {
-				// TODO: Notify the user there has been an error in the deletion of the project
-				console.error(error);
-			});
+		});
+
+		if (response.ok) {
+			console.log('Project deleted successfully');
+			// If the response is successful
+			projects = projects.filter((p) => p.id !== projectId);
+		} else {
+			const result = await response.json();
+			console.error(`Unable to delete project ${projectId}`)
+			throw new AlertError(result);
+		}
 	}
 </script>
 

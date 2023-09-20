@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte';
@@ -10,22 +9,41 @@
 	let workflows = $page.data.workflows;
 	let projectUpdatesSuccess = undefined;
 
+	let updatedProjectName = '';
+
 	onMount(async () => {});
 
-	function handleProjectPropertiesUpdate() {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				console.log('Project updated successfully');
-				projectUpdatesSuccess = true;
-				setTimeout(() => {
-					projectUpdatesSuccess = undefined;
-				}, 3000);
-				project.name = result.data.name;
-			} else {
-				console.error('Error while updating project', result.data);
-				projectUpdatesSuccess = false;
-			}
-		};
+	async function handleProjectPropertiesUpdate() {
+		projectUpdatesSuccess = undefined;
+		if (!updatedProjectName) {
+			return;
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${project.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			mode: 'cors',
+			headers,
+			body: JSON.stringify({
+				name: updatedProjectName
+			})
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			console.log('Project updated successfully');
+			projectUpdatesSuccess = true;
+			setTimeout(() => {
+				projectUpdatesSuccess = undefined;
+			}, 3000);
+			project.name = result.name;
+		} else {
+			console.error('Error while updating project', result);
+			projectUpdatesSuccess = false;
+		}
 	}
 </script>
 
@@ -41,12 +59,17 @@
 		</ol>
 	</nav>
 	<div>
-		<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProjectModal"
-			><i class="bi-gear-wide-connected" /></button
+		<button
+			class="btn btn-light"
+			data-bs-toggle="modal"
+			data-bs-target="#editProjectModal"
+			on:click={() => (updatedProjectName = project.name)}
 		>
-		<a href={`/projects/${project?.id}/jobs`} class="btn btn-light"
-			><i class="bi-journal-code" /> Jobs</a
-		>
+			<i class="bi-gear-wide-connected" />
+		</button>
+		<a href={`/projects/${project?.id}/jobs`} class="btn btn-light">
+			<i class="bi-journal-code" /> Jobs
+		</a>
 	</div>
 </div>
 
@@ -70,12 +93,7 @@
 			</div>
 			<div class="modal-body">
 				{#if project}
-					<form
-						id="updateProject"
-						method="post"
-						action="?/update"
-						use:enhance={handleProjectPropertiesUpdate}
-					>
+					<form id="updateProject" on:submit|preventDefault={handleProjectPropertiesUpdate}>
 						<div class="mb-3">
 							<label for="projectName" class="form-label">Project name</label>
 							<input
@@ -83,7 +101,8 @@
 								class="form-control"
 								name="projectName"
 								id="projectName"
-								value={project.name}
+								bind:value={updatedProjectName}
+								required
 							/>
 						</div>
 					</form>

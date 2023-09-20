@@ -13,6 +13,9 @@
 	$: enableCreateWorkflow = !!newWorkflowName;
 	let validationError = false;
 
+	/** @type {WorkflowImport} */
+	let workflowImportComponent;
+
 	/**
 	 * Creates a new workflow in the server
 	 * @returns {Promise<*>}
@@ -82,7 +85,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
-				<WorkflowImport on:workflowImported={handleWorkflowImported} />
+				<WorkflowImport on:workflowImported={handleWorkflowImported} bind:this={workflowImportComponent} />
 			</div>
 		</div>
 	</div>
@@ -101,6 +104,7 @@
 						class="btn btn-primary"
 						data-bs-toggle="modal"
 						data-bs-target="#importWorkflowModal"
+						on:click={() => workflowImportComponent.reset()}
 					>
 						Import workflow
 					</button>

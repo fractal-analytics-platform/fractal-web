@@ -1,7 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-	import { enhance } from '$app/forms';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { page } from '$app/stores';
 
 	const dispatch = createEventDispatcher();
 
@@ -10,33 +10,84 @@
 	let importSuccess = undefined;
 	let workflowName = undefined;
 
-	async function handleWorkflowImportForm({ form }) {
+	/** @type {FileList|null} */
+	let files = null;
+	/** @type {HTMLInputElement|undefined} */
+	let fileInput = undefined;
+
+	/**
+	 * Reset the form fields.
+	 */
+	export function reset() {
+		files = null;
+		if (fileInput) {
+			fileInput.value = '';
+		}
+		workflowName = undefined;
+	}
+
+	/**
+	 * Request the import of a project's workflow to the server.
+	 */
+	async function handleWorkflowImportForm() {
+		if (!files || files.length === 0) {
+			return;
+		}
 		importing = true;
 
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				importing = false;
-				importSuccess = true;
-				setTimeout(() => {
-					importSuccess = false;
-				}, 3000);
-				form.reset();
-				const workflow = result.data;
-				dispatch('workflowImported', workflow);
-			} else {
-				// The form submission failed
-				const error = JSON.parse(result.data);
-				console.error('Import workflow failed', error);
-				displayStandardErrorAlert(error, 'importWorkflowError');
-				importing = false;
-			}
-		};
+		const workflowFile = files[0];
+
+		const workflowFileContent = await workflowFile.text();
+		let workflowMetadata;
+		try {
+			workflowMetadata = JSON.parse(workflowFileContent);
+		} catch (err) {
+			console.error(err);
+			importing = false;
+			displayStandardErrorAlert(
+				'The workflow file is not a valid JSON file',
+				'importWorkflowError'
+			);
+			return;
+		}
+
+		if (workflowName) {
+			console.log(`Overriding workflow name from ${workflowMetadata.name} to ${workflowName}`);
+			workflowMetadata.name = workflowName;
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${$page.params.projectId}/workflow/import`, {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(workflowMetadata)
+		});
+
+		importing = false;
+
+		const result = await response.json();
+		if (response.ok) {
+			// Return a workflow item
+			importSuccess = true;
+			setTimeout(() => {
+				importSuccess = false;
+			}, 3000);
+			reset();
+			const workflow = result;
+			dispatch('workflowImported', workflow);
+		} else {
+			console.error('Import workflow failed', result);
+			displayStandardErrorAlert(result, 'importWorkflowError');
+		}
 	}
 </script>
 
 <div id="importWorkflowError" />
 
-<form method="post" action="?/importWorkflow" use:enhance={handleWorkflowImportForm}>
+<form on:submit|preventDefault={handleWorkflowImportForm}>
 	<div class="mb-3">
 		<label for="workflowFile" class="form-label">Select a workflow file</label>
 		<input
@@ -45,13 +96,21 @@
 			type="file"
 			name="workflowFile"
 			id="workflowFile"
+			bind:this={fileInput}
+			bind:files
 			required
 		/>
 	</div>
 
 	<div class="mb-2">
 		<label for="workflowName" class="form-label">Override workflow name (optional)</label>
-		<input id="workflowName" name="workflowName" type="text" bind:value={workflowName} class="form-control">
+		<input
+			id="workflowName"
+			name="workflowName"
+			type="text"
+			bind:value={workflowName}
+			class="form-control"
+		/>
 	</div>
 
 	<button class="btn btn-primary mt-2" disabled={importing}>

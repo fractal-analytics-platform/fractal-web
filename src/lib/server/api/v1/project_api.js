@@ -1,5 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException, responseError } from '$lib/common/errors';
+import { responseError } from '$lib/common/errors';
 
 // PROJECT ENDPOINTS
 
@@ -24,8 +24,8 @@ export async function listProjects(fetch) {
 
 /**
  * Fetches a project from the server
- * @param fetch
- * @param projectId
+ * @param {typeof fetch} fetch
+ * @param {string} projectId
  * @returns {Promise<*>}
  */
 export async function getProject(fetch, projectId) {
@@ -41,50 +41,6 @@ export async function getProject(fetch, projectId) {
 	}
 
 	await responseError(response);
-}
-
-/**
- * Updates a project in the server
- * @param fetch
- * @param projectId
- * @param formData
- * @returns {Promise<*>}
- */
-export async function updateProject(fetch, projectId, formData) {
-	const requestBody = {
-		name: formData.get('projectName')
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
-		method: 'PATCH',
-		credentials: 'include',
-		mode: 'cors',
-		headers,
-		body: JSON.stringify(requestBody)
-	});
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
-}
-
-/**
- * Deletes a project from the server
- * @param fetch
- * @param projectId
- * @returns {Promise<*>}
- */
-export async function deleteProject(fetch, projectId) {
-	return await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
-		method: 'DELETE',
-		credentials: 'include',
-		mode: 'cors'
-	});
 }
 
 // DATASET ENDPOINTS
@@ -135,36 +91,6 @@ export async function getWorkflows(fetch, projectId) {
 	}
 
 	throw new Error('The client was not able to fetch project workflows');
-}
-
-/**
- * Request the import of a project's workflow to the server
- * @param fetch
- * @param projectId
- * @param workflowMetadata
- * @returns {Promise<*>}
- */
-export async function importWorkflow(fetch, projectId, workflowMetadata) {
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/import/`,
-		{
-			method: 'POST',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(workflowMetadata)
-		}
-	);
-
-	if (response.ok) {
-		// Return a workflow item
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
 }
 
 // JOB ENDPOINTS
