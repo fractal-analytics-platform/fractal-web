@@ -1,6 +1,5 @@
 <script>
 	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 

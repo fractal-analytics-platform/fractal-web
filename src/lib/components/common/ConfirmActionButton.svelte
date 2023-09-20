@@ -1,6 +1,5 @@
 <script>
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	export let callbackAction = async () => {}; // A default empty function
 	export let style = 'primary';

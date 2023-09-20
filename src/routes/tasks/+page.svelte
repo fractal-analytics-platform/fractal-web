@@ -9,7 +9,6 @@
 	import TaskEditModal from '$lib/components/tasks/TaskEditModal.svelte';
 	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte';
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 

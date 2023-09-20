@@ -23,37 +23,6 @@ export async function listProjects(fetch) {
 }
 
 /**
- * Creates a new project in the server
- * @param fetch
- * @param data
- * @returns {Promise<*>}
- */
-export async function createProject(fetch, data) {
-	// Data is a FormData object
-
-	const requestData = {
-		name: data.get('projectName')
-	};
-
-	const headers = new Headers();
-	headers.set('Content-Type', 'application/json');
-
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project/', {
-		method: 'POST',
-		credentials: 'include',
-		mode: 'cors',
-		headers,
-		body: JSON.stringify(requestData)
-	});
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new PostResourceException(await response.json());
-}
-
-/**
  * Fetches a project from the server
  * @param fetch
  * @param projectId

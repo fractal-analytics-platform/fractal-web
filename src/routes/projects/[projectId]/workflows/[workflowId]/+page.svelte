@@ -6,7 +6,6 @@
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';

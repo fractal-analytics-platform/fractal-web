@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
 	let projectId = $page.params.projectId;
 	let datasetId = $page.params.datasetId;

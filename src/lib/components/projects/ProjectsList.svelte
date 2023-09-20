@@ -1,8 +1,8 @@
 <script>
 	import { modalProject } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { goto } from '$app/navigation';
 
 	// List of projects to be displayed
 	export let projects = [];
@@ -34,6 +34,7 @@
 		if (response.ok) {
 			newProjectName = '';
 			projects = [...projects, result]
+			goto(`/projects/${result.id}`);
 		} else {
 			displayStandardErrorAlert(result, 'createProjectErrorAlert');
 		}

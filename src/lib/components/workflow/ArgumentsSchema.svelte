@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
 	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 

@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// This component shall handle a form which the user can use to specify arguments of a workflow-task

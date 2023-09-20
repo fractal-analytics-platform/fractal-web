@@ -1,7 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { enhance } from '$app/forms';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	const dispatch = createEventDispatcher();

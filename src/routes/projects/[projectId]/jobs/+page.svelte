@@ -7,7 +7,6 @@
 	import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Component properties
