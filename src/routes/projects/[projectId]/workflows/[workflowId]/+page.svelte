@@ -9,7 +9,7 @@
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
 	import { formatMarkdown } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Workflow
 	let workflow = undefined;
@@ -233,22 +233,43 @@
 		resetCreateWorkflowTaskModal();
 	}
 
+	/**
+	 * Deletes a project's workflow task from the server
+	 * @param {number} workflowId
+	 * @param {number} workflowTaskId
+	 * @returns {Promise<void>}
+	 */
 	async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
 		const response = await fetch(
-			`/projects/${project.id}/workflows/${workflowId}/tasks/${workflowTaskId}`,
+			`/api/v1/project/${project.id}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
 			}
 		);
 
-		if (response.ok) {
-			// Successfully deleted task
-			workflow = await response.json();
-			workflowTaskContext.set(undefined);
-		} else {
-			console.error(response);
+		if (!response.ok) {
+			const error = await response.json();
+			console.error('Unable to delete workflow task', error);
+			throw new AlertError(error);
 		}
+
+		// Get updated workflow with deleted task
+		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const workflowResult = await workflowResponse.json();
+
+		if (!response.ok) {
+			console.error('Unable to retrieve workflow', workflowResult);
+			throw new AlertError(workflowResult);
+		}
+
+		// Successfully deleted task
+		workflow = workflowResult;
+		workflowTaskContext.set(undefined);
 	}
 
 	async function setActiveWorkflowTaskContext(event) {

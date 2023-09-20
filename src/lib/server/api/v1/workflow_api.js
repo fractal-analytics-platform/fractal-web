@@ -49,30 +49,6 @@ export async function exportWorkflow(fetch, projectId, workflowId) {
 }
 
 /**
- * Deletes a project's workflow task from the server
- * @param fetch
- * @param projectId
- * @param workflowId
- * @param workflowTaskId
- * @returns {Promise<boolean>}
- */
-export async function deleteWorkflowTask(fetch, projectId, workflowId, workflowTaskId) {
-	const response = await fetch(
-		FRACTAL_SERVER_HOST +
-			`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
-		{
-			method: 'DELETE',
-			credentials: 'include',
-			mode: 'cors'
-		}
-	);
-
-	if (response.ok) return true;
-
-	throw new Error('The client was not able to delete the workflow task');
-}
-
-/**
  * Requests the server to apply a project's workflow (i.e. run it)
  * @param fetch
  * @param projectId
