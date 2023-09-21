@@ -6,6 +6,7 @@
 	import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
+	import { AlertError } from '$lib/common/errors';
 
 	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections';
 
@@ -105,12 +106,12 @@
 	}
 
 	/**
-	 * Fetches a task collection status from the server
-	 * @param {any} taskCollection
+	 * Fetches a task collection from the server
+	 * @param {string} taskCollectionId
 	 * @returns {Promise<*>}
 	 */
-	async function updateTaskCollectionStatus(taskCollection) {
-		const response = await fetch(`/api/v1/task/collect/${taskCollection.id}?verbose=True`, {
+	async function getTaskCollection(taskCollectionId) {
+		const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -118,46 +119,45 @@
 		const result = await response.json();
 		if (response.ok) {
 			console.log('Retrieved collection status', result);
-			taskCollection.status = result.data.status;
-			taskCollection.logs = result.data.log;
+			return result;
 		} else {
 			if (response.status === 404) {
-				cleanupDeletedCollectionFromStorage(taskCollection.id)
+				console.log(
+					`Missing task collection ${taskCollectionId} will be deleted from local storage`
+				);
+				return undefined;
 			} else {
 				console.error('Failed to fetch task collection status', result);
-				collectTaskErrorStore.set(result);
+				throw new AlertError(result);
 			}
 		}
 	}
 
 	async function updateTaskCollectionsState() {
-		const updatedTaskCollection = await Promise.all(
-			taskCollections.map(async (taskCollection) => {
-				switch (taskCollection.status) {
-					case 'pending':
-					case 'installing':
-					case 'collecting':
-						{
-							await updateTaskCollectionStatus(taskCollection);
-						}
-						break;
-					case 'fail':
-						break;
-					default:
-						// When the status is ok
-						// Only if the taskCollection logs are undefined
-						if (taskCollection.logs === undefined) {
-							// Shall fetch the verbose log of the task collection
-							await updateTaskCollectionStatus(taskCollection);
-						}
-						break;
+		const updates = await Promise.allSettled(taskCollections.map((tc) => getTaskCollection(tc.id)));
+
+		const updatedTaskCollections = [];
+		for (const update of updates) {
+			if (update.status === 'rejected') {
+				collectTaskErrorStore.set(update.reason);
+			} else {
+				const updatedTaskCollection = update.value;
+				if (!updatedTaskCollection) {
+					// Removing missing task collection
+					continue;
 				}
-				// Return the updated taskCollection object
-				return taskCollection;
-			})
-		);
+				const oldTaskCollection = taskCollections.find((tc) => tc.id === updatedTaskCollection.id);
+				if (!oldTaskCollection) {
+					continue;
+				}
+				oldTaskCollection.status = updatedTaskCollection.data.status;
+				oldTaskCollection.logs = updatedTaskCollection.data.logs;
+				updatedTaskCollections.push(oldTaskCollection);
+			}
+		}
+
 		// Update task collections list
-		updateTaskCollections(updatedTaskCollection);
+		updateTaskCollections(updatedTaskCollections);
 	}
 
 	function loadTaskCollectionsFromStorage() {
@@ -168,12 +168,6 @@
 		}
 		// Fallback to empty task collections list
 		return [];
-	}
-
-	function cleanupDeletedCollectionFromStorage(taskCollectionId) {
-		console.log(`Deleting missing task collection ${taskCollectionId} from local storage`);
-		const storedCollections = loadTaskCollectionsFromStorage();
-		updateTaskCollections(storedCollections.filter((tc) => tc.id !== taskCollectionId));
 	}
 
 	function updateTaskCollections(updatedCollectionTasks) {
