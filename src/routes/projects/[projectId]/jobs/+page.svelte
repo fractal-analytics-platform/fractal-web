@@ -85,31 +85,6 @@
 		rows = tableHandler.getRows();
 	}
 
-	async function handleJobLogsDownload(jobId) {
-		console.log('Download job');
-
-		const response = await fetch(`/projects/${project.id}/jobs/${jobId}/logs`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		if (response.ok) {
-			// The response body is a blob
-			const blob = await response.blob();
-			const downloadUrl = URL.createObjectURL(blob);
-			// Create a hidden link within the page to trigger the download of the file
-			const link = document.createElement('a');
-			// Append the link to the body
-			document.body.appendChild(link);
-			// Set the href of the link to the download URL
-			link.href = downloadUrl;
-			link.download = `${jobId}_logs.zip`;
-			// Trigger the download
-			link.click();
-			document.body.removeChild(link);
-		}
-	}
-
 	/**
 	 * Requests the server to stop a job execution
 	 * @param {number} jobId
@@ -286,9 +261,13 @@
 												<i class="bi-list-columns-reverse" />
 												Logs
 											</button>
-											<button class="btn btn-light" on:click={() => handleJobLogsDownload(row.id)}>
+											<a
+												class="btn btn-light"
+												href={`/api/v1/project/${project.id}/job/${row.id}/download`}
+												download={`${row.id}_logs.zip`}
+											>
 												<i class="bi-arrow-down-circle" />
-											</button>
+											</a>
 										{/if}
 										{#if row.status === 'running'}
 											<button class="btn btn-danger" on:click={() => handleJobCancel(row.id)}>
