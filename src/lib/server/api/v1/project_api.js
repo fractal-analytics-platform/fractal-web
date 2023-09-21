@@ -90,7 +90,7 @@ export async function getWorkflows(fetch, projectId) {
 		return await response.json();
 	}
 
-	throw new Error('The client was not able to fetch project workflows');
+	await responseError(response);
 }
 
 // JOB ENDPOINTS
@@ -112,5 +112,5 @@ export async function getJobs(fetch, projectId) {
 		return await response.json();
 	}
 
-	throw new Error('The client was not able to fetch project jobs');
+	await responseError(response);
 }
