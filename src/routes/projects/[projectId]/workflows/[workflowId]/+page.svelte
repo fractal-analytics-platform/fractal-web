@@ -380,7 +380,7 @@
 			const requestBody = {
 				worker_init: workerInitControl,
 				first_task_index: firstTaskIndexControl,
-				lastTaskIndex: lastTaskIndexControl
+				last_task_index: lastTaskIndexControl
 			};
 
 			const headers = new Headers();
