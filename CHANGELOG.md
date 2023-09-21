@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Added proxy endpoints and refactored error propagation on projects
+* Added proxy endpoints and refactored error propagation
 
 # 0.5.6
 
