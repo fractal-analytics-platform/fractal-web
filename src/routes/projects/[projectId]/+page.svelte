@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Component properties
 	let project = $page.data.project;
@@ -10,13 +11,29 @@
 	let projectUpdatesSuccess = undefined;
 
 	let updatedProjectName = '';
+	let projectPropertiesErrorAlert = undefined;
 
-	onMount(async () => {});
+	onMount(async () => {
+		// Remove old error when opening the modal
+		const editProjectModal = document.getElementById('editProjectModal');
+		if (editProjectModal) {
+			editProjectModal.addEventListener('show.bs.modal', () => {
+				if (projectPropertiesErrorAlert) {
+					projectPropertiesErrorAlert.hide();
+				}
+			});
+		}
+	});
 
 	async function handleProjectPropertiesUpdate() {
 		projectUpdatesSuccess = undefined;
 		if (!updatedProjectName) {
 			return;
+		}
+
+		// Remove old error
+		if (projectPropertiesErrorAlert) {
+			projectPropertiesErrorAlert.hide();
 		}
 
 		const headers = new Headers();
@@ -42,6 +59,7 @@
 			project.name = result.name;
 		} else {
 			console.error('Error while updating project', result);
+			projectPropertiesErrorAlert = displayStandardErrorAlert(result, 'projectPropertiesError');
 			projectUpdatesSuccess = false;
 		}
 	}
@@ -92,6 +110,7 @@
 				<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
+				<div id="projectPropertiesError" />
 				{#if project}
 					<form id="updateProject" on:submit|preventDefault={handleProjectPropertiesUpdate}>
 						<div class="mb-3">
@@ -113,11 +132,6 @@
 					<div class="m-2 p-2 alert alert-success d-flex align-items-center">
 						<i class="bi bi-check-circle" />
 						<div class="ms-2">Properties updated</div>
-					</div>
-				{:else if projectUpdatesSuccess === false}
-					<div class="m-2 p-2 alert alert-danger d-flex align-items-center">
-						<i class="bi bi-x-circle" />
-						<div class="ms-2">Error while updating properties</div>
 					</div>
 				{/if}
 				<button class="btn btn-primary" form="updateProject">Save</button>
