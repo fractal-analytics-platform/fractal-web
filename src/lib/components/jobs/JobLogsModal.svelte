@@ -15,7 +15,7 @@
 		}
 
 		const job = await fetchJob();
-		logs = job?.log;
+		logs = job?.log || '';
 
 		// @ts-ignore
 		// eslint-disable-next-line

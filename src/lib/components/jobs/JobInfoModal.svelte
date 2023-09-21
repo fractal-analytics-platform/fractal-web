@@ -38,6 +38,7 @@
 		if (errorAlert) {
 			errorAlert.hide();
 		}
+		job = undefined;
 
 		const response = await fetch(`/api/v1/project/${$page.params.projectId}/job/${workflowJobId}`, {
 			method: 'GET',

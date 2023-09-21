@@ -11,6 +11,7 @@
 			if (errorAlert) {
 				errorAlert.hide();
 			}
+			logs = '';
 
 			const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
 				method: 'GET',
