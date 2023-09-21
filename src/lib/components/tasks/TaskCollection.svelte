@@ -121,8 +121,12 @@
 			taskCollection.status = result.data.status;
 			taskCollection.logs = result.data.log;
 		} else {
-			console.error('Failed to fetch task collection status', result);
-			collectTaskErrorStore.set(result);
+			if (response.status === 404) {
+				cleanupDeletedCollectionFromStorage(taskCollection.id)
+			} else {
+				console.error('Failed to fetch task collection status', result);
+				collectTaskErrorStore.set(result);
+			}
 		}
 	}
 
@@ -164,6 +168,12 @@
 		}
 		// Fallback to empty task collections list
 		return [];
+	}
+
+	function cleanupDeletedCollectionFromStorage(taskCollectionId) {
+		console.log(`Deleting missing task collection ${taskCollectionId} from local storage`);
+		const storedCollections = loadTaskCollectionsFromStorage();
+		updateTaskCollections(storedCollections.filter((tc) => tc.id !== taskCollectionId));
 	}
 
 	function updateTaskCollections(updatedCollectionTasks) {

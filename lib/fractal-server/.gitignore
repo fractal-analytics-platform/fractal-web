@@ -5,7 +5,7 @@ myenv
 artifacts
 LOG*
 logs
-*.db
+*.db*
 FRACTAL_TASKS_DIR
 .fractal_server.env
 tmp

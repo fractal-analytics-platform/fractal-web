@@ -9,14 +9,19 @@
 	import Th from '$lib/components/common/filterable/Th.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
+	/** @type {JobInfoModal} */
+	let jobInfoModal;
+	/** @type {JobLogsModal} */
+	let jobLogsModal;
+
 	// Component properties
 	let project = $page.data.project;
 	let workflows = $page.data.workflows || [];
 	let datasets = $page.data.datasets;
 	let jobs = $page.data.jobs || [];
 	let tableHandler = undefined;
+	/** @type {any} */
 	let rows = undefined;
-	let workflowJobInfoId = undefined;
 
 	// Filters
 	/** @type {number|string} */
@@ -126,22 +131,6 @@
 			const errorResponse = await response.json();
 			displayStandardErrorAlert(errorResponse, 'jobUpdatesError');
 		}
-	}
-
-	function openWorkflowJobInfoModal(jobId) {
-		workflowJobInfoId = jobId;
-		// @ts-ignore
-		// eslint-disable-next-line
-		const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'), {});
-		infoModal.show();
-	}
-
-	function openWorkflowJobLogsModal(jobId) {
-		workflowJobInfoId = jobId;
-		// @ts-ignore
-		// eslint-disable-next-line
-		const logsModal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'), {});
-		logsModal.show();
 	}
 </script>
 
@@ -284,7 +273,7 @@
 									<td>
 										<button
 											class="btn btn-info"
-											on:click|preventDefault={() => openWorkflowJobInfoModal(row.id)}
+											on:click|preventDefault={() => jobInfoModal.show(row.id)}
 										>
 											<i class="bi-info-circle" />
 											Info
@@ -292,7 +281,7 @@
 										{#if row.status === 'failed' || row.status === 'done'}
 											<button
 												class="btn btn-light"
-												on:click|preventDefault={() => openWorkflowJobLogsModal(row.id)}
+												on:click|preventDefault={() => jobLogsModal.show(row.id)}
 											>
 												<i class="bi-list-columns-reverse" />
 												Logs
@@ -317,5 +306,5 @@
 	</div>
 {/if}
 
-<JobInfoModal workflowJobId={workflowJobInfoId} projectName={project.name} {workflows} {datasets} />
-<JobLogsModal workflowJobId={workflowJobInfoId} />
+<JobInfoModal projectName={project.name} {workflows} {datasets} bind:this={jobInfoModal} />
+<JobLogsModal bind:this={jobLogsModal} />
