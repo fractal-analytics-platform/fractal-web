@@ -62,21 +62,18 @@ But how is this interaction implemented in this client?
 
 ### Client server interoperability
 
-As said, the svelte client communicate with the fractal server through a set of REST APIs.
+As said, the svelte client communicates with the fractal server through a set of REST APIs.
 
 In this client, every request to the fractal server is sent by the *nodejs server that is serving the svelte
 application*.
-In fact, within the project structure, in `src/lib/server/api` are defined all the REST endpoint requests that
-the svelte client could make to the fractal server from within the nodejs server context (client backend).
 
 > It is important to understand that these requests are made in the server context of the svelte client.
 > No request to the fractal server is sent directly by the browser of the user.
 
 The fact that every request on behalf of a user is sent through a common backend nodejs server, implies a proxy
 architecture.
-The way this works is the following, the svelte client in the browser, sends a HTTP request to the nodejs server that
-is serving the application. This request, with the attached cookies, is then used to compose a new request to be sent to
-the fractal server.
+The way this works is the following: the svelte client in the browser sends a HTTP request to the nodejs server that
+is serving the application. This request, with the attached cookies, is then used to compose a new request to be sent to the fractal server.
 
 > Note that the authentication context is kept thanks to cookies that establish user sessions.
 
@@ -84,12 +81,17 @@ The following image provides an overview for the reader of the described archite
 
 ![proxy-architecture.png](media/proxy-architecture.png)
 
-Every fractal server REST endpoint that the client application support is listed within a file in `src/server/api/v1`.
-Here requests are grouped by contexts as `auth_api`, `monitoring_api`, [...].
+To avoid duplicating the logic of each fractal-server endpoint and simplify the error handling, a special Svelte route has been setup to act like a transparent proxy: `src/routes/api/[...path]/+server.js`. This is one of the suggested way to handle a different backend [according to Svelte Kit FAQ](https://kit.svelte.dev/docs/faq#how-do-i-use-x-with-sveltekit-how-do-i-use-a-different-backend-api-server).
 
-### An example
+So, by default, the AJAX calls performed by the front-end have exactly the same path and payload of the fractal-server API, but are sent to the Node.js Svelte back-end.
 
-For instance, considering the code at `src/lib/server/api/v1/auth_api.js:5`:
+Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under `src/lib/server/api/v1`. Here requests are grouped by contexts as `auth_api`, `monitoring_api`, [...].
+
+### An example using actions
+
+The login is still using the Svelte action approach, in which we have to extract the data from a formData object and then use it to build a JSON payload to be forwarded to fractal-server.
+
+Consider the code at `src/lib/server/api/v1/auth_api.js:5`:
 
 ```javascript
 /**
@@ -241,3 +243,37 @@ _Stores_ are modules that export svelte store objects that are used by component
 application.
 > Note that stores are currently not well-organized or used due to the youth of the client.
 
+## Error handling
+
+The errors received from fractal-server are displayed in error modals without changing the content of their messages. The `displayStandardErrorAlert()` function can be used to easily display an error message alert in a div having a specific id. This function returns a `StandardErrorAlert` object that can be stored in a variable and then used to hide previous error messages calling its `hide()` method.
+
+Here an example:
+
+```javascript
+async function myFunction() {
+  // remove previous error
+  if (errorAlert) {
+    errorAlert.hide();
+  }
+
+  const response = await fetch(`/api/v1/something`);
+  if (response.ok) {
+    // do something with the result
+  } else {
+    const error = await response.json();
+    // add error alert inside the element having 'errorElement' as id
+    errorAlert = displayStandardErrorAlert(error, 'errorElement');
+  }
+}
+```
+
+When the displaying of the error alert should be handled by the caller function it is possible to throw an `AlertError` that has to be caught by the caller in order to display the message.
+
+Errors happening during SSR should be considered fatal and propagated using the `responseError()` utility function:
+
+```javascript
+if (response.ok) {
+  return await response.json();
+}
+await responseError(response);
+```
