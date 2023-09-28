@@ -45,8 +45,6 @@
 			<div class="col d-flex justify-content-center">
 				<div class="hstack gap-3">
 					<span class="font-monospace">{server.version}</span>
-					<div class="vr" />
-					<span class="font-monospace">{server.deployment_type}</span>
 				</div>
 			</div>
 		</footer>
