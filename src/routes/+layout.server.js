@@ -9,7 +9,7 @@ export async function load({ fetch, cookies }) {
 		.then(async (res) => {
 			const info = await res.json();
 			console.log(
-				`Server info loaded: Alive ${info.alive} - ${info.version} - ${info.deployment_type}`
+				`Server info loaded: Alive ${info.alive} - ${info.version}`
 			);
 			return info;
 		})

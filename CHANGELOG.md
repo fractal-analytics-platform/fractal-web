@@ -2,7 +2,8 @@
 
 # Unreleased
 
-* Added proxy endpoints and refactored error propagation
+* Added proxy endpoints and refactored error propagation (\#288).
+* Remove use of deployment-type `fractal-server` variable (\#298).
 
 # 0.5.6
 
