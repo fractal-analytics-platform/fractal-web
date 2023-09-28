@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Remove use of deployment-type `fractal-server` variable (\#298).
+
 # 0.5.6
 
 * Improve displaying of `Dataset.meta` properties (\#281).
