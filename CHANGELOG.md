@@ -3,6 +3,7 @@
 # Unreleased
 
 * Remove use of deployment-type `fractal-server` variable (\#298).
+* Add a BSD3 license (\#300).
 
 # 0.5.6
 
