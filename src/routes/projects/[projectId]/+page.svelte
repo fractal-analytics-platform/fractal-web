@@ -1,31 +1,67 @@
 <script>
 	import { onMount } from 'svelte';
-	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Component properties
 	let project = $page.data.project;
 	let workflows = $page.data.workflows;
 	let projectUpdatesSuccess = undefined;
 
-	onMount(async () => {});
+	let updatedProjectName = '';
+	let projectPropertiesErrorAlert = undefined;
 
-	function handleProjectPropertiesUpdate() {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				console.log('Project updated successfully');
-				projectUpdatesSuccess = true;
-				setTimeout(() => {
-					projectUpdatesSuccess = undefined;
-				}, 3000);
-				project.name = result.data.name;
-			} else {
-				console.error('Error while updating project', result.data);
-				projectUpdatesSuccess = false;
-			}
-		};
+	onMount(async () => {
+		// Remove old error when opening the modal
+		const editProjectModal = document.getElementById('editProjectModal');
+		if (editProjectModal) {
+			editProjectModal.addEventListener('show.bs.modal', () => {
+				if (projectPropertiesErrorAlert) {
+					projectPropertiesErrorAlert.hide();
+				}
+			});
+		}
+	});
+
+	async function handleProjectPropertiesUpdate() {
+		projectUpdatesSuccess = undefined;
+		if (!updatedProjectName) {
+			return;
+		}
+
+		// Remove old error
+		if (projectPropertiesErrorAlert) {
+			projectPropertiesErrorAlert.hide();
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${project.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			mode: 'cors',
+			headers,
+			body: JSON.stringify({
+				name: updatedProjectName
+			})
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			console.log('Project updated successfully');
+			projectUpdatesSuccess = true;
+			setTimeout(() => {
+				projectUpdatesSuccess = undefined;
+			}, 3000);
+			project.name = result.name;
+		} else {
+			console.error('Error while updating project', result);
+			projectPropertiesErrorAlert = displayStandardErrorAlert(result, 'projectPropertiesError');
+			projectUpdatesSuccess = false;
+		}
 	}
 </script>
 
@@ -41,12 +77,17 @@
 		</ol>
 	</nav>
 	<div>
-		<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProjectModal"
-			><i class="bi-gear-wide-connected" /></button
+		<button
+			class="btn btn-light"
+			data-bs-toggle="modal"
+			data-bs-target="#editProjectModal"
+			on:click={() => (updatedProjectName = project.name)}
 		>
-		<a href={`/projects/${project?.id}/jobs`} class="btn btn-light"
-			><i class="bi-journal-code" /> Jobs</a
-		>
+			<i class="bi-gear-wide-connected" />
+		</button>
+		<a href={`/projects/${project?.id}/jobs`} class="btn btn-light">
+			<i class="bi-journal-code" /> Jobs
+		</a>
 	</div>
 </div>
 
@@ -69,13 +110,9 @@
 				<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
+				<div id="projectPropertiesError" />
 				{#if project}
-					<form
-						id="updateProject"
-						method="post"
-						action="?/update"
-						use:enhance={handleProjectPropertiesUpdate}
-					>
+					<form id="updateProject" on:submit|preventDefault={handleProjectPropertiesUpdate}>
 						<div class="mb-3">
 							<label for="projectName" class="form-label">Project name</label>
 							<input
@@ -83,7 +120,8 @@
 								class="form-control"
 								name="projectName"
 								id="projectName"
-								value={project.name}
+								bind:value={updatedProjectName}
+								required
 							/>
 						</div>
 					</form>
@@ -94,11 +132,6 @@
 					<div class="m-2 p-2 alert alert-success d-flex align-items-center">
 						<i class="bi bi-check-circle" />
 						<div class="ms-2">Properties updated</div>
-					</div>
-				{:else if projectUpdatesSuccess === false}
-					<div class="m-2 p-2 alert alert-danger d-flex align-items-center">
-						<i class="bi bi-x-circle" />
-						<div class="ms-2">Error while updating properties</div>
 					</div>
 				{/if}
 				<button class="btn btn-primary" form="updateProject">Save</button>

@@ -3,8 +3,8 @@ import { responseError } from '$lib/common/errors';
 
 /**
  * Request to authenticate user
- * @param fetch
- * @param data
+ * @param {typeof fetch} fetch
+ * @param {any} data
  * @returns {Promise<*>}
  */
 export async function userAuthentication(fetch, data) {
@@ -15,16 +15,16 @@ export async function userAuthentication(fetch, data) {
 		body: data
 	});
 
-	if (!response.ok) {
-		throw new Error('Authentication failed');
+	if (response.ok) {
+		return await response.json();
 	}
 
-	return await response.json();
+	await responseError(response);
 }
 
 /**
  * Fetches user identity
- * @param fetch
+ * @param {typeof fetch} fetch
  * @returns {Promise<*>}
  */
 export async function whoami(fetch) {
@@ -38,12 +38,12 @@ export async function whoami(fetch) {
 		return await response.json();
 	}
 
-	throw new Error('Unable to fetch user identity');
+	await responseError(response);
 }
 
 /**
  * Requests to close a user session on the server
- * @param fetch
+ * @param {typeof fetch} fetch
  * @returns {Promise<void>}
  */
 export async function logout(fetch) {

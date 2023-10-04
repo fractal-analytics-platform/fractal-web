@@ -7,7 +7,12 @@
 	import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
+
+	/** @type {JobInfoModal} */
+	let jobInfoModal;
+	/** @type {JobLogsModal} */
+	let jobLogsModal;
 
 	// Component properties
 	let project = $page.data.project;
@@ -15,12 +20,15 @@
 	let datasets = $page.data.datasets;
 	let jobs = $page.data.jobs || [];
 	let tableHandler = undefined;
+	/** @type {any} */
 	let rows = undefined;
-	let workflowJobInfoId = undefined;
 
 	// Filters
+	/** @type {number|string} */
 	let workflowFilter = '';
+	/** @type {number|string} */
 	let inputDatasetFilter = '';
+	/** @type {number|string} */
 	let outputDatasetFilter = '';
 	let statusFilter = '';
 
@@ -77,36 +85,16 @@
 		rows = tableHandler.getRows();
 	}
 
-	async function handleJobLogsDownload(jobId) {
-		console.log('Download job');
-
-		const response = await fetch(`/projects/${project.id}/jobs/${jobId}/logs`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		if (response.ok) {
-			// The response body is a blob
-			const blob = await response.blob();
-			const downloadUrl = URL.createObjectURL(blob);
-			// Create a hidden link within the page to trigger the download of the file
-			const link = document.createElement('a');
-			// Append the link to the body
-			document.body.appendChild(link);
-			// Set the href of the link to the download URL
-			link.href = downloadUrl;
-			link.download = `${jobId}_logs.zip`;
-			// Trigger the download
-			link.click();
-			document.body.removeChild(link);
-		}
-	}
-
+	/**
+	 * Requests the server to stop a job execution
+	 * @param {number} jobId
+	 * @returns {Promise<void>}
+	 */
 	async function handleJobCancel(jobId) {
 		console.log('Stop running job');
 
-		const response = await fetch(`/projects/${project.id}/jobs/${jobId}?action=stop`, {
-			method: 'PATCH',
+		const response = await fetch(`/api/v1/project/${project.id}/job/${jobId}/stop`, {
+			method: 'GET',
 			credentials: 'include'
 		});
 
@@ -116,29 +104,9 @@
 		} else {
 			console.error('Error stopping job');
 			const errorResponse = await response.json();
-			new StandardErrorAlert({
-				target: document.getElementById('jobUpdatesError'),
-				props: {
-					error: errorResponse.error
-				}
-			});
+			displayStandardErrorAlert(errorResponse, 'jobUpdatesError');
 		}
 	}
-
-	function openWorkflowJobInfoModal(jobId) {
-		workflowJobInfoId = jobId;
-		// eslint-disable-next-line
-		const infoModal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'), {});
-		infoModal.show();
-	}
-
-	function openWorkflowJobLogsModal(jobId) {
-		workflowJobInfoId = jobId;
-		// eslint-disable-next-line
-		const logsModal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'), {});
-		logsModal.show();
-	}
-
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -189,7 +157,7 @@
 					>
 				</div>
 			</div>
-			<div id='jobUpdatesError' />
+			<div id="jobUpdatesError" />
 			<table class="table">
 				<thead class="table-light">
 					<tr>
@@ -203,9 +171,9 @@
 						<th>Options</th>
 					</tr>
 					<tr>
-						<th class="col-2"></th>
-						<th></th>
-						<th></th>
+						<th class="col-2" />
+						<th />
+						<th />
 						<th>
 							{#if workflows}
 								<select class="form-control" bind:value={workflowFilter}>
@@ -279,32 +247,32 @@
 									</td>
 									<td>
 										<button
-											class='btn btn-info'
-											on:click|preventDefault={() => openWorkflowJobInfoModal(row.id)}>
-											<i class='bi-info-circle' />
+											class="btn btn-info"
+											on:click|preventDefault={() => jobInfoModal.show(row.id)}
+										>
+											<i class="bi-info-circle" />
 											Info
 										</button>
 										{#if row.status === 'failed' || row.status === 'done'}
 											<button
-												class='btn btn-light'
-												on:click|preventDefault={() => openWorkflowJobLogsModal(row.id)}
+												class="btn btn-light"
+												on:click|preventDefault={() => jobLogsModal.show(row.id)}
 											>
-												<i class='bi-list-columns-reverse' />
+												<i class="bi-list-columns-reverse" />
 												Logs
 											</button>
-											<button
-												class='btn btn-light'
-												on:click={handleJobLogsDownload.bind(this, row.id)}
-											><i class='bi-arrow-down-circle' /></button
+											<a
+												class="btn btn-light"
+												href={`/api/v1/project/${project.id}/job/${row.id}/download`}
+												download={`${row.id}_logs.zip`}
 											>
+												<i class="bi-arrow-down-circle" />
+											</a>
 										{/if}
-										{#if row.status === 'running' }
-											<button
-												class='btn btn-danger'
-												on:click={handleJobCancel.bind(this, row.id)}
-											><i class='bi-x-circle' /> Cancel
-											</button
-											>
+										{#if row.status === 'running'}
+											<button class="btn btn-danger" on:click={() => handleJobCancel(row.id)}>
+												<i class="bi-x-circle" /> Cancel
+											</button>
 										{/if}
 									</td>
 								</tr>
@@ -317,5 +285,5 @@
 	</div>
 {/if}
 
-<JobInfoModal workflowJobId={workflowJobInfoId} projectName={project.name} {workflows} {datasets} />
-<JobLogsModal workflowJobId={workflowJobInfoId} />
+<JobInfoModal projectName={project.name} {workflows} {datasets} bind:this={jobInfoModal} />
+<JobLogsModal bind:this={jobLogsModal} />

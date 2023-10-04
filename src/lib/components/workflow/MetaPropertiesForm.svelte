@@ -9,8 +9,8 @@
 	import { page } from '$app/stores';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { getOnlyModifiedProperties } from '$lib/common/component_utilities';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Workflow id
 	export let workflowId;
@@ -45,17 +45,12 @@
 			}
 		} catch (error) {
 			console.log(error);
-			new StandardErrorAlert({
-				target: document.getElementById('metaPropertiesFormError'),
-				props: {
-					error
-				}
-			});
+			displayStandardErrorAlert(error, 'metaPropertiesFormError');
 		}
 	}
 </script>
 
 <div>
-	<span id="metaPropertiesFormError"></span>
+	<span id="metaPropertiesFormError" />
 	<FormBuilder entry={metaProperties} updateEntry={handleEntryUpdate} />
 </div>

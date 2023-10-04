@@ -1,11 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { enhance } from '$app/forms';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { replaceEmptyStrings } from '$lib/common/component_utilities';
+	import { AlertError } from '$lib/common/errors';
 
 	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections';
 
@@ -28,6 +29,11 @@
 	let taskCollections = [];
 	let taskCollectionAlreadyPresent = undefined;
 
+	let python_package = '';
+	let package_version = '';
+	let python_version = '';
+	let package_extras = '';
+
 	// On component load set the taskCollections from the local storage
 	onMount(async () => {
 		if (browser) {
@@ -36,35 +42,56 @@
 		await updateTaskCollectionsState();
 	});
 
-	async function handleTaskCollection({ data, form }) {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				console.log('Task collection request successful');
-				const taskCollectionData = result.data.taskCollection;
+	/**
+	 * Requests a task collection to the server
+	 * @returns {Promise<*>}
+	 */
+	async function handleTaskCollection() {
+		taskCollectionAlreadyPresent = undefined;
 
-				if (taskCollectionData.status === 200) {
-					taskCollectionAlreadyPresent = taskCollectionData;
-					taskCollectionAlreadyPresent.package = data.get('package');
-					setTimeout(() => {
-						taskCollectionAlreadyPresent = undefined;
-					}, 5500);
-				} else {
-					// If a package_version is specified, add it to taskCollection result
-					const package_version = data.get('package_version');
-					if (package_version !== undefined) {
-						taskCollectionData.data.package_version = package_version;
-					}
-					// Add task collection to local storage
-					storeCreatedTaskCollection(taskCollectionData);
-				}
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/json');
 
-				// Clear form
-				form.reset();
-			} else {
-				console.error('Task collection request failed: ', result.data);
-				collectTaskErrorStore.set(result.data);
-			}
+		const requestData = {
+			package: python_package,
+			// Optional
+			package_version,
+			python_version,
+			package_extras
 		};
+
+		const response = await fetch('/api/v1/task/collect/pip', {
+			method: 'POST',
+			credentials: 'include',
+			headers: headers,
+			body: JSON.stringify(requestData, replaceEmptyStrings)
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			if (response.status === 200) {
+				console.log('Task collection already exists');
+				taskCollectionAlreadyPresent = result.data;
+				taskCollectionAlreadyPresent.package = python_package;
+				setTimeout(() => {
+					taskCollectionAlreadyPresent = undefined;
+				}, 5500);
+			} else {
+				console.log('Task collection created', result);
+				if (package_version) {
+					result.data.package_version = package_version;
+				}
+				// Add task collection to local storage
+				storeCreatedTaskCollection(result);
+			}
+			python_package = '';
+			package_version = '';
+			python_version = '';
+			package_extras = '';
+		} else {
+			console.error('Task collection request failed: ', result);
+			collectTaskErrorStore.set(result);
+		}
 	}
 
 	function storeCreatedTaskCollection(taskCollection) {
@@ -78,51 +105,65 @@
 		updateTaskCollections(taskCollections);
 	}
 
-	async function updateTaskCollectionStatus(taskCollection) {
-		await fetchTaskCollectionStatus(taskCollection.id)
-			.then((taskCollectionUpdate) => {
-				// Update a task collection status with the one fetched from the server
-				taskCollection.status = taskCollectionUpdate.data.status;
-				taskCollection.logs = taskCollectionUpdate.data.log;
-				console.log(taskCollectionUpdate);
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+	/**
+	 * Fetches a task collection from the server
+	 * @param {string} taskCollectionId
+	 * @returns {Promise<*>}
+	 */
+	async function getTaskCollection(taskCollectionId) {
+		const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			console.log('Retrieved collection status', result);
+			return result;
+		} else {
+			if (response.status === 404) {
+				console.log(
+					`Missing task collection ${taskCollectionId} will be deleted from local storage`
+				);
+				return undefined;
+			} else {
+				console.error('Failed to fetch task collection status', result);
+				throw new AlertError(result);
+			}
+		}
 	}
 
 	async function updateTaskCollectionsState() {
-		const updatedTaskCollection = await Promise.all(
-			taskCollections.map(async (taskCollection) => {
-				switch (taskCollection.status) {
-					case 'pending':
-					case 'installing':
-						{
-							await updateTaskCollectionStatus(taskCollection);
-						}
-						break;
-					case 'fail':
-						break;
-					default:
-						// When the status is ok
-						// Only if the taskCollection logs are undefined
-						if (taskCollection.logs === undefined) {
-							// Shall fetch the verbose log of the task collection
-							await updateTaskCollectionStatus(taskCollection);
-						}
-						break;
+		const updates = await Promise.allSettled(taskCollections.map((tc) => getTaskCollection(tc.id)));
+
+		const updatedTaskCollections = [];
+		for (const update of updates) {
+			if (update.status === 'rejected') {
+				collectTaskErrorStore.set(update.reason);
+			} else {
+				const updatedTaskCollection = update.value;
+				if (!updatedTaskCollection) {
+					// Removing missing task collection
+					continue;
 				}
-				// Return the updated taskCollection object
-				return taskCollection;
-			})
-		);
+				const oldTaskCollection = taskCollections.find((tc) => tc.id === updatedTaskCollection.id);
+				if (!oldTaskCollection) {
+					continue;
+				}
+				oldTaskCollection.status = updatedTaskCollection.data.status;
+				oldTaskCollection.logs = updatedTaskCollection.data.logs;
+				updatedTaskCollections.push(oldTaskCollection);
+			}
+		}
+
 		// Update task collections list
-		updateTaskCollections(updatedTaskCollection);
+		updateTaskCollections(updatedTaskCollections);
 	}
 
 	function loadTaskCollectionsFromStorage() {
 		if (browser) {
 			// Parse local storage task collections value
+			// @ts-ignore
 			return JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_TASK_COLLECTIONS)) || [];
 		}
 		// Fallback to empty task collections list
@@ -139,7 +180,7 @@
 		}
 	}
 
-	function clearTaskCollections() {
+	async function clearTaskCollections() {
 		updateTaskCollections([]);
 	}
 
@@ -153,6 +194,7 @@
 			case 'pending':
 				return 'text-bg-light';
 			case 'installing':
+			case 'collecting':
 				return 'text-bg-primary';
 			case 'fail':
 				return 'text-bg-danger';
@@ -165,19 +207,6 @@
 		const id = event.currentTarget.getAttribute('data-fc-tc');
 		modalTaskCollectionId.set(id);
 	}
-
-	async function fetchTaskCollectionStatus(collectionId) {
-		const request = await fetch(`/tasks/collections/${collectionId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		if (request.ok) {
-			return await request.json();
-		}
-
-		throw new Error(`Failed to fetch task collection status: ${request.status}`);
-	}
 </script>
 
 <TaskCollectionLogsModal />
@@ -189,14 +218,20 @@
 			<div class="mt-2 fw-bold">{taskCollectionAlreadyPresent.info}</div>
 		</div>
 	{/if}
-	<form method="post" action="?/createTaskCollection" use:enhance={handleTaskCollection}>
+	<form on:submit|preventDefault={handleTaskCollection}>
 		<div class="row g-3">
 			<div class="col-6">
 				<div class="input-group">
 					<div class="input-group-text">
 						<span class="font-monospace">Package</span>
 					</div>
-					<input name="package" type="text" class="form-control" required />
+					<input
+						name="package"
+						type="text"
+						class="form-control"
+						required
+						bind:value={python_package}
+					/>
 				</div>
 			</div>
 			<div class="col-6">
@@ -204,7 +239,12 @@
 					<div class="input-group-text">
 						<span class="font-monospace">Package Version</span>
 					</div>
-					<input name="package_version" type="text" class="form-control" />
+					<input
+						name="package_version"
+						type="text"
+						class="form-control"
+						bind:value={package_version}
+					/>
 				</div>
 			</div>
 			<div class="col-6">
@@ -212,7 +252,12 @@
 					<div class="input-group-text">
 						<span class="font-monospace">Python Version</span>
 					</div>
-					<input name="python_version" type="text" class="form-control" />
+					<input
+						name="python_version"
+						type="text"
+						class="form-control"
+						bind:value={python_version}
+					/>
 				</div>
 			</div>
 			<div class="col-6">
@@ -220,7 +265,12 @@
 					<div class="input-group-text">
 						<span class="font-monospace">Package extras</span>
 					</div>
-					<input name="package_extras" type="text" class="form-control" />
+					<input
+						name="package_extras"
+						type="text"
+						class="form-control"
+						bind:value={package_extras}
+					/>
 				</div>
 			</div>
 			<div class="col-auto">
@@ -274,7 +324,7 @@
 									btnStyle="warning"
 									buttonIcon="trash"
 									message="Remove a task collection log"
-									callbackAction={removeTaskCollection.bind(this, id)}
+									callbackAction={async () => removeTaskCollection(id)}
 								/>
 								{#if status == 'fail' || (status == 'OK' && logs !== '')}
 									<button

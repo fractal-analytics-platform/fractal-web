@@ -1,16 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { enhance } from '$app/forms';
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
-	import { formatMarkdown } from '$lib/common/component_utilities';
+	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 
 	// Workflow
 	let workflow = undefined;
@@ -39,6 +38,16 @@
 	let saveArgumentsChanges = undefined;
 	let preventedTaskContextChange = undefined;
 
+	// Create workflow task modal
+	/** @type {number|undefined} */
+	let taskOrder = undefined;
+	let workflowTaskSelectionComponent = undefined;
+	let workflowTaskErrorAlert = undefined;
+
+	// Update workflow modal
+	let updatedWorkflowName = '';
+	let updatedWorkflowErrorAlert = undefined;
+
 	$: updatableWorkflowList = workflow?.task_list || [];
 
 	workflowTaskContext.subscribe((value) => {
@@ -66,8 +75,12 @@
 		}
 	});
 
+	/**
+	 * Exports a project's workflow from the server
+	 * @returns {Promise<void>}
+	 */
 	async function handleExportWorkflow() {
-		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/export`, {
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/export`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -81,13 +94,14 @@
 
 		if (workflowData !== null) {
 			const file = new File(
-				[JSON.stringify(workflowData, '', 2)],
+				[JSON.stringify(workflowData, null, 2)],
 				`workflow-export-${workflow.name}-${Date.now().toString()}.json`,
 				{
 					type: `application/json`
 				}
 			);
 			const fileUrl = URL.createObjectURL(file);
+			/** @type {any} */
 			const linkElement = document.getElementById('downloadWorkflowButton');
 			linkElement.download = `workflow-export-${workflow.name}-${Date.now().toString()}.json`;
 			linkElement.href = fileUrl;
@@ -96,8 +110,10 @@
 	}
 
 	async function getAvailableTasks() {
+		resetCreateWorkflowTaskModal();
+
 		// Get available tasks from the server
-		const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/tasks`, {
+		const response = await fetch('/api/v1/task', {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -110,56 +126,155 @@
 		}
 	}
 
+	function resetWorkflowUpdateModal() {
+		updatedWorkflowName = workflow.name;
+		workflowUpdated = false;
+		if (updatedWorkflowErrorAlert) {
+			updatedWorkflowErrorAlert.hide();
+		}
+	}
+
+	/**
+	 * Updates a project's workflow in the server
+	 * @returns {Promise<void>}
+	 */
 	async function handleWorkflowUpdate() {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				const updatedWorkflow = result.data;
-				workflow = updatedWorkflow;
-				workflowUpdated = true;
-				setTimeout(() => {
-					workflowUpdated = false;
-				}, 3000);
-			} else {
-				console.error('Error updating workflow properties', result.data);
-			}
-		};
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				name: updatedWorkflowName
+			})
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			workflow = result;
+			workflowUpdated = true;
+			setTimeout(() => {
+				workflowUpdated = false;
+			}, 3000);
+		} else {
+			console.error('Error updating workflow properties', result);
+			updatedWorkflowErrorAlert = displayStandardErrorAlert(result, 'updatedWorkflowError');
+		}
 	}
 
-	async function handleCreateWorkflowTask({ form }) {
-		return async ({ result }) => {
-			if (result.type !== 'failure') {
-				// Workflow task created
-				console.log('Workflow task created');
-				// Update workflow
-				workflow = result.data;
-				// UI Feedback
-				workflowTaskCreated = true;
-				setTimeout(() => {
-					workflowTaskCreated = false;
-				}, 3000);
-				form.reset();
-			} else {
-				console.error('Error creating new workflow task', result.data);
-			}
-		};
+	function resetCreateWorkflowTaskModal() {
+		taskOrder = undefined;
+		if (workflowTaskErrorAlert) {
+			workflowTaskErrorAlert.hide();
+		}
+		workflowTaskSelectionComponent.reset();
 	}
 
+	/**
+	 * Creates a new project's workflow task in the server.
+	 * @returns {Promise<void>}
+	 */
+	async function handleCreateWorkflowTask() {
+		const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
+		if (taskId === undefined) {
+			return;
+		}
+
+		// Remove previous errors
+		if (workflowTaskErrorAlert) {
+			workflowTaskErrorAlert.hide();
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		// Creating workflow task
+		const workflowTaskResponse = await fetch(
+			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify({
+					order: taskOrder,
+					meta: {},
+					args: {}
+				})
+			}
+		);
+
+		const workflowTaskResult = await workflowTaskResponse.json();
+
+		if (!workflowTaskResponse.ok) {
+			console.error('Error while creating workflow task', workflowTaskResult);
+			workflowTaskErrorAlert = displayStandardErrorAlert(workflowTaskResult, 'workflowTaskError');
+			return;
+		}
+		console.log('Workflow task created');
+
+		// Get updated workflow with created task
+		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const workflowResult = await workflowResponse.json();
+
+		if (!workflowResponse.ok) {
+			console.error('Error while retrieving workflow', workflowResult);
+			workflowTaskErrorAlert = displayStandardErrorAlert(workflowResult, 'workflowTaskError');
+			return;
+		}
+
+		// Update workflow
+		workflow = workflowResult;
+		// UI Feedback
+		workflowTaskCreated = true;
+		setTimeout(() => {
+			workflowTaskCreated = false;
+		}, 3000);
+		resetCreateWorkflowTaskModal();
+	}
+
+	/**
+	 * Deletes a project's workflow task from the server
+	 * @param {number} workflowId
+	 * @param {number} workflowTaskId
+	 * @returns {Promise<void>}
+	 */
 	async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
 		const response = await fetch(
-			`/projects/${project.id}/workflows/${workflowId}/tasks/${workflowTaskId}`,
+			`/api/v1/project/${project.id}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
 			}
 		);
 
-		if (response.ok) {
-			// Successfully deleted task
-			workflow = await response.json();
-			workflowTaskContext.set(undefined);
-		} else {
-			console.error(response);
+		if (!response.ok) {
+			const error = await response.json();
+			console.error('Unable to delete workflow task', error);
+			throw new AlertError(error);
 		}
+
+		// Get updated workflow with deleted task
+		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const workflowResult = await workflowResponse.json();
+
+		if (!response.ok) {
+			console.error('Unable to retrieve workflow', workflowResult);
+			throw new AlertError(workflowResult);
+		}
+
+		// Successfully deleted task
+		workflow = workflowResult;
+		workflowTaskContext.set(undefined);
 	}
 
 	async function setActiveWorkflowTaskContext(event) {
@@ -174,6 +289,7 @@
 	}
 
 	function toggleUnsavedChangesModal() {
+		// @ts-ignore
 		// eslint-disable-next-line no-undef
 		const modal = new bootstrap.Modal(document.getElementById('changes-unsaved-dialog'), {});
 		modal.toggle();
@@ -182,7 +298,8 @@
 	function setWorkflowTaskContext(wft) {
 		workflowTaskContext.set(wft);
 		// Check if args schema is available
-		argsSchemaAvailable = wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
+		argsSchemaAvailable =
+			wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
 		// Suppose args schema is valid
 		argsSchemaValid = true;
 	}
@@ -207,77 +324,83 @@
 		updatableWorkflowList = wftList;
 	}
 
+	/**
+	 * Reorders a project's workflow in the server
+	 * @returns {Promise<*>}
+	 */
 	async function handleWorkflowOrderUpdate() {
-		const requestData = {
-			tasksOrder: updatableWorkflowList.map((t) => t.id)
+		const patchData = {
+			reordered_workflowtask_ids: updatableWorkflowList.map((t) => t.id)
 		};
 
-		// Patch workflow task order
-		const request = await fetch(`/projects/${project.id}/workflows/${workflow.id}`, {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
 			method: 'PATCH',
 			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(requestData)
+			mode: 'cors',
+			headers,
+			body: JSON.stringify(patchData)
 		});
 
-		if (request.ok) {
+		const result = await response.json();
+		if (response.ok) {
 			console.log('Workflow task order updated');
-			// Successfully updated workflow task order
-			workflow = await request.json();
+			workflow = result;
+			// @ts-ignore
 			// eslint-disable-next-line
 			const modal = bootstrap.Modal.getInstance(
 				document.getElementById('editWorkflowTasksOrderModal')
 			);
 			modal.toggle();
 		} else {
-			console.error('Workflow task order not updated', request.statusText);
+			console.error('Workflow task order not updated', result);
+			displayStandardErrorAlert(result, 'workflowTasksOrderError');
 		}
 	}
 
+	/**
+	 * Requests the server to apply a project's workflow (i.e. run it)
+	 * @returns {Promise<void>}
+	 */
 	async function handleApplyWorkflow() {
-
-		if (inputDatasetControl === ''){
+		if (inputDatasetControl === '') {
 			// Preliminary check: if inputDatasetControl is not set, raise an error
 			let message = 'Input dataset is required. Select one from the list.';
 			console.error(message);
-			new StandardErrorAlert({
-				target: document.getElementById('applyWorkflowError'),
-				props: { error: message }
-			});
-		}
-		else if (outputDatasetControl === '') {
+			displayStandardErrorAlert(message, 'applyWorkflowError');
+		} else if (outputDatasetControl === '') {
 			// Preliminary check: if outputDatasetControl is not set, raise an error
 			let message = 'Output dataset is required. Select one from the list.';
 			console.error(message);
-			new StandardErrorAlert({
-				target: document.getElementById('applyWorkflowError'),
-				props: { error: message }
-			});
-		}
-		else {
+			displayStandardErrorAlert(message, 'applyWorkflowError');
+		} else {
 			// Both inputDatasetControl and outputDatasetControl are set, continue
+			const requestBody = {
+				worker_init: workerInitControl,
+				first_task_index: firstTaskIndexControl,
+				last_task_index: lastTaskIndexControl
+			};
 
-			// Build a FormData object
-			const data = new FormData();
-			data.append('inputDataset', inputDatasetControl);
-			data.append('outputDataset', outputDatasetControl);
-			data.append('workerInit', workerInitControl);
-			data.append('firstTaskIndex', firstTaskIndexControl);
-			data.append('lastTaskIndex', lastTaskIndexControl);
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
 
-			// Make API call
-			const response = await fetch(`/projects/${project.id}/workflows/${workflow.id}/apply`, {
-				method: 'POST',
-				credentials: 'include',
-				body: data
-			});
+			const response = await fetch(
+				`/api/v1/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${inputDatasetControl}&output_dataset_id=${outputDatasetControl}`,
+				{
+					method: 'POST',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify(requestBody, replaceEmptyStrings)
+				}
+			);
 
 			// Handle API response
 			if (response.ok) {
 				// Successfully applied workflow
 				const job = await response.json();
+				// @ts-ignore
 				// eslint-disable-next-line
 				const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'));
 				modal.toggle();
@@ -292,12 +415,7 @@
 			} else {
 				console.error(response);
 				// Set an error message on the component
-				new StandardErrorAlert({
-					target: document.getElementById('applyWorkflowError'),
-					props: {
-						error: await response.json()
-					}
-				});
+				displayStandardErrorAlert(await response.json(), 'applyWorkflowError');
 			}
 		}
 	}
@@ -316,7 +434,6 @@
 			lastTaskIndexControl = '';
 		}
 	}
-
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -327,7 +444,7 @@
 			</li>
 			{#if $page.params.projectId}
 				<li class="breadcrumb-item" aria-current="page">
-					<a href='/projects/{$page.params.projectId}'>{project?.name}</a>
+					<a href="/projects/{$page.params.projectId}">{project?.name}</a>
 				</li>
 			{/if}
 			<li class="breadcrumb-item">Workflows</li>
@@ -339,43 +456,50 @@
 		</ol>
 	</nav>
 	<div>
-		<a href='/projects/{project?.id}/jobs?workflow={workflow?.id}' class='btn btn-light'
-		><i class='bi-journal-code' /> List jobs</a
+		<a href="/projects/{project?.id}/jobs?workflow={workflow?.id}" class="btn btn-light"
+			><i class="bi-journal-code" /> List jobs</a
 		>
-		<button class='btn btn-light' on:click|preventDefault={handleExportWorkflow}
-		><i class='bi-box-arrow-up' /></button
+		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}
+			><i class="bi-box-arrow-up" /></button
 		>
-		<a id='downloadWorkflowButton' class='d-none'>Download workflow link</a>
-		<button class='btn btn-light' data-bs-toggle='modal' data-bs-target='#editWorkflowModal'
-		><i class='bi-gear-wide-connected' /></button
+		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
+		<button
+			class="btn btn-light"
+			data-bs-toggle="modal"
+			data-bs-target="#editWorkflowModal"
+			on:click={resetWorkflowUpdateModal}
 		>
-		<button class='btn btn-success' on:click|preventDefault={() => {
-			if (argumentsWithUnsavedChanges === false) {
-				// eslint-disable-next-line no-undef
-				const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
-				modal.toggle();
-			} else {
-				toggleUnsavedChangesModal()
-			}
-		}}
-		><i class='bi-play-fill' /> Run workflow
-		</button
-		>
+			<i class="bi-gear-wide-connected" />
+		</button>
+		<button
+			class="btn btn-success"
+			on:click|preventDefault={() => {
+				if (argumentsWithUnsavedChanges === false) {
+					// @ts-ignore
+					// eslint-disable-next-line no-undef
+					const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
+					modal.toggle();
+				} else {
+					toggleUnsavedChangesModal();
+				}
+			}}
+			><i class="bi-play-fill" /> Run workflow
+		</button>
 	</div>
 </div>
 
 {#if workflow}
-	<div class='container py-4 px-0'>
-		<div class='row'>
-			<div class='col-4'>
-				<div class='card'>
-					<div class='card-header'>
-						<div class='d-flex justify-content-between align-items-center'>
+	<div class="container py-4 px-0">
+		<div class="row">
+			<div class="col-4">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex justify-content-between align-items-center">
 							<span>Workflow sequence</span>
 							<div>
 								<button
-									class='btn btn-light'
-									data-bs-toggle='modal'
+									class="btn btn-light"
+									data-bs-toggle="modal"
 									data-bs-target="#insertTaskModal"
 									on:click={getAvailableTasks}><i class="bi-plus-lg" /></button
 								>
@@ -395,7 +519,7 @@
 						<ul class="list-group list-group-flush">
 							{#each workflow.task_list as workflowTask}
 								<li
-									style='cursor: pointer'
+									style="cursor: pointer"
 									class="list-group-item list-group-item-action {$workflowTaskContext !==
 										undefined && $workflowTaskContext.id == workflowTask.id
 										? 'active'
@@ -415,61 +539,57 @@
 			</div>
 			<div class="col-8">
 				<div class="card">
-					<div class='card-header py-1'>
+					<div class="card-header py-1">
 						{#if selectedWorkflowTask}
-							<div class='d-flex justify-content-between'>
-								<ul class='nav nav-tabs card-header-tabs'>
-									<li class='nav-item'>
+							<div class="d-flex justify-content-between">
+								<ul class="nav nav-tabs card-header-tabs">
+									<li class="nav-item">
 										<button
-											data-bs-toggle='tab'
-											data-bs-target='#args-tab'
+											data-bs-toggle="tab"
+											data-bs-target="#args-tab"
 											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-											aria-current='true'
-										>Arguments
+											aria-current="true"
+											>Arguments
 										</button>
 									</li>
-									<li class='nav-item'>
+									<li class="nav-item">
 										<button
-											data-bs-toggle='tab'
-											data-bs-target='#meta-tab'
+											data-bs-toggle="tab"
+											data-bs-target="#meta-tab"
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
-										>Meta
+											>Meta
 										</button>
 									</li>
-									<li class='nav-item'>
+									<li class="nav-item">
 										<button
-											data-bs-toggle='tab'
-											data-bs-target='#info-tab'
+											data-bs-toggle="tab"
+											data-bs-target="#info-tab"
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
-										>Info
+											>Info
 										</button>
 									</li>
 								</ul>
 								<ConfirmActionButton
-									modalId='confirmDeleteWorkflowTask'
-									btnStyle='danger'
-									buttonIcon='trash'
-									message='Delete a workflow task {selectedWorkflowTask.task.name}'
-									callbackAction={handleDeleteWorkflowTask.bind(
-										this,
-										workflow.id,
-										selectedWorkflowTask.id
-									)}
+									modalId="confirmDeleteWorkflowTask"
+									btnStyle="danger"
+									buttonIcon="trash"
+									message="Delete a workflow task {selectedWorkflowTask.task.name}"
+									callbackAction={() =>
+										handleDeleteWorkflowTask(workflow.id, selectedWorkflowTask.id)}
 								/>
 							</div>
-
 						{:else}
 							Select a workflow task from the list
 						{/if}
 					</div>
 					<div class="tab-content">
 						<div id="args-tab" class="tab-pane show active">
-							<div class='card-body p-0'>
+							<div class="card-body p-0">
 								{#if selectedWorkflowTask}
 									{#key selectedWorkflowTask}
 										{#if argsSchemaAvailable && argsSchemaValid}
-											{#if argsChangesSaved }
-												<div class='alert alert-success m-3' role='alert'>
+											{#if argsChangesSaved}
+												<div class="alert alert-success m-3" role="alert">
 													Arguments changes saved successfully
 												</div>
 											{/if}
@@ -483,7 +603,7 @@
 												bind:validSchema={argsSchemaValid}
 												bind:unsavedChanges={argumentsWithUnsavedChanges}
 												on:argsSaved={handleArgsSaved}
-											></ArgumentsSchema>
+											/>
 										{:else}
 											<ArgumentForm
 												workflowId={workflow.id}
@@ -503,7 +623,7 @@
 											workflowId={workflow.id}
 											taskId={selectedWorkflowTask.id}
 											metaProperties={selectedWorkflowTask.meta}
-											originalMetaProperties={originalMetaProperties}
+											{originalMetaProperties}
 										/>
 									{/key}
 								{/if}
@@ -512,54 +632,66 @@
 						<div id="info-tab" class="tab-pane">
 							<div class="card-body">
 								{#if selectedWorkflowTask}
-								<ul class="list-group">
-									<li class="list-group-item list-group-item-light fw-bold">Name</li>
-									<li class="list-group-item">{selectedWorkflowTask.task.name}</li>
-									<li class="list-group-item list-group-item-light fw-bold">Version</li>
-									<li class="list-group-item">{selectedWorkflowTask.task.version || '–'}</li>
-									<li class='list-group-item list-group-item-light fw-bold'>Docs Link</li>
-									<li class='list-group-item'>
-										{#if selectedWorkflowTask.task.docs_link}
-											<a href="{selectedWorkflowTask.task.docs_link}" target="_blank">{selectedWorkflowTask.task.docs_link}</a>
-										{:else}
-										-
-										{/if}
-									</li>
-									<li class='list-group-item list-group-item-light fw-bold'>Docs Info</li>
-									<li class='list-group-item'>
-										{#if selectedWorkflowTask.task.docs_info}
-											{@html formatMarkdown(selectedWorkflowTask.task.docs_info)}
-										{:else}
-										-
-										{/if}
-									</li>
-									<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-									<li class="list-group-item">{selectedWorkflowTask.task.owner || '–'}</li>
-									<li class="list-group-item list-group-item-light fw-bold">Command</li>
-									<li class='list-group-item'><code>{selectedWorkflowTask.task.command}</code></li>
-									<li class='list-group-item list-group-item-light fw-bold'>Source</li>
-									<li class='list-group-item'><code>{selectedWorkflowTask.task.source}</code></li>
-									<li class='list-group-item list-group-item-light fw-bold'>Input Type</li>
-									<li class='list-group-item'>
-										<code>{selectedWorkflowTask.task.input_type}</code>
-									</li>
-									<li class='list-group-item list-group-item-light fw-bold'>Output Type</li>
-									<li class='list-group-item'>
-										<code>{selectedWorkflowTask.task.output_type}</code>
-									</li>
-									<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
-									<li class='list-group-item'>{selectedWorkflowTask.task.args_schema_version || '–'}</li>
-									<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
-									<li class='list-group-item'>
-										{#if selectedWorkflowTask.task.args_schema}
-										<code>
-											<pre>{JSON.stringify(selectedWorkflowTask.task.args_schema, null, 2)}</pre>
-										</code>
-										{:else}
-										-
-										{/if}
-									</li>
-								</ul>
+									<ul class="list-group">
+										<li class="list-group-item list-group-item-light fw-bold">Name</li>
+										<li class="list-group-item">{selectedWorkflowTask.task.name}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Version</li>
+										<li class="list-group-item">{selectedWorkflowTask.task.version || '–'}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
+										<li class="list-group-item">
+											{#if selectedWorkflowTask.task.docs_link}
+												<a href={selectedWorkflowTask.task.docs_link} target="_blank"
+													>{selectedWorkflowTask.task.docs_link}</a
+												>
+											{:else}
+												-
+											{/if}
+										</li>
+										<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
+										<li class="list-group-item">
+											{#if selectedWorkflowTask.task.docs_info}
+												{@html formatMarkdown(selectedWorkflowTask.task.docs_info)}
+											{:else}
+												-
+											{/if}
+										</li>
+										<li class="list-group-item list-group-item-light fw-bold">Owner</li>
+										<li class="list-group-item">{selectedWorkflowTask.task.owner || '–'}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Command</li>
+										<li class="list-group-item">
+											<code>{selectedWorkflowTask.task.command}</code>
+										</li>
+										<li class="list-group-item list-group-item-light fw-bold">Source</li>
+										<li class="list-group-item"><code>{selectedWorkflowTask.task.source}</code></li>
+										<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
+										<li class="list-group-item">
+											<code>{selectedWorkflowTask.task.input_type}</code>
+										</li>
+										<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
+										<li class="list-group-item">
+											<code>{selectedWorkflowTask.task.output_type}</code>
+										</li>
+										<li class="list-group-item list-group-item-light fw-bold">
+											Args Schema Version
+										</li>
+										<li class="list-group-item">
+											{selectedWorkflowTask.task.args_schema_version || '–'}
+										</li>
+										<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
+										<li class="list-group-item">
+											{#if selectedWorkflowTask.task.args_schema}
+												<code>
+													<pre>{JSON.stringify(
+															selectedWorkflowTask.task.args_schema,
+															null,
+															2
+														)}</pre>
+												</code>
+											{:else}
+												-
+											{/if}
+										</li>
+									</ul>
 								{/if}
 							</div>
 						</div>
@@ -578,25 +710,30 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
-				<form method='post' action='?/createWorkflowTask' use:enhance={handleCreateWorkflowTask}>
-					<div class='mb-3'>
-						<WorkflowTaskSelection tasks={availableTasks}></WorkflowTaskSelection>
-					</div>
-
-					<div class='mb-3'>
-						<label for='taskOrder' class='form-label'>Task order in workflow</label>
-						<input
-							id='taskOrder'
-							type='number'
-							name='taskOrder'
-							class='form-control'
-							placeholder='Leave it blank to append at the end'
-							min='0'
-							max={workflow?.task_list.length}
+				<div id="workflowTaskError" />
+				<form on:submit|preventDefault={handleCreateWorkflowTask}>
+					<div class="mb-3">
+						<WorkflowTaskSelection
+							tasks={availableTasks}
+							bind:this={workflowTaskSelectionComponent}
 						/>
 					</div>
 
-					<button class="btn btn-primary">Insert</button>
+					<div class="mb-3">
+						<label for="taskOrder" class="form-label">Task order in workflow</label>
+						<input
+							id="taskOrder"
+							type="number"
+							name="taskOrder"
+							class="form-control"
+							placeholder="Leave it blank to append at the end"
+							min="0"
+							max={workflow?.task_list.length}
+							bind:value={taskOrder}
+						/>
+					</div>
+
+					<button class="btn btn-primary" type="submit">Insert</button>
 				</form>
 			</div>
 			<div class="modal-footer d-flex">
@@ -616,13 +753,9 @@
 				<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
 			<div class="modal-body">
+				<div id="updatedWorkflowError" />
 				{#if workflow}
-					<form
-						id="updateWorkflow"
-						method="post"
-						action="?/updateWorkflow"
-						use:enhance={handleWorkflowUpdate}
-					>
+					<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
 						<div class="mb-3">
 							<label for="workflowName" class="form-label">Workflow name</label>
 							<input
@@ -630,7 +763,7 @@
 								class="form-control"
 								name="workflowName"
 								id="workflowName"
-								value={workflow.name}
+								bind:value={updatedWorkflowName}
 							/>
 						</div>
 					</form>
@@ -654,6 +787,7 @@
 				<button class="btn-close" data-bs-dismiss="modal" />
 			</div>
 			<div class="modal-body">
+				<div id="workflowTasksOrderError" />
 				{#if workflow !== undefined && updatableWorkflowList.length == 0}
 					<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 				{:else if workflow !== undefined}
@@ -791,9 +925,9 @@
 							checkingConfiguration = false;
 						}}>Cancel</button
 					>
-					<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}
-						>Confirm</button
-					>
+					<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>
+						Confirm
+					</button>
 				{:else}
 					<button
 						class="btn btn-primary"
@@ -807,25 +941,37 @@
 	</div>
 </div>
 
-<div class='modal' tabindex='-1' id='changes-unsaved-dialog'>
-	<div class='modal-dialog'>
-		<div class='modal-content'>
-			<div class='modal-header'>
-				<h5 class='modal-title'>There are argument changes unsaved</h5>
-				<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+<div class="modal" tabindex="-1" id="changes-unsaved-dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">There are argument changes unsaved</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 			</div>
-			<div class='modal-body'>
-				<p>Do you want to save the changes made to the arguments of the current selected workflow task?</p>
+			<div class="modal-body">
+				<p>
+					Do you want to save the changes made to the arguments of the current selected workflow
+					task?
+				</p>
 			</div>
-			<div class='modal-footer'>
-				<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Cancel</button>
-				<button type='button' class='btn btn-warning' on:click={ () => {
-					argumentsWithUnsavedChanges = false
-					setWorkflowTaskContext(preventedTaskContextChange)
-				}} data-bs-dismiss='modal'>Discard changes
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button
+					type="button"
+					class="btn btn-warning"
+					on:click={() => {
+						argumentsWithUnsavedChanges = false;
+						setWorkflowTaskContext(preventedTaskContextChange);
+					}}
+					data-bs-dismiss="modal"
+					>Discard changes
 				</button>
-				<button type='button' class='btn btn-success' on:click={saveArgumentsChanges} data-bs-dismiss='modal'>Save
-					changes
+				<button
+					type="button"
+					class="btn btn-success"
+					on:click={saveArgumentsChanges}
+					data-bs-dismiss="modal"
+					>Save changes
 				</button>
 			</div>
 		</div>

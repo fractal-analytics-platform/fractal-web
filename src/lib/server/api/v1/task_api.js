@@ -1,9 +1,9 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { PostResourceException, responseError } from '$lib/common/errors.js';
+import { responseError } from '$lib/common/errors.js';
 
 /**
  * Fetches a list of tasks from the server
- * @param fetch
+ * @param {typeof fetch} fetch
  * @returns {Promise<*>}
  */
 export async function listTasks(fetch) {
@@ -16,177 +16,8 @@ export async function listTasks(fetch) {
 		mode: 'cors'
 	});
 
-	if (!response.ok) {
-		throw new Error('Unable to fetch tasks');
-	}
-
-	// The response should be of form ActionResult
-	return await response.json();
-}
-
-/**
- * Creates a new task in the server
- * @param fetch
- * @param formData
- * @returns {Promise<*>}
- */
-export async function createTask(fetch, formData) {
-	// Set headers
-	const headers = new Headers();
-	// headers.append('Authorization', cookies.get('AccessToken'))
-	headers.append('Content-Type', 'application/json');
-
-	// Compose request
-	// Since the api accepts application/json data format, we shall serialize data
-	// into a json object. It is better to do this explicitly.
-	const requestData = {
-		name: formData.get('name'),
-		command: formData.get('command'),
-		version: formData.get('version'),
-		source: formData.get('source'),
-		input_type: formData.get('input_type'),
-		output_type: formData.get('output_type')
-	};
-	// There is an interesting thing, if we use the svelte kit fetch object the server will not
-	// accept our request. If, instead, we use the default javascript fetch the server accepts it.
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/', {
-		method: 'POST',
-		mode: 'cors',
-		credentials: 'include',
-		headers,
-		body: JSON.stringify(requestData)
-	});
-
 	if (response.ok) {
 		return await response.json();
 	}
-
-	throw new PostResourceException(await response.json());
-}
-
-// Replace empty string value with undefined, so that it will be ignored in JSON.stringify (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description)
-function replaceEmptyString(key, value) {
-	if (typeof value === 'string' && value === '') {
-		return undefined;
-	} else {
-		return value;
-	}
-}
-
-
-/**
- * Requests a task collection to the server
- * @param fetch
- * @param formData
- * @returns {Promise<{info, status}|*>}
- */
-export async function createTaskCollection(fetch, formData) {
-	const headers = new Headers();
-	headers.append('Content-Type', 'application/json');
-
-	const requestData = {
-		package: formData.get('package'),
-		// Optional
-		package_version: formData.get('package_version'),
-		python_version: formData.get('python_version'),
-		package_extras: formData.get('package_extras')
-	};
-
-
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/collect/pip/', {
-		method: 'POST',
-		mode: 'cors',
-		credentials: 'include',
-		headers: headers,
-		body: JSON.stringify(requestData, replaceEmptyString)
-	});
-
-	if (response.ok) {
-		const responseData = await response.json();
-		if (response.status === 200) {
-			return {
-				info: responseData.data.info,
-				status: response.status
-			};
-		}
-		return responseData;
-	}
-
-	throw new PostResourceException(await response.json());
-}
-
-/**
- * Fetches a task collection status from the server
- * @param fetch
- * @param taskId
- * @returns {Promise<*>}
- */
-export async function taskCollectionStatus(fetch, taskId) {
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/task/collect/${taskId}?verbose=True`,
-		{
-			method: 'GET',
-			mode: 'cors',
-			credentials: 'include'
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	throw new Error('Unable to fetch collection operation status');
-}
-
-
-/**
- * Deletes a task from the server
- * @param fetch
- * @param taskId
- * @returns {Promise<*>}
- */
-export async function deleteTask(fetch, taskId) {
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/task/${taskId}`,
-		{
-			method: 'DELETE',
-			credentials: 'include',
-			mode: 'cors'
-		}
-	);
-
-	if (response.ok) {
-		return new Response(null, { status: response.status });
-	}
-
-	await responseError(response);
-}
-
-
-/**
- * Edits a task on the server
- * @param fetch
- * @param taskId
- * @returns {Promise<*>}
- */
-export async function editTask(fetch, taskId, task) {
-	const headers = new Headers();
-	headers.append('Content-Type', 'application/json');
-
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/task/${taskId}`,
-		{
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(task)
-		}
-	);
-
-	if (response.ok) {
-		return new Response(null, { status: response.status });
-	}
-
 	await responseError(response);
 }

@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// This component shall handle a form which the user can use to specify arguments of a workflow-task
 	// Upon interacting with this component, a representation of the arguments to be used with a workflow task
@@ -34,10 +35,12 @@
 			workflowTaskArgs = response.args;
 		} catch (error) {
 			console.error(error);
+			displayStandardErrorAlert(error, 'argsPropertiesFormError');
 		}
 	}
 </script>
 
 <div>
+	<span id="argsPropertiesFormError" />
 	<FormBuilder entry={workflowTaskArgs} updateEntry={handleEntryUpdate} />
 </div>

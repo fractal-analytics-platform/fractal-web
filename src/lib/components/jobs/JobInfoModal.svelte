@@ -1,9 +1,9 @@
 <script>
 	import { page } from '$app/stores';
-	import { afterUpdate, onMount } from 'svelte';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 
-	export let workflowJobId = undefined;
+	let workflowJobId = undefined;
 	let job = undefined;
 	export let projectName = undefined;
 	export let datasets = undefined;
@@ -13,13 +13,11 @@
 	let jobOutputDatasetName = undefined;
 	let jobStatus = undefined;
 
-	onMount(async () => {});
+	let errorAlert = undefined;
 
-	afterUpdate(async () => {
-		// If workflowJobId is undefined, do nothing
-		if (workflowJobId === undefined) return;
-		// Should fetch job info from server
-		if (job === undefined) await fetchJob();
+	export async function show(jobId) {
+		workflowJobId = jobId;
+		await fetchJob();
 		// Should update jobWorkflowName
 		jobWorkflowName = workflows.find((workflow) => workflow.id === job.workflow_id)?.name;
 		// Should update jobInputDatasetName
@@ -28,18 +26,30 @@
 		jobOutputDatasetName = datasets.find((dataset) => dataset.id === job.output_dataset_id)?.name;
 		// Should update jobStatus
 		jobStatus = job.status;
-	});
+
+		// @ts-ignore
+		// eslint-disable-next-line
+		const modal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'), {});
+		modal.show();
+	}
 
 	async function fetchJob() {
-		const request = await fetch(`/projects/${$page.params.projectId}/jobs/${workflowJobId}`, {
+		// remove previous error
+		if (errorAlert) {
+			errorAlert.hide();
+		}
+		job = undefined;
+
+		const response = await fetch(`/api/v1/project/${$page.params.projectId}/job/${workflowJobId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
 
-		if (request.status === 200) {
-			job = await request.json();
+		const result = await response.json();
+		if (response.ok) {
+			job = result;
 		} else {
-			console.error(request);
+			errorAlert = displayStandardErrorAlert(result, 'workflowJobError');
 		}
 	}
 </script>
@@ -50,15 +60,16 @@
 			<div class="modal-header d-flex justify-content-between">
 				<h1 class="h5 modal-title">Workflow Job #{workflowJobId}</h1>
 				<div class="d-flex align-items-center">
-					<button class="btn btn-light me-3" on:click={fetchJob}
-						><i class="bi-arrow-clockwise" /></button
-					>
+					<button class="btn btn-light me-3" on:click={fetchJob}>
+						<i class="bi-arrow-clockwise" />
+					</button>
 					<button class="btn-close bg-light p-2" data-bs-dismiss="modal" />
 				</div>
 			</div>
 			<div class="modal-body">
 				<div class="row mb-3">
 					<div class="col-12">
+						<div id="workflowJobError" />
 						<p class="lead">Workflow job properties</p>
 						<ul class="list-group">
 							<li class="list-group-item list-group-item-light fw-bold">Id</li>

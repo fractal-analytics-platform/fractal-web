@@ -1,36 +1,32 @@
 <script>
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 
 	let logs = '';
+	let errorAlert = undefined;
 
 	modalTaskCollectionId.subscribe(async (taskCollectionId) => {
 		if (taskCollectionId !== undefined) {
-			fetchTaskCollectionStatus(taskCollectionId)
-				.then((status) => {
-					getTaskCollectionLogs(status.data.log);
-				})
-				.catch((error) => {
-					console.error(error);
-				});
+			// remove previous error
+			if (errorAlert) {
+				errorAlert.hide();
+			}
+			logs = '';
+
+			const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			const result = await response.json();
+			if (response.ok) {
+				logs = result.data.log;
+			} else {
+				console.error('Failed to fetch collection logs', result);
+				errorAlert = displayStandardErrorAlert(result, 'collectionTaskLogsError');
+			}
 		}
 	});
-
-	async function getTaskCollectionLogs(collectionLogs) {
-		logs = collectionLogs;
-	}
-
-	async function fetchTaskCollectionStatus(collectionId) {
-		const request = await fetch(`/tasks/collections/${collectionId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		if (request.ok) {
-			return await request.json();
-		}
-
-		throw new Error(`Failed to fetch task collection status: ${request.status}`);
-	}
 </script>
 
 <div class="modal" id="collectionTaskLogsModal">
@@ -41,6 +37,7 @@
 				<button class="btn-close" data-bs-dismiss="modal" />
 			</div>
 			<div class="modal-body bg-tertiary text-secondary">
+				<div id="collectionTaskLogsError" />
 				<pre>{logs}</pre>
 			</div>
 		</div>
