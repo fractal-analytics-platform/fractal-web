@@ -10,6 +10,7 @@
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
 	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	// Workflow
 	let workflow = undefined;
@@ -19,6 +20,7 @@
 	// List of available tasks to be inserted into workflow
 	let availableTasks = [];
 
+	/** @type {import('svelte/types/runtime/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
 	let workflowTaskContext = writable(undefined);
 	let workflowTabContextId = 0;
 	let workflowUpdated = false;
@@ -47,6 +49,14 @@
 	// Update workflow modal
 	let updatedWorkflowName = '';
 	let updatedWorkflowErrorAlert = undefined;
+
+	// Modals
+	/** @type {Modal} */
+	let unsavedChangesModal;
+	/** @type {Modal} */
+	let runWorkflowModal;
+	/** @type {Modal} */
+	let editWorkflowTasksOrderModal;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -289,10 +299,7 @@
 	}
 
 	function toggleUnsavedChangesModal() {
-		// @ts-ignore
-		// eslint-disable-next-line no-undef
-		const modal = new bootstrap.Modal(document.getElementById('changes-unsaved-dialog'), {});
-		modal.toggle();
+		unsavedChangesModal.toggle();
 	}
 
 	function setWorkflowTaskContext(wft) {
@@ -348,12 +355,7 @@
 		if (response.ok) {
 			console.log('Workflow task order updated');
 			workflow = result;
-			// @ts-ignore
-			// eslint-disable-next-line
-			const modal = bootstrap.Modal.getInstance(
-				document.getElementById('editWorkflowTasksOrderModal')
-			);
-			modal.toggle();
+			editWorkflowTasksOrderModal.toggle();
 		} else {
 			console.error('Workflow task order not updated', result);
 			displayStandardErrorAlert(result, 'workflowTasksOrderError');
@@ -402,8 +404,7 @@
 				const job = await response.json();
 				// @ts-ignore
 				// eslint-disable-next-line
-				const modal = bootstrap.Modal.getInstance(document.getElementById('runWorkflowModal'));
-				modal.toggle();
+				runWorkflowModal.toggle();
 				// Navigate to project jobs page
 				// Define URL to navigate to
 				const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin);
@@ -475,10 +476,7 @@
 			class="btn btn-success"
 			on:click|preventDefault={() => {
 				if (argumentsWithUnsavedChanges === false) {
-					// @ts-ignore
-					// eslint-disable-next-line no-undef
-					const modal = new bootstrap.Modal(document.getElementById('runWorkflowModal'));
-					modal.toggle();
+					runWorkflowModal.toggle();
 				} else {
 					toggleUnsavedChangesModal();
 				}
@@ -702,278 +700,255 @@
 	</div>
 {/if}
 
-<div class="modal" id="insertTaskModal">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">New workflow task</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-			</div>
-			<div class="modal-body">
-				<div id="workflowTaskError" />
-				<form on:submit|preventDefault={handleCreateWorkflowTask}>
-					<div class="mb-3">
-						<WorkflowTaskSelection
-							tasks={availableTasks}
-							bind:this={workflowTaskSelectionComponent}
-						/>
-					</div>
-
-					<div class="mb-3">
-						<label for="taskOrder" class="form-label">Task order in workflow</label>
-						<input
-							id="taskOrder"
-							type="number"
-							name="taskOrder"
-							class="form-control"
-							placeholder="Leave it blank to append at the end"
-							min="0"
-							max={workflow?.task_list.length}
-							bind:value={taskOrder}
-						/>
-					</div>
-
-					<button class="btn btn-primary" type="submit">Insert</button>
-				</form>
-			</div>
-			<div class="modal-footer d-flex">
-				{#if workflowTaskCreated}
-					<span class="w-100 alert alert-success">Workflow task created</span>
-				{/if}
-			</div>
-		</div>
+<Modal id="insertTaskModal" centered={true}>
+	<div class="modal-header">
+		<h5 class="modal-title">New workflow task</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 	</div>
-</div>
+	<div class="modal-body">
+		<div id="workflowTaskError" />
+		<form on:submit|preventDefault={handleCreateWorkflowTask}>
+			<div class="mb-3">
+				<WorkflowTaskSelection tasks={availableTasks} bind:this={workflowTaskSelectionComponent} />
+			</div>
 
-<div class="modal" id="editWorkflowModal">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Workflow properties</h5>
-				<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+			<div class="mb-3">
+				<label for="taskOrder" class="form-label">Task order in workflow</label>
+				<input
+					id="taskOrder"
+					type="number"
+					name="taskOrder"
+					class="form-control"
+					placeholder="Leave it blank to append at the end"
+					min="0"
+					max={workflow?.task_list.length}
+					bind:value={taskOrder}
+				/>
 			</div>
-			<div class="modal-body">
-				<div id="updatedWorkflowError" />
-				{#if workflow}
-					<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
-						<div class="mb-3">
-							<label for="workflowName" class="form-label">Workflow name</label>
-							<input
-								type="text"
-								class="form-control"
-								name="workflowName"
-								id="workflowName"
-								bind:value={updatedWorkflowName}
-							/>
-						</div>
-					</form>
-				{/if}
-			</div>
-			<div class="modal-footer">
-				{#if workflowUpdated}
-					<span class="alert alert-success">Workflow updated correctly</span>
-				{/if}
-				<button class="btn btn-primary" form="updateWorkflow">Save</button>
-			</div>
-		</div>
+
+			<button class="btn btn-primary" type="submit">Insert</button>
+		</form>
 	</div>
-</div>
+	<div class="modal-footer d-flex">
+		{#if workflowTaskCreated}
+			<span class="w-100 alert alert-success">Workflow task created</span>
+		{/if}
+	</div>
+</Modal>
 
-<div class="modal" id="editWorkflowTasksOrderModal">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Edit workflow tasks order</h5>
-				<button class="btn-close" data-bs-dismiss="modal" />
-			</div>
-			<div class="modal-body">
-				<div id="workflowTasksOrderError" />
-				{#if workflow !== undefined && updatableWorkflowList.length == 0}
-					<p class="text-center mt-3">No workflow tasks yet, add one.</p>
-				{:else if workflow !== undefined}
-					{#key updatableWorkflowList}
-						<ul class="list-group list-group-flush">
-							{#each updatableWorkflowList as workflowTask, i}
-								<li class="list-group-item" data-fs-target={workflowTask.id}>
-									<div class="d-flex justify-content-between align-items-center">
-										<div>
-											{workflowTask.task.name} #{workflowTask.id}
-										</div>
-										<div>
-											{#if i !== 0}
-												<button
-													class="btn btn-light"
-													on:click|preventDefault={moveWorkflowTask.bind(this, i, 'up')}
-													><i class="bi-arrow-up" /></button
-												>
-											{/if}
-											{#if i !== updatableWorkflowList.length - 1}
-												<button
-													class="btn btn-light"
-													on:click|preventDefault={moveWorkflowTask.bind(this, i, 'down')}
-													><i class="bi-arrow-down" /></button
-												>
-											{/if}
-										</div>
-									</div>
-								</li>
-							{/each}
-						</ul>
-					{/key}
-				{/if}
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}
-					>Save</button
+<Modal id="editWorkflowModal" centered={true}>
+	<div class="modal-header">
+		<h5 class="modal-title">Workflow properties</h5>
+		<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+	</div>
+	<div class="modal-body">
+		<div id="updatedWorkflowError" />
+		{#if workflow}
+			<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
+				<div class="mb-3">
+					<label for="workflowName" class="form-label">Workflow name</label>
+					<input
+						type="text"
+						class="form-control"
+						name="workflowName"
+						id="workflowName"
+						bind:value={updatedWorkflowName}
+					/>
+				</div>
+			</form>
+		{/if}
+	</div>
+	<div class="modal-footer">
+		{#if workflowUpdated}
+			<span class="alert alert-success">Workflow updated correctly</span>
+		{/if}
+		<button class="btn btn-primary" form="updateWorkflow">Save</button>
+	</div>
+</Modal>
+
+<Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
+	<div class="modal-header">
+		<h5 class="modal-title">Edit workflow tasks order</h5>
+		<button class="btn-close" data-bs-dismiss="modal" />
+	</div>
+	<div class="modal-body">
+		<div id="workflowTasksOrderError" />
+		{#if workflow !== undefined && updatableWorkflowList.length == 0}
+			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
+		{:else if workflow !== undefined}
+			{#key updatableWorkflowList}
+				<ul class="list-group list-group-flush">
+					{#each updatableWorkflowList as workflowTask, i}
+						<li class="list-group-item" data-fs-target={workflowTask.id}>
+							<div class="d-flex justify-content-between align-items-center">
+								<div>
+									{workflowTask.task.name} #{workflowTask.id}
+								</div>
+								<div>
+									{#if i !== 0}
+										<button
+											class="btn btn-light"
+											on:click|preventDefault={() => moveWorkflowTask.bind(i, 'up')}
+										>
+											<i class="bi-arrow-up" />
+										</button>
+									{/if}
+									{#if i !== updatableWorkflowList.length - 1}
+										<button
+											class="btn btn-light"
+											on:click|preventDefault={() => moveWorkflowTask(i, 'down')}
+										>
+											<i class="bi-arrow-down" />
+										</button>
+									{/if}
+								</div>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{/key}
+		{/if}
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>Save</button
+		>
+	</div>
+</Modal>
+
+<Modal id="runWorkflowModal" centered={true} bind:this={runWorkflowModal}>
+	<div class="modal-header">
+		<h5 class="modal-title">Run workflow</h5>
+		<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+	</div>
+	<div class="modal-body">
+		<div id="applyWorkflowError" />
+		<form id="runWorkflowForm">
+			<div class="mb-3">
+				<label for="inputDataset" class="form-label">Input dataset</label>
+				<select
+					name="inputDataset"
+					id="inputDataset"
+					class="form-control"
+					disabled={checkingConfiguration}
+					bind:value={inputDatasetControl}
 				>
+					<option value="">Select an input dataset</option>
+					{#each datasets as dataset}
+						<option value={dataset.id}>{dataset.name}</option>
+					{/each}
+				</select>
 			</div>
-		</div>
+			<div class="mb-3">
+				<label for="outputDataset" class="form-label">Output dataset</label>
+				<select
+					name="outputDataset"
+					id="outputDataset"
+					class="form-control"
+					disabled={checkingConfiguration}
+					bind:value={outputDatasetControl}
+				>
+					<option value="">Select an output dataset</option>
+					{#each datasets as dataset}
+						<option value={dataset.id}>{dataset.name}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="mb-3">
+				<label for="firstTaskIndex" class="form-label">First task (Optional)</label>
+				<select
+					name="firstTaskIndex"
+					id="firstTaskIndex"
+					class="form-control"
+					disabled={checkingConfiguration}
+					bind:value={firstTaskIndexControl}
+					on:change={resetLastTask}
+				>
+					<option value="">Select first task</option>
+					{#each updatableWorkflowList as wft}
+						<option value={wft.order}>{wft.task.name}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="mb-3">
+				<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
+				<select
+					name="lastTaskIndex"
+					id="lastTaskIndex"
+					class="form-control"
+					disabled={checkingConfiguration}
+					bind:value={lastTaskIndexControl}
+				>
+					<option value="">Select last task</option>
+					{#each updatableWorkflowList as wft}
+						{#if firstTaskIndexControl === '' || wft.order >= firstTaskIndexControl}
+							<option value={wft.order}>{wft.task.name}</option>
+						{/if}
+					{/each}
+				</select>
+			</div>
+			<div class="mb-3">
+				<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
+				<textarea
+					name="workerInit"
+					id="workerInit"
+					class="form-control font-monospace"
+					rows="5"
+					disabled={checkingConfiguration}
+					bind:value={workerInitControl}
+				/>
+			</div>
+		</form>
 	</div>
-</div>
+	<div class="modal-footer">
+		{#if checkingConfiguration}
+			<button
+				class="btn btn-warning"
+				on:click={() => {
+					checkingConfiguration = false;
+				}}>Cancel</button
+			>
+			<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>
+				Confirm
+			</button>
+		{:else}
+			<button
+				class="btn btn-primary"
+				on:click={() => {
+					checkingConfiguration = true;
+				}}>Run</button
+			>
+		{/if}
+	</div>
+</Modal>
 
-<div class="modal" id="runWorkflowModal">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Run workflow</h5>
-				<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-			</div>
-			<div class="modal-body">
-				<div id="applyWorkflowError" />
-				<form id="runWorkflowForm">
-					<div class="mb-3">
-						<label for="inputDataset" class="form-label">Input dataset</label>
-						<select
-							name="inputDataset"
-							id="inputDataset"
-							class="form-control"
-							disabled={checkingConfiguration}
-							bind:value={inputDatasetControl}
-						>
-							<option value="">Select an input dataset</option>
-							{#each datasets as dataset}
-								<option value={dataset.id}>{dataset.name}</option>
-							{/each}
-						</select>
-					</div>
-					<div class="mb-3">
-						<label for="outputDataset" class="form-label">Output dataset</label>
-						<select
-							name="outputDataset"
-							id="outputDataset"
-							class="form-control"
-							disabled={checkingConfiguration}
-							bind:value={outputDatasetControl}
-						>
-							<option value="">Select an output dataset</option>
-							{#each datasets as dataset}
-								<option value={dataset.id}>{dataset.name}</option>
-							{/each}
-						</select>
-					</div>
-					<div class="mb-3">
-						<label for="firstTaskIndex" class="form-label">First task (Optional)</label>
-						<select
-							name="firstTaskIndex"
-							id="firstTaskIndex"
-							class="form-control"
-							disabled={checkingConfiguration}
-							bind:value={firstTaskIndexControl}
-							on:change={resetLastTask}
-						>
-							<option value="">Select first task</option>
-							{#each updatableWorkflowList as wft}
-								<option value={wft.order}>{wft.task.name}</option>
-							{/each}
-						</select>
-					</div>
-					<div class="mb-3">
-						<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
-						<select
-							name="lastTaskIndex"
-							id="lastTaskIndex"
-							class="form-control"
-							disabled={checkingConfiguration}
-							bind:value={lastTaskIndexControl}
-						>
-							<option value="">Select last task</option>
-							{#each updatableWorkflowList as wft}
-								{#if firstTaskIndexControl === '' || wft.order >= firstTaskIndexControl}
-									<option value={wft.order}>{wft.task.name}</option>
-								{/if}
-							{/each}
-						</select>
-					</div>
-					<div class="mb-3">
-						<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-						<textarea
-							name="workerInit"
-							id="workerInit"
-							class="form-control font-monospace"
-							rows="5"
-							disabled={checkingConfiguration}
-							bind:value={workerInitControl}
-						/>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				{#if checkingConfiguration}
-					<button
-						class="btn btn-warning"
-						on:click={() => {
-							checkingConfiguration = false;
-						}}>Cancel</button
-					>
-					<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>
-						Confirm
-					</button>
-				{:else}
-					<button
-						class="btn btn-primary"
-						on:click={() => {
-							checkingConfiguration = true;
-						}}>Run</button
-					>
-				{/if}
-			</div>
-		</div>
+<Modal id="changes-unsaved-dialog" bind:this={unsavedChangesModal}>
+	<div class="modal-header">
+		<h5 class="modal-title">There are argument changes unsaved</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 	</div>
-</div>
-
-<div class="modal" tabindex="-1" id="changes-unsaved-dialog">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">There are argument changes unsaved</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-			</div>
-			<div class="modal-body">
-				<p>
-					Do you want to save the changes made to the arguments of the current selected workflow
-					task?
-				</p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-				<button
-					type="button"
-					class="btn btn-warning"
-					on:click={() => {
-						argumentsWithUnsavedChanges = false;
-						setWorkflowTaskContext(preventedTaskContextChange);
-					}}
-					data-bs-dismiss="modal"
-					>Discard changes
-				</button>
-				<button
-					type="button"
-					class="btn btn-success"
-					on:click={saveArgumentsChanges}
-					data-bs-dismiss="modal"
-					>Save changes
-				</button>
-			</div>
-		</div>
+	<div class="modal-body">
+		<p>
+			Do you want to save the changes made to the arguments of the current selected workflow task?
+		</p>
 	</div>
-</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-warning"
+			on:click={() => {
+				argumentsWithUnsavedChanges = false;
+				setWorkflowTaskContext(preventedTaskContextChange);
+			}}
+			data-bs-dismiss="modal"
+			>Discard changes
+		</button>
+		<button
+			type="button"
+			class="btn btn-success"
+			on:click={saveArgumentsChanges}
+			data-bs-dismiss="modal"
+			>Save changes
+		</button>
+	</div>
+</Modal>

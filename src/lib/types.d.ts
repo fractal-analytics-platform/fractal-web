@@ -14,3 +14,8 @@ export type Task = {
   docs_link: string
   docs_info: string
 }
+
+export type WorkflowTask = {
+  id: number
+  meta: {[string]: any}
+}

@@ -1,10 +1,13 @@
 <script>
 	import { page } from '$app/stores';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '../common/Modal.svelte';
 
 	let workflowJobId = undefined;
 	let logs = '';
 	let errorAlert = undefined;
+	/** @type {Modal} */
+	let modal;
 
 	export async function show(jobId) {
 		workflowJobId = jobId;
@@ -17,9 +20,6 @@
 		const job = await fetchJob();
 		logs = job?.log || '';
 
-		// @ts-ignore
-		// eslint-disable-next-line
-		const modal = new bootstrap.Modal(document.getElementById('workflowJobLogsModal'), {});
 		modal.show();
 	}
 
@@ -39,17 +39,13 @@
 	}
 </script>
 
-<div class="modal" id="workflowJobLogsModal">
-	<div class="modal-dialog modal-fullscreen">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h1 class="h5 modal-title">Workflow Job logs</h1>
-				<button class="btn-close" data-bs-dismiss="modal" />
-			</div>
-			<div class="modal-body bg-tertiary text-secondary">
-				<div id="workflowJobLogsError" />
-				<pre>{logs}</pre>
-			</div>
-		</div>
+<Modal id="workflowJobLogsModal" fullscreen={true} bind:this={modal}>
+	<div class="modal-header">
+		<h1 class="h5 modal-title">Workflow Job logs</h1>
+		<button class="btn-close" data-bs-dismiss="modal" />
 	</div>
-</div>
+	<div class="modal-body bg-tertiary text-secondary">
+		<div id="workflowJobLogsError" />
+		<pre>{logs}</pre>
+	</div>
+</Modal>

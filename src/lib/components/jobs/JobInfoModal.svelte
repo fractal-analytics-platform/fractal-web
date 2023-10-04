@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '../common/Modal.svelte';
 
 	let workflowJobId = undefined;
 	let job = undefined;
@@ -14,6 +15,8 @@
 	let jobStatus = undefined;
 
 	let errorAlert = undefined;
+	/** @type {Modal} */
+	let modal;
 
 	export async function show(jobId) {
 		workflowJobId = jobId;
@@ -27,9 +30,6 @@
 		// Should update jobStatus
 		jobStatus = job.status;
 
-		// @ts-ignore
-		// eslint-disable-next-line
-		const modal = new bootstrap.Modal(document.getElementById('workflowJobInfoModal'), {});
 		modal.show();
 	}
 
@@ -54,49 +54,45 @@
 	}
 </script>
 
-<div class="modal modal-lg" id="workflowJobInfoModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header d-flex justify-content-between">
-				<h1 class="h5 modal-title">Workflow Job #{workflowJobId}</h1>
-				<div class="d-flex align-items-center">
-					<button class="btn btn-light me-3" on:click={fetchJob}>
-						<i class="bi-arrow-clockwise" />
-					</button>
-					<button class="btn-close bg-light p-2" data-bs-dismiss="modal" />
-				</div>
-			</div>
-			<div class="modal-body">
-				<div class="row mb-3">
-					<div class="col-12">
-						<div id="workflowJobError" />
-						<p class="lead">Workflow job properties</p>
-						<ul class="list-group">
-							<li class="list-group-item list-group-item-light fw-bold">Id</li>
-							<li class="list-group-item">{job?.id}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Workflow</li>
-							<li class="list-group-item">{jobWorkflowName}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Project</li>
-							<li class="list-group-item">{projectName}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Input dataset</li>
-							<li class="list-group-item">{jobInputDatasetName}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Output dataset</li>
-							<li class="list-group-item">{jobOutputDatasetName}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Status</li>
-							{#key jobStatus}
-								<li class="list-group-item"><StatusBadge status={jobStatus} /></li>
-							{/key}
-							<li class="list-group-item list-group-item-light fw-bold">Working directory</li>
-							<li class="list-group-item"><code>{job?.working_dir}</code></li>
-							<li class="list-group-item list-group-item-light fw-bold">User Working directory</li>
-							<li class="list-group-item"><code>{job?.working_dir_user}</code></li>
-						</ul>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-12" />
-				</div>
-			</div>
+<Modal id="workflowJobInfoModal" bind:this={modal} size="lg">
+	<div class="modal-header d-flex justify-content-between">
+		<h1 class="h5 modal-title">Workflow Job #{workflowJobId}</h1>
+		<div class="d-flex align-items-center">
+			<button class="btn btn-light me-3" on:click={fetchJob}>
+				<i class="bi-arrow-clockwise" />
+			</button>
+			<button class="btn-close bg-light p-2" data-bs-dismiss="modal" />
 		</div>
 	</div>
-</div>
+	<div class="modal-body">
+		<div class="row mb-3">
+			<div class="col-12">
+				<div id="workflowJobError" />
+				<p class="lead">Workflow job properties</p>
+				<ul class="list-group">
+					<li class="list-group-item list-group-item-light fw-bold">Id</li>
+					<li class="list-group-item">{job?.id}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Workflow</li>
+					<li class="list-group-item">{jobWorkflowName}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Project</li>
+					<li class="list-group-item">{projectName}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Input dataset</li>
+					<li class="list-group-item">{jobInputDatasetName}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Output dataset</li>
+					<li class="list-group-item">{jobOutputDatasetName}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Status</li>
+					{#key jobStatus}
+						<li class="list-group-item"><StatusBadge status={jobStatus} /></li>
+					{/key}
+					<li class="list-group-item list-group-item-light fw-bold">Working directory</li>
+					<li class="list-group-item"><code>{job?.working_dir}</code></li>
+					<li class="list-group-item list-group-item-light fw-bold">User Working directory</li>
+					<li class="list-group-item"><code>{job?.working_dir_user}</code></li>
+				</ul>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12" />
+		</div>
+	</div>
+</Modal>

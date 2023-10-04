@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	let projectId = $page.params.projectId;
 	let datasetId = $page.params.datasetId;
@@ -243,123 +244,111 @@
 	</div>
 {/if}
 
-<div class="modal" id="createDatasetResourceModal">
-	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Create dataset resource</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-			</div>
-			<div class="modal-body">
-				<form on:submit|preventDefault={handleCreateDatasetResource}>
-					<div id="createDatasetResourceError" />
-					<div class="mb-3">
-						<label for="source" class="form-label">Resource path</label>
-						<input class="form-control" type="text" name="source" id="source" bind:value={source} />
-					</div>
-					<button class="btn btn-primary" disabled={!source} type="submit">
-						Create new resource
-					</button>
-					{#if createResourceSuccess}
-						<p class="alert alert-success mt-3">Resource created</p>
-					{/if}
-				</form>
-			</div>
-		</div>
+<Modal id="createDatasetResourceModal" size="lg" centered={true} scrollable={true}>
+	<div class="modal-header">
+		<h5 class="modal-title">Create dataset resource</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 	</div>
-</div>
+	<div class="modal-body">
+		<form on:submit|preventDefault={handleCreateDatasetResource}>
+			<div id="createDatasetResourceError" />
+			<div class="mb-3">
+				<label for="source" class="form-label">Resource path</label>
+				<input class="form-control" type="text" name="source" id="source" bind:value={source} />
+			</div>
+			<button class="btn btn-primary" disabled={!source} type="submit">
+				Create new resource
+			</button>
+			{#if createResourceSuccess}
+				<p class="alert alert-success mt-3">Resource created</p>
+			{/if}
+		</form>
+	</div>
+</Modal>
 
 {#if dataset}
-	<div class="modal" id="updateDatasetModal">
-		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Update dataset properties</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-				</div>
-				<div class="modal-body">
-					<div id="updateDatasetError" />
-					<div class="mb-3">
-						<label for="name" class="form-label">Dataset name</label>
-						<input
-							class="form-control"
-							type="text"
-							name="name"
-							id="name"
-							class:is-invalid={!name}
-							bind:value={name}
-						/>
-						{#if !name}
-							<div class="invalid-feedback">The dataset name can not be empty</div>
-						{/if}
-					</div>
-					<div class="mb-3">
-						<label for="type" class="form-label">Dataset type</label>
-						<input class="form-control" type="text" name="type" id="type" bind:value={type} />
-					</div>
-					<div class="mb-3">
-						<input
-							class="form-check-input"
-							type="checkbox"
-							name="read_only"
-							id="read_only"
-							bind:checked={read_only}
-						/>
-						<label for="read_only" class="form-check-label">Readonly dataset?</label>
-					</div>
+	<Modal id="updateDatasetModal" size="lg" centered={true} scrollable={true}>
+		<div class="modal-header">
+			<h5 class="modal-title">Update dataset properties</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+		</div>
+		<div class="modal-body">
+			<div id="updateDatasetError" />
+			<div class="mb-3">
+				<label for="name" class="form-label">Dataset name</label>
+				<input
+					class="form-control"
+					type="text"
+					name="name"
+					id="name"
+					class:is-invalid={!name}
+					bind:value={name}
+				/>
+				{#if !name}
+					<div class="invalid-feedback">The dataset name can not be empty</div>
+				{/if}
+			</div>
+			<div class="mb-3">
+				<label for="type" class="form-label">Dataset type</label>
+				<input class="form-control" type="text" name="type" id="type" bind:value={type} />
+			</div>
+			<div class="mb-3">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					name="read_only"
+					id="read_only"
+					bind:checked={read_only}
+				/>
+				<label for="read_only" class="form-check-label">Readonly dataset?</label>
+			</div>
 
-					<div class="d-flex align-items-center">
-						<button
-							class="btn btn-primary me-3"
-							type="button"
-							on:click={handleDatasetUpdate}
-							disabled={!name}
-						>
-							Update
-						</button>
-						{#if updateDatasetSuccess}
-							<span class="text-success">Dataset properties updated with success</span>
-						{/if}
-					</div>
-				</div>
+			<div class="d-flex align-items-center">
+				<button
+					class="btn btn-primary me-3"
+					type="button"
+					on:click={handleDatasetUpdate}
+					disabled={!name}
+				>
+					Update
+				</button>
+				{#if updateDatasetSuccess}
+					<span class="text-success">Dataset properties updated with success</span>
+				{/if}
 			</div>
 		</div>
-	</div>
+	</Modal>
 {/if}
 
 {#if dataset && Object.keys(dataset.meta).length > 0}
-	<div class="modal" id="datasetMetaModal">
-		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Dataset meta properties</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-				</div>
-				<div class="modal-body">
-					<ul class="list-group">
-						{#each Object.entries(dataset.meta) as [key, value]}
-							<li class="list-group-item text-bg-light">
-								<span class="text-capitalize">{key}</span>
-							</li>
-							<li class="list-group-item text-break">
-								{#if value === null}
-									<span>-</span>
-								{:else if typeof value == 'object'}
-									{#if Object.keys(value).length > 1}
-										<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
-									{:else}
-										<code><pre>{JSON.stringify(value, null)}</pre></code>
-									{/if}
-								{:else}
-									<code>{value}</code>
-								{/if}
-							</li>
-						{/each}
-					</ul>
-				</div>
-			</div>
+	<Modal id="datasetMetaModal" size="lg" centered={true} scrollable={true}>
+		<div class="modal-header">
+			<h5 class="modal-title">Dataset meta properties</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 		</div>
-	</div>
+		<div class="modal-body">
+			<ul class="list-group">
+				{#each Object.entries(dataset.meta) as [key, value]}
+					<li class="list-group-item text-bg-light">
+						<span class="text-capitalize">{key}</span>
+					</li>
+					<li class="list-group-item text-break">
+						{#if value === null}
+							<span>-</span>
+						{:else if typeof value == 'object'}
+							{#if Object.keys(value).length > 1}
+								<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
+							{:else}
+								<code><pre>{JSON.stringify(value, null)}</pre></code>
+							{/if}
+						{:else}
+							<code>{value}</code>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		</div>
+	</Modal>
 {/if}
 
 <style type="text/css">

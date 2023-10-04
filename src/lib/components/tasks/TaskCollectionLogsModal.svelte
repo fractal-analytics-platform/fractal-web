@@ -1,6 +1,7 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
+	import Modal from '../common/Modal.svelte';
 
 	let logs = '';
 	let errorAlert = undefined;
@@ -29,17 +30,13 @@
 	});
 </script>
 
-<div class="modal" id="collectionTaskLogsModal">
-	<div class="modal-dialog modal-fullscreen">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h1 class="h5 modal-title">Task collection logs</h1>
-				<button class="btn-close" data-bs-dismiss="modal" />
-			</div>
-			<div class="modal-body bg-tertiary text-secondary">
-				<div id="collectionTaskLogsError" />
-				<pre>{logs}</pre>
-			</div>
-		</div>
+<Modal id="collectionTaskLogsModal" fullscreen={true}>
+	<div class="modal-header">
+		<h1 class="h5 modal-title">Task collection logs</h1>
+		<button class="btn-close" data-bs-dismiss="modal" />
 	</div>
-</div>
+	<div class="modal-body bg-tertiary text-secondary">
+		<div id="collectionTaskLogsError" />
+		<pre>{logs}</pre>
+	</div>
+</Modal>

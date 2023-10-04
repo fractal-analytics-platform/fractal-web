@@ -3,6 +3,7 @@
 	import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '../common/Modal.svelte';
 
 	// The list of workflows
 	export let workflows = [];
@@ -77,19 +78,15 @@
 	}
 </script>
 
-<div class="modal" id="importWorkflowModal">
-	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Import workflow</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-			</div>
-			<div class="modal-body">
-				<WorkflowImport on:workflowImported={handleWorkflowImported} bind:this={workflowImportComponent} />
-			</div>
-		</div>
+<Modal id="importWorkflowModal" size="lg" centered="{true}" scrollable={true}>
+	<div class="modal-header">
+		<h5 class="modal-title">Import workflow</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 	</div>
-</div>
+	<div class="modal-body">
+		<WorkflowImport on:workflowImported={handleWorkflowImported} bind:this={workflowImportComponent} />
+	</div>
+</Modal>
 
 <div class="container p-0 mt-4">
 	<p class="lead">Workflows</p>
