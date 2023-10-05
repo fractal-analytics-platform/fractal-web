@@ -1,8 +1,23 @@
 <script>
 	import { page } from '$app/stores';
+	import { navigating } from '$app/stores';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: server = $page.data.serverInfo || {};
+
+	// Detects page change
+	$: if ($navigating) cleanupModalBackdrop();
+
+	/**
+	 * Removes the modal backdrop that remains stuck at page change.
+	 */
+	function cleanupModalBackdrop() {
+		document.querySelector('.modal-backdrop')?.remove();
+		const body = document.querySelector('body');
+		body?.classList.remove('modal-open');
+		body?.style.removeProperty('overflow');
+		body?.style.removeProperty('padding-right');
+	}
 </script>
 
 <main>
@@ -35,7 +50,7 @@
 			</ul>
 		</div>
 	</nav>
-	<div class='container p-4'>
+	<div class="container p-4">
 		<slot />
 	</div>
 	<div class="container">
