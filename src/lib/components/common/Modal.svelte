@@ -20,6 +20,13 @@
 				hideErrorAlert();
 				onOpen();
 			});
+			modal.addEventListener('shown.bs.modal', () => {
+				// Automatically set focus on first input element (if any)
+				const firstInput = document.querySelector(`#${id} input`);
+				if (firstInput instanceof HTMLElement) {
+					firstInput.focus();
+				}
+			});
 			modal.addEventListener('hidden.bs.modal', onClose);
 		}
 	});
