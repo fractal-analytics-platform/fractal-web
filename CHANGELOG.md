@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Standardized modal management to fix some bugs (\#306).
 * Added proxy endpoints and refactored error propagation (\#288).
 * Remove use of deployment-type `fractal-server` variable (\#298).
 * Add a BSD3 license (\#300).
