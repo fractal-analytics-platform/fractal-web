@@ -13,17 +13,17 @@
 
 	let dataset = undefined;
 
+	let datasetSuccessMessage = '';
+
 	// for updating the dataset
 	let name = '';
 	let type = '';
 	let read_only = false;
-	let updateDatasetSuccess = false;
 	/** @type {Modal} */
 	let updateDatasetModal;
 
 	// for creating a new resource
 	let source = '';
-	let createResourceSuccessMessage = '';
 	/** @type {Modal} */
 	let createDatasetResourceModal;
 
@@ -38,42 +38,44 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDatasetUpdate() {
-		updateDatasetSuccess = false;
+		updateDatasetModal.confirmAndHide(async () => {
+			datasetSuccessMessage = '';
 
-		if (!dataset || !name) {
-			return;
-		}
+			if (!dataset || !name) {
+				return;
+			}
 
-		const requestBody = {
-			name,
-			type,
-			read_only
-		};
+			const requestBody = {
+				name,
+				type,
+				read_only
+			};
 
-		// Should prevent requestBody null or empty values
-		Object.keys(requestBody).forEach((key) => {
-			if (requestBody[key] === null || requestBody[key] === '') {
-				delete requestBody[key];
+			// Should prevent requestBody null or empty values
+			Object.keys(requestBody).forEach((key) => {
+				if (requestBody[key] === null || requestBody[key] === '') {
+					delete requestBody[key];
+				}
+			});
+
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
+
+			const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}`, {
+				method: 'PATCH',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify(requestBody)
+			});
+
+			const result = await response.json();
+			if (response.ok) {
+				dataset = result;
+				datasetSuccessMessage = 'Dataset properties successfully updated';
+			} else {
+				throw new AlertError(result);
 			}
 		});
-
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-
-		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify(requestBody)
-		});
-
-		const result = await response.json();
-		if (response.ok) {
-			dataset = result;
-			updateDatasetSuccess = true;
-		} else {
-			updateDatasetModal.displayErrorAlert(result);
-		}
 	}
 
 	function onCreateDatasetResourceModalOpen() {
@@ -86,7 +88,7 @@
 	 */
 	async function handleCreateDatasetResource() {
 		createDatasetResourceModal.confirmAndHide(async () => {
-			createResourceSuccessMessage = '';
+			datasetSuccessMessage = '';
 			createDatasetResourceModal.hideErrorAlert();
 			if (!source) {
 				return;
@@ -108,7 +110,7 @@
 			const result = await response.json();
 			if (response.ok) {
 				dataset.resource_list = [...dataset.resource_list, result];
-				createResourceSuccessMessage = 'Resource created';
+				datasetSuccessMessage = 'Resource created';
 				source = '';
 			} else {
 				throw new AlertError(result);
@@ -168,7 +170,7 @@
 				class="btn btn-light"
 				data-bs-toggle="modal"
 				data-bs-target="#updateDatasetModal"
-				on:click={() => (updateDatasetSuccess = false)}
+				on:click={() => (datasetSuccessMessage = '')}
 			>
 				<i class="bi-gear-wide-connected" />
 			</button>
@@ -182,7 +184,7 @@
 			<h1>Dataset {dataset.name} #{dataset.id}</h1>
 		</div>
 
-		<StandardDismissableAlert message={createResourceSuccessMessage} />
+		<StandardDismissableAlert message={datasetSuccessMessage} />
 
 		<div class="row mt-2">
 			<div class="col-4">
@@ -329,9 +331,6 @@
 
 				<div class="d-flex align-items-center">
 					<button class="btn btn-primary me-3" type="submit" disabled={!name}>Update</button>
-					{#if updateDatasetSuccess}
-						<span class="text-success">Dataset properties updated with success</span>
-					{/if}
 				</div>
 			</form>
 		</svelte:fragment>

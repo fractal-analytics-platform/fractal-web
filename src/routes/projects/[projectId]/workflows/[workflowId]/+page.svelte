@@ -11,6 +11,7 @@
 	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	// Workflow
 	let workflow = undefined;
@@ -23,8 +24,7 @@
 	/** @type {import('svelte/types/runtime/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
 	let workflowTaskContext = writable(undefined);
 	let workflowTabContextId = 0;
-	let workflowUpdated = false;
-	let workflowTaskCreated = false;
+	let workflowSuccessMessage = '';
 	let selectedWorkflowTask = undefined;
 	let originalMetaProperties = {};
 	let checkingConfiguration = false;
@@ -44,11 +44,9 @@
 	/** @type {number|undefined} */
 	let taskOrder = undefined;
 	let workflowTaskSelectionComponent = undefined;
-	let workflowTaskErrorAlert = undefined;
 
 	// Update workflow modal
 	let updatedWorkflowName = '';
-	let updatedWorkflowErrorAlert = undefined;
 
 	// Modals
 	/** @type {Modal} */
@@ -57,6 +55,10 @@
 	let runWorkflowModal;
 	/** @type {Modal} */
 	let editWorkflowTasksOrderModal;
+	/** @type {Modal} */
+	let insertTaskModal;
+	/** @type {Modal} */
+	let editWorkflowModal;
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
@@ -138,10 +140,6 @@
 
 	function resetWorkflowUpdateModal() {
 		updatedWorkflowName = workflow.name;
-		workflowUpdated = false;
-		if (updatedWorkflowErrorAlert) {
-			updatedWorkflowErrorAlert.hide();
-		}
 	}
 
 	/**
@@ -149,36 +147,35 @@
 	 * @returns {Promise<void>}
 	 */
 	async function handleWorkflowUpdate() {
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
+		editWorkflowModal.confirmAndHide(async () => {
+			workflowSuccessMessage = '';
 
-		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				name: updatedWorkflowName
-			})
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
+
+			const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+				method: 'PATCH',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify({
+					name: updatedWorkflowName
+				})
+			});
+
+			const result = await response.json();
+			if (response.ok) {
+				workflow = result;
+				workflowSuccessMessage = 'Workflow updated correctly';
+			} else {
+				console.error('Error updating workflow properties', result);
+				throw new AlertError(result);
+			}
 		});
-
-		const result = await response.json();
-		if (response.ok) {
-			workflow = result;
-			workflowUpdated = true;
-			setTimeout(() => {
-				workflowUpdated = false;
-			}, 3000);
-		} else {
-			console.error('Error updating workflow properties', result);
-			updatedWorkflowErrorAlert = displayStandardErrorAlert(result, 'updatedWorkflowError');
-		}
 	}
 
 	function resetCreateWorkflowTaskModal() {
 		taskOrder = undefined;
-		if (workflowTaskErrorAlert) {
-			workflowTaskErrorAlert.hide();
-		}
+		insertTaskModal.hideErrorAlert();
 		workflowTaskSelectionComponent.reset();
 	}
 
@@ -187,65 +184,62 @@
 	 * @returns {Promise<void>}
 	 */
 	async function handleCreateWorkflowTask() {
-		const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
-		if (taskId === undefined) {
-			return;
-		}
+		insertTaskModal.confirmAndHide(async () => {
+			workflowSuccessMessage = '';
 
-		// Remove previous errors
-		if (workflowTaskErrorAlert) {
-			workflowTaskErrorAlert.hide();
-		}
-
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-
-		// Creating workflow task
-		const workflowTaskResponse = await fetch(
-			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({
-					order: taskOrder,
-					meta: {},
-					args: {}
-				})
+			const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
+			if (taskId === undefined) {
+				return;
 			}
-		);
 
-		const workflowTaskResult = await workflowTaskResponse.json();
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
 
-		if (!workflowTaskResponse.ok) {
-			console.error('Error while creating workflow task', workflowTaskResult);
-			workflowTaskErrorAlert = displayStandardErrorAlert(workflowTaskResult, 'workflowTaskError');
-			return;
-		}
-		console.log('Workflow task created');
+			// Creating workflow task
+			const workflowTaskResponse = await fetch(
+				`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
+				{
+					method: 'POST',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify({
+						order: taskOrder,
+						meta: {},
+						args: {}
+					})
+				}
+			);
 
-		// Get updated workflow with created task
-		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'GET',
-			credentials: 'include'
+			const workflowTaskResult = await workflowTaskResponse.json();
+
+			if (!workflowTaskResponse.ok) {
+				console.error('Error while creating workflow task', workflowTaskResult);
+				throw new AlertError(workflowTaskResult);
+			}
+			console.log('Workflow task created');
+
+			// Get updated workflow with created task
+			const workflowResponse = await fetch(
+				`/api/v1/project/${project.id}/workflow/${workflow.id}`,
+				{
+					method: 'GET',
+					credentials: 'include'
+				}
+			);
+
+			const workflowResult = await workflowResponse.json();
+
+			if (!workflowResponse.ok) {
+				console.error('Error while retrieving workflow', workflowResult);
+				throw new AlertError(workflowResult);
+			}
+
+			// Update workflow
+			workflow = workflowResult;
+			// UI Feedback
+			workflowSuccessMessage = 'Workflow task created';
+			resetCreateWorkflowTaskModal();
 		});
-
-		const workflowResult = await workflowResponse.json();
-
-		if (!workflowResponse.ok) {
-			console.error('Error while retrieving workflow', workflowResult);
-			workflowTaskErrorAlert = displayStandardErrorAlert(workflowResult, 'workflowTaskError');
-			return;
-		}
-
-		// Update workflow
-		workflow = workflowResult;
-		// UI Feedback
-		workflowTaskCreated = true;
-		setTimeout(() => {
-			workflowTaskCreated = false;
-		}, 3000);
-		resetCreateWorkflowTaskModal();
 	}
 
 	/**
@@ -439,7 +433,7 @@
 	}
 </script>
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex justify-content-between align-items-center mb-4">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
@@ -489,7 +483,9 @@
 </div>
 
 {#if workflow}
-	<div class="container py-4 px-0">
+	<StandardDismissableAlert message={workflowSuccessMessage} />
+
+	<div class="container mt-4 px-0">
 		<div class="row">
 			<div class="col-4">
 				<div class="card">
@@ -702,12 +698,12 @@
 	</div>
 {/if}
 
-<Modal id="insertTaskModal" centered={true}>
+<Modal id="insertTaskModal" centered={true} bind:this={insertTaskModal}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">New workflow task</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<div id="workflowTaskError" />
+		<div id="errorAlert-insertTaskModal" />
 		<form on:submit|preventDefault={handleCreateWorkflowTask}>
 			<div class="mb-3">
 				<WorkflowTaskSelection tasks={availableTasks} bind:this={workflowTaskSelectionComponent} />
@@ -730,19 +726,14 @@
 			<button class="btn btn-primary" type="submit">Insert</button>
 		</form>
 	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		{#if workflowTaskCreated}
-			<span class="w-100 alert alert-success">Workflow task created</span>
-		{/if}
-	</svelte:fragment>
 </Modal>
 
-<Modal id="editWorkflowModal" centered={true}>
+<Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Workflow properties</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<div id="updatedWorkflowError" />
+		<div id="errorAlert-editWorkflowModal" />
 		{#if workflow}
 			<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
 				<div class="mb-3">
@@ -759,9 +750,6 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		{#if workflowUpdated}
-			<span class="alert alert-success">Workflow updated correctly</span>
-		{/if}
 		<button class="btn btn-primary" form="updateWorkflow">Save</button>
 	</svelte:fragment>
 </Modal>

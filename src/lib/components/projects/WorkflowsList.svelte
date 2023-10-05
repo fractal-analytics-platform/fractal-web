@@ -14,6 +14,8 @@
 	$: enableCreateWorkflow = !!newWorkflowName;
 	let validationError = false;
 
+	/** @type {Modal} */
+	let importWorkflowModal;
 	/** @type {WorkflowImport} */
 	let workflowImportComponent;
 
@@ -75,10 +77,11 @@
 		const importedWorkflow = event.detail;
 		workflows.push(importedWorkflow);
 		workflows = workflows;
+		goto(`/projects/${projectId}/workflows/${importedWorkflow.id}`);
 	}
 </script>
 
-<Modal id="importWorkflowModal" size="lg" centered={true} scrollable={true}>
+<Modal id="importWorkflowModal" size="lg" centered={true} scrollable={true} bind:this={importWorkflowModal}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Import workflow</h5>
 	</svelte:fragment>

@@ -47,6 +47,10 @@
 			}
 		});
 	}
+
+	function onEditProjectModalOpen() {
+		projectUpdatesSuccessMessage = '';
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -87,7 +91,7 @@
 	</div>
 {/if}
 
-<Modal id="editProjectModal" centered={true} bind:this={editProjectModal}>
+<Modal id="editProjectModal" centered={true} bind:this={editProjectModal} onOpen={onEditProjectModalOpen}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Project properties</h5>
 	</svelte:fragment>

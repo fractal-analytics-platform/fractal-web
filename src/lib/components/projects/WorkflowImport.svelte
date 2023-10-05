@@ -53,7 +53,7 @@
 			importing = false;
 			errorAlert = displayStandardErrorAlert(
 				'The workflow file is not a valid JSON file',
-				'importWorkflowError'
+				'errorAlert-importWorkflowModal'
 			);
 			return;
 		}
@@ -87,12 +87,12 @@
 			dispatch('workflowImported', workflow);
 		} else {
 			console.error('Import workflow failed', result);
-			errorAlert = displayStandardErrorAlert(result, 'importWorkflowError');
+			errorAlert = displayStandardErrorAlert(result, 'errorAlert-importWorkflowModal');
 		}
 	}
 </script>
 
-<div id="importWorkflowError" />
+<div id="errorAlert-importWorkflowModal" />
 
 <form on:submit|preventDefault={handleWorkflowImportForm}>
 	<div class="mb-3">
