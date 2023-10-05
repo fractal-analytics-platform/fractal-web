@@ -9,7 +9,7 @@
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
 	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 

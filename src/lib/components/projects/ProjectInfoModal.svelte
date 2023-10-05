@@ -1,5 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
 	// ProjectInfoModal component
 	import { modalProject } from '$lib/stores/projectStores';
 	import Modal from '../common/Modal.svelte';
