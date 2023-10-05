@@ -39,13 +39,17 @@
 	}
 </script>
 
-<Modal id="workflowJobLogsModal" fullscreen={true} bind:this={modal}>
-	<div class="modal-header">
+<Modal
+	id="workflowJobLogsModal"
+	fullscreen={true}
+	bind:this={modal}
+	bodyCss="bg-tertiary text-secondary"
+>
+	<svelte:fragment slot="header">
 		<h1 class="h5 modal-title">Workflow Job logs</h1>
-		<button class="btn-close" data-bs-dismiss="modal" />
-	</div>
-	<div class="modal-body bg-tertiary text-secondary">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div id="workflowJobLogsError" />
 		<pre>{logs}</pre>
-	</div>
+	</svelte:fragment>
 </Modal>

@@ -1,9 +1,7 @@
 <script>
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	// Component properties
@@ -12,19 +10,9 @@
 	let projectUpdatesSuccess = undefined;
 
 	let updatedProjectName = '';
-	let projectPropertiesErrorAlert = undefined;
 
-	onMount(async () => {
-		// Remove old error when opening the modal
-		const editProjectModal = document.getElementById('editProjectModal');
-		if (editProjectModal) {
-			editProjectModal.addEventListener('show.bs.modal', () => {
-				if (projectPropertiesErrorAlert) {
-					projectPropertiesErrorAlert.hide();
-				}
-			});
-		}
-	});
+	/** @type {Modal} */
+	let editProjectModal;
 
 	async function handleProjectPropertiesUpdate() {
 		projectUpdatesSuccess = undefined;
@@ -33,9 +21,7 @@
 		}
 
 		// Remove old error
-		if (projectPropertiesErrorAlert) {
-			projectPropertiesErrorAlert.hide();
-		}
+		editProjectModal.hideErrorAlert();
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -60,7 +46,7 @@
 			project.name = result.name;
 		} else {
 			console.error('Error while updating project', result);
-			projectPropertiesErrorAlert = displayStandardErrorAlert(result, 'projectPropertiesError');
+			editProjectModal.displayErrorAlert(result);
 			projectUpdatesSuccess = false;
 		}
 	}
@@ -103,13 +89,12 @@
 	</div>
 {/if}
 
-<Modal id="editProjectModal" centered={true}>
-	<div class="modal-header">
+<Modal id="editProjectModal" centered={true} bind:this={editProjectModal}>
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">Project properties</h5>
-		<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
-		<div id="projectPropertiesError" />
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<div id="errorAlert-editProjectModal" />
 		{#if project}
 			<form id="updateProject" on:submit|preventDefault={handleProjectPropertiesUpdate}>
 				<div class="mb-3">
@@ -125,8 +110,8 @@
 				</div>
 			</form>
 		{/if}
-	</div>
-	<div class="modal-footer">
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		{#if projectUpdatesSuccess}
 			<div class="m-2 p-2 alert alert-success d-flex align-items-center">
 				<i class="bi bi-check-circle" />
@@ -134,5 +119,5 @@
 			</div>
 		{/if}
 		<button class="btn btn-primary" form="updateProject">Save</button>
-	</div>
+	</svelte:fragment>
 </Modal>

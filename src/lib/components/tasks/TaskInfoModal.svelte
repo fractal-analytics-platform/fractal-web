@@ -18,12 +18,13 @@
 </script>
 
 <Modal id="taskInfoModal" size="xl">
-	{#if task}
-		<div class="modal-header">
+	<svelte:fragment slot="header">
+		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
-			<button class="btn-close" data-bs-dismiss="modal" />
-		</div>
-		<div class="modal-body">
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		{#if task}
 			<div class="row mb-3">
 				<div class="col-12">
 					<p class="lead">Task properties</p>
@@ -77,9 +78,9 @@
 					</ul>
 				</div>
 			</div>
-		</div>
-		<div class="modal-footer">
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-		</div>
-	{/if}
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	</svelte:fragment>
 </Modal>

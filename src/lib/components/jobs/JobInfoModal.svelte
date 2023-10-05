@@ -55,16 +55,13 @@
 </script>
 
 <Modal id="workflowJobInfoModal" bind:this={modal} size="lg">
-	<div class="modal-header d-flex justify-content-between">
-		<h1 class="h5 modal-title">Workflow Job #{workflowJobId}</h1>
-		<div class="d-flex align-items-center">
-			<button class="btn btn-light me-3" on:click={fetchJob}>
-				<i class="bi-arrow-clockwise" />
-			</button>
-			<button class="btn-close bg-light p-2" data-bs-dismiss="modal" />
-		</div>
-	</div>
-	<div class="modal-body">
+	<svelte:fragment slot="header">
+		<h1 class="h5 modal-title flex-grow-1">Workflow Job #{workflowJobId}</h1>
+		<button class="btn btn-light me-3" on:click={fetchJob}>
+			<i class="bi-arrow-clockwise" />
+		</button>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div class="row mb-3">
 			<div class="col-12">
 				<div id="workflowJobError" />
@@ -94,5 +91,5 @@
 		<div class="row">
 			<div class="col-12" />
 		</div>
-	</div>
+	</svelte:fragment>
 </Modal>

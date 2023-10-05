@@ -703,11 +703,10 @@
 {/if}
 
 <Modal id="insertTaskModal" centered={true}>
-	<div class="modal-header">
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">New workflow task</h5>
-		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div id="workflowTaskError" />
 		<form on:submit|preventDefault={handleCreateWorkflowTask}>
 			<div class="mb-3">
@@ -730,20 +729,19 @@
 
 			<button class="btn btn-primary" type="submit">Insert</button>
 		</form>
-	</div>
-	<div class="modal-footer d-flex">
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		{#if workflowTaskCreated}
 			<span class="w-100 alert alert-success">Workflow task created</span>
 		{/if}
-	</div>
+	</svelte:fragment>
 </Modal>
 
 <Modal id="editWorkflowModal" centered={true}>
-	<div class="modal-header">
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">Workflow properties</h5>
-		<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div id="updatedWorkflowError" />
 		{#if workflow}
 			<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
@@ -759,21 +757,20 @@
 				</div>
 			</form>
 		{/if}
-	</div>
-	<div class="modal-footer">
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		{#if workflowUpdated}
 			<span class="alert alert-success">Workflow updated correctly</span>
 		{/if}
 		<button class="btn btn-primary" form="updateWorkflow">Save</button>
-	</div>
+	</svelte:fragment>
 </Modal>
 
 <Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
-	<div class="modal-header">
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">Edit workflow tasks order</h5>
-		<button class="btn-close" data-bs-dismiss="modal" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div id="errorAlert-editWorkflowTasksOrderModal" />
 		{#if workflow !== undefined && updatableWorkflowList.length == 0}
 			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
@@ -810,20 +807,19 @@
 				</ul>
 			{/key}
 		{/if}
-	</div>
-	<div class="modal-footer">
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>
 			Save
 		</button>
-	</div>
+	</svelte:fragment>
 </Modal>
 
 <Modal id="runWorkflowModal" centered={true} bind:this={runWorkflowModal}>
-	<div class="modal-header">
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">Run workflow</h5>
-		<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div id="errorAlert-runWorkflowModal" />
 		<form id="runWorkflowForm">
 			<div class="mb-3">
@@ -901,8 +897,8 @@
 				/>
 			</div>
 		</form>
-	</div>
-	<div class="modal-footer">
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		{#if checkingConfiguration}
 			<button
 				class="btn btn-warning"
@@ -921,20 +917,19 @@
 				}}>Run</button
 			>
 		{/if}
-	</div>
+	</svelte:fragment>
 </Modal>
 
 <Modal id="changes-unsaved-dialog" bind:this={unsavedChangesModal}>
-	<div class="modal-header">
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">There are argument changes unsaved</h5>
-		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<p>
 			Do you want to save the changes made to the arguments of the current selected workflow task?
 		</p>
-	</div>
-	<div class="modal-footer">
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		<button
 			type="button"
@@ -953,5 +948,5 @@
 			data-bs-dismiss="modal"
 			>Save changes
 		</button>
-	</div>
+	</svelte:fragment>
 </Modal>

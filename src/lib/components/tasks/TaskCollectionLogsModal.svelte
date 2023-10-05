@@ -30,13 +30,12 @@
 	});
 </script>
 
-<Modal id="collectionTaskLogsModal" fullscreen={true}>
-	<div class="modal-header">
+<Modal id="collectionTaskLogsModal" fullscreen={true} bodyCss="bg-tertiary text-secondary">
+	<svelte:fragment slot="header">
 		<h1 class="h5 modal-title">Task collection logs</h1>
-		<button class="btn-close" data-bs-dismiss="modal" />
-	</div>
-	<div class="modal-body bg-tertiary text-secondary">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div id="collectionTaskLogsError" />
 		<pre>{logs}</pre>
-	</div>
+	</svelte:fragment>
 </Modal>

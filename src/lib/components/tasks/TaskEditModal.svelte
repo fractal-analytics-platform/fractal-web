@@ -67,11 +67,13 @@
 </script>
 
 <Modal id="taskEditModal" {onOpen} {onClose} bind:this={modal} size="xl">
-	{#if task}
-		<div class="modal-header">
+	<svelte:fragment slot="header">
+		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
-		</div>
-		<div class="modal-body">
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		{#if task}
 			<div class="row mb-3">
 				<div class="col-12">
 					<p class="lead">Task properties</p>
@@ -224,12 +226,14 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="modal-footer">
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
+		{#if task}
 			<button class="btn btn-primary" on:click={handleEditTask} disabled={!updateEnabled}>
 				Update
 			</button>
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-		</div>
-	{/if}
+		{/if}
+	</svelte:fragment>
 </Modal>

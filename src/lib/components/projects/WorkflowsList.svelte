@@ -78,14 +78,16 @@
 	}
 </script>
 
-<Modal id="importWorkflowModal" size="lg" centered="{true}" scrollable={true}>
-	<div class="modal-header">
+<Modal id="importWorkflowModal" size="lg" centered={true} scrollable={true}>
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">Import workflow</h5>
-		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
-		<WorkflowImport on:workflowImported={handleWorkflowImported} bind:this={workflowImportComponent} />
-	</div>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<WorkflowImport
+			on:workflowImported={handleWorkflowImported}
+			bind:this={workflowImportComponent}
+		/>
+	</svelte:fragment>
 </Modal>
 
 <div class="container p-0 mt-4">

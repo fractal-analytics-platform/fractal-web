@@ -10,6 +10,7 @@
 	export let fullscreen = false;
 	export let centered = false;
 	export let scrollable = false;
+	export let bodyCss = '';
 	let errorAlert;
 
 	onMount(async () => {
@@ -87,7 +88,18 @@
 		class:modal-dialog-scrollable={scrollable}
 	>
 		<div class="modal-content">
-			<slot />
+			<div class="modal-header">
+				<slot name="header" />
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+			</div>
+			<div class="modal-body {bodyCss}">
+				<slot name="body" />
+			</div>
+			{#if !!$$slots.footer}
+			<div class="modal-footer">
+				<slot name="footer" />
+			</div>
+			{/if}
 		</div>
 	</div>
 </div>

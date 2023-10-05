@@ -23,34 +23,29 @@
 	 * Executes the callback handling possible errors
 	 */
 	const handleCallbackAction = async () => {
-		modal.confirmAndHide(callbackAction)
+		modal.confirmAndHide(callbackAction);
 	};
 </script>
 
-<Modal id={modalId} {onOpen} bind:this={modal}>
-	<div class="modal-header">
+<Modal id={modalId} {onOpen} bind:this={modal} size="lg">
+	<svelte:fragment slot="header">
 		<h1 class="modal-title fs-5">Confirm action</h1>
-		<button class="btn-close" data-bs-dismiss="modal" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<p>You're about to:</p>
 		<p class="badge bg-{style} fs-6">{message}</p>
 		<p>Do you confirm?</p>
-	</div>
-	<div class="modal-footer">
 		<div class="container">
 			<div id="errorAlert-{modalId}" />
 		</div>
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		<button class="btn btn-primary" on:click={handleCallbackAction}>Confirm</button>
-	</div>
+	</svelte:fragment>
 </Modal>
 
-<button
-	class="btn btn-{btnStyle}"
-	data-bs-toggle="modal"
-	data-bs-target="#{modalId}"
->
+<button class="btn btn-{btnStyle}" data-bs-toggle="modal" data-bs-target="#{modalId}">
 	{#if buttonIcon}
 		<i class="bi bi-{buttonIcon}" />
 	{/if}

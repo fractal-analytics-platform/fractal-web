@@ -16,21 +16,13 @@
 </script>
 
 <Modal id="projectInfoModal" size="lg">
-	<div class="modal-header d-flex justify-content-between">
-		<h1 class="h5 modal-title">Project {project?.name}</h1>
-		<div class="d-flex align-items-center">
-			<button
-				class="btn btn-light me-3"
-				data-bs-dismiss="modal"
-				on:click={() => {
-					// This method is required in order to correctly dismissing the modal
-					goto('/projects/' + project.id);
-				}}>Open <i class="bi bi-arrow-up-right-square" /></button
-			>
-			<button class="btn-close bg-light p-2" data-bs-dismiss="modal" />
-		</div>
-	</div>
-	<div class="modal-body">
+	<svelte:fragment slot="header">
+		<h1 class="h5 modal-title flex-grow-1">Project {project?.name}</h1>
+		<a href={'/projects/' + project.id} class="btn btn-light me-3">
+			Open <i class="bi bi-arrow-up-right-square" />
+		</a>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<div class="row mb-3">
 			<div class="col-12">
 				<p class="lead">Project properties</p>
@@ -69,5 +61,5 @@
 				{/if}
 			</div>
 		</div>
-	</div>
+	</svelte:fragment>
 </Modal>

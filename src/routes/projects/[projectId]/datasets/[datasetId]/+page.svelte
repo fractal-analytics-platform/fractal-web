@@ -261,11 +261,10 @@
 	bind:this={createDatasetResourceModal}
 	onOpen={onCreateDatasetResourceModalOpen}
 >
-	<div class="modal-header">
+	<svelte:fragment slot="header">
 		<h5 class="modal-title">Create dataset resource</h5>
-		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-	</div>
-	<div class="modal-body">
+	</svelte:fragment>
+	<svelte:fragment slot="body">
 		<form on:submit|preventDefault={handleCreateDatasetResource}>
 			<div id="errorAlert-createDatasetResourceModal" />
 			<div class="mb-3">
@@ -279,63 +278,69 @@
 				<p class="alert alert-success mt-3">Resource created</p>
 			{/if}
 		</form>
-	</div>
+	</svelte:fragment>
 </Modal>
 
 {#if dataset}
-	<Modal id="updateDatasetModal" size="lg" centered={true} scrollable={true} bind:this={updateDatasetModal}>
-		<div class="modal-header">
+	<Modal
+		id="updateDatasetModal"
+		size="lg"
+		centered={true}
+		scrollable={true}
+		bind:this={updateDatasetModal}
+	>
+		<svelte:fragment slot="header">
 			<h5 class="modal-title">Update dataset properties</h5>
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-		</div>
-		<form class="modal-body" on:submit|preventDefault={handleDatasetUpdate}>
-			<div id="errorAlert-updateDatasetModal" />
-			<div class="mb-3">
-				<label for="name" class="form-label">Dataset name</label>
-				<input
-					class="form-control"
-					type="text"
-					name="name"
-					id="name"
-					class:is-invalid={!name}
-					bind:value={name}
-				/>
-				{#if !name}
-					<div class="invalid-feedback">The dataset name can not be empty</div>
-				{/if}
-			</div>
-			<div class="mb-3">
-				<label for="type" class="form-label">Dataset type</label>
-				<input class="form-control" type="text" name="type" id="type" bind:value={type} />
-			</div>
-			<div class="mb-3">
-				<input
-					class="form-check-input"
-					type="checkbox"
-					name="read_only"
-					id="read_only"
-					bind:checked={read_only}
-				/>
-				<label for="read_only" class="form-check-label">Readonly dataset?</label>
-			</div>
+		</svelte:fragment>
+		<svelte:fragment slot="body">
+			<form on:submit|preventDefault={handleDatasetUpdate}>
+				<div id="errorAlert-updateDatasetModal" />
+				<div class="mb-3">
+					<label for="name" class="form-label">Dataset name</label>
+					<input
+						class="form-control"
+						type="text"
+						name="name"
+						id="name"
+						class:is-invalid={!name}
+						bind:value={name}
+					/>
+					{#if !name}
+						<div class="invalid-feedback">The dataset name can not be empty</div>
+					{/if}
+				</div>
+				<div class="mb-3">
+					<label for="type" class="form-label">Dataset type</label>
+					<input class="form-control" type="text" name="type" id="type" bind:value={type} />
+				</div>
+				<div class="mb-3">
+					<input
+						class="form-check-input"
+						type="checkbox"
+						name="read_only"
+						id="read_only"
+						bind:checked={read_only}
+					/>
+					<label for="read_only" class="form-check-label">Readonly dataset?</label>
+				</div>
 
-			<div class="d-flex align-items-center">
-				<button class="btn btn-primary me-3" type="submit" disabled={!name}>Update</button>
-				{#if updateDatasetSuccess}
-					<span class="text-success">Dataset properties updated with success</span>
-				{/if}
-			</div>
-		</form>
+				<div class="d-flex align-items-center">
+					<button class="btn btn-primary me-3" type="submit" disabled={!name}>Update</button>
+					{#if updateDatasetSuccess}
+						<span class="text-success">Dataset properties updated with success</span>
+					{/if}
+				</div>
+			</form>
+		</svelte:fragment>
 	</Modal>
 {/if}
 
 {#if dataset && Object.keys(dataset.meta).length > 0}
 	<Modal id="datasetMetaModal" size="lg" centered={true} scrollable={true}>
-		<div class="modal-header">
+		<svelte:fragment slot="header">
 			<h5 class="modal-title">Dataset meta properties</h5>
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-		</div>
-		<div class="modal-body">
+		</svelte:fragment>
+		<svelte:fragment slot="body">
 			<ul class="list-group">
 				{#each Object.entries(dataset.meta) as [key, value]}
 					<li class="list-group-item text-bg-light">
@@ -356,7 +361,7 @@
 					</li>
 				{/each}
 			</ul>
-		</div>
+		</svelte:fragment>
 	</Modal>
 {/if}
 
