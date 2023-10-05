@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	let projectId = $page.params.projectId;
@@ -17,10 +17,14 @@
 	let type = '';
 	let read_only = false;
 	let updateDatasetSuccess = false;
+	/** @type {Modal} */
+	let updateDatasetModal;
 
 	// for creating a new resource
 	let source = '';
 	let createResourceSuccess = false;
+	/** @type {Modal} */
+	let createDatasetResourceModal;
 
 	onMount(async () => {
 		dataset = await $page.data.dataset;
@@ -67,8 +71,12 @@
 			dataset = result;
 			updateDatasetSuccess = true;
 		} else {
-			displayStandardErrorAlert(result, 'updateDatasetError');
+			updateDatasetModal.displayErrorAlert(result);
 		}
+	}
+
+	function onCreateDatasetResourceModalOpen() {
+		source = '';
 	}
 
 	/**
@@ -77,6 +85,7 @@
 	 */
 	async function handleCreateDatasetResource() {
 		createResourceSuccess = false;
+		createDatasetResourceModal.hideErrorAlert();
 		if (!source) {
 			return;
 		}
@@ -100,7 +109,7 @@
 			createResourceSuccess = true;
 			source = '';
 		} else {
-			displayStandardErrorAlert(result, 'createDatasetResourceError');
+			createDatasetResourceModal.displayErrorAlert(result);
 		}
 	}
 
@@ -244,14 +253,21 @@
 	</div>
 {/if}
 
-<Modal id="createDatasetResourceModal" size="lg" centered={true} scrollable={true}>
+<Modal
+	id="createDatasetResourceModal"
+	size="lg"
+	centered={true}
+	scrollable={true}
+	bind:this={createDatasetResourceModal}
+	onOpen={onCreateDatasetResourceModalOpen}
+>
 	<div class="modal-header">
 		<h5 class="modal-title">Create dataset resource</h5>
 		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 	</div>
 	<div class="modal-body">
 		<form on:submit|preventDefault={handleCreateDatasetResource}>
-			<div id="createDatasetResourceError" />
+			<div id="errorAlert-createDatasetResourceModal" />
 			<div class="mb-3">
 				<label for="source" class="form-label">Resource path</label>
 				<input class="form-control" type="text" name="source" id="source" bind:value={source} />
@@ -267,13 +283,13 @@
 </Modal>
 
 {#if dataset}
-	<Modal id="updateDatasetModal" size="lg" centered={true} scrollable={true}>
+	<Modal id="updateDatasetModal" size="lg" centered={true} scrollable={true} bind:this={updateDatasetModal}>
 		<div class="modal-header">
 			<h5 class="modal-title">Update dataset properties</h5>
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 		</div>
-		<div class="modal-body">
-			<div id="updateDatasetError" />
+		<form class="modal-body" on:submit|preventDefault={handleDatasetUpdate}>
+			<div id="errorAlert-updateDatasetModal" />
 			<div class="mb-3">
 				<label for="name" class="form-label">Dataset name</label>
 				<input
@@ -304,19 +320,12 @@
 			</div>
 
 			<div class="d-flex align-items-center">
-				<button
-					class="btn btn-primary me-3"
-					type="button"
-					on:click={handleDatasetUpdate}
-					disabled={!name}
-				>
-					Update
-				</button>
+				<button class="btn btn-primary me-3" type="submit" disabled={!name}>Update</button>
 				{#if updateDatasetSuccess}
 					<span class="text-success">Dataset properties updated with success</span>
 				{/if}
 			</div>
-		</div>
+		</form>
 	</Modal>
 {/if}
 

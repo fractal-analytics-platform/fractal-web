@@ -358,7 +358,7 @@
 			editWorkflowTasksOrderModal.toggle();
 		} else {
 			console.error('Workflow task order not updated', result);
-			displayStandardErrorAlert(result, 'workflowTasksOrderError');
+			editWorkflowTasksOrderModal.displayErrorAlert(result);
 		}
 	}
 
@@ -367,16 +367,18 @@
 	 * @returns {Promise<void>}
 	 */
 	async function handleApplyWorkflow() {
+		// reset previous errors
+		runWorkflowModal.hideErrorAlert();
 		if (inputDatasetControl === '') {
 			// Preliminary check: if inputDatasetControl is not set, raise an error
 			let message = 'Input dataset is required. Select one from the list.';
 			console.error(message);
-			displayStandardErrorAlert(message, 'applyWorkflowError');
+			runWorkflowModal.displayErrorAlert(message);
 		} else if (outputDatasetControl === '') {
 			// Preliminary check: if outputDatasetControl is not set, raise an error
 			let message = 'Output dataset is required. Select one from the list.';
 			console.error(message);
-			displayStandardErrorAlert(message, 'applyWorkflowError');
+			runWorkflowModal.displayErrorAlert(message);
 		} else {
 			// Both inputDatasetControl and outputDatasetControl are set, continue
 			const requestBody = {
@@ -416,7 +418,7 @@
 			} else {
 				console.error(response);
 				// Set an error message on the component
-				displayStandardErrorAlert(await response.json(), 'applyWorkflowError');
+				runWorkflowModal.displayErrorAlert(await response.json());
 			}
 		}
 	}
@@ -772,7 +774,7 @@
 		<button class="btn-close" data-bs-dismiss="modal" />
 	</div>
 	<div class="modal-body">
-		<div id="workflowTasksOrderError" />
+		<div id="errorAlert-editWorkflowTasksOrderModal" />
 		{#if workflow !== undefined && updatableWorkflowList.length == 0}
 			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 		{:else if workflow !== undefined}
@@ -788,7 +790,7 @@
 									{#if i !== 0}
 										<button
 											class="btn btn-light"
-											on:click|preventDefault={() => moveWorkflowTask.bind(i, 'up')}
+											on:click|preventDefault={() => moveWorkflowTask(i, 'up')}
 										>
 											<i class="bi-arrow-up" />
 										</button>
@@ -810,8 +812,9 @@
 		{/if}
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>Save</button
-		>
+		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>
+			Save
+		</button>
 	</div>
 </Modal>
 
@@ -821,7 +824,7 @@
 		<button class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
 	</div>
 	<div class="modal-body">
-		<div id="applyWorkflowError" />
+		<div id="errorAlert-runWorkflowModal" />
 		<form id="runWorkflowForm">
 			<div class="mb-3">
 				<label for="inputDataset" class="form-label">Input dataset</label>

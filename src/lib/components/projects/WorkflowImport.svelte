@@ -38,6 +38,9 @@
 			return;
 		}
 		importing = true;
+		if (errorAlert) {
+			errorAlert.hide();
+		}
 
 		const workflowFile = files[0];
 

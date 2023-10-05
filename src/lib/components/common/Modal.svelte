@@ -16,7 +16,7 @@
 		const modal = document.getElementById(id);
 		if (modal) {
 			modal.addEventListener('show.bs.modal', () => {
-				hidePreviousErrorAlert();
+				hideErrorAlert();
 				onOpen();
 			});
 			modal.addEventListener('hidden.bs.modal', onClose);
@@ -45,7 +45,7 @@
 		// the container element and then cause issues with the hide function
 		const modal = getBootstrapModal();
 		try {
-			hidePreviousErrorAlert();
+			hideErrorAlert();
 			await confirm();
 			modal.hide();
 		} catch (/** @type {any} */ error) {
@@ -53,10 +53,14 @@
 		}
 	}
 
-	function hidePreviousErrorAlert() {
+	export function hideErrorAlert() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
+	}
+
+	export function displayErrorAlert(/** @type {any} */ error) {
+		errorAlert = displayStandardErrorAlert(error, `errorAlert-${id}`);
 	}
 
 	function getBootstrapModal() {

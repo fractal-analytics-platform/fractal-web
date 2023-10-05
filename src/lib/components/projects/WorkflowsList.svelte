@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
 	// The list of workflows
@@ -67,7 +67,7 @@
 		} else {
 			const result = await response.json();
 			console.error('Workflow not deleted', result);
-			displayStandardErrorAlert(result, 'workflowDeleteAlertError');
+			throw new AlertError(result);
 		}
 	}
 
@@ -91,7 +91,6 @@
 <div class="container p-0 mt-4">
 	<p class="lead">Workflows</p>
 	<div id="workflowCreateAlertError" />
-	<div id="workflowDeleteAlertError" />
 	<table class="table align-middle caption-top">
 		<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
 			<div class="d-flex align-items-center justify-content-between">
