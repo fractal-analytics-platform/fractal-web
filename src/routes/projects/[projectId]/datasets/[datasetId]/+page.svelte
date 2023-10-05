@@ -4,6 +4,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	let projectId = $page.params.projectId;
 	let datasetId = $page.params.datasetId;
@@ -22,7 +23,7 @@
 
 	// for creating a new resource
 	let source = '';
-	let createResourceSuccess = false;
+	let createResourceSuccessMessage = '';
 	/** @type {Modal} */
 	let createDatasetResourceModal;
 
@@ -84,33 +85,35 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleCreateDatasetResource() {
-		createResourceSuccess = false;
-		createDatasetResourceModal.hideErrorAlert();
-		if (!source) {
-			return;
-		}
+		createDatasetResourceModal.confirmAndHide(async () => {
+			createResourceSuccessMessage = '';
+			createDatasetResourceModal.hideErrorAlert();
+			if (!source) {
+				return;
+			}
 
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}/resource/`, {
-			method: 'POST',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify({
-				path: source
-			})
+			const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}/resource/`, {
+				method: 'POST',
+				credentials: 'include',
+				mode: 'cors',
+				headers,
+				body: JSON.stringify({
+					path: source
+				})
+			});
+
+			const result = await response.json();
+			if (response.ok) {
+				dataset.resource_list = [...dataset.resource_list, result];
+				createResourceSuccessMessage = 'Resource created';
+				source = '';
+			} else {
+				throw new AlertError(result);
+			}
 		});
-
-		const result = await response.json();
-		if (response.ok) {
-			dataset.resource_list = [...dataset.resource_list, result];
-			createResourceSuccess = true;
-			source = '';
-		} else {
-			createDatasetResourceModal.displayErrorAlert(result);
-		}
 	}
 
 	/**
@@ -155,9 +158,10 @@
 	</nav>
 	<div>
 		{#if dataset && Object.keys(dataset.meta).length > 0}
-			<button class="btn btn-light" data-bs-target="#datasetMetaModal" data-bs-toggle="modal"
-				><i class="bi-arrow-up-right-square" /> Show meta properties</button
-			>
+			<button class="btn btn-light" data-bs-target="#datasetMetaModal" data-bs-toggle="modal">
+				<i class="bi-arrow-up-right-square" />
+				Show meta properties
+			</button>
 		{/if}
 		{#if dataset}
 			<button
@@ -177,6 +181,8 @@
 		<div class="d-flex justify-content-between align-items-center my-3">
 			<h1>Dataset {dataset.name} #{dataset.id}</h1>
 		</div>
+
+		<StandardDismissableAlert message={createResourceSuccessMessage} />
 
 		<div class="row mt-2">
 			<div class="col-4">
@@ -274,9 +280,6 @@
 			<button class="btn btn-primary" disabled={!source} type="submit">
 				Create new resource
 			</button>
-			{#if createResourceSuccess}
-				<p class="alert alert-success mt-3">Resource created</p>
-			{/if}
 		</form>
 	</svelte:fragment>
 </Modal>

@@ -3,11 +3,13 @@
 	import ProjectDatasetsList from '$lib/components/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/projects/WorkflowsList.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { AlertError } from '$lib/common/errors';
 
 	// Component properties
 	let project = $page.data.project;
 	let workflows = $page.data.workflows;
-	let projectUpdatesSuccess = undefined;
+	let projectUpdatesSuccessMessage = '';
 
 	let updatedProjectName = '';
 
@@ -15,40 +17,35 @@
 	let editProjectModal;
 
 	async function handleProjectPropertiesUpdate() {
-		projectUpdatesSuccess = undefined;
-		if (!updatedProjectName) {
-			return;
-		}
+		editProjectModal.confirmAndHide(async () => {
+			projectUpdatesSuccessMessage = '';
+			if (!updatedProjectName) {
+				return;
+			}
 
-		// Remove old error
-		editProjectModal.hideErrorAlert();
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
 
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
+			const response = await fetch(`/api/v1/project/${project.id}`, {
+				method: 'PATCH',
+				credentials: 'include',
+				mode: 'cors',
+				headers,
+				body: JSON.stringify({
+					name: updatedProjectName
+				})
+			});
 
-		const response = await fetch(`/api/v1/project/${project.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify({
-				name: updatedProjectName
-			})
+			const result = await response.json();
+			if (response.ok) {
+				console.log('Project updated successfully');
+				projectUpdatesSuccessMessage = 'Project properties successfully updated';
+				project.name = result.name;
+			} else {
+				console.error('Error while updating project', result);
+				throw new AlertError(result);
+			}
 		});
-
-		const result = await response.json();
-		if (response.ok) {
-			console.log('Project updated successfully');
-			projectUpdatesSuccess = true;
-			setTimeout(() => {
-				projectUpdatesSuccess = undefined;
-			}, 3000);
-			project.name = result.name;
-		} else {
-			console.error('Error while updating project', result);
-			editProjectModal.displayErrorAlert(result);
-			projectUpdatesSuccess = false;
-		}
 	}
 </script>
 
@@ -84,6 +81,7 @@
 			<h1>Project {project.name} #{project.id}</h1>
 		</div>
 
+		<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
 		<ProjectDatasetsList datasets={project.dataset_list} />
 		<WorkflowsList {workflows} projectId={project.id} />
 	</div>
@@ -112,12 +110,6 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		{#if projectUpdatesSuccess}
-			<div class="m-2 p-2 alert alert-success d-flex align-items-center">
-				<i class="bi bi-check-circle" />
-				<div class="ms-2">Properties updated</div>
-			</div>
-		{/if}
 		<button class="btn btn-primary" form="updateProject">Save</button>
 	</svelte:fragment>
 </Modal>
