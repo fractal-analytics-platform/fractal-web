@@ -10,12 +10,18 @@ export type Task = {
   owner: string
   source: string
   args_schema_version: string
-  args_schema: string
+  args_schema: object
   docs_link: string
   docs_info: string
+  meta: object
 }
 
 export type WorkflowTask = {
   id: number
-  meta: {[string]: any}
+  meta: object
+  args: object
+  order: number
+  workflow_id: number
+  task_id: number
+  task: Task
 }
