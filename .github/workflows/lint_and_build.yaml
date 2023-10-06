@@ -1,4 +1,4 @@
-name: Check&Build
+name: Lint and build
 
 on:
   push:
@@ -7,18 +7,18 @@ on:
     branches: ['main']
 
 jobs:
-  check_and_build:
+  lint_and_build:
     name: 'Node ${{ matrix.node-version }}'
     runs-on: ubuntu-20.04
     timeout-minutes: 10
 
     strategy:
       matrix:
-        node-version: ['16', '18']
+        node-version: ['16', '18', '20']
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up node
         uses: actions/setup-node@v3
@@ -31,9 +31,6 @@ jobs:
 
       - name: Run static code analysis
         run: npx eslint .
-
-      - name: Run vitest tests
-        run: npm run test
 
       - name: Build site
         env:

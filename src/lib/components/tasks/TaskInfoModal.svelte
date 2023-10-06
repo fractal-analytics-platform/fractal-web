@@ -3,6 +3,7 @@
 
 	// TaskInfoModal component
 	import { taskStore } from '$lib/stores/taskStores';
+	import Modal from '../common/Modal.svelte';
 
 	// Task to be displayed
 	// let task = {}
@@ -16,71 +17,70 @@
 	$: task = $taskStore;
 </script>
 
-<div class="modal modal-xl" id="taskInfoModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h1 class="h5 modal-title">Task {task?.name}</h1>
-				<button class="btn-close" data-bs-dismiss="modal" />
-			</div>
-			<div class="modal-body">
-				<div class="row mb-3">
-					<div class="col-12">
-						<p class="lead">Task properties</p>
-						<ul class="list-group">
-							<li class="list-group-item list-group-item-light fw-bold">Name</li>
-							<li class="list-group-item">{task?.name}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Version</li>
-							<li class="list-group-item">{task?.version || '-'}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-							<li class="list-group-item">{task?.owner || '-'}</li>
-							<li class="list-group-item list-group-item-light fw-bold">Command</li>
-							<li class='list-group-item'><code>{task?.command}</code></li>
-							<li class='list-group-item list-group-item-light fw-bold'>Source</li>
-							<li class='list-group-item'><code>{task?.source}</code></li>
-							<li class='list-group-item list-group-item-light fw-bold'>Input Type</li>
-							<li class='list-group-item'>
-								<code>{task?.input_type}</code>
-							</li>
-							<li class='list-group-item list-group-item-light fw-bold'>Output Type</li>
-							<li class='list-group-item'>
-								<code>{task?.output_type}</code>
-							</li>
-							<li class='list-group-item list-group-item-light fw-bold'>Args Schema Version</li>
-							<li class='list-group-item'>{task?.args_schema_version || '-'}</li>
-							<li class='list-group-item list-group-item-light fw-bold'>Args Schema</li>
-							<li class='list-group-item'>
-								{#if task?.args_schema}
+<Modal id="taskInfoModal" size="xl">
+	<svelte:fragment slot="header">
+		{#if task}
+			<h1 class="h5 modal-title">Task {task.name}</h1>
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		{#if task}
+			<div class="row mb-3">
+				<div class="col-12">
+					<p class="lead">Task properties</p>
+					<ul class="list-group">
+						<li class="list-group-item list-group-item-light fw-bold">Name</li>
+						<li class="list-group-item">{task.name}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Version</li>
+						<li class="list-group-item">{task.version || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Owner</li>
+						<li class="list-group-item">{task.owner || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Command</li>
+						<li class="list-group-item"><code>{task.command}</code></li>
+						<li class="list-group-item list-group-item-light fw-bold">Source</li>
+						<li class="list-group-item"><code>{task.source}</code></li>
+						<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
+						<li class="list-group-item">
+							<code>{task.input_type}</code>
+						</li>
+						<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
+						<li class="list-group-item">
+							<code>{task.output_type}</code>
+						</li>
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
+						<li class="list-group-item">{task.args_schema_version || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
+						<li class="list-group-item">
+							{#if task.args_schema}
 								<code>
-									<pre>{JSON.stringify(task?.args_schema, null, 2)}</pre>
+									<pre>{JSON.stringify(task.args_schema, null, 2)}</pre>
 								</code>
-								{:else}
+							{:else}
 								-
-								{/if}
-							</li>
-							<li class='list-group-item list-group-item-light fw-bold'>Docs Link</li>
-							<li class='list-group-item'>
-								{#if task?.docs_link}
-									<a href="{task?.docs_link}" target="_blank">{task?.docs_link}</a>
-								{:else}
+							{/if}
+						</li>
+						<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
+						<li class="list-group-item">
+							{#if task.docs_link}
+								<a href={task.docs_link} target="_blank">{task?.docs_link}</a>
+							{:else}
 								-
-								{/if}
-							</li>
-							<li class='list-group-item list-group-item-light fw-bold'>Docs Info</li>
-							<li class='list-group-item'>
-								{#if task?.docs_info}
-									{@html formatMarkdown(task?.docs_info)}
-								{:else}
+							{/if}
+						</li>
+						<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
+						<li class="list-group-item">
+							{#if task.docs_info}
+								{@html formatMarkdown(task.docs_info)}
+							{:else}
 								-
-								{/if}
-							</li>
-						</ul>
-					</div>
+							{/if}
+						</li>
+					</ul>
 				</div>
 			</div>
-			<div class="modal-footer">
-				<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
-</div>
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	</svelte:fragment>
+</Modal>

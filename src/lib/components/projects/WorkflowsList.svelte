@@ -2,7 +2,8 @@
 	import { goto } from '$app/navigation';
 	import WorkflowImport from '$lib/components/projects/WorkflowImport.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '../common/Modal.svelte';
 
 	// The list of workflows
 	export let workflows = [];
@@ -13,6 +14,8 @@
 	$: enableCreateWorkflow = !!newWorkflowName;
 	let validationError = false;
 
+	/** @type {Modal} */
+	let importWorkflowModal;
 	/** @type {WorkflowImport} */
 	let workflowImportComponent;
 
@@ -66,7 +69,7 @@
 		} else {
 			const result = await response.json();
 			console.error('Workflow not deleted', result);
-			displayStandardErrorAlert(result, 'workflowDeleteAlertError');
+			throw new AlertError(result);
 		}
 	}
 
@@ -74,27 +77,25 @@
 		const importedWorkflow = event.detail;
 		workflows.push(importedWorkflow);
 		workflows = workflows;
+		goto(`/projects/${projectId}/workflows/${importedWorkflow.id}`);
 	}
 </script>
 
-<div class="modal" id="importWorkflowModal">
-	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Import workflow</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-			</div>
-			<div class="modal-body">
-				<WorkflowImport on:workflowImported={handleWorkflowImported} bind:this={workflowImportComponent} />
-			</div>
-		</div>
-	</div>
-</div>
+<Modal id="importWorkflowModal" size="lg" centered={true} scrollable={true} bind:this={importWorkflowModal}>
+	<svelte:fragment slot="header">
+		<h5 class="modal-title">Import workflow</h5>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<WorkflowImport
+			on:workflowImported={handleWorkflowImported}
+			bind:this={workflowImportComponent}
+		/>
+	</svelte:fragment>
+</Modal>
 
 <div class="container p-0 mt-4">
 	<p class="lead">Workflows</p>
 	<div id="workflowCreateAlertError" />
-	<div id="workflowDeleteAlertError" />
 	<table class="table align-middle caption-top">
 		<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
 			<div class="d-flex align-items-center justify-content-between">
