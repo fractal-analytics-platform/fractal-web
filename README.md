@@ -21,6 +21,7 @@ More details can be found at:
 2. [How to run fractal-server](docs/fractal_server.md)
 3. [Deployment examples](docs/examples.md)
 3. [Project structure](docs/structure.md)
+3. [Tests](docs/tests.md)
 4. [Dependencies](docs/dependencies.md)
 5. [JSON Schemas for WorkflowTask arguments](docs/json_schemas.md)
 6. [CHANGELOG](CHANGELOG.md)
