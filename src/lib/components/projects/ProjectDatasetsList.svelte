@@ -1,44 +1,19 @@
 <script>
-	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError } from '$lib/common/errors';
+	import CreateUpdateDatasetModal from './CreateUpdateDatasetModal.svelte';
 
+	/** @type {import('$lib/types').Dataset[]} */
 	export let datasets = [];
 
-	$: newDatasetName = '';
-	$: newDatasetReadonly = false;
-	$: enableCreateDataset = !!newDatasetName;
+	/** @type {CreateUpdateDatasetModal} */
+	let createUpdateDatasetModal;
 
-	/**
-	 * Creates a project's dataset in the server
-	 * @returns {Promise<*>}
-	 */
-	async function handleCreateDataset() {
-		if (!enableCreateDataset) {
-			return;
-		}
-		const projectId = $page.params.projectId;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v1/project/${projectId}/dataset`, {
-			method: 'POST',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				name: newDatasetName,
-				read_only: newDatasetReadonly,
-				meta: {}
-			})
-		});
-		const result = await response.json();
-		if (response.ok) {
-			datasets = [...datasets, result];
-			newDatasetName = '';
-			newDatasetReadonly = false;
-		} else {
-			console.log('Dataset creation failed', result);
-			displayStandardErrorAlert(result, 'datasetCreateErrorAlert');
-		}
+	function createDatasetCallback(/** @type {import('$lib/types').Dataset} */ newDataset) {
+		datasets = [...datasets, newDataset];
+	}
+	function updateDatasetCallback(/** @type {import('$lib/types').Dataset} */ updatedDataset) {
+		datasets = datasets.map((d) => (d.id === updatedDataset.id ? updatedDataset : d));
 	}
 
 	/**
@@ -67,47 +42,16 @@
 </script>
 
 <div class="container p-0 mt-4">
+	<button
+		class="btn btn-primary float-end"
+		type="button"
+		on:click={() => createUpdateDatasetModal.openForCreate()}
+	>
+		Create new dataset
+	</button>
 	<p class="lead">Datasets</p>
 	<div id="datasetCreateErrorAlert" />
-	<table class="table align-middle caption-top">
-		<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
-			<div class="d-flex align-items-center justify-content-end">
-				<span class="fw-normal" />
-				<div>
-					<form
-						class="row row-cols-lg-auto g-3 align-items-center"
-						on:submit|preventDefault={handleCreateDataset}
-					>
-						<div class="col-12">
-							<div class="input-group">
-								<div class="input-group-text">Name</div>
-								<input
-									type="text"
-									class="form-control"
-									placeholder="dataset name"
-									bind:value={newDatasetName}
-								/>
-							</div>
-						</div>
-						<div class="col-12">
-							<div class="input-group">
-								<div class="form-check">
-									<input
-										type="checkbox"
-										class="form-check-input"
-										bind:checked={newDatasetReadonly}
-									/>
-									<div class="form-check-label">Is readonly</div>
-								</div>
-							</div>
-						</div>
-						<button class="btn btn-primary" type="submit" disabled={!enableCreateDataset}>
-							Create new dataset
-						</button>
-					</form>
-				</div>
-			</div>
-		</caption>
+	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
 				<th class="col-4">Name</th>
@@ -116,22 +60,29 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each datasets as { name, type, project_id, id }}
+			{#each datasets as dataset}
 				<tr>
-					<td>{name}</td>
-					<td>{type || 'Unknown'}</td>
+					<td>{dataset.name}</td>
+					<td>{dataset.type || 'Unknown'}</td>
 					<td>
-						<a class="btn btn-light" href="/projects/{project_id}/datasets/{id}"
-							><i class="bi bi-arrow-up-right-square" /> Open</a
+						<a class="btn btn-light" href="/projects/{dataset.project_id}/datasets/{dataset.id}">
+							<i class="bi bi-arrow-up-right-square" /> Open
+						</a>
+						<button
+							class="btn btn-primary"
+							type="button"
+							on:click|preventDefault={() => createUpdateDatasetModal.openForEdit(dataset)}
 						>
+							<i class="bi bi-pencil" /> Edit
+						</button>
 						<ConfirmActionButton
-							modalId="confirmDatasetDeleteModal{id}"
+							modalId="confirmDatasetDeleteModal{dataset.id}"
 							style={'danger'}
 							btnStyle="danger"
 							buttonIcon="trash"
 							label={'Delete'}
-							message={`Delete dataset ${name} from project ${project_id}`}
-							callbackAction={() => handleDatasetDelete(project_id, id)}
+							message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
+							callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
 						/>
 					</td>
 				</tr>
@@ -139,3 +90,9 @@
 		</tbody>
 	</table>
 </div>
+
+<CreateUpdateDatasetModal
+	bind:this={createUpdateDatasetModal}
+	{createDatasetCallback}
+	{updateDatasetCallback}
+/>

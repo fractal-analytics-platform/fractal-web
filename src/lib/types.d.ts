@@ -25,3 +25,19 @@ export type WorkflowTask = {
   task_id: number
   task: Task
 }
+
+export type Resource = {
+  path: string
+  id: number
+  dataset_id: number
+}
+
+export type Dataset = {
+  name: string
+  type: string
+  meta: object
+  readonly: boolean
+  id: number
+  resource_list: Resource[]
+  project_id: number
+}
