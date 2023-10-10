@@ -91,14 +91,14 @@
 		originalDataset = dataset;
 		datasetId = dataset.id;
 		datasetName = dataset.name;
-		if (datasetTypes.indexOf(dataset.type) !== -1) {
+		if (!dataset.type || datasetTypes.indexOf(dataset.type) !== -1) {
 			datasetTypeOption = 'standard';
-			datasetType = dataset.type;
+			datasetType = dataset.type || "";
 			customDatasetType = '';
 		} else {
 			datasetTypeOption = 'custom';
 			datasetType = '';
-			customDatasetType = dataset.type;
+			customDatasetType = dataset.type || "";
 		}
 		readonly = dataset.readonly;
 		resources = dataset.resource_list.map((r) => {
@@ -154,7 +154,7 @@
 			headers,
 			body: JSON.stringify({
 				name: datasetName,
-				type: datasetType,
+				type: getDatasetType(),
 				read_only: readonly,
 				meta: {}
 			})
@@ -177,7 +177,7 @@
 			headers,
 			body: JSON.stringify({
 				name: datasetName,
-				type: datasetTypeOption === 'standard' ? datasetType : customDatasetType,
+				type: getDatasetType(),
 				read_only: readonly,
 				meta: {}
 			})
@@ -365,14 +365,14 @@
 				return false;
 			}
 		}
-		return datasetName && getDatasetType();
+		return datasetName;
 	}
 
 	function getDatasetType() {
 		if (datasetTypeOption === 'custom') {
-			return customDatasetType;
+			return customDatasetType || undefined;
 		}
-		return datasetType;
+		return datasetType || undefined;
 	}
 
 	function handleResourceKeyDown(/** @type {KeyboardEvent} */ event, /** @type {number} */ index) {
@@ -442,28 +442,20 @@
 								id="datasetType"
 								bind:value={datasetType}
 								class="form-control"
-								class:is-invalid={submitted && !datasetType}
 							>
 								<option value="">Select...</option>
 								{#each datasetTypes as allowedType}
 									<option>{allowedType}</option>
 								{/each}
 							</select>
-							{#if submitted && !datasetType}
-								<div class="invalid-feedback">Required field</div>
-							{/if}
 						{:else}
 							<input
 								id="customDatasetType"
 								type="text"
 								bind:value={customDatasetType}
 								class="form-control"
-								class:is-invalid={submitted && !customDatasetType}
 								placeholder="Your custom type"
 							/>
-							{#if submitted && !customDatasetType}
-								<div class="invalid-feedback">Required field</div>
-							{/if}
 						{/if}
 					</div>
 				</div>

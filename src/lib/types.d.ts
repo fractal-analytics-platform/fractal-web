@@ -34,7 +34,7 @@ export type Resource = {
 
 export type Dataset = {
   name: string
-  type: string
+  type?: string
   meta: object
   readonly: boolean
   id: number
