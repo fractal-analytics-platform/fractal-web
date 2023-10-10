@@ -3,7 +3,6 @@
 	import { AlertError } from '$lib/common/errors';
 	import { onMount, tick } from 'svelte';
 	import Modal from '../common/Modal.svelte';
-	import { error } from '@sveltejs/kit';
 
 	/** @type {(dataset: (import('$lib/types').Dataset)) => void} */
 	export let createDatasetCallback;
@@ -103,7 +102,7 @@
 			datasetType = '';
 			customDatasetType = dataset.type || '';
 		}
-		readonly = dataset.readonly;
+		readonly = dataset.read_only;
 		resources = dataset.resource_list.map((r) => {
 			return { id: r.id, path: r.path, editing: false, error: '' };
 		});
@@ -367,7 +366,7 @@
 			name: datasetName,
 			type: getDatasetType(),
 			meta: originalDataset.meta,
-			readonly: readonly,
+			read_only: readonly,
 			id: /** @type {number} */ (datasetId),
 			resource_list: resources.map((r) => {
 				return /** @type {import('$lib/types').Resource} */ ({
