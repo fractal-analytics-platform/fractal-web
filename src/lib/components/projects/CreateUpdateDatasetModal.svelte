@@ -3,6 +3,7 @@
 	import { AlertError } from '$lib/common/errors';
 	import { onMount, tick } from 'svelte';
 	import Modal from '../common/Modal.svelte';
+	import { error } from '@sveltejs/kit';
 
 	/** @type {(dataset: (import('$lib/types').Dataset)) => void} */
 	export let createDatasetCallback;
@@ -20,10 +21,11 @@
 	let datasetType = '';
 	let customDatasetType = '';
 	let readonly = false;
-	/** @type {Array<{ id: number | null, path: string, editing: boolean, error: boolean }>} */
+	/** @type {Array<{ id: number | null, path: string, editing: boolean, error: string }>} */
 	let resources = [getNewResource()];
 	let submitted = false;
 	let saving = false;
+	let creatingDataset = false;
 
 	// Used for the update
 	/** @type {import('$lib/types').Dataset} */
@@ -75,6 +77,7 @@
 		readonly = false;
 		resources = [getNewResource()];
 		submitted = false;
+		creatingDataset = false;
 		modal.show();
 	}
 
@@ -83,7 +86,7 @@
 			id: /** @type {number | null} */ null,
 			path: '',
 			editing: true,
-			error: false
+			error: ''
 		};
 	}
 
@@ -93,18 +96,19 @@
 		datasetName = dataset.name;
 		if (!dataset.type || datasetTypes.indexOf(dataset.type) !== -1) {
 			datasetTypeOption = 'standard';
-			datasetType = dataset.type || "";
+			datasetType = dataset.type || '';
 			customDatasetType = '';
 		} else {
 			datasetTypeOption = 'custom';
 			datasetType = '';
-			customDatasetType = dataset.type || "";
+			customDatasetType = dataset.type || '';
 		}
 		readonly = dataset.readonly;
 		resources = dataset.resource_list.map((r) => {
-			return { id: r.id, path: r.path, editing: false, error: false };
+			return { id: r.id, path: r.path, editing: false, error: '' };
 		});
 		submitted = false;
+		creatingDataset = false;
 		modal.show();
 	}
 
@@ -121,12 +125,19 @@
 	}
 
 	async function save() {
+		// reset resources errors
+		resources = resources.map((r) => {
+			return { ...r, error: '' };
+		});
+
 		try {
 			if (datasetId === null) {
+				creatingDataset = true;
 				originalDataset = await callCreateDataset();
 				datasetId = originalDataset.id;
 				createDatasetCallback(originalDataset);
 			} else {
+				creatingDataset = false;
 				originalDataset = await callUpdateDataset();
 				updateDatasetCallback(originalDataset);
 			}
@@ -196,13 +207,17 @@
 		modal.hideErrorAlert();
 
 		const resource = resources[index];
-		resource.error = false;
+		resource.error = '';
 		if (!resource.path) {
 			return false;
 		}
 
 		if (datasetId === null) {
 			try {
+				if (!fieldsAreValid()) {
+					return false;
+				}
+				creatingDataset = true;
 				originalDataset = await callCreateDataset();
 				datasetId = originalDataset.id;
 				createDatasetCallback(originalDataset);
@@ -224,8 +239,14 @@
 			setResourceEditable(index, false);
 			updateDatasetCallback(getUpdatedDataset());
 		} catch (err) {
-			resource.error = true;
-			modal.displayErrorAlert(err);
+			const validationMsg =
+				err instanceof AlertError ? err.getSimpleValidationMessage('path') : null;
+			if (validationMsg) {
+				resource.error = validationMsg;
+			} else {
+				resource.error = 'An error happened saving the resource';
+				modal.displayErrorAlert(err);
+			}
 		} finally {
 			resources = resources.filter((r, i) => (i === index ? resource : r));
 		}
@@ -251,7 +272,7 @@
 		const result = await response.json();
 		if (!response.ok) {
 			console.log('Dataset resource creation failed', result);
-			throw new AlertError(result);
+			throw new AlertError(result, response.status);
 		}
 		return result;
 	}
@@ -365,7 +386,7 @@
 				return false;
 			}
 		}
-		return datasetName;
+		return !!datasetName;
 	}
 
 	function getDatasetType() {
@@ -390,6 +411,16 @@
 		</h4>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
+		{#if creatingDataset && resources.filter((r) => r.error !== '').length > 0}
+			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+				<span>
+					<i class="bi bi-exclamation-triangle" />
+					<strong>Warning</strong>: Dataset has been created but the creation of some of its
+					resources failed.
+				</span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
+			</div>
+		{/if}
 		<span id="errorAlert-createUpdateDatasetModal" />
 		<form class="row" on:submit|preventDefault={handleSave} id="create-update-dataset-form">
 			<div class="col">
@@ -438,11 +469,7 @@
 				<div class="row mb-3">
 					<div class="col-10 offset-2">
 						{#if datasetTypeOption === 'standard'}
-							<select
-								id="datasetType"
-								bind:value={datasetType}
-								class="form-control"
-							>
+							<select id="datasetType" bind:value={datasetType} class="form-control">
 								<option value="">Select...</option>
 								{#each datasetTypes as allowedType}
 									<option>{allowedType}</option>
@@ -521,7 +548,7 @@
 										<div class="invalid-feedback">Required field</div>
 									{/if}
 									{#if submitted && resource.error}
-										<div class="invalid-feedback">An error happened saving the resource</div>
+										<div class="invalid-feedback">{resource.error}</div>
 									{/if}
 								</div>
 							</div>
