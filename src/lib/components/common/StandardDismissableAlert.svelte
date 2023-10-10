@@ -5,7 +5,6 @@
 	let timeout;
 
 	$: if (autoDismiss && message) {
-		console.log(`alertMessage=${message}`)
 		if (timeout) {
 			clearTimeout(timeout);
 		}
