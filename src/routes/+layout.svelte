@@ -4,6 +4,9 @@
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: server = $page.data.serverInfo || {};
+	// @ts-ignore
+	// eslint-disable-next-line no-undef
+	let clientVersion = __APP_VERSION__;
 
 	// Detects page change
 	$: if ($navigating) cleanupModalBackdrop();
@@ -59,7 +62,9 @@
 		>
 			<div class="col d-flex justify-content-center">
 				<div class="hstack gap-3">
-					<span class="font-monospace">{server.version}</span>
+					<span class="font-monospace">
+						fractal-server {server.version}, fractal-web {clientVersion}
+					</span>
 				</div>
 			</div>
 		</footer>
