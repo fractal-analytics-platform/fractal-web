@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Added fractal-web version to the footer (\#312).
 * Added new modal for create/update dataset feature (\#310).
 * Standardized modal management to fix some bugs (\#306).
 * Added proxy endpoints and refactored error propagation (\#288).
