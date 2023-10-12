@@ -19,17 +19,17 @@
 			blockProperties.push(schemaManager.addProperty(prop));
 		});
 	});
-
 </script>
 
-<div class='d-flex flex-column properties-block'>
-  {#if parsedProperties}
-    {#each blockProperties as prop}
-      {#if removePropertyBlock }
-        <button class='btn btn-danger' type="button" on:click={() => removePropertyBlock(prop.key)}>Remove Property Block
-        </button>
-      {/if}
-      <PropertyDiscriminator schemaProperty={prop}></PropertyDiscriminator>
-    {/each}
-  {/if}
+<div class="d-flex flex-column properties-block">
+	{#if parsedProperties}
+		{#each blockProperties as prop}
+			{#if removePropertyBlock}
+				<button class="btn btn-danger" type="button" on:click={() => removePropertyBlock(prop.key)}>
+					Remove Property Block
+				</button>
+			{/if}
+			<PropertyDiscriminator schemaProperty={prop} />
+		{/each}
+	{/if}
 </div>
