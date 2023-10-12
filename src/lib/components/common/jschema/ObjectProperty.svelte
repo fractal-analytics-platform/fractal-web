@@ -58,7 +58,7 @@
                       <input type='text' bind:value={customObjectPropertyKey} placeholder='Key' class='form-control'>
                     </div>
                     <div class='col-6'>
-                      <button class='btn btn-primary' on:click={addNestedObjectProperty}>Add property</button>
+                      <button class='btn btn-primary' type="button" on:click={addNestedObjectProperty}>Add property</button>
                     </div>
                   </form>
                 </div>

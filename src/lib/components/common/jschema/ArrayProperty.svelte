@@ -47,13 +47,13 @@
           <div id='{collapseSymbol}' class='accordion-collapse collapse' data-bs-parent='#{accordionParentKey}'>
             <div class='accordion-body p-1'>
               <div class='d-flex justify-content-center p-2'>
-                <button class='btn btn-primary' on:click={addNestedProperty}>Add argument to list</button>
+                <button class='btn btn-primary' type="button" on:click={addNestedProperty}>Add argument to list</button>
               </div>
               <div>
                 {#each nestedProperties as nestedProperty, index (nestedProperty.key)}
                   <div class='d-flex'>
                     <div class='align-self-center m-2'>
-                      <button class='btn btn-warning' on:click={removeNestedProperty(index)}>Remove</button>
+                      <button class='btn btn-warning' type="button" on:click={removeNestedProperty(index)}>Remove</button>
                     </div>
                     <div class='flex-fill'>
                       <PropertyDiscriminator schemaProperty={nestedProperty} />

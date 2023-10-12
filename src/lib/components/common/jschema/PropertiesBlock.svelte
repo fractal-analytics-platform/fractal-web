@@ -26,7 +26,7 @@
   {#if parsedProperties}
     {#each blockProperties as prop}
       {#if removePropertyBlock }
-        <button class='btn btn-danger' on:click={removePropertyBlock.bind(this, prop.key)}>Remove Property Block
+        <button class='btn btn-danger' type="button" on:click={() => removePropertyBlock(prop.key)}>Remove Property Block
         </button>
       {/if}
       <PropertyDiscriminator schemaProperty={prop}></PropertyDiscriminator>
