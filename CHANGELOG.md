@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Added dataset history modal (\#316).
 * Fixed bug with save/discard changes in workflow task (\#315).
 * Fixed first-run redirects issue (\#315).
 

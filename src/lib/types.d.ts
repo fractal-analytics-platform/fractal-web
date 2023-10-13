@@ -32,12 +32,19 @@ export type Resource = {
   dataset_id: number
 }
 
+export type DatasetHistoryItem = {
+  workflowtask: WorkflowTask
+  status: string
+  parallelization: object
+}
+
 export type Dataset = {
   name: string
   type?: string
   meta: object
+  history: Array<DatasetHistoryItem>
   read_only: boolean
   id: number
-  resource_list: Resource[]
+  resource_list: Array<Resource>
   project_id: number
 }
