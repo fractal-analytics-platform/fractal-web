@@ -36,6 +36,7 @@ export type Dataset = {
   name: string
   type?: string
   meta: object
+  history: object
   read_only: boolean
   id: number
   resource_list: Resource[]
