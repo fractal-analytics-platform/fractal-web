@@ -2,7 +2,8 @@
 
 # Unreleased
 
-* Fixed deleted workflow task pending changes bug and first-run redirects issue (\#315).
+* Fixed bug with save/discard changes in workflow task (\#315).
+* Fixed first-run redirects issue (\#315).
 
 # 0.6.0
 
