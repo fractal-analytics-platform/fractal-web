@@ -170,7 +170,7 @@
 		</svelte:fragment>
 		<svelte:fragment slot="body">
 			<ul class="list-group">
-				{#if Object.keys(dataset.history).length > 0}
+				{#if dataset.history && Object.keys(dataset.history).length > 0}
 					{#each Object.entries(dataset.history) as [key, value]}
 						<li class="list-group-item text-bg-light">
 							<span>
