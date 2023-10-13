@@ -34,7 +34,11 @@
 		{#if dataset}
 			<button class="btn btn-light" data-bs-target="#datasetMetaModal" data-bs-toggle="modal">
 				<i class="bi-arrow-up-right-square" />
-				Show meta properties
+				Show dataset metadata
+			</button>
+			<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
+				<i class="bi-arrow-up-right-square" />
+				Show dataset history
 			</button>
 		{/if}
 	</div>
@@ -131,6 +135,27 @@
 					{/each}
 				{:else}
 					<p>No meta properties</p>
+				{/if}
+			</ul>
+		</svelte:fragment>
+	</Modal>
+	<Modal id="datasetHistoryModal" size="lg" centered={true} scrollable={true}>
+		<svelte:fragment slot="header">
+			<h5 class="modal-title">Dataset history</h5>
+		</svelte:fragment>
+		<svelte:fragment slot="body">
+			<ul class="list-group">
+				{#if Object.keys(dataset.history).length > 0}
+					{#each Object.entries(dataset.history) as [key, value]}
+						<li class="list-group-item text-bg-light">
+							<span class="text-capitalize">History item {key}</span>
+						</li>
+						<li class="list-group-item text-break">
+							<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
+						</li>
+					{/each}
+				{:else}
+					<p>No history</p>
 				{/if}
 			</ul>
 		</svelte:fragment>
