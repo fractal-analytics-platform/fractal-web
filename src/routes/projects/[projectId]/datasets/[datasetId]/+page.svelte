@@ -13,6 +13,31 @@
 	onMount(async () => {
 		dataset = await $page.data.dataset;
 	});
+
+	/**
+	 * Returns the dataset history formatted in JSON hiding some values.
+	 *
+	 * @param {object} value
+	 * @returns {string}
+	 */
+	function formatDatasetHistory(value) {
+		return JSON.stringify(
+			{
+				...value,
+				workflowtask: {
+					...value.workflowtask,
+					task: {
+						...value.workflowtask.task,
+						args_schema: value.workflowtask.task.args_schema ? '[HIDDEN]' : undefined,
+						docs_info: value.workflowtask.task.docs_info ? '[HIDDEN]' : undefined,
+						docs_link: value.workflowtask.task.docs_link ? '[HIDDEN]' : undefined
+					}
+				}
+			},
+			null,
+			2
+		);
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -139,7 +164,7 @@
 			</ul>
 		</svelte:fragment>
 	</Modal>
-	<Modal id="datasetHistoryModal" size="lg" centered={true} scrollable={true}>
+	<Modal id="datasetHistoryModal" size="xl" centered={true} scrollable={true}>
 		<svelte:fragment slot="header">
 			<h5 class="modal-title">Dataset history</h5>
 		</svelte:fragment>
@@ -151,7 +176,7 @@
 							<span class="text-capitalize">History item {key}</span>
 						</li>
 						<li class="list-group-item text-break">
-							<code><pre>{JSON.stringify(value, null, 2)}</pre></code>
+							<code><pre>{formatDatasetHistory(value)}</pre></code>
 						</li>
 					{/each}
 				{:else}
@@ -164,6 +189,7 @@
 
 <style type="text/css">
 	pre {
+		white-space: pre-wrap;
 		display: inline;
 	}
 </style>
