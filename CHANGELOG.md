@@ -2,6 +2,9 @@
 
 # Unreleased
 
+* Fixed bug with save/discard changes in workflow task (\#315).
+* Fixed first-run redirects issue (\#315).
+
 # 0.6.0
 
 * Added fractal-web version to the footer (\#312).

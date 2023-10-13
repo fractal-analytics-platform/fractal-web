@@ -15,6 +15,10 @@ const config = {
 	test: {
 		globals: true,
 		include: ['**/__tests__/**/*.?(c|m)[jt]s?(x)']
+	},
+	optimizeDeps: {
+		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection
+		include: ['slim-select', 'marked', 'dompurify', 'semver', 'ajv', '@vincjo/datatables']
 	}
 };
 

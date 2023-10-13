@@ -113,8 +113,7 @@
 				}
 			);
 			const fileUrl = URL.createObjectURL(file);
-			/** @type {any} */
-			const linkElement = document.getElementById('downloadWorkflowButton');
+			const linkElement = /** @type {HTMLAnchorElement} */ (document.getElementById('downloadWorkflowButton'));
 			linkElement.download = `workflow-export-${workflow.name}-${Date.now().toString()}.json`;
 			linkElement.href = fileUrl;
 			linkElement.click();
@@ -262,6 +261,9 @@
 			console.error('Unable to delete workflow task', error);
 			throw new AlertError(error);
 		}
+
+		// Discard unsaved changes when workflow task is deleted
+		argumentsWithUnsavedChanges = false;
 
 		// Get updated workflow with deleted task
 		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
