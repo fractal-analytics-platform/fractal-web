@@ -1,6 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.6.1
+
+This release works best with fractal-server >=1.3.12 (since it makes use of the
+`dataset.history` property), but previous fractal-server versions are still
+supported.
 
 * Added dataset history modal (\#316).
 * Fixed bug with save/discard changes in workflow task (\#315).
