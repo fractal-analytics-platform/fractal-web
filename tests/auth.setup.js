@@ -8,7 +8,7 @@ setup('authentication', async ({ page }) => {
 	await page.getByLabel('Password').fill('1234');
 	await page.getByRole('button', { name: 'Submit' }).click();
 
-	await page.waitForURL('/');
+	await page.waitForURL('/projects');
 
 	await page.context().storageState({ path: authFile });
 });

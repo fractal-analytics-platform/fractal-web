@@ -2,14 +2,41 @@
 
 ## Unit tests
 
-Unit tests are performed via [vitest](https://vitest.dev), via the `test` script defined in `package.json`. Current tests are in the `__tests__` folder.
-
+Unit tests are performed via [vitest](https://vitest.dev), via the `test` script defined in `package.json`.
 
 ## End-to-end testing
 
-This is not yet implemented in an automated way (tracked in
-https://github.com/fractal-analytics-platform/fractal-web/issues/8), and for
-the moment it needs to be done manually.
+E2E tests are done using playwright. They can be executed using the following command:
+
+```
+npx playwright test
+```
+
+To print Svelte webserver log set the environment variable `DEBUG=pw:webserver`.
+
+To execute the tests seeing the browser add the `--headed` flag or the `--debug` flag if you need to watch them step by step.
+
+## Coverage
+
+Coverage for the unit tests:
+
+```
+npx vitest run --coverage.enabled --coverage.provider=istanbul --coverage.include=src --coverage.reporter=json --coverage.all
+```
+
+Warning: coverage takes some time using the option `--coverage.all`.
+
+Coverage for the playwright tests is automatically collected when running `npx playwright test`.
+
+To generate a merged html report:
+
+```
+mkdir coverage-all
+cp coverage-playwright/* coverage-all
+cp coverage-unit/* coverage-all
+cp .nyc_output/*.json coverage-all
+npx nyc report --report-dir ./coverage-html --temp-dir ./coverage-all --reporter=html --exclude-after-remap false
+```
 
 ### Local `fractal-server` instance
 

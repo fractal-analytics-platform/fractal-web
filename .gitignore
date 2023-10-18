@@ -10,3 +10,5 @@ node_modules
 *.bak
 .*.swp
 /tests/.auth
+coverage*
+.nyc_output
