@@ -34,7 +34,6 @@ To generate a merged html report:
 mkdir coverage-all
 cp coverage-playwright/* coverage-all
 cp coverage-unit/* coverage-all
-cp .nyc_output/*.json coverage-all
 npx nyc report --report-dir ./coverage-html --temp-dir ./coverage-all --reporter=html --exclude-after-remap false
 ```
 
