@@ -18,7 +18,10 @@ test('Create and delete a project', async ({ page }) => {
 
 	// Go back to projects list
 	await page.goto('/projects');
-	expect(await page.locator('table tbody tr').count()).toBe(initialProjectsCount + 1);
+	await page.waitForFunction(
+		(expectedCount) => document.querySelectorAll('table tbody tr').length === expectedCount,
+		initialProjectsCount + 1
+	);
 
 	// Click on the last delete project button
 	const deleteButtons = await page.getByRole('button', { name: 'Delete' }).all();
