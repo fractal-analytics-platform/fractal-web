@@ -1,15 +1,11 @@
 name: Unit tests
 
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+on: [workflow_call]
 
 jobs:
   unit_tests:
     name: 'Node ${{ matrix.node-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
 
     strategy:
@@ -30,4 +26,10 @@ jobs:
         run: npm install
 
       - name: Run vitest tests
-        run: npm run test
+        run: npx vitest run --coverage.enabled --coverage.provider=istanbul --coverage.include=src --coverage.reporter=json --coverage.all
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: unit-coverage
+          path: coverage-unit/
+          retention-days: 30
