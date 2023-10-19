@@ -8,10 +8,10 @@ on:
 
 jobs:
   unit_tests:
-    uses: ./.github/workflows/unit_tests.yml
+    uses: ./.github/workflows/unit_tests.yaml
 
   end_to_end_tests:
-    uses: ./.github/workflows/end_to_end_tests.yml
+    uses: ./.github/workflows/end_to_end_tests.yaml
 
   coverage:
     name: Compute coverage
@@ -45,11 +45,6 @@ jobs:
         with:
           name: playwright-coverage
           path: coverage-all
-
-      - name: Merge coverage files
-      - run: |
-          mv coverage-all/unit-coverage/*.json coverage-all
-          mv coverage-all/playwright-coverage/*.json coverage-all
 
       - name: Code coverage report
         uses: tj-actions/coverage-reporter@v5.4

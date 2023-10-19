@@ -1,6 +1,9 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.development' });
 
 export default defineConfig({
 	testDir: 'tests',
@@ -32,7 +35,7 @@ export default defineConfig({
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
-			reuseExistingServer: !process.env.CI,
+			reuseExistingServer: !process.env.CI
 		},
 		{
 			command: 'npm run build && ORIGIN=http://localhost:5173 PORT=5173 node build',

@@ -28,15 +28,14 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      # Fix for Node 18 issue:
+      # See: https://github.com/node-fetch/node-fetch/issues/1624
+      - name: Set fractal-server host for Node 18
+        if: matrix.node-version == '18'
+        run: echo "FRACTAL_SERVER_HOST=http://127.0.0.1:8000" >> $GITHUB_ENV
+
       - name: Run Playwright tests
         run: npx playwright test
-
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
 
       - uses: actions/upload-artifact@v3
         with:
