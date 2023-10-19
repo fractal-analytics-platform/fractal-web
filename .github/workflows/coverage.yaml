@@ -1,0 +1,57 @@
+name: Coverage
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  unit_tests:
+    uses: ./.github/workflows/unit_tests.yml
+
+  end_to_end_tests:
+    uses: ./.github/workflows/end_to_end_tests.yml
+
+  coverage:
+    name: Compute coverage
+    runs-on: ubuntu-22.04
+    needs: [unit_tests, end_to_end_tests]
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install nyc
+        run: npm install -g nyc
+
+      - name: Create coverage-all folder
+        run: mkdir coverage-all
+
+      - name: Download unit coverage
+        uses: actions/download-artifact@v3
+        with:
+          name: unit-coverage
+          path: coverage-all
+
+      - name: Download playwright coverage
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-coverage
+          path: coverage-all
+
+      - name: Merge coverage files
+      - run: |
+          mv coverage-all/unit-coverage/*.json coverage-all
+          mv coverage-all/playwright-coverage/*.json coverage-all
+
+      - name: Code coverage report
+        uses: tj-actions/coverage-reporter@v5.4
+        with:
+          coverage-command: "nyc report --temp-dir ./coverage-all --reporter=text --exclude-after-remap false"

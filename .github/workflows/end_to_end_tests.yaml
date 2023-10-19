@@ -1,15 +1,11 @@
 name: End-to-end tests
 
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+on: [workflow_call]
 
 jobs:
   end_to_end_tests:
     name: 'Node ${{ matrix.node-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
 
     strategy:
@@ -29,5 +25,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run playwright tests (not implemented)
-        run: echo "Not implemented"
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: playwright-coverage
+          path: coverage-playwright/
+          retention-days: 30
