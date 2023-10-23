@@ -27,6 +27,9 @@ export class SchemaValidator {
 		return this.#validator(data);
 	}
 
+	/**
+	 * @returns {import('ajv').ErrorObject[] | null}
+	 */
 	getErrors() {
 		if (!this.#canValidate) return null;
 		return this.#validator.errors;

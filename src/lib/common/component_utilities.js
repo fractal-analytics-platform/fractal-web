@@ -2,20 +2,25 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import semver from 'semver';
 
+/**
+ * 
+ * @param {import('$lib/types').Task} t1 
+ * @param {import('$lib/types').Task} t2 
+ * @returns 
+ */
 export function greatestVersionAsc(t1, t2) {
 	const semverValidationOptions = {
 		loose: true,
 		includePrerelease: true
 	};
-	try {
-		const t1Version = semver.valid(t1.version, semverValidationOptions);
-		const t2Version = semver.valid(t2.version, semverValidationOptions);
+	const t1Version = semver.valid(t1.version, semverValidationOptions);
+	const t2Version = semver.valid(t2.version, semverValidationOptions);
+	if (t1Version !== null && t2Version !== null) {
 		const t1VersionLt = semver.lte(t1Version, t2Version);
 		if (t1VersionLt) return -1;
 		if (!t1VersionLt) return 1;
-	} catch {
-		return 0;
 	}
+	return 0;
 }
 
 export function greatestVersionDesc(t1, t2) {
