@@ -1,9 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.6.2
 
-* Fixed argument popovers performance issue (\#324).
-* Added end to end tests and coverage configuration (\#320).
+* Fixed peformance issue with argument-description popovers (\#324).
+* Added end-to-end tests and coverage configuration (\#320).
 
 # 0.6.1
 
