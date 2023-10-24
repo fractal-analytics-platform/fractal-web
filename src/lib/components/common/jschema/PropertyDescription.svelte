@@ -3,17 +3,27 @@
 
 	export let description = undefined;
 
-	onMount(() => {
-		const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-		// eslint-disable-next-line no-undef
-		popoverTriggerList.forEach(popoverEl => new bootstrap.Popover(popoverEl));
-	});
+	let element;
 
+	onMount(() => {
+		if (element) {
+			// @ts-ignore
+			// eslint-disable-next-line no-undef
+			new bootstrap.Popover(element);
+		}
+	});
 </script>
 
-<span class='ms-2'>
-  {#if description }
-    <a tabindex='0' role='button' data-bs-trigger='focus' class='bi bi-info-circle' data-bs-toggle='popover'
-       data-bs-content={description}></a>
-  {/if}
+<span class="ms-2 property-description">
+	{#if description}
+		<span
+			bind:this={element}
+			tabindex="0"
+			role="button"
+			data-bs-trigger="focus"
+			class="bi bi-info-circle text-primary"
+			data-bs-toggle="popover"
+			data-bs-content={description}
+		/>
+	{/if}
 </span>

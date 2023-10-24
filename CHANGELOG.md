@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Fixed argument popovers performance issue (\#324).
 * Added end to end tests and coverage configuration (\#320).
 
 # 0.6.1

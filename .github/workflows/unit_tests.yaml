@@ -33,3 +33,6 @@ jobs:
           name: unit-coverage
           path: coverage-unit/
           retention-days: 30
+
+    env:
+      ENABLE_COVERAGE: "true"

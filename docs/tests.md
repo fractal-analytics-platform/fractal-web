@@ -21,12 +21,12 @@ To execute the tests seeing the browser add the `--headed` flag or the `--debug`
 Coverage for the unit tests:
 
 ```
-npx vitest run --coverage.enabled --coverage.provider=istanbul --coverage.include=src --coverage.reporter=json --coverage.all
+ENABLE_COVERAGE=true npx vitest run --coverage.enabled --coverage.provider=istanbul --coverage.include=src --coverage.reporter=json --coverage.all
 ```
 
 Warning: coverage takes some time using the option `--coverage.all`.
 
-Coverage for the playwright tests is automatically collected when running `npx playwright test`.
+Coverage for the playwright tests is automatically collected when running `ENABLE_COVERAGE=true npx playwright test`.
 
 To generate a merged html report:
 
