@@ -42,3 +42,6 @@ jobs:
           name: playwright-coverage
           path: coverage-playwright/
           retention-days: 30
+
+    env:
+      ENABLE_COVERAGE: "true"
