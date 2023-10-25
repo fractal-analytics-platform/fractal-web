@@ -497,7 +497,7 @@
 
 		workflow = workflowResult;
 		selectedWorkflowTask = workflowTask;
-		workflowSuccessMessage = 'Workflow updated';
+		workflowSuccessMessage = 'Task version updated successfully';
 	}
 
 	let newVersionsCount = 0;
