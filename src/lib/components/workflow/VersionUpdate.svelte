@@ -19,6 +19,7 @@
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
 	let argsToBeFixed = '';
+	let argsToBeFixedValidJson = true;
 	/** @type {import('ajv').ErrorObject[] | null} */
 	let validationErrors = null;
 
@@ -84,7 +85,15 @@
 	}
 
 	function check() {
-		validateArguments(JSON.parse(argsToBeFixed));
+		argsToBeFixedValidJson = true;
+		let args;
+		try {
+			args = JSON.parse(argsToBeFixed);
+		} catch (err) {
+			argsToBeFixedValidJson = false;
+			return;
+		}
+		validateArguments(args);
 	}
 
 	/**
@@ -196,7 +205,15 @@
 					<div class="alert alert-success mt-3">The arguments are valid</div>
 				{/if}
 				<label class="form-label" for="fix-arguments">Fix the arguments:</label>
-				<textarea class="form-control" id="fix-arguments" bind:value={argsToBeFixed} />
+				<textarea
+					class="form-control"
+					id="fix-arguments"
+					class:is-invalid={!argsToBeFixedValidJson}
+					bind:value={argsToBeFixed}
+				/>
+				{#if !argsToBeFixedValidJson}
+					<div class="invalid-feedback">Invalid JSON</div>
+				{/if}
 				<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
 				&nbsp;
 			{/if}

@@ -94,6 +94,25 @@ describe('VersionUpdate', () => {
 		expect(updateBtnEnabled.disabled).eq(false);
 	});
 
+	it('trying to fix the arguments with invalid JSON', async () => {
+		const task = getTask('My Task', '1.2.4');
+		const versions = await checkVersions(task, 1);
+		expect(versions[0]).toBe('2.0.0');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
+
+		const [checkBtn, updateBtnDisabled] = screen.getAllByRole('button');
+		expect(updateBtnDisabled.disabled).eq(true);
+
+		await fireEvent.input(screen.getByRole('textbox'), {
+			target: { value: '}{' }
+		});
+		await fireEvent.click(checkBtn);
+
+		expect(screen.getByRole('textbox').classList.contains('is-invalid')).eq(true);
+		expect(screen.getByText('Invalid JSON')).toBeDefined();
+	});
+
 	it('no new versions available for null owner', async () => {
 		const task = getTask('My Other Task', '1.2.3');
 		await checkVersions(task, 0);
