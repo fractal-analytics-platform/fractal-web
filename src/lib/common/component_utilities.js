@@ -3,10 +3,9 @@ import DOMPurify from 'dompurify';
 import semver from 'semver';
 
 /**
- * 
- * @param {import('$lib/types').Task} t1 
- * @param {import('$lib/types').Task} t2 
- * @returns 
+ * @param {import('$lib/types').Task} t1
+ * @param {import('$lib/types').Task} t2
+ * @returns {-1|0|1}
  */
 export function greatestVersionAsc(t1, t2) {
 	const semverValidationOptions = {
@@ -17,28 +16,35 @@ export function greatestVersionAsc(t1, t2) {
 	const t2Version = semver.valid(t2.version, semverValidationOptions);
 	if (t1Version !== null && t2Version !== null) {
 		const t1VersionLt = semver.lte(t1Version, t2Version);
-		if (t1VersionLt) return -1;
-		if (!t1VersionLt) return 1;
+		return t1VersionLt ? -1 : 1;
 	}
 	return 0;
 }
 
+/**
+ * @param {import('$lib/types').Task} t1
+ * @param {import('$lib/types').Task} t2
+ * @returns {-1|0|1}
+ */
 export function greatestVersionDesc(t1, t2) {
 	const semverValidationOptions = {
 		loose: true,
 		includePrerelease: true
 	};
-	try {
-		const t1Version = semver.valid(t1.version, semverValidationOptions);
-		const t2Version = semver.valid(t2.version, semverValidationOptions);
+	const t1Version = semver.valid(t1.version, semverValidationOptions);
+	const t2Version = semver.valid(t2.version, semverValidationOptions);
+	if (t1Version !== null && t2Version !== null) {
 		const t1VersionGt = semver.gte(t1Version, t2Version);
-		if (t1VersionGt) return -1;
-		if (!t1VersionGt) return 1;
-	} catch {
-		return 0;
+		return t1VersionGt ? -1 : 1;
 	}
+	return 0;
 }
 
+/**
+ * @param {import('$lib/types').Task} t1
+ * @param {import('$lib/types').Task} t2
+ * @returns {-1|0|1}
+ */
 function compareTaskNameAndVersion(t1, t2) {
 	if (t1.name < t2.name) return -1;
 	if (t1.name > t2.name) return 1;
@@ -118,8 +124,8 @@ export function nullifyEmptyStrings(inputValues) {
 /**
  * Replacer function to ignore empty strings when using JSON.stringify().
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description}
- * @param {string} _key 
- * @param {any} value 
+ * @param {string} _key
+ * @param {any} value
  * @returns {any}
  */
 export function replaceEmptyStrings(_key, value) {

@@ -1,5 +1,5 @@
 <script>
-	import { greatestVersionAsc } from '$lib/common/component_utilities';
+	import { greatestVersionAsc, greatestVersionDesc } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { SchemaValidator } from '$lib/common/jschema_validation';
 	import { page } from '$app/stores';
@@ -55,15 +55,18 @@
 		/** @type {import('$lib/types').Task[]} */
 		const result = await response.json();
 
-		updateCandidates = result.filter((t) => {
-			return (
-				t.name === task.name &&
-				t.owner === task.owner &&
-				t.version &&
-				t.args_schema &&
-				greatestVersionAsc(t, task) === 1
-			);
-		});
+		updateCandidates = result
+			.filter((t) => {
+				return (
+					t.name === task.name &&
+					t.owner === task.owner &&
+					t.version &&
+					t.args_schema &&
+					greatestVersionAsc(t, task) === 1
+				);
+			})
+			.sort(greatestVersionDesc);
+
 		updateNewVersionsCount(updateCandidates.length);
 	}
 
@@ -91,7 +94,9 @@
 		const updateCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
 		const newSchema = updateCandidate.args_schema;
 		const validator = new SchemaValidator();
-		stripSchemaProperties(newSchema);
+		if ('properties' in newSchema) {
+			stripSchemaProperties(newSchema);
+		}
 		const parsedSchema = JSON.parse(JSON.stringify(newSchema));
 		const isSchemaValid = validator.loadSchema(parsedSchema);
 		if (!isSchemaValid) {
