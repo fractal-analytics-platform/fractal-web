@@ -30,11 +30,15 @@ const task3ArgsSchema = {
 	title: 'MyTask',
 	type: 'object',
 	properties: {
+		changed_property: {
+			type: 'boolean'
+		},
 		new_property: {
 			type: 'string'
 		}
 	},
-	required: ['new_property']
+	required: ['changed_property', 'new_property'],
+	additionalProperties: false
 };
 
 const tasks = [
@@ -70,12 +74,13 @@ describe('VersionUpdate', () => {
 
 	it('update task fixing the arguments', async () => {
 		const task = getTask('My Task', '1.2.4');
-		const versions = await checkVersions(task, 1);
+		const versions = await checkVersions(task, 1, { extra_property: 1, changed_property: 'x' });
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		const [checkBtn, updateBtnDisabled] = screen.getAllByRole('button');
+		const [moreLink, checkBtn, updateBtnDisabled] = screen.getAllByRole('button');
+		expect(moreLink.textContent).eq('more');
 		expect(checkBtn.textContent).eq('Check');
 		expect(updateBtnDisabled.textContent).eq('Update');
 		expect(updateBtnDisabled.disabled).eq(true);
@@ -84,8 +89,14 @@ describe('VersionUpdate', () => {
 			screen.getByText('Following errors must be fixed before performing the update:')
 		).toBeDefined();
 
+		const list = screen.getAllByRole('listitem');
+		expect(list.length).eq(3);
+		expect(list[0].textContent.trim()).eq("must have required property 'new_property'");
+		expect(list[1].textContent.trim()).eq("must NOT have additional property 'extra_property'");
+		expect(list[2].textContent.trim()).contain('/changed_property: must be boolean');
+
 		await fireEvent.input(screen.getByRole('textbox'), {
-			target: { value: '{"new_property": "test"}' }
+			target: { value: '{"changed_property": true, "new_property": "test"}' }
 		});
 		await fireEvent.click(checkBtn);
 
@@ -142,8 +153,8 @@ describe('VersionUpdate', () => {
 	});
 });
 
-async function checkVersions(task, expectedCount) {
-	const result = renderVersionUpdate(task);
+async function checkVersions(task, expectedCount, args = {}) {
+	const result = renderVersionUpdate(task, args);
 
 	// triggers the updates
 	await new Promise(setTimeout);
@@ -159,11 +170,11 @@ async function checkVersions(task, expectedCount) {
 	return options.filter((_, i) => i > 0).map((o) => o.value);
 }
 
-function renderVersionUpdate(task) {
+function renderVersionUpdate(task, args) {
 	const nop = function () {};
 	mockTaskList();
 
-	const workflowTask = { task };
+	const workflowTask = { task, args };
 
 	return render(VersionUpdate, {
 		props: { workflowTask, updateWorkflowCallback: nop, updateNewVersionsCount: nop }

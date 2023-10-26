@@ -1,21 +1,20 @@
-/*
- *
- */
-
 import Ajv from 'ajv';
 
 export class SchemaValidator {
 	#validator;
 	#canValidate = false;
 
-	constructor() {
-		this.ajv = new Ajv();
+	/**
+	 * @param {boolean} allErrors if true, check all rules collecting all errors. Default is to return after the first error.
+	 */
+	constructor(allErrors = false) {
+		this.ajv = new Ajv({ allErrors });
 	}
 
 	loadSchema(schema) {
 		try {
 			this.#validator = this.ajv.compile(schema);
-			return this.#canValidate = true;
+			return (this.#canValidate = true);
 		} catch {
 			console.error('SchemaValidator:loadSchema: error compiling schema');
 			return false;
@@ -34,5 +33,4 @@ export class SchemaValidator {
 		if (!this.#canValidate) return null;
 		return this.#validator.errors;
 	}
-
 }

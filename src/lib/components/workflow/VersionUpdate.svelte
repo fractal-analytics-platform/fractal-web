@@ -102,7 +102,7 @@
 	function validateArguments(args) {
 		const updateCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
 		const newSchema = updateCandidate.args_schema;
-		const validator = new SchemaValidator();
+		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
 			stripSchemaProperties(newSchema);
 		}
@@ -195,9 +195,41 @@
 			{#if validationErrors}
 				<div class="alert alert-danger mt-3">
 					<p>Following errors must be fixed before performing the update:</p>
-					{#each validationErrors as error}
-						<pre>{JSON.stringify(error, null, 2)}</pre>
-					{/each}
+					<ul id="validation-errors">
+						{#each validationErrors as error, index}
+							<li>
+								{#if error.instancePath !== ''}
+									{error.instancePath}:
+								{/if}
+								{#if error.keyword === 'additionalProperties'}
+									must NOT have additional property '{error.params.additionalProperty}'
+								{:else if error.keyword === 'required'}
+									{error.message}
+								{:else}
+									{error.message}
+									<small
+										data-bs-toggle="collapse"
+										data-bs-target="#collapse-{index}"
+										aria-expanded="true"
+										aria-controls="collapse-{index}"
+										class="text-primary"
+										role="button"
+									>
+										more
+									</small>
+									<div
+										id="collapse-{index}"
+										class="accordion-collapse collapse"
+										data-bs-parent="#validation-errors"
+									>
+										<div class="accordion-body">
+											<pre class="alert alert-warning mt-1">{JSON.stringify(error, null, 2)}</pre>
+										</div>
+									</div>
+								{/if}
+							</li>
+						{/each}
+					</ul>
 				</div>
 			{/if}
 			{#if argsToBeFixed}
@@ -210,6 +242,7 @@
 					id="fix-arguments"
 					class:is-invalid={!argsToBeFixedValidJson}
 					bind:value={argsToBeFixed}
+					rows="20"
 				/>
 				{#if !argsToBeFixedValidJson}
 					<div class="invalid-feedback">Invalid JSON</div>
