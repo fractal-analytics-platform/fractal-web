@@ -79,9 +79,10 @@ describe('VersionUpdate', () => {
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		const [moreLink, checkBtn, updateBtnDisabled] = screen.getAllByRole('button');
+		const [moreLink, checkBtn, cancelBtn, updateBtnDisabled] = screen.getAllByRole('button');
 		expect(moreLink.textContent).eq('more');
 		expect(checkBtn.textContent).eq('Check');
+		expect(cancelBtn.textContent).eq('Cancel');
 		expect(updateBtnDisabled.textContent).eq('Update');
 		expect(updateBtnDisabled.disabled).eq(true);
 
@@ -100,9 +101,36 @@ describe('VersionUpdate', () => {
 		});
 		await fireEvent.click(checkBtn);
 
-		const updateBtnEnabled = screen.getAllByRole('button')[1];
+		const updateBtnEnabled = screen.getAllByRole('button')[2];
 		expect(updateBtnEnabled.textContent).eq('Update');
 		expect(updateBtnEnabled.disabled).eq(false);
+	});
+
+	it('use the cancel button when fixing the arguments', async () => {
+		const task = getTask('My Task', '1.2.4');
+		const versions = await checkVersions(task, 1, { changed_property: 'x' });
+		expect(versions[0]).toBe('2.0.0');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
+
+		expect(screen.getByRole('textbox').value).eq(
+			JSON.stringify({ changed_property: 'x' }, null, 2)
+		);
+
+		const cancelBtnDisabled = screen.getByRole('button', { name: 'Cancel' });
+		expect(cancelBtnDisabled.disabled).eq(true);
+
+		await fireEvent.input(screen.getByRole('textbox'), {
+			target: { value: '{"changed_property": "y"}' }
+		});
+
+		const cancelBtnEnabled = screen.getByRole('button', { name: 'Cancel' });
+		expect(cancelBtnEnabled.disabled).eq(false);
+		await fireEvent.click(cancelBtnEnabled);
+
+		expect(screen.getByRole('textbox').value).eq(
+			JSON.stringify({ changed_property: 'x' }, null, 2)
+		);
 	});
 
 	it('trying to fix the arguments with invalid JSON', async () => {

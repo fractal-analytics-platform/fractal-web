@@ -18,6 +18,7 @@
 	/** @type {import('$lib/types').Task[]} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
+	let originalArgs = '';
 	let argsToBeFixed = '';
 	let argsToBeFixedValidJson = true;
 	/** @type {import('ajv').ErrorObject[] | null} */
@@ -96,6 +97,11 @@
 		validateArguments(args);
 	}
 
+	function cancel() {
+		argsToBeFixed = originalArgs;
+		check();
+	}
+
 	/**
 	 * @param args {object}
 	 */
@@ -116,7 +122,8 @@
 		if (valid) {
 			validationErrors = null;
 		} else {
-			argsToBeFixed = JSON.stringify(args, null, 2);
+			originalArgs = JSON.stringify(args, null, 2);
+			argsToBeFixed = originalArgs;
 			validationErrors = validator.getErrors();
 		}
 	}
@@ -248,6 +255,15 @@
 					<div class="invalid-feedback">Invalid JSON</div>
 				{/if}
 				<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
+				&nbsp;
+				<button
+					type="button"
+					class="btn btn-secondary mt-3"
+					on:click={cancel}
+					disabled={argsToBeFixed === originalArgs}
+				>
+					Cancel
+				</button>
 				&nbsp;
 			{/if}
 			<button type="button" class="btn btn-primary mt-3" on:click={update} disabled={!canBeUpdated}>
