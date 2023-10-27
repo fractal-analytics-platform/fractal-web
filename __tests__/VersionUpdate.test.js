@@ -79,8 +79,11 @@ describe('VersionUpdate', () => {
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		const [moreLink, checkBtn, cancelBtn, updateBtnDisabled] = screen.getAllByRole('button');
-		expect(moreLink.textContent).eq('more');
+		const [moreLink1, moreLink2, moreLink3, checkBtn, cancelBtn, updateBtnDisabled] =
+			screen.getAllByRole('button');
+		expect(moreLink1.textContent).eq('more');
+		expect(moreLink2.textContent).eq('more');
+		expect(moreLink3.textContent).eq('more');
 		expect(checkBtn.textContent).eq('Check');
 		expect(cancelBtn.textContent).eq('Cancel');
 		expect(updateBtnDisabled.textContent).eq('Update');
@@ -92,9 +95,9 @@ describe('VersionUpdate', () => {
 
 		const list = screen.getAllByRole('listitem');
 		expect(list.length).eq(3);
-		expect(list[0].textContent.trim()).eq("must have required property 'new_property'");
-		expect(list[1].textContent.trim()).eq("must NOT have additional property 'extra_property'");
-		expect(list[2].textContent.trim()).contain('/changed_property: must be boolean');
+		expect(list[0].textContent).contain("must have required property 'new_property'");
+		expect(list[1].textContent).contain("must NOT have additional property 'extra_property'");
+		expect(list[2].textContent).contain('/changed_property: must be boolean');
 
 		await fireEvent.input(screen.getByRole('textbox'), {
 			target: { value: '{"changed_property": true, "new_property": "test"}' }
@@ -140,8 +143,9 @@ describe('VersionUpdate', () => {
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		const [checkBtn, updateBtnDisabled] = screen.getAllByRole('button');
-		expect(updateBtnDisabled.disabled).eq(true);
+		const checkBtn = screen.getByRole('button', { name: 'Check' });
+		const updateBtn = screen.getByRole('button', { name: 'Update' });
+		expect(updateBtn.disabled).eq(true);
 
 		await fireEvent.input(screen.getByRole('textbox'), {
 			target: { value: '}{' }
