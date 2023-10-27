@@ -13,6 +13,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/workflow/VersionUpdate.svelte';
+	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
 
 	// Workflow
 	/** @type {import('$lib/types').Workflow|undefined} */
@@ -65,6 +66,9 @@
 	/** @type {Modal} */
 	let editWorkflowModal;
 
+	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
+	let newVersionsMap = {};
+
 	$: updatableWorkflowList = workflow?.task_list || [];
 
 	workflowTaskContext.subscribe((value) => {
@@ -81,6 +85,7 @@
 		workflow = $page.data.workflow;
 		project = $page.data.project;
 		datasets = $page.data.datasets;
+		checkNewVersions();
 	});
 
 	beforeNavigate((navigation) => {
@@ -258,6 +263,7 @@
 			// UI Feedback
 			workflowSuccessMessage = 'Workflow task created';
 			resetCreateWorkflowTaskModal();
+			await checkNewVersions();
 		});
 	}
 
@@ -498,6 +504,13 @@
 		workflow = workflowResult;
 		selectedWorkflowTask = workflowTask;
 		workflowSuccessMessage = 'Task version updated successfully';
+		await checkNewVersions();
+	}
+
+	async function checkNewVersions() {
+		if (workflow) {
+			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task));
+		}
 	}
 
 	let newVersionsCount = 0;
@@ -505,7 +518,7 @@
 	 * Used to receive new version count from VersionUpdate component.
 	 * @param count {number}
 	 */
-	function updateNewVersionsCount(count) {
+	async function updateNewVersionsCount(count) {
 		newVersionsCount = count;
 	}
 </script>
@@ -606,6 +619,12 @@
 									on:keypress|preventDefault
 								>
 									{workflowTask.task.name} #{workflowTask.id}
+
+									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
+										<span class="float-end text-warning" title="new version available">
+											<i class="bi bi-exclamation-triangle" />
+										</span>
+									{/if}
 								</li>
 							{/each}
 						</ul>

@@ -1,16 +1,16 @@
 <script>
-	import { greatestVersionAsc, greatestVersionDesc } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { SchemaValidator } from '$lib/common/jschema_validation';
 	import { page } from '$app/stores';
 	import { stripSchemaProperties } from '../common/jschema/schema_management';
+	import { getNewVersions } from './version-checker';
 
 	/** @type {import('$lib/types').WorkflowTask} */
 	export let workflowTask;
 
 	/** @type {(workflowTask: import('$lib/types').WorkflowTask) => void} */
 	export let updateWorkflowCallback;
-	/** @type {(count: number) => void} */
+	/** @type {(count: number) => Promise<void>} */
 	export let updateNewVersionsCount;
 
 	$: task = workflowTask.task;
@@ -46,30 +46,14 @@
 			return;
 		}
 
-		console.log('Checking for new versions');
-		const response = await fetch('/api/v1/task');
-
-		if (!response.ok) {
-			errorAlert = displayStandardErrorAlert(await response.json(), 'versionUpdateError');
+		try {
+			updateCandidates = await getNewVersions(task);
+		} catch (error) {
+			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
 		}
 
-		/** @type {import('$lib/types').Task[]} */
-		const result = await response.json();
-
-		updateCandidates = result
-			.filter((t) => {
-				return (
-					t.name === task.name &&
-					t.owner === task.owner &&
-					t.version &&
-					t.args_schema &&
-					greatestVersionAsc(t, task) === 1
-				);
-			})
-			.sort(greatestVersionDesc);
-
-		updateNewVersionsCount(updateCandidates.length);
+		await updateNewVersionsCount(updateCandidates.length);
 	}
 
 	function checkArgumentsWithNewSchema() {
