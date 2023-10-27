@@ -179,6 +179,14 @@
 		updateWorkflowCallback(result);
 	}
 
+	function getSelectedUpdateCandidate() {
+		const selectedCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion);
+		if (selectedCandidate.length === 1) {
+			return selectedCandidate[0];
+		}
+		return null;
+	}
+
 	$: canBeUpdated =
 		selectedUpdateVersion && (validationErrors === null || validationErrors.length === 0);
 </script>
@@ -235,6 +243,17 @@
 							</li>
 						{/each}
 					</ul>
+				</div>
+			{/if}
+			{#if selectedUpdateVersion}
+				<div class="alert alert-warning mt-3">
+					You are updating version from {task.version} to {selectedUpdateVersion}<br />
+					{#if getSelectedUpdateCandidate()?.docs_link}
+						Information on different version may be found on
+						<a href={getSelectedUpdateCandidate()?.docs_link} target="_blank">
+							task documentation
+						</a>
+					{/if}
 				</div>
 			{/if}
 			{#if argsToBeFixed}
