@@ -2,7 +2,9 @@
 
 # Unreleased
 
-* Implemented task version update (\#325).
+# 0.6.3
+
+* Implemented task-version update (\#325).
 
 # 0.6.2
 
