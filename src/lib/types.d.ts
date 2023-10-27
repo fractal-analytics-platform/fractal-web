@@ -16,6 +16,13 @@ export type Task = {
   meta: object
 }
 
+export type Workflow = {
+  id: number
+  name: string
+  project_id: number
+  task_list: Array<WorkflowTask>
+}
+
 export type WorkflowTask = {
   id: number
   meta: object

@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Implemented task version update (\#325).
+
 # 0.6.2
 
 * Fixed peformance issue with argument-description popovers (\#324).

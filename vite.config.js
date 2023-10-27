@@ -30,6 +30,7 @@ const config = {
 	},
 	test: {
 		globals: true,
+		environment: 'jsdom',
 		include: ['**/__tests__/**/*.?(c|m)[jt]s?(x)'],
 		coverage: {
 			provider: 'istanbul',

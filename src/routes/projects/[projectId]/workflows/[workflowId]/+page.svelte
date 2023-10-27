@@ -9,12 +9,17 @@
 	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
 	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import VersionUpdate from '$lib/components/workflow/VersionUpdate.svelte';
+	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
 
 	// Workflow
+	/** @type {import('$lib/types').Workflow|undefined} */
 	let workflow = undefined;
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let workflowErrorAlert = undefined;
 	// Project context properties
 	let project = undefined;
 	let datasets = [];
@@ -25,6 +30,7 @@
 	let workflowTaskContext = writable(undefined);
 	let workflowTabContextId = 0;
 	let workflowSuccessMessage = '';
+	/** @type {import('$lib/types').WorkflowTask|undefined} */
 	let selectedWorkflowTask = undefined;
 	let originalMetaProperties = {};
 	let checkingConfiguration = false;
@@ -60,6 +66,9 @@
 	/** @type {Modal} */
 	let editWorkflowModal;
 
+	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
+	let newVersionsMap = {};
+
 	$: updatableWorkflowList = workflow?.task_list || [];
 
 	workflowTaskContext.subscribe((value) => {
@@ -76,6 +85,7 @@
 		workflow = $page.data.workflow;
 		project = $page.data.project;
 		datasets = $page.data.datasets;
+		checkNewVersions();
 	});
 
 	beforeNavigate((navigation) => {
@@ -92,6 +102,10 @@
 	 * @returns {Promise<void>}
 	 */
 	async function handleExportWorkflow() {
+		if (!workflow) {
+			return;
+		}
+
 		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/export`, {
 			method: 'GET',
 			credentials: 'include'
@@ -113,7 +127,9 @@
 				}
 			);
 			const fileUrl = URL.createObjectURL(file);
-			const linkElement = /** @type {HTMLAnchorElement} */ (document.getElementById('downloadWorkflowButton'));
+			const linkElement = /** @type {HTMLAnchorElement} */ (
+				document.getElementById('downloadWorkflowButton')
+			);
 			linkElement.download = `workflow-export-${workflow.name}-${Date.now().toString()}.json`;
 			linkElement.href = fileUrl;
 			linkElement.click();
@@ -138,6 +154,9 @@
 	}
 
 	function resetWorkflowUpdateModal() {
+		if (!workflow) {
+			return;
+		}
 		updatedWorkflowName = workflow.name;
 	}
 
@@ -148,6 +167,9 @@
 	async function handleWorkflowUpdate() {
 		editWorkflowModal.confirmAndHide(async () => {
 			workflowSuccessMessage = '';
+			if (!workflow) {
+				return;
+			}
 
 			const headers = new Headers();
 			headers.set('Content-Type', 'application/json');
@@ -184,6 +206,9 @@
 	 */
 	async function handleCreateWorkflowTask() {
 		insertTaskModal.confirmAndHide(async () => {
+			if (!workflow) {
+				return;
+			}
 			workflowSuccessMessage = '';
 
 			const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
@@ -238,18 +263,20 @@
 			// UI Feedback
 			workflowSuccessMessage = 'Workflow task created';
 			resetCreateWorkflowTaskModal();
+			await checkNewVersions();
 		});
 	}
 
 	/**
 	 * Deletes a project's workflow task from the server
-	 * @param {number} workflowId
-	 * @param {number} workflowTaskId
 	 * @returns {Promise<void>}
 	 */
-	async function handleDeleteWorkflowTask(workflowId, workflowTaskId) {
+	async function handleDeleteWorkflowTask() {
+		if (!workflow || !selectedWorkflowTask) {
+			return;
+		}
 		const response = await fetch(
-			`/api/v1/project/${project.id}/workflow/${workflowId}/wftask/${workflowTaskId}`,
+			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
@@ -284,6 +311,9 @@
 	}
 
 	async function setActiveWorkflowTaskContext(event) {
+		if (!workflow) {
+			return;
+		}
 		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
 		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
 		if (argumentsWithUnsavedChanges === true) {
@@ -332,6 +362,9 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleWorkflowOrderUpdate() {
+		if (!workflow) {
+			return;
+		}
 		const patchData = {
 			reordered_workflowtask_ids: updatableWorkflowList.map((t) => t.id)
 		};
@@ -365,6 +398,9 @@
 	async function handleApplyWorkflow() {
 		// reset previous errors
 		runWorkflowModal.hideErrorAlert();
+		if (!workflow) {
+			return;
+		}
 		if (inputDatasetControl === '') {
 			// Preliminary check: if inputDatasetControl is not set, raise an error
 			let message = 'Input dataset is required. Select one from the list.';
@@ -407,7 +443,7 @@
 				// Define URL to navigate to
 				const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin);
 				// Set jobsUrl search params
-				jobsUrl.searchParams.set('workflow', workflow.id);
+				jobsUrl.searchParams.set('workflow', workflow.id.toString());
 				jobsUrl.searchParams.set('id', job.id);
 				// Trigger navigation
 				await goto(jobsUrl);
@@ -420,6 +456,9 @@
 	}
 
 	function handleArgsSaved(event) {
+		if (!selectedWorkflowTask) {
+			return;
+		}
 		selectedWorkflowTask.args = event.detail.args;
 		selectedWorkflowTask = selectedWorkflowTask;
 		argsChangesSaved = true;
@@ -432,6 +471,55 @@
 		if (lastTaskIndexControl !== '' && firstTaskIndexControl > lastTaskIndexControl) {
 			lastTaskIndexControl = '';
 		}
+	}
+
+	/**
+	 * Called by VersionUpdate component at the end of the update to reload the workflow.
+	 * @param workflowTask {import('$lib/types').WorkflowTask}
+	 */
+	async function taskUpdated(workflowTask) {
+		if (!workflow) {
+			return;
+		}
+		workflowSuccessMessage = '';
+		if (workflowErrorAlert) {
+			workflowErrorAlert.hide();
+		}
+
+		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const workflowResult = await workflowResponse.json();
+
+		if (!workflowResponse.ok) {
+			workflowErrorAlert = displayStandardErrorAlert(
+				'Error while retrieving workflow',
+				'workflowErrorAlert'
+			);
+			return;
+		}
+
+		workflow = workflowResult;
+		selectedWorkflowTask = workflowTask;
+		workflowSuccessMessage = 'Task version updated successfully';
+		await checkNewVersions();
+	}
+
+	async function checkNewVersions() {
+		if (workflow) {
+			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task));
+		}
+	}
+
+	let newVersionsCount = 0;
+	/**
+	 * Used to receive new version count from VersionUpdate component.
+	 * @param count {number}
+	 */
+	async function updateNewVersionsCount(count) {
+		newVersionsCount = count;
 	}
 </script>
 
@@ -487,6 +575,8 @@
 {#if workflow}
 	<StandardDismissableAlert message={workflowSuccessMessage} />
 
+	<div id="workflowErrorAlert" />
+
 	<div class="container mt-4 px-0">
 		<div class="row">
 			<div class="col-4">
@@ -529,6 +619,12 @@
 									on:keypress|preventDefault
 								>
 									{workflowTask.task.name} #{workflowTask.id}
+
+									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
+										<span class="float-end text-warning" title="new version available">
+											<i class="bi bi-exclamation-triangle" />
+										</span>
+									{/if}
 								</li>
 							{/each}
 						</ul>
@@ -546,7 +642,8 @@
 											data-bs-toggle="tab"
 											data-bs-target="#args-tab"
 											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-											aria-current="true"
+											on:click={() => (workflowTabContextId = 0)}
+											aria-current={workflowTabContextId === 0}
 											>Arguments
 										</button>
 									</li>
@@ -555,6 +652,8 @@
 											data-bs-toggle="tab"
 											data-bs-target="#meta-tab"
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
+											on:click={() => (workflowTabContextId = 1)}
+											aria-current={workflowTabContextId === 1}
 											>Meta
 										</button>
 									</li>
@@ -563,7 +662,23 @@
 											data-bs-toggle="tab"
 											data-bs-target="#info-tab"
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
+											on:click={() => (workflowTabContextId = 2)}
+											aria-current={workflowTabContextId === 2}
 											>Info
+										</button>
+									</li>
+									<li class="nav-item">
+										<button
+											data-bs-toggle="tab"
+											data-bs-target="#version-tab"
+											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
+											on:click={() => (workflowTabContextId = 3)}
+											aria-current={workflowTabContextId === 3}
+										>
+											Version
+											{#if newVersionsCount}
+												<span class="badge bg-primary rounded-pill">{newVersionsCount}</span>
+											{/if}
 										</button>
 									</li>
 								</ul>
@@ -572,8 +687,7 @@
 									btnStyle="danger"
 									buttonIcon="trash"
 									message="Delete a workflow task {selectedWorkflowTask.task.name}"
-									callbackAction={() =>
-										handleDeleteWorkflowTask(workflow.id, selectedWorkflowTask.id)}
+									callbackAction={handleDeleteWorkflowTask}
 								/>
 							</div>
 						{:else}
@@ -581,115 +695,137 @@
 						{/if}
 					</div>
 					<div class="tab-content">
-						<div id="args-tab" class="tab-pane show active">
-							<div class="card-body p-0">
-								{#if selectedWorkflowTask}
-									{#key selectedWorkflowTask}
-										{#if argsSchemaAvailable && argsSchemaValid}
-											{#if argsChangesSaved}
-												<div class="alert alert-success m-3" role="alert">
-													Arguments changes saved successfully
-												</div>
+						{#if workflowTabContextId === 0}
+							<div id="args-tab" class="tab-pane show active">
+								<div class="card-body p-0">
+									{#if selectedWorkflowTask}
+										{#key selectedWorkflowTask}
+											{#if argsSchemaAvailable && argsSchemaValid}
+												{#if argsChangesSaved}
+													<div class="alert alert-success m-3" role="alert">
+														Arguments changes saved successfully
+													</div>
+												{/if}
+												<ArgumentsSchema
+													workflowId={workflow.id}
+													workflowTaskId={selectedWorkflowTask.id}
+													argumentsSchema={selectedWorkflowTask.task.args_schema}
+													argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
+													args={selectedWorkflowTask.args}
+													bind:saveChanges={saveArgumentsChanges}
+													bind:validSchema={argsSchemaValid}
+													bind:unsavedChanges={argumentsWithUnsavedChanges}
+													on:argsSaved={handleArgsSaved}
+												/>
+											{:else}
+												<ArgumentForm
+													workflowId={workflow.id}
+													workflowTaskId={selectedWorkflowTask.id}
+													workflowTaskArgs={selectedWorkflowTask.args}
+												/>
 											{/if}
-											<ArgumentsSchema
-												workflowId={workflow.id}
-												workflowTaskId={selectedWorkflowTask.id}
-												argumentsSchema={selectedWorkflowTask.task.args_schema}
-												argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
-												args={selectedWorkflowTask.args}
-												bind:saveChanges={saveArgumentsChanges}
-												bind:validSchema={argsSchemaValid}
-												bind:unsavedChanges={argumentsWithUnsavedChanges}
-												on:argsSaved={handleArgsSaved}
-											/>
-										{:else}
-											<ArgumentForm
-												workflowId={workflow.id}
-												workflowTaskId={selectedWorkflowTask.id}
-												workflowTaskArgs={selectedWorkflowTask.args}
-											/>
-										{/if}
-									{/key}
-								{/if}
+										{/key}
+									{/if}
+								</div>
 							</div>
-						</div>
-						<div id="meta-tab" class="tab-pane">
+						{:else if workflowTabContextId === 1}
+							<div id="meta-tab" class="tab-pane show active">
+								<div class="card-body">
+									{#if selectedWorkflowTask}
+										{#key selectedWorkflowTask}
+											<MetaPropertiesForm
+												workflowId={workflow.id}
+												taskId={selectedWorkflowTask.id}
+												metaProperties={selectedWorkflowTask.meta}
+												{originalMetaProperties}
+											/>
+										{/key}
+									{/if}
+								</div>
+							</div>
+						{:else if workflowTabContextId === 2}
+							<div id="info-tab" class="tab-pane show active">
+								<div class="card-body">
+									{#if selectedWorkflowTask}
+										<ul class="list-group">
+											<li class="list-group-item list-group-item-light fw-bold">Name</li>
+											<li class="list-group-item">{selectedWorkflowTask.task.name}</li>
+											<li class="list-group-item list-group-item-light fw-bold">Version</li>
+											<li class="list-group-item">{selectedWorkflowTask.task.version || '–'}</li>
+											<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
+											<li class="list-group-item">
+												{#if selectedWorkflowTask.task.docs_link}
+													<a href={selectedWorkflowTask.task.docs_link} target="_blank"
+														>{selectedWorkflowTask.task.docs_link}</a
+													>
+												{:else}
+													-
+												{/if}
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
+											<li class="list-group-item">
+												{#if selectedWorkflowTask.task.docs_info}
+													{@html formatMarkdown(selectedWorkflowTask.task.docs_info)}
+												{:else}
+													-
+												{/if}
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Owner</li>
+											<li class="list-group-item">{selectedWorkflowTask.task.owner || '–'}</li>
+											<li class="list-group-item list-group-item-light fw-bold">Command</li>
+											<li class="list-group-item">
+												<code>{selectedWorkflowTask.task.command}</code>
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Source</li>
+											<li class="list-group-item">
+												<code>{selectedWorkflowTask.task.source}</code>
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
+											<li class="list-group-item">
+												<code>{selectedWorkflowTask.task.input_type}</code>
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
+											<li class="list-group-item">
+												<code>{selectedWorkflowTask.task.output_type}</code>
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">
+												Args Schema Version
+											</li>
+											<li class="list-group-item">
+												{selectedWorkflowTask.task.args_schema_version || '–'}
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
+											<li class="list-group-item">
+												{#if selectedWorkflowTask.task.args_schema}
+													<code>
+														<pre>{JSON.stringify(
+																selectedWorkflowTask.task.args_schema,
+																null,
+																2
+															)}</pre>
+													</code>
+												{:else}
+													-
+												{/if}
+											</li>
+										</ul>
+									{/if}
+								</div>
+							</div>
+						{/if}
+						<div
+							id="version-tab"
+							class="tab-pane"
+							class:show={workflowTabContextId === 3}
+							class:active={workflowTabContextId === 3}
+						>
 							<div class="card-body">
 								{#if selectedWorkflowTask}
-									{#key selectedWorkflowTask}
-										<MetaPropertiesForm
-											workflowId={workflow.id}
-											taskId={selectedWorkflowTask.id}
-											metaProperties={selectedWorkflowTask.meta}
-											{originalMetaProperties}
-										/>
-									{/key}
-								{/if}
-							</div>
-						</div>
-						<div id="info-tab" class="tab-pane">
-							<div class="card-body">
-								{#if selectedWorkflowTask}
-									<ul class="list-group">
-										<li class="list-group-item list-group-item-light fw-bold">Name</li>
-										<li class="list-group-item">{selectedWorkflowTask.task.name}</li>
-										<li class="list-group-item list-group-item-light fw-bold">Version</li>
-										<li class="list-group-item">{selectedWorkflowTask.task.version || '–'}</li>
-										<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
-										<li class="list-group-item">
-											{#if selectedWorkflowTask.task.docs_link}
-												<a href={selectedWorkflowTask.task.docs_link} target="_blank"
-													>{selectedWorkflowTask.task.docs_link}</a
-												>
-											{:else}
-												-
-											{/if}
-										</li>
-										<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
-										<li class="list-group-item">
-											{#if selectedWorkflowTask.task.docs_info}
-												{@html formatMarkdown(selectedWorkflowTask.task.docs_info)}
-											{:else}
-												-
-											{/if}
-										</li>
-										<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-										<li class="list-group-item">{selectedWorkflowTask.task.owner || '–'}</li>
-										<li class="list-group-item list-group-item-light fw-bold">Command</li>
-										<li class="list-group-item">
-											<code>{selectedWorkflowTask.task.command}</code>
-										</li>
-										<li class="list-group-item list-group-item-light fw-bold">Source</li>
-										<li class="list-group-item"><code>{selectedWorkflowTask.task.source}</code></li>
-										<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
-										<li class="list-group-item">
-											<code>{selectedWorkflowTask.task.input_type}</code>
-										</li>
-										<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
-										<li class="list-group-item">
-											<code>{selectedWorkflowTask.task.output_type}</code>
-										</li>
-										<li class="list-group-item list-group-item-light fw-bold">
-											Args Schema Version
-										</li>
-										<li class="list-group-item">
-											{selectedWorkflowTask.task.args_schema_version || '–'}
-										</li>
-										<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
-										<li class="list-group-item">
-											{#if selectedWorkflowTask.task.args_schema}
-												<code>
-													<pre>{JSON.stringify(
-															selectedWorkflowTask.task.args_schema,
-															null,
-															2
-														)}</pre>
-												</code>
-											{:else}
-												-
-											{/if}
-										</li>
-									</ul>
+									<VersionUpdate
+										workflowTask={selectedWorkflowTask}
+										updateWorkflowCallback={taskUpdated}
+										{updateNewVersionsCount}
+									/>
 								{/if}
 							</div>
 						</div>
@@ -869,7 +1005,7 @@
 				>
 					<option value="">Select last task</option>
 					{#each updatableWorkflowList as wft}
-						{#if firstTaskIndexControl === '' || wft.order >= firstTaskIndexControl}
+						{#if firstTaskIndexControl === '' || wft.order >= parseInt(firstTaskIndexControl)}
 							<option value={wft.order}>{wft.task.name}</option>
 						{/if}
 					{/each}
