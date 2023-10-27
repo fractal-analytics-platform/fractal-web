@@ -82,6 +82,7 @@
 			return;
 		}
 		const oldArgs = workflowTask.args || {};
+		originalArgs = JSON.stringify(oldArgs, null, 2);
 		validateArguments(oldArgs);
 	}
 
@@ -122,8 +123,7 @@
 		if (valid) {
 			validationErrors = null;
 		} else {
-			originalArgs = JSON.stringify(args, null, 2);
-			argsToBeFixed = originalArgs;
+			argsToBeFixed = JSON.stringify(args, null, 2);
 			validationErrors = validator.getErrors();
 		}
 	}
@@ -135,7 +135,7 @@
 		if (argsToBeFixed) {
 			check();
 		}
-		if (validationErrors !== null) {
+		if (!argsToBeFixedValidJson || validationErrors !== null) {
 			return;
 		}
 		let response = await fetch(
