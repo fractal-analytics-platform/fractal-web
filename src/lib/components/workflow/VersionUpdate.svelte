@@ -191,6 +191,17 @@
 					<option>{update.version}</option>
 				{/each}
 			</select>
+			{#if selectedUpdateVersion}
+				<div class="alert alert-warning mt-3">
+					You are updating version from {task.version} to {selectedUpdateVersion}<br />
+					{#if getSelectedUpdateCandidate()?.docs_link}
+						Information on different version may be found on
+						<a href={getSelectedUpdateCandidate()?.docs_link} target="_blank">
+							task documentation
+						</a>
+					{/if}
+				</div>
+			{/if}
 			{#if validationErrors}
 				<div class="alert alert-danger mt-3">
 					<p>Following errors must be fixed before performing the update:</p>
@@ -227,17 +238,6 @@
 							</li>
 						{/each}
 					</ul>
-				</div>
-			{/if}
-			{#if selectedUpdateVersion}
-				<div class="alert alert-warning mt-3">
-					You are updating version from {task.version} to {selectedUpdateVersion}<br />
-					{#if getSelectedUpdateCandidate()?.docs_link}
-						Information on different version may be found on
-						<a href={getSelectedUpdateCandidate()?.docs_link} target="_blank">
-							task documentation
-						</a>
-					{/if}
 				</div>
 			{/if}
 			{#if argsToBeFixed}
