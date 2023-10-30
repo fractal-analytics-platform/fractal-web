@@ -55,7 +55,7 @@ export async function logout(fetch) {
 
 	if (response.ok) {
 		console.log('Logout successful');
-		return await response.json();
+		return;
 	}
 
 	console.error('Logout failed');
