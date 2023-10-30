@@ -1,15 +1,21 @@
 <script>
-	import { page } from '$app/stores';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
+	/** @type {number|undefined} */
+	let projectId = undefined;
 	let workflowJobId = undefined;
 	let logs = '';
 	let errorAlert = undefined;
 	/** @type {Modal} */
 	let modal;
 
-	export async function show(jobId) {
+	/**
+	 * @param prjId {number}
+	 * @param jobId {number}
+	 */
+	export async function show(prjId, jobId) {
+		projectId = prjId;
 		workflowJobId = jobId;
 
 		// remove previous error
@@ -24,7 +30,7 @@
 	}
 
 	async function fetchJob() {
-		const request = await fetch(`/api/v1/project/${$page.params.projectId}/job/${workflowJobId}`, {
+		const request = await fetch(`/api/v1/project/${projectId}/job/${workflowJobId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

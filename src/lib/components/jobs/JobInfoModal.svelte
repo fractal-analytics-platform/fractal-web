@@ -1,14 +1,21 @@
 <script>
-	import { page } from '$app/stores';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
+	/** @type {import('$lib/types').Dataset[]} */
+	export let datasets;
+	/** @type {import('$lib/types').Workflow[]} */
+	export let workflows;
+
+	/** @type {number|undefined} */
 	let workflowJobId = undefined;
+	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
 	let job = undefined;
-	export let projectName = undefined;
-	export let datasets = undefined;
-	export let workflows = undefined;
+	/** @type {number|undefined} */
+	let projectId = undefined;
+	/** @type {string|undefined} */
+	let projectName = undefined;
 	let jobWorkflowName = undefined;
 	let jobInputDatasetName = undefined;
 	let jobOutputDatasetName = undefined;
@@ -18,15 +25,21 @@
 	/** @type {Modal} */
 	let modal;
 
-	export async function show(jobId) {
-		workflowJobId = jobId;
-		await fetchJob();
+	/**
+	 * @param jobToDisplay {import('$lib/types').ApplyWorkflow}
+	 * @param projectNameToDisplay {string}
+	 */
+	export async function show(jobToDisplay, projectNameToDisplay) {
+		job = jobToDisplay;
+		workflowJobId = job.id;
+		projectId = job.project_id;
+		projectName = projectNameToDisplay;
 		// Should update jobWorkflowName
-		jobWorkflowName = workflows.find((workflow) => workflow.id === job.workflow_id)?.name;
+		jobWorkflowName = workflows.find((workflow) => workflow.id === jobToDisplay.workflow_id)?.name;
 		// Should update jobInputDatasetName
-		jobInputDatasetName = datasets.find((dataset) => dataset.id === job.input_dataset_id)?.name;
+		jobInputDatasetName = datasets.find((dataset) => dataset.id === jobToDisplay.input_dataset_id)?.name;
 		// Should update jobOutputDatasetName
-		jobOutputDatasetName = datasets.find((dataset) => dataset.id === job.output_dataset_id)?.name;
+		jobOutputDatasetName = datasets.find((dataset) => dataset.id === jobToDisplay.output_dataset_id)?.name;
 		// Should update jobStatus
 		jobStatus = job.status;
 
@@ -38,9 +51,8 @@
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		job = undefined;
 
-		const response = await fetch(`/api/v1/project/${$page.params.projectId}/job/${workflowJobId}`, {
+		const response = await fetch(`/api/v1/project/${projectId}/job/${workflowJobId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

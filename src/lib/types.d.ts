@@ -1,5 +1,12 @@
 export type GetHeaders = (originalHeaders: Headers | undefined) => Headers
 
+export type Project = {
+  id: number
+  name: string
+  read_only: boolean
+  dataset_list: Array<Dataset>
+}
+
 export type Task = {
   id: number
   name: string
@@ -54,4 +61,24 @@ export type Dataset = {
   id: number
   resource_list: Array<Resource>
   project_id: number
+}
+
+export type JobStatus = 'submitted' | 'running' | 'done' | 'failed'
+
+export type ApplyWorkflow = {
+  id: number
+  project_id: number
+  workflow_id: number
+  input_dataset_id: number
+  output_dataset_id: number
+  worker_init: string | null
+  start_timestamp: string
+  end_timestamp: string | null
+  status: JobStatus
+  log: string | null
+  workflow_dump: object | null
+  working_dir: string | null
+  working_dir_user: string | null
+  first_task_index: number | null
+  last_task_index: number | null
 }

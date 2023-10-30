@@ -151,7 +151,7 @@
 							<i class="bi bi-arrow-up-right-square" />
 							Open
 						</a>
-						<a href="/projects/{projectId}/jobs?workflow={id}" class="btn btn-light">
+						<a href="/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
 							<i class="bi-journal-code" /> List jobs
 						</a>
 						<ConfirmActionButton

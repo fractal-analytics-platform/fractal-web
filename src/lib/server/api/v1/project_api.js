@@ -93,6 +93,27 @@ export async function getWorkflows(fetch, projectId) {
 	await responseError(response);
 }
 
+/**
+ * Fetches the list of workflows of a project from the server
+ * @param fetch
+ * @param projectId
+ * @param workflowId
+ * @returns {Promise<*>}
+ */
+export async function getWorkflow(fetch, projectId, workflowId) {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (response.ok) {
+		// If the response is ok, return the workflow as json
+		return await response.json();
+	}
+
+	await responseError(response);
+}
+
 // JOB ENDPOINTS
 
 /**

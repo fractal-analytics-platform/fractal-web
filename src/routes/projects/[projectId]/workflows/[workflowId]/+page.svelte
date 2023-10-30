@@ -543,12 +543,12 @@
 		</ol>
 	</nav>
 	<div>
-		<a href="/projects/{project?.id}/jobs?workflow={workflow?.id}" class="btn btn-light"
-			><i class="bi-journal-code" /> List jobs</a
-		>
-		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}
-			><i class="bi-box-arrow-up" /></button
-		>
+		<a href="/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+			<i class="bi-journal-code" /> List jobs
+		</a>
+		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
+			<i class="bi-box-arrow-up" />
+		</button>
 		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 		<button
 			class="btn btn-light"

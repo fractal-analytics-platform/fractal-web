@@ -58,6 +58,9 @@
 					<li class="nav-item">
 						<a href="/tasks" class="nav-link">Tasks</a>
 					</li>
+					<li class="nav-item">
+						<a href="/jobs" class="nav-link">Jobs</a>
+					</li>
 				{/if}
 			</ul>
 			<ul class="nav">
