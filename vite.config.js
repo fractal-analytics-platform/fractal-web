@@ -31,7 +31,7 @@ const config = {
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		include: ['**/__tests__/**/*.?(c|m)[jt]s?(x)'],
+		include: ['**/__tests__/**/*\\.test\\.js'],
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
