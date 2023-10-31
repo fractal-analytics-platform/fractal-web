@@ -8,6 +8,8 @@
 	import Th from '$lib/components/common/filterable/Th.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
+	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
+	export let jobUpdater;
 	/** @type {string[]} */
 	export let columnsToHide = [];
 
@@ -32,13 +34,9 @@
 	let rows = tableHandler.getRows();
 
 	// Filters
-	/** @type {string} */
 	let projectFilter = '';
-	/** @type {string} */
 	let workflowFilter = '';
-	/** @type {string} */
 	let inputDatasetFilter = '';
-	/** @type {string} */
 	let outputDatasetFilter = '';
 	let statusFilter = '';
 
@@ -49,14 +47,37 @@
 	$: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo);
 	$: tableHandler.filter(statusFilter, 'status');
 
+	let reloading = false;
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
+
+	async function refresh() {
+		if (errorAlert) {
+			errorAlert.hide();
+		}
+		reloading = true;
+		try {
+			jobs = await jobUpdater();
+			tableHandler.setRows(jobs);
+		} catch (err) {
+			errorAlert = displayStandardErrorAlert(err, 'jobUpdatesError');
+		} finally {
+			reloading = false;
+		}
+	}
+
 	/**
 	 * Requests the server to stop a job execution
 	 * @param {import('$lib/types').ApplyWorkflow} job
 	 * @returns {Promise<void>}
 	 */
 	async function handleJobCancel(job) {
-		console.log('Stop running job');
+		if (errorAlert) {
+			errorAlert.hide();
+		}
 
+		console.log('Stop running job');
 		const response = await fetch(`/api/v1/project/${job.project_id}/job/${job.id}/stop`, {
 			method: 'GET',
 			credentials: 'include'
@@ -68,7 +89,7 @@
 		} else {
 			console.error('Error stopping job');
 			const errorResponse = await response.json();
-			displayStandardErrorAlert(errorResponse, 'jobUpdatesError');
+			errorAlert = displayStandardErrorAlert(errorResponse, 'jobUpdatesError');
 		}
 	}
 
@@ -100,13 +121,12 @@
 				<i class="bi-x-square" />
 				Clear filters
 			</button>
-			<button
-				class="btn btn-primary"
-				on:click={() => {
-					// Refresh page
-					window.location.reload();
-				}}><i class="bi-arrow-clockwise" /> Refresh</button
-			>
+			<button class="btn btn-primary" on:click={refresh} disabled={reloading}>
+				{#if reloading}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				<i class="bi-arrow-clockwise" /> Refresh
+			</button>
 		</div>
 	</div>
 	<div id="jobUpdatesError" />
