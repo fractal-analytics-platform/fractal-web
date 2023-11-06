@@ -9,15 +9,22 @@ export default defineConfig({
 	testDir: 'tests',
 
 	projects: [
-		{ name: 'setup', testMatch: /.*\.setup\.js/ },
-
+		{ name: 'auth', testMatch: /auth\.setup\.js/ },
+		{
+			name: 'collect_core_tasks',
+			testMatch: /collect_core_tasks\.setup\.js/,
+			use: {
+				storageState: 'tests/.auth/user.json'
+			},
+			dependencies: ['auth']
+		},
 		{
 			name: 'chromium',
 			use: {
 				...devices['Desktop Chrome'],
 				storageState: 'tests/.auth/user.json'
 			},
-			dependencies: ['setup']
+			dependencies: ['collect_core_tasks']
 		},
 		{
 			name: 'firefox',
@@ -25,7 +32,7 @@ export default defineConfig({
 				...devices['Desktop Firefox'],
 				storageState: 'tests/.auth/user.json'
 			},
-			dependencies: ['setup']
+			dependencies: ['collect_core_tasks']
 		}
 	],
 
