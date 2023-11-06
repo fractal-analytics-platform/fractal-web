@@ -7,6 +7,7 @@
 	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { onDestroy, onMount } from 'svelte';
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
@@ -105,6 +106,27 @@
 		}
 		return '';
 	}
+
+	let updateJobsTimeout = null;
+
+	async function updateJobsInBackground() {
+		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');		
+		if (jobsToCheck.length > 0) {
+			jobs = await jobUpdater();
+			tableHandler.setRows(jobs);
+		}
+		updateJobsTimeout = setTimeout(updateJobsInBackground, 3000);
+	}
+
+	onMount(() => {
+		updateJobsTimeout = setTimeout(updateJobsInBackground, 3000);
+	});
+
+	onDestroy(() => {
+		if (updateJobsTimeout) {
+			clearTimeout(updateJobsTimeout);
+		}
+	});
 </script>
 
 {#if tableHandler}

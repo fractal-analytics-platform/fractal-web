@@ -110,7 +110,7 @@ describe('JobsList', () => {
 	});
 
 	async function clearFilters(result) {
-		const clearFiltersBtn = result.getByRole('button', {name: 'Clear filters'});
+		const clearFiltersBtn = result.getByRole('button', { name: 'Clear filters' });
 		await fireEvent.click(clearFiltersBtn);
 	}
 
@@ -173,6 +173,35 @@ describe('JobsList', () => {
 		await new Promise(setTimeout);
 
 		expect(result.queryAllByRole('alert').length).eq(1);
+	});
+
+	it('updates jobs in background', async () => {
+		vi.useFakeTimers();
+		try {
+			const jobUpdater = function () {
+				return data.jobs.map((j) => (j.status === 'running' ? { ...j, status: 'done' } : j));
+			};
+			const result = render(JobsList, {
+				props: { jobUpdater }
+			});
+			let table = result.getByRole('table');
+			expect(table.querySelectorAll('tbody tr').length).eq(3);
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('running');
+			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('failed');
+			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[7].textContent).eq('done');
+
+			vi.advanceTimersByTime(3500);
+			vi.useRealTimers();
+			// trigger table update
+			await new Promise(setTimeout);
+
+			table = result.getByRole('table');
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('failed');
+			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[7].textContent).eq('done');
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 });
 
