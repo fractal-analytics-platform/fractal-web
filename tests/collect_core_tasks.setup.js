@@ -16,7 +16,6 @@ test('Collect core tasks', async ({ page }) => {
 	});
 	await collectTasksAccordion.click();
 	await page.locator('[name="package"]').fill('fractal-tasks-core');
-	await page.locator('[name="package_extras"]').fill('fractal-tasks');
 
 	const collectBtn = page.getByRole('button', { name: /^Collect$/ });
 	await collectBtn.click();
