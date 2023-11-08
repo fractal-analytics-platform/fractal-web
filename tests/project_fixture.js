@@ -12,8 +12,11 @@ export class PageWithProject {
 
 	async createProject() {
 		await this.page.goto('/projects');
-		await this.page.locator('[name="projectName"]').fill(this.projectName);
+		const projectNameInput = this.page.locator('[name="projectName"]');
+		await projectNameInput.fill(this.projectName);
+		await projectNameInput.blur();
 		const createProjectBtn = this.page.getByRole('button', { name: 'Create new project' });
+		await createProjectBtn.waitFor();
 		await createProjectBtn.click();
 		await this.page.waitForURL(/\/projects\/\d+/);
 		this.url = this.page.url();

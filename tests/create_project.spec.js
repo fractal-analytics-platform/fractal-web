@@ -5,8 +5,11 @@ test('Create and delete a project', async ({ page }) => {
 
 	// Create a new project with a random name
 	const randomProjectName = Math.random().toString(36).substring(7);
-	await page.locator('[name="projectName"]').fill(randomProjectName);
+	const projectNameInput = page.locator('[name="projectName"]');
+	await projectNameInput.fill(randomProjectName);
+	await projectNameInput.blur();
 	const createProjectBtn = page.getByRole('button', { name: 'Create new project' });
+	await createProjectBtn.waitFor();
 	await createProjectBtn.click();
 
 	// Verify that the user is redirected to the project page

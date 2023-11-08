@@ -3,11 +3,14 @@ import { expect, test } from './project_fixture.js';
 test('Create, update and delete a dataset', async ({ page, project }) => {
 	await page.waitForURL(project.url);
 
+	const initialDatasetsCount = (await page.getByRole('table').first().getByRole('row').count()) - 1;
+
 	const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 	await createDatasetButton.click();
 	await waitDatasetModal(page, 'Create new dataset');
 
 	// Check dataset type options
+	await page.waitForFunction(() => document.querySelectorAll('#datasetType option').length === 3);
 	const datasetTypeOptions = await page.locator('#datasetType option').allTextContents();
 	expect(datasetTypeOptions.length).toEqual(3);
 	expect(datasetTypeOptions[0]).toEqual('Select...');
@@ -30,10 +33,12 @@ test('Create, update and delete a dataset', async ({ page, project }) => {
 
 	// Verify dataset table content
 	let datasetTable = page.getByRole('table').nth(0);
-	await verifyDatasetsCount(page, 2);
-	let defaultDatasetRow = datasetTable.getByRole('row').nth(1);
-	expect(await defaultDatasetRow.getByRole('cell').nth(0).innerText()).toEqual('default');
-	let datasetRow = datasetTable.getByRole('row').nth(2);
+	await verifyDatasetsCount(page, initialDatasetsCount + 1);
+	if (initialDatasetsCount === 1) {
+		let defaultDatasetRow = datasetTable.getByRole('row').nth(1);
+		expect(await defaultDatasetRow.getByRole('cell').nth(0).innerText()).toEqual('default');
+	}
+	let datasetRow = datasetTable.getByRole('row').nth(initialDatasetsCount + 1);
 	expect(await datasetRow.getByRole('cell').nth(0).innerText()).toEqual('test-dataset');
 	expect(await datasetRow.getByRole('cell').nth(1).innerText()).toEqual('image');
 
@@ -65,7 +70,7 @@ test('Create, update and delete a dataset', async ({ page, project }) => {
 
 	// Verify updated dataset table content
 	datasetTable = page.getByRole('table').nth(0);
-	datasetRow = datasetTable.getByRole('row').nth(2);
+	datasetRow = datasetTable.getByRole('row').nth(initialDatasetsCount + 1);
 	expect(await datasetRow.getByRole('cell').nth(0).innerText()).toEqual('test-dataset-renamed');
 	expect(await datasetRow.getByRole('cell').nth(1).innerText()).toEqual('custom-type');
 
@@ -84,7 +89,7 @@ test('Create, update and delete a dataset', async ({ page, project }) => {
 
 	// Check table rows count
 	datasetTable = page.getByRole('table').nth(0);
-	await verifyDatasetsCount(page, 1);
+	await verifyDatasetsCount(page, initialDatasetsCount);
 });
 
 /**
