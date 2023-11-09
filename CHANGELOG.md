@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Added more playwright tests (\#332).
 * Fixed logout bug (\#327).
 
 # 0.6.3
