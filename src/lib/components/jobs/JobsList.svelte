@@ -1,4 +1,5 @@
 <script>
+	import { env } from '$env/dynamic/public';
 	import { page } from '$app/stores';
 	import { DataHandler, check } from '@vincjo/datatables';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
@@ -107,19 +108,22 @@
 		return '';
 	}
 
+	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+		: 3000;
 	let updateJobsTimeout = null;
 
 	async function updateJobsInBackground() {
-		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');		
+		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');
 		if (jobsToCheck.length > 0) {
 			jobs = await jobUpdater();
 			tableHandler.setRows(jobs);
 		}
-		updateJobsTimeout = setTimeout(updateJobsInBackground, 3000);
+		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
 	}
 
 	onMount(() => {
-		updateJobsTimeout = setTimeout(updateJobsInBackground, 3000);
+		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
 	});
 
 	onDestroy(() => {
