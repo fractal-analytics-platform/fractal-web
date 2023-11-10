@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { displayStandardErrorAlert } from '$lib/common/errors.js';
 
 	export let form;
 	let loginError = false;
@@ -9,6 +10,22 @@
 	}
 
 	$: userLoggedIn = !!$page.data.userInfo;
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let externalLoginErrorAlert = undefined;
+
+	async function gitHubLogin() {
+		if (externalLoginErrorAlert) {
+			externalLoginErrorAlert.hide();
+		}
+		const response = await fetch('/auth/github/authorize');
+		const result = await response.json();
+		if (!response.ok) {
+			externalLoginErrorAlert = displayStandardErrorAlert(result, 'externalLoginError');
+			return;
+		}
+		window.location.replace(result.authorization_url);
+	}
 </script>
 
 <div class="container">
@@ -24,6 +41,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-4">
+				<h3 class="mt-2">Local account</h3>
 				<form method="POST">
 					<div class="mb-3">
 						<label for="userEmail" class="form-label">Email address</label>
@@ -52,6 +70,15 @@
 					</div>
 					<button class="btn btn-primary">Submit</button>
 				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col mt-5">
+				<h3>External account</h3>
+				<div id="externalLoginError" />
+				<button type="button" on:click={gitHubLogin} class="btn btn-primary">
+					Login with GitHub
+				</button>
 			</div>
 		</div>
 	{/if}
