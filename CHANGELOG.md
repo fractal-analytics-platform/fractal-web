@@ -2,10 +2,14 @@
 
 # Unreleased
 
+This release improves and extends the login/logout features. Using OAuth
+authentication requires fractal-server >1.3.13 (due to the recent addition of
+the fractal-server `redirect_url` environment variable).
+
 * Improved handling of session expiration (\#333).
+* Fixed logout bug (\#327).
 * Implemented OAuth2 login (\#333).
 * Added more playwright tests (\#332).
-* Fixed logout bug (\#327).
 
 # 0.6.3
 
