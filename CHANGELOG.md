@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Improved handling of session expiration (\#333).
 * Implemented OAuth2 login (\#333).
 * Added more playwright tests (\#332).
 * Fixed logout bug (\#327).
