@@ -32,7 +32,8 @@ test('Loading SSR page with expired cookied', async ({ page }) => {
 	await login(page);
 	await page.context().clearCookies();
 	await page.getByRole('link', { name: 'Tasks' }).click();
-	await page.waitForSelector('text=Session expired. Please login again.');
+	await page.waitForURL('/auth/login?invalidate=true');
+	await page.waitForSelector('text=Session expired');
 });
 
 test('Reloading SSR page with expired cookied', async ({ page }) => {
@@ -40,7 +41,8 @@ test('Reloading SSR page with expired cookied', async ({ page }) => {
 	await login(page);
 	await page.context().clearCookies();
 	await page.reload();
-	await page.waitForSelector('text=Session expired. Please login again.');
+	await page.waitForURL('/auth/login?invalidate=true');
+	await page.waitForSelector('text=Session expired');
 });
 
 test('Loading AJAX request with expired cookied', async ({ page }) => {
@@ -53,7 +55,8 @@ test('Loading AJAX request with expired cookied', async ({ page }) => {
 	const createProjectBtn = page.getByRole('button', { name: 'Create new project' });
 	await createProjectBtn.waitFor();
 	await createProjectBtn.click();
-	await page.waitForSelector('text=Session expired. Please login again.');
+	await page.waitForURL('/auth/login?invalidate=true');
+	await page.waitForSelector('text=Session expired');
 });
 
 /**
