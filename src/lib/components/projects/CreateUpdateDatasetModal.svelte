@@ -375,7 +375,8 @@
 					dataset_id: datasetId
 				});
 			}),
-			project_id: originalDataset.project_id
+			project_id: originalDataset.project_id,
+			history: []
 		};
 	}
 
@@ -507,9 +508,8 @@
 									<input
 										type="text"
 										class="form-control"
-										aria-label="Remove resource"
+										id="resource-path-{i}"
 										bind:value={resource.path}
-										aria-describedby="remove-resource-{i}"
 										class:is-invalid={submitted && (!resource.path || resource.error)}
 										disabled={!resource.editing}
 										on:keydown={(event) => handleResourceKeyDown(event, i)}

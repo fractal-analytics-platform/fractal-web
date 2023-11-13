@@ -35,7 +35,7 @@ jobs:
         run: echo "FRACTAL_SERVER_HOST=http://127.0.0.1:8000" >> $GITHUB_ENV
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --workers=1
 
       - uses: actions/upload-artifact@v3
         with:
