@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { displayStandardErrorAlert } from '$lib/common/errors.js';
+	import { env } from '$env/dynamic/public';
 
 	export let form;
 	let loginError = false;
@@ -14,11 +15,13 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;
 
-	async function gitHubLogin() {
+	$: oauth2Provider = env.PUBLIC_OAUTH_PROVIDER;
+
+	async function oauth2Login() {
 		if (externalLoginErrorAlert) {
 			externalLoginErrorAlert.hide();
 		}
-		const response = await fetch('/auth/github/authorize');
+		const response = await fetch(`/auth/${oauth2Provider}/authorize`);
 		const result = await response.json();
 		if (!response.ok) {
 			externalLoginErrorAlert = displayStandardErrorAlert(result, 'externalLoginError');
@@ -72,14 +75,22 @@
 				</form>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col mt-5">
-				<h3>External account</h3>
-				<div id="externalLoginError" />
-				<button type="button" on:click={gitHubLogin} class="btn btn-primary">
-					Login with GitHub
-				</button>
+		{#if oauth2Provider}
+			<div class="row">
+				<div class="col mt-5">
+					<h3>External account</h3>
+					<div id="externalLoginError" />
+					<button type="button" on:click={oauth2Login} class="btn btn-primary">
+						{#if oauth2Provider === 'github'}
+							Login with GitHub
+						{:else if oauth2Provider === 'google'}
+							Login with Google
+						{:else}
+							Login with OAuth2 provider
+						{/if}
+					</button>
+				</div>
 			</div>
-		</div>
+		{/if}
 	{/if}
 </div>
