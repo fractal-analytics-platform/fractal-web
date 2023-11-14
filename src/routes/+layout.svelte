@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
+	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
@@ -64,6 +65,11 @@
 					<li class="nav-item">
 						<a href="/jobs" class="nav-link">Jobs</a>
 					</li>
+                                        {#if isAdmin}
+						<li class="nav-item">
+							<a href="/admin" class="nav-link">Administration</a>
+						</li>
+					{/if}
 				{/if}
 			</ul>
 			<ul class="nav">

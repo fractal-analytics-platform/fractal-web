@@ -92,3 +92,15 @@ export type ApplyWorkflow = {
   first_task_index: number | null
   last_task_index: number | null
 }
+
+export type User = {
+  id: number
+  email: string
+  is_active: boolean
+  is_superuser: boolean
+  is_verified: boolean
+  username: string | null
+  slurm_user: string | null
+  cache_dir: string | null
+  password: string?
+}

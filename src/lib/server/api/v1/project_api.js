@@ -19,7 +19,7 @@ export async function listProjects(fetch) {
 	}
 
 	console.error('Client unable to fetch projects list');
-	throw new Error('Unable to list projects');
+	await responseError(response);
 }
 
 /**

@@ -61,3 +61,21 @@ export async function logout(fetch) {
 	console.error('Logout failed');
 	await responseError(response);
 }
+
+/**
+ * Fetches the list of users from the server
+ * @param {typeof fetch} fetch
+ * @returns {Promise<*>}
+ */
+export async function listUsers(fetch) {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/userlist', {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (response.ok) {
+		return await response.json();
+	}
+
+	await responseError(response);
+}
