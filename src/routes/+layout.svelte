@@ -1,6 +1,8 @@
 <script>
+	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
+	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: server = $page.data.serverInfo || {};
@@ -21,6 +23,25 @@
 		body?.style.removeProperty('overflow');
 		body?.style.removeProperty('padding-right');
 	}
+
+	if (browser) {
+		// Overriding global fetch function to detect unauthorized requests
+		const originalFetch = window.fetch;
+		window.fetch = async function (input, init) {
+			const response = await originalFetch(input, init);
+			if (response.status === 401) {
+				// Reloading the page to trigger a redirect to login page
+				location.reload();
+			}
+			return response;
+		};
+	}
+
+	onMount(() => {
+		if (sessionStorage && userLoggedIn) {
+			sessionStorage.setItem('userLoggedIn', 'true');
+		}
+	});
 </script>
 
 <main>

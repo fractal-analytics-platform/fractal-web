@@ -20,11 +20,12 @@ More details can be found at:
 1. [How to run/develop fractal-web](docs/contribute.md)
 2. [How to run fractal-server](docs/fractal_server.md)
 3. [Deployment examples](docs/examples.md)
-3. [Project structure](docs/structure.md)
-3. [Tests](docs/tests.md)
-4. [Dependencies](docs/dependencies.md)
-5. [JSON Schemas for WorkflowTask arguments](docs/json_schemas.md)
-6. [CHANGELOG](CHANGELOG.md)
+4. [Integration with OAuth2 providers](docs/oauth2.md)
+5. [Project structure](docs/structure.md)
+6. [Tests](docs/tests.md)
+7. [Dependencies](docs/dependencies.md)
+8. [JSON Schemas for WorkflowTask arguments](docs/json_schemas.md)
+9. [CHANGELOG](CHANGELOG.md)
 
 # Contributors
 
