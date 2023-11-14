@@ -6,8 +6,10 @@ First, configure the server as described in [OAuth2 documentation of fractal-ser
 
 Fractal-web callback has to be defined using the following path: `/auth/login/oauth2`.
 
-Then, enable the desired provider on fractal-web using the `PUBLIC_OAUTH_PROVIDER` environment variable, for example:
+Then, enable the desired provider on fractal-web using the `PUBLIC_OAUTH_CLIENT_NAME` environment variable, for example:
 
 ```
-PUBLIC_OAUTH_PROVIDER=github
+PUBLIC_OAUTH_CLIENT_NAME=github
 ```
+
+This variable has to match the client name defined in fractal-server configuration.

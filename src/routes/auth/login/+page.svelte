@@ -17,7 +17,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;
 
-	$: oauth2Provider = env.PUBLIC_OAUTH_PROVIDER;
+	$: oauth2Provider = env.PUBLIC_OAUTH_CLIENT_NAME;
 
 	async function oauth2Login() {
 		if (externalLoginErrorAlert) {
