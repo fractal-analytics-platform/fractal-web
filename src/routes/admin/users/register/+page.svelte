@@ -1,9 +1,17 @@
 <script>
-	import { page } from '$app/stores';
 	import UserEditor from '$lib/components/admin/UserEditor.svelte';
 
 	/** @type {import('$lib/types').User} */
-	let user = $page.data.user;
+	let user = {
+		email: '',
+		is_active: true,
+		is_superuser: false,
+		is_verified: true,
+		username: '',
+		slurm_user: '',
+		cache_dir: '',
+		password: ''
+	};
 
 	/**
 	 * @param {import('$lib/types').User} user
@@ -13,8 +21,8 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		return await fetch(`/auth/users/${user.id}`, {
-			method: 'PATCH',
+		return await fetch(`/auth/register`, {
+			method: 'POST',
 			credentials: 'include',
 			headers,
 			body: JSON.stringify(user)
@@ -30,12 +38,10 @@
 		<li class="breadcrumb-item">
 			<a href="/admin/users">Manage users</a>
 		</li>
-		<li class="breadcrumb-item active" aria-current="page">
-			Editing user #{user.id} ({user.email})
-		</li>
+		<li class="breadcrumb-item active" aria-current="page">Registering new user</li>
 	</ol>
 </nav>
 
-<h3 class="mb-3">Editing user #{user.id} ({user.email})</h3>
+<h3 class="mb-3">Registering new user</h3>
 
 <UserEditor {user} {save} />

@@ -94,7 +94,7 @@ export type ApplyWorkflow = {
 }
 
 export type User = {
-  id: number
+  id?: number
   email: string
   is_active: boolean
   is_superuser: boolean
@@ -102,5 +102,5 @@ export type User = {
   username: string | null
   slurm_user: string | null
   cache_dir: string | null
-  password: string?
+  password?: string
 }
