@@ -11,6 +11,10 @@ vi.mock('$app/stores', () => {
 		})
 	};
 });
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
 
 // Mocking fetch
 global.fetch = vi.fn();

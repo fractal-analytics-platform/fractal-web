@@ -28,7 +28,7 @@
 	let jobs = $page.data.jobs || [];
 
 	/** @type {import('$lib/types').Dataset[]} */
-	$: datasets = projects.map((p) => p.dataset_list).reduce((l1, l2) => l1.concat(l2));
+	$: datasets = projects.map((p) => p.dataset_list).reduce((l1, l2) => l1.concat(l2), []);
 
 	/** @type {DataHandler} */
 	let tableHandler = new DataHandler(jobs);
