@@ -63,7 +63,7 @@
 			addValidationError('password', 'Field is required');
 		}
 		if (password !== confirmPassword) {
-			addValidationError('confirmPassword', "Password don't match");
+			addValidationError('confirmPassword', "Passwords don't match");
 		}
 	}
 
@@ -105,7 +105,7 @@
 			</div>
 		{/if}
 		<div class="row mb-3 has-validation">
-			<label for="userEmail" class="col-sm-3 col-form-label text-end">
+			<label for="email" class="col-sm-3 col-form-label text-end">
 				<strong>E-mail</strong>
 			</label>
 			<div class="col-sm-9">
@@ -113,7 +113,7 @@
 					autocomplete="off"
 					type="email"
 					class="form-control"
-					id="userEmail"
+					id="email"
 					bind:value={user.email}
 					class:is-invalid={formSubmitted && validationErrors['email']}
 					required

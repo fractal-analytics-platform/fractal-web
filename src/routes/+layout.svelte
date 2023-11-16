@@ -14,6 +14,8 @@
 	// Detects page change
 	$: if ($navigating) cleanupModalBackdrop();
 
+	$: adminArea = $page.url.pathname.startsWith('/admin');
+
 	/**
 	 * Removes the modal backdrop that remains stuck at page change.
 	 */
@@ -86,6 +88,9 @@
 			</ul>
 		</div>
 	</nav>
+	{#if adminArea}
+		<div class="admin-border" />
+	{/if}
 	<div class="container p-4">
 		<slot />
 	</div>
@@ -115,6 +120,10 @@
 </main>
 
 <style>
+        .admin-border {
+		height: 8px;
+		background-color: #dc3545;
+	}
 	.loading {
 		position: fixed;
 		top: 0;
