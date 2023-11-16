@@ -27,37 +27,53 @@ test('Login and Logout', async ({ page }) => {
 	await expect(page.getByText('Login')).toHaveCount(2);
 });
 
-test('Loading SSR page with expired cookied', async ({ page }) => {
-	await page.goto('/auth/login');
-	await login(page);
-	await page.context().clearCookies();
-	await page.getByRole('link', { name: 'Tasks' }).click();
-	await page.waitForURL('/auth/login?invalidate=true');
-	await page.waitForSelector('text=Session expired');
+test.describe(() => {
+	// "Session expired" message randomly doesn't show up in pipeline.
+	// Since the behavior is not reproducible locally we allow these tests to be retried.
+	test.describe.configure({ retries: 3 });
+
+	test('Loading SSR page with expired cookied', async ({ page }) => {
+		await page.goto('/auth/login');
+		await login(page);
+		await page.context().clearCookies();
+		await page.getByRole('link', { name: 'Tasks' }).click();
+		await page.waitForURL('/auth/login?invalidate=true');
+		await verifySessionExpiredMessage(page);
+	});
+
+	test('Reloading SSR page with expired cookied', async ({ page }) => {
+		await page.goto('/auth/login');
+		await login(page);
+		await page.context().clearCookies();
+		await page.reload();
+		await page.waitForURL('/auth/login?invalidate=true');
+		await verifySessionExpiredMessage(page);
+	});
+
+	test('Loading AJAX request with expired cookied', async ({ page }) => {
+		await page.goto('/auth/login');
+		await login(page);
+		await page.context().clearCookies();
+		const projectNameInput = page.locator('[name="projectName"]');
+		await projectNameInput.fill('unauthorized');
+		await projectNameInput.blur();
+		const createProjectBtn = page.getByRole('button', { name: 'Create new project' });
+		await createProjectBtn.waitFor();
+		await createProjectBtn.click();
+		await page.waitForURL('/auth/login?invalidate=true');
+		await verifySessionExpiredMessage(page);
+	});
 });
 
-test('Reloading SSR page with expired cookied', async ({ page }) => {
-	await page.goto('/auth/login');
-	await login(page);
-	await page.context().clearCookies();
-	await page.reload();
-	await page.waitForURL('/auth/login?invalidate=true');
-	await page.waitForSelector('text=Session expired');
-});
-
-test('Loading AJAX request with expired cookied', async ({ page }) => {
-	await page.goto('/auth/login');
-	await login(page);
-	await page.context().clearCookies();
-	const projectNameInput = page.locator('[name="projectName"]');
-	await projectNameInput.fill('unauthorized');
-	await projectNameInput.blur();
-	const createProjectBtn = page.getByRole('button', { name: 'Create new project' });
-	await createProjectBtn.waitFor();
-	await createProjectBtn.click();
-	await page.waitForURL('/auth/login?invalidate=true');
-	await page.waitForSelector('text=Session expired');
-});
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+async function verifySessionExpiredMessage(page) {
+	await page.waitForFunction(() => {
+		const warning = document.querySelector('.alert-warning');
+		return warning instanceof HTMLElement && warning.innerText.includes('Session expired');
+	});
+}
 
 /**
  * @param {import('@playwright/test').Page} page
