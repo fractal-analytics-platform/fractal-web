@@ -66,15 +66,17 @@
 					<a href="/admin/users/{user.id}" class="btn btn-primary">
 						<i class="bi bi-pencil" /> Edit
 					</a>
-					<ConfirmActionButton
-						modalId={'confirmDeleteProject' + user.id}
-						style={'danger'}
-						btnStyle="danger"
-						message="Delete user {user.email}"
-						buttonIcon="trash"
-						label="Delete"
-						callbackAction={() => handleDeleteUser(user.id)}
-					/>
+					{#if user.email !== $page.data.userInfo.email}
+						<ConfirmActionButton
+							modalId={'confirmDeleteProject' + user.id}
+							style={'danger'}
+							btnStyle="danger"
+							message="Delete user {user.email}"
+							buttonIcon="trash"
+							label="Delete"
+							callbackAction={() => handleDeleteUser(user.id)}
+						/>
+					{/if}
 				</td>
 			</tr>
 		{/each}
