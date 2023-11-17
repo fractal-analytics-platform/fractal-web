@@ -76,7 +76,7 @@
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
-					<span class="navbar-text">{$page.data.userInfo.email}</span>
+					<a href="/profile" class="nav-link">{$page.data.userInfo.email}</a>
 				{/if}
 				<li class="nav-item">
 					{#if !userLoggedIn}
