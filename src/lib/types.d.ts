@@ -76,7 +76,10 @@ export type ApplyWorkflow = {
   end_timestamp: string | null
   status: JobStatus
   log: string | null
-  workflow_dump: object | null
+  workflow_dump: {
+    id: number
+    name: string
+  } | null
   working_dir: string | null
   working_dir_user: string | null
   first_task_index: number | null

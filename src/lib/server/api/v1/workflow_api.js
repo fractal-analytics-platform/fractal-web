@@ -23,3 +23,26 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 
 	await responseError(response);
 }
+
+/**
+ * Fetches the jobs of a given workflow from the server
+ * @param {typeof fetch} fetch
+ * @param {number|string} projectId
+ * @param {number|string} workflowId
+ * @returns {Promise<*>}
+ */
+export async function getWorkflowJobs(fetch, projectId, workflowId) {
+	const response = await fetch(
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/job/`,
+		{
+			method: 'GET',
+			credentials: 'include'
+		}
+	);
+
+	if (response.ok) {
+		return await response.json();
+	}
+
+	await responseError(response);
+}

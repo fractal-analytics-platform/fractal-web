@@ -73,9 +73,6 @@
 		>
 			<i class="bi-gear-wide-connected" />
 		</button>
-		<a href={`/projects/${project?.id}/jobs`} class="btn btn-light">
-			<i class="bi-journal-code" /> Jobs
-		</a>
 	</div>
 </div>
 

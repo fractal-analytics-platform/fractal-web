@@ -31,8 +31,7 @@ export async function listProjects(fetch) {
 export async function getProject(fetch, projectId) {
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}`, {
 		method: 'GET',
-		credentials: 'include',
-		mode: 'cors'
+		credentials: 'include'
 	});
 
 	if (response.ok) {
@@ -57,8 +56,7 @@ export async function getDataset(fetch, projectId, datasetId) {
 		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}`,
 		{
 			method: 'GET',
-			credentials: 'include',
-			mode: 'cors'
+			credentials: 'include'
 		}
 	);
 
@@ -81,8 +79,7 @@ export async function getDataset(fetch, projectId, datasetId) {
 export async function getWorkflows(fetch, projectId) {
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
 		method: 'GET',
-		credentials: 'include',
-		mode: 'cors'
+		credentials: 'include'
 	});
 
 	if (response.ok) {
@@ -95,16 +92,19 @@ export async function getWorkflows(fetch, projectId) {
 
 /**
  * Fetches the list of workflows of a project from the server
- * @param fetch
- * @param projectId
- * @param workflowId
+ * @param {typeof fetch} fetch
+ * @param {number|string}projectId
+ * @param {number|string} workflowId
  * @returns {Promise<*>}
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,
+		{
+			method: 'GET',
+			credentials: 'include'
+		}
+	);
 
 	if (response.ok) {
 		// If the response is ok, return the workflow as json
@@ -118,15 +118,32 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 
 /**
  * Fetches the list of jobs of a project from the server
- * @param fetch
- * @param projectId
+ * @param {typeof fetch} fetch
+ * @param {number|string} projectId
  * @returns {Promise<*>}
  */
-export async function getJobs(fetch, projectId) {
+export async function getProjectJobs(fetch, projectId) {
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/`, {
 		method: 'GET',
-		credentials: 'include',
-		mode: 'cors'
+		credentials: 'include'
+	});
+
+	if (response.ok) {
+		return await response.json();
+	}
+
+	await responseError(response);
+}
+
+/**
+ * Fetches the list of all the jobs belonging to the current user
+ * @param {typeof fetch} fetch
+ * @returns {Promise<*>}
+ */
+export async function getUserJobs(fetch) {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/job/`, {
+		method: 'GET',
+		credentials: 'include'
 	});
 
 	if (response.ok) {

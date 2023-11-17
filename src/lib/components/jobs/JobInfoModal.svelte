@@ -5,7 +5,7 @@
 
 	/** @type {import('$lib/types').Dataset[]} */
 	export let datasets;
-	/** @type {import('$lib/types').Workflow[]} */
+	/** @type {{id: number, name: string}[]} */
 	export let workflows;
 
 	/** @type {number|undefined} */

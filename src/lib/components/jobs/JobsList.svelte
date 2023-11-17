@@ -22,7 +22,7 @@
 
 	/** @type {import('$lib/types').Project[]} */
 	let projects = $page.data.projects;
-	/** @type {import('$lib/types').Workflow[]} */
+	/** @type {{id: number, name: string}[]} */
 	let workflows = $page.data.workflows || [];
 	/** @type {import('$lib/types').ApplyWorkflow[]} */
 	let jobs = $page.data.jobs || [];
@@ -158,7 +158,10 @@
 		</div>
 	</div>
 	<div id="jobUpdatesError" />
-	<table class="table">
+	<table class="table jobs-table">
+		<colgroup>
+			<col id="id-column" />
+		</colgroup>
 		<thead class="table-light text-nowrap">
 			<tr>
 				<Th handler={tableHandler} key="id" label="Id" />
@@ -180,7 +183,7 @@
 				<th />
 				<th />
 				{#if !columnsToHide.includes('project')}
-					<th>
+					<th class="col-2">
 						{#if projects}
 							<select class="form-control" bind:value={projectFilter}>
 								<option value="">All</option>
@@ -257,7 +260,7 @@
 							{/if}
 							{#if !columnsToHide.includes('workflow')}
 								<td>
-									{#if workflows}
+									{#if workflows && row.workflow_id !== null}
 										<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
 											{workflows.find((workflow) => workflow.id === row.workflow_id)?.name}
 										</a>
@@ -266,12 +269,16 @@
 							{/if}
 							<td>
 								{#if datasets}
-									{datasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
+									<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
+										{datasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
+									</a>
 								{/if}
 							</td>
 							<td>
 								{#if datasets}
-									{datasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
+									<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
+										{datasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
+									</a>
 								{/if}
 							</td>
 							<td>
@@ -318,3 +325,14 @@
 
 <JobInfoModal {workflows} {datasets} bind:this={jobInfoModal} />
 <JobLogsModal bind:this={jobLogsModal} />
+
+<style>
+	.jobs-table {
+		table-layout: fixed;
+		word-break: break-all;
+	}
+
+	#id-column {
+		width: 60px;
+	}
+</style>
