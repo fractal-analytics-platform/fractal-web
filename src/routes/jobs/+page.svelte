@@ -3,27 +3,21 @@
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
 
-	/** @type {import('$lib/types').Project[]} */
-	let projects = $page.data.projects;
-
 	/**
 	 * @returns {Promise<import('$lib/types').ApplyWorkflow[]>}
 	 */
 	async function jobUpdater() {
-		let jobs = [];
-		for (const project of projects) {
-			const response = await fetch(`/api/v1/project/${project.id}/job`, {
-				method: 'GET',
-				credentials: 'include',
-				mode: 'cors'
-			});
-			const result = await response.json();
-			if (!response.ok) {
-				throw new AlertError(result);
-			}
-			jobs = jobs.concat(result);
+		const response = await fetch(`/api/v1/project/job`, {
+			method: 'GET',
+			credentials: 'include',
+			mode: 'cors',
+			headers: { 'x-fractal-slash': 'true' }
+		});
+		const result = await response.json();
+		if (!response.ok) {
+			throw new AlertError(result);
 		}
-		return jobs;
+		return result;
 	}
 </script>
 

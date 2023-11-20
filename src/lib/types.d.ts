@@ -4,7 +4,6 @@ export type Project = {
   id: number
   name: string
   read_only: boolean
-  dataset_list: Array<Dataset>
 }
 
 export type Task = {

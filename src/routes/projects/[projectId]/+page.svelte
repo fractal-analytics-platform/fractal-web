@@ -8,6 +8,7 @@
 
 	// Component properties
 	let project = $page.data.project;
+	let datasets = $page.data.datasets;
 	let workflows = $page.data.workflows;
 	let projectUpdatesSuccessMessage = '';
 
@@ -83,7 +84,7 @@
 		</div>
 
 		<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
-		<ProjectDatasetsList datasets={project.dataset_list} />
+		<ProjectDatasetsList {datasets} />
 		<WorkflowsList {workflows} projectId={project.id} />
 	</div>
 {/if}

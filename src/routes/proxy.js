@@ -6,11 +6,14 @@ import { FRACTAL_SERVER_HOST } from '$env/static/private';
 export function createGetProxy(path) {
 	return async function GET({ params, url, request }) {
 		try {
-			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}${url.search}`, {
-				method: 'GET',
-				credentials: 'include',
-				headers: filterHeaders(request.headers)
-			});
+			return await fetch(
+				`${FRACTAL_SERVER_HOST}/${path}/${params.path}${getTrailingSlash(request)}${url.search}`,
+				{
+					method: 'GET',
+					credentials: 'include',
+					headers: filterHeaders(request.headers)
+				}
+			);
 		} catch (err) {
 			console.log(err);
 			throw err;
@@ -72,6 +75,14 @@ export function createDeleteProxy(path) {
 			throw err;
 		}
 	};
+}
+
+/**
+ * @param {Request} request
+ * @returns {string}
+ */
+function getTrailingSlash(request) {
+	return request.headers.get('x-fractal-slash') ? '/' : '';
 }
 
 /**

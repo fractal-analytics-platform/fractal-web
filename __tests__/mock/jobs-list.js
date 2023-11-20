@@ -2,22 +2,20 @@ export const data = {
 	projects: [
 		{
 			id: 1,
-			name: 'project 1',
-			dataset_list: [
-				{ id: 1, name: 'input1', type: 'image' },
-				{ id: 2, name: 'output1', type: 'zarr' }
-			]
+			name: 'project 1'
 		},
 		{
 			id: 2,
-			name: 'project 2',
-			dataset_list: [
-				{ id: 3, name: 'input2', type: 'image' },
-				{ id: 4, name: 'output2', type: 'zarr' },
-				{ id: 5, name: 'input3', type: 'image' },
-				{ id: 6, name: 'output3', type: 'zarr' }
-			]
+			name: 'project 2'
 		}
+	],
+	datasets: [
+		{ id: 1, name: 'input1', type: 'image', project_id: 1 },
+		{ id: 2, name: 'output1', type: 'zarr', project_id: 1 },
+		{ id: 3, name: 'input2', type: 'image', project_id: 2 },
+		{ id: 4, name: 'output2', type: 'zarr', project_id: 2 },
+		{ id: 5, name: 'input3', type: 'image', project_id: 2 },
+		{ id: 6, name: 'output3', type: 'zarr', project_id: 2 }
 	],
 	workflows: [
 		{

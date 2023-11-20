@@ -26,9 +26,8 @@
 	let workflows = $page.data.workflows || [];
 	/** @type {import('$lib/types').ApplyWorkflow[]} */
 	let jobs = $page.data.jobs || [];
-
 	/** @type {import('$lib/types').Dataset[]} */
-	$: datasets = projects.map((p) => p.dataset_list).reduce((l1, l2) => l1.concat(l2), []);
+	let datasets = $page.data.datasets || [];
 
 	/** @type {DataHandler} */
 	let tableHandler = new DataHandler(jobs);
@@ -183,7 +182,7 @@
 				<th />
 				<th />
 				{#if !columnsToHide.includes('project')}
-					<th class="col-2">
+					<th>
 						{#if projects}
 							<select class="form-control" bind:value={projectFilter}>
 								<option value="">All</option>

@@ -1,5 +1,5 @@
 import { getWorkflow } from '$lib/server/api/v1/workflow_api';
-import { getProject } from '$lib/server/api/v1/project_api';
+import { getProject, getProjectDatasets } from '$lib/server/api/v1/project_api';
 
 export async function load({ fetch, params }) {
 	console.log('Load workflow page');
@@ -12,8 +12,8 @@ export async function load({ fetch, params }) {
 	// Get the workflow
 	const workflow = await getWorkflow(fetch, projectId, workflowId);
 
-	// Get available tasks
-	const datasets = project ? project.dataset_list : [];
+	// Get the datasets
+	const datasets = await getProjectDatasets(fetch, projectId);
 
 	return {
 		project,

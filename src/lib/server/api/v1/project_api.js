@@ -45,6 +45,29 @@ export async function getProject(fetch, projectId) {
 // DATASET ENDPOINTS
 
 /**
+ * Fetches all the project's datasets from the server
+ * @param {typeof fetch} fetch
+ * @param {number|string} projectId
+ * @returns {Promise<*>}
+ */
+export async function getProjectDatasets(fetch, projectId) {
+	const response = await fetch(
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/`,
+		{
+			method: 'GET',
+			credentials: 'include'
+		}
+	);
+
+	if (response.ok) {
+		// Return the dataset as json object
+		return await response.json();
+	}
+
+	await responseError(response);
+}
+
+/**
  * Fetches a project's dataset from the server
  * @param fetch
  * @param projectId
