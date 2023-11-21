@@ -6,6 +6,8 @@ This release improves and extends the login/logout features. Using OAuth
 authentication requires fractal-server >1.3.13 (due to the recent addition of
 the fractal-server `redirect_url` environment variable).
 
+* Used trailing slash in all API calls (\#328).
+* Created per-user and per-workflow jobs pages (\#328).
 * Improved handling of session expiration (\#333).
 * Fixed logout bug (\#327).
 * Implemented OAuth2 login (\#333).
