@@ -8,7 +8,7 @@ import { responseError } from '$lib/common/errors';
  */
 export async function getUserWorkflows(fetch) {
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/workflow/`,
+		FRACTAL_SERVER_HOST + `/api/v1/workflow/`,
 		{
 			method: 'GET',
 			credentials: 'include'
@@ -31,7 +31,7 @@ export async function getUserWorkflows(fetch) {
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}`,
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/`,
 		{
 			method: 'GET',
 			credentials: 'include'

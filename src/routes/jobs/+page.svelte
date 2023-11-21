@@ -7,11 +7,10 @@
 	 * @returns {Promise<import('$lib/types').ApplyWorkflow[]>}
 	 */
 	async function jobUpdater() {
-		const response = await fetch(`/api/v1/project/job`, {
+		const response = await fetch(`/api/v1/job`, {
 			method: 'GET',
 			credentials: 'include',
-			mode: 'cors',
-			headers: { 'x-fractal-slash': 'true' }
+			mode: 'cors'
 		});
 		const result = await response.json();
 		if (!response.ok) {
