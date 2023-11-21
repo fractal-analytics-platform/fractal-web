@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import { DataHandler, check } from '@vincjo/datatables';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
-	import TimestampBadge from '$lib/components/jobs/TimestampBadge.svelte';
 	import JobInfoModal from '$lib/components/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
@@ -239,83 +238,81 @@
 		<tbody>
 			{#if rows}
 				{#each $rows as row}
-					{#key row}
-						<tr class="align-middle">
-							<td>{row.id}</td>
+					<tr class="align-middle">
+						<td>{row.id}</td>
+						<td>
+							{row.start_timestamp ? new Date(row.start_timestamp).toLocaleString() : '-'}
+						</td>
+						<td>
+							{row.end_timestamp ? new Date(row.end_timestamp).toLocaleString() : '-'}
+						</td>
+						{#if !columnsToHide.includes('project')}
 							<td>
-								<TimestampBadge timestamp={row.start_timestamp} />
-							</td>
-							<td>
-								<TimestampBadge timestamp={row.end_timestamp} />
-							</td>
-							{#if !columnsToHide.includes('project')}
-								<td>
-									{#if projects}
-										<a href={`/projects/${row.project_id}`}>
-											{projects.find((project) => project.id === row.project_id)?.name}
-										</a>
-									{/if}
-								</td>
-							{/if}
-							{#if !columnsToHide.includes('workflow')}
-								<td>
-									{#if workflows && row.workflow_id !== null}
-										<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
-											{workflows.find((workflow) => workflow.id === row.workflow_id)?.name}
-										</a>
-									{/if}
-								</td>
-							{/if}
-							<td>
-								{#if datasets}
-									<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
-										{datasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
+								{#if projects}
+									<a href={`/projects/${row.project_id}`}>
+										{projects.find((project) => project.id === row.project_id)?.name}
 									</a>
 								{/if}
 							</td>
+						{/if}
+						{#if !columnsToHide.includes('workflow')}
 							<td>
-								{#if datasets}
-									<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
-										{datasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
+								{#if workflows && row.workflow_id !== null}
+									<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
+										{workflows.find((workflow) => workflow.id === row.workflow_id)?.name}
 									</a>
 								{/if}
 							</td>
-							<td>
-								<StatusBadge status={row.status} />
-							</td>
-							<td>
+						{/if}
+						<td>
+							{#if datasets}
+								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
+									{datasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
+								</a>
+							{/if}
+						</td>
+						<td>
+							{#if datasets}
+								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
+									{datasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
+								</a>
+							{/if}
+						</td>
+						<td>
+							<StatusBadge status={row.status} />
+						</td>
+						<td>
+							<button
+								class="btn btn-info"
+								on:click|preventDefault={() =>
+									jobInfoModal.show(row, getProjectName(row.project_id))}
+							>
+								<i class="bi-info-circle" />
+								Info
+							</button>
+							{#if row.status === 'failed' || row.status === 'done'}
 								<button
-									class="btn btn-info"
-									on:click|preventDefault={() =>
-										jobInfoModal.show(row, getProjectName(row.project_id))}
+									class="btn btn-light"
+									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id)}
 								>
-									<i class="bi-info-circle" />
-									Info
+									<i class="bi-list-columns-reverse" />
+									Logs
 								</button>
-								{#if row.status === 'failed' || row.status === 'done'}
-									<button
-										class="btn btn-light"
-										on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id)}
-									>
-										<i class="bi-list-columns-reverse" />
-										Logs
-									</button>
-									<a
-										class="btn btn-light"
-										href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
-										download={`${row.id}_logs.zip`}
-									>
-										<i class="bi-arrow-down-circle" />
-									</a>
-								{/if}
-								{#if row.status === 'running'}
-									<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
-										<i class="bi-x-circle" /> Cancel
-									</button>
-								{/if}
-							</td>
-						</tr>
-					{/key}
+								<a
+									class="btn btn-light"
+									href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
+									download={`${row.id}_logs.zip`}
+								>
+									<i class="bi-arrow-down-circle" />
+								</a>
+							{/if}
+							{#if row.status === 'running'}
+								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
+									<i class="bi-x-circle" /> Cancel
+								</button>
+							{/if}
+						</td>
+					</tr>
 				{/each}
 			{/if}
 		</tbody>
