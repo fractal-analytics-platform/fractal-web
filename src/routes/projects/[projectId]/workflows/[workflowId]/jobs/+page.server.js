@@ -1,5 +1,6 @@
-import { getProject, getProjectDatasets } from '$lib/server/api/v1/project_api';
-import { getUserWorkflows, getWorkflowJobs } from '$lib/server/api/v1/workflow_api';
+import { removeDuplicatedItems } from '$lib/common/component_utilities';
+import { getProject } from '$lib/server/api/v1/project_api';
+import { getWorkflowJobs } from '$lib/server/api/v1/workflow_api';
 
 export async function load({ fetch, params }) {
 	const { projectId, workflowId } = params;
@@ -10,18 +11,27 @@ export async function load({ fetch, params }) {
 	/** @type {import('$lib/types').ApplyWorkflow[]} */
 	const jobs = await getWorkflowJobs(fetch, projectId, workflowId);
 
-	/** @type {import('$lib/types').Workflow[]} */
-	const workflows = await getUserWorkflows(fetch);
-
-	/** @type {import('$lib/types').Workflow[]} */
-	const datasets = await getProjectDatasets(fetch, projectId);
+	const workflows = removeDuplicatedItems(
+		/** @type {{id: number, name: string}[]} */ (
+			jobs.filter((j) => j.workflow_dump).map((j) => j.workflow_dump)
+		)
+	);
+	const inputDatasets = removeDuplicatedItems(
+		/** @type {{id: number, name: string}[]} */
+		(jobs.filter((j) => j.input_dataset_dump).map((j) => j.input_dataset_dump))
+	);
+	const outputDatasets = removeDuplicatedItems(
+		/** @type {{id: number, name: string}[]} */
+		(jobs.filter((j) => j.output_dataset_dump).map((j) => j.output_dataset_dump))
+	);
 
 	return {
 		project: project,
 		projects: [project],
 		workflow: workflows[0],
 		workflows,
-		datasets,
+		inputDatasets,
+		outputDatasets,
 		jobs
 	};
 }

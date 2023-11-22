@@ -20,6 +20,10 @@ export class PageWithProject {
 		await createProjectBtn.click();
 		await this.page.waitForURL(/\/projects\/\d+/);
 		this.url = this.page.url();
+		const match = this.url.match(/\/projects\/(\d+)/);
+		if (match) {
+			this.projectId = match[1];
+		}
 	}
 
 	async deleteProject() {

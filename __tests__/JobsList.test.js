@@ -44,9 +44,9 @@ describe('JobsList', () => {
 		const workflowFilter = filters[1];
 		verifyOptions(workflowFilter, ['', '1', '2']);
 		const inputDatasetFilter = filters[2];
-		verifyOptions(inputDatasetFilter, ['', '1', '2', '3', '4', '5', '6']);
+		verifyOptions(inputDatasetFilter, ['', '1', '3', '5']);
 		const outputDatasetFilter = filters[3];
-		verifyOptions(outputDatasetFilter, ['', '1', '2', '3', '4', '5', '6']);
+		verifyOptions(outputDatasetFilter, ['', '2', '4', '6']);
 		const statusFilter = filters[4];
 		verifyOptions(statusFilter, ['', 'running', 'done', 'failed', 'submitted']);
 

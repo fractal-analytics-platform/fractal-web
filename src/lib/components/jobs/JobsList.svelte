@@ -25,8 +25,12 @@
 	let workflows = $page.data.workflows || [];
 	/** @type {import('$lib/types').ApplyWorkflow[]} */
 	let jobs = $page.data.jobs || [];
-	/** @type {import('$lib/types').Dataset[]} */
-	let datasets = $page.data.datasets || [];
+	/** @type {{ id: number, name: string }[]} */
+	let inputDatasets = $page.data.inputDatasets || [];
+	/** @type {{ id: number, name: string }[]} */
+	let outputDatasets = $page.data.outputDatasets || [];
+	/** @type {{ id: number, name: string }[]} */
+	let datasets = inputDatasets.concat(outputDatasets);
 
 	/** @type {DataHandler} */
 	let tableHandler = new DataHandler(jobs);
@@ -208,7 +212,7 @@
 					{#key inputDatasetFilter}
 						<select class="form-control" bind:value={inputDatasetFilter}>
 							<option value="">All</option>
-							{#each datasets as dataset}
+							{#each inputDatasets as dataset}
 								<option value={dataset.id}>{dataset.name}</option>
 							{/each}
 						</select>
@@ -217,7 +221,7 @@
 				<th>
 					<select class="form-control" bind:value={outputDatasetFilter}>
 						<option value="">All</option>
-						{#each datasets as dataset}
+						{#each outputDatasets as dataset}
 							<option value={dataset.id}>{dataset.name}</option>
 						{/each}
 					</select>
@@ -265,16 +269,16 @@
 							</td>
 						{/if}
 						<td>
-							{#if datasets}
+							{#if inputDatasets}
 								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
-									{datasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
+									{inputDatasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
 								</a>
 							{/if}
 						</td>
 						<td>
-							{#if datasets}
+							{#if outputDatasets}
 								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
-									{datasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
+									{outputDatasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
 								</a>
 							{/if}
 						</td>

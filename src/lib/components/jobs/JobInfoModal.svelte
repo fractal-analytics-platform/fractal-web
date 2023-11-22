@@ -3,7 +3,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
-	/** @type {import('$lib/types').Dataset[]} */
+	/** @type {{id: number, name: string}[]} */
 	export let datasets;
 	/** @type {{id: number, name: string}[]} */
 	export let workflows;

@@ -79,6 +79,14 @@ export type ApplyWorkflow = {
     id: number
     name: string
   } | null
+  output_dataset_dump: {
+    id: number
+    name: string
+  } | null
+  input_dataset_dump: {
+    id: number
+    name: string
+  } | null
   working_dir: string | null
   working_dir_user: string | null
   first_task_index: number | null

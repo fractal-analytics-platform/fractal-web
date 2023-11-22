@@ -142,3 +142,18 @@ export function formatMarkdown(markdownValue) {
 	}
 	return DOMPurify.sanitize(marked.parse(markdownValue));
 }
+
+/**
+ * @param {{id: number, name: string}[]} allItems
+ * @returns {{id: number, name: string}[]}
+ */
+export function removeDuplicatedItems(allItems) {
+	const items = [];
+	for (const item of allItems) {
+		const exists = items.find((e) => e.id === item.id);
+		if (!exists) {
+			items.push(item);
+		}
+	}
+	return items.sort((a, b) => (a.name < b.name ? -1 : a.name === b.name ? 0 : 1));
+}
