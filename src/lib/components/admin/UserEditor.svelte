@@ -138,45 +138,47 @@
 				<span class="invalid-feedback">{validationErrors['username']}</span>
 			</div>
 		</div>
-		<div class="row mb-3">
-			<div class="col-sm-9 offset-sm-3">
-				<div class="form-check">
-					<input
-						class="form-check-input"
-						type="checkbox"
-						id="active"
-						bind:checked={user.is_active}
-					/>
-					<label class="form-check-label" for="active"> Active </label>
+		{#if user.id}
+			<div class="row mb-3">
+				<div class="col-sm-9 offset-sm-3">
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="active"
+							bind:checked={user.is_active}
+						/>
+						<label class="form-check-label" for="active"> Active </label>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row mb-3">
-			<div class="col-sm-9 offset-sm-3">
-				<div class="form-check">
-					<input
-						class="form-check-input"
-						type="checkbox"
-						id="superuser"
-						bind:checked={user.is_superuser}
-					/>
-					<label class="form-check-label" for="superuser"> Superuser </label>
+			<div class="row mb-3">
+				<div class="col-sm-9 offset-sm-3">
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="superuser"
+							bind:checked={user.is_superuser}
+						/>
+						<label class="form-check-label" for="superuser"> Superuser </label>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row mb-3">
-			<div class="col-sm-9 offset-sm-3">
-				<div class="form-check">
-					<input
-						class="form-check-input"
-						type="checkbox"
-						id="verified"
-						bind:checked={user.is_verified}
-					/>
-					<label class="form-check-label" for="verified"> Verified </label>
+			<div class="row mb-3">
+				<div class="col-sm-9 offset-sm-3">
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="verified"
+							bind:checked={user.is_verified}
+						/>
+						<label class="form-check-label" for="verified"> Verified </label>
+					</div>
 				</div>
 			</div>
-		</div>
+		{/if}
 		<div class="row mb-3 has-validation">
 			<label for="password" class="col-sm-3 col-form-label text-end">
 				<strong>Password</strong>
