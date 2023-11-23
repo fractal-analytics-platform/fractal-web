@@ -83,7 +83,10 @@
 	<div class="container p-4">
 		<slot />
 	</div>
-	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:d-none={!($navigating || loading)}>
+	<div
+		class="d-flex flex-column min-vh-100 min-vw-100 loading"
+		class:show={$navigating || loading}
+	>
 		<div class="d-flex flex-grow-1 justify-content-center align-items-center">
 			<div class="spinner-border text-primary" role="status">
 				<span class="visually-hidden">Loading...</span>
@@ -113,6 +116,16 @@
 		bottom: 0;
 		right: 0;
 		background-color: rgba(255, 255, 255, 0.8);
+		visibility: hidden;
+		opacity: 0;
+		transition: visibility 0s, opacity 0.5s linear;
+		transition-delay: 250ms;
+		transition-property: visibility;
+	}
+
+	.loading.show {
+		visibility: visible;
+		opacity: 1;
 	}
 
 	.loading .spinner-border {
