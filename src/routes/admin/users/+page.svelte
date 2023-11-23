@@ -7,6 +7,8 @@
 	/** @type {Array<import('$lib/types').User & {id: number}>} */
 	let users = $page.data.users;
 
+	const deleteEnabled = false;
+
 	/**
 	 * @param {number} userId
 	 */
@@ -66,7 +68,7 @@
 					<a href="/admin/users/{user.id}" class="btn btn-primary">
 						<i class="bi bi-pencil" /> Edit
 					</a>
-					{#if user.email !== $page.data.userInfo.email}
+					{#if deleteEnabled && user.email !== $page.data.userInfo.email}
 						<ConfirmActionButton
 							modalId={'confirmDeleteProject' + user.id}
 							style={'danger'}
