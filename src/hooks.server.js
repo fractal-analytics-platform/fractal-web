@@ -1,4 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { error } from '@sveltejs/kit';
 
 export async function handle({ event, resolve }) {
 	console.log(`[${event.request.method}] - ${event.url.pathname}`);
