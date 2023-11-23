@@ -1,13 +1,15 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.7.0 (unreleased)
 
-This release improves and extends the login/logout features. Using OAuth
-authentication requires fractal-server >1.3.13 (due to the recent addition of
-the fractal-server `redirect_url` environment variable).
+This release requires fractal-server 1.4.0.
 
-* Used trailing slash in all API calls (\#328).
-* Created per-user and per-workflow jobs pages (\#328).
+* Aligned with fractal-server 1.4.0 API, including trailing slash for endpoints' paths (\#328).
+* Added spinner during page loading (\#328).
+* Job pages:
+    * Created per-user and per-workflow jobs pages (\#328).
+    * Removed per-project and per-workflow jobs pages (\#328).
+    * Added automatic background update job pages (\#328).
 * Improved handling of session expiration (\#333).
 * Fixed logout bug (\#327).
 * Implemented OAuth2 login (\#333).
