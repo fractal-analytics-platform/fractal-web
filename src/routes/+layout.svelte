@@ -76,15 +76,27 @@
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
-					<a href="/profile" class="nav-link">{$page.data.userInfo.email}</a>
-				{/if}
-				<li class="nav-item">
-					{#if !userLoggedIn}
+					<li class="nav-item dropdown">
+						<a
+							class="nav-link dropdown-toggle"
+							href="#user"
+							role="button"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+						>
+							<i class="bi bi-person-circle" />
+							{$page.data.userInfo.email}
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="/profile">My profile</a></li>
+							<li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+						</ul>
+					</li>
+				{:else}
+					<li class="nav-item">
 						<a href="/auth/login" class="nav-link">Login</a>
-					{:else}
-						<a href="/auth/logout" class="nav-link">Logout</a>
-					{/if}
-				</li>
+					</li>
+				{/if}
 			</ul>
 		</div>
 	</nav>

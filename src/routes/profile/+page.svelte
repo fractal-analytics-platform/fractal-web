@@ -6,7 +6,7 @@
 	$: user = $page.data.userInfo;
 </script>
 
-<h3>My account</h3>
+<h3>My profile</h3>
 
 <div class="row mt-4">
 	<div class="col-md-8 col-lg-6">

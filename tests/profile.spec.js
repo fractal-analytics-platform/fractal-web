@@ -2,7 +2,8 @@ import { expect, test } from './base_test.js';
 
 test('User profile', async ({ page }) => {
 	await page.goto('/');
-	await page.getByRole('link', { name: 'admin@fractal.xy' }).click();
+	await page.getByRole('button', { name: 'admin@fractal.xy' }).click();
+	await page.getByRole('link', { name: 'My profile' }).click();
 	await page.waitForURL('/profile');
 
 	const cells = await page.locator('table td').all();
