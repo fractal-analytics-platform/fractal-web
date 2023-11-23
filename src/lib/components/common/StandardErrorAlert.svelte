@@ -21,7 +21,7 @@
 </script>
 
 {#if errorString}
-	<div class="alert alert-danger alert-dismissible">
+	<div class="alert alert-danger alert-dismissible" role="alert">
 		<pre>There has been an error, reason:</pre>
 		<pre>{errorString}</pre>
 		<button class="btn-close" data-bs-dismiss="alert" on:click={hide} />

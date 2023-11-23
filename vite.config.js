@@ -31,12 +31,16 @@ const config = {
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		include: ['**/__tests__/**/*.?(c|m)[jt]s?(x)'],
+		include: ['**/__tests__/**/*\\.test\\.js'],
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
 			reportsDirectory: './coverage-unit'
-		}
+		},
+		alias: [
+			// See https://github.com/vitest-dev/vitest/issues/2834#issuecomment-1439576110
+			{ find: /^svelte$/, replacement: 'svelte/internal' }
+		]
 	},
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection

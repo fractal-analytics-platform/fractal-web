@@ -435,16 +435,12 @@
 			// Handle API response
 			if (response.ok) {
 				// Successfully applied workflow
-				const job = await response.json();
 				// @ts-ignore
 				// eslint-disable-next-line
 				runWorkflowModal.toggle();
 				// Navigate to project jobs page
 				// Define URL to navigate to
-				const jobsUrl = new URL(`/projects/${project.id}/jobs`, window.location.origin);
-				// Set jobsUrl search params
-				jobsUrl.searchParams.set('workflow', workflow.id.toString());
-				jobsUrl.searchParams.set('id', job.id);
+				const jobsUrl = new URL(`projects/${project.id}/workflows/${workflow.id}/jobs`, window.location.origin);
 				// Trigger navigation
 				await goto(jobsUrl);
 			} else {
@@ -543,12 +539,12 @@
 		</ol>
 	</nav>
 	<div>
-		<a href="/projects/{project?.id}/jobs?workflow={workflow?.id}" class="btn btn-light"
-			><i class="bi-journal-code" /> List jobs</a
-		>
-		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}
-			><i class="bi-box-arrow-up" /></button
-		>
+		<a href="/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+			<i class="bi-journal-code" /> List jobs
+		</a>
+		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
+			<i class="bi-box-arrow-up" />
+		</button>
 		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 		<button
 			class="btn btn-light"

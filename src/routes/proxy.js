@@ -6,7 +6,7 @@ import { FRACTAL_SERVER_HOST } from '$env/static/private';
 export function createGetProxy(path) {
 	return async function GET({ params, url, request }) {
 		try {
-			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}${url.search}`, {
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'GET',
 				credentials: 'include',
 				headers: filterHeaders(request.headers)
@@ -43,7 +43,7 @@ export function createPostProxy(path) {
 export function createPatchProxy(path) {
 	return async function PATCH({ params, url, request }) {
 		try {
-			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}${url.search}`, {
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: filterHeaders(request.headers),
@@ -62,7 +62,7 @@ export function createPatchProxy(path) {
 export function createDeleteProxy(path) {
 	return async function DELETE({ params, url, request }) {
 		try {
-			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}${url.search}`, {
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'DELETE',
 				credentials: 'include',
 				headers: filterHeaders(request.headers)

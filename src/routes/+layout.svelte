@@ -37,7 +37,10 @@
 		};
 	}
 
+	let loading = true;
+
 	onMount(() => {
+		loading = false;
 		if (sessionStorage && userLoggedIn) {
 			sessionStorage.setItem('userLoggedIn', 'true');
 		}
@@ -58,6 +61,9 @@
 					<li class="nav-item">
 						<a href="/tasks" class="nav-link">Tasks</a>
 					</li>
+					<li class="nav-item">
+						<a href="/jobs" class="nav-link">Jobs</a>
+					</li>
 				{/if}
 			</ul>
 			<ul class="nav">
@@ -77,6 +83,16 @@
 	<div class="container p-4">
 		<slot />
 	</div>
+	<div
+		class="d-flex flex-column min-vh-100 min-vw-100 loading"
+		class:show={$navigating || loading}
+	>
+		<div class="d-flex flex-grow-1 justify-content-center align-items-center">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+	</div>
 	<div class="container">
 		<footer
 			class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
@@ -91,3 +107,29 @@
 		</footer>
 	</div>
 </main>
+
+<style>
+	.loading {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background-color: rgba(255, 255, 255, 0.8);
+		visibility: hidden;
+		opacity: 0;
+		transition: visibility 0s, opacity 0.5s linear;
+		transition-delay: 250ms;
+		transition-property: visibility;
+	}
+
+	.loading.show {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.loading .spinner-border {
+		width: 3rem;
+		height: 3rem;
+	}
+</style>

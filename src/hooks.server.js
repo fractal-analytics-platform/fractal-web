@@ -20,7 +20,7 @@ export async function handle({ event, resolve }) {
 		return new Response(null, { status: 302, headers: { location: '/auth/login?invalidate=true' } });
 	}
 
-	const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami`);
+	const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami/`);
 	if (whoami.ok) {
 		return await resolve(event);
 	} else {

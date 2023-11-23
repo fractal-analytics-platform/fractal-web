@@ -1,9 +1,9 @@
 <script>
+	/** @type {import('$lib/types').JobStatus|null} */
 	export let status = null;
 	let labelStyle = null;
 
 	switch (status) {
-		// Status could be submitted, running, done or failed
 		case 'submitted':
 			labelStyle = 'badge text-bg-info';
 			break;

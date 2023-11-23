@@ -5,15 +5,22 @@
 	import { goto } from '$app/navigation';
 
 	// List of projects to be displayed
+	/** @type {import('$lib/types').Project[]} */
 	export let projects = [];
+	/** @type {import('$lib/types').Dataset[]} */
+	export let datasets = [];
 
 	let newProjectName = '';
 	$: enableCreateProject = !!newProjectName;
 
-	function setModalProject(event) {
-		const projectId = event.currentTarget.getAttribute('data-fc-project');
-		const project = projects.find((p) => p.id == projectId);
-		modalProject.set(project);
+	/**
+	 * @param {number} projectId
+	 */
+	function setModalProject(projectId) {
+		/** @type {import('$lib/types').Project} */
+		const project = projects.filter((p) => p.id === projectId)[0];
+		const projectDatasets = datasets.filter((d) => d.project_id === projectId);
+		modalProject.set({ project, datasets: projectDatasets });
 	}
 
 	async function handleCreateProject() {
@@ -59,7 +66,7 @@
 			projects = projects.filter((p) => p.id !== projectId);
 		} else {
 			const result = await response.json();
-			console.error(`Unable to delete project ${projectId}`)
+			console.error(`Unable to delete project ${projectId}`);
 			throw new AlertError(result);
 		}
 	}
@@ -86,9 +93,9 @@
 					</div>
 				</div>
 				<div class="col-auto">
-					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}
-						>Create new project</button
-					>
+					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}>
+						Create new project
+					</button>
 				</div>
 			</form>
 			<div id="createProjectErrorAlert" class="mt-3" />
@@ -110,17 +117,16 @@
 						<td class="col-6">{name}</td>
 						<td class="col-4">
 							<button
-								data-fc-project={id}
 								class="btn btn-light"
 								data-bs-toggle="modal"
 								data-bs-target="#projectInfoModal"
-								on:click={setModalProject}
+								on:click={() => setModalProject(id)}
 							>
 								<i class="bi bi-info-circle" /> Info
 							</button>
-							<a href={'/projects/' + id} class="btn btn-light"
-								><i class="bi bi-arrow-up-right-square" /> Open</a
-							>
+							<a href={'/projects/' + id} class="btn btn-light">
+								<i class="bi bi-arrow-up-right-square" /> Open
+							</a>
 							<ConfirmActionButton
 								modalId={'confirmDeleteProject' + id}
 								style={'danger'}

@@ -8,7 +8,7 @@ import { responseError } from '$lib/common/errors';
  * @returns {Promise<*>}
  */
 export async function userAuthentication(fetch, data) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/login', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/login/', {
 		method: 'POST',
 		credentials: 'include',
 		mode: 'cors',
@@ -28,7 +28,7 @@ export async function userAuthentication(fetch, data) {
  * @returns {Promise<*>}
  */
 export async function whoami(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/whoami', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/whoami/', {
 		method: 'GET',
 		credentials: 'include',
 		mode: 'cors'
@@ -47,7 +47,7 @@ export async function whoami(fetch) {
  * @returns {Promise<void>}
  */
 export async function logout(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/logout', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/logout/', {
 		method: 'POST',
 		credentials: 'include',
 		mode: 'cors'

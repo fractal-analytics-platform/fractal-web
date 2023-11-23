@@ -8,6 +8,7 @@
 
 	// Component properties
 	let project = $page.data.project;
+	let datasets = $page.data.datasets;
 	let workflows = $page.data.workflows;
 	let projectUpdatesSuccessMessage = '';
 
@@ -73,9 +74,6 @@
 		>
 			<i class="bi-gear-wide-connected" />
 		</button>
-		<a href={`/projects/${project?.id}/jobs`} class="btn btn-light">
-			<i class="bi-journal-code" /> Jobs
-		</a>
 	</div>
 </div>
 
@@ -86,7 +84,7 @@
 		</div>
 
 		<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
-		<ProjectDatasetsList datasets={project.dataset_list} />
+		<ProjectDatasetsList {datasets} />
 		<WorkflowsList {workflows} projectId={project.id} />
 	</div>
 {/if}
