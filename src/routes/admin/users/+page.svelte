@@ -65,7 +65,10 @@
 				<td><BooleanIcon value={user.is_verified} /></td>
 				<td>{user.slurm_user || '-'}</td>
 				<td>
-					<a href="/admin/users/{user.id}" class="btn btn-primary">
+					<a href="/admin/users/{user.id}" class="btn btn-light">
+						<i class="bi-info-circle" /> Info
+					</a>
+					<a href="/admin/users/{user.id}/edit" class="btn btn-primary">
 						<i class="bi bi-pencil" /> Edit
 					</a>
 					{#if deleteEnabled && user.email !== $page.data.userInfo.email}

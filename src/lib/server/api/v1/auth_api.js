@@ -68,7 +68,26 @@ export async function logout(fetch) {
  * @returns {Promise<*>}
  */
 export async function listUsers(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/userlist', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/userlist/', {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (response.ok) {
+		return await response.json();
+	}
+
+	await responseError(response);
+}
+
+/**
+ * Fetches a user from the server
+ * @param {typeof fetch} fetch
+ * @param {number|string} userId
+ * @returns {Promise<*>}
+ */
+export async function getUser(fetch, userId) {
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/auth/users/${userId}/`, {
 		method: 'GET',
 		credentials: 'include'
 	});
