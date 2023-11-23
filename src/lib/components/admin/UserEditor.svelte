@@ -65,7 +65,7 @@
 				}
 				return;
 			}
-			goto('/admin/users');
+			await goto('/admin/users');
 		} finally {
 			saving = false;
 		}
