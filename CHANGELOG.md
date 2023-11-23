@@ -8,7 +8,7 @@ This release requires fractal-server 1.4.0.
 * Added spinner during page loading (\#328).
 * Job pages:
     * Created per-user and per-workflow jobs pages (\#328).
-    * Removed per-project and per-workflow jobs pages (\#328).
+    * Removed per-project jobs pages (\#328).
     * Added automatic background update job pages (\#328).
 * Improved handling of session expiration (\#333).
 * Fixed logout bug (\#327).
