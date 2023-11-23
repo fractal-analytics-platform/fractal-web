@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getValidationMessagesMap } from '$lib/common/errors';
+	import { onMount } from 'svelte';
+	import Modal from '../common/Modal.svelte';
 
 	/** @type {import('$lib/types').User} */
 	export let user;
@@ -17,7 +19,14 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let genericErrorAlert = undefined;
 
-	async function handleSave() {
+	/** @type {Modal} */
+	let confirmSuperuserChange;
+	let initialSuperuserValue = false;
+
+	/**
+	 * @param {SubmitEvent} event
+	 */
+	async function handleSave(event) {
 		saving = true;
 		try {
 			formSubmitted = true;
@@ -26,6 +35,21 @@
 			if (Object.keys(validationErrors).length > 0) {
 				return;
 			}
+			if (user.is_superuser === initialSuperuserValue) {
+				await confirmSave();
+			} else {
+				saving = false;
+				event.preventDefault();
+				confirmSuperuserChange.show();
+			}
+		} finally {
+			saving = false;
+		}
+	}
+
+	async function confirmSave() {
+		saving = true;
+		try {
 			if (password) {
 				user.password = password;
 			}
@@ -88,6 +112,10 @@
 		}
 		return true;
 	}
+
+	onMount(() => {
+		initialSuperuserValue = user.is_superuser;
+	});
 </script>
 
 <div id="genericError" />
@@ -246,4 +274,26 @@
 			</div>
 		</div>
 	</form>
+
+	<Modal
+		id="confirmSuperuserChangeModal"
+		bind:this={confirmSuperuserChange}
+		size="md"
+		centered={true}
+	>
+		<svelte:fragment slot="header">
+			<h1 class="modal-title fs-5">Confirm action</h1>
+		</svelte:fragment>
+		<svelte:fragment slot="body">
+			<p>
+				Do you really want to
+				<strong>{user.is_superuser ? 'grant' : 'revoke'}</strong>
+				superuser privilege to this user?
+			</p>
+		</svelte:fragment>
+		<svelte:fragment slot="footer">
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" on:click={confirmSave}>Confirm</button>
+		</svelte:fragment>
+	</Modal>
 </div>
