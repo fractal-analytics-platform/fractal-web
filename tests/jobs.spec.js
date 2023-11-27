@@ -37,8 +37,8 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 	await page.locator('table tbody').waitFor();
 	expect(await page.locator('table tbody tr').count()).toEqual(1);
 	const cells = await page.locator('table tbody tr td').allInnerTexts();
-	expect(cells[2]).toEqual('input');
-	expect(cells[3]).toEqual('output');
+	expect(cells[4]).toEqual('input');
+	expect(cells[5]).toEqual('output');
 
 	// Open Info modal
 	await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).click();
@@ -68,10 +68,10 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 		if (id === jobId) {
 			jobRow = row;
 			const cells = await row.locator('td').allInnerTexts();
-			expect(cells[2]).toEqual(workflow.projectName);
-			expect(cells[3]).toEqual(workflow.workflowName);
-			expect(cells[4]).toEqual('input');
-			expect(cells[5]).toEqual('output');
+			expect(cells[4]).toEqual(workflow.projectName);
+			expect(cells[5]).toEqual(workflow.workflowName);
+			expect(cells[6]).toEqual('input');
+			expect(cells[7]).toEqual('output');
 			break;
 		}
 	}
