@@ -1,21 +1,22 @@
 <script>
 	/** @type {import('$lib/types').JobStatus|null} */
 	export let status = null;
-	let labelStyle = null;
+	$: labelStyle = getLabelStyle(status);
 
-	switch (status) {
-		case 'submitted':
-			labelStyle = 'badge text-bg-info';
-			break;
-		case 'running':
-			labelStyle = 'badge text-bg-primary';
-			break;
-		case 'done':
-			labelStyle = 'badge text-bg-success';
-			break;
-		case 'failed':
-			labelStyle = 'badge text-bg-danger';
-			break;
+	/**
+	 * @param {import('$lib/types').JobStatus|null} status
+	 */
+	function getLabelStyle(status) {
+		switch (status) {
+			case 'submitted':
+				return 'badge text-bg-info';
+			case 'running':
+				return 'badge text-bg-primary';
+			case 'done':
+				return 'badge text-bg-success';
+			case 'failed':
+				return 'badge text-bg-danger';
+		}
 	}
 </script>
 
