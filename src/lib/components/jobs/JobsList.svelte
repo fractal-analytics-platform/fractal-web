@@ -162,11 +162,21 @@
 	<div id="jobUpdatesError" />
 	<table class="table jobs-table">
 		<colgroup>
-			<col id="id-column" />
+			<col width="120" />
+			<col width="120" />
+			{#if !columnsToHide.includes('project')}
+				<col width="120" />
+			{/if}
+			{#if !columnsToHide.includes('workflow')}
+				<col width="120" />
+			{/if}
+			<col width="135" />
+			<col width="145" />
+			<col width="120" />
+			<col width="120" />
 		</colgroup>
 		<thead class="table-light text-nowrap">
 			<tr>
-				<Th handler={tableHandler} key="id" label="Id" />
 				<Th handler={tableHandler} key="start_timestamp" label="Start" />
 				<Th handler={tableHandler} key="end_timestamp" label="End" />
 				{#if !columnsToHide.includes('project')}
@@ -181,7 +191,6 @@
 				<th>Options</th>
 			</tr>
 			<tr>
-				<th />
 				<th />
 				<th />
 				{#if !columnsToHide.includes('project')}
@@ -243,7 +252,6 @@
 			{#if rows}
 				{#each $rows as row}
 					<tr class="align-middle">
-						<td>{row.id}</td>
 						<td>
 							{row.start_timestamp ? new Date(row.start_timestamp).toLocaleString() : '-'}
 						</td>
@@ -330,9 +338,5 @@
 	.jobs-table {
 		table-layout: fixed;
 		word-break: break-all;
-	}
-
-	#id-column {
-		width: 60px;
 	}
 </style>
