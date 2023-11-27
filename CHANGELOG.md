@@ -4,6 +4,7 @@
 
 This release requires fractal-server 1.4.0.
 
+* Added Jobs button in home page (\#346).
 * Improved jobs table layout for small screens (\#346).
 * Fixed jobs status badge color bug (\#346).
 * Aligned with fractal-server 1.4.0 API, including trailing slash for endpoints' paths (\#328).
