@@ -54,47 +54,47 @@ describe('JobsList', () => {
 		await fireEvent.change(projectFilter, { target: { value: '1' } });
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
-		expect(table.querySelectorAll('tbody tr td')[5].textContent).eq('input1');
+		expect(table.querySelectorAll('tbody tr td')[4].textContent).eq('input1');
 		await clearFilters(result);
 
 		// Filter by workflow
 		await fireEvent.change(workflowFilter, { target: { value: '2' } });
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(2);
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[5].textContent).eq('input3');
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[5].textContent).eq('input2');
+		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[4].textContent).eq('input3');
+		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[4].textContent).eq('input2');
 		await clearFilters(result);
 
 		// Filter by input dataset
 		await fireEvent.change(inputDatasetFilter, { target: { value: '3' } });
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
-		expect(table.querySelectorAll('tbody tr td')[5].textContent).eq('input2');
+		expect(table.querySelectorAll('tbody tr td')[4].textContent).eq('input2');
 		await clearFilters(result);
 
 		// Filter by output dataset
 		await fireEvent.change(outputDatasetFilter, { target: { value: '4' } });
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
-		expect(table.querySelectorAll('tbody tr td')[6].textContent).eq('output2');
+		expect(table.querySelectorAll('tbody tr td')[5].textContent).eq('output2');
 		await clearFilters(result);
 
 		// Filter by job status
 		await fireEvent.change(statusFilter, { target: { value: 'running' } });
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
-		expect(table.querySelectorAll('tbody tr td')[5].textContent).eq('input3');
+		expect(table.querySelectorAll('tbody tr td')[4].textContent).eq('input3');
 		await clearFilters(result);
 
 		// Verify default sorting
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[1].textContent).eq(
+		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).eq(
 			'10/30/2023, 9:30:38 AM'
 		);
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[1].textContent).eq(
+		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).eq(
 			'10/30/2023, 9:15:38 AM'
 		);
-		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[1].textContent).eq(
+		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).eq(
 			'10/30/2023, 9:00:38 AM'
 		);
 
@@ -102,13 +102,13 @@ describe('JobsList', () => {
 		const startDateSorter = table.querySelector('thead th:nth-child(2)');
 		await fireEvent.click(startDateSorter);
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[1].textContent).eq(
+		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).eq(
 			'10/30/2023, 9:00:38 AM'
 		);
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[1].textContent).eq(
+		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).eq(
 			'10/30/2023, 9:15:38 AM'
 		);
-		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[1].textContent).eq(
+		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).eq(
 			'10/30/2023, 9:30:38 AM'
 		);
 	});
@@ -127,17 +127,17 @@ describe('JobsList', () => {
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('running');
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('failed');
-		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[7].textContent).eq('done');
+		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[6].textContent).eq('running');
+		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[6].textContent).eq('failed');
+		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[6].textContent).eq('done');
 
 		const refreshButton = result.getByRole('button', { name: 'Refresh' });
 		await fireEvent.click(refreshButton);
 
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('done');
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('failed');
-		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[7].textContent).eq('done');
+		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[6].textContent).eq('done');
+		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[6].textContent).eq('failed');
+		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[6].textContent).eq('done');
 	});
 
 	it('cancel job', async () => {
@@ -190,9 +190,9 @@ describe('JobsList', () => {
 			});
 			let table = result.getByRole('table');
 			expect(table.querySelectorAll('tbody tr').length).eq(3);
-			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('running');
-			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('failed');
-			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[7].textContent).eq('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[6].textContent).eq('running');
+			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[6].textContent).eq('failed');
+			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[6].textContent).eq('done');
 
 			vi.advanceTimersByTime(3500);
 			vi.useRealTimers();
@@ -200,9 +200,9 @@ describe('JobsList', () => {
 			await new Promise(setTimeout);
 
 			table = result.getByRole('table');
-			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('done');
-			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('failed');
-			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[7].textContent).eq('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[6].textContent).eq('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[6].textContent).eq('failed');
+			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[6].textContent).eq('done');
 		} finally {
 			vi.useRealTimers();
 		}
