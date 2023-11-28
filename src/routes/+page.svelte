@@ -16,7 +16,8 @@
 		To access Fractal features, you should first log-in as a registered user. Navigate to the
 		<i>Projects</i>
 		page to create new projects and to create/edit/execute image-analysis workflows. The
-		<i>Tasks</i> page lets you view/edit the available image-analysis tasks or create new ones.
+		<i>Tasks</i> page lets you view/edit the available image-analysis tasks or create new ones. The
+		<i>Jobs</i> page lets you view jobs associated to your projects.
 	</p>
 
 	<div class="col mb-3">
@@ -25,6 +26,7 @@
 		{/if}
 		<a href="/projects" class="btn btn-primary">Projects</a>
 		<a href="/tasks" class="btn btn-primary">Tasks</a>
+		<a href="/jobs" class="btn btn-primary">Jobs</a>
 	</div>
 
 	{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}

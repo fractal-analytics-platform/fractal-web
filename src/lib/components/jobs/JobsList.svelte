@@ -162,11 +162,23 @@
 	<div id="jobUpdatesError" />
 	<table class="table jobs-table">
 		<colgroup>
-			<col id="id-column" />
+			<col width="110" />
+			<col width="110" />
+			<col width="100" />
+			<col width="100" />
+			{#if !columnsToHide.includes('project')}
+				<col width="110" />
+			{/if}
+			{#if !columnsToHide.includes('workflow')}
+				<col width="110" />
+			{/if}
+			<col width="110" />
+			<col width="110" />
 		</colgroup>
-		<thead class="table-light text-nowrap">
+		<thead class="table-light">
 			<tr>
-				<Th handler={tableHandler} key="id" label="Id" />
+				<Th handler={tableHandler} key="status" label="Status" />
+				<th>Options</th>
 				<Th handler={tableHandler} key="start_timestamp" label="Start" />
 				<Th handler={tableHandler} key="end_timestamp" label="End" />
 				{#if !columnsToHide.includes('project')}
@@ -177,10 +189,17 @@
 				{/if}
 				<Th handler={tableHandler} key="input_dataset_id" label="Input dataset" />
 				<Th handler={tableHandler} key="output_dataset_id" label="Output dataset" />
-				<Th handler={tableHandler} key="status" label="Status" />
-				<th>Options</th>
 			</tr>
 			<tr>
+				<th>
+					<select class="form-control" bind:value={statusFilter}>
+						<option value="">All</option>
+						<option value="running">Running</option>
+						<option value="done">Done</option>
+						<option value="failed">Failed</option>
+						<option value="submitted">Submitted</option>
+					</select>
+				</th>
 				<th />
 				<th />
 				<th />
@@ -226,16 +245,6 @@
 						{/each}
 					</select>
 				</th>
-				<th>
-					<select class="form-control" bind:value={statusFilter}>
-						<option value="">All</option>
-						<option value="running">Running</option>
-						<option value="done">Done</option>
-						<option value="failed">Failed</option>
-						<option value="submitted">Submitted</option>
-					</select>
-				</th>
-				<th />
 			</tr>
 		</thead>
 
@@ -243,7 +252,40 @@
 			{#if rows}
 				{#each $rows as row}
 					<tr class="align-middle">
-						<td>{row.id}</td>
+						<td>
+							<StatusBadge status={row.status} />
+						</td>
+						<td>
+							<button
+								class="btn btn-info"
+								on:click|preventDefault={() =>
+									jobInfoModal.show(row, getProjectName(row.project_id))}
+							>
+								<i class="bi-info-circle" />
+								Info
+							</button>
+							{#if row.status === 'failed' || row.status === 'done'}
+								<button
+									class="btn btn-light"
+									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id)}
+								>
+									<i class="bi-list-columns-reverse" />
+									Logs
+								</button>
+								<a
+									class="btn btn-light"
+									href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
+									download={`${row.id}_logs.zip`}
+								>
+									<i class="bi-arrow-down-circle" />
+								</a>
+							{/if}
+							{#if row.status === 'running'}
+								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
+									<i class="bi-x-circle" /> Cancel
+								</button>
+							{/if}
+						</td>
 						<td>
 							{row.start_timestamp ? new Date(row.start_timestamp).toLocaleString() : '-'}
 						</td>
@@ -282,40 +324,6 @@
 								</a>
 							{/if}
 						</td>
-						<td>
-							<StatusBadge status={row.status} />
-						</td>
-						<td>
-							<button
-								class="btn btn-info"
-								on:click|preventDefault={() =>
-									jobInfoModal.show(row, getProjectName(row.project_id))}
-							>
-								<i class="bi-info-circle" />
-								Info
-							</button>
-							{#if row.status === 'failed' || row.status === 'done'}
-								<button
-									class="btn btn-light"
-									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id)}
-								>
-									<i class="bi-list-columns-reverse" />
-									Logs
-								</button>
-								<a
-									class="btn btn-light"
-									href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
-									download={`${row.id}_logs.zip`}
-								>
-									<i class="bi-arrow-down-circle" />
-								</a>
-							{/if}
-							{#if row.status === 'running'}
-								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
-									<i class="bi-x-circle" /> Cancel
-								</button>
-							{/if}
-						</td>
 					</tr>
 				{/each}
 			{/if}
@@ -329,10 +337,13 @@
 <style>
 	.jobs-table {
 		table-layout: fixed;
-		word-break: break-all;
 	}
 
-	#id-column {
-		width: 60px;
+	.jobs-table thead {
+		word-break: break-word;
+	}
+
+	.jobs-table tbody {
+		word-break: break-all;
 	}
 </style>

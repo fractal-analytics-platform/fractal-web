@@ -37,19 +37,18 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 	await page.locator('table tbody').waitFor();
 	expect(await page.locator('table tbody tr').count()).toEqual(1);
 	const cells = await page.locator('table tbody tr td').allInnerTexts();
-	const jobId = cells[0];
-	expect(cells[3]).toEqual('input');
-	expect(cells[4]).toEqual('output');
+	expect(cells[4]).toEqual('input');
+	expect(cells[5]).toEqual('output');
 
 	// Open Info modal
 	await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).click();
 	modalTitle = page.locator('.modal.show .modal-title');
 	await modalTitle.waitFor();
-	await expect(modalTitle).toHaveText(`Workflow Job #${jobId}`);
+	await expect(modalTitle).toContainText(`Workflow Job #`);
 
 	const items = await page.locator('.modal.show').getByRole('listitem').allInnerTexts();
 	expect(items[0]).toEqual('Id');
-	expect(items[1]).toEqual(jobId);
+	const jobId = items[1];
 	expect(items[2]).toEqual('Workflow');
 	expect(items[3]).toEqual(workflow.workflowName);
 	expect(items[4]).toEqual('Project');
@@ -65,14 +64,14 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 	const rows = await page.locator('table tbody tr').all();
 	let jobRow = null;
 	for (const row of rows) {
-		const id = await row.locator('td').first().innerText();
+		const id = await getJobId(page, row);
 		if (id === jobId) {
 			jobRow = row;
 			const cells = await row.locator('td').allInnerTexts();
-			expect(cells[3]).toEqual(workflow.projectName);
-			expect(cells[4]).toEqual(workflow.workflowName);
-			expect(cells[5]).toEqual('input');
-			expect(cells[6]).toEqual('output');
+			expect(cells[4]).toEqual(workflow.projectName);
+			expect(cells[5]).toEqual(workflow.workflowName);
+			expect(cells[6]).toEqual('input');
+			expect(cells[7]).toEqual('output');
 			break;
 		}
 	}
@@ -87,3 +86,19 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 	await expect(modalTitle).toHaveText('Workflow Job logs');
 	expect(await page.locator('.modal.show .modal-body').innerText()).toContain('TASK ERROR');
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} row
+ * @returns {Promise<string>}
+ */
+async function getJobId(page, row) {
+	await row.getByRole('button', { name: 'Info' }).click();
+	const modalTitle = page.locator('.modal.show .modal-title');
+	await modalTitle.waitFor();
+	const text = await modalTitle.innerText();
+	const match = text.match('Workflow Job #(\\d+)');
+	expect(match).not.toBeNull();
+	await page.locator('.modal.show .modal-header [aria-label="Close"]').click();
+	return /** @type {RegExpMatchArray} */ (match)[1];
+}
