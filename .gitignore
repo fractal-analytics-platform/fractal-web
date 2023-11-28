@@ -12,3 +12,4 @@ node_modules
 /tests/.auth
 coverage*/
 .nyc_output
+playwright-report/

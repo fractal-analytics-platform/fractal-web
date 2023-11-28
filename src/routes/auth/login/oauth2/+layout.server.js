@@ -14,7 +14,7 @@ export async function load({ request, fetch, cookies }) {
 
 	if (!response.ok) {
 		const result = await response.json();
-		throw error(400, { message: result });
+		throw error(400, { message: JSON.stringify(result) });
 	}
 
 	const receivedCookies = response.headers.getSetCookie();

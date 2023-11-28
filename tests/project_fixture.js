@@ -33,8 +33,19 @@ export class PageWithProject {
 			if ((await row.getByRole('cell', { name: this.projectName }).count()) === 1) {
 				const deleteBtn = row.getByRole('button', { name: 'Delete' });
 				await deleteBtn.click();
+				break;
 			}
 		}
+
+		await this.page.getByRole('button', { name: 'Confirm' }).click();
+
+		await this.page.waitForFunction((projectName) => {
+			const projectNames = [...document.querySelectorAll('table td:nth-child(2)')].map(
+				(c) => /** @type {HTMLElement} */ (c).innerText
+			);
+			return !projectNames.includes(projectName);
+		}, this.projectName);
+		await expect(this.page.getByRole('cell', { name: this.projectName })).toHaveCount(0);
 	}
 }
 

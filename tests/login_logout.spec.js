@@ -20,6 +20,7 @@ test('Login and Logout', async ({ page }) => {
 	await page.goto('/auth/login');
 	await expect(page.getByText('You are already logged in, click here to log out.')).toHaveCount(1);
 
+	await page.getByRole('button', { name: 'admin@fractal.xy' }).click();
 	await page.getByRole('link', { name: 'Logout' }).click();
 	await page.waitForURL('/');
 

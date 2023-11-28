@@ -55,22 +55,57 @@ export class AlertError extends Error {
  * @returns {null | { loc: string[], msg: string }}
  */
 function getSimpleValidationMessage(reason, statusCode) {
-	if (
-		statusCode !== 422 ||
-		!('detail' in reason) ||
-		!Array.isArray(reason.detail) ||
-		reason.detail.length !== 1
-	) {
+	if (!isValidationError(reason, statusCode) || reason.detail.length !== 1) {
 		return null;
 	}
 	const err = reason.detail[0];
-	if (!Array.isArray(err.loc) || !err.msg || err.type !== 'value_error') {
+	if (!isValueError(err)) {
 		return null;
 	}
 	return {
 		loc: err.loc.length > 1 && err.loc[0] === 'body' ? err.loc.slice(1) : err.loc,
 		msg: err.msg
 	};
+}
+
+/**
+ * @param {any} reason
+ * @param {number | null} statusCode
+ * @returns {null | { [key: string]: string }}
+ */
+export function getValidationMessagesMap(reason, statusCode) {
+	if (!isValidationError(reason, statusCode) || reason.detail.length === 0) {
+		return null;
+	}
+	/** @type {{[key: string]: string}} */
+	const map = {};
+	for (const error of reason.detail) {
+		if (!isValueError(error)) {
+			return null;
+		}
+		if (error.loc.length !== 2 || error.loc[0] !== 'body') {
+			return null;
+		}
+		map[error.loc[1]] = error.msg;
+	}
+	return map;
+}
+
+/**
+ * @param {any} reason
+ * @param {number | null} statusCode
+ * @returns {boolean}
+ */
+function isValidationError(reason, statusCode) {
+	return statusCode === 422 && 'detail' in reason && Array.isArray(reason.detail);
+}
+
+/**
+ * @param {any} err
+ * @returns {boolean}
+ */
+function isValueError(err) {
+	return Array.isArray(err.loc) && !!err.msg && err.type === 'value_error';
 }
 
 /**

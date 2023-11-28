@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
+	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
@@ -12,6 +13,8 @@
 
 	// Detects page change
 	$: if ($navigating) cleanupModalBackdrop();
+
+	$: adminArea = $page.url.pathname.startsWith('/admin');
 
 	/**
 	 * Removes the modal backdrop that remains stuck at page change.
@@ -64,29 +67,46 @@
 					<li class="nav-item">
 						<a href="/jobs" class="nav-link">Jobs</a>
 					</li>
+					{#if isAdmin}
+						<li class="nav-item">
+							<a href="/admin" class="nav-link">Administration</a>
+						</li>
+					{/if}
 				{/if}
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
-					<span class="navbar-text">{$page.data.userInfo.email}</span>
-				{/if}
-				<li class="nav-item">
-					{#if !userLoggedIn}
+					<li class="nav-item dropdown">
+						<a
+							class="nav-link dropdown-toggle"
+							href="#user"
+							role="button"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+						>
+							<i class="bi bi-person-circle" />
+							{$page.data.userInfo.email}
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="/profile">My profile</a></li>
+							<li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+						</ul>
+					</li>
+				{:else}
+					<li class="nav-item">
 						<a href="/auth/login" class="nav-link">Login</a>
-					{:else}
-						<a href="/auth/logout" class="nav-link">Logout</a>
-					{/if}
-				</li>
+					</li>
+				{/if}
 			</ul>
 		</div>
 	</nav>
+	{#if adminArea}
+		<div class="admin-border" />
+	{/if}
 	<div class="container p-4">
 		<slot />
 	</div>
-	<div
-		class="d-flex flex-column min-vh-100 min-vw-100 loading"
-		class:show={$navigating || loading}
-	>
+	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:show={$navigating || loading}>
 		<div class="d-flex flex-grow-1 justify-content-center align-items-center">
 			<div class="spinner-border text-primary" role="status">
 				<span class="visually-hidden">Loading...</span>
@@ -109,6 +129,10 @@
 </main>
 
 <style>
+	.admin-border {
+		height: 8px;
+		background-color: #dc3545;
+	}
 	.loading {
 		position: fixed;
 		top: 0;

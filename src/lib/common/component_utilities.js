@@ -122,6 +122,21 @@ export function nullifyEmptyStrings(inputValues) {
 }
 
 /**
+ * Removes null values from an object
+ * @param {object} inputValues
+ * @returns {object}
+ */
+export function removeNullValues(inputValues) {
+	const clearedValues = {};
+	for (let key in inputValues) {
+		if (inputValues[key] !== null) {
+			clearedValues[key] = inputValues[key];
+		}
+	}
+	return clearedValues;
+}
+
+/**
  * Replacer function to ignore empty strings when using JSON.stringify().
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description}
  * @param {string} _key

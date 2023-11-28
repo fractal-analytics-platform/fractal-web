@@ -1,4 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { error } from '@sveltejs/kit';
 
 export async function handle({ event, resolve }) {
 	console.log(`[${event.request.method}] - ${event.url.pathname}`);
@@ -17,16 +18,29 @@ export async function handle({ event, resolve }) {
 	const fastApiUsersAuth = event.cookies.get('fastapiusersauth');
 	if (!fastApiUsersAuth) {
 		console.log('Authentication required - No auth cookie found - Redirecting to login');
-		return new Response(null, { status: 302, headers: { location: '/auth/login?invalidate=true' } });
+		return new Response(null, {
+			status: 302,
+			headers: { location: '/auth/login?invalidate=true' }
+		});
 	}
 
 	const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami/`);
-	if (whoami.ok) {
-		return await resolve(event);
-	} else {
+	if (!whoami.ok) {
 		console.log('Validation of authentication - Error loading user info');
-		return new Response(null, { status: 302, headers: { location: '/auth/login?invalidate=true' } });
+		return new Response(null, {
+			status: 302,
+			headers: { location: '/auth/login?invalidate=true' }
+		});
 	}
+
+	if (event.url.pathname.startsWith('/admin')) {
+		const user = await whoami.json();
+		if (!user.is_superuser) {
+			throw error(403, `Only superusers can access the admin area`);
+		}
+	}
+
+	return await resolve(event);
 }
 
 /** @type {import('@sveltejs/kit').HandleFetch} */
