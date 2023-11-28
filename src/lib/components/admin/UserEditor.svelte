@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getValidationMessagesMap } from '$lib/common/errors';
 	import { onMount } from 'svelte';
@@ -166,7 +167,7 @@
 				<span class="invalid-feedback">{validationErrors['username']}</span>
 			</div>
 		</div>
-		{#if user.id}
+		{#if user.id && user.id !== $page.data.userInfo.id}
 			<div class="row mb-3">
 				<div class="col-sm-9 offset-sm-3">
 					<div class="form-check">

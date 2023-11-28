@@ -157,6 +157,11 @@ test('Create, update and delete a user', async ({ page }) => {
 		verifyChecked(userRow, 4, false);
 		verifyChecked(userRow, 5, true);
 	});
+
+	await test.step("Verify that the admin can't edit his/her superuser status", async () => {
+		await page.goto(`/admin/users/1/edit`);
+		expect(await page.locator('input[type="checkbox"]').count()).toEqual(0);
+	});
 });
 
 /**
