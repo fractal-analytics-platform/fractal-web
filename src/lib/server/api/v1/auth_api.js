@@ -27,8 +27,8 @@ export async function userAuthentication(fetch, data) {
  * @param {typeof fetch} fetch
  * @returns {Promise<*>}
  */
-export async function whoami(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/whoami/', {
+export async function getCurrentUser(fetch) {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/current-user/', {
 		method: 'GET',
 		credentials: 'include',
 		mode: 'cors'
@@ -68,7 +68,7 @@ export async function logout(fetch) {
  * @returns {Promise<*>}
  */
 export async function listUsers(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/userlist/', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/users/', {
 		method: 'GET',
 		credentials: 'include'
 	});

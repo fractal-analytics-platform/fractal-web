@@ -24,8 +24,8 @@ export async function handle({ event, resolve }) {
 		});
 	}
 
-	const whoami = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/whoami/`);
-	if (!whoami.ok) {
+	const currentUser = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/current-user/`);
+	if (!currentUser.ok) {
 		console.log('Validation of authentication - Error loading user info');
 		return new Response(null, {
 			status: 302,
@@ -34,7 +34,7 @@ export async function handle({ event, resolve }) {
 	}
 
 	if (event.url.pathname.startsWith('/admin')) {
-		const user = await whoami.json();
+		const user = await currentUser.json();
 		if (!user.is_superuser) {
 			throw error(403, `Only superusers can access the admin area`);
 		}

@@ -1,5 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { whoami } from '$lib/server/api/v1/auth_api';
+import { getCurrentUser } from '$lib/server/api/v1/auth_api';
 
 export async function load({ fetch, cookies }) {
 	// This is a mark to notify and log when the server is running SSR
@@ -29,7 +29,7 @@ export async function load({ fetch, cookies }) {
 		};
 	}
 
-	const userInfo = await whoami(fetch).catch((error) => {
+	const userInfo = await getCurrentUser(fetch).catch((error) => {
 		console.log('Error loading user info');
 		console.error(error);
 		return null;

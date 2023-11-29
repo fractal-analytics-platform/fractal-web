@@ -4,6 +4,7 @@
 
 This release requires fractal-server 1.4.0.
 
+* Used new endpoints for retrieving current user and list of users (\#350).
 * Added user profile page (\#336).
 * Added admin area with users management (\#336).
 * Added Jobs button in home page (\#346).
