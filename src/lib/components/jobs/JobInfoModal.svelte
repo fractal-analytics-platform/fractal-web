@@ -37,9 +37,13 @@
 		// Should update jobWorkflowName
 		jobWorkflowName = workflows.find((workflow) => workflow.id === jobToDisplay.workflow_id)?.name;
 		// Should update jobInputDatasetName
-		jobInputDatasetName = datasets.find((dataset) => dataset.id === jobToDisplay.input_dataset_id)?.name;
+		jobInputDatasetName = datasets.find(
+			(dataset) => dataset.id === jobToDisplay.input_dataset_id
+		)?.name;
 		// Should update jobOutputDatasetName
-		jobOutputDatasetName = datasets.find((dataset) => dataset.id === jobToDisplay.output_dataset_id)?.name;
+		jobOutputDatasetName = datasets.find(
+			(dataset) => dataset.id === jobToDisplay.output_dataset_id
+		)?.name;
 		// Should update jobStatus
 		jobStatus = job.status;
 
@@ -78,26 +82,28 @@
 			<div class="col-12">
 				<div id="workflowJobError" />
 				<p class="lead">Workflow job properties</p>
-				<ul class="list-group">
-					<li class="list-group-item list-group-item-light fw-bold">Id</li>
-					<li class="list-group-item">{job?.id}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Workflow</li>
-					<li class="list-group-item">{jobWorkflowName}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Project</li>
-					<li class="list-group-item">{projectName}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Input dataset</li>
-					<li class="list-group-item">{jobInputDatasetName}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Output dataset</li>
-					<li class="list-group-item">{jobOutputDatasetName}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Status</li>
-					{#key jobStatus}
-						<li class="list-group-item"><StatusBadge status={jobStatus} /></li>
-					{/key}
-					<li class="list-group-item list-group-item-light fw-bold">Working directory</li>
-					<li class="list-group-item"><code>{job?.working_dir}</code></li>
-					<li class="list-group-item list-group-item-light fw-bold">User Working directory</li>
-					<li class="list-group-item"><code>{job?.working_dir_user}</code></li>
-				</ul>
+				{#if job}
+					<ul class="list-group">
+						<li class="list-group-item list-group-item-light fw-bold">Id</li>
+						<li class="list-group-item">{job.id}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Workflow</li>
+						<li class="list-group-item">{job.workflow_dump?.name || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Project</li>
+						<li class="list-group-item">{projectName || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Input dataset</li>
+						<li class="list-group-item">{job.input_dataset_dump?.name || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Output dataset</li>
+						<li class="list-group-item">{job.output_dataset_dump?.name || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Status</li>
+						{#key jobStatus}
+							<li class="list-group-item"><StatusBadge status={jobStatus} /></li>
+						{/key}
+						<li class="list-group-item list-group-item-light fw-bold">Working directory</li>
+						<li class="list-group-item"><code>{job.working_dir}</code></li>
+						<li class="list-group-item list-group-item-light fw-bold">User Working directory</li>
+						<li class="list-group-item"><code>{job.working_dir_user}</code></li>
+					</ul>
+				{/if}
 			</div>
 		</div>
 		<div class="row">

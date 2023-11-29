@@ -2,9 +2,6 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
-	/** @type {number|undefined} */
-	let projectId = undefined;
-	let workflowJobId = undefined;
 	let logs = '';
 	let errorAlert = undefined;
 	/** @type {Modal} */
@@ -13,23 +10,30 @@
 	/**
 	 * @param prjId {number}
 	 * @param jobId {number}
+	 * @param log {string|null=}
 	 */
-	export async function show(prjId, jobId) {
-		projectId = prjId;
-		workflowJobId = jobId;
+	export async function show(prjId, jobId, log) {
 
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
 		}
 
-		const job = await fetchJob();
-		logs = job?.log || '';
+		if (log) {
+			logs = log;
+		} else {
+			const job = await fetchJob(prjId, jobId);
+			logs = job?.log || '';
+		}
 
 		modal.show();
 	}
 
-	async function fetchJob() {
+	/**
+	 * @param projectId {number}
+	 * @param workflowJobId {number}
+	 */
+	async function fetchJob(projectId, workflowJobId) {
 		const request = await fetch(`/api/v1/project/${projectId}/job/${workflowJobId}`, {
 			method: 'GET',
 			credentials: 'include'

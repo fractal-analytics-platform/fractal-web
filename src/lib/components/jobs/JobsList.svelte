@@ -305,18 +305,20 @@
 							{#if row.status === 'failed' || row.status === 'done'}
 								<button
 									class="btn btn-light"
-									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id)}
+									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id, row.log)}
 								>
 									<i class="bi-list-columns-reverse" />
 									Logs
 								</button>
-								<a
-									class="btn btn-light"
-									href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
-									download={`${row.id}_logs.zip`}
-								>
-									<i class="bi-arrow-down-circle" />
-								</a>
+								{#if row.project_id !== null}
+									<a
+										class="btn btn-light"
+										href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
+										download={`${row.id}_logs.zip`}
+									>
+										<i class="bi-arrow-down-circle" />
+									</a>
+								{/if}
 							{/if}
 							{#if row.status === 'running'}
 								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
@@ -332,10 +334,12 @@
 						</td>
 						{#if !columnsToHide.includes('project')}
 							<td>
-								{#if projects}
+								{#if projects && row.project_id !== null}
 									<a href={`/projects/${row.project_id}`}>
 										{projects.find((project) => project.id === row.project_id)?.name}
 									</a>
+								{:else}
+									-
 								{/if}
 							</td>
 						{/if}
@@ -345,21 +349,27 @@
 									<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
 										{row.workflow_dump?.name}
 									</a>
+								{:else}
+									{row.workflow_dump?.name || '-'}
 								{/if}
 							</td>
 						{/if}
 						<td>
-							{#if inputDatasets}
+							{#if inputDatasets && row.input_dataset_id !== null}
 								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
 									{row.input_dataset_dump?.name}
 								</a>
+							{:else}
+								{row.input_dataset_dump?.name || '-'}
 							{/if}
 						</td>
 						<td>
-							{#if outputDatasets}
+							{#if outputDatasets && row.output_dataset_id !== null}
 								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
 									{row.output_dataset_dump?.name}
 								</a>
+							{:else}
+								{row.output_dataset_dump?.name || '-'}
 							{/if}
 						</td>
 						{#if !columnsToHide.includes('user_email')}
