@@ -91,6 +91,7 @@ export type ApplyWorkflow = {
   working_dir_user: string | null
   first_task_index: number | null
   last_task_index: number | null
+  user_email: string
 }
 
 export type User = {
