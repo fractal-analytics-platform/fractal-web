@@ -35,6 +35,22 @@
 	 * @returns {Promise<import('$lib/types').ApplyWorkflow[]>}
 	 */
 	async function jobUpdater() {
+		/** @type {import('$lib/types').ApplyWorkflow[]} */
+		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');
+		/** @type {import('$lib/types').ApplyWorkflow[]} */
+		const updatedJobs = [];
+		for (const job of jobsToCheck) {
+			const url = new URL('/admin/job', window.location.origin);
+			url.searchParams.append('id', job.id.toString());
+			const response = await fetch(url);
+			if (response.ok) {
+				updatedJobs.push((await response.json())[0]);
+			}
+		}
+		jobs = jobs.map((j) => {
+			const updatedJob = updatedJobs.find((uj) => uj.id === j.id);
+			return updatedJob ?? j;
+		});
 		return jobs;
 	}
 
