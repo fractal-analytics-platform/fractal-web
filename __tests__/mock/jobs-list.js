@@ -38,6 +38,9 @@ export const data = {
 			output_dataset_id: 2,
 			start_timestamp: '2023-10-30T09:00:38.442196',
 			end_timestamp: '2023-10-30T09:10:38.442196',
+			workflow_dump: { id: 1, name: 'workflow 1' },
+			input_dataset_dump: { id: 1, name: 'input1' },
+			output_dataset_dump: { id: 2, name: 'output1' },
 			status: 'done'
 		},
 		{
@@ -48,6 +51,9 @@ export const data = {
 			output_dataset_id: 4,
 			start_timestamp: '2023-10-30T09:15:38.442196',
 			end_timestamp: '2023-10-30T09:20:38.442196',
+			workflow_dump: { id: 2, name: 'workflow 2' },
+			input_dataset_dump: { id: 3, name: 'input2' },
+			output_dataset_dump: { id: 4, name: 'output2' },
 			status: 'failed'
 		},
 		{
@@ -57,6 +63,8 @@ export const data = {
 			input_dataset_id: 5,
 			output_dataset_id: 6,
 			start_timestamp: '2023-10-30T09:30:38.442196',
+			input_dataset_dump: { id: 5, name: 'input3' },
+			output_dataset_dump: { id: 6, name: 'output3' },
 			end_timestamp: null,
 			status: 'running'
 		}
