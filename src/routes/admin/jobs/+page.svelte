@@ -254,15 +254,15 @@
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Min</div>
-						<input type="date" class="form-control" bind:value={startDateMin} />
-						<input type="time" class="form-control" bind:value={startTimeMin} />
+						<input type="date" class="form-control" bind:value={startDateMin} id="start_date_min" />
+						<input type="time" class="form-control" bind:value={startTimeMin} id="start_time_min" />
 					</div>
 				</div>
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Max</div>
-						<input type="date" class="form-control" bind:value={startDateMax} />
-						<input type="time" class="form-control" bind:value={startTimeMax} />
+						<input type="date" class="form-control" bind:value={startDateMax} id="start_date_max" />
+						<input type="time" class="form-control" bind:value={startTimeMax} id="start_time_max" />
 					</div>
 				</div>
 			</div>
@@ -275,15 +275,15 @@
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Min</div>
-						<input type="date" class="form-control" bind:value={endDateMin} />
-						<input type="time" class="form-control" bind:value={endTimeMin} />
+						<input type="date" class="form-control" bind:value={endDateMin} id="end_date_min" />
+						<input type="time" class="form-control" bind:value={endTimeMin} id="end_time_min" />
 					</div>
 				</div>
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Max</div>
-						<input type="date" class="form-control" bind:value={endDateMax} />
-						<input type="time" class="form-control" bind:value={endTimeMax} />
+						<input type="date" class="form-control" bind:value={endDateMax} id="end_date_max" />
+						<input type="time" class="form-control" bind:value={endTimeMax} id="end_time_max" />
 					</div>
 				</div>
 			</div>

@@ -33,7 +33,7 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 	await confirmBtn.click();
 
 	// Check workflow jobs page
-	await page.waitForURL(`/projects/${workflow.projectId}/workflows/${workflow.workflowId}`);
+	await page.waitForURL(`/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
 	await page.locator('table tbody').waitFor();
 	expect(await page.locator('table tbody tr').count()).toEqual(1);
 	const cells = await page.locator('table tbody tr td').allInnerTexts();
