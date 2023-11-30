@@ -83,9 +83,15 @@ The following image provides an overview for the reader of the described archite
 
 To avoid duplicating the logic of each fractal-server endpoint and simplify the error handling, a special Svelte route has been setup to act like a transparent proxy: `src/routes/api/[...path]/+server.js`. This is one of the suggested way to handle a different backend [according to Svelte Kit FAQ](https://kit.svelte.dev/docs/faq#how-do-i-use-x-with-sveltekit-how-do-i-use-a-different-backend-api-server).
 
-So, by default, the AJAX calls performed by the front-end have exactly the same path and payload of the fractal-server API, but are sent to the Node.js Svelte back-end.
+So, by default, the AJAX calls performed by the front-end have the same path and payload of the fractal-server API, but are sent to the Node.js Svelte back-end. Some Python API endpoints (like the `/auth` and `/admin` endpoints) that don't start with `/api` are handled in a slightly different way. Indeed, the `/api` prefix is needed by `hooks.server.js` to detect if the received call is an AJAX call, in order to process the token expiration in a custom way. To preserve this behavior for all the API calls these paths are rewritten adding the `/api` prefix.
 
-Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under `src/lib/server/api/v1`. Here requests are grouped by contexts as `auth_api`, `monitoring_api`, [...].
+Summarizing, the frontend code:
+
+* uses exactly the same path of the fractal-server API for the `/api` endpoints 
+* uses `/api/auth` for `/auth` endpoints
+* uses `/api/admin` for `/admin` endpoints
+
+Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under `src/lib/server/api/v1`. Here requests are grouped by contexts as `auth_api`, `admin_api`, [...].
 
 ### An example using actions
 

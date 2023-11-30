@@ -23,7 +23,7 @@
 		if (externalLoginErrorAlert) {
 			externalLoginErrorAlert.hide();
 		}
-		const response = await fetch(`/auth/${oauth2Provider}/authorize`);
+		const response = await fetch(`/api/auth/${oauth2Provider}/authorize`);
 		const result = await response.json();
 		if (!response.ok) {
 			externalLoginErrorAlert = displayStandardErrorAlert(result, 'externalLoginError');
