@@ -184,6 +184,7 @@
 				{/if}
 				<i class="bi-arrow-clockwise" /> Refresh
 			</button>
+			<slot name="buttons" />
 		</div>
 	</div>
 	<div id="jobUpdatesError" />

@@ -146,6 +146,70 @@
 		jobs = [];
 		jobsListComponent.setJobs([]);
 	}
+
+	async function downloadCSV() {
+		const header = [
+			'status',
+			'start_timestamp',
+			'end_timestamp',
+			'project_id',
+			'workflow_id',
+			'workflow_name',
+			'input_dataset_id',
+			'input_dataset_name',
+			'output_dataset_id',
+			'output_dataset_name',
+			'user_email'
+		];
+		const rows = jobs.map((job) => [
+			job.status,
+			job.start_timestamp,
+			job.end_timestamp,
+			job.project_id,
+			job.workflow_id,
+			job.workflow_dump?.name,
+			job.input_dataset_id,
+			job.input_dataset_dump?.name,
+			job.output_dataset_id,
+			job.output_dataset_dump?.name,
+			job.user_email
+		]);
+		const csv = arrayToCsv([header, ...rows]);
+		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
+	}
+
+	/**
+	 * @param {any[][]} data
+	 */
+	function arrayToCsv(data) {
+		return data
+			.map((row) =>
+				row
+					.map((v) => (v === null || v === undefined ? '' : v))
+					.map(String) // convert every value to String
+					.map((v) => v.replaceAll('"', '""')) // escape double quotes
+					.map((v) => `"${v}"`)
+					.join(',')
+			)
+			.join('\n');
+	}
+
+	/**
+	 * @param {string} content
+	 * @param {string} filename
+	 * @param {string} contentType
+	 */
+	function downloadBlob(content, filename, contentType) {
+		// Create a blob
+		var blob = new Blob([content], { type: contentType });
+		var url = URL.createObjectURL(blob);
+
+		// Create a link to download it
+		var downloader = document.createElement('a');
+		downloader.href = url;
+		downloader.setAttribute('download', filename);
+		downloader.click();
+	}
 </script>
 
 <div class="container">
@@ -295,7 +359,13 @@
 	<div id="searchError" class="mt-3" />
 
 	<div class:d-none={!searched}>
-		<JobsList {jobUpdater} bind:this={jobsListComponent} showFilters={false} />
+		<JobsList {jobUpdater} bind:this={jobsListComponent} showFilters={false}>
+			<svelte:fragment slot="buttons">
+				<button class="btn btn-outline-secondary" on:click={downloadCSV}>
+					<i class="bi-download" /> Download CSV
+				</button>
+			</svelte:fragment>
+		</JobsList>
 	</div>
 </div>
 
