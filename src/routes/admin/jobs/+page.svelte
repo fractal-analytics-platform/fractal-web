@@ -422,7 +422,7 @@
 				</button>
 			</svelte:fragment>
 			<svelte:fragment slot="edit-status" let:row>
-				{#if row.status !== 'failed'}
+				{#if row.status === 'submitted' || row.status === 'running'}
 					&nbsp;
 					<button class="btn btn-link p-0" on:click={() => openEditStatusModal(row)}>
 						<i class="bi bi-pencil" />

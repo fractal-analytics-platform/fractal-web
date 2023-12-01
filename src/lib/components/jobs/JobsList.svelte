@@ -322,7 +322,7 @@
 										{projects.find((project) => project.id === row.project_id)?.name}
 									</a>
 								{:else}
-									-
+									{projects.find((project) => project.id === row.project_id)?.name || '-'}
 								{/if}
 							</td>
 						{/if}
