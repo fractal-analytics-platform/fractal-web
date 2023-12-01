@@ -1,6 +1,7 @@
 <script>
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { page } from '$app/stores';
 	import Modal from '../common/Modal.svelte';
 
 	/** @type {{id: number, name: string}[]} */
@@ -73,9 +74,11 @@
 <Modal id="workflowJobInfoModal" bind:this={modal} size="lg">
 	<svelte:fragment slot="header">
 		<h1 class="h5 modal-title flex-grow-1">Workflow Job #{workflowJobId}</h1>
-		<button class="btn btn-light me-3" on:click={fetchJob}>
-			<i class="bi-arrow-clockwise" />
-		</button>
+		{#if job && job.user_email === $page.data.userInfo.email && job.project_id !== null}
+			<button class="btn btn-light me-3" on:click={fetchJob}>
+				<i class="bi-arrow-clockwise" />
+			</button>
+		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div class="row mb-3">

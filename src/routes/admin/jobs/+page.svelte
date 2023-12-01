@@ -359,7 +359,7 @@
 	<div id="searchError" class="mt-3" />
 
 	<div class:d-none={!searched}>
-		<JobsList {jobUpdater} bind:this={jobsListComponent} showFilters={false}>
+		<JobsList {jobUpdater} bind:this={jobsListComponent} showFilters={false} hideCancelJobButton={true}>
 			<svelte:fragment slot="buttons">
 				<button class="btn btn-outline-secondary" on:click={downloadCSV}>
 					<i class="bi-download" /> Download CSV

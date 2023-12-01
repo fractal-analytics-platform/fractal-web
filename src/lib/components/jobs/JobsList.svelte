@@ -16,6 +16,8 @@
 	export let columnsToHide = [];
 	/** @type {boolean} */
 	export let showFilters = true;
+	/** @type {boolean} */
+	export let hideCancelJobButton = false;
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
@@ -288,7 +290,7 @@
 									<i class="bi-list-columns-reverse" />
 									Logs
 								</button>
-								{#if row.project_id !== null}
+								{#if row.project_id !== null && row.user_email === $page.data.userInfo.email}
 									<a
 										class="btn btn-light"
 										href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
@@ -298,7 +300,7 @@
 									</a>
 								{/if}
 							{/if}
-							{#if row.status === 'running'}
+							{#if row.status === 'running' && !hideCancelJobButton}
 								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
 									<i class="bi-x-circle" /> Cancel
 								</button>
