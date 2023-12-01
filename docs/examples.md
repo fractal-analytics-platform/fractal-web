@@ -1,3 +1,11 @@
-# Deployment examples
+# Examples
 
-See working configurations in the xxx folder, for fractal-server, fractal-web and an apache proxy.
+**in progress**
+
+See examples in
+https://github.com/fractal-analytics-platform/fractal-web/tree/main/examples,
+with configurations for:
+
+* fractal-server
+* fractal-web
+* Apache proxy

@@ -1,0 +1,71 @@
+site_name: Fractal Web Client
+
+repo_url: https://github.com/fractal-analytics-platform/fractal-web
+repo_name: fractal-web
+
+markdown_extensions:
+- admonition
+- pymdownx.details
+- pymdownx.emoji
+- pymdownx.magiclink
+- pymdownx.snippets:
+    check_paths: true
+- pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.tasklist
+- toc:
+    permalink: true
+- attr_list
+- md_in_html
+
+theme:
+  name: "material"
+  custom_dir: "docs/overrides"
+  features:
+    - content.code.annotate
+    - content.code.copy
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: deep orange
+    accent: orange
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: deep orange
+    accent: orange
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home page: index.md
+  - Quickstart: quickstart.md
+  - CHANGELOG: changelog.md
+  - OAuth2 integration: oauth2.md
+  - Development: development/
+  - Deployment examples: examples.md
+
+
+plugins:
+  - search
+  - autorefs
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+
+extra_css:
+  - extra.css
+
+copyright: |
+  © Copyright 2022
+  Friedrich Miescher Institute for Biomedical Research and
+  University of Zurich
+  (see <u><a href="https://github.com/fractal-analytics-platform/fractal-web/blob/main/LICENSE">
+  LICENSE
+  </a></u>).
