@@ -317,7 +317,7 @@
 						</td>
 						{#if !columnsToHide.includes('project')}
 							<td>
-								{#if projects && row.project_id !== null}
+								{#if projects && row.project_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/projects/${row.project_id}`}>
 										{projects.find((project) => project.id === row.project_id)?.name}
 									</a>
@@ -328,7 +328,7 @@
 						{/if}
 						{#if !columnsToHide.includes('workflow')}
 							<td>
-								{#if workflows && row.workflow_id !== null}
+								{#if workflows && row.workflow_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
 										{row.workflow_dump?.name}
 									</a>
@@ -338,7 +338,7 @@
 							</td>
 						{/if}
 						<td>
-							{#if inputDatasets && row.input_dataset_id !== null}
+							{#if inputDatasets && row.input_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
 									{row.input_dataset_dump?.name}
 								</a>
@@ -347,7 +347,7 @@
 							{/if}
 						</td>
 						<td>
-							{#if outputDatasets && row.output_dataset_id !== null}
+							{#if outputDatasets && row.output_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
 									{row.output_dataset_dump?.name}
 								</a>
