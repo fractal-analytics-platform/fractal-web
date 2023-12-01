@@ -1,4 +1,7 @@
 export const data = {
+	userInfo: {
+		email: 'admin@fractal.xy'
+	},
 	projects: [
 		{
 			id: 1,
@@ -41,7 +44,8 @@ export const data = {
 			workflow_dump: { id: 1, name: 'workflow 1' },
 			input_dataset_dump: { id: 1, name: 'input1' },
 			output_dataset_dump: { id: 2, name: 'output1' },
-			status: 'done'
+			status: 'done',
+			user_email: 'admin@fractal.xy'
 		},
 		{
 			id: 2,
@@ -54,7 +58,8 @@ export const data = {
 			workflow_dump: { id: 2, name: 'workflow 2' },
 			input_dataset_dump: { id: 3, name: 'input2' },
 			output_dataset_dump: { id: 4, name: 'output2' },
-			status: 'failed'
+			status: 'failed',
+			user_email: 'admin@fractal.xy'
 		},
 		{
 			id: 3,
@@ -66,7 +71,8 @@ export const data = {
 			input_dataset_dump: { id: 5, name: 'input3' },
 			output_dataset_dump: { id: 6, name: 'output3' },
 			end_timestamp: null,
-			status: 'running'
+			status: 'running',
+			user_email: 'admin@fractal.xy'
 		}
 	]
 };

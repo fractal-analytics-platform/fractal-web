@@ -3,7 +3,7 @@ import { expect, test } from './base_test.js';
 test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Open the admin area', async () => {
 		await page.goto('/');
-		await page.getByRole('link', { name: 'Administration' }).click();
+		await page.getByRole('link', { name: 'Admin area' }).click();
 		await page.waitForURL('/admin');
 	});
 
