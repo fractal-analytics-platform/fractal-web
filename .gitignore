@@ -13,3 +13,5 @@ node_modules
 coverage*/
 .nyc_output
 playwright-report/
+venv
+site

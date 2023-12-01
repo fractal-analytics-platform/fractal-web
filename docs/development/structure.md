@@ -79,7 +79,7 @@ is serving the application. This request, with the attached cookies, is then use
 
 The following image provides an overview for the reader of the described architecture.
 
-![proxy-architecture.png](media/proxy-architecture.png)
+![proxy-architecture.png](../media/proxy-architecture.png)
 
 To avoid duplicating the logic of each fractal-server endpoint and simplify the error handling, a special Svelte route has been setup to act like a transparent proxy: `src/routes/api/[...path]/+server.js`. This is one of the suggested way to handle a different backend [according to Svelte Kit FAQ](https://kit.svelte.dev/docs/faq#how-do-i-use-x-with-sveltekit-how-do-i-use-a-different-backend-api-server).
 
