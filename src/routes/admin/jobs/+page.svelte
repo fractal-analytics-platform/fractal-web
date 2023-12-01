@@ -159,7 +159,11 @@
 			'input_dataset_name',
 			'output_dataset_id',
 			'output_dataset_name',
-			'user_email'
+			'user_email',
+			'working_dir',
+			'working_dir_user',
+			'first_task_index',
+			'last_task_index'
 		];
 		const rows = jobs.map((job) => [
 			job.status,
@@ -172,7 +176,11 @@
 			job.input_dataset_dump?.name,
 			job.output_dataset_id,
 			job.output_dataset_dump?.name,
-			job.user_email
+			job.user_email,
+			job.working_dir,
+			job.working_dir_user,
+			job.first_task_index,
+			job.last_task_index
 		]);
 		const csv = arrayToCsv([header, ...rows]);
 		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
