@@ -69,7 +69,7 @@
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
-							<a href="/admin" class="nav-link">Administration</a>
+							<a href="/admin" class="nav-link">Admin area</a>
 						</li>
 					{/if}
 				{/if}
