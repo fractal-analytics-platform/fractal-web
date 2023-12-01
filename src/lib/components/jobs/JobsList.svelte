@@ -15,9 +15,7 @@
 	/** @type {('project'|'workflow'|'user_email')[]} */
 	export let columnsToHide = [];
 	/** @type {boolean} */
-	export let showFilters = true;
-	/** @type {boolean} */
-	export let hideCancelJobButton = false;
+	export let admin = false;
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
@@ -148,7 +146,7 @@
 {#if tableHandler}
 	<div class="d-flex justify-content-end align-items-center my-3">
 		<div>
-			{#if showFilters}
+			{#if !admin}
 				<button
 					class="btn btn-warning"
 					on:click={() => {
@@ -169,7 +167,7 @@
 	<div id="jobUpdatesError" />
 	<table class="table jobs-table">
 		<colgroup>
-			<col width="90" />
+			<col width="100" />
 			<col width="110" />
 			<col width="100" />
 			<col width="100" />
@@ -203,7 +201,7 @@
 					<Th handler={tableHandler} key="user_email" label="User" />
 				{/if}
 			</tr>
-			{#if showFilters}
+			{#if !admin}
 				<tr>
 					<th>
 						<select class="form-control" bind:value={statusFilter}>
@@ -271,7 +269,12 @@
 				{#each $rows as row}
 					<tr class="align-middle">
 						<td>
-							<StatusBadge status={row.status} />
+							<span>
+								<StatusBadge status={row.status} />
+								{#if admin}
+									<slot name="edit-status" {row} />
+								{/if}
+							</span>
 						</td>
 						<td>
 							<button
@@ -300,7 +303,7 @@
 									</a>
 								{/if}
 							{/if}
-							{#if row.status === 'running' && !hideCancelJobButton}
+							{#if row.status === 'running' && !admin}
 								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
 									<i class="bi-x-circle" /> Cancel
 								</button>

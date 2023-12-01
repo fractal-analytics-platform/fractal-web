@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/jobs/JobsList.svelte';
 
 	let searched = false;
@@ -48,6 +49,10 @@
 			}
 		}
 		jobs = jobs.map((j) => {
+			if (j.status === 'failed') {
+				// The admin has manually updated the job status while the AJAX call was in progress
+				return j;
+			}
 			const updatedJob = updatedJobs.find((uj) => uj.id === j.id);
 			return updatedJob ?? j;
 		});
@@ -218,6 +223,49 @@
 		downloader.setAttribute('download', filename);
 		downloader.click();
 	}
+
+	/** @type {Modal} */
+	let statusModal;
+	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	let jobInEditing;
+
+	/**
+	 * @param {import('$lib/types').ApplyWorkflow} row
+	 */
+	function openEditStatusModal(row) {
+		jobInEditing = row;
+		statusModal.show();
+	}
+
+	let updatingStatus = false;
+
+	async function updateJobStatus() {
+		statusModal.confirmAndHide(async () => {
+			updatingStatus = true;
+			try {
+				const jobId = /** @type {import('$lib/types').ApplyWorkflow} */ (jobInEditing).id;
+
+				const headers = new Headers();
+				headers.append('Content-Type', 'application/json');
+
+				const response = await fetch(`/api/admin/job/${jobId}`, {
+					method: 'PATCH',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify({ status: 'failed' })
+				});
+
+				if (!response.ok) {
+					throw new AlertError(await response.json());
+				}
+
+				jobs = jobs.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));
+				jobsListComponent.setJobs(jobs);
+			} finally {
+				updatingStatus = false;
+			}
+		});
+	}
 </script>
 
 <div class="container">
@@ -367,15 +415,46 @@
 	<div id="searchError" class="mt-3" />
 
 	<div class:d-none={!searched}>
-		<JobsList {jobUpdater} bind:this={jobsListComponent} showFilters={false} hideCancelJobButton={true}>
+		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
 			<svelte:fragment slot="buttons">
 				<button class="btn btn-outline-secondary" on:click={downloadCSV}>
 					<i class="bi-download" /> Download CSV
 				</button>
 			</svelte:fragment>
+			<svelte:fragment slot="edit-status" let:row>
+				{#if row.status !== 'failed'}
+					&nbsp;
+					<button class="btn btn-link p-0" on:click={() => openEditStatusModal(row)}>
+						<i class="bi bi-pencil" />
+					</button>
+				{/if}
+			</svelte:fragment>
 		</JobsList>
 	</div>
 </div>
+
+<Modal id="editJobStatusModal" bind:this={statusModal} centered={true} size="md">
+	<svelte:fragment slot="header">
+		{#if jobInEditing}
+			<h1 class="h5 modal-title flex-grow-1">Editing job #{jobInEditing.id}</h1>
+		{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<div id="errorAlert-editJobStatusModal" />
+		<div class="alert alert-warning">
+			<i class="bi bi-exclamation-triangle" />
+			<strong>Warning</strong>: this operation will not cancel job execution but only modify its
+			status in the database
+		</div>
+		<div class="d-flex justify-content-center">
+			<button class="btn btn-danger" on:click={updateJobStatus} disabled={updatingStatus}>
+				Set status to failed
+			</button>
+			&nbsp;
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		</div>
+	</svelte:fragment>
+</Modal>
 
 <style>
 	input[type='date'] {
