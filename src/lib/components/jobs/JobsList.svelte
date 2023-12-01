@@ -56,25 +56,8 @@
 	$: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo);
 	$: tableHandler.filter(statusFilter, 'status');
 
-	let reloading = false;
-
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
-
-	async function refresh() {
-		if (errorAlert) {
-			errorAlert.hide();
-		}
-		reloading = true;
-		try {
-			jobs = await jobUpdater();
-			tableHandler.setRows(jobs);
-		} catch (err) {
-			errorAlert = displayStandardErrorAlert(err, 'jobUpdatesError');
-		} finally {
-			reloading = false;
-		}
-	}
 
 	/**
 	 * @param {import('$lib/types').ApplyWorkflow[]} newJobs
@@ -178,12 +161,6 @@
 					Clear filters
 				</button>
 			{/if}
-			<button class="btn btn-primary" on:click={refresh} disabled={reloading}>
-				{#if reloading}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				<i class="bi-arrow-clockwise" /> Refresh
-			</button>
 			<slot name="buttons" />
 		</div>
 	</div>
