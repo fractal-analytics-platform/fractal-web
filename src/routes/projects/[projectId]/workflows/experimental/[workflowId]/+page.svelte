@@ -614,7 +614,7 @@
 									on:keyup|preventDefault
 									on:keypress|preventDefault
 								>
-									{workflowTask.task.name} #{workflowTask.id}
+									{workflowTask.task.name}
 
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-warning" title="new version available">
