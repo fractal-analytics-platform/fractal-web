@@ -9,24 +9,19 @@ Fractal provides distributed workflows that convert TBs of image data into OME-Z
 
 This is the repository that contains the **Fractal web client**. Find more information about Fractal in general and the other repositories at the [Fractal home page](https://fractal-analytics-platform.github.io).
 
-# Client architecture
+Documentation for `fractal-web` (in progress) is available at https://fractal-analytics-platform.github.io/fractal-web.
 
-The client is a Svelte application that uses [SvelteKit](https://kit.svelte.dev) as a framework.
-The application is composed of a set of pages that are rendered by a node server and served to a client browser.
-The node server acts as a proxy to the fractal server, forwarding the requests to the server and returning the responses to the client.
+## License and contributors
 
-More details can be found at:
+Unless otherwise stated in each individual module, all Fractal components are
+released according to a BSD 3-Clause License, and Copyright is with Friedrich
+Miescher Institute for Biomedical Research and University of Zurich.
 
-1. [How to run/develop fractal-web](docs/contribute.md)
-2. [How to run fractal-server](docs/fractal_server.md)
-3. [Deployment examples](docs/examples.md)
-4. [Integration with OAuth2 providers](docs/oauth2.md)
-5. [Project structure](docs/structure.md)
-6. [Tests](docs/tests.md)
-7. [Dependencies](docs/dependencies.md)
-8. [JSON Schemas for WorkflowTask arguments](docs/json_schemas.md)
-9. [CHANGELOG](CHANGELOG.md)
-
-# Contributors
-
-Fractal was conceived in the Liberali Lab at the Friedrich Miescher Institute for Biomedical Research and in the Pelkmans Lab at the University of Zurich by [@jluethi](https://github.com/jluethi) and [@gusqgm](https://github.com/gusqgm). The Fractal project is now developed at the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) at the University of Zurich and the project lead is with [@jluethi](https://github.com/jluethi). The core development is done under contract by [eXact lab S.r.l.](https://www.exact-lab.it/).
+Fractal was conceived in the Liberali Lab at the Friedrich Miescher Institute
+for Biomedical Research and in the Pelkmans Lab at the University of Zurich by
+[@jluethi](https://github.com/jluethi) and
+[@gusqgm](https://github.com/gusqgm). The Fractal project is now developed at
+the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) at the
+University of Zurich and the project lead is with
+[@jluethi](https://github.com/jluethi). The core development is done under
+contract by [eXact lab S.r.l.](https://www.exact-lab.it/).
