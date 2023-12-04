@@ -13,7 +13,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		return await fetch(`/auth/users/${user.id}`, {
+		return await fetch(`/api/auth/users/${user.id}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,

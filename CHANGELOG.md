@@ -4,6 +4,8 @@
 
 This release requires fractal-server 1.4.0.
 
+* Added admin jobs page (\#352).
+* Fixed expiration token issue for /admin and /auth endpoints (\#352).
 * Used new endpoints for retrieving current user and list of users (\#350).
 * Added user profile page (\#336).
 * Added admin area with users management (\#336).

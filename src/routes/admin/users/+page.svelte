@@ -13,7 +13,7 @@
 	 * @param {number} userId
 	 */
 	async function handleDeleteUser(userId) {
-		const response = await fetch(`/auth/users/${userId}`, {
+		const response = await fetch(`/api/auth/users/${userId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});

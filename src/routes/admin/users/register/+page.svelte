@@ -21,7 +21,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		return await fetch(`/auth/register`, {
+		return await fetch(`/api/auth/register`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,

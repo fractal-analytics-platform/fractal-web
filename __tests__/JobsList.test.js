@@ -118,28 +118,6 @@ describe('JobsList', () => {
 		await fireEvent.click(clearFiltersBtn);
 	}
 
-	it('refresh jobs', async () => {
-		const jobUpdater = function () {
-			return data.jobs.map((j) => (j.status === 'running' ? { ...j, status: 'done' } : j));
-		};
-		const result = render(JobsList, {
-			props: { jobUpdater }
-		});
-		let table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr').length).eq(3);
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).eq('running');
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).eq('failed');
-		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).eq('done');
-
-		const refreshButton = result.getByRole('button', { name: 'Refresh' });
-		await fireEvent.click(refreshButton);
-
-		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).eq('done');
-		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).eq('failed');
-		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).eq('done');
-	});
-
 	it('cancel job', async () => {
 		const nop = function () {};
 		const result = render(JobsList, {
@@ -190,9 +168,9 @@ describe('JobsList', () => {
 			});
 			let table = result.getByRole('table');
 			expect(table.querySelectorAll('tbody tr').length).eq(3);
-			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).eq('running');
-			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).eq('failed');
-			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).eq('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).contain('running');
+			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).contain('failed');
+			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).contain('done');
 
 			vi.advanceTimersByTime(3500);
 			vi.useRealTimers();
@@ -200,9 +178,9 @@ describe('JobsList', () => {
 			await new Promise(setTimeout);
 
 			table = result.getByRole('table');
-			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).eq('done');
-			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).eq('failed');
-			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).eq('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).contain('done');
+			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).contain('failed');
+			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).contain('done');
 		} finally {
 			vi.useRealTimers();
 		}

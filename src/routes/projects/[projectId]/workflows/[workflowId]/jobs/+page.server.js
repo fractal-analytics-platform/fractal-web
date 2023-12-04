@@ -1,5 +1,5 @@
 import { removeDuplicatedItems } from '$lib/common/component_utilities';
-import { getProject } from '$lib/server/api/v1/project_api';
+import { getProject, getWorkflow } from '$lib/server/api/v1/project_api';
 import { getWorkflowJobs } from '$lib/server/api/v1/workflow_api';
 
 export async function load({ fetch, params }) {
@@ -16,6 +16,13 @@ export async function load({ fetch, params }) {
 			jobs.filter((j) => j.workflow_dump).map((j) => j.workflow_dump)
 		)
 	);
+	let workflow;
+	if (workflows.length > 0) {
+		workflow = workflows[0];
+	} else {
+		workflow = await getWorkflow(fetch, projectId, workflowId);
+	}
+
 	const inputDatasets = removeDuplicatedItems(
 		/** @type {{id: number, name: string}[]} */
 		(jobs.filter((j) => j.input_dataset_dump).map((j) => j.input_dataset_dump))
@@ -28,7 +35,7 @@ export async function load({ fetch, params }) {
 	return {
 		project: project,
 		projects: [project],
-		workflow: workflows[0],
+		workflow,
 		workflows,
 		inputDatasets,
 		outputDatasets,

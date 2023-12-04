@@ -8,11 +8,14 @@
 	import Th from '$lib/components/common/filterable/Th.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
+	import { removeDuplicatedItems } from '$lib/common/component_utilities';
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
-	/** @type {string[]} */
+	/** @type {('project'|'workflow'|'user_email')[]} */
 	export let columnsToHide = [];
+	/** @type {boolean} */
+	export let admin = false;
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
@@ -53,24 +56,29 @@
 	$: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo);
 	$: tableHandler.filter(statusFilter, 'status');
 
-	let reloading = false;
-
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	async function refresh() {
-		if (errorAlert) {
-			errorAlert.hide();
-		}
-		reloading = true;
-		try {
-			jobs = await jobUpdater();
-			tableHandler.setRows(jobs);
-		} catch (err) {
-			errorAlert = displayStandardErrorAlert(err, 'jobUpdatesError');
-		} finally {
-			reloading = false;
-		}
+	/**
+	 * @param {import('$lib/types').ApplyWorkflow[]} newJobs
+	 */
+	export function setJobs(newJobs) {
+		jobs = newJobs;
+		workflows = removeDuplicatedItems(
+			/** @type {{id: number, name: string}[]} */ (
+				jobs.filter((j) => j.workflow_dump).map((j) => j.workflow_dump)
+			)
+		);
+		inputDatasets = removeDuplicatedItems(
+			/** @type {{id: number, name: string}[]} */
+			(jobs.filter((j) => j.input_dataset_dump).map((j) => j.input_dataset_dump))
+		);
+		outputDatasets = removeDuplicatedItems(
+			/** @type {{id: number, name: string}[]} */
+			(jobs.filter((j) => j.output_dataset_dump).map((j) => j.output_dataset_dump))
+		);
+		datasets = inputDatasets.concat(outputDatasets);
+		tableHandler.setRows(jobs);
 	}
 
 	/**
@@ -138,31 +146,28 @@
 {#if tableHandler}
 	<div class="d-flex justify-content-end align-items-center my-3">
 		<div>
-			<button
-				class="btn btn-warning"
-				on:click={() => {
-					tableHandler.clearFilters();
-					workflowFilter = '';
-					inputDatasetFilter = '';
-					outputDatasetFilter = '';
-					statusFilter = '';
-				}}
-			>
-				<i class="bi-x-square" />
-				Clear filters
-			</button>
-			<button class="btn btn-primary" on:click={refresh} disabled={reloading}>
-				{#if reloading}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				<i class="bi-arrow-clockwise" /> Refresh
-			</button>
+			{#if !admin}
+				<button
+					class="btn btn-warning"
+					on:click={() => {
+						tableHandler.clearFilters();
+						workflowFilter = '';
+						inputDatasetFilter = '';
+						outputDatasetFilter = '';
+						statusFilter = '';
+					}}
+				>
+					<i class="bi-x-square" />
+					Clear filters
+				</button>
+			{/if}
+			<slot name="buttons" />
 		</div>
 	</div>
 	<div id="jobUpdatesError" />
 	<table class="table jobs-table">
 		<colgroup>
-			<col width="110" />
+			<col width="100" />
 			<col width="110" />
 			<col width="100" />
 			<col width="100" />
@@ -173,7 +178,10 @@
 				<col width="110" />
 			{/if}
 			<col width="110" />
-			<col width="110" />
+			<col width="120" />
+			{#if !columnsToHide.includes('user_email')}
+				<col width="120" />
+			{/if}
 		</colgroup>
 		<thead class="table-light">
 			<tr>
@@ -189,63 +197,71 @@
 				{/if}
 				<Th handler={tableHandler} key="input_dataset_id" label="Input dataset" />
 				<Th handler={tableHandler} key="output_dataset_id" label="Output dataset" />
+				{#if !columnsToHide.includes('user_email')}
+					<Th handler={tableHandler} key="user_email" label="User" />
+				{/if}
 			</tr>
-			<tr>
-				<th>
-					<select class="form-control" bind:value={statusFilter}>
-						<option value="">All</option>
-						<option value="running">Running</option>
-						<option value="done">Done</option>
-						<option value="failed">Failed</option>
-						<option value="submitted">Submitted</option>
-					</select>
-				</th>
-				<th />
-				<th />
-				<th />
-				{#if !columnsToHide.includes('project')}
+			{#if !admin}
+				<tr>
 					<th>
-						{#if projects}
-							<select class="form-control" bind:value={projectFilter}>
-								<option value="">All</option>
-								{#each projects as project}
-									<option value={project.id}>{project.name}</option>
-								{/each}
-							</select>
-						{/if}
-					</th>
-				{/if}
-				{#if !columnsToHide.includes('workflow')}
-					<th>
-						{#if workflows}
-							<select class="form-control" bind:value={workflowFilter}>
-								<option value="">All</option>
-								{#each workflows as workflow}
-									<option value={workflow.id}>{workflow.name}</option>
-								{/each}
-							</select>
-						{/if}
-					</th>
-				{/if}
-				<th>
-					{#key inputDatasetFilter}
-						<select class="form-control" bind:value={inputDatasetFilter}>
+						<select class="form-control" bind:value={statusFilter}>
 							<option value="">All</option>
-							{#each inputDatasets as dataset}
+							<option value="running">Running</option>
+							<option value="done">Done</option>
+							<option value="failed">Failed</option>
+							<option value="submitted">Submitted</option>
+						</select>
+					</th>
+					<th />
+					<th />
+					<th />
+					{#if !columnsToHide.includes('project')}
+						<th>
+							{#if projects}
+								<select class="form-control" bind:value={projectFilter}>
+									<option value="">All</option>
+									{#each projects as project}
+										<option value={project.id}>{project.name}</option>
+									{/each}
+								</select>
+							{/if}
+						</th>
+					{/if}
+					{#if !columnsToHide.includes('workflow')}
+						<th>
+							{#if workflows}
+								<select class="form-control" bind:value={workflowFilter}>
+									<option value="">All</option>
+									{#each workflows as workflow}
+										<option value={workflow.id}>{workflow.name}</option>
+									{/each}
+								</select>
+							{/if}
+						</th>
+					{/if}
+					<th>
+						{#key inputDatasetFilter}
+							<select class="form-control" bind:value={inputDatasetFilter}>
+								<option value="">All</option>
+								{#each inputDatasets as dataset}
+									<option value={dataset.id}>{dataset.name}</option>
+								{/each}
+							</select>
+						{/key}
+					</th>
+					<th>
+						<select class="form-control" bind:value={outputDatasetFilter}>
+							<option value="">All</option>
+							{#each outputDatasets as dataset}
 								<option value={dataset.id}>{dataset.name}</option>
 							{/each}
 						</select>
-					{/key}
-				</th>
-				<th>
-					<select class="form-control" bind:value={outputDatasetFilter}>
-						<option value="">All</option>
-						{#each outputDatasets as dataset}
-							<option value={dataset.id}>{dataset.name}</option>
-						{/each}
-					</select>
-				</th>
-			</tr>
+					</th>
+					{#if !columnsToHide.includes('user_email')}
+						<th />
+					{/if}
+				</tr>
+			{/if}
 		</thead>
 
 		<tbody>
@@ -253,7 +269,12 @@
 				{#each $rows as row}
 					<tr class="align-middle">
 						<td>
-							<StatusBadge status={row.status} />
+							<span>
+								<StatusBadge status={row.status} />
+								{#if admin}
+									<slot name="edit-status" {row} />
+								{/if}
+							</span>
 						</td>
 						<td>
 							<button
@@ -267,20 +288,22 @@
 							{#if row.status === 'failed' || row.status === 'done'}
 								<button
 									class="btn btn-light"
-									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id)}
+									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id, row.log)}
 								>
 									<i class="bi-list-columns-reverse" />
 									Logs
 								</button>
-								<a
-									class="btn btn-light"
-									href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
-									download={`${row.id}_logs.zip`}
-								>
-									<i class="bi-arrow-down-circle" />
-								</a>
+								{#if row.project_id !== null && row.user_email === $page.data.userInfo.email}
+									<a
+										class="btn btn-light"
+										href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
+										download={`${row.id}_logs.zip`}
+									>
+										<i class="bi-arrow-down-circle" />
+									</a>
+								{/if}
 							{/if}
-							{#if row.status === 'running'}
+							{#if row.status === 'running' && !admin}
 								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
 									<i class="bi-x-circle" /> Cancel
 								</button>
@@ -294,36 +317,47 @@
 						</td>
 						{#if !columnsToHide.includes('project')}
 							<td>
-								{#if projects}
+								{#if projects && row.project_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/projects/${row.project_id}`}>
 										{projects.find((project) => project.id === row.project_id)?.name}
 									</a>
+								{:else}
+									{projects.find((project) => project.id === row.project_id)?.name || '-'}
 								{/if}
 							</td>
 						{/if}
 						{#if !columnsToHide.includes('workflow')}
 							<td>
-								{#if workflows && row.workflow_id !== null}
+								{#if workflows && row.workflow_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
-										{workflows.find((workflow) => workflow.id === row.workflow_id)?.name}
+										{row.workflow_dump?.name}
 									</a>
+								{:else}
+									{row.workflow_dump?.name || '-'}
 								{/if}
 							</td>
 						{/if}
 						<td>
-							{#if inputDatasets}
+							{#if inputDatasets && row.input_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
-									{inputDatasets.find((dataset) => dataset.id === row.input_dataset_id)?.name}
+									{row.input_dataset_dump?.name}
 								</a>
+							{:else}
+								{row.input_dataset_dump?.name || '-'}
 							{/if}
 						</td>
 						<td>
-							{#if outputDatasets}
+							{#if outputDatasets && row.output_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
-									{outputDatasets.find((dataset) => dataset.id === row.output_dataset_id)?.name}
+									{row.output_dataset_dump?.name}
 								</a>
+							{:else}
+								{row.output_dataset_dump?.name || '-'}
 							{/if}
 						</td>
+						{#if !columnsToHide.includes('user_email')}
+							<td>{row.user_email}</td>
+						{/if}
 					</tr>
 				{/each}
 			{/if}
