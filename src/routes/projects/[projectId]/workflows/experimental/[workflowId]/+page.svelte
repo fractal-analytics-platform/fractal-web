@@ -1,6 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -498,15 +498,15 @@
 		const runningOrSubmitted = Object.values(statuses).filter(
 			(s) => s === 'running' || s === 'submitted'
 		);
-		if (statusWatcherTimer) {
-			if (runningOrSubmitted.length === 0) {
-				clearTimeout(statusWatcherTimer);
-				statusWatcherTimer = undefined;
-			}
-		} else if (runningOrSubmitted.length > 0) {
-			statusWatcherTimer = setInterval(loadJobsStatus, updateJobsInterval);
+		if (runningOrSubmitted.length > 0) {
+			clearTimeout(statusWatcherTimer);
+			statusWatcherTimer = setTimeout(loadJobsStatus, updateJobsInterval);
 		}
 	}
+
+	onDestroy(() => {
+		clearTimeout(statusWatcherTimer);
+	});
 </script>
 
 <div class="row">

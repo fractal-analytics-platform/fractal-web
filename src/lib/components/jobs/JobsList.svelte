@@ -121,7 +121,7 @@
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
-	let updateJobsTimeout = null;
+	let updateJobsTimeout = undefined;
 
 	async function updateJobsInBackground() {
 		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');
@@ -129,6 +129,7 @@
 			jobs = await jobUpdater();
 			tableHandler.setRows(jobs);
 		}
+		clearTimeout(updateJobsTimeout);
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
 	}
 
@@ -137,9 +138,7 @@
 	});
 
 	onDestroy(() => {
-		if (updateJobsTimeout) {
-			clearTimeout(updateJobsTimeout);
-		}
+		clearTimeout(updateJobsTimeout);
 	});
 </script>
 
