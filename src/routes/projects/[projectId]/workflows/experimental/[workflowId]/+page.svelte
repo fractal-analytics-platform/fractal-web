@@ -1,7 +1,8 @@
 <script>
+	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { goto, beforeNavigate } from '$app/navigation';
+	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -14,17 +15,24 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/workflow/VersionUpdate.svelte';
 	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
+	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 
-	// Workflow
-	/** @type {import('$lib/types').Workflow|undefined} */
-	let workflow = undefined;
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let workflowErrorAlert = undefined;
-	// Project context properties
-	let project = undefined;
-	let datasets = [];
+	/** @type {import('$lib/types').Workflow} */
+	let workflow = $page.data.workflow;
+	/** @type {import('$lib/types').Project} */
+	let project = $page.data.project;
+	/** @type {import('$lib/types').Dataset[]} */
+	let datasets = $page.data.datasets;
 	// List of available tasks to be inserted into workflow
 	let availableTasks = [];
+
+	/** @type {number|undefined} */
+	let selectedInputDatasetId;
+	/** @type {number|undefined} */
+	let selectedOutputDatasetId;
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let workflowErrorAlert = undefined;
 
 	/** @type {import('svelte/types/runtime/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
 	let workflowTaskContext = writable(undefined);
@@ -34,8 +42,6 @@
 	let selectedWorkflowTask = undefined;
 	let originalMetaProperties = {};
 	let checkingConfiguration = false;
-	let inputDatasetControl = '';
-	let outputDatasetControl = '';
 	let workerInitControl = '';
 	let firstTaskIndexControl = '';
 	let lastTaskIndexControl = '';
@@ -69,7 +75,7 @@
 	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
 	let newVersionsMap = {};
 
-	$: updatableWorkflowList = workflow?.task_list || [];
+	$: updatableWorkflowList = workflow.task_list || [];
 
 	workflowTaskContext.subscribe((value) => {
 		selectedWorkflowTask = value;
@@ -81,11 +87,13 @@
 		}
 	});
 
+	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+		: 3000;
+
 	onMount(async () => {
-		workflow = $page.data.workflow;
-		project = $page.data.project;
-		datasets = $page.data.datasets;
-		checkNewVersions();
+		await loadJobsStatus();
+		await checkNewVersions();
 	});
 
 	beforeNavigate((navigation) => {
@@ -401,12 +409,12 @@
 		if (!workflow) {
 			return;
 		}
-		if (inputDatasetControl === '') {
+		if (selectedInputDatasetId === undefined) {
 			// Preliminary check: if inputDatasetControl is not set, raise an error
 			let message = 'Input dataset is required. Select one from the list.';
 			console.error(message);
 			runWorkflowModal.displayErrorAlert(message);
-		} else if (outputDatasetControl === '') {
+		} else if (selectedOutputDatasetId === undefined) {
 			// Preliminary check: if outputDatasetControl is not set, raise an error
 			let message = 'Output dataset is required. Select one from the list.';
 			console.error(message);
@@ -423,7 +431,7 @@
 			headers.set('Content-Type', 'application/json');
 
 			const response = await fetch(
-				`/api/v1/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${inputDatasetControl}&output_dataset_id=${outputDatasetControl}`,
+				`/api/v1/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${selectedInputDatasetId}&output_dataset_id=${selectedOutputDatasetId}`,
 				{
 					method: 'POST',
 					credentials: 'include',
@@ -438,11 +446,7 @@
 				// @ts-ignore
 				// eslint-disable-next-line
 				runWorkflowModal.toggle();
-				// Navigate to project jobs page
-				// Define URL to navigate to
-				const jobsUrl = new URL(`projects/${project.id}/workflows/${workflow.id}/jobs`, window.location.origin);
-				// Trigger navigation
-				await goto(jobsUrl);
+				await loadJobsStatus();
 			} else {
 				console.error(response);
 				// Set an error message on the component
@@ -517,9 +521,46 @@
 	async function updateNewVersionsCount(count) {
 		newVersionsCount = count;
 	}
+
+	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
+	let statuses = {};
+
+	/** @type {NodeJS.Timer|undefined} */
+	let statusWatcherTimer;
+
+	async function loadJobsStatus() {
+		if (selectedInputDatasetId === undefined || selectedOutputDatasetId === undefined) {
+			return;
+		}
+		if (workflowErrorAlert) {
+			workflowErrorAlert.hide();
+		}
+		const outputStatusResponse = await fetch(
+			`/api/v1/project/${project.id}/dataset/${selectedOutputDatasetId}/status`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
+		const outputStatus = await outputStatusResponse.json();
+		if (!outputStatusResponse.ok) {
+			workflowErrorAlert = displayStandardErrorAlert(outputStatus, 'workflowErrorAlert');
+			return;
+		}
+		statuses = outputStatus.status;
+		const runningOrSubmitted = Object.values(statuses).filter(s => s === 'running' || s === 'submitted');
+		if (statusWatcherTimer) {
+			if (runningOrSubmitted.length === 0) {
+				clearTimeout(statusWatcherTimer);
+				statusWatcherTimer = undefined;
+			}
+		} else if (runningOrSubmitted.length > 0) {
+			statusWatcherTimer = setInterval(loadJobsStatus, updateJobsInterval);
+		}
+	}
 </script>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="row">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
@@ -538,33 +579,76 @@
 			{/if}
 		</ol>
 	</nav>
-	<div>
-		<a href="/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
-			<i class="bi-journal-code" /> List jobs
-		</a>
-		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
-			<i class="bi-box-arrow-up" />
-		</button>
-		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-		<button
-			class="btn btn-light"
-			data-bs-toggle="modal"
-			data-bs-target="#editWorkflowModal"
-			on:click={resetWorkflowUpdateModal}
-		>
-			<i class="bi-gear-wide-connected" />
-		</button>
-		<button
-			class="btn btn-success"
-			on:click|preventDefault={() => {
-				if (argumentsWithUnsavedChanges === false) {
-					runWorkflowModal.toggle();
-				} else {
-					toggleUnsavedChangesModal();
-				}
-			}}
-			><i class="bi-play-fill" /> Run workflow
-		</button>
+</div>
+<div class="row mt-2">
+	<div class="col-lg-9">
+		<div class="row">
+			<div class="col-lg-4 col-md-6">
+				<div class="input-group mb-3">
+					<label for="input-dataset" class="input-group-text">Input dataset</label>
+					<select
+						class="form-control"
+						id="input-dataset"
+						bind:value={selectedInputDatasetId}
+						on:change={loadJobsStatus}
+					>
+						<option value={undefined}>Select...</option>
+						{#each datasets as dataset}
+							<option value={dataset.id}>{dataset.name}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<div class="input-group mb-3">
+					<label for="output-dataset" class="input-group-text">Output dataset</label>
+					<select
+						class="form-control"
+						id="output-dataset"
+						bind:value={selectedOutputDatasetId}
+						on:change={loadJobsStatus}
+					>
+						<option value={undefined}>Select...</option>
+						{#each datasets as dataset}
+							<option value={dataset.id}>{dataset.name}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-12">
+				<button
+					class="btn btn-success"
+					on:click|preventDefault={() => {
+						if (argumentsWithUnsavedChanges === false) {
+							runWorkflowModal.toggle();
+						} else {
+							toggleUnsavedChangesModal();
+						}
+					}}
+					><i class="bi-play-fill" /> Run workflow
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-3">
+		<div class="float-end">
+			<a href="/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+				<i class="bi-journal-code" /> List jobs
+			</a>
+			<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
+				<i class="bi-box-arrow-up" />
+			</button>
+			<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
+			<button
+				class="btn btn-light"
+				data-bs-toggle="modal"
+				data-bs-target="#editWorkflowModal"
+				on:click={resetWorkflowUpdateModal}
+			>
+				<i class="bi-gear-wide-connected" />
+			</button>
+		</div>
 	</div>
 </div>
 
@@ -573,7 +657,7 @@
 
 	<div id="workflowErrorAlert" />
 
-	<div class="container mt-4 px-0">
+	<div class="container mt-3 px-0">
 		<div class="row">
 			<div class="col-4">
 				<div class="card">
@@ -616,6 +700,9 @@
 								>
 									{workflowTask.task.name}
 
+									<span class="float-end ps-2">
+										<JobStatusIcon status={statuses[workflowTask.id]} />
+									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-warning" title="new version available">
 											<i class="bi bi-exclamation-triangle" />
@@ -951,9 +1038,9 @@
 					id="inputDataset"
 					class="form-control"
 					disabled={checkingConfiguration}
-					bind:value={inputDatasetControl}
+					bind:value={selectedInputDatasetId}
 				>
-					<option value="">Select an input dataset</option>
+					<option value={undefined}>Select an input dataset</option>
 					{#each datasets as dataset}
 						<option value={dataset.id}>{dataset.name}</option>
 					{/each}
@@ -966,9 +1053,9 @@
 					id="outputDataset"
 					class="form-control"
 					disabled={checkingConfiguration}
-					bind:value={outputDatasetControl}
+					bind:value={selectedOutputDatasetId}
 				>
-					<option value="">Select an output dataset</option>
+					<option value={undefined}>Select an output dataset</option>
 					{#each datasets as dataset}
 						<option value={dataset.id}>{dataset.name}</option>
 					{/each}
