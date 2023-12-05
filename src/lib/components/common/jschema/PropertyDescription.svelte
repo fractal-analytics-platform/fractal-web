@@ -3,13 +3,34 @@
 
 	export let description = undefined;
 
+	/** @type {HTMLElement|undefined} */
 	let element;
+
+	let popover;
+	let windowEventListener;
 
 	onMount(() => {
 		if (element) {
-			// @ts-ignore
-			// eslint-disable-next-line no-undef
-			new bootstrap.Popover(element);
+			element.addEventListener('click', function () {
+				// @ts-ignore
+				// eslint-disable-next-line no-undef
+				popover = bootstrap.Popover.getOrCreateInstance(element, { trigger: 'manual' });
+				popover.toggle();
+				if (!windowEventListener) {
+					windowEventListener = function (/** @type {MouseEvent} */ event) {
+						if (event.target instanceof HTMLElement && event.target !== element) {
+							const clickedPopover = event.target.closest('.popover');
+							if (!clickedPopover) {
+								popover.hide();
+								popover = undefined;
+								window.removeEventListener('click', windowEventListener);
+								windowEventListener = undefined;
+							}
+						}
+					};
+					window.addEventListener('click', windowEventListener);
+				}
+			});
 		}
 	});
 </script>
@@ -22,7 +43,8 @@
 			role="button"
 			data-bs-trigger="focus"
 			class="bi bi-info-circle text-primary"
-			data-bs-toggle="popover"
+			data-bs-toggle="collapse"
+			data-bs-target
 			data-bs-content={description}
 		/>
 	{/if}

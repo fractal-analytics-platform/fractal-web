@@ -29,26 +29,28 @@
 
 {#if schemaProperty}
 	<div class="d-flex flex-column p-2">
-		<div class="property-metadata d-flex flex-row w-100">
-			<span class={schemaProperty.isRequired() ? 'fw-bold' : ''}>{schemaProperty.title || ''}</span>
-			<PropertyDescription description={schemaProperty.description} />
-		</div>
 		<div class="array-items my-2">
 			<div class="accordion" id={accordionParentKey}>
 				<div class="accordion-item">
 					<div class="accordion-header">
 						<button
-							class="accordion-button collapsed"
+							class="accordion-button"
+							class:collapsed={!schemaProperty.isRequired()}
 							type="button"
 							data-bs-toggle="collapse"
 							data-bs-target="#{collapseSymbol}"
 						>
-							Arguments list
+							<span class={schemaProperty.isRequired() ? 'fw-bold' : ''}>
+								{schemaProperty.title || ''}
+							</span>
+							<PropertyDescription description={schemaProperty.description} />
 						</button>
 					</div>
 					<div
 						id={collapseSymbol}
-						class="accordion-collapse collapse"
+						class="accordion-collapse"
+						class:collapse={!schemaProperty.isRequired()}
+						class:show={schemaProperty.isRequired()}
 						data-bs-parent="#{accordionParentKey}"
 					>
 						<div class="accordion-body p-1">
