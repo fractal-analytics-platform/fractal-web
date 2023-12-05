@@ -16,6 +16,7 @@
 	import VersionUpdate from '$lib/components/workflow/VersionUpdate.svelte';
 	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
+	import TasksOrderModal from '$lib/components/workflow/TasksOrderModal.svelte';
 
 	/** @type {import('$lib/types').Workflow} */
 	let workflow = $page.data.workflow;
@@ -65,8 +66,8 @@
 	let unsavedChangesModal;
 	/** @type {Modal} */
 	let runWorkflowModal;
-	/** @type {Modal} */
-	let editWorkflowTasksOrderModal;
+	/** @type {import('$lib/components/workflow/TasksOrderModal.svelte').default} */
+	let editTasksOrderModal;
 	/** @type {Modal} */
 	let insertTaskModal;
 	/** @type {Modal} */
@@ -345,60 +346,6 @@
 		argsSchemaValid = true;
 	}
 
-	function moveWorkflowTask(index, direction) {
-		const wftList = updatableWorkflowList;
-
-		let replaceId;
-		switch (direction) {
-			case 'up':
-				if (index === 0) break;
-				replaceId = index - 1;
-				break;
-			case 'down':
-				if (index === wftList.length - 1) break;
-				replaceId = index + 1;
-		}
-
-		const replaceTask = wftList[replaceId];
-		wftList[replaceId] = wftList[index];
-		wftList[index] = replaceTask;
-		updatableWorkflowList = wftList;
-	}
-
-	/**
-	 * Reorders a project's workflow in the server
-	 * @returns {Promise<*>}
-	 */
-	async function handleWorkflowOrderUpdate() {
-		if (!workflow) {
-			return;
-		}
-		const patchData = {
-			reordered_workflowtask_ids: updatableWorkflowList.map((t) => t.id)
-		};
-
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-
-		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
-			headers,
-			body: JSON.stringify(patchData)
-		});
-
-		const result = await response.json();
-		if (response.ok) {
-			console.log('Workflow task order updated');
-			workflow = result;
-			editWorkflowTasksOrderModal.toggle();
-		} else {
-			console.error('Workflow task order not updated', result);
-			editWorkflowTasksOrderModal.displayErrorAlert(result);
-		}
-	}
-
 	/**
 	 * Requests the server to apply a project's workflow (i.e. run it)
 	 * @returns {Promise<void>}
@@ -548,7 +495,9 @@
 			return;
 		}
 		statuses = outputStatus.status;
-		const runningOrSubmitted = Object.values(statuses).filter(s => s === 'running' || s === 'submitted');
+		const runningOrSubmitted = Object.values(statuses).filter(
+			(s) => s === 'running' || s === 'submitted'
+		);
 		if (statusWatcherTimer) {
 			if (runningOrSubmitted.length === 0) {
 				clearTimeout(statusWatcherTimer);
@@ -673,10 +622,10 @@
 								>
 								<button
 									class="btn btn-light"
-									data-bs-toggle="modal"
-									data-bs-target="#editWorkflowTasksOrderModal"
-									><i class="bi-gear-wide-connected" /></button
+									on:click={() => editTasksOrderModal.show(updatableWorkflowList)}
 								>
+									<i class="bi-gear-wide-connected" />
+								</button>
 							</div>
 						</div>
 					</div>
@@ -975,54 +924,12 @@
 	</svelte:fragment>
 </Modal>
 
-<Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">Edit workflow tasks order</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editWorkflowTasksOrderModal" />
-		{#if workflow !== undefined && updatableWorkflowList.length == 0}
-			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
-		{:else if workflow !== undefined}
-			{#key updatableWorkflowList}
-				<ul class="list-group list-group-flush">
-					{#each updatableWorkflowList as workflowTask, i}
-						<li class="list-group-item" data-fs-target={workflowTask.id}>
-							<div class="d-flex justify-content-between align-items-center">
-								<div>
-									{workflowTask.task.name} #{workflowTask.id}
-								</div>
-								<div>
-									{#if i !== 0}
-										<button
-											class="btn btn-light"
-											on:click|preventDefault={() => moveWorkflowTask(i, 'up')}
-										>
-											<i class="bi-arrow-up" />
-										</button>
-									{/if}
-									{#if i !== updatableWorkflowList.length - 1}
-										<button
-											class="btn btn-light"
-											on:click|preventDefault={() => moveWorkflowTask(i, 'down')}
-										>
-											<i class="bi-arrow-down" />
-										</button>
-									{/if}
-								</div>
-							</div>
-						</li>
-					{/each}
-				</ul>
-			{/key}
-		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>
-			Save
-		</button>
-	</svelte:fragment>
-</Modal>
+<TasksOrderModal
+	projectId={project.id}
+	{workflow}
+	workflowUpdater={(updated) => (workflow = updated)}
+	bind:this={editTasksOrderModal}
+/>
 
 <Modal id="runWorkflowModal" centered={true} bind:this={runWorkflowModal}>
 	<svelte:fragment slot="header">
