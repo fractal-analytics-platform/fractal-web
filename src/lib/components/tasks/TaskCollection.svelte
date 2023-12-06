@@ -33,6 +33,8 @@
 	let package_version = '';
 	let python_version = '';
 	let package_extras = '';
+	/** @type {{key: string, value: string}[]} */
+	let pinnedPackageVersions = [];
 
 	// On component load set the taskCollections from the local storage
 	onMount(async () => {
@@ -59,6 +61,11 @@
 			python_version,
 			package_extras
 		};
+
+		const ppv = getPinnedPackageVersionsMap();
+		if (ppv) {
+			requestData.pinned_package_versions = ppv;
+		}
 
 		const response = await fetch('/api/v1/task/collect/pip', {
 			method: 'POST',
@@ -88,10 +95,28 @@
 			package_version = '';
 			python_version = '';
 			package_extras = '';
+			pinnedPackageVersions = [];
 		} else {
 			console.error('Task collection request failed: ', result);
 			collectTaskErrorStore.set(result);
 		}
+	}
+
+	/**
+	 * @returns {{[key: string]: string}|undefined}
+	 */
+	function getPinnedPackageVersionsMap() {
+		/** @type {{[key: string]: string}} */
+		const map = {};
+		for (const ppv of pinnedPackageVersions) {
+			if (ppv.key && ppv.value) {
+				map[ppv.key] = ppv.value;
+			}
+		}
+		if (Object.keys(map).length === 0) {
+			return undefined;
+		}
+		return map;
 	}
 
 	function storeCreatedTaskCollection(taskCollection) {
@@ -207,6 +232,17 @@
 		const id = event.currentTarget.getAttribute('data-fc-tc');
 		modalTaskCollectionId.set(id);
 	}
+
+	function addPackageVersion() {
+		pinnedPackageVersions = [...pinnedPackageVersions, { key: '', value: '' }];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removePackageVersion(index) {
+		pinnedPackageVersions = pinnedPackageVersions.filter((_, i) => i !== index);
+	}
 </script>
 
 <TaskCollectionLogsModal />
@@ -219,14 +255,15 @@
 		</div>
 	{/if}
 	<form on:submit|preventDefault={handleTaskCollection}>
-		<div class="row g-3">
-			<div class="col-6">
+		<div class="row">
+			<div class="col-md-6 mb-2">
 				<div class="input-group">
 					<div class="input-group-text">
-						<span class="font-monospace">Package</span>
+						<label class="font-monospace" for="package">Package</label>
 					</div>
 					<input
 						name="package"
+						id="package"
 						type="text"
 						class="form-control"
 						required
@@ -234,12 +271,13 @@
 					/>
 				</div>
 			</div>
-			<div class="col-6">
+			<div class="col-md-6 mb-2">
 				<div class="input-group">
 					<div class="input-group-text">
-						<span class="font-monospace">Package Version</span>
+						<label class="font-monospace" for="package_version">Package Version</label>
 					</div>
 					<input
+						id="package_version"
 						name="package_version"
 						type="text"
 						class="form-control"
@@ -247,12 +285,15 @@
 					/>
 				</div>
 			</div>
-			<div class="col-6">
+		</div>
+		<div class="row">
+			<div class="col-md-6 mb-2">
 				<div class="input-group">
 					<div class="input-group-text">
-						<span class="font-monospace">Python Version</span>
+						<label class="font-monospace" for="python_version">Python Version</label>
 					</div>
 					<input
+						id="python_version"
 						name="python_version"
 						type="text"
 						class="form-control"
@@ -260,12 +301,13 @@
 					/>
 				</div>
 			</div>
-			<div class="col-6">
+			<div class="col-md-6 mb-2">
 				<div class="input-group">
 					<div class="input-group-text">
-						<span class="font-monospace">Package extras</span>
+						<label class="font-monospace" for="package_extras">Package extras</label>
 					</div>
 					<input
+						id="package_extras"
 						name="package_extras"
 						type="text"
 						class="form-control"
@@ -273,6 +315,48 @@
 					/>
 				</div>
 			</div>
+		</div>
+		{#each pinnedPackageVersions as ppv, i}
+			<div class="row">
+				<div class="col-xl-6 col-lg-8 col-md-12 mb-2">
+					<div class="input-group">
+						<label class="input-group-text" for="ppv_key_{i}">Key</label>
+						<input
+							type="text"
+							class="form-control"
+							id="ppv_key_{i}"
+							bind:value={ppv.key}
+							required
+						/>
+						<label class="input-group-text" for="ppv_value_{i}">Value</label>
+						<input
+							type="text"
+							class="form-control"
+							id="ppv_value_{i}"
+							bind:value={ppv.value}
+							required
+						/>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							id="ppv_remove_{i}"
+							aria-label="Remove pinned package version"
+							on:click|preventDefault={() => removePackageVersion(i)}
+						>
+							<i class="bi bi-trash" />
+						</button>
+					</div>
+				</div>
+			</div>
+		{/each}
+		<div class="row">
+			<div class="col-12 mb-3">
+				<button class="btn btn-light" on:click|preventDefault={addPackageVersion}>
+					<i class="bi bi-plus-circle" /> Add pinned package version
+				</button>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-auto">
 				<button type="submit" class="btn btn-primary">Collect</button>
 			</div>
