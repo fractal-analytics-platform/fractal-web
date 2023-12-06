@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added experimental workflow page with job monitoring (\#363).
+
 # 0.7.0
 
 This release requires fractal-server 1.4.0.

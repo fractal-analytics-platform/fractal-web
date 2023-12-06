@@ -38,26 +38,26 @@
 
 {#if objectSchema}
 	<div class="d-flex flex-column p-2">
-		<div class="property-metadata d-flex flex-row w-100">
-			<span class={objectSchema.isRequired() ? 'fw-bold' : ''}>{objectSchema.title}</span>
-			<PropertyDescription description={objectSchema.description} />
-		</div>
 		<div class="object-properties my-2">
 			<div class="accordion" id={accordionParentKey}>
 				<div class="accordion-item">
 					<div class="accordion-header">
 						<button
-							class="accordion-button collapsed"
+							class="accordion-button"
+							class:collapsed={!objectSchema.isRequired()}
 							type="button"
 							data-bs-toggle="collapse"
 							data-bs-target="#{collapseSymbol}"
 						>
-							Argument Properties
+							<span class={objectSchema.isRequired() ? 'fw-bold' : ''}>{objectSchema.title}</span>
+							<PropertyDescription description={objectSchema.description} />
 						</button>
 					</div>
 					<div
 						id={collapseSymbol}
-						class="accordion-collapse collapse"
+						class="accordion-collapse"
+						class:collapse={!objectSchema.isRequired()}
+						class:show={objectSchema.isRequired()}
 						data-bs-parent="#{accordionParentKey}"
 					>
 						<div class="accordion-body p-1">
