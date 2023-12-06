@@ -76,6 +76,9 @@
 	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
 	let newVersionsMap = {};
 
+	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	let selectedRunningJob;
+
 	$: updatableWorkflowList = workflow.task_list || [];
 
 	workflowTaskContext.subscribe((value) => {
@@ -393,6 +396,8 @@
 				// @ts-ignore
 				// eslint-disable-next-line
 				runWorkflowModal.toggle();
+				const job = await response.json();
+				selectedRunningJob = job;
 				await loadJobsStatus();
 			} else {
 				console.error(response);
@@ -479,9 +484,10 @@
 		if (selectedInputDatasetId === undefined || selectedOutputDatasetId === undefined) {
 			return;
 		}
-		if (workflowErrorAlert) {
-			workflowErrorAlert.hide();
-		}
+		selectedRunningJob = await getSelectedRunningJob(
+			selectedInputDatasetId,
+			selectedOutputDatasetId
+		);
 		const outputStatusResponse = await fetch(
 			`/api/v1/project/${project.id}/dataset/${selectedOutputDatasetId}/status`,
 			{
@@ -491,7 +497,7 @@
 		);
 		const outputStatus = await outputStatusResponse.json();
 		if (!outputStatusResponse.ok) {
-			workflowErrorAlert = displayStandardErrorAlert(outputStatus, 'workflowErrorAlert');
+			console.error('Error retrieving dataset status', outputStatus)
 			return;
 		}
 		statuses = outputStatus.status;
@@ -501,6 +507,64 @@
 		if (runningOrSubmitted.length > 0) {
 			clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = setTimeout(loadJobsStatus, updateJobsInterval);
+		} else {
+			selectedRunningJob = undefined;
+		}
+	}
+
+	/**
+	 * @param {number} inputDatasetId
+	 * @param {number} outputDatasetId
+	 * @return {Promise<import('$lib/types').ApplyWorkflow|undefined>}
+	 */
+	async function getSelectedRunningJob(inputDatasetId, outputDatasetId) {
+		if (
+			selectedRunningJob &&
+			selectedRunningJob.input_dataset_id === inputDatasetId &&
+			selectedRunningJob.output_dataset_id === outputDatasetId
+		) {
+			return selectedRunningJob;
+		}
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/job`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (response.ok) {
+			/** @type {import('$lib/types').ApplyWorkflow[]} */
+			const allJobs = await response.json();
+			const jobs = allJobs
+				.filter(
+					(j) => j.input_dataset_id === inputDatasetId && j.output_dataset_id === outputDatasetId
+				)
+				.sort((a, b) => (a.start_timestamp < b.start_timestamp ? 1 : -1));
+			if (jobs.length > 0) {
+				return jobs[0];
+			}
+		} else {
+			console.error('Unable to load workflow jobs', await response.json());
+		}
+	}
+
+	async function stopWorkflow() {
+		if (!selectedRunningJob) {
+			return;
+		}
+		if (workflowErrorAlert) {
+			workflowErrorAlert.hide();
+		}
+		const response = await fetch(
+			`/api/v1/project/${project.id}/job/${selectedRunningJob.id}/stop`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
+		if (response.ok) {
+			await loadJobsStatus();
+		} else {
+			console.error('Error stopping job');
+			const errorResponse = await response.json();
+			workflowErrorAlert = displayStandardErrorAlert(errorResponse, 'workflowErrorAlert');
 		}
 	}
 
@@ -565,17 +629,23 @@
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-12">
-				<button
-					class="btn btn-success"
-					on:click|preventDefault={() => {
-						if (argumentsWithUnsavedChanges === false) {
-							runWorkflowModal.toggle();
-						} else {
-							toggleUnsavedChangesModal();
-						}
-					}}
-					><i class="bi-play-fill" /> Run workflow
-				</button>
+				{#if selectedRunningJob && (selectedRunningJob.status === 'running' || selectedRunningJob.status === 'submitted')}
+					<button class="btn btn-danger" on:click={stopWorkflow}>
+						<i class="bi-stop-circle-fill" /> Stop workflow
+					</button>
+				{:else}
+					<button
+						class="btn btn-success"
+						on:click|preventDefault={() => {
+							if (argumentsWithUnsavedChanges === false) {
+								runWorkflowModal.toggle();
+							} else {
+								toggleUnsavedChangesModal();
+							}
+						}}
+						><i class="bi-play-fill" /> Run workflow
+					</button>
+				{/if}
 			</div>
 		</div>
 	</div>
