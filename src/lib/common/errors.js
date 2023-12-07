@@ -105,7 +105,24 @@ function isValidationError(reason, statusCode) {
  * @returns {boolean}
  */
 function isValueError(err) {
-	return Array.isArray(err.loc) && !!err.msg && err.type === 'value_error';
+	return Array.isArray(err.loc) && !!err.msg && err.type.startsWith('value_error');
+}
+
+/**
+ * Returns true if all the keys of the error map are handled by the current page or component.
+ * Used to decide if it possible to show user friendly validation messages
+ * or if it is necessary to display a generic error message.
+ * @param {{[key:string]: string}} errorsMap
+ * @param {string[]} handledErrorKeys
+ * @return {boolean}
+ */
+export function validateErrorMapKeys(errorsMap, handledErrorKeys) {
+	for (const key of Object.keys(errorsMap)) {
+		if (!handledErrorKeys.includes(key)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**

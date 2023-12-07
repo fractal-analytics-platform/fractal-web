@@ -1,9 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import {
-		orderTasksByOwnerThenByNameThenByVersion,
-		replaceEmptyStrings
-	} from '$lib/common/component_utilities.js';
+	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
 	import TaskEditModal from '$lib/components/tasks/TaskEditModal.svelte';
@@ -11,20 +8,14 @@
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import AddSingleTask from '$lib/components/tasks/AddSingleTask.svelte';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
-	// Tasks property updated with respect to data store
-	let tasks = $page.data.tasks;
-	let taskCreateSuccess = false;
 
-	// Add a single task fields
-	let name = '';
-	let command = '';
-	let source = '';
-	let version = '';
-	let input_type = '';
-	let output_type = '';
+	// Tasks property updated with respect to data store
+	/** @type {import('$lib/types').Task[]} */
+	let tasks = $page.data.tasks;
 
 	// Store subscriptions
 	collectTaskErrorStore.subscribe((error) => {
@@ -39,9 +30,11 @@
 		displayStandardErrorAlert(errorReasons, 'errorSection');
 	}
 
-	function setTaskModal(event) {
-		const taskId = event.currentTarget.getAttribute('data-fc-task');
-		const task = tasks.find((t) => t.id == taskId);
+	/**
+	 * @param {number} taskId
+	 */
+	function setTaskModal(taskId) {
+		const task = /** @type {import('$lib/types').Task} */ (tasks.find((t) => t.id === taskId));
 		taskStore.set(task);
 		originalTaskStore.set({ ...task });
 	}
@@ -57,47 +50,15 @@
 		});
 	}
 
-	async function reloadTaskList() {
-		window.location.reload();
+	/**
+	 * @param {import('$lib/types').Task} task
+	 */
+	function addNewTask(task) {
+		tasks = [...tasks, task];
 	}
 
-	/**
-	 * Creates a new task in the server
-	 * @returns {Promise<*>}
-	 */
-	async function handleCreateTask() {
-		taskCreateSuccess = false;
-
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-
-		const response = await fetch('/api/v1/task', {
-			method: 'POST',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify(
-				{
-					name,
-					command,
-					version,
-					source,
-					input_type,
-					output_type
-				},
-				replaceEmptyStrings
-			)
-		});
-
-		const result = await response.json();
-		if (response.ok) {
-			// Add created task to the list
-			console.log('Task created', result);
-			tasks = [...tasks, result];
-			taskCreateSuccess = true;
-		} else {
-			console.error('Unable to create task', result);
-			setErrorReasons(result);
-		}
+	async function reloadTaskList() {
+		window.location.reload();
 	}
 
 	/**
@@ -161,63 +122,7 @@
 			</h2>
 			<div id="addTask" class="accordion-collapse collapse">
 				<div class="accordion-body">
-					{#if taskCreateSuccess}
-						<div class="alert alert-success" role="alert">Task created successfully</div>
-					{/if}
-					<form on:submit|preventDefault={handleCreateTask}>
-						<div class="row g-3">
-							<div class="col-6">
-								<div class="input-group">
-									<div class="input-group-text">Task name</div>
-									<input name="name" type="text" class="form-control" bind:value={name} />
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="input-group">
-									<div class="input-group-text">Command</div>
-									<input name="command" type="text" class="form-control" bind:value={command} />
-								</div>
-							</div>
-							<div class="col-6">
-								<div class="input-group">
-									<div class="input-group-text">Source</div>
-									<input name="source" type="text" class="form-control" bind:value={source} />
-								</div>
-							</div>
-							<div class="col-6">
-								<div class="input-group">
-									<div class="input-group-text">Version</div>
-									<input name="version" type="text" class="form-control" bind:value={version} />
-								</div>
-							</div>
-							<div class="row" />
-							<div class="col-6">
-								<div class="input-group">
-									<div class="input-group-text">Input type</div>
-									<input
-										name="input_type"
-										type="text"
-										class="form-control"
-										bind:value={input_type}
-									/>
-								</div>
-							</div>
-							<div class="col-6">
-								<div class="input-group">
-									<div class="input-group-text">Output type</div>
-									<input
-										name="output_type"
-										type="text"
-										class="form-control"
-										bind:value={output_type}
-									/>
-								</div>
-							</div>
-							<div class="col-auto">
-								<button type="submit" class="btn btn-primary">Create</button>
-							</div>
-						</div>
-					</form>
+					<AddSingleTask {addNewTask} />
 				</div>
 			</div>
 		</div>
@@ -253,22 +158,19 @@
 							<td class="col-1">{task.owner || '–'}</td>
 							<td class="col-2">
 								<button
-									data-fc-task={task.id}
 									class="btn btn-light"
 									data-bs-toggle="modal"
 									data-bs-target="#taskInfoModal"
-									on:click={setTaskModal}
+									on:click={() => setTaskModal(task.id)}
 								>
 									<i class="bi bi-info-circle" />
 									Info
 								</button>
 								<button
-									on:click={() => {}}
-									data-fc-task={task.id}
 									class="btn btn-primary"
 									data-bs-toggle="modal"
 									data-bs-target="#taskEditModal"
-									on:click={setTaskModal}
+									on:click={() => setTaskModal(task.id)}
 								>
 									<i class="bi bi-pencil" />
 									Edit
