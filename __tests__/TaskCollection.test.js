@@ -29,8 +29,8 @@ describe('TaskCollection', () => {
 		await fireEvent.click(removePpvBtn);
 		expect(screen.getAllByRole('textbox').length).eq(8);
 
-		const [key1, key2] = screen.getAllByRole('textbox', { name: 'Key' });
-		const [value1, value2] = screen.getAllByRole('textbox', { name: 'Value' });
+		const [key1, key2] = screen.getAllByRole('textbox', { name: 'Name' });
+		const [value1, value2] = screen.getAllByRole('textbox', { name: 'Version' });
 
 		await fireEvent.input(key1, { target: { value: 'package1' } });
 		await fireEvent.input(value1, { target: { value: '1.2.3' } });
