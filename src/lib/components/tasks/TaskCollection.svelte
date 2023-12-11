@@ -29,6 +29,9 @@
 	let taskCollections = [];
 	let taskCollectionAlreadyPresent = undefined;
 
+	/** @type {'pypi'|'wheel'} */
+	let packageType = 'pypi';
+
 	let python_package = '';
 	let package_version = '';
 	let python_version = '';
@@ -255,8 +258,37 @@
 		</div>
 	{/if}
 	<form on:submit|preventDefault={handleTaskCollection}>
+		<div class="row row-cols-auto align-items-center mb-2">
+			<div class="form-check-inline">Package type:</div>
+			<div class="form-check form-check-inline">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="pypi"
+					id="pypi"
+					value="pypi"
+					bind:group={packageType}
+				/>
+				<label class="form-check-label" for="pypi"> PyPI </label>
+			</div>
+			<div class="form-check">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="wheel"
+					id="wheel"
+					value="wheel"
+					bind:group={packageType}
+				/>
+				<label class="form-check-label" for="wheel"> Wheel </label>
+			</div>
+		</div>
 		<div class="row">
-			<div class="col-md-6 mb-2">
+			<div
+				class="mb-2"
+				class:col-md-6={packageType === 'pypi'}
+				class:col-md-12={packageType === 'wheel'}
+			>
 				<div class="input-group">
 					<div class="input-group-text">
 						<label class="font-monospace" for="package">Package</label>
@@ -270,20 +302,34 @@
 						bind:value={python_package}
 					/>
 				</div>
-			</div>
-			<div class="col-md-6 mb-2">
-				<div class="input-group">
-					<div class="input-group-text">
-						<label class="font-monospace" for="package_version">Package Version</label>
-					</div>
-					<input
-						id="package_version"
-						name="package_version"
-						type="text"
-						class="form-control"
-						bind:value={package_version}
-					/>
+				<div class="form-text">
+					{#if packageType === 'pypi'}
+						The name of a package published on PyPI
+					{:else}
+						The full path to a wheel file
+					{/if}
 				</div>
+			</div>
+			{#if packageType === 'pypi'}
+				<div class="col-md-6 mb-2">
+					<div class="input-group">
+						<div class="input-group-text">
+							<label class="font-monospace" for="package_version">Package Version</label>
+						</div>
+						<input
+							id="package_version"
+							name="package_version"
+							type="text"
+							class="form-control"
+							bind:value={package_version}
+						/>
+					</div>
+				</div>
+			{/if}
+		</div>
+		<div class="row mb-2 mt-2">
+			<div class="col">
+				<span class="fw-bold text-secondary">Optional arguments</span>
 			</div>
 		</div>
 		<div class="row">
@@ -300,6 +346,7 @@
 						bind:value={python_version}
 					/>
 				</div>
+				<div class="form-text">Python version to install and run the package tasks</div>
 			</div>
 			<div class="col-md-6 mb-2">
 				<div class="input-group">
@@ -313,6 +360,9 @@
 						class="form-control"
 						bind:value={package_extras}
 					/>
+				</div>
+				<div class="form-text">
+					Package extras to include in the <code>pip install</code> command
 				</div>
 			</div>
 		</div>
@@ -353,15 +403,16 @@
 			</div>
 		{/each}
 		<div class="row">
-			<div class="col-12 mb-3">
+			<div class="col-12 mb-1">
 				<button class="btn btn-light" on:click|preventDefault={addPackageVersion}>
 					<i class="bi bi-plus-circle" /> Add pinned package version
 				</button>
 			</div>
 		</div>
+
 		<div class="row">
 			<div class="col-auto">
-				<button type="submit" class="btn btn-primary">Collect</button>
+				<button type="submit" class="btn btn-primary mt-3 mb-3">Collect</button>
 			</div>
 		</div>
 	</form>

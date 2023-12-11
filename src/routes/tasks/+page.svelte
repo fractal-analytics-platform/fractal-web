@@ -17,6 +17,9 @@
 	/** @type {import('$lib/types').Task[]} */
 	let tasks = $page.data.tasks;
 
+	/** @type {'from_package'|'single'} */
+	let collectionMode = 'from_package';
+
 	// Store subscriptions
 	collectTaskErrorStore.subscribe((error) => {
 		if (error) setErrorReasons(error);
@@ -82,50 +85,45 @@
 	}
 </script>
 
-<div class="d-flex justify-content-between align-items-center">
-	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb">
-			<li class="breadcrumb-item active" aria-current="page">Tasks</li>
-		</ol>
-	</nav>
-</div>
-
 <div class="container">
-	<div class="mb-3" id="errorSection" />
+	<div class="d-flex justify-content-between align-items-center">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item active" aria-current="page">Tasks</li>
+			</ol>
+		</nav>
+	</div>
+
+	<div class="mb-2" id="errorSection" />
+
 	<p class="lead">Add tasks</p>
-	<div class="accordion">
-		<div class="accordion-item">
-			<h2 class="accordion-header">
-				<button
-					class="accordion-button collapsed"
-					data-bs-toggle="collapse"
-					data-bs-target="#taskCollection"
-				>
-					Collect tasks from a package
-				</button>
-			</h2>
-			<div id="taskCollection" class="accordion-collapse collapse">
-				<div class="accordion-body">
-					<TaskCollection />
-				</div>
-			</div>
-		</div>
-		<div class="accordion-item">
-			<h2 class="accordion-header">
-				<button
-					class="accordion-button collapsed"
-					data-bs-toggle="collapse"
-					data-bs-target="#addTask"
-				>
-					Add a single task
-				</button>
-			</h2>
-			<div id="addTask" class="accordion-collapse collapse">
-				<div class="accordion-body">
-					<AddSingleTask {addNewTask} />
-				</div>
-			</div>
-		</div>
+
+	<input
+		class="btn-check"
+		type="radio"
+		name="from_package"
+		id="from_package"
+		value="from_package"
+		bind:group={collectionMode}
+	/>
+	<label class="btn btn-outline-primary" for="from_package"> Collect tasks from a package </label>
+
+	<input
+		class="btn-check"
+		type="radio"
+		name="single"
+		id="single"
+		value="single"
+		bind:group={collectionMode}
+	/>
+	<label class="btn btn-outline-primary" for="single"> Add a single task </label>
+
+	<div class="mt-4">
+		{#if collectionMode === 'from_package'}
+			<TaskCollection />
+		{:else}
+			<AddSingleTask {addNewTask} />
+		{/if}
 	</div>
 
 	<div class="row mt-4">
