@@ -29,8 +29,8 @@
 	let taskCollections = [];
 	let taskCollectionAlreadyPresent = undefined;
 
-	/** @type {'pypi'|'wheel'} */
-	let packageType = 'pypi';
+	/** @type {'pypi'|'local'} */
+	export let packageType = 'pypi';
 
 	let python_package = '';
 	let package_version = '';
@@ -258,36 +258,11 @@
 		</div>
 	{/if}
 	<form on:submit|preventDefault={handleTaskCollection}>
-		<div class="row row-cols-auto align-items-center mb-2">
-			<div class="form-check-inline">Package type:</div>
-			<div class="form-check form-check-inline">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="pypi"
-					id="pypi"
-					value="pypi"
-					bind:group={packageType}
-				/>
-				<label class="form-check-label" for="pypi"> PyPI </label>
-			</div>
-			<div class="form-check">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="wheel"
-					id="wheel"
-					value="wheel"
-					bind:group={packageType}
-				/>
-				<label class="form-check-label" for="wheel"> Wheel </label>
-			</div>
-		</div>
 		<div class="row">
 			<div
 				class="mb-2"
 				class:col-md-6={packageType === 'pypi'}
-				class:col-md-12={packageType === 'wheel'}
+				class:col-md-12={packageType === 'local'}
 			>
 				<div class="input-group">
 					<div class="input-group-text">
@@ -417,8 +392,7 @@
 		</div>
 	</form>
 	{#if taskCollections.length > 0}
-		<hr />
-		<div class="">
+		<div class="mb-5">
 			<table class="table table-hover caption-top align-middle">
 				<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
 					<div class="d-flex align-items-center justify-content-between">

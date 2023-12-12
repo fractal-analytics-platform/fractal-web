@@ -17,8 +17,8 @@
 	/** @type {import('$lib/types').Task[]} */
 	let tasks = $page.data.tasks;
 
-	/** @type {'from_package'|'single'} */
-	let collectionMode = 'from_package';
+	/** @type {'pypi'|'local'|'single'} */
+	let packageType = 'pypi';
 
 	// Store subscriptions
 	collectTaskErrorStore.subscribe((error) => {
@@ -98,15 +98,27 @@
 
 	<p class="lead">Add tasks</p>
 
+	<div class="form-check-inline">Package type:</div>
+
 	<input
 		class="btn-check"
 		type="radio"
-		name="from_package"
-		id="from_package"
-		value="from_package"
-		bind:group={collectionMode}
+		name="pypi"
+		id="pypi"
+		value="pypi"
+		bind:group={packageType}
 	/>
-	<label class="btn btn-outline-primary" for="from_package"> Collect tasks from a package </label>
+	<label class="btn btn-outline-secondary" for="pypi"> PyPI </label>
+
+	<input
+		class="btn-check"
+		type="radio"
+		name="local"
+		id="local"
+		value="local"
+		bind:group={packageType}
+	/>
+	<label class="btn btn-outline-secondary" for="local"> Local </label>
 
 	<input
 		class="btn-check"
@@ -114,13 +126,13 @@
 		name="single"
 		id="single"
 		value="single"
-		bind:group={collectionMode}
+		bind:group={packageType}
 	/>
-	<label class="btn btn-outline-primary" for="single"> Add a single task </label>
+	<label class="btn btn-outline-secondary" for="single"> Single </label>
 
-	<div class="mt-4">
-		{#if collectionMode === 'from_package'}
-			<TaskCollection />
+	<div class="mt-3">
+		{#if packageType === 'pypi' || packageType === 'local'}
+			<TaskCollection {packageType} />
 		{:else}
 			<AddSingleTask {addNewTask} />
 		{/if}
