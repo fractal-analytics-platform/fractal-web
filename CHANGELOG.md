@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Supported editing of cache_dir from user profile page (\#365).
 * Added experimental workflow page with job monitoring (\#363).
 
 # 0.7.0
