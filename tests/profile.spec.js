@@ -30,8 +30,8 @@ test('User profile', async ({ page }) => {
 	await test.step('Save cache dir using enter', async () => {
 		await page.getByRole('button', { name: 'Edit' }).click();
 		await page.getByRole('textbox').waitFor();
-		await page.getByRole('textbox').fill('/tmp/foo2\n');
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('textbox').fill('/tmp/foo2');
+		await page.keyboard.down('Enter');
 		await page.getByRole('button', { name: 'Edit' }).waitFor();
 	});
 
