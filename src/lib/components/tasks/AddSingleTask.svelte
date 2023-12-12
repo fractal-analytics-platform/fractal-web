@@ -6,11 +6,12 @@
 		getValidationMessagesMap,
 		validateErrorMapKeys
 	} from '$lib/common/errors';
+	import StandardDismissableAlert from '../common/StandardDismissableAlert.svelte';
 
 	/** @type {(task: import('$lib/types').Task) => void} */
 	export let addNewTask;
 
-	let taskCreateSuccess = false;
+	let taskSuccessMessage = '';
 
 	// Add a single task fields
 	let name = '';
@@ -42,7 +43,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleCreateTask() {
-		taskCreateSuccess = false;
+		taskSuccessMessage = '';
 		if (errorAlert) {
 			errorAlert.hide();
 		}
@@ -82,7 +83,8 @@
 			// Add created task to the list
 			console.log('Task created', result);
 			addNewTask(result);
-			taskCreateSuccess = true;
+			taskSuccessMessage = 'Task created successfully';
+			resetFields();
 		} else {
 			console.error('Unable to create task', result);
 			const errorsMap = getValidationMessagesMap(result, response.status);
@@ -150,11 +152,20 @@
 		delete newErrors[key];
 		validationErrors = newErrors;
 	}
+
+	function resetFields() {
+		name = '';
+		command = '';
+		version = '';
+		source = '';
+		input_type = '';
+		output_type = '';
+		clearFileUpload();
+	}
 </script>
 
-{#if taskCreateSuccess}
-	<div class="alert alert-success" role="alert">Task created successfully</div>
-{/if}
+<StandardDismissableAlert message={taskSuccessMessage} />
+
 <form on:submit|preventDefault={handleCreateTask}>
 	<div class="row">
 		<div class="col-md-6 mb-2">
@@ -167,6 +178,7 @@
 					class="form-control"
 					bind:value={name}
 					class:is-invalid={validationErrors['name']}
+					required
 				/>
 				<span class="invalid-feedback">{validationErrors['name']}</span>
 			</div>
@@ -183,6 +195,7 @@
 					class="form-control"
 					bind:value={command}
 					class:is-invalid={validationErrors['command']}
+					required
 				/>
 				<span class="invalid-feedback">{validationErrors['command']}</span>
 			</div>
@@ -199,8 +212,12 @@
 					class="form-control"
 					bind:value={source}
 					class:is-invalid={validationErrors['source']}
+					required
 				/>
 				<span class="invalid-feedback">{validationErrors['source']}</span>
+			</div>
+			<div class="form-text">
+				Used to match tasks across installations when a workflow is imported
 			</div>
 		</div>
 		<div class="col-md-6 mb-2">
@@ -229,9 +246,11 @@
 					class="form-control"
 					bind:value={input_type}
 					class:is-invalid={validationErrors['input_type']}
+					required
 				/>
 				<span class="invalid-feedback">{validationErrors['input_type']}</span>
 			</div>
+			<div class="form-text">Expected type of input dataset</div>
 		</div>
 		<div class="col-md-6 mb-2">
 			<div class="input-group has-validation">
@@ -243,9 +262,11 @@
 					class="form-control"
 					bind:value={output_type}
 					class:is-invalid={validationErrors['output_type']}
+					required
 				/>
 				<span class="invalid-feedback">{validationErrors['output_type']}</span>
 			</div>
+			<div class="form-text">Expected type of output dataset</div>
 		</div>
 	</div>
 	<div class="row">
@@ -269,12 +290,13 @@
 				{/if}
 				<span class="invalid-feedback">{validationErrors['args_schema']}</span>
 			</div>
+			<div class="form-text">JSON schema of task arguments</div>
 		</div>
 	</div>
 	<div class="row">
 		<div id="errorAlert-createTask" />
 		<div class="col-auto">
-			<button type="submit" class="btn btn-primary">Create</button>
+			<button type="submit" class="btn btn-primary mb-3">Create</button>
 		</div>
 	</div>
 </form>
