@@ -25,12 +25,16 @@
 		if (error) setErrorReasons(error);
 	});
 
-	// Sort tasks
-	tasks = orderTasksByOwnerThenByNameThenByVersion(tasks);
-
 	function setErrorReasons(value) {
 		errorReasons = value;
 		displayStandardErrorAlert(errorReasons, 'errorSection');
+	}
+
+	/**
+	 * @param {import('$lib/types').Task[]} tasks
+	 */
+	function sortTasks(tasks) {
+		return orderTasksByOwnerThenByNameThenByVersion(tasks, null, 'desc');
 	}
 
 	/**
@@ -42,22 +46,29 @@
 		originalTaskStore.set({ ...task });
 	}
 
-	// Updates the tasks list after a task is edited in the modal
+	/**
+	 * Updates the tasks list after a task is edited in the modal
+	 * @param {import('$lib/types').Task} editedTask
+	 */
 	async function updateEditedTask(editedTask) {
-		tasks = tasks.filter((t) => {
+		const updatedTasks = tasks.filter((t) => {
 			if (t.id === editedTask.id) {
 				return editedTask;
 			} else {
 				return t;
 			}
 		});
+		sortTasks(updatedTasks);
+		tasks = updatedTasks;
 	}
 
 	/**
 	 * @param {import('$lib/types').Task} task
 	 */
 	function addNewTask(task) {
-		tasks = [...tasks, task];
+		const updatedTasks = [...tasks, task];
+		sortTasks(updatedTasks);
+		tasks = updatedTasks;
 	}
 
 	async function reloadTaskList() {
@@ -81,6 +92,86 @@
 			const result = await response.json();
 			console.error('Error deleting the task', result);
 			throw new AlertError(result);
+		}
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function isOldVersion(index) {
+		if (index === 0) {
+			return false;
+		}
+		const previousTask = tasks[index - 1];
+		return previousTask.name === tasks[index].name;
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function isLastOldVersion(index) {
+		if (!isOldVersion(index)) {
+			return false;
+		}
+		if (index === tasks.length - 1) {
+			return false;
+		}
+		const nextTask = tasks[index + 1];
+		return nextTask.name !== tasks[index].name;
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function isMainVersion(index) {
+		if (isOldVersion(index)) {
+			return false;
+		}
+		if (index === tasks.length - 1) {
+			return false;
+		}
+		const nextTask = tasks[index + 1];
+		return nextTask.name === tasks[index].name;
+	}
+
+	/**
+	 * @param {Event} event
+	 */
+	function handleToggleOldVersions(event) {
+		const element = /** @type {HTMLElement} */ (event.target);
+		/** @type {HTMLElement|null} */
+		let row = /** @type {HTMLElement} */ (element.closest('tr'));
+		if (!row.classList.contains('expanded')) {
+			closeAllOldVersions(/** @type {HTMLElement} */ (row.closest('table')));
+		}
+		toggleOldVersions(row);
+	}
+
+	/**
+	 * @param {HTMLElement} table
+	 */
+	function closeAllOldVersions(table) {
+		const rows = table.querySelectorAll('tr');
+		for (const row of rows) {
+			if (row.classList.contains('expanded')) {
+				toggleOldVersions(row);
+			}
+		}
+	}
+
+	/**
+	 * @param {HTMLElement} mainRow
+	 */
+	function toggleOldVersions(mainRow) {
+		mainRow.classList.toggle('expanded');
+		/** @type {HTMLElement|null} */
+		let row = mainRow;
+		while ((row = /** @type {HTMLElement|null} */ (row?.nextSibling))) {
+			if (row.classList.contains('old-version')) {
+				row.classList.toggle('collapsed');
+			} else {
+				break;
+			}
 		}
 	}
 </script>
@@ -161,42 +252,56 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each tasks as task}
-						<tr>
-							<td class="col-3">{task.name}</td>
-							<td class="col-1">{task.version || '–'}</td>
-							<td class="col-1">{task.owner || '–'}</td>
-							<td class="col-2">
-								<button
-									class="btn btn-light"
-									data-bs-toggle="modal"
-									data-bs-target="#taskInfoModal"
-									on:click={() => setTaskModal(task.id)}
-								>
-									<i class="bi bi-info-circle" />
-									Info
-								</button>
-								<button
-									class="btn btn-primary"
-									data-bs-toggle="modal"
-									data-bs-target="#taskEditModal"
-									on:click={() => setTaskModal(task.id)}
-								>
-									<i class="bi bi-pencil" />
-									Edit
-								</button>
-								<ConfirmActionButton
-									modalId="confirmTaskDeleteModal{task.id}"
-									style={'danger'}
-									btnStyle="danger"
-									buttonIcon="trash"
-									label={'Delete'}
-									message={`Delete task ${task.name}`}
-									callbackAction={() => handleDeleteTask(task.id)}
-								/>
-							</td>
-						</tr>
-					{/each}
+					{#key tasks}
+						{#each tasks as task, i}
+							<tr
+								class:old-version={isOldVersion(i)}
+								class:last-old-version={isLastOldVersion(i)}
+								class:is-main-version={isMainVersion(i)}
+								class:collapsed={isOldVersion(i)}
+							>
+								<td class="col-3">{isOldVersion(i) ? '' : task.name}</td>
+								<td class="col-1">
+									{task.version || '–'}
+									{#if isMainVersion(i)}
+										<button class="btn btn-link" on:click={handleToggleOldVersions}>
+											<i class="bi bi-plus-circle" />
+										</button>
+									{/if}
+								</td>
+								<td class="col-1">{task.owner || '–'}</td>
+								<td class="col-2">
+									<button
+										class="btn btn-light"
+										data-bs-toggle="modal"
+										data-bs-target="#taskInfoModal"
+										on:click={() => setTaskModal(task.id)}
+									>
+										<i class="bi bi-info-circle" />
+										Info
+									</button>
+									<button
+										class="btn btn-primary"
+										data-bs-toggle="modal"
+										data-bs-target="#taskEditModal"
+										on:click={() => setTaskModal(task.id)}
+									>
+										<i class="bi bi-pencil" />
+										Edit
+									</button>
+									<ConfirmActionButton
+										modalId="confirmTaskDeleteModal{task.id}"
+										style={'danger'}
+										btnStyle="danger"
+										buttonIcon="trash"
+										label={'Delete'}
+										message={`Delete task ${task.name}`}
+										callbackAction={() => handleDeleteTask(task.id)}
+									/>
+								</td>
+							</tr>
+						{/each}
+					{/key}
 				</tbody>
 			</table>
 		</div>
@@ -205,3 +310,25 @@
 
 <TaskInfoModal />
 <TaskEditModal {updateEditedTask} />
+
+<style>
+	:global(.is-main-version.expanded td) {
+		border-bottom-style: dashed;
+	}
+
+	.old-version.collapsed {
+		display: none;
+	}
+
+	.old-version {
+		display: table-row;
+	}
+
+	.old-version td {
+		border-bottom-style: dashed;
+	}
+
+	.last-old-version td {
+		border-bottom-style: solid;
+	}
+</style>
