@@ -128,7 +128,7 @@
 		value="single"
 		bind:group={packageType}
 	/>
-	<label class="btn btn-outline-secondary" for="single"> Single </label>
+	<label class="btn btn-outline-secondary" for="single"> Single task </label>
 
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
