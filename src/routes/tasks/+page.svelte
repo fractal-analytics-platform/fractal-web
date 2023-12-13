@@ -102,8 +102,9 @@
 		if (index === 0) {
 			return false;
 		}
+		const currentTask = tasks[index];
 		const previousTask = tasks[index - 1];
-		return previousTask.name === tasks[index].name;
+		return previousTask.name === currentTask.name && previousTask.owner === currentTask.owner;
 	}
 
 	/**
@@ -116,8 +117,9 @@
 		if (index === tasks.length - 1) {
 			return false;
 		}
+		const currentTask = tasks[index];
 		const nextTask = tasks[index + 1];
-		return nextTask.name !== tasks[index].name;
+		return nextTask.name !== currentTask.name || nextTask.owner !== currentTask.owner;
 	}
 
 	/**
@@ -130,8 +132,9 @@
 		if (index === tasks.length - 1) {
 			return false;
 		}
+		const currentTask = tasks[index];
 		const nextTask = tasks[index + 1];
-		return nextTask.name === tasks[index].name;
+		return nextTask.name === currentTask.name && nextTask.owner === currentTask.owner;
 	}
 
 	/**
