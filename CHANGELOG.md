@@ -2,7 +2,11 @@
 
 # Unreleased
 
-* Added upload of args schema file on single task creation (\#364).
+* Made tasks list more compact by hiding the older versions (\#364).
+* Added the following fields on single task creation:
+    * args schema file upload (\#364).
+    * meta file upload (\#364).
+    * docs info and docs link (\#364).
 * Added editing of pinned package versions on tasks collection (\#364).
 * Supported editing of cache_dir from user profile page (\#365).
 * Added experimental workflow page with job monitoring (\#363).
