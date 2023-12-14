@@ -1,6 +1,6 @@
 <script>
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
+	import { env } from '$env/dynamic/public';
+	import { onDestroy, onMount } from 'svelte';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import TaskCollectionLogsModal from '$lib/components/tasks/TaskCollectionLogsModal.svelte';
@@ -26,7 +26,9 @@
 	// If a collection status is installing, the component shall fetch update
 
 	// Component properties
+	/** @type {import('$lib/types').TasksCollections[]} */
 	let taskCollections = [];
+	/** @type {import('$lib/types').TasksCollectionsStateData|undefined} */
 	let taskCollectionAlreadyPresent = undefined;
 
 	/** @type {'pypi'|'local'} */
@@ -39,12 +41,19 @@
 	/** @type {{key: string, value: string}[]} */
 	let pinnedPackageVersions = [];
 
+	const updateTasksCollectionInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+		: 3000;
+	let updateTasksCollectionTimeout = undefined;
+
 	// On component load set the taskCollections from the local storage
 	onMount(async () => {
-		if (browser) {
-			taskCollections = loadTaskCollectionsFromStorage();
-		}
+		taskCollections = loadTaskCollectionsFromStorage();
 		await updateTaskCollectionsState();
+		updateTasksCollectionTimeout = setTimeout(
+			updateTasksCollectionInBackground,
+			updateTasksCollectionInterval
+		);
 	});
 
 	let taskCollectionInProgress = false;
@@ -81,8 +90,10 @@
 		});
 		taskCollectionInProgress = false;
 
-		const result = await response.json();
 		if (response.ok) {
+			const result = /** @type {import('$lib/types').TasksCollectionsState} */ (
+				await response.json()
+			);
 			if (response.status === 200) {
 				console.log('Task collection already exists');
 				taskCollectionAlreadyPresent = result.data;
@@ -104,6 +115,7 @@
 			package_extras = '';
 			pinnedPackageVersions = [];
 		} else {
+			const result = await response.json();
 			console.error('Task collection request failed: ', result);
 			collectTaskErrorStore.set(result);
 		}
@@ -126,6 +138,9 @@
 		return map;
 	}
 
+	/**
+	 * @param {import('$lib/types').TasksCollectionsState} taskCollection
+	 */
 	function storeCreatedTaskCollection(taskCollection) {
 		taskCollections.push({
 			id: taskCollection.id,
@@ -139,8 +154,8 @@
 
 	/**
 	 * Fetches a task collection from the server
-	 * @param {string} taskCollectionId
-	 * @returns {Promise<*>}
+	 * @param {number} taskCollectionId
+	 * @returns {Promise<import('$lib/types').TasksCollectionsState|undefined>}
 	 */
 	async function getTaskCollection(taskCollectionId) {
 		const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
@@ -165,62 +180,81 @@
 		}
 	}
 
-	async function updateTaskCollectionsState() {
-		const updates = await Promise.allSettled(taskCollections.map((tc) => getTaskCollection(tc.id)));
+	/**
+	 * @param {import('$lib/types').TasksCollections[]|null} collectionsToUpdate
+	 */
+	async function updateTaskCollectionsState(collectionsToUpdate = null) {
+		const collections = collectionsToUpdate ?? taskCollections;
+		const updates = await Promise.allSettled(collections.map((tc) => getTaskCollection(tc.id)));
+
+		const failure = /** @type {PromiseRejectedResult|undefined} */ (
+			updates.find((u) => u.status === 'rejected')
+		);
+		if (failure) {
+			collectTaskErrorStore.set(failure.reason);
+		}
+
+		const successfulUpdates =
+			/** @type {PromiseFulfilledResult<import('$lib/types').TasksCollectionsState|undefined>[]} */ (
+				updates.filter((u) => u.status === 'fulfilled')
+			).map((u) => u.value);
 
 		const updatedTaskCollections = [];
-		for (const update of updates) {
-			if (update.status === 'rejected') {
-				collectTaskErrorStore.set(update.reason);
-			} else {
-				const updatedTaskCollection = update.value;
-				if (!updatedTaskCollection) {
-					// Removing missing task collection
-					continue;
-				}
-				const oldTaskCollection = taskCollections.find((tc) => tc.id === updatedTaskCollection.id);
-				if (!oldTaskCollection) {
-					continue;
-				}
-				oldTaskCollection.status = updatedTaskCollection.data.status;
-				oldTaskCollection.logs = updatedTaskCollection.data.logs;
+
+		for (const oldTaskCollection of taskCollections) {
+			const updatedTaskCollection = successfulUpdates.find(
+				(u) => u !== undefined && u.id === oldTaskCollection.id
+			);
+			if (!updatedTaskCollection) {
 				updatedTaskCollections.push(oldTaskCollection);
+				continue;
 			}
+			oldTaskCollection.status = updatedTaskCollection.data.status;
+			oldTaskCollection.logs = updatedTaskCollection.data.logs;
+			updatedTaskCollections.push(oldTaskCollection);
 		}
 
 		// Update task collections list
 		updateTaskCollections(updatedTaskCollections);
 	}
 
+	/**
+	 * @returns {import('$lib/types').TasksCollections[]}
+	 */
 	function loadTaskCollectionsFromStorage() {
-		if (browser) {
-			// Parse local storage task collections value
-			// @ts-ignore
-			return JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_TASK_COLLECTIONS)) || [];
+		// Parse local storage task collections value
+		const storageContent = window.localStorage.getItem(LOCAL_STORAGE_TASK_COLLECTIONS);
+		if (storageContent) {
+			return JSON.parse(storageContent) || [];
 		}
-		// Fallback to empty task collections list
 		return [];
 	}
 
+	/**
+	 * @param {import('$lib/types').TasksCollections[]} updatedCollectionTasks
+	 */
 	function updateTaskCollections(updatedCollectionTasks) {
-		if (browser) {
-			window.localStorage.setItem(
-				LOCAL_STORAGE_TASK_COLLECTIONS,
-				JSON.stringify(updatedCollectionTasks)
-			);
-			taskCollections = updatedCollectionTasks;
-		}
+		window.localStorage.setItem(
+			LOCAL_STORAGE_TASK_COLLECTIONS,
+			JSON.stringify(updatedCollectionTasks)
+		);
+		taskCollections = updatedCollectionTasks;
 	}
 
 	async function clearTaskCollections() {
 		updateTaskCollections([]);
 	}
 
+	/**
+	 * @param {number} taskCollectionId
+	 */
 	function removeTaskCollection(taskCollectionId) {
 		updateTaskCollections(taskCollections.filter((tc) => tc.id != taskCollectionId));
 	}
 
-	// Component utilities
+	/**
+	 * @param {import('$lib/types').TaskCollectStatus} status
+	 */
 	function statusBadge(status) {
 		switch (status.toLowerCase()) {
 			case 'pending':
@@ -250,6 +284,24 @@
 	function removePackageVersion(index) {
 		pinnedPackageVersions = pinnedPackageVersions.filter((_, i) => i !== index);
 	}
+
+	async function updateTasksCollectionInBackground() {
+		const collectionsToCheck = taskCollections.filter(
+			(t) => t.status !== 'OK' && t.status !== 'fail'
+		);
+		if (collectionsToCheck.length > 0) {
+			await updateTaskCollectionsState(collectionsToCheck);
+		}
+		clearTimeout(updateTasksCollectionTimeout);
+		updateTasksCollectionTimeout = setTimeout(
+			updateTasksCollectionInBackground,
+			updateTasksCollectionInterval
+		);
+	}
+
+	onDestroy(() => {
+		clearTimeout(updateTasksCollectionTimeout);
+	});
 </script>
 
 <TaskCollectionLogsModal />
@@ -417,7 +469,7 @@
 								message="Clear task collections requests"
 								callbackAction={clearTaskCollections}
 							/>
-							<button class="btn btn-primary" on:click={updateTaskCollectionsState}>
+							<button class="btn btn-primary" on:click={() => updateTaskCollectionsState()}>
 								Refresh <i class="bi bi-arrow-clockwise" />
 							</button>
 						</div>

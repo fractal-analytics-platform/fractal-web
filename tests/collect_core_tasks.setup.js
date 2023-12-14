@@ -29,11 +29,9 @@ test('Collect core tasks', async ({ page }) => {
 	expect(await getStatus(page)).toEqual('pending');
 
 	// Wait tasks collection
-	do {
-		const refreshBtn = page.getByRole('button', { name: 'Refresh' });
-		await refreshBtn.click();
-		await new Promise((r) => setTimeout(r, 3000));
-	} while ((await getStatus(page)) !== 'OK');
+	await page.waitForFunction(
+		() => document.querySelector('table tbody tr:first-child td:nth-child(4)')?.textContent === 'OK'
+	);
 
 	// Delete task collection log
 	const deleteCollectionLogBtn = page.locator(

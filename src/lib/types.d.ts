@@ -105,3 +105,28 @@ export type User = {
   cache_dir: string | null
   password?: string
 }
+
+export type TaskCollectStatus = 'pending' | 'installing' | 'collecting' | 'fail' | 'OK';
+
+export type TasksCollections = {
+  id: number
+  package_version: string
+  pkg: string
+  status: TaskCollectStatus
+  timestamp: string
+  logs?: string
+}
+
+export type TasksCollectionsStateData = {
+  package: string
+  package_version: string
+  status: TaskCollectStatus
+  logs?: string
+  info?: string
+}
+
+export type TasksCollectionsState = {
+  id: number
+  data: TasksCollectionsStateData
+  timestamp: string
+}

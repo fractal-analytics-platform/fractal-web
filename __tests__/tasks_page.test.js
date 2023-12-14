@@ -2,6 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 import { readable } from 'svelte/store';
 
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
+
 // Mocking the page store
 vi.mock('$app/stores', () => {
 	return {
