@@ -34,6 +34,9 @@
 	/** @type {'pypi'|'local'} */
 	export let packageType = 'pypi';
 
+	/** @type {() => Promise<void>} */
+	export let reloadTaskList;
+
 	let python_package = '';
 	let package_version = '';
 	let python_version = '';
@@ -290,7 +293,14 @@
 			(t) => t.status !== 'OK' && t.status !== 'fail'
 		);
 		if (collectionsToCheck.length > 0) {
+			const collectionsToCheckIds = collectionsToCheck.map((c) => c.id);
 			await updateTaskCollectionsState(collectionsToCheck);
+			const newOkTasks = taskCollections.filter(
+				(t) => collectionsToCheckIds.includes(t.id) && t.status === 'OK'
+			).length;
+			if (newOkTasks > 0) {
+				await reloadTaskList();
+			}
 		}
 		clearTimeout(updateTasksCollectionTimeout);
 		updateTasksCollectionTimeout = setTimeout(
@@ -469,9 +479,6 @@
 								message="Clear task collections requests"
 								callbackAction={clearTaskCollections}
 							/>
-							<button class="btn btn-primary" on:click={() => updateTaskCollectionsState()}>
-								Refresh <i class="bi bi-arrow-clockwise" />
-							</button>
 						</div>
 					</div>
 				</caption>

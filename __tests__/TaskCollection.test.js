@@ -95,6 +95,11 @@ describe('TaskCollection', () => {
 	});
 
 	it('Update tasks collection in background', async () => {
+		let reloaded = false;
+		async function reloadTaskList() {
+			reloaded = true;
+		}
+
 		const coll1 = {
 			id: 5,
 			status: 'OK',
@@ -109,8 +114,15 @@ describe('TaskCollection', () => {
 			package_version: '0.12.1',
 			timestamp: '2023-12-14T10:47:03.372651'
 		};
+		const coll3 = {
+			id: 7,
+			status: 'pending',
+			pkg: 'fractal-tasks-core',
+			package_version: '0.12.1',
+			timestamp: '2023-12-14T10:47:03.372651'
+		};
 
-		const storageContent = JSON.stringify([coll1, coll2]);
+		const storageContent = JSON.stringify([coll1, coll2, coll3]);
 		window.localStorage.setItem('TaskCollections', storageContent);
 
 		fetch
@@ -128,29 +140,61 @@ describe('TaskCollection', () => {
 			)
 			.mockResolvedValueOnce(
 				createFetchResponse({
+					id: 7,
+					data: { status: 'installing', logs: '...' }
+				})
+			)
+			.mockResolvedValueOnce(
+				createFetchResponse({
 					id: 6,
 					data: { status: 'fail', logs: '...' }
 				})
+			)
+			.mockResolvedValueOnce(
+				createFetchResponse({
+					id: 7,
+					data: { status: 'installing', logs: '...' }
+				})
+			)
+			.mockResolvedValueOnce(
+				createFetchResponse({
+					id: 7,
+					data: { status: 'OK', logs: '...' }
+				})
 			);
 
-		const result = render(TaskCollection);
+		const result = render(TaskCollection, { props: { reloadTaskList } });
 
 		const table = result.getAllByRole('table')[0];
 		let rows = table.querySelectorAll('tbody tr');
-		expect(rows.length).eq(2);
+		expect(rows.length).eq(3);
 
 		let statuses = getStatuses(rows);
 		expect(statuses[0]).eq('OK');
 		expect(statuses[1]).eq('installing');
+		expect(statuses[2]).eq('pending');
 
 		await act(() => vi.runOnlyPendingTimersAsync());
 
 		rows = table.querySelectorAll('tbody tr');
-		expect(rows.length).eq(2);
+		expect(rows.length).eq(3);
 
 		statuses = getStatuses(rows);
 		expect(statuses[0]).eq('OK');
 		expect(statuses[1]).eq('fail');
+		expect(statuses[2]).eq('installing');
+		expect(reloaded).eq(false);
+
+		await act(() => vi.runOnlyPendingTimersAsync());
+
+		rows = table.querySelectorAll('tbody tr');
+		expect(rows.length).eq(3);
+
+		statuses = getStatuses(rows);
+		expect(statuses[0]).eq('OK');
+		expect(statuses[1]).eq('fail');
+		expect(statuses[2]).eq('OK');
+		expect(reloaded).eq(true);
 	});
 });
 

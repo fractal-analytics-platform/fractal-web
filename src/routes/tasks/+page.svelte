@@ -72,7 +72,17 @@
 	}
 
 	async function reloadTaskList() {
-		window.location.reload();
+		const response = await fetch(`/api/v1/task`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		const result = await response.json();
+		if (response.ok) {
+			sortTasks(result);
+			tasks = result;
+		} else {
+			setErrorReasons(result);
+		}
 	}
 
 	/**
@@ -226,7 +236,7 @@
 
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
-			<TaskCollection {packageType} />
+			<TaskCollection {packageType} {reloadTaskList} />
 		{:else}
 			<AddSingleTask {addNewTask} />
 		{/if}
@@ -235,17 +245,7 @@
 	<div class="row mt-4">
 		<p class="lead">Task List</p>
 		<div class="col-12">
-			<table class="table caption-top align-middle">
-				<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
-					<div class="d-flex align-items-center justify-content-between">
-						<span class="fw-normal" />
-						<div>
-							<button class="btn btn-outline-primary" on:click={reloadTaskList}>
-								<i class="bi bi-arrow-clockwise" />
-							</button>
-						</div>
-					</div>
-				</caption>
+			<table class="table align-middle">
 				<thead class="table-light">
 					<tr>
 						<th>Name</th>
