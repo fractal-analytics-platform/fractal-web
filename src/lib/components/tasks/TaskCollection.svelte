@@ -47,6 +47,8 @@
 		await updateTaskCollectionsState();
 	});
 
+	let taskCollectionInProgress = false;
+
 	/**
 	 * Requests a task collection to the server
 	 * @returns {Promise<*>}
@@ -70,12 +72,14 @@
 			requestData.pinned_package_versions = ppv;
 		}
 
+		taskCollectionInProgress = true;
 		const response = await fetch('/api/v1/task/collect/pip', {
 			method: 'POST',
 			credentials: 'include',
 			headers: headers,
 			body: JSON.stringify(requestData, replaceEmptyStrings)
 		});
+		taskCollectionInProgress = false;
 
 		const result = await response.json();
 		if (response.ok) {
@@ -387,7 +391,14 @@
 
 		<div class="row">
 			<div class="col-auto">
-				<button type="submit" class="btn btn-primary mt-3 mb-3">Collect</button>
+				<button type="submit" class="btn btn-primary mt-3 mb-3" disabled={taskCollectionInProgress}>
+					{#if taskCollectionInProgress}
+						<div class="spinner-border spinner-border-sm" role="status">
+							<span class="visually-hidden">Collecting...</span>
+						</div>
+					{/if}
+					Collect
+				</button>
 			</div>
 		</div>
 	</form>
