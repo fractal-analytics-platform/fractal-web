@@ -11,10 +11,6 @@ test('Collect core tasks', async ({ page }) => {
 	// Triple the default timeout
 	test.slow();
 
-	const collectTasksAccordion = page.getByRole('button', {
-		name: 'Collect tasks from a package'
-	});
-	await collectTasksAccordion.click();
 	await page.locator('[name="package"]').fill('fractal-tasks-core');
 
 	const collectBtn = page.getByRole('button', { name: /^Collect$/ });
@@ -26,22 +22,20 @@ test('Collect core tasks', async ({ page }) => {
 		2
 	);
 
-	await expect(page.locator('.accordion table tbody tr:first-child td:nth-child(2)')).toContainText(
+	await expect(page.locator('table tbody tr:first-child td:nth-child(2)').first()).toContainText(
 		'fractal-tasks-core'
 	);
 
 	expect(await getStatus(page)).toEqual('pending');
 
 	// Wait tasks collection
-	do {
-		const refreshBtn = page.getByRole('button', { name: 'Refresh' });
-		await refreshBtn.click();
-		await new Promise((r) => setTimeout(r, 3000));
-	} while ((await getStatus(page)) !== 'OK');
+	await page.waitForFunction(
+		() => document.querySelector('table tbody tr:first-child td:nth-child(4)')?.textContent === 'OK'
+	);
 
 	// Delete task collection log
 	const deleteCollectionLogBtn = page.locator(
-		'.accordion table tr:first-child td:nth-child(5) button.btn-warning'
+		'table tr:first-child td:nth-child(5) button.btn-warning'
 	);
 	await deleteCollectionLogBtn.click();
 
@@ -69,6 +63,6 @@ test('Collect core tasks', async ({ page }) => {
  * @return {Promise<string>}
  */
 async function getStatus(page) {
-	const statusCell = page.locator('.accordion table tbody tr:first-child td:nth-child(4)');
+	const statusCell = page.locator('table tbody tr:first-child td:nth-child(4)').first();
 	return await statusCell.innerText();
 }

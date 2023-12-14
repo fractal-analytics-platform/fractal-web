@@ -1,0 +1,162 @@
+{
+  "title": "CreateOmeZarr",
+  "type": "object",
+  "properties": {
+    "input_paths": {
+      "title": "Input Paths",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of input paths where the image data from the microscope is stored (as TIF or PNG). Should point to the parent folder containing the images and the metadata files `MeasurementData.mlf` and `MeasurementDetail.mrf` (if present). Example: `[\"/some/path/\"]`. (standard argument for Fractal tasks, managed by Fractal server)."
+    },
+    "output_path": {
+      "title": "Output Path",
+      "type": "string",
+      "description": "Path were the output of this task is stored. Example: \"/some/path/\" => puts the new OME-Zarr file in the \"/some/path/\". (standard argument for Fractal tasks, managed by Fractal server)."
+    },
+    "metadata": {
+      "title": "Metadata",
+      "type": "object",
+      "description": "This parameter is not used by this task. (standard argument for Fractal tasks, managed by Fractal server)."
+    },
+    "allowed_channels": {
+      "title": "Allowed Channels",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/OmeroChannel"
+      },
+      "description": "A list of `OmeroChannel` s, where each channel must include the `wavelength_id` attribute and where the `wavelength_id` values must be unique across the list."
+    },
+    "image_glob_patterns": {
+      "title": "Image Glob Patterns",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "If specified, only parse images with filenames that match with all these patterns. Patterns must be defined as in https://docs.python.org/3/library/fnmatch.html, Example: `image_glob_pattern=[\"*_B03_*\"]` => only process well B03 `image_glob_pattern=[\"*_C09_*\", \"*F016*\", \"*Z[0-5][0-9]C*\"]` => only process well C09, field of view 16 and Z planes 0-59."
+    },
+    "num_levels": {
+      "title": "Num Levels",
+      "default": 5,
+      "type": "integer",
+      "description": "Number of resolution-pyramid levels. If set to `5`, there will be the full-resolution level and 4 levels of downsampled images."
+    },
+    "coarsening_xy": {
+      "title": "Coarsening Xy",
+      "default": 2,
+      "type": "integer",
+      "description": "Linear coarsening factor between subsequent levels. If set to `2`, level 1 is 2x downsampled, level 2 is 4x downsampled etc."
+    },
+    "image_extension": {
+      "title": "Image Extension",
+      "default": "tif",
+      "type": "string",
+      "description": "Filename extension of images (e.g. `\"tif\"` or `\"png\"`)"
+    },
+    "metadata_table_file": {
+      "title": "Metadata Table File",
+      "type": "string",
+      "description": "If `None`, parse Yokogawa metadata from mrf/mlf files in the input_path folder; else, the full path to a csv file containing the parsed metadata table."
+    },
+    "overwrite": {
+      "title": "Overwrite",
+      "default": false,
+      "type": "boolean",
+      "description": "If `True`, overwrite the task output."
+    }
+  },
+  "required": [
+    "input_paths",
+    "output_path",
+    "metadata",
+    "allowed_channels"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "Window": {
+      "title": "Window",
+      "description": "Custom class for Omero-channel window, based on OME-NGFF v0.4.",
+      "type": "object",
+      "properties": {
+        "min": {
+          "title": "Min",
+          "type": "integer",
+          "description": "Do not change. It will be set to `0` by default."
+        },
+        "max": {
+          "title": "Max",
+          "type": "integer",
+          "description": "Do not change. It will be set according to bit-depth of the images by default (e.g. 65535 for 16 bit images)."
+        },
+        "start": {
+          "title": "Start",
+          "type": "integer",
+          "description": "Lower-bound rescaling value for visualization."
+        },
+        "end": {
+          "title": "End",
+          "type": "integer",
+          "description": "Upper-bound rescaling value for visualization."
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "OmeroChannel": {
+      "title": "OmeroChannel",
+      "description": "Custom class for Omero channels, based on OME-NGFF v0.4.",
+      "type": "object",
+      "properties": {
+        "wavelength_id": {
+          "title": "Wavelength Id",
+          "type": "string",
+          "description": "Unique ID for the channel wavelength, e.g. `A01_C01`."
+        },
+        "index": {
+          "title": "Index",
+          "type": "integer",
+          "description": "Do not change. For internal use only."
+        },
+        "label": {
+          "title": "Label",
+          "type": "string",
+          "description": "Name of the channel."
+        },
+        "window": {
+          "$ref": "#/definitions/Window",
+          "title": "Window",
+          "description": "Optional `Window` object to set default display settings for napari."
+        },
+        "color": {
+          "title": "Color",
+          "type": "string",
+          "description": "Optional hex colormap to display the channel in napari (it must be of length 6, e.g. `00FFFF`)."
+        },
+        "active": {
+          "title": "Active",
+          "default": true,
+          "type": "boolean",
+          "description": "Should this channel be shown in the viewer?"
+        },
+        "coefficient": {
+          "title": "Coefficient",
+          "default": 1,
+          "type": "integer",
+          "description": "Do not change. Omero-channel attribute."
+        },
+        "inverted": {
+          "title": "Inverted",
+          "default": false,
+          "type": "boolean",
+          "description": "Do not change. Omero-channel attribute."
+        }
+      },
+      "required": [
+        "wavelength_id"
+      ]
+    }
+  }
+}

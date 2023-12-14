@@ -2,7 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getValidationMessagesMap } from '$lib/common/errors';
+	import {
+		displayStandardErrorAlert,
+		getValidationMessagesMap,
+		validateErrorMapKeys
+	} from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
@@ -48,6 +52,8 @@
 		}
 	}
 
+	const handledErrorKeys = ['email', 'username', 'slurm_user', 'cache_dir', 'password'];
+
 	async function confirmSave() {
 		saving = true;
 		try {
@@ -59,7 +65,7 @@
 			const result = await response.json();
 			if (!response.ok) {
 				const errorsMap = getValidationMessagesMap(result, response.status);
-				if (errorsMap && validateErrorMapKeys(errorsMap)) {
+				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
 					validationErrors = errorsMap;
 				} else {
 					genericErrorAlert = displayStandardErrorAlert(result, 'genericError');
@@ -98,20 +104,6 @@
 	 */
 	function addValidationError(key, value) {
 		validationErrors = { ...validationErrors, [key]: value };
-	}
-
-	/**
-	 * @param {{[key:string]: string}} errorsMap
-	 * @return {boolean}
-	 */
-	function validateErrorMapKeys(errorsMap) {
-		const handledErrorKeys = ['email', 'username', 'slurm_user', 'cache_dir', 'password'];
-		for (const key of Object.keys(errorsMap)) {
-			if (!handledErrorKeys.includes(key)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	onMount(() => {
