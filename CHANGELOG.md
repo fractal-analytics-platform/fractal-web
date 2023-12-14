@@ -1,7 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.7.1
 
+* Auto-refresh of tasks table when a tasks collection completes successfully (\#364).
+* Auto-refresh of tasks collection status (\#364).
 * Made tasks list more compact by hiding the older versions (\#364).
 * Added the following fields on single task creation:
     * args schema file upload (\#364).
