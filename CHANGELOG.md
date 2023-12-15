@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Made PUBLIC_OAUTH_CLIENT_NAME static (\#376).
 * Added help messages to user registration (\#376).
 * Made AUTH_COOKIE_DOMAIN optional (\#376).
 * Fixed hardcoded OAuth2 variable (\#376).
