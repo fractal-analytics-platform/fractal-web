@@ -86,7 +86,10 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.locator('#cacheDir').fill('foo');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForFunction(() => {
-			const invalidFeeback = document.querySelector('#cacheDir + .invalid-feedback');
+			const invalidFeeback = document
+				.querySelector('#cacheDir')
+				?.closest('div')
+				?.querySelector('.invalid-feedback');
 			if (invalidFeeback instanceof HTMLElement) {
 				return invalidFeeback.innerText.includes(
 					"String attribute 'cache_dir' must be an absolute path (given 'foo')"
