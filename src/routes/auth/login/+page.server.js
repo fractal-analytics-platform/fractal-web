@@ -18,7 +18,7 @@ export const actions = {
 			return fail(400, { invalidMessage: 'Invalid credentials', invalid: true });
 		}
 
-		setCookieFromToken(cookies, authData.access_token);
+		setCookieFromToken(request, cookies, authData.access_token);
 		throw redirect(302, '/projects');
 	}
 };

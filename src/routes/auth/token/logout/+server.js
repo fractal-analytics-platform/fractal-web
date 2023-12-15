@@ -8,14 +8,13 @@ import {
 	AUTH_COOKIE_HTTP_ONLY
 } from '$env/static/private';
 
-export async function POST({fetch, cookies}) {
-	
+export async function POST({ fetch, request, cookies }) {
 	await logout(fetch);
 
 	// Set the fastapiusersauth cookie to expire in the past
 	// This will delete the cookie
 	cookies.set(AUTH_COOKIE_NAME, '', {
-		domain: `${AUTH_COOKIE_DOMAIN}`,
+		domain: `${AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`,
 		path: `${AUTH_COOKIE_PATH}`,
 		expires: new Date(0),
 		sameSite: `${AUTH_COOKIE_SAME_SITE}`,

@@ -41,7 +41,7 @@ export async function load({ request, fetch, cookies }) {
 		});
 	}
 
-	setCookieFromToken(cookies, fastApiToken);
+	setCookieFromToken(request, cookies, fastApiToken);
 
 	throw redirect(302, '/projects');
 }
