@@ -34,8 +34,3 @@ AUTH_COOKIE_DOMAIN=127.0.0.1
 PUBLIC_OAUTH_CLIENT_NAME=github
 # [all other variables]
 ```
-
-> A typical gotcha: if there is a mismatch between the cookie domain and the
-> URL you are using (e.g. one points to localhost and the other one to
-> 127.0.0.1), then the cookie won't be set and this will fail silently,
-> therefore likely triggering other unexpected behaviors.
