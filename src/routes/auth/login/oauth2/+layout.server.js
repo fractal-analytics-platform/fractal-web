@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/public';
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 import { setCookieFromToken } from '../cookie';
@@ -8,8 +9,15 @@ export async function load({ request, fetch, cookies }) {
 		throw error(400, { message: 'Missing query string' });
 	}
 
+	const oauth2Provider = env.PUBLIC_OAUTH_CLIENT_NAME;
+	if (!oauth2Provider) {
+		throw error(500, { message: 'Undefined OAuth2 client name' });
+	}
+
 	const response = await fetch(
-		`${FRACTAL_SERVER_HOST}/auth/github/callback${request.url.substring(queryStringIndex)}`
+		`${FRACTAL_SERVER_HOST}/auth/${oauth2Provider}/callback${request.url.substring(
+			queryStringIndex
+		)}`
 	);
 
 	if (!response.ok) {
