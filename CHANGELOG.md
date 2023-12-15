@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added help messages to user registration (\#376).
+* Made AUTH_COOKIE_DOMAIN optional (\#376).
+* Fixed hardcoded OAuth2 variable (\#376).
+
 # 0.7.1
 
 * Auto-refresh of tasks table when a tasks collection completes successfully (\#364).
