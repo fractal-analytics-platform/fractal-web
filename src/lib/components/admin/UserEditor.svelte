@@ -142,23 +142,6 @@
 				<span class="invalid-feedback">{validationErrors['email']}</span>
 			</div>
 		</div>
-		<div class="row mb-3 has-validation">
-			<label for="username" class="col-sm-3 col-form-label text-end">
-				<strong>Username</strong>
-			</label>
-			<div class="col-sm-9">
-				<input
-					autocomplete="off"
-					aria-autocomplete="none"
-					type="text"
-					class="form-control"
-					id="username"
-					class:is-invalid={formSubmitted && validationErrors['username']}
-					bind:value={user.username}
-				/>
-				<span class="invalid-feedback">{validationErrors['username']}</span>
-			</div>
-		</div>
 		{#if user.id && user.id !== $page.data.userInfo.id}
 			<div class="row mb-3">
 				<div class="col-sm-9 offset-sm-3">
@@ -213,6 +196,7 @@
 					bind:value={password}
 					class:is-invalid={formSubmitted && validationErrors['password']}
 				/>
+				<span class="form-text">Create a new password for this Fractal user</span>
 				<span class="invalid-feedback">{validationErrors['password']}</span>
 			</div>
 		</div>
@@ -233,7 +217,7 @@
 		</div>
 		<div class="row mb-3 has-validation">
 			<label for="slurmUser" class="col-sm-3 col-form-label text-end">
-				<strong>Slurm user</strong>
+				<strong>SLURM user</strong>
 			</label>
 			<div class="col-sm-9">
 				<input
@@ -243,7 +227,31 @@
 					bind:value={user.slurm_user}
 					class:is-invalid={formSubmitted && validationErrors['slurm_user']}
 				/>
+				<div class="form-text">
+					The user who will be impersonated by Fractal when running SLURM jobs
+				</div>
 				<span class="invalid-feedback">{validationErrors['slurm_user']}</span>
+			</div>
+		</div>
+		<div class="row mb-3 has-validation">
+			<label for="username" class="col-sm-3 col-form-label text-end">
+				<strong>Username</strong>
+			</label>
+			<div class="col-sm-9">
+				<input
+					autocomplete="off"
+					aria-autocomplete="none"
+					type="text"
+					class="form-control"
+					id="username"
+					class:is-invalid={formSubmitted && validationErrors['username']}
+					bind:value={user.username}
+				/>
+				<span class="form-text">
+					Optional property (useful if the user creates their own tasks), not required if the SLURM
+					user is set
+				</span>
+				<span class="invalid-feedback">{validationErrors['username']}</span>
 			</div>
 		</div>
 		<div class="row mb-3 has-validation">
@@ -258,6 +266,9 @@
 					bind:value={user.cache_dir}
 					class:is-invalid={formSubmitted && validationErrors['cache_dir']}
 				/>
+				<div class="form-text">
+					Absolute path to a user-owned folder that will be used as a cache for job-related files
+				</div>
 				<span class="invalid-feedback">{validationErrors['cache_dir']}</span>
 			</div>
 		</div>
