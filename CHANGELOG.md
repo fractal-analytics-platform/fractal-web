@@ -2,6 +2,11 @@
 
 # 0.7.2
 
+Note: with this release, `PUBLIC_OAUTH_CLIENT_NAME` becomes a required
+environment variable, and `npm run build` fails if it is missing. If you do not
+need OAuth2 authentication, just include a `PUBLIC_OAUTH_CLIENT_NAME=` line in
+your env file.
+
 * Made `PUBLIC_OAUTH_CLIENT_NAME` static (\#376).
 * Added help messages to user registration (\#376).
 * Made `AUTH_COOKIE_DOMAIN` optional (\#376).
@@ -17,7 +22,7 @@
     * meta file upload (\#364).
     * docs info and docs link (\#364).
 * Added editing of pinned package versions on tasks collection (\#364).
-* Supported editing of cache_dir from user profile page (\#365).
+* Supported editing of `cache_dir` from user profile page (\#365).
 * Added experimental workflow page with job monitoring (\#363).
 
 # 0.7.0
