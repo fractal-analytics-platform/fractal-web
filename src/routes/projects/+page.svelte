@@ -5,8 +5,6 @@
 
 	/** @type {import('$lib/types').Project[]} */
 	const projects = $page.data.projects;
-	/** @type {import('$lib/types').Dataset[]} */
-	const datasets = $page.data.datasets;
 </script>
 
 <nav aria-label="breadcrumb">
@@ -16,7 +14,6 @@
 </nav>
 
 <div class="container">
+	<ProjectsList {projects} />
 	<ProjectInfoModal />
-
-	<ProjectsList {projects} {datasets} />
 </div>

@@ -7,8 +7,6 @@
 	// List of projects to be displayed
 	/** @type {import('$lib/types').Project[]} */
 	export let projects = [];
-	/** @type {import('$lib/types').Dataset[]} */
-	export let datasets = [];
 
 	let newProjectName = '';
 	$: enableCreateProject = !!newProjectName;
@@ -19,8 +17,7 @@
 	function setModalProject(projectId) {
 		/** @type {import('$lib/types').Project} */
 		const project = projects.filter((p) => p.id === projectId)[0];
-		const projectDatasets = datasets.filter((d) => d.project_id === projectId);
-		modalProject.set({ project, datasets: projectDatasets });
+		modalProject.set(project);
 	}
 
 	async function handleCreateProject() {
