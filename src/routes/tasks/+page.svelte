@@ -9,6 +9,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import AddSingleTask from '$lib/components/tasks/AddSingleTask.svelte';
+	import { onDestroy } from 'svelte';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
@@ -21,7 +22,7 @@
 	let packageType = 'pypi';
 
 	// Store subscriptions
-	collectTaskErrorStore.subscribe((error) => {
+	const unsubscribe = collectTaskErrorStore.subscribe((error) => {
 		if (error) setErrorReasons(error);
 	});
 
@@ -187,6 +188,8 @@
 			}
 		}
 	}
+
+	onDestroy(unsubscribe);
 </script>
 
 <div class="container">

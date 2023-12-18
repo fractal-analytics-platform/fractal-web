@@ -81,7 +81,7 @@
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
-	workflowTaskContext.subscribe((value) => {
+	const unsubscribe = workflowTaskContext.subscribe((value) => {
 		selectedWorkflowTask = value;
 		originalMetaProperties = {};
 		if (value && value.meta) {
@@ -570,6 +570,7 @@
 
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
+		unsubscribe();
 	});
 </script>
 

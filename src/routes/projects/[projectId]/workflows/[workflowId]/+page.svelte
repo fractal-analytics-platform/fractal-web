@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -71,7 +71,7 @@
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
-	workflowTaskContext.subscribe((value) => {
+	const unsubscribe = workflowTaskContext.subscribe((value) => {
 		selectedWorkflowTask = value;
 		originalMetaProperties = {};
 		if (value && value.meta) {
@@ -517,6 +517,8 @@
 	async function updateNewVersionsCount(count) {
 		newVersionsCount = count;
 	}
+
+	onDestroy(unsubscribe);
 </script>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
