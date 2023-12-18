@@ -9,16 +9,17 @@ import {
 } from '$env/static/private';
 
 /**
+ * @param {Request} request
  * @param {import('@sveltejs/kit').Cookies} cookies
  * @param {string} accessToken
  */
-export function setCookieFromToken(cookies, accessToken) {
+export function setCookieFromToken(request, cookies, accessToken) {
 	// Decode JWT token claims
 	const tokenClaims = jose.decodeJwt(accessToken);
 
 	// Set the authentication cookie
 	const cookieOptions = {
-		domain: `${AUTH_COOKIE_DOMAIN}`,
+		domain: `${AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`,
 		path: `${AUTH_COOKIE_PATH}`,
 		expires: new Date(/** @type {number} */ (tokenClaims.exp) * 1000),
 		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${AUTH_COOKIE_SAME_SITE}`),
