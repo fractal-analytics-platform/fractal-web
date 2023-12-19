@@ -5,8 +5,6 @@
 
 	let projectId = $page.params.projectId;
 
-	$: project = $page.data.project;
-
 	/** @type {import('$lib/types').Dataset | undefined} */
 	let dataset = undefined;
 
@@ -46,11 +44,11 @@
 			<li class="breadcrumb-item" aria-current="page">
 				<a href="/projects">Projects</a>
 			</li>
-			<li class="breadcrumb-item" aria-current="page">
-				<a href="/projects/{projectId}">{project?.name}</a>
-			</li>
-			<li class="breadcrumb-item" aria-current="page">Datasets</li>
 			{#if dataset}
+				<li class="breadcrumb-item" aria-current="page">
+					<a href="/projects/{projectId}">{dataset.project.name}</a>
+				</li>
+				<li class="breadcrumb-item" aria-current="page">Datasets</li>
 				<li class="breadcrumb-item active" aria-current="page">{dataset.name}</li>
 			{/if}
 		</ol>

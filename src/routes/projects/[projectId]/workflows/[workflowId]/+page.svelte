@@ -82,8 +82,8 @@
 	});
 
 	onMount(async () => {
-		workflow = $page.data.workflow;
-		project = $page.data.project;
+		workflow = /** @type {import('$lib/types').Workflow} */ ($page.data.workflow);
+		project = workflow.project;
 		datasets = $page.data.datasets;
 		checkNewVersions();
 	});
@@ -440,7 +440,10 @@
 				runWorkflowModal.toggle();
 				// Navigate to project jobs page
 				// Define URL to navigate to
-				const jobsUrl = new URL(`projects/${project.id}/workflows/${workflow.id}/jobs`, window.location.origin);
+				const jobsUrl = new URL(
+					`projects/${project.id}/workflows/${workflow.id}/jobs`,
+					window.location.origin
+				);
 				// Trigger navigation
 				await goto(jobsUrl);
 			} else {
