@@ -2,8 +2,8 @@ export default class SchemaManager {
 	keySeparator = '###';
 	propertiesMap = new Map();
 	hasUnsavedChanges = false;
-	onPropertyChanges = () => {
-	};
+	/** @type {(hasChanges: boolean) => void} */
+	onPropertyChanges = () => {};
 
 	constructor(schema, schemaData) {
 		this.loadSchema(schema);

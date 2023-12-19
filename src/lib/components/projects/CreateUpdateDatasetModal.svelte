@@ -4,9 +4,9 @@
 	import { onMount, tick } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
-	/** @type {(dataset: (import('$lib/types').Dataset)) => void} */
+	/** @type {(dataset: import('$lib/types').Dataset) => void} */
 	export let createDatasetCallback;
-	/** @type {(dataset: Omit<(import('$lib/types').Dataset), 'project'>) => void} */
+	/** @type {(dataset: import('$lib/types').Dataset) => void} */
 	export let updateDatasetCallback;
 
 	/** @type {Modal} */
@@ -177,6 +177,9 @@
 		return result;
 	}
 
+	/**
+	 * @returns {Promise<import('$lib/types').Dataset>}
+	 */
 	async function callUpdateDataset() {
 		const projectId = $page.params.projectId;
 		const headers = new Headers();
@@ -359,7 +362,7 @@
 
 	/**
 	 * Creates an object for the updateDatasetCallback()
-	 * @returns {Omit<import('$lib/types').Dataset, 'project'>}
+	 * @returns {import('$lib/types').Dataset}
 	 */
 	function getUpdatedDataset() {
 		return {
@@ -376,6 +379,7 @@
 				});
 			}),
 			project_id: originalDataset.project_id,
+			project: originalDataset.project,
 			history: []
 		};
 	}

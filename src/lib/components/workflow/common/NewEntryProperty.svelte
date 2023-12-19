@@ -43,9 +43,9 @@
 		if (entryType === 'object' && !isArray) {
 			// Check that the property name is not already used
 			if (Object.hasOwn(entry, propertyName)) {
-				const error = document.getElementById('submitEntryError');
+				const error = /** @type {HTMLElement} */ (document.getElementById('submitEntryError'));
 				error.textContent = `Property name "${propertyName}" is already used`;
-				const input = document.getElementById('submitEntryName');
+				const input = /** @type {HTMLElement} */ (document.getElementById('submitEntryName'));
 				input.classList.add('is-invalid');
 				return;
 			}

@@ -44,7 +44,8 @@ const semverValidationOptions = {
 function validateVersion(version) {
 	return (
 		semver.valid(version, semverValidationOptions) ||
-		semver.valid(semver.coerce(version), semverValidationOptions)
+		semver.valid(semver.coerce(version), semverValidationOptions) ||
+		null
 	);
 }
 
