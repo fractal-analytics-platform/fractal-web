@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased 
+
+* Sorted datasets by name (\#379).
+* Fixed accessibility issue (\#379).
+* Improved performance reducing the number of API calls on project, workflow and dataset pages (\#379).
+
 # 0.7.2
 
 Note: with this release, `PUBLIC_OAUTH_CLIENT_NAME` becomes a required
