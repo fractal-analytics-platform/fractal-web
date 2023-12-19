@@ -2,6 +2,7 @@
 
 # Unreleased 
 
+* Fixed issue with version sorting (\#379).
 * Sorted datasets by name (\#379).
 * Fixed accessibility issue (\#379).
 * Improved performance reducing the number of API calls on project, workflow and dataset pages (\#379).
