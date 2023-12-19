@@ -14,6 +14,7 @@
 	let selectedMapKey;
 	let selectedMapTaskVersions = undefined;
 	let selectionControl = undefined;
+	/** @type {import('$lib/types').Task[]} */
 	let filteredTasks = [];
 
 	export function getSelectedTaskId() {
@@ -150,6 +151,11 @@
 	}
 
 	function setSelectionControlData() {
+		/**
+		 * @typedef {{ text: string, value?: string, placeholder?: boolean, data?: object }} Option
+		 * @typedef {{ label: string, options: Option[] }} NestedOptions
+		 * @type {Array<Option | NestedOptions>}
+		 */
 		let optionsMap = [];
 
 		if (selectedTypeOfTask === 'common') {
@@ -168,7 +174,7 @@
 						dataOptions[sourceIndex].options.push({ text: task.name, value: task.name });
 				}
 				return dataOptions;
-			}, []);
+			}, /** @type {NestedOptions[]} */ ([]));
 		}
 
 		if (selectedTypeOfTask === 'user') {
@@ -194,7 +200,7 @@
 						});
 				}
 				return dataOptions;
-			}, []);
+			}, /** @type {NestedOptions[]} */ ([]));
 		}
 
 		optionsMap = [{ text: 'Task selection', placeholder: true }, ...optionsMap];
@@ -214,26 +220,24 @@
 			<div class="card-header">
 				<div class="nav nav-tabs card-header-tabs">
 					<div class="nav-item">
-						<a
+						<button
 							class="nav-link active"
-							href="#"
 							data-bs-target="#common-tasks-tab"
 							data-bs-toggle="tab"
 							on:click|preventDefault={() => setSelectedGroup('common')}
 						>
 							Common tasks
-						</a>
+						</button>
 					</div>
 					<div class="nav-item">
-						<a
+						<button
 							class="nav-link"
-							href="#"
 							data-bs-target="#user-tasks-tab"
 							data-bs-toggle="tab"
 							on:click|preventDefault={() => setSelectedGroup('user')}
 						>
 							User tasks
-						</a>
+						</button>
 					</div>
 				</div>
 			</div>
