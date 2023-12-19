@@ -30,11 +30,16 @@
 				method: 'GET',
 				credentials: 'include'
 			});
-			const result = await response.json();
 			if (response.ok) {
+				/** @type {import('$lib/types.js').Dataset[]} */
+				const result = await response.json();
+				result.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 				datasets = result;
 			} else {
-				datasetErrorAlert = displayStandardErrorAlert(result, 'errorAlert-projectInfoModal');
+				datasetErrorAlert = displayStandardErrorAlert(
+					await response.json(),
+					'errorAlert-projectInfoModal'
+				);
 			}
 			loadingDatasets = false;
 		} else {

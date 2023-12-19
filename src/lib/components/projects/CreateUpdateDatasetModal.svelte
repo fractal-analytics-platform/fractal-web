@@ -6,7 +6,7 @@
 
 	/** @type {(dataset: (import('$lib/types').Dataset)) => void} */
 	export let createDatasetCallback;
-	/** @type {(dataset: (import('$lib/types').Dataset)) => void} */
+	/** @type {(dataset: Omit<(import('$lib/types').Dataset), 'project'>) => void} */
 	export let updateDatasetCallback;
 
 	/** @type {Modal} */
@@ -359,7 +359,7 @@
 
 	/**
 	 * Creates an object for the updateDatasetCallback()
-	 * @returns {import('$lib/types').Dataset}
+	 * @returns {Omit<import('$lib/types').Dataset, 'project'>}
 	 */
 	function getUpdatedDataset() {
 		return {
