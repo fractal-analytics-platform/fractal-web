@@ -2,6 +2,7 @@
 
 # Unreleased 
 
+* Sorted users in admin-area page (\#379).
 * Exposed stop-job and download-logs in admin-area jobs page (\#379).
 * Displayed number of rows in admin jobs page (\#379).
 * Fixed semver circular dependency issue (\#379).
