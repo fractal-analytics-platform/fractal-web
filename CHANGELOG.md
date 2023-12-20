@@ -2,6 +2,7 @@
 
 # Unreleased 
 
+* Displayed number of rows in admin jobs page (\#379).
 * Fixed semver circular dependency issue (\#379).
 * Fixed issue with version sorting (\#379).
 * Sorted datasets by name (\#379).

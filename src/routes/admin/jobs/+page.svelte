@@ -430,6 +430,9 @@
 				{/if}
 			</svelte:fragment>
 		</JobsList>
+		<p class="text-center">
+			The query returned {jobs.length} matching {jobs.length !== 1 ? 'jobs' : 'job'}
+		</p>
 	</div>
 </div>
 
