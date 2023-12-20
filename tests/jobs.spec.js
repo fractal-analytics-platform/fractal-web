@@ -1,3 +1,4 @@
+import { waitPageLoading } from './base_test.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Execute a job and show it on the job tables', async ({ page, workflow }) => {
@@ -60,7 +61,7 @@ test('Execute a job and show it on the job tables', async ({ page, workflow }) =
 
 	// Check generic jobs page
 	await page.goto('/jobs');
-	await page.locator('table tbody').waitFor();
+	await waitPageLoading(page);
 	const rows = await page.locator('table tbody tr').all();
 	let jobRow = null;
 	for (const row of rows) {

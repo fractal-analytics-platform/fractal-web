@@ -10,6 +10,14 @@ export function generateUUID() {
 }
 
 /**
+ * Wait until spinner disappear
+ * @param {import('@playwright/test').Page} page
+ */
+export async function waitPageLoading(page) {
+	await page.waitForFunction(() => !document.querySelector('.loading')?.classList.contains('show'));
+}
+
+/**
  * Base test adding coverage logic using istanbul.
  */
 export const test = baseTest.extend({

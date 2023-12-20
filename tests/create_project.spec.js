@@ -1,7 +1,8 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 
 test('Create and delete a project', async ({ page }) => {
 	await page.goto('/projects');
+	await waitPageLoading(page);
 
 	// Create a new project with a random name
 	const randomProjectName = Math.random().toString(36).substring(7);
@@ -20,6 +21,7 @@ test('Create and delete a project', async ({ page }) => {
 
 	// Go back to projects list
 	await page.goto('/projects');
+	await waitPageLoading(page);
 	await expect(page.getByRole('cell', { name: randomProjectName })).toHaveCount(1);
 
 	// Get project row

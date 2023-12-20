@@ -1,4 +1,4 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -80,6 +80,7 @@ async function verifySessionExpiredMessage(page) {
  * @param {import('@playwright/test').Page} page
  */
 async function login(page) {
+	await waitPageLoading(page);
 	await page.getByLabel('Email address').fill('admin@fractal.xy');
 	await page.getByLabel('Password').fill('1234');
 	await page.getByRole('button', { name: 'Submit' }).click();

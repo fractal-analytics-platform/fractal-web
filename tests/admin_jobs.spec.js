@@ -1,4 +1,4 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
 
@@ -9,6 +9,7 @@ test('Execute a job and show it on the job tables', async ({ page }) => {
 
 	await test.step('Open the admin area', async () => {
 		await page.goto('/');
+		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Admin area' }).click();
 		await page.waitForURL('/admin');
 	});
