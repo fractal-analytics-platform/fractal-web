@@ -2,6 +2,7 @@
 
 # Unreleased 
 
+* Fixed semver circular dependency issue (\#379).
 * Fixed issue with version sorting (\#379).
 * Sorted datasets by name (\#379).
 * Fixed accessibility issue (\#379).
