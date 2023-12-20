@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import semver from 'semver';
+import valid from 'semver/functions/valid';
 import { greatestVersionAsc } from '../src/lib/common/component_utilities';
 
 it('should be able to loosely validate versions', () => {
@@ -20,7 +20,7 @@ it('should be able to loosely validate versions', () => {
 	};
 
 	cases.forEach(([input, expected]) => {
-		const validatedVersion = semver.valid(input, validationOptions);
+		const validatedVersion = valid(input, validationOptions);
 		expect(validatedVersion).toBe(expected);
 	});
 });
