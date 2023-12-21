@@ -24,12 +24,12 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.getByRole('button', { name: 'Save' }).click();
 		expect(await page.getByText('Field is required').count()).toEqual(2);
 
-		await page.locator('#email').fill(randomUserName + '@example.com');
-		await page.locator('#username').fill(randomUserName);
+		await page.getByLabel('E-mail').fill(randomUserName + '@example.com');
+		await page.getByLabel('Username').fill(randomUserName);
 	});
 
 	await test.step('Test password confirm validation errors', async () => {
-		await page.locator('#password').fill('test');
+		await page.getByLabel('Password', { exact: true }).fill('test');
 		await page.getByRole('button', { name: 'Save' }).click();
 		expect(await page.getByText("Passwords don't match").count()).toEqual(1);
 	});
@@ -38,9 +38,9 @@ test('Create, update and delete a user', async ({ page }) => {
 	let userId = null;
 
 	await test.step('Create user', async () => {
-		await page.locator('#confirmPassword').fill('test');
-		await page.locator('#slurmUser').fill(randomUserName + '_slurm');
-		await page.locator('#cacheDir').fill('/tmp/test');
+		await page.getByLabel('Confirm password').fill('test');
+		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm');
+		await page.getByLabel('Cache dir').fill('/tmp/test');
 
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForURL('/admin/users');
@@ -86,7 +86,7 @@ test('Create, update and delete a user', async ({ page }) => {
 	});
 
 	await test.step('Test cache dir validation error', async () => {
-		await page.locator('#cacheDir').fill('foo');
+		await page.getByLabel('Cache dir').fill('foo');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForFunction(() => {
 			const invalidFeeback = document
@@ -103,10 +103,10 @@ test('Create, update and delete a user', async ({ page }) => {
 	});
 
 	await test.step('Rename username and set verified checkbox', async () => {
-		await page.locator('#cacheDir').fill('/tmp/test');
-		await page.locator('#username').fill(randomUserName + '-renamed');
-		await page.locator('#slurmUser').fill(randomUserName + '_slurm-renamed');
-		await page.locator('#verified').check();
+		await page.getByLabel('Verified').check();
+		await page.getByLabel('Cache dir').fill('/tmp/test');
+		await page.getByLabel('Username').fill(randomUserName + '-renamed');
+		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
 		await page.getByRole('button', { name: 'Save' }).click();
 
 		await page.waitForURL('/admin/users');
