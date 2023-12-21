@@ -13,12 +13,23 @@ export class PageWithProject {
 	async createProject() {
 		await this.page.goto('/projects');
 		await waitPageLoading(this.page);
-		const projectNameInput = this.page.locator('[name="projectName"]');
+
+		await this.page.getByRole('button', { name: 'Create new project' }).click();
+
+		// Wait modal opening
+		let modalTitle = this.page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('Create new project');
+
+		// Fill form and submit
+		const projectNameInput = this.page.getByLabel('Project name');
 		await projectNameInput.fill(this.projectName);
-		await projectNameInput.blur();
-		const createProjectBtn = this.page.getByRole('button', { name: 'Create new project' });
-		await createProjectBtn.waitFor();
+		const createProjectBtn = this.page
+			.locator('.modal.show')
+			.getByRole('button', { name: 'Confirm' });
 		await createProjectBtn.click();
+
+		// Verify that the user is redirected to the project page
 		await this.page.waitForURL(/\/projects\/\d+/);
 		this.url = this.page.url();
 		const match = this.url.match(/\/projects\/(\d+)/);

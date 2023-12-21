@@ -55,11 +55,12 @@ test.describe(() => {
 		await page.goto('/auth/login');
 		await login(page);
 		await page.context().clearCookies();
-		const projectNameInput = page.locator('[name="projectName"]');
+		await page.getByRole('button', { name: 'Create new project' }).click();
+		let modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill('unauthorized');
-		await projectNameInput.blur();
-		const createProjectBtn = page.getByRole('button', { name: 'Create new project' });
-		await createProjectBtn.waitFor();
+		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
 		await createProjectBtn.click();
 		await page.waitForURL('/auth/login?invalidate=true');
 		await verifySessionExpiredMessage(page);
