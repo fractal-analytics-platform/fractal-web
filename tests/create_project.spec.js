@@ -17,7 +17,7 @@ test('Create and delete a project', async ({ page }) => {
 		// Fill form and submit
 		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill(randomProjectName);
-		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
+		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page
@@ -76,7 +76,7 @@ test('Create and delete a project', async ({ page }) => {
 		// Fill form and submit
 		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill(randomProjectName);
-		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
+		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		// Check validation error

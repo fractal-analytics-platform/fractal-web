@@ -200,6 +200,6 @@
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary" form="create-project-form">Confirm</button>
+		<button class="btn btn-primary" form="create-project-form">Create</button>
 	</svelte:fragment>
 </Modal>

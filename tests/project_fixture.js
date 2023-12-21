@@ -26,7 +26,7 @@ export class PageWithProject {
 		await projectNameInput.fill(this.projectName);
 		const createProjectBtn = this.page
 			.locator('.modal.show')
-			.getByRole('button', { name: 'Confirm' });
+			.getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page

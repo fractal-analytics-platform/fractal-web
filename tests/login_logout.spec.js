@@ -60,7 +60,7 @@ test.describe(() => {
 		await modalTitle.waitFor();
 		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill('unauthorized');
-		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
+		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 		await page.waitForURL('/auth/login?invalidate=true');
 		await verifySessionExpiredMessage(page);
