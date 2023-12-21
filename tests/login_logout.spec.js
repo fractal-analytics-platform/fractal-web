@@ -1,4 +1,4 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -55,11 +55,12 @@ test.describe(() => {
 		await page.goto('/auth/login');
 		await login(page);
 		await page.context().clearCookies();
-		const projectNameInput = page.locator('[name="projectName"]');
+		await page.getByRole('button', { name: 'Create new project' }).click();
+		let modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill('unauthorized');
-		await projectNameInput.blur();
-		const createProjectBtn = page.getByRole('button', { name: 'Create new project' });
-		await createProjectBtn.waitFor();
+		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 		await page.waitForURL('/auth/login?invalidate=true');
 		await verifySessionExpiredMessage(page);
@@ -80,6 +81,7 @@ async function verifySessionExpiredMessage(page) {
  * @param {import('@playwright/test').Page} page
  */
 async function login(page) {
+	await waitPageLoading(page);
 	await page.getByLabel('Email address').fill('admin@fractal.xy');
 	await page.getByLabel('Password').fill('1234');
 	await page.getByRole('button', { name: 'Submit' }).click();

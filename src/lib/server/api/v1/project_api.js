@@ -61,7 +61,10 @@ export async function getProjectDatasets(fetch, projectId) {
 
 	if (response.ok) {
 		// Return the dataset as json object
-		return await response.json();
+		/** @type {import('$lib/types.js').Dataset[]} */
+		const datasets = await response.json();
+		datasets.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+		return datasets;
 	}
 
 	await responseError(response);

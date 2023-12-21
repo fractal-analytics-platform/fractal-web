@@ -415,6 +415,9 @@
 	<div id="searchError" class="mt-3" />
 
 	<div class:d-none={!searched}>
+		<p class="text-center">
+			The query returned {jobs.length} matching {jobs.length !== 1 ? 'jobs' : 'job'}
+		</p>
 		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
 			<svelte:fragment slot="buttons">
 				<button class="btn btn-outline-secondary" on:click={downloadCSV}>

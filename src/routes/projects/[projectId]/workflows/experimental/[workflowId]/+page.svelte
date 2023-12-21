@@ -20,8 +20,7 @@
 
 	/** @type {import('$lib/types').Workflow} */
 	let workflow = $page.data.workflow;
-	/** @type {import('$lib/types').Project} */
-	let project = $page.data.project;
+	$: project = workflow.project;
 	/** @type {import('$lib/types').Dataset[]} */
 	let datasets = $page.data.datasets;
 	// List of available tasks to be inserted into workflow
@@ -81,7 +80,7 @@
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
-	workflowTaskContext.subscribe((value) => {
+	const unsubscribe = workflowTaskContext.subscribe((value) => {
 		selectedWorkflowTask = value;
 		originalMetaProperties = {};
 		if (value && value.meta) {
@@ -570,6 +569,7 @@
 
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
+		unsubscribe();
 	});
 </script>
 

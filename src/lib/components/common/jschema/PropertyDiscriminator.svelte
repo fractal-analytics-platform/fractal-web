@@ -5,9 +5,10 @@
 	import ArrayProperty from '$lib/components/common/jschema/ArrayProperty.svelte';
 	import ObjectProperty from '$lib/components/common/jschema/ObjectProperty.svelte';
 
+        /** @type {any|undefined} */
 	export let schemaProperty = undefined;
 
-	const key = schemaProperty.key;
+	const key = schemaProperty?.key;
 
 </script>
 

@@ -1,5 +1,5 @@
 import { test as playwrightTest, mergeTests } from '@playwright/test';
-import { test as baseTest } from './base_test.js';
+import { test as baseTest, waitPageLoading } from './base_test.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -30,6 +30,7 @@ export class PageWithWorkflow extends PageWithProject {
 
 	async createWorkflow() {
 		await this.page.goto('/projects/' + this.projectId);
+		await waitPageLoading(this.page);
 		const workflowNameInput = this.page.locator('table [name="workflowName"]');
 		await workflowNameInput.fill(this.workflowName);
 		await workflowNameInput.blur();

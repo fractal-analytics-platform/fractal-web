@@ -5,15 +5,9 @@
 	import { taskStore } from '$lib/stores/taskStores';
 	import Modal from '../common/Modal.svelte';
 
-	// Task to be displayed
-	// let task = {}
-
 	// Subscription to taskModalId store to update task property with respect
 	// to the task in the store. Enable app-wide updates to the project to be
 	// displayed in this component.
-	// taskModal.subscribe( taskId => {
-	// 	project =
-	// })
 	$: task = $taskStore;
 </script>
 

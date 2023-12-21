@@ -1,29 +1,45 @@
 <script>
-	import { modalProject } from '$lib/stores/projectStores.js';
+	import { projectInfoModal } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, getValidationMessagesMap } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
+	import Modal from '../common/Modal.svelte';
 
 	// List of projects to be displayed
 	/** @type {import('$lib/types').Project[]} */
 	export let projects = [];
-	/** @type {import('$lib/types').Dataset[]} */
-	export let datasets = [];
+
+	let projectSearch = '';
+
+	$: filteredProjects = projects.filter((p) =>
+		p.name.toLowerCase().includes(projectSearch.toLowerCase())
+	);
+
+	/** @type {Modal} */
+	let newProjectModal;
 
 	let newProjectName = '';
-	$: enableCreateProject = !!newProjectName;
+	let newProjectNameError = '';
+
+	function onNewProjectModalOpen() {
+		newProjectName = '';
+		newProjectNameError = '';
+		newProjectModal.hideErrorAlert();
+	}
 
 	/**
 	 * @param {number} projectId
 	 */
-	function setModalProject(projectId) {
+	function setProjectInfoModal(projectId) {
 		/** @type {import('$lib/types').Project} */
 		const project = projects.filter((p) => p.id === projectId)[0];
-		const projectDatasets = datasets.filter((d) => d.project_id === projectId);
-		modalProject.set({ project, datasets: projectDatasets });
+		projectInfoModal.set(project);
 	}
 
 	async function handleCreateProject() {
+		newProjectModal.hideErrorAlert();
+		newProjectNameError = '';
+
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -41,9 +57,17 @@
 		if (response.ok) {
 			newProjectName = '';
 			projects = [...projects, result];
+			newProjectModal.hide();
 			goto(`/projects/${result.id}`);
 		} else {
-			displayStandardErrorAlert(result, 'createProjectErrorAlert');
+			const errors = getValidationMessagesMap(result, response.status);
+			if (errors != null && 'name' in errors) {
+				newProjectNameError = errors['name'];
+			} else if ('detail' in result) {
+				newProjectNameError = result['detail'];
+			} else {
+				newProjectModal.displayErrorAlert(result);
+			}
 		}
 	}
 
@@ -76,70 +100,104 @@
 <div class="container">
 	<div class="row mt-3 mb-3">
 		<div class="col-sm-12">
-			<form
-				method="post"
-				class="row justify-content-end"
-				on:submit|preventDefault={handleCreateProject}
-			>
+			<div class="row justify-content-end">
 				<div class="col-auto">
 					<div class="input-group">
-						<div class="input-group-text">Project name</div>
 						<input
-							name="projectName"
+							name="searchProject"
 							type="text"
 							class="form-control"
-							bind:value={newProjectName}
+							placeholder="Search"
+							bind:value={projectSearch}
 						/>
 					</div>
 				</div>
 				<div class="col-auto">
-					<button type="submit" class="btn btn-primary" disabled={!enableCreateProject}>
+					<button class="btn btn-primary" on:click={() => newProjectModal.show()}>
 						Create new project
 					</button>
 				</div>
-			</form>
-			<div id="createProjectErrorAlert" class="mt-3" />
+			</div>
 		</div>
 	</div>
 	<div class="row">
 		<table class="table table-hover align-middle">
 			<thead class="table-light">
 				<tr>
-					<th>Id</th>
 					<th>Name</th>
 					<th>Options</th>
 				</tr>
 			</thead>
 			<tbody>
-				{#each projects as { id, name }}
-					<tr>
-						<td class="col-2">{id}</td>
-						<td class="col-6">{name}</td>
-						<td class="col-4">
-							<button
-								class="btn btn-light"
-								data-bs-toggle="modal"
-								data-bs-target="#projectInfoModal"
-								on:click={() => setModalProject(id)}
-							>
-								<i class="bi bi-info-circle" /> Info
-							</button>
-							<a href={'/projects/' + id} class="btn btn-light">
-								<i class="bi bi-arrow-up-right-square" /> Open
-							</a>
-							<ConfirmActionButton
-								modalId={'confirmDeleteProject' + id}
-								style={'danger'}
-								btnStyle="danger"
-								message="Delete project {name}"
-								buttonIcon="trash"
-								label="Delete"
-								callbackAction={() => handleDeleteProject(id)}
-							/>
-						</td>
-					</tr>
-				{/each}
+				{#key projects}
+					{#each filteredProjects as { id, name }}
+						<tr>
+							<td class="col-6">{name}</td>
+							<td class="col-4">
+								<button
+									class="btn btn-light"
+									data-bs-toggle="modal"
+									data-bs-target="#projectInfoModal"
+									on:click={() => setProjectInfoModal(id)}
+								>
+									<i class="bi bi-info-circle" /> Info
+								</button>
+								<a href={'/projects/' + id} class="btn btn-light">
+									<i class="bi bi-arrow-up-right-square" /> Open
+								</a>
+								<ConfirmActionButton
+									modalId={'confirmDeleteProject' + id}
+									style={'danger'}
+									btnStyle="danger"
+									message="Delete project {name}"
+									buttonIcon="trash"
+									label="Delete"
+									callbackAction={() => handleDeleteProject(id)}
+								/>
+							</td>
+						</tr>
+					{/each}
+				{/key}
 			</tbody>
 		</table>
 	</div>
 </div>
+
+<Modal
+	id="crateNewProjectModal"
+	bind:this={newProjectModal}
+	onOpen={onNewProjectModalOpen}
+	size="md"
+	centered={true}
+>
+	<svelte:fragment slot="header">
+		<h1 class="modal-title fs-5">Create new project</h1>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<div id="errorAlert-crateNewProjectModal" />
+		<form class="row" on:submit|preventDefault={handleCreateProject} id="create-project-form">
+			<div class="col">
+				<div class="row mb-3">
+					<label for="projectName" class="col-md-3 col-form-label">Project name</label>
+					<div class="col-md-9">
+						<input
+							id="projectName"
+							type="text"
+							bind:value={newProjectName}
+							class="form-control"
+							class:is-invalid={newProjectNameError}
+							required
+						/>
+						{#if newProjectNameError}
+							<div class="invalid-feedback">{newProjectNameError}</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+		</form>
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button class="btn btn-primary" form="create-project-form">Create</button>
+	</svelte:fragment>
+</Modal>

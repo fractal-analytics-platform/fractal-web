@@ -1,8 +1,9 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 
 test('User profile', async ({ page }) => {
 	await test.step('Open user profile page', async () => {
 		await page.goto('/');
+		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'admin@fractal.xy' }).click();
 		await page.getByRole('link', { name: 'My profile' }).click();
 		await page.waitForURL('/profile');
@@ -37,6 +38,7 @@ test('User profile', async ({ page }) => {
 
 	await test.step('Verify cache dir updated', async () => {
 		await page.reload();
+		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
 		expect(await cells[14].innerText()).toEqual('/tmp/foo2');
 	});

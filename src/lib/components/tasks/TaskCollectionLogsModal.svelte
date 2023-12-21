@@ -1,12 +1,13 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
+	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
 	let logs = '';
 	let errorAlert = undefined;
 
-	modalTaskCollectionId.subscribe(async (taskCollectionId) => {
+	const unsubscribe = modalTaskCollectionId.subscribe(async (taskCollectionId) => {
 		if (taskCollectionId !== undefined) {
 			// remove previous error
 			if (errorAlert) {
@@ -28,6 +29,8 @@
 			}
 		}
 	});
+
+	onDestroy(unsubscribe);
 </script>
 
 <Modal id="collectionTaskLogsModal" fullscreen={true} bodyCss="bg-tertiary text-secondary">

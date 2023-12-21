@@ -1,11 +1,13 @@
 <script>
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
+	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {Array<import('$lib/types').User & {id: number}>} */
-	let users = $page.data.users;
+	let users = [];
 
 	const deleteEnabled = false;
 
@@ -21,8 +23,15 @@
 			const result = await response.json();
 			throw new AlertError(result);
 		}
-		users = users.filter((u) => u.id !== userId);
+		users = sortUsers(
+			users.filter((u) => u.id !== userId),
+			$page.data.userInfo.id
+		);
 	}
+
+	onMount(() => {
+		users = sortUsers($page.data.users, $page.data.userInfo.id);
+	});
 </script>
 
 <nav aria-label="breadcrumb">
@@ -55,35 +64,37 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each users as user}
-			<tr class="align-middle">
-				<td>{user.id}</td>
-				<td>{user.email}</td>
-				<td>{user.username || '-'}</td>
-				<td><BooleanIcon value={user.is_active} /></td>
-				<td><BooleanIcon value={user.is_superuser} /></td>
-				<td><BooleanIcon value={user.is_verified} /></td>
-				<td>{user.slurm_user || '-'}</td>
-				<td>
-					<a href="/admin/users/{user.id}" class="btn btn-light">
-						<i class="bi-info-circle" /> Info
-					</a>
-					<a href="/admin/users/{user.id}/edit" class="btn btn-primary">
-						<i class="bi bi-pencil" /> Edit
-					</a>
-					{#if deleteEnabled && user.email !== $page.data.userInfo.email}
-						<ConfirmActionButton
-							modalId={'confirmDeleteProject' + user.id}
-							style={'danger'}
-							btnStyle="danger"
-							message="Delete user {user.email}"
-							buttonIcon="trash"
-							label="Delete"
-							callbackAction={() => handleDeleteUser(user.id)}
-						/>
-					{/if}
-				</td>
-			</tr>
-		{/each}
+		{#key users}
+			{#each users as user}
+				<tr class="align-middle">
+					<td>{user.id}</td>
+					<td>{user.email}</td>
+					<td>{user.username || '-'}</td>
+					<td><BooleanIcon value={user.is_active} /></td>
+					<td><BooleanIcon value={user.is_superuser} /></td>
+					<td><BooleanIcon value={user.is_verified} /></td>
+					<td>{user.slurm_user || '-'}</td>
+					<td>
+						<a href="/admin/users/{user.id}" class="btn btn-light">
+							<i class="bi-info-circle" /> Info
+						</a>
+						<a href="/admin/users/{user.id}/edit" class="btn btn-primary">
+							<i class="bi bi-pencil" /> Edit
+						</a>
+						{#if deleteEnabled && user.email !== $page.data.userInfo.email}
+							<ConfirmActionButton
+								modalId={'confirmDeleteProject' + user.id}
+								style={'danger'}
+								btnStyle="danger"
+								message="Delete user {user.email}"
+								buttonIcon="trash"
+								label="Delete"
+								callbackAction={() => handleDeleteUser(user.id)}
+							/>
+						{/if}
+					</td>
+				</tr>
+			{/each}
+		{/key}
 	</tbody>
 </table>

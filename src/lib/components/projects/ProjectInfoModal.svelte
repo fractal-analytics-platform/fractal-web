@@ -1,24 +1,60 @@
 <script>
+	import { displayStandardErrorAlert } from '$lib/common/errors';
+
 	// ProjectInfoModal component
-	import { modalProject } from '$lib/stores/projectStores';
+	import { projectInfoModal } from '$lib/stores/projectStores';
+	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
 	// Project to be displayed
 	/** @type {import('$lib/types').Project|undefined} */
 	let project = undefined;
+
+	let loadingDatasets = true;
 	/** @type {import('$lib/types').Dataset[]|undefined} */
 	let datasets = undefined;
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let datasetErrorAlert;
 
 	// Subscription to modalProject store to update project property with respect
 	// to the project in the store. Enable app-wide updates to the project to be
 	// displayed in this component.
-	modalProject.subscribe((projectUpdate) => {
-		project = projectUpdate?.project;
-		datasets = projectUpdate?.datasets;
+	const unsubscribe = projectInfoModal.subscribe(async (selectedProject) => {
+		project = selectedProject;
+		if (project) {
+			loadingDatasets = true;
+			datasets = undefined;
+			datasetErrorAlert?.hide();
+			const response = await fetch(`/api/v1/project/${project.id}/dataset`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+			if (response.ok) {
+				/** @type {import('$lib/types.js').Dataset[]} */
+				const result = await response.json();
+				result.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+				datasets = result;
+			} else {
+				datasetErrorAlert = displayStandardErrorAlert(
+					await response.json(),
+					'errorAlert-projectInfoModal'
+				);
+			}
+			loadingDatasets = false;
+		} else {
+			datasets = undefined;
+		}
 	});
+
+	function onClose() {
+		projectInfoModal.set(undefined);
+	}
+
+	onDestroy(unsubscribe);
 </script>
 
-<Modal id="projectInfoModal" size="lg">
+<Modal id="projectInfoModal" size="lg" {onClose}>
 	<svelte:fragment slot="header">
 		{#if project}
 			<h1 class="h5 modal-title flex-grow-1">Project {project.name}</h1>
@@ -42,6 +78,10 @@
 			</div>
 			<div class="row">
 				<div class="col-12">
+					{#if loadingDatasets}
+						Loading...
+					{/if}
+					<div id="errorAlert-projectInfoModal" />
 					{#if datasets}
 						<p class="lead">Datasets</p>
 						<table class="table">

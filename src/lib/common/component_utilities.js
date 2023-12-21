@@ -1,6 +1,9 @@
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-import semver from 'semver';
+import coerce from 'semver/functions/coerce';
+import gte from 'semver/functions/gte';
+import lte from 'semver/functions/lte';
+import valid from 'semver/functions/valid';
 
 /**
  * @param {import('$lib/types').Task} t1
@@ -8,14 +11,10 @@ import semver from 'semver';
  * @returns {-1|0|1}
  */
 export function greatestVersionAsc(t1, t2) {
-	const semverValidationOptions = {
-		loose: true,
-		includePrerelease: true
-	};
-	const t1Version = semver.valid(t1.version, semverValidationOptions);
-	const t2Version = semver.valid(t2.version, semverValidationOptions);
+	const t1Version = validateVersion(t1.version);
+	const t2Version = validateVersion(t2.version);
 	if (t1Version !== null && t2Version !== null) {
-		const t1VersionLt = semver.lte(t1Version, t2Version);
+		const t1VersionLt = lte(t1Version, t2Version);
 		return t1VersionLt ? -1 : 1;
 	}
 	return 0;
@@ -27,17 +26,30 @@ export function greatestVersionAsc(t1, t2) {
  * @returns {-1|0|1}
  */
 export function greatestVersionDesc(t1, t2) {
-	const semverValidationOptions = {
-		loose: true,
-		includePrerelease: true
-	};
-	const t1Version = semver.valid(t1.version, semverValidationOptions);
-	const t2Version = semver.valid(t2.version, semverValidationOptions);
+	const t1Version = validateVersion(t1.version);
+	const t2Version = validateVersion(t2.version);
 	if (t1Version !== null && t2Version !== null) {
-		const t1VersionGt = semver.gte(t1Version, t2Version);
+		const t1VersionGt = gte(t1Version, t2Version);
 		return t1VersionGt ? -1 : 1;
 	}
 	return 0;
+}
+
+const semverValidationOptions = {
+	loose: true,
+	includePrerelease: true
+};
+
+/**
+ * @param {string} version
+ * @returns {string | null}
+ */
+function validateVersion(version) {
+	return (
+		valid(version, semverValidationOptions) ||
+		valid(coerce(version), semverValidationOptions) ||
+		null
+	);
 }
 
 /**

@@ -1,5 +1,18 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased 
+
+* Added search project field on projects list page (\#379).
+* Used modal to create new project (\#379).
+* Sorted users in admin-area page (\#379).
+* Exposed stop-job and download-logs in admin-area jobs page (\#379).
+* Displayed number of rows in admin jobs page (\#379).
+* Fixed semver circular dependency issue (\#379).
+* Fixed issue with version sorting (\#379).
+* Sorted datasets by name (\#379).
+* Fixed accessibility issue (\#379).
+* Improved performance reducing the number of API calls on project, workflow and dataset pages (\#379).
+
 # 0.7.2
 
 Note: with this release, `PUBLIC_OAUTH_CLIENT_NAME` becomes a required

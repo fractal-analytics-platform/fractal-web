@@ -492,36 +492,38 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each taskCollections as { timestamp, status, package_version, pkg, id, logs }}
-						<tr>
-							<td class="col-2">{new Date(timestamp).toLocaleString()}</td>
-							<td>{pkg}</td>
-							<td class="col-1">
-								<code>{package_version ? package_version : 'Unspecified'}</code>
-							</td>
-							<td class="col-1"><span class="badge {statusBadge(status)}">{status}</span></td>
-							<td class="col-2">
-								<ConfirmActionButton
-									modalId="removeTaskCollectionModal{id}"
-									btnStyle="warning"
-									buttonIcon="trash"
-									message="Remove a task collection log"
-									callbackAction={async () => removeTaskCollection(id)}
-								/>
-								{#if status == 'fail' || (status == 'OK' && logs !== '')}
-									<button
-										class="btn btn-info"
-										data-fc-tc={id}
-										data-bs-toggle="modal"
-										data-bs-target="#collectionTaskLogsModal"
-										on:click={setTaskCollectionLogsModal}
-									>
-										<i class="bi bi-info-circle" />
-									</button>
-								{/if}
-							</td>
-						</tr>
-					{/each}
+					{#key taskCollections}
+						{#each taskCollections as { timestamp, status, package_version, pkg, id, logs }}
+							<tr>
+								<td class="col-2">{new Date(timestamp).toLocaleString()}</td>
+								<td>{pkg}</td>
+								<td class="col-1">
+									<code>{package_version ? package_version : 'Unspecified'}</code>
+								</td>
+								<td class="col-1"><span class="badge {statusBadge(status)}">{status}</span></td>
+								<td class="col-2">
+									<ConfirmActionButton
+										modalId="removeTaskCollectionModal{id}"
+										btnStyle="warning"
+										buttonIcon="trash"
+										message="Remove a task collection log"
+										callbackAction={async () => removeTaskCollection(id)}
+									/>
+									{#if status == 'fail' || (status == 'OK' && logs !== '')}
+										<button
+											class="btn btn-info"
+											data-fc-tc={id}
+											data-bs-toggle="modal"
+											data-bs-target="#collectionTaskLogsModal"
+											on:click={setTaskCollectionLogsModal}
+										>
+											<i class="bi bi-info-circle" />
+										</button>
+									{/if}
+								</td>
+							</tr>
+						{/each}
+					{/key}
 				</tbody>
 			</table>
 		</div>

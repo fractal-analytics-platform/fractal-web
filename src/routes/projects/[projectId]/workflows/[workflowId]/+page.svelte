@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -71,7 +71,7 @@
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
-	workflowTaskContext.subscribe((value) => {
+	const unsubscribe = workflowTaskContext.subscribe((value) => {
 		selectedWorkflowTask = value;
 		originalMetaProperties = {};
 		if (value && value.meta) {
@@ -82,8 +82,8 @@
 	});
 
 	onMount(async () => {
-		workflow = $page.data.workflow;
-		project = $page.data.project;
+		workflow = /** @type {import('$lib/types').Workflow} */ ($page.data.workflow);
+		project = workflow.project;
 		datasets = $page.data.datasets;
 		checkNewVersions();
 	});
@@ -440,7 +440,10 @@
 				runWorkflowModal.toggle();
 				// Navigate to project jobs page
 				// Define URL to navigate to
-				const jobsUrl = new URL(`projects/${project.id}/workflows/${workflow.id}/jobs`, window.location.origin);
+				const jobsUrl = new URL(
+					`projects/${project.id}/workflows/${workflow.id}/jobs`,
+					window.location.origin
+				);
 				// Trigger navigation
 				await goto(jobsUrl);
 			} else {
@@ -517,6 +520,8 @@
 	async function updateNewVersionsCount(count) {
 		newVersionsCount = count;
 	}
+
+	onDestroy(unsubscribe);
 </script>
 
 <div class="d-flex justify-content-between align-items-center mb-4">

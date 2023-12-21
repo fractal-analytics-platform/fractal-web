@@ -1,4 +1,4 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 
 test('Add single tasks', async ({ page }) => {
 	await page.goto('/tasks');
+	await waitPageLoading(page);
 
 	await test.step('Select "Add a single task" form', async () => {
 		await page.getByLabel('Single task').click({ force: true });

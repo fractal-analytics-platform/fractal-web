@@ -92,7 +92,10 @@
 		}
 
 		console.log('Stop running job');
-		const response = await fetch(`/api/v1/project/${job.project_id}/job/${job.id}/stop`, {
+		let stopJobUrl = admin
+			? `/api/admin/job/${job.id}/stop`
+			: `/api/v1/project/${job.project_id}/job/${job.id}/stop`;
+		const response = await fetch(stopJobUrl, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -131,6 +134,17 @@
 		}
 		clearTimeout(updateJobsTimeout);
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+	}
+
+	/**
+	 * @param {import('$lib/types').ApplyWorkflow} row
+	 */
+	function getDownloadUrl(row) {
+		if (admin) {
+			return `/api/admin/job/${row.id}/download`;
+		} else {
+			return `/api/v1/project/${row.project_id}/job/${row.id}/download`;
+		}
 	}
 
 	onMount(() => {
@@ -292,17 +306,17 @@
 									<i class="bi-list-columns-reverse" />
 									Logs
 								</button>
-								{#if row.project_id !== null && row.user_email === $page.data.userInfo.email}
+								{#if (admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email)}
 									<a
 										class="btn btn-light"
-										href={`/api/v1/project/${row.project_id}/job/${row.id}/download`}
+										href={getDownloadUrl(row)}
 										download={`${row.id}_logs.zip`}
 									>
 										<i class="bi-arrow-down-circle" />
 									</a>
 								{/if}
 							{/if}
-							{#if row.status === 'running' && !admin}
+							{#if row.status === 'running'}
 								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
 									<i class="bi-x-circle" /> Cancel
 								</button>

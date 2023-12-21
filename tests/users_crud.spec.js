@@ -1,8 +1,9 @@
-import { expect, test } from './base_test.js';
+import { expect, test, waitPageLoading } from './base_test.js';
 
 test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Open the admin area', async () => {
 		await page.goto('/');
+		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Admin area' }).click();
 		await page.waitForURL('/admin');
 	});
@@ -23,12 +24,12 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.getByRole('button', { name: 'Save' }).click();
 		expect(await page.getByText('Field is required').count()).toEqual(2);
 
-		await page.locator('#email').fill(randomUserName + '@example.com');
-		await page.locator('#username').fill(randomUserName);
+		await page.getByLabel('E-mail').fill(randomUserName + '@example.com');
+		await page.getByLabel('Username').fill(randomUserName);
 	});
 
 	await test.step('Test password confirm validation errors', async () => {
-		await page.locator('#password').fill('test');
+		await page.getByLabel('Password', { exact: true }).fill('test');
 		await page.getByRole('button', { name: 'Save' }).click();
 		expect(await page.getByText("Passwords don't match").count()).toEqual(1);
 	});
@@ -37,29 +38,30 @@ test('Create, update and delete a user', async ({ page }) => {
 	let userId = null;
 
 	await test.step('Create user', async () => {
-		await page.locator('#confirmPassword').fill('test');
-		await page.locator('#slurmUser').fill(randomUserName + '_slurm');
-		await page.locator('#cacheDir').fill('/tmp/test');
+		await page.getByLabel('Confirm password').fill('test');
+		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm');
+		await page.getByLabel('Cache dir').fill('/tmp/test');
 
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForURL('/admin/users');
 
 		await expect(page.getByRole('cell', { name: randomUserName })).toHaveCount(3);
 
-		const userRow = await getUserRow(page, randomUserName);
-		userId = (await userRow[0].innerText()).trim();
-		expect(await userRow[1].innerText()).toEqual(randomUserName + '@example.com');
-		expect(await userRow[2].innerText()).toEqual(randomUserName);
-		verifyChecked(userRow, 3, true);
-		verifyChecked(userRow, 4, false);
-		verifyChecked(userRow, 5, false);
-		expect(await userRow[6].innerText()).toEqual(randomUserName + '_slurm');
+		const userRowCells = await getUserRowCells(page, randomUserName);
+		userId = (await userRowCells[0].innerText()).trim();
+		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
+		expect(await userRowCells[2].innerText()).toEqual(randomUserName);
+		verifyChecked(userRowCells, 3, true);
+		verifyChecked(userRowCells, 4, false);
+		verifyChecked(userRowCells, 5, false);
+		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm');
 	});
 
 	expect(userId).not.toBeNull();
 
 	await test.step('Display the user info page', async () => {
-		await page.getByRole('row').last().getByRole('link', { name: 'Info' }).click();
+		const userRow = await getUserRow(page, randomUserName);
+		await userRow.getByRole('link', { name: 'Info' }).click();
 		await page.waitForURL(`/admin/users/${userId}`);
 
 		const cells = await page.locator('table td').all();
@@ -78,12 +80,13 @@ test('Create, update and delete a user', async ({ page }) => {
 	await page.waitForURL('/admin/users');
 
 	await test.step('Open edit user page', async () => {
-		await page.getByRole('row').last().getByRole('link', { name: 'Edit' }).click();
+		const userRow = await getUserRow(page, randomUserName);
+		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(`/admin/users/${userId}/edit`);
 	});
 
 	await test.step('Test cache dir validation error', async () => {
-		await page.locator('#cacheDir').fill('foo');
+		await page.getByLabel('Cache dir').fill('foo');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForFunction(() => {
 			const invalidFeeback = document
@@ -100,25 +103,26 @@ test('Create, update and delete a user', async ({ page }) => {
 	});
 
 	await test.step('Rename username and set verified checkbox', async () => {
-		await page.locator('#cacheDir').fill('/tmp/test');
-		await page.locator('#username').fill(randomUserName + '-renamed');
-		await page.locator('#slurmUser').fill(randomUserName + '_slurm-renamed');
-		await page.locator('#verified').check();
+		await page.getByLabel('Verified').check();
+		await page.getByLabel('Cache dir').fill('/tmp/test');
+		await page.getByLabel('Username').fill(randomUserName + '-renamed');
+		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
 		await page.getByRole('button', { name: 'Save' }).click();
 
 		await page.waitForURL('/admin/users');
 
-		const userRow = await getUserRow(page, randomUserName + '-renamed');
-		expect(await userRow[1].innerText()).toEqual(randomUserName + '@example.com');
-		expect(await userRow[2].innerText()).toEqual(randomUserName + '-renamed');
-		verifyChecked(userRow, 3, true);
-		verifyChecked(userRow, 4, false);
-		verifyChecked(userRow, 5, true);
-		expect(await userRow[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
+		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
+		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
+		expect(await userRowCells[2].innerText()).toEqual(randomUserName + '-renamed');
+		verifyChecked(userRowCells, 3, true);
+		verifyChecked(userRowCells, 4, false);
+		verifyChecked(userRowCells, 5, true);
+		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
 	});
 
 	await test.step('Grant superuser privilege', async () => {
-		await page.getByRole('row').last().getByRole('link', { name: 'Edit' }).click();
+		const userRow = await getUserRow(page, randomUserName + '-renamed');
+		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(`/admin/users/${userId}/edit`);
 		await page.locator('#superuser').check();
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -133,14 +137,17 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.waitForURL('/admin/users');
 		await page.reload();
 
-		const userRow = await getUserRow(page, randomUserName + '-renamed');
-		verifyChecked(userRow, 3, true);
-		verifyChecked(userRow, 4, true);
-		verifyChecked(userRow, 5, true);
+		await waitPageLoading(page);
+
+		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
+		verifyChecked(userRowCells, 3, true);
+		verifyChecked(userRowCells, 4, true);
+		verifyChecked(userRowCells, 5, true);
 	});
 
 	await test.step('Revoke superuser privilege', async () => {
-		await page.getByRole('row').last().getByRole('link', { name: 'Edit' }).click();
+		const userRow = await getUserRow(page, randomUserName + '-renamed');
+		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(`/admin/users/${userId}/edit`);
 		await page.locator('#superuser').uncheck();
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -155,14 +162,17 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.waitForURL('/admin/users');
 		await page.reload();
 
-		const userRow = await getUserRow(page, randomUserName + '-renamed');
-		verifyChecked(userRow, 3, true);
-		verifyChecked(userRow, 4, false);
-		verifyChecked(userRow, 5, true);
+		await waitPageLoading(page);
+
+		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
+		verifyChecked(userRowCells, 3, true);
+		verifyChecked(userRowCells, 4, false);
+		verifyChecked(userRowCells, 5, true);
 	});
 
 	await test.step("Verify that the admin can't edit his/her superuser status", async () => {
 		await page.goto(`/admin/users/1/edit`);
+		await waitPageLoading(page);
 		expect(await page.locator('input[type="checkbox"]').count()).toEqual(0);
 	});
 });
@@ -172,18 +182,25 @@ test('Create, update and delete a user', async ({ page }) => {
  * @param {string} username
  * @returns {Promise<import('@playwright/test').Locator[]>}
  */
+async function getUserRowCells(page, username) {
+	const row = await getUserRow(page, username);
+	return await row.locator('td').all();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} username
+ * @returns {Promise<import('@playwright/test').Locator>}
+ */
 async function getUserRow(page, username) {
 	const rows = await page.locator('tbody tr').all();
-	let result = null;
 	for (const row of rows) {
 		const cells = await row.locator('td').all();
 		if (username === (await cells[2].innerText())) {
-			result = cells;
-			break;
+			return row;
 		}
 	}
-	expect(result).not.toBeNull();
-	return /**@type {import('@playwright/test').Locator[]} */ (result);
+	throw new Error(`Row not found for user ${username}`);
 }
 
 /**
