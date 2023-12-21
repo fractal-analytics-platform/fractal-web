@@ -124,7 +124,6 @@
 		<table class="table table-hover align-middle">
 			<thead class="table-light">
 				<tr>
-					<th>Id</th>
 					<th>Name</th>
 					<th>Options</th>
 				</tr>
@@ -133,7 +132,6 @@
 				{#key projects}
 					{#each filteredProjects as { id, name }}
 						<tr>
-							<td class="col-2">{id}</td>
 							<td class="col-6">{name}</td>
 							<td class="col-4">
 								<button

@@ -7,13 +7,5 @@
 	const projects = $page.data.projects;
 </script>
 
-<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item active" aria-current="page">Projects</li>
-	</ol>
-</nav>
-
-<div class="container">
-	<ProjectsList {projects} />
-	<ProjectInfoModal />
-</div>
+<ProjectsList {projects} />
+<ProjectInfoModal />
