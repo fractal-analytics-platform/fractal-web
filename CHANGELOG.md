@@ -2,6 +2,8 @@
 
 # Unreleased 
 
+* Added search project field on projects list page (\#379).
+* Used modal to create new project (\#379).
 * Sorted users in admin-area page (\#379).
 * Exposed stop-job and download-logs in admin-area jobs page (\#379).
 * Displayed number of rows in admin jobs page (\#379).

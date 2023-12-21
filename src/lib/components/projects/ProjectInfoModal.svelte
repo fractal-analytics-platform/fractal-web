@@ -2,7 +2,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// ProjectInfoModal component
-	import { modalProject } from '$lib/stores/projectStores';
+	import { projectInfoModal } from '$lib/stores/projectStores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
@@ -20,7 +20,7 @@
 	// Subscription to modalProject store to update project property with respect
 	// to the project in the store. Enable app-wide updates to the project to be
 	// displayed in this component.
-	const unsubscribe = modalProject.subscribe(async (selectedProject) => {
+	const unsubscribe = projectInfoModal.subscribe(async (selectedProject) => {
 		project = selectedProject;
 		if (project) {
 			loadingDatasets = true;
@@ -48,7 +48,7 @@
 	});
 
 	function onClose() {
-		modalProject.set(undefined);
+		projectInfoModal.set(undefined);
 	}
 
 	onDestroy(unsubscribe);
