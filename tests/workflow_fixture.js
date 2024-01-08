@@ -31,12 +31,17 @@ export class PageWithWorkflow extends PageWithProject {
 	async createWorkflow() {
 		await this.page.goto('/projects/' + this.projectId);
 		await waitPageLoading(this.page);
-		const workflowNameInput = this.page.locator('table [name="workflowName"]');
-		await workflowNameInput.fill(this.workflowName);
-		await workflowNameInput.blur();
 		const createWorkflowBtn = this.page.getByRole('button', { name: 'Create new workflow' });
 		await createWorkflowBtn.waitFor();
 		await createWorkflowBtn.click();
+		const modalTitle = this.page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('Create new workflow');
+		const workflowNameInput = this.page.getByRole('textbox', { name: 'Workflow name' });
+		await workflowNameInput.fill(this.workflowName);
+		await workflowNameInput.blur();
+		const createNewWorkflowBtn = this.page.getByRole('button', { name: 'Create empty workflow' });
+		await createNewWorkflowBtn.click();
 		await this.page.waitForURL(/\/projects\/\d+\/workflows\/\d+/);
 		this.url = this.page.url();
 		const match = this.url.match(/\/projects\/\d+\/workflows\/(\d+)/);
