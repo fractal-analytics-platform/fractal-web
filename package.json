@@ -44,6 +44,6 @@
 		"dompurify": "^3.0.5",
 		"jose": "^4.14.4",
 		"marked": "^7.0.4",
-		"slim-select": "^2.5.1"
+		"slim-select": "^2.8.1"
 	}
 }

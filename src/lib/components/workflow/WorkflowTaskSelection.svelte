@@ -33,7 +33,7 @@
 		selectionControl = new SlimSelect({
 			select: '#advanced-select',
 			settings: {
-				showSearch: false
+				showSearch: true
 			},
 			events: {
 				afterChange: (selection) => {

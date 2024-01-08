@@ -87,7 +87,9 @@
 
 <!-- Note: tabindex="-1" is needed to fix escape key not working in some cases -->
 <!-- (see https://stackoverflow.com/a/12630531) -->
-<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1">
+<!-- Note: data-bs-focus="false" is needed to avoid conflicts with slim-select -->
+<!-- (see https://github.com/brianvoe/slim-select/issues/475#issuecomment-1736440245) -->
+<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1" data-bs-focus="false">
 	<div
 		class="modal-dialog"
 		class:modal-fullscreen={fullscreen}
