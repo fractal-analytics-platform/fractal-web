@@ -2,6 +2,10 @@
 
 # Unreleased 
 
+* Made page headers more homogeneous (\#386).
+* Replaced some icons with more suitable ones (\#386).
+* Added search boxes on datasets, workflows and workflow tasks selection (\#386).
+* Moved "Create new workflow" to a modal (\#386).
 * Added search project field on projects list page (\#379).
 * Used modal to create new project (\#379).
 * Sorted users in admin-area page (\#379).
