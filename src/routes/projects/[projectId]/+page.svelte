@@ -72,7 +72,7 @@
 			data-bs-target="#editProjectModal"
 			on:click={() => (updatedProjectName = project.name)}
 		>
-			<i class="bi-gear-wide-connected" />
+			<i class="bi-pencil" />
 		</button>
 	</div>
 </div>

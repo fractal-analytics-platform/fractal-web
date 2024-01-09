@@ -557,7 +557,7 @@
 			data-bs-target="#editWorkflowModal"
 			on:click={resetWorkflowUpdateModal}
 		>
-			<i class="bi-gear-wide-connected" />
+			<i class="bi-pencil" />
 		</button>
 		<button
 			class="btn btn-success"
@@ -596,8 +596,9 @@
 									class="btn btn-light"
 									data-bs-toggle="modal"
 									data-bs-target="#editWorkflowTasksOrderModal"
-									><i class="bi-gear-wide-connected" /></button
 								>
+									<i class="bi-arrow-down-up" />
+								</button>
 							</div>
 						</div>
 					</div>
