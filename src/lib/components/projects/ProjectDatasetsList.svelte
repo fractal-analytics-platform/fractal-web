@@ -2,9 +2,16 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError } from '$lib/common/errors';
 	import CreateUpdateDatasetModal from './CreateUpdateDatasetModal.svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types').Dataset[]} */
 	export let datasets = [];
+
+	let datasetSearch = '';
+
+	$: filteredDatasets = datasets.filter((p) =>
+		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
+	);
 
 	/** @type {CreateUpdateDatasetModal} */
 	let createUpdateDatasetModal;
@@ -39,17 +46,42 @@
 			throw new AlertError(result);
 		}
 	}
+
+	onMount(() => {
+		datasetSearch = '';
+	});
 </script>
 
 <div class="container p-0 mt-4">
-	<button
-		class="btn btn-primary float-end"
-		type="button"
-		on:click={() => createUpdateDatasetModal.openForCreate()}
-	>
-		Create new dataset
-	</button>
-	<p class="lead">Datasets</p>
+	<div class="row">
+		<div class="col-sm-2">
+			<p class="lead">Datasets</p>
+		</div>
+		<div class="col-sm-10">
+			<div class="row justify-content-end">
+				<div class="col-auto">
+					<div class="input-group">
+						<input
+							name="searchDataset"
+							type="text"
+							class="form-control"
+							placeholder="Search dataset"
+							bind:value={datasetSearch}
+						/>
+					</div>
+				</div>
+				<div class="col-auto">
+					<button
+						class="btn btn-primary float-end"
+						type="button"
+						on:click={() => createUpdateDatasetModal.openForCreate()}
+					>
+						Create new dataset
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="datasetCreateErrorAlert" />
 	<table class="table align-middle">
 		<thead class="table-light">
@@ -60,33 +92,35 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each datasets as dataset}
-				<tr>
-					<td>{dataset.name}</td>
-					<td>{dataset.type || 'Unknown'}</td>
-					<td>
-						<a class="btn btn-light" href="/projects/{dataset.project_id}/datasets/{dataset.id}">
-							<i class="bi bi-arrow-up-right-square" /> Open
-						</a>
-						<button
-							class="btn btn-primary"
-							type="button"
-							on:click|preventDefault={() => createUpdateDatasetModal.openForEdit(dataset)}
-						>
-							<i class="bi bi-pencil" /> Edit
-						</button>
-						<ConfirmActionButton
-							modalId="confirmDatasetDeleteModal{dataset.id}"
-							style={'danger'}
-							btnStyle="danger"
-							buttonIcon="trash"
-							label={'Delete'}
-							message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
-							callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
-						/>
-					</td>
-				</tr>
-			{/each}
+			{#key datasets}
+				{#each filteredDatasets as dataset}
+					<tr>
+						<td>{dataset.name}</td>
+						<td>{dataset.type || 'Unknown'}</td>
+						<td>
+							<a class="btn btn-light" href="/projects/{dataset.project_id}/datasets/{dataset.id}">
+								<i class="bi bi-arrow-up-right-square" /> Open
+							</a>
+							<button
+								class="btn btn-primary"
+								type="button"
+								on:click|preventDefault={() => createUpdateDatasetModal.openForEdit(dataset)}
+							>
+								<i class="bi bi-pencil" /> Edit
+							</button>
+							<ConfirmActionButton
+								modalId="confirmDatasetDeleteModal{dataset.id}"
+								style={'danger'}
+								btnStyle="danger"
+								buttonIcon="trash"
+								label={'Delete'}
+								message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
+								callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
+							/>
+						</td>
+					</tr>
+				{/each}
+			{/key}
 		</tbody>
 	</table>
 </div>
