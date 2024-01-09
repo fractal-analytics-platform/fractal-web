@@ -4,7 +4,6 @@
 	import { AlertError } from '$lib/common/errors';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
-	import { each } from 'svelte/internal';
 
 	// The list of workflows
 	/** @type {import('$lib/types').Workflow[]} */
