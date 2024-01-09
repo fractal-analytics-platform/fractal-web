@@ -50,7 +50,7 @@
 	}
 </script>
 
-<h3>My profile</h3>
+<h1 class="fw-light">My profile</h1>
 
 <div class="row mt-4">
 	<div class="col-lg-10 col-xl-8">

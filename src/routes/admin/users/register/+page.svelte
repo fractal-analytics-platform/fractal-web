@@ -42,6 +42,6 @@
 	</ol>
 </nav>
 
-<h3 class="mb-3">Registering new user</h3>
+<h1 class="fw-light mb-4">Registering new user</h1>
 
 <UserEditor {user} {save} />

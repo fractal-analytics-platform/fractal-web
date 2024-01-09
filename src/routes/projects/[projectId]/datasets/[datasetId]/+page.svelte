@@ -68,15 +68,15 @@
 </div>
 
 {#if dataset}
-	<div class="container">
+	<div>
 		<div class="d-flex justify-content-between align-items-center my-3">
-			<h1>Dataset {dataset.name} #{dataset.id}</h1>
+			<h1 class="fw-light">Dataset {dataset.name} #{dataset.id}</h1>
 		</div>
 
 		<div class="row mt-2">
 			<div class="col-4">
 				<div class="d-flex align-items-center justify-content-between">
-					<span class="lead py-3">Dataset properties</span>
+					<h3 class="fw-light mt-1">Dataset properties</h3>
 				</div>
 				<ul class="list-group">
 					<li class="list-group-item text-bg-light">
@@ -107,7 +107,7 @@
 			</div>
 			<div class="col-8">
 				<div class="d-flex align-items-center justify-content-between">
-					<span class="lead py-3">Dataset resources</span>
+					<h3 class="fw-light mt-1">Dataset resources</h3>
 				</div>
 				<table class="table table-bordered caption-top align-middle">
 					<thead class="bg-light">

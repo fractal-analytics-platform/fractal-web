@@ -192,18 +192,12 @@
 	onDestroy(unsubscribe);
 </script>
 
-<div class="container">
-	<div class="d-flex justify-content-between align-items-center">
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item active" aria-current="page">Tasks</li>
-			</ol>
-		</nav>
-	</div>
+<div>
+	<h1 class="fw-light mb-4">Tasks</h1>
 
 	<div class="mb-2" id="errorSection" />
 
-	<p class="lead">Add tasks</p>
+	<h3 class="fw-light">Add tasks</h3>
 
 	<div class="form-check-inline">Package type:</div>
 
@@ -246,7 +240,7 @@
 	</div>
 
 	<div class="row mt-4">
-		<p class="lead">Task List</p>
+		<h3 class="fw-light">Task List</h3>
 		<div class="col-12">
 			<table class="table align-middle">
 				<thead class="table-light">

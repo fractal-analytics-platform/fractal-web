@@ -63,7 +63,7 @@
 <div class="container p-0 mt-5">
 	<div class="row">
 		<div class="col-sm-2">
-			<p class="lead">Workflows</p>
+			<h3 class="fw-light">Workflows</h3>
 		</div>
 		<div class="col-sm-10">
 			<div class="row justify-content-end">

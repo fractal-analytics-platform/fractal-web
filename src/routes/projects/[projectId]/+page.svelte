@@ -78,18 +78,21 @@
 </div>
 
 {#if project}
-	<div class="container">
-		<div class="d-flex justify-content-between align-items-center my-3">
-			<h1>Project {project.name} #{project.id}</h1>
-		</div>
-
-		<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
-		<ProjectDatasetsList {datasets} />
-		<WorkflowsList {workflows} projectId={project.id} />
+	<div class="d-flex justify-content-between align-items-center my-3">
+		<h1 class="fw-light">Project {project.name} #{project.id}</h1>
 	</div>
+
+	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
+	<ProjectDatasetsList {datasets} />
+	<WorkflowsList {workflows} projectId={project.id} />
 {/if}
 
-<Modal id="editProjectModal" centered={true} bind:this={editProjectModal} onOpen={onEditProjectModalOpen}>
+<Modal
+	id="editProjectModal"
+	centered={true}
+	bind:this={editProjectModal}
+	onOpen={onEditProjectModalOpen}
+>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Project properties</h5>
 	</svelte:fragment>

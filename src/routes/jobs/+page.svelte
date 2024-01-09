@@ -20,9 +20,7 @@
 	}
 </script>
 
-<div class="container">
-	<div class="d-flex justify-content-between align-items-center my-3">
-		<h1>Jobs of user "{$page.data.userInfo.email}"</h1>
-	</div>
-	<JobsList {jobUpdater} columnsToHide={['user_email']} />
+<div class="d-flex justify-content-between align-items-center mt-2">
+	<h1 class="fw-light">Jobs of user "{$page.data.userInfo.email}"</h1>
 </div>
+<JobsList {jobUpdater} columnsToHide={['user_email']} />

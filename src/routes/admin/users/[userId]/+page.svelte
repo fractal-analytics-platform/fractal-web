@@ -20,7 +20,7 @@
 	</ol>
 </nav>
 
-<h3 class="mb-3">User #{user.id} ({user.email})</h3>
+<h1 class="mb-3 fw-light">User #{user.id} ({user.email})</h1>
 
 <div class="row mt-4">
 	<div class="col-md-8 col-lg-6">

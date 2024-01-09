@@ -48,7 +48,7 @@
 	Register new user
 </a>
 
-<h3>Users list</h3>
+<h1 class="fw-light">Users list</h1>
 
 <table class="table mt-3">
 	<thead>

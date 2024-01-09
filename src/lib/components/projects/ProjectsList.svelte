@@ -96,7 +96,7 @@
 	}
 </script>
 
-<p class="lead">Projects list</p>
+<h1 class="fw-light">Projects list</h1>
 <div class="container">
 	<div class="row mt-3 mb-3">
 		<div class="col-sm-12">
