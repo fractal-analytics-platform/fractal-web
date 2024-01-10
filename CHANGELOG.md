@@ -2,6 +2,8 @@
 
 # Unreleased 
 
+* Users registered by the admin are automatically verified (\#386).
+* A warning message is displayed to unverified users (\#386).
 * Made page headers more homogeneous (\#386).
 * Replaced some icons with more suitable ones (\#386).
 * Added search boxes on datasets, workflows and workflow tasks selection (\#386).
