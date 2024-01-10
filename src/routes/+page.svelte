@@ -5,7 +5,7 @@
 	$: userLoggedIn = !!$page.data.userInfo;
 </script>
 
-<h1>Welcome to Fractal web client.</h1>
+<h1 class="fw-light">Welcome to Fractal web client.</h1>
 
 <div>
 	<p>
@@ -30,7 +30,7 @@
 	</div>
 
 	{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
-		<h3>Where to get support</h3>
+		<h3 class="fw-light">Where to get support</h3>
 		<p>
 			<a href="mailto:{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">
 				{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
@@ -38,7 +38,7 @@
 		</p>
 	{/if}
 
-	<h3>Links</h3>
+	<h3 class="fw-light">Links</h3>
 
 	<ul>
 		<li>

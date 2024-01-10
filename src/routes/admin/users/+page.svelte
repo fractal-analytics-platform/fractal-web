@@ -34,21 +34,12 @@
 	});
 </script>
 
-<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item">
-			<a href="/admin">Admin area</a>
-		</li>
-		<li class="breadcrumb-item active" aria-current="page">Manage users</li>
-	</ol>
-</nav>
-
 <a href="/admin/users/register" class="btn btn-primary float-end">
 	<i class="bi bi-person-fill-add" />
 	Register new user
 </a>
 
-<h3>Users list</h3>
+<h1 class="fw-light">Users list</h1>
 
 <table class="table mt-3">
 	<thead>

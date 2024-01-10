@@ -14,7 +14,7 @@ export async function responseError(response) {
  * Used for example to handle the displaying of the error alert when using the ConfirmActionButton.
  */
 export class AlertError extends Error {
-	/** @type {null | { loc: string[], msg: string }} */
+	/** @type {null | { loc: string[], msg: string } | string} */
 	simpleValidationMessage;
 
 	/**
@@ -35,6 +35,9 @@ export class AlertError extends Error {
 		if (!this.simpleValidationMessage) {
 			return null;
 		}
+		if (typeof this.simpleValidationMessage === 'string') {
+			return this.simpleValidationMessage;
+		}
 		if (this.simpleValidationMessage.loc.length !== loc.length) {
 			return null;
 		}
@@ -52,10 +55,16 @@ export class AlertError extends Error {
  *
  * @param {any} reason
  * @param {number | null} statusCode
- * @returns {null | { loc: string[], msg: string }}
+ * @returns {null | { loc: string[], msg: string } | string}
  */
 function getSimpleValidationMessage(reason, statusCode) {
-	if (!isValidationError(reason, statusCode) || reason.detail.length !== 1) {
+	if (!isValidationError(reason, statusCode)) {
+		return null;
+	}
+	if (typeof reason.detail === 'string') {
+		return reason.detail;
+	}
+	if (reason.detail.length !== 1) {
 		return null;
 	}
 	const err = reason.detail[0];
@@ -74,7 +83,10 @@ function getSimpleValidationMessage(reason, statusCode) {
  * @returns {null | { [key: string]: string }}
  */
 export function getValidationMessagesMap(reason, statusCode) {
-	if (!isValidationError(reason, statusCode) || reason.detail.length === 0) {
+	if (!isValidationError(reason, statusCode)) {
+		return null;
+	}
+	if (!Array.isArray(reason.detail) || reason.detail.length === 0) {
 		return null;
 	}
 	/** @type {{[key: string]: string}} */
@@ -97,7 +109,11 @@ export function getValidationMessagesMap(reason, statusCode) {
  * @returns {boolean}
  */
 function isValidationError(reason, statusCode) {
-	return statusCode === 422 && 'detail' in reason && Array.isArray(reason.detail);
+	return (
+		statusCode === 422 &&
+		'detail' in reason &&
+		(Array.isArray(reason.detail) || typeof reason.detail === 'string')
+	);
 }
 
 /**

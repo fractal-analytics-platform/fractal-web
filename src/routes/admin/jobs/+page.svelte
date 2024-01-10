@@ -268,9 +268,9 @@
 	}
 </script>
 
-<div class="container">
-	<div class="d-flex justify-content-between align-items-center my-3">
-		<h1>Jobs</h1>
+<div>
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<h1 class="fw-light">Jobs</h1>
 	</div>
 
 	<div class="row">

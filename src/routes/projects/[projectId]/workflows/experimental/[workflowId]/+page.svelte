@@ -665,7 +665,7 @@
 				data-bs-target="#editWorkflowModal"
 				on:click={resetWorkflowUpdateModal}
 			>
-				<i class="bi-gear-wide-connected" />
+				<i class="bi-pencil" />
 			</button>
 		</div>
 	</div>
@@ -694,7 +694,7 @@
 									class="btn btn-light"
 									on:click={() => editTasksOrderModal.show(updatableWorkflowList)}
 								>
-									<i class="bi-gear-wide-connected" />
+									<i class="bi-arrow-down-up" />
 								</button>
 							</div>
 						</div>

@@ -53,7 +53,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		expect(await userRowCells[2].innerText()).toEqual(randomUserName);
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);
-		verifyChecked(userRowCells, 5, false);
+		verifyChecked(userRowCells, 5, true);
 		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm');
 	});
 
@@ -70,7 +70,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		expect(await cells[2].innerText()).toEqual(randomUserName);
 		verifyChecked(cells, 3, true);
 		verifyChecked(cells, 4, false);
-		verifyChecked(cells, 5, false);
+		verifyChecked(cells, 5, true);
 		expect(await cells[6].innerText()).toEqual(randomUserName + '_slurm');
 		expect(await cells[7].innerText()).toEqual('/tmp/test');
 	});
@@ -102,8 +102,8 @@ test('Create, update and delete a user', async ({ page }) => {
 		});
 	});
 
-	await test.step('Rename username and set verified checkbox', async () => {
-		await page.getByLabel('Verified').check();
+	await test.step('Rename username and unset verified checkbox', async () => {
+		await page.getByLabel('Verified').uncheck();
 		await page.getByLabel('Cache dir').fill('/tmp/test');
 		await page.getByLabel('Username').fill(randomUserName + '-renamed');
 		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
@@ -116,7 +116,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		expect(await userRowCells[2].innerText()).toEqual(randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);
-		verifyChecked(userRowCells, 5, true);
+		verifyChecked(userRowCells, 5, false);
 		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
 	});
 
@@ -142,7 +142,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, true);
-		verifyChecked(userRowCells, 5, true);
+		verifyChecked(userRowCells, 5, false);
 	});
 
 	await test.step('Revoke superuser privilege', async () => {
@@ -167,7 +167,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);
-		verifyChecked(userRowCells, 5, true);
+		verifyChecked(userRowCells, 5, false);
 	});
 
 	await test.step("Verify that the admin can't edit his/her superuser status", async () => {

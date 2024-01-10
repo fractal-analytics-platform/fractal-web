@@ -44,7 +44,7 @@
 	});
 </script>
 
-<div class="container">
+<div>
 	{#if userLoggedIn}
 		<div class="row mt-4">
 			<div class="col">
@@ -53,7 +53,7 @@
 		</div>
 	{:else}
 		<div class="row">
-			<h1>Login</h1>
+			<h1 class="fw-light">Login</h1>
 		</div>
 		{#if showSessionExpiredMessage}
 			<div class="row">
@@ -64,7 +64,7 @@
 		{/if}
 		<div class="row">
 			<div class="col-md-4">
-				<h3 class="mt-2">Local account</h3>
+				<h3 class="mt-2 fw-light">Local account</h3>
 				<form method="POST">
 					<div class="mb-3">
 						<label for="userEmail" class="form-label">Email address</label>
@@ -98,7 +98,7 @@
 		{#if oauth2Provider}
 			<div class="row">
 				<div class="col mt-5">
-					<h3>External account</h3>
+					<h3 class="fw-light">External account</h3>
 					<div id="externalLoginError" />
 					<button type="button" on:click={oauth2Login} class="btn btn-primary">
 						{#if oauth2Provider === 'github'}

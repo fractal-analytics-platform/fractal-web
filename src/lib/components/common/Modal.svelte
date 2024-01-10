@@ -1,5 +1,5 @@
 <script>
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 
 	export let id;
@@ -11,6 +11,7 @@
 	export let centered = false;
 	export let scrollable = false;
 	export let bodyCss = '';
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	onMount(async () => {
@@ -57,7 +58,7 @@
 			await confirm();
 			modal.hide();
 		} catch (/** @type {any} */ error) {
-			errorAlert = displayStandardErrorAlert(error, `errorAlert-${id}`);
+			displayErrorAlert(error);
 		}
 	}
 
@@ -68,6 +69,9 @@
 	}
 
 	export function displayErrorAlert(/** @type {any} */ error) {
+		if (error instanceof AlertError && error.getSimpleValidationMessage()) {
+			error = error.getSimpleValidationMessage();
+		}
 		errorAlert = displayStandardErrorAlert(error, `errorAlert-${id}`);
 	}
 
@@ -87,7 +91,9 @@
 
 <!-- Note: tabindex="-1" is needed to fix escape key not working in some cases -->
 <!-- (see https://stackoverflow.com/a/12630531) -->
-<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1">
+<!-- Note: data-bs-focus="false" is needed to avoid conflicts with slim-select -->
+<!-- (see https://github.com/brianvoe/slim-select/issues/475#issuecomment-1736440245) -->
+<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1" data-bs-focus="false">
 	<div
 		class="modal-dialog"
 		class:modal-fullscreen={fullscreen}
@@ -103,9 +109,9 @@
 				<slot name="body" />
 			</div>
 			{#if !!$$slots.footer}
-			<div class="modal-footer">
-				<slot name="footer" />
-			</div>
+				<div class="modal-footer">
+					<slot name="footer" />
+				</div>
 			{/if}
 		</div>
 	</div>

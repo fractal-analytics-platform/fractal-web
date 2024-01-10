@@ -20,8 +20,6 @@
 	</ol>
 </nav>
 
-<h3 class="mb-3">User #{user.id} ({user.email})</h3>
-
 <div class="row mt-4">
 	<div class="col-md-8 col-lg-6">
 		<table class="table">

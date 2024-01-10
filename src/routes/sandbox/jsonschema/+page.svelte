@@ -10,7 +10,7 @@
 
 </script>
 
-<h1>Sandbox page for jsonschema</h1>
+<h1 class="fw-light">Sandbox page for jsonschema</h1>
 
 <SchemaInput {jsonSchema} bind:parsedSchema={schema} bind:parsedData={schemaData}></SchemaInput>
 

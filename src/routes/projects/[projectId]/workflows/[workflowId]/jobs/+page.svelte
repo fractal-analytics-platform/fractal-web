@@ -35,6 +35,7 @@
 				<li class="breadcrumb-item" aria-current="page">
 					<a href="/projects/{project.id}">{project.name}</a>
 				</li>
+				<li class="breadcrumb-item">Workflows</li>
 				<li class="breadcrumb-item" aria-current="page">
 					<a href="/projects/{project.id}/workflows/{workflow.id}">{workflow.name}</a>
 				</li>
@@ -44,10 +45,5 @@
 		<div />
 	</div>
 
-	<div class="container">
-		<div class="d-flex justify-content-between align-items-center my-3">
-			<h1>Jobs of workflow "{workflow.name}"</h1>
-		</div>
-		<JobsList columnsToHide={['project', 'workflow', 'user_email']} {jobUpdater} />
-	</div>
+	<JobsList columnsToHide={['project', 'workflow', 'user_email']} {jobUpdater} />
 {/if}

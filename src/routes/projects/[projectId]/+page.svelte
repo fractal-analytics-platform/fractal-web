@@ -54,42 +54,34 @@
 	}
 </script>
 
-<div class="d-flex justify-content-between align-items-center">
-	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb">
-			<li class="breadcrumb-item" aria-current="page">
-				<a href="/projects">Projects</a>
-			</li>
-			{#if project}
-				<li class="breadcrumb-item active" aria-current="page">{project.name}</li>
-			{/if}
-		</ol>
-	</nav>
-	<div>
-		<button
-			class="btn btn-light"
-			data-bs-toggle="modal"
-			data-bs-target="#editProjectModal"
-			on:click={() => (updatedProjectName = project.name)}
-		>
-			<i class="bi-gear-wide-connected" />
-		</button>
-	</div>
-</div>
-
 {#if project}
-	<div class="container">
-		<div class="d-flex justify-content-between align-items-center my-3">
-			<h1>Project {project.name} #{project.id}</h1>
+	<div class="d-flex justify-content-between align-items-center">
+		<div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+			<h1 class="fw-light">Project {project.name} #{project.id}</h1>
 		</div>
-
-		<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
-		<ProjectDatasetsList {datasets} />
-		<WorkflowsList {workflows} projectId={project.id} />
+		<div>
+			<button
+				class="btn btn-light"
+				data-bs-toggle="modal"
+				data-bs-target="#editProjectModal"
+				on:click={() => (updatedProjectName = project.name)}
+			>
+				<i class="bi-pencil" />
+			</button>
+		</div>
 	</div>
+
+	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
+	<ProjectDatasetsList {datasets} />
+	<WorkflowsList {workflows} projectId={project.id} />
 {/if}
 
-<Modal id="editProjectModal" centered={true} bind:this={editProjectModal} onOpen={onEditProjectModalOpen}>
+<Modal
+	id="editProjectModal"
+	centered={true}
+	bind:this={editProjectModal}
+	onOpen={onEditProjectModalOpen}
+>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Project properties</h5>
 	</svelte:fragment>
