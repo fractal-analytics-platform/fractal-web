@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased 
+# 0.8.0 
 
 * Users registered by the admin are automatically verified (\#386).
 * A warning message is displayed to unverified users (\#386).
