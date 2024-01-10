@@ -54,32 +54,21 @@
 	}
 </script>
 
-<div class="d-flex justify-content-between align-items-center">
-	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb">
-			<li class="breadcrumb-item" aria-current="page">
-				<a href="/projects">Projects</a>
-			</li>
-			{#if project}
-				<li class="breadcrumb-item active" aria-current="page">{project.name}</li>
-			{/if}
-		</ol>
-	</nav>
-	<div>
-		<button
-			class="btn btn-light"
-			data-bs-toggle="modal"
-			data-bs-target="#editProjectModal"
-			on:click={() => (updatedProjectName = project.name)}
-		>
-			<i class="bi-pencil" />
-		</button>
-	</div>
-</div>
-
 {#if project}
-	<div class="d-flex justify-content-between align-items-center my-3">
-		<h1 class="fw-light">Project {project.name} #{project.id}</h1>
+	<div class="d-flex justify-content-between align-items-center">
+		<div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+			<h1 class="fw-light">Project {project.name} #{project.id}</h1>
+		</div>
+		<div>
+			<button
+				class="btn btn-light"
+				data-bs-toggle="modal"
+				data-bs-target="#editProjectModal"
+				on:click={() => (updatedProjectName = project.name)}
+			>
+				<i class="bi-pencil" />
+			</button>
+		</div>
 	</div>
 
 	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />

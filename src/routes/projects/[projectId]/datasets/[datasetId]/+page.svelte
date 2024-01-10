@@ -69,10 +69,6 @@
 
 {#if dataset}
 	<div>
-		<div class="d-flex justify-content-between align-items-center my-3">
-			<h1 class="fw-light">Dataset {dataset.name} #{dataset.id}</h1>
-		</div>
-
 		<div class="row mt-2">
 			<div class="col-4">
 				<div class="d-flex align-items-center justify-content-between">

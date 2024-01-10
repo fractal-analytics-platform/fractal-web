@@ -36,6 +36,4 @@
 	</ol>
 </nav>
 
-<h1 class="mb-3 fw-light">Editing user #{user.id} ({user.email})</h1>
-
 <UserEditor {user} {save} />

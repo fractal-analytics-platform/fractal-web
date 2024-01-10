@@ -44,8 +44,5 @@
 		<div />
 	</div>
 
-	<div class="d-flex justify-content-between align-items-center my-3">
-		<h1 class="fw-light">Jobs of workflow "{workflow.name}"</h1>
-	</div>
 	<JobsList columnsToHide={['project', 'workflow', 'user_email']} {jobUpdater} />
 {/if}

@@ -193,8 +193,6 @@
 </script>
 
 <div>
-	<h1 class="fw-light mb-4">Tasks</h1>
-
 	<div class="mb-2" id="errorSection" />
 
 	<h3 class="fw-light">Add tasks</h3>

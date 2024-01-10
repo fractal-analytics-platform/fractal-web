@@ -31,7 +31,7 @@
 </script>
 
 <nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
+	<ol class="breadcrumb mb-4">
 		<li class="breadcrumb-item">
 			<a href="/admin">Admin area</a>
 		</li>
@@ -41,7 +41,5 @@
 		<li class="breadcrumb-item active" aria-current="page">Registering new user</li>
 	</ol>
 </nav>
-
-<h1 class="fw-light mb-4">Registering new user</h1>
 
 <UserEditor {user} {save} />

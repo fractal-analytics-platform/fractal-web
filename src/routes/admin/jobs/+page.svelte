@@ -269,16 +269,7 @@
 </script>
 
 <div>
-	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb">
-			<li class="breadcrumb-item">
-				<a href="/admin">Admin area</a>
-			</li>
-			<li class="breadcrumb-item active" aria-current="page">Jobs</li>
-		</ol>
-	</nav>
-
-	<div class="d-flex justify-content-between align-items-center my-3">
+	<div class="d-flex justify-content-between align-items-center mb-3">
 		<h1 class="fw-light">Jobs</h1>
 	</div>
 

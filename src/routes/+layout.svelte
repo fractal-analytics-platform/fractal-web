@@ -14,7 +14,7 @@
 	// Detects page change
 	$: if ($navigating) cleanupModalBackdrop();
 
-	$: adminArea = $page.url.pathname.startsWith('/admin');
+	$: selectedSection = getSelectedSection($page.url.pathname);
 
 	/**
 	 * Removes the modal backdrop that remains stuck at page change.
@@ -40,6 +40,20 @@
 		};
 	}
 
+	/**
+	 * @param {string} pathname
+	 */
+	function getSelectedSection(pathname) {
+		if (pathname === '/') {
+			return 'home';
+		}
+		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
+			if (pathname.startsWith(`/${section}`)) {
+				return section;
+			}
+		}
+	}
+
 	let loading = true;
 
 	onMount(() => {
@@ -55,21 +69,25 @@
 		<div class="container d-flex flex-wrap">
 			<ul class="nav me-auto">
 				<li class="nav-item">
-					<a href="/" class="nav-link">Home</a>
+					<a href="/" class="nav-link" class:active={selectedSection === 'home'}> Home </a>
 				</li>
 				{#if userLoggedIn}
 					<li class="nav-item">
-						<a href="/projects" class="nav-link">Projects</a>
+						<a href="/projects" class="nav-link" class:active={selectedSection === 'projects'}>
+							Projects
+						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/tasks" class="nav-link">Tasks</a>
+						<a href="/tasks" class="nav-link" class:active={selectedSection === 'tasks'}> Tasks </a>
 					</li>
 					<li class="nav-item">
-						<a href="/jobs" class="nav-link">Jobs</a>
+						<a href="/jobs" class="nav-link" class:active={selectedSection === 'jobs'}> Jobs </a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
-							<a href="/admin" class="nav-link">Admin area</a>
+							<a href="/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
+								Admin area
+							</a>
 						</li>
 					{/if}
 				{/if}
@@ -94,13 +112,15 @@
 					</li>
 				{:else}
 					<li class="nav-item">
-						<a href="/auth/login" class="nav-link">Login</a>
+						<a href="/auth/login" class="nav-link" class:active={selectedSection === 'auth'}>
+							Login
+						</a>
 					</li>
 				{/if}
 			</ul>
 		</div>
 	</nav>
-	{#if adminArea}
+	{#if selectedSection === 'admin'}
 		<div class="admin-border" />
 	{/if}
 	<div class="container p-4">
@@ -129,6 +149,16 @@
 </main>
 
 <style>
+	.nav-link.active {
+		background-color: #eee;
+		border-bottom-width: 3px;
+		border-bottom-style: solid;
+	}
+
+	.nav-link.admin-active {
+		background-color: #eee;
+	}
+
 	.admin-border {
 		height: 8px;
 		background-color: #dc3545;

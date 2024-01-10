@@ -57,7 +57,7 @@
 		<div class="col-sm-2">
 			<h3 class="fw-light">Datasets</h3>
 		</div>
-		<div class="col-sm-10">
+		<div class="col-sm-10 mb-2">
 			<div class="row justify-content-end">
 				<div class="col-auto">
 					<div class="input-group">
