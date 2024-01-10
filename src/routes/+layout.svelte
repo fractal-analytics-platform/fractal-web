@@ -124,6 +124,17 @@
 		<div class="admin-border" />
 	{/if}
 	<div class="container p-4">
+		{#if userLoggedIn && !$page.data.userInfo.is_verified}
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-warning">
+						<i class="bi bi-exclamation-triangle" />
+						<strong>Warning</strong>: as a non-verified user, you have limited access; please
+						contact an admin.
+					</div>
+				</div>
+			</div>
+		{/if}
 		<slot />
 	</div>
 	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:show={$navigating || loading}>
