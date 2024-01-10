@@ -35,6 +35,7 @@
 				<li class="breadcrumb-item" aria-current="page">
 					<a href="/projects/{project.id}">{project.name}</a>
 				</li>
+				<li class="breadcrumb-item">Workflows</li>
 				<li class="breadcrumb-item" aria-current="page">
 					<a href="/projects/{project.id}/workflows/{workflow.id}">{workflow.name}</a>
 				</li>
