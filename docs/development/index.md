@@ -8,3 +8,4 @@ Here are some useful details for `fractal-web` developments:
 * [Documentation](docs.md)
 * [Precommit](precommit.md)
 * [JSON Schema component](json_schemas.md)
+* [Release](release.md)
