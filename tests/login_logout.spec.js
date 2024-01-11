@@ -29,10 +29,6 @@ test('Login and Logout', async ({ page }) => {
 });
 
 test.describe(() => {
-	// "Session expired" message randomly doesn't show up in pipeline.
-	// Since the behavior is not reproducible locally we allow these tests to be retried.
-	test.describe.configure({ retries: 3 });
-
 	test('Loading SSR page with expired cookied', async ({ page }) => {
 		await page.goto('/auth/login');
 		await login(page);
