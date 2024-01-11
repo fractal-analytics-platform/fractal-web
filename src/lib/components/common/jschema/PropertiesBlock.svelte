@@ -3,6 +3,7 @@
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
 	import { mapSchemaProperties } from '$lib/components/common/jschema/schema_management.js';
 
+	/** @type {import('$lib/components/common/jschema/schema_management').default} */
 	const schemaManager = getContext('schemaManager');
 
 	export let properties = undefined;

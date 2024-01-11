@@ -5,11 +5,18 @@ export default class SchemaManager {
 	/** @type {(hasChanges: boolean) => void} */
 	onPropertyChanges = () => {};
 
+	/**
+	 * @param {string|object|undefined} schema 
+	 * @param {object|undefined} schemaData 
+	 */
 	constructor(schema, schemaData) {
 		this.loadSchema(schema);
 		this.loadSchemaData(schemaData);
 	}
 
+	/**
+	 * @param {string|object|undefined} schema 
+	 */
 	loadSchema(schema) {
 		if (schema === undefined) {
 			throw new Error('Schema is undefined');
@@ -21,6 +28,9 @@ export default class SchemaManager {
 		}
 	}
 
+	/**
+	 * @param {object|undefined} schemaData 
+	 */
 	loadSchemaData(schemaData) {
 		// Should check that schemaData is not undefined
 		if (schemaData === undefined) {
@@ -30,6 +40,10 @@ export default class SchemaManager {
 		this.data = JSON.parse(JSON.stringify(schemaData));
 	}
 
+	/**
+	 * @param {string} key 
+	 * @returns 
+	 */
 	getValue(key) {
 		const keys = key.split(this.keySeparator);
 		let value = this.data;
