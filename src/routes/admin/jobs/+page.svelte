@@ -240,9 +240,9 @@
 	let updatingStatus = false;
 
 	async function updateJobStatus() {
-		statusModal.confirmAndHide(async () => {
-			updatingStatus = true;
-			try {
+		statusModal.confirmAndHide(
+			async () => {
+				updatingStatus = true;
 				const jobId = /** @type {import('$lib/types').ApplyWorkflow} */ (jobInEditing).id;
 
 				const headers = new Headers();
@@ -261,10 +261,11 @@
 
 				jobs = jobs.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));
 				jobsListComponent.setJobs(jobs);
-			} finally {
+			},
+			() => {
 				updatingStatus = false;
 			}
-		});
+		);
 	}
 </script>
 
@@ -451,6 +452,9 @@
 		</div>
 		<div class="d-flex justify-content-center">
 			<button class="btn btn-danger" on:click={updateJobStatus} disabled={updatingStatus}>
+				{#if updatingStatus}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
 				Set status to failed
 			</button>
 			&nbsp;

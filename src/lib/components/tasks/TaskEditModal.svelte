@@ -9,10 +9,12 @@
 	$: task = $taskStore;
 	/** @type {import('$lib/types').Task|undefined} */
 	$: originalTask = $originalTaskStore;
-	$: updateEnabled = task && task.name && task.command && task.input_type && task.output_type;
+	$: updateEnabled = !saving && task && task.name && task.command && task.input_type && task.output_type;
 	/** @type {Modal} */
 	let modal;
 	let saved = false;
+
+	let saving = false;
 
 	/**
 	 * Edits a task on the server
@@ -23,6 +25,7 @@
 			if (!task) {
 				return;
 			}
+			saving = true;
 
 			let taskProperties = nullifyEmptyStrings(task);
 			taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
@@ -46,6 +49,8 @@
 			console.log('Task updated successfully');
 			updateEditedTask(task);
 			saved = true;
+		}, () => {
+			saving = false;
 		});
 	}
 
@@ -231,6 +236,9 @@
 	<svelte:fragment slot="footer">
 		{#if task}
 			<button class="btn btn-primary" on:click={handleEditTask} disabled={!updateEnabled}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
 				Update
 			</button>
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

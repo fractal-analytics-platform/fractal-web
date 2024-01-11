@@ -171,38 +171,46 @@
 		updatedWorkflowName = workflow.name;
 	}
 
+	let workflowUpdating = false;
+
 	/**
 	 * Updates a project's workflow in the server
 	 * @returns {Promise<void>}
 	 */
 	async function handleWorkflowUpdate() {
-		editWorkflowModal.confirmAndHide(async () => {
-			workflowSuccessMessage = '';
-			if (!workflow) {
-				return;
+		editWorkflowModal.confirmAndHide(
+			async () => {
+				workflowSuccessMessage = '';
+				if (!workflow) {
+					return;
+				}
+				workflowUpdating = true;
+
+				const headers = new Headers();
+				headers.set('Content-Type', 'application/json');
+
+				const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+					method: 'PATCH',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify({
+						name: updatedWorkflowName
+					})
+				});
+
+				const result = await response.json();
+				if (response.ok) {
+					workflow = result;
+					workflowSuccessMessage = 'Workflow updated correctly';
+				} else {
+					console.error('Error updating workflow properties', result);
+					throw new AlertError(result);
+				}
+			},
+			() => {
+				workflowUpdating = false;
 			}
-
-			const headers = new Headers();
-			headers.set('Content-Type', 'application/json');
-
-			const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
-				method: 'PATCH',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({
-					name: updatedWorkflowName
-				})
-			});
-
-			const result = await response.json();
-			if (response.ok) {
-				workflow = result;
-				workflowSuccessMessage = 'Workflow updated correctly';
-			} else {
-				console.error('Error updating workflow properties', result);
-				throw new AlertError(result);
-			}
-		});
+		);
 	}
 
 	function resetCreateWorkflowTaskModal() {
@@ -211,71 +219,79 @@
 		workflowTaskSelectionComponent.reset();
 	}
 
+	let creatingWorkflowTask = false;
+
 	/**
 	 * Creates a new project's workflow task in the server.
 	 * @returns {Promise<void>}
 	 */
 	async function handleCreateWorkflowTask() {
-		insertTaskModal.confirmAndHide(async () => {
-			if (!workflow) {
-				return;
-			}
-			workflowSuccessMessage = '';
-
-			const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
-			if (taskId === undefined) {
-				return;
-			}
-
-			const headers = new Headers();
-			headers.set('Content-Type', 'application/json');
-
-			// Creating workflow task
-			const workflowTaskResponse = await fetch(
-				`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers,
-					body: JSON.stringify({
-						order: taskOrder,
-						meta: {},
-						args: {}
-					})
+		insertTaskModal.confirmAndHide(
+			async () => {
+				if (!workflow) {
+					return;
 				}
-			);
+				workflowSuccessMessage = '';
+				creatingWorkflowTask = true;
 
-			const workflowTaskResult = await workflowTaskResponse.json();
-
-			if (!workflowTaskResponse.ok) {
-				console.error('Error while creating workflow task', workflowTaskResult);
-				throw new AlertError(workflowTaskResult);
-			}
-			console.log('Workflow task created');
-
-			// Get updated workflow with created task
-			const workflowResponse = await fetch(
-				`/api/v1/project/${project.id}/workflow/${workflow.id}`,
-				{
-					method: 'GET',
-					credentials: 'include'
+				const taskId = workflowTaskSelectionComponent.getSelectedTaskId();
+				if (taskId === undefined) {
+					return;
 				}
-			);
 
-			const workflowResult = await workflowResponse.json();
+				const headers = new Headers();
+				headers.set('Content-Type', 'application/json');
 
-			if (!workflowResponse.ok) {
-				console.error('Error while retrieving workflow', workflowResult);
-				throw new AlertError(workflowResult);
+				// Creating workflow task
+				const workflowTaskResponse = await fetch(
+					`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
+					{
+						method: 'POST',
+						credentials: 'include',
+						headers,
+						body: JSON.stringify({
+							order: taskOrder,
+							meta: {},
+							args: {}
+						})
+					}
+				);
+
+				const workflowTaskResult = await workflowTaskResponse.json();
+
+				if (!workflowTaskResponse.ok) {
+					console.error('Error while creating workflow task', workflowTaskResult);
+					throw new AlertError(workflowTaskResult);
+				}
+				console.log('Workflow task created');
+
+				// Get updated workflow with created task
+				const workflowResponse = await fetch(
+					`/api/v1/project/${project.id}/workflow/${workflow.id}`,
+					{
+						method: 'GET',
+						credentials: 'include'
+					}
+				);
+
+				const workflowResult = await workflowResponse.json();
+
+				if (!workflowResponse.ok) {
+					console.error('Error while retrieving workflow', workflowResult);
+					throw new AlertError(workflowResult);
+				}
+
+				// Update workflow
+				workflow = workflowResult;
+				// UI Feedback
+				workflowSuccessMessage = 'Workflow task created';
+				resetCreateWorkflowTaskModal();
+				await checkNewVersions();
+			},
+			() => {
+				creatingWorkflowTask = false;
 			}
-
-			// Update workflow
-			workflow = workflowResult;
-			// UI Feedback
-			workflowSuccessMessage = 'Workflow task created';
-			resetCreateWorkflowTaskModal();
-			await checkNewVersions();
-		});
+		);
 	}
 
 	/**
@@ -348,6 +364,8 @@
 		argsSchemaValid = true;
 	}
 
+	let applyingWorkflow = false;
+
 	/**
 	 * Requests the server to apply a project's workflow (i.e. run it)
 	 * @returns {Promise<void>}
@@ -376,6 +394,7 @@
 				last_task_index: lastTaskIndexControl
 			};
 
+			applyingWorkflow = true;
 			const headers = new Headers();
 			headers.set('Content-Type', 'application/json');
 
@@ -388,6 +407,7 @@
 					body: JSON.stringify(requestBody, replaceEmptyStrings)
 				}
 			);
+			applyingWorkflow = false;
 
 			// Handle API response
 			if (response.ok) {
@@ -496,7 +516,7 @@
 		);
 		const outputStatus = await outputStatusResponse.json();
 		if (!outputStatusResponse.ok) {
-			console.error('Error retrieving dataset status', outputStatus)
+			console.error('Error retrieving dataset status', outputStatus);
 			return;
 		}
 		statuses = outputStatus.status;
@@ -963,7 +983,12 @@
 				/>
 			</div>
 
-			<button class="btn btn-primary" type="submit">Insert</button>
+			<button class="btn btn-primary" type="submit" disabled={creatingWorkflowTask}>
+				{#if creatingWorkflowTask}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				Insert
+			</button>
 		</form>
 	</svelte:fragment>
 </Modal>
@@ -990,7 +1015,12 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" form="updateWorkflow">Save</button>
+		<button class="btn btn-primary" form="updateWorkflow" disabled={workflowUpdating}>
+			{#if workflowUpdating}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Save
+		</button>
 	</svelte:fragment>
 </Modal>
 
@@ -1092,7 +1122,10 @@
 					checkingConfiguration = false;
 				}}>Cancel</button
 			>
-			<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow}>
+			<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow} disabled={applyingWorkflow}>
+				{#if applyingWorkflow}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
 				Confirm
 			</button>
 		{:else}

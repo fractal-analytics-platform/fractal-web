@@ -9,6 +9,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
+	import StandardDismissableAlert from '../common/StandardDismissableAlert.svelte';
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
@@ -81,6 +82,9 @@
 		tableHandler.setRows(jobs);
 	}
 
+	let cancellingJobs = [];
+	let jobCancelledMessage = '';
+
 	/**
 	 * Requests the server to stop a job execution
 	 * @param {import('$lib/types').ApplyWorkflow} job
@@ -92,6 +96,10 @@
 		}
 
 		console.log('Stop running job');
+
+		cancellingJobs = [...cancellingJobs, job.id];
+		jobCancelledMessage = '';
+
 		let stopJobUrl = admin
 			? `/api/admin/job/${job.id}/stop`
 			: `/api/v1/project/${job.project_id}/job/${job.id}/stop`;
@@ -100,9 +108,10 @@
 			credentials: 'include'
 		});
 
+		cancellingJobs = cancellingJobs.filter((j) => j !== job.id);
+
 		if (response.ok) {
-			// Refresh page
-			window.location.reload();
+			jobCancelledMessage = 'Job cancellation request received. The job will stop in a few seconds';
 		} else {
 			console.error('Error stopping job');
 			const errorResponse = await response.json();
@@ -155,6 +164,8 @@
 		clearTimeout(updateJobsTimeout);
 	});
 </script>
+
+<StandardDismissableAlert message={jobCancelledMessage} />
 
 {#if tableHandler}
 	<div class="d-flex justify-content-end align-items-center my-3">
@@ -317,8 +328,21 @@
 								{/if}
 							{/if}
 							{#if row.status === 'running'}
-								<button class="btn btn-danger" on:click={() => handleJobCancel(row)}>
-									<i class="bi-x-circle" /> Cancel
+								<button
+									class="btn btn-danger"
+									on:click={() => handleJobCancel(row)}
+									disabled={cancellingJobs.includes(row.id)}
+								>
+									{#if cancellingJobs.includes(row.id)}
+										<span
+											class="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										/>
+									{:else}
+										<i class="bi-x-circle" />
+									{/if}
+									Cancel
 								</button>
 							{/if}
 						</td>
