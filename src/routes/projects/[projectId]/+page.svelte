@@ -13,40 +13,47 @@
 	let projectUpdatesSuccessMessage = '';
 
 	let updatedProjectName = '';
+	let updating = false;
 
 	/** @type {Modal} */
 	let editProjectModal;
 
 	async function handleProjectPropertiesUpdate() {
-		editProjectModal.confirmAndHide(async () => {
-			projectUpdatesSuccessMessage = '';
-			if (!updatedProjectName) {
-				return;
+		editProjectModal.confirmAndHide(
+			async () => {
+				updating = true;
+				projectUpdatesSuccessMessage = '';
+				if (!updatedProjectName) {
+					return;
+				}
+
+				const headers = new Headers();
+				headers.set('Content-Type', 'application/json');
+
+				const response = await fetch(`/api/v1/project/${project.id}`, {
+					method: 'PATCH',
+					credentials: 'include',
+					mode: 'cors',
+					headers,
+					body: JSON.stringify({
+						name: updatedProjectName
+					})
+				});
+
+				const result = await response.json();
+				if (response.ok) {
+					console.log('Project updated successfully');
+					projectUpdatesSuccessMessage = 'Project properties successfully updated';
+					project.name = result.name;
+				} else {
+					console.error('Error while updating project', result);
+					throw new AlertError(result);
+				}
+			},
+			() => {
+				updating = false;
 			}
-
-			const headers = new Headers();
-			headers.set('Content-Type', 'application/json');
-
-			const response = await fetch(`/api/v1/project/${project.id}`, {
-				method: 'PATCH',
-				credentials: 'include',
-				mode: 'cors',
-				headers,
-				body: JSON.stringify({
-					name: updatedProjectName
-				})
-			});
-
-			const result = await response.json();
-			if (response.ok) {
-				console.log('Project updated successfully');
-				projectUpdatesSuccessMessage = 'Project properties successfully updated';
-				project.name = result.name;
-			} else {
-				console.error('Error while updating project', result);
-				throw new AlertError(result);
-			}
-		});
+		);
 	}
 
 	function onEditProjectModalOpen() {
@@ -104,6 +111,11 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" form="updateProject">Save</button>
+		<button class="btn btn-primary" form="updateProject" disabled={updating}>
+			{#if updating}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Save
+		</button>
 	</svelte:fragment>
 </Modal>

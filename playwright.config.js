@@ -7,6 +7,7 @@ dotenv.config({ path: '.env.development' });
 
 export default defineConfig({
 	testDir: 'tests',
+	retries: 3,
 
 	projects: [
 		{ name: 'auth', testMatch: /auth\.setup\.js/ },

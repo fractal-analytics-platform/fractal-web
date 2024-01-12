@@ -83,6 +83,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		const userRow = await getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(`/admin/users/${userId}/edit`);
+		await waitPageLoading(page);
 	});
 
 	await test.step('Test cache dir validation error', async () => {
@@ -103,7 +104,10 @@ test('Create, update and delete a user', async ({ page }) => {
 	});
 
 	await test.step('Rename username and unset verified checkbox', async () => {
-		await page.getByLabel('Verified').uncheck();
+		const verifiedCheckbox = page.getByLabel('Verified');
+		await verifiedCheckbox.waitFor();
+		expect(await verifiedCheckbox.isChecked()).toEqual(true);
+		await verifiedCheckbox.uncheck();
 		await page.getByLabel('Cache dir').fill('/tmp/test');
 		await page.getByLabel('Username').fill(randomUserName + '-renamed');
 		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');

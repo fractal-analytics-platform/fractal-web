@@ -36,9 +36,12 @@
 		projectInfoModal.set(project);
 	}
 
+	let creating = false;
+
 	async function handleCreateProject() {
 		newProjectModal.hideErrorAlert();
 		newProjectNameError = '';
+		creating = true;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -54,6 +57,7 @@
 		});
 
 		const result = await response.json();
+		creating = false;
 		if (response.ok) {
 			newProjectName = '';
 			projects = [...projects, result];
@@ -197,6 +201,11 @@
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary" form="create-project-form">Create</button>
+		<button class="btn btn-primary" form="create-project-form" disabled={creating}>
+			{#if creating}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Create
+		</button>
 	</svelte:fragment>
 </Modal>

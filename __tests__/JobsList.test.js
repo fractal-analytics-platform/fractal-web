@@ -132,7 +132,8 @@ describe('JobsList', () => {
 		await fireEvent.click(cancelButton);
 		await new Promise(setTimeout);
 
-		expect(window.location.reload).toHaveBeenCalledOnce();
+		const message = result.getByText(/Job cancellation request received/);
+		expect(message).toBeDefined();
 	});
 
 	it('error while cancelling job', async () => {

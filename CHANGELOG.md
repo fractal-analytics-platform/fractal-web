@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Improved buttons feedback for slow API calls (\#389).
+
 # 0.8.0 
 
 * Users registered by the admin are automatically verified (\#386).

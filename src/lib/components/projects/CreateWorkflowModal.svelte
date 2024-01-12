@@ -42,16 +42,18 @@
 
 	function handleImportOrCreateWorkflow() {
 		modal.confirmAndHide(async () => {
+			creating = true;
 			if (workflowFileSelected) {
 				await handleImportWorkflow();
 			} else {
 				await handleCreateWorkflow();
 			}
+		}, () => {
+			creating = false;
 		});
 	}
 
 	async function handleImportWorkflow() {
-		creating = true;
 		const workflowFile = /** @type {FileList}*/ (files)[0];
 
 		const workflowFileContent = await workflowFile.text();
@@ -60,7 +62,6 @@
 			workflowMetadata = JSON.parse(workflowFileContent);
 		} catch (err) {
 			console.error(err);
-			creating = false;
 			throw new AlertError('The workflow file is not a valid JSON file');
 		}
 
@@ -78,8 +79,6 @@
 			headers,
 			body: JSON.stringify(workflowMetadata)
 		});
-
-		creating = false;
 
 		const result = await response.json();
 		if (response.ok) {
@@ -106,7 +105,6 @@
 			return;
 		}
 
-		creating = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -125,7 +123,6 @@
 			workflowName = '';
 			goto(`/projects/${projectId}/workflows/${result.id}`);
 		} else {
-			creating = false;
 			throw new AlertError(result, response.status);
 		}
 	}

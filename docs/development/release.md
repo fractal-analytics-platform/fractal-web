@@ -6,3 +6,4 @@ Steps to release a new `fractal-web` version:
 * Execute `npm version <major|minor|patch>`
 * Execute `git push origin main`
 * Execute `git push origin <new-version-tag>`
+* Update the GitHub release page with the information from `CHANGELOG.md`

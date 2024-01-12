@@ -49,6 +49,8 @@
 		}
 	}
 
+	let workflowTaskSorting = false;
+
 	/**
 	 * Reorders a project's workflow in the server
 	 * @returns {Promise<*>}
@@ -61,6 +63,7 @@
 			reordered_workflowtask_ids: editableTasksList.map((t) => t.id)
 		};
 
+		workflowTaskSorting = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -71,6 +74,7 @@
 			headers,
 			body: JSON.stringify(patchData)
 		});
+		workflowTaskSorting = false;
 
 		const result = await response.json();
 		if (response.ok) {
@@ -127,7 +131,10 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate}>
+		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate} disabled={workflowTaskSorting}>
+			{#if workflowTaskSorting}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
 			Save
 		</button>
 	</svelte:fragment>

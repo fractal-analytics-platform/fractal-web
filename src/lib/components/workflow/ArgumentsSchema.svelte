@@ -20,10 +20,12 @@
 	export let unsavedChanges = false;
 	let resetChanges = undefined;
 	export let saveChanges = undefined;
+	let savingChanges = false;
 
 	async function handleSaveChanges(newArgs) {
 		const projectId = $page.params.projectId;
 		try {
+			savingChanges = true;
 			const response = await updateFormEntry(
 				projectId,
 				workflowId,
@@ -37,6 +39,8 @@
 		} catch (err) {
 			displayStandardErrorAlert(err, 'json-schema-validation-errors');
 			throw err;
+		} finally {
+			savingChanges = false;
 		}
 	}
 
@@ -77,7 +81,14 @@
 			</button>
 		</div>
 		<div class="ms-1">
-			<button class="btn btn-success {unsavedChanges ? '' : 'disabled'}" on:click={saveChanges}>
+			<button
+				class="btn btn-success"
+				disabled={!unsavedChanges || savingChanges}
+				on:click={saveChanges}
+			>
+				{#if savingChanges}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
 				Save changes
 			</button>
 		</div>

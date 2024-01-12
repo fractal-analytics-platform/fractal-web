@@ -48,8 +48,10 @@
 	 * Executes a callback function when the user confirm the modal action. If the callback is successful
 	 * the modal is closed, otherwise an error message is displayed.
 	 * @param {() => Promise<void>} confirm The asynchronous function to be executed before closing the modal
+	 * @param {(() => void)|undefined} finallyCallback Optional function to be executed at the end of the processing
+	 * (both in case of success or failure)
 	 */
-	export async function confirmAndHide(confirm) {
+	export async function confirmAndHide(confirm, finallyCallback = undefined) {
 		// important: retrieve the modal before executing confirm(), because it could remove
 		// the container element and then cause issues with the hide function
 		const modal = getBootstrapModal();
@@ -59,6 +61,10 @@
 			modal.hide();
 		} catch (/** @type {any} */ error) {
 			displayErrorAlert(error);
+		} finally {
+			if (finallyCallback) {
+				finallyCallback();
+			}
 		}
 	}
 
