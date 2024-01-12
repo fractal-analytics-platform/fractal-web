@@ -1,5 +1,5 @@
 <script>
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL } from '$env/static/public';
 	import { page } from '$app/stores';
 
 	$: userLoggedIn = !!$page.data.userInfo;
@@ -29,11 +29,11 @@
 		<a href="/jobs" class="btn btn-primary">Jobs</a>
 	</div>
 
-	{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
+	{#if PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 		<h3 class="fw-light">Where to get support</h3>
 		<p>
-			<a href="mailto:{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">
-				{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
+			<a href="mailto:{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">
+				{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 			</a>
 		</p>
 	{/if}

@@ -2,6 +2,13 @@
 
 # Unreleased
 
+Note: with this release, `PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL` becomes a required
+environment variable, and `npm run build` fails if it is missing. If you do not
+need a support email, just include a `PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL=` line in
+your env file.
+
+* Made `PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL` static (\#391).
+* Added SLURM-account selection for user editing and for job execution (\#391).
 * Improved buttons feedback for slow API calls (\#389).
 
 # 0.8.0 
