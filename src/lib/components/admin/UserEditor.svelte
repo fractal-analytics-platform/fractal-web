@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import {
@@ -52,7 +52,14 @@
 		}
 	}
 
-	const handledErrorKeys = ['email', 'username', 'slurm_user', 'cache_dir', 'password'];
+	const handledErrorKeys = [
+		'email',
+		'username',
+		'slurm_user',
+		'cache_dir',
+		'password',
+		'slurm_accounts'
+	];
 
 	async function confirmSave() {
 		saving = true;
@@ -71,6 +78,10 @@
 					genericErrorAlert = displayStandardErrorAlert(result, 'genericError');
 				}
 				return;
+			}
+			if (result.id === $page.data.userInfo.id) {
+				// If the user modifies their own account the userInfo cached in the store has to be reloaded
+				await invalidateAll();
 			}
 			await goto('/admin/users');
 		} finally {
@@ -104,6 +115,17 @@
 	 */
 	function addValidationError(key, value) {
 		validationErrors = { ...validationErrors, [key]: value };
+	}
+
+	function addSlurmAccount() {
+		user.slurm_accounts = [...user.slurm_accounts, ''];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeSlurmAccount(index) {
+		user.slurm_accounts = user.slurm_accounts.filter((_, i) => i !== index);
 	}
 
 	onMount(() => {
@@ -231,6 +253,45 @@
 					The user who will be impersonated by Fractal when running SLURM jobs
 				</div>
 				<span class="invalid-feedback">{validationErrors['slurm_user']}</span>
+			</div>
+		</div>
+		<div class="row mb-3 has-validation">
+			<label for="slurmAccount-0" class="col-sm-3 col-form-label text-end">
+				<strong>SLURM accounts</strong>
+			</label>
+			<div class="col-sm-9 has-validation">
+				{#each user.slurm_accounts as slurmAccount, i}
+					<div
+						class="input-group mb-2"
+						class:is-invalid={formSubmitted && validationErrors['slurm_accounts']}
+					>
+						<input
+							type="text"
+							class="form-control"
+							id={`slurmAccount-${i}`}
+							bind:value={slurmAccount}
+							class:is-invalid={formSubmitted && validationErrors['slurm_accounts']}
+							required
+						/>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							id="slurm_account_remove_{i}"
+							aria-label="Remove SLURM account"
+							on:click={() => removeSlurmAccount(i)}
+						>
+							<i class="bi bi-trash" />
+						</button>
+					</div>
+				{/each}
+				<span class="invalid-feedback mb-2">{validationErrors['slurm_accounts']}</span>
+				<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
+					<i class="bi bi-plus-circle" />
+					Add SLURM account
+				</button>
+				<div class="form-text">
+					The first account in the list will be used as a default for job execution.
+				</div>
 			</div>
 		</div>
 		<div class="row mb-3 has-validation">

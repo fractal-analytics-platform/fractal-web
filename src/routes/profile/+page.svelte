@@ -9,9 +9,23 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
+	let editSlurmAccounts = false;
+	let slurmAccounts = [];
+	let slurmAccountsError = '';
+
 	let editCacheDir = false;
 	let cacheDir = '';
 	let cacheDirError = '';
+
+	function toggleEditSlurmAccounts() {
+		if (editSlurmAccounts) {
+			editSlurmAccounts = false;
+			slurmAccountsError = '';
+		} else {
+			editSlurmAccounts = true;
+			slurmAccounts = user.slurm_accounts;
+		}
+	}
 
 	function toggleEditCacheDir() {
 		if (editCacheDir) {
@@ -23,7 +37,48 @@
 		}
 	}
 
+	function addSlurmAccount() {
+		slurmAccounts = [...slurmAccounts, ''];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeSlurmAccount(index) {
+		slurmAccounts = slurmAccounts.filter((_, i) => i !== index);
+	}
+
+	async function saveSlurmAccounts() {
+		handlePatch(
+			{ slurm_accounts: slurmAccounts },
+			() => {
+				user.slurm_accounts = slurmAccounts;
+				editSlurmAccounts = false;
+			},
+			(error) => (slurmAccountsError = error),
+			'slurm_accounts'
+		);
+	}
+
 	async function saveCacheDir() {
+		handlePatch(
+			{ cache_dir: cacheDir },
+			() => {
+				user.cache_dir = cacheDir;
+				editCacheDir = false;
+			},
+			(error) => (cacheDirError = error),
+			'cache_dir'
+		);
+	}
+
+	/**
+	 * @param {object} payload
+	 * @param {() => void} onSuccess
+	 * @param {(error: string) => void} onError
+	 * @param {string} errorKey
+	 */
+	async function handlePatch(payload, onSuccess, onError, errorKey) {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
@@ -33,16 +88,15 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({ cache_dir: cacheDir })
+			body: JSON.stringify(payload)
 		});
 		if (response.ok) {
-			user.cache_dir = cacheDir;
-			editCacheDir = false;
+			onSuccess();
 		} else {
 			const result = await response.json();
 			const errorMap = getValidationMessagesMap(result, response.status);
-			if (errorMap && Object.keys(errorMap).length === 1 && 'cache_dir' in errorMap) {
-				cacheDirError = errorMap['cache_dir'];
+			if (errorMap && Object.keys(errorMap).length === 1 && errorKey in errorMap) {
+				onError(errorMap[errorKey]);
 			} else {
 				errorAlert = displayStandardErrorAlert(result, 'profileUpdate-error');
 			}
@@ -95,6 +149,63 @@
 					<th>Slurm user</th>
 					<td>{user.slurm_user || '-'}</td>
 					<td />
+				</tr>
+				<tr>
+					<th>SLURM accounts</th>
+					<td>
+						{#if editSlurmAccounts}
+							<div class="col-sm-9 has-validation">
+								{#each slurmAccounts as slurmAccount, i}
+									<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
+										<input
+											type="text"
+											class="form-control"
+											id={`slurmAccount-${i}`}
+											bind:value={slurmAccount}
+											class:is-invalid={slurmAccountsError}
+											required
+										/>
+										<button
+											class="btn btn-outline-secondary"
+											type="button"
+											id="slurm_account_remove_{i}"
+											aria-label="Remove SLURM account"
+											on:click={() => removeSlurmAccount(i)}
+										>
+											<i class="bi bi-trash" />
+										</button>
+									</div>
+								{/each}
+								<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
+								<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
+									<i class="bi bi-plus-circle" />
+									Add SLURM account
+								</button>
+							</div>
+						{:else if user.slurm_accounts.length > 0}
+							{#each user.slurm_accounts as account}
+								<span class="badge text-bg-light fw-normal fs-6">{account}</span>
+								&nbsp;
+							{/each}
+						{:else}
+							-
+						{/if}
+					</td>
+					<td>
+						{#if editSlurmAccounts}
+							<button class="btn btn-primary float-end" on:click={saveSlurmAccounts}> Save </button>
+							<button class="btn btn-outline-secondary float-end me-1" on:click={toggleEditSlurmAccounts}>
+								<i class="bi bi-arrow-counterclockwise" /> Undo
+							</button>
+						{:else}
+							<button
+								class="btn btn-primary pt-0 pb-0 float-end"
+								on:click={toggleEditSlurmAccounts}
+							>
+								<i class="bi bi-pencil" /> Edit
+							</button>
+						{/if}
+					</td>
 				</tr>
 				<tr>
 					<th>Cache dir</th>

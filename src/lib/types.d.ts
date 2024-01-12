@@ -94,6 +94,7 @@ export type ApplyWorkflow = {
   first_task_index: number | null
   last_task_index: number | null
   user_email: string
+  slurm_account: string | null
 }
 
 export type User = {
@@ -106,6 +107,7 @@ export type User = {
   slurm_user: string | null
   cache_dir: string | null
   password?: string
+  slurm_accounts: string[]
 }
 
 export type TaskCollectStatus = 'pending' | 'installing' | 'collecting' | 'fail' | 'OK';

@@ -36,6 +36,9 @@
 	let checkingConfiguration = false;
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
+	let setSlurmAccount = true;
+	let slurmAccount =
+		$page.data.userInfo.slurm_accounts.length === 0 ? '' : $page.data.userInfo.slurm_accounts[0];
 	let workerInitControl = '';
 	let firstTaskIndexControl = '';
 	let lastTaskIndexControl = '';
@@ -440,6 +443,9 @@
 				first_task_index: firstTaskIndexControl,
 				last_task_index: lastTaskIndexControl
 			};
+			if (setSlurmAccount && slurmAccount !== '') {
+				requestBody.slurm_account = slurmAccount;
+			}
 
 			applyingWorkflow = true;
 			const headers = new Headers();
@@ -1065,6 +1071,35 @@
 					bind:value={workerInitControl}
 				/>
 			</div>
+			{#if $page.data.userInfo.slurm_accounts.length > 0}
+				<div class="mb-3">
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="setSlurmAccount"
+							bind:checked={setSlurmAccount}
+						/>
+						<label class="form-check-label" for="setSlurmAccount"> Set SLURM account </label>
+					</div>
+				</div>
+				{#if setSlurmAccount}
+					<div class="mb-3">
+						<label for="slurmAccount" class="form-label">SLURM account</label>
+						<select
+							name="slurmAccount"
+							id="slurmAccount"
+							class="form-control"
+							disabled={checkingConfiguration}
+							bind:value={slurmAccount}
+						>
+							{#each $page.data.userInfo.slurm_accounts as account}
+								<option>{account}</option>
+							{/each}
+						</select>
+					</div>
+				{/if}
+			{/if}
 		</form>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
