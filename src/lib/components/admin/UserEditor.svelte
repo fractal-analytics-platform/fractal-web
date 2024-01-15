@@ -270,6 +270,7 @@
 							class="form-control"
 							id={`slurmAccount-${i}`}
 							bind:value={slurmAccount}
+							aria-label={`SLURM account #${i + 1}`}
 							class:is-invalid={formSubmitted && validationErrors['slurm_accounts']}
 							required
 						/>
@@ -277,7 +278,7 @@
 							class="btn btn-outline-secondary"
 							type="button"
 							id="slurm_account_remove_{i}"
-							aria-label="Remove SLURM account"
+							aria-label={`Remove SLURM account #${i + 1}`}
 							on:click={() => removeSlurmAccount(i)}
 						>
 							<i class="bi bi-trash" />

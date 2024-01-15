@@ -110,8 +110,8 @@ test('Create, update and delete a user', async ({ page }) => {
 	await test.step('SLURM account validation error', async () => {
 		await page.getByRole('button', { name: 'Add SLURM account' }).click();
 		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page.getByRole('textbox', { name: 'SLURM accounts' }).fill(randomUserName + '-slurm-account');
-		await page.locator('#slurmAccount-1').fill(randomUserName + '-slurm-account');
+		await page.getByRole('textbox', { name: /^SLURM account #1/ }).fill(randomUserName + '-slurm-account');
+		await page.getByRole('textbox', { name: /^SLURM account #2/ }).fill(randomUserName + '-slurm-account');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
 		await page.getByLabel('Remove SLURM account').first().click();
