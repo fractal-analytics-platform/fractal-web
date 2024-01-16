@@ -11,11 +11,13 @@ test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Open the manage users page', async () => {
 		await page.getByRole('link', { name: 'Manage users' }).click();
 		await page.waitForURL('/admin/users');
+		await waitPageLoading(page);
 	});
 
 	await test.step('Open the user registration page', async () => {
 		await page.getByRole('link', { name: 'Register new user' }).click();
 		await page.waitForURL('/admin/users/register');
+		await waitPageLoading(page);
 	});
 
 	const randomUserName = Math.random().toString(36).substring(7);
@@ -63,7 +65,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		const userRow = await getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Info' }).click();
 		await page.waitForURL(`/admin/users/${userId}`);
-
+		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
 		expect(await cells[0].innerText()).toEqual(userId);
 		expect(await cells[1].innerText()).toEqual(randomUserName + '@example.com');
@@ -72,7 +74,8 @@ test('Create, update and delete a user', async ({ page }) => {
 		verifyChecked(cells, 4, false);
 		verifyChecked(cells, 5, true);
 		expect(await cells[6].innerText()).toEqual(randomUserName + '_slurm');
-		expect(await cells[7].innerText()).toEqual('/tmp/test');
+		expect(await cells[7].innerText()).toEqual('-');
+		expect(await cells[8].innerText()).toEqual('/tmp/test');
 	});
 
 	// Go back to previous page
@@ -101,6 +104,17 @@ test('Create, update and delete a user', async ({ page }) => {
 			}
 			return false;
 		});
+		await page.getByLabel('Cache dir').fill('/tmp/test');
+	});
+
+	await test.step('SLURM account validation error', async () => {
+		await page.getByRole('button', { name: 'Add SLURM account' }).click();
+		await page.getByRole('button', { name: 'Add SLURM account' }).click();
+		await page.getByRole('textbox', { name: /^SLURM account #1/ }).fill(randomUserName + '-slurm-account');
+		await page.getByRole('textbox', { name: /^SLURM account #2/ }).fill(randomUserName + '-slurm-account');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
+		await page.getByLabel('Remove SLURM account').first().click();
 	});
 
 	await test.step('Rename username and unset verified checkbox', async () => {
@@ -122,6 +136,29 @@ test('Create, update and delete a user', async ({ page }) => {
 		verifyChecked(userRowCells, 4, false);
 		verifyChecked(userRowCells, 5, false);
 		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
+	});
+
+	await test.step('Display the user info page', async () => {
+		const userRow = await getUserRow(page, randomUserName + '-renamed');
+		await userRow.getByRole('link', { name: 'Info' }).click();
+		await page.waitForURL(`/admin/users/${userId}`);
+		await waitPageLoading(page);
+		const cells = await page.locator('table td').all();
+		expect(await cells[0].innerText()).toEqual(userId);
+		expect(await cells[1].innerText()).toEqual(randomUserName + '@example.com');
+		expect(await cells[2].innerText()).toEqual(randomUserName + '-renamed');
+		verifyChecked(cells, 3, true);
+		verifyChecked(cells, 4, false);
+		verifyChecked(cells, 5, false);
+		expect(await cells[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
+		expect(await cells[7].innerText()).toContain(randomUserName + '-slurm-account');
+		expect(await cells[8].innerText()).toEqual('/tmp/test');
+	});
+
+	await test.step('Go back clicking on breadcrumb', async () => {
+		await page.getByText('Manage users').click();
+		await page.waitForURL(`/admin/users`);
+		await waitPageLoading(page);
 	});
 
 	await test.step('Grant superuser privilege', async () => {

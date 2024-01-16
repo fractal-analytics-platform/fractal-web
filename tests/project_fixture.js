@@ -53,7 +53,7 @@ export class PageWithProject {
 		await this.page.getByRole('button', { name: 'Confirm' }).click();
 
 		await this.page.waitForFunction((projectName) => {
-			const projectNames = [...document.querySelectorAll('table td:nth-child(2)')].map(
+			const projectNames = [...document.querySelectorAll('table td:nth-child(1)')].map(
 				(c) => /** @type {HTMLElement} */ (c).innerText
 			);
 			return !projectNames.includes(projectName);

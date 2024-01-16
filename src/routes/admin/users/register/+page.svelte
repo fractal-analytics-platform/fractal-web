@@ -11,7 +11,8 @@
 		username: '',
 		slurm_user: '',
 		cache_dir: '',
-		password: ''
+		password: '',
+		slurm_accounts: []
 	};
 
 	/** @type {undefined|boolean} */

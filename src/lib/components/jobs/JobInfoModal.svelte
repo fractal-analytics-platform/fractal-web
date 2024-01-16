@@ -105,6 +105,8 @@
 						<li class="list-group-item"><code>{job.working_dir}</code></li>
 						<li class="list-group-item list-group-item-light fw-bold">User Working directory</li>
 						<li class="list-group-item"><code>{job.working_dir_user}</code></li>
+						<li class="list-group-item list-group-item-light fw-bold">SLURM account</li>
+						<li class="list-group-item">{job.slurm_account || '-'}</li>
 					</ul>
 				{/if}
 			</div>

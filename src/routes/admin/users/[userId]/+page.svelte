@@ -49,8 +49,21 @@
 					<td><BooleanIcon value={user.is_verified} /></td>
 				</tr>
 				<tr>
-					<th>Slurm user</th>
+					<th>SLURM user</th>
 					<td>{user.slurm_user || '-'}</td>
+				</tr>
+				<tr>
+					<th>SLURM accounts</th>
+					<td>
+						{#if user.slurm_accounts.length > 0}
+							{#each user.slurm_accounts as account}
+								<span class="badge text-bg-light fw-normal fs-6">{account}</span>
+								&nbsp;
+							{/each}
+						{:else}
+							-
+						{/if}
+					</td>
 				</tr>
 				<tr>
 					<th>Cache dir</th>
