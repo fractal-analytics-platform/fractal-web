@@ -1,6 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.8.1
+
+This release requires fractal-server 1.4.3.
 
 Note: with this release, `PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL` becomes a required
 environment variable, and `npm run build` fails if it is missing. If you do not
@@ -11,7 +13,7 @@ your env file.
 * Added SLURM-account selection for user editing and for job execution (\#391).
 * Improved buttons feedback for slow API calls (\#389).
 
-# 0.8.0 
+# 0.8.0
 
 * Users registered by the admin are automatically verified (\#386).
 * A warning message is displayed to unverified users (\#386).
