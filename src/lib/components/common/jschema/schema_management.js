@@ -250,6 +250,19 @@ export class SchemaProperty {
 	}
 
 	/**
+	 * @param {any} value
+	 * @param {number} index
+	 */
+	updateNestedPropertyValue(value, index) {
+		const nestedProperty = this.nestedProperties[index];
+		nestedProperty.value = value;
+		this.nestedProperties = this.nestedProperties.filter((p, i) =>
+			i === index ? nestedProperty : p
+		);
+		this.manager.updateValue(this.key, this.getUpdatedNestedProperties());
+	}
+
+	/**
 	 * @param {number} index
 	 * @returns {any[]}
 	 */

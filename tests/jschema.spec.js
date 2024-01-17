@@ -146,7 +146,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		const addBtn = form.getByRole('button', { name: 'Add argument to list' }).first();
 		await addBtn.click();
 		await addBtn.click();
-		await addBtn.click();
+		expect(await addBtn.isDisabled()).toEqual(true);
 		// Fill items
 		await form.locator('id=property-requiredArrayWithMinMaxItems###0').fill('a');
 		await form.locator('id=property-requiredArrayWithMinMaxItems###1').fill('b');
@@ -163,6 +163,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await checkFirstArray(['a', 'b', 'd', 'c']);
 		// Remove items
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
+		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		await checkFirstArray(['a', 'b']);
 		await form.getByRole('button', { name: 'Remove' }).nth(1).click();
@@ -186,11 +187,12 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await addBtn.click();
 		await addBtn.click();
 		await addBtn.click();
-		await addBtn.click();
+		expect(await addBtn.isDisabled()).toEqual(true);
 		await form.locator('id=property-optionalArrayWithMinMaxItems###0').fill('a');
 		await form.locator('id=property-optionalArrayWithMinMaxItems###1').fill('b');
 		await form.locator('id=property-optionalArrayWithMinMaxItems###2').fill('c');
 		await form.getByRole('button', { name: 'Remove' }).nth(4).click();
+		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		expect(form.locator('id=property-optionalArrayWithMinMaxItems###0')).toHaveCount(0);

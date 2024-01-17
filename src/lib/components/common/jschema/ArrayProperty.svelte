@@ -55,9 +55,7 @@
 	}
 
 	function addNestedProperty() {
-		const maxItems = getMaxItems(schemaProperty.referenceSchema);
-		if (maxItems !== null && nestedProperties.length === maxItems) {
-			// It is not possible to add more properties than maxItems
+		if (!canAddMoreItems(nestedProperties)) {
 			return;
 		}
 		schemaProperty.addNestedSchemaProperty(undefined, nestedProperties.length);
@@ -68,13 +66,13 @@
 	 * @param {number} index
 	 */
 	function removeNestedProperty(index) {
-		schemaProperty.removeNestedSchemaProperty(index);
-		nestedProperties = schemaProperty.nestedProperties;
 		const minItems = getMinItems(schemaProperty.referenceSchema);
-		if (schemaProperty.isRequired() && minItems !== null && nestedProperties.length < minItems) {
-			schemaProperty.addNestedSchemaProperty(undefined, index);
-			nestedProperties = schemaProperty.nestedProperties;
+		if (schemaProperty.isRequired() && minItems !== null && nestedProperties.length === minItems) {
+			schemaProperty.updateNestedPropertyValue(undefined, index);
+		} else {
+			schemaProperty.removeNestedSchemaProperty(index);
 		}
+		nestedProperties = schemaProperty.nestedProperties;
 	}
 
 	/**
@@ -90,6 +88,16 @@
 	function moveDown(index) {
 		nestedProperties = schemaProperty.moveNestedPropertyDown(index);
 	}
+
+	/**
+	 * @param {any[]} nestedProperties
+	 */
+	function canAddMoreItems(nestedProperties) {
+		const maxItems = getMaxItems(schemaProperty.referenceSchema);
+		return maxItems === null || nestedProperties.length < maxItems;
+	}
+
+	$: addNestedPropertyBtnDisabled = !canAddMoreItems(nestedProperties);
 </script>
 
 {#if schemaProperty}
@@ -120,7 +128,12 @@
 					>
 						<div class="accordion-body p-1">
 							<div class="d-flex justify-content-center p-2">
-								<button class="btn btn-primary" type="button" on:click={addNestedProperty}>
+								<button
+									class="btn btn-primary"
+									type="button"
+									on:click={addNestedProperty}
+									disabled={addNestedPropertyBtnDisabled}
+								>
 									Add argument to list
 								</button>
 							</div>
