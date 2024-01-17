@@ -10,6 +10,17 @@
 	function handleValueChange() {
 		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
 	}
+
+	/** @type {HTMLInputElement} */
+	let field;
+	let validationError = '';
+
+	function validate() {
+		validationError = '';
+		if (schemaProperty.isRequired() && field.value === '') {
+			validationError = 'Field is required';
+		}
+	}
 </script>
 
 <div class="d-flex align-items-center p-2">
@@ -19,13 +30,17 @@
 		</label>
 		<PropertyDescription description={schemaProperty.description} />
 	</div>
-	<div class="property-input ms-auto w-50">
+	<div class="property-input ms-auto w-50 has-validation">
 		<input
 			type="text"
+			bind:this={field}
 			bind:value={schemaProperty.value}
 			on:change={handleValueChange}
+			on:input={validate}
 			class="form-control"
 			id="property-{schemaProperty.key}"
+			class:is-invalid={validationError}
 		/>
+		<span class="invalid-feedback">{validationError}</span>
 	</div>
 </div>

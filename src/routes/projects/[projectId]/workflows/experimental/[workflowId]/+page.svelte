@@ -816,6 +816,7 @@
 									buttonIcon="trash"
 									message="Delete a workflow task {selectedWorkflowTask.task.name}"
 									callbackAction={handleDeleteWorkflowTask}
+									ariaLabel="Delete workflow task"
 								/>
 							</div>
 						{:else}

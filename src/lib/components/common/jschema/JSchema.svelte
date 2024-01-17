@@ -33,6 +33,7 @@
 
 	export let schema = undefined;
 	export let schemaData = undefined;
+	/** @type {((value: object) => Promise<object>)|undefined} */
 	export let handleSaveChanges = undefined;
 	export let saveChanges = undefined;
 	export let handleValidationErrors = undefined;
@@ -97,80 +98,72 @@
 		}
 	}
 
-    saveChanges = function() {
-        const data = schemaManager.data;
-        // The following is required to remove all null values from the data object
-        // We suppose that null values are not valid, hence we remove them
-        // Deep copy the data object
-        const toStripData = JSON.parse(JSON.stringify(data));
-        const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
-        const isDataValid = validator.isValid(strippedNullData);
-        if (!isDataValid) {
-            if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
-                handleValidationErrors(validator.getErrors());
-            }
-            console.error('Could not save changes. Data is invalid', validator.getErrors());
-            return;
-        }
+	saveChanges = async function () {
+		// Trigger validation on input fields
+		for (const field of document.querySelectorAll('#json-schema input, #json-schema select')) {
+			field.dispatchEvent(new Event('input'));
+		}
 
-        if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
-            handleSaveChanges(strippedNullData)
-                .then((updated_args) => {
-                    schemaManager.data = updated_args;
-                    schemaManager.changesSaved();
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        }
-    }
+		const data = schemaManager.data;
+		// The following is required to remove all null values from the data object
+		// We suppose that null values are not valid, hence we remove them
+		// Deep copy the data object
+		const toStripData = JSON.parse(JSON.stringify(data));
+		const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
+		const isDataValid = validator.isValid(strippedNullData);
+		if (!isDataValid) {
+			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
+				handleValidationErrors(validator.getErrors());
+			}
+			console.error('Could not save changes. Data is invalid', validator.getErrors());
+			return;
+		}
 
+		if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
+			try {
+				const updatedArgs = await handleSaveChanges(strippedNullData);
+				schemaManager.data = updatedArgs;
+				schemaManager.changesSaved();
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	};
+
+	/**
+	 * @param {object} args
+	 */
 	export function discardChanges(args) {
 		// Set schemaData to incoming args value
 		schemaData = args;
 		// Mark changes as unsaved
 		unsavedChanges = false;
 	}
-
-
 </script>
 
 {#if parsedSchema !== undefined && isSchemaValid && isDataValid !== undefined}
-
-  <!-- Start rendering the schema structure -->
-  <div id='json-schema'>
-    {#key schemaManager}
-      <PropertiesBlock
-        properties={parsedSchema.properties}
-      />
-    {/key}
-  </div>
-
+	<!-- Start rendering the schema structure -->
+	<div id="json-schema">
+		{#key schemaManager}
+			<PropertiesBlock properties={parsedSchema.properties} />
+		{/key}
+	</div>
 {:else if parsedSchema === undefined}
-
-  <div>
-    <p>Loading schema</p>
-  </div>
-
+	<div>
+		<p>Loading schema</p>
+	</div>
 {:else if !isSchemaValid}
-
-  <div class='alert alert-danger'>
-    <p>Invalid schema or undefined parsed schema</p>
-    <p>Something is wrong</p>
-  </div>
-
+	<div class="alert alert-danger">
+		<p>Invalid schema or undefined parsed schema</p>
+		<p>Something is wrong</p>
+	</div>
 {:else if !isDataValid && schemaData !== undefined}
-
-
-  <div class='alert alert-danger'>
-    <div>Data object is invalid</div>
-    <div>Something is wrong</div>
-  </div>
-
+	<div class="alert alert-danger">
+		<div>Data object is invalid</div>
+		<div>Something is wrong</div>
+	</div>
 {:else if schemaData === undefined}
-
-  <div class='alert alert-warning'>
-    <span>Data object is missing</span>
-  </div>
-
+	<div class="alert alert-warning">
+		<span>Data object is missing</span>
+	</div>
 {/if}

@@ -10,13 +10,55 @@
 	let collapseSymbol = accordionParentKey + '-collapse';
 
 	onMount(() => {
-		schemaProperty.value?.forEach((/** @type {any} */ nestedValue, /** @type {number} */ index) => {
-			schemaProperty.addNestedSchemaProperty(nestedValue, index);
-		});
+		let count = 0;
+		if (Array.isArray(schemaProperty.value)) {
+			schemaProperty.value.forEach(
+				(/** @type {any} */ nestedValue, /** @type {number} */ index) => {
+					schemaProperty.addNestedSchemaProperty(nestedValue, index);
+				}
+			);
+			count = schemaProperty.value.length;
+		}
+		// Create mandatory fields in case of minItems
+		if (schemaProperty.isRequired()) {
+			const minItems = getMinItems(schemaProperty.referenceSchema);
+			if (minItems !== null) {
+				for (let i = count; i < minItems; i++) {
+					addNestedProperty();
+				}
+			}
+		}
 		nestedProperties = schemaProperty.nestedProperties;
 	});
 
+	/**
+	 * @param {object} referenceSchema
+	 * @returns {number|null}
+	 */
+	function getMinItems(referenceSchema) {
+		if ('minItems' in referenceSchema) {
+			return /** @type {number} */ (referenceSchema.minItems);
+		}
+		return null;
+	}
+
+	/**
+	 * @param {object} referenceSchema
+	 * @returns {number|null}
+	 */
+	function getMaxItems(referenceSchema) {
+		if ('maxItems' in referenceSchema) {
+			return /** @type {number} */ (referenceSchema.maxItems);
+		}
+		return null;
+	}
+
 	function addNestedProperty() {
+		const maxItems = getMaxItems(schemaProperty.referenceSchema);
+		if (maxItems !== null && nestedProperties.length === maxItems) {
+			// It is not possible to add more properties than maxItems
+			return;
+		}
 		schemaProperty.addNestedSchemaProperty(undefined, nestedProperties.length);
 		nestedProperties = schemaProperty.nestedProperties;
 	}
@@ -24,6 +66,11 @@
 	function removeNestedProperty(/** @type {number} */ index) {
 		schemaProperty.removeNestedSchemaProperty(index);
 		nestedProperties = schemaProperty.nestedProperties;
+		const minItems = getMinItems(schemaProperty.referenceSchema);
+		if (schemaProperty.isRequired() && minItems !== null && nestedProperties.length < minItems) {
+			schemaProperty.addNestedSchemaProperty(undefined, index);
+			nestedProperties = schemaProperty.nestedProperties;
+		}
 	}
 </script>
 

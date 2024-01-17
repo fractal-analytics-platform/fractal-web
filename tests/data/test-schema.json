@@ -1,0 +1,71 @@
+{
+	"title": "Test Schema",
+	"type": "object",
+	"properties": {
+		"requiredString": {
+			"title": "Required string",
+			"type": "string"
+		},
+		"optionalString": {
+			"title": "Optional string",
+			"type": "string"
+		},
+		"requiredEnum": {
+			"title": "Required enum",
+			"enum": ["option1", "option2"],
+			"type": "string"
+		},
+		"optionalEnum": {
+			"title": "Optional enum",
+			"enum": ["option1", "option2"],
+			"type": "string"
+		},
+		"minMaxRequiredInt": {
+			"title": "minMaxRequiredInt",
+			"description": "Required integer with min max",
+			"minimum": 5,
+			"maximum": 10,
+			"type": "integer"
+		},
+		"minMaxOptionalInt": {
+			"title": "minMaxOptionalInt",
+			"description": "Optional integer with min max",
+			"minimum": 0,
+			"maximum": 8,
+			"type": "integer"
+		},
+		"exclusiveMinMaxOptionalInt": {
+			"title": "exclusiveMinMaxOptionalInt",
+			"description": "Optional integer with exclusive min max",
+			"exclusiveMinimum": 3,
+			"exclusiveMaximum": 42,
+			"type": "integer"
+		},
+		"requiredArrayWithMinMaxItems": {
+			"title": "requiredArrayWithMinMaxItems",
+			"description": "Required array with min max array length",
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"minItems": 2,
+			"maxItems": 4
+		},
+		"optionalArrayWithMinMaxItems": {
+			"title": "optionalArrayWithMinMaxItems",
+			"description": "optional array with min max array length",
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"minItems": 1,
+			"maxItems": 3
+		}
+	},
+	"required": [
+		"requiredString",
+		"requiredEnum",
+		"minMaxRequiredInt",
+		"requiredArrayWithMinMaxItems"
+	]
+}
