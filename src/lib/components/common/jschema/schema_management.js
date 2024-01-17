@@ -249,6 +249,52 @@ export class SchemaProperty {
 		return nestedProperty;
 	}
 
+	/**
+	 * @param {number} index
+	 * @returns {any[]}
+	 */
+	moveNestedPropertyUp(index) {
+		if (index > 0) {
+			let updatedArray = [];
+			for (let i = 0; i < this.nestedProperties.length; i++) {
+				if (i === index - 1) {
+					updatedArray[i] = this.nestedProperties[i + 1];
+				} else if (i === index) {
+					updatedArray[i] = this.nestedProperties[i - 1];
+				} else {
+					updatedArray[i] = this.nestedProperties[i];
+				}
+				updatedArray[i].key = `${this.key}${this.keySeparator}${i}`;
+			}
+			this.nestedProperties = updatedArray;
+			this.manager.updateValue(this.key, this.getUpdatedNestedProperties());
+		}
+		return this.nestedProperties;
+	}
+
+	/**
+	 * @param {number} index
+	 * @returns {any[]}
+	 */
+	moveNestedPropertyDown(index) {
+		if (index < this.nestedProperties.length - 1) {
+			let updatedArray = [];
+			for (let i = 0; i < this.nestedProperties.length; i++) {
+				if (i === index) {
+					updatedArray[i] = this.nestedProperties[i + 1];
+				} else if (i === index + 1) {
+					updatedArray[i] = this.nestedProperties[i - 1];
+				} else {
+					updatedArray[i] = this.nestedProperties[i];
+				}
+				updatedArray[i].key = `${this.key}${this.keySeparator}${i}`;
+			}
+			this.nestedProperties = updatedArray;
+			this.manager.updateValue(this.key, this.getUpdatedNestedProperties());
+		}
+		return this.nestedProperties;
+	}
+
 	addProperty(namedKey, propertyValue) {
 		if (this.type !== 'object') {
 			throw new Error('Schema property is not of type object');
@@ -292,15 +338,20 @@ export class SchemaProperty {
 		}
 	}
 
+	/**
+	 * @param {number} index
+	 */
 	removeNestedSchemaProperty(index) {
 		this.nestedProperties.splice(index, 1);
 		// Should update the keys of nested properties and update the value of the property
-		const updatedValues = this.nestedProperties.map((nestedProperty, index) => {
+		this.manager.updateValue(this.key, this.getUpdatedNestedProperties());
+	}
+
+	getUpdatedNestedProperties() {
+		return this.nestedProperties.map((nestedProperty, index) => {
 			nestedProperty.key = `${this.key}${this.keySeparator}${index}`;
 			return nestedProperty.value;
 		});
-		this.manager.updateValue(this.key, updatedValues);
-		// this.manager.updateValue(this.key, this.value)
 	}
 
 	discriminatePropertyType(schema, globalSchema, currentValue) {

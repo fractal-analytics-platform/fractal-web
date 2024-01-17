@@ -6,7 +6,7 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-test('JSON Schema validation', async ({ page, workflow }) => {
+test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
@@ -97,8 +97,11 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Fill required integer with min and max', async () => {
 		const input = form.getByLabel('minMaxRequiredInt', { exact: true });
-		await input.pressSequentially('foo');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		if (browserName === 'firefox') {
+			// chrome doesn't allow to insert text inside numeric inputs
+			await input.pressSequentially('foo');
+			expect(form.getByText('Should be a number')).toHaveCount(1);
+		}
 		await input.fill('1');
 		expect(form.getByText('Should be greater or equal than 5')).toHaveCount(1);
 		await input.fill('15');
@@ -111,8 +114,11 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Fill optional integer with min and max', async () => {
 		const input = form.getByLabel('minMaxOptionalInt', { exact: true });
-		await input.pressSequentially('foo');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		if (browserName === 'firefox') {
+			// chrome doesn't allow to insert text inside numeric inputs
+			await input.pressSequentially('foo');
+			expect(form.getByText('Should be a number')).toHaveCount(1);
+		}
 		await input.fill('-7');
 		expect(form.getByText('Should be greater or equal than 0')).toHaveCount(1);
 		await input.fill('33');
@@ -123,8 +129,11 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Fill optional integer with exclusive min and max', async () => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
-		await input.pressSequentially('foo');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		if (browserName === 'firefox') {
+			// chrome doesn't allow to insert text inside numeric inputs
+			await input.pressSequentially('foo');
+			expect(form.getByText('Should be a number')).toHaveCount(1);
+		}
 		await input.fill('2');
 		expect(form.getByText('Should be greater or equal than 4')).toHaveCount(1);
 		await input.fill('99');
@@ -138,20 +147,38 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await addBtn.click();
 		await addBtn.click();
 		await addBtn.click();
+		// Fill items
 		await form.locator('id=property-requiredArrayWithMinMaxItems###0').fill('a');
 		await form.locator('id=property-requiredArrayWithMinMaxItems###1').fill('b');
 		await form.locator('id=property-requiredArrayWithMinMaxItems###2').fill('c');
 		await form.locator('id=property-requiredArrayWithMinMaxItems###3').fill('d');
+		// Move "d" up
+		await page.getByRole('button', { name: 'Move item up' }).nth(3).click();
+		await page.getByRole('button', { name: 'Move item up' }).nth(2).click();
+		await page.getByRole('button', { name: 'Move item up' }).nth(1).click();
+		await checkFirstArray(['d', 'a', 'b', 'c']);
+		// Move "d" down
+		await page.getByRole('button', { name: 'Move item down' }).first().click();
+		await page.getByRole('button', { name: 'Move item down' }).nth(1).click();
+		await checkFirstArray(['a', 'b', 'd', 'c']);
+		// Remove items
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
-		expect(await form.locator('id=property-requiredArrayWithMinMaxItems###1').inputValue()).toEqual(
-			'b'
-		);
+		await checkFirstArray(['a', 'b']);
 		await form.getByRole('button', { name: 'Remove' }).nth(1).click();
-		expect(await form.locator('id=property-requiredArrayWithMinMaxItems###1').inputValue()).toEqual(
-			''
-		);
+		await checkFirstArray(['a', '']);
 	});
+
+	/**
+	 * @param {string[]} expectedValues
+	 */
+	async function checkFirstArray(expectedValues) {
+		for (let i = 0; i < expectedValues.length; i++) {
+			expect(
+				await form.locator('id=property-requiredArrayWithMinMaxItems###' + i).inputValue()
+			).toEqual(expectedValues[i]);
+		}
+	}
 
 	await test.step('Optional array with minItems and maxItems', async () => {
 		await form.getByText('optionalArrayWithMinMaxItems').first().click();
@@ -177,6 +204,24 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await intInput.fill('');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		expect(form.getByText('Field is required')).toHaveCount(2);
+	});
+
+	await test.step('Save values', async () => {
+		const stringInput = form.getByLabel('Required string', { exact: true });
+		await stringInput.fill('foo');
+		const intInput = form.getByLabel('minMaxRequiredInt', { exact: true });
+		await intInput.fill('7');
+		await form.locator('id=property-requiredArrayWithMinMaxItems###1').fill('b');
+		await page.getByRole('button', { name: 'Move item up' }).nth(1).click();
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByText('Arguments changes saved successfully').waitFor();
+		await page.reload();
+		await waitPageLoading(page);
+		await page.getByText(`${randomTaskName} #`).first().click();
+		expect(await page.getByLabel('Required string', { exact: true }).inputValue()).toEqual('foo');
+		expect(await page.getByLabel('minMaxRequiredInt', { exact: true }).inputValue()).toEqual('7');
+		expect(await page.locator('id=property-requiredEnum').inputValue()).toEqual('option1');
+		await checkFirstArray(['b', 'a']);
 	});
 
 	await test.step('Delete workflow task', async () => {

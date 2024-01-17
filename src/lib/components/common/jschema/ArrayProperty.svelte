@@ -3,6 +3,7 @@
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
 	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 
+	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let schemaProperty;
 	let nestedProperties = [];
 
@@ -63,7 +64,10 @@
 		nestedProperties = schemaProperty.nestedProperties;
 	}
 
-	function removeNestedProperty(/** @type {number} */ index) {
+	/**
+	 * @param {number} index
+	 */
+	function removeNestedProperty(index) {
 		schemaProperty.removeNestedSchemaProperty(index);
 		nestedProperties = schemaProperty.nestedProperties;
 		const minItems = getMinItems(schemaProperty.referenceSchema);
@@ -71,6 +75,20 @@
 			schemaProperty.addNestedSchemaProperty(undefined, index);
 			nestedProperties = schemaProperty.nestedProperties;
 		}
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function moveUp(index) {
+		nestedProperties = schemaProperty.moveNestedPropertyUp(index);
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function moveDown(index) {
+		nestedProperties = schemaProperty.moveNestedPropertyDown(index);
 	}
 </script>
 
@@ -120,6 +138,26 @@
 										</div>
 										<div class="flex-fill">
 											<PropertyDiscriminator schemaProperty={nestedProperty} />
+										</div>
+										<div class="align-self-right mt-2 me-2">
+											{#if nestedProperties.length > 1}
+												<button
+													class="btn btn-light"
+													on:click|preventDefault={() => moveUp(index)}
+													aria-label="Move item up"
+													disabled={index === 0}
+												>
+													<i class="bi-arrow-up" />
+												</button>
+												<button
+													class="btn btn-light"
+													on:click|preventDefault={() => moveDown(index)}
+													aria-label="Move item down"
+													disabled={index === nestedProperties.length - 1}
+												>
+													<i class="bi-arrow-down" />
+												</button>
+											{/if}
 										</div>
 									</div>
 								{/each}
