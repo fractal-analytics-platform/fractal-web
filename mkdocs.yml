@@ -46,6 +46,7 @@ theme:
 nav:
   - Home page: index.md
   - Quickstart: quickstart.md
+  - Version compatibility: version-compatibility.md
   - CHANGELOG: changelog.md
   - OAuth2 integration: oauth2.md
   - Development: development/
