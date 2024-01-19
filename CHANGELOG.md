@@ -7,6 +7,7 @@
     * supported JSON Schema `minimum`, `maximum`, `exclusiveMinimum` and `exclusiveMaximum` for numeric types;
     * supported JSON Schema `minItems` and `maxItems` for array type;
     * supported reordering of array fields;
+    * set bold font on nested required properties;
     * improved field validation error messages.
 
 # 0.8.1
