@@ -142,6 +142,19 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
+	await test.step('Required boolean', async () => {
+		const checkbox = form.locator('id=property-requiredBoolean');
+		const label = form.locator('[for="property-requiredBoolean"]');
+		expect(await checkbox.isChecked()).toEqual(false);
+		expect((await label.innerText()).trim()).toEqual('null');
+		await checkbox.check();
+		expect(await checkbox.isChecked()).toEqual(true);
+		expect((await label.innerText()).trim()).toEqual('true');
+		await checkbox.uncheck();
+		expect(await checkbox.isChecked()).toEqual(false);
+		expect((await label.innerText()).trim()).toEqual('false');
+	});
+
 	await test.step('Required array with minItems and maxItems', async () => {
 		const addBtn = form.getByRole('button', { name: 'Add argument to list' }).first();
 		await addBtn.click();
@@ -196,6 +209,12 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		expect(form.locator('id=property-optionalArrayWithMinMaxItems###0')).toHaveCount(0);
+	});
+
+	await test.step('Object with nested properties', async() => {
+		await page.locator('[id="property-requiredObject###requiredNestedString"]').fill('nested string');
+		await page.getByLabel('Required Min', { exact: true }).fill('1');
+		await page.getByLabel('Optional Max', { exact: true }).fill('5');
 	});
 
 	await test.step('Attempt to save with missing required fields', async () => {

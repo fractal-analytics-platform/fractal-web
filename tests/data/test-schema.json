@@ -41,6 +41,10 @@
 			"exclusiveMaximum": 42,
 			"type": "integer"
 		},
+		"requiredBoolean": {
+			"title": "Required boolean",
+			"type": "boolean"
+		},
 		"requiredArrayWithMinMaxItems": {
 			"title": "requiredArrayWithMinMaxItems",
 			"description": "Required array with min max array length",
@@ -60,12 +64,66 @@
 			},
 			"minItems": 1,
 			"maxItems": 3
+		},
+		"requiredObject": {
+			"title": "Required object",
+			"type": "object",
+			"properties": {
+				"requiredNestedString": {
+					"type": "string"
+				},
+				"referencedRequiredNestedObject": {
+					"title": "Referenced object",
+					"$ref": "#/definitions/Ref1"
+				},
+				"optionalNestedObject": {
+					"title": "Optional nested object",
+					"type": "object",
+					"properties": {
+						"requiredValues": {
+							"title": "Required numbers",
+							"type": "array",
+							"items": {
+								"type": "number"
+							}
+						},
+						"optionalValues": {
+							"title": "Optional numbers",
+							"type": "array",
+							"items": {
+								"type": "number"
+							}
+						}
+					},
+					"required": ["requiredValues"]
+				}
+			},
+			"required": ["requiredNestedString", "referencedRequiredNestedObject"]
 		}
 	},
 	"required": [
 		"requiredString",
 		"requiredEnum",
 		"minMaxRequiredInt",
-		"requiredArrayWithMinMaxItems"
-	]
+		"requiredBoolean",
+		"requiredArrayWithMinMaxItems",
+		"requiredObject"
+	],
+	"definitions": {
+		"Ref1": {
+			"title": "Referenced object",
+			"type": "object",
+			"properties": {
+				"requiredMin": {
+					"title": "Required Min",
+					"type": "integer"
+				},
+				"optionalMax": {
+					"title": "Optional Max",
+					"type": "integer"
+				}
+			},
+			"required": ["requiredMin"]
+		}
+	}
 }

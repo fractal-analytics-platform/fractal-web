@@ -14,7 +14,7 @@
 
 <div class="d-flex align-items-center p-2">
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
-		<span class="">{schemaProperty.title || 'Boolean argument'}</span>
+		<span class={schemaProperty.isRequired() ? 'fw-bold' : ''}>{schemaProperty.title || 'Boolean argument'}</span>
 		<PropertyDescription description={schemaProperty.description} />
 	</div>
 	<div class="property-input ms-auto w-25">

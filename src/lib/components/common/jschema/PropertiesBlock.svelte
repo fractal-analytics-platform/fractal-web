@@ -6,16 +6,22 @@
 	/** @type {import('$lib/components/common/jschema/schema_management').default} */
 	const schemaManager = getContext('schemaManager');
 
-	export let properties = undefined;
+	/** @type {{[key: string]: import('./jschema-types').JSONSchemaProperty}} */
+	export let properties;
+	/** @type {string|undefined} */
 	export let blockKey = undefined;
+	/** @type {string[]|undefined} */
+	export let required = undefined;
 	export let removePropertyBlock = undefined;
 
+	/** @type {Array<import('./jschema-types').FormProperty>|undefined} */
 	let parsedProperties = undefined;
+	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty[]} */
 	let blockProperties = [];
 
 	onMount(() => {
 		// Make properties object into an array
-		parsedProperties = mapSchemaProperties(properties, blockKey);
+		parsedProperties = mapSchemaProperties(properties, blockKey, required);
 		parsedProperties.forEach((prop) => {
 			blockProperties.push(schemaManager.addProperty(prop));
 		});

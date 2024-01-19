@@ -31,6 +31,7 @@
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 
+	/** @type {import('./jschema-types').JSONSchemaObjectProperty|undefined} */
 	export let schema = undefined;
 	export let schemaData = undefined;
 	/** @type {((value: object) => Promise<object>)|undefined} */
@@ -39,7 +40,9 @@
 	export let handleValidationErrors = undefined;
 
 	let validator = undefined;
+	/** @type {import('./jschema-types').JSONSchema|undefined} */
 	let parsedSchema = undefined;
+	/** @type {undefined|boolean} */
 	let isSchemaValid = undefined;
 	let isDataValid = undefined;
 
@@ -145,7 +148,7 @@
 	<!-- Start rendering the schema structure -->
 	<div id="json-schema">
 		{#key schemaManager}
-			<PropertiesBlock properties={parsedSchema.properties} />
+			<PropertiesBlock properties={parsedSchema.properties} required={parsedSchema.required} />
 		{/key}
 	</div>
 {:else if parsedSchema === undefined}

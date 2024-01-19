@@ -6,7 +6,7 @@
 	import ArrayProperty from '$lib/components/common/jschema/ArrayProperty.svelte';
 	import ObjectProperty from '$lib/components/common/jschema/ObjectProperty.svelte';
 
-	/** @type {any|undefined} */
+	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty|undefined} */
 	export let schemaProperty = undefined;
 
 	const key = schemaProperty?.key;
@@ -19,7 +19,7 @@
 				<NumberProperty {schemaProperty} />
 			{/if}
 			{#if schemaProperty.type === 'string'}
-				{#if 'enum' in schemaProperty.referenceSchema}
+				{#if 'enum' in schemaProperty}
 					<EnumProperty {schemaProperty} />
 				{:else}
 					<StringProperty {schemaProperty} />

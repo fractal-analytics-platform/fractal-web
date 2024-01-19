@@ -12,6 +12,7 @@
 	function handleValueChange() {
 		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
 		hasChanged = true;
+		validate();
 	}
 
 	/**
@@ -83,12 +84,11 @@
 			type="number"
 			bind:this={inputField}
 			bind:value={schemaProperty.value}
-			on:change={handleValueChange}
 			class="form-control"
 			id="property-{schemaProperty.key}"
 			min={getMin(schemaProperty.referenceSchema)}
 			max={getMax(schemaProperty.referenceSchema)}
-			on:input={validate}
+			on:input={handleValueChange}
 			class:is-invalid={validationError}
 		/>
 		<span class="invalid-feedback">{validationError}</span>

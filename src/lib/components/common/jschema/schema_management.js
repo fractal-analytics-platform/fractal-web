@@ -4,32 +4,39 @@ export default class SchemaManager {
 	hasUnsavedChanges = false;
 	/** @type {(hasChanges: boolean) => void} */
 	onPropertyChanges = () => {};
+	/** @type {import('./jschema-types').JSONSchemaObjectProperty} */
+	schema;
 
 	/**
-	 * @param {string|object|undefined} schema 
-	 * @param {object|undefined} schemaData 
+	 * @param {import('./jschema-types').JSONSchema|undefined} schema
+	 * @param {object|undefined} schemaData
 	 */
 	constructor(schema, schemaData) {
-		this.loadSchema(schema);
-		this.loadSchemaData(schemaData);
+		this.schema = this.loadSchema(schema);
+		this.data = this.loadSchemaData(schemaData);
 	}
 
 	/**
-	 * @param {string|object|undefined} schema 
+	 * @param {import('./jschema-types').JSONSchema|string|undefined} schema
+	 * @returns {import('./jschema-types').JSONSchemaObjectProperty}
 	 */
 	loadSchema(schema) {
 		if (schema === undefined) {
 			throw new Error('Schema is undefined');
 		}
 		if (typeof schema === 'string') {
-			this.schema = JSON.parse(schema);
+			/** @type {import('./jschema-types').JSONSchema} */
+			return JSON.parse(schema);
 		} else if (typeof schema === 'object') {
-			this.schema = schema;
+			/** @type {import('./jschema-types').JSONSchema} */
+			return schema;
 		}
+		throw new Error(`Schema object has an unexpected type: ${typeof schema}`);
 	}
 
 	/**
-	 * @param {object|undefined} schemaData 
+	 * @param {object|undefined} schemaData
+	 * @returns {object}
 	 */
 	loadSchemaData(schemaData) {
 		// Should check that schemaData is not undefined
@@ -37,17 +44,17 @@ export default class SchemaManager {
 			throw new Error('Schema data is undefined');
 		}
 		// Deep copy the schema data
-		this.data = JSON.parse(JSON.stringify(schemaData));
+		return JSON.parse(JSON.stringify(schemaData));
 	}
 
 	/**
-	 * @param {string} key 
-	 * @returns 
+	 * @param {string} key the long key
+	 * @returns
 	 */
 	getValue(key) {
 		const keys = key.split(this.keySeparator);
 		let value = this.data;
-		keys.forEach(k => {
+		keys.forEach((k) => {
 			// Unless value is undefined, set the value to value[k]
 			if (value !== undefined) {
 				value = value[k];
@@ -56,17 +63,20 @@ export default class SchemaManager {
 		return value;
 	}
 
+	/**
+	 * @param {string} key
+	 * @param {any} value
+	 */
 	updateValue(key, value) {
 		// Split key into keys
 		const keys = key.split(this.keySeparator);
 		// Get the last key
-		const lastKey = keys.pop();
+		const lastKey = /** @type {string} */ (keys.pop());
 		// Get the object at the key
 		let object = this.data;
-		keys.forEach(k => {
+		keys.forEach((k) => {
 			// Unless k is #.#, set object to object[k]
-			if (k !== this.keySeparator)
-				object = object[k];
+			if (k !== this.keySeparator) object = object[k];
 		});
 		// Set the value at the last key
 		object[lastKey] = value;
@@ -75,30 +85,46 @@ export default class SchemaManager {
 		this.changesNotSaved();
 	}
 
+	/**
+	 * @param {string} key
+	 * @param {any} value
+	 */
 	setDefaultValue(key, value) {
 		// Split key into keys
 		const keys = key.split(this.keySeparator);
 		// Get the last key
-		const lastKey = keys.pop();
+		const lastKey = /** @type {string} */ (keys.pop());
 		// Get the object at the key
 		let dataProperty = this.data;
-		keys.forEach(k => {
+		keys.forEach((k) => {
 			// Unless k is #.#, set object to object[k]
-			if (k !== this.keySeparator)
-				dataProperty = dataProperty[k];
+			if (k !== this.keySeparator) dataProperty = dataProperty[k];
 		});
 		// Set the value at the last key
 		dataProperty[lastKey] = value;
 	}
 
-	addProperty(propertySchema) {
-		const schemaPropertyKey = propertySchema.key;
-		const schemaProperty = new SchemaProperty(propertySchema, this, this.getValue(schemaPropertyKey));
-		this.propertiesMap.set(propertySchema.key, schemaProperty);
+	/**
+	 * @param {import('./jschema-types').FormProperty} formProperty
+	 * @returns {SchemaProperty}
+	 */
+	addProperty(formProperty) {
+		const schemaPropertyKey = formProperty.property.key;
+		const schemaProperty = new SchemaProperty(
+			formProperty.property,
+			this,
+			this.getValue(schemaPropertyKey)
+		);
+		schemaProperty.required = formProperty.required;
+		this.propertiesMap.set(formProperty.property.key, schemaProperty);
 		this.setDefaultValue(schemaPropertyKey, schemaProperty.value);
 		return schemaProperty;
 	}
 
+	/**
+	 * @param {string} propertyKey
+	 * @param {string} namedKey
+	 */
 	deleteNestedPropertyData(propertyKey, namedKey) {
 		// Check if the property key is defined
 		if (propertyKey === undefined) {
@@ -120,15 +146,13 @@ export default class SchemaManager {
 		// Delete nested property from data
 		// Should traverse the data object to find the property
 		const keys = propertyKey.split(this.keySeparator);
-		const lastKey = keys.pop();
+		const lastKey = /** @type {string} */ (keys.pop());
 		let dataProperty = this.data;
-		keys.forEach(k => {
-			if (k !== this.keySeparator)
-				dataProperty = dataProperty[k];
+		keys.forEach((k) => {
+			if (k !== this.keySeparator) dataProperty = dataProperty[k];
 		});
 
-		if (dataProperty[lastKey] !== undefined)
-			delete dataProperty[lastKey][namedKey];
+		if (dataProperty[lastKey] !== undefined) delete dataProperty[lastKey][namedKey];
 	}
 
 	changesSaved() {
@@ -140,37 +164,62 @@ export default class SchemaManager {
 		this.hasUnsavedChanges = true;
 		this.onPropertyChanges.call(this, this.hasUnsavedChanges);
 	}
-
 }
 
 export class SchemaProperty {
-	manager = {};
-	globalSchema = {};
+	manager;
+	/** @type {import('./jschema-types').JSONSchemaObjectProperty} */
+	globalSchema;
 	keySeparator = '###';
 	nestedProperties = [];
 	hasCustomKeyValues = false;
+	/** @type {string[]|undefined} */
+	requiredProperties = undefined;
+	required = false;
 
-	constructor(propertySchema, manager, currentValue) {
+	/**
+	 * @param {import('./jschema-types').JSONSchemaProperty & { key: string }} propertySchema
+	 * @param {SchemaManager} manager
+	 * @param {any} currentValue
+	 */
+	constructor(propertySchema, manager, currentValue = undefined) {
 		this.manager = manager;
 		this.globalSchema = this.manager.schema;
 		this.referenceSchema = propertySchema;
 
 		// Default properties
 		this.type = propertySchema.type;
+		/** @type {string} */
 		this.key = propertySchema.key;
 		this.title = propertySchema.title;
 		this.description = propertySchema.description;
-		this.properties = propertySchema.properties;
-		this.items = propertySchema.items;
+		if ('properties' in propertySchema) {
+			this.properties = propertySchema.properties;
+		}
+		if ('items' in propertySchema) {
+			this.items = propertySchema.items;
+		}
 		this.$ref = propertySchema.$ref;
+		if ('required' in propertySchema) {
+			this.requiredProperties = propertySchema.required;
+		}
+		if ('enum' in propertySchema) {
+			this.enum = propertySchema.enum;
+		}
 
 		// Resolve the schema type by reference
 		if (this.type === undefined && this.$ref !== undefined) {
 			const resolvedSchema = resolveSchemaReference(this.$ref, this.globalSchema);
-			Object.keys(resolvedSchema).forEach(schemaKey => {
-				if (this[schemaKey] === undefined)
-					this[schemaKey] = resolvedSchema[schemaKey];
-			});
+			if (resolvedSchema !== undefined) {
+				if ('required' in resolvedSchema) {
+					this.requiredProperties = resolvedSchema.required;
+				}
+				Object.keys(resolvedSchema).forEach((schemaKey) => {
+					if (this[schemaKey] === undefined) {
+						this[schemaKey] = resolvedSchema[schemaKey];
+					}
+				});
+			}
 		}
 
 		// Resolve the schema default value
@@ -180,15 +229,19 @@ export class SchemaProperty {
 			this.defaultValue = propertySchema.default;
 		}
 		if (this.defaultValue === null) {
-			if (this.type === 'array') this.defaultValue = [];
-			if (this.type === 'object') this.defaultValue = {};
+			if (this.type === 'array') {
+				this.defaultValue = [];
+			}
+			if (this.type === 'object') {
+				this.defaultValue = {};
+			}
 		}
 
 		// Resolve the schema value
-		if (propertySchema.value === undefined) {
-			this.value = this.defaultValue;
-		} else {
+		if ('value' in propertySchema && propertySchema.value !== undefined) {
 			this.value = propertySchema.value;
+		} else {
+			this.value = this.defaultValue;
 		}
 
 		if (currentValue !== undefined) {
@@ -198,20 +251,24 @@ export class SchemaProperty {
 		// Check if the schema property is of type object
 		if (this.type === 'object') {
 			// Check if the property schema has additional properties
-			if (propertySchema.additionalProperties !== undefined) {
+			if (
+				/** @type {import('./jschema-types').JSONSchemaObjectProperty} */ (propertySchema)
+					.additionalProperties !== undefined
+			) {
 				this.hasCustomKeyValues = true;
 			}
 		}
-
 	}
 
 	isRequired() {
-		if (this.globalSchema.required)
-			return this.globalSchema.required.includes(this.key);
-		else
-			return false;
+		return this.required;
 	}
 
+	/**
+	 * @param {any} value
+	 * @param {number} index
+	 * @returns {SchemaProperty}
+	 */
 	addNestedSchemaProperty(value, index) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
@@ -223,25 +280,33 @@ export class SchemaProperty {
 		// Define the nested property schema
 		const propertySchema = {};
 
+		const items = /** @type {import('./jschema-types').JSONSchemaArrayProperty} */ (this).items;
+
 		// Set the nested property schema key
 		propertySchema.key = `${this.key}${this.keySeparator}${index}`;
 		// Set the nested property schema type
-		propertySchema.type = this.items.type;
+		propertySchema.type = items.type;
 		// Set the nested property schema title
-		propertySchema.title = this.items.title;
+		propertySchema.title = items.title;
 		// Set the nested property schema description
-		propertySchema.description = this.items.description;
+		propertySchema.description = items.description;
 		// Set the nested property schema properties
-		propertySchema.properties = this.items.properties;
+		if ('properties' in items) {
+			propertySchema.properties = items.properties;
+		}
 		// Set the nested property schema items
-		propertySchema.items = this.items.items;
+		if ('items' in items) {
+			propertySchema.items = items.items;
+		}
 		// Set the nested property schema $ref
-		propertySchema.$ref = this.items.$ref;
+		propertySchema.$ref = items.$ref;
 		// Set the nested property schema default
-		propertySchema.default = this.items.default;
+		propertySchema.default = items.default;
 		// Set the nested property schema value
 		propertySchema.value = value;
-
+		if ('required' in items) {
+			propertySchema.required = items.required;
+		}
 
 		const nestedProperty = new SchemaProperty(propertySchema, this.manager);
 		this.manager.setDefaultValue(nestedProperty.key, nestedProperty.value);
@@ -308,7 +373,11 @@ export class SchemaProperty {
 		return this.nestedProperties;
 	}
 
-	addProperty(namedKey, propertyValue) {
+	/**
+	 * @param {string} namedKey
+	 * @param {any} propertyValue
+	 */
+	addProperty(namedKey, propertyValue = undefined) {
 		if (this.type !== 'object') {
 			throw new Error('Schema property is not of type object');
 		}
@@ -328,12 +397,23 @@ export class SchemaProperty {
 			}
 
 			// This should resolve the reference to the inner schema within the global schema
-			this.properties[namedKey] = JSON.parse(JSON.stringify(this.referenceSchema.additionalProperties));
-			this.properties[namedKey].title = namedKey;
-			this.properties[namedKey].value = propertyValue;
+			if (
+				'additionalProperties' in this.referenceSchema &&
+				typeof this.referenceSchema.additionalProperties === 'object'
+			) {
+				const parsedAdditionalProperties = JSON.parse(
+					JSON.stringify(this.referenceSchema.additionalProperties)
+				);
+				parsedAdditionalProperties.title = namedKey;
+				parsedAdditionalProperties.value = propertyValue;
+				this.properties[namedKey] = parsedAdditionalProperties;
+			}
 		}
 	}
 
+	/**
+	 * @param {string} namedKey
+	 */
 	removeProperty(namedKey) {
 		if (this.type !== 'object') {
 			throw new Error('Schema property is not of type object');
@@ -366,34 +446,15 @@ export class SchemaProperty {
 			return nestedProperty.value;
 		});
 	}
-
-	discriminatePropertyType(schema, globalSchema, currentValue) {
-		// Discriminate the property if required
-		if (schema && schema.type === undefined) {
-			// The propertyData.type should not be undefined
-			if (schema.$ref !== undefined) {
-				// Resolve a value from the context
-				const objectPropertiesValues = currentValue;
-				const resolvedSchema = resolveSchemaReference(schema.$ref, globalSchema);
-				// Intersect the resolved schema with the propertyData
-				schema = { ...schema, ...resolvedSchema };
-				if (objectPropertiesValues !== undefined) {
-					Object.keys(objectPropertiesValues).forEach((key) => {
-						schema.properties[key].value = objectPropertiesValues[key];
-					});
-				}
-			}
-		}
-	}
 }
 
 /**
  * Resolve a reference in a schema
  * @param {string} reference - the reference to resolve
- * @param {object} schema - the schema to resolve the reference against
- * @returns {object} the resolved reference
+ * @param {import('./jschema-types').JSONSchemaProperty} schema - the schema to resolve the reference against
+ * @returns {import('./jschema-types').JSONSchemaProperty|undefined} the resolved reference
  */
-export function resolveSchemaReference(reference, schema) {
+function resolveSchemaReference(reference, schema) {
 	// If reference is a string, resolve it
 	if (typeof reference === 'string') {
 		// If reference is a local reference, resolve it
@@ -410,6 +471,7 @@ export function resolveSchemaReference(reference, schema) {
 			// Resolve the reference against the schema
 			// NOTE: We need to stringify and parse the schema to avoid mutating it
 			const jschema = JSON.stringify(schema);
+			/** @type {import('./jschema-types').JSONSchemaProperty} */
 			let resolvedReference = JSON.parse(jschema);
 			// Resolve the reference against a new schema object
 			for (const referencePart of referenceParts) {
@@ -422,19 +484,32 @@ export function resolveSchemaReference(reference, schema) {
 	}
 }
 
-export function mapSchemaProperties(properties, propertiesKey) {
+/**
+ * @param {{[key: string]: import('./jschema-types').JSONSchemaProperty}} properties
+ * @param {string|undefined} blockKey the parent key, undefined for root object
+ * @param {string[]|undefined} required list of required properties specified in parent element
+ * @returns {Array<import('./jschema-types').FormProperty>}
+ */
+export function mapSchemaProperties(properties, blockKey, required) {
 	// Make properties object into an array
-	const mapProperties = Object.keys(properties).map(key => {
-		const props = { ...properties[key] };
-		// If blockKey is undefined, set it to the key
-		if (propertiesKey === undefined) props.key = key;
-		// If blockKey is defined, set it to the blockKey
-		else props.key = propertiesKey + '###' + key;
-		return props;
+	const mapProperties = Object.keys(properties).map((key) => {
+		let itemKey;
+		if (blockKey === undefined) {
+			// If blockKey is undefined, set it to the key
+			itemKey = key;
+		} else {
+			// If blockKey is defined, set it to the blockKey
+			itemKey = blockKey + '###' + key;
+		}
+		const itemRequired = Array.isArray(required) ? required.includes(key) : false;
+		return { property: { ...properties[key], key: itemKey }, required: itemRequired };
 	});
 	return mapProperties;
 }
 
+/**
+ * @param {import('./jschema-types').JSONSchemaObjectProperty} schema
+ */
 export function stripSchemaProperties(schema) {
 	const ignoreProperties = ['input_paths', 'output_path', 'metadata', 'component'];
 	Object.keys(schema.properties).forEach((k) => {
@@ -449,14 +524,14 @@ export function stripSchemaProperties(schema) {
 
 /**
  * Remove null values and empty strings from an object and its nested objects
- * @param obj
+ * @param {object} obj
  * @returns {*}
  */
 function removeNullValuesAndEmptyStrings(obj) {
-	Object.keys(obj).forEach(key => {
+	Object.keys(obj).forEach((key) => {
 		if (Array.isArray(obj[key])) {
 			// If the obj[key] is an array, filter its null and empty string values
-			obj[key] = obj[key].filter(value => value !== null && value !== '');
+			obj[key] = obj[key].filter((value) => value !== null && value !== '');
 		}
 
 		if (obj[key] && typeof obj[key] === 'object') removeNullValuesAndEmptyStrings(obj[key]);
@@ -467,11 +542,11 @@ function removeNullValuesAndEmptyStrings(obj) {
 
 /**
  * Remove empty objects and arrays from an object and its nested objects
- * @param obj
+ * @param {object} obj
  * @returns {*}
  */
 function removeEmptyObjectsAndArrays(obj) {
-	Object.keys(obj).forEach(key => {
+	Object.keys(obj).forEach((key) => {
 		if (obj[key] && typeof obj[key] === 'object') {
 			// Next line would enable removing empty objects and arrays from nested objects
 			removeEmptyObjectsAndArrays(obj[key]);
@@ -483,7 +558,7 @@ function removeEmptyObjectsAndArrays(obj) {
 
 /**
  * Strip null and empty objects and arrays from a data object
- * @param data
+ * @param {object} data
  * @returns {*}
  */
 export function stripNullAndEmptyObjectsAndArrays(data) {

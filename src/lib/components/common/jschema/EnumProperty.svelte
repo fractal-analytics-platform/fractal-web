@@ -41,9 +41,11 @@
 			class:is-invalid={validationError}
 		>
 			<option value={null}>Select...</option>
-			{#each schemaProperty.referenceSchema.enum as optionValue}
-				<option>{optionValue}</option>
-			{/each}
+			{#if schemaProperty.enum}
+				{#each schemaProperty.enum as optionValue}
+					<option>{optionValue}</option>
+				{/each}
+			{/if}
 		</select>
 		<span class="invalid-feedback">{validationError}</span>
 	</div>

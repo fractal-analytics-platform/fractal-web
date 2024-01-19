@@ -92,7 +92,10 @@
 	 */
 	function validateArguments(args) {
 		const updateCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
-		const newSchema = updateCandidate.args_schema;
+		const newSchema =
+			/** @type {import('../common/jschema/jschema-types').JSONSchemaObjectProperty} */ (
+				updateCandidate.args_schema
+			);
 		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
 			stripSchemaProperties(newSchema);
