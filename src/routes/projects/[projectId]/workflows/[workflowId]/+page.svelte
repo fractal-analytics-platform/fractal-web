@@ -26,7 +26,7 @@
 	// List of available tasks to be inserted into workflow
 	let availableTasks = [];
 
-	/** @type {import('svelte/types/runtime/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
+	/** @type {import('svelte/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
 	let workflowTaskContext = writable(undefined);
 	let workflowTabContextId = 0;
 	let workflowSuccessMessage = '';

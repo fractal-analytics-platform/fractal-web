@@ -34,7 +34,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let workflowErrorAlert = undefined;
 
-	/** @type {import('svelte/types/runtime/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
+	/** @type {import('svelte/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
 	let workflowTaskContext = writable(undefined);
 	let workflowTabContextId = 0;
 	let workflowSuccessMessage = '';

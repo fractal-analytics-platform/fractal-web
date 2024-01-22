@@ -17,7 +17,7 @@ export async function POST({ fetch, request, cookies }) {
 		domain: `${AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`,
 		path: `${AUTH_COOKIE_PATH}`,
 		expires: new Date(0),
-		sameSite: `${AUTH_COOKIE_SAME_SITE}`,
+		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${AUTH_COOKIE_SAME_SITE}`),
 		secure: `${AUTH_COOKIE_SECURE}` === 'true',
 		httpOnly: `${AUTH_COOKIE_HTTP_ONLY}` === 'true'
 	});

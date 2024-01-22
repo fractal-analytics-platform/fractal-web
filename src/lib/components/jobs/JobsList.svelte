@@ -40,7 +40,7 @@
 	let tableHandler = new DataHandler(jobs);
 	tableHandler.sortDesc('id');
 
-	/** @type {import('svelte/types/runtime/store').Readable<import('$lib/types').ApplyWorkflow[]>} */
+	/** @type {import('svelte/store').Readable<import('$lib/types').ApplyWorkflow[]>} */
 	let rows = tableHandler.getRows();
 
 	// Filters
