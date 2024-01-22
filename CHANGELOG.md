@@ -9,6 +9,7 @@
     * supported reordering of array fields;
     * set bold font on nested required properties;
     * improved field validation error messages.
+* Add trailing slash to OAuth-callback url (\#395).
 
 # 0.8.1
 

@@ -14,7 +14,7 @@ export async function load({ request, fetch, cookies }) {
 	}
 
 	const response = await fetch(
-		`${FRACTAL_SERVER_HOST}/auth/${PUBLIC_OAUTH_CLIENT_NAME}/callback${request.url.substring(
+		`${FRACTAL_SERVER_HOST}/auth/${PUBLIC_OAUTH_CLIENT_NAME}/callback/${request.url.substring(
 			queryStringIndex
 		)}`
 	);
