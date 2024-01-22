@@ -3,6 +3,7 @@
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 
+	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let objectSchema;
 
 	let customObjectPropertyKey = undefined;
@@ -92,6 +93,7 @@
 										<PropertiesBlock
 											blockKey={objectSchema.key}
 											properties={objectSchema.properties}
+											required={objectSchema.requiredProperties}
 											removePropertyBlock={(propertyKey) => {
 												propertyKey = propertyKey.split(objectSchema.manager.keySeparator).pop();
 												objectSchema.removeProperty(propertyKey);
@@ -105,6 +107,7 @@
 									<PropertiesBlock
 										blockKey={objectSchema.key}
 										properties={objectSchema.properties}
+										required={objectSchema.requiredProperties}
 									/>
 								{/key}
 							{/if}

@@ -1,7 +1,16 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# 0.8.1
+# Unreleased
 
+* Improvements on worflow task form (\#393):
+    * supported JSON Schema `enum` type;
+    * supported JSON Schema `minimum`, `maximum`, `exclusiveMinimum` and `exclusiveMaximum` for numeric types;
+    * supported JSON Schema `minItems` and `maxItems` for array type;
+    * supported reordering of array fields;
+    * set bold font on nested required properties;
+    * improved field validation error messages.
+
+# 0.8.1
 
 Note: with this release, `PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL` becomes a required
 environment variable, and `npm run build` fails if it is missing. If you do not

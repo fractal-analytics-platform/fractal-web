@@ -3,6 +3,7 @@
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
 	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 
+	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let schemaProperty;
 	let nestedProperties = [];
 
@@ -10,21 +11,93 @@
 	let collapseSymbol = accordionParentKey + '-collapse';
 
 	onMount(() => {
-		schemaProperty.value?.forEach((/** @type {any} */ nestedValue, /** @type {number} */ index) => {
-			schemaProperty.addNestedSchemaProperty(nestedValue, index);
-		});
+		let count = 0;
+		if (Array.isArray(schemaProperty.value)) {
+			schemaProperty.value.forEach(
+				(/** @type {any} */ nestedValue, /** @type {number} */ index) => {
+					schemaProperty.addNestedSchemaProperty(nestedValue, index);
+				}
+			);
+			count = schemaProperty.value.length;
+		}
+		// Create mandatory fields in case of minItems
+		if (schemaProperty.isRequired()) {
+			const minItems = getMinItems(schemaProperty.referenceSchema);
+			if (minItems !== null) {
+				for (let i = count; i < minItems; i++) {
+					addNestedProperty();
+				}
+			}
+		}
 		nestedProperties = schemaProperty.nestedProperties;
 	});
 
+	/**
+	 * @param {object} referenceSchema
+	 * @returns {number|null}
+	 */
+	function getMinItems(referenceSchema) {
+		if ('minItems' in referenceSchema) {
+			return /** @type {number} */ (referenceSchema.minItems);
+		}
+		return null;
+	}
+
+	/**
+	 * @param {object} referenceSchema
+	 * @returns {number|null}
+	 */
+	function getMaxItems(referenceSchema) {
+		if ('maxItems' in referenceSchema) {
+			return /** @type {number} */ (referenceSchema.maxItems);
+		}
+		return null;
+	}
+
 	function addNestedProperty() {
+		if (!canAddMoreItems(nestedProperties)) {
+			return;
+		}
 		schemaProperty.addNestedSchemaProperty(undefined, nestedProperties.length);
 		nestedProperties = schemaProperty.nestedProperties;
 	}
 
-	function removeNestedProperty(/** @type {number} */ index) {
-		schemaProperty.removeNestedSchemaProperty(index);
+	/**
+	 * @param {number} index
+	 */
+	function removeNestedProperty(index) {
+		const minItems = getMinItems(schemaProperty.referenceSchema);
+		if (schemaProperty.isRequired() && minItems !== null && nestedProperties.length === minItems) {
+			schemaProperty.updateNestedPropertyValue(undefined, index);
+		} else {
+			schemaProperty.removeNestedSchemaProperty(index);
+		}
 		nestedProperties = schemaProperty.nestedProperties;
 	}
+
+	/**
+	 * @param {number} index
+	 */
+	function moveUp(index) {
+		nestedProperties = schemaProperty.moveNestedPropertyUp(index);
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function moveDown(index) {
+		nestedProperties = schemaProperty.moveNestedPropertyDown(index);
+	}
+
+	/**
+	 * @param {any[]} nestedProperties
+	 */
+	function canAddMoreItems(nestedProperties) {
+		const maxItems = getMaxItems(schemaProperty.referenceSchema);
+		return maxItems === null || nestedProperties.length < maxItems;
+	}
+
+	$: addNestedPropertyBtnDisabled = !canAddMoreItems(nestedProperties);
 </script>
 
 {#if schemaProperty}
@@ -55,7 +128,12 @@
 					>
 						<div class="accordion-body p-1">
 							<div class="d-flex justify-content-center p-2">
-								<button class="btn btn-primary" type="button" on:click={addNestedProperty}>
+								<button
+									class="btn btn-primary"
+									type="button"
+									on:click={addNestedProperty}
+									disabled={addNestedPropertyBtnDisabled}
+								>
 									Add argument to list
 								</button>
 							</div>
@@ -73,6 +151,26 @@
 										</div>
 										<div class="flex-fill">
 											<PropertyDiscriminator schemaProperty={nestedProperty} />
+										</div>
+										<div class="align-self-right mt-2 me-2">
+											{#if nestedProperties.length > 1}
+												<button
+													class="btn btn-light"
+													on:click|preventDefault={() => moveUp(index)}
+													aria-label="Move item up"
+													disabled={index === 0}
+												>
+													<i class="bi-arrow-up" />
+												</button>
+												<button
+													class="btn btn-light"
+													on:click|preventDefault={() => moveDown(index)}
+													aria-label="Move item down"
+													disabled={index === nestedProperties.length - 1}
+												>
+													<i class="bi-arrow-down" />
+												</button>
+											{/if}
 										</div>
 									</div>
 								{/each}

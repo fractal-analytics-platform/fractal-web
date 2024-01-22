@@ -18,6 +18,14 @@ export async function waitPageLoading(page) {
 }
 
 /**
+ * Wait until modal is closed
+ * @param {import('@playwright/test').Page} page
+ */
+export async function waitModalClosed(page) {
+	await page.waitForFunction(() => document.querySelector('.modal.show') === null);
+}
+
+/**
  * Base test adding coverage logic using istanbul.
  */
 export const test = baseTest.extend({
