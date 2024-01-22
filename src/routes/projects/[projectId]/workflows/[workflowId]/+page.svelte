@@ -798,6 +798,7 @@
 											<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
 											<li class="list-group-item">
 												{#if selectedWorkflowTask.task.docs_info}
+												  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
 													{@html formatMarkdown(selectedWorkflowTask.task.docs_info)}
 												{:else}
 													-

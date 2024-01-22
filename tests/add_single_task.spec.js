@@ -10,7 +10,7 @@ test('Add single tasks', async ({ page }) => {
 	await waitPageLoading(page);
 
 	await test.step('Select "Add a single task" form', async () => {
-		await page.getByLabel('Single task').click({ force: true });
+		await page.getByText('Single task').click();
 	});
 
 	const createBtn = page.getByRole('button', { name: /^Create$/ });

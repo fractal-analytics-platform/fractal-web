@@ -19,6 +19,6 @@ export const actions = {
 		}
 
 		setCookieFromToken(request, cookies, authData.access_token);
-		throw redirect(302, '/projects');
+		redirect(302, '/projects');
 	}
 };

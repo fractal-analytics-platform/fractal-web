@@ -36,7 +36,7 @@ export async function handle({ event, resolve }) {
 	if (event.url.pathname.startsWith('/admin')) {
 		const user = await currentUser.json();
 		if (!user.is_superuser) {
-			throw error(403, `Only superusers can access the admin area`);
+			error(403, `Only superusers can access the admin area`);
 		}
 	}
 

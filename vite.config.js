@@ -1,26 +1,17 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import istanbul from 'vite-plugin-istanbul';
 
 const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
-const pkg = JSON.parse(packageJsonData);
+const pkg = JSON.parse(packageJsonData.toString());
 
-const enableIstanbul = process.env['ENABLE_COVERAGE'];
+//const enableCoverage = process.env['ENABLE_COVERAGE'];
 
 /** @type {import('vite').UserConfig} */
 const config = {
 	plugins: [
-		sveltekit(),
-		enableIstanbul &&
-			istanbul({
-				include: 'src/*',
-				exclude: ['node_modules', 'tests', 'static'],
-				extension: ['.js', '.svelte'],
-				requireEnv: false,
-				forceBuildInstrument: true
-			})
+		sveltekit()
 	],
 	define: {
 		__APP_VERSION__: JSON.stringify(pkg.version)
@@ -33,7 +24,7 @@ const config = {
 		environment: 'jsdom',
 		include: ['**/__tests__/**/*\\.test\\.js'],
 		coverage: {
-			provider: 'istanbul',
+			provider: 'v8',
 			reporter: ['text', 'json', 'html'],
 			reportsDirectory: './coverage-unit'
 		},

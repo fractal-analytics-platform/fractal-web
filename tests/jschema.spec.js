@@ -13,7 +13,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	await test.step('Go to "Add a single task" form', async () => {
 		await page.goto('/tasks');
 		await waitPageLoading(page);
-		await page.getByLabel('Single task').click({ force: true });
+		await page.getByText('Single task').click();
 	});
 
 	const randomTaskName = 'validation-test-' + Math.random().toString(36).substring(7);
@@ -83,7 +83,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Select required option', async () => {
 		await page.selectOption('id=property-requiredEnum', 'option1');
-		await page.selectOption('id=property-requiredEnum', 'null');
+		await page.selectOption('id=property-requiredEnum', '');
 		expect(form.getByText('Field is required')).toHaveCount(1);
 		await page.selectOption('id=property-requiredEnum', 'option1');
 		expect(form.getByText('Field is required')).toHaveCount(0);
@@ -91,7 +91,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Select optional option', async () => {
 		await page.selectOption('id=property-optionalEnum', 'option1');
-		await page.selectOption('id=property-optionalEnum', 'null');
+		await page.selectOption('id=property-optionalEnum', '');
 		expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 

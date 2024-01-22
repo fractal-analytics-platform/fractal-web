@@ -23,4 +23,7 @@
 	}
 </script>
 
-<th on:click={() => handler.sort(key)} style="cursor: pointer">{@html filterLabel}</th>
+<th on:click={() => handler.sort(key)} style="cursor: pointer">
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+	{@html filterLabel}
+</th>

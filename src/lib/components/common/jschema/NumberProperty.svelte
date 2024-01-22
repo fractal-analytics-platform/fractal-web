@@ -7,11 +7,8 @@
 	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let schemaProperty;
 
-	let hasChanged = false;
-
 	function handleValueChange() {
 		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
-		hasChanged = true;
 		validate();
 	}
 
