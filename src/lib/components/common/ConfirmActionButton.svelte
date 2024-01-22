@@ -5,6 +5,8 @@
 	export let style = 'primary';
 	export let btnStyle = 'primary';
 	export let label = '';
+	/** @type {string|undefined} */
+	export let ariaLabel = undefined;
 	export let buttonIcon = undefined;
 	export let modalId = undefined;
 	export let message = '';
@@ -45,7 +47,7 @@
 	</svelte:fragment>
 </Modal>
 
-<button class="btn btn-{btnStyle}" data-bs-toggle="modal" data-bs-target="#{modalId}">
+<button class="btn btn-{btnStyle}" data-bs-toggle="modal" data-bs-target="#{modalId}" aria-label={ariaLabel}>
 	{#if buttonIcon}
 		<i class="bi bi-{buttonIcon}" />
 	{/if}
