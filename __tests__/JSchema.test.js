@@ -220,6 +220,62 @@ describe('JSchema', () => {
 		expect(inputs.length).eq(3);
 	});
 
+	it('Object with additional array propery', async () => {
+		const result = renderSchema({
+			title: 'Object with additionalProperties',
+			type: 'object',
+			properties: {
+				testProp: {
+					title: 'testProp',
+					type: 'object',
+					additionalProperties: {
+						type: 'array',
+						items: {
+							$ref: '#/definitions/Ref'
+						}
+					}
+				}
+			},
+			definitions: {
+				Ref: {
+					title: 'argument',
+					type: 'object',
+					properties: {
+						required_string: {
+							title: 'Required String',
+							type: 'string'
+						},
+						optional_number: {
+							title: 'Optional Number',
+							type: 'integer'
+						}
+					},
+					required: ['required_string']
+				}
+			}
+		});
+		const input = result.getByRole('textbox');
+		await fireEvent.input(input, { target: { value: 'my-key' } });
+		const addPropertyBtn = result.getByRole('button', { name: 'Add property' });
+		await fireEvent.click(addPropertyBtn);
+		expect(result.queryByText('my-key')).not.null;
+		const accordionBtn1 = result.getByRole('button', { name: 'my-key' });
+		await fireEvent.click(accordionBtn1);
+		const addArgumentBtn = result.getByRole('button', { name: 'Add argument to list' });
+		await fireEvent.click(addArgumentBtn);
+		const accordionBtn2 = result.getByRole('button', { name: 'argument' });
+		await fireEvent.click(accordionBtn2);
+		expect(result.queryByText('Required String')).not.null;
+		checkBold(result.getByText('Required String'), true);
+		checkBold(result.getByText('Optional Number'), false);
+		const removeArgumentBtn = result.getByRole('button', { name: 'Remove' });
+		await fireEvent.click(removeArgumentBtn);
+		expect(result.queryByText('Required String')).null;
+		const removePropertyBtn = result.getByRole('button', { name: 'Remove Property Block' });
+		await fireEvent.click(removePropertyBtn);
+		expect(result.queryByText('my-key')).null;
+	});
+
 	it('Required nested objects', async () => {
 		const result = renderSchema({
 			title: 'Args',
