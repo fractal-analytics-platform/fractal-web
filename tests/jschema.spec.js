@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from './base_test.js';
+import { waitModalClosed, waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';

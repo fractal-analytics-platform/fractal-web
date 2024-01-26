@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url';
-import { waitPageLoading } from './base_test.js';
+import { waitPageLoading } from './utils.js';
 import { expect, test } from './project_fixture.js';
 import path from 'path';
 

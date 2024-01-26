@@ -1,5 +1,5 @@
-import { test as playwrightTest, mergeTests } from '@playwright/test';
-import { test as baseTest, waitPageLoading } from './base_test.js';
+import { test as baseTest, mergeTests } from '@playwright/test';
+import { waitPageLoading } from './utils.js';
 
 export class PageWithProject {
 	/**
@@ -62,7 +62,7 @@ export class PageWithProject {
 	}
 }
 
-const projectTest = playwrightTest.extend({
+const projectTest = baseTest.extend({
 	project: async ({ page }, use) => {
 		const project = new PageWithProject(page);
 		await project.createProject();

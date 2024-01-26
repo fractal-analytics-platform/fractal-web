@@ -1,4 +1,4 @@
-import { waitPageLoading } from './base_test.js';
+import { waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Execute jobs', async ({ page, workflow }) => {

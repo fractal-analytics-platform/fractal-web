@@ -1,4 +1,5 @@
-import { expect, test, waitPageLoading } from './base_test.js';
+import { expect, test } from '@playwright/test';
+import { waitPageLoading } from './utils.js';
 
 test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Open the admin area', async () => {

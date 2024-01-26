@@ -1,5 +1,5 @@
 import { test as setup } from '@playwright/test';
-import { waitPageLoading } from './base_test';
+import { waitPageLoading } from './utils.js';
 
 const authFile = 'tests/.auth/user.json';
 

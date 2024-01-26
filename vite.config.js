@@ -6,8 +6,6 @@ const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
 const pkg = JSON.parse(packageJsonData.toString());
 
-//const enableCoverage = process.env['ENABLE_COVERAGE'];
-
 /** @type {import('vite').UserConfig} */
 const config = {
 	plugins: [
@@ -26,7 +24,8 @@ const config = {
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'json', 'html'],
-			reportsDirectory: './coverage-unit'
+			reportsDirectory: './coverage-unit',
+			include: ['src']
 		},
 		alias: [
 			// See https://github.com/vitest-dev/vitest/issues/2834#issuecomment-1439576110

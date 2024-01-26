@@ -1,4 +1,4 @@
-import { waitPageLoading } from './base_test.js';
+import { waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Add SLURM accounts for the admin and execute workflow using a specific account', async ({

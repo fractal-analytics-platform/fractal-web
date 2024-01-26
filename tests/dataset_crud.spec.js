@@ -1,4 +1,4 @@
-import { waitPageLoading } from './base_test.js';
+import { waitPageLoading } from './utils.js';
 import { expect, test } from './project_fixture.js';
 
 test('Create, update and delete a dataset', async ({ page, project }) => {
