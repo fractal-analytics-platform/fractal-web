@@ -729,9 +729,9 @@
 					{#if workflow.task_list.length == 0}
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 					{:else}
-						<ul class="list-group list-group-flush">
+						<div class="list-group list-group-flush">
 							{#each workflow.task_list as workflowTask}
-								<li
+								<button
 									style="cursor: pointer"
 									class="list-group-item list-group-item-action {$workflowTaskContext !==
 										undefined && $workflowTaskContext.id == workflowTask.id
@@ -739,9 +739,6 @@
 										: ''}"
 									data-fs-target={workflowTask.id}
 									on:click|preventDefault={setActiveWorkflowTaskContext}
-									on:keydown|preventDefault
-									on:keyup|preventDefault
-									on:keypress|preventDefault
 								>
 									{workflowTask.task.name}
 
@@ -753,9 +750,9 @@
 											<i class="bi bi-exclamation-triangle" />
 										</span>
 									{/if}
-								</li>
+								</button>
 							{/each}
-						</ul>
+						</div>
 					{/if}
 				</div>
 			</div>

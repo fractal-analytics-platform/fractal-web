@@ -7,10 +7,10 @@
 	export let label;
 	let filterLabel = label;
 
-	/** @type {import('svelte/store').Writable<{ identifier: string | null, direction: 'asc' | 'desc' | null }>} */
+	/** @type {import('svelte/store').Writable<{ identifier?: string, direction?: 'asc' | 'desc' }>} */
 	let sorted;
 	$: {
-		sorted = handler.getSorted();
+		sorted = handler.getSort();
 		if ($sorted.identifier === key) {
 			if ($sorted.direction === 'asc') {
 				filterLabel = label + '&nbsp;↑';

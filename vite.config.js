@@ -1,13 +1,14 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
+import { defineConfig } from 'vitest/config';
 
 const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
 const pkg = JSON.parse(packageJsonData.toString());
 
 /** @type {import('vite').UserConfig} */
-const config = {
+const config = defineConfig({
 	plugins: [
 		sveltekit()
 	],
@@ -46,6 +47,6 @@ const config = {
 			'semver/functions/valid'
 		]
 	}
-};
+});
 
 export default config;

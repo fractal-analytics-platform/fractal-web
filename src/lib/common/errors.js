@@ -6,7 +6,8 @@ import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte
  * @param {Response} response
  */
 export async function responseError(response) {
-	error(response.status, await response.json());
+	const status = /** @type {import('@sveltejs/kit').NumericRange<400, 599>} */ (response.status);
+	error(status, await response.json());
 }
 
 /**
