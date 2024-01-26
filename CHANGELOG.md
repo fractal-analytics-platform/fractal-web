@@ -1,5 +1,14 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 0.8.3
+
+* Updated dependencies (\#398):
+    * Svelte from 3.58.0 to 4.2.9
+    * SvelteKit from 1.15.7 to 2.5.0
+    * vite from 4.2.2 to 5.0.12
+    * vitest from 0.32.4 to 1.2.1
+    * vincjo/datatables from 1.6.0 to 1.14.4
+
 # 0.8.2
 
 * Improvements on worflow task form (\#393):
