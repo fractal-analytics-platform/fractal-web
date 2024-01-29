@@ -31,3 +31,5 @@ jobs:
 
       - name: Run vitest tests
         run: npx vitest run
+        env:
+          TZ: Europe/Rome

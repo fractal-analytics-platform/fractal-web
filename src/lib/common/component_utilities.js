@@ -212,3 +212,16 @@ export function removeDuplicatedItems(allItems) {
 	}
 	return items.sort((a, b) => (a.name < b.name ? -1 : a.name === b.name ? 0 : 1));
 }
+
+/**
+ * @param {import('$lib/types').Project[]} projects
+ */
+export function sortProjectsByTimestampCreatedDesc(projects) {
+	projects.sort((p1, p2) =>
+		p1.timestamp_created < p2.timestamp_created
+			? 1
+			: p1.timestamp_created > p2.timestamp_created
+			? -1
+			: 0
+	);
+}

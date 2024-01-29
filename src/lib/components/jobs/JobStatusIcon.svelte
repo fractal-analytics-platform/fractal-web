@@ -6,9 +6,7 @@
 {#if status}
 	<span title={status}>
 		{#if status === 'submitted'}
-    <i class="bi bi-hourglass text-secondary job-status-submitted" />
-		{:else if status === 'running'}
-    <div class="spinner-border spinner-border-sm text-primary job-status-icon-running" role="status">
+    <div class="spinner-border spinner-border-sm text-primary job-status-icon-submitted" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
 		{:else if status === 'done'}
@@ -33,7 +31,7 @@
 		border-radius: 50%;
 	}
 
-	:global(.active .job-status-icon-running, .active .job-status-submitted) {
+	:global(.active .job-status-submitted) {
 		color: #fff !important;
 	}
 </style>

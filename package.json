@@ -11,7 +11,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"pre-commit": "lint-staged",
-		"test": "vitest"
+		"test": "TZ=Europe/Rome vitest"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.40.0",

@@ -79,7 +79,7 @@
 	let newVersionsMap = {};
 
 	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
-	let selectedRunningJob;
+	let selectedSubmittedJob;
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
@@ -422,7 +422,7 @@
 				// eslint-disable-next-line
 				runWorkflowModal.toggle();
 				const job = await response.json();
-				selectedRunningJob = job;
+				selectedSubmittedJob = job;
 				await loadJobsStatus();
 			} else {
 				console.error(response);
@@ -509,7 +509,7 @@
 		if (selectedInputDatasetId === undefined || selectedOutputDatasetId === undefined) {
 			return;
 		}
-		selectedRunningJob = await getSelectedRunningJob(
+		selectedSubmittedJob = await getSelectedSubmittedJob(
 			selectedInputDatasetId,
 			selectedOutputDatasetId
 		);
@@ -526,14 +526,12 @@
 			return;
 		}
 		statuses = outputStatus.status;
-		const runningOrSubmitted = Object.values(statuses).filter(
-			(s) => s === 'running' || s === 'submitted'
-		);
-		if (runningOrSubmitted.length > 0) {
+		const submitted = Object.values(statuses).filter((s) => s === 'submitted');
+		if (submitted.length > 0) {
 			clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = setTimeout(loadJobsStatus, updateJobsInterval);
 		} else {
-			selectedRunningJob = undefined;
+			selectedSubmittedJob = undefined;
 		}
 	}
 
@@ -542,13 +540,13 @@
 	 * @param {number} outputDatasetId
 	 * @return {Promise<import('$lib/types').ApplyWorkflow|undefined>}
 	 */
-	async function getSelectedRunningJob(inputDatasetId, outputDatasetId) {
+	async function getSelectedSubmittedJob(inputDatasetId, outputDatasetId) {
 		if (
-			selectedRunningJob &&
-			selectedRunningJob.input_dataset_id === inputDatasetId &&
-			selectedRunningJob.output_dataset_id === outputDatasetId
+			selectedSubmittedJob &&
+			selectedSubmittedJob.input_dataset_id === inputDatasetId &&
+			selectedSubmittedJob.output_dataset_id === outputDatasetId
 		) {
-			return selectedRunningJob;
+			return selectedSubmittedJob;
 		}
 		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/job`, {
 			method: 'GET',
@@ -571,14 +569,14 @@
 	}
 
 	async function stopWorkflow() {
-		if (!selectedRunningJob) {
+		if (!selectedSubmittedJob) {
 			return;
 		}
 		if (workflowErrorAlert) {
 			workflowErrorAlert.hide();
 		}
 		const response = await fetch(
-			`/api/v1/project/${project.id}/job/${selectedRunningJob.id}/stop`,
+			`/api/v1/project/${project.id}/job/${selectedSubmittedJob.id}/stop`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -655,7 +653,7 @@
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-12">
-				{#if selectedRunningJob && (selectedRunningJob.status === 'running' || selectedRunningJob.status === 'submitted')}
+				{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
 					<button class="btn btn-danger" on:click={stopWorkflow}>
 						<i class="bi-stop-circle-fill" /> Stop workflow
 					</button>
@@ -752,7 +750,7 @@
 									{/if}
 								</button>
 							{/each}
-							</div>
+						</div>
 					{/if}
 				</div>
 			</div>
@@ -1155,7 +1153,11 @@
 					checkingConfiguration = false;
 				}}>Cancel</button
 			>
-			<button class="btn btn-primary" on:click|preventDefault={handleApplyWorkflow} disabled={applyingWorkflow}>
+			<button
+				class="btn btn-primary"
+				on:click|preventDefault={handleApplyWorkflow}
+				disabled={applyingWorkflow}
+			>
 				{#if applyingWorkflow}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 				{/if}

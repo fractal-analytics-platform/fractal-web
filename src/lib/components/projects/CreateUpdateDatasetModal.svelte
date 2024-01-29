@@ -380,7 +380,8 @@
 			}),
 			project_id: originalDataset.project_id,
 			project: originalDataset.project,
-			history: []
+			history: [],
+			timestamp_created: originalDataset.timestamp_created
 		};
 	}
 

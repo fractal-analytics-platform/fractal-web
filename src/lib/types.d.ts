@@ -4,6 +4,7 @@ export type Project = {
   id: number
   name: string
   read_only: boolean
+  timestamp_created: string
 }
 
 export type Task = {
@@ -28,6 +29,7 @@ export type Workflow = {
   project_id: number
   project: Project
   task_list: Array<WorkflowTask>
+  timestamp_created: string
 }
 
 export type WorkflowTask = {
@@ -62,9 +64,10 @@ export type Dataset = {
   resource_list: Array<Resource>
   project_id: number
   project: Project
+  timestamp_created: string
 }
 
-export type JobStatus = 'submitted' | 'running' | 'done' | 'failed'
+export type JobStatus = 'submitted' | 'done' | 'failed'
 
 export type ApplyWorkflow = {
   id: number
@@ -77,18 +80,22 @@ export type ApplyWorkflow = {
   end_timestamp: string | null
   status: JobStatus
   log: string | null
+  project_dump: {
+    id: number
+    name: string
+  },
   workflow_dump: {
     id: number
     name: string
-  } | null
+  }
   output_dataset_dump: {
     id: number
     name: string
-  } | null
+  }
   input_dataset_dump: {
     id: number
     name: string
-  } | null
+  }
   working_dir: string | null
   working_dir_user: string | null
   first_task_index: number | null

@@ -92,7 +92,7 @@
 			errorAlert.hide();
 		}
 
-		console.log('Stop running job');
+		console.log('Stop submitted job');
 
 		cancellingJobs = [...cancellingJobs, job.id];
 		jobCancelledMessage = '';
@@ -116,24 +116,13 @@
 		}
 	}
 
-	/**
-	 * @param projectId {number}
-	 */
-	function getProjectName(projectId) {
-		const filteredProjects = projects.filter((p) => p.id === projectId);
-		if (filteredProjects.length === 1) {
-			return filteredProjects[0].name;
-		}
-		return '';
-	}
-
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
 	let updateJobsTimeout = undefined;
 
 	async function updateJobsInBackground() {
-		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');
+		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
 		if (jobsToCheck.length > 0) {
 			jobs = await jobUpdater();
 			tableHandler.setRows(jobs);
@@ -227,10 +216,9 @@
 					<th>
 						<select class="form-control" bind:value={statusFilter}>
 							<option value="">All</option>
-							<option value="running">Running</option>
+							<option value="submitted">Submitted</option>
 							<option value="done">Done</option>
 							<option value="failed">Failed</option>
-							<option value="submitted">Submitted</option>
 						</select>
 					</th>
 					<th />
@@ -298,11 +286,7 @@
 							</span>
 						</td>
 						<td>
-							<button
-								class="btn btn-info"
-								on:click|preventDefault={() =>
-									jobInfoModal.show(row, getProjectName(row.project_id))}
-							>
+							<button class="btn btn-info" on:click|preventDefault={() => jobInfoModal.show(row)}>
 								<i class="bi-info-circle" />
 								Info
 							</button>
@@ -324,7 +308,7 @@
 									</a>
 								{/if}
 							{/if}
-							{#if row.status === 'running'}
+							{#if row.status === 'submitted'}
 								<button
 									class="btn btn-danger"
 									on:click={() => handleJobCancel(row)}
@@ -364,29 +348,29 @@
 							<td>
 								{#if workflows && row.workflow_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
-										{row.workflow_dump?.name}
+										{row.workflow_dump.name}
 									</a>
 								{:else}
-									{row.workflow_dump?.name || '-'}
+									{row.workflow_dump.name}
 								{/if}
 							</td>
 						{/if}
 						<td>
 							{#if inputDatasets && row.input_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
-									{row.input_dataset_dump?.name}
+									{row.input_dataset_dump.name}
 								</a>
 							{:else}
-								{row.input_dataset_dump?.name || '-'}
+								{row.input_dataset_dump.name}
 							{/if}
 						</td>
 						<td>
 							{#if outputDatasets && row.output_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
-									{row.output_dataset_dump?.name}
+									{row.output_dataset_dump.name}
 								</a>
 							{:else}
-								{row.output_dataset_dump?.name || '-'}
+								{row.output_dataset_dump.name}
 							{/if}
 						</td>
 						{#if !columnsToHide.includes('user_email')}

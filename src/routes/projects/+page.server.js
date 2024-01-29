@@ -1,11 +1,5 @@
+import { sortProjectsByTimestampCreatedDesc } from '$lib/common/component_utilities';
 import { listProjects } from '$lib/server/api/v1/project_api';
-
-async function loadProjects(fetch) {
-	return await listProjects(fetch).catch((error) => {
-		console.error(error);
-		return [];
-	});
-}
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch }) {
@@ -13,7 +7,8 @@ export async function load({ fetch }) {
 
 	// Load projects from server
 	/** @type {import('$lib/types').Project[]} */
-	const projects = await loadProjects(fetch);
+	const projects = await listProjects(fetch);
+	sortProjectsByTimestampCreatedDesc(projects);
 
 	return {
 		projects
