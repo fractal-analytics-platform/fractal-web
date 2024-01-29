@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Aligned timestamp definitions with fractal-server 1.4.3 (\#401).
+* Sorted projects by descending creation timestamp (\#401).
 * Removed coverage setup from Playwright tests and CI (\#399).
 
 # 0.8.2
