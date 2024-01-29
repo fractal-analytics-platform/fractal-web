@@ -33,14 +33,12 @@
 	let inputDatasets = $page.data.inputDatasets || [];
 	/** @type {{ id: number, name: string }[]} */
 	let outputDatasets = $page.data.outputDatasets || [];
-	/** @type {{ id: number, name: string }[]} */
-	let datasets = inputDatasets.concat(outputDatasets);
 
 	/** @type {DataHandler} */
 	let tableHandler = new DataHandler(jobs);
 	tableHandler.sortDesc('id');
 
-	/** @type {import('svelte/types/runtime/store').Readable<import('$lib/types').ApplyWorkflow[]>} */
+	/** @type {import('svelte/store').Readable<import('$lib/types').ApplyWorkflow[]>} */
 	let rows = tableHandler.getRows();
 
 	// Filters
@@ -78,7 +76,6 @@
 			/** @type {{id: number, name: string}[]} */
 			(jobs.filter((j) => j.output_dataset_dump).map((j) => j.output_dataset_dump))
 		);
-		datasets = inputDatasets.concat(outputDatasets);
 		tableHandler.setRows(jobs);
 	}
 
@@ -402,7 +399,7 @@
 	</table>
 {/if}
 
-<JobInfoModal {workflows} {datasets} bind:this={jobInfoModal} />
+<JobInfoModal bind:this={jobInfoModal} />
 <JobLogsModal bind:this={jobLogsModal} />
 
 <style>

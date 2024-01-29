@@ -1,12 +1,4 @@
 export default class SchemaManager {
-	keySeparator = '###';
-	propertiesMap = new Map();
-	hasUnsavedChanges = false;
-	/** @type {(hasChanges: boolean) => void} */
-	onPropertyChanges = () => {};
-	/** @type {import('./jschema-types').JSONSchemaObjectProperty} */
-	schema;
-
 	/**
 	 * @param {import('./jschema-types').JSONSchema|undefined} schema
 	 * @param {object|undefined} schemaData
@@ -14,6 +6,11 @@ export default class SchemaManager {
 	constructor(schema, schemaData) {
 		this.schema = this.loadSchema(schema);
 		this.data = this.loadSchemaData(schemaData);
+		this.keySeparator = '###';
+		this.propertiesMap = new Map();
+		this.hasUnsavedChanges = false;
+		/** @type {(hasChanges: boolean) => void} */
+		this.onPropertyChanges = () => {};
 	}
 
 	/**
@@ -167,16 +164,6 @@ export default class SchemaManager {
 }
 
 export class SchemaProperty {
-	manager;
-	/** @type {import('./jschema-types').JSONSchemaObjectProperty} */
-	globalSchema;
-	keySeparator = '###';
-	nestedProperties = [];
-	hasCustomKeyValues = false;
-	/** @type {string[]|undefined} */
-	requiredProperties = undefined;
-	required = false;
-
 	/**
 	 * @param {import('./jschema-types').JSONSchemaProperty & { key: string }} propertySchema
 	 * @param {SchemaManager} manager
@@ -186,6 +173,12 @@ export class SchemaProperty {
 		this.manager = manager;
 		this.globalSchema = this.manager.schema;
 		this.referenceSchema = propertySchema;
+		this.keySeparator = '###';
+		this.nestedProperties = [];
+		this.hasCustomKeyValues = false;
+		/** @type {string[]|undefined} */
+		this.requiredProperties = undefined;
+		this.required = false;
 
 		// Default properties
 		this.type = propertySchema.type;
