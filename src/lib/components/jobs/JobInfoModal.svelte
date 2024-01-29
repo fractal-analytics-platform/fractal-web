@@ -4,11 +4,6 @@
 	import { page } from '$app/stores';
 	import Modal from '../common/Modal.svelte';
 
-	/** @type {{id: number, name: string}[]} */
-	export let datasets;
-	/** @type {{id: number, name: string}[]} */
-	export let workflows;
-
 	/** @type {number|undefined} */
 	let workflowJobId = undefined;
 	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
@@ -17,9 +12,6 @@
 	let projectId = undefined;
 	/** @type {string|undefined} */
 	let projectName = undefined;
-	let jobWorkflowName = undefined;
-	let jobInputDatasetName = undefined;
-	let jobOutputDatasetName = undefined;
 	let jobStatus = undefined;
 
 	let errorAlert = undefined;
@@ -35,17 +27,6 @@
 		workflowJobId = job.id;
 		projectId = job.project_id;
 		projectName = projectNameToDisplay;
-		// Should update jobWorkflowName
-		jobWorkflowName = workflows.find((workflow) => workflow.id === jobToDisplay.workflow_id)?.name;
-		// Should update jobInputDatasetName
-		jobInputDatasetName = datasets.find(
-			(dataset) => dataset.id === jobToDisplay.input_dataset_id
-		)?.name;
-		// Should update jobOutputDatasetName
-		jobOutputDatasetName = datasets.find(
-			(dataset) => dataset.id === jobToDisplay.output_dataset_id
-		)?.name;
-		// Should update jobStatus
 		jobStatus = job.status;
 
 		modal.show();

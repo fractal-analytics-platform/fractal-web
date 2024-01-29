@@ -1,5 +1,5 @@
-import { test as playwrightTest, mergeTests } from '@playwright/test';
-import { test as baseTest, waitPageLoading } from './base_test.js';
+import { test as baseTest, mergeTests } from '@playwright/test';
+import { waitPageLoading } from './utils.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -51,7 +51,7 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 }
 
-const workflowTest = playwrightTest.extend({
+const workflowTest = baseTest.extend({
 	workflow: async ({ page }, use) => {
 		const workflow = new PageWithWorkflow(page);
 		await workflow.createProject();

@@ -1,6 +1,10 @@
 name: Unit tests
 
-on: [workflow_call]
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
 
 jobs:
   unit_tests:
@@ -26,13 +30,4 @@ jobs:
         run: npm install
 
       - name: Run vitest tests
-        run: npx vitest run --coverage.enabled --coverage.provider=istanbul --coverage.include=src --coverage.reporter=json --coverage.all
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: unit-coverage
-          path: coverage-unit/
-          retention-days: 30
-
-    env:
-      ENABLE_COVERAGE: "true"
+        run: npx vitest run

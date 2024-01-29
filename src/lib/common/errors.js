@@ -14,9 +14,6 @@ export async function responseError(response) {
  * Used for example to handle the displaying of the error alert when using the ConfirmActionButton.
  */
 export class AlertError extends Error {
-	/** @type {null | { loc: string[], msg: string } | string} */
-	simpleValidationMessage;
-
 	/**
 	 * @param {any} reason
 	 * @param {number|null} statusCode
@@ -24,6 +21,7 @@ export class AlertError extends Error {
 	constructor(reason, statusCode = null) {
 		super();
 		this.reason = reason;
+		/** @type {null | { loc: string[], msg: string } | string} */
 		this.simpleValidationMessage = getSimpleValidationMessage(reason, statusCode);
 	}
 
