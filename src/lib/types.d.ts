@@ -4,6 +4,7 @@ export type Project = {
   id: number
   name: string
   read_only: boolean
+  timestamp_created: string
 }
 
 export type Task = {
