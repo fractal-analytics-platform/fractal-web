@@ -29,6 +29,7 @@ export type Workflow = {
   project_id: number
   project: Project
   task_list: Array<WorkflowTask>
+  timestamp_created: string
 }
 
 export type WorkflowTask = {
@@ -63,6 +64,7 @@ export type Dataset = {
   resource_list: Array<Resource>
   project_id: number
   project: Project
+  timestamp_created: string
 }
 
 export type JobStatus = 'submitted' | 'running' | 'done' | 'failed'

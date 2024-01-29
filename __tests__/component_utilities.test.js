@@ -67,9 +67,9 @@ it('removes duplicated datasets and sort by name', () => {
 
 it('sort projects by timestamp_created DESC', () => {
 	const projects = [
-		{ name: 'p1', read_only: false, id: 2, timestamp_created: '2024-01-29T09:34:40.687256' },
-		{ name: 'p3', read_only: false, id: 5, timestamp_created: '2024-01-29T09:36:40.380260' },
-		{ name: 'p2', read_only: false, id: 4, timestamp_created: '2024-01-29T09:35:20.571999' }
+		{ name: 'p1', read_only: false, id: 2, timestamp_created: '2024-01-29T09:34:40.687256+00:00' },
+		{ name: 'p3', read_only: false, id: 5, timestamp_created: '2024-01-29T09:36:40.380260+00:00' },
+		{ name: 'p2', read_only: false, id: 4, timestamp_created: '2024-01-29T09:35:20.571999+00:00' }
 	];
 
 	sortProjectsByTimestampCreatedDesc(projects);

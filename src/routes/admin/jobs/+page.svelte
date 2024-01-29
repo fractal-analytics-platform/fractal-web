@@ -124,9 +124,9 @@
 			return undefined;
 		}
 		if (time === undefined || time === '') {
-			return `${date}T00:00:00`;
+			return new Date(`${date}T00:00:00`).toISOString();
 		}
-		return `${date}T${time}:00`;
+		return new Date(`${date}T${time}:00`).toISOString();
 	}
 
 	function resetSearchFields() {
