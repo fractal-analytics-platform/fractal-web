@@ -67,7 +67,7 @@ export type Dataset = {
   timestamp_created: string
 }
 
-export type JobStatus = 'submitted' | 'running' | 'done' | 'failed'
+export type JobStatus = 'submitted' | 'done' | 'failed'
 
 export type ApplyWorkflow = {
   id: number

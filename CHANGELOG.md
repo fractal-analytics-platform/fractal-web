@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Removed `running` job status (\#401).
 * Aligned timestamp definitions with fractal-server 1.4.3 (\#401).
 * Sorted projects by descending creation timestamp (\#401).
 * Removed coverage setup from Playwright tests and CI (\#399).

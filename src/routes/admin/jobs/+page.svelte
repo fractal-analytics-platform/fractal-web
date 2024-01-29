@@ -37,7 +37,7 @@
 	 */
 	async function jobUpdater() {
 		/** @type {import('$lib/types').ApplyWorkflow[]} */
-		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');
+		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
 		/** @type {import('$lib/types').ApplyWorkflow[]} */
 		const updatedJobs = [];
 		for (const job of jobsToCheck) {
@@ -281,10 +281,9 @@
 				<div class="col-9">
 					<select class="form-control" bind:value={status} id="status">
 						<option value="">All</option>
-						<option value="running">Running</option>
+						<option value="submitted">Submitted</option>
 						<option value="done">Done</option>
 						<option value="failed">Failed</option>
-						<option value="submitted">Submitted</option>
 					</select>
 				</div>
 			</div>
@@ -426,7 +425,7 @@
 				</button>
 			</svelte:fragment>
 			<svelte:fragment slot="edit-status" let:row>
-				{#if row.status === 'submitted' || row.status === 'running'}
+				{#if row.status === 'submitted'}
 					&nbsp;
 					<button class="btn btn-link p-0" on:click={() => openEditStatusModal(row)}>
 						<i class="bi bi-pencil" />

@@ -10,8 +10,6 @@
 		switch (status) {
 			case 'submitted':
 				return 'badge text-bg-info';
-			case 'running':
-				return 'badge text-bg-primary';
 			case 'done':
 				return 'badge text-bg-success';
 			case 'failed':

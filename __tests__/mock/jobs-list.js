@@ -71,7 +71,7 @@ export const data = {
 			input_dataset_dump: { id: 5, name: 'input3' },
 			output_dataset_dump: { id: 6, name: 'output3' },
 			end_timestamp: null,
-			status: 'running',
+			status: 'submitted',
 			user_email: 'admin@fractal.xy'
 		}
 	]

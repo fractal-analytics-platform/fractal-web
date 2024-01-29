@@ -40,7 +40,7 @@ describe('JobsList', () => {
 		const filters = result.getAllByRole('combobox');
 
 		const statusFilter = filters[0];
-		verifyOptions(statusFilter, ['', 'running', 'done', 'failed', 'submitted']);
+		verifyOptions(statusFilter, ['', 'submitted', 'done', 'failed']);
 		const projectFilter = filters[1];
 		verifyOptions(projectFilter, ['', '1', '2']);
 		const workflowFilter = filters[2];
@@ -80,7 +80,7 @@ describe('JobsList', () => {
 		await clearFilters(result);
 
 		// Filter by job status
-		await fireEvent.change(statusFilter, { target: { value: 'running' } });
+		await fireEvent.change(statusFilter, { target: { value: 'submitted' } });
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
 		expect(table.querySelectorAll('tbody tr td')[6].textContent).eq('input3');
@@ -162,14 +162,14 @@ describe('JobsList', () => {
 		vi.useFakeTimers();
 		try {
 			const jobUpdater = function () {
-				return data.jobs.map((j) => (j.status === 'running' ? { ...j, status: 'done' } : j));
+				return data.jobs.map((j) => (j.status === 'submitted' ? { ...j, status: 'done' } : j));
 			};
 			const result = render(JobsList, {
 				props: { jobUpdater }
 			});
 			let table = result.getByRole('table');
 			expect(table.querySelectorAll('tbody tr').length).eq(3);
-			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).contain('running');
+			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[0].textContent).contain('submitted');
 			expect(table.querySelectorAll('tbody tr:nth-child(2) td')[0].textContent).contain('failed');
 			expect(table.querySelectorAll('tbody tr:nth-child(3) td')[0].textContent).contain('done');
 

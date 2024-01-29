@@ -92,7 +92,7 @@
 			errorAlert.hide();
 		}
 
-		console.log('Stop running job');
+		console.log('Stop submitted job');
 
 		cancellingJobs = [...cancellingJobs, job.id];
 		jobCancelledMessage = '';
@@ -133,7 +133,7 @@
 	let updateJobsTimeout = undefined;
 
 	async function updateJobsInBackground() {
-		const jobsToCheck = jobs.filter((j) => j.status === 'running' || j.status === 'submitted');
+		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
 		if (jobsToCheck.length > 0) {
 			jobs = await jobUpdater();
 			tableHandler.setRows(jobs);
@@ -227,10 +227,9 @@
 					<th>
 						<select class="form-control" bind:value={statusFilter}>
 							<option value="">All</option>
-							<option value="running">Running</option>
+							<option value="submitted">Submitted</option>
 							<option value="done">Done</option>
 							<option value="failed">Failed</option>
-							<option value="submitted">Submitted</option>
 						</select>
 					</th>
 					<th />
@@ -324,7 +323,7 @@
 									</a>
 								{/if}
 							{/if}
-							{#if row.status === 'running'}
+							{#if row.status === 'submitted'}
 								<button
 									class="btn btn-danger"
 									on:click={() => handleJobCancel(row)}
