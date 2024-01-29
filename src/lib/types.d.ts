@@ -80,18 +80,22 @@ export type ApplyWorkflow = {
   end_timestamp: string | null
   status: JobStatus
   log: string | null
+  project_dump: {
+    id: number
+    name: string
+  },
   workflow_dump: {
     id: number
     name: string
-  } | null
+  }
   output_dataset_dump: {
     id: number
     name: string
-  } | null
+  }
   input_dataset_dump: {
     id: number
     name: string
-  } | null
+  }
   working_dir: string | null
   working_dir_user: string | null
   first_task_index: number | null

@@ -116,17 +116,6 @@
 		}
 	}
 
-	/**
-	 * @param projectId {number}
-	 */
-	function getProjectName(projectId) {
-		const filteredProjects = projects.filter((p) => p.id === projectId);
-		if (filteredProjects.length === 1) {
-			return filteredProjects[0].name;
-		}
-		return '';
-	}
-
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
@@ -297,11 +286,7 @@
 							</span>
 						</td>
 						<td>
-							<button
-								class="btn btn-info"
-								on:click|preventDefault={() =>
-									jobInfoModal.show(row, getProjectName(row.project_id))}
-							>
+							<button class="btn btn-info" on:click|preventDefault={() => jobInfoModal.show(row)}>
 								<i class="bi-info-circle" />
 								Info
 							</button>
@@ -363,29 +348,29 @@
 							<td>
 								{#if workflows && row.workflow_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/projects/${row.project_id}/workflows/${row.workflow_id}`}>
-										{row.workflow_dump?.name}
+										{row.workflow_dump.name}
 									</a>
 								{:else}
-									{row.workflow_dump?.name || '-'}
+									{row.workflow_dump.name}
 								{/if}
 							</td>
 						{/if}
 						<td>
 							{#if inputDatasets && row.input_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
-									{row.input_dataset_dump?.name}
+									{row.input_dataset_dump.name}
 								</a>
 							{:else}
-								{row.input_dataset_dump?.name || '-'}
+								{row.input_dataset_dump.name}
 							{/if}
 						</td>
 						<td>
 							{#if outputDatasets && row.output_dataset_id !== null && row.user_email === $page.data.userInfo.email}
 								<a href={`/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
-									{row.output_dataset_dump?.name}
+									{row.output_dataset_dump.name}
 								</a>
 							{:else}
-								{row.output_dataset_dump?.name || '-'}
+								{row.output_dataset_dump.name}
 							{/if}
 						</td>
 						{#if !columnsToHide.includes('user_email')}
