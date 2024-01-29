@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from './base_test.js';
+import { waitModalClosed, waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -13,7 +13,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	await test.step('Go to "Add a single task" form', async () => {
 		await page.goto('/tasks');
 		await waitPageLoading(page);
-		await page.getByLabel('Single task').click({ force: true });
+		await page.getByText('Single task').click();
 	});
 
 	const randomTaskName = 'validation-test-' + Math.random().toString(36).substring(7);

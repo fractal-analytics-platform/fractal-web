@@ -1,26 +1,16 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import istanbul from 'vite-plugin-istanbul';
+import { defineConfig } from 'vitest/config';
 
 const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
 const pkg = JSON.parse(packageJsonData);
 
-const enableIstanbul = process.env['ENABLE_COVERAGE'];
-
 /** @type {import('vite').UserConfig} */
-const config = {
+const config = defineConfig({
 	plugins: [
 		sveltekit(),
-		enableIstanbul &&
-			istanbul({
-				include: 'src/*',
-				exclude: ['node_modules', 'tests', 'static'],
-				extension: ['.js', '.svelte'],
-				requireEnv: false,
-				forceBuildInstrument: true
-			})
 	],
 	define: {
 		__APP_VERSION__: JSON.stringify(pkg.version)
@@ -35,7 +25,9 @@ const config = {
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
-			reportsDirectory: './coverage-unit'
+			reportsDirectory: './coverage-unit',
+			include: ['src'],
+			all: true
 		},
 		alias: [
 			// See https://github.com/vitest-dev/vitest/issues/2834#issuecomment-1439576110
@@ -56,6 +48,6 @@ const config = {
 			'semver/functions/valid'
 		]
 	}
-};
+});
 
 export default config;

@@ -36,12 +36,3 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test --workers=1
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: playwright-coverage
-          path: coverage-playwright/
-          retention-days: 30
-
-    env:
-      ENABLE_COVERAGE: "true"
