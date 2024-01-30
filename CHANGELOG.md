@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Highlighted relevant part of the error message in workflow job log modal (\#402).
+
 # 0.9.0
 
 This release requires fractal-server 1.4.3.
