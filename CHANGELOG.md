@@ -3,6 +3,7 @@
 # Unreleased
 
 * Highlighted relevant part of the error message in workflow job log modal (\#402).
+* Made the error message directly accessible from the new workflow page (\#402).
 
 # 0.9.0
 

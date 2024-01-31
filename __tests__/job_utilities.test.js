@@ -86,3 +86,19 @@ it('extract relevant part of a workflow job error message without traceback', ()
 	const relevantError = extractRelevantJobError('foo');
 	expect(relevantError).eq('foo');
 });
+
+it('extract relevant part of a workflow job error with max lines reached', () => {
+	const relevantError = extractRelevantJobError(completeTracebackError, 2);
+	expect(relevantError)
+		.eq(`pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
+allowed_channels
+[...]`);
+});
+
+it('extract relevant part of a workflow job error with max lines not reached', () => {
+	const relevantError = extractRelevantJobError(completeTracebackError, 3);
+	expect(relevantError)
+		.eq(`pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
+allowed_channels
+  field required (type=value_error.missing)`);
+});

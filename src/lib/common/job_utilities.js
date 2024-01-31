@@ -47,12 +47,28 @@ export function extractJobErrorParts(jobError) {
 
 /**
  * @param {string} completeJobError
+ * @param {number|undefined} maxLines
  * @returns {string}
  */
-export function extractRelevantJobError(completeJobError) {
+export function extractRelevantJobError(completeJobError, maxLines = undefined) {
 	const relevantParts = extractJobErrorParts(completeJobError).filter((p) => p.highlight);
+	let relevantError;
 	if (relevantParts.length === 0) {
-		return completeJobError;
+		relevantError = completeJobError;
+	} else {
+		relevantError = relevantParts[0].text;
 	}
-	return relevantParts[0].text;
+	if (!maxLines) {
+		return relevantError;
+	}
+	const lines = relevantError.split('\n');
+	if (lines.length > maxLines) {
+		const truncatedErrorLines = [];
+		for (let i = 0; i < maxLines; i++) {
+			truncatedErrorLines.push(lines[i]);
+		}
+		truncatedErrorLines.push('[...]');
+		return truncatedErrorLines.join('\n');
+	}
+	return relevantError;
 }
