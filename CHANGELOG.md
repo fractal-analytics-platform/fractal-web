@@ -1,6 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.9.0
+
+This release requires fractal-server 1.4.3.
 
 * Removed `running` job status (\#401).
 * Aligned timestamp definitions with fractal-server 1.4.3 (\#401).
