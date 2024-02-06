@@ -2,47 +2,79 @@
  * Split the error of a failed workflow job into multiple parts, marking the relevents ones,
  * so that they can be extracted or highlighted in a different way in the UI.
  *
- * @param {string} jobError
+ * @param {string} log
  * @returns {Array<{text: string, highlight: boolean}>}
  */
-export function extractJobErrorParts(jobError) {
-	const tracebackLine = 'TRACEBACK:';
-	const completeTracebackLine = 'Traceback (most recent call last):';
+export function extractJobErrorParts(log) {
+	log = log.trim();
+	if (
+		log.startsWith('TASK ERROR:') ||
+		log.startsWith('JOB ERROR:') ||
+		log.startsWith('UNKNOWN ERROR')
+	) {
+		const lines = log.split('\n');
+		if (lines.length > 1) {
+			const [firstLine, ...nextLines] = lines;
+			return [{ text: firstLine, highlight: true }, ...extractTraceback(nextLines.join('\n'))];
+		}
+	}
+	return [{ text: log, highlight: false }];
+}
 
-	if (jobError.includes(completeTracebackLine)) {
-		const parts = [];
-		let tracebackStarted = false;
+const completeTracebackLine = 'Traceback (most recent call last):';
+
+/**
+ * @param {string} error
+ */
+function extractTraceback(error) {
+	if (error.includes(completeTracebackLine)) {
+		return extractCompleteTraceback(error);
+	}
+	return extractUppercaseTraceback(error);
+}
+
+/**
+ * @param {string} error
+ * @returns {Array<{text: string, highlight: boolean}>}
+ */
+function extractCompleteTraceback(error) {
+	const index = error.lastIndexOf('Traceback (most recent call last):');
+	if (index !== -1) {
+		const firstPart = error.substring(0, index);
+		const lastPart = error.substring(index);
 		let relevantErrorStarted = false;
-		let part = '';
-		for (const line of jobError.split('\n')) {
-			if (line === completeTracebackLine) {
-				tracebackStarted = true;
-			} else if (tracebackStarted && !relevantErrorStarted) {
-				if (!line.startsWith(' ') && !line.startsWith('\t')) {
-					parts.push({ text: part.trim(), highlight: false });
-					relevantErrorStarted = true;
-					part = '';
-				}
+		let part = firstPart;
+		const parts = [];
+		const lines = lastPart.split('\n');
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			if (i > 0 && !relevantErrorStarted && !line.startsWith(' ') && !line.startsWith('\t')) {
+				parts.push({ text: part.trim(), highlight: false });
+				relevantErrorStarted = true;
+				part = '';
 			}
 			part += line + '\n';
 		}
 		parts.push({ text: part.trim(), highlight: true });
 		return parts;
 	}
+	return [{ text: error.trim(), highlight: false }];
+}
 
-	if (jobError.includes(tracebackLine)) {
-		const parts = jobError.split(new RegExp('(.*' + tracebackLine + '\n)(.*)', 's'));
-		return parts
-			.map((t) => t.trim())
-			.filter((t) => t !== '')
-			.map((text) => {
-				return text.includes(tracebackLine)
-					? { text, highlight: false }
-					: { text, highlight: true };
-			});
+/**
+ * @param {string} error
+ * @returns {Array<{text: string, highlight: boolean}>}
+ */
+function extractUppercaseTraceback(error) {
+	const uppercaseTraceback = 'TRACEBACK:';
+	const tracebackIndex = error.indexOf(uppercaseTraceback);
+	if (tracebackIndex !== -1) {
+		return [
+			{ text: error.substring(tracebackIndex, uppercaseTraceback.length), highlight: false },
+			{ text: error.substring(tracebackIndex + uppercaseTraceback.length + 1), highlight: true }
+		];
 	}
-
-	return [{ text: jobError.trim(), highlight: false }];
+	return [{ text: error.trim(), highlight: false }];
 }
 
 /**
@@ -56,7 +88,7 @@ export function extractRelevantJobError(completeJobError, maxLines = undefined) 
 	if (relevantParts.length === 0) {
 		relevantError = completeJobError;
 	} else {
-		relevantError = relevantParts[0].text;
+		relevantError = relevantParts.map((p) => p.text).join('\n');
 	}
 	if (!maxLines) {
 		return relevantError;
