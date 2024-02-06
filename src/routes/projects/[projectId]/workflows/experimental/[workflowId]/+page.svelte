@@ -422,6 +422,7 @@
 				}
 			);
 			applyingWorkflow = false;
+			checkingConfiguration = false;
 
 			// Handle API response
 			if (response.ok) {
@@ -1213,12 +1214,9 @@
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		{#if checkingConfiguration}
-			<button
-				class="btn btn-warning"
-				on:click={() => {
-					checkingConfiguration = false;
-				}}>Cancel</button
-			>
+			<button class="btn btn-warning" on:click={() => (checkingConfiguration = false)}>
+				Cancel
+			</button>
 			<button
 				class="btn btn-primary"
 				on:click|preventDefault={handleApplyWorkflow}
@@ -1230,12 +1228,7 @@
 				Confirm
 			</button>
 		{:else}
-			<button
-				class="btn btn-primary"
-				on:click={() => {
-					checkingConfiguration = true;
-				}}>Run</button
-			>
+			<button class="btn btn-primary" on:click={() => (checkingConfiguration = true)}> Run </button>
 		{/if}
 	</svelte:fragment>
 </Modal>
