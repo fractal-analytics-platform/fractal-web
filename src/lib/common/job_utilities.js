@@ -8,8 +8,8 @@
 export function extractJobErrorParts(log) {
 	log = log.trim();
 	if (
-		log.startsWith('TASK ERROR:') ||
-		log.startsWith('JOB ERROR:') ||
+		log.startsWith('TASK ERROR') ||
+		log.startsWith('JOB ERROR') ||
 		log.startsWith('UNKNOWN ERROR')
 	) {
 		const lines = log.split('\n');

@@ -8,6 +8,8 @@
 	let errorAlert = undefined;
 	/** @type {Modal} */
 	let modal;
+	/** Show/hide complete stack trace */
+	let showDetails = false;
 
 	/**
 	 * @param prjId {number}
@@ -57,23 +59,43 @@
 	fullscreen={true}
 	bind:this={modal}
 	bodyCss="bg-tertiary text-secondary"
+	onClose={() => (showDetails = false)}
 >
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Workflow Job logs</h1>
+		<div class="flex-fill">
+			<h1 class="h5 modal-title float-start mt-1">Workflow Job logs</h1>
+			<button
+				class="btn btn-secondary float-end me-3"
+				on:click={() => (showDetails = !showDetails)}
+			>
+				{#if showDetails}
+					Hide details
+				{:else}
+					Show details
+				{/if}
+			</button>
+		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="workflowJobLogsError" />
-		<div class="row">
+		<div class="row" id="workflow-job-logs">
 			<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
-			<pre class="ps-0 pe-0" id="workflow-job-logs">
+			{#if showDetails}
+				<pre class="ps-0 pe-0">
 <!-- -->{#each logParts as part}<div class:highlight={part.highlight} class="ps-3 pe-3">{part.text}
 <!-- --></div>{/each}</pre>
+			{:else}
+				<pre class="fw-bold">{logParts
+						.filter((p) => p.highlight)
+						.map((p) => p.text)
+						.join('\n')}</pre>
+			{/if}
 		</div>
 	</svelte:fragment>
 </Modal>
 
 <style>
-	#workflow-job-logs {
+	#workflow-job-logs pre {
 		/** avoid issues with overflow of inner divs */
 		display: table;
 	}
