@@ -293,7 +293,7 @@
 							{#if row.status === 'failed' || row.status === 'done'}
 								<button
 									class="btn btn-light"
-									on:click|preventDefault={() => jobLogsModal.show(row.project_id, row.id, row.log)}
+									on:click|preventDefault={() => jobLogsModal.show(row.log)}
 								>
 									<i class="bi-list-columns-reverse" />
 									Logs

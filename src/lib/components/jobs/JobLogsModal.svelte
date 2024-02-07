@@ -1,5 +1,4 @@
 <script>
-	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { extractJobErrorParts } from '$lib/common/job_utilities';
 	import Modal from '../common/Modal.svelte';
 
@@ -12,45 +11,15 @@
 	let showDetails = false;
 
 	/**
-	 * @param prjId {number}
-	 * @param jobId {number}
-	 * @param log {string|null=}
+	 * @param logs {string|null}
 	 */
-	export async function show(prjId, jobId, log) {
+	export async function show(logs) {
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-
-		let logs;
-		if (log) {
-			logs = log;
-		} else {
-			const job = await fetchJob(prjId, jobId);
-			logs = job?.log || '';
-		}
 		logParts = extractJobErrorParts(logs);
-
 		modal.show();
-	}
-
-	/**
-	 * @param projectId {number}
-	 * @param workflowJobId {number}
-	 */
-	async function fetchJob(projectId, workflowJobId) {
-		const request = await fetch(`/api/v1/project/${projectId}/job/${workflowJobId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		const result = await request.json();
-		if (request.ok) {
-			return result;
-		} else {
-			console.error('Failed to fetch job', result);
-			errorAlert = displayStandardErrorAlert(result, 'workflowJobLogsError');
-		}
 	}
 </script>
 

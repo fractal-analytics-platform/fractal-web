@@ -206,3 +206,10 @@ ImportError: cannot import name 'StandardScalerfrom' from 'sklearn.preprocessing
 	);
 	expect(parts[2].highlight).eq(true);
 });
+
+it('handles null or undefined inputs', () => {
+	expect(extractJobErrorParts(null)).toHaveLength(0);
+	expect(extractJobErrorParts()).toHaveLength(0);
+	expect(extractRelevantJobError(null)).eq('');
+	expect(extractRelevantJobError()).eq('');
+});

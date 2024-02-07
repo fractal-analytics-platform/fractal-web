@@ -2,10 +2,13 @@
  * Split the error of a failed workflow job into multiple parts, marking the relevents ones,
  * so that they can be extracted or highlighted in a different way in the UI.
  *
- * @param {string} log
+ * @param {string|null} log
  * @returns {Array<{text: string, highlight: boolean}>}
  */
 export function extractJobErrorParts(log) {
+	if (!log) {
+		return [];
+	}
 	log = log.trim();
 	if (
 		log.startsWith('TASK ERROR') ||
@@ -78,11 +81,14 @@ function extractUppercaseTraceback(error) {
 }
 
 /**
- * @param {string} completeJobError
+ * @param {string|null} completeJobError
  * @param {number|undefined} maxLines
  * @returns {string}
  */
 export function extractRelevantJobError(completeJobError, maxLines = undefined) {
+	if (!completeJobError) {
+		return '';
+	}
 	const relevantParts = extractJobErrorParts(completeJobError).filter((p) => p.highlight);
 	let relevantError;
 	if (relevantParts.length === 0) {
