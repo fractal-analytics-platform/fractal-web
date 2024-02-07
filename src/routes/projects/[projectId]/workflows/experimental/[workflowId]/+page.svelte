@@ -1027,7 +1027,7 @@
 	</div>
 {/if}
 
-<Modal id="insertTaskModal" centered={true} bind:this={insertTaskModal}>
+<Modal id="insertTaskModal" centered={true} bind:this={insertTaskModal} focus={false}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">New workflow task</h5>
 	</svelte:fragment>
