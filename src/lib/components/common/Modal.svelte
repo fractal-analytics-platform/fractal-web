@@ -11,6 +11,9 @@
 	export let centered = false;
 	export let scrollable = false;
 	export let bodyCss = '';
+	// Set to false to avoid issues in modals containing slim-select dropdowns
+	// As a side effect, it prevents closing the modal with the esc key, unless the user has clicked inside the modal before
+	export let focus = true;
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
@@ -99,7 +102,7 @@
 <!-- (see https://stackoverflow.com/a/12630531) -->
 <!-- Note: data-bs-focus="false" is needed to avoid conflicts with slim-select -->
 <!-- (see https://github.com/brianvoe/slim-select/issues/475#issuecomment-1736440245) -->
-<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1" data-bs-focus="false">
+<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1" data-bs-focus={focus}>
 	<div
 		class="modal-dialog"
 		class:modal-fullscreen={fullscreen}

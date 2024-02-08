@@ -63,7 +63,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
 		await createBtn.click();
-		expect(await page.getByText("File doesn't contain valid JSON").count()).toEqual(1);
+		await page.getByText("File doesn't contain valid JSON").waitFor();
 		await page.getByRole('button', { name: 'Clear' }).click();
 	});
 
@@ -73,11 +73,9 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, 'data', 'invalid-schema.json'));
 		await createBtn.click();
-		expect(
-			await page
-				.getByText('File doesn\'t contain valid JSON Schema: strict mode: unknown keyword: "foo"')
-				.count()
-		).toEqual(1);
+		await page
+			.getByText('File doesn\'t contain valid JSON Schema: strict mode: unknown keyword: "foo"')
+			.waitFor();
 		await page.getByRole('button', { name: 'Clear' }).click();
 	});
 
@@ -115,7 +113,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
 		await createBtn.click();
-		expect(await page.getByText("File doesn't contain valid JSON").count()).toEqual(1);
+		await page.getByText("File doesn't contain valid JSON").waitFor();
 		await page.getByRole('button', { name: 'Clear' }).click();
 	});
 

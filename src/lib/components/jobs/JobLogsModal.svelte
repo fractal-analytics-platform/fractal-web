@@ -1,51 +1,25 @@
 <script>
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { extractJobErrorParts } from '$lib/common/job_utilities';
 	import Modal from '../common/Modal.svelte';
 
-	let logs = '';
+	/** @type {Array<{text: string, highlight: boolean}>} */
+	let logParts = [];
 	let errorAlert = undefined;
 	/** @type {Modal} */
 	let modal;
+	/** Show/hide complete stack trace */
+	let showDetails = false;
 
 	/**
-	 * @param prjId {number}
-	 * @param jobId {number}
-	 * @param log {string|null=}
+	 * @param logs {string|null}
 	 */
-	export async function show(prjId, jobId, log) {
-
+	export async function show(logs) {
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-
-		if (log) {
-			logs = log;
-		} else {
-			const job = await fetchJob(prjId, jobId);
-			logs = job?.log || '';
-		}
-
+		logParts = extractJobErrorParts(logs);
 		modal.show();
-	}
-
-	/**
-	 * @param projectId {number}
-	 * @param workflowJobId {number}
-	 */
-	async function fetchJob(projectId, workflowJobId) {
-		const request = await fetch(`/api/v1/project/${projectId}/job/${workflowJobId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		const result = await request.json();
-		if (request.ok) {
-			return result;
-		} else {
-			console.error('Failed to fetch job', result);
-			errorAlert = displayStandardErrorAlert(result, 'workflowJobLogsError');
-		}
 	}
 </script>
 
@@ -54,12 +28,48 @@
 	fullscreen={true}
 	bind:this={modal}
 	bodyCss="bg-tertiary text-secondary"
+	onClose={() => (showDetails = false)}
 >
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Workflow Job logs</h1>
+		<div class="flex-fill">
+			<h1 class="h5 modal-title float-start mt-1">Workflow Job logs</h1>
+			<button
+				class="btn btn-secondary float-end me-3"
+				on:click={() => (showDetails = !showDetails)}
+			>
+				{#if showDetails}
+					Hide details
+				{:else}
+					Show details
+				{/if}
+			</button>
+		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="workflowJobLogsError" />
-		<pre>{logs}</pre>
+		<div class="row" id="workflow-job-logs">
+			<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
+			{#if showDetails}
+				<pre class="ps-0 pe-0">
+<!-- -->{#each logParts as part}<div class:highlight={part.highlight} class="ps-3 pe-3">{part.text}
+<!-- --></div>{/each}</pre>
+			{:else}
+				<pre class="fw-bold">{logParts
+						.filter((p) => p.highlight)
+						.map((p) => p.text)
+						.join('\n')}</pre>
+			{/if}
+		</div>
 	</svelte:fragment>
 </Modal>
+
+<style>
+	#workflow-job-logs pre {
+		/** avoid issues with overflow of inner divs */
+		display: table;
+	}
+	.highlight {
+		font-weight: bold;
+		background-color: #ffe5e5;
+	}
+</style>

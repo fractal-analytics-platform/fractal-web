@@ -17,6 +17,8 @@
 	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import TasksOrderModal from '$lib/components/workflow/TasksOrderModal.svelte';
+	import { extractRelevantJobError } from '$lib/common/job_utilities';
+	import JobLogsModal from '$lib/components/jobs/JobLogsModal.svelte';
 
 	/** @type {import('$lib/types').Workflow} */
 	let workflow = $page.data.workflow;
@@ -30,6 +32,12 @@
 	let selectedInputDatasetId;
 	/** @type {number|undefined} */
 	let selectedOutputDatasetId;
+
+	let jobError = '';
+	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	let failedJob;
+	/** @type {JobLogsModal} */
+	let jobLogsModal;
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let workflowErrorAlert = undefined;
@@ -414,6 +422,7 @@
 				}
 			);
 			applyingWorkflow = false;
+			checkingConfiguration = false;
 
 			// Handle API response
 			if (response.ok) {
@@ -507,6 +516,9 @@
 
 	async function loadJobsStatus() {
 		if (selectedInputDatasetId === undefined || selectedOutputDatasetId === undefined) {
+			statuses = {};
+			jobError = '';
+			failedJob = undefined;
 			return;
 		}
 		selectedSubmittedJob = await getSelectedSubmittedJob(
@@ -533,6 +545,45 @@
 		} else {
 			selectedSubmittedJob = undefined;
 		}
+		loadJobError();
+	}
+
+	async function loadJobError() {
+		const failedStatus = Object.values(statuses).find((s) => s === 'failed');
+		if (!failedStatus) {
+			jobError = '';
+			failedJob = undefined;
+			return;
+		}
+		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/job`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (!response.ok) {
+			console.error('Error retrieving workflow jobs', await response.json());
+			return;
+		}
+		const jobs = /** @type {import('$lib/types').ApplyWorkflow[]} */ (await response.json());
+		const failedJobs = jobs
+			.filter(
+				(j) =>
+					j.input_dataset_id === selectedInputDatasetId &&
+					j.output_dataset_id === selectedOutputDatasetId &&
+					j.status === 'failed'
+			)
+			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
+		if (failedJobs.length === 0) {
+			return;
+		}
+		failedJob = failedJobs[0];
+		jobError = extractRelevantJobError(failedJob.log || '', 5);
+	}
+
+	function showJobLogsModal() {
+		if (!failedJob) {
+			return;
+		}
+		jobLogsModal.show(failedJob.log);
 	}
 
 	/**
@@ -674,7 +725,7 @@
 		</div>
 	</div>
 
-	<div class="col-lg-3">
+	<div class="col-lg-3 mb-2">
 		<div class="float-end">
 			<a href="/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
 				<i class="bi-journal-code" /> List jobs
@@ -699,6 +750,22 @@
 	<StandardDismissableAlert message={workflowSuccessMessage} />
 
 	<div id="workflowErrorAlert" />
+
+	{#if jobError}
+		<div class="alert border border-danger bg-light">
+			<div class="row">
+				<div class="col-md-10 col-sm-9">
+					<div class="text-muted mb-2 fw-bolder">The last job failed with the following error:</div>
+					<pre class="text-danger mb-0">{jobError}</pre>
+				</div>
+				<div class="col-md-2 col-sm-3">
+					<button class="btn btn-outline-secondary float-end" on:click={showJobLogsModal}>
+						Show complete log
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 
 	<div class="container mt-3 px-0">
 		<div class="row">
@@ -960,7 +1027,7 @@
 	</div>
 {/if}
 
-<Modal id="insertTaskModal" centered={true} bind:this={insertTaskModal}>
+<Modal id="insertTaskModal" centered={true} bind:this={insertTaskModal} focus={false}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">New workflow task</h5>
 	</svelte:fragment>
@@ -1147,12 +1214,9 @@
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		{#if checkingConfiguration}
-			<button
-				class="btn btn-warning"
-				on:click={() => {
-					checkingConfiguration = false;
-				}}>Cancel</button
-			>
+			<button class="btn btn-warning" on:click={() => (checkingConfiguration = false)}>
+				Cancel
+			</button>
 			<button
 				class="btn btn-primary"
 				on:click|preventDefault={handleApplyWorkflow}
@@ -1164,12 +1228,7 @@
 				Confirm
 			</button>
 		{:else}
-			<button
-				class="btn btn-primary"
-				on:click={() => {
-					checkingConfiguration = true;
-				}}>Run</button
-			>
+			<button class="btn btn-primary" on:click={() => (checkingConfiguration = true)}> Run </button>
 		{/if}
 	</svelte:fragment>
 </Modal>
@@ -1204,3 +1263,5 @@
 		</button>
 	</svelte:fragment>
 </Modal>
+
+<JobLogsModal bind:this={jobLogsModal} />
