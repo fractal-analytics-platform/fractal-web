@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/jobs/JobsList.svelte';
 
@@ -267,6 +268,17 @@
 			}
 		);
 	}
+
+	$: users = sortDropdownUsers($page.data.users);
+
+	/**
+	 * @param {import('$lib/types').User[]} users
+	 */
+	function sortDropdownUsers(users) {
+		const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
+		sortUsers(usersCopy, $page.data.userInfo.id, false);
+		return usersCopy;
+	}
 </script>
 
 <div>
@@ -294,7 +306,7 @@
 				<div class="col-9">
 					<select class="form-control" bind:value={userId} id="user">
 						<option value="">All</option>
-						{#each $page.data.users as user}
+						{#each users as user}
 							<option value={user.id}>{user.email}</option>
 						{/each}
 					</select>

@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Improved sorting of users in dropdown of the admin jobs page (\#402).
 * Fixed bug in retrieval of job log from the admin jobs page (\#402).
 * Highlighted relevant part of the error message in workflow job log modal (\#402).
 * Made the error message directly accessible from the new workflow page (\#402).
