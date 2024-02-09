@@ -292,6 +292,8 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await fileChooser.setFiles(downloadedFile);
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await page.getByText('must be equal to one of the allowed values').waitFor();
+		await page.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
 	});
 
 	await test.step('Import valid file', async () => {
@@ -307,6 +309,9 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 			}
 		};
 		fs.writeFileSync(downloadedFile, JSON.stringify(validData));
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select arguments file').click();
 		const fileChooser = await fileChooserPromise;
