@@ -30,13 +30,13 @@
 	} from '$lib/components/common/jschema/schema_management.js';
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
+	import { AlertError } from '$lib/common/errors';
 
 	/** @type {import('./jschema-types').JSONSchemaObjectProperty|undefined} */
 	export let schema = undefined;
 	export let schemaData = undefined;
 	/** @type {((value: object) => Promise<object>)|undefined} */
 	export let handleSaveChanges = undefined;
-	export let saveChanges = undefined;
 	export let handleValidationErrors = undefined;
 
 	let validator = undefined;
@@ -101,13 +101,22 @@
 		}
 	}
 
-	saveChanges = async function () {
-		// Trigger validation on input fields
-		for (const field of document.querySelectorAll('#json-schema input, #json-schema select')) {
-			field.dispatchEvent(new Event('input'));
+	/**
+	 * Save changes to schema arguments. Used both by the "Save changes" button
+	 * and by the "Import" button.
+	 * @param {Event|object} param click event when using "Save changes" or
+	 * arguments object passed by the "Import" button.
+	 */
+	export async function saveChanges(param) {
+		const isImport = !(param instanceof Event);
+		if (!isImport) {
+			// Trigger validation on input fields, when we are using the "Save changes" button
+			for (const field of document.querySelectorAll('#json-schema input, #json-schema select')) {
+				field.dispatchEvent(new Event('input'));
+			}
 		}
 
-		const data = schemaManager.data;
+		const data = isImport ? param : schemaManager.data;
 		// The following is required to remove all null values from the data object
 		// We suppose that null values are not valid, hence we remove them
 		// Deep copy the data object
@@ -115,10 +124,15 @@
 		const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
 		const isDataValid = validator.isValid(strippedNullData);
 		if (!isDataValid) {
-			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
-				handleValidationErrors(validator.getErrors());
+			const errors = validator.getErrors();
+			console.error('Could not save changes. Data is invalid', errors);
+			if (isImport) {
+				// Stop inside import modal
+				throw new AlertError(errors);
 			}
-			console.error('Could not save changes. Data is invalid', validator.getErrors());
+			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
+				handleValidationErrors(errors);
+			}
 			return;
 		}
 
@@ -131,7 +145,7 @@
 				console.error(err);
 			}
 		}
-	};
+	}
 
 	/**
 	 * @param {object} args
