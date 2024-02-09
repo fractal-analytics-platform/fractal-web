@@ -279,7 +279,22 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(exportedData.requiredObject.referencedRequiredNestedObject.optionalMax).toEqual(5);
 	});
 
-	await test.step('Attempt to import invalid file', async () => {
+	await test.step('Attempt to import a file containing invalid JSON', async () => {
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('Import arguments');
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await page.getByText("File doesn't contain valid JSON").waitFor();
+		await page.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Attempt to import a file containing invalid arguments', async () => {
 		const invalidData = { ...exportedData, requiredEnum: 'invalid' };
 		fs.writeFileSync(downloadedFile, JSON.stringify(invalidData));
 		await page.getByRole('button', { name: 'Import' }).click();

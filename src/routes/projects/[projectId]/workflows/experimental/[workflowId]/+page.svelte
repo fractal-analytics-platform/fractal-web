@@ -731,7 +731,7 @@
 				<i class="bi-journal-code" /> List jobs
 			</a>
 			<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
-				<i class="bi-box-arrow-up" />
+				<i class="bi-download" />
 			</button>
 			<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 			<button
