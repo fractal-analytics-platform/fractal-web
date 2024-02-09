@@ -23,7 +23,10 @@
 	// Project context properties
 	let project = undefined;
 	let datasets = [];
-	// List of available tasks to be inserted into workflow
+	/**
+	 * List of available tasks to be inserted into workflow
+	 * @type {import('$lib/types').Task[]}
+	 */
 	let availableTasks = [];
 
 	/** @type {import('svelte/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
@@ -141,6 +144,7 @@
 
 	async function getAvailableTasks() {
 		resetCreateWorkflowTaskModal();
+		workflowTaskSelectionComponent.setLoadingTasks(true);
 
 		// Get available tasks from the server
 		const response = await fetch('/api/v1/task', {
@@ -154,6 +158,8 @@
 			console.error(response);
 			availableTasks = [];
 		}
+
+		workflowTaskSelectionComponent.setLoadingTasks(false);
 	}
 
 	function resetWorkflowUpdateModal() {
