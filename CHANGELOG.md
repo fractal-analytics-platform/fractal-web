@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Added spinner on workflow task modal when tasks list is loading (\#410).
+* Implemented import and export of workflow task arguments (\#410).
 * Improved sorting of users in dropdown of the admin jobs page (\#402).
 * Fixed bug in retrieval of job log from the admin jobs page (\#402).
 * Highlighted relevant part of the error message in workflow job log modal (\#402).
