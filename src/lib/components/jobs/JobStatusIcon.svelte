@@ -6,7 +6,7 @@
 {#if status}
 	<span title={status}>
 		{#if status === 'submitted'}
-    <div class="spinner-border spinner-border-sm text-primary job-status-icon-submitted" role="status">
+    <div class="spinner-border spinner-border-sm text-primary job-status-submitted" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
 		{:else if status === 'done'}
