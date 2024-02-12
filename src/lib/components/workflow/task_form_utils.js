@@ -3,8 +3,8 @@ import { AlertError } from "$lib/common/errors";
 /**
  * Updates the workflow task properties.
  * @param {string} projectId 
- * @param {string} workflowId 
- * @param {string} workflowTaskId 
+ * @param {number} workflowId 
+ * @param {number} workflowTaskId 
  * @param {any} updatingWorkflowTaskProperties 
  * @param {string} groupName 
  * @returns 
@@ -45,8 +45,8 @@ export async function updateFormEntry(
 /**
  * Updates a project's workflow task in the server
  * @param {string} projectId
- * @param {string} workflowId
- * @param {string} workflowTaskId
+ * @param {number} workflowId
+ * @param {number} workflowTaskId
  * @param {any} args
  * @returns {Promise<*>}
  */
@@ -85,8 +85,8 @@ async function updateWorkflowTaskArguments(
 /**
  * Updates a project's workflow task in the server
  * @param {string} projectId
- * @param {string} workflowId
- * @param {string} workflowTaskId
+ * @param {number} workflowId
+ * @param {number} workflowTaskId
  * @param {any} meta
  * @returns {Promise<*>}
  */

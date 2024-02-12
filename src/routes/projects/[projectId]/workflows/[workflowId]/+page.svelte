@@ -747,6 +747,7 @@
 													workflowTaskId={selectedWorkflowTask.id}
 													argumentsSchema={selectedWorkflowTask.task.args_schema}
 													argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
+													taskName={selectedWorkflowTask.task.name}
 													args={selectedWorkflowTask.args}
 													bind:saveChanges={saveArgumentsChanges}
 													bind:validSchema={argsSchemaValid}
@@ -756,8 +757,7 @@
 											{:else}
 												<ArgumentForm
 													workflowId={workflow.id}
-													workflowTaskId={selectedWorkflowTask.id}
-													workflowTaskArgs={selectedWorkflowTask.args}
+													workflowTask={selectedWorkflowTask}
 												/>
 											{/if}
 										{/key}
