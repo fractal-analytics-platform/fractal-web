@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitModalClosed, waitPageLoading } from './utils.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -49,6 +49,52 @@ export class PageWithWorkflow extends PageWithProject {
 			this.workflowId = match[1];
 		}
 	}
+
+	async addFirstTask() {
+		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
+		let modalTitle = this.page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('New workflow task');
+		const modal = this.page.locator('.modal.show');
+		const selector = modal.getByRole('combobox').first();
+		await selector.click();
+		const firstItem = this.page.getByRole('listbox').locator('[aria-selected="false"]').first();
+		await firstItem.click();
+		await this.page.locator('#taskId').waitFor();
+		await this.page.getByRole('button', { name: 'Insert' }).click();
+	}
+
+	/**
+	 * @param {string} taskName
+	 * @returns {Promise<void>}
+	 */
+	async addTask(taskName) {
+		if (!this.url) {
+			return;
+		}
+		await this.page.goto(this.url);
+		await waitPageLoading(this.page);
+		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
+		const modal = this.page.locator('.modal.show');
+		await modal.waitFor();
+		await this.page.getByText('User tasks').click();
+		const selector = modal.getByRole('combobox').first();
+		await selector.click();
+		const items = await this.page.getByRole('option').all();
+		let testTaskItem = null;
+		for (const item of items) {
+			const itemText = await item.innerText();
+			if (itemText.includes(taskName)) {
+				testTaskItem = item;
+				break;
+			}
+		}
+		expect(testTaskItem).not.toBeNull();
+		await /** @type {import('@playwright/test').Locator} */ (testTaskItem).click();
+		await this.page.locator('#taskId').waitFor();
+		await this.page.getByRole('button', { name: 'Insert' }).click();
+		await waitModalClosed(this.page);
+	}
 }
 
 const workflowTest = baseTest.extend({
@@ -65,3 +111,5 @@ const workflowTest = baseTest.extend({
 
 export const test = mergeTests(baseTest, workflowTest);
 export const expect = test.expect;
+
+export async function addTaskToWorkflow() {}

@@ -37,28 +37,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await page.goto(workflow.url);
-		await waitPageLoading(page);
-		await page.locator('[data-bs-target="#insertTaskModal"]').click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await page.getByText('User tasks').click();
-		const selector = modal.getByRole('combobox').first();
-		await selector.click();
-		const items = await page.getByRole('option').all();
-		let testTaskItem = null;
-		for (const item of items) {
-			const itemText = await item.innerText();
-			if (itemText.includes(randomTaskName)) {
-				testTaskItem = item;
-				break;
-			}
-		}
-		expect(testTaskItem).not.toBeNull();
-		await /** @type {import('@playwright/test').Locator} */ (testTaskItem).click();
-		await page.locator('#taskId').waitFor();
-		await page.getByRole('button', { name: 'Insert' }).click();
-		await waitModalClosed(page);
+		await workflow.addTask(randomTaskName);
 	});
 
 	await test.step('Open workflow task form', async () => {

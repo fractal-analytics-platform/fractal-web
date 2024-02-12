@@ -6,19 +6,7 @@ test('Execute jobs', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	await test.step('Add task to workflow', async () => {
-		await page.locator('[data-bs-target="#insertTaskModal"]').click();
-		let modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('New workflow task');
-
-		const modal = page.locator('.modal.show');
-
-		const selector = modal.getByRole('combobox').first();
-		await selector.click();
-		const firstItem = page.getByRole('listbox').locator('[aria-selected="false"]').first();
-		await firstItem.click();
-		await page.locator('#taskId').waitFor();
-		await page.getByRole('button', { name: 'Insert' }).click();
+		await workflow.addFirstTask();
 	});
 
 	await test.step('Run workflow', async () => {
