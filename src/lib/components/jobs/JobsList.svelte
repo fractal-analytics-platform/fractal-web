@@ -13,7 +13,7 @@
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
-	/** @type {('project'|'workflow'|'user_email')[]} */
+	/** @type {('project'|'workflow'|'user_email'|'id')[]} */
 	export let columnsToHide = [];
 	/** @type {boolean} */
 	export let admin = false;
@@ -177,6 +177,9 @@
 	<div id="jobUpdatesError" />
 	<table class="table jobs-table">
 		<colgroup>
+			{#if !columnsToHide.includes('id')}
+				<col width="40" />
+			{/if}
 			<col width="100" />
 			<col width="110" />
 			<col width="100" />
@@ -195,6 +198,9 @@
 		</colgroup>
 		<thead class="table-light">
 			<tr>
+				{#if !columnsToHide.includes('id')}
+					<Th handler={tableHandler} key="id" label="Id" />
+				{/if}
 				<Th handler={tableHandler} key="status" label="Status" />
 				<th>Options</th>
 				<Th handler={tableHandler} key="start_timestamp" label="Start" />
@@ -213,6 +219,9 @@
 			</tr>
 			{#if !admin}
 				<tr>
+					{#if !columnsToHide.includes('id')}
+						<th />
+					{/if}
 					<th>
 						<select class="form-control" bind:value={statusFilter}>
 							<option value="">All</option>
@@ -277,6 +286,9 @@
 			{#if rows}
 				{#each $rows as row}
 					<tr class="align-middle">
+						{#if !columnsToHide.includes('id')}
+							<td> {row.id} </td>
+						{/if}
 						<td>
 							<span>
 								<StatusBadge status={row.status} />

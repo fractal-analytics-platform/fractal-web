@@ -45,5 +45,5 @@
 		<div />
 	</div>
 
-	<JobsList columnsToHide={['project', 'workflow', 'user_email']} {jobUpdater} />
+	<JobsList columnsToHide={['project', 'workflow', 'user_email', 'id']} {jobUpdater} />
 {/if}
