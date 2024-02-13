@@ -13,16 +13,18 @@ global.window.bootstrap = {
 import JobLogsModal from '../src/lib/components/jobs/JobLogsModal.svelte';
 
 describe('JobLogsModal', async () => {
-	it('display log without highlighting', async () => {
+	it('display error log fully highlighted', async () => {
 		const result = render(JobLogsModal);
 		const error = `TASK ERROR:Task id: 20 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:
 Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.`;
-		await result.component.show(error);
-		expect(result.container.querySelector('pre').innerHTML).eq(error);
+		await result.component.show({ status: 'failed', log: error });
+		const pre = result.container.querySelector('pre');
+		expect(pre.classList.contains('highlight')).eq(true);
+		expect(pre.innerHTML).eq(error);
 	});
 
-	it('display log with highlighting', async () => {
+	it('display log with highlighting and hidden details', async () => {
 		const result = render(JobLogsModal);
 		const error = `TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:
@@ -37,13 +39,15 @@ Traceback (most recent call last):
 pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
   field required (type=value_error.missing)`;
-		await result.component.show(error);
+		await result.component.show({ status: 'failed', log: error });
 		const pre = result.container.querySelector('pre');
 		let divs = pre.querySelectorAll('div');
 		expect(divs.length).eq(2);
+		expect(divs[0].classList.contains('highlight')).eq(true);
 		expect(divs[0].innerHTML).eq(
 			'TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0\n'
 		);
+		expect(divs[1].classList.contains('highlight')).eq(true);
 		expect(divs[1].innerHTML)
 			.eq(`pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
@@ -52,7 +56,19 @@ allowed_channels
 		await fireEvent.click(result.getByRole('button', { name: /details hidden/ }));
 		divs = pre.querySelectorAll('div');
 		expect(divs.length).eq(3);
+		expect(divs[0].classList.contains('highlight')).eq(true);
+		expect(divs[1].classList.contains('highlight')).eq(false);
+		expect(divs[2].classList.contains('highlight')).eq(true);
 		expect(divs[1].innerHTML.startsWith('TRACEBACK')).eq(true);
 		expect(pre.querySelectorAll('button').length).eq(0);
+	});
+
+	it('display successful log', async () => {
+		const result = render(JobLogsModal);
+		const log = 'Successful log...';
+		await result.component.show({ status: 'done', log });
+		const pre = result.container.querySelector('pre');
+		expect(pre.classList.contains('highlight')).eq(false);
+		expect(pre.innerHTML).eq(log);
 	});
 });

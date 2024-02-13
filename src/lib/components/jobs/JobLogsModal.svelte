@@ -9,16 +9,23 @@
 	let modal;
 	/** Show/hide complete stack trace */
 	let showDetails = false;
+	/** @type {import('$lib/types').JobStatus} */
+	let jobStatus;
 
 	/**
-	 * @param logs {string|null}
+	 * @param {import('$lib/types').ApplyWorkflow} job
 	 */
-	export async function show(logs) {
+	export async function show(job) {
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		logParts = extractJobErrorParts(logs, true);
+		jobStatus = job.status;
+		if (job.status === 'failed') {
+			logParts = extractJobErrorParts(job.log, true);
+		} else {
+			logParts = [{ text: job.log || '', highlight: false }];
+		}
 		modal.show();
 	}
 
@@ -56,7 +63,7 @@
 								on:click={expandDetails}>... (details hidden, click here to expand)</button
 							>{/if}{/each}</pre>
 			{:else}
-				<pre class="highlight">{logParts.map((p) => p.text).join('\n')}</pre>
+				<pre class:highlight={jobStatus === 'failed'}>{logParts.map((p) => p.text).join('\n')}</pre>
 			{/if}
 		</div>
 	</svelte:fragment>
