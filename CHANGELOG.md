@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.9.1
 
 * Improved visualization of details on job logs modal (\#415).
 * Added job id filter on admin jobs page (\#415).
