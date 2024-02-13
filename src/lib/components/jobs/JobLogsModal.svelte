@@ -18,8 +18,17 @@
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		logParts = extractJobErrorParts(logs);
+		logParts = extractJobErrorParts(logs, true);
 		modal.show();
+	}
+
+	function expandDetails() {
+		showDetails = true;
+		// Restore focus on modal, otherwise it will not be possible to close it using the esc key
+		const modal = document.querySelector('.modal.show');
+		if (modal instanceof HTMLElement) {
+			modal.focus();
+		}
 	}
 </script>
 
@@ -33,31 +42,21 @@
 	<svelte:fragment slot="header">
 		<div class="flex-fill">
 			<h1 class="h5 modal-title float-start mt-1">Workflow Job logs</h1>
-			<button
-				class="btn btn-secondary float-end me-3"
-				on:click={() => (showDetails = !showDetails)}
-			>
-				{#if showDetails}
-					Hide details
-				{:else}
-					Show details
-				{/if}
-			</button>
 		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="workflowJobLogsError" />
 		<div class="row" id="workflow-job-logs">
 			<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
-			{#if showDetails}
+			{#if logParts.length > 1}
 				<pre class="ps-0 pe-0">
-<!-- -->{#each logParts as part}<div class:highlight={part.highlight} class="ps-3 pe-3">{part.text}
-<!-- --></div>{/each}</pre>
+<!-- -->{#each logParts as part}{#if part.highlight}<div class="ps-3 pe-3 highlight">{part.text}
+<!-- --></div>{:else if showDetails}<div class="ps-3 pe-3">{part.text}</div>{:else}<button
+								class="btn btn-link text-decoration-none details-btn"
+								on:click={expandDetails}>... (details hidden, click here to expand)</button
+							>{/if}{/each}</pre>
 			{:else}
-				<pre class="fw-bold">{logParts
-						.filter((p) => p.highlight)
-						.map((p) => p.text)
-						.join('\n')}</pre>
+				<pre class="highlight">{logParts.map((p) => p.text).join('\n')}</pre>
 			{/if}
 		</div>
 	</svelte:fragment>
@@ -71,5 +70,9 @@
 	.highlight {
 		font-weight: bold;
 		background-color: #ffe5e5;
+	}
+
+	.details-btn {
+		font-family: revert;
 	}
 </style>
