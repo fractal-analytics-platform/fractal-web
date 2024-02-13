@@ -124,28 +124,18 @@ async function createJob(page, inputDataset, outputDataset) {
 		await workflow.createDataset(outputDataset, 'zarr');
 		await workflow.createWorkflow();
 		await page.waitForURL(/** @type {string} */ (workflow.url));
-		await addTaskToWorkflow(page);
+		await addTaskToWorkflow(workflow);
 		await runWorkflow(page, inputDataset, outputDataset);
 	});
 	return workflow;
 }
 
 /**
- * @param {import('@playwright/test').Page} page
+ * @param {PageWithWorkflow} workflow
  */
-async function addTaskToWorkflow(page) {
+async function addTaskToWorkflow(workflow) {
 	await test.step('Add task to workflow', async () => {
-		await page.locator('[data-bs-target="#insertTaskModal"]').click();
-		let modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('New workflow task');
-		const modal = page.locator('.modal.show');
-		const selector = modal.getByRole('combobox').first();
-		await selector.click();
-		const firstItem = page.getByRole('listbox').locator('[aria-selected="false"]').first();
-		await firstItem.click();
-		await page.locator('#taskId').waitFor();
-		await page.getByRole('button', { name: 'Insert' }).click();
+		await workflow.addFirstTask();
 	});
 }
 

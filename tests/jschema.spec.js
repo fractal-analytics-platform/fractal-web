@@ -2,6 +2,8 @@ import { waitModalClosed, waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import os from 'os';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,28 +37,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await page.goto(workflow.url);
-		await waitPageLoading(page);
-		await page.locator('[data-bs-target="#insertTaskModal"]').click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await page.getByText('User tasks').click();
-		const selector = modal.getByRole('combobox').first();
-		await selector.click();
-		const items = await page.getByRole('option').all();
-		let testTaskItem = null;
-		for (const item of items) {
-			const itemText = await item.innerText();
-			if (itemText.includes(randomTaskName)) {
-				testTaskItem = item;
-				break;
-			}
-		}
-		expect(testTaskItem).not.toBeNull();
-		await /** @type {import('@playwright/test').Locator} */ (testTaskItem).click();
-		await page.locator('#taskId').waitFor();
-		await page.getByRole('button', { name: 'Insert' }).click();
-		await waitModalClosed(page);
+		await workflow.addTask(randomTaskName);
 	});
 
 	await test.step('Open workflow task form', async () => {
@@ -72,6 +53,8 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(form.getByText('Field is required')).toHaveCount(1);
 		await input.fill('bar');
 		expect(form.getByText('Field is required')).toHaveCount(0);
+		// Check that export button is disabled when there are some pending changes
+		expect(await page.getByRole('button', { name: 'Export' }).isDisabled()).toEqual(true);
 	});
 
 	await test.step('Fill optional string', async () => {
@@ -211,8 +194,10 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(form.locator('id=property-optionalArrayWithMinMaxItems###0')).toHaveCount(0);
 	});
 
-	await test.step('Object with nested properties', async() => {
-		await page.locator('[id="property-requiredObject###requiredNestedString"]').fill('nested string');
+	await test.step('Object with nested properties', async () => {
+		await page
+			.locator('[id="property-requiredObject###requiredNestedString"]')
+			.fill('nested string');
 		await page.getByLabel('Required Min', { exact: true }).fill('1');
 		await page.getByLabel('Optional Max', { exact: true }).fill('5');
 	});
@@ -243,6 +228,113 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(await page.getByLabel('minMaxRequiredInt', { exact: true }).inputValue()).toEqual('7');
 		expect(await page.locator('id=property-requiredEnum').inputValue()).toEqual('option1');
 		await checkFirstArray(['b', 'a']);
+	});
+
+	/** @type {string} */
+	let downloadedFile;
+
+	await test.step('Export arguments', async () => {
+		const exportBtn = page.getByRole('button', { name: 'Export' });
+		const downloadPromise = page.waitForEvent('download');
+		await exportBtn.click();
+		const download = await downloadPromise;
+		downloadedFile = path.resolve(os.tmpdir(), 'playwright', download.suggestedFilename());
+		await download.saveAs(downloadedFile);
+	});
+
+	/** @type {object} */
+	let exportedData;
+
+	await test.step('Check exported file', async () => {
+		exportedData = JSON.parse(fs.readFileSync(downloadedFile).toString());
+		expect(exportedData.requiredString).toEqual('foo');
+		expect(exportedData.requiredEnum).toEqual('option1');
+		expect(exportedData.minMaxRequiredInt).toEqual(7);
+		expect(exportedData.requiredBoolean).toEqual(false);
+		expect(exportedData.requiredArrayWithMinMaxItems[0]).toEqual('b');
+		expect(exportedData.requiredArrayWithMinMaxItems[1]).toEqual('a');
+		expect(exportedData.requiredObject.requiredNestedString).toEqual('nested string');
+		expect(exportedData.requiredObject.referencedRequiredNestedObject.requiredMin).toEqual(1);
+		expect(exportedData.requiredObject.referencedRequiredNestedObject.optionalMax).toEqual(5);
+	});
+
+	await test.step('Attempt to import a file containing invalid JSON', async () => {
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('Import arguments');
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await page.getByText("File doesn't contain valid JSON").waitFor();
+		await page.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Attempt to import a file containing invalid arguments', async () => {
+		const invalidData = { ...exportedData, requiredEnum: 'invalid' };
+		fs.writeFileSync(downloadedFile, JSON.stringify(invalidData));
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('Import arguments');
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(downloadedFile);
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await page.getByText('must be equal to one of the allowed values').waitFor();
+		await page.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Import valid file', async () => {
+		const validData = {
+			requiredString: 'imported',
+			requiredEnum: 'option2',
+			minMaxRequiredInt: 9,
+			requiredBoolean: true,
+			requiredArrayWithMinMaxItems: ['imported1', 'imported2'],
+			requiredObject: {
+				requiredNestedString: 'imported nested string',
+				referencedRequiredNestedObject: { requiredMin: 2 }
+			}
+		};
+		fs.writeFileSync(downloadedFile, JSON.stringify(validData));
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(downloadedFile);
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Check the values updated by the import', async () => {
+		expect(await page.getByRole('button', { name: 'Save changes' }).isDisabled()).toEqual(true);
+		expect(await page.getByRole('button', { name: 'Discard changes' }).isDisabled()).toEqual(true);
+		expect(await page.getByRole('textbox', { name: 'Required string' }).inputValue()).toEqual(
+			'imported'
+		);
+		expect(await page.getByRole('combobox', { name: 'Required enum' }).inputValue()).toEqual(
+			'option2'
+		);
+		expect(await page.getByRole('spinbutton', { name: 'minMaxRequiredInt' }).inputValue()).toEqual(
+			'9'
+		);
+		expect(await page.locator('id=property-requiredBoolean').isChecked()).toEqual(true);
+		expect(await page.locator('id=property-requiredArrayWithMinMaxItems###0').inputValue()).toEqual(
+			'imported1'
+		);
+		expect(await page.locator('id=property-requiredArrayWithMinMaxItems###1').inputValue()).toEqual(
+			'imported2'
+		);
+		expect(await page.getByRole('spinbutton', { name: 'Required Min' }).inputValue()).toEqual('2');
+		expect(await page.getByRole('spinbutton', { name: 'Optional Max' }).inputValue()).toEqual('');
 	});
 
 	await test.step('Delete workflow task', async () => {

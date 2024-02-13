@@ -23,7 +23,10 @@
 	// Project context properties
 	let project = undefined;
 	let datasets = [];
-	// List of available tasks to be inserted into workflow
+	/**
+	 * List of available tasks to be inserted into workflow
+	 * @type {import('$lib/types').Task[]}
+	 */
 	let availableTasks = [];
 
 	/** @type {import('svelte/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
@@ -141,6 +144,7 @@
 
 	async function getAvailableTasks() {
 		resetCreateWorkflowTaskModal();
+		workflowTaskSelectionComponent.setLoadingTasks(true);
 
 		// Get available tasks from the server
 		const response = await fetch('/api/v1/task', {
@@ -154,6 +158,8 @@
 			console.error(response);
 			availableTasks = [];
 		}
+
+		workflowTaskSelectionComponent.setLoadingTasks(false);
 	}
 
 	function resetWorkflowUpdateModal() {
@@ -578,7 +584,7 @@
 			<i class="bi-journal-code" /> List jobs
 		</a>
 		<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
-			<i class="bi-box-arrow-up" />
+			<i class="bi-download" />
 		</button>
 		<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 		<button
@@ -741,6 +747,7 @@
 													workflowTaskId={selectedWorkflowTask.id}
 													argumentsSchema={selectedWorkflowTask.task.args_schema}
 													argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
+													taskName={selectedWorkflowTask.task.name}
 													args={selectedWorkflowTask.args}
 													bind:saveChanges={saveArgumentsChanges}
 													bind:validSchema={argsSchemaValid}
@@ -750,8 +757,7 @@
 											{:else}
 												<ArgumentForm
 													workflowId={workflow.id}
-													workflowTaskId={selectedWorkflowTask.id}
-													workflowTaskArgs={selectedWorkflowTask.args}
+													workflowTask={selectedWorkflowTask}
 												/>
 											{/if}
 										{/key}

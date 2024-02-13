@@ -225,3 +225,20 @@ export function sortProjectsByTimestampCreatedDesc(projects) {
 			: 0
 	);
 }
+
+/**
+ * @param {string} content
+ * @param {string} filename
+ * @param {string} contentType
+ */
+export function downloadBlob(content, filename, contentType) {
+	// Create a blob
+	var blob = new Blob([content], { type: contentType });
+	var url = URL.createObjectURL(blob);
+
+	// Create a link to download it
+	var downloader = document.createElement('a');
+	downloader.href = url;
+	downloader.setAttribute('download', filename);
+	downloader.click();
+}

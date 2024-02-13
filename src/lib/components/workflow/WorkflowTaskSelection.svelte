@@ -7,7 +7,16 @@
 		orderTasksByOwnerThenByNameThenByVersion
 	} from '$lib/common/component_utilities.js';
 
-	export let tasks = undefined;
+	/** @type {import('$lib/types').Task[]} */
+	export let tasks;
+	let loadingTasks = false;
+
+	/**
+	 * @param {boolean} loading
+	 */
+	export function setLoadingTasks(loading) {
+		loadingTasks = loading;
+	}
 
 	let selectedTypeOfTask = 'common';
 	let selectionTasks = new Map();
@@ -242,7 +251,13 @@
 				</div>
 			</div>
 			<div class="card-body">
-				<label for="taskId" class="form-label">Select task</label>
+				<label for="taskId" class="form-label">
+					Select task
+					{#if loadingTasks}
+						&nbsp;
+						<span class="spinner-border spinner-border-sm" aria-hidden="true" />
+					{/if}
+				</label>
 				{#if selectedTypeOfTask}
 					<select id="advanced-select" />
 				{/if}

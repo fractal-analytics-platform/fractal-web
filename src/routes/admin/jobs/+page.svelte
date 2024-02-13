@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { downloadBlob } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -206,23 +207,6 @@
 					.join(',')
 			)
 			.join('\n');
-	}
-
-	/**
-	 * @param {string} content
-	 * @param {string} filename
-	 * @param {string} contentType
-	 */
-	function downloadBlob(content, filename, contentType) {
-		// Create a blob
-		var blob = new Blob([content], { type: contentType });
-		var url = URL.createObjectURL(blob);
-
-		// Create a link to download it
-		var downloader = document.createElement('a');
-		downloader.href = url;
-		downloader.setAttribute('download', filename);
-		downloader.click();
 	}
 
 	/** @type {Modal} */

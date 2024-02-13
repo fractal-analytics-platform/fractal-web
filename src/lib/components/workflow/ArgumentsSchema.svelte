@@ -4,6 +4,7 @@
 	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import ImportExportArgs from './ImportExportArgs.svelte';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -15,8 +16,11 @@
 	export let argumentsSchemaVersion = undefined;
 	export let validSchema = undefined;
 	export let args = undefined;
+	/** @type {string} */
+	export let taskName;
 
-	let schemaComponent = undefined;
+	/** @type {JSchema} */
+	let schemaComponent;
 	export let unsavedChanges = false;
 	let resetChanges = undefined;
 	export let saveChanges = undefined;
@@ -71,10 +75,17 @@
 			bind:this={schemaComponent}
 		/>
 	</div>
-	<div class="d-flex justify-content-end jschema-controls-bar p-3">
+	<div class="d-flex jschema-controls-bar p-3">
+		<ImportExportArgs
+			{taskName}
+			{args}
+			onImport={(json) => schemaComponent.saveChanges(json)}
+			exportDisabled={unsavedChanges || savingChanges}
+		/>
 		<div>
 			<button
-				class="btn btn-warning {unsavedChanges ? '' : 'disabled'}"
+				class="btn btn-warning"
+				disabled={!unsavedChanges || savingChanges}
 				on:click={() => resetChanges(args)}
 			>
 				Discard changes

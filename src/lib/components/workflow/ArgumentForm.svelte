@@ -3,6 +3,8 @@
 	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
 	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import ImportExportArgs from './ImportExportArgs.svelte';
+	import { onMount } from 'svelte';
 
 	// This component shall handle a form which the user can use to specify arguments of a workflow-task
 	// Upon interacting with this component, a representation of the arguments to be used with a workflow task
@@ -12,27 +14,30 @@
 	// - store the sequence in a coherent object
 	// - enable the usage of the object that keeps the representation of the list
 
-	export let workflowId = undefined;
-	export let workflowTaskId = undefined;
+	export let workflowId;
+	/** @type {import('$lib/types').WorkflowTask} */
+	export let workflowTask;
 
-	// The main property managed by this component
-	export let workflowTaskArgs = {};
+	onMount(() => {
+		if (!workflowTask.args) {
+			workflowTask.args = {};
+		}
+	});
 
-	if (workflowTaskArgs == null || workflowTaskArgs === undefined) {
-		workflowTaskArgs = {};
-	}
-
+	/**
+	 * @param {object} updatedEntry
+	 */
 	async function handleEntryUpdate(updatedEntry) {
 		const projectId = $page.params.projectId;
 		try {
 			const response = await updateFormEntry(
 				projectId,
 				workflowId,
-				workflowTaskId,
+				workflowTask.id,
 				updatedEntry,
 				'args'
 			);
-			workflowTaskArgs = response.args;
+			workflowTask.args = response.args;
 		} catch (error) {
 			console.error(error);
 			displayStandardErrorAlert(error, 'argsPropertiesFormError');
@@ -42,5 +47,21 @@
 
 <div>
 	<span id="argsPropertiesFormError" />
-	<FormBuilder entry={workflowTaskArgs} updateEntry={handleEntryUpdate} />
+	<FormBuilder entry={workflowTask.args} updateEntry={handleEntryUpdate} />
+	<div class="d-flex args-controls-bar p-3 mt-3">
+		<ImportExportArgs
+			taskName={workflowTask.task.name}
+			args={workflowTask.args}
+			onImport={(json) => handleEntryUpdate(json)}
+			exportDisabled={false}
+		/>
+	</div>
 </div>
+
+<style>
+	.args-controls-bar {
+		background-color: whitesmoke;
+		margin-top: 5px;
+		border-top: 1px solid lightgray;
+	}
+</style>

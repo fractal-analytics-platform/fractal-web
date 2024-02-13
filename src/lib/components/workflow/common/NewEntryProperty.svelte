@@ -122,10 +122,12 @@
 			</form>
 		</div>
 		<div>
-			<button class="btn btn-primary" type="submit" form={uuid}
-				><i class="bi-check-square" /></button
-			>
-			<button class="btn btn-danger" on:click={resetComponent}><i class="bi-trash" /></button>
+			<button class="btn btn-primary" type="submit" form={uuid} aria-label="Save argument">
+				<i class="bi-check-square" />
+			</button>
+			<button class="btn btn-danger" on:click={resetComponent} aria-label="Delete argument">
+				<i class="bi-trash" />
+			</button>
 		</div>
 	</div>
 {/if}
