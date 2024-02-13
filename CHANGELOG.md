@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Improved visualization of details on job logs modal (\#415).
+* Added job id filter on admin jobs page (\#415).
 * Added spinner on workflow task modal when tasks list is loading (\#410).
 * Implemented import and export of workflow task arguments (\#410).
 * Improved sorting of users in dropdown of the admin jobs page (\#402).
