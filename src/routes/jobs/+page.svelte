@@ -19,4 +19,4 @@
 	}
 </script>
 
-<JobsList {jobUpdater} columnsToHide={['user_email']} />
+<JobsList {jobUpdater} columnsToHide={['user_email', 'id']} />

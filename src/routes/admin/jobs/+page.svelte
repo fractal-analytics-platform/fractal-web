@@ -18,6 +18,7 @@
 
 	let status;
 	let userId;
+	let jobId;
 
 	let startDateMin;
 	let startTimeMin;
@@ -73,6 +74,9 @@
 			}
 			if (userId) {
 				url.searchParams.append('user_id', userId);
+			}
+			if (jobId) {
+				url.searchParams.append('id', jobId);
 			}
 			const startTimestampMin = getTimestamp(startDateMin, startTimeMin);
 			if (startTimestampMin) {
@@ -137,6 +141,7 @@
 		}
 		status = '';
 		userId = '';
+		jobId = '';
 		startDateMin = '';
 		startTimeMin = '';
 		startDateMax = '';
@@ -156,6 +161,7 @@
 
 	async function downloadCSV() {
 		const header = [
+			'id',
 			'status',
 			'start_timestamp',
 			'end_timestamp',
@@ -173,6 +179,7 @@
 			'last_task_index'
 		];
 		const rows = jobs.map((job) => [
+			job.id,
 			job.status,
 			job.start_timestamp,
 			job.end_timestamp,
@@ -294,6 +301,14 @@
 							<option value={user.id}>{user.email}</option>
 						{/each}
 					</select>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3 offset-lg-1">
+			<div class="row mt-1">
+				<label class="col-3 col-form-label" for="job_id">Job Id</label>
+				<div class="col-9">
+					<input type="number" id="job_id" class="form-control" bind:value={jobId} />
 				</div>
 			</div>
 		</div>

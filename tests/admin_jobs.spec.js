@@ -25,17 +25,17 @@ test('Execute a job and show it on the job tables', async ({ page }) => {
 
 		const row1 = await getWorkflowRow(page, workflow1.workflowName);
 		const cells1 = await row1.locator('td').all();
-		expect(await cells1[4].innerText()).toEqual('-');
-		expect(await cells1[6].innerText()).toEqual('input');
-		expect(await cells1[7].innerText()).toEqual('output');
-		expect(await cells1[8].innerText()).toEqual('admin@fractal.xy');
+		expect(await cells1[5].innerText()).toEqual('-');
+		expect(await cells1[7].innerText()).toEqual('input');
+		expect(await cells1[8].innerText()).toEqual('output');
+		expect(await cells1[9].innerText()).toEqual('admin@fractal.xy');
 
 		const row2 = await getWorkflowRow(page, workflow2.workflowName);
 		const cells2 = await row2.locator('td').all();
-		expect(await cells2[4].innerText()).toEqual(workflow2.projectName);
-		expect(await cells2[6].innerText()).toEqual('input2');
-		expect(await cells2[7].innerText()).toEqual('output2');
-		expect(await cells2[8].innerText()).toEqual('admin@fractal.xy');
+		expect(await cells2[5].innerText()).toEqual(workflow2.projectName);
+		expect(await cells2[7].innerText()).toEqual('input2');
+		expect(await cells2[8].innerText()).toEqual('output2');
+		expect(await cells2[9].innerText()).toEqual('admin@fractal.xy');
 	});
 
 	await test.step('Download CSV', async () => {
@@ -61,7 +61,7 @@ test('Execute a job and show it on the job tables', async ({ page }) => {
 		await page.getByText('Reset').click();
 		await page.selectOption('#status', 'failed');
 		await search(page);
-		const statuses = await page.locator('table tbody tr td:first-child').allInnerTexts();
+		const statuses = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
 		for (const status of statuses) {
 			expect(status).toEqual('failed');
 		}
@@ -78,6 +78,17 @@ test('Execute a job and show it on the job tables', async ({ page }) => {
 		await page.locator('#end_time_max').fill('23:00');
 		await search(page);
 		expect(await page.locator('table tbody tr').count()).toEqual(0);
+	});
+
+	await test.step('Search by id', async () => {
+		await page.getByText('Reset').click();
+		await search(page);
+		const count = await page.locator('table tbody tr').count();
+		expect(count).toBeGreaterThan(1);
+		const firstRowId = await page.locator('table tbody tr td:first-child').first().innerText();
+		await page.getByRole('spinbutton', { name: 'Job Id' }).fill(firstRowId);
+		await search(page);
+		expect(await page.locator('table tbody tr').count()).toEqual(1);
 	});
 });
 
@@ -102,7 +113,7 @@ async function getWorkflowRow(page, workflowName) {
 	let workflowRow = null;
 	for (const row of rows) {
 		const cells = await row.locator('td').all();
-		if ((await cells[5].innerText()) === workflowName) {
+		if ((await cells[6].innerText()) === workflowName) {
 			workflowRow = row;
 			break;
 		}

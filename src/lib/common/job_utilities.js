@@ -1,15 +1,21 @@
+const completeTracebackLine = 'Traceback (most recent call last):';
+
 /**
  * Split the error of a failed workflow job into multiple parts, marking the relevents ones,
  * so that they can be extracted or highlighted in a different way in the UI.
  *
  * @param {string|null} log
+ * @param {boolean} ignoreUppercaseTraceback
  * @returns {Array<{text: string, highlight: boolean}>}
  */
-export function extractJobErrorParts(log) {
+export function extractJobErrorParts(log, ignoreUppercaseTraceback = false) {
 	if (!log) {
 		return [];
 	}
 	log = log.trim();
+	if (!log.includes(completeTracebackLine) && ignoreUppercaseTraceback) {
+		return [{ text: log, highlight: false }];
+	}
 	if (
 		log.startsWith('TASK ERROR') ||
 		log.startsWith('JOB ERROR') ||
@@ -23,8 +29,6 @@ export function extractJobErrorParts(log) {
 	}
 	return [{ text: log, highlight: false }];
 }
-
-const completeTracebackLine = 'Traceback (most recent call last):';
 
 /**
  * @param {string} error

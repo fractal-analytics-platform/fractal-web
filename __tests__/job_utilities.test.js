@@ -59,6 +59,16 @@ it('detect parts of a workflow task error message with short traceback', () => {
 	expect(parts[2].highlight).eq(true);
 });
 
+it('detect parts of a workflow task error message with short traceback, ignoring uppercase traceback', () => {
+	const parts = extractJobErrorParts(shortTracebackError, true);
+	expect(parts.length).eq(1);
+	expect(parts[0].text)
+		.eq(`TASK ERROR:Task id: 20 (Create OME-Zarr structure), e.workflow_task_order=0
+TRACEBACK:
+Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.`);
+	expect(parts[0].highlight).eq(false);
+});
+
 it('detect parts of a workflow task error message without traceback', () => {
 	const parts = extractJobErrorParts('foo');
 	expect(parts.length).eq(1);
