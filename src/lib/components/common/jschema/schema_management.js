@@ -180,75 +180,100 @@ export class SchemaProperty {
 		this.requiredProperties = undefined;
 		this.required = false;
 
-		// Default properties
-		this.type = propertySchema.type;
-		/** @type {string} */
-		this.key = propertySchema.key;
-		this.title = propertySchema.title;
-		this.description = propertySchema.description;
-		if ('properties' in propertySchema) {
-			this.properties = propertySchema.properties;
-		}
-		if ('items' in propertySchema) {
-			this.items = propertySchema.items;
-		}
-		this.$ref = propertySchema.$ref;
-		if ('required' in propertySchema) {
-			this.requiredProperties = propertySchema.required;
-		}
-		if ('enum' in propertySchema) {
-			this.enum = propertySchema.enum;
-		}
+		/** @type {Array<Partial<import('./jschema-types').JSONSchemaProperty>>} */
+		const schemas = propertySchema.allOf
+			? [{ ...propertySchema, allOf: undefined }, ...propertySchema.allOf]
+			: [propertySchema];
 
-		// Resolve the schema type by reference
-		if (this.type === undefined && this.$ref !== undefined) {
-			const resolvedSchema = resolveSchemaReference(this.$ref, this.globalSchema);
-			if (resolvedSchema !== undefined) {
-				if ('required' in resolvedSchema) {
-					this.requiredProperties = resolvedSchema.required;
+		this.defaultValue = null;
+
+		for (const schema of schemas) {
+			// Merge allOf schemas
+			this.referenceSchema = { ...this.referenceSchema, ...schema };
+
+			// Default properties
+			this.type = schema.type || propertySchema.type;
+			/** @type {string} */
+			this.key = propertySchema.key;
+			if (schema.title) {
+				this.title = schema.title;
+			}
+			if (schema.description) {
+				this.description = schema.description;
+			}
+			if ('properties' in schema) {
+				this.properties = schema.properties;
+			}
+			if ('items' in schema) {
+				this.items = schema.items;
+			}
+			if ('$ref' in schema) {
+				if (!this.references) {
+					this.references = [];
 				}
-				Object.keys(resolvedSchema).forEach((schemaKey) => {
-					if (this[schemaKey] === undefined) {
-						this[schemaKey] = resolvedSchema[schemaKey];
+				this.references = [...this.references, schema.$ref];
+			}
+			if ('required' in schema && Array.isArray(schema.required)) {
+				this.requiredProperties = schema.required;
+			}
+			if ('enum' in schema && Array.isArray(schema.enum)) {
+				this.enum = schema.enum;
+			}
+
+			// Resolve the schema type by reference
+			if (this.type === undefined && this.references !== undefined) {
+				for (const reference of this.references) {
+					const resolvedSchema = resolveSchemaReference(reference, this.globalSchema);
+					if (resolvedSchema !== undefined) {
+						if ('required' in resolvedSchema) {
+							this.requiredProperties = resolvedSchema.required;
+						}
+						Object.keys(resolvedSchema).forEach((schemaKey) => {
+							const resolvedItem = resolvedSchema[schemaKey];
+							if (this[schemaKey] === undefined) {
+								this[schemaKey] = resolvedItem;
+							} else if (schemaKey === 'properties') {
+								// Merge allOf schema properties
+								this.properties = { ...this.properties, ...resolvedItem };
+							}
+						});
 					}
-				});
+				}
 			}
-		}
 
-		// Resolve the schema default value
-		if (propertySchema.default === undefined) {
-			this.defaultValue = null;
-		} else {
-			this.defaultValue = propertySchema.default;
-		}
-		if (this.defaultValue === null) {
-			if (this.type === 'array') {
-				this.defaultValue = [];
+			// Resolve the schema default value
+			if (schema.default !== undefined) {
+				this.defaultValue = schema.default;
 			}
+			if (this.defaultValue === null) {
+				if (this.type === 'array') {
+					this.defaultValue = [];
+				}
+				if (this.type === 'object') {
+					this.defaultValue = {};
+				}
+			}
+
+			// Resolve the schema value
+			if ('value' in schema && schema.value !== undefined) {
+				this.value = schema.value;
+			} else {
+				this.value = this.defaultValue;
+			}
+
+			if (currentValue !== undefined) {
+				this.value = currentValue;
+			}
+
+			// Check if the schema property is of type object
 			if (this.type === 'object') {
-				this.defaultValue = {};
-			}
-		}
-
-		// Resolve the schema value
-		if ('value' in propertySchema && propertySchema.value !== undefined) {
-			this.value = propertySchema.value;
-		} else {
-			this.value = this.defaultValue;
-		}
-
-		if (currentValue !== undefined) {
-			this.value = currentValue;
-		}
-
-		// Check if the schema property is of type object
-		if (this.type === 'object') {
-			// Check if the property schema has additional properties
-			if (
-				/** @type {import('./jschema-types').JSONSchemaObjectProperty} */ (propertySchema)
-					.additionalProperties !== undefined
-			) {
-				this.hasCustomKeyValues = true;
+				// Check if the property schema has additional properties
+				if (
+					/** @type {import('./jschema-types').JSONSchemaObjectProperty} */ (schema)
+						.additionalProperties !== undefined
+				) {
+					this.hasCustomKeyValues = true;
+				}
 			}
 		}
 	}

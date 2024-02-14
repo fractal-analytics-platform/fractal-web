@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Supported JSON Schema `allOf` feature in task arguments form (\#417).
+
 # 0.9.1
 
 * Improved visualization of details on job logs modal (\#415).
