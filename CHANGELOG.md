@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.9.2
 
 * Supported JSON Schema `allOf` feature in task arguments form (\#417).
 
