@@ -5,6 +5,7 @@ export type BaseJSONSchemaProperty<JSONSchemaType> = {
   title?: string
   description?: string
   "$ref"?: string
+  allOf?: Array<Partial<BaseJSONSchemaProperty<JSONSchemaType>>>
   default?: any
 }
 
