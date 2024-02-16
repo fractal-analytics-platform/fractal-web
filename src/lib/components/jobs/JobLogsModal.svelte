@@ -11,22 +11,72 @@
 	let showDetails = false;
 	/** @type {import('$lib/types').JobStatus} */
 	let jobStatus;
+	let log = '';
+	let loading = true;
 
 	/**
 	 * @param {import('$lib/types').ApplyWorkflow} job
+	 * @param {boolean} admin
 	 */
-	export async function show(job) {
+	export async function show(job, admin) {
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
 		}
 		jobStatus = job.status;
-		if (job.status === 'failed') {
-			logParts = extractJobErrorParts(job.log, true);
-		} else {
-			logParts = [{ text: job.log || '', highlight: false }];
-		}
+		log = '';
+		loading = true;
 		modal.show();
+		try {
+			await loadJobLog(job, admin);
+			if (job.status === 'failed') {
+				logParts = extractJobErrorParts(log, true);
+			} else {
+				logParts = [{ text: log, highlight: false }];
+			}
+		} finally {
+			loading = false;
+		}
+	}
+
+	/**
+	 * @param {import('$lib/types').ApplyWorkflow} job
+	 * @param {boolean} admin
+	 */
+	async function loadJobLog(job, admin) {
+		if (admin) {
+			await loadAdminJobLog(job);
+		} else {
+			await loadUserJobLog(job);
+		}
+	}
+
+	/**
+	 * @param {import('$lib/types').ApplyWorkflow} job
+	 */
+	async function loadAdminJobLog(job) {
+		const response = await fetch(`/api/admin/job/${job.id}?show_tmp_logs=true`);
+		if (response.ok) {
+			const result = await response.json();
+			log = result.log || '';
+		} else {
+			modal.displayErrorAlert('Unable to fetch job');
+		}
+	}
+
+	/**
+	 * @param {import('$lib/types').ApplyWorkflow} job
+	 */
+	async function loadUserJobLog(job) {
+		const response = await fetch(
+			`/api/v1/project/${job.project_id}/job/${job.id}?show_tmp_logs=true`
+		);
+		if (response.ok) {
+			const result = await response.json();
+			log = result.log || '';
+		} else {
+			modal.displayErrorAlert('Unable to fetch job');
+		}
 	}
 
 	function expandDetails() {
@@ -52,20 +102,29 @@
 		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<div id="workflowJobLogsError" />
-		<div class="row" id="workflow-job-logs">
-			<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
-			{#if logParts.length > 1}
-				<pre class="ps-0 pe-0">
+		<div id="errorAlert-workflowJobLogsModal" />
+		{#if loading}
+			<div class="spinner-border spinner-border-sm" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+			Loading...
+		{:else}
+			<div class="row" id="workflow-job-logs">
+				<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
+				{#if logParts.length > 1}
+					<pre class="ps-0 pe-0">
 <!-- -->{#each logParts as part}{#if part.highlight}<div class="ps-3 pe-3 highlight">{part.text}
 <!-- --></div>{:else if showDetails}<div class="ps-3 pe-3">{part.text}</div>{:else}<button
-								class="btn btn-link text-decoration-none details-btn"
-								on:click={expandDetails}>... (details hidden, click here to expand)</button
-							>{/if}{/each}</pre>
-			{:else}
-				<pre class:highlight={jobStatus === 'failed'}>{logParts.map((p) => p.text).join('\n')}</pre>
-			{/if}
-		</div>
+									class="btn btn-link text-decoration-none details-btn"
+									on:click={expandDetails}>... (details hidden, click here to expand)</button
+								>{/if}{/each}</pre>
+				{:else}
+					<pre class:highlight={jobStatus === 'failed'}>{logParts
+							.map((p) => p.text)
+							.join('\n')}</pre>
+				{/if}
+			</div>
+		{/if}
 	</svelte:fragment>
 </Modal>
 

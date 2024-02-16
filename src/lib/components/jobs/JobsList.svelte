@@ -302,23 +302,17 @@
 								<i class="bi-info-circle" />
 								Info
 							</button>
-							{#if row.status === 'failed' || row.status === 'done'}
-								<button
-									class="btn btn-light"
-									on:click|preventDefault={() => jobLogsModal.show(row)}
-								>
-									<i class="bi-list-columns-reverse" />
-									Logs
-								</button>
-								{#if (admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email)}
-									<a
-										class="btn btn-light"
-										href={getDownloadUrl(row)}
-										download={`${row.id}_logs.zip`}
-									>
-										<i class="bi-arrow-down-circle" />
-									</a>
-								{/if}
+							<button
+								class="btn btn-light"
+								on:click|preventDefault={() => jobLogsModal.show(row, admin)}
+							>
+								<i class="bi-list-columns-reverse" />
+								Logs
+							</button>
+							{#if row.status !== 'submitted' && ((admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email))}
+								<a class="btn btn-light" href={getDownloadUrl(row)} download={`${row.id}_logs.zip`}>
+									<i class="bi-arrow-down-circle" />
+								</a>
 							{/if}
 							{#if row.status === 'submitted'}
 								<button

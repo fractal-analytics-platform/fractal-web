@@ -583,7 +583,7 @@
 		if (!failedJob) {
 			return;
 		}
-		jobLogsModal.show(failedJob);
+		jobLogsModal.show(failedJob, false);
 	}
 
 	/**

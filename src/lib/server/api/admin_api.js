@@ -9,7 +9,7 @@ import { responseError } from '$lib/common/errors';
 export async function getJobs(fetch) {
 	console.log('Fetching job from server');
 
-	const response = await fetch(FRACTAL_SERVER_HOST + `/admin/job/`, {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/admin/job/?log=false`, {
 		method: 'GET',
 		credentials: 'include'
 	});
