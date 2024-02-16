@@ -309,7 +309,7 @@
 								<i class="bi-list-columns-reverse" />
 								Logs
 							</button>
-							{#if row.status !== 'submitted' && ((admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email))}
+							{#if (admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email)}
 								<a class="btn btn-light" href={getDownloadUrl(row)} download={`${row.id}_logs.zip`}>
 									<i class="bi-arrow-down-circle" />
 								</a>

@@ -1,5 +1,7 @@
 <script>
+	import { env } from '$env/dynamic/public';
 	import { extractJobErrorParts } from '$lib/common/job_utilities';
+	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
@@ -9,71 +11,87 @@
 	let modal;
 	/** Show/hide complete stack trace */
 	let showDetails = false;
-	/** @type {import('$lib/types').JobStatus} */
-	let jobStatus;
+	/** @type {import('$lib/types').ApplyWorkflow} */
+	let job;
+	let admin = false;
 	let log = '';
 	let loading = true;
 
+	const updateJobInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+		: 3000;
+	/** @type {NodeJS.Timeout|undefined} */
+	let updateJobTimeout = undefined;
+
 	/**
-	 * @param {import('$lib/types').ApplyWorkflow} job
-	 * @param {boolean} admin
+	 * @param {import('$lib/types').ApplyWorkflow} selectedJob
+	 * @param {boolean} isAdminPage
 	 */
-	export async function show(job, admin) {
+	export async function show(selectedJob, isAdminPage) {
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		jobStatus = job.status;
+		job = selectedJob;
+		admin = isAdminPage;
 		log = '';
 		loading = true;
 		modal.show();
 		try {
-			await loadJobLog(job, admin);
+			await loadJobLog();
 			if (job.status === 'failed') {
 				logParts = extractJobErrorParts(log, true);
 			} else {
 				logParts = [{ text: log, highlight: false }];
+				if (job.status === 'submitted') {
+					updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
+				}
 			}
 		} finally {
 			loading = false;
 		}
 	}
 
-	/**
-	 * @param {import('$lib/types').ApplyWorkflow} job
-	 * @param {boolean} admin
-	 */
-	async function loadJobLog(job, admin) {
-		if (admin) {
-			await loadAdminJobLog(job);
+	async function updateJobLogInBackground() {
+		clearTimeout(updateJobTimeout);
+		if (job.status === 'submitted') {
+			await loadJobLog();
+			logParts = [{ text: log, highlight: false }];
+			updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
+		} else if (job.status === 'failed') {
+			logParts = extractJobErrorParts(log, true);
 		} else {
-			await loadUserJobLog(job);
+			logParts = [{ text: log, highlight: false }];
 		}
 	}
 
-	/**
-	 * @param {import('$lib/types').ApplyWorkflow} job
-	 */
-	async function loadAdminJobLog(job) {
+	async function loadJobLog() {
+		if (admin) {
+			await loadAdminJobLog();
+		} else {
+			await loadUserJobLog();
+		}
+	}
+
+	async function loadAdminJobLog() {
 		const response = await fetch(`/api/admin/job/${job.id}?show_tmp_logs=true`);
 		if (response.ok) {
 			const result = await response.json();
 			log = result.log || '';
+			job.status = result.status;
 		} else {
 			modal.displayErrorAlert('Unable to fetch job');
 		}
 	}
 
-	/**
-	 * @param {import('$lib/types').ApplyWorkflow} job
-	 */
-	async function loadUserJobLog(job) {
+	async function loadUserJobLog() {
 		const response = await fetch(
 			`/api/v1/project/${job.project_id}/job/${job.id}?show_tmp_logs=true`
 		);
 		if (response.ok) {
 			const result = await response.json();
 			log = result.log || '';
+			job.status = result.status;
 		} else {
 			modal.displayErrorAlert('Unable to fetch job');
 		}
@@ -87,6 +105,15 @@
 			modal.focus();
 		}
 	}
+
+	function onClose() {
+		showDetails = false;
+		clearTimeout(updateJobTimeout);
+	}
+
+	onDestroy(() => {
+		clearTimeout(updateJobTimeout);
+	});
 </script>
 
 <Modal
@@ -94,7 +121,7 @@
 	fullscreen={true}
 	bind:this={modal}
 	bodyCss="bg-tertiary text-secondary"
-	onClose={() => (showDetails = false)}
+	{onClose}
 >
 	<svelte:fragment slot="header">
 		<div class="flex-fill">
@@ -119,7 +146,7 @@
 									on:click={expandDetails}>... (details hidden, click here to expand)</button
 								>{/if}{/each}</pre>
 				{:else}
-					<pre class:highlight={jobStatus === 'failed'}>{logParts
+					<pre class:highlight={job.status === 'failed'}>{logParts
 							.map((p) => p.text)
 							.join('\n')}</pre>
 				{/if}
