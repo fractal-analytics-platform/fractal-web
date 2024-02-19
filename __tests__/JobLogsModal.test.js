@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
+
 // Mocking bootstrap.Modal
 class MockModal {
 	show = vi.fn();

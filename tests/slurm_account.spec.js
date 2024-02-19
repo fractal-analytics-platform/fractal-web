@@ -44,7 +44,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addFirstTask();
+		await workflow.addFakeTask();
 	});
 
 	await test.step('Open Run workflow modal', async () => {
@@ -78,6 +78,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	});
 
 	await test.step('Wait for job completion', async () => {
-		await page.getByRole('table').getByText('failed', { exact: true }).waitFor();
+		await workflow.triggerTaskSuccess();
+		await page.getByRole('table').getByText('done', { exact: true }).waitFor();
 	});
 });

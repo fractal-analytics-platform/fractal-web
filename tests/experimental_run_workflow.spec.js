@@ -2,14 +2,17 @@ import { waitModalClosed, waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Experimental workflow page', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
+	await test.step('Open experimental workflow page', async () => {
+		await page.goto(
+			`/projects/${workflow.projectId}/workflows/experimental/${workflow.workflowId}`
+		);
+		await waitPageLoading(page);
+	});
 
-	await page.goto(`/projects/${workflow.projectId}/workflows/experimental/${workflow.workflowId}`);
-	await waitPageLoading(page);
-
-	await test.step('Add task to workflow', async () => {
-		await workflow.addFirstTask();
+	await test.step('Add 3 tasks to the workflow', async () => {
+		await workflow.addFakeTask();
+		await workflow.addFakeTask();
+		await workflow.addFakeTask();
 	});
 
 	await test.step('Select input and output datasets', async () => {
@@ -31,7 +34,20 @@ test('Experimental workflow page', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 	});
 
+	await test.step('Wait tasks submitted', async () => {
+		await workflow.triggerTaskSuccess();
+		const spinners = page.locator('.job-status-submitted.spinner-border');
+		await spinners.first().waitFor();
+		expect(await spinners.count()).toEqual(3);
+	});
+
+	await test.step('Wait first task success', async () => {
+		await workflow.triggerTaskSuccess();
+		await page.locator('.job-status-icon.bi-check').waitFor();
+	});
+
 	await test.step('Wait job failure', async () => {
+		await workflow.triggerTaskFailure();
 		await page.locator('.job-status-icon.bi-x').waitFor();
 		await page.getByText('The last job failed with the following error').waitFor();
 	});

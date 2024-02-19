@@ -29,16 +29,15 @@ test('Create and edit arguments of a task without schema', async ({ page, workfl
 	});
 
 	await test.step('Open workflow page', async () => {
-		await page.goto(workflow.url);
-		await waitPageLoading(page);
+		await workflow.openWorkflowPage();
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addTask(randomTaskName);
+		await workflow.addUserTask(randomTaskName);
 	});
 
 	await test.step('Add task to workflow again', async () => {
-		await workflow.addTask(randomTaskName);
+		await workflow.addUserTask(randomTaskName);
 	});
 
 	await test.step('Open workflow task form', async () => {

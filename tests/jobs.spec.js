@@ -6,7 +6,7 @@ test('Execute jobs', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addFirstTask();
+		await workflow.addFakeTask();
 	});
 
 	await test.step('Run workflow', async () => {
@@ -82,6 +82,7 @@ test('Execute jobs', async ({ page, workflow }) => {
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
 		await expect(modalTitle).toHaveText('Workflow Job logs');
+		await workflow.triggerTaskFailure();
 		await page.waitForFunction(() => {
 			const modalBody = document.querySelector('.modal.show .modal-body');
 			return modalBody instanceof HTMLElement && modalBody.innerText.includes('TASK ERROR');
