@@ -1,16 +1,17 @@
 <script>
-	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
 	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
 	export let updateEditedTask;
+
 	/** @type {import('$lib/types').Task|undefined} */
-	$: task = $taskStore;
+	let task;
 	/** @type {import('$lib/types').Task|undefined} */
-	$: originalTask = $originalTaskStore;
+	let originalTask;
+
 	$: updateEnabled =
-		!saving && task && task.name && task.command && task.input_type && task.output_type;
+		!loading && !saving && task && task.name && task.command && task.input_type && task.output_type;
 	/** @type {Modal} */
 	let modal;
 	let loading = false;
@@ -58,13 +59,17 @@
 		);
 	}
 
-	async function onOpen() {
-		if (!task) {
-			return;
-		}
-		saved = false;
+	/**
+	 *
+	 * @param {import('$lib/types').Task} taskToEdit
+	 */
+	export async function open(taskToEdit) {
 		loading = true;
-		const response = await fetch(`/api/v1/task/${task.id}`, {
+		saved = false;
+		modal.show();
+
+		// Retrieving the args_schema field
+		const response = await fetch(`/api/v1/task/${taskToEdit.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -73,8 +78,11 @@
 
 		if (response.ok) {
 			task = result;
+			originalTask = { ...result };
 		} else {
-			console.error('Unable to load task', result);
+			modal.displayErrorAlert('Unable to load task');
+			task = undefined;
+			originalTask = undefined;
 		}
 		loading = false;
 	}
@@ -92,14 +100,18 @@
 	}
 </script>
 
-<Modal id="taskEditModal" {onOpen} {onClose} bind:this={modal} size="xl">
+<Modal id="taskEditModal" {onClose} bind:this={modal} size="xl">
 	<svelte:fragment slot="header">
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		{#if task}
+		{#if loading}
+			<div class="spinner-border spinner-border-sm" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		{:else if task}
 			<div class="row mb-3">
 				<div class="col-12">
 					<p class="lead">Task properties</p>
@@ -215,19 +227,13 @@
 					<div class="mb-2 row">
 						<label for="argsSchema" class="col-2 col-form-label text-end">Args Schema</label>
 						<div class="col-10">
-							{#if loading}
-								<div class="spinner-border spinner-border-sm" role="status">
-									<span class="visually-hidden">Loading...</span>
-								</div>
-							{:else}
-								<textarea
-									name="argsSchema"
-									value={JSON.stringify(task.args_schema, null, 2)}
-									disabled
-									class="form-control"
-									rows="10"
-								/>
-							{/if}
+							<textarea
+								name="argsSchema"
+								value={task.args_schema ? JSON.stringify(task.args_schema, null, 2) : null}
+								disabled
+								class="form-control"
+								rows="10"
+							/>
 						</div>
 					</div>
 

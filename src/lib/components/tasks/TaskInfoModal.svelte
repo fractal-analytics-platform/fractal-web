@@ -1,23 +1,25 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
-
-	// TaskInfoModal component
-	import { taskStore } from '$lib/stores/taskStores';
 	import Modal from '../common/Modal.svelte';
 
-	// Subscription to taskModalId store to update task property with respect
-	// to the task in the store. Enable app-wide updates to the project to be
-	// displayed in this component.
-	$: task = $taskStore;
+	/** @type {import('$lib/types').Task|undefined} */
+	let task;
 
+	/** @type {Modal} */
+	let modal;
 	let loading = false;
 
-	async function onOpen() {
-		if (!task) {
-			return;
-		}
+	/**
+	 *
+	 * @param {import('$lib/types').Task} taskToLoad
+	 */
+	export async function open(taskToLoad) {
+		modal.show();
+		task = taskToLoad;
+
+		// Retrieving the args_schema field
 		loading = true;
-		const response = await fetch(`/api/v1/task/${task.id}`, {
+		const response = await fetch(`/api/v1/task/${taskToLoad.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -27,19 +29,21 @@
 		if (response.ok) {
 			task = result;
 		} else {
-			console.error('Unable to load task', result);
+			modal.displayErrorAlert('Unable to load task');
+			task = undefined;
 		}
 		loading = false;
 	}
 </script>
 
-<Modal id="taskInfoModal" size="xl" {onOpen}>
+<Modal id="taskInfoModal" size="xl" bind:this={modal}>
 	<svelte:fragment slot="header">
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
+		<span id="errorAlert-taskInfoModal" />
 		{#if task}
 			<div class="row mb-3">
 				<div class="col-12">
