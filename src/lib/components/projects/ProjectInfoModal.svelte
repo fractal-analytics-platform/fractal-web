@@ -26,7 +26,7 @@
 			loadingDatasets = true;
 			datasets = undefined;
 			datasetErrorAlert?.hide();
-			const response = await fetch(`/api/v1/project/${project.id}/dataset`, {
+			const response = await fetch(`/api/v1/project/${project.id}/dataset?history=false`, {
 				method: 'GET',
 				credentials: 'include'
 			});

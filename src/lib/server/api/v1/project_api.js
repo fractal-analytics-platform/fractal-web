@@ -52,7 +52,7 @@ export async function getProject(fetch, projectId) {
  */
 export async function getProjectDatasets(fetch, projectId) {
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/`,
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/?history=false`,
 		{
 			method: 'GET',
 			credentials: 'include'

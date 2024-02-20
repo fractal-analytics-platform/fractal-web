@@ -58,7 +58,7 @@ export type Dataset = {
   name: string
   type?: string
   meta: object
-  history: Array<DatasetHistoryItem>
+  history: Array<DatasetHistoryItem> | null
   read_only: boolean
   id: number
   resource_list: Array<Resource>
