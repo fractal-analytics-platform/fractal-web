@@ -17,7 +17,7 @@ export type Task = {
   owner: string
   source: string
   args_schema_version: string
-  args_schema: object
+  args_schema: object | null
   docs_link: string
   docs_info: string
   meta: object

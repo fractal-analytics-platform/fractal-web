@@ -9,11 +9,12 @@
 	$: task = $taskStore;
 	/** @type {import('$lib/types').Task|undefined} */
 	$: originalTask = $originalTaskStore;
-	$: updateEnabled = !saving && task && task.name && task.command && task.input_type && task.output_type;
+	$: updateEnabled =
+		!saving && task && task.name && task.command && task.input_type && task.output_type;
 	/** @type {Modal} */
 	let modal;
+	let loading = false;
 	let saved = false;
-
 	let saving = false;
 
 	/**
@@ -21,41 +22,61 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleEditTask() {
-		modal.confirmAndHide(async () => {
-			if (!task) {
-				return;
+		modal.confirmAndHide(
+			async () => {
+				if (!task) {
+					return;
+				}
+				saving = true;
+
+				let taskProperties = nullifyEmptyStrings(task);
+				taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
+
+				console.log('Task to edit: ' + task.id);
+
+				const headers = new Headers();
+				headers.append('Content-Type', 'application/json');
+
+				const response = await fetch(`/api/v1/task/${task.id}`, {
+					method: 'PATCH',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify(taskProperties)
+				});
+
+				if (!response.ok) {
+					throw new AlertError(await response.json());
+				}
+
+				console.log('Task updated successfully');
+				updateEditedTask(task);
+				saved = true;
+			},
+			() => {
+				saving = false;
 			}
-			saving = true;
-
-			let taskProperties = nullifyEmptyStrings(task);
-			taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
-
-			console.log('Task to edit: ' + task.id);
-
-			const headers = new Headers();
-			headers.append('Content-Type', 'application/json');
-
-			const response = await fetch(`/api/v1/task/${task.id}`, {
-				method: 'PATCH',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify(taskProperties)
-			});
-
-			if (!response.ok) {
-				throw new AlertError(await response.json());
-			}
-
-			console.log('Task updated successfully');
-			updateEditedTask(task);
-			saved = true;
-		}, () => {
-			saving = false;
-		});
+		);
 	}
 
 	async function onOpen() {
+		if (!task) {
+			return;
+		}
 		saved = false;
+		loading = true;
+		const response = await fetch(`/api/v1/task/${task.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const result = await response.json();
+
+		if (response.ok) {
+			task = result;
+		} else {
+			console.error('Unable to load task', result);
+		}
+		loading = false;
 	}
 
 	async function onClose() {
@@ -194,13 +215,19 @@
 					<div class="mb-2 row">
 						<label for="argsSchema" class="col-2 col-form-label text-end">Args Schema</label>
 						<div class="col-10">
-							<textarea
-								name="argsSchema"
-								value={JSON.stringify(task.args_schema, null, 2)}
-								disabled
-								class="form-control"
-								rows="10"
-							/>
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else}
+								<textarea
+									name="argsSchema"
+									value={JSON.stringify(task.args_schema, null, 2)}
+									disabled
+									class="form-control"
+									rows="10"
+								/>
+							{/if}
 						</div>
 					</div>
 

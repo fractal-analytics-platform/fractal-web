@@ -73,7 +73,7 @@
 	}
 
 	async function reloadTaskList() {
-		const response = await fetch(`/api/v1/task`, {
+		const response = await fetch(`/api/v1/task?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
