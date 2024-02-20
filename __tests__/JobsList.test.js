@@ -89,13 +89,13 @@ describe('JobsList', () => {
 		// Verify default sorting
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[3].textContent).eq(
-			'10/30/2023, 10:30:38 AM'
+			'30/10/2023 10:30:38'
 		);
 		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[3].textContent).eq(
-			'10/30/2023, 10:15:38 AM'
+			'30/10/2023 10:15:38'
 		);
 		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[3].textContent).eq(
-			'10/30/2023, 10:00:38 AM'
+			'30/10/2023 10:00:38'
 		);
 
 		// Sort by start date
@@ -103,13 +103,13 @@ describe('JobsList', () => {
 		await fireEvent.click(startDateSorter);
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[3].textContent).eq(
-			'10/30/2023, 10:00:38 AM'
+			'30/10/2023 10:00:38'
 		);
 		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[3].textContent).eq(
-			'10/30/2023, 10:15:38 AM'
+			'30/10/2023 10:15:38'
 		);
 		expect(table.querySelectorAll('tbody tr:nth-child(3) td')[3].textContent).eq(
-			'10/30/2023, 10:30:38 AM'
+			'30/10/2023 10:30:38'
 		);
 	});
 

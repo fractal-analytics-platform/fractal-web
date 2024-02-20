@@ -10,6 +10,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
 	import StandardDismissableAlert from '../common/StandardDismissableAlert.svelte';
+	import TimestampCell from './TimestampCell.svelte';
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
@@ -178,7 +179,7 @@
 	<table class="table jobs-table">
 		<colgroup>
 			{#if !columnsToHide.includes('id')}
-				<col width="40" />
+				<col width="60" />
 			{/if}
 			<col width="100" />
 			<col width="110" />
@@ -334,10 +335,10 @@
 							{/if}
 						</td>
 						<td>
-							{row.start_timestamp ? new Date(row.start_timestamp).toLocaleString() : '-'}
+							<TimestampCell timestamp={row.start_timestamp} />
 						</td>
 						<td>
-							{row.end_timestamp ? new Date(row.end_timestamp).toLocaleString() : '-'}
+							<TimestampCell timestamp={row.end_timestamp} />
 						</td>
 						{#if !columnsToHide.includes('project')}
 							<td>
