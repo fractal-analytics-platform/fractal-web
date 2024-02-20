@@ -1,5 +1,14 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Improved id and timestamp layout on jobs table (\#420).
+* Added query parameters to avoid loading unused fields on the following GET endpoints (\#420):
+    * `/api/v1/job/`, `/api/v1/{project.id}/job/`, `/admin/job/` (`log` param)
+    * `/api/v1/task/` (`args_schema` param)
+    * `/api/v1/dataset/`, `/api/v1/project/{project.id}/dataset/` (`history` param)
+* Added `show_tmp_logs=true` query parameter to display log of running jobs (\#420).
+
 # 0.9.2
 
 * Supported JSON Schema `allOf` feature in task arguments form (\#417).
