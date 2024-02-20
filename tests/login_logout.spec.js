@@ -10,7 +10,7 @@ test('Login and Logout', async ({ page }) => {
 
 	await page.getByRole('link', { name: 'Login' }).first().click();
 
-	await page.waitForURL('/auth/login');
+	await waitPageLoading(page);
 	await login(page);
 
 	await expect(page.getByText('admin@fractal.xy')).toHaveCount(1);

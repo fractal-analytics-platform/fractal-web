@@ -7,7 +7,8 @@ test('User profile', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'admin@fractal.xy' }).click();
 		await page.getByRole('link', { name: 'My profile' }).click();
-		await page.waitForURL('/profile');
+		await waitPageLoading(page);
+		await page.getByText('User ID').waitFor();
 
 		const cells = await page.locator('table td').all();
 		expect(await cells[0].innerText()).toEqual('1');

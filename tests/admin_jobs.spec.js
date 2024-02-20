@@ -25,12 +25,14 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 		await page.goto('/');
 		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Admin area' }).click();
-		await page.waitForURL('/admin');
+		await waitPageLoading(page);
+		await page.getByRole('link', { name: 'Manage users' }).waitFor();
 	});
 
 	await test.step('Open the admin jobs', async () => {
 		await page.getByRole('link', { name: 'Jobs' }).nth(1).click();
-		await page.waitForURL('/admin/jobs');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Search jobs' }).waitFor();
 	});
 
 	await test.step('Search with empty form fields', async () => {

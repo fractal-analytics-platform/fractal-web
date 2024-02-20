@@ -6,19 +6,19 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.goto('/');
 		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Admin area' }).click();
-		await page.waitForURL('/admin');
+		await waitPageLoading(page);
 	});
 
 	await test.step('Open the manage users page', async () => {
 		await page.getByRole('link', { name: 'Manage users' }).click();
-		await page.waitForURL('/admin/users');
 		await waitPageLoading(page);
+		await page.getByText('Users list').waitFor();
 	});
 
 	await test.step('Open the user registration page', async () => {
 		await page.getByRole('link', { name: 'Register new user' }).click();
-		await page.waitForURL('/admin/users/register');
 		await waitPageLoading(page);
+		await page.getByText('Registering new user').waitFor();
 	});
 
 	const randomUserName = Math.random().toString(36).substring(7);
@@ -46,7 +46,8 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.getByLabel('Cache dir').fill('/tmp/test');
 
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.waitForURL('/admin/users');
+		await waitPageLoading(page);
+		await page.getByText('Users list').waitFor();
 
 		await expect(page.getByRole('cell', { name: randomUserName })).toHaveCount(3);
 
@@ -65,7 +66,6 @@ test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Display the user info page', async () => {
 		const userRow = await getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Info' }).click();
-		await page.waitForURL(`/admin/users/${userId}`);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
 		expect(await cells[0].innerText()).toEqual(userId);
@@ -79,14 +79,14 @@ test('Create, update and delete a user', async ({ page }) => {
 		expect(await cells[8].innerText()).toEqual('/tmp/test');
 	});
 
-	// Go back to previous page
-	await page.getByRole('link', { name: 'Manage users' }).click();
-	await page.waitForURL('/admin/users');
+	await test.step('Go back to previous page', async () => {
+		await page.getByRole('link', { name: 'Manage users' }).click();
+		await waitPageLoading(page);
+	});
 
 	await test.step('Open edit user page', async () => {
 		const userRow = await getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Edit' }).click();
-		await page.waitForURL(`/admin/users/${userId}/edit`);
 		await waitPageLoading(page);
 	});
 
@@ -111,8 +111,12 @@ test('Create, update and delete a user', async ({ page }) => {
 	await test.step('SLURM account validation error', async () => {
 		await page.getByRole('button', { name: 'Add SLURM account' }).click();
 		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page.getByRole('textbox', { name: /^SLURM account #1/ }).fill(randomUserName + '-slurm-account');
-		await page.getByRole('textbox', { name: /^SLURM account #2/ }).fill(randomUserName + '-slurm-account');
+		await page
+			.getByRole('textbox', { name: /^SLURM account #1/ })
+			.fill(randomUserName + '-slurm-account');
+		await page
+			.getByRole('textbox', { name: /^SLURM account #2/ })
+			.fill(randomUserName + '-slurm-account');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
 		await page.getByLabel('Remove SLURM account').first().click();
@@ -128,7 +132,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
 		await page.getByRole('button', { name: 'Save' }).click();
 
-		await page.waitForURL('/admin/users');
+		await waitPageLoading(page);
 
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
@@ -142,7 +146,6 @@ test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Display the user info page', async () => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Info' }).click();
-		await page.waitForURL(`/admin/users/${userId}`);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
 		expect(await cells[0].innerText()).toEqual(userId);
@@ -158,14 +161,13 @@ test('Create, update and delete a user', async ({ page }) => {
 
 	await test.step('Go back clicking on breadcrumb', async () => {
 		await page.getByText('Manage users').click();
-		await page.waitForURL(`/admin/users`);
 		await waitPageLoading(page);
+		await page.getByText('Users list').waitFor();
 	});
 
 	await test.step('Grant superuser privilege', async () => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
-		await page.waitForURL(`/admin/users/${userId}/edit`);
 		await page.locator('#superuser').check();
 		await page.getByRole('button', { name: 'Save' }).click();
 
@@ -176,7 +178,7 @@ test('Create, update and delete a user', async ({ page }) => {
 			'Do you really want to grant superuser privilege to this user?'
 		);
 		await page.locator('.modal.show').getByRole('button', { name: 'Confirm' }).click();
-		await page.waitForURL('/admin/users');
+		await page.getByText('Users list').waitFor();
 		await page.reload();
 
 		await waitPageLoading(page);
@@ -190,7 +192,8 @@ test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Revoke superuser privilege', async () => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
-		await page.waitForURL(`/admin/users/${userId}/edit`);
+		await waitPageLoading(page);
+		await page.getByText('Editing user #').waitFor();
 		await page.locator('#superuser').uncheck();
 		await page.getByRole('button', { name: 'Save' }).click();
 
@@ -201,7 +204,8 @@ test('Create, update and delete a user', async ({ page }) => {
 			'Do you really want to revoke superuser privilege to this user?'
 		);
 		await page.locator('.modal.show').getByRole('button', { name: 'Confirm' }).click();
-		await page.waitForURL('/admin/users');
+		await waitPageLoading(page);
+		await page.getByText('Users list').waitFor();
 		await page.reload();
 
 		await waitPageLoading(page);
@@ -235,6 +239,7 @@ async function getUserRowCells(page, username) {
  * @returns {Promise<import('@playwright/test').Locator>}
  */
 async function getUserRow(page, username) {
+	await page.getByRole('row').getByText(username, { exact: true }).waitFor();
 	const rows = await page.locator('tbody tr').all();
 	for (const row of rows) {
 		const cells = await row.locator('td').all();
