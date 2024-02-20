@@ -1,6 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 0.10.0
+
+This release requires fractal-server 1.4.6.
 
 * Improved id and timestamp layout on jobs table (\#420).
 * Added query parameters to avoid loading unused fields on the following GET endpoints (\#420):
