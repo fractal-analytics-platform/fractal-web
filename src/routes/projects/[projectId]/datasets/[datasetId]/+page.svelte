@@ -1,16 +1,11 @@
 <script>
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	let projectId = $page.params.projectId;
 
 	/** @type {import('$lib/types').Dataset | undefined} */
-	let dataset = undefined;
-
-	onMount(async () => {
-		dataset = await $page.data.dataset;
-	});
+	let dataset = $page.data.dataset;
 
 	/**
 	 * Returns the dataset history formatted in JSON hiding some values.

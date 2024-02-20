@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import { collectTaskErrorStore } from '$lib/stores/errorStores';
-	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
 	import TaskEditModal from '$lib/components/tasks/TaskEditModal.svelte';
 	import TaskInfoModal from '$lib/components/tasks/TaskInfoModal.svelte';
 	import TaskCollection from '$lib/components/tasks/TaskCollection.svelte';
@@ -21,6 +20,11 @@
 	/** @type {'pypi'|'local'|'single'} */
 	let packageType = 'pypi';
 
+	/** @type {import('$lib/components/tasks/TaskInfoModal.svelte').default} */
+	let taskInfoModal;
+	/** @type {import('$lib/components/tasks/TaskEditModal.svelte').default} */
+	let taskEditModal;
+
 	// Store subscriptions
 	const unsubscribe = collectTaskErrorStore.subscribe((error) => {
 		if (error) setErrorReasons(error);
@@ -36,15 +40,6 @@
 	 */
 	function sortTasks(tasks) {
 		return orderTasksByOwnerThenByNameThenByVersion(tasks, null, 'desc');
-	}
-
-	/**
-	 * @param {number} taskId
-	 */
-	function setTaskModal(taskId) {
-		const task = /** @type {import('$lib/types').Task} */ (tasks.find((t) => t.id === taskId));
-		taskStore.set(task);
-		originalTaskStore.set({ ...task });
 	}
 
 	/**
@@ -73,7 +68,7 @@
 	}
 
 	async function reloadTaskList() {
-		const response = await fetch(`/api/v1/task`, {
+		const response = await fetch(`/api/v1/task?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -273,7 +268,7 @@
 										class="btn btn-light"
 										data-bs-toggle="modal"
 										data-bs-target="#taskInfoModal"
-										on:click={() => setTaskModal(task.id)}
+										on:click={() => taskInfoModal.open(task)}
 									>
 										<i class="bi bi-info-circle" />
 										Info
@@ -282,7 +277,7 @@
 										class="btn btn-primary"
 										data-bs-toggle="modal"
 										data-bs-target="#taskEditModal"
-										on:click={() => setTaskModal(task.id)}
+										on:click={() => taskEditModal.open(task)}
 									>
 										<i class="bi bi-pencil" />
 										Edit
@@ -306,8 +301,8 @@
 	</div>
 </div>
 
-<TaskInfoModal />
-<TaskEditModal {updateEditedTask} />
+<TaskInfoModal bind:this={taskInfoModal} />
+<TaskEditModal bind:this={taskEditModal} {updateEditedTask} />
 
 <style>
 	:global(.is-main-version.expanded td) {

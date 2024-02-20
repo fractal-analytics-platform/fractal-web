@@ -3,21 +3,36 @@ import { waitPageLoading } from './utils.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
 
-test('Execute a job and show it on the job tables', async ({ page }) => {
-	const workflow1 = await createJob(page, 'input', 'output');
-	const workflow2 = await createJob(page, 'input2', 'output2');
-	await workflow1.deleteProject();
+test('Execute a job and show it on the job tables', async ({ page, request }) => {
+	/** @type {PageWithWorkflow} */
+	let workflow1;
+	await test.step('Create first job and wait its failure', async () => {
+		workflow1 = await createJob(page, request, 'input', 'output');
+		await workflow1.triggerTaskFailure();
+		const jobBadge = page.locator('.badge.text-bg-danger');
+		await jobBadge.waitFor();
+		expect(await jobBadge.innerText()).toEqual('failed');
+		await workflow1.deleteProject();
+	});
+
+	/** @type {PageWithWorkflow} */
+	let workflow2;
+	await test.step('Create second job', async () => {
+		workflow2 = await createJob(page, request, 'input2', 'output2');
+	});
 
 	await test.step('Open the admin area', async () => {
 		await page.goto('/');
 		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Admin area' }).click();
-		await page.waitForURL('/admin');
+		await waitPageLoading(page);
+		await page.getByRole('link', { name: 'Manage users' }).waitFor();
 	});
 
 	await test.step('Open the admin jobs', async () => {
 		await page.getByRole('link', { name: 'Jobs' }).nth(1).click();
-		await page.waitForURL('/admin/jobs');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Search jobs' }).waitFor();
 	});
 
 	await test.step('Search with empty form fields', async () => {
@@ -57,13 +72,29 @@ test('Execute a job and show it on the job tables', async ({ page }) => {
 		await getWorkflowRow(page, workflow2.workflowName);
 	});
 
+	await test.step('Search running jobs', async () => {
+		await page.getByText('Reset').click();
+		await page.selectOption('#status', 'submitted');
+		await search(page);
+		const statuses = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
+		expect(statuses.length).toEqual(1);
+		expect(statuses[0].trim()).toEqual('submitted');
+	});
+
+	await test.step('Wait job completion', async () => {
+		await workflow2.triggerTaskSuccess();
+		const jobBadge = page.locator('.badge.text-bg-success');
+		await jobBadge.waitFor();
+		expect(await jobBadge.innerText()).toEqual('done');
+	});
+
 	await test.step('Search failed jobs', async () => {
 		await page.getByText('Reset').click();
 		await page.selectOption('#status', 'failed');
 		await search(page);
 		const statuses = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
 		for (const status of statuses) {
-			expect(status).toEqual('failed');
+			expect(status.trim()).toEqual('failed');
 		}
 	});
 
@@ -124,11 +155,12 @@ async function getWorkflowRow(page, workflowName) {
 
 /**
  * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').APIRequestContext} request
  * @param {string} inputDataset
  * @param {string} outputDataset
  */
-async function createJob(page, inputDataset, outputDataset) {
-	const workflow = new PageWithWorkflow(page);
+async function createJob(page, request, inputDataset, outputDataset) {
+	const workflow = new PageWithWorkflow(page, request);
 	await test.step('Create workflow', async () => {
 		await workflow.createProject();
 		await workflow.createDataset(inputDataset, 'image');
@@ -146,7 +178,7 @@ async function createJob(page, inputDataset, outputDataset) {
  */
 async function addTaskToWorkflow(workflow) {
 	await test.step('Add task to workflow', async () => {
-		await workflow.addFirstTask();
+		await workflow.addFakeTask();
 	});
 }
 

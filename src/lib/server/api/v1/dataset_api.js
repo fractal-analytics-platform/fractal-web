@@ -7,7 +7,7 @@ import { responseError } from '$lib/common/errors';
  * @returns {Promise<*>}
  */
 export async function getUserDatasets(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/dataset/`, {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/dataset/?history=false`, {
 		method: 'GET',
 		credentials: 'include'
 	});

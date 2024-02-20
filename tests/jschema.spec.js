@@ -37,7 +37,8 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addTask(randomTaskName);
+		await workflow.openWorkflowPage();
+		await workflow.addUserTask(randomTaskName);
 	});
 
 	await test.step('Open workflow task form', async () => {

@@ -1,23 +1,49 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
-
-	// TaskInfoModal component
-	import { taskStore } from '$lib/stores/taskStores';
 	import Modal from '../common/Modal.svelte';
 
-	// Subscription to taskModalId store to update task property with respect
-	// to the task in the store. Enable app-wide updates to the project to be
-	// displayed in this component.
-	$: task = $taskStore;
+	/** @type {import('$lib/types').Task|undefined} */
+	let task;
+
+	/** @type {Modal} */
+	let modal;
+	let loading = false;
+
+	/**
+	 *
+	 * @param {import('$lib/types').Task} taskToLoad
+	 */
+	export async function open(taskToLoad) {
+		modal.show();
+		task = taskToLoad;
+
+		// Retrieving the args_schema field
+		loading = true;
+		const response = await fetch(`/api/v1/task/${taskToLoad.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const result = await response.json();
+
+		if (response.ok) {
+			task = result;
+		} else {
+			modal.displayErrorAlert('Unable to load task');
+			task = undefined;
+		}
+		loading = false;
+	}
 </script>
 
-<Modal id="taskInfoModal" size="xl">
+<Modal id="taskInfoModal" size="xl" bind:this={modal}>
 	<svelte:fragment slot="header">
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
+		<span id="errorAlert-taskInfoModal" />
 		{#if task}
 			<div class="row mb-3">
 				<div class="col-12">
@@ -45,7 +71,11 @@
 						<li class="list-group-item">{task.args_schema_version || '-'}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
 						<li class="list-group-item">
-							{#if task.args_schema}
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else if task.args_schema}
 								<code>
 									<pre>{JSON.stringify(task.args_schema, null, 2)}</pre>
 								</code>

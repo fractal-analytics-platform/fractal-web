@@ -5,9 +5,9 @@ import { defineConfig } from 'vitest/config';
 
 const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
-const pkg = JSON.parse(packageJsonData);
+const pkg = JSON.parse(packageJsonData.toString());
 
-/** @type {import('vite').UserConfig} */
+/** @type {import('vite').UserConfigExport} */
 const config = defineConfig({
 	plugins: [
 		sveltekit(),

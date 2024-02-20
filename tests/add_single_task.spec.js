@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading, waitStopSpinnerIn } from './utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -177,6 +177,7 @@ async function getCreatedTaskModalData(page, taskName) {
 	const modalTitle = page.locator('.modal.show .modal-title');
 	await modalTitle.waitFor();
 	await expect(modalTitle).toHaveText(`Task ${taskName}`);
+	await waitStopSpinnerIn(page, '.modal.show');
 	const items = await page.locator('.modal.show .modal-body').getByRole('listitem').all();
 	const task = {
 		name: await items[1].innerText(),

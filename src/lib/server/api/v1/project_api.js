@@ -52,7 +52,7 @@ export async function getProject(fetch, projectId) {
  */
 export async function getProjectDatasets(fetch, projectId) {
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/`,
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/?history=false`,
 		{
 			method: 'GET',
 			credentials: 'include'
@@ -149,7 +149,7 @@ export async function getWorkflow(fetch, projectId, workflowId) {
  * @returns {Promise<*>}
  */
 export async function getProjectJobs(fetch, projectId) {
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/`, {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/?log=false`, {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -167,7 +167,7 @@ export async function getProjectJobs(fetch, projectId) {
  * @returns {Promise<*>}
  */
 export async function getUserJobs(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/`, {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/?log=false`, {
 		method: 'GET',
 		credentials: 'include'
 	});

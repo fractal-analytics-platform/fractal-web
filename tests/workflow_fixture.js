@@ -5,9 +5,11 @@ import { PageWithProject } from './project_fixture.js';
 export class PageWithWorkflow extends PageWithProject {
 	/**
 	 * @param {import('@playwright/test').Page} page
+	 * @param {import('@playwright/test').APIRequestContext} request
 	 */
-	constructor(page) {
+	constructor(page, request) {
 		super(page);
+		this.request = request;
 		this.workflowName = Math.random().toString(36).substring(7);
 	}
 
@@ -20,8 +22,8 @@ export class PageWithWorkflow extends PageWithProject {
 		await createDatasetButton.click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
-		await this.page.locator('#datasetName').fill(datasetName);
-		await this.page.selectOption('#datasetType', datasetType);
+		await this.page.getByRole('textbox', { name: 'Dataset Name' }).fill(datasetName);
+		await this.page.getByRole('combobox', { name: 'Dataset type' }).selectOption(datasetType);
 		await this.page.locator('#resource-path-0').fill('/tmp');
 		let saveBtn = this.page.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
@@ -48,9 +50,10 @@ export class PageWithWorkflow extends PageWithProject {
 		if (match) {
 			this.workflowId = match[1];
 		}
+		await waitPageLoading(this.page);
 	}
 
-	async addFirstTask() {
+	async addFirstCollectedTask() {
 		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
 		let modalTitle = this.page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
@@ -64,16 +67,39 @@ export class PageWithWorkflow extends PageWithProject {
 		await this.page.getByRole('button', { name: 'Insert' }).click();
 	}
 
+	async addFakeTask() {
+		await this.addUserTask('Fake Task');
+	}
+
+	async triggerTaskSuccess() {
+		await this.setTaskStatus('done');
+	}
+
+	async triggerTaskFailure() {
+		await this.setTaskStatus('failed');
+	}
+
 	/**
-	 * @param {string} taskName
-	 * @returns {Promise<void>}
+	 * @param {import('$lib/types.js').JobStatus} status
 	 */
-	async addTask(taskName) {
+	async setTaskStatus(status) {
+		const response = await this.request.put(`http://localhost:8080/${status}`);
+		expect(response.ok()).toEqual(true);
+	}
+
+	async openWorkflowPage() {
 		if (!this.url) {
 			return;
 		}
 		await this.page.goto(this.url);
 		await waitPageLoading(this.page);
+	}
+
+	/**
+	 * @param {string} taskName
+	 * @returns {Promise<void>}
+	 */
+	async addUserTask(taskName) {
 		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
@@ -98,8 +124,8 @@ export class PageWithWorkflow extends PageWithProject {
 }
 
 const workflowTest = baseTest.extend({
-	workflow: async ({ page }, use) => {
-		const workflow = new PageWithWorkflow(page);
+	workflow: async ({ page, request }, use) => {
+		const workflow = new PageWithWorkflow(page, request);
 		await workflow.createProject();
 		await workflow.createDataset('input', 'image');
 		await workflow.createDataset('output', 'zarr');

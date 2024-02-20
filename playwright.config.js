@@ -20,12 +20,20 @@ export default defineConfig({
 			dependencies: ['auth']
 		},
 		{
+			name: 'create_fake_task',
+			testMatch: /create_fake_task\.setup\.js/,
+			use: {
+				storageState: 'tests/.auth/user.json'
+			},
+			dependencies: ['collect_core_tasks', 'auth']
+		},
+		{
 			name: 'chromium',
 			use: {
 				...devices['Desktop Chrome'],
 				storageState: 'tests/.auth/user.json'
 			},
-			dependencies: ['collect_core_tasks']
+			dependencies: ['create_fake_task']
 		},
 		{
 			name: 'firefox',
@@ -33,14 +41,21 @@ export default defineConfig({
 				...devices['Desktop Firefox'],
 				storageState: 'tests/.auth/user.json'
 			},
-			dependencies: ['collect_core_tasks']
+			dependencies: ['create_fake_task']
 		}
 	],
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh 1.4.3',
+			command: './tests/start-test-server.sh 1.4.6',
 			port: 8000,
+			waitForPort: true,
+			stdout: 'pipe',
+			reuseExistingServer: !process.env.CI
+		},
+		{
+			command: 'node ./tests/fake-job-server.js',
+			port: 8080,
 			waitForPort: true,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI

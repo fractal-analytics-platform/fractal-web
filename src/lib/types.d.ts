@@ -17,7 +17,7 @@ export type Task = {
   owner: string
   source: string
   args_schema_version: string
-  args_schema: object
+  args_schema: object | null
   docs_link: string
   docs_info: string
   meta: object
@@ -58,7 +58,7 @@ export type Dataset = {
   name: string
   type?: string
   meta: object
-  history: Array<DatasetHistoryItem>
+  history: Array<DatasetHistoryItem> | null
   read_only: boolean
   id: number
   resource_list: Array<Resource>

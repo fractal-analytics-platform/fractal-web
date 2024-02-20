@@ -1,19 +1,21 @@
 <script>
-	import { originalTaskStore, taskStore } from '$lib/stores/taskStores';
 	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
 
 	export let updateEditedTask;
+
 	/** @type {import('$lib/types').Task|undefined} */
-	$: task = $taskStore;
+	let task;
 	/** @type {import('$lib/types').Task|undefined} */
-	$: originalTask = $originalTaskStore;
-	$: updateEnabled = !saving && task && task.name && task.command && task.input_type && task.output_type;
+	let originalTask;
+
+	$: updateEnabled =
+		!loading && !saving && task && task.name && task.command && task.input_type && task.output_type;
 	/** @type {Modal} */
 	let modal;
+	let loading = false;
 	let saved = false;
-
 	let saving = false;
 
 	/**
@@ -21,41 +23,68 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleEditTask() {
-		modal.confirmAndHide(async () => {
-			if (!task) {
-				return;
+		modal.confirmAndHide(
+			async () => {
+				if (!task) {
+					return;
+				}
+				saving = true;
+
+				let taskProperties = nullifyEmptyStrings(task);
+				taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
+
+				console.log('Task to edit: ' + task.id);
+
+				const headers = new Headers();
+				headers.append('Content-Type', 'application/json');
+
+				const response = await fetch(`/api/v1/task/${task.id}`, {
+					method: 'PATCH',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify(taskProperties)
+				});
+
+				if (!response.ok) {
+					throw new AlertError(await response.json());
+				}
+
+				console.log('Task updated successfully');
+				updateEditedTask(task);
+				saved = true;
+			},
+			() => {
+				saving = false;
 			}
-			saving = true;
-
-			let taskProperties = nullifyEmptyStrings(task);
-			taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
-
-			console.log('Task to edit: ' + task.id);
-
-			const headers = new Headers();
-			headers.append('Content-Type', 'application/json');
-
-			const response = await fetch(`/api/v1/task/${task.id}`, {
-				method: 'PATCH',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify(taskProperties)
-			});
-
-			if (!response.ok) {
-				throw new AlertError(await response.json());
-			}
-
-			console.log('Task updated successfully');
-			updateEditedTask(task);
-			saved = true;
-		}, () => {
-			saving = false;
-		});
+		);
 	}
 
-	async function onOpen() {
+	/**
+	 *
+	 * @param {import('$lib/types').Task} taskToEdit
+	 */
+	export async function open(taskToEdit) {
+		loading = true;
 		saved = false;
+		modal.show();
+
+		// Retrieving the args_schema field
+		const response = await fetch(`/api/v1/task/${taskToEdit.id}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		const result = await response.json();
+
+		if (response.ok) {
+			task = result;
+			originalTask = { ...result };
+		} else {
+			modal.displayErrorAlert('Unable to load task');
+			task = undefined;
+			originalTask = undefined;
+		}
+		loading = false;
 	}
 
 	async function onClose() {
@@ -71,14 +100,18 @@
 	}
 </script>
 
-<Modal id="taskEditModal" {onOpen} {onClose} bind:this={modal} size="xl">
+<Modal id="taskEditModal" {onClose} bind:this={modal} size="xl">
 	<svelte:fragment slot="header">
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		{#if task}
+		{#if loading}
+			<div class="spinner-border spinner-border-sm" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		{:else if task}
 			<div class="row mb-3">
 				<div class="col-12">
 					<p class="lead">Task properties</p>
@@ -196,7 +229,7 @@
 						<div class="col-10">
 							<textarea
 								name="argsSchema"
-								value={JSON.stringify(task.args_schema, null, 2)}
+								value={task.args_schema ? JSON.stringify(task.args_schema, null, 2) : null}
 								disabled
 								class="form-control"
 								rows="10"

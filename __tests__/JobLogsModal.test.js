@@ -1,6 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
+
+// Mocking bootstrap.Modal
 class MockModal {
 	show = vi.fn();
 }
@@ -10,6 +16,9 @@ global.window.bootstrap = {
 	Modal: MockModal
 };
 
+// Mocking fetch
+global.fetch = vi.fn();
+
 import JobLogsModal from '../src/lib/components/jobs/JobLogsModal.svelte';
 
 describe('JobLogsModal', async () => {
@@ -18,7 +27,8 @@ describe('JobLogsModal', async () => {
 		const error = `TASK ERROR:Task id: 20 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:
 Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.`;
-		await result.component.show({ status: 'failed', log: error });
+		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
+		await result.component.show({ id: 1, status: 'failed', log: null }, false);
 		const pre = result.container.querySelector('pre');
 		expect(pre.classList.contains('highlight')).eq(true);
 		expect(pre.innerHTML).eq(error);
@@ -39,7 +49,8 @@ Traceback (most recent call last):
 pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
   field required (type=value_error.missing)`;
-		await result.component.show({ status: 'failed', log: error });
+		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
+		await result.component.show({ id: 1, status: 'failed', log: null }, true);
 		const pre = result.container.querySelector('pre');
 		let divs = pre.querySelectorAll('div');
 		expect(divs.length).eq(2);
@@ -66,9 +77,37 @@ allowed_channels
 	it('display successful log', async () => {
 		const result = render(JobLogsModal);
 		const log = 'Successful log...';
-		await result.component.show({ status: 'done', log });
+		mockSuccesfulJobFetch({ id: 1, status: 'done', log });
+		await result.component.show({ id: 1, status: 'done', log: null }, false);
 		const pre = result.container.querySelector('pre');
 		expect(pre.classList.contains('highlight')).eq(false);
 		expect(pre.innerHTML).eq(log);
 	});
+
+	it('error while loading job for user', async () => {
+		const result = render(JobLogsModal);
+		fetch.mockResolvedValue({
+			ok: false,
+			json: () => new Promise((resolve) => resolve({ error: 'Something happened' }))
+		});
+		await result.component.show({ id: 1, status: 'done', log: null }, false);
+		expect(result.queryByText(/Unable to fetch job/)).not.null;
+	});
+
+	it('error while loading job for admin', async () => {
+		const result = render(JobLogsModal);
+		fetch.mockResolvedValue({
+			ok: false,
+			json: () => new Promise((resolve) => resolve({ error: 'Something happened' }))
+		});
+		await result.component.show({ id: 1, status: 'done', log: null }, true);
+		expect(result.queryByText(/Unable to fetch job/)).not.null;
+	});
 });
+
+function mockSuccesfulJobFetch(job) {
+	fetch.mockResolvedValue({
+		ok: true,
+		json: () => new Promise((resolve) => resolve(job))
+	});
+}

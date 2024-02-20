@@ -33,3 +33,4 @@ jobs:
         run: npx vitest run
         env:
           TZ: Europe/Rome
+          LANG: it-IT

@@ -147,7 +147,7 @@
 		workflowTaskSelectionComponent.setLoadingTasks(true);
 
 		// Get available tasks from the server
-		const response = await fetch('/api/v1/task', {
+		const response = await fetch('/api/v1/task?args_schema=false', {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -341,6 +341,9 @@
 		}
 		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
 		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
+		if (!wft) {
+			return;
+		}
 		if (argumentsWithUnsavedChanges === true) {
 			toggleUnsavedChangesModal();
 			preventedTaskContextChange = wft;
@@ -353,6 +356,9 @@
 		unsavedChangesModal.toggle();
 	}
 
+	/**
+	 * @param {import('$lib/types').WorkflowTask} wft
+	 */
 	function setWorkflowTaskContext(wft) {
 		workflowTaskContext.set(wft);
 		// Check if args schema is available
@@ -362,6 +368,10 @@
 		argsSchemaValid = true;
 	}
 
+	/**
+	 * @param {number} index
+	 * @param {'up'|'down'} direction
+	 */
 	function moveWorkflowTask(index, direction) {
 		const wftList = updatableWorkflowList;
 
@@ -374,6 +384,10 @@
 			case 'down':
 				if (index === wftList.length - 1) break;
 				replaceId = index + 1;
+		}
+
+		if (!replaceId) {
+			return;
 		}
 
 		const replaceTask = wftList[replaceId];
