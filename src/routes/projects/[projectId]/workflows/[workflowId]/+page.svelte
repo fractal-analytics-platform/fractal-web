@@ -1,6 +1,5 @@
 <script>
-	import { onDestroy, onMount } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { onMount } from 'svelte';
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
@@ -29,13 +28,10 @@
 	 */
 	let availableTasks = [];
 
-	/** @type {import('svelte/store').Writable<import('$lib/types').WorkflowTask|undefined>} */
-	let workflowTaskContext = writable(undefined);
 	let workflowTabContextId = 0;
 	let workflowSuccessMessage = '';
 	/** @type {import('$lib/types').WorkflowTask|undefined} */
 	let selectedWorkflowTask = undefined;
-	let originalMetaProperties = {};
 	let checkingConfiguration = false;
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
@@ -76,16 +72,6 @@
 	let newVersionsMap = {};
 
 	$: updatableWorkflowList = workflow?.task_list || [];
-
-	const unsubscribe = workflowTaskContext.subscribe((value) => {
-		selectedWorkflowTask = value;
-		originalMetaProperties = {};
-		if (value && value.meta) {
-			for (let key in value.meta) {
-				originalMetaProperties[key] = value.meta[key];
-			}
-		}
-	});
 
 	onMount(async () => {
 		workflow = /** @type {import('$lib/types').Workflow} */ ($page.data.workflow);
@@ -332,7 +318,7 @@
 
 		// Successfully deleted task
 		workflow = workflowResult;
-		workflowTaskContext.set(undefined);
+		selectedWorkflowTask = undefined;
 	}
 
 	async function setActiveWorkflowTaskContext(event) {
@@ -360,7 +346,7 @@
 	 * @param {import('$lib/types').WorkflowTask} wft
 	 */
 	function setWorkflowTaskContext(wft) {
-		workflowTaskContext.set(wft);
+		selectedWorkflowTask = wft;
 		// Check if args schema is available
 		argsSchemaAvailable =
 			wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
@@ -570,8 +556,6 @@
 	async function updateNewVersionsCount(count) {
 		newVersionsCount = count;
 	}
-
-	onDestroy(unsubscribe);
 </script>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -660,8 +644,8 @@
 							{#each workflow.task_list as workflowTask}
 								<button
 									style="cursor: pointer"
-									class="list-group-item list-group-item-action {$workflowTaskContext !==
-										undefined && $workflowTaskContext.id == workflowTask.id
+									class="list-group-item list-group-item-action {selectedWorkflowTask !==
+										undefined && selectedWorkflowTask.id == workflowTask.id
 										? 'active'
 										: ''}"
 									data-fs-target={workflowTask.id}
@@ -785,9 +769,7 @@
 										{#key selectedWorkflowTask}
 											<MetaPropertiesForm
 												workflowId={workflow.id}
-												taskId={selectedWorkflowTask.id}
-												metaProperties={selectedWorkflowTask.meta}
-												{originalMetaProperties}
+												workflowTask={selectedWorkflowTask}
 											/>
 										{/key}
 									{/if}
