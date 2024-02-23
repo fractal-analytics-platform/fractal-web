@@ -14,17 +14,15 @@
 
 	// Workflow id
 	export let workflowId;
-	// Workflow task id
-	export let taskId;
-	// Workflow task meta properties
-	export let metaProperties;
-	export let originalMetaProperties;
+	/** @type {import('$lib/types').WorkflowTask} */
+	export let workflowTask;
 
-	if (metaProperties === null || metaProperties === undefined) {
-		metaProperties = {};
-	}
-	if (originalMetaProperties === null || originalMetaProperties === undefined) {
-		originalMetaProperties = {};
+	let metaProperties = {};
+	let originalMetaProperties = {};
+
+	$: {
+		metaProperties = workflowTask.meta || {};
+		updateOriginalMetaProperties();
 	}
 
 	async function handleEntryUpdate() {
@@ -34,18 +32,23 @@
 			const updatedMetaProperties = await updateFormEntry(
 				projectId,
 				workflowId,
-				taskId,
+				workflowTask.id,
 				modifiedProperties,
 				'meta'
 			);
+			workflowTask.meta = updatedMetaProperties.meta;
 			metaProperties = updatedMetaProperties.meta;
 			// Updating original properties again
-			for (let key in metaProperties) {
-				originalMetaProperties[key] = metaProperties[key];
-			}
+			updateOriginalMetaProperties();
 		} catch (error) {
 			console.log(error);
 			displayStandardErrorAlert(error, 'metaPropertiesFormError');
+		}
+	}
+
+	function updateOriginalMetaProperties() {
+		for (let key in metaProperties) {
+			originalMetaProperties[key] = metaProperties[key];
 		}
 	}
 </script>

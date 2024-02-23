@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed bug in workflow task meta properties update (\#422).
+
 # 0.10.0
 
 This release requires fractal-server 1.4.6.
