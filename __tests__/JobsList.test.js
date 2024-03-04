@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import { within, waitFor } from '@testing-library/dom'
 import { readable } from 'svelte/store';
 import { data } from './mock/jobs-list';
 
@@ -30,6 +32,7 @@ import JobsList from '../src/lib/components/jobs/JobsList.svelte';
 
 describe('JobsList', () => {
 	it('display, filter and sort jobs', async () => {
+		const user = userEvent.setup();
 		const nop = function () {};
 		const result = render(JobsList, {
 			props: { jobUpdater: nop }
@@ -37,52 +40,63 @@ describe('JobsList', () => {
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
 
-		const filters = result.getAllByRole('combobox');
+		const filters = result.getAllByRole('listbox', { hidden: false });
+		expect(filters.length).eq(5);
 
 		const statusFilter = filters[0];
-		verifyOptions(statusFilter, ['', 'submitted', 'done', 'failed']);
+		verifyOptions(statusFilter, ['Submitted', 'Done', 'Failed']);
 		const projectFilter = filters[1];
-		verifyOptions(projectFilter, ['', '1', '2']);
+		verifyOptions(projectFilter, ['project 1', 'project 2']);
 		const workflowFilter = filters[2];
-		verifyOptions(workflowFilter, ['', '1', '2']);
+		verifyOptions(workflowFilter, ['workflow 1', 'workflow 2']);
 		const inputDatasetFilter = filters[3];
-		verifyOptions(inputDatasetFilter, ['', '1', '3', '5']);
+		verifyOptions(inputDatasetFilter, ['input1', 'input2', 'input3']);
 		const outputDatasetFilter = filters[4];
-		verifyOptions(outputDatasetFilter, ['', '2', '4', '6']);
+		verifyOptions(outputDatasetFilter, ['output1', 'output2', 'output3']);
 
 		// Filter by project
-		await fireEvent.change(projectFilter, { target: { value: '1' } });
+		const optionProject1  = within(projectFilter).getByRole('option', {name: 'project 1'});
+		await user.click(optionProject1);
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr').length).eq(1);
+		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(1));
 		expect(table.querySelectorAll('tbody tr td')[7].textContent).eq('input1');
+		verifyOptions(workflowFilter, ['workflow 1']);
+		verifyOptions(inputDatasetFilter, ['input1']);
+		verifyOptions(outputDatasetFilter, ['output1']);
 		await clearFilters(result);
 
 		// Filter by workflow
-		await fireEvent.change(workflowFilter, { target: { value: '2' } });
+		const optionWorkflow2  = within(workflowFilter).getByRole('option', {name: 'workflow 2'});
+		await user.click(optionWorkflow2);
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr').length).eq(2);
+		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(2));
 		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[7].textContent).eq('input3');
 		expect(table.querySelectorAll('tbody tr:nth-child(2) td')[7].textContent).eq('input2');
+		verifyOptions(inputDatasetFilter, ['input2', 'input3']);
+		verifyOptions(outputDatasetFilter, ['output2', 'output3']);
 		await clearFilters(result);
 
 		// Filter by input dataset
-		await fireEvent.change(inputDatasetFilter, { target: { value: '3' } });
+		const optionInput2  = within(inputDatasetFilter).getByRole('option', {name: 'input2'});
+		await user.click(optionInput2);
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr').length).eq(1);
+		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(1));
 		expect(table.querySelectorAll('tbody tr td')[7].textContent).eq('input2');
 		await clearFilters(result);
 
 		// Filter by output dataset
-		await fireEvent.change(outputDatasetFilter, { target: { value: '4' } });
+		const optionOutput2  = within(outputDatasetFilter).getByRole('option', {name: 'output2'});
+		await user.click(optionOutput2);
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr').length).eq(1);
+		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(1));
 		expect(table.querySelectorAll('tbody tr td')[8].textContent).eq('output2');
 		await clearFilters(result);
 
 		// Filter by job status
-		await fireEvent.change(statusFilter, { target: { value: 'submitted' } });
+		const optionSubmitted  = within(statusFilter).getByRole('option', {name: 'Submitted'});
+		await user.click(optionSubmitted);
 		table = result.getByRole('table');
-		expect(table.querySelectorAll('tbody tr').length).eq(1);
+		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(1));
 		expect(table.querySelectorAll('tbody tr td')[7].textContent).eq('input3');
 		await clearFilters(result);
 
@@ -116,6 +130,8 @@ describe('JobsList', () => {
 	async function clearFilters(result) {
 		const clearFiltersBtn = result.getByRole('button', { name: 'Clear filters' });
 		await fireEvent.click(clearFiltersBtn);
+		const table = result.getByRole('table');
+		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(3));
 	}
 
 	it('cancel job', async () => {
@@ -189,9 +205,9 @@ describe('JobsList', () => {
 });
 
 function verifyOptions(element, expectedOptions) {
-	const options = element.querySelectorAll('option');
+	const options = within(element).getAllByRole('option');
 	expect(options.length).eq(expectedOptions.length);
 	for (let i = 0; i < options.length; i++) {
-		expect(options[i].value).eq(expectedOptions[i]);
+		expect(options[i].textContent).eq(expectedOptions[i]);
 	}
 }
