@@ -232,7 +232,7 @@
 			events: {
 				afterChange: (selection) => {
 					const selectedOption = selection[0];
-					if (selectedOption.placeholder) {
+					if (!selectedOption || selectedOption.placeholder) {
 						setter('');
 					} else {
 						setter(selectedOption.value);
