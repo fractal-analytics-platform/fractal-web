@@ -11,6 +11,7 @@
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
 	import StandardDismissableAlert from '../common/StandardDismissableAlert.svelte';
 	import TimestampCell from './TimestampCell.svelte';
+	import SlimSelect from 'slim-select';
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
@@ -42,19 +43,41 @@
 	/** @type {import('svelte/store').Readable<import('$lib/types').ApplyWorkflow[]>} */
 	let rows = tableHandler.getRows();
 
+	// Selectors
+	/** @type {SlimSelect|undefined} */
+	let statusSelect;
+	/** @type {SlimSelect|undefined} */
+	let projectSelect;
+	/** @type {SlimSelect|undefined} */
+	let workflowSelect;
+	/** @type {SlimSelect|undefined} */
+	let inputDatasetSelect;
+	/** @type {SlimSelect|undefined} */
+	let outputDatasetSelect;
+
 	// Filters
+	let statusFilter = '';
 	let projectFilter = '';
 	let workflowFilter = '';
 	let inputDatasetFilter = '';
 	let outputDatasetFilter = '';
-	let statusFilter = '';
 
 	// Filters
-	$: tableHandler.filter(projectFilter, 'project_id', check.isEqualTo);
-	$: tableHandler.filter(workflowFilter, 'workflow_id', check.isEqualTo);
-	$: tableHandler.filter(inputDatasetFilter, 'input_dataset_id', check.isEqualTo);
-	$: tableHandler.filter(outputDatasetFilter, 'output_dataset_id', check.isEqualTo);
-	$: tableHandler.filter(statusFilter, 'status');
+	$: tableHandler.filter(statusFilter, 'status', check.isEqualTo);
+	$: tableHandler.filter(projectFilter, (row) => row.project_dump.id.toString(), check.isEqualTo);
+	$: tableHandler.filter(workflowFilter, (row) => row.workflow_dump.id.toString(), check.isEqualTo);
+	$: tableHandler.filter(
+		inputDatasetFilter,
+		(row) => row.input_dataset_dump.id.toString(),
+		check.isEqualTo
+	);
+	$: tableHandler.filter(
+		outputDatasetFilter,
+		(row) => row.output_dataset_dump.id.toString(),
+		check.isEqualTo
+	);
+
+	$: rebuildSlimSelectOptions($rows);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -143,9 +166,132 @@
 		}
 	}
 
+	function clearFilters() {
+		tableHandler.clearFilters();
+		statusSelect?.setSelected('');
+		projectSelect?.setSelected('');
+		workflowSelect?.setSelected('');
+		inputDatasetSelect?.setSelected('');
+		outputDatasetSelect?.setSelected('');
+	}
+
 	onMount(() => {
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+
+		statusSelect = setSlimSelect(
+			'status-select',
+			[
+				{ id: 'submitted', name: 'Submitted' },
+				{ id: 'done', name: 'Done' },
+				{ id: 'failed', name: 'Failed' }
+			],
+			(value) => (statusFilter = value),
+			false
+		);
+		projectSelect = setSlimSelect('project-select', projects, (value) => (projectFilter = value));
+		workflowSelect = setSlimSelect(
+			'workflow-select',
+			workflows,
+			(value) => (workflowFilter = value)
+		);
+		inputDatasetSelect = setSlimSelect(
+			'input-dataset-select',
+			inputDatasets,
+			(value) => (inputDatasetFilter = value)
+		);
+		outputDatasetSelect = setSlimSelect(
+			'output-dataset-select',
+			outputDatasets,
+			(value) => (outputDatasetFilter = value)
+		);
 	});
+
+	/**
+	 * Initializes slim-select dropdown on a given HTML element.
+	 * @param {string} id id of HTML element where slim-select has to be configured
+	 * @param {Array<{ name: string, id: number|string }>} values
+	 * @param {(value: string) => void} setter function executed when a dropdown value is selected
+	 * @param {boolean} showSearch
+	 * @returns the SlimSelect instance
+	 */
+	function setSlimSelect(id, values, setter, showSearch = true) {
+		if (!values) {
+			return;
+		}
+		const selectElement = document.getElementById(id);
+		if (!selectElement) {
+			return;
+		}
+		selectElement.classList.remove('invisible');
+		const select = new SlimSelect({
+			select: `#${id}`,
+			settings: {
+				showSearch,
+				allowDeselect: true
+			},
+			events: {
+				afterChange: (selection) => {
+					const selectedOption = selection[0];
+					if (!selectedOption || selectedOption.placeholder) {
+						setter('');
+					} else {
+						setter(selectedOption.value);
+					}
+				}
+			}
+		});
+		setSlimSelectOptions(select, values);
+		return select;
+	}
+
+	/**
+	 * Rebuilds valid slim-select options according to the visible rows.
+	 * Example: if a project filter is selected the user can select only the workflows belonging to that project.
+	 * @param {import('$lib/types').ApplyWorkflow[]} rows
+	 */
+	function rebuildSlimSelectOptions(rows) {
+		setValidSlimSelectOptions(
+			workflowSelect,
+			workflows.filter((w) => rows.filter((r) => r.workflow_dump.id === w.id).length > 0)
+		);
+		setValidSlimSelectOptions(
+			inputDatasetSelect,
+			inputDatasets.filter((d) => rows.filter((r) => r.input_dataset_dump.id === d.id).length > 0)
+		);
+		setValidSlimSelectOptions(
+			outputDatasetSelect,
+			outputDatasets.filter((d) => rows.filter((r) => r.output_dataset_dump.id === d.id).length > 0)
+		);
+	}
+
+	/**
+	 * Updates the available options only when needed, to avoid unsetting the selected value when the desired list of
+	 * options is already set (e.g. if we change the selected dataset we don't want to change the selected workflow).
+	 * @param {SlimSelect|undefined} select
+	 * @param {{id: number, name: string}[]} validValues
+	 */
+	function setValidSlimSelectOptions(select, validValues) {
+		if (!select) {
+			return;
+		}
+		const selected = select.getSelected()[0];
+		if (!selected || !validValues.map((v) => v.id.toString()).includes(selected)) {
+			setSlimSelectOptions(select, validValues);
+		}
+	}
+
+	/**
+	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
+	 * @param {SlimSelect|undefined} select
+	 * @param {Array<{ name: string, id: number|string }>} values
+	 */
+	function setSlimSelectOptions(select, values) {
+		if (!select) {
+			return;
+		}
+		const options = values.map((p) => ({ text: p.name, value: p.id.toString() }));
+		select.setData([{ text: 'All', placeholder: true }, ...options]);
+	}
 
 	onDestroy(() => {
 		clearTimeout(updateJobsTimeout);
@@ -158,16 +304,7 @@
 	<div class="d-flex justify-content-end align-items-center my-3">
 		<div>
 			{#if !admin}
-				<button
-					class="btn btn-warning"
-					on:click={() => {
-						tableHandler.clearFilters();
-						workflowFilter = '';
-						inputDatasetFilter = '';
-						outputDatasetFilter = '';
-						statusFilter = '';
-					}}
-				>
+				<button class="btn btn-warning" on:click={clearFilters}>
 					<i class="bi-x-square" />
 					Clear filters
 				</button>
@@ -224,12 +361,7 @@
 						<th />
 					{/if}
 					<th>
-						<select class="form-control" bind:value={statusFilter}>
-							<option value="">All</option>
-							<option value="submitted">Submitted</option>
-							<option value="done">Done</option>
-							<option value="failed">Failed</option>
-						</select>
+						<select id="status-select" class="invisible" />
 					</th>
 					<th />
 					<th />
@@ -237,44 +369,22 @@
 					{#if !columnsToHide.includes('project')}
 						<th>
 							{#if projects}
-								<select class="form-control" bind:value={projectFilter}>
-									<option value="">All</option>
-									{#each projects as project}
-										<option value={project.id}>{project.name}</option>
-									{/each}
-								</select>
+								<select id="project-select" class="invisible" />
 							{/if}
 						</th>
 					{/if}
 					{#if !columnsToHide.includes('workflow')}
 						<th>
 							{#if workflows}
-								<select class="form-control" bind:value={workflowFilter}>
-									<option value="">All</option>
-									{#each workflows as workflow}
-										<option value={workflow.id}>{workflow.name}</option>
-									{/each}
-								</select>
+								<select id="workflow-select" class="invisible" />
 							{/if}
 						</th>
 					{/if}
 					<th>
-						{#key inputDatasetFilter}
-							<select class="form-control" bind:value={inputDatasetFilter}>
-								<option value="">All</option>
-								{#each inputDatasets as dataset}
-									<option value={dataset.id}>{dataset.name}</option>
-								{/each}
-							</select>
-						{/key}
+						<select id="input-dataset-select" class="invisible" />
 					</th>
 					<th>
-						<select class="form-control" bind:value={outputDatasetFilter}>
-							<option value="">All</option>
-							{#each outputDatasets as dataset}
-								<option value={dataset.id}>{dataset.name}</option>
-							{/each}
-						</select>
+						<select id="output-dataset-select" class="invisible" />
 					</th>
 					{#if !columnsToHide.includes('user_email')}
 						<th />
