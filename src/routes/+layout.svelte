@@ -2,11 +2,13 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
+	import { setSelectedApiVersion, versionsLabels } from '$lib/common/selected_api_version';
 	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
+	$: apiVersion = $page.data.apiVersion;
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
@@ -94,6 +96,28 @@
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
+					<li class="nav-item dropdown">
+						<a
+							class="nav-link dropdown-toggle"
+							href="#api-version"
+							role="button"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+						>
+							{versionsLabels[apiVersion]}
+						</a>
+						<ul class="dropdown-menu">
+							{#each Object.entries(versionsLabels) as [version, label]}
+								<li>
+									<button
+										class="dropdown-item"
+										type="button"
+										on:click={() => setSelectedApiVersion(version)}>{label}</button
+									>
+								</li>
+							{/each}
+						</ul>
+					</li>
 					<li class="nav-item dropdown">
 						<a
 							class="nav-link dropdown-toggle"

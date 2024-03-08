@@ -1,4 +1,5 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { loadSelectedApiVersion } from '$lib/common/selected_api_version';
 import { getCurrentUser } from '$lib/server/api/v1/auth_api';
 
 export async function load({ fetch, cookies }) {
@@ -18,6 +19,8 @@ export async function load({ fetch, cookies }) {
 			console.error(error);
 		});
 
+	const apiVersion = loadSelectedApiVersion(cookies);
+
 	// Check user info
 	// Check auth cookie is present
 	const fastApiUsersAuth = cookies.get('fastapiusersauth');
@@ -25,7 +28,8 @@ export async function load({ fetch, cookies }) {
 		console.log('No auth cookie found');
 		return {
 			serverInfo,
-			userInfo: null
+			userInfo: null,
+			apiVersion
 		};
 	}
 
@@ -37,6 +41,7 @@ export async function load({ fetch, cookies }) {
 
 	return {
 		serverInfo,
-		userInfo
+		userInfo,
+		apiVersion
 	};
 }
