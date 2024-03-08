@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import Modal from '../common/Modal.svelte';
 
 	/** @type {number} */
@@ -67,7 +68,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v1/project/${projectId}/workflow/${workflow.id}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/workflow/${workflow.id}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			mode: 'cors',

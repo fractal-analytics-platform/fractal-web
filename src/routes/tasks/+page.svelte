@@ -68,7 +68,7 @@
 	}
 
 	async function reloadTaskList() {
-		const response = await fetch(`/api/v1/task?args_schema=false`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -87,7 +87,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDeleteTask(taskId) {
-		const response = await fetch(`/api/v1/task/${taskId}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task/${taskId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});

@@ -3,6 +3,7 @@
 	import { AlertError } from '$lib/common/errors';
 	import CreateUpdateDatasetModal from './CreateUpdateDatasetModal.svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	/** @type {import('$lib/types').Dataset[]} */
 	export let datasets = [];
@@ -30,7 +31,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDatasetDelete(projectId, datasetId) {
-		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/dataset/${datasetId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});

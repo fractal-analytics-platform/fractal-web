@@ -47,7 +47,7 @@
 		}
 
 		try {
-			updateCandidates = await getNewVersions(task);
+			updateCandidates = await getNewVersions(task, $page.data.apiVersion);
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
@@ -126,7 +126,7 @@
 			return;
 		}
 		let response = await fetch(
-			`/api/v1/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
+			`/api/${$page.data.apiVersion}/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
@@ -145,7 +145,7 @@
 		headers.set('Content-Type', 'application/json');
 
 		response = await fetch(
-			`/api/v1/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
+			`/api/${$page.data.apiVersion}/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
 			{
 				method: 'POST',
 				credentials: 'include',

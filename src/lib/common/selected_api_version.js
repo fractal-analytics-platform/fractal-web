@@ -37,6 +37,19 @@ export async function setSelectedApiVersion(version) {
 }
 
 /**
+ * @template T
+ * @param {import("@sveltejs/kit").Cookies} cookies
+ * @param {T[]} modules
+ */
+export function loadForVersion(cookies, ...modules) {
+	const version = loadSelectedApiVersion(cookies);
+	if (version === 'v1') {
+		return modules[0];
+	}
+	return modules[1];
+}
+
+/**
  * @param {string|undefined} version
  * @returns {boolean}
  */

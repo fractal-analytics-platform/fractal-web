@@ -1,7 +1,12 @@
 import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities';
-import { listTasks } from '$lib/server/api/v1/task_api';
+import { loadForVersion } from '$lib/common/selected_api_version';
+import { listTasks as listTasksV1 } from '$lib/server/api/v1/task_api';
+import { listTasks as listTasksV2 } from '$lib/server/api/v2/task_api';
 
-export async function load({ fetch }) {
+export async function load({ fetch, cookies }) {
+
+	const listTasks = loadForVersion(cookies, listTasksV1, listTasksV2);
+
 	/** @type {import('$lib/types').Task[]} */
 	const tasks = await listTasks(fetch);
 

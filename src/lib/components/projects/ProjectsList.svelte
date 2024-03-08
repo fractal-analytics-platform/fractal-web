@@ -4,6 +4,7 @@
 	import { AlertError, getValidationMessagesMap } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
 	import Modal from '../common/Modal.svelte';
+	import { page } from '$app/stores';
 
 	// List of projects to be displayed
 	/** @type {import('$lib/types').Project[]} */
@@ -46,7 +47,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch('/api/v1/project', {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project`, {
 			method: 'POST',
 			credentials: 'include',
 			mode: 'cors',
@@ -83,7 +84,7 @@
 	async function handleDeleteProject(projectId) {
 		console.log('Client request project delete');
 
-		const response = await fetch(`/api/v1/project/${projectId}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});

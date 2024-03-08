@@ -35,7 +35,8 @@
 				workflowId,
 				workflowTask.id,
 				updatedEntry,
-				'args'
+				'args',
+				$page.data.apiVersion
 			);
 			workflowTask.args = response.args;
 		} catch (error) {

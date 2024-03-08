@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import Modal from '../common/Modal.svelte';
 
@@ -19,7 +20,7 @@
 
 		// Retrieving the args_schema field
 		loading = true;
-		const response = await fetch(`/api/v1/task/${taskToLoad.id}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task/${taskToLoad.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

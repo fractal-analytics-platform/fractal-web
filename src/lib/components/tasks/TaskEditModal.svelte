@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '../common/Modal.svelte';
@@ -38,7 +39,7 @@
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
 
-				const response = await fetch(`/api/v1/task/${task.id}`, {
+				const response = await fetch(`/api/${$page.data.apiVersion}/task/${task.id}`, {
 					method: 'PATCH',
 					credentials: 'include',
 					headers,
@@ -69,7 +70,7 @@
 		modal.show();
 
 		// Retrieving the args_schema field
-		const response = await fetch(`/api/v1/task/${taskToEdit.id}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task/${taskToEdit.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

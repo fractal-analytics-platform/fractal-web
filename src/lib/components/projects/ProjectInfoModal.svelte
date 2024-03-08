@@ -5,6 +5,7 @@
 	import { projectInfoModal } from '$lib/stores/projectStores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
+	import { page } from '$app/stores';
 
 	// Project to be displayed
 	/** @type {import('$lib/types').Project|undefined} */
@@ -26,7 +27,7 @@
 			loadingDatasets = true;
 			datasets = undefined;
 			datasetErrorAlert?.hide();
-			const response = await fetch(`/api/v1/project/${project.id}/dataset?history=false`, {
+			const response = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/dataset?history=false`, {
 				method: 'GET',
 				credentials: 'include'
 			});

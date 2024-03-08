@@ -37,7 +37,7 @@
 	});
 
 	async function loadDatasetTypes() {
-		const response = await fetch(`/api/v1/task?args_schema=false`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -158,7 +158,7 @@
 		const projectId = $page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v1/project/${projectId}/dataset`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/dataset`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -184,7 +184,7 @@
 		const projectId = $page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/dataset/${datasetId}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
@@ -262,7 +262,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v1/project/${projectId}/dataset/${datasetId}/resource`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/dataset/${datasetId}/resource`, {
 			method: 'POST',
 			credentials: 'include',
 			mode: 'cors',
@@ -289,7 +289,7 @@
 		headers.set('Content-Type', 'application/json');
 
 		const response = await fetch(
-			`/api/v1/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,
+			`/api/${$page.data.apiVersion}/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,
 			{
 				method: 'PATCH',
 				credentials: 'include',
@@ -325,7 +325,7 @@
 	async function callDeleteResource(/** @type {number} */ resourceId) {
 		const projectId = $page.params.projectId;
 		const response = await fetch(
-			`/api/v1/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,
+			`/api/${$page.data.apiVersion}/project/${projectId}/dataset/${datasetId}/resource/${resourceId}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'

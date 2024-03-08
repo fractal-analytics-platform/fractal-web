@@ -7,6 +7,7 @@
 		validateErrorMapKeys
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '../common/StandardDismissableAlert.svelte';
+	import { page } from '$app/stores';
 
 	/** @type {(task: import('$lib/types').Task) => void} */
 	export let addNewTask;
@@ -91,7 +92,7 @@
 			bodyData.meta = meta;
 		}
 
-		const response = await fetch('/api/v1/task', {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,

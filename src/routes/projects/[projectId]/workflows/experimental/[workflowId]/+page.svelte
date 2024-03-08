@@ -114,7 +114,7 @@
 			return;
 		}
 
-		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/export`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}/export`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -148,7 +148,7 @@
 		resetCreateWorkflowTaskModal();
 
 		// Get available tasks from the server
-		const response = await fetch('/api/v1/task?args_schema=false', {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -186,7 +186,7 @@
 				const headers = new Headers();
 				headers.set('Content-Type', 'application/json');
 
-				const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+				const response = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}`, {
 					method: 'PATCH',
 					credentials: 'include',
 					headers,
@@ -241,7 +241,7 @@
 
 				// Creating workflow task
 				const workflowTaskResponse = await fetch(
-					`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
+					`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
 					{
 						method: 'POST',
 						credentials: 'include',
@@ -264,7 +264,7 @@
 
 				// Get updated workflow with created task
 				const workflowResponse = await fetch(
-					`/api/v1/project/${project.id}/workflow/${workflow.id}`,
+					`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}`,
 					{
 						method: 'GET',
 						credentials: 'include'
@@ -300,7 +300,7 @@
 			return;
 		}
 		const response = await fetch(
-			`/api/v1/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
+			`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
@@ -317,7 +317,7 @@
 		argumentsWithUnsavedChanges = false;
 
 		// Get updated workflow with deleted task
-		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+		const workflowResponse = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -405,7 +405,7 @@
 			headers.set('Content-Type', 'application/json');
 
 			const response = await fetch(
-				`/api/v1/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${selectedInputDatasetId}&output_dataset_id=${selectedOutputDatasetId}`,
+				`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${selectedInputDatasetId}&output_dataset_id=${selectedOutputDatasetId}`,
 				{
 					method: 'POST',
 					credentials: 'include',
@@ -464,7 +464,7 @@
 			workflowErrorAlert.hide();
 		}
 
-		const workflowResponse = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}`, {
+		const workflowResponse = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -487,7 +487,7 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task));
+			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task), $page.data.apiVersion);
 		}
 	}
 
@@ -518,7 +518,7 @@
 			selectedOutputDatasetId
 		);
 		const outputStatusResponse = await fetch(
-			`/api/v1/project/${project.id}/dataset/${selectedOutputDatasetId}/status`,
+			`/api/${$page.data.apiVersion}/project/${project.id}/dataset/${selectedOutputDatasetId}/status`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -547,7 +547,7 @@
 			failedJob = undefined;
 			return;
 		}
-		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/job`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}/job`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -591,7 +591,7 @@
 		) {
 			return selectedSubmittedJob;
 		}
-		const response = await fetch(`/api/v1/project/${project.id}/workflow/${workflow.id}/job`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}/workflow/${workflow.id}/job`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -619,7 +619,7 @@
 			workflowErrorAlert.hide();
 		}
 		const response = await fetch(
-			`/api/v1/project/${project.id}/job/${selectedSubmittedJob.id}/stop`,
+			`/api/${$page.data.apiVersion}/project/${project.id}/job/${selectedSubmittedJob.id}/stop`,
 			{
 				method: 'GET',
 				credentials: 'include'

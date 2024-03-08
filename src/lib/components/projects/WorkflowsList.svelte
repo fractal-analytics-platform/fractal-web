@@ -4,6 +4,7 @@
 	import { AlertError } from '$lib/common/errors';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	// The list of workflows
 	/** @type {import('$lib/types').Workflow[]} */
@@ -26,7 +27,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDeleteWorkflow(workflowId) {
-		const response = await fetch(`/api/v1/project/${projectId}/workflow/${workflowId}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/workflow/${workflowId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});

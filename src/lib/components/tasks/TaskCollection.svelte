@@ -7,6 +7,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
+	import { page } from '$app/stores';
 
 	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections';
 
@@ -85,7 +86,7 @@
 		}
 
 		taskCollectionInProgress = true;
-		const response = await fetch('/api/v1/task/collect/pip', {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task/collect/pip`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: headers,
@@ -161,7 +162,7 @@
 	 * @returns {Promise<import('$lib/types').TasksCollectionsState|undefined>}
 	 */
 	async function getTaskCollection(taskCollectionId) {
-		const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/task/collect/${taskCollectionId}?verbose=True`, {
 			method: 'GET',
 			credentials: 'include'
 		});

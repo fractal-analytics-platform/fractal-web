@@ -34,7 +34,8 @@
 				workflowId,
 				workflowTask.id,
 				modifiedProperties,
-				'meta'
+				'meta',
+				$page.data.apiVersion
 			);
 			workflowTask.meta = updatedMetaProperties.meta;
 			metaProperties = updatedMetaProperties.meta;

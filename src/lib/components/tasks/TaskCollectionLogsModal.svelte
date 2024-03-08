@@ -3,6 +3,7 @@
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
+	import { page } from '$app/stores';
 
 	let logs = '';
 	let errorAlert = undefined;
@@ -15,7 +16,7 @@
 			}
 			logs = '';
 
-			const response = await fetch(`/api/v1/task/collect/${taskCollectionId}?verbose=True`, {
+			const response = await fetch(`/api/${$page.data.apiVersion}/task/collect/${taskCollectionId}?verbose=True`, {
 				method: 'GET',
 				credentials: 'include'
 			});

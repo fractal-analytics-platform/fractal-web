@@ -28,7 +28,7 @@
 			return;
 		}
 
-		const response = await fetch(`/api/v1/project/${job.project_dump.id}/job/${job.id}`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${job.project_dump.id}/job/${job.id}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

@@ -123,7 +123,7 @@
 
 		let stopJobUrl = admin
 			? `/api/admin/job/${job.id}/stop`
-			: `/api/v1/project/${job.project_id}/job/${job.id}/stop`;
+			: `/api/${$page.data.apiVersion}/project/${job.project_id}/job/${job.id}/stop`;
 		const response = await fetch(stopJobUrl, {
 			method: 'GET',
 			credentials: 'include'
@@ -162,7 +162,7 @@
 		if (admin) {
 			return `/api/admin/job/${row.id}/download`;
 		} else {
-			return `/api/v1/project/${row.project_id}/job/${row.id}/download`;
+			return `/api/${$page.data.apiVersion}/project/${row.project_id}/job/${row.id}/download`;
 		}
 	}
 

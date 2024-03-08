@@ -30,7 +30,7 @@
 				const headers = new Headers();
 				headers.set('Content-Type', 'application/json');
 
-				const response = await fetch(`/api/v1/project/${project.id}`, {
+				const response = await fetch(`/api/${$page.data.apiVersion}/project/${project.id}`, {
 					method: 'PATCH',
 					credentials: 'include',
 					mode: 'cors',

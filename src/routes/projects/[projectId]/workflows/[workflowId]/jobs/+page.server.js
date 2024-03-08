@@ -1,9 +1,16 @@
 import { removeDuplicatedItems } from '$lib/common/component_utilities';
-import { getProject, getWorkflow } from '$lib/server/api/v1/project_api';
-import { getWorkflowJobs } from '$lib/server/api/v1/workflow_api';
+import { getProject as getProjectV1, getWorkflow as getWorkflowV1 } from '$lib/server/api/v1/project_api';
+import { getProject as getProjectV2, getWorkflow as getWorkflowV2 } from '$lib/server/api/v2/project_api';
+import { getWorkflowJobs as getWorkflowJobsV1 } from '$lib/server/api/v1/workflow_api';
+import { getWorkflowJobs as getWorkflowJobsV2 } from '$lib/server/api/v2/workflow_api';
+import { loadForVersion } from '$lib/common/selected_api_version';
 
-export async function load({ fetch, params }) {
+export async function load({ fetch, params, cookies }) {
 	const { projectId, workflowId } = params;
+
+	const getProject = loadForVersion(cookies, getProjectV1, getProjectV2);
+	const getWorkflowJobs = loadForVersion(cookies, getWorkflowJobsV1, getWorkflowJobsV2);
+	const getWorkflow = loadForVersion(cookies, getWorkflowV1, getWorkflowV2);
 
 	/** @type {import('$lib/types').Project} */
 	const project = await getProject(fetch, projectId);

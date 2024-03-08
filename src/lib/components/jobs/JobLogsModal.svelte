@@ -3,6 +3,7 @@
 	import { extractJobErrorParts } from '$lib/common/job_utilities';
 	import { onDestroy } from 'svelte';
 	import Modal from '../common/Modal.svelte';
+	import { page } from '$app/stores';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = [];
@@ -86,7 +87,7 @@
 
 	async function loadUserJobLog() {
 		const response = await fetch(
-			`/api/v1/project/${job.project_id}/job/${job.id}?show_tmp_logs=true`
+			`/api/${$page.data.apiVersion}/project/${job.project_id}/job/${job.id}?show_tmp_logs=true`
 		);
 		if (response.ok) {
 			const result = await response.json();

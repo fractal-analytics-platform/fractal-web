@@ -73,7 +73,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v1/project/${$page.params.projectId}/workflow/import`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${$page.params.projectId}/workflow/import`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -108,7 +108,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v1/project/${projectId}/workflow`, {
+		const response = await fetch(`/api/${$page.data.apiVersion}/project/${projectId}/workflow`, {
 			method: 'POST',
 			credentials: 'include',
 			mode: 'cors',

@@ -35,7 +35,8 @@
 				workflowId,
 				workflowTaskId,
 				newArgs,
-				'args'
+				'args',
+				$page.data.apiVersion
 			);
 			args = response.args;
 			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
