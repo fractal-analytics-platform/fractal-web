@@ -12,6 +12,8 @@
 	export let updateWorkflowCallback;
 	/** @type {(count: number) => Promise<void>} */
 	export let updateNewVersionsCount;
+	/** @type {'v1'|'v2'} */
+	export let apiVersion;
 
 	$: task = workflowTask.task;
 
@@ -47,7 +49,7 @@
 		}
 
 		try {
-			updateCandidates = await getNewVersions(task, $page.data.apiVersion);
+			updateCandidates = await getNewVersions(task, apiVersion);
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
@@ -126,7 +128,7 @@
 			return;
 		}
 		let response = await fetch(
-			`/api/${$page.data.apiVersion}/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
+			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
@@ -145,7 +147,7 @@
 		headers.set('Content-Type', 'application/json');
 
 		response = await fetch(
-			`/api/${$page.data.apiVersion}/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
+			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
 			{
 				method: 'POST',
 				credentials: 'include',

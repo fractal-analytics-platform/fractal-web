@@ -24,9 +24,9 @@
 		{#if !userLoggedIn}
 			<a href="/auth/login" class="btn btn-primary">Login</a>
 		{/if}
-		<a href="/projects" class="btn btn-primary">Projects</a>
-		<a href="/tasks" class="btn btn-primary">Tasks</a>
-		<a href="/jobs" class="btn btn-primary">Jobs</a>
+		<a href="/v2/projects" class="btn btn-primary">Projects</a>
+		<a href="/v2/tasks" class="btn btn-primary">Tasks</a>
+		<a href="/v2/jobs" class="btn btn-primary">Jobs</a>
 	</div>
 
 	{#if PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}

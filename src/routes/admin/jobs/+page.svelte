@@ -4,7 +4,7 @@
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import JobsList from '$lib/components/jobs/JobsList.svelte';
+	import JobsList from '$lib/components/v1/jobs/JobsList.svelte';
 
 	let searched = false;
 	let searching = false;

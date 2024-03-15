@@ -2,16 +2,35 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
-	import { setSelectedApiVersion, versionsLabels } from '$lib/common/selected_api_version';
+	import { reloadVersionedPage, versionsLabels } from '$lib/common/selected_api_version';
 	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
-	$: apiVersion = $page.data.apiVersion;
+	let apiVersion = $page.data.apiVersion;
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
+
+	$: displayVersionSelector = !isSubPage($page.url.pathname, apiVersion);
+
+	/**
+	 * Returns true if the URL indicates a subpage.
+	 * Values need to be passed to trigger the reactivity.
+	 * @param {string} pathname
+	 * @param {string} version
+	 * @returns {boolean}
+	 */
+	function isSubPage(pathname, version) {
+		if (!pathname.startsWith(`/${version}/`)) {
+			return false;
+		}
+		if (pathname.endsWith('/')) {
+			pathname = pathname.substring(0, pathname.length - 1);
+		}
+		return pathname.substring(4).includes('/');
+	}
 
 	// Detects page change
 	$: if ($navigating) cleanupModalBackdrop();
@@ -50,10 +69,18 @@
 			return 'home';
 		}
 		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
-			if (pathname.startsWith(`/${section}`)) {
+			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/${apiVersion}/${section}`)) {
 				return section;
 			}
 		}
+	}
+
+	/**
+	 * @param {string} version
+	 */
+	function setSelecteApiVersion(version) {
+		apiVersion = version;
+		reloadVersionedPage($page.url.pathname, version);
 	}
 
 	let loading = true;
@@ -75,15 +102,31 @@
 				</li>
 				{#if userLoggedIn}
 					<li class="nav-item">
-						<a href="/projects" class="nav-link" class:active={selectedSection === 'projects'}>
+						<a
+							href={`/${apiVersion}/projects`}
+							class="nav-link"
+							class:active={selectedSection === 'projects'}
+						>
 							Projects
 						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/tasks" class="nav-link" class:active={selectedSection === 'tasks'}> Tasks </a>
+						<a
+							href={`/${apiVersion}/tasks`}
+							class="nav-link"
+							class:active={selectedSection === 'tasks'}
+						>
+							Tasks
+						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/jobs" class="nav-link" class:active={selectedSection === 'jobs'}> Jobs </a>
+						<a
+							href={`/${apiVersion}/jobs`}
+							class="nav-link"
+							class:active={selectedSection === 'jobs'}
+						>
+							Jobs
+						</a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
@@ -96,28 +139,36 @@
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
-					<li class="nav-item dropdown">
-						<a
-							class="nav-link dropdown-toggle"
-							href="#api-version"
-							role="button"
-							data-bs-toggle="dropdown"
-							aria-expanded="false"
-						>
-							{versionsLabels[apiVersion]}
-						</a>
-						<ul class="dropdown-menu">
-							{#each Object.entries(versionsLabels) as [version, label]}
-								<li>
-									<button
-										class="dropdown-item"
-										type="button"
-										on:click={() => setSelectedApiVersion(version)}>{label}</button
-									>
-								</li>
-							{/each}
-						</ul>
-					</li>
+					{#if displayVersionSelector}
+						<li class="nav-item dropdown">
+							<a
+								class="nav-link dropdown-toggle"
+								href="#api-version"
+								role="button"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+							>
+								{versionsLabels[apiVersion]}
+							</a>
+							<ul class="dropdown-menu">
+								{#each Object.entries(versionsLabels) as [version, label]}
+									<li>
+										<button
+											class="dropdown-item"
+											type="button"
+											on:click={() => setSelecteApiVersion(version)}
+										>
+											{label}
+										</button>
+									</li>
+								{/each}
+							</ul>
+						</li>
+					{:else}
+						<li class="navbar-text me-3">
+							<span class="badge text-bg-info">{versionsLabels[apiVersion]}</span>
+						</li>
+					{/if}
 					<li class="nav-item dropdown">
 						<a
 							class="nav-link dropdown-toggle"

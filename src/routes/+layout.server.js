@@ -1,17 +1,14 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
-import { loadSelectedApiVersion } from '$lib/common/selected_api_version';
 import { getCurrentUser } from '$lib/server/api/v1/auth_api';
 
-export async function load({ fetch, cookies }) {
+export async function load({ fetch, cookies, request }) {
 	// This is a mark to notify and log when the server is running SSR
 	console.log('SSR - Main layout');
 
 	const serverInfo = await fetch(FRACTAL_SERVER_HOST + '/api/alive/')
 		.then(async (res) => {
 			const info = await res.json();
-			console.log(
-				`Server info loaded: Alive ${info.alive} - ${info.version}`
-			);
+			console.log(`Server info loaded: Alive ${info.alive} - ${info.version}`);
 			return info;
 		})
 		.catch((error) => {
@@ -19,7 +16,7 @@ export async function load({ fetch, cookies }) {
 			console.error(error);
 		});
 
-	const apiVersion = loadSelectedApiVersion(cookies);
+	const apiVersion = request.url.includes('/v1/') ? 'v1' : 'v2';
 
 	// Check user info
 	// Check auth cookie is present

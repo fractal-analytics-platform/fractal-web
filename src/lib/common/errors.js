@@ -6,7 +6,11 @@ import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte
  * @param {Response} response
  */
 export async function responseError(response) {
-	throw error(response.status, await response.json());
+	let errorResponse = await response.json();
+	if ('detail' in errorResponse) {
+		errorResponse = errorResponse.detail;
+	}
+	throw error(response.status, errorResponse);
 }
 
 /**

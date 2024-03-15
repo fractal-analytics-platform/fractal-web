@@ -16,6 +16,8 @@
 	export let workflowId;
 	/** @type {import('$lib/types').WorkflowTask} */
 	export let workflowTask;
+	/** @type {'v1'|'v2'} */
+	export let apiVersion;
 
 	let metaProperties = {};
 	let originalMetaProperties = {};
@@ -35,7 +37,7 @@
 				workflowTask.id,
 				modifiedProperties,
 				'meta',
-				$page.data.apiVersion
+				apiVersion
 			);
 			workflowTask.meta = updatedMetaProperties.meta;
 			metaProperties = updatedMetaProperties.meta;

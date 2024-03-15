@@ -18,6 +18,8 @@
 	export let args = undefined;
 	/** @type {string} */
 	export let taskName;
+	/** @type {'v1'|'v2'} */
+	export let apiVersion;
 
 	/** @type {JSchema} */
 	let schemaComponent;
@@ -36,7 +38,7 @@
 				workflowTaskId,
 				newArgs,
 				'args',
-				$page.data.apiVersion
+				apiVersion
 			);
 			args = response.args;
 			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
