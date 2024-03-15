@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from './utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -9,7 +9,7 @@ test('Create and edit arguments of a task without schema', async ({ page, workfl
 	await waitPageLoading(page);
 
 	await test.step('Open "Add a single task" form', async () => {
-		await page.goto('/tasks');
+		await page.goto('/v1/tasks');
 		await waitPageLoading(page);
 		await page.getByText('Single task').click();
 	});

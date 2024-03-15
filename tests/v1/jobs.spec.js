@@ -1,4 +1,4 @@
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Execute jobs', async ({ page, workflow }) => {
@@ -25,7 +25,7 @@ test('Execute jobs', async ({ page, workflow }) => {
 	});
 
 	await test.step('Check workflow jobs page', async () => {
-		await page.waitForURL(`/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
+		await page.waitForURL(`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
 		await page.locator('table tbody').waitFor();
 		expect(await page.locator('table tbody tr').count()).toEqual(1);
 		const cells = await page.locator('table tbody tr td').allInnerTexts();
@@ -56,7 +56,7 @@ test('Execute jobs', async ({ page, workflow }) => {
 
 	let jobRow = null;
 	await test.step('Check generic jobs page', async () => {
-		await page.goto('/jobs');
+		await page.goto('/v1/jobs');
 		await waitPageLoading(page);
 		const rows = await page.locator('table tbody tr').all();
 		for (const row of rows) {

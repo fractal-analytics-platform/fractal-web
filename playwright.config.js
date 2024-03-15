@@ -13,7 +13,7 @@ export default defineConfig({
 		{ name: 'auth', testMatch: /auth\.setup\.js/ },
 		{
 			name: 'collect_core_tasks',
-			testMatch: /collect_core_tasks\.setup\.js/,
+			testMatch: /v1\/collect_core_tasks\.setup\.js/,
 			use: {
 				storageState: 'tests/.auth/user.json'
 			},
@@ -21,7 +21,7 @@ export default defineConfig({
 		},
 		{
 			name: 'create_fake_task',
-			testMatch: /create_fake_task\.setup\.js/,
+			testMatch: /v1\/create_fake_task\.setup\.js/,
 			use: {
 				storageState: 'tests/.auth/user.json'
 			},

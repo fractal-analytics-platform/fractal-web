@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from './utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -31,7 +31,7 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 
 	async createWorkflow() {
-		await this.page.goto('/projects/' + this.projectId);
+		await this.page.goto('/v1/projects/' + this.projectId);
 		await waitPageLoading(this.page);
 		const createWorkflowBtn = this.page.getByRole('button', { name: 'Create new workflow' });
 		await createWorkflowBtn.waitFor();
@@ -44,9 +44,9 @@ export class PageWithWorkflow extends PageWithProject {
 		await workflowNameInput.blur();
 		const createNewWorkflowBtn = this.page.getByRole('button', { name: 'Create empty workflow' });
 		await createNewWorkflowBtn.click();
-		await this.page.waitForURL(/\/projects\/\d+\/workflows\/\d+/);
+		await this.page.waitForURL(/\/v1\/projects\/\d+\/workflows\/\d+/);
 		this.url = this.page.url();
-		const match = this.url.match(/\/projects\/\d+\/workflows\/(\d+)/);
+		const match = this.url.match(/\/v1\/projects\/\d+\/workflows\/(\d+)/);
 		if (match) {
 			this.workflowId = match[1];
 		}

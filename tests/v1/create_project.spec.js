@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 
 test('Create and delete a project', async ({ page }) => {
-	await page.goto('/projects');
+	await page.goto('/v1/projects');
 	await waitPageLoading(page);
 
 	const randomProjectName = Math.random().toString(36).substring(7);
@@ -22,7 +22,7 @@ test('Create and delete a project', async ({ page }) => {
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page
-		await page.waitForURL(/\/projects\/\d+/);
+		await page.waitForURL(/\/v1\/projects\/\d+/);
 		await expect(page.locator('h1:not(.modal-title)')).toHaveText(
 			new RegExp('Project ' + randomProjectName + ' #\\d+')
 		);
@@ -30,7 +30,7 @@ test('Create and delete a project', async ({ page }) => {
 
 	await test.step('Verify that new project is visible in projects page', async () => {
 		// Go back to projects list
-		await page.goto('/projects');
+		await page.goto('/v1/projects');
 		await waitPageLoading(page);
 		await expect(page.getByRole('cell', { name: randomProjectName })).toHaveCount(1);
 

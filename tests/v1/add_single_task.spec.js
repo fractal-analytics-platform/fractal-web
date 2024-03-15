@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading, waitStopSpinnerIn } from './utils.js';
+import { waitPageLoading, waitStopSpinnerIn } from '../utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 test('Add single tasks', async ({ page }) => {
-	await page.goto('/tasks');
+	await page.goto('/v1/tasks');
 	await waitPageLoading(page);
 
 	await test.step('Select "Add a single task" form', async () => {
@@ -61,7 +61,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload args schema').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		await createBtn.click();
 		await page.getByText("File doesn't contain valid JSON").waitFor();
 		await page.getByRole('button', { name: 'Clear' }).click();
@@ -71,7 +71,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload args schema').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'invalid-schema.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'invalid-schema.json'));
 		await createBtn.click();
 		await page
 			.getByText('File doesn\'t contain valid JSON Schema: strict mode: unknown keyword: "foo"')
@@ -83,7 +83,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload args schema').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'create-ome-zarr-schema.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'create-ome-zarr-schema.json'));
 		await createBtn.click();
 		await page.getByText('Task created successfully').waitFor();
 
@@ -111,7 +111,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload a meta file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		await createBtn.click();
 		await page.getByText("File doesn't contain valid JSON").waitFor();
 		await page.getByRole('button', { name: 'Clear' }).click();
@@ -121,7 +121,7 @@ test('Add single tasks', async ({ page }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload a meta file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'meta.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'meta.json'));
 
 		await createBtn.click();
 		await page.getByText('Task created successfully').waitFor();

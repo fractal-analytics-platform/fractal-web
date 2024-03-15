@@ -1,4 +1,4 @@
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Add SLURM accounts for the admin and execute workflow using a specific account', async ({
@@ -66,7 +66,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	});
 
 	await test.step('Check SLURM account in workflow info modal', async () => {
-		await page.waitForURL(`/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
+		await page.waitForURL(`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
 		await page.locator('table tbody').waitFor();
 		await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).click();
 		const modalTitle = page.locator('.modal.show .modal-title');

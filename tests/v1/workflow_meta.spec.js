@@ -1,4 +1,4 @@
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Workflow task meta', async ({ page, workflow }) => {

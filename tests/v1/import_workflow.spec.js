@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 import { expect, test } from './project_fixture.js';
 import path from 'path';
 
@@ -25,7 +25,7 @@ test('Import workflow', async ({ page, project }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Import workflow from file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		importWorkflowBtn = page.getByRole('button', { name: 'Import workflow' });
 		await importWorkflowBtn.waitFor();
 		await expect(page.getByRole('button', { name: 'Create empty workflow' })).toHaveCount(0);
@@ -37,7 +37,7 @@ test('Import workflow', async ({ page, project }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Import workflow from file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'workflow_to_import.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'workflow_to_import.json'));
 		await importWorkflowBtn.click();
 		await page.getByText(/Found 0 tasks with source='pip_remote:fractal_tasks_core/).waitFor();
 	});
@@ -60,7 +60,7 @@ test('Import workflow', async ({ page, project }) => {
 			)
 		});
 		await importWorkflowBtn.click();
-		await page.waitForURL(/\/projects\/\d+\/workflows\/\d+/);
+		await page.waitForURL(/\/v1\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
 		expect(await page.locator('.breadcrumb-item.active').innerText()).toEqual(randomWorkflowName1);
 	});
@@ -97,7 +97,7 @@ test('Import workflow', async ({ page, project }) => {
 			)
 		});
 		await importWorkflowBtn.click();
-		await page.waitForURL(/\/projects\/\d+\/workflows\/\d+/);
+		await page.waitForURL(/\/v1\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
 		expect(await page.locator('.breadcrumb-item.active').innerText()).toEqual(randomWorkflowName2);
 	});

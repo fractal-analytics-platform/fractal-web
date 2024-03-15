@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 
 test('Collect core tasks', async ({ page }) => {
-	await page.goto('/tasks');
+	await page.goto('/v1/tasks');
 	await waitPageLoading(page);
 
 	if ((await page.getByRole('table').last().locator('tbody tr').count()) > 0) {

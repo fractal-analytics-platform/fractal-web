@@ -1,5 +1,5 @@
 import { test as setup } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 setup('Create fake task', async ({ page }) => {
-	await page.goto('/tasks');
+	await page.goto('/v1/tasks');
 	await waitPageLoading(page);
 
 	const fakeTasks = await page.getByText('Fake Task').all();
@@ -18,7 +18,7 @@ setup('Create fake task', async ({ page }) => {
 
 	await page.getByText('Single task').click();
 
-	const command = path.join(__dirname, 'data', 'fake-task.sh');
+	const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
 
 	await page.getByRole('textbox', { name: 'Task name' }).fill('Fake Task');
 	await page.getByRole('textbox', { name: 'Command' }).fill(command);

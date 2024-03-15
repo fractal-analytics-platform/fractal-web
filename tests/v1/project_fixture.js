@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 
 export class PageWithProject {
 	/**
@@ -11,7 +11,7 @@ export class PageWithProject {
 	}
 
 	async createProject() {
-		await this.page.goto('/projects');
+		await this.page.goto('/v1/projects');
 		await waitPageLoading(this.page);
 
 		await this.page.getByRole('button', { name: 'Create new project' }).click();
@@ -30,16 +30,16 @@ export class PageWithProject {
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page
-		await this.page.waitForURL(/\/projects\/\d+/);
+		await this.page.waitForURL(/\/v1\/projects\/\d+/);
 		this.url = this.page.url();
-		const match = this.url.match(/\/projects\/(\d+)/);
+		const match = this.url.match(/\/v1\/projects\/(\d+)/);
 		if (match) {
 			this.projectId = match[1];
 		}
 	}
 
 	async deleteProject() {
-		await this.page.goto('/projects');
+		await this.page.goto('/v1/projects');
 		await waitPageLoading(this.page);
 		const rows = await this.page.getByRole('row').all();
 		for (const row of rows) {

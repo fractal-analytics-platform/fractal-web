@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
 
@@ -200,6 +200,6 @@ async function runWorkflow(page, inputDataset, outputDataset) {
 		await runBtn.click();
 		const confirmBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
 		await confirmBtn.click();
-		await page.waitForURL(new RegExp(`/projects/(\\d+)/workflows/(\\d+)/jobs`));
+		await page.waitForURL(new RegExp(`/v1/projects/(\\d+)/workflows/(\\d+)/jobs`));
 	});
 }

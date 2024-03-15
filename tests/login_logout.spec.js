@@ -82,5 +82,5 @@ async function login(page) {
 	await page.getByLabel('Email address').fill('admin@fractal.xy');
 	await page.getByLabel('Password').fill('1234');
 	await page.getByRole('button', { name: 'Submit' }).click();
-	await page.waitForURL('/projects');
+	await page.waitForURL('/v2/projects');
 }

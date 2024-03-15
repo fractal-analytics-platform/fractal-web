@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from './utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -13,7 +13,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	await waitPageLoading(page);
 
 	await test.step('Go to "Add a single task" form', async () => {
-		await page.goto('/tasks');
+		await page.goto('/v1/tasks');
 		await waitPageLoading(page);
 		await page.getByText('Single task').click();
 	});
@@ -29,7 +29,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload args schema').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'test-schema.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'test-schema.json'));
 		const createBtn = page.getByRole('button', { name: /^Create$/ });
 		await createBtn.click();
 		expect(await page.getByText('field required').count()).toEqual(0);
@@ -267,7 +267,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select arguments file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await page.getByText("File doesn't contain valid JSON").waitFor();
 		await page.getByRole('button', { name: 'Close' }).click();
@@ -347,7 +347,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	});
 
 	await test.step('Delete task', async () => {
-		await page.goto('/tasks');
+		await page.goto('/v1/tasks');
 		await waitPageLoading(page);
 		const taskRow = /** @type {import('@playwright/test').Locator} */ (
 			await getTaskRow(page, randomTaskName)
