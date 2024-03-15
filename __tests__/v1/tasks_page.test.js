@@ -35,7 +35,7 @@ vi.mock('$app/stores', () => {
 	};
 });
 
-import page from '../src/routes/tasks/+page.svelte';
+import page from '../../src/routes/v1/tasks/+page.svelte';
 
 describe('Tasks page', () => {
 	it('display the task table', async () => {

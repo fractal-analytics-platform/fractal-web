@@ -17,7 +17,7 @@ vi.mock('$env/dynamic/public', () => {
 });
 
 // The component to be tested must be imported after the mock setup
-import TaskCollection from '../src/lib/components/tasks/TaskCollection.svelte';
+import TaskCollection from '../../src/lib/components/v1/tasks/TaskCollection.svelte';
 
 describe('TaskCollection', () => {
 	it('collect tasks with pinned package versions', async () => {

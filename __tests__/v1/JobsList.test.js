@@ -3,7 +3,7 @@ import { fireEvent, render } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { within, waitFor } from '@testing-library/dom'
 import { readable } from 'svelte/store';
-import { data } from './mock/jobs-list';
+import { data } from '../mock/jobs-list';
 
 // Mocking the page store
 vi.mock('$app/stores', () => {
@@ -28,7 +28,7 @@ global.window.location = {
 };
 
 // The component to be tested must be imported after the mock setup
-import JobsList from '../src/lib/components/jobs/JobsList.svelte';
+import JobsList from '../../src/lib/components/v1/jobs/JobsList.svelte';
 
 describe('JobsList', () => {
 	it('display, filter and sort jobs', async () => {

@@ -19,7 +19,7 @@ global.window.bootstrap = {
 // Mocking fetch
 global.fetch = vi.fn();
 
-import JobLogsModal from '../src/lib/components/jobs/JobLogsModal.svelte';
+import JobLogsModal from '../../src/lib/components/v1/jobs/JobLogsModal.svelte';
 
 describe('JobLogsModal', async () => {
 	it('display error log fully highlighted', async () => {
