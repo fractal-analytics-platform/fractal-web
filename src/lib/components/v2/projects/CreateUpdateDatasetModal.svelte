@@ -293,7 +293,7 @@
 						placeholder="Value"
 						bind:value={filter.value}
 					/>
-					<select class="form-control" bind:value={filter.type} class:is-invalid={filter.error}>
+					<select class="form-control" bind:value={filter.type} class:is-invalid={filter.error} aria-label="Type">
 						<option value="string">String</option>
 						<option value="number">Number</option>
 						<option value="boolean">Boolean</option>
