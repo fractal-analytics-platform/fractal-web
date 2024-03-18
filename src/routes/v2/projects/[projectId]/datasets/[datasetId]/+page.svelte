@@ -99,7 +99,7 @@
 				<table class="table table-bordered caption-top align-middle">
 					<thead class="bg-light">
 						<tr>
-							<th class="col-1">Key</th>
+							<th class="col-4">Key</th>
 							<th class="col">Value</th>
 						</tr>
 					</thead>
