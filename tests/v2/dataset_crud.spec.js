@@ -77,6 +77,21 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		expect(await datasetTable.getByRole('row').count()).toEqual(1);
 	});
 
+	await test.step('Open dataset page', async () => {
+		await datasetRow.getByRole('link', { name: 'Open' }).click();
+		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
+		const properties = page.locator('.list-group');
+		await expect(properties.getByText('test-dataset-renamed')).toBeVisible();
+		await expect(properties.getByText('/tmp-renamed')).toBeVisible();
+		const filters = page.getByRole('table');
+		await expect(filters.getByText('key1-renamed')).toBeVisible();
+		await expect(filters.getByText('value1-renamed')).toBeVisible();
+	});
+
+	await test.step('Go back to datasets page', async () => {
+		await page.goBack();
+	});
+
 	await test.step('Delete dataset', async () => {
 		// Open delete dataset modal
 		await datasetRow.getByRole('button', { name: 'Delete' }).click();
