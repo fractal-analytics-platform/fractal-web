@@ -50,6 +50,10 @@
 	</nav>
 	<div>
 		{#if dataset}
+			<a href="/v2/projects/{projectId}/datasets/{dataset.id}/images" class="btn btn-light">
+				<i class="bi-arrow-up-right-square" />
+				Images
+			</a>
 			<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
 				<i class="bi-arrow-up-right-square" />
 				Show dataset history

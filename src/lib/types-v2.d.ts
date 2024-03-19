@@ -13,3 +13,14 @@ export type DatasetV2 = {
   }
   timestamp_created: string
 }
+
+export type ImagePage = {
+  total_count: number
+  page_size: number
+  current_page: number
+  attributes: Array<string>
+  images: Array<{
+    path: string
+    attributes: { [key: string]: string }
+  }>
+}
