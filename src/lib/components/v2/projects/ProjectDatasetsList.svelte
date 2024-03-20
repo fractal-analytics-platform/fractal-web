@@ -1,7 +1,7 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError } from '$lib/common/errors';
-	import CreateUpdateDatasetModal from './CreateUpdateDatasetModal.svelte';
+	import CreateUpdateDatasetModal from './datasets/CreateUpdateDatasetModal.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2[]} */

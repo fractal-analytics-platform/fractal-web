@@ -1,8 +1,8 @@
 <script>
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
-	import { tick } from 'svelte';
-	import Modal from '../../common/Modal.svelte';
+	import Modal from '../../../common/Modal.svelte';
+	import FiltersCreationForm from './FiltersCreationForm.svelte';
 
 	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
 	export let createDatasetCallback;
@@ -17,35 +17,19 @@
 	let datasetName = '';
 	let zarrDir = '';
 	let readonly = false;
-	/** @type {Array<{ key: string, value: string, type: string, error: string}>} */
-	let filters = [];
 	let submitted = false;
 	let saving = false;
 	let creatingDataset = false;
 
-	async function addFilter() {
-		const filter = { key: '', value: '', type: 'string', error: '' };
-		filters = [...filters, filter];
-		// Set focus to last filter key input
-		await tick();
-		const allKeyInputs = document.querySelectorAll('.filter-key');
-		const lastKeyInput = /**@type {HTMLInputElement}*/ (allKeyInputs[allKeyInputs.length - 1]);
-		lastKeyInput.focus();
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function removeFilter(index) {
-		filters = filters.filter((_, i) => i !== index);
-	}
+	/** @type {FiltersCreationForm} */
+	let filtersCreationForm;
 
 	export function openForCreate() {
 		datasetId = null;
 		datasetName = '';
 		zarrDir = '';
 		readonly = false;
-		filters = [];
+		filtersCreationForm.init({}, {});
 		submitted = false;
 		creatingDataset = false;
 		modal.show();
@@ -56,19 +40,14 @@
 		datasetName = dataset.name;
 		zarrDir = dataset.zarr_dir;
 		readonly = dataset.read_only;
-		filters = Object.entries(dataset.filters).map(([k, v]) => {
-			return { key: k, value: v.toString(), type: typeof v, error: '' };
-		});
+		filtersCreationForm.init(dataset.attribute_filters, dataset.flag_filters);
 		submitted = false;
 		creatingDataset = false;
 		modal.show();
 	}
 
 	async function handleSave() {
-		// reset filters errors
-		filters = filters.map((f) => {
-			return { ...f, error: '' };
-		});
+		filtersCreationForm.resetErrors();
 
 		submitted = true;
 		modal.hideErrorAlert();
@@ -115,7 +94,8 @@
 				name: datasetName,
 				read_only: readonly,
 				zarr_dir: zarrDir,
-				filters: getDatasetFilters()
+				attribute_filters: filtersCreationForm.getAttributes(),
+				flag_filters: filtersCreationForm.getFlags()
 			})
 		});
 		const result = await response.json();
@@ -141,7 +121,8 @@
 				name: datasetName,
 				read_only: readonly,
 				zarr_dir: zarrDir,
-				filters: getDatasetFilters()
+				attribute_filters: filtersCreationForm.getAttributes(),
+				flag_filters: filtersCreationForm.getFlags()
 			})
 		});
 		const result = await response.json();
@@ -152,65 +133,8 @@
 		return result;
 	}
 
-	function getDatasetFilters() {
-		return Object.fromEntries(
-			filters.map((f) => {
-				return [f.key, getTypedValue(f)];
-			})
-		);
-	}
-
-	/**
-	 * @param {{ value: string, type: string }} filter
-	 * @returns {string | number | boolean}
-	 */
-	function getTypedValue(filter) {
-		switch (filter.type) {
-			case 'string':
-				return filter.value;
-			case 'number':
-				return parseFloat(filter.value);
-			case 'boolean':
-				return filter.value === 'true';
-			default:
-				throw new Error(`Unsupported type: ${filter.type}`);
-		}
-	}
-
 	function fieldsAreValid() {
-		let validFilters = true;
-		const keys = [];
-		for (const filter of filters) {
-			if (!filter.key) {
-				filter.error = 'Key is required';
-				validFilters = false;
-				continue;
-			}
-			if (!filter.value) {
-				filter.error = 'Value is required';
-				validFilters = false;
-				continue;
-			}
-			if (filter.type === 'boolean' && filter.value !== 'true' && filter.value !== 'false') {
-				filter.error = 'Invalid boolean value: use "true" or "false"';
-				validFilters = false;
-				continue;
-			}
-			if (filter.type === 'number' && !filter.value.match(/^\d+\.*\d*$/)) {
-				filter.error = 'Invalid number';
-				validFilters = false;
-				continue;
-			}
-			if (keys.includes(filter.key)) {
-				filter.error = 'Duplicated key';
-				validFilters = false;
-				continue;
-			} else {
-				keys.push(filter.key);
-			}
-		}
-		// Trigger filters update
-		filters = filters;
+		const validFilters = filtersCreationForm.validateFields();
 		return validFilters && !!datasetName.trim() && !!zarrDir.trim();
 	}
 </script>
@@ -274,50 +198,7 @@
 					</div>
 				</div>
 			</div>
-			{#if filters.length > 0}
-				<h5>Filters</h5>
-			{/if}
-			{#each filters as filter, index}
-				<div class="input-group mb-3" class:has-validation={filter.error}>
-					<input
-						type="text"
-						class="form-control filter-key"
-						placeholder="Key"
-						bind:value={filter.key}
-						class:is-invalid={filter.error}
-					/>
-					<input
-						type="text"
-						class="form-control"
-						class:is-invalid={filter.error}
-						placeholder="Value"
-						bind:value={filter.value}
-					/>
-					<select class="form-control" bind:value={filter.type} class:is-invalid={filter.error} aria-label="Type">
-						<option value="string">String</option>
-						<option value="number">Number</option>
-						<option value="boolean">Boolean</option>
-					</select>
-					<button
-						class="btn btn-outline-danger"
-						type="button"
-						on:click={() => removeFilter(index)}
-						aria-label="Remove filter"
-					>
-						<i class="bi bi-trash" />
-					</button>
-					{#if filter.error}
-						<div class="invalid-feedback">{filter.error}</div>
-					{/if}
-				</div>
-			{/each}
-			<div class="row mb-3">
-				<div class="col-12">
-					<button class="btn btn-outline-primary" type="button" on:click={addFilter}>
-						Add filter
-					</button>
-				</div>
-			</div>
+			<FiltersCreationForm bind:this={filtersCreationForm} />
 		</form>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
