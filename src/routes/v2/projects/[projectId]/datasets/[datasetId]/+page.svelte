@@ -24,6 +24,7 @@
 	let flagFilters = getFlagFilterBaseValues(imagePage);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
+	let useDatasetFilters = false;
 
 	/** @param {import('$lib/types-v2').ImagePage} imagePage */
 	function getAttributeFilterBaseValues(imagePage) {
@@ -50,6 +51,9 @@
 	 * @returns {string}
 	 */
 	function getRelativePath(imagePath) {
+		if (!imagePath.startsWith(dataset.zarr_dir)) {
+			return imagePath;
+		}
 		const relativePath = imagePath.substring(dataset.zarr_dir.length);
 		if (relativePath.startsWith('/')) {
 			return relativePath.substring(1);
@@ -102,7 +106,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/project/${projectId}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
+			`/api/v2/project/${projectId}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}&use_dataset_filters=${useDatasetFilters}`,
 			{
 				method: 'POST',
 				headers,
@@ -114,7 +118,8 @@
 		const result = await response.json();
 		if (response.ok) {
 			imagePage = result;
-			getAttributeFilterBaseValues(imagePage);
+			attributeFilters = getAttributeFilterBaseValues(imagePage);
+			flagFilters = getFlagFilterBaseValues(imagePage);
 		} else {
 			errorAlert = displayStandardErrorAlert(result, 'searchError');
 		}
@@ -307,46 +312,72 @@
 		</div>
 	</div>
 
-	{#if imagePage.images.length > 0}
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Path</th>
-					{#each Object.keys(imagePage.attributes) as attributeKey}
-						<th>{attributeKey}</th>
-					{/each}
-					{#each imagePage.flags as flagKey}
-						<th>{flagKey}</th>
-					{/each}
-					<th>Options</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each imagePage.images as image}
+	<div class="table-responsive">
+		{#if imagePage.images.length > 0}
+			<table class="table" id="dataset-images-table">
+				<thead>
 					<tr>
-						<td>{getRelativePath(image.path)}</td>
-						{#each Object.keys(imagePage.attributes) as attribute}
-							<td>{image.attributes[attribute] || ''}</td>
+						<th>Path</th>
+						{#each Object.keys(imagePage.attributes) as attributeKey}
+							<th>{attributeKey}</th>
 						{/each}
 						{#each imagePage.flags as flagKey}
-							<td><BooleanIcon value={image.flags[flagKey]} /></td>
+							<th>{flagKey}</th>
 						{/each}
-						<td class="col-2">
-							<ConfirmActionButton
-								modalId={'deleteConfirmImageModal-' + getIdFromPath(image.path)}
-								style={'danger'}
-								btnStyle="danger"
-								buttonIcon="trash"
-								label={'Delete'}
-								message="Delete image {image.path}"
-								callbackAction={() => handleDeleteImage(image.path)}
-							/>
-						</td>
+						<th>Options</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{/if}
+				</thead>
+				<tbody>
+					{#each imagePage.images as image}
+						<tr>
+							<td>{getRelativePath(image.path)}</td>
+							{#each Object.keys(imagePage.attributes) as attribute}
+								<td>{image.attributes[attribute] || ''}</td>
+							{/each}
+							{#each imagePage.flags as flagKey}
+								<td><BooleanIcon value={image.flags[flagKey]} /></td>
+							{/each}
+							<td class="col-2">
+								<ConfirmActionButton
+									modalId={'deleteConfirmImageModal-' + getIdFromPath(image.path)}
+									style={'danger'}
+									btnStyle="danger"
+									buttonIcon="trash"
+									label={'Delete'}
+									message="Delete image {image.path}"
+									callbackAction={() => handleDeleteImage(image.path)}
+								/>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</div>
+	<div class="sticky-bottom pb-2" id="dataset-filters-wrapper">
+		<input
+			type="radio"
+			class="btn-check"
+			name="filters-switch"
+			id="all-images"
+			autocomplete="off"
+			value={false}
+			bind:group={useDatasetFilters}
+			on:change={() => searchImages()}
+		/>
+		<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
+		<input
+			type="radio"
+			class="btn-check"
+			name="filters-switch"
+			id="dataset-filters"
+			autocomplete="off"
+			value={true}
+			bind:group={useDatasetFilters}
+			on:change={() => searchImages()}
+		/>
+		<label class="btn btn-white btn-outline-primary" for="dataset-filters">Dataset filters</label>
+	</div>
 	<Paginator
 		currentPage={imagePage.current_page}
 		pageSize={imagePage.page_size}
@@ -359,3 +390,19 @@
 <DatasetFiltersModal {dataset} />
 <DatasetHistoryModal {dataset} />
 <AddImageModal {dataset} onImageSave={searchImages} />
+
+<style>
+	#dataset-images-table td:first-child,
+	#dataset-images-table td:last-child {
+		white-space: nowrap;
+	}
+
+	#dataset-filters-wrapper {
+		display: inline-block;
+	}
+
+	.btn-check:not(:checked) + .btn-white {
+		color: #0d6efd;
+		background-color: #fff;
+	}
+</style>
