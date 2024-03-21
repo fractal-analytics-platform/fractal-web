@@ -89,15 +89,17 @@
 								<tr>
 									<th>Name</th>
 									<th>Readonly</th>
-									<th># Filters</th>
+									<th># Attribute Filters</th>
+									<th># Flag Filters</th>
 								</tr>
 							</thead>
 							<tbody>
-								{#each datasets as { name, read_only, filters }}
+								{#each datasets as { name, read_only, attribute_filters, flag_filters }}
 									<tr>
 										<td>{name}</td>
 										<td>{read_only ? 'Yes' : 'No'}</td>
-										<td>{Object.entries(filters).length}</td>
+										<td>{Object.entries(attribute_filters).length}</td>
+										<td>{Object.entries(flag_filters).length}</td>
 									</tr>
 								{/each}
 							</tbody>
