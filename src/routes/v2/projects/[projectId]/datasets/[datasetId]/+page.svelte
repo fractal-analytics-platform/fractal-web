@@ -18,7 +18,7 @@
 	let searching = false;
 
 	let pathFilter = '';
-	/** @type {{ [key: string]: {value: string, type: string, error: string }}} */
+	/** @type {{ [key: string]: null | string | number}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let flagFilters = getFlagFilterBaseValues(imagePage);
@@ -28,22 +28,37 @@
 
 	/** @param {import('$lib/types-v2').ImagePage} imagePage */
 	function getAttributeFilterBaseValues(imagePage) {
-		/** @type {{ [key: string] : {value: string, type: string, error: string }}} */
-		let baseFilters = {};
-		for (const attributeKey of Object.keys(imagePage.attributes)) {
-			baseFilters[attributeKey] = { value: '', type: 'string', error: '' };
-		}
-		return baseFilters;
+		return Object.fromEntries(Object.keys(imagePage.attributes).map((k) => [k, null]));
 	}
 
 	/** @param {import('$lib/types-v2').ImagePage} imagePage */
 	function getFlagFilterBaseValues(imagePage) {
-		/** @type {{ [key: string]: null | boolean }} */
-		let baseFilters = {};
-		for (const flagKey of imagePage.flags) {
-			baseFilters[flagKey] = null;
-		}
-		return baseFilters;
+		return Object.fromEntries(imagePage.flags.map((k) => [k, null]));
+	}
+
+	/**
+	 * Reload the attribute filters according to the received imagePage
+	 * preserving the values selected by the user
+	 * @param {import('$lib/types-v2').ImagePage} imagePage
+	 */
+	function reloadAttributeFilters(imagePage) {
+		attributeFilters = Object.fromEntries(
+			Object.keys(imagePage.attributes).map((k) => [
+				k,
+				k in attributeFilters ? attributeFilters[k] : null
+			])
+		);
+	}
+
+	/**
+	 * Reload the flag filters according to the received imagePage
+	 * preserving the values selected by the user
+	 * @param {import('$lib/types-v2').ImagePage} imagePage
+	 */
+	function reloadFlagFilters(imagePage) {
+		flagFilters = Object.fromEntries(
+			imagePage.flags.map((k) => [k, k in flagFilters ? flagFilters[k] : null])
+		);
 	}
 
 	/**
@@ -72,12 +87,7 @@
 		if (pageSize === null) {
 			pageSize = imagePage.page_size;
 		}
-		resetAttributeFiltersErrors();
 		errorAlert?.hide();
-		const valid = validateAttributeFilters();
-		if (!valid) {
-			return;
-		}
 		searching = true;
 		const params = {};
 		if (pathFilter) {
@@ -86,8 +96,8 @@
 		let attributes = {};
 		for (const attributeKey of Object.keys(imagePage.attributes)) {
 			const filter = attributeFilters[attributeKey];
-			if (filter.value) {
-				attributes[attributeKey] = getTypedValue(filter);
+			if (filter) {
+				attributes[attributeKey] = filter;
 			}
 		}
 		if (Object.entries(attributes).length > 0) {
@@ -118,49 +128,16 @@
 		const result = await response.json();
 		if (response.ok) {
 			imagePage = result;
-			attributeFilters = getAttributeFilterBaseValues(imagePage);
-			flagFilters = getFlagFilterBaseValues(imagePage);
+			reloadAttributeFilters(imagePage);
+			reloadFlagFilters(imagePage);
+			// Go to first page if the search returns no values and we are not in the first page
+			// This happens when we are in a given page and we restrict the search setting more filters
+			if (imagePage.images.length === 0 && imagePage.current_page > 1) {
+				imagePage.current_page = 1;
+				await searchImages();
+			}
 		} else {
 			errorAlert = displayStandardErrorAlert(result, 'searchError');
-		}
-	}
-
-	function resetAttributeFiltersErrors() {
-		for (const attributeKey of Object.keys(imagePage.attributes)) {
-			const filter = attributeFilters[attributeKey];
-			filter.error = '';
-		}
-		// trigger attributeFilters update
-		attributeFilters = attributeFilters;
-	}
-
-	function validateAttributeFilters() {
-		let validFilters = true;
-		for (const attributeKey of Object.keys(imagePage.attributes)) {
-			const filter = attributeFilters[attributeKey];
-			if (filter.value) {
-				if (filter.type === 'number' && !filter.value.match(/^\d+\.*\d*$/)) {
-					filter.error = 'Invalid number';
-					validFilters = false;
-					continue;
-				}
-			}
-		}
-		return validFilters;
-	}
-
-	/**
-	 * @param {{ value: string, type: string }} filter
-	 * @returns {string | number}
-	 */
-	function getTypedValue(filter) {
-		switch (filter.type) {
-			case 'string':
-				return filter.value;
-			case 'number':
-				return parseFloat(filter.value);
-			default:
-				throw new Error(`Unsupported type: ${filter.type}`);
 		}
 	}
 
@@ -255,26 +232,18 @@
 	<div class="row row-cols-lg-auto">
 		{#each Object.keys(imagePage.attributes) as attributeKey}
 			<div class="col-12 mt-3">
-				<div class="input-group" class:has-validation={attributeFilters[attributeKey].error}>
+				<div class="input-group">
 					<span class="input-group-text">{attributeKey}</span>
-					<input
-						type="text"
-						class="form-control"
-						bind:value={attributeFilters[attributeKey].value}
-						aria-label="Value for {attributeKey}"
-						class:is-invalid={attributeFilters[attributeKey].error}
-					/>
 					<select
 						class="form-control"
-						bind:value={attributeFilters[attributeKey].type}
-						aria-label="Type for {attributeKey}"
+						bind:value={attributeFilters[attributeKey]}
+						aria-label="Value for {attributeKey}"
 					>
-						<option value="string">String</option>
-						<option value="number">Number</option>
+						<option value={null}>Select...</option>
+						{#each imagePage.attributes[attributeKey] as value}
+							<option {value}>{value}</option>
+						{/each}
 					</select>
-					{#if attributeFilters[attributeKey].error}
-						<div class="invalid-feedback">{attributeFilters[attributeKey].error}</div>
-					{/if}
 				</div>
 			</div>
 		{/each}
