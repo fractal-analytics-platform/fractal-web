@@ -8,8 +8,10 @@ export type DatasetV2 = {
   history: Array<DatasetHistoryItem> | null
   read_only: boolean
   zarr_dir: string
-  attribute_filters: { [key: string]: string | number }
-  flag_filters: { [key: string]: boolean }
+  filters: {
+    attributes: { [key: string]: string | number },
+    types: { [key: string]: boolean }
+  },
   timestamp_created: string
 }
 
@@ -18,10 +20,10 @@ export type ImagePage = {
   page_size: number
   current_page: number
   attributes: { [key: string]: Array<string | number> }
-  flags: Array<string>
+  types: Array<string>
   images: Array<{
     path: string
     attributes: { [key: string]: string }
-    flags: { [key: string]: boolean }
+    types: { [key: string]: boolean }
   }>
 }

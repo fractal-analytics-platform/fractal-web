@@ -40,7 +40,7 @@
 		datasetName = dataset.name;
 		zarrDir = dataset.zarr_dir;
 		readonly = dataset.read_only;
-		filtersCreationForm.init(dataset.attribute_filters, dataset.flag_filters);
+		filtersCreationForm.init(dataset.filters.attributes, dataset.filters.types);
 		submitted = false;
 		creatingDataset = false;
 		modal.show();
@@ -94,8 +94,10 @@
 				name: datasetName,
 				read_only: readonly,
 				zarr_dir: zarrDir,
-				attribute_filters: filtersCreationForm.getAttributes(),
-				flag_filters: filtersCreationForm.getFlags()
+				filters: {
+					attributes: filtersCreationForm.getAttributes(),
+					types: filtersCreationForm.getFlags()
+				}
 			})
 		});
 		const result = await response.json();
@@ -121,8 +123,10 @@
 				name: datasetName,
 				read_only: readonly,
 				zarr_dir: zarrDir,
-				attribute_filters: filtersCreationForm.getAttributes(),
-				flag_filters: filtersCreationForm.getFlags()
+				filters: {
+					attributes: filtersCreationForm.getAttributes(),
+					types: filtersCreationForm.getFlags()
+				}
 			})
 		});
 		const result = await response.json();

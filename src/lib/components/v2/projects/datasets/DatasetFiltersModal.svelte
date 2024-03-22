@@ -12,7 +12,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<h5>Attribute filters</h5>
-		{#if Object.entries(dataset.attribute_filters).length > 0}
+		{#if Object.entries(dataset.filters.attributes).length > 0}
 			<table class="table table-bordered caption-top align-middle">
 				<thead class="bg-light">
 					<tr>
@@ -21,7 +21,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each Object.entries(dataset.attribute_filters) as [filterKey, filterValue]}
+					{#each Object.entries(dataset.filters.attributes) as [filterKey, filterValue]}
 						<tr>
 							<td>{filterKey}</td>
 							<td class="text-break"><code>{filterValue}</code></td>
@@ -34,7 +34,7 @@
 		{/if}
 
 		<h5 class="mt-4">Flag filters</h5>
-		{#if Object.entries(dataset.flag_filters).length > 0}
+		{#if Object.entries(dataset.filters.types).length > 0}
 			<table class="table table-bordered caption-top align-middle">
 				<thead class="bg-light">
 					<tr>
@@ -43,7 +43,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each Object.entries(dataset.flag_filters) as [filterKey, filterValue]}
+					{#each Object.entries(dataset.filters.types) as [filterKey, filterValue]}
 						<tr>
 							<td>{filterKey}</td>
 							<td>

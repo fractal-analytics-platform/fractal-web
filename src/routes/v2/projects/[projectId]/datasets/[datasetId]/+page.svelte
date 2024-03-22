@@ -33,7 +33,7 @@
 
 	/** @param {import('$lib/types-v2').ImagePage} imagePage */
 	function getFlagFilterBaseValues(imagePage) {
-		return Object.fromEntries(imagePage.flags.map((k) => [k, null]));
+		return Object.fromEntries(imagePage.types.map((k) => [k, null]));
 	}
 
 	/**
@@ -57,7 +57,7 @@
 	 */
 	function reloadFlagFilters(imagePage) {
 		flagFilters = Object.fromEntries(
-			imagePage.flags.map((k) => [k, k in flagFilters ? flagFilters[k] : null])
+			imagePage.types.map((k) => [k, k in flagFilters ? flagFilters[k] : null])
 		);
 	}
 
@@ -89,10 +89,7 @@
 		}
 		errorAlert?.hide();
 		searching = true;
-		const params = {};
-		if (pathFilter) {
-			params['path'] = pathFilter;
-		}
+		const filters = {};
 		let attributes = {};
 		for (const attributeKey of Object.keys(imagePage.attributes)) {
 			const filter = attributeFilters[attributeKey];
@@ -101,17 +98,21 @@
 			}
 		}
 		if (Object.entries(attributes).length > 0) {
-			params['attributes'] = attributes;
+			filters['attributes'] = attributes;
 		}
-		let flags = {};
-		for (const flagKey of imagePage.flags) {
+		let types = {};
+		for (const flagKey of imagePage.types) {
 			const flag = flagFilters[flagKey];
 			if (flag !== null) {
-				flags[flagKey] = flag;
+				types[flagKey] = flag;
 			}
 		}
-		if (Object.entries(flags).length > 0) {
-			params['flags'] = flags;
+		if (Object.entries(types).length > 0) {
+			filters['types'] = types;
+		}
+		const params = { filters };
+		if (pathFilter) {
+			params['path'] = pathFilter;
 		}
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -243,7 +244,7 @@
 				</div>
 			</div>
 		{/each}
-		{#each imagePage.flags as flagKey}
+		{#each imagePage.types as flagKey}
 			<div class="col-12 mt-3">
 				<div class="input-group">
 					<span class="input-group-text">{flagKey}</span>
@@ -286,7 +287,7 @@
 						{#each Object.keys(imagePage.attributes) as attributeKey}
 							<th>{attributeKey}</th>
 						{/each}
-						{#each imagePage.flags as flagKey}
+						{#each imagePage.types as flagKey}
 							<th>{flagKey}</th>
 						{/each}
 						<th>Options</th>
@@ -299,8 +300,8 @@
 							{#each Object.keys(imagePage.attributes) as attribute}
 								<td>{image.attributes[attribute] || ''}</td>
 							{/each}
-							{#each imagePage.flags as flagKey}
-								<td><BooleanIcon value={image.flags[flagKey]} /></td>
+							{#each imagePage.types as flagKey}
+								<td><BooleanIcon value={image.types[flagKey]} /></td>
 							{/each}
 							<td class="col-2">
 								<ConfirmActionButton

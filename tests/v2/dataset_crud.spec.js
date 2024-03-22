@@ -65,7 +65,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Edit dataset', async () => {
 		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-renamed');
 		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp-renamed');
-		await page.getByPlaceholder('Key').fill('key1-renamed');
+		await page.getByPlaceholder('Key').nth(0).fill('key1-renamed');
 		await page.getByPlaceholder('Value').fill('value1-renamed');
 	});
 
@@ -87,12 +87,27 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Open dataset page', async () => {
 		await datasetRow.getByRole('link', { name: 'Open' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
-		const properties = page.locator('.list-group');
-		await expect(properties.getByText('test-dataset-renamed')).toBeVisible();
-		await expect(properties.getByText('/tmp-renamed')).toBeVisible();
-		const filters = page.getByRole('table');
-		await expect(filters.getByText('key1-renamed')).toBeVisible();
-		await expect(filters.getByText('value1-renamed')).toBeVisible();
+	});
+
+	await test.step('Open info modal', async () => {
+		await page.getByRole('button', { name: 'Info' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await expect(modal.getByText('test-dataset-renamed')).toBeVisible();
+		await expect(modal.getByText('/tmp-renamed')).toBeVisible();
+		await modal.getByLabel('Close').click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Open filters modal', async () => {
+		await page.getByRole('button', { name: 'Filters' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await expect(modal.getByText('key1-renamed')).toBeVisible();
+		await expect(modal.getByText('value1-renamed')).toBeVisible();
+		await expect(modal.getByText('key2')).toBeVisible();
+		await modal.getByLabel('Close').click();
+		await waitModalClosed(page);
 	});
 
 	await test.step('Go back to datasets page', async () => {

@@ -75,8 +75,10 @@ describe('CreateUpdateDatasetModal', () => {
 					name: 'my dataset',
 					read_only: false,
 					zarr_dir: '/tmp',
-					attribute_filters: { 'my-key': 'my-value' },
-					flag_filters: {}
+					filters: {
+						attributes: { 'my-key': 'my-value' },
+						types: {}
+					}
 				})
 			})
 		);
@@ -105,8 +107,10 @@ describe('CreateUpdateDatasetModal', () => {
 					name: 'my dataset',
 					read_only: false,
 					zarr_dir: '/tmp',
-					attribute_filters: { 'my-key': 123 },
-					flag_filters: {}
+					filters: {
+						attributes: { 'my-key': 123 },
+						types: {}
+					}
 				})
 			})
 		);
@@ -133,8 +137,10 @@ describe('CreateUpdateDatasetModal', () => {
 					name: 'my dataset',
 					read_only: false,
 					zarr_dir: '/tmp',
-					attribute_filters: {},
-					flag_filters: { 'my-key': false }
+					filters: {
+						attributes: {},
+						types: { 'my-key': false }
+					}
 				})
 			})
 		);
@@ -162,8 +168,10 @@ describe('CreateUpdateDatasetModal', () => {
 					name: 'my dataset',
 					read_only: false,
 					zarr_dir: '/tmp',
-					attribute_filters: {},
-					flag_filters: { 'my-key': true }
+					filters: {
+						attributes: {},
+						types: { 'my-key': true }
+					}
 				})
 			})
 		);
