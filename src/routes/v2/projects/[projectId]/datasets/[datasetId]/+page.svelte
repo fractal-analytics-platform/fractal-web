@@ -210,8 +210,10 @@
 
 <div>
 	<div class="row mt-4 pt-2">
-		<div class="col-3 col-md-2 col-lg-1">Zarr dir</div>
-		<div class="col-5"><code>{dataset.zarr_dir}</code></div>
+		<label class="col-3 col-md-2 col-lg-1 col-form-label" for="path_filter"> Path </label>
+		<div class="col col-md-8 col-lg-6">
+			<input type="text" class="form-control" bind:value={pathFilter} id="path_filter" />
+		</div>
 		<div class="col">
 			<button
 				class="btn btn-outline-secondary float-end"
@@ -221,12 +223,6 @@
 				<i class="bi bi-plus-circle" />
 				Add an image list entry
 			</button>
-		</div>
-	</div>
-	<div class="row mt-3">
-		<label class="col-3 col-md-2 col-lg-1 col-form-label" for="path_filter"> Path </label>
-		<div class="col col-md-8 col-lg-6">
-			<input type="text" class="form-control" bind:value={pathFilter} id="path_filter" />
 		</div>
 	</div>
 	<div class="row row-cols-lg-auto">

@@ -18,11 +18,17 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
 	});
 
-	await test.step('Add filter', async () => {
-		const addFilterBtn = page.getByRole('button', { name: 'Add filter' });
+	await test.step('Add attribute filter', async () => {
+		const addFilterBtn = page.getByRole('button', { name: 'Add attribute filter' });
 		await addFilterBtn.click();
 		await page.getByPlaceholder('Key').fill('key1');
 		await page.getByPlaceholder('Value').fill('value1');
+	});
+
+	await test.step('Add flag filter', async () => {
+		const addFilterBtn = page.getByRole('button', { name: 'Add flag filter' });
+		await addFilterBtn.click();
+		await page.getByPlaceholder('Key').nth(1).fill('key2');
 	});
 
 	await test.step('Save dataset', async () => {
@@ -51,8 +57,9 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 			'test-dataset'
 		);
 		expect(await page.getByRole('textbox', { name: 'Zarr dir' }).inputValue()).toEqual('/tmp');
-		expect(await page.getByPlaceholder('Key').inputValue()).toEqual('key1');
+		expect(await page.getByPlaceholder('Key').nth(0).inputValue()).toEqual('key1');
 		expect(await page.getByPlaceholder('Value').inputValue()).toEqual('value1');
+		expect(await page.getByPlaceholder('Key').nth(1).inputValue()).toEqual('key2');
 	});
 
 	await test.step('Edit dataset', async () => {

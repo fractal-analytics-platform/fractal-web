@@ -70,6 +70,11 @@
 			}
 		}
 		for (const flagField of flagFields) {
+			if (!flagField.key) {
+				flagField.error = 'Key is required';
+				validFilters = false;
+				continue;
+			}
 			if (keys.includes(flagField.key)) {
 				flagField.error = 'Duplicated key';
 				validFilters = false;
@@ -188,12 +193,13 @@
 {#each flagFields as field, index}
 	<div class="row">
 		<div class="col-lg-8">
-			<div class="input-group mb-3">
+			<div class="input-group mb-3" class:has-validation={field.error}>
 				<input
 					type="text"
 					class="form-control flag-filter-key"
 					placeholder="Key"
 					bind:value={field.key}
+					class:is-invalid={field.error}
 				/>
 				<div class="input-group-text">
 					<label>
@@ -214,6 +220,9 @@
 				>
 					<i class="bi bi-trash" />
 				</button>
+				{#if field.error}
+					<div class="invalid-feedback">{field.error}</div>
+				{/if}
 			</div>
 		</div>
 	</div>
