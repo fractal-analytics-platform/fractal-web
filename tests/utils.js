@@ -85,3 +85,28 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 		await expect(selector).toHaveText(optionValue);
 	}
 }
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} email
+ * @param {string} password
+ */
+export async function login(page, email, password) {
+	await page.goto('/auth/login');
+	await waitPageLoading(page);
+	await page.getByLabel('Email address').fill(email);
+	await page.getByLabel('Password').fill(password);
+	await page.getByRole('button', { name: 'Submit' }).click();
+	await page.waitForURL('/v2/projects');
+	await waitPageLoading(page);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} email
+ */
+export async function logout(page, email) {
+	await page.getByRole('button', { name: email }).click();
+	await page.getByRole('link', { name: 'Logout' }).click();
+	await waitPageLoading(page);
+}

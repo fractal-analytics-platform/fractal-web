@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/stores';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import {
@@ -8,6 +7,7 @@
 	} from '$lib/common/job_utilities';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	export let datasets;
@@ -28,8 +28,9 @@
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
 	let setSlurmAccount = true;
-	let slurmAccount =
-		$page.data.userInfo.slurm_accounts.length === 0 ? '' : $page.data.userInfo.slurm_accounts[0];
+	/** @type {string[]} */
+	let slurmAccounts = [];
+	let slurmAccount = '';
 	let workerInitControl = '';
 	/** @type {number|undefined} */
 	let firstTaskIndex = undefined;
@@ -215,6 +216,24 @@
 		const dataset = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
 		newDatasetName = generateNewUniqueDatasetName(datasets, dataset.name);
 	}
+
+	async function loadSlurmAccounts() {
+		const response = await fetch(`/api/auth/current-user/settings`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		const result = await response.json();
+		if (response.ok) {
+			slurmAccounts = result.slurm_accounts;
+			slurmAccount = slurmAccounts.length === 0 ? '' : slurmAccounts[0];
+		} else {
+			console.error('Error while loading current user settings', result);
+		}
+	}
+
+	onMount(async () => {
+		await loadSlurmAccounts();
+	});
 </script>
 
 <Modal id="runWorkflowModal" centered={true} bind:this={modal}>
@@ -364,7 +383,7 @@
 									bind:value={workerInitControl}
 								/>
 							</div>
-							{#if $page.data.userInfo.slurm_accounts.length > 0}
+							{#if slurmAccounts.length > 0}
 								<div class="mb-3">
 									<div class="form-check">
 										<input
@@ -388,7 +407,7 @@
 											disabled={checkingConfiguration}
 											bind:value={slurmAccount}
 										>
-											{#each $page.data.userInfo.slurm_accounts as account}
+											{#each slurmAccounts as account}
 												<option>{account}</option>
 											{/each}
 										</select>

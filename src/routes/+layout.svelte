@@ -196,6 +196,9 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/profile">My profile</a></li>
+							{#if $page.data.runnerBackend !== 'local' && $page.data.runnerBackend !== 'local_experimental'}
+								<li><a class="dropdown-item" href="/settings">My settings</a></li>
+							{/if}
 							<li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
 						</ul>
 					</li>

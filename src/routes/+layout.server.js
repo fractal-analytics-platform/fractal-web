@@ -22,7 +22,8 @@ export async function load({ locals, request, url }) {
 	return {
 		...pageInfo,
 		warningBanner,
-		apiV1Mode: env.FRACTAL_API_V1_MODE
+		apiV1Mode: env.FRACTAL_API_V1_MODE,
+		runnerBackend: env.FRACTAL_RUNNER_BACKEND || 'local'
 	};
 }
 

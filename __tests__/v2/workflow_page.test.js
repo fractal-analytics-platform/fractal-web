@@ -63,6 +63,8 @@ describe('Workflow page', () => {
 									log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
 								}
 							];
+						case '/api/auth/current-user/settings':
+							return { slurm_accounts: [] };
 						default:
 							throw Error(`Unexpected API call: ${url}`);
 					}

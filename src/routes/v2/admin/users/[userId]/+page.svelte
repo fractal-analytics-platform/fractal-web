@@ -5,8 +5,12 @@
 
 	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	const user = $page.data.user;
+	/** @type {import('$lib/types').UserSettings} */
+	const settings = $page.data.settings;
 	/** @type {Array<import('$lib/types').Group>} */
 	const groups = $page.data.groups;
+	/** @type {string} */
+	const runnerBackend = $page.data.runnerBackend;
 
 	$: userGroups = user.group_ids
 		.map((id) => groups.filter((g) => g.id === id)[0])
@@ -61,27 +65,6 @@
 					<td><BooleanIcon value={user.is_verified} /></td>
 				</tr>
 				<tr>
-					<th>SLURM user</th>
-					<td>{user.slurm_user || '-'}</td>
-				</tr>
-				<tr>
-					<th>SLURM accounts</th>
-					<td>
-						{#if user.slurm_accounts.length > 0}
-							{#each user.slurm_accounts as account}
-								<span class="badge text-bg-light fw-normal fs-6">{account}</span>
-								&nbsp;
-							{/each}
-						{:else}
-							-
-						{/if}
-					</td>
-				</tr>
-				<tr>
-					<th>Cache dir</th>
-					<td>{user.cache_dir || '-'}</td>
-				</tr>
-				<tr>
 					<th>Groups</th>
 					<td>
 						{#each userGroups as group}
@@ -89,6 +72,37 @@
 						{/each}
 					</td>
 				</tr>
+				{#if runnerBackend === 'slurm'}
+					<tr>
+						<th>SLURM user</th>
+						<td>{settings.slurm_user || '-'}</td>
+					</tr>
+				{/if}
+				{#if runnerBackend === 'slurm_ssh'}
+					<tr>
+						<th>SSH username</th>
+						<td>{settings.ssh_username || '-'}</td>
+					</tr>
+				{/if}
+				{#if runnerBackend === 'slurm' || runnerBackend === 'slurm_ssh'}
+					<tr>
+						<th>SLURM accounts</th>
+						<td>
+							{#if settings.slurm_accounts.length > 0}
+								{#each settings.slurm_accounts as account}
+									<span class="badge text-bg-light fw-normal fs-6">{account}</span>
+									&nbsp;
+								{/each}
+							{:else}
+								-
+							{/if}
+						</td>
+					</tr>
+					<tr>
+						<th>Cache dir</th>
+						<td>{settings.cache_dir || '-'}</td>
+					</tr>
+				{/if}
 			</tbody>
 		</table>
 	</div>

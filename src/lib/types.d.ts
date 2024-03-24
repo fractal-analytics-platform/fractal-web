@@ -111,10 +111,7 @@ export type User = {
   is_superuser: boolean
   is_verified: boolean
   username: string | null
-  slurm_user: string | null
-  cache_dir: string | null
   password?: string
-  slurm_accounts: string[]
   group_names?: string[]
   group_ids?: number[]
   oauth_accounts: Array<{
@@ -122,6 +119,13 @@ export type User = {
     account_email: string
     oauth_name: string
   }>
+}
+
+export type UserSettings = {
+  slurm_user: string | null
+  ssh_username: string | null
+  cache_dir: string | null
+  slurm_accounts: string[]
 }
 
 export type Group = {

@@ -5,6 +5,9 @@
 	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	let user = $page.data.user;
 
+	/** @type {import('$lib/types').UserSettings} */
+	let settings = $page.data.settings;
+
 	/** @type {Array<import('$lib/types').Group>} */
 	let groups = $page.data.groups;
 
@@ -39,4 +42,4 @@
 	</ol>
 </nav>
 
-<UserEditor {user} {groups} {save} />
+<UserEditor {user} {settings} {groups} {save} runnerBackend={$page.data.runnerBackend} />

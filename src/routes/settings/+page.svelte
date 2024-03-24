@@ -1,0 +1,178 @@
+<script>
+	import { page } from '$app/stores';
+	import {
+		AlertError,
+		displayStandardErrorAlert,
+		getValidationMessagesMap
+	} from '$lib/common/errors';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { onMount } from 'svelte';
+
+	/**
+	 * @type {import('$lib/types').UserSettings}
+	 */
+	const settings = $page.data.settings;
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
+
+	let slurmAccounts = [];
+	let slurmAccountsError = '';
+
+	let cacheDir = '';
+	let cacheDirError = '';
+
+	let cacheDirSet = false;
+
+	let settingsUpdatedMessage = '';
+
+	function addSlurmAccount() {
+		slurmAccounts = [...slurmAccounts, ''];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeSlurmAccount(index) {
+		slurmAccounts = slurmAccounts.filter((_, i) => i !== index);
+	}
+
+	async function save() {
+		if (errorAlert) {
+			errorAlert.hide();
+		}
+		settingsUpdatedMessage = '';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const payload = {
+			slurm_accounts: slurmAccounts
+		};
+		if (cacheDirSet || cacheDir) {
+			payload.cache_dir = cacheDir;
+		}
+		const response = await fetch(`/api/auth/current-user/settings`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(payload)
+		});
+		const result = await response.json();
+		if (response.ok) {
+			initFields(result);
+			settingsUpdatedMessage = 'User settings successfully updated';
+		} else {
+			const errorMap = getValidationMessagesMap(result, response.status);
+			let errorShown = false;
+			if (errorMap) {
+				if ('slurm_accounts' in errorMap) {
+					slurmAccountsError = errorMap['slurm_accounts'];
+					errorShown = true;
+				}
+				if ('cache_dir' in errorMap) {
+					cacheDirError = errorMap['cache_dir'];
+					errorShown = true;
+				}
+			}
+			if (!errorShown) {
+				errorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					'settingsUpdate-error'
+				);
+			}
+		}
+	}
+
+	/**
+	 * @param {import('$lib/types').UserSettings} settings
+	 */
+	function initFields(settings) {
+		slurmAccounts = settings.slurm_accounts;
+		cacheDir = settings.cache_dir || '';
+		cacheDirSet = !!settings.cache_dir;
+	}
+
+	onMount(() => {
+		initFields($page.data.settings);
+	});
+</script>
+
+<h1 class="fw-light mb-4">My settings</h1>
+
+{#if $page.data.runnerBackend !== 'local' && $page.data.runnerBackend !== 'local_experimental'}
+	{#if $page.data.runnerBackend === 'slurm'}
+		<div class="row mb-4">
+			<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
+			<div class="col-lg-6 col-sm-8">
+				{settings.slurm_user || '-'}
+			</div>
+		</div>
+	{/if}
+	{#if $page.data.runnerBackend === 'slurm_ssh'}
+		<div class="row mb-4">
+			<div class="col-lg-2 col-sm-4 fw-bold">SSH username</div>
+			<div class="col-lg-6 col-sm-8">
+				{settings.ssh_username || '-'}
+			</div>
+		</div>
+	{/if}
+	<div class="row mb-3">
+		<div class="col-lg-2 col-sm-4 fw-bold">SLURM accounts</div>
+		<div class="col-lg-6 col-sm-8">
+			<div class="col-sm-9 has-validation">
+				{#each slurmAccounts as slurmAccount, i}
+					<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
+						<input
+							type="text"
+							class="form-control"
+							id={`slurmAccount-${i}`}
+							bind:value={slurmAccount}
+							class:is-invalid={slurmAccountsError}
+							aria-label="SLURM account {i + 1}"
+							required
+						/>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							id="slurm_account_remove_{i}"
+							aria-label="Remove SLURM account"
+							on:click={() => removeSlurmAccount(i)}
+						>
+							<i class="bi bi-trash" />
+						</button>
+					</div>
+				{/each}
+				<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
+				<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
+					<i class="bi bi-plus-circle" />
+					Add SLURM account
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<label class="col-lg-2 col-sm-4 fw-bold" for="cache-dir">Cache dir</label>
+		<div class="col-lg-6 col-sm-8">
+			<div class="input-group" class:has-validation={cacheDirError}>
+				<input
+					type="text"
+					class="form-control"
+					id="cache-dir"
+					bind:value={cacheDir}
+					class:is-invalid={cacheDirError}
+				/>
+				{#if cacheDirError}
+					<div class="invalid-feedback">{cacheDirError}</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col">
+			<div id="settingsUpdate-error" />
+			<StandardDismissableAlert message={settingsUpdatedMessage} />
+			<button class="btn btn-primary" on:click={save}> Save </button>
+		</div>
+	</div>
+{/if}

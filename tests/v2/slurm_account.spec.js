@@ -27,21 +27,8 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 			.getByLabel(/^SLURM account #/)
 			.last()
 			.fill(randomSlurmAccount);
-		await page.getByRole('button', { name: 'Save' }).click();
-		await page.waitForURL('/v2/admin/users');
-		await waitPageLoading(page);
-	});
-
-	/**
-	 * Notice: when a user modifies their own account the userInfo cached in the store has to be reloaded.
-	 * If that doesn't happen the "My Profile" page shows outdated information.
-	 */
-	await test.step('Check My Profile page (verify userInfo cache invalidation)', async () => {
-		await page.getByRole('button', { name: 'admin@fractal.xy' }).click();
-		await page.getByRole('link', { name: 'My profile' }).click();
-		await page.waitForURL('/profile');
-		await waitPageLoading(page);
-		await page.getByText(randomSlurmAccount).waitFor();
+		await page.getByRole('button', { name: 'Save' }).nth(1).click();
+		await expect(page.getByText('Settings successfully updated')).toBeVisible();
 	});
 
 	await test.step('Add task to workflow', async () => {
@@ -63,10 +50,8 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 		const modal = page.locator('.modal.show');
 		await modal.getByRole('button', { name: 'Advanced Options' }).click();
 		await modal.getByRole('combobox', { name: 'SLURM account' }).selectOption(randomSlurmAccount);
-		const runBtn = page.locator('.modal.show').getByRole('button', { name: 'Run' });
-		await runBtn.click();
-		const confirmBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
-		await confirmBtn.click();
+		await modal.getByRole('button', { name: 'Run' }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 	});
 
 	await test.step('Wait task submitted', async () => {

@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
@@ -9,10 +10,7 @@
 		is_superuser: false,
 		is_verified: false,
 		username: '',
-		slurm_user: '',
-		cache_dir: '',
 		password: '',
-		slurm_accounts: [],
 		group_ids: [],
 		oauth_accounts: []
 	};
@@ -87,4 +85,4 @@
 	</div>
 {/if}
 
-<UserEditor {user} groups={[]} {save} />
+<UserEditor {user} {save} runnerBackend={$page.data.runnerBackend} />

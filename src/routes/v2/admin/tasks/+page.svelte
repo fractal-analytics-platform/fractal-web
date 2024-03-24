@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/stores';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { PropertyDescription } from 'fractal-jschema';
@@ -7,7 +6,6 @@
 	let name = '';
 	let kind = '';
 	let id = '';
-	let owner = '';
 	let source = '';
 	let version = '';
 	let max_number_of_results = '25';
@@ -19,9 +17,6 @@
 
 	/** @type {import('$lib/types-v2').TaskV2Info[]} */
 	let results = [];
-
-	/** @type {string[]} */
-	$: users = $page.data.users;
 
 	/** @type {Modal} */
 	let infoModal;
@@ -46,9 +41,6 @@
 			}
 			if (kind) {
 				url.searchParams.append('kind', kind);
-			}
-			if (owner) {
-				url.searchParams.append('owner', owner);
 			}
 			if (source) {
 				url.searchParams.append('source', source);
@@ -82,7 +74,6 @@
 		name = '';
 		kind = '';
 		id = '';
-		owner = '';
 		source = '';
 		version = '';
 		max_number_of_results = '25';
@@ -189,25 +180,6 @@
 		</div>
 
 		<div class="row mt-lg-3">
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="owner">Owner</label>
-						<PropertyDescription
-							description="Only include a task if its <code>owner</code> matches this value."
-							html={true}
-						/>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-control" bind:value={owner} id="owner">
-							<option value="">All</option>
-							{#each users as user}
-								<option>{user}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-			</div>
 			<div class="col-lg-4 pe-5">
 				<div class="row mt-1">
 					<div class="col-xl-4 col-lg-5 col-3 col-form-label">

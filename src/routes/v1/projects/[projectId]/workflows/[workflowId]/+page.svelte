@@ -37,8 +37,9 @@
 	let inputDatasetControl = '';
 	let outputDatasetControl = '';
 	let setSlurmAccount = true;
-	let slurmAccount =
-		$page.data.userInfo.slurm_accounts.length === 0 ? '' : $page.data.userInfo.slurm_accounts[0];
+	/** @type {string[]} */
+	let slurmAccounts = [];
+	let slurmAccount = '';
 	let workerInitControl = '';
 	let firstTaskIndexControl = '';
 	let lastTaskIndexControl = '';
@@ -74,11 +75,26 @@
 
 	$: updatableWorkflowList = workflow?.task_list || [];
 
+	async function loadSlurmAccounts() {
+		const response = await fetch(`/api/auth/current-user/settings`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		const result = await response.json();
+		if (response.ok) {
+			slurmAccounts = result.slurm_accounts;
+			slurmAccount = slurmAccounts.length === 0 ? '' : slurmAccounts[0];
+		} else {
+			console.error('Error while loading current user settings', result);
+		}
+	}
+
 	onMount(async () => {
 		workflow = /** @type {import('$lib/types').Workflow} */ ($page.data.workflow);
 		project = workflow.project;
 		datasets = $page.data.datasets;
-		checkNewVersions();
+		await checkNewVersions();
+		await loadSlurmAccounts();
 	});
 
 	beforeNavigate((navigation) => {
@@ -1019,7 +1035,7 @@
 					bind:value={workerInitControl}
 				/>
 			</div>
-			{#if $page.data.userInfo.slurm_accounts.length > 0}
+			{#if slurmAccounts.length > 0}
 				<div class="mb-3">
 					<div class="form-check">
 						<input
@@ -1041,7 +1057,7 @@
 							disabled={checkingConfiguration}
 							bind:value={slurmAccount}
 						>
-							{#each $page.data.userInfo.slurm_accounts as account}
+							{#each slurmAccounts as account}
 								<option>{account}</option>
 							{/each}
 						</select>

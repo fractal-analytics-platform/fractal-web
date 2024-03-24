@@ -1,19 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
-import { readable } from 'svelte/store';
 
 // Mocking fetch
 global.fetch = vi.fn();
 
-// Mocking the page store
-vi.mock('$app/stores', () => {
-	return {
-		page: readable({
-			data: {
-				userInfo: { slurm_accounts: [] }
-			}
-		})
-	};
+fetch.mockResolvedValue({
+	ok: true,
+	status: 200,
+	json: () => new Promise((resolve) => resolve({ slurm_accounts: [] }))
 });
 
 // Mocking bootstrap.Modal

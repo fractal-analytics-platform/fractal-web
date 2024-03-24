@@ -80,15 +80,6 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
-	await test.step('Search tasks by owner', async () => {
-		await page.getByRole('combobox', { name: 'Owner' }).selectOption('admin');
-		await searchTasks(page);
-		await expect(page.getByRole('table')).toBeVisible();
-		const count = await page.getByRole('row').count();
-		expect(count).toBeLessThan(total);
-		await reset(page);
-	});
-
 	await test.step('Search tasks by source', async () => {
 		await page.getByRole('textbox', { name: 'Source' }).fill('cellpose_segmentation');
 		await searchTasks(page);
