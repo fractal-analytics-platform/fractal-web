@@ -15,8 +15,8 @@
 	let dataset = $page.data.dataset;
 	/** @type {import('$lib/types-v2').ImagePage} */
 	let imagePage = $page.data.imagePage;
+	let showSearchForm = $page.data.imagePage.total_count > 0;
 	let searching = false;
-
 	let pathFilter = '';
 	/** @type {{ [key: string]: null | string | number}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
@@ -126,6 +126,7 @@
 			}
 		);
 		searching = false;
+		showSearchForm = true;
 		const result = await response.json();
 		if (response.ok) {
 			imagePage = result;
@@ -209,148 +210,160 @@
 	</div>
 </div>
 
-<div>
-	<div class="row mt-4 pt-2">
-		<label class="col-3 col-md-2 col-lg-1 col-form-label" for="path_filter"> Path </label>
-		<div class="col col-md-8 col-lg-6">
-			<input type="text" class="form-control" bind:value={pathFilter} id="path_filter" />
-		</div>
-		<div class="col">
-			<button
-				class="btn btn-outline-secondary float-end"
-				data-bs-target="#datasetAddImageModal"
-				data-bs-toggle="modal"
-			>
-				<i class="bi bi-plus-circle" />
-				Add an image list entry
-			</button>
-		</div>
-	</div>
-	<div class="row row-cols-lg-auto">
-		{#each Object.keys(imagePage.attributes) as attributeKey}
-			<div class="col-12 mt-3">
-				<div class="input-group">
-					<span class="input-group-text">{attributeKey}</span>
-					<select
-						class="form-control"
-						bind:value={attributeFilters[attributeKey]}
-						aria-label="Value for {attributeKey}"
-					>
-						<option value={null}>Select...</option>
-						{#each imagePage.attributes[attributeKey] as value}
-							<option {value}>{value}</option>
-						{/each}
-					</select>
-				</div>
+{#if !showSearchForm}
+	<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
+	<button
+		class="btn btn-outline-secondary ms-4"
+		data-bs-target="#datasetAddImageModal"
+		data-bs-toggle="modal"
+	>
+		<i class="bi bi-plus-circle" />
+		Add an image list entry
+	</button>
+{:else}
+	<div>
+		<div class="row mt-4 pt-2">
+			<label class="col-3 col-md-2 col-lg-1 col-form-label" for="path_filter"> Path </label>
+			<div class="col col-md-8 col-lg-6">
+				<input type="text" class="form-control" bind:value={pathFilter} id="path_filter" />
 			</div>
-		{/each}
-		{#each imagePage.types as flagKey}
-			<div class="col-12 mt-3">
-				<div class="input-group">
-					<span class="input-group-text">{flagKey}</span>
-					<select
-						class="form-control"
-						bind:value={flagFilters[flagKey]}
-						aria-label="Value for {flagKey}"
-					>
-						<option value={null}>Select...</option>
-						<option value={true}>True</option>
-						<option value={false}>False</option>
-					</select>
-				</div>
+			<div class="col">
+				<button
+					class="btn btn-outline-secondary float-end"
+					data-bs-target="#datasetAddImageModal"
+					data-bs-toggle="modal"
+				>
+					<i class="bi bi-plus-circle" />
+					Add an image list entry
+				</button>
 			</div>
-		{/each}
-	</div>
-	<div class="row mb-4">
-		<div class="col mt-4">
-			<div id="searchError" class="mb-2" />
-			<button class="btn btn-primary" on:click={() => searchImages()} disabled={searching}>
-				{#if searching}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{:else}
-					<i class="bi bi-search" />
-				{/if}
-				Search images
-			</button>
-			<button class="btn btn-warning" on:click={resetSearchFields} disabled={searching}>
-				Reset
-			</button>
 		</div>
-	</div>
+		<div class="row row-cols-lg-auto">
+			{#each Object.keys(imagePage.attributes) as attributeKey}
+				<div class="col-12 mt-3">
+					<div class="input-group">
+						<span class="input-group-text">{attributeKey}</span>
+						<select
+							class="form-control"
+							bind:value={attributeFilters[attributeKey]}
+							aria-label="Value for {attributeKey}"
+						>
+							<option value={null}>Select...</option>
+							{#each imagePage.attributes[attributeKey] as value}
+								<option {value}>{value}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+			{/each}
+			{#each imagePage.types as flagKey}
+				<div class="col-12 mt-3">
+					<div class="input-group">
+						<span class="input-group-text">{flagKey}</span>
+						<select
+							class="form-control"
+							bind:value={flagFilters[flagKey]}
+							aria-label="Value for {flagKey}"
+						>
+							<option value={null}>Select...</option>
+							<option value={true}>True</option>
+							<option value={false}>False</option>
+						</select>
+					</div>
+				</div>
+			{/each}
+		</div>
+		<div class="row mb-4">
+			<div class="col mt-4">
+				<div id="searchError" class="mb-2" />
+				<button class="btn btn-primary" on:click={() => searchImages()} disabled={searching}>
+					{#if searching}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					{:else}
+						<i class="bi bi-search" />
+					{/if}
+					Search images
+				</button>
+				<button class="btn btn-warning" on:click={resetSearchFields} disabled={searching}>
+					Reset
+				</button>
+			</div>
+		</div>
 
-	<div class="table-responsive">
-		{#if imagePage.images.length > 0}
-			<table class="table" id="dataset-images-table">
-				<thead>
-					<tr>
-						<th>Path</th>
-						{#each Object.keys(imagePage.attributes) as attributeKey}
-							<th>{attributeKey}</th>
-						{/each}
-						{#each imagePage.types as flagKey}
-							<th>{flagKey}</th>
-						{/each}
-						<th>Options</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each imagePage.images as image}
+		<div class="table-responsive">
+			{#if imagePage.images.length > 0}
+				<table class="table" id="dataset-images-table">
+					<thead>
 						<tr>
-							<td>{getRelativePath(image.path)}</td>
-							{#each Object.keys(imagePage.attributes) as attribute}
-								<td>{image.attributes[attribute] || ''}</td>
+							<th>Path</th>
+							{#each Object.keys(imagePage.attributes) as attributeKey}
+								<th>{attributeKey}</th>
 							{/each}
 							{#each imagePage.types as flagKey}
-								<td><BooleanIcon value={image.types[flagKey]} /></td>
+								<th>{flagKey}</th>
 							{/each}
-							<td class="col-2">
-								<ConfirmActionButton
-									modalId={'deleteConfirmImageModal-' + getIdFromPath(image.path)}
-									style={'danger'}
-									btnStyle="danger"
-									buttonIcon="trash"
-									label={'Delete'}
-									message="Delete image {image.path}"
-									callbackAction={() => handleDeleteImage(image.path)}
-								/>
-							</td>
+							<th>Options</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
-		{/if}
-	</div>
-	<div class="sticky-bottom pb-2" id="dataset-filters-wrapper">
-		<input
-			type="radio"
-			class="btn-check"
-			name="filters-switch"
-			id="all-images"
-			autocomplete="off"
-			value={false}
-			bind:group={useDatasetFilters}
-			on:change={() => searchImages()}
+					</thead>
+					<tbody>
+						{#each imagePage.images as image}
+							<tr>
+								<td>{getRelativePath(image.path)}</td>
+								{#each Object.keys(imagePage.attributes) as attribute}
+									<td>{image.attributes[attribute] || ''}</td>
+								{/each}
+								{#each imagePage.types as flagKey}
+									<td><BooleanIcon value={image.types[flagKey]} /></td>
+								{/each}
+								<td class="col-2">
+									<ConfirmActionButton
+										modalId={'deleteConfirmImageModal-' + getIdFromPath(image.path)}
+										style={'danger'}
+										btnStyle="danger"
+										buttonIcon="trash"
+										label={'Delete'}
+										message="Delete image {image.path}"
+										callbackAction={() => handleDeleteImage(image.path)}
+									/>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{/if}
+		</div>
+		<div class="sticky-bottom pb-2" id="dataset-filters-wrapper">
+			<input
+				type="radio"
+				class="btn-check"
+				name="filters-switch"
+				id="all-images"
+				autocomplete="off"
+				value={false}
+				bind:group={useDatasetFilters}
+				on:change={() => searchImages()}
+			/>
+			<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
+			<input
+				type="radio"
+				class="btn-check"
+				name="filters-switch"
+				id="dataset-filters"
+				autocomplete="off"
+				value={true}
+				bind:group={useDatasetFilters}
+				on:change={() => searchImages()}
+			/>
+			<label class="btn btn-white btn-outline-primary" for="dataset-filters">Dataset filters</label>
+		</div>
+		<Paginator
+			currentPage={imagePage.current_page}
+			pageSize={imagePage.page_size}
+			totalCount={imagePage.total_count}
+			onPageChange={searchImages}
 		/>
-		<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
-		<input
-			type="radio"
-			class="btn-check"
-			name="filters-switch"
-			id="dataset-filters"
-			autocomplete="off"
-			value={true}
-			bind:group={useDatasetFilters}
-			on:change={() => searchImages()}
-		/>
-		<label class="btn btn-white btn-outline-primary" for="dataset-filters">Dataset filters</label>
 	</div>
-	<Paginator
-		currentPage={imagePage.current_page}
-		pageSize={imagePage.page_size}
-		totalCount={imagePage.total_count}
-		onPageChange={searchImages}
-	/>
-</div>
+{/if}
 
 <DatasetInfoModal {dataset} />
 <DatasetFiltersModal {dataset} />
