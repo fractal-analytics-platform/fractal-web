@@ -32,7 +32,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Save dataset', async () => {
-		let saveBtn = page.getByRole('button', { name: 'Save' });
+		const saveBtn = page.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
 		await waitModalClosed(page);
 	});
