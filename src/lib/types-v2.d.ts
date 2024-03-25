@@ -27,3 +27,33 @@ export type ImagePage = {
     types: { [key: string]: boolean }
   }>
 }
+
+export type ApplyWorkflowV2 = {
+  id: number
+  project_id: number
+  workflow_id: number
+  dataset_id: number
+  worker_init: string | null
+  start_timestamp: string
+  end_timestamp: string | null
+  status: JobStatus
+  log: string | null
+  project_dump: {
+    id: number
+    name: string
+  },
+  workflow_dump: {
+    id: number
+    name: string
+  }
+  dataset_dump: {
+    id: number
+    name: string
+  }
+  working_dir: string | null
+  working_dir_user: string | null
+  first_task_index: number | null
+  last_task_index: number | null
+  user_email: string
+  slurm_account: string | null
+}

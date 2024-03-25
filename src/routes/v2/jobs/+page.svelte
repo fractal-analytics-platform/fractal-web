@@ -3,7 +3,7 @@
 	import { AlertError } from '$lib/common/errors';
 
 	/**
-	 * @returns {Promise<import('$lib/types').ApplyWorkflow[]>}
+	 * @returns {Promise<import('$lib/types-v2').ApplyWorkflowV2[]>}
 	 */
 	async function jobUpdater() {
 		const response = await fetch(`/api/v2/job?log=false`, {

@@ -11,7 +11,7 @@
 	let modal;
 	/** Show/hide complete stack trace */
 	let showDetails = false;
-	/** @type {import('$lib/types').ApplyWorkflow} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2} */
 	let job;
 	let admin = false;
 	let log = '';
@@ -24,7 +24,7 @@
 	let updateJobTimeout = undefined;
 
 	/**
-	 * @param {import('$lib/types').ApplyWorkflow} selectedJob
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2} selectedJob
 	 * @param {boolean} isAdminPage
 	 */
 	export async function show(selectedJob, isAdminPage) {

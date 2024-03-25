@@ -9,7 +9,7 @@
 	let workflow = $page.data.workflow;
 
 	/**
-	 * @returns {Promise<import('$lib/types').ApplyWorkflow[]>}
+	 * @returns {Promise<import('$lib/types-v2').ApplyWorkflowV2[]>}
 	 */
 	async function jobUpdater() {
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {

@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let job = undefined;
 
 	let errorAlert = undefined;
@@ -12,7 +12,7 @@
 	let modal;
 
 	/**
-	 * @param jobToDisplay {import('$lib/types').ApplyWorkflow}
+	 * @param jobToDisplay {import('$lib/types-v2').ApplyWorkflowV2}
 	 */
 	export async function show(jobToDisplay) {
 		job = jobToDisplay;
@@ -64,10 +64,8 @@
 						<li class="list-group-item">{job.workflow_dump.name}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Project</li>
 						<li class="list-group-item">{job.project_dump.name}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Input dataset</li>
-						<li class="list-group-item">{job.input_dataset_dump.name}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Output dataset</li>
-						<li class="list-group-item">{job.output_dataset_dump.name}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Dataset</li>
+						<li class="list-group-item">{job.dataset_dump.name}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Status</li>
 						{#key job.status}
 							<li class="list-group-item"><StatusBadge status={job.status} /></li>

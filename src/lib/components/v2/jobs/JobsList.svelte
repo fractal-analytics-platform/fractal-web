@@ -13,7 +13,7 @@
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
 	import SlimSelect from 'slim-select';
 
-	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
+	/** @type {() => Promise<import('$lib/types-v2').ApplyWorkflowV2[]>} */
 	export let jobUpdater;
 	/** @type {('project'|'workflow'|'user_email'|'id')[]} */
 	export let columnsToHide = [];
@@ -29,18 +29,16 @@
 	let projects = $page.data.projects;
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $page.data.workflows || [];
-	/** @type {import('$lib/types').ApplyWorkflow[]} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
 	let jobs = $page.data.jobs || [];
 	/** @type {{ id: number, name: string }[]} */
-	let inputDatasets = $page.data.inputDatasets || [];
-	/** @type {{ id: number, name: string }[]} */
-	let outputDatasets = $page.data.outputDatasets || [];
+	let datasets = $page.data.datasets || [];
 
 	/** @type {DataHandler} */
 	let tableHandler = new DataHandler(jobs);
 	tableHandler.sortDesc('id');
 
-	/** @type {import('svelte/store').Readable<import('$lib/types').ApplyWorkflow[]>} */
+	/** @type {import('svelte/store').Readable<import('$lib/types-v2').ApplyWorkflowV2[]>} */
 	let rows = tableHandler.getRows();
 
 	// Selectors
@@ -51,7 +49,7 @@
 	/** @type {SlimSelect|undefined} */
 	let workflowSelect;
 	/** @type {SlimSelect|undefined} */
-	let inputDatasetSelect;
+	let datasetSelect;
 	/** @type {SlimSelect|undefined} */
 	let outputDatasetSelect;
 
@@ -59,21 +57,15 @@
 	let statusFilter = '';
 	let projectFilter = '';
 	let workflowFilter = '';
-	let inputDatasetFilter = '';
-	let outputDatasetFilter = '';
+	let datasetFilter = '';
 
 	// Filters
 	$: tableHandler.filter(statusFilter, 'status', check.isEqualTo);
 	$: tableHandler.filter(projectFilter, (row) => row.project_dump.id.toString(), check.isEqualTo);
 	$: tableHandler.filter(workflowFilter, (row) => row.workflow_dump.id.toString(), check.isEqualTo);
 	$: tableHandler.filter(
-		inputDatasetFilter,
-		(row) => row.input_dataset_dump.id.toString(),
-		check.isEqualTo
-	);
-	$: tableHandler.filter(
-		outputDatasetFilter,
-		(row) => row.output_dataset_dump.id.toString(),
+		datasetFilter,
+		(row) => row.dataset_dump.id.toString(),
 		check.isEqualTo
 	);
 
@@ -83,7 +75,7 @@
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('$lib/types').ApplyWorkflow[]} newJobs
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2[]} newJobs
 	 */
 	export function setJobs(newJobs) {
 		jobs = newJobs;
@@ -92,13 +84,9 @@
 				jobs.filter((j) => j.workflow_dump).map((j) => j.workflow_dump)
 			)
 		);
-		inputDatasets = removeDuplicatedItems(
+		datasets = removeDuplicatedItems(
 			/** @type {{id: number, name: string}[]} */
-			(jobs.filter((j) => j.input_dataset_dump).map((j) => j.input_dataset_dump))
-		);
-		outputDatasets = removeDuplicatedItems(
-			/** @type {{id: number, name: string}[]} */
-			(jobs.filter((j) => j.output_dataset_dump).map((j) => j.output_dataset_dump))
+			(jobs.filter((j) => j.dataset_dump).map((j) => j.dataset_dump))
 		);
 		tableHandler.setRows(jobs);
 	}
@@ -108,7 +96,7 @@
 
 	/**
 	 * Requests the server to stop a job execution
-	 * @param {import('$lib/types').ApplyWorkflow} job
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2} job
 	 * @returns {Promise<void>}
 	 */
 	async function handleJobCancel(job) {
@@ -156,7 +144,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').ApplyWorkflow} row
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2} row
 	 */
 	function getDownloadUrl(row) {
 		if (admin) {
@@ -171,7 +159,7 @@
 		statusSelect?.setSelected('');
 		projectSelect?.setSelected('');
 		workflowSelect?.setSelected('');
-		inputDatasetSelect?.setSelected('');
+		datasetSelect?.setSelected('');
 		outputDatasetSelect?.setSelected('');
 	}
 
@@ -194,15 +182,10 @@
 			workflows,
 			(value) => (workflowFilter = value)
 		);
-		inputDatasetSelect = setSlimSelect(
+		datasetSelect = setSlimSelect(
 			'input-dataset-select',
-			inputDatasets,
-			(value) => (inputDatasetFilter = value)
-		);
-		outputDatasetSelect = setSlimSelect(
-			'output-dataset-select',
-			outputDatasets,
-			(value) => (outputDatasetFilter = value)
+			datasets,
+			(value) => (datasetFilter = value)
 		);
 	});
 
@@ -247,7 +230,7 @@
 	/**
 	 * Rebuilds valid slim-select options according to the visible rows.
 	 * Example: if a project filter is selected the user can select only the workflows belonging to that project.
-	 * @param {import('$lib/types').ApplyWorkflow[]} rows
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2[]} rows
 	 */
 	function rebuildSlimSelectOptions(rows) {
 		setValidSlimSelectOptions(
@@ -255,12 +238,8 @@
 			workflows.filter((w) => rows.filter((r) => r.workflow_dump.id === w.id).length > 0)
 		);
 		setValidSlimSelectOptions(
-			inputDatasetSelect,
-			inputDatasets.filter((d) => rows.filter((r) => r.input_dataset_dump.id === d.id).length > 0)
-		);
-		setValidSlimSelectOptions(
-			outputDatasetSelect,
-			outputDatasets.filter((d) => rows.filter((r) => r.output_dataset_dump.id === d.id).length > 0)
+			datasetSelect,
+			datasets.filter((d) => rows.filter((r) => r.dataset_dump.id === d.id).length > 0)
 		);
 	}
 
@@ -329,7 +308,6 @@
 				<col width="110" />
 			{/if}
 			<col width="110" />
-			<col width="120" />
 			{#if !columnsToHide.includes('user_email')}
 				<col width="120" />
 			{/if}
@@ -349,8 +327,7 @@
 				{#if !columnsToHide.includes('workflow')}
 					<Th handler={tableHandler} key="workflow_id" label="Workflow" />
 				{/if}
-				<Th handler={tableHandler} key="input_dataset_id" label="Input dataset" />
-				<Th handler={tableHandler} key="output_dataset_id" label="Output dataset" />
+				<Th handler={tableHandler} key="dataset_id" label="Dataset" />
 				{#if !columnsToHide.includes('user_email')}
 					<Th handler={tableHandler} key="user_email" label="User" />
 				{/if}
@@ -381,10 +358,7 @@
 						</th>
 					{/if}
 					<th>
-						<select id="input-dataset-select" class="invisible" />
-					</th>
-					<th>
-						<select id="output-dataset-select" class="invisible" />
+						<select id="dataset-select" class="invisible" />
 					</th>
 					{#if !columnsToHide.includes('user_email')}
 						<th />
@@ -473,21 +447,12 @@
 							</td>
 						{/if}
 						<td>
-							{#if inputDatasets && row.input_dataset_id !== null && row.user_email === $page.data.userInfo.email}
-								<a href={`/v2/projects/${row.project_id}/datasets/${row.input_dataset_id}`}>
-									{row.input_dataset_dump.name}
+							{#if datasets && row.dataset_id !== null && row.user_email === $page.data.userInfo.email}
+								<a href={`/v2/projects/${row.project_id}/datasets/${row.dataset_id}`}>
+									{row.dataset_dump.name}
 								</a>
 							{:else}
-								{row.input_dataset_dump.name}
-							{/if}
-						</td>
-						<td>
-							{#if outputDatasets && row.output_dataset_id !== null && row.user_email === $page.data.userInfo.email}
-								<a href={`/v2/projects/${row.project_id}/datasets/${row.output_dataset_id}`}>
-									{row.output_dataset_dump.name}
-								</a>
-							{:else}
-								{row.output_dataset_dump.name}
+								{row.dataset_dump.name}
 							{/if}
 						</td>
 						{#if !columnsToHide.includes('user_email')}

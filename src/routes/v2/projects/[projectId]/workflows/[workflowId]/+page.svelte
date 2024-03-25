@@ -28,12 +28,10 @@
 	let availableTasks = [];
 
 	/** @type {number|undefined} */
-	let selectedInputDatasetId;
-	/** @type {number|undefined} */
-	let selectedOutputDatasetId;
+	let selectedDatasetId;
 
 	let jobError = '';
-	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let failedJob;
 	/** @type {JobLogsModal} */
 	let jobLogsModal;
@@ -82,7 +80,7 @@
 	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
 	let newVersionsMap = {};
 
-	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
 
 	$: updatableWorkflowList = workflow.task_list || [];
@@ -379,18 +377,11 @@
 		if (!workflow) {
 			return;
 		}
-		if (selectedInputDatasetId === undefined) {
-			// Preliminary check: if inputDatasetControl is not set, raise an error
-			let message = 'Input dataset is required. Select one from the list.';
-			console.error(message);
-			runWorkflowModal.displayErrorAlert(message);
-		} else if (selectedOutputDatasetId === undefined) {
-			// Preliminary check: if outputDatasetControl is not set, raise an error
-			let message = 'Output dataset is required. Select one from the list.';
+		if (selectedDatasetId === undefined) {
+			let message = 'Dataset is required. Select one from the list.';
 			console.error(message);
 			runWorkflowModal.displayErrorAlert(message);
 		} else {
-			// Both inputDatasetControl and outputDatasetControl are set, continue
 			const requestBody = {
 				worker_init: workerInitControl,
 				first_task_index: firstTaskIndexControl,
@@ -405,7 +396,7 @@
 			headers.set('Content-Type', 'application/json');
 
 			const response = await fetch(
-				`/api/v2/project/${project.id}/workflow/${workflow.id}/apply?input_dataset_id=${selectedInputDatasetId}&output_dataset_id=${selectedOutputDatasetId}`,
+				`/api/v2/project/${project.id}/workflow/${workflow.id}/apply?dataset_id=${selectedDatasetId}`,
 				{
 					method: 'POST',
 					credentials: 'include',
@@ -487,7 +478,10 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task), 'v2');
+			newVersionsMap = await getAllNewVersions(
+				workflow.task_list.map((wt) => wt.task),
+				'v2'
+			);
 		}
 	}
 
@@ -507,18 +501,15 @@
 	let statusWatcherTimer;
 
 	async function loadJobsStatus() {
-		if (selectedInputDatasetId === undefined || selectedOutputDatasetId === undefined) {
+		if (selectedDatasetId === undefined) {
 			statuses = {};
 			jobError = '';
 			failedJob = undefined;
 			return;
 		}
-		selectedSubmittedJob = await getSelectedSubmittedJob(
-			selectedInputDatasetId,
-			selectedOutputDatasetId
-		);
+		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
 		const outputStatusResponse = await fetch(
-			`/api/v2/project/${project.id}/dataset/${selectedOutputDatasetId}/status`,
+			`/api/v2/project/${project.id}/dataset/${selectedDatasetId}/status`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -555,14 +546,9 @@
 			console.error('Error retrieving workflow jobs', await response.json());
 			return;
 		}
-		const jobs = /** @type {import('$lib/types').ApplyWorkflow[]} */ (await response.json());
+		const jobs = /** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */ (await response.json());
 		const failedJobs = jobs
-			.filter(
-				(j) =>
-					j.input_dataset_id === selectedInputDatasetId &&
-					j.output_dataset_id === selectedOutputDatasetId &&
-					j.status === 'failed'
-			)
+			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
 			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
 		if (failedJobs.length === 0) {
 			return;
@@ -579,16 +565,11 @@
 	}
 
 	/**
-	 * @param {number} inputDatasetId
-	 * @param {number} outputDatasetId
-	 * @return {Promise<import('$lib/types').ApplyWorkflow|undefined>}
+	 * @param {number} datasetId
+	 * @return {Promise<import('$lib/types-v2').ApplyWorkflowV2|undefined>}
 	 */
-	async function getSelectedSubmittedJob(inputDatasetId, outputDatasetId) {
-		if (
-			selectedSubmittedJob &&
-			selectedSubmittedJob.input_dataset_id === inputDatasetId &&
-			selectedSubmittedJob.output_dataset_id === outputDatasetId
-		) {
+	async function getSelectedSubmittedJob(datasetId) {
+		if (selectedSubmittedJob && selectedSubmittedJob.dataset_id === datasetId) {
 			return selectedSubmittedJob;
 		}
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
@@ -596,12 +577,10 @@
 			credentials: 'include'
 		});
 		if (response.ok) {
-			/** @type {import('$lib/types').ApplyWorkflow[]} */
+			/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
 			const allJobs = await response.json();
 			const jobs = allJobs
-				.filter(
-					(j) => j.input_dataset_id === inputDatasetId && j.output_dataset_id === outputDatasetId
-				)
+				.filter((j) => j.dataset_id === datasetId)
 				.sort((a, b) => (a.start_timestamp < b.start_timestamp ? 1 : -1));
 			if (jobs.length > 0) {
 				return jobs[0];
@@ -664,27 +643,11 @@
 		<div class="row">
 			<div class="col-lg-4 col-md-6">
 				<div class="input-group mb-3">
-					<label for="input-dataset" class="input-group-text">Input dataset</label>
+					<label for="dataset" class="input-group-text">Dataset</label>
 					<select
 						class="form-control"
-						id="input-dataset"
-						bind:value={selectedInputDatasetId}
-						on:change={loadJobsStatus}
-					>
-						<option value={undefined}>Select...</option>
-						{#each datasets as dataset}
-							<option value={dataset.id}>{dataset.name}</option>
-						{/each}
-					</select>
-				</div>
-			</div>
-			<div class="col-lg-4 col-md-6">
-				<div class="input-group mb-3">
-					<label for="output-dataset" class="input-group-text">Output dataset</label>
-					<select
-						class="form-control"
-						id="output-dataset"
-						bind:value={selectedOutputDatasetId}
+						id="dataset"
+						bind:value={selectedDatasetId}
 						on:change={loadJobsStatus}
 					>
 						<option value={undefined}>Select...</option>
@@ -1101,30 +1064,15 @@
 		<div id="errorAlert-runWorkflowModal" />
 		<form id="runWorkflowForm">
 			<div class="mb-3">
-				<label for="inputDataset" class="form-label">Input dataset</label>
+				<label for="dataset" class="form-label">Dataset</label>
 				<select
-					name="inputDataset"
-					id="inputDataset"
+					name="dataset"
+					id="dataset"
 					class="form-control"
 					disabled={checkingConfiguration}
-					bind:value={selectedInputDatasetId}
+					bind:value={selectedDatasetId}
 				>
-					<option value={undefined}>Select an input dataset</option>
-					{#each datasets as dataset}
-						<option value={dataset.id}>{dataset.name}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="mb-3">
-				<label for="outputDataset" class="form-label">Output dataset</label>
-				<select
-					name="outputDataset"
-					id="outputDataset"
-					class="form-control"
-					disabled={checkingConfiguration}
-					bind:value={selectedOutputDatasetId}
-				>
-					<option value={undefined}>Select an output dataset</option>
+					<option value={undefined}>Select a dataset</option>
 					{#each datasets as dataset}
 						<option value={dataset.id}>{dataset.name}</option>
 					{/each}
