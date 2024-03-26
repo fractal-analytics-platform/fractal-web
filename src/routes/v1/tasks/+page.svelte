@@ -47,7 +47,7 @@
 	 * @param {import('$lib/types').Task} editedTask
 	 */
 	async function updateEditedTask(editedTask) {
-		const updatedTasks = tasks.filter((t) => {
+		const updatedTasks = tasks.map((t) => {
 			if (t.id === editedTask.id) {
 				return editedTask;
 			} else {

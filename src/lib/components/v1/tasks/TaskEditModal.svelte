@@ -50,7 +50,7 @@
 				}
 
 				console.log('Task updated successfully');
-				updateEditedTask(task);
+				updateEditedTask(await response.json());
 				saved = true;
 			},
 			() => {

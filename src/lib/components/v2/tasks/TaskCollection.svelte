@@ -8,7 +8,7 @@
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 
-	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollections';
+	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollectionsV2';
 
 	// This component, when receives a collectTaskAction successful result
 	// should store in local storage the collection request id
