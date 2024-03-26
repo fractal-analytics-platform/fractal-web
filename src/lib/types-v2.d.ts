@@ -28,6 +28,24 @@ export type ImagePage = {
   }>
 }
 
+export type TaskV2 = {
+  id: number
+  name: string
+  command_non_parallel: string | null
+  command_parallel: string | null
+  input_types: { [key: string]: boolean }
+  output_types: { [key: string]: boolean }
+  version: string
+  owner: string
+  source: string
+  args_schema_version: string
+  args_schema_non_parallel: object | null
+  args_schema_parallel: object | null
+  docs_link: string
+  docs_info: string
+  meta: object
+}
+
 export type ApplyWorkflowV2 = {
   id: number
   project_id: number

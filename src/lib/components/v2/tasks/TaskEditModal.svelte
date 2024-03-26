@@ -5,13 +5,16 @@
 
 	export let updateEditedTask;
 
-	/** @type {import('$lib/types').Task|undefined} */
+	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let task;
-	/** @type {import('$lib/types').Task|undefined} */
+	/** @type {Array<{ key: string, value: boolean, error: string }>} */
+	let inputTypes = [];
+	/** @type {Array<{ key: string, value: boolean, error: string }>} */
+	let outputTypes = [];
+	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let originalTask;
 
-	$: updateEnabled =
-		!loading && !saving && task && task.name && task.command && task.input_type && task.output_type;
+	$: updateEnabled = !loading && !saving && task && task.name;
 	/** @type {Modal} */
 	let modal;
 	let loading = false;
@@ -23,6 +26,12 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleEditTask() {
+		inputTypes = validateTypes(inputTypes);
+		outputTypes = validateTypes(outputTypes);
+		if (typesHaveErrors(inputTypes) || typesHaveErrors(outputTypes)) {
+			return;
+		}
+
 		modal.confirmAndHide(
 			async () => {
 				if (!task) {
@@ -33,7 +42,8 @@
 				let taskProperties = nullifyEmptyStrings(task);
 				taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
 
-				console.log('Task to edit: ' + task.id);
+				taskProperties.input_types = getTypesFromArray(inputTypes);
+				taskProperties.output_types = getTypesFromArray(outputTypes);
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
@@ -60,8 +70,7 @@
 	}
 
 	/**
-	 *
-	 * @param {import('$lib/types').Task} taskToEdit
+	 * @param {import('$lib/types-v2').TaskV2} taskToEdit
 	 */
 	export async function open(taskToEdit) {
 		loading = true;
@@ -77,14 +86,53 @@
 		const result = await response.json();
 
 		if (response.ok) {
-			task = result;
+			task = /** @type {import('$lib/types-v2').TaskV2} */ (result);
 			originalTask = { ...result };
+			inputTypes = getArrayFromTypes(task.input_types);
+			outputTypes = getArrayFromTypes(task.output_types);
 		} else {
 			modal.displayErrorAlert('Unable to load task');
 			task = undefined;
+			inputTypes = [];
+			outputTypes = [];
 			originalTask = undefined;
 		}
 		loading = false;
+	}
+
+	/**
+	 * @param {{ [key: string]: boolean }} types
+	 * @returns {Array<{ key: string, value: boolean, error: string }>}
+	 */
+	function getArrayFromTypes(types) {
+		return Object.entries(types).map(([key, value]) => ({ key, value, error: '' }));
+	}
+
+	/**
+	 * @param {Array<{ key: string, value: boolean, error: string }>} items
+	 * @returns {Array<{ key: string, value: boolean, error: string }>}
+	 */
+	function validateTypes(items) {
+		return items.map((item) =>
+			item.key ? { ...item, error: '' } : { ...item, error: 'Key is required' }
+		);
+	}
+
+	/**
+	 * @param {Array<{ key: string, value: boolean, error: string }>} items
+	 * @returns {boolean}
+	 */
+	function typesHaveErrors(items) {
+		return items.filter((t) => t.error !== '').length > 0;
+	}
+
+	/**
+	 *
+	 * @param {Array<{ key: string, value: boolean, error: string }>} items
+	 * @returns {{ [key: string]: boolean }}
+	 */
+	function getTypesFromArray(items) {
+		return Object.fromEntries(items.map((i) => [i.key, i.value]));
 	}
 
 	async function onClose() {
@@ -97,6 +145,28 @@
 		for (let key in originalTask) {
 			task[key] = originalTask[key];
 		}
+	}
+
+	function addInputType() {
+		inputTypes = [...inputTypes, { key: '', value: false, error: '' }];
+	}
+
+	function addOutputType() {
+		outputTypes = [...outputTypes, { key: '', value: false, error: '' }];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeInputType(index) {
+		inputTypes = inputTypes.filter((_, i) => i !== index);
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeOutputType(index) {
+		outputTypes = outputTypes.filter((_, i) => i !== index);
 	}
 </script>
 
@@ -149,18 +219,30 @@
 					</div>
 
 					<div class="mb-2 row">
-						<label for="command" class="col-2 col-form-label text-end">Command</label>
+						<label for="command_non_parallel" class="col-2 col-form-label text-end"
+							>Command non parallel</label
+						>
 						<div class="col-10">
 							<input
-								id="command"
+								id="command_non_parallel"
 								type="text"
-								bind:value={task.command}
+								bind:value={task.command_non_parallel}
 								class="form-control"
-								class:is-invalid={!task.command}
 							/>
-							{#if !task.command}
-								<div class="invalid-feedback">Required field</div>
-							{/if}
+						</div>
+					</div>
+
+					<div class="mb-2 row">
+						<label for="command_parallel" class="col-2 col-form-label text-end"
+							>Command parallel</label
+						>
+						<div class="col-10">
+							<input
+								id="command_parallel"
+								type="text"
+								bind:value={task.command_parallel}
+								class="form-control"
+							/>
 						</div>
 					</div>
 
@@ -178,34 +260,102 @@
 					</div>
 
 					<div class="mb-2 row">
-						<label for="inputType" class="col-2 col-form-label text-end">Input Type</label>
-						<div class="col-10">
-							<input
-								id="inputType"
-								type="text"
-								bind:value={task.input_type}
-								class="form-control"
-								class:is-invalid={!task.input_type}
-							/>
-							{#if !task.input_type}
-								<div class="invalid-feedback">Required field</div>
-							{/if}
+						<span class="col-2 col-form-label text-end"> Input Types </span>
+						{#if inputTypes.length > 0}
+							<div class="col-7">
+								{#each inputTypes as inputType, index}
+									<div class="row">
+										<div class="col">
+											<div class="input-group mb-1" class:has-validation={inputType.error}>
+												<input
+													type="text"
+													class="form-control flag-filter-key"
+													placeholder="Key"
+													bind:value={inputType.key}
+													class:is-invalid={inputType.error}
+												/>
+												<div class="input-group-text">
+													<label>
+														<input
+															class="form-check-input me-1"
+															type="checkbox"
+															bind:checked={inputType.value}
+															aria-label="Value for {inputType.key}"
+														/>
+														{inputType.value}
+													</label>
+												</div>
+												<button
+													class="btn btn-outline-danger"
+													type="button"
+													on:click={() => removeInputType(index)}
+													aria-label="Remove input type"
+												>
+													<i class="bi bi-trash" />
+												</button>
+												{#if inputType.error}
+													<div class="invalid-feedback">{inputType.error}</div>
+												{/if}
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
+						<div class="col-3">
+							<button class="btn btn-outline-primary" on:click={addInputType}>
+								Add input type
+							</button>
 						</div>
 					</div>
 
 					<div class="mb-2 row">
-						<label for="outputType" class="col-2 col-form-label text-end">Output Type</label>
-						<div class="col-10">
-							<input
-								id="outputType"
-								type="text"
-								bind:value={task.output_type}
-								class="form-control"
-								class:is-invalid={!task.output_type}
-							/>
-							{#if !task.output_type}
-								<div class="invalid-feedback">Required field</div>
-							{/if}
+						<span class="col-2 col-form-label text-end"> Output Types </span>
+						{#if outputTypes.length > 0}
+							<div class="col-7">
+								{#each outputTypes as outputType, index}
+									<div class="row">
+										<div class="col">
+											<div class="input-group mb-1" class:has-validation={outputType.error}>
+												<input
+													type="text"
+													class="form-control flag-filter-key"
+													placeholder="Key"
+													bind:value={outputType.key}
+													class:is-invalid={outputType.error}
+												/>
+												<div class="input-group-text">
+													<label>
+														<input
+															class="form-check-input me-1"
+															type="checkbox"
+															bind:checked={outputType.value}
+															aria-label="Value for {outputType.key}"
+														/>
+														{outputType.value}
+													</label>
+												</div>
+												<button
+													class="btn btn-outline-danger"
+													type="button"
+													on:click={() => removeOutputType(index)}
+													aria-label="Remove output type"
+												>
+													<i class="bi bi-trash" />
+												</button>
+												{#if outputType.error}
+													<div class="invalid-feedback">{outputType.error}</div>
+												{/if}
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
+						<div class="col-3">
+							<button class="btn btn-outline-primary" on:click={addOutputType}>
+								Add output type
+							</button>
 						</div>
 					</div>
 
@@ -225,11 +375,32 @@
 					</div>
 
 					<div class="mb-2 row">
-						<label for="argsSchema" class="col-2 col-form-label text-end">Args Schema</label>
+						<label for="argsSchema" class="col-2 col-form-label text-end"
+							>Args Schema non parallel</label
+						>
 						<div class="col-10">
 							<textarea
 								name="argsSchema"
-								value={task.args_schema ? JSON.stringify(task.args_schema, null, 2) : null}
+								value={task.args_schema_non_parallel
+									? JSON.stringify(task.args_schema_non_parallel, null, 2)
+									: null}
+								disabled
+								class="form-control"
+								rows="10"
+							/>
+						</div>
+					</div>
+
+					<div class="mb-2 row">
+						<label for="argsSchema" class="col-2 col-form-label text-end"
+							>Args Schema parallel</label
+						>
+						<div class="col-10">
+							<textarea
+								name="argsSchema"
+								value={task.args_schema_parallel
+									? JSON.stringify(task.args_schema_parallel, null, 2)
+									: null}
 								disabled
 								class="form-control"
 								rows="10"

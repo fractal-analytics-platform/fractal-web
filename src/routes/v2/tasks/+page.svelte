@@ -14,7 +14,7 @@
 	let errorReasons = undefined;
 
 	// Tasks property updated with respect to data store
-	/** @type {import('$lib/types').Task[]} */
+	/** @type {import('$lib/types-v2').TaskV2[]} */
 	let tasks = $page.data.tasks;
 
 	/** @type {'pypi'|'local'|'single'} */
@@ -36,7 +36,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').Task[]} tasks
+	 * @param {import('$lib/types-v2').TaskV2[]} tasks
 	 */
 	function sortTasks(tasks) {
 		return orderTasksByOwnerThenByNameThenByVersion(tasks, null, 'desc');
@@ -44,7 +44,7 @@
 
 	/**
 	 * Updates the tasks list after a task is edited in the modal
-	 * @param {import('$lib/types').Task} editedTask
+	 * @param {import('$lib/types-v2').TaskV2} editedTask
 	 */
 	async function updateEditedTask(editedTask) {
 		const updatedTasks = tasks.filter((t) => {
@@ -59,7 +59,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').Task} task
+	 * @param {import('$lib/types-v2').TaskV2} task
 	 */
 	function addNewTask(task) {
 		const updatedTasks = [...tasks, task];
@@ -68,7 +68,7 @@
 	}
 
 	async function reloadTaskList() {
-		const response = await fetch(`/api/v2/task?args_schema=false`, {
+		const response = await fetch(`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});

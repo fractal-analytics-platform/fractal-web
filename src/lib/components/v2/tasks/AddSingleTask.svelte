@@ -8,7 +8,7 @@
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 
-	/** @type {(task: import('$lib/types').Task) => void} */
+	/** @type {(task: import('$lib/types-v2').TaskV2) => void} */
 	export let addNewTask;
 
 	let taskSuccessMessage = '';

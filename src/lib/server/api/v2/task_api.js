@@ -10,7 +10,7 @@ export async function listTasks(fetch) {
 	console.log('Server fetching tasks');
 
 	// Compose request
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v2/task/?args_schema=false', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v2/task/?args_schema_non_parallel=false&args_schema_parallel=false', {
 		method: 'GET',
 		credentials: 'include',
 		mode: 'cors'

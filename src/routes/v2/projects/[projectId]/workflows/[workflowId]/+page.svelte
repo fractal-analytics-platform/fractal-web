@@ -146,7 +146,7 @@
 		resetCreateWorkflowTaskModal();
 
 		// Get available tasks from the server
-		const response = await fetch(`/api/v2/task?args_schema=false`, {
+		const response = await fetch(`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});

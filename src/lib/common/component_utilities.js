@@ -6,8 +6,8 @@ import lte from 'semver/functions/lte';
 import valid from 'semver/functions/valid';
 
 /**
- * @param {import('$lib/types').Task} t1
- * @param {import('$lib/types').Task} t2
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
  * @returns {-1|0|1}
  */
 export function greatestVersionAsc(t1, t2) {
@@ -21,8 +21,8 @@ export function greatestVersionAsc(t1, t2) {
 }
 
 /**
- * @param {import('$lib/types').Task} t1
- * @param {import('$lib/types').Task} t2
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
  * @returns {-1|0|1}
  */
 export function greatestVersionDesc(t1, t2) {
@@ -53,8 +53,8 @@ function validateVersion(version) {
 }
 
 /**
- * @param {import('$lib/types').Task} t1
- * @param {import('$lib/types').Task} t2
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
  * @returns {-1|0|1}
  */
 export function compareTaskNameAscAndVersionAsc(t1, t2) {
@@ -65,8 +65,8 @@ export function compareTaskNameAscAndVersionAsc(t1, t2) {
 }
 
 /**
- * @param {import('$lib/types').Task} t1
- * @param {import('$lib/types').Task} t2
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
+ * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
  * @returns {-1|0|1}
  */
 export function compareTaskNameAscAndVersionDesc(t1, t2) {
@@ -77,7 +77,7 @@ export function compareTaskNameAscAndVersionDesc(t1, t2) {
 }
 
 /**
- * @param {import('$lib/types').Task[]} tasks
+ * @param {Array<import('$lib/types').Task|import('$lib/types-v2').TaskV2>} tasks
  * @param {string|null} ownerName
  * @param {'asc'|'desc'} order
  */

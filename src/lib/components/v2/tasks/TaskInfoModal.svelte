@@ -1,8 +1,9 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
+	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('$lib/types').Task|undefined} */
+	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let task;
 
 	/** @type {Modal} */
@@ -11,7 +12,7 @@
 
 	/**
 	 *
-	 * @param {import('$lib/types').Task} taskToLoad
+	 * @param {import('$lib/types-v2').TaskV2} taskToLoad
 	 */
 	export async function open(taskToLoad) {
 		modal.show();
@@ -55,29 +56,63 @@
 						<li class="list-group-item">{task.version || '-'}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Owner</li>
 						<li class="list-group-item">{task.owner || '-'}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Command</li>
-						<li class="list-group-item"><code>{task.command}</code></li>
+						<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
+						<li class="list-group-item"><code>{task.command_non_parallel}</code></li>
+						<li class="list-group-item list-group-item-light fw-bold">Command parallel</li>
+						<li class="list-group-item"><code>{task.command_parallel}</code></li>
 						<li class="list-group-item list-group-item-light fw-bold">Source</li>
 						<li class="list-group-item"><code>{task.source}</code></li>
-						<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
+						<li class="list-group-item list-group-item-light fw-bold">Input Types</li>
 						<li class="list-group-item">
-							<code>{task.input_type}</code>
+							<table class="table table-borderless mb-0">
+								<tbody>
+									{#each Object.keys(task.input_types) as key}
+									<tr class="d-flex">
+										<td><code>{key}</code></td>
+										<td class="flex-grow"><BooleanIcon value={task.input_types[key]} /></td>
+									</tr>
+									{/each}
+								</tbody>
+							</table>
 						</li>
-						<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
+						<li class="list-group-item list-group-item-light fw-bold">Output Types</li>
 						<li class="list-group-item">
-							<code>{task.output_type}</code>
+							<table class="table table-borderless mb-0">
+								<tbody>
+									{#each Object.keys(task.output_types) as key}
+									<tr class="d-flex">
+										<td><code>{key}</code></td>
+										<td class="flex-grow"><BooleanIcon value={task.output_types[key]} /></td>
+									</tr>
+									{/each}
+								</tbody>
+							</table>
 						</li>
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
 						<li class="list-group-item">{task.args_schema_version || '-'}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema non parallel</li>
 						<li class="list-group-item">
 							{#if loading}
 								<div class="spinner-border spinner-border-sm" role="status">
 									<span class="visually-hidden">Loading...</span>
 								</div>
-							{:else if task.args_schema}
+							{:else if task.args_schema_non_parallel}
 								<code>
-									<pre>{JSON.stringify(task.args_schema, null, 2)}</pre>
+									<pre>{JSON.stringify(task.args_schema_non_parallel, null, 2)}</pre>
+								</code>
+							{:else}
+								-
+							{/if}
+						</li>
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema parallel</li>
+						<li class="list-group-item">
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else if task.args_schema_parallel}
+								<code>
+									<pre>{JSON.stringify(task.args_schema_parallel, null, 2)}</pre>
 								</code>
 							{:else}
 								-
