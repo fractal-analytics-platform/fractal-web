@@ -2,17 +2,17 @@
 	import { onMount } from 'svelte';
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
+	import ArgumentForm from '$lib/components/v1/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
-	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
-	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
+	import MetaPropertiesForm from '$lib/components/v1/workflow/MetaPropertiesForm.svelte';
+	import ArgumentsSchema from '$lib/components/v1/workflow/ArgumentsSchema.svelte';
+	import WorkflowTaskSelection from '$lib/components/v1/workflow/WorkflowTaskSelection.svelte';
 	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import VersionUpdate from '$lib/components/workflow/VersionUpdate.svelte';
-	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
+	import VersionUpdate from '$lib/components/v1/workflow/VersionUpdate.svelte';
+	import { getAllNewVersions } from '$lib/components/v1/workflow/version-checker';
 
 	// Workflow
 	/** @type {import('$lib/types').Workflow|undefined} */

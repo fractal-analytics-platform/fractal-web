@@ -7,8 +7,8 @@
 	// This component also manages the overall form structure of meta properties.
 	// The form should be structured in multiple levels of depth, and support complex structure.
 	import { page } from '$app/stores';
-	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
-	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
+	import { updateFormEntry } from '$lib/components/v2/workflow/task_form_utils';
+	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
 	import { getOnlyModifiedProperties } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 

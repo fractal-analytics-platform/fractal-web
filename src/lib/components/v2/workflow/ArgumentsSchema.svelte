@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
 	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
-	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
+	import { updateFormEntry } from '$lib/components/v2/workflow/task_form_utils';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 

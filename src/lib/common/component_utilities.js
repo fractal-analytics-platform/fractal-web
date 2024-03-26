@@ -77,9 +77,11 @@ export function compareTaskNameAscAndVersionDesc(t1, t2) {
 }
 
 /**
- * @param {Array<import('$lib/types').Task|import('$lib/types-v2').TaskV2>} tasks
+ * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
+ * @param {Array<T>} tasks
  * @param {string|null} ownerName
  * @param {'asc'|'desc'} order
+ * @returns {Array<T>}
  */
 export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null, order = 'asc') {
 	const sortingFunction = getVersionSortingFunction(order);

@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
-	import { updateFormEntry } from '$lib/components/workflow/task_form_utils';
-	import FormBuilder from '$lib/components/workflow/common/FormBuilder.svelte';
+	import { updateFormEntry } from '$lib/components/v1/workflow/task_form_utils';
+	import FormBuilder from '$lib/components/v1/workflow/FormBuilder.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import { onMount } from 'svelte';

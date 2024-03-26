@@ -3,19 +3,19 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import ArgumentForm from '$lib/components/workflow/ArgumentForm.svelte';
+	import ArgumentForm from '$lib/components/v2/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import MetaPropertiesForm from '$lib/components/workflow/MetaPropertiesForm.svelte';
-	import ArgumentsSchema from '$lib/components/workflow/ArgumentsSchema.svelte';
-	import WorkflowTaskSelection from '$lib/components/workflow/WorkflowTaskSelection.svelte';
+	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
+	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
+	import WorkflowTaskSelection from '$lib/components/v2/workflow/WorkflowTaskSelection.svelte';
 	import { formatMarkdown, replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import VersionUpdate from '$lib/components/workflow/VersionUpdate.svelte';
-	import { getAllNewVersions } from '$lib/components/workflow/version-checker';
+	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
+	import { getAllNewVersions } from '$lib/components/v2/workflow/version-checker';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
-	import TasksOrderModal from '$lib/components/workflow/v2/TasksOrderModal.svelte';
+	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
 
@@ -70,7 +70,7 @@
 	let unsavedChangesModal;
 	/** @type {Modal} */
 	let runWorkflowModal;
-	/** @type {import('$lib/components/workflow/v2/TasksOrderModal.svelte').default} */
+	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
 	let editTasksOrderModal;
 	/** @type {Modal} */
 	let insertTaskModal;

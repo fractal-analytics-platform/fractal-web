@@ -1,6 +1,6 @@
 <script>
 	import { downloadBlob } from '$lib/common/component_utilities';
-	import Modal from '../common/Modal.svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {string} */
 	export let taskName;
