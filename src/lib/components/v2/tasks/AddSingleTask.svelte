@@ -7,6 +7,7 @@
 		validateErrorMapKeys
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
+	import TypesEditor from './TypesEditor.svelte';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2) => void} */
 	export let addNewTask;
@@ -15,28 +16,34 @@
 
 	// Add a single task fields
 	let name = '';
-	let command = '';
+	let command_non_parallel = '';
+	let command_parallel = '';
 	let source = '';
 	let version = '';
-	let input_type = '';
-	let output_type = '';
 	let docs_info = '';
 	let docs_link = '';
 	let args_schema_version = 'pydantic_v1';
+	/** @type {import('$lib/types-v2').TaskV2Type} */
+	let taskType = 'standalone_non_parallel';
+
+	/** @type {TypesEditor} */
+	let typesEditor;
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @typedef {('name'|'command'|'version'|'source'|'input_type'|'output_type'|'args_schema'|'args_schema_version'|'meta'|'docs_info'|'docs_link')} ErrorKey **/
+	/** @typedef {('name'|'command_non_parallel'|'command_parallel'|'version'|'source'|'input_type'|'output_type'|'args_schema_non_parallel'|'args_schema_parallel'|'args_schema_version'|'meta'|'docs_info'|'docs_link')} ErrorKey **/
 	/** @type {ErrorKey[]} */
 	const handledErrorKeys = [
 		'name',
-		'command',
+		'command_non_parallel',
+		'command_parallel',
 		'version',
 		'source',
 		'input_type',
 		'output_type',
-		'args_schema',
+		'args_schema_parallel',
+		'args_schema_non_parallel',
 		'args_schema_version',
 		'meta',
 		'docs_info',
@@ -56,9 +63,15 @@
 		}
 		validationErrors = {};
 
-		const argsSchema = await getArgsSchema();
-		if (argsSchema instanceof Error) {
-			addValidationError('args_schema', argsSchema.message);
+		const argsSchemaNonParallel = await getArgsSchemaNonParallel();
+		if (argsSchemaNonParallel instanceof Error) {
+			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
+			return;
+		}
+
+		const argsSchemaParallel = await getArgsSchemaParallel();
+		if (argsSchemaParallel instanceof Error) {
+			addValidationError('args_schema_parallel', argsSchemaParallel.message);
 			return;
 		}
 
@@ -73,17 +86,28 @@
 
 		const bodyData = {
 			name,
-			command,
+			command_non_parallel,
+			command_parallel,
 			version,
 			source,
-			input_type,
-			output_type,
+			input_types: typesEditor.getInputTypes(),
+			output_types: typesEditor.getOutputTypes(),
 			docs_info,
 			docs_link
 		};
 
-		if (argsSchema) {
-			bodyData.args_schema = argsSchema;
+		if (argsSchemaNonParallel && (taskType === 'standalone_non_parallel' || taskType === 'compound')) {
+			bodyData.args_schema_non_parallel = argsSchemaNonParallel;
+		}
+
+		if (argsSchemaParallel && (taskType === 'standalone_parallel' || taskType === 'compound')) {
+			bodyData.args_schema_parallel = argsSchemaParallel;
+		}
+
+		if (
+			(argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0) ||
+			(argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0)
+		) {
 			bodyData.args_schema_version = args_schema_version;
 		}
 
@@ -117,9 +141,13 @@
 	}
 
 	/** @type {FileList|null} */
-	let argsSchemaFiles = null;
+	let argsSchemaNonParallelFiles = null;
 	/** @type {HTMLInputElement|undefined} */
-	let argsSchemaFileInput = undefined;
+	let argsSchemaNonParallelFileInput = undefined;
+	/** @type {FileList|null} */
+	let argsSchemaParallelFiles = null;
+	/** @type {HTMLInputElement|undefined} */
+	let argsSchemaParallelFileInput = undefined;
 
 	/** @type {FileList|null} */
 	let metaFiles = null;
@@ -129,11 +157,29 @@
 	/**
 	 * @returns {Promise<object|Error|undefined>}
 	 */
-	async function getArgsSchema() {
-		removeValidationError('args_schema');
-		if (!argsSchemaFiles || argsSchemaFiles.length === 0) {
+	async function getArgsSchemaNonParallel() {
+		removeValidationError('args_schema_non_parallel');
+		if (!argsSchemaNonParallelFiles || argsSchemaNonParallelFiles.length === 0) {
 			return;
 		}
+		return parseArgsSchemaContent(argsSchemaNonParallelFiles);
+	}
+
+	/**
+	 * @returns {Promise<object|Error|undefined>}
+	 */
+	async function getArgsSchemaParallel() {
+		removeValidationError('args_schema_parallel');
+		if (!argsSchemaParallelFiles || argsSchemaParallelFiles.length === 0) {
+			return;
+		}
+		return parseArgsSchemaContent(argsSchemaParallelFiles);
+	}
+
+	/**
+	 * @param {FileList} argsSchemaFiles
+	 */
+	async function parseArgsSchemaContent(argsSchemaFiles) {
 		const argsSchemaFile = argsSchemaFiles[0];
 		let content = await argsSchemaFile.text();
 		let json;
@@ -170,12 +216,20 @@
 		}
 	}
 
-	function clearArgsSchemaFileUpload() {
-		argsSchemaFiles = null;
-		if (argsSchemaFileInput) {
-			argsSchemaFileInput.value = '';
+	function clearArgsSchemaNonParallelFileUpload() {
+		argsSchemaNonParallelFiles = null;
+		if (argsSchemaNonParallelFileInput) {
+			argsSchemaNonParallelFileInput.value = '';
 		}
-		removeValidationError('args_schema');
+		removeValidationError('args_schema_non_parallel');
+	}
+
+	function clearArgsSchemaParallelFileUpload() {
+		argsSchemaParallelFiles = null;
+		if (argsSchemaParallelFileInput) {
+			argsSchemaParallelFileInput.value = '';
+		}
+		removeValidationError('args_schema_parallel');
 	}
 
 	function clearMetaFileUpload() {
@@ -205,15 +259,16 @@
 
 	function resetFields() {
 		name = '';
-		command = '';
+		command_non_parallel = '';
+		command_parallel = '';
 		version = '';
 		source = '';
-		input_type = '';
-		output_type = '';
+		typesEditor.init({}, {});
 		docs_info = '';
 		docs_link = '';
 		args_schema_version = 'pydantic_v1';
-		clearArgsSchemaFileUpload();
+		clearArgsSchemaNonParallelFileUpload();
+		clearArgsSchemaParallelFileUpload();
 		clearMetaFileUpload();
 		closeDocsAccordion();
 	}
@@ -232,6 +287,46 @@
 <StandardDismissableAlert message={taskSuccessMessage} />
 
 <form on:submit|preventDefault={handleCreateTask}>
+	<div class="row mb-1">
+		<div class="col-xl-1 col-lg-2 col-3">Task type</div>
+		<div class="col-xl-11 col-lg-8 col-9">
+			<div class="form-check form-check-inline">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="taskType"
+					id="standalone_non_parallel"
+					value="standalone_non_parallel"
+					bind:group={taskType}
+				/>
+				<label class="form-check-label" for="standalone_non_parallel">
+					Standalone non parallel
+				</label>
+			</div>
+			<div class="form-check form-check-inline">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="taskType"
+					id="standalone_parallel"
+					value="standalone_parallel"
+					bind:group={taskType}
+				/>
+				<label class="form-check-label" for="standalone_parallel">Standalone parallel</label>
+			</div>
+			<div class="form-check form-check-inline">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="taskType"
+					id="compound"
+					value="compound"
+					bind:group={taskType}
+				/>
+				<label class="form-check-label" for="compound">Compound</label>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-md-6 mb-2">
 			<div class="input-group has-validation">
@@ -249,23 +344,44 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-12 mb-2">
-			<div class="input-group has-validation">
-				<label for="command" class="input-group-text">Command</label>
-				<input
-					name="command"
-					id="command"
-					type="text"
-					class="form-control"
-					bind:value={command}
-					class:is-invalid={validationErrors['command']}
-					required
-				/>
-				<span class="invalid-feedback">{validationErrors['command']}</span>
+	{#if taskType === 'standalone_non_parallel' || taskType === 'compound'}
+		<div class="row">
+			<div class="col-12 mb-2">
+				<div class="input-group has-validation">
+					<label for="command_non_parallel" class="input-group-text">Command non parallel</label>
+					<input
+						name="command_non_parallel"
+						id="command_non_parallel"
+						type="text"
+						class="form-control"
+						bind:value={command_non_parallel}
+						class:is-invalid={validationErrors['command_non_parallel']}
+						required
+					/>
+					<span class="invalid-feedback">{validationErrors['command_non_parallel']}</span>
+				</div>
 			</div>
 		</div>
-	</div>
+	{/if}
+	{#if taskType === 'standalone_parallel' || taskType === 'compound'}
+		<div class="row">
+			<div class="col-12 mb-2">
+				<div class="input-group has-validation">
+					<label for="command_parallel" class="input-group-text">Command parallel</label>
+					<input
+						name="command_parallel"
+						id="command_parallel"
+						type="text"
+						class="form-control"
+						bind:value={command_parallel}
+						class:is-invalid={validationErrors['command_parallel']}
+						required
+					/>
+					<span class="invalid-feedback">{validationErrors['command_parallel']}</span>
+				</div>
+			</div>
+		</div>
+	{/if}
 	<div class="row">
 		<div class="col-md-6 mb-2">
 			<div class="input-group has-validation">
@@ -287,41 +403,8 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-6 mb-2">
-			<div class="input-group has-validation">
-				<label class="input-group-text" for="input_type">Input type</label>
-				<input
-					name="input_type"
-					id="input_type"
-					type="text"
-					class="form-control"
-					bind:value={input_type}
-					class:is-invalid={validationErrors['input_type']}
-					required
-				/>
-				<span class="invalid-feedback">{validationErrors['input_type']}</span>
-			</div>
-			<div class="form-text">
-				Expected type of input dataset; use <code>Any</code> for a generic type
-			</div>
-		</div>
-		<div class="col-md-6 mb-2">
-			<div class="input-group has-validation">
-				<label for="output_type" class="input-group-text">Output type</label>
-				<input
-					name="output_type"
-					id="output_type"
-					type="text"
-					class="form-control"
-					bind:value={output_type}
-					class:is-invalid={validationErrors['output_type']}
-					required
-				/>
-				<span class="invalid-feedback">{validationErrors['output_type']}</span>
-			</div>
-			<div class="form-text">
-				Expected type of output dataset; use <code>Any</code> for a generic type
-			</div>
+		<div class="col-xl-8">
+			<TypesEditor bind:this={typesEditor} />
 		</div>
 	</div>
 	<div class="row mb-2 mt-2">
@@ -343,32 +426,6 @@
 				/>
 				<span class="invalid-feedback">{validationErrors['version']}</span>
 			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-6 mb-2">
-			<div class="input-group has-validation">
-				<label for="argsSchemaFile" class="input-group-text">
-					<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload args schema
-				</label>
-				<input
-					class="form-control schemaFile"
-					accept="application/json"
-					type="file"
-					name="argsSchemaFile"
-					id="argsSchemaFile"
-					bind:this={argsSchemaFileInput}
-					bind:files={argsSchemaFiles}
-					class:is-invalid={validationErrors['args_schema']}
-				/>
-				{#if argsSchemaFiles && argsSchemaFiles.length > 0}
-					<button class="btn btn-outline-secondary" on:click={clearArgsSchemaFileUpload}>
-						Clear
-					</button>
-				{/if}
-				<span class="invalid-feedback">{validationErrors['args_schema']}</span>
-			</div>
-			<div class="form-text">JSON schema of task arguments</div>
 		</div>
 		<div class="col-lg-6 mb-2">
 			<div class="input-group has-validation">
@@ -395,7 +452,64 @@
 			</div>
 		</div>
 	</div>
-	{#if argsSchemaFiles && argsSchemaFiles.length > 0}
+	<div class="row">
+		{#if taskType === 'standalone_non_parallel' || taskType === 'compound'}
+			<div class="col-lg-6 mb-2">
+				<div class="input-group has-validation">
+					<label for="argsSchemaNonParallelFile" class="input-group-text">
+						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload args schema non parallel
+					</label>
+					<input
+						class="form-control schemaFile"
+						accept="application/json"
+						type="file"
+						name="argsSchemaNonParallelFile"
+						id="argsSchemaNonParallelFile"
+						bind:this={argsSchemaNonParallelFileInput}
+						bind:files={argsSchemaNonParallelFiles}
+						class:is-invalid={validationErrors['args_schema_non_parallel']}
+					/>
+					{#if argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0}
+						<button
+							class="btn btn-outline-secondary"
+							on:click={clearArgsSchemaNonParallelFileUpload}
+						>
+							Clear
+						</button>
+					{/if}
+					<span class="invalid-feedback">{validationErrors['args_schema_non_parallel']}</span>
+				</div>
+				<div class="form-text">JSON schema of task arguments - non parallel</div>
+			</div>
+		{/if}
+		{#if taskType === 'standalone_parallel' || taskType === 'compound'}
+			<div class="col-lg-6 mb-2">
+				<div class="input-group has-validation">
+					<label for="argsSchemaParallelFile" class="input-group-text">
+						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload args schema parallel
+					</label>
+					<input
+						class="form-control schemaFile"
+						accept="application/json"
+						type="file"
+						name="argsSchemaParallelFile"
+						id="argsSchemaParallelFile"
+						bind:this={argsSchemaParallelFileInput}
+						bind:files={argsSchemaParallelFiles}
+						class:is-invalid={validationErrors['args_schema_parallel']}
+					/>
+					{#if argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0}
+						<button class="btn btn-outline-secondary" on:click={clearArgsSchemaParallelFileUpload}>
+							Clear
+						</button>
+					{/if}
+					<span class="invalid-feedback">{validationErrors['args_schema_parallel']}</span>
+				</div>
+				<div class="form-text">JSON schema of task arguments - parallel</div>
+			</div>
+		{/if}
+	</div>
+	{#if (argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0) || (argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0)}
 		<div class="row">
 			<div class="col-md-6 mb-2">
 				<div class="input-group has-validation">

@@ -28,6 +28,8 @@ export type ImagePage = {
   }>
 }
 
+export type TaskV2Type = 'standalone_non_parallel' | 'standalone_parallel' | 'compound'
+
 export type TaskV2 = {
   id: number
   name: string

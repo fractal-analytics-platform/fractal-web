@@ -1,16 +1,14 @@
 <script>
 	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
+	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
+	import TypesEditor from './TypesEditor.svelte';
 
 	export let updateEditedTask;
 
 	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let task;
-	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let inputTypes = [];
-	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let outputTypes = [];
 	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let originalTask;
 
@@ -21,14 +19,15 @@
 	let saved = false;
 	let saving = false;
 
+	/** @type {TypesEditor} */
+	let typesEditor;
+
 	/**
 	 * Edits a task on the server
 	 * @returns {Promise<*>}
 	 */
 	async function handleEditTask() {
-		inputTypes = validateTypes(inputTypes);
-		outputTypes = validateTypes(outputTypes);
-		if (typesHaveErrors(inputTypes) || typesHaveErrors(outputTypes)) {
+		if (!typesEditor.validate()) {
 			return;
 		}
 
@@ -42,8 +41,8 @@
 				let taskProperties = nullifyEmptyStrings(task);
 				taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
 
-				taskProperties.input_types = getTypesFromArray(inputTypes);
-				taskProperties.output_types = getTypesFromArray(outputTypes);
+				taskProperties.input_types = typesEditor.getInputTypes();
+				taskProperties.output_types = typesEditor.getOutputTypes();
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
@@ -84,55 +83,20 @@
 		});
 
 		const result = await response.json();
+		loading = false;
 
 		if (response.ok) {
 			task = /** @type {import('$lib/types-v2').TaskV2} */ (result);
 			originalTask = { ...result };
-			inputTypes = getArrayFromTypes(task.input_types);
-			outputTypes = getArrayFromTypes(task.output_types);
+			// wait the typesEditor element rendering, that happens after task is defined
+			await tick();
+			typesEditor.init(task.input_types, task.output_types);
 		} else {
 			modal.displayErrorAlert('Unable to load task');
 			task = undefined;
-			inputTypes = [];
-			outputTypes = [];
+			typesEditor.init({}, {});
 			originalTask = undefined;
 		}
-		loading = false;
-	}
-
-	/**
-	 * @param {{ [key: string]: boolean }} types
-	 * @returns {Array<{ key: string, value: boolean, error: string }>}
-	 */
-	function getArrayFromTypes(types) {
-		return Object.entries(types).map(([key, value]) => ({ key, value, error: '' }));
-	}
-
-	/**
-	 * @param {Array<{ key: string, value: boolean, error: string }>} items
-	 * @returns {Array<{ key: string, value: boolean, error: string }>}
-	 */
-	function validateTypes(items) {
-		return items.map((item) =>
-			item.key ? { ...item, error: '' } : { ...item, error: 'Key is required' }
-		);
-	}
-
-	/**
-	 * @param {Array<{ key: string, value: boolean, error: string }>} items
-	 * @returns {boolean}
-	 */
-	function typesHaveErrors(items) {
-		return items.filter((t) => t.error !== '').length > 0;
-	}
-
-	/**
-	 *
-	 * @param {Array<{ key: string, value: boolean, error: string }>} items
-	 * @returns {{ [key: string]: boolean }}
-	 */
-	function getTypesFromArray(items) {
-		return Object.fromEntries(items.map((i) => [i.key, i.value]));
 	}
 
 	async function onClose() {
@@ -145,28 +109,6 @@
 		for (let key in originalTask) {
 			task[key] = originalTask[key];
 		}
-	}
-
-	function addInputType() {
-		inputTypes = [...inputTypes, { key: '', value: false, error: '' }];
-	}
-
-	function addOutputType() {
-		outputTypes = [...outputTypes, { key: '', value: false, error: '' }];
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function removeInputType(index) {
-		inputTypes = inputTypes.filter((_, i) => i !== index);
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function removeOutputType(index) {
-		outputTypes = outputTypes.filter((_, i) => i !== index);
 	}
 </script>
 
@@ -233,9 +175,9 @@
 					</div>
 
 					<div class="mb-2 row">
-						<label for="command_parallel" class="col-2 col-form-label text-end"
-							>Command parallel</label
-						>
+						<label for="command_parallel" class="col-2 col-form-label text-end">
+							Command parallel
+						</label>
 						<div class="col-10">
 							<input
 								id="command_parallel"
@@ -259,105 +201,7 @@
 						</div>
 					</div>
 
-					<div class="mb-2 row">
-						<span class="col-2 col-form-label text-end"> Input Types </span>
-						{#if inputTypes.length > 0}
-							<div class="col-7">
-								{#each inputTypes as inputType, index}
-									<div class="row">
-										<div class="col">
-											<div class="input-group mb-1" class:has-validation={inputType.error}>
-												<input
-													type="text"
-													class="form-control flag-filter-key"
-													placeholder="Key"
-													bind:value={inputType.key}
-													class:is-invalid={inputType.error}
-												/>
-												<div class="input-group-text">
-													<label>
-														<input
-															class="form-check-input me-1"
-															type="checkbox"
-															bind:checked={inputType.value}
-															aria-label="Value for {inputType.key}"
-														/>
-														{inputType.value}
-													</label>
-												</div>
-												<button
-													class="btn btn-outline-danger"
-													type="button"
-													on:click={() => removeInputType(index)}
-													aria-label="Remove input type"
-												>
-													<i class="bi bi-trash" />
-												</button>
-												{#if inputType.error}
-													<div class="invalid-feedback">{inputType.error}</div>
-												{/if}
-											</div>
-										</div>
-									</div>
-								{/each}
-							</div>
-						{/if}
-						<div class="col-3">
-							<button class="btn btn-outline-primary" on:click={addInputType}>
-								Add input type
-							</button>
-						</div>
-					</div>
-
-					<div class="mb-2 row">
-						<span class="col-2 col-form-label text-end"> Output Types </span>
-						{#if outputTypes.length > 0}
-							<div class="col-7">
-								{#each outputTypes as outputType, index}
-									<div class="row">
-										<div class="col">
-											<div class="input-group mb-1" class:has-validation={outputType.error}>
-												<input
-													type="text"
-													class="form-control flag-filter-key"
-													placeholder="Key"
-													bind:value={outputType.key}
-													class:is-invalid={outputType.error}
-												/>
-												<div class="input-group-text">
-													<label>
-														<input
-															class="form-check-input me-1"
-															type="checkbox"
-															bind:checked={outputType.value}
-															aria-label="Value for {outputType.key}"
-														/>
-														{outputType.value}
-													</label>
-												</div>
-												<button
-													class="btn btn-outline-danger"
-													type="button"
-													on:click={() => removeOutputType(index)}
-													aria-label="Remove output type"
-												>
-													<i class="bi bi-trash" />
-												</button>
-												{#if outputType.error}
-													<div class="invalid-feedback">{outputType.error}</div>
-												{/if}
-											</div>
-										</div>
-									</div>
-								{/each}
-							</div>
-						{/if}
-						<div class="col-3">
-							<button class="btn btn-outline-primary" on:click={addOutputType}>
-								Add output type
-							</button>
-						</div>
-					</div>
+					<TypesEditor bind:this={typesEditor} />
 
 					<div class="mb-2 row">
 						<label for="argsSchemaVersion" class="col-2 col-form-label text-end"
