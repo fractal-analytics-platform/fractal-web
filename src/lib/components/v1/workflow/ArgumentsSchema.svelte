@@ -1,10 +1,10 @@
 <script>
 	import { page } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
-	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
 	import { updateFormEntry } from '$lib/components/v1/workflow/task_form_utils';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
+	import JSchema from '$lib/components/v1/workflow/JSchema.svelte';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -18,8 +18,6 @@
 	export let args = undefined;
 	/** @type {string} */
 	export let taskName;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
 
 	/** @type {JSchema} */
 	let schemaComponent;
@@ -37,8 +35,7 @@
 				workflowId,
 				workflowTaskId,
 				newArgs,
-				'args',
-				apiVersion
+				'args'
 			);
 			args = response.args;
 			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });

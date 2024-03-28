@@ -14,10 +14,8 @@
 
 	// Workflow id
 	export let workflowId;
-	/** @type {import('$lib/types').WorkflowTask} */
+	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
 
 	let metaProperties = {};
 	let originalMetaProperties = {};
@@ -36,8 +34,7 @@
 				workflowId,
 				workflowTask.id,
 				modifiedProperties,
-				'meta',
-				apiVersion
+				'meta'
 			);
 			workflowTask.meta = updatedMetaProperties.meta;
 			metaProperties = updatedMetaProperties.meta;

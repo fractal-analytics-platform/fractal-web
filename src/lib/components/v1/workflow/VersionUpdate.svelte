@@ -12,8 +12,6 @@
 	export let updateWorkflowCallback;
 	/** @type {(count: number) => Promise<void>} */
 	export let updateNewVersionsCount;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
 
 	$: task = workflowTask.task;
 
@@ -49,7 +47,7 @@
 		}
 
 		try {
-			updateCandidates = await getNewVersions(task, apiVersion);
+			updateCandidates = await getNewVersions(task);
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;

@@ -1,95 +1,161 @@
 <script>
 	import { page } from '$app/stores';
-	import { createEventDispatcher } from 'svelte';
-	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
-	import { updateFormEntry } from '$lib/components/v2/workflow/task_form_utils';
+	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
-	import ImportExportArgs from './ImportExportArgs.svelte';
+	import FormBuilder from './FormBuilder.svelte';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
-	const dispatch = createEventDispatcher();
+	/** @type {import('$lib/types-v2').WorkflowTaskV2}  */
+	export let workflowTask;
+	/** @type {(wft: import('$lib/types-v2').WorkflowTaskV2) => void} */
+	export let onWorkflowTaskUpdated;
 
-	export let workflowId = undefined;
-	export let workflowTaskId = undefined;
-	export let argumentsSchema = undefined;
-	export let argumentsSchemaVersion = undefined;
-	export let validSchema = undefined;
-	export let args = undefined;
-	/** @type {string} */
-	export let taskName;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
-
-	/** @type {JSchema} */
-	let schemaComponent;
-	export let unsavedChanges = false;
-	let resetChanges = undefined;
-	export let saveChanges = undefined;
+	/** @type {JSchema|undefined} */
+	let nonParallelSchemaComponent;
+	/** @type {JSchema|undefined} */
+	let parallelSchemaComponent;
+	let unsavedChangesParallel = false;
+	let unsavedChangesNonParallel = false;
 	let savingChanges = false;
 
-	async function handleSaveChanges(newArgs) {
-		const projectId = $page.params.projectId;
+	let argsChangesSaved = false;
+
+	$: unsavedChanges = unsavedChangesParallel || unsavedChangesNonParallel;
+
+	// TODO: handle this
+	$: isSchemaValid =
+		workflowTask.task.args_schema_version &&
+		SUPPORTED_SCHEMA_VERSIONS.includes(workflowTask.task.args_schema_version);
+
+	$: hasNonParallel =
+		workflowTask.task.type === 'non_parallel' || workflowTask.task.type === 'compound';
+	$: hasParallel = workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound';
+
+	export function hasUnsavedChanges() {
+		return unsavedChanges;
+	}
+
+	export function saveChanges() {
+		console.log('Inside saveChanges');
 		try {
-			savingChanges = true;
-			const response = await updateFormEntry(
-				projectId,
-				workflowId,
-				workflowTaskId,
-				newArgs,
-				'args',
-				apiVersion
-			);
-			args = response.args;
-			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
-			return args;
+			nonParallelSchemaComponent?.validateArguments();
+			parallelSchemaComponent?.validateArguments();
 		} catch (err) {
+			console.log(err);
 			displayStandardErrorAlert(err, 'json-schema-validation-errors');
-			throw err;
-		} finally {
-			savingChanges = false;
+			return;
 		}
+		const payload = {};
+		if (hasNonParallel) {
+			payload.args_non_parallel = nonParallelSchemaComponent?.getArguments();
+		}
+		if (hasParallel) {
+			payload.args_parallel = parallelSchemaComponent?.getArguments();
+		}
+		handleSaveChanges(payload);
 	}
 
-	function handleValidationErrors(errors) {
-		displayStandardErrorAlert(errors, 'json-schema-validation-errors');
+	export function discardChanges() {
+		nonParallelSchemaComponent?.discardChanges(workflowTask.args_non_parallel);
+		parallelSchemaComponent?.discardChanges(workflowTask.args_parallel);
 	}
 
-	$: {
-		if (argumentsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argumentsSchemaVersion)) {
-			validSchema = true;
+	async function handleSaveChanges(payload) {
+		savingChanges = true;
+		const projectId = $page.params.projectId;
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(
+			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.task_id}`,
+			{
+				method: 'PATCH',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify(payload)
+			}
+		);
+
+		const result = await response.json();
+		if (response.ok) {
+			if (result.args_non_parallel) {
+				nonParallelSchemaComponent?.onArgumentsUpdated(result.args_non_parallel);
+			}
+			if (result.args_parallel) {
+				parallelSchemaComponent?.onArgumentsUpdated(result.args_parallel);
+			}
+			onWorkflowTaskUpdated(result);
+			argsChangesSaved = true;
+			setTimeout(() => {
+				argsChangesSaved = false;
+			}, 3000);
 		} else {
-			validSchema = false;
+			displayStandardErrorAlert(await result, 'json-schema-validation-errors');
 		}
+		savingChanges = false;
 	}
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="json-schema-validation-errors" />
-	<div class="args-list">
-		<JSchema
-			bind:unsavedChanges
-			bind:discardChanges={resetChanges}
-			bind:saveChanges
-			schema={argumentsSchema}
-			schemaData={args}
-			{handleSaveChanges}
-			{handleValidationErrors}
-			bind:this={schemaComponent}
-		/>
-	</div>
+	{#if argsChangesSaved}
+		<div class="alert alert-success m-3" role="alert">Arguments changes saved successfully</div>
+	{/if}
+	{#if workflowTask.task.type === 'non_parallel' || workflowTask.task.type === 'compound'}
+		<h5 class="ps-2 mt-3">Args non parallel</h5>
+		{#if workflowTask.task.args_schema_non_parallel}
+			<div class="args-list">
+				<JSchema
+					bind:unsavedChanges={unsavedChangesNonParallel}
+					schema={workflowTask.task.args_schema_non_parallel}
+					schemaData={workflowTask.args_non_parallel}
+					bind:this={nonParallelSchemaComponent}
+				/>
+			</div>
+		{:else}
+			<div>
+				<span id="argsPropertiesFormError" />
+				<FormBuilder
+					entry={workflowTask.args_non_parallel}
+					updateEntry={() => {
+						/* TODO */
+					}}
+				/>
+			</div>
+		{/if}
+	{/if}
+	<hr />
+	{#if workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound'}
+		<h5 class="ps-2">Args parallel</h5>
+		{#if workflowTask.task.args_schema_parallel}
+			<div class="args-list">
+				<JSchema
+					bind:unsavedChanges={unsavedChangesParallel}
+					schema={workflowTask.task.args_schema_parallel}
+					schemaData={workflowTask.args_parallel}
+					bind:this={parallelSchemaComponent}
+				/>
+			</div>
+		{:else}
+			<div>
+				<span id="argsPropertiesFormError" />
+				<FormBuilder
+					entry={workflowTask.args_parallel}
+					updateEntry={() => {
+						/* TODO */
+					}}
+				/>
+			</div>
+		{/if}
+	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
-		<ImportExportArgs
-			{taskName}
-			{args}
-			onImport={(json) => schemaComponent.saveChanges(json)}
-			exportDisabled={unsavedChanges || savingChanges}
-		/>
 		<div>
 			<button
 				class="btn btn-warning"
 				disabled={!unsavedChanges || savingChanges}
-				on:click={() => resetChanges(args)}
+				on:click={discardChanges}
 			>
 				Discard changes
 			</button>
@@ -97,6 +163,7 @@
 		<div class="ms-1">
 			<button
 				class="btn btn-success"
+				type="button"
 				disabled={!unsavedChanges || savingChanges}
 				on:click={saveChanges}
 			>

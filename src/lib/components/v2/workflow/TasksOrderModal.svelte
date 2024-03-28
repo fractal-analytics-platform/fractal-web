@@ -3,10 +3,10 @@
 
 	/** @type {number} */
 	export let projectId;
-	/** @type {import('$lib/types').Workflow} */
+	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
 
-	/** @type {(workflow: import('$lib/types').Workflow) => void} */
+	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => void} */
 	export let workflowUpdater;
 
 	/** @type {Modal} */
@@ -16,7 +16,7 @@
 	let editableTasksList = [];
 
 	/**
-	 * @param {import('$lib/types').WorkflowTask[]} originalTasksList
+	 * @param {import('$lib/types-v2').WorkflowTaskV2[]} originalTasksList
 	 */
 	export function show(originalTasksList) {
 		editableTasksList = originalTasksList.map((task) => ({ id: task.id, name: task.task.name }));

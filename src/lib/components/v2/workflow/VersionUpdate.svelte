@@ -5,19 +5,17 @@
 	import { getNewVersions } from './version-checker';
 	import { stripSchemaProperties } from '$lib/components/common/jschema/schema_management';
 
-	/** @type {import('$lib/types').WorkflowTask} */
+	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
 
-	/** @type {(workflowTask: import('$lib/types').WorkflowTask) => void} */
+	/** @type {(workflowTask: import('$lib/types-v2').WorkflowTaskV2) => void} */
 	export let updateWorkflowCallback;
 	/** @type {(count: number) => Promise<void>} */
 	export let updateNewVersionsCount;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
 
 	$: task = workflowTask.task;
 
-	/** @type {import('$lib/types').Task[]} */
+	/** @type {import('$lib/types-v2').TaskV2[]} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
 	let originalArgs = '';
@@ -44,12 +42,12 @@
 		argsToBeFixed = '';
 		validationErrors = null;
 
-		if (!task.args_schema || !task.version) {
+		if (!(task.args_schema_parallel || task.args_schema_non_parallel) || !task.version) {
 			return;
 		}
 
 		try {
-			updateCandidates = await getNewVersions(task, apiVersion);
+			updateCandidates = await getNewVersions(task);
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
@@ -93,10 +91,11 @@
 	 * @param args {object}
 	 */
 	function validateArguments(args) {
+		// TODO
 		const updateCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
 		const newSchema =
 			/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchemaObjectProperty} */ (
-				updateCandidate.args_schema
+				updateCandidate.args_schema_non_parallel
 			);
 		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
@@ -182,7 +181,7 @@
 
 <div>
 	<div id="versionUpdateError" />
-	{#if task.args_schema && task.version}
+	{#if (task.args_schema_non_parallel || task.args_schema_parallel) && task.version}
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection"> New versions of this task exist: </label>
 			<select
@@ -282,7 +281,7 @@
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task version is not set.
 		</div>
-	{:else if !task.args_schema}
+	{:else if (!task.args_schema_non_parallel && !task.args_schema_parallel)}
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task has no args_schema.
 		</div>

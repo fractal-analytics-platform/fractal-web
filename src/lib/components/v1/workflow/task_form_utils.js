@@ -7,7 +7,6 @@ import { AlertError } from "$lib/common/errors";
  * @param {number} workflowTaskId 
  * @param {any} updatingWorkflowTaskProperties 
  * @param {string} groupName
- * @param {'v1'|'v2'} apiVersion
  * @returns 
  */
 export async function updateFormEntry(
@@ -15,8 +14,7 @@ export async function updateFormEntry(
 	workflowId,
 	workflowTaskId,
 	updatingWorkflowTaskProperties,
-	groupName,
-	apiVersion
+	groupName
 ) {
 	const requestData = {};
 	requestData[groupName] = updatingWorkflowTaskProperties;
@@ -31,16 +29,14 @@ export async function updateFormEntry(
 			projectId,
 			workflowId,
 			workflowTaskId,
-			updateArgs,
-			apiVersion
+			updateArgs
 		);
 	} else if (updateMeta) {
 		return await updateWorkflowTaskMetadata(
 			projectId,
 			workflowId,
 			workflowTaskId,
-			updateMeta,
-			apiVersion
+			updateMeta
 		);
 	}
 	throw new AlertError('Invalid request data: args or meta are required');
@@ -52,15 +48,13 @@ export async function updateFormEntry(
  * @param {number} workflowId
  * @param {number} workflowTaskId
  * @param {any} args
- * @param {'v1'|'v2'} apiVersion
  * @returns {Promise<*>}
  */
 async function updateWorkflowTaskArguments(
 	projectId,
 	workflowId,
 	workflowTaskId,
-	args,
-	apiVersion
+	args
 ) {
 	const requestBody = {
 		args: args
@@ -70,7 +64,7 @@ async function updateWorkflowTaskArguments(
 	headers.set('Content-Type', 'application/json');
 
 	const response = await fetch(
-		`/api/${apiVersion}/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
+		`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 		{
 			method: 'PATCH',
 			credentials: 'include',
@@ -94,15 +88,13 @@ async function updateWorkflowTaskArguments(
  * @param {number} workflowId
  * @param {number} workflowTaskId
  * @param {any} meta
- * @param {'v1'|'v2'} apiVersion
  * @returns {Promise<*>}
  */
 async function updateWorkflowTaskMetadata(
 	projectId,
 	workflowId,
 	workflowTaskId,
-	meta,
-	apiVersion
+	meta
 ) {
 	const requestBody = {
 		meta: meta
@@ -112,7 +104,7 @@ async function updateWorkflowTaskMetadata(
 	headers.set('Content-Type', 'application/json');
 
 	const response = await fetch(
-		`/api/${apiVersion}/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
+		`/api/v1/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 		{
 			method: 'PATCH',
 			credentials: 'include',

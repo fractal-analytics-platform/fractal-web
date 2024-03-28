@@ -15,14 +15,14 @@
 	// - enable the usage of the object that keeps the representation of the list
 
 	export let workflowId;
-	/** @type {import('$lib/types').WorkflowTask} */
+	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
+	/** @type {'args_non_parallel'|'args_parallel'} */
+	export let key;
 
 	onMount(() => {
-		if (!workflowTask.args) {
-			workflowTask.args = {};
+		if (!workflowTask[key]) {
+			workflowTask[key] = {};
 		}
 	});
 
@@ -37,10 +37,9 @@
 				workflowId,
 				workflowTask.id,
 				updatedEntry,
-				'args',
-				apiVersion
+				key
 			);
-			workflowTask.args = response.args;
+			workflowTask[key] = response.args;
 		} catch (error) {
 			console.error(error);
 			displayStandardErrorAlert(error, 'argsPropertiesFormError');
@@ -50,11 +49,11 @@
 
 <div>
 	<span id="argsPropertiesFormError" />
-	<FormBuilder entry={workflowTask.args} updateEntry={handleEntryUpdate} />
+	<FormBuilder entry={workflowTask[key]} updateEntry={handleEntryUpdate} />
 	<div class="d-flex args-controls-bar p-3 mt-3">
 		<ImportExportArgs
 			taskName={workflowTask.task.name}
-			args={workflowTask.args}
+			args={workflowTask[key]}
 			onImport={(json) => handleEntryUpdate(json)}
 			exportDisabled={false}
 		/>

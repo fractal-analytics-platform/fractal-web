@@ -544,7 +544,7 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task), 'v1');
+			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task));
 		}
 	}
 
@@ -751,13 +751,11 @@
 													bind:validSchema={argsSchemaValid}
 													bind:unsavedChanges={argumentsWithUnsavedChanges}
 													on:argsSaved={handleArgsSaved}
-													apiVersion="v1"
 												/>
 											{:else}
 												<ArgumentForm
 													workflowId={workflow.id}
 													workflowTask={selectedWorkflowTask}
-													apiVersion="v1"
 												/>
 											{/if}
 										{/key}
@@ -772,7 +770,6 @@
 											<MetaPropertiesForm
 												workflowId={workflow.id}
 												workflowTask={selectedWorkflowTask}
-												apiVersion="v1"
 											/>
 										{/key}
 									{/if}
@@ -860,7 +857,6 @@
 										workflowTask={selectedWorkflowTask}
 										updateWorkflowCallback={taskUpdated}
 										{updateNewVersionsCount}
-										apiVersion="v1"
 									/>
 								{/if}
 							</div>

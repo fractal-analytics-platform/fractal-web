@@ -3,7 +3,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import ArgumentForm from '$lib/components/v2/workflow/ArgumentForm.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
@@ -18,11 +17,12 @@
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
+	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').Workflow} */
+	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
 	$: project = workflow.project;
-	/** @type {import('$lib/types').Dataset[]} */
+	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	let datasets = $page.data.datasets;
 	// List of available tasks to be inserted into workflow
 	let availableTasks = [];
@@ -41,7 +41,7 @@
 
 	let workflowTabContextId = 0;
 	let workflowSuccessMessage = '';
-	/** @type {import('$lib/types').WorkflowTask|undefined} */
+	/** @type {import('$lib/types-v2').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = undefined;
 	let checkingConfiguration = false;
 	let setSlurmAccount = true;
@@ -50,12 +50,10 @@
 	let workerInitControl = '';
 	let firstTaskIndexControl = '';
 	let lastTaskIndexControl = '';
-	let argsSchemaAvailable = undefined;
-	let argsSchemaValid = undefined;
-	let argsChangesSaved = false;
-	let argumentsWithUnsavedChanges = false;
-	let saveArgumentsChanges = undefined;
-	let preventedTaskContextChange = undefined;
+	let preventedSelectedTaskChange = undefined;
+
+	/** @type {ArgumentsSchema|undefined} */
+	let argsSchemaForm = undefined;
 
 	// Create workflow task modal
 	/** @type {number|undefined} */
@@ -77,7 +75,7 @@
 	/** @type {Modal} */
 	let editWorkflowModal;
 
-	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
+	/** @type {{ [id: string]: import('$lib/types-v2').TaskV2[] }} */
 	let newVersionsMap = {};
 
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
@@ -95,7 +93,7 @@
 	});
 
 	beforeNavigate((navigation) => {
-		if (argumentsWithUnsavedChanges === true) {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
 			// Prevent navigation
 			navigation.cancel();
 			// Toggle the modal
@@ -146,10 +144,13 @@
 		resetCreateWorkflowTaskModal();
 
 		// Get available tasks from the server
-		const response = await fetch(`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(
+			`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
 
 		if (response.ok) {
 			availableTasks = await response.json();
@@ -246,8 +247,10 @@
 						headers,
 						body: JSON.stringify({
 							order: taskOrder,
-							meta: {},
-							args: {}
+							meta_non_parallel: {},
+							meta_parallel: {},
+							args_non_parallel: {},
+							args_parallel: {}
 						})
 					}
 				);
@@ -312,7 +315,7 @@
 		}
 
 		// Discard unsaved changes when workflow task is deleted
-		argumentsWithUnsavedChanges = false;
+		argsSchemaForm?.discardChanges();
 
 		// Get updated workflow with deleted task
 		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
@@ -332,37 +335,20 @@
 		selectedWorkflowTask = undefined;
 	}
 
-	async function setActiveWorkflowTaskContext(event) {
-		if (!workflow) {
-			return;
-		}
-		const workflowTaskId = event.currentTarget.getAttribute('data-fs-target');
-		const wft = workflow.task_list.find((task) => task.id == workflowTaskId);
-		if (!wft) {
-			return;
-		}
-		if (argumentsWithUnsavedChanges === true) {
+	/**
+	 * @param {import('$lib/types-v2').WorkflowTaskV2} wft
+	 */
+	async function setSelectedWorkflowTask(wft) {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
 			toggleUnsavedChangesModal();
-			preventedTaskContextChange = wft;
+			preventedSelectedTaskChange = wft;
 			throw new Error('Cannot change workflow task context while there are unsaved changes');
 		}
-		setWorkflowTaskContext(wft);
+		selectedWorkflowTask = wft;
 	}
 
 	function toggleUnsavedChangesModal() {
 		unsavedChangesModal.toggle();
-	}
-
-	/**
-	 * @param {import('$lib/types').WorkflowTask} wft
-	 */
-	function setWorkflowTaskContext(wft) {
-		selectedWorkflowTask = wft;
-		// Check if args schema is available
-		argsSchemaAvailable =
-			wft.task.args_schema === undefined || wft.task.args_schema === null ? false : true;
-		// Suppose args schema is valid
-		argsSchemaValid = true;
 	}
 
 	let applyingWorkflow = false;
@@ -424,18 +410,6 @@
 		}
 	}
 
-	function handleArgsSaved(event) {
-		if (!selectedWorkflowTask) {
-			return;
-		}
-		selectedWorkflowTask.args = event.detail.args;
-		selectedWorkflowTask = selectedWorkflowTask;
-		argsChangesSaved = true;
-		setTimeout(() => {
-			argsChangesSaved = false;
-		}, 3000);
-	}
-
 	function resetLastTask() {
 		if (lastTaskIndexControl !== '' && firstTaskIndexControl > lastTaskIndexControl) {
 			lastTaskIndexControl = '';
@@ -444,7 +418,7 @@
 
 	/**
 	 * Called by VersionUpdate component at the end of the update to reload the workflow.
-	 * @param workflowTask {import('$lib/types').WorkflowTask}
+	 * @param workflowTask {import('$lib/types-v2').WorkflowTaskV2}
 	 */
 	async function taskUpdated(workflowTask) {
 		if (!workflow) {
@@ -478,10 +452,7 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMap = await getAllNewVersions(
-				workflow.task_list.map((wt) => wt.task),
-				'v2'
-			);
+			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task));
 		}
 	}
 
@@ -613,6 +584,13 @@
 		}
 	}
 
+	/**
+	 * @param {import('$lib/types-v2').WorkflowTaskV2} updatedWft
+	 */
+	function onWorkflowTaskUpdated(updatedWft) {
+		selectedWorkflowTask = updatedWft;
+	}
+
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
 	});
@@ -666,7 +644,7 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => {
-							if (argumentsWithUnsavedChanges === false) {
+							if (argsSchemaForm?.hasUnsavedChanges() === false) {
 								runWorkflowModal.toggle();
 							} else {
 								toggleUnsavedChangesModal();
@@ -757,7 +735,7 @@
 										? 'active'
 										: ''}"
 									data-fs-target={workflowTask.id}
-									on:click|preventDefault={setActiveWorkflowTaskContext}
+									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
 								>
 									{workflowTask.task.name}
 
@@ -845,32 +823,11 @@
 								<div class="card-body p-0">
 									{#if selectedWorkflowTask}
 										{#key selectedWorkflowTask}
-											{#if argsSchemaAvailable && argsSchemaValid}
-												{#if argsChangesSaved}
-													<div class="alert alert-success m-3" role="alert">
-														Arguments changes saved successfully
-													</div>
-												{/if}
-												<ArgumentsSchema
-													workflowId={workflow.id}
-													workflowTaskId={selectedWorkflowTask.id}
-													argumentsSchema={selectedWorkflowTask.task.args_schema}
-													argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
-													taskName={selectedWorkflowTask.task.name}
-													args={selectedWorkflowTask.args}
-													bind:saveChanges={saveArgumentsChanges}
-													bind:validSchema={argsSchemaValid}
-													bind:unsavedChanges={argumentsWithUnsavedChanges}
-													on:argsSaved={handleArgsSaved}
-													apiVersion="v2"
-												/>
-											{:else}
-												<ArgumentForm
-													workflowId={workflow.id}
-													workflowTask={selectedWorkflowTask}
-													apiVersion="v2"
-												/>
-											{/if}
+											<ArgumentsSchema
+												workflowTask={selectedWorkflowTask}
+												{onWorkflowTaskUpdated}
+												bind:this={argsSchemaForm}
+											/>
 										{/key}
 									{/if}
 								</div>
@@ -883,7 +840,6 @@
 											<MetaPropertiesForm
 												workflowId={workflow.id}
 												workflowTask={selectedWorkflowTask}
-												apiVersion="v2"
 											/>
 										{/key}
 									{/if}
@@ -918,21 +874,57 @@
 											</li>
 											<li class="list-group-item list-group-item-light fw-bold">Owner</li>
 											<li class="list-group-item">{selectedWorkflowTask.task.owner || '–'}</li>
-											<li class="list-group-item list-group-item-light fw-bold">Command</li>
-											<li class="list-group-item">
-												<code>{selectedWorkflowTask.task.command}</code>
-											</li>
+											{#if selectedWorkflowTask.task.command_non_parallel !== null}
+												<li class="list-group-item list-group-item-light fw-bold">
+													Command non parallel
+												</li>
+												<li class="list-group-item">
+													<code>{selectedWorkflowTask.task.command_non_parallel}</code>
+												</li>
+											{/if}
+											{#if selectedWorkflowTask.task.command_parallel !== null}
+												<li class="list-group-item list-group-item-light fw-bold">
+													Command parallel
+												</li>
+												<li class="list-group-item">
+													<code>{selectedWorkflowTask.task.command_parallel}</code>
+												</li>
+											{/if}
 											<li class="list-group-item list-group-item-light fw-bold">Source</li>
 											<li class="list-group-item">
 												<code>{selectedWorkflowTask.task.source}</code>
 											</li>
 											<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
 											<li class="list-group-item">
-												<code>{selectedWorkflowTask.task.input_type}</code>
+												<table class="table table-borderless mb-0">
+													<tbody>
+														{#each Object.keys(selectedWorkflowTask.task.input_types) as key}
+															<tr class="d-flex">
+																<td><code>{key}</code></td>
+																<td class="flex-grow">
+																	<BooleanIcon value={selectedWorkflowTask.task.input_types[key]} />
+																</td>
+															</tr>
+														{/each}
+													</tbody>
+												</table>
 											</li>
 											<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
 											<li class="list-group-item">
-												<code>{selectedWorkflowTask.task.output_type}</code>
+												<table class="table table-borderless mb-0">
+													<tbody>
+														{#each Object.keys(selectedWorkflowTask.task.output_types) as key}
+															<tr class="d-flex">
+																<td><code>{key}</code></td>
+																<td class="flex-grow">
+																	<BooleanIcon
+																		value={selectedWorkflowTask.task.output_types[key]}
+																	/>
+																</td>
+															</tr>
+														{/each}
+													</tbody>
+												</table>
 											</li>
 											<li class="list-group-item list-group-item-light fw-bold">
 												Args Schema Version
@@ -940,20 +932,42 @@
 											<li class="list-group-item">
 												{selectedWorkflowTask.task.args_schema_version || '–'}
 											</li>
-											<li class="list-group-item list-group-item-light fw-bold">Args Schema</li>
-											<li class="list-group-item">
-												{#if selectedWorkflowTask.task.args_schema}
-													<code>
-														<pre>{JSON.stringify(
-																selectedWorkflowTask.task.args_schema,
-																null,
-																2
-															)}</pre>
-													</code>
-												{:else}
-													-
-												{/if}
-											</li>
+											{#if selectedWorkflowTask.task.command_non_parallel !== null}
+												<li class="list-group-item list-group-item-light fw-bold">
+													Args Schema non parallel
+												</li>
+												<li class="list-group-item">
+													{#if selectedWorkflowTask.task.args_schema_non_parallel}
+														<code>
+															<pre>{JSON.stringify(
+																	selectedWorkflowTask.task.args_schema_non_parallel,
+																	null,
+																	2
+																)}</pre>
+														</code>
+													{:else}
+														-
+													{/if}
+												</li>
+											{/if}
+											{#if selectedWorkflowTask.task.command_parallel !== null}
+												<li class="list-group-item list-group-item-light fw-bold">
+													Args Schema parallel
+												</li>
+												<li class="list-group-item">
+													{#if selectedWorkflowTask.task.args_schema_parallel}
+														<code>
+															<pre>{JSON.stringify(
+																	selectedWorkflowTask.task.args_schema_parallel,
+																	null,
+																	2
+																)}</pre>
+														</code>
+													{:else}
+														-
+													{/if}
+												</li>
+											{/if}
 										</ul>
 									{/if}
 								</div>
@@ -971,7 +985,6 @@
 										workflowTask={selectedWorkflowTask}
 										updateWorkflowCallback={taskUpdated}
 										{updateNewVersionsCount}
-										apiVersion="v2"
 									/>
 								{/if}
 							</div>
@@ -1189,8 +1202,8 @@
 			type="button"
 			class="btn btn-warning"
 			on:click={() => {
-				argumentsWithUnsavedChanges = false;
-				setWorkflowTaskContext(preventedTaskContextChange);
+				argsSchemaForm?.discardChanges();
+				setSelectedWorkflowTask(preventedSelectedTaskChange);
 			}}
 			data-bs-dismiss="modal"
 			>Discard changes
@@ -1198,7 +1211,9 @@
 		<button
 			type="button"
 			class="btn btn-success"
-			on:click={saveArgumentsChanges}
+			on:click={() => {
+				argsSchemaForm?.saveChanges();
+			}}
 			data-bs-dismiss="modal"
 			>Save changes
 		</button>

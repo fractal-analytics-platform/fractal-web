@@ -17,8 +17,6 @@
 	export let workflowId;
 	/** @type {import('$lib/types').WorkflowTask} */
 	export let workflowTask;
-	/** @type {'v1'|'v2'} */
-	export let apiVersion;
 
 	onMount(() => {
 		if (!workflowTask.args) {
@@ -37,8 +35,7 @@
 				workflowId,
 				workflowTask.id,
 				updatedEntry,
-				'args',
-				apiVersion
+				'args'
 			);
 			workflowTask.args = response.args;
 		} catch (error) {

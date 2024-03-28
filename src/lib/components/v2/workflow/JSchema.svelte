@@ -32,15 +32,12 @@
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 	import { AlertError } from '$lib/common/errors';
 
-	/** @type {import('./jschema-types').JSONSchemaObjectProperty|undefined} */
+	/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchema|undefined} */
 	export let schema = undefined;
 	export let schemaData = undefined;
-	/** @type {((value: object) => Promise<object>)|undefined} */
-	export let handleSaveChanges = undefined;
-	export let handleValidationErrors = undefined;
 
 	let validator = undefined;
-	/** @type {import('./jschema-types').JSONSchema|undefined} */
+	/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchema|undefined} */
 	let parsedSchema = undefined;
 	/** @type {undefined|boolean} */
 	let isSchemaValid = undefined;
@@ -101,14 +98,19 @@
 		}
 	}
 
+	export function getArguments() {
+		return schemaManager.data;
+	}
+
 	/**
 	 * Save changes to schema arguments. Used both by the "Save changes" button
 	 * and by the "Import" button.
-	 * @param {Event|object} param click event when using "Save changes" or
-	 * arguments object passed by the "Import" button.
+	 * @param {object|null} param arguments object passed by the "Import" button or
+	 * null when clicking the "Save changes" button
 	 */
-	export async function saveChanges(param) {
-		const isImport = !(param instanceof Event);
+	export function validateArguments(param = null) {
+		console.log('in validateArguments');
+		const isImport = param !== null;
 		if (!isImport) {
 			// Trigger validation on input fields, when we are using the "Save changes" button
 			for (const field of document.querySelectorAll('#json-schema input, #json-schema select')) {
@@ -125,26 +127,14 @@
 		const isDataValid = validator.isValid(strippedNullData);
 		if (!isDataValid) {
 			const errors = validator.getErrors();
-			console.error('Could not save changes. Data is invalid', errors);
-			if (isImport) {
-				// Stop inside import modal
-				throw new AlertError(errors);
-			}
-			if (handleValidationErrors !== null && handleValidationErrors !== undefined) {
-				handleValidationErrors(errors);
-			}
-			return;
+			throw new AlertError(errors);
 		}
+		console.log('data is valid');
+	}
 
-		if (handleSaveChanges !== null && handleSaveChanges !== undefined) {
-			try {
-				const updatedArgs = await handleSaveChanges(strippedNullData);
-				schemaManager.data = updatedArgs;
-				schemaManager.changesSaved();
-			} catch (err) {
-				console.error(err);
-			}
-		}
+	export function onArgumentsUpdated(updatedArgs) {
+		schemaManager.data = updatedArgs;
+		schemaManager.changesSaved();
 	}
 
 	/**

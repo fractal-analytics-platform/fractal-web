@@ -160,33 +160,37 @@
 						</div>
 					</div>
 
-					<div class="mb-2 row">
-						<label for="command_non_parallel" class="col-2 col-form-label text-end"
-							>Command non parallel</label
-						>
-						<div class="col-10">
-							<input
-								id="command_non_parallel"
-								type="text"
-								bind:value={task.command_non_parallel}
-								class="form-control"
-							/>
+					{#if task.command_non_parallel !== null}
+						<div class="mb-2 row">
+							<label for="command_non_parallel" class="col-2 col-form-label text-end">
+								Command non parallel
+							</label>
+							<div class="col-10">
+								<input
+									id="command_non_parallel"
+									type="text"
+									bind:value={task.command_non_parallel}
+									class="form-control"
+								/>
+							</div>
 						</div>
-					</div>
+					{/if}
 
-					<div class="mb-2 row">
-						<label for="command_parallel" class="col-2 col-form-label text-end">
-							Command parallel
-						</label>
-						<div class="col-10">
-							<input
-								id="command_parallel"
-								type="text"
-								bind:value={task.command_parallel}
-								class="form-control"
-							/>
+					{#if task.command_parallel !== null}
+						<div class="mb-2 row">
+							<label for="command_parallel" class="col-2 col-form-label text-end">
+								Command parallel
+							</label>
+							<div class="col-10">
+								<input
+									id="command_parallel"
+									type="text"
+									bind:value={task.command_parallel}
+									class="form-control"
+								/>
+							</div>
 						</div>
-					</div>
+					{/if}
 
 					<div class="mb-2 row">
 						<label for="source" class="col-2 col-form-label text-end">Source</label>
@@ -204,9 +208,9 @@
 					<TypesEditor bind:this={typesEditor} />
 
 					<div class="mb-2 row">
-						<label for="argsSchemaVersion" class="col-2 col-form-label text-end"
-							>Args Schema Version</label
-						>
+						<label for="argsSchemaVersion" class="col-2 col-form-label text-end">
+							Args Schema Version
+						</label>
 						<div class="col-10">
 							<input
 								id="ar$gsSchemaVersion"
@@ -218,39 +222,43 @@
 						</div>
 					</div>
 
-					<div class="mb-2 row">
-						<label for="argsSchema" class="col-2 col-form-label text-end"
-							>Args Schema non parallel</label
-						>
-						<div class="col-10">
-							<textarea
-								name="argsSchema"
-								value={task.args_schema_non_parallel
-									? JSON.stringify(task.args_schema_non_parallel, null, 2)
-									: null}
-								disabled
-								class="form-control"
-								rows="10"
-							/>
+					{#if task.command_non_parallel !== null}
+						<div class="mb-2 row">
+							<label for="argsSchema" class="col-2 col-form-label text-end">
+								Args Schema non parallel
+							</label>
+							<div class="col-10">
+								<textarea
+									name="argsSchema"
+									value={task.args_schema_non_parallel
+										? JSON.stringify(task.args_schema_non_parallel, null, 2)
+										: null}
+									disabled
+									class="form-control"
+									rows="10"
+								/>
+							</div>
 						</div>
-					</div>
+					{/if}
 
-					<div class="mb-2 row">
-						<label for="argsSchema" class="col-2 col-form-label text-end"
-							>Args Schema parallel</label
-						>
-						<div class="col-10">
-							<textarea
-								name="argsSchema"
-								value={task.args_schema_parallel
-									? JSON.stringify(task.args_schema_parallel, null, 2)
-									: null}
-								disabled
-								class="form-control"
-								rows="10"
-							/>
+					{#if task.command_parallel !== null}
+						<div class="mb-2 row">
+							<label for="argsSchema" class="col-2 col-form-label text-end">
+								Args Schema parallel
+							</label>
+							<div class="col-10">
+								<textarea
+									name="argsSchema"
+									value={task.args_schema_parallel
+										? JSON.stringify(task.args_schema_parallel, null, 2)
+										: null}
+									disabled
+									class="form-control"
+									rows="10"
+								/>
+							</div>
 						</div>
-					</div>
+					{/if}
 
 					<div class="mb-2 row">
 						<label for="docsLink" class="col-2 col-form-label text-end">Docs Link</label>
