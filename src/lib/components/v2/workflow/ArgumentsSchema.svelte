@@ -19,8 +19,6 @@
 	let unsavedChangesNonParallel = false;
 	let savingChanges = false;
 
-	let argsChangesSaved = false;
-
 	$: unsavedChanges = unsavedChangesParallel || unsavedChangesNonParallel;
 
 	$: isSchemaValid =
@@ -28,14 +26,14 @@
 		SUPPORTED_SCHEMA_VERSIONS.includes(workflowTask.task.args_schema_version);
 
 	$: hasNonParallel =
-		workflowTask.task.type === 'non_parallel' || workflowTask.task.type === 'compound';
-	$: hasParallel = workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound';
+		workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound';
+	$: hasParallel = workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound';
 
 	export function hasUnsavedChanges() {
 		return unsavedChanges;
 	}
 
-	export function saveChanges() {
+	export async function saveChanges() {
 		try {
 			nonParallelSchemaComponent?.validateArguments();
 			parallelSchemaComponent?.validateArguments();
@@ -51,7 +49,7 @@
 		if (hasParallel) {
 			payload.args_parallel = parallelSchemaComponent?.getArguments();
 		}
-		handleSaveChanges(payload);
+		await handleSaveChanges(payload);
 	}
 
 	export function discardChanges() {
@@ -102,10 +100,6 @@
 				parallelSchemaComponent?.onArgumentsUpdated(result.args_parallel);
 			}
 			onWorkflowTaskUpdated(result);
-			argsChangesSaved = true;
-			setTimeout(() => {
-				argsChangesSaved = false;
-			}, 3000);
 		} else {
 			displayStandardErrorAlert(await result, 'json-schema-validation-errors');
 		}
@@ -115,10 +109,7 @@
 
 <div id="workflow-arguments-schema-panel">
 	<div id="json-schema-validation-errors" />
-	{#if argsChangesSaved}
-		<div class="alert alert-success m-3" role="alert">Arguments changes saved successfully</div>
-	{/if}
-	{#if workflowTask.task.type === 'non_parallel' || workflowTask.task.type === 'compound'}
+	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
 		<h5 class="ps-2 mt-3">Args non parallel</h5>
 		{#if workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
@@ -140,10 +131,10 @@
 			</div>
 		{/if}
 	{/if}
-	{#if workflowTask.task.type === 'compound'}
+	{#if workflowTask.task_type === 'compound'}
 		<hr />
 	{/if}
-	{#if workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound'}
+	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
 		<h5 class="ps-2 mt-3">Args parallel</h5>
 		{#if workflowTask.task.args_schema_parallel && isSchemaValid}
 			<div class="args-list">

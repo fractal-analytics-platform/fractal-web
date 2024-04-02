@@ -55,6 +55,8 @@
 	/** @type {ArgumentsSchema|undefined} */
 	let argsSchemaForm = undefined;
 
+	let argsChangesSaved = false;
+
 	// Create workflow task modal
 	/** @type {number|undefined} */
 	let taskOrder = undefined;
@@ -589,6 +591,10 @@
 	 */
 	function onWorkflowTaskUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
+		argsChangesSaved = true;
+		setTimeout(() => {
+			argsChangesSaved = false;
+		}, 3000);
 	}
 
 	onDestroy(() => {
@@ -821,6 +827,11 @@
 						{#if workflowTabContextId === 0}
 							<div id="args-tab" class="tab-pane show active">
 								<div class="card-body p-0">
+									{#if argsChangesSaved}
+										<div class="alert alert-success m-3" role="alert">
+											Arguments changes saved successfully
+										</div>
+									{/if}
 									{#if selectedWorkflowTask}
 										{#key selectedWorkflowTask}
 											<ArgumentsSchema
@@ -837,10 +848,7 @@
 								<div class="card-body">
 									{#if selectedWorkflowTask}
 										{#key selectedWorkflowTask}
-											<MetaPropertiesForm
-												workflowId={workflow.id}
-												workflowTask={selectedWorkflowTask}
-											/>
+											<MetaPropertiesForm workflowTask={selectedWorkflowTask} />
 										{/key}
 									{/if}
 								</div>

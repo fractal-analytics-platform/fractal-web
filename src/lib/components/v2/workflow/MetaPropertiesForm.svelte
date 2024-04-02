@@ -90,14 +90,14 @@
 
 <div>
 	<span id="metaPropertiesFormError" />
-	{#if workflowTask.task.type === 'non_parallel' || workflowTask.task.type === 'compound'}
+	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
 		<h5>Meta non parallel</h5>
 		<FormBuilder entry={metaPropertiesNonParallel} updateEntry={updateMetaNonParallel} />
 	{/if}
-	{#if workflowTask.task.type === 'compound'}
+	{#if workflowTask.task_type === 'compound'}
 		<hr />
 	{/if}
-	{#if workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound'}
+	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
 		<h5>Meta parallel</h5>
 		<FormBuilder entry={metaPropertiesParallel} updateEntry={updateMetaParallel} />
 	{/if}

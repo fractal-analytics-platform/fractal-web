@@ -103,4 +103,5 @@ export type WorkflowTaskV2 = {
   is_legacy_task: boolean
   task_legacy_id: number
   task_legacy: Task
+  task_type: TaskV2Type
 }
