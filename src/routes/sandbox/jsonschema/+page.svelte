@@ -1,6 +1,6 @@
 <script>
 	import SchemaInput from '$lib/components/common/jschema/SchemaInput.svelte';
-	import JSchema from '$lib/components/common/jschema/JSchema.svelte';
+	import JSchema from '$lib/components/v1/workflow/JSchema.svelte';
 
 	let schema = undefined;
 	let schemaData = undefined;

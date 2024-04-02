@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 
-import JSchema from '../src/lib/components/common/jschema/JSchema.svelte';
+import JSchema from '../../src/lib/components/v1/workflow/JSchema.svelte';
 
 describe('JSchema', () => {
 	it('Required NumberProperty with title', async () => {

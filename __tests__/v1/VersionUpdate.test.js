@@ -24,7 +24,7 @@ function createFetchResponse(data) {
 }
 
 // The component to be tested must be imported after the mock setup
-import VersionUpdate from '../src/lib/components/workflow/VersionUpdate.svelte';
+import VersionUpdate from '../../src/lib/components/v1/workflow/VersionUpdate.svelte';
 
 const task3ArgsSchema = {
 	title: 'MyTask',
