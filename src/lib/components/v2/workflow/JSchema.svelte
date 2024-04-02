@@ -35,6 +35,8 @@
 	/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchema|undefined} */
 	export let schema = undefined;
 	export let schemaData = undefined;
+	/** @type {boolean} */
+	export let legacy;
 
 	let validator = undefined;
 	/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchema|undefined} */
@@ -49,23 +51,15 @@
 	onMount(() => {
 		// Load a default schema
 		if (schema !== undefined) {
-			stripSchemaProperties(schema);
+			stripSchemaProperties(schema, legacy);
 			parsedSchema = schema;
-		}
-
-		// Load schema and data from server
-		// Validate schema
-		if (isSchemaValid && isDataValid) {
-			// Create component structures
-			// Setup svelte context
-			// Add event listeners
 		}
 	});
 
 	$: {
 		if (schema !== undefined) {
 			validator = new SchemaValidator();
-			stripSchemaProperties(schema);
+			stripSchemaProperties(schema, legacy);
 			parsedSchema = JSON.parse(JSON.stringify(schema));
 			console.log('Schema parsed', parsedSchema);
 			isSchemaValid = validator.loadSchema(parsedSchema);

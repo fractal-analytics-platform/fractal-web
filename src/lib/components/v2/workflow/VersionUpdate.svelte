@@ -99,7 +99,7 @@
 			);
 		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
-			stripSchemaProperties(newSchema);
+			stripSchemaProperties(newSchema, workflowTask.is_legacy_task);
 		}
 		const parsedSchema = JSON.parse(JSON.stringify(newSchema));
 		const isSchemaValid = validator.loadSchema(parsedSchema);

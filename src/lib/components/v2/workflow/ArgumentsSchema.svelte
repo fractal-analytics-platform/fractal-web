@@ -126,6 +126,7 @@
 					bind:unsavedChanges={unsavedChangesNonParallel}
 					schema={workflowTask.task.args_schema_non_parallel}
 					schemaData={workflowTask.args_non_parallel}
+					legacy={workflowTask.is_legacy_task}
 					bind:this={nonParallelSchemaComponent}
 				/>
 			</div>
@@ -150,6 +151,7 @@
 					bind:unsavedChanges={unsavedChangesParallel}
 					schema={workflowTask.task.args_schema_parallel}
 					schemaData={workflowTask.args_parallel}
+					legacy={workflowTask.is_legacy_task}
 					bind:this={parallelSchemaComponent}
 				/>
 			</div>
