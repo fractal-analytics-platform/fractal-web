@@ -23,7 +23,6 @@
 
 	$: unsavedChanges = unsavedChangesParallel || unsavedChangesNonParallel;
 
-	// TODO: handle this
 	$: isSchemaValid =
 		workflowTask.task.args_schema_version &&
 		SUPPORTED_SCHEMA_VERSIONS.includes(workflowTask.task.args_schema_version);
@@ -37,7 +36,6 @@
 	}
 
 	export function saveChanges() {
-		console.log('Inside saveChanges');
 		try {
 			nonParallelSchemaComponent?.validateArguments();
 			parallelSchemaComponent?.validateArguments();
@@ -61,6 +59,23 @@
 		parallelSchemaComponent?.discardChanges(workflowTask.args_parallel);
 	}
 
+	/**
+	 * @param {object} updatedEntry
+	 */
+	async function saveGenericFormEntryNonParallel(updatedEntry) {
+		await handleSaveChanges({ args_non_parallel: updatedEntry });
+	}
+
+	/**
+	 * @param {object} updatedEntry
+	 */
+	async function saveGenericFormEntryParallel(updatedEntry) {
+		await handleSaveChanges({ args_parallel: updatedEntry });
+	}
+
+	/**
+	 * @param {object} payload
+	 */
 	async function handleSaveChanges(payload) {
 		savingChanges = true;
 		const projectId = $page.params.projectId;
@@ -69,7 +84,7 @@
 		headers.set('Content-Type', 'application/json');
 
 		const response = await fetch(
-			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.task_id}`,
+			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
 				credentials: 'include',
@@ -105,7 +120,7 @@
 	{/if}
 	{#if workflowTask.task.type === 'non_parallel' || workflowTask.task.type === 'compound'}
 		<h5 class="ps-2 mt-3">Args non parallel</h5>
-		{#if workflowTask.task.args_schema_non_parallel}
+		{#if workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
 					bind:unsavedChanges={unsavedChangesNonParallel}
@@ -119,9 +134,7 @@
 				<span id="argsPropertiesFormError" />
 				<FormBuilder
 					entry={workflowTask.args_non_parallel}
-					updateEntry={() => {
-						/* TODO */
-					}}
+					updateEntry={saveGenericFormEntryNonParallel}
 				/>
 			</div>
 		{/if}
@@ -129,7 +142,7 @@
 	<hr />
 	{#if workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound'}
 		<h5 class="ps-2">Args parallel</h5>
-		{#if workflowTask.task.args_schema_parallel}
+		{#if workflowTask.task.args_schema_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
 					bind:unsavedChanges={unsavedChangesParallel}
@@ -139,41 +152,41 @@
 				/>
 			</div>
 		{:else}
-			<div>
+			<div class="mb-3">
 				<span id="argsPropertiesFormError" />
 				<FormBuilder
 					entry={workflowTask.args_parallel}
-					updateEntry={() => {
-						/* TODO */
-					}}
+					updateEntry={saveGenericFormEntryParallel}
 				/>
 			</div>
 		{/if}
 	{/if}
-	<div class="d-flex jschema-controls-bar p-3">
-		<div>
-			<button
-				class="btn btn-warning"
-				disabled={!unsavedChanges || savingChanges}
-				on:click={discardChanges}
-			>
-				Discard changes
-			</button>
+	{#if (workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel) && isSchemaValid}
+		<div class="d-flex jschema-controls-bar p-3">
+			<div>
+				<button
+					class="btn btn-warning"
+					disabled={!unsavedChanges || savingChanges}
+					on:click={discardChanges}
+				>
+					Discard changes
+				</button>
+			</div>
+			<div class="ms-1">
+				<button
+					class="btn btn-success"
+					type="button"
+					disabled={!unsavedChanges || savingChanges}
+					on:click={saveChanges}
+				>
+					{#if savingChanges}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					{/if}
+					Save changes
+				</button>
+			</div>
 		</div>
-		<div class="ms-1">
-			<button
-				class="btn btn-success"
-				type="button"
-				disabled={!unsavedChanges || savingChanges}
-				on:click={saveChanges}
-			>
-				{#if savingChanges}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Save changes
-			</button>
-		</div>
-	</div>
+	{/if}
 </div>
 
 <style>
