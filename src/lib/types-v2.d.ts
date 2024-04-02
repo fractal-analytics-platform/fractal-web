@@ -1,5 +1,5 @@
 import type { JSONSchemaObjectProperty } from "./components/common/jschema/jschema-types";
-import { Project, DatasetHistoryItem } from "./types";
+import { Project, DatasetHistoryItem, type Task } from "./types";
 
 export type DatasetV2 = {
   id: number
@@ -39,7 +39,7 @@ export type TaskV2 = {
   command_parallel: string | null
   input_types: { [key: string]: boolean }
   output_types: { [key: string]: boolean }
-  version: string
+  version: string | null
   owner: string
   source: string
   args_schema_version: string
@@ -100,4 +100,7 @@ export type WorkflowTaskV2 = {
   workflow_id: number
   task_id: number
   task: TaskV2
+  is_legacy_task: boolean
+  task_legacy_id: number
+  task_legacy: Task
 }

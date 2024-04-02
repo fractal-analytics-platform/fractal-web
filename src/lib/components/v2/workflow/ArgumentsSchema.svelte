@@ -139,9 +139,11 @@
 			</div>
 		{/if}
 	{/if}
-	<hr />
+	{#if workflowTask.task.type === 'compound'}
+		<hr />
+	{/if}
 	{#if workflowTask.task.type === 'parallel' || workflowTask.task.type === 'compound'}
-		<h5 class="ps-2">Args parallel</h5>
+		<h5 class="ps-2 mt-3">Args parallel</h5>
 		{#if workflowTask.task.args_schema_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
