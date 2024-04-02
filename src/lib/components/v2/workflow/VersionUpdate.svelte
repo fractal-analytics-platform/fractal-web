@@ -1,9 +1,9 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
-	import { SchemaValidator } from '$lib/common/jschema_validation';
 	import { page } from '$app/stores';
 	import { getNewVersions } from './version-checker';
-	import { stripSchemaProperties } from '$lib/components/common/jschema/schema_management';
+	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
+	import { tick } from 'svelte';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
@@ -13,16 +13,22 @@
 	/** @type {(count: number) => Promise<void>} */
 	export let updateNewVersionsCount;
 
+	/** @type {VersionUpdateFixArgs|undefined} */
+	let fixArgsComponentNonParallel;
+	/** @type {VersionUpdateFixArgs|undefined} */
+	let fixArgsComponentParallel;
+
+	let nonParallelCanBeUpdated = false;
+	let parallelCanBeUpdated = false;
+
+	let nonParallelArgsChanged = false;
+	let parallelArgsChanged = false;
+
 	$: task = workflowTask.task;
 
 	/** @type {import('$lib/types-v2').TaskV2[]} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
-	let originalArgs = '';
-	let argsToBeFixed = '';
-	let argsToBeFixedValidJson = true;
-	/** @type {import('ajv').ErrorObject[] | null} */
-	let validationErrors = null;
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -33,14 +39,21 @@
 		}
 	}
 
+	$: updateCandidate =
+		selectedUpdateVersion === ''
+			? null
+			: updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
+
+	$: cancelEnabled = nonParallelArgsChanged || parallelArgsChanged;
+
 	async function checkNewVersions() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
 		updateCandidates = [];
 		selectedUpdateVersion = '';
-		argsToBeFixed = '';
-		validationErrors = null;
+		fixArgsComponentNonParallel?.reset();
+		fixArgsComponentParallel?.reset();
 
 		if (!(task.args_schema_parallel || task.args_schema_non_parallel) || !task.version) {
 			return;
@@ -56,74 +69,46 @@
 		await updateNewVersionsCount(updateCandidates.length);
 	}
 
-	function checkArgumentsWithNewSchema() {
+	async function checkArgumentsWithNewSchema() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		validationErrors = null;
-		argsToBeFixed = '';
+		fixArgsComponentNonParallel?.reset();
+		fixArgsComponentParallel?.reset();
 		if (!selectedUpdateVersion) {
 			return;
 		}
-		const oldArgs = workflowTask.args || {};
-		originalArgs = JSON.stringify(oldArgs, null, 2);
-		validateArguments(oldArgs);
+		// await components rendering
+		await tick();
+		fixArgsComponentNonParallel?.checkArgumentsWithNewSchema();
+		fixArgsComponentParallel?.checkArgumentsWithNewSchema();
 	}
 
 	function check() {
-		argsToBeFixedValidJson = true;
-		let args;
-		try {
-			args = JSON.parse(argsToBeFixed);
-		} catch (err) {
-			argsToBeFixedValidJson = false;
-			return;
-		}
-		validateArguments(args);
+		fixArgsComponentNonParallel?.check();
+		fixArgsComponentParallel?.check();
 	}
 
 	function cancel() {
-		argsToBeFixed = originalArgs;
-		check();
-	}
-
-	/**
-	 * @param args {object}
-	 */
-	function validateArguments(args) {
-		// TODO
-		const updateCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
-		const newSchema =
-			/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchemaObjectProperty} */ (
-				updateCandidate.args_schema_non_parallel
-			);
-		const validator = new SchemaValidator(true);
-		if ('properties' in newSchema) {
-			stripSchemaProperties(newSchema, workflowTask.is_legacy_task);
-		}
-		const parsedSchema = JSON.parse(JSON.stringify(newSchema));
-		const isSchemaValid = validator.loadSchema(parsedSchema);
-		if (!isSchemaValid) {
-			errorAlert = displayStandardErrorAlert('Invalid JSON schema', 'versionUpdateError');
-			return;
-		}
-		const valid = validator.isValid(args);
-		if (valid) {
-			validationErrors = null;
-		} else {
-			argsToBeFixed = JSON.stringify(args, null, 2);
-			validationErrors = validator.getErrors();
-		}
+		fixArgsComponentNonParallel?.cancel();
+		fixArgsComponentParallel?.cancel();
 	}
 
 	async function update() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		if (argsToBeFixed) {
-			check();
+		try {
+			fixArgsComponentNonParallel?.check();
+			fixArgsComponentParallel?.check();
+		} catch (err) {
+			errorAlert = displayStandardErrorAlert(err, 'versionUpdateError');
+			return;
 		}
-		if (!argsToBeFixedValidJson || validationErrors !== null) {
+		if (
+			fixArgsComponentNonParallel?.hasValidationErrors() ||
+			fixArgsComponentParallel?.hasValidationErrors()
+		) {
 			return;
 		}
 		let response = await fetch(
@@ -140,7 +125,6 @@
 		}
 
 		const newTaskId = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0].id;
-		const newArgs = argsToBeFixed !== '' ? JSON.parse(argsToBeFixed) : workflowTask.args || {};
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -153,8 +137,10 @@
 				headers,
 				body: JSON.stringify({
 					order: workflowTask.order,
-					meta: workflowTask.meta,
-					args: newArgs
+					meta_non_parallel: workflowTask.meta_non_parallel,
+					meta_parallel: workflowTask.meta_parallel,
+					args_non_parallel: fixArgsComponentNonParallel?.getNewArgs() || null,
+					args_parallel: fixArgsComponentParallel?.getNewArgs() || null
 				})
 			}
 		);
@@ -175,8 +161,7 @@
 		return null;
 	}
 
-	$: canBeUpdated =
-		selectedUpdateVersion && (validationErrors === null || validationErrors.length === 0);
+	$: canBeUpdated = selectedUpdateVersion && nonParallelCanBeUpdated && parallelCanBeUpdated;
 </script>
 
 <div>
@@ -206,66 +191,32 @@
 					{/if}
 				</div>
 			{/if}
-			{#if validationErrors}
-				<div class="alert alert-danger mt-3">
-					<p>Following errors must be fixed before performing the update:</p>
-					<ul id="validation-errors">
-						{#each validationErrors as error, index}
-							<li>
-								{#if error.instancePath !== ''}
-									{error.instancePath}:
-								{/if}
-								{#if error.keyword === 'additionalProperties'}
-									must NOT have additional property '{error.params.additionalProperty}'
-								{:else}
-									{error.message}
-								{/if}
-								<small
-									data-bs-toggle="collapse"
-									data-bs-target="#collapse-{index}"
-									aria-expanded="true"
-									aria-controls="collapse-{index}"
-									class="text-primary"
-									role="button"
-								>
-									more
-								</small>
-								<div
-									id="collapse-{index}"
-									class="accordion-collapse collapse"
-									data-bs-parent="#validation-errors"
-								>
-									<div class="accordion-body">
-										<pre class="alert alert-warning mt-1">{JSON.stringify(error, null, 2)}</pre>
-									</div>
-								</div>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{/if}
-			{#if argsToBeFixed}
-				{#if !validationErrors}
-					<div class="alert alert-success mt-3">The arguments are valid</div>
-				{/if}
-				<label class="form-label" for="fix-arguments">Fix the arguments:</label>
-				<textarea
-					class="form-control"
-					id="fix-arguments"
-					class:is-invalid={!argsToBeFixedValidJson}
-					bind:value={argsToBeFixed}
-					rows="20"
+			{#if updateCandidate}
+				<VersionUpdateFixArgs
+					{workflowTask}
+					{updateCandidate}
+					parallel={false}
+					bind:canBeUpdated={nonParallelCanBeUpdated}
+					bind:argsChanged={nonParallelArgsChanged}
+					bind:this={fixArgsComponentNonParallel}
 				/>
-				{#if !argsToBeFixedValidJson}
-					<div class="invalid-feedback">Invalid JSON</div>
-				{/if}
+				<VersionUpdateFixArgs
+					{workflowTask}
+					{updateCandidate}
+					parallel={true}
+					bind:canBeUpdated={parallelCanBeUpdated}
+					bind:argsChanged={parallelArgsChanged}
+					bind:this={fixArgsComponentParallel}
+				/>
+			{/if}
+			{#if updateCandidate}
 				<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
 				&nbsp;
 				<button
 					type="button"
 					class="btn btn-secondary mt-3"
 					on:click={cancel}
-					disabled={argsToBeFixed === originalArgs}
+					disabled={!cancelEnabled}
 				>
 					Cancel
 				</button>
@@ -281,7 +232,7 @@
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task version is not set.
 		</div>
-	{:else if (!task.args_schema_non_parallel && !task.args_schema_parallel)}
+	{:else if !task.args_schema_non_parallel && !task.args_schema_parallel}
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task has no args_schema.
 		</div>

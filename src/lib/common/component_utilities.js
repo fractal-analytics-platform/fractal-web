@@ -41,7 +41,7 @@ const semverValidationOptions = {
 };
 
 /**
- * @param {string} version
+ * @param {string|null} version
  * @returns {string | null}
  */
 function validateVersion(version) {

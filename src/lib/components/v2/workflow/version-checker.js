@@ -33,6 +33,7 @@ export async function getAllNewVersions(tasks) {
 					task.version !== null &&
 					t.name === task.name &&
 					t.owner === task.owner &&
+					t.type === task.type &&
 					t.version &&
 					(t.args_schema_non_parallel || t.args_schema_parallel) &&
 					greatestVersionAsc(t, task) === 1
