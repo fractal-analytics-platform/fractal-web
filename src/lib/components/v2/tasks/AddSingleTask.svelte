@@ -24,7 +24,7 @@
 	let docs_link = '';
 	let args_schema_version = 'pydantic_v1';
 	/** @type {import('$lib/types-v2').TaskV2Type} */
-	let taskType = 'standalone_non_parallel';
+	let taskType = 'non_parallel';
 
 	/** @type {TypesEditor} */
 	let typesEditor;
@@ -32,7 +32,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @typedef {('name'|'command_non_parallel'|'command_parallel'|'version'|'source'|'input_type'|'output_type'|'args_schema_non_parallel'|'args_schema_parallel'|'args_schema_version'|'meta'|'docs_info'|'docs_link')} ErrorKey **/
+	/** @typedef {('name'|'command_non_parallel'|'command_parallel'|'version'|'source'|'input_type'|'output_type'|'args_schema_non_parallel'|'args_schema_parallel'|'args_schema_version'|'meta_non_parallel'|'meta_parallel'|'docs_info'|'docs_link')} ErrorKey **/
 	/** @type {ErrorKey[]} */
 	const handledErrorKeys = [
 		'name',
@@ -45,7 +45,8 @@
 		'args_schema_parallel',
 		'args_schema_non_parallel',
 		'args_schema_version',
-		'meta',
+		'meta_non_parallel',
+		'meta_parallel',
 		'docs_info',
 		'docs_link'
 	];
@@ -75,9 +76,15 @@
 			return;
 		}
 
-		const meta = await getMeta();
-		if (meta instanceof Error) {
-			addValidationError('meta', meta.message);
+		const metaNonParallel = await getMetaNonParallel();
+		if (metaNonParallel instanceof Error) {
+			addValidationError('meta_non_parallel', metaNonParallel.message);
+			return;
+		}
+
+		const metaParallel = await getMetaParallel();
+		if (metaParallel instanceof Error) {
+			addValidationError('meta_parallel', metaParallel.message);
 			return;
 		}
 
@@ -96,11 +103,11 @@
 			docs_link
 		};
 
-		if (argsSchemaNonParallel && (taskType === 'standalone_non_parallel' || taskType === 'compound')) {
+		if (argsSchemaNonParallel && (taskType === 'non_parallel' || taskType === 'compound')) {
 			bodyData.args_schema_non_parallel = argsSchemaNonParallel;
 		}
 
-		if (argsSchemaParallel && (taskType === 'standalone_parallel' || taskType === 'compound')) {
+		if (argsSchemaParallel && (taskType === 'parallel' || taskType === 'compound')) {
 			bodyData.args_schema_parallel = argsSchemaParallel;
 		}
 
@@ -111,8 +118,8 @@
 			bodyData.args_schema_version = args_schema_version;
 		}
 
-		if (meta) {
-			bodyData.meta = meta;
+		if (metaNonParallel) {
+			bodyData.meta = metaNonParallel;
 		}
 
 		const response = await fetch(`/api/v2/task`, {
@@ -150,9 +157,13 @@
 	let argsSchemaParallelFileInput = undefined;
 
 	/** @type {FileList|null} */
-	let metaFiles = null;
+	let metaFilesNonParallel = null;
 	/** @type {HTMLInputElement|undefined} */
-	let metaFileInput = undefined;
+	let metaFileInputNonParallel = undefined;
+	/** @type {FileList|null} */
+	let metaFilesParallel = null;
+	/** @type {HTMLInputElement|undefined} */
+	let metaFileInputParallel = undefined;
 
 	/**
 	 * @returns {Promise<object|Error|undefined>}
@@ -199,11 +210,21 @@
 		return json;
 	}
 
+	async function getMetaNonParallel() {
+		removeValidationError('meta_non_parallel');
+		return await getMeta(metaFilesNonParallel);
+	}
+
+	async function getMetaParallel() {
+		removeValidationError('meta_parallel');
+		return await getMeta(metaFilesParallel);
+	}
+
 	/**
+	 * @param {FileList|null} metaFiles
 	 * @returns {Promise<object|Error|undefined>}
 	 */
-	async function getMeta() {
-		removeValidationError('meta');
+	async function getMeta(metaFiles) {
 		if (!metaFiles || metaFiles.length === 0) {
 			return;
 		}
@@ -232,12 +253,20 @@
 		removeValidationError('args_schema_parallel');
 	}
 
-	function clearMetaFileUpload() {
-		metaFiles = null;
-		if (metaFileInput) {
-			metaFileInput.value = '';
+	function clearMetaNonParallelFileUpload() {
+		metaFilesNonParallel = null;
+		if (metaFileInputNonParallel) {
+			metaFileInputNonParallel.value = '';
 		}
-		removeValidationError('meta');
+		removeValidationError('meta_non_parallel');
+	}
+
+	function clearMetaParallelFileUpload() {
+		metaFilesParallel = null;
+		if (metaFileInputParallel) {
+			metaFileInputParallel.value = '';
+		}
+		removeValidationError('meta_parallel');
 	}
 
 	/**
@@ -269,7 +298,8 @@
 		args_schema_version = 'pydantic_v1';
 		clearArgsSchemaNonParallelFileUpload();
 		clearArgsSchemaParallelFileUpload();
-		clearMetaFileUpload();
+		clearMetaNonParallelFileUpload();
+		clearMetaParallelFileUpload();
 		closeDocsAccordion();
 	}
 
@@ -295,24 +325,22 @@
 					class="form-check-input"
 					type="radio"
 					name="taskType"
-					id="standalone_non_parallel"
-					value="standalone_non_parallel"
+					id="non_parallel"
+					value="non_parallel"
 					bind:group={taskType}
 				/>
-				<label class="form-check-label" for="standalone_non_parallel">
-					Standalone non parallel
-				</label>
+				<label class="form-check-label" for="non_parallel"> Standalone non parallel </label>
 			</div>
 			<div class="form-check form-check-inline">
 				<input
 					class="form-check-input"
 					type="radio"
 					name="taskType"
-					id="standalone_parallel"
-					value="standalone_parallel"
+					id="parallel"
+					value="parallel"
 					bind:group={taskType}
 				/>
-				<label class="form-check-label" for="standalone_parallel">Standalone parallel</label>
+				<label class="form-check-label" for="parallel">Standalone parallel</label>
 			</div>
 			<div class="form-check form-check-inline">
 				<input
@@ -344,7 +372,7 @@
 			</div>
 		</div>
 	</div>
-	{#if taskType === 'standalone_non_parallel' || taskType === 'compound'}
+	{#if taskType === 'non_parallel' || taskType === 'compound'}
 		<div class="row">
 			<div class="col-12 mb-2">
 				<div class="input-group has-validation">
@@ -363,7 +391,7 @@
 			</div>
 		</div>
 	{/if}
-	{#if taskType === 'standalone_parallel' || taskType === 'compound'}
+	{#if taskType === 'parallel' || taskType === 'compound'}
 		<div class="row">
 			<div class="col-12 mb-2">
 				<div class="input-group has-validation">
@@ -427,37 +455,39 @@
 				<span class="invalid-feedback">{validationErrors['version']}</span>
 			</div>
 		</div>
-		<div class="col-lg-6 mb-2">
-			<div class="input-group has-validation">
-				<label for="metaFile" class="input-group-text">
-					<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload a meta file
-				</label>
-				<input
-					class="form-control schemaFile"
-					accept="application/json"
-					type="file"
-					name="metaFile"
-					id="metaFile"
-					bind:this={metaFileInput}
-					bind:files={metaFiles}
-					class:is-invalid={validationErrors['meta']}
-				/>
-				{#if metaFiles && metaFiles.length > 0}
-					<button class="btn btn-outline-secondary" on:click={clearMetaFileUpload}> Clear </button>
-				{/if}
-				<span class="invalid-feedback">{validationErrors['meta']}</span>
-			</div>
-			<div class="form-text">
-				Additional metadata related to execution (e.g. computational resources)
-			</div>
-		</div>
 	</div>
-	<div class="row">
-		{#if taskType === 'standalone_non_parallel' || taskType === 'compound'}
+	{#if taskType === 'non_parallel' || taskType === 'compound'}
+		<div class="row">
+			<div class="col-lg-6 mb-2">
+				<div class="input-group has-validation">
+					<label for="metaFileNonParallel" class="input-group-text">
+						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload non parallel meta file
+					</label>
+					<input
+						class="form-control schemaFile"
+						accept="application/json"
+						type="file"
+						name="metaFileNonParallel"
+						id="metaFileNonParallel"
+						bind:this={metaFileInputNonParallel}
+						bind:files={metaFilesNonParallel}
+						class:is-invalid={validationErrors['meta_non_parallel']}
+					/>
+					{#if metaFilesNonParallel && metaFilesNonParallel.length > 0}
+						<button class="btn btn-outline-secondary" on:click={clearMetaNonParallelFileUpload}>
+							Clear
+						</button>
+					{/if}
+					<span class="invalid-feedback">{validationErrors['meta_non_parallel']}</span>
+				</div>
+				<div class="form-text">
+					Additional metadata related to execution (e.g. computational resources)
+				</div>
+			</div>
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="argsSchemaNonParallelFile" class="input-group-text">
-						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload args schema non parallel
+						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload non parallel args schema
 					</label>
 					<input
 						class="form-control schemaFile"
@@ -481,12 +511,40 @@
 				</div>
 				<div class="form-text">JSON schema of task arguments - non parallel</div>
 			</div>
-		{/if}
-		{#if taskType === 'standalone_parallel' || taskType === 'compound'}
+		</div>
+	{/if}
+	{#if taskType === 'parallel' || taskType === 'compound'}
+		<div class="row">
+			<div class="col-lg-6 mb-2">
+				<div class="input-group has-validation">
+					<label for="metaFileParallel" class="input-group-text">
+						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload parallel meta file
+					</label>
+					<input
+						class="form-control schemaFile"
+						accept="application/json"
+						type="file"
+						name="metaFileParallel"
+						id="metaFileParallel"
+						bind:this={metaFileInputParallel}
+						bind:files={metaFilesParallel}
+						class:is-invalid={validationErrors['meta_parallel']}
+					/>
+					{#if metaFilesParallel && metaFilesParallel.length > 0}
+						<button class="btn btn-outline-secondary" on:click={clearMetaParallelFileUpload}>
+							Clear
+						</button>
+					{/if}
+					<span class="invalid-feedback">{validationErrors['meta_parallel']}</span>
+				</div>
+				<div class="form-text">
+					Additional metadata related to execution (e.g. computational resources)
+				</div>
+			</div>
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="argsSchemaParallelFile" class="input-group-text">
-						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload args schema parallel
+						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload parallel args schema
 					</label>
 					<input
 						class="form-control schemaFile"
@@ -507,8 +565,8 @@
 				</div>
 				<div class="form-text">JSON schema of task arguments - parallel</div>
 			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 	{#if (argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0) || (argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0)}
 		<div class="row">
 			<div class="col-md-6 mb-2">
