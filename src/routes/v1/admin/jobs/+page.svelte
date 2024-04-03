@@ -44,7 +44,7 @@
 		/** @type {import('$lib/types').ApplyWorkflow[]} */
 		const updatedJobs = [];
 		for (const job of jobsToCheck) {
-			const url = new URL('/api/admin/job', window.location.origin);
+			const url = new URL('/api/admin/v1/job', window.location.origin);
 			url.searchParams.append('log', 'false');
 			url.searchParams.append('id', job.id.toString());
 			const response = await fetch(url);
@@ -69,7 +69,7 @@
 			if (searchErrorAlert) {
 				searchErrorAlert.hide();
 			}
-			const url = new URL('/api/admin/job', window.location.origin);
+			const url = new URL('/api/admin/v1/job', window.location.origin);
 			url.searchParams.append('log', 'false');
 			if (status) {
 				url.searchParams.append('status', status);
@@ -242,7 +242,7 @@
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
 
-				const response = await fetch(`/api/admin/job/${jobId}`, {
+				const response = await fetch(`/api/admin/v1/job/${jobId}`, {
 					method: 'PATCH',
 					credentials: 'include',
 					headers,

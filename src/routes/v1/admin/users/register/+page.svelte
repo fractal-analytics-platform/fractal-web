@@ -1,5 +1,5 @@
 <script>
-	import UserEditor from '$lib/components/admin/UserEditor.svelte';
+	import UserEditor from '$lib/components/v1/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types').User} */
@@ -69,10 +69,10 @@
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb mb-4">
 		<li class="breadcrumb-item">
-			<a href="/admin">Admin area</a>
+			<a href="/v1/admin">Admin area</a>
 		</li>
 		<li class="breadcrumb-item">
-			<a href="/admin/users">Manage users</a>
+			<a href="/v1/admin/users">Manage users</a>
 		</li>
 		<li class="breadcrumb-item active" aria-current="page">Registering new user</li>
 	</ol>

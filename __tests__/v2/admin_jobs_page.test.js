@@ -27,7 +27,7 @@ vi.mock('$env/dynamic/public', () => {
 });
 
 // The component to be tested must be imported after the mock setup
-import page from '../src/routes/admin/jobs/+page.svelte';
+import page from '../../src/routes/v2/admin/jobs/+page.svelte';
 
 describe('Admin jobs page', () => {
 	it('Users in dropdown are correctly sorted', async () => {

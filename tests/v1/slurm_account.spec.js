@@ -9,7 +9,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	await waitPageLoading(page);
 
 	await test.step('Open the edit user page for admin user', async () => {
-		await page.goto('/admin/users/1/edit');
+		await page.goto('/v1/admin/users/1/edit');
 		await waitPageLoading(page);
 	});
 
@@ -22,7 +22,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 			.last()
 			.fill(randomSlurmAccount);
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.waitForURL('/admin/users');
+		await page.waitForURL('/v1/admin/users');
 		await waitPageLoading(page);
 	});
 

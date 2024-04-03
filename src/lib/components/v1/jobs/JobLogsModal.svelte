@@ -74,7 +74,7 @@
 	}
 
 	async function loadAdminJobLog() {
-		const response = await fetch(`/api/admin/job/${job.id}?show_tmp_logs=true`);
+		const response = await fetch(`/api/admin/v1/job/${job.id}?show_tmp_logs=true`);
 		if (response.ok) {
 			const result = await response.json();
 			log = result.log || '';

@@ -8,7 +8,7 @@
 		validateErrorMapKeys
 	} from '$lib/common/errors';
 	import { onMount } from 'svelte';
-	import Modal from '../common/Modal.svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('$lib/types').User} */
 	export let user;
@@ -83,7 +83,7 @@
 				// If the user modifies their own account the userInfo cached in the store has to be reloaded
 				await invalidateAll();
 			}
-			await goto('/admin/users');
+			await goto('/v2/admin/users');
 		} finally {
 			saving = false;
 		}

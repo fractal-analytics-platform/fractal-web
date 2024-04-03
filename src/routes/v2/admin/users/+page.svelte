@@ -34,7 +34,7 @@
 	});
 </script>
 
-<a href="/admin/users/register" class="btn btn-primary float-end">
+<a href="/v2/admin/users/register" class="btn btn-primary float-end">
 	<i class="bi bi-person-fill-add" />
 	Register new user
 </a>
@@ -66,10 +66,10 @@
 					<td><BooleanIcon value={user.is_verified} /></td>
 					<td>{user.slurm_user || '-'}</td>
 					<td>
-						<a href="/admin/users/{user.id}" class="btn btn-light">
+						<a href="/v2/admin/users/{user.id}" class="btn btn-light">
 							<i class="bi-info-circle" /> Info
 						</a>
-						<a href="/admin/users/{user.id}/edit" class="btn btn-primary">
+						<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary">
 							<i class="bi bi-pencil" /> Edit
 						</a>
 						{#if deleteEnabled && user.email !== $page.data.userInfo.email}

@@ -9,10 +9,10 @@
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item">
-			<a href="/admin">Admin area</a>
+			<a href="/v2/admin">Admin area</a>
 		</li>
 		<li class="breadcrumb-item">
-			<a href="/admin/users">Manage users</a>
+			<a href="/v2/admin/users">Manage users</a>
 		</li>
 		<li class="breadcrumb-item active" aria-current="page">
 			User #{user.id} ({user.email})

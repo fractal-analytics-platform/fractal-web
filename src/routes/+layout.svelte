@@ -103,7 +103,7 @@
 				{#if userLoggedIn}
 					<li class="nav-item">
 						<a
-							href={`/${apiVersion}/projects`}
+							href="/{apiVersion}/projects"
 							class="nav-link"
 							class:active={selectedSection === 'projects'}
 						>
@@ -112,7 +112,7 @@
 					</li>
 					<li class="nav-item">
 						<a
-							href={`/${apiVersion}/tasks`}
+							href="/{apiVersion}/tasks"
 							class="nav-link"
 							class:active={selectedSection === 'tasks'}
 						>
@@ -121,7 +121,7 @@
 					</li>
 					<li class="nav-item">
 						<a
-							href={`/${apiVersion}/jobs`}
+							href="/{apiVersion}/jobs"
 							class="nav-link"
 							class:active={selectedSection === 'jobs'}
 						>
@@ -130,7 +130,7 @@
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
-							<a href="/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
+							<a href="/{apiVersion}/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
 								Admin area
 							</a>
 						</li>

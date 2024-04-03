@@ -33,7 +33,7 @@ export async function handle({ event, resolve }) {
 		});
 	}
 
-	if (event.url.pathname.startsWith('/admin')) {
+	if (event.url.pathname.startsWith('/v1/admin') || event.url.pathname.startsWith('/v2/admin')) {
 		const user = await currentUser.json();
 		if (!user.is_superuser) {
 			throw error(403, `Only superusers can access the admin area`);

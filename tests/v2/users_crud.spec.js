@@ -1,11 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from '../utils.js';
 
 test('Create, update and delete a user', async ({ page }) => {
 	await test.step('Open the admin area', async () => {
-		await page.goto('/');
-		await waitPageLoading(page);
-		await page.getByRole('link', { name: 'Admin area' }).click();
+		await page.goto('/v2/admin');
 		await waitPageLoading(page);
 	});
 
@@ -217,7 +215,7 @@ test('Create, update and delete a user', async ({ page }) => {
 	});
 
 	await test.step("Verify that the admin can't edit his/her superuser status", async () => {
-		await page.goto(`/admin/users/1/edit`);
+		await page.goto(`/v2/admin/users/1/edit`);
 		await waitPageLoading(page);
 		expect(await page.locator('input[type="checkbox"]').count()).toEqual(0);
 	});

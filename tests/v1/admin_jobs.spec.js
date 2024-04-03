@@ -22,7 +22,7 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 	});
 
 	await test.step('Open the admin area', async () => {
-		await page.goto('/');
+		await page.goto('/v1/admin');
 		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Admin area' }).click();
 		await waitPageLoading(page);

@@ -9,7 +9,7 @@ import { responseError } from '$lib/common/errors';
 export async function getJobs(fetch) {
 	console.log('Fetching job from server');
 
-	const response = await fetch(FRACTAL_SERVER_HOST + `/admin/job/?log=false`, {
+	const response = await fetch(FRACTAL_SERVER_HOST + `/admin/v1/job/?log=false`, {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -27,7 +27,7 @@ export async function getJobs(fetch) {
  * @returns {Promise<*>}
  */
 export async function listProjects(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/admin/project/', {
+	const response = await fetch(FRACTAL_SERVER_HOST + '/admin/v1/project/', {
 		method: 'GET',
 		credentials: 'include'
 	});

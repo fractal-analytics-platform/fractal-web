@@ -110,7 +110,7 @@
 		jobCancelledMessage = '';
 
 		let stopJobUrl = admin
-			? `/api/admin/job/${job.id}/stop`
+			? `/api/admin/v2/job/${job.id}/stop`
 			: `/api/v2/project/${job.project_id}/job/${job.id}/stop`;
 		const response = await fetch(stopJobUrl, {
 			method: 'GET',

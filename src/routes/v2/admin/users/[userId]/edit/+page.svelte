@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import UserEditor from '$lib/components/admin/UserEditor.svelte';
+	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
 	/** @type {import('$lib/types').User} */
 	let user = $page.data.user;
@@ -25,10 +25,10 @@
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item">
-			<a href="/admin">Admin area</a>
+			<a href="/v2/admin">Admin area</a>
 		</li>
 		<li class="breadcrumb-item">
-			<a href="/admin/users">Manage users</a>
+			<a href="/v2/admin/users">Manage users</a>
 		</li>
 		<li class="breadcrumb-item active" aria-current="page">
 			Editing user #{user.id} ({user.email})
