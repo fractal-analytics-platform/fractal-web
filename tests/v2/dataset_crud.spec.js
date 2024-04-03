@@ -25,8 +25,8 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await page.getByPlaceholder('Value').fill('value1');
 	});
 
-	await test.step('Add flag filter', async () => {
-		const addFilterBtn = page.getByRole('button', { name: 'Add flag filter' });
+	await test.step('Add type filter', async () => {
+		const addFilterBtn = page.getByRole('button', { name: 'Add type filter' });
 		await addFilterBtn.click();
 		await page.getByPlaceholder('Key').nth(1).fill('key2');
 	});

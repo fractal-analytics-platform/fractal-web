@@ -4,18 +4,18 @@
 	/** @type {Array<{ key: string, value: string, type: string, error: string }>} */
 	let attributeFields = [];
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let flagFields = [];
+	let typeFields = [];
 
 	/**
 	 *
 	 * @param {{ [key: string]: string | number }} attributes
-	 * @param {{ [key: string]: boolean }} flags
+	 * @param {{ [key: string]: boolean }} types
 	 */
-	export function init(attributes, flags) {
+	export function init(attributes, types) {
 		attributeFields = Object.entries(attributes).map(([k, v]) => {
 			return { key: k, value: v.toString(), type: typeof v, error: '' };
 		});
-		flagFields = Object.entries(flags).map(([k, v]) => {
+		typeFields = Object.entries(types).map(([k, v]) => {
 			return { key: k, value: v, error: '' };
 		});
 	}
@@ -34,9 +34,9 @@
 	/**
 	 * @returns {{ [key: string]: boolean }}
 	 */
-	export function getFlags() {
+	export function getTypes() {
 		return Object.fromEntries(
-			flagFields.map((f) => {
+			typeFields.map((f) => {
 				return [f.key, f.value];
 			})
 		);
@@ -69,23 +69,23 @@
 				keys.push(attributeField.key);
 			}
 		}
-		for (const flagField of flagFields) {
-			if (!flagField.key) {
-				flagField.error = 'Key is required';
+		for (const typeField of typeFields) {
+			if (!typeField.key) {
+				typeField.error = 'Key is required';
 				validFilters = false;
 				continue;
 			}
-			if (keys.includes(flagField.key)) {
-				flagField.error = 'Duplicated key';
+			if (keys.includes(typeField.key)) {
+				typeField.error = 'Duplicated key';
 				validFilters = false;
 				continue;
 			} else {
-				keys.push(flagField.key);
+				keys.push(typeField.key);
 			}
 		}
 		// Trigger filters update
 		attributeFields = attributeFields;
-		flagFields = flagFields;
+		typeFields = typeFields;
 		return validFilters;
 	}
 
@@ -110,7 +110,7 @@
 		}
 	}
 
-	async function addAttribute() {
+	async function addAttributeFilter() {
 		const filter = { key: '', value: '', type: 'string', error: '' };
 		attributeFields = [...attributeFields, filter];
 		// Set focus to last filter key input
@@ -120,12 +120,12 @@
 		lastKeyInput.focus();
 	}
 
-	async function addFlag() {
+	async function addTypeFilter() {
 		const filter = { key: '', value: false, error: '' };
-		flagFields = [...flagFields, filter];
+		typeFields = [...typeFields, filter];
 		// Set focus to last filter key input
 		await tick();
-		const allKeyInputs = document.querySelectorAll('.flag-filter-key');
+		const allKeyInputs = document.querySelectorAll('.type-filter-key');
 		const lastKeyInput = /**@type {HTMLInputElement}*/ (allKeyInputs[allKeyInputs.length - 1]);
 		lastKeyInput.focus();
 	}
@@ -133,15 +133,15 @@
 	/**
 	 * @param {number} index
 	 */
-	function removeAttribute(index) {
+	function removeAttributeFilter(index) {
 		attributeFields = attributeFields.filter((_, i) => i !== index);
 	}
 
 	/**
 	 * @param {number} index
 	 */
-	function removeFlag(index) {
-		flagFields = flagFields.filter((_, i) => i !== index);
+	function removeTypeFilter(index) {
+		typeFields = typeFields.filter((_, i) => i !== index);
 	}
 </script>
 
@@ -176,7 +176,7 @@
 		<button
 			class="btn btn-outline-danger"
 			type="button"
-			on:click={() => removeAttribute(index)}
+			on:click={() => removeAttributeFilter(index)}
 			aria-label="Remove attribute filter"
 		>
 			<i class="bi bi-trash" />
@@ -187,16 +187,16 @@
 	</div>
 {/each}
 
-{#if flagFields.length > 0}
-	<h5>Flag filters</h5>
+{#if typeFields.length > 0}
+	<h5>Type filters</h5>
 {/if}
-{#each flagFields as field, index}
+{#each typeFields as field, index}
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="input-group mb-3" class:has-validation={field.error}>
 				<input
 					type="text"
-					class="form-control flag-filter-key"
+					class="form-control type-filter-key"
 					placeholder="Key"
 					bind:value={field.key}
 					class:is-invalid={field.error}
@@ -215,8 +215,8 @@
 				<button
 					class="btn btn-outline-danger"
 					type="button"
-					on:click={() => removeFlag(index)}
-					aria-label="Remove flag filter"
+					on:click={() => removeTypeFilter(index)}
+					aria-label="Remove type filter"
 				>
 					<i class="bi bi-trash" />
 				</button>
@@ -230,11 +230,11 @@
 
 <div class="row mb-3">
 	<div class="col-12">
-		<button class="btn btn-outline-primary" type="button" on:click={addAttribute}>
+		<button class="btn btn-outline-primary" type="button" on:click={addAttributeFilter}>
 			Add attribute filter
 		</button>
-		<button class="btn btn-outline-primary" type="button" on:click={addFlag}>
-			Add flag filter
+		<button class="btn btn-outline-primary" type="button" on:click={addTypeFilter}>
+			Add type filter
 		</button>
 	</div>
 </div>

@@ -37,12 +37,12 @@ describe('FiltersCreationForm', () => {
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
 	});
 
-	it('add and remove flag filter', async () => {
+	it('add and remove type filter', async () => {
 		const result = render(FiltersCreationForm);
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
-		await fireEvent.click(result.getByRole('button', { name: 'Add flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(1);
-		await fireEvent.click(result.getByRole('button', { name: 'Remove flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Remove type filter' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
 	});
 
@@ -93,21 +93,21 @@ describe('FiltersCreationForm', () => {
 		expect(result.getByText('Duplicated key')).toBeDefined();
 	});
 
-	it('validate missing flag filter key', async () => {
+	it('validate missing type filter key', async () => {
 		const result = render(FiltersCreationForm);
 		result.component.init({}, {});
-		await fireEvent.click(result.getByRole('button', { name: 'Add flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Key is required')).toBeDefined();
 	});
 
-	it('validate duplicated flag filter key', async () => {
+	it('validate duplicated type filter key', async () => {
 		const result = render(FiltersCreationForm);
 		result.component.init({}, {});
-		await fireEvent.click(result.getByRole('button', { name: 'Add flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.click(result.getByRole('button', { name: 'Add flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		await fireEvent.input(result.queryAllByPlaceholderText('Key')[1], {
 			target: { value: 'my-key' }
 		});

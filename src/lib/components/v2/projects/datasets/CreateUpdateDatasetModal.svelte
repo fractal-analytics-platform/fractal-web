@@ -96,7 +96,7 @@
 				zarr_dir: zarrDir,
 				filters: {
 					attributes: filtersCreationForm.getAttributes(),
-					types: filtersCreationForm.getFlags()
+					types: filtersCreationForm.getTypes()
 				}
 			})
 		});
@@ -125,7 +125,7 @@
 				zarr_dir: zarrDir,
 				filters: {
 					attributes: filtersCreationForm.getAttributes(),
-					types: filtersCreationForm.getFlags()
+					types: filtersCreationForm.getTypes()
 				}
 			})
 		});

@@ -21,7 +21,7 @@
 	/** @type {{ [key: string]: null | string | number}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
-	let flagFilters = getFlagFilterBaseValues(imagePage);
+	let typeFilters = getTypeFilterBaseValues(imagePage);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 	let useDatasetFilters = false;
@@ -32,7 +32,7 @@
 	}
 
 	/** @param {import('$lib/types-v2').ImagePage} imagePage */
-	function getFlagFilterBaseValues(imagePage) {
+	function getTypeFilterBaseValues(imagePage) {
 		return Object.fromEntries(imagePage.types.map((k) => [k, null]));
 	}
 
@@ -51,13 +51,13 @@
 	}
 
 	/**
-	 * Reload the flag filters according to the received imagePage
+	 * Reload the type filters according to the received imagePage
 	 * preserving the values selected by the user
 	 * @param {import('$lib/types-v2').ImagePage} imagePage
 	 */
-	function reloadFlagFilters(imagePage) {
-		flagFilters = Object.fromEntries(
-			imagePage.types.map((k) => [k, k in flagFilters ? flagFilters[k] : null])
+	function reloadTypeFilters(imagePage) {
+		typeFilters = Object.fromEntries(
+			imagePage.types.map((k) => [k, k in typeFilters ? typeFilters[k] : null])
 		);
 	}
 
@@ -101,10 +101,10 @@
 			filters['attributes'] = attributes;
 		}
 		let types = {};
-		for (const flagKey of imagePage.types) {
-			const flag = flagFilters[flagKey];
-			if (flag !== null) {
-				types[flagKey] = flag;
+		for (const typeKey of imagePage.types) {
+			const typeValue = typeFilters[typeKey];
+			if (typeValue !== null) {
+				types[typeKey] = typeValue;
 			}
 		}
 		if (Object.entries(types).length > 0) {
@@ -131,7 +131,7 @@
 		if (response.ok) {
 			imagePage = result;
 			reloadAttributeFilters(imagePage);
-			reloadFlagFilters(imagePage);
+			reloadTypeFilters(imagePage);
 			// Go to first page if the search returns no values and we are not in the first page
 			// This happens when we are in a given page and we restrict the search setting more filters
 			if (imagePage.images.length === 0 && imagePage.current_page > 1) {
@@ -146,7 +146,7 @@
 	async function resetSearchFields() {
 		pathFilter = '';
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		flagFilters = getFlagFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
 		await searchImages();
 	}
 
@@ -256,14 +256,14 @@
 					</div>
 				</div>
 			{/each}
-			{#each imagePage.types as flagKey}
+			{#each imagePage.types as typeKey}
 				<div class="col-12 mt-3">
 					<div class="input-group">
-						<span class="input-group-text">{flagKey}</span>
+						<span class="input-group-text">{typeKey}</span>
 						<select
 							class="form-control"
-							bind:value={flagFilters[flagKey]}
-							aria-label="Value for {flagKey}"
+							bind:value={typeFilters[typeKey]}
+							aria-label="Value for {typeKey}"
 						>
 							<option value={null}>Select...</option>
 							<option value={true}>True</option>
@@ -299,8 +299,8 @@
 							{#each Object.keys(imagePage.attributes) as attributeKey}
 								<th>{attributeKey}</th>
 							{/each}
-							{#each imagePage.types as flagKey}
-								<th>{flagKey}</th>
+							{#each imagePage.types as typeKey}
+								<th>{typeKey}</th>
 							{/each}
 							<th>Options</th>
 						</tr>
@@ -312,8 +312,8 @@
 								{#each Object.keys(imagePage.attributes) as attribute}
 									<td>{image.attributes[attribute] || ''}</td>
 								{/each}
-								{#each imagePage.types as flagKey}
-									<td><BooleanIcon value={image.types[flagKey]} /></td>
+								{#each imagePage.types as typeKey}
+									<td><BooleanIcon value={image.types[typeKey]} /></td>
 								{/each}
 								<td class="col-2">
 									<ConfirmActionButton

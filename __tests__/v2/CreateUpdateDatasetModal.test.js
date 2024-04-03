@@ -116,7 +116,7 @@ describe('CreateUpdateDatasetModal', () => {
 		);
 	});
 
-	it('create dataset with flag filter set to false', async () => {
+	it('create dataset with type filter set to false', async () => {
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateUpdateDatasetModal, {
 			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
@@ -127,7 +127,7 @@ describe('CreateUpdateDatasetModal', () => {
 		await fireEvent.input(result.getByRole('textbox', { name: 'Zarr dir' }), {
 			target: { value: '/tmp' }
 		});
-		await fireEvent.click(result.getByRole('button', { name: 'Add flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
 		expect(fetch).toHaveBeenCalledWith(
@@ -146,7 +146,7 @@ describe('CreateUpdateDatasetModal', () => {
 		);
 	});
 
-	it('create dataset with flag filter set to true', async () => {
+	it('create dataset with type filter set to true', async () => {
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateUpdateDatasetModal, {
 			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
@@ -157,7 +157,7 @@ describe('CreateUpdateDatasetModal', () => {
 		await fireEvent.input(result.getByRole('textbox', { name: 'Zarr dir' }), {
 			target: { value: '/tmp' }
 		});
-		await fireEvent.click(result.getByRole('button', { name: 'Add flag filter' }));
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.click(result.getByLabelText('Value for my-key'));
 		await fireEvent.click(result.getByRole('button', { name: 'Save' }));

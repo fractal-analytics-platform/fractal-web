@@ -90,7 +90,7 @@
 									<th>Name</th>
 									<th>Readonly</th>
 									<th># Attribute Filters</th>
-									<th># Flag Filters</th>
+									<th># Type Filters</th>
 								</tr>
 							</thead>
 							<tbody>

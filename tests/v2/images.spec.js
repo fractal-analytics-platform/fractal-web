@@ -46,16 +46,16 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		});
 	});
 
-	await test.step('Create an image with false flag filter', async () => {
+	await test.step('Create an image with false type filter', async () => {
 		await createImage(page, 'img4', async function (modal) {
-			await modal.getByRole('button', { name: 'Add flag filter' }).click();
+			await modal.getByRole('button', { name: 'Add type filter' }).click();
 			await modal.getByPlaceholder('Key').fill('k3');
 		});
 	});
 
-	await test.step('Create an image with true flag filter', async () => {
+	await test.step('Create an image with true type filter', async () => {
 		await createImage(page, 'img5', async function (modal) {
-			await modal.getByRole('button', { name: 'Add flag filter' }).click();
+			await modal.getByRole('button', { name: 'Add type filter' }).click();
 			await modal.getByPlaceholder('Key').fill('k3');
 			await modal.getByRole('checkbox').check();
 		});
@@ -92,12 +92,12 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await searchImages(page, 1);
 	});
 
-	await test.step('Filter by false flag', async () => {
+	await test.step('Filter by false type', async () => {
 		await page.getByRole('combobox', { name: 'k3' }).selectOption('False');
 		await searchImages(page, 4);
 	});
 
-	await test.step('Filter by true flag', async () => {
+	await test.step('Filter by true type', async () => {
 		await page.getByRole('combobox', { name: 'k3' }).selectOption('True');
 		await searchImages(page, 1);
 	});

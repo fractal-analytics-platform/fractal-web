@@ -103,7 +103,7 @@
 						<div class="input-group mb-1" class:has-validation={inputType.error}>
 							<input
 								type="text"
-								class="form-control flag-filter-key"
+								class="form-control type-filter-key"
 								placeholder="Key"
 								bind:value={inputType.key}
 								class:is-invalid={inputType.error}
@@ -153,7 +153,7 @@
 						<div class="input-group mb-1" class:has-validation={outputType.error}>
 							<input
 								type="text"
-								class="form-control flag-filter-key"
+								class="form-control type-filter-key"
 								placeholder="Key"
 								bind:value={outputType.key}
 								class:is-invalid={outputType.error}

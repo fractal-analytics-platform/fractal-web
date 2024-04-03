@@ -33,7 +33,7 @@
 			None
 		{/if}
 
-		<h5 class="mt-4">Flag filters</h5>
+		<h5 class="mt-4">Type filters</h5>
 		{#if Object.entries(dataset.filters.types).length > 0}
 			<table class="table table-bordered caption-top align-middle">
 				<thead class="bg-light">

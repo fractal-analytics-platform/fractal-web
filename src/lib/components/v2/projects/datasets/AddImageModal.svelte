@@ -38,7 +38,7 @@
 						body: JSON.stringify({
 							path,
 							attributes: filtersCreationForm.getAttributes(),
-							types: filtersCreationForm.getFlags()
+							types: filtersCreationForm.getTypes()
 						})
 					}
 				);
