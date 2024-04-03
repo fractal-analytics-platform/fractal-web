@@ -650,7 +650,7 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => {
-							if (argsSchemaForm?.hasUnsavedChanges() === false) {
+							if (!argsSchemaForm || !argsSchemaForm.hasUnsavedChanges()) {
 								runWorkflowModal.toggle();
 							} else {
 								toggleUnsavedChangesModal();
