@@ -51,7 +51,7 @@ test('Add single tasks', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Output Type' }).fill('zarr');
 		await createBtn.click();
 		await page
-			.getByText(`Task source \\"admin:${randomTaskName1}-source\\" already in use`)
+			.getByText(`Source 'admin:${randomTaskName1}-source' already used by some Task`)
 			.waitFor();
 	});
 
