@@ -3,6 +3,7 @@
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import FormBuilder from './FormBuilder.svelte';
+	import ImportExportArgs from './ImportExportArgs.svelte';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -94,10 +95,10 @@
 		const result = await response.json();
 		if (response.ok) {
 			if (result.args_non_parallel) {
-				nonParallelSchemaComponent?.onArgumentsUpdated(result.args_non_parallel);
+				nonParallelSchemaComponent?.setArguments(result.args_non_parallel);
 			}
 			if (result.args_parallel) {
-				parallelSchemaComponent?.onArgumentsUpdated(result.args_parallel);
+				parallelSchemaComponent?.setArguments(result.args_parallel);
 			}
 			onWorkflowTaskUpdated(result);
 		} else {
@@ -156,8 +157,13 @@
 			</div>
 		{/if}
 	{/if}
-	{#if (workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel) && isSchemaValid}
-		<div class="d-flex jschema-controls-bar p-3">
+	<div class="d-flex jschema-controls-bar p-3">
+		<ImportExportArgs
+			{workflowTask}
+			onImport={handleSaveChanges}
+			exportDisabled={unsavedChanges || savingChanges}
+		/>
+		{#if (workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel) && isSchemaValid}
 			<div>
 				<button
 					class="btn btn-warning"
@@ -180,8 +186,8 @@
 					Save changes
 				</button>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <style>

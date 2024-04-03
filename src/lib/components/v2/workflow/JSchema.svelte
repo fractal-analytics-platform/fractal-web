@@ -103,7 +103,6 @@
 	 * null when clicking the "Save changes" button
 	 */
 	export function validateArguments(param = null) {
-		console.log('in validateArguments');
 		const isImport = param !== null;
 		if (!isImport) {
 			// Trigger validation on input fields, when we are using the "Save changes" button
@@ -123,10 +122,14 @@
 			const errors = validator.getErrors();
 			throw new AlertError(errors);
 		}
-		console.log('data is valid');
 	}
 
-	export function onArgumentsUpdated(updatedArgs) {
+	/**
+	 * Save the changes to the schema manager. Called by the container element after the PATCH call
+	 * has been applied or during the import from file.
+	 * @param {object} updatedArgs the result of the PATCH call or the content of the imported args file.
+	 */
+	export function setArguments(updatedArgs) {
 		schemaManager.data = updatedArgs;
 		schemaManager.changesSaved();
 	}

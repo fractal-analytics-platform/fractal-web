@@ -2,11 +2,9 @@
 	import { downloadBlob } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {string} */
-	export let taskName;
-	/** @type {object} */
-	export let args;
-	/** @type {(json: string) => Promise<void>} */
+	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
+	export let workflowTask;
+	/** @type {(json: object) => Promise<void>} */
 	export let onImport;
 	/** @type {boolean} */
 	export let exportDisabled;
@@ -48,8 +46,16 @@
 	}
 
 	function exportArgs() {
+		const args = {
+			args_parallel: workflowTask.args_parallel,
+			args_non_parallel: workflowTask.args_non_parallel
+		};
 		const serializedArgs = JSON.stringify(args, null, 2);
-		downloadBlob(serializedArgs, `args-${createSlug(taskName)}.json`, 'text/json;charset=utf-8;');
+		downloadBlob(
+			serializedArgs,
+			`args-${createSlug(workflowTask.task.name)}.json`,
+			'text/json;charset=utf-8;'
+		);
 	}
 
 	/**
