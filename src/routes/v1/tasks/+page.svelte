@@ -176,6 +176,9 @@
 		/** @type {HTMLElement|null} */
 		let row = mainRow;
 		while ((row = /** @type {HTMLElement|null} */ (row?.nextSibling))) {
+			if (!row.classList) {
+				continue;
+			}
 			if (row.classList.contains('old-version')) {
 				row.classList.toggle('collapsed');
 			} else {

@@ -68,10 +68,13 @@
 	}
 
 	async function reloadTaskList() {
-		const response = await fetch(`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(
+			`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
 		const result = await response.json();
 		if (response.ok) {
 			sortTasks(result);
@@ -176,6 +179,9 @@
 		/** @type {HTMLElement|null} */
 		let row = mainRow;
 		while ((row = /** @type {HTMLElement|null} */ (row?.nextSibling))) {
+			if (!row.classList) {
+				continue;
+			}
 			if (row.classList.contains('old-version')) {
 				row.classList.toggle('collapsed');
 			} else {
