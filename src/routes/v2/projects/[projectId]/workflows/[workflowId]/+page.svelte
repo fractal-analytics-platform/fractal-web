@@ -248,11 +248,7 @@
 						credentials: 'include',
 						headers,
 						body: JSON.stringify({
-							order: taskOrder,
-							meta_non_parallel: {},
-							meta_parallel: {},
-							args_non_parallel: {},
-							args_parallel: {}
+							order: taskOrder
 						})
 					}
 				);
@@ -717,8 +713,10 @@
 									class="btn btn-light"
 									data-bs-toggle="modal"
 									data-bs-target="#insertTaskModal"
-									on:click={getAvailableTasks}><i class="bi-plus-lg" /></button
-								>
+									aria-label="Add task to workflow"
+									on:click={getAvailableTasks}>
+									<i class="bi-plus-lg" />
+								</button>
 								<button
 									class="btn btn-light"
 									on:click={() => editTasksOrderModal.show(updatableWorkflowList)}
