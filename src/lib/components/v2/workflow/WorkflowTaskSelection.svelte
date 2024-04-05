@@ -75,7 +75,7 @@
 		filteredTasks = [];
 
 		if (group === 'common') {
-			filteredTasks = tasks.filter((task) => task.owner === null); // .filter((task, index, self) => self.findIndex(t => t.name === task.name) === index);
+			filteredTasks = tasks.filter((task) => task.owner === null);
 			filteredTasks.forEach((task) => {
 				let taskPackage = task.source.split(':')[1];
 				if (!selectionTasks.has(task.name)) {

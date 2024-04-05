@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
  * @returns {Promise<string>} the name of the created task
  */
 export async function createFakeTask(page, task) {
-	const randomTaskName = Math.random().toString(36).substring(7);
+	const taskName = task.name ? task.name : Math.random().toString(36).substring(7);
 
 	const tmpFiles = [];
 
@@ -28,8 +28,10 @@ export async function createFakeTask(page, task) {
 			await page.getByText('Compound').click();
 		}
 
-		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName);
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName}-src`);
+		await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);
+
+		const randomTaskSource = Math.random().toString(36).substring(7);
+		await page.getByRole('textbox', { name: 'Source' }).fill(randomTaskSource);
 
 		const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
 		if (task.type === 'non_parallel' || task.type === 'compound') {
@@ -48,7 +50,7 @@ export async function createFakeTask(page, task) {
 				await uploadFile(
 					page,
 					'Upload non parallel args schema',
-					`${randomTaskName}-args-non-parallel.json`,
+					`${taskName}-args-non-parallel.json`,
 					task.args_schema_non_parallel
 				)
 			);
@@ -59,7 +61,7 @@ export async function createFakeTask(page, task) {
 				await uploadFile(
 					page,
 					'Upload parallel args schema',
-					`${randomTaskName}-args-parallel.json`,
+					`${taskName}-args-parallel.json`,
 					task.args_schema_parallel
 				)
 			);
@@ -73,7 +75,7 @@ export async function createFakeTask(page, task) {
 			fs.rmSync(tmpFile);
 		}
 	}
-	return randomTaskName;
+	return taskName;
 }
 
 /**

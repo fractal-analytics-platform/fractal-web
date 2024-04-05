@@ -15,7 +15,6 @@ export async function getNewVersions(task) {
  * @returns {Promise<{ [id: string]: import('$lib/types-v2').TaskV2[] }>} the list of update candidates, for each task received as input
  */
 export async function getAllNewVersions(tasks) {
-	console.log('Checking for new versions');
 	const response = await fetch(`/api/v2/task`);
 
 	if (!response.ok) {

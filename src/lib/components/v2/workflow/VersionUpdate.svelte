@@ -161,7 +161,13 @@
 		return null;
 	}
 
-	$: canBeUpdated = selectedUpdateVersion && nonParallelCanBeUpdated && parallelCanBeUpdated;
+	$: canBeUpdated =
+		selectedUpdateVersion &&
+		updateCandidate &&
+		(((updateCandidate.type === 'non_parallel' || updateCandidate.type === 'compound') &&
+			nonParallelCanBeUpdated) ||
+			((updateCandidate.type === 'parallel' || updateCandidate.type === 'compound') &&
+				parallelCanBeUpdated));
 </script>
 
 <div>
@@ -192,22 +198,26 @@
 				</div>
 			{/if}
 			{#if updateCandidate}
-				<VersionUpdateFixArgs
-					{workflowTask}
-					{updateCandidate}
-					parallel={false}
-					bind:canBeUpdated={nonParallelCanBeUpdated}
-					bind:argsChanged={nonParallelArgsChanged}
-					bind:this={fixArgsComponentNonParallel}
-				/>
-				<VersionUpdateFixArgs
-					{workflowTask}
-					{updateCandidate}
-					parallel={true}
-					bind:canBeUpdated={parallelCanBeUpdated}
-					bind:argsChanged={parallelArgsChanged}
-					bind:this={fixArgsComponentParallel}
-				/>
+				{#if updateCandidate.type === 'non_parallel' || updateCandidate.type === 'compound'}
+					<VersionUpdateFixArgs
+						{workflowTask}
+						{updateCandidate}
+						parallel={false}
+						bind:canBeUpdated={nonParallelCanBeUpdated}
+						bind:argsChanged={nonParallelArgsChanged}
+						bind:this={fixArgsComponentNonParallel}
+					/>
+				{/if}
+				{#if updateCandidate.type === 'parallel' || updateCandidate.type === 'compound'}
+					<VersionUpdateFixArgs
+						{workflowTask}
+						{updateCandidate}
+						parallel={true}
+						bind:canBeUpdated={parallelCanBeUpdated}
+						bind:argsChanged={parallelArgsChanged}
+						bind:this={fixArgsComponentParallel}
+					/>
+				{/if}
 			{/if}
 			{#if updateCandidate}
 				<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>

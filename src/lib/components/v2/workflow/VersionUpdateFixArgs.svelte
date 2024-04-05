@@ -134,12 +134,12 @@
 	{#if !validationErrors}
 		<div class="alert alert-success mt-3">The arguments are valid</div>
 	{/if}
-	<label class="form-label" for="fix-arguments">
+	<label class="form-label" for="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}">
 		Fix the {parallel ? '' : ' non'} parallel arguments:
 	</label>
 	<textarea
 		class="form-control"
-		id="fix-arguments"
+		id="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}"
 		class:is-invalid={!argsToBeFixedValidJson}
 		bind:value={argsToBeFixed}
 		rows="20"
