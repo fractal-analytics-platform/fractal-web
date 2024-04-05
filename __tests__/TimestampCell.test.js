@@ -20,8 +20,8 @@ describe('TimestampCell', () => {
 
 	it('handles valid timestamp', async () => {
 		const result = render(TimestampCell, {
-			props: { timestamp: '2024-02-09T10:35:56.237579+00:00' }
+			props: { timestamp: '2024-12-19T10:35:56.237579+00:00' }
 		});
-		expect(result.container.textContent).eq('9/2/2024 11:35:56');
+		expect(result.container.textContent).eq('19/12/2024 11:35:56');
 	});
 });
