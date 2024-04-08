@@ -58,8 +58,8 @@ function validateVersion(version) {
  * @returns {-1|0|1}
  */
 export function compareTaskNameAscAndVersionAsc(t1, t2) {
-	if (t1.name < t2.name) return -1;
-	if (t1.name > t2.name) return 1;
+	if (t1.name.toLowerCase() < t2.name.toLowerCase()) return -1;
+	if (t1.name.toLowerCase() > t2.name.toLowerCase()) return 1;
 	// Names are equal, sort by version
 	return greatestVersionAsc(t1, t2);
 }
@@ -70,8 +70,8 @@ export function compareTaskNameAscAndVersionAsc(t1, t2) {
  * @returns {-1|0|1}
  */
 export function compareTaskNameAscAndVersionDesc(t1, t2) {
-	if (t1.name < t2.name) return -1;
-	if (t1.name > t2.name) return 1;
+	if (t1.name.toLowerCase() < t2.name.toLowerCase()) return -1;
+	if (t1.name.toLowerCase() > t2.name.toLowerCase()) return 1;
 	// Names are equal, sort by version
 	return greatestVersionDesc(t1, t2);
 }
@@ -113,8 +113,8 @@ export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null
 			// t1 owner is not null, t2 owner is null, t2 should go before t1
 			if (t2.owner === null) return 1;
 			// Both owners are not null, sort by owner
-			if (t1.owner < t2.owner) return -1;
-			if (t1.owner > t2.owner) return 1;
+			if (t1.owner.toLowerCase() < t2.owner.toLowerCase()) return -1;
+			if (t1.owner.toLowerCase() > t2.owner.toLowerCase()) return 1;
 			// Owners are equal, sort by name
 			return sortingFunction(t1, t2);
 		}
@@ -212,7 +212,13 @@ export function removeDuplicatedItems(allItems) {
 			items.push(item);
 		}
 	}
-	return items.sort((a, b) => (a.name < b.name ? -1 : a.name === b.name ? 0 : 1));
+	return items.sort((a, b) =>
+		a.name.toLowerCase() < b.name.toLowerCase()
+			? -1
+			: a.name.toLowerCase() === b.name.toLowerCase()
+			? 0
+			: 1
+	);
 }
 
 /**
