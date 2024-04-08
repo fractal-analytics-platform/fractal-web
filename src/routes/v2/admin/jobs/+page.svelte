@@ -4,7 +4,7 @@
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import JobsList from '$lib/components/v1/jobs/JobsList.svelte';
+	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 
 	let searched = false;
 	let searching = false;
@@ -13,7 +13,7 @@
 
 	/** @type {JobsList} */
 	let jobsListComponent;
-	/** @type {import('$lib/types').ApplyWorkflow[]} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
 	let jobs = [];
 
 	let status;
@@ -32,16 +32,15 @@
 
 	let projectId;
 	let workflowId;
-	let inputDatasetId;
-	let outputDatasetId;
+	let datasetId;
 
 	/**
-	 * @returns {Promise<import('$lib/types').ApplyWorkflow[]>}
+	 * @returns {Promise<import('$lib/types-v2').ApplyWorkflowV2[]>}
 	 */
 	async function jobUpdater() {
-		/** @type {import('$lib/types').ApplyWorkflow[]} */
+		/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
 		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
-		/** @type {import('$lib/types').ApplyWorkflow[]} */
+		/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
 		const updatedJobs = [];
 		for (const job of jobsToCheck) {
 			const url = new URL('/api/admin/v2/job', window.location.origin);
@@ -102,11 +101,8 @@
 			if (workflowId) {
 				url.searchParams.append('workflow_id', workflowId);
 			}
-			if (inputDatasetId) {
-				url.searchParams.append('input_dataset_id', inputDatasetId);
-			}
-			if (outputDatasetId) {
-				url.searchParams.append('output_dataset_id', outputDatasetId);
+			if (datasetId) {
+				url.searchParams.append('dataset_id', datasetId);
 			}
 			const response = await fetch(url);
 			const result = await response.json();
@@ -154,8 +150,7 @@
 		endTimeMax = '';
 		projectId = '';
 		workflowId = '';
-		inputDatasetId = '';
-		outputDatasetId = '';
+		datasetId = '';
 		searched = false;
 		jobs = [];
 		jobsListComponent.setJobs([]);
@@ -170,10 +165,8 @@
 			'project_id',
 			'workflow_id',
 			'workflow_name',
-			'input_dataset_id',
-			'input_dataset_name',
-			'output_dataset_id',
-			'output_dataset_name',
+			'dataset_id',
+			'dataset_name',
 			'user_email',
 			'working_dir',
 			'working_dir_user',
@@ -188,10 +181,8 @@
 			job.project_id,
 			job.workflow_id,
 			job.workflow_dump.name,
-			job.input_dataset_id,
-			job.input_dataset_dump.name,
-			job.output_dataset_id,
-			job.output_dataset_dump.name,
+			job.dataset_id,
+			job.dataset_dump.name,
 			job.user_email,
 			job.working_dir,
 			job.working_dir_user,
@@ -220,11 +211,11 @@
 
 	/** @type {Modal} */
 	let statusModal;
-	/** @type {import('$lib/types').ApplyWorkflow|undefined} */
+	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let jobInEditing;
 
 	/**
-	 * @param {import('$lib/types').ApplyWorkflow} row
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2} row
 	 */
 	function openEditStatusModal(row) {
 		jobInEditing = row;
@@ -237,7 +228,7 @@
 		statusModal.confirmAndHide(
 			async () => {
 				updatingStatus = true;
-				const jobId = /** @type {import('$lib/types').ApplyWorkflow} */ (jobInEditing).id;
+				const jobId = /** @type {import('$lib/types-v2').ApplyWorkflowV2} */ (jobInEditing).id;
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
@@ -382,32 +373,9 @@
 	<div class="row mt-3">
 		<div class="col-lg-5 col-xl-4">
 			<div class="row mt-1">
-				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="input_dataset"
-					>Input dataset Id</label
-				>
+				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="dataset"> Dataset Id </label>
 				<div class="col-6">
-					<input
-						type="number"
-						class="form-control"
-						bind:value={inputDatasetId}
-						id="input_dataset"
-					/>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-lg-5 offset-lg-1 col-xl-4 offset-xl-1">
-			<div class="row mt-1">
-				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="output_dataset"
-					>Output dataset Id</label
-				>
-				<div class="col-6">
-					<input
-						type="number"
-						class="form-control"
-						bind:value={outputDatasetId}
-						id="output_dataset"
-					/>
+					<input type="number" class="form-control" bind:value={datasetId} id="dataset" />
 				</div>
 			</div>
 		</div>

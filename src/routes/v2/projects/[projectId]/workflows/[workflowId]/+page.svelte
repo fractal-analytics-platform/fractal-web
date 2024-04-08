@@ -380,7 +380,7 @@
 			headers.set('Content-Type', 'application/json');
 
 			const response = await fetch(
-				`/api/v2/project/${project.id}/workflow/${workflow.id}/apply?dataset_id=${selectedDatasetId}`,
+				`/api/v2/project/${project.id}/job/submit?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`,
 				{
 					method: 'POST',
 					credentials: 'include',
