@@ -67,24 +67,24 @@
 		const argsSchemaNonParallel = await getArgsSchemaNonParallel();
 		if (argsSchemaNonParallel instanceof Error) {
 			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
-			return;
 		}
 
 		const argsSchemaParallel = await getArgsSchemaParallel();
 		if (argsSchemaParallel instanceof Error) {
 			addValidationError('args_schema_parallel', argsSchemaParallel.message);
-			return;
 		}
 
 		const metaNonParallel = await getMetaNonParallel();
 		if (metaNonParallel instanceof Error) {
 			addValidationError('meta_non_parallel', metaNonParallel.message);
-			return;
 		}
 
 		const metaParallel = await getMetaParallel();
 		if (metaParallel instanceof Error) {
 			addValidationError('meta_parallel', metaParallel.message);
+		}
+
+		if (Object.keys(validationErrors).length > 0) {
 			return;
 		}
 
@@ -119,7 +119,10 @@
 		}
 
 		if (metaNonParallel) {
-			bodyData.meta = metaNonParallel;
+			bodyData.meta_non_parallel = metaNonParallel;
+		}
+		if (metaParallel) {
+			bodyData.meta_parallel = metaParallel;
 		}
 
 		const response = await fetch(`/api/v2/task`, {
@@ -329,7 +332,7 @@
 					value="non_parallel"
 					bind:group={taskType}
 				/>
-				<label class="form-check-label" for="non_parallel"> Standalone non parallel </label>
+				<label class="form-check-label" for="non_parallel"> Non parallel </label>
 			</div>
 			<div class="form-check form-check-inline">
 				<input
@@ -340,7 +343,7 @@
 					value="parallel"
 					bind:group={taskType}
 				/>
-				<label class="form-check-label" for="parallel">Standalone parallel</label>
+				<label class="form-check-label" for="parallel">Parallel</label>
 			</div>
 			<div class="form-check form-check-inline">
 				<input

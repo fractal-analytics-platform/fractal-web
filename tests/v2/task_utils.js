@@ -23,7 +23,7 @@ export async function createFakeTask(page, task) {
 		await page.getByText('Single task').click();
 
 		if (task.type === 'parallel') {
-			await page.getByText('Standalone parallel').click();
+			await page.getByText('Parallel').click();
 		} else if (task.type === 'compound') {
 			await page.getByText('Compound').click();
 		}
