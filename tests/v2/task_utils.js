@@ -23,9 +23,9 @@ export async function createFakeTask(page, task) {
 		await page.getByText('Single task').click();
 
 		if (task.type === 'parallel') {
-			await page.getByText('Parallel').click();
+			await page.getByText('Parallel', { exact: true }).click();
 		} else if (task.type === 'compound') {
-			await page.getByText('Compound').click();
+			await page.getByText('Compound', { exact: true }).click();
 		}
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);

@@ -143,7 +143,9 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await setUploadFile(page, 'Upload parallel args schema', invalidArgsSchema);
 		await createBtn.click();
 		await page.getByText("File doesn't contain valid JSON").first().waitFor();
-		expect(await page.getByText("File doesn't contain valid JSON").count()).toEqual(3);
+		expect(
+			await page.getByText("File doesn't contain valid JSON", { exact: true }).count()
+		).toEqual(3);
 		await page
 			.getByText('File doesn\'t contain valid JSON Schema: strict mode: unknown keyword: "foo"')
 			.waitFor();
