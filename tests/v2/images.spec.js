@@ -61,11 +61,11 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		});
 	});
 
-	await test.step('Attempt to create an image with existing path', async () => {
+	await test.step('Attempt to create an image with existing Zarr URL', async () => {
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await modal.getByRole('textbox', { name: 'Path' }).fill('/tmp/img1');
+		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('/tmp/img1');
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
 		await modal.getByText('There has been an error').waitFor();
@@ -77,8 +77,8 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await expect(page.getByRole('row')).toHaveCount(6);
 	});
 
-	await test.step('Filter by path', async () => {
-		await page.getByRole('textbox', { name: 'Path' }).first().fill('/tmp/img1');
+	await test.step('Filter by Zarr URL', async () => {
+		await page.getByRole('textbox', { name: 'Zarr URL' }).first().fill('/tmp/img1');
 		await searchImages(page, 1);
 	});
 
@@ -125,14 +125,14 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {string} path
+ * @param {string} zarr_url
  * @param {(modal: import('@playwright/test').Locator) => Promise<void>} filtersFunction
  */
-async function createImage(page, path, filtersFunction) {
+async function createImage(page, zarr_url, filtersFunction) {
 	await page.getByRole('button', { name: 'Add an image list entry' }).click();
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
-	await modal.getByRole('textbox', { name: 'Path' }).fill('/tmp/' + path);
+	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('/tmp/' + zarr_url);
 	await filtersFunction(modal);
 	await modal.getByRole('button', { name: 'Save' }).click();
 	await waitModalClosed(page);

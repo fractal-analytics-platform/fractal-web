@@ -11,14 +11,14 @@
 	/** @type {Modal} */
 	let modal;
 
-	let path = '';
+	let zarr_url = '';
 	let saving = false;
 
 	/** @type {FiltersCreationForm} */
 	let filtersCreationForm;
 
 	function onOpen() {
-		path = '';
+		zarr_url = '';
 		saving = false;
 		filtersCreationForm.init({}, {});
 	}
@@ -36,7 +36,7 @@
 						method: 'POST',
 						headers,
 						body: JSON.stringify({
-							path,
+							zarr_url,
 							attributes: filtersCreationForm.getAttributes(),
 							types: filtersCreationForm.getTypes()
 						})
@@ -70,9 +70,9 @@
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div class="row mb-3">
-			<label class="col-3 col-lg-2 col-form-label" for="new-image-path"> Path </label>
+			<label class="col-3 col-lg-2 col-form-label" for="new-image-zarr-url"> Zarr URL </label>
 			<div class="col col-lg-10">
-				<input type="text" class="form-control" bind:value={path} id="new-image-path" />
+				<input type="text" class="form-control" bind:value={zarr_url} id="new-image-zarr-url" />
 			</div>
 		</div>
 		<FiltersCreationForm bind:this={filtersCreationForm} />

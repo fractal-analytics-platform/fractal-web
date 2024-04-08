@@ -17,7 +17,7 @@
 	let imagePage = $page.data.imagePage;
 	let showSearchForm = $page.data.imagePage.total_count > 0;
 	let searching = false;
-	let pathFilter = '';
+	let zarrUrlFilter = '';
 	/** @type {{ [key: string]: null | string | number}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
@@ -62,14 +62,14 @@
 	}
 
 	/**
-	 * @param {string} imagePath
+	 * @param {string} zarrUrl
 	 * @returns {string}
 	 */
-	function getRelativePath(imagePath) {
-		if (!imagePath.startsWith(dataset.zarr_dir)) {
-			return imagePath;
+	function getRelativePath(zarrUrl) {
+		if (!zarrUrl.startsWith(dataset.zarr_dir)) {
+			return zarrUrl;
 		}
-		const relativePath = imagePath.substring(dataset.zarr_dir.length);
+		const relativePath = zarrUrl.substring(dataset.zarr_dir.length);
 		if (relativePath.startsWith('/')) {
 			return relativePath.substring(1);
 		}
@@ -111,8 +111,8 @@
 			filters['types'] = types;
 		}
 		const params = { filters };
-		if (pathFilter) {
-			params['path'] = pathFilter;
+		if (zarrUrlFilter) {
+			params['zarr_url'] = zarrUrlFilter;
 		}
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -144,7 +144,7 @@
 	}
 
 	async function resetSearchFields() {
-		pathFilter = '';
+		zarrUrlFilter = '';
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
 		await searchImages();
@@ -152,20 +152,20 @@
 
 	/**
 	 * Removes all the characters that can't be used as HTML element id
-	 * @param {string} imagePath
+	 * @param {string} zarrUrl
 	 * @returns {string}
 	 */
-	function getIdFromPath(imagePath) {
-		return imagePath.replaceAll(/[^\w]/g, '');
+	function getIdFromZarrURL(zarrUrl) {
+		return zarrUrl.replaceAll(/[^\w]/g, '');
 	}
 
 	/**
-	 * @param  {string} imagePath
+	 * @param  {string} zarrUrl
 	 */
-	async function handleDeleteImage(imagePath) {
+	async function handleDeleteImage(zarrUrl) {
 		const response = await fetch(
-			`/api/v2/project/${projectId}/dataset/${dataset.id}/images?path=${encodeURIComponent(
-				imagePath
+			`/api/v2/project/${projectId}/dataset/${dataset.id}/images?zarr_url=${encodeURIComponent(
+				zarrUrl
 			)}`,
 			{
 				method: 'DELETE',
@@ -223,9 +223,9 @@
 {:else}
 	<div>
 		<div class="row mt-4 pt-2">
-			<label class="col-3 col-md-2 col-lg-1 col-form-label" for="path_filter"> Path </label>
+			<label class="col-3 col-md-2 col-lg-1 col-form-label" for="zarr_url_filter"> Zarr URL </label>
 			<div class="col col-md-8 col-lg-6">
-				<input type="text" class="form-control" bind:value={pathFilter} id="path_filter" />
+				<input type="text" class="form-control" bind:value={zarrUrlFilter} id="zarr_url_filter" />
 			</div>
 			<div class="col">
 				<button
@@ -295,7 +295,7 @@
 				<table class="table" id="dataset-images-table">
 					<thead>
 						<tr>
-							<th>Path</th>
+							<th>Zarr URL</th>
 							{#each Object.keys(imagePage.attributes) as attributeKey}
 								<th>{attributeKey}</th>
 							{/each}
@@ -308,7 +308,7 @@
 					<tbody>
 						{#each imagePage.images as image}
 							<tr>
-								<td>{getRelativePath(image.path)}</td>
+								<td>{getRelativePath(image.zarr_url)}</td>
 								{#each Object.keys(imagePage.attributes) as attribute}
 									<td>{image.attributes[attribute] || ''}</td>
 								{/each}
@@ -317,13 +317,13 @@
 								{/each}
 								<td class="col-2">
 									<ConfirmActionButton
-										modalId={'deleteConfirmImageModal-' + getIdFromPath(image.path)}
+										modalId={'deleteConfirmImageModal-' + getIdFromZarrURL(image.zarr_url)}
 										style={'danger'}
 										btnStyle="danger"
 										buttonIcon="trash"
 										label={'Delete'}
-										message="Delete image {image.path}"
-										callbackAction={() => handleDeleteImage(image.path)}
+										message="Delete image {image.zarr_url}"
+										callbackAction={() => handleDeleteImage(image.zarr_url)}
 									/>
 								</td>
 							</tr>

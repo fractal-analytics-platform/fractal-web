@@ -23,7 +23,7 @@ export type ImagePage = {
   attributes: { [key: string]: Array<string | number> }
   types: Array<string>
   images: Array<{
-    path: string
+    zarr_url: string
     attributes: { [key: string]: string }
     types: { [key: string]: boolean }
   }>
