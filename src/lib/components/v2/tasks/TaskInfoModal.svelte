@@ -92,42 +92,6 @@
 								</tbody>
 							</table>
 						</li>
-						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
-						<li class="list-group-item">{task.args_schema_version || '-'}</li>
-						{#if task.command_non_parallel !== null}
-							<li class="list-group-item list-group-item-light fw-bold">
-								Args Schema non parallel
-							</li>
-							<li class="list-group-item">
-								{#if loading}
-									<div class="spinner-border spinner-border-sm" role="status">
-										<span class="visually-hidden">Loading...</span>
-									</div>
-								{:else if task.args_schema_non_parallel}
-									<code>
-										<pre>{JSON.stringify(task.args_schema_non_parallel, null, 2)}</pre>
-									</code>
-								{:else}
-									-
-								{/if}
-							</li>
-						{/if}
-						{#if task.command_parallel !== null}
-							<li class="list-group-item list-group-item-light fw-bold">Args Schema parallel</li>
-							<li class="list-group-item">
-								{#if loading}
-									<div class="spinner-border spinner-border-sm" role="status">
-										<span class="visually-hidden">Loading...</span>
-									</div>
-								{:else if task.args_schema_parallel}
-									<code>
-										<pre>{JSON.stringify(task.args_schema_parallel, null, 2)}</pre>
-									</code>
-								{:else}
-									-
-								{/if}
-							</li>
-						{/if}
 						<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
 						<li class="list-group-item">
 							{#if task.docs_link}
@@ -144,6 +108,94 @@
 								-
 							{/if}
 						</li>
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
+						<li class="list-group-item">{task.args_schema_version || '-'}</li>
+						{#if task.command_non_parallel !== null}
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else if task.args_schema_non_parallel}
+								<div
+									class="accordion"
+									id="accordion-args-schema-non-parallel"
+								>
+									<div class="accordion-item rounded-0">
+										<h2 class="accordion-header">
+											<button
+												class="accordion-button list-group-item-light fw-bold collapsed rounded-0"
+												type="button"
+												data-bs-toggle="collapse"
+												data-bs-target="#collapse-args-schema-non-parallel"
+												aria-expanded="false"
+												aria-controls="collapse-args-schema-non-parallel"
+											>
+												Args Schema non parallel
+											</button>
+										</h2>
+										<div
+											id="collapse-args-schema-non-parallel"
+											class="accordion-collapse collapse"
+											data-bs-parent="#accordion-args-schema-non-parallel"
+										>
+											<div class="accordion-body">
+												<code>
+													<pre>{JSON.stringify(task.args_schema_non_parallel, null, 2)}</pre>
+												</code>
+											</div>
+										</div>
+									</div>
+								</div>
+							{:else}
+								<li class="list-group-item list-group-item-light fw-bold">
+									Args Schema non parallel
+								</li>
+								<li class="list-group-item">-</li>
+							{/if}
+						{/if}
+						{#if task.command_parallel !== null}
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else if task.args_schema_parallel}
+								<div
+									class="accordion"
+									id="accordion-args-schema-parallel"
+								>
+									<div class="accordion-item rounded-0">
+										<h2 class="accordion-header">
+											<button
+												class="accordion-button list-group-item-light fw-bold collapsed rounded-0"
+												type="button"
+												data-bs-toggle="collapse"
+												data-bs-target="#collapse-args-schema-parallel"
+												aria-expanded="false"
+												aria-controls="collapse-args-schema-parallel"
+											>
+												Args Schema parallel
+											</button>
+										</h2>
+										<div
+											id="collapse-args-schema-parallel"
+											class="accordion-collapse collapse"
+											data-bs-parent="#accordion-args-schema-parallel"
+										>
+											<div class="accordion-body">
+												<code>
+													<pre>{JSON.stringify(task.args_schema_parallel, null, 2)}</pre>
+												</code>
+											</div>
+										</div>
+									</div>
+								</div>
+							{:else}
+								<li class="list-group-item list-group-item-light fw-bold">
+									Args Schema parallel
+								</li>
+								<li class="list-group-item">-</li>
+							{/if}
+						{/if}
 					</ul>
 				</div>
 			</div>

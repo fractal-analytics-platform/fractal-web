@@ -174,13 +174,13 @@ async function getCreatedTaskModalData(page, taskName, taskType) {
 	let task;
 	switch (taskType) {
 		case 'non_parallel':
-			task = getTaskDataNonParallel(items);
+			task = await getTaskDataNonParallel(page, items);
 			break;
 		case 'parallel':
-			task = getTaskDataParallel(items);
+			task = await getTaskDataParallel(page, items);
 			break;
 		case 'compound':
-			task = getTaskDataCompound(items);
+			task = await getTaskDataCompound(page, items);
 			break;
 		default:
 			throw new Error('Invalid task type');
@@ -192,10 +192,11 @@ async function getCreatedTaskModalData(page, taskName, taskType) {
 }
 
 /**
+ * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator[]} items
  */
-async function getTaskDataNonParallel(items) {
-	return {
+async function getTaskDataNonParallel(page, items) {
+	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
 		owner: await items[5].innerText(),
@@ -203,18 +204,27 @@ async function getTaskDataNonParallel(items) {
 		source: await items[9].innerText(),
 		input_types: await items[11].innerText(),
 		output_types: await items[13].innerText(),
-		args_schema_version: await items[15].innerText(),
-		args_schema_non_parallel: await items[17].innerText(),
-		docs_link: await items[19].innerText(),
-		docs_info: await items[21].innerText()
+		docs_link: await items[15].innerText(),
+		docs_info: await items[17].innerText(),
+		args_schema_version: await items[19].innerText()
 	};
+	if (items.length > 20) {
+		data.args_schema_non_parallel = await items[21].innerText();
+	} else {
+		await page.getByRole('button', { name: 'Args schema non parallel' }).click();
+		data.args_schema_non_parallel = (
+			await page.locator('#collapse-args-schema-non-parallel').innerText()
+		).trim();
+	}
+	return data;
 }
 
 /**
+ * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator[]} items
  */
-async function getTaskDataParallel(items) {
-	return {
+async function getTaskDataParallel(page, items) {
+	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
 		owner: await items[5].innerText(),
@@ -222,18 +232,27 @@ async function getTaskDataParallel(items) {
 		source: await items[9].innerText(),
 		input_types: await items[11].innerText(),
 		output_types: await items[13].innerText(),
-		args_schema_version: await items[15].innerText(),
-		args_schema_parallel: await items[17].innerText(),
-		docs_link: await items[19].innerText(),
-		docs_info: await items[21].innerText()
+		docs_link: await items[15].innerText(),
+		docs_info: await items[17].innerText(),
+		args_schema_version: await items[19].innerText()
 	};
+	if (items.length > 20) {
+		data.args_schema_parallel = await items[21].innerText();
+	} else {
+		await page.getByRole('button', { name: 'Args schema parallel' }).click();
+		data.args_schema_parallel = (
+			await page.locator('#collapse-args-schema-parallel').innerText()
+		).trim();
+	}
+	return data;
 }
 
 /**
+ * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator[]} items
  */
-async function getTaskDataCompound(items) {
-	return {
+async function getTaskDataCompound(page, items) {
+	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
 		owner: await items[5].innerText(),
@@ -242,12 +261,24 @@ async function getTaskDataCompound(items) {
 		source: await items[11].innerText(),
 		input_types: await items[13].innerText(),
 		output_types: await items[15].innerText(),
-		args_schema_version: await items[17].innerText(),
-		args_schema_parallel: await items[19].innerText(),
-		args_schema_non_parallel: await items[21].innerText(),
-		docs_link: await items[23].innerText(),
-		docs_info: await items[25].innerText()
+		docs_link: await items[17].innerText(),
+		docs_info: await items[19].innerText(),
+		args_schema_version: await items[21].innerText()
 	};
+	if (items.length > 24) {
+		data.args_schema_parallel = await items[23].innerText();
+		data.args_schema_parallel = await items[25].innerText();
+	} else {
+		await page.getByRole('button', { name: 'Args schema non parallel' }).click();
+		data.args_schema_non_parallel = (
+			await page.locator('#collapse-args-schema-non-parallel').innerText()
+		).trim();
+		await page.getByRole('button', { name: 'Args schema parallel' }).click();
+		data.args_schema_parallel = (
+			await page.locator('#collapse-args-schema-parallel').innerText()
+		).trim();
+	}
+	return data;
 }
 
 /**

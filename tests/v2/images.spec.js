@@ -129,7 +129,9 @@ test('Dataset images [v2]', async ({ page, project }) => {
  * @param {(modal: import('@playwright/test').Locator) => Promise<void>} filtersFunction
  */
 async function createImage(page, zarr_url, filtersFunction) {
-	await page.getByRole('button', { name: 'Add an image list entry' }).click();
+	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
+	await newImageBtn.waitFor();
+	await newImageBtn.click();
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
 	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('/tmp/' + zarr_url);
