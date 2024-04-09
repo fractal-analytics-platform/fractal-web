@@ -35,7 +35,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<p>You're about to:</p>
-		<p class="badge bg-{style} fs-6">{message}</p>
+		<p class="badge bg-{style} fs-6 wrap">{message}</p>
 		<p>Do you confirm?</p>
 		<div class="container">
 			<div id="errorAlert-{modalId}" />
@@ -47,9 +47,20 @@
 	</svelte:fragment>
 </Modal>
 
-<button class="btn btn-{btnStyle}" data-bs-toggle="modal" data-bs-target="#{modalId}" aria-label={ariaLabel}>
+<button
+	class="btn btn-{btnStyle}"
+	data-bs-toggle="modal"
+	data-bs-target="#{modalId}"
+	aria-label={ariaLabel}
+>
 	{#if buttonIcon}
 		<i class="bi bi-{buttonIcon}" />
 	{/if}
 	{label}
 </button>
+
+<style>
+	.wrap {
+		white-space: normal;
+	}
+</style>

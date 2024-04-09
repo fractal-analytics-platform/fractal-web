@@ -1,13 +1,13 @@
 <script>
-	/** @type {boolean} */
+	/** @type {boolean|null|undefined} */
 	export let value;
 </script>
 
-{#if value}
+{#if value === true}
 	<span class="text-success boolean-icon" aria-checked="true">
 		<i class="bi bi-check" />
 	</span>
-{:else}
+{:else if value === false}
 	<span class="text-danger boolean-icon" aria-checked="false">
 		<i class="bi bi-x" />
 	</span>

@@ -13,7 +13,7 @@ export default defineConfig({
 		{ name: 'auth', testMatch: /auth\.setup\.js/ },
 		{
 			name: 'collect_core_tasks',
-			testMatch: /collect_core_tasks\.setup\.js/,
+			testMatch: /v1\/collect_core_tasks\.setup\.js/,
 			use: {
 				storageState: 'tests/.auth/user.json'
 			},
@@ -21,7 +21,7 @@ export default defineConfig({
 		},
 		{
 			name: 'create_fake_task',
-			testMatch: /create_fake_task\.setup\.js/,
+			testMatch: /v1\/create_fake_task\.setup\.js/,
 			use: {
 				storageState: 'tests/.auth/user.json'
 			},
@@ -47,7 +47,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh 1.4.6',
+			command: './tests/start-test-server.sh 2.0.0a3',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

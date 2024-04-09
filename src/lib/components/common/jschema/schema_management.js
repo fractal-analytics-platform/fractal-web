@@ -527,9 +527,12 @@ export function mapSchemaProperties(properties, blockKey, required) {
 
 /**
  * @param {import('./jschema-types').JSONSchemaObjectProperty} schema
+ * @param {boolean|true=} legacy
  */
-export function stripSchemaProperties(schema) {
-	const ignoreProperties = ['input_paths', 'output_path', 'metadata', 'component'];
+export function stripSchemaProperties(schema, legacy = true) {
+	const ignoreProperties = legacy
+		? ['input_paths', 'output_path', 'metadata', 'component']
+		: ['zarr_url', 'zarr_urls', 'init_args', 'zarr_dir'];
 	Object.keys(schema.properties).forEach((k) => {
 		if (ignoreProperties.includes(k)) {
 			delete schema.properties[k];

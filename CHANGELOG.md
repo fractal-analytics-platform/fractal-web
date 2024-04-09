@@ -1,5 +1,16 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Supported fractal-server API V2 (\#434):
+    * added menu switch to support legacy and current API;
+    * Dataset V2 CRUD with attribute and type filters;
+    * new Dataset page with image list and filters;
+    * updated Single Task form to handle parallel and non parallel fields;
+    * updated workflow task form to handle parallel and non parallel arguments;
+    * handled V2 import and export of workflow task arguments;
+    * handled V2 version workflow task version update;
+
 # 0.10.2
 
 * Added search functionality on jobs table filters (\#424).

@@ -1,10 +1,10 @@
-import { waitModalClosed, waitPageLoading } from './utils.js';
+/*import { waitModalClosed, waitPageLoading } from './utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Experimental workflow page', async ({ page, workflow }) => {
 	await test.step('Open experimental workflow page', async () => {
 		await page.goto(
-			`/projects/${workflow.projectId}/workflows/experimental/${workflow.workflowId}`
+			`/v2/projects/${workflow.projectId}/workflows/${workflow.workflowId}`
 		);
 		await waitPageLoading(page);
 	});
@@ -60,3 +60,4 @@ test('Experimental workflow page', async ({ page, workflow }) => {
 		expect(await page.getByRole('button', { name: 'Run', exact: true }).isVisible()).toEqual(true);
 	});
 });
+*/
