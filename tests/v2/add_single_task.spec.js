@@ -242,10 +242,9 @@ async function getTaskDataNonParallel(page, items) {
 		docs_info: await items[17].innerText(),
 		args_schema_version: await items[19].innerText()
 	};
-	if (items.length > 20) {
-		data.args_schema_non_parallel = await items[21].innerText();
-	} else {
-		await page.getByRole('button', { name: 'Args schema non parallel' }).click();
+	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
+	if ((await argsSchemaNonParallelBtn.count()) === 1) {
+		await argsSchemaNonParallelBtn.click();
 		data.args_schema_non_parallel = (
 			await page.locator('#collapse-args-schema-non-parallel').innerText()
 		).trim();
@@ -270,10 +269,9 @@ async function getTaskDataParallel(page, items) {
 		docs_info: await items[17].innerText(),
 		args_schema_version: await items[19].innerText()
 	};
-	if (items.length > 20) {
-		data.args_schema_parallel = await items[21].innerText();
-	} else {
-		await page.getByRole('button', { name: 'Args schema parallel' }).click();
+	const argsSchemaParallelBtn = page.getByRole('button', { name: 'Args schema parallel' });
+	if ((await argsSchemaParallelBtn.count()) === 1) {
+		await argsSchemaParallelBtn.click();
 		data.args_schema_parallel = (
 			await page.locator('#collapse-args-schema-parallel').innerText()
 		).trim();
@@ -299,15 +297,16 @@ async function getTaskDataCompound(page, items) {
 		docs_info: await items[19].innerText(),
 		args_schema_version: await items[21].innerText()
 	};
-	if (items.length > 24) {
-		data.args_schema_parallel = await items[23].innerText();
-		data.args_schema_parallel = await items[25].innerText();
-	} else {
-		await page.getByRole('button', { name: 'Args schema non parallel' }).click();
+	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
+	if ((await argsSchemaNonParallelBtn.count()) === 1) {
+		await argsSchemaNonParallelBtn.click();
 		data.args_schema_non_parallel = (
 			await page.locator('#collapse-args-schema-non-parallel').innerText()
 		).trim();
-		await page.getByRole('button', { name: 'Args schema parallel' }).click();
+	}
+	const argsSchemaParallelBtn = page.getByRole('button', { name: 'Args schema parallel' });
+	if ((await argsSchemaParallelBtn.count()) === 1) {
+		await argsSchemaParallelBtn.click();
 		data.args_schema_parallel = (
 			await page.locator('#collapse-args-schema-parallel').innerText()
 		).trim();

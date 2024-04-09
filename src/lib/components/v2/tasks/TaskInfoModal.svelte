@@ -108,6 +108,93 @@
 								-
 							{/if}
 						</li>
+
+						{#if task.command_non_parallel !== null}
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else if Object.keys(task.meta_non_parallel).length > 0}
+								<div
+									class="accordion"
+									id="accordion-meta-non-parallel"
+								>
+									<div class="accordion-item rounded-0">
+										<h2 class="accordion-header">
+											<button
+												class="accordion-button list-group-item-light fw-bold collapsed rounded-0"
+												type="button"
+												data-bs-toggle="collapse"
+												data-bs-target="#collapse-meta-non-parallel"
+												aria-expanded="false"
+												aria-controls="collapse-meta-non-parallel"
+											>
+												Meta non parallel
+											</button>
+										</h2>
+										<div
+											id="collapse-meta-non-parallel"
+											class="accordion-collapse collapse"
+											data-bs-parent="#accordion-meta-non-parallel"
+										>
+											<div class="accordion-body">
+												<code>
+													<pre>{JSON.stringify(task.meta_non_parallel, null, 2)}</pre>
+												</code>
+											</div>
+										</div>
+									</div>
+								</div>
+							{:else}
+								<li class="list-group-item list-group-item-light fw-bold">
+									Meta non parallel
+								</li>
+								<li class="list-group-item">-</li>
+							{/if}
+						{/if}
+						{#if task.command_parallel !== null}
+							{#if loading}
+								<div class="spinner-border spinner-border-sm" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							{:else if Object.keys(task.meta_parallel).length > 0}
+								<div
+									class="accordion"
+									id="accordion-meta-parallel"
+								>
+									<div class="accordion-item rounded-0">
+										<h2 class="accordion-header">
+											<button
+												class="accordion-button list-group-item-light fw-bold collapsed rounded-0"
+												type="button"
+												data-bs-toggle="collapse"
+												data-bs-target="#collapse-meta-parallel"
+												aria-expanded="false"
+												aria-controls="collapse-meta-parallel"
+											>
+												Meta parallel
+											</button>
+										</h2>
+										<div
+											id="collapse-meta-parallel"
+											class="accordion-collapse collapse"
+											data-bs-parent="#accordion-meta-parallel"
+										>
+											<div class="accordion-body">
+												<code>
+													<pre>{JSON.stringify(task.meta_parallel, null, 2)}</pre>
+												</code>
+											</div>
+										</div>
+									</div>
+								</div>
+							{:else}
+								<li class="list-group-item list-group-item-light fw-bold">
+									Meta parallel
+								</li>
+								<li class="list-group-item">-</li>
+							{/if}
+						{/if}
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
 						<li class="list-group-item">{task.args_schema_version || '-'}</li>
 						{#if task.command_non_parallel !== null}
