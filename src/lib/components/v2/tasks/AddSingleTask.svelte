@@ -196,8 +196,13 @@
 	 * @param {FileList} argsSchemaFiles
 	 */
 	async function parseArgsSchemaContent(argsSchemaFiles) {
-		const argsSchemaFile = argsSchemaFiles[0];
-		let content = await argsSchemaFile.text();
+		let content = '';
+		try {
+			const argsSchemaFile = argsSchemaFiles[0];
+			content = await argsSchemaFile.text();
+		} catch (err) {
+			return new Error('Unable to read file');
+		}
 		let json;
 		try {
 			json = JSON.parse(content);
@@ -233,8 +238,13 @@
 		if (!metaFiles || metaFiles.length === 0) {
 			return;
 		}
-		const metaFile = metaFiles[0];
-		let content = await metaFile.text();
+		let content = '';
+		try {
+			const metaFile = metaFiles[0];
+			content = await metaFile.text();
+		} catch (err) {
+			return new Error('Unable to read file');
+		}
 		try {
 			return JSON.parse(content);
 		} catch (err) {
