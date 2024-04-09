@@ -49,9 +49,19 @@
 	 * @returns {Array<{ key: string, value: boolean, error: string }>}
 	 */
 	function validateTypes(items) {
-		return items.map((item) =>
-			item.key ? { ...item, error: '' } : { ...item, error: 'Key is required' }
-		);
+		const validatedItems = [];
+		const keys = [];
+		for (const item of items) {
+			const validatedItem = { ...item, error: '' };
+			if (!item.key) {
+				validatedItem.error = 'Key is required';
+			} else if (keys.includes(item.key)) {
+				validatedItem.error = 'Duplicated key';
+			}
+			keys.push(item.key);
+			validatedItems.push(validatedItem);
+		}
+		return validatedItems;
 	}
 
 	/**

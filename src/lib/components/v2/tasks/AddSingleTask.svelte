@@ -84,7 +84,9 @@
 			addValidationError('meta_parallel', metaParallel.message);
 		}
 
-		if (Object.keys(validationErrors).length > 0) {
+		const typesValid = typesEditor.validate();
+
+		if (Object.keys(validationErrors).length > 0 || !typesValid) {
 			return;
 		}
 

@@ -136,7 +136,41 @@ test('Add single tasks [v2]', async ({ page }) => {
 			.waitFor();
 	});
 
-	await test.step('Attempt to create task with invalid fields', async () => {
+	const addInputTypeBtn = page.getByRole('button', { name: 'Add input type' });
+	const addOutputTypeBtn = page.getByRole('button', { name: 'Add output type' });
+
+	await test.step('Attempt to create task with types with empty keys', async () => {
+		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName4}-source`);
+		await addInputTypeBtn.click();
+		await addOutputTypeBtn.click();
+		await createBtn.click();
+		await page.getByText('Key is required').first().waitFor();
+		expect(await page.getByText('Key is required').count()).toEqual(2);
+	});
+
+	await test.step('Attempt to create task with types with duplicated keys', async () => {
+		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName4}-source`);
+		await addInputTypeBtn.click();
+		await addOutputTypeBtn.click();
+		const inputs = await page.getByPlaceholder('Key').all();
+		for (const input of inputs) {
+			await input.fill('SameKey');
+		}
+		await createBtn.click();
+		await page.getByText('Duplicated key').first().waitFor();
+		// Check that old errors are cleaned up
+		expect(await page.getByText('Key is required').count()).toEqual(0);
+		expect(await page.getByText('Duplicated key').count()).toEqual(2);
+	});
+
+	await test.step('Remove type fields', async () => {
+		await page.getByLabel('Remove input type').first().click();
+		await page.getByLabel('Remove input type').click();
+		await page.getByLabel('Remove output type').first().click();
+		await page.getByLabel('Remove output type').click();
+	});
+
+	await test.step('Attempt to create task with invalid JSON files', async () => {
 		await setUploadFile(page, 'Upload non parallel meta file', brokenJson);
 		await setUploadFile(page, 'Upload parallel meta file', brokenJson);
 		await setUploadFile(page, 'Upload non parallel args schema', brokenJson);
