@@ -6,6 +6,13 @@
 <br />
 
 <a href="/v2/admin/jobs" class="btn btn-primary mt-3">
-	<i class="bi bi-gear-fill"></i>
+	<i class="bi bi-gear-fill" />
 	Jobs
+</a>
+
+<br />
+
+<a href="/v2/admin/tasks" class="btn btn-primary mt-3">
+	<i class="bi bi-list-task" />
+	Tasks V1/V2 compatibility
 </a>
