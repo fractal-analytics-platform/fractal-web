@@ -5,7 +5,7 @@
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
-	/** @type {import('$lib/types-v2').TaskV2} */
+	/** @type {import('$lib/types').Task|import('$lib/types-v2').TaskV2} */
 	export let updateCandidate;
 	/** @type {boolean} */
 	export let parallel;
@@ -19,6 +19,7 @@
 	}
 
 	let originalArgs = '';
+	let displayTextarea = false;
 	let argsToBeFixed = '';
 	let argsToBeFixedValidJson = true;
 	/** @type {import('ajv').ErrorObject[] | null} */
@@ -53,6 +54,7 @@
 		const oldArgs = (parallel ? workflowTask.args_parallel : workflowTask.args_non_parallel) || {};
 		originalArgs = JSON.stringify(oldArgs, null, 2);
 		validateArguments(oldArgs);
+		return displayTextarea;
 	}
 
 	export function getNewArgs() {
@@ -67,7 +69,11 @@
 	function validateArguments(args) {
 		const newSchema =
 			/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchemaObjectProperty} */ (
-				parallel ? updateCandidate.args_schema_parallel : updateCandidate.args_schema_non_parallel
+				'args_schema' in updateCandidate
+					? updateCandidate.args_schema
+					: parallel
+					? updateCandidate.args_schema_parallel
+					: updateCandidate.args_schema_non_parallel
 			);
 		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
@@ -83,6 +89,7 @@
 			validationErrors = null;
 		} else {
 			argsToBeFixed = JSON.stringify(args, null, 2);
+			displayTextarea = true;
 			validationErrors = validator.getErrors();
 		}
 	}
@@ -130,20 +137,22 @@
 		</ul>
 	</div>
 {/if}
-{#if argsToBeFixed}
+{#if originalArgs}
 	{#if !validationErrors}
 		<div class="alert alert-success mt-3">The arguments are valid</div>
 	{/if}
-	<label class="form-label" for="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}">
-		Fix the {parallel ? '' : ' non'} parallel arguments:
-	</label>
-	<textarea
-		class="form-control"
-		id="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}"
-		class:is-invalid={!argsToBeFixedValidJson}
-		bind:value={argsToBeFixed}
-		rows="20"
-	/>
+	{#if displayTextarea}
+		<label class="form-label" for="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}">
+			Fix the {parallel ? '' : ' non'} parallel arguments:
+		</label>
+		<textarea
+			class="form-control"
+			id="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}"
+			class:is-invalid={!argsToBeFixedValidJson}
+			bind:value={argsToBeFixed}
+			rows="20"
+		/>
+	{/if}
 	{#if !argsToBeFixedValidJson}
 		<div class="invalid-feedback">Invalid JSON</div>
 	{/if}

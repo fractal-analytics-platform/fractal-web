@@ -243,7 +243,7 @@
 					</ul>
 				</div>
 			{/if}
-			{#if argsToBeFixed}
+			{#if originalArgs}
 				{#if !validationErrors}
 					<div class="alert alert-success mt-3">The arguments are valid</div>
 				{/if}

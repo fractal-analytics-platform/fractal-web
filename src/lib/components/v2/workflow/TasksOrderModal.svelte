@@ -19,7 +19,10 @@
 	 * @param {import('$lib/types-v2').WorkflowTaskV2[]} originalTasksList
 	 */
 	export function show(originalTasksList) {
-		editableTasksList = originalTasksList.map((task) => ({ id: task.id, name: task.task.name }));
+		editableTasksList = originalTasksList.map((wt) => ({
+			id: wt.id,
+			name: wt.is_legacy_task ? wt.task_legacy.name : wt.task.name
+		}));
 		editWorkflowTasksOrderModal.show();
 	}
 
@@ -131,7 +134,11 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click|preventDefault={handleWorkflowOrderUpdate} disabled={workflowTaskSorting}>
+		<button
+			class="btn btn-primary"
+			on:click|preventDefault={handleWorkflowOrderUpdate}
+			disabled={workflowTaskSorting}
+		>
 			{#if workflowTaskSorting}
 				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 			{/if}

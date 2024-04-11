@@ -22,13 +22,19 @@
 
 	$: unsavedChanges = unsavedChangesParallel || unsavedChangesNonParallel;
 
-	$: isSchemaValid =
-		workflowTask.task.args_schema_version &&
-		SUPPORTED_SCHEMA_VERSIONS.includes(workflowTask.task.args_schema_version);
+	$: isSchemaValid = argsSchemaVersionValid(
+		workflowTask.is_legacy_task
+			? workflowTask.task_legacy.args_schema_version
+			: workflowTask.task.args_schema_version
+	);
 
 	$: hasNonParallel =
 		workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound';
 	$: hasParallel = workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound';
+
+	$: argsSchemaParallel = workflowTask.is_legacy_task
+		? workflowTask.task_legacy.args_schema
+		: workflowTask.task.args_schema_parallel;
 
 	export function hasUnsavedChanges() {
 		return unsavedChanges;
@@ -106,13 +112,20 @@
 		}
 		savingChanges = false;
 	}
+
+	/**
+	 * @param {string} argsSchemaVersion
+	 */
+	function argsSchemaVersionValid(argsSchemaVersion) {
+		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
+	}
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="json-schema-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
 		<h5 class="ps-2 mt-3">Args non parallel</h5>
-		{#if workflowTask.task.args_schema_non_parallel && isSchemaValid}
+		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
 					bind:unsavedChanges={unsavedChangesNonParallel}
@@ -136,12 +149,18 @@
 		<hr />
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		<h5 class="ps-2 mt-3">Args parallel</h5>
-		{#if workflowTask.task.args_schema_parallel && isSchemaValid}
+		<h5 class="ps-2 mt-3">
+			{#if workflowTask.is_legacy_task}
+				Args (legacy task)
+			{:else}
+				Args parallel
+			{/if}
+		</h5>
+		{#if argsSchemaParallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
 					bind:unsavedChanges={unsavedChangesParallel}
-					schema={workflowTask.task.args_schema_parallel}
+					schema={argsSchemaParallel}
 					schemaData={workflowTask.args_parallel}
 					legacy={workflowTask.is_legacy_task}
 					bind:this={parallelSchemaComponent}
@@ -163,7 +182,7 @@
 			onImport={handleSaveChanges}
 			exportDisabled={unsavedChanges || savingChanges}
 		/>
-		{#if (workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel) && isSchemaValid}
+		{#if ((!workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel) || argsSchemaParallel) && isSchemaValid}
 			<div>
 				<button
 					class="btn btn-warning"

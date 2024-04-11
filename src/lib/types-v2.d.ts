@@ -98,10 +98,13 @@ export type WorkflowTaskV2 = {
   args_parallel: object
   order: number
   workflow_id: number
+  task_type: TaskV2Type
+} & ({
+  is_legacy_task: false
   task_id: number
   task: TaskV2
-  is_legacy_task: boolean
+} | {
+  is_legacy_task: true
   task_legacy_id: number
   task_legacy: Task
-  task_type: TaskV2Type
-}
+})
