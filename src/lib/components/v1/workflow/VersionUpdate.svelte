@@ -20,6 +20,7 @@
 	let selectedUpdateVersion = '';
 	let originalArgs = '';
 	let argsToBeFixed = '';
+	let needChanges = false;
 	let argsToBeFixedValidJson = true;
 	/** @type {import('ajv').ErrorObject[] | null} */
 	let validationErrors = null;
@@ -111,6 +112,7 @@
 			validationErrors = null;
 		} else {
 			argsToBeFixed = JSON.stringify(args, null, 2);
+			needChanges = true;
 			validationErrors = validator.getErrors();
 		}
 	}
@@ -247,28 +249,30 @@
 				{#if !validationErrors}
 					<div class="alert alert-success mt-3">The arguments are valid</div>
 				{/if}
-				<label class="form-label" for="fix-arguments">Fix the arguments:</label>
-				<textarea
-					class="form-control"
-					id="fix-arguments"
-					class:is-invalid={!argsToBeFixedValidJson}
-					bind:value={argsToBeFixed}
-					rows="20"
-				/>
-				{#if !argsToBeFixedValidJson}
-					<div class="invalid-feedback">Invalid JSON</div>
+				{#if needChanges}
+					<label class="form-label" for="fix-arguments">Fix the arguments:</label>
+					<textarea
+						class="form-control"
+						id="fix-arguments"
+						class:is-invalid={!argsToBeFixedValidJson}
+						bind:value={argsToBeFixed}
+						rows="20"
+					/>
+					{#if !argsToBeFixedValidJson}
+						<div class="invalid-feedback">Invalid JSON</div>
+					{/if}
+					<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
+					&nbsp;
+					<button
+						type="button"
+						class="btn btn-secondary mt-3"
+						on:click={cancel}
+						disabled={argsToBeFixed === originalArgs}
+					>
+						Cancel
+					</button>
+					&nbsp;
 				{/if}
-				<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
-				&nbsp;
-				<button
-					type="button"
-					class="btn btn-secondary mt-3"
-					on:click={cancel}
-					disabled={argsToBeFixed === originalArgs}
-				>
-					Cancel
-				</button>
-				&nbsp;
 			{/if}
 			<button type="button" class="btn btn-primary mt-3" on:click={update} disabled={!canBeUpdated}>
 				Update
