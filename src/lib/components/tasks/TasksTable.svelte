@@ -107,7 +107,7 @@
 					<td>
 						{task.version || '–'}
 						{#if isMainVersion(i)}
-							<button class="btn btn-link" on:click={handleToggleOldVersions}>
+							<button class="btn btn-link" on:click={handleToggleOldVersions} aria-label="Expand old versions">
 								<i class="bi bi-plus-circle" />
 							</button>
 						{/if}
