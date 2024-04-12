@@ -2,14 +2,17 @@
 
 # Unreleased
 
-* Supported fractal-server API V2 (\#434):
-    * added menu switch to support legacy and current API;
-    * Dataset V2 CRUD with attribute and type filters;
-    * new Dataset page with image list and filters;
-    * updated Single Task form to handle parallel and non parallel fields;
-    * updated workflow task form to handle parallel and non parallel arguments;
-    * handled V2 import and export of workflow task arguments;
-    * handled V2 version workflow task version update;
+* Supported fractal-server API V2:
+    * added menu switch to support legacy and current API (\#434);
+    * Dataset V2 CRUD with attribute and type filters (\#434);
+    * new Dataset page with image list and filters (\#434);
+    * updated Single Task form to handle parallel and non parallel fields (\#434);
+    * updated workflow task form to handle parallel and non parallel arguments (\#434);
+    * handled V2 import and export of workflow task arguments (\#434);
+    * handled V2 version workflow task version update (\#434);
+    * added admin "Tasks V1/V2 compatibility" page (\#450);
+    * supported adding V1 task in V2 workflow (\#450);
+    * removed read only property from V2 datasets (\#450);
 
 # 0.10.2
 
