@@ -83,7 +83,7 @@
 		try {
 			if (workflowTask.is_legacy_task) {
 				// @ts-ignore
-				updateCandidates = await getNewVersionsV1(workflowTask.task_legacy);
+				updateCandidates = await getNewVersionsV1(workflowTask.task_legacy, true);
 			} else {
 				// @ts-ignore
 				updateCandidates = await getNewVersionsV2(workflowTask.task);

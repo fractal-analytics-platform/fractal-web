@@ -179,15 +179,13 @@
 
 	async function loadAvailableTasksV1() {
 		workflowTaskSelectionComponentV1?.setLoadingTasks(true);
-		const responseV1 = await fetch(`/api/v1/task?args_schema=false`, {
+		const responseV1 = await fetch(`/api/v2/task-legacy?args_schema=false&only_v2_compatible=true`, {
 			method: 'GET',
 			credentials: 'include'
 		});
 
 		if (responseV1.ok) {
-			/** @type {import('$lib/types').Task[]} */
-			const v1Tasks = await responseV1.json();
-			availableTasksV1 = v1Tasks.filter((t) => t.is_v2_compatible);
+			availableTasksV1 = await responseV1.json();
 		} else {
 			console.error(responseV1);
 			availableTasksV1 = [];
@@ -501,7 +499,8 @@
 						(wt) =>
 							/** @type {import('$lib/types-v2').WorkflowTaskV2 & {is_legacy_task: true}} */ (wt)
 								.task_legacy
-					)
+					),
+				true
 			);
 			newVersionsMapV2 = await getAllNewVersionsV2(
 				workflow.task_list
@@ -1073,10 +1072,9 @@
 		<div id="errorAlert-runWorkflowModal" />
 		<form id="runWorkflowForm">
 			<div class="mb-3">
-				<label for="dataset" class="form-label">Dataset</label>
+				<label for="run-workflow-dataset" class="form-label">Dataset</label>
 				<select
-					name="dataset"
-					id="dataset"
+					id="run-workflow-dataset"
 					class="form-control"
 					disabled={checkingConfiguration}
 					bind:value={selectedDatasetId}
