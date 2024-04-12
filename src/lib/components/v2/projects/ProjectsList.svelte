@@ -1,5 +1,5 @@
 <script>
-	import { projectInfoModal } from '$lib/stores/projectStores.js';
+	import { projectInfoModalV2 } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, getValidationMessagesMap } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
@@ -31,9 +31,9 @@
 	 * @param {number} projectId
 	 */
 	function setProjectInfoModal(projectId) {
-		/** @type {import('$lib/types').Project} */
+		/** @type {import('$lib/types-v2').ProjectV2} */
 		const project = projects.filter((p) => p.id === projectId)[0];
-		projectInfoModal.set(project);
+		projectInfoModalV2.set(project);
 	}
 
 	let creating = false;

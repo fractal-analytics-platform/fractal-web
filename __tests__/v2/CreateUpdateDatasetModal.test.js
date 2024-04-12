@@ -73,7 +73,6 @@ describe('CreateUpdateDatasetModal', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'my dataset',
-					read_only: false,
 					zarr_dir: '/tmp',
 					filters: {
 						attributes: { 'my-key': 'my-value' },
@@ -105,7 +104,6 @@ describe('CreateUpdateDatasetModal', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'my dataset',
-					read_only: false,
 					zarr_dir: '/tmp',
 					filters: {
 						attributes: { 'my-key': 123 },
@@ -135,7 +133,6 @@ describe('CreateUpdateDatasetModal', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'my dataset',
-					read_only: false,
 					zarr_dir: '/tmp',
 					filters: {
 						attributes: {},
@@ -166,7 +163,6 @@ describe('CreateUpdateDatasetModal', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'my dataset',
-					read_only: false,
 					zarr_dir: '/tmp',
 					filters: {
 						attributes: {},

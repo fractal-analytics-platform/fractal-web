@@ -16,7 +16,6 @@
 	let datasetId = null;
 	let datasetName = '';
 	let zarrDir = '';
-	let readonly = false;
 	let submitted = false;
 	let saving = false;
 	let creatingDataset = false;
@@ -28,7 +27,6 @@
 		datasetId = null;
 		datasetName = '';
 		zarrDir = '';
-		readonly = false;
 		filtersCreationForm.init({}, {});
 		submitted = false;
 		creatingDataset = false;
@@ -39,7 +37,6 @@
 		datasetId = dataset.id;
 		datasetName = dataset.name;
 		zarrDir = dataset.zarr_dir;
-		readonly = dataset.read_only;
 		filtersCreationForm.init(dataset.filters.attributes, dataset.filters.types);
 		submitted = false;
 		creatingDataset = false;
@@ -92,7 +89,6 @@
 			headers,
 			body: JSON.stringify({
 				name: datasetName,
-				read_only: readonly,
 				zarr_dir: zarrDir,
 				filters: {
 					attributes: filtersCreationForm.getAttributes(),
@@ -121,7 +117,6 @@
 			headers,
 			body: JSON.stringify({
 				name: datasetName,
-				read_only: readonly,
 				zarr_dir: zarrDir,
 				filters: {
 					attributes: filtersCreationForm.getAttributes(),
@@ -186,19 +181,6 @@
 						{#if submitted && !zarrDir}
 							<div class="invalid-feedback">Required field</div>
 						{/if}
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-10 offset-2">
-						<div class="form-check">
-							<input
-								class="form-check-input"
-								type="checkbox"
-								id="readonly"
-								bind:checked={readonly}
-							/>
-							<label class="form-check-label" for="readonly">Is readonly</label>
-						</div>
 					</div>
 				</div>
 			</div>
