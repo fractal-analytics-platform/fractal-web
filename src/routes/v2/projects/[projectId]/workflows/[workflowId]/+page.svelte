@@ -20,6 +20,7 @@
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
 	import TaskInfoTabV1 from '$lib/components/v1/workflow/TaskInfoTab.svelte';
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
+	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -179,10 +180,13 @@
 
 	async function loadAvailableTasksV1() {
 		workflowTaskSelectionComponentV1?.setLoadingTasks(true);
-		const responseV1 = await fetch(`/api/v2/task-legacy?args_schema=false&only_v2_compatible=true`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const responseV1 = await fetch(
+			`/api/v2/task-legacy?args_schema=false&only_v2_compatible=true`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
 
 		if (responseV1.ok) {
 			availableTasksV1 = await responseV1.json();
@@ -866,10 +870,20 @@
 									<li class="nav-item">
 										<button
 											data-bs-toggle="tab"
-											data-bs-target="#version-tab"
+											data-bs-target="#info-tab"
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
 											on:click={() => (workflowTabContextId = 3)}
 											aria-current={workflowTabContextId === 3}
+											>Input Filters
+										</button>
+									</li>
+									<li class="nav-item">
+										<button
+											data-bs-toggle="tab"
+											data-bs-target="#version-tab"
+											class="nav-link {workflowTabContextId === 4 ? 'active' : ''}"
+											on:click={() => (workflowTabContextId = 4)}
+											aria-current={workflowTabContextId === 4}
 										>
 											Version
 											{#if newVersionsCount}
@@ -935,12 +949,16 @@
 									{/if}
 								</div>
 							</div>
+						{:else if workflowTabContextId === 3}
+							{#if selectedWorkflowTask}
+								<InputFiltersTab {workflow} workflowTask={selectedWorkflowTask} />
+							{/if}
 						{/if}
 						<div
 							id="version-tab"
 							class="tab-pane"
-							class:show={workflowTabContextId === 3}
-							class:active={workflowTabContextId === 3}
+							class:show={workflowTabContextId === 4}
+							class:active={workflowTabContextId === 4}
 						>
 							<div class="card-body">
 								{#if selectedWorkflowTask}

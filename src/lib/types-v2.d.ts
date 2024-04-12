@@ -104,6 +104,10 @@ export type WorkflowTaskV2 = {
   order: number
   workflow_id: number
   task_type: TaskV2Type
+  input_filters: {
+    attributes: { [key: string]: string }
+    types: { [key: string]: boolean }
+  }
 } & ({
   is_legacy_task: false
   task_id: number
