@@ -37,7 +37,6 @@
 
 	export function getSelectedTaskId() {
 		const taskIdSelector = document.getElementById('taskId');
-		console.log(taskIdSelector);
 		if (taskIdSelector instanceof HTMLSelectElement) {
 			return taskIdSelector.value;
 		}

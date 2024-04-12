@@ -805,7 +805,7 @@
 										? workflowTask.task_legacy.name
 										: workflowTask.task.name}
 									{#if workflowTask.is_legacy_task}
-										<span class="badge rounded-pill text-bg-warning">v1</span>
+										<span class="badge rounded-pill text-bg-warning">legacy</span>
 									{/if}
 									<span class="float-end ps-2">
 										<JobStatusIcon status={statuses[workflowTask.id]} />
@@ -972,22 +972,22 @@
 						class="form-check-input"
 						type="radio"
 						name="taskV1V2"
-						id="taskV2"
+						id="tasksV2"
 						value="v2"
 						bind:group={taskV1V2}
 					/>
-					<label class="form-check-label" for="taskV2">Task V2</label>
+					<label class="form-check-label" for="tasksV2">Current tasks</label>
 				</div>
 				<div class="form-check form-check-inline mb-3">
 					<input
 						class="form-check-input"
 						type="radio"
 						name="taskV1V2"
-						id="taskV1"
+						id="tasksV1"
 						value="v1"
 						bind:group={taskV1V2}
 					/>
-					<label class="form-check-label" for="taskV1">Task V1</label>
+					<label class="form-check-label" for="tasksV1">Legacy tasks</label>
 				</div>
 				{#if taskV1V2 === 'v1'}
 					<WorkflowTaskSelection

@@ -121,9 +121,9 @@ export class PageWithWorkflow extends PageWithProject {
 	 */
 	async selectTaskV1V2(modal, legacy) {
 		if (legacy) {
-			await modal.getByText('Task V1').click();
+			await modal.getByText('Legacy tasks').click();
 		} else {
-			await modal.getByText('Task V2').click();
+			await modal.getByText('Current tasks').click();
 		}
 	}
 
