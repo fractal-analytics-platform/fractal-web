@@ -1,15 +1,95 @@
 <script>
+	import { page } from '$app/stores';
+	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2} */
 	export let dataset;
+	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
+	export let updateDatasetCallback;
+
+	/** @type {Modal} */
+	let modal;
+
+	let editName = false;
+	let name = '';
+	let editZarrDir = false;
+	let zarrDir = '';
+
+	function onOpen() {
+		editName = false;
+		editZarrDir = false;
+		name = dataset.name;
+		zarrDir = dataset.zarr_dir;
+	}
+
+	let savingName = false;
+
+	async function saveName() {
+		if (!name) {
+			return;
+		}
+		savingName = true;
+		await updateDataset({ name }, () => {
+			savingName = false;
+			editName = false;
+		});
+	}
+
+	function undoEditName() {
+		editName = false;
+		name = dataset.name;
+	}
+
+	let savingZarrDir = false;
+
+	async function saveZarrDir() {
+		if (!zarrDir) {
+			return;
+		}
+		savingZarrDir = true;
+		await updateDataset({ zarr_dir: zarrDir }, () => {
+			savingZarrDir = false;
+			editZarrDir = false;
+		});
+	}
+
+	function undoEditZarrDir() {
+		editZarrDir = false;
+		zarrDir = dataset.zarr_dir;
+	}
+
+	/**
+	 * @param {object} body
+	 * @param {() => void} onSuccess
+	 */
+	async function updateDataset(body, onSuccess) {
+		const projectId = $page.params.projectId;
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/v2/project/${projectId}/dataset/${dataset.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(body)
+		});
+		const result = await response.json();
+		if (response.ok) {
+			onSuccess();
+			updateDatasetCallback(result);
+		} else {
+			console.log('Dataset update failed', result);
+			modal.displayErrorAlert(new AlertError(await response.json()));
+		}
+	}
 </script>
 
-<Modal id="datasetInfoModal" centered={true} scrollable={true}>
+<Modal id="datasetInfoModal" centered={true} scrollable={true} {onOpen} bind:this={modal}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Dataset properties</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
+		<div id="errorAlert-datasetInfoModal" />
 		<ul class="list-group">
 			<li class="list-group-item text-bg-light">
 				<strong>Id</strong>
@@ -21,13 +101,91 @@
 				<strong>Name</strong>
 			</li>
 			<li class="list-group-item">
-				<span>{dataset.name}</span>
+				{#if editName}
+					<div class="input-group">
+						<input
+							type="text"
+							bind:value={name}
+							class="form-control"
+							on:keydown={(e) => {
+								if (e.key === 'Enter') {
+									saveName();
+								}
+							}}
+						/>
+						<button class="btn btn-outline-secondary" type="button" on:click={undoEditName}>
+							<i class="bi bi-arrow-counterclockwise" />
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							on:click={saveName}
+							disabled={!name || savingName}
+						>
+							{#if savingName}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							{/if}
+							Save
+						</button>
+					</div>
+				{:else}
+					<span>
+						{dataset.name}
+						<button
+							class="btn btn-primary float-end pt-0 pb-0"
+							on:click={() => (editName = true)}
+							aria-label="Edit dataset name"
+						>
+							<i class="bi bi-pencil" />
+							Edit
+						</button>
+					</span>
+				{/if}
 			</li>
 			<li class="list-group-item text-bg-light">
 				<strong>Zarr dir</strong>
 			</li>
 			<li class="list-group-item">
-				<span>{dataset.zarr_dir}</span>
+				{#if editZarrDir}
+					<div class="input-group">
+						<input
+							type="text"
+							bind:value={zarrDir}
+							class="form-control"
+							on:keydown={(e) => {
+								if (e.key === 'Enter') {
+									saveZarrDir();
+								}
+							}}
+						/>
+						<button class="btn btn-outline-secondary" type="button" on:click={undoEditZarrDir}>
+							<i class="bi bi-arrow-counterclockwise" />
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							on:click={saveZarrDir}
+							disabled={!zarrDir || savingZarrDir}
+						>
+							{#if savingZarrDir}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							{/if}
+							Save
+						</button>
+					</div>
+				{:else}
+					<span>
+						{dataset.zarr_dir}
+						<button
+							class="btn btn-primary float-end pt-0 pb-0"
+							on:click={() => (editZarrDir = true)}
+							aria-label="Edit Zarr dir"
+						>
+							<i class="bi bi-pencil" />
+							Edit
+						</button>
+					</span>
+				{/if}
 			</li>
 		</ul>
 	</svelte:fragment>

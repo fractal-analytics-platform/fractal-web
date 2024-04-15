@@ -329,6 +329,16 @@
 			throw new AlertError(await response.json());
 		}
 	}
+
+	/**
+	 * @param {import('$lib/types-v2').DatasetV2} updatedDataset
+	 */
+	async function updateDatasetFiltersCallback(updatedDataset) {
+		dataset = updatedDataset;
+		if (useDatasetFilters) {
+			await reload();
+		}
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -514,8 +524,8 @@
 	</div>
 {/if}
 
-<DatasetInfoModal {dataset} />
-<DatasetFiltersModal {dataset} />
+<DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
+<DatasetFiltersModal {dataset} updateDatasetCallback={updateDatasetFiltersCallback} />
 <DatasetHistoryModal {dataset} />
 <AddImageModal {dataset} onImageSave={searchImages} />
 

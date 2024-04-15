@@ -1,7 +1,7 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError } from '$lib/common/errors';
-	import CreateUpdateDatasetModal from './datasets/CreateUpdateDatasetModal.svelte';
+	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
@@ -13,14 +13,8 @@
 		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
 	);
 
-	/** @type {CreateUpdateDatasetModal} */
-	let createUpdateDatasetModal;
-
 	function createDatasetCallback(/** @type {import('$lib/types-v2').DatasetV2} */ newDataset) {
 		datasets = [...datasets, newDataset];
-	}
-	function updateDatasetCallback(/** @type {import('$lib/types-v2').DatasetV2} */ updatedDataset) {
-		datasets = datasets.map((d) => (d.id === updatedDataset.id ? updatedDataset : d));
 	}
 
 	/**
@@ -74,7 +68,8 @@
 					<button
 						class="btn btn-primary float-end"
 						type="button"
-						on:click={() => createUpdateDatasetModal.openForCreate()}
+						data-bs-target="#createDatasetModal"
+						data-bs-toggle="modal"
 					>
 						Create new dataset
 					</button>
@@ -96,16 +91,12 @@
 					<tr>
 						<td>{dataset.name}</td>
 						<td>
-							<a class="btn btn-light" href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
+							<a
+								class="btn btn-light"
+								href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}"
+							>
 								<i class="bi bi-arrow-up-right-square" /> Open
 							</a>
-							<button
-								class="btn btn-primary"
-								type="button"
-								on:click|preventDefault={() => createUpdateDatasetModal.openForEdit(dataset)}
-							>
-								<i class="bi bi-pencil" /> Edit
-							</button>
 							<ConfirmActionButton
 								modalId="confirmDatasetDeleteModal{dataset.id}"
 								style={'danger'}
@@ -123,8 +114,4 @@
 	</table>
 </div>
 
-<CreateUpdateDatasetModal
-	bind:this={createUpdateDatasetModal}
-	{createDatasetCallback}
-	{updateDatasetCallback}
-/>
+<CreateDatasetModal {createDatasetCallback} />
