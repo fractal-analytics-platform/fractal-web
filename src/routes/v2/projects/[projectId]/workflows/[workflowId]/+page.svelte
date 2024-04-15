@@ -1,6 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -70,6 +70,9 @@
 	let workflowTaskSelectionComponentV1 = undefined;
 	/** @type {WorkflowTaskSelection|undefined} */
 	let workflowTaskSelectionComponentV2 = undefined;
+
+	/** @type {InputFiltersTab|undefined} */
+	let inputFiltersTab = undefined;
 
 	// Update workflow modal
 	let updatedWorkflowName = '';
@@ -389,6 +392,8 @@
 			throw new Error('Cannot change workflow task context while there are unsaved changes');
 		}
 		selectedWorkflowTask = wft;
+		await tick();
+		inputFiltersTab?.init();
 	}
 
 	function toggleUnsavedChangesModal() {
@@ -655,6 +660,15 @@
 		setTimeout(() => {
 			argsChangesSaved = false;
 		}, 3000);
+		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
+	}
+
+	/**
+	 * @param {import('$lib/types-v2').WorkflowTaskV2} updatedWft
+	 */
+	function onInputFiltersUpdated(updatedWft) {
+		selectedWorkflowTask = updatedWft;
+		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
 	}
 
 	onDestroy(() => {
@@ -951,7 +965,12 @@
 							</div>
 						{:else if workflowTabContextId === 3}
 							{#if selectedWorkflowTask}
-								<InputFiltersTab {workflow} workflowTask={selectedWorkflowTask} />
+								<InputFiltersTab
+									{workflow}
+									workflowTask={selectedWorkflowTask}
+									updateWorkflowTaskCallback={onInputFiltersUpdated}
+									bind:this={inputFiltersTab}
+								/>
 							{/if}
 						{/if}
 						<div

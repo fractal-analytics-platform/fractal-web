@@ -7,6 +7,8 @@
 	export let workflow;
 	/** @type {import("$lib/types-v2").WorkflowTaskV2} */
 	export let workflowTask;
+	/** @type {(wft: import("$lib/types-v2").WorkflowTaskV2) => void} */
+	export let updateWorkflowTaskCallback;
 
 	/** @type {FiltersCreationForm} */
 	let form;
@@ -18,8 +20,12 @@
 	let errorAlert;
 
 	onMount(() => {
-		form.init(workflowTask.input_filters.attributes, workflowTask.input_filters.types);
+		init();
 	});
+
+	export function init() {
+		form.init(workflowTask.input_filters.attributes, workflowTask.input_filters.types);
+	}
 
 	async function save() {
 		if (errorAlert) {
@@ -54,6 +60,7 @@
 			setTimeout(() => {
 				successfullySaved = false;
 			}, 3000);
+			updateWorkflowTaskCallback(await response.json());
 		} else {
 			errorAlert = displayStandardErrorAlert(await response.json(), `errorAlert-inputFilters`);
 		}
