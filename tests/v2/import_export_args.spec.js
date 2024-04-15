@@ -114,10 +114,12 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Arg name').fill('key_non_parallel');
 		await page.getByPlaceholder('Argument default value').fill('value_non_parallel');
 		await page.getByLabel('Save argument').click();
+		await page.getByText('Arguments changes saved successfully').waitFor();
 		await page.getByRole('button', { name: 'Add property' }).nth(1).click();
 		await page.getByPlaceholder('Arg name').fill('key_parallel');
 		await page.getByPlaceholder('Argument default value').fill('value_parallel');
 		await page.getByLabel('Save argument').click();
+		await page.getByText('Arguments changes saved successfully').waitFor();
 
 		const { file, data } = await exportArgs(page, compoundTaskWithoutArgsSchema);
 		expect(data.args_non_parallel.key_non_parallel).toEqual('value_non_parallel');

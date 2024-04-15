@@ -459,9 +459,20 @@
 									btnStyle="danger"
 									buttonIcon="trash"
 									label={'Delete'}
-									message="Delete image {image.zarr_url}"
 									callbackAction={() => handleDeleteImage(image.zarr_url)}
-								/>
+								>
+									<svelte:fragment slot="body">
+										<div class="alert alert-danger fw-semibold wrap">
+											The following image is about to be removed from the Fractal image list:<br />
+											{image.zarr_url}
+										</div>
+										<p class="fw-semibold wrap">
+											This does not remove the actual image data from disk, it just removes it from
+											the Fractal database
+										</p>
+										<p>Do you confirm?</p>
+									</svelte:fragment>
+								</ConfirmActionButton>
 							</td>
 						</tr>
 					{/each}
@@ -470,7 +481,7 @@
 		</div>
 		<div class="sticky-bottom pb-2" id="dataset-filters-wrapper">
 			<div class="row">
-				<div class="col-lg-3">
+				<div class="col-lg-3 mb-3">
 					<input
 						type="radio"
 						class="btn-check"
@@ -530,8 +541,8 @@
 <AddImageModal {dataset} onImageSave={searchImages} />
 
 <style>
-	#dataset-images-table td:first-child,
-	#dataset-images-table td:last-child {
+	#dataset-images-table td:last-child,
+	#dataset-images-table th:last-child {
 		white-space: nowrap;
 	}
 
@@ -542,5 +553,9 @@
 	.btn-check:not(:checked) + .btn-white {
 		color: #0d6efd;
 		background-color: #fff;
+	}
+
+	.wrap {
+		white-space: normal;
 	}
 </style>

@@ -66,7 +66,7 @@
 
 <div class="row row-cols-lg-auto justify-content-center">
 	{#if totalCount > 0}
-		<div class="col-12">
+		<div class="col-6">
 			<nav aria-label="Page navigation">
 				<ul class="pagination justify-content-center">
 					<li class="page-item">
@@ -113,7 +113,7 @@
 				</ul>
 			</nav>
 		</div>
-		<div class="col-12">
+		<div class="col-6">
 			<div class="input-group mb-1">
 				<label class="input-group-text" for="page_size">Page size</label>
 				<select

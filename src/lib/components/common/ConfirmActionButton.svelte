@@ -38,9 +38,13 @@
 		<h1 class="modal-title fs-5">Confirm action</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<p>You're about to:</p>
-		<p class="badge bg-{style} fs-6 wrap">{message}</p>
-		<p>Do you confirm?</p>
+		{#if !!$$slots.body}
+			<slot name="body" />
+		{:else}
+			<p>You're about to:</p>
+			<p class="badge bg-{style} fs-6 wrap">{message}</p>
+			<p>Do you confirm?</p>
+		{/if}
 		<div class="container">
 			<div id="errorAlert-{modalId}" />
 		</div>
