@@ -1,8 +1,7 @@
-import { waitModalClosed, waitPageLoading } from '../utils';
+import { uploadFile, waitModalClosed, waitPageLoading } from '../utils';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -81,9 +80,10 @@ export async function createFakeTask(page, task) {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} taskName
+ * @param {'v1'|'v2'} version
  */
-export async function deleteTask(page, taskName) {
-	await page.goto('/v2/tasks');
+export async function deleteTask(page, taskName, version = 'v2') {
+	await page.goto(`/${version}/tasks`);
 	await waitPageLoading(page);
 	const row = await getTaskRow(page, taskName);
 	await row.getByRole('button', { name: 'Delete' }).click();
@@ -107,23 +107,4 @@ async function getTaskRow(page, taskName) {
 		}
 	}
 	throw new Error(`Unable to find task ${taskName} in tasks table`);
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} selectorText
- * @param {string} fileName
- * @param {any} data
- * @returns {Promise<string>} the path of the created file
- */
-async function uploadFile(page, selectorText, fileName, data) {
-	const file = path.join(os.tmpdir(), fileName);
-	fs.writeFileSync(file, JSON.stringify(data));
-
-	const fileChooserPromise = page.waitForEvent('filechooser');
-	await page.getByText(selectorText).click();
-	const fileChooser = await fileChooserPromise;
-	await fileChooser.setFiles(file);
-
-	return file;
 }

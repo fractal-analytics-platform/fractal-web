@@ -5,8 +5,10 @@ test('Collect core tasks', async ({ page }) => {
 	await page.goto('/v1/tasks');
 	await waitPageLoading(page);
 
-	if ((await page.getByRole('table').last().locator('tbody tr').count()) > 0) {
-		console.warn('WARNING: Tasks already collected. Skipping tasks collections');
+	let rowsCount = await page.getByRole('table').last().locator('tbody tr').count();
+
+	if ((await page.getByRole('table').last().getByText('Import OME-Zarr').count()) > 0) {
+		console.warn('WARNING: Tasks core V1 already collected. Skipping tasks collection');
 		return;
 	}
 
@@ -57,12 +59,8 @@ test('Collect core tasks', async ({ page }) => {
 		await page.getByRole('button', { name: 'Confirm' }).click();
 	});
 
-	await test.step('Reload task list', async () => {
-		const reloadTasksBtn = page.getByRole('table').last().getByRole('button').nth(0);
-		await reloadTasksBtn.click();
-
-		const rows = await page.getByRole('table').last().locator('tbody tr').count();
-		expect(rows).toEqual(12);
+	await test.step('Check task list', async () => {
+		await expect(page.getByRole('table').last().locator('tbody tr')).toHaveCount(rowsCount + 12);
 	});
 });
 

@@ -29,12 +29,6 @@
 			<li class="list-group-item">
 				<span>{dataset.zarr_dir}</span>
 			</li>
-			<li class="list-group-item text-bg-light">
-				<strong>Readonly</strong>
-			</li>
-			<li class="list-group-item">
-				<span class="badge bg-info">{dataset.read_only}</span>
-			</li>
 		</ul>
 	</svelte:fragment>
 </Modal>

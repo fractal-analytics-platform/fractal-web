@@ -53,7 +53,9 @@
 		const serializedArgs = JSON.stringify(args, null, 2);
 		downloadBlob(
 			serializedArgs,
-			`args-${createSlug(workflowTask.task.name)}.json`,
+			`args-${createSlug(
+				workflowTask.is_legacy_task ? workflowTask.task_legacy.name : workflowTask.task.name
+			)}.json`,
 			'text/json;charset=utf-8;'
 		);
 	}

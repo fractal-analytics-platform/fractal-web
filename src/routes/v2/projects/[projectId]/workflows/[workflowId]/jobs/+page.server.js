@@ -5,7 +5,7 @@ import { getWorkflowJobs } from '$lib/server/api/v2/workflow_api';
 export async function load({ fetch, params }) {
 	const { projectId, workflowId } = params;
 
-	/** @type {import('$lib/types').Project} */
+	/** @type {import('$lib/types-v2').ProjectV2} */
 	const project = await getProject(fetch, projectId);
 
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */

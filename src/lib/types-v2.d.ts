@@ -1,13 +1,18 @@
 import type { JSONSchemaObjectProperty } from "./components/common/jschema/jschema-types";
-import { Project, DatasetHistoryItem, type Task } from "./types";
+import { DatasetHistoryItem, type Task } from "./types";
+
+export type ProjectV2 = {
+  id: number
+  name: string
+  timestamp_created: string
+}
 
 export type DatasetV2 = {
   id: number
   name: string
   project_id: number
-  project: Project
+  project: ProjectV2
   history: Array<DatasetHistoryItem> | null
-  read_only: boolean
   zarr_dir: string
   filters: {
     attributes: { [key: string]: string | number },
@@ -85,7 +90,7 @@ export type WorkflowV2 = {
   id: number
   name: string
   project_id: number
-  project: Project
+  project: ProjectV2
   task_list: Array<WorkflowTaskV2>
   timestamp_created: string
 }
@@ -98,10 +103,13 @@ export type WorkflowTaskV2 = {
   args_parallel: object
   order: number
   workflow_id: number
+  task_type: TaskV2Type
+} & ({
+  is_legacy_task: false
   task_id: number
   task: TaskV2
-  is_legacy_task: boolean
+} | {
+  is_legacy_task: true
   task_legacy_id: number
   task_legacy: Task
-  task_type: TaskV2Type
-}
+})

@@ -2,12 +2,12 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	// ProjectInfoModal component
-	import { projectInfoModal } from '$lib/stores/projectStores';
+	import { projectInfoModalV2 } from '$lib/stores/projectStores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	// Project to be displayed
-	/** @type {import('$lib/types').Project|undefined} */
+	/** @type {import('$lib/types-v2').ProjectV2|undefined} */
 	let project = undefined;
 
 	let loadingDatasets = true;
@@ -20,7 +20,7 @@
 	// Subscription to modalProject store to update project property with respect
 	// to the project in the store. Enable app-wide updates to the project to be
 	// displayed in this component.
-	const unsubscribe = projectInfoModal.subscribe(async (selectedProject) => {
+	const unsubscribe = projectInfoModalV2.subscribe(async (selectedProject) => {
 		project = selectedProject;
 		if (project) {
 			loadingDatasets = true;
@@ -48,7 +48,7 @@
 	});
 
 	function onClose() {
-		projectInfoModal.set(undefined);
+		projectInfoModalV2.set(undefined);
 	}
 
 	onDestroy(unsubscribe);
@@ -71,8 +71,6 @@
 					<ul class="list-group">
 						<li class="list-group-item list-group-item-light fw-bold">Name</li>
 						<li class="list-group-item">{project.name}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Read only</li>
-						<li class="list-group-item">{project.read_only ? 'Yes' : 'No'}</li>
 					</ul>
 				</div>
 			</div>
@@ -88,16 +86,14 @@
 							<thead class="table-light">
 								<tr>
 									<th>Name</th>
-									<th>Readonly</th>
 									<th># Attribute Filters</th>
 									<th># Type Filters</th>
 								</tr>
 							</thead>
 							<tbody>
-								{#each datasets as { name, read_only, filters }}
+								{#each datasets as { name, filters }}
 									<tr>
 										<td>{name}</td>
-										<td>{read_only ? 'Yes' : 'No'}</td>
 										<td>{Object.entries(filters.attributes).length}</td>
 										<td>{Object.entries(filters.types).length}</td>
 									</tr>

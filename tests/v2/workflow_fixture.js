@@ -88,13 +88,51 @@ export class PageWithWorkflow extends PageWithProject {
 	/**
 	 * @param {string} taskName
 	 * @param {string|null=} taskVersion
+	 * @param {boolean|false=} legacy
 	 * @returns {Promise<void>}
 	 */
-	async addUserTask(taskName, taskVersion = null) {
+	async addCollectedTask(taskName, taskVersion = null, legacy = false) {
 		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
+		await this.selectTaskV1V2(modal, legacy);
+		await this.page.getByText('Common tasks').click();
+		await this.addTask(modal, taskName, taskVersion);
+	}
+
+	/**
+	 * @param {string} taskName
+	 * @param {string|null=} taskVersion
+	 * @param {boolean|false=} legacy
+	 * @returns {Promise<void>}
+	 */
+	async addUserTask(taskName, taskVersion = null, legacy = false) {
+		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
+		const modal = this.page.locator('.modal.show');
+		await modal.waitFor();
+		await this.selectTaskV1V2(modal, legacy);
 		await this.page.getByText('User tasks').click();
+		await this.addTask(modal, taskName, taskVersion);
+	}
+
+	/**
+	 * @param {import('@playwright/test').Locator} modal
+	 * @param {boolean} legacy
+	 */
+	async selectTaskV1V2(modal, legacy) {
+		if (legacy) {
+			await modal.getByText('Legacy tasks').click();
+		} else {
+			await modal.getByText('Current tasks').click();
+		}
+	}
+
+	/**
+	 * @param {import('@playwright/test').Locator} modal
+	 * @param {string} taskName
+	 * @param {string|null} taskVersion
+	 */
+	async addTask(modal, taskName, taskVersion) {
 		const selector = modal.getByRole('combobox').first();
 		await selector.click();
 		const items = await this.page.getByRole('option').all();
@@ -110,7 +148,9 @@ export class PageWithWorkflow extends PageWithProject {
 		await /** @type {import('@playwright/test').Locator} */ (testTaskItem).click();
 		await this.page.locator('#taskId').waitFor();
 		if (taskVersion) {
-			await this.page.getByRole('combobox', { name: 'Select task version' }).selectOption(taskVersion);
+			await this.page
+				.getByRole('combobox', { name: 'Select task version' })
+				.selectOption(taskVersion);
 		}
 		await this.page.getByRole('button', { name: 'Insert' }).click();
 		await waitModalClosed(this.page);

@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
 
-	/** @type {import('$lib/types').Project} */
+	/** @type {import('$lib/types-v2').ProjectV2} */
 	let project = $page.data.project;
 	/** @type {import('$lib/types').Workflow} */
 	let workflow = $page.data.workflow;

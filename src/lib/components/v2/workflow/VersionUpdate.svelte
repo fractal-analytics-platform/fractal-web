@@ -1,9 +1,10 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { page } from '$app/stores';
-	import { getNewVersions } from './version-checker';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
+	import { getNewVersions as getNewVersionsV1 } from '$lib/components/v1/workflow/version-checker';
+	import { getNewVersions as getNewVersionsV2 } from '$lib/components/v2/workflow/version-checker';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
@@ -24,9 +25,13 @@
 	let nonParallelArgsChanged = false;
 	let parallelArgsChanged = false;
 
-	$: task = workflowTask.task;
+	let displayCheckAndCancelBtn = true;
 
-	/** @type {import('$lib/types-v2').TaskV2[]} */
+	$: task = workflowTask.is_legacy_task ? workflowTask.task_legacy : workflowTask.task;
+
+	/**
+	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
+	 * @type {T[]} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
 
@@ -46,6 +51,21 @@
 
 	$: cancelEnabled = nonParallelArgsChanged || parallelArgsChanged;
 
+	$: taskHasArgsSchema = workflowTask.is_legacy_task
+		? !!workflowTask.task_legacy.args_schema
+		: !!(workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel);
+
+	$: updateCandidateType =
+		updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel';
+
+	$: canBeUpdated =
+		selectedUpdateVersion &&
+		updateCandidate &&
+		(((updateCandidateType === 'non_parallel' || updateCandidateType === 'compound') &&
+			nonParallelCanBeUpdated) ||
+			((updateCandidateType === 'parallel' || updateCandidateType === 'compound') &&
+				parallelCanBeUpdated));
+
 	async function checkNewVersions() {
 		if (errorAlert) {
 			errorAlert.hide();
@@ -55,12 +75,19 @@
 		fixArgsComponentNonParallel?.reset();
 		fixArgsComponentParallel?.reset();
 
-		if (!(task.args_schema_parallel || task.args_schema_non_parallel) || !task.version) {
+		await tick(); // wait taskHasArgsSchema is set
+		if (!taskHasArgsSchema || !task.version) {
 			return;
 		}
 
 		try {
-			updateCandidates = await getNewVersions(task);
+			if (workflowTask.is_legacy_task) {
+				// @ts-ignore
+				updateCandidates = await getNewVersionsV1(workflowTask.task_legacy, true);
+			} else {
+				// @ts-ignore
+				updateCandidates = await getNewVersionsV2(workflowTask.task);
+			}
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
@@ -80,8 +107,11 @@
 		}
 		// await components rendering
 		await tick();
-		fixArgsComponentNonParallel?.checkArgumentsWithNewSchema();
-		fixArgsComponentParallel?.checkArgumentsWithNewSchema();
+		const displayTextareaNonParallel =
+			fixArgsComponentNonParallel?.checkArgumentsWithNewSchema() || false;
+		const displayTextareaParallel =
+			fixArgsComponentParallel?.checkArgumentsWithNewSchema() || false;
+		displayCheckAndCancelBtn = displayTextareaNonParallel || displayTextareaParallel;
 	}
 
 	function check() {
@@ -140,7 +170,8 @@
 					meta_non_parallel: workflowTask.meta_non_parallel,
 					meta_parallel: workflowTask.meta_parallel,
 					args_non_parallel: fixArgsComponentNonParallel?.getNewArgs() || null,
-					args_parallel: fixArgsComponentParallel?.getNewArgs() || null
+					args_parallel: fixArgsComponentParallel?.getNewArgs() || null,
+					is_legacy_task: workflowTask.is_legacy_task
 				})
 			}
 		);
@@ -160,19 +191,11 @@
 		}
 		return null;
 	}
-
-	$: canBeUpdated =
-		selectedUpdateVersion &&
-		updateCandidate &&
-		(((updateCandidate.type === 'non_parallel' || updateCandidate.type === 'compound') &&
-			nonParallelCanBeUpdated) ||
-			((updateCandidate.type === 'parallel' || updateCandidate.type === 'compound') &&
-				parallelCanBeUpdated));
 </script>
 
 <div>
 	<div id="versionUpdateError" />
-	{#if (task.args_schema_non_parallel || task.args_schema_parallel) && task.version}
+	{#if taskHasArgsSchema && task.version}
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection"> New versions of this task exist: </label>
 			<select
@@ -198,7 +221,7 @@
 				</div>
 			{/if}
 			{#if updateCandidate}
-				{#if updateCandidate.type === 'non_parallel' || updateCandidate.type === 'compound'}
+				{#if updateCandidateType === 'non_parallel' || updateCandidateType === 'compound'}
 					<VersionUpdateFixArgs
 						{workflowTask}
 						{updateCandidate}
@@ -208,7 +231,7 @@
 						bind:this={fixArgsComponentNonParallel}
 					/>
 				{/if}
-				{#if updateCandidate.type === 'parallel' || updateCandidate.type === 'compound'}
+				{#if updateCandidateType === 'parallel' || updateCandidateType === 'compound'}
 					<VersionUpdateFixArgs
 						{workflowTask}
 						{updateCandidate}
@@ -220,17 +243,19 @@
 				{/if}
 			{/if}
 			{#if updateCandidate}
-				<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
-				&nbsp;
-				<button
-					type="button"
-					class="btn btn-secondary mt-3"
-					on:click={cancel}
-					disabled={!cancelEnabled}
-				>
-					Cancel
-				</button>
-				&nbsp;
+				{#if displayCheckAndCancelBtn}
+					<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
+					&nbsp;
+					<button
+						type="button"
+						class="btn btn-secondary mt-3"
+						on:click={cancel}
+						disabled={!cancelEnabled}
+					>
+						Cancel
+					</button>
+					&nbsp;
+				{/if}
 			{/if}
 			<button type="button" class="btn btn-primary mt-3" on:click={update} disabled={!canBeUpdated}>
 				Update
@@ -242,7 +267,7 @@
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task version is not set.
 		</div>
-	{:else if !task.args_schema_non_parallel && !task.args_schema_parallel}
+	{:else if !taskHasArgsSchema}
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task has no args_schema.
 		</div>

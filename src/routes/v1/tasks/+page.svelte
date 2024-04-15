@@ -9,6 +9,7 @@
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import AddSingleTask from '$lib/components/v1/tasks/AddSingleTask.svelte';
 	import { onDestroy } from 'svelte';
+	import TasksTable from '$lib/components/tasks/TasksTable.svelte';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
@@ -101,92 +102,6 @@
 		}
 	}
 
-	/**
-	 * @param {number} index
-	 */
-	function isOldVersion(index) {
-		if (index === 0) {
-			return false;
-		}
-		const currentTask = tasks[index];
-		const previousTask = tasks[index - 1];
-		return previousTask.name === currentTask.name && previousTask.owner === currentTask.owner;
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function isLastOldVersion(index) {
-		if (!isOldVersion(index)) {
-			return false;
-		}
-		if (index === tasks.length - 1) {
-			return false;
-		}
-		const currentTask = tasks[index];
-		const nextTask = tasks[index + 1];
-		return nextTask.name !== currentTask.name || nextTask.owner !== currentTask.owner;
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function isMainVersion(index) {
-		if (isOldVersion(index)) {
-			return false;
-		}
-		if (index === tasks.length - 1) {
-			return false;
-		}
-		const currentTask = tasks[index];
-		const nextTask = tasks[index + 1];
-		return nextTask.name === currentTask.name && nextTask.owner === currentTask.owner;
-	}
-
-	/**
-	 * @param {Event} event
-	 */
-	function handleToggleOldVersions(event) {
-		const element = /** @type {HTMLElement} */ (event.target);
-		/** @type {HTMLElement|null} */
-		let row = /** @type {HTMLElement} */ (element.closest('tr'));
-		if (!row.classList.contains('expanded')) {
-			closeAllOldVersions(/** @type {HTMLElement} */ (row.closest('table')));
-		}
-		toggleOldVersions(row);
-	}
-
-	/**
-	 * @param {HTMLElement} table
-	 */
-	function closeAllOldVersions(table) {
-		const rows = table.querySelectorAll('tr');
-		for (const row of rows) {
-			if (row.classList.contains('expanded')) {
-				toggleOldVersions(row);
-			}
-		}
-	}
-
-	/**
-	 * @param {HTMLElement} mainRow
-	 */
-	function toggleOldVersions(mainRow) {
-		mainRow.classList.toggle('expanded');
-		/** @type {HTMLElement|null} */
-		let row = mainRow;
-		while ((row = /** @type {HTMLElement|null} */ (row?.nextSibling))) {
-			if (!row.classList) {
-				continue;
-			}
-			if (row.classList.contains('old-version')) {
-				row.classList.toggle('collapsed');
-			} else {
-				break;
-			}
-		}
-	}
-
 	onDestroy(unsubscribe);
 </script>
 
@@ -238,93 +153,59 @@
 	<div class="row mt-4">
 		<h3 class="fw-light">Task List</h3>
 		<div class="col-12">
-			<table class="table align-middle">
-				<thead class="table-light">
-					<tr>
-						<th>Name</th>
-						<th>Version</th>
-						<th>Owner</th>
-						<th>Options</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#key tasks}
-						{#each tasks as task, i}
-							<tr
-								class:old-version={isOldVersion(i)}
-								class:last-old-version={isLastOldVersion(i)}
-								class:is-main-version={isMainVersion(i)}
-								class:collapsed={isOldVersion(i)}
-							>
-								<td class="col-3">{isOldVersion(i) ? '' : task.name}</td>
-								<td class="col-1">
-									{task.version || '–'}
-									{#if isMainVersion(i)}
-										<button class="btn btn-link" on:click={handleToggleOldVersions}>
-											<i class="bi bi-plus-circle" />
-										</button>
-									{/if}
-								</td>
-								<td class="col-1">{task.owner || '–'}</td>
-								<td class="col-2">
-									<button
-										class="btn btn-light"
-										data-bs-toggle="modal"
-										data-bs-target="#taskInfoModal"
-										on:click={() => taskInfoModal.open(task)}
-									>
-										<i class="bi bi-info-circle" />
-										Info
-									</button>
-									<button
-										class="btn btn-primary"
-										data-bs-toggle="modal"
-										data-bs-target="#taskEditModal"
-										on:click={() => taskEditModal.open(task)}
-									>
-										<i class="bi bi-pencil" />
-										Edit
-									</button>
-									<ConfirmActionButton
-										modalId="confirmTaskDeleteModal{task.id}"
-										style={'danger'}
-										btnStyle="danger"
-										buttonIcon="trash"
-										label={'Delete'}
-										message={`Delete task ${task.name}`}
-										callbackAction={() => handleDeleteTask(task.id)}
-									/>
-								</td>
-							</tr>
-						{/each}
-					{/key}
-				</tbody>
-			</table>
+			<TasksTable {tasks}>
+				<svelte:fragment slot="thead">
+					<colgroup>
+						<col width="auto" />
+						<col width="100" />
+						<col width="auto" />
+						<col width="350" />
+					</colgroup>
+					<thead class="table-light">
+						<tr>
+							<th>Name</th>
+							<th>Version</th>
+							<th>Owner</th>
+							<th>Options</th>
+						</tr>
+					</thead>
+				</svelte:fragment>
+				<svelte:fragment slot="custom-columns-right" let:task>
+					<td>{task.owner || '–'}</td>
+					<td>
+						<button
+							class="btn btn-light"
+							data-bs-toggle="modal"
+							data-bs-target="#taskInfoModal"
+							on:click={() => taskInfoModal.open(task)}
+						>
+							<i class="bi bi-info-circle" />
+							Info
+						</button>
+						<button
+							class="btn btn-primary"
+							data-bs-toggle="modal"
+							data-bs-target="#taskEditModal"
+							on:click={() => taskEditModal.open(task)}
+						>
+							<i class="bi bi-pencil" />
+							Edit
+						</button>
+						<ConfirmActionButton
+							modalId="confirmTaskDeleteModal{task.id}"
+							style={'danger'}
+							btnStyle="danger"
+							buttonIcon="trash"
+							label={'Delete'}
+							message={`Delete task ${task.name}`}
+							callbackAction={() => handleDeleteTask(task.id)}
+						/>
+					</td>
+				</svelte:fragment>
+			</TasksTable>
 		</div>
 	</div>
 </div>
 
 <TaskInfoModal bind:this={taskInfoModal} />
 <TaskEditModal bind:this={taskEditModal} {updateEditedTask} />
-
-<style>
-	:global(.is-main-version.expanded td) {
-		border-bottom-style: dashed;
-	}
-
-	.old-version.collapsed {
-		display: none;
-	}
-
-	.old-version {
-		display: table-row;
-	}
-
-	.old-version td {
-		border-bottom-style: dashed;
-	}
-
-	.last-old-version td {
-		border-bottom-style: solid;
-	}
-</style>

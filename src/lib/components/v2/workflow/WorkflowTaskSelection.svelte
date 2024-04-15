@@ -7,7 +7,10 @@
 		orderTasksByOwnerThenByNameThenByVersion
 	} from '$lib/common/component_utilities.js';
 
-	/** @type {import('$lib/types').Task[]} */
+	/**
+	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
+	 * @type {T[]}
+	 */
 	export let tasks;
 	let loadingTasks = false;
 
@@ -18,19 +21,24 @@
 		loadingTasks = loading;
 	}
 
+	/**
+	 * @type {'common'|'user'}
+	 */
 	let selectedTypeOfTask = 'common';
 	let selectionTasks = new Map();
 	let selectedMapKey;
 	let selectedMapTaskVersions = undefined;
 	let selectionControl = undefined;
-	/** @type {import('$lib/types-v2').TaskV2[]} */
+	/**
+	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
+	 * @type {T[]}
+	 */
 	let filteredTasks = [];
 
 	export function getSelectedTaskId() {
 		const taskIdSelector = document.getElementById('taskId');
-		if (taskIdSelector) {
-			// @ts-ignore
-			return document.getElementById('taskId').value;
+		if (taskIdSelector instanceof HTMLSelectElement) {
+			return taskIdSelector.value;
 		}
 	}
 
@@ -65,8 +73,14 @@
 				}
 			}
 		});
+		setSelectionControlData();
 	});
 
+	/**
+	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
+	 * @param {T[]} tasks
+	 * @param {'common'|'user'} group
+	 */
 	function setSelectionTasks(group, tasks) {
 		selectionTasks = new Map();
 		selectedMapKey = null;
@@ -75,6 +89,7 @@
 		filteredTasks = [];
 
 		if (group === 'common') {
+			// @ts-ignore
 			filteredTasks = tasks.filter((task) => task.owner === null);
 			filteredTasks.forEach((task) => {
 				let taskPackage = task.source.split(':')[1];
@@ -117,6 +132,7 @@
 		}
 
 		if (group === 'user') {
+			// @ts-ignore
 			filteredTasks = tasks.filter((task) => task.owner !== null);
 			filteredTasks.forEach((task) => {
 				if (!selectionTasks.has(task.name)) {
@@ -216,6 +232,9 @@
 		selectionControl?.setData(optionsMap);
 	}
 
+	/**
+	 * @param {'common'|'user'} group
+	 */
 	function setSelectedGroup(group) {
 		selectedTypeOfTask = group;
 	}

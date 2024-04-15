@@ -17,10 +17,11 @@ export type Task = {
   owner: string
   source: string
   args_schema_version: string
-  args_schema: object | null
+  args_schema: JSONSchemaObjectProperty | null
   docs_link: string
   docs_info: string
   meta: object
+  is_v2_compatible: boolean
 }
 
 export type Workflow = {
