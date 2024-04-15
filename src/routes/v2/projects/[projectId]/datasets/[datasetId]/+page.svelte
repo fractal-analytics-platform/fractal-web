@@ -8,6 +8,8 @@
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import AddImageModal from '$lib/components/v2/projects/datasets/AddImageModal.svelte';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import SlimSelect from 'slim-select';
+	import { onMount, tick } from 'svelte';
 
 	let projectId = $page.params.projectId;
 
@@ -15,9 +17,11 @@
 	let dataset = $page.data.dataset;
 	/** @type {import('$lib/types-v2').ImagePage} */
 	let imagePage = $page.data.imagePage;
-	let showSearchForm = $page.data.imagePage.total_count > 0;
+	let showTable = $page.data.imagePage.total_count > 0;
+	let applyClicked = false;
 	let searching = false;
-	let zarrUrlFilter = '';
+	let resetting = false;
+	let reloading = false;
 	/** @type {{ [key: string]: null | string | number}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
@@ -25,6 +29,130 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 	let useDatasetFilters = false;
+
+	/** @type {{[key: string]: SlimSelect}} */
+	let attributesSelectors = {};
+	/** @type {{[key: string]: SlimSelect}} */
+	let typesSelectors = {};
+
+	onMount(() => {
+		loadAttributesSelectors();
+		loadTypesSelector();
+	});
+
+	function loadAttributesSelectors() {
+		// Destroy previous selectors
+		for (const selector of Object.values(attributesSelectors)) {
+			selector.destroy();
+		}
+		// Init new selectors
+		attributesSelectors = Object.fromEntries(
+			Object.keys(imagePage.attributes).map((k) => [
+				k,
+				loadSelector(
+					k,
+					imagePage.attributes[k]
+						.map((a) => a.toString())
+						.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })),
+					(value) => {
+						if (value === null) {
+							attributeFilters[k] = null;
+						} else {
+							const values = imagePage.attributes[k];
+							attributeFilters[k] = values.filter((v) => value === v.toString())[0];
+						}
+					},
+					attributeFilters[k]?.toString() || '',
+					true
+				)
+			])
+		);
+	}
+
+	function loadTypesSelector() {
+		// Destroy previous selectors
+		for (const selector of Object.values(typesSelectors)) {
+			selector.destroy();
+		}
+		// Init new selectors
+		typesSelectors = Object.fromEntries(
+			imagePage.types.map((k) => [
+				k,
+				loadSelector(
+					k,
+					['True', 'False'],
+					(value) => {
+						if (value === 'True') {
+							typeFilters[k] = true;
+						} else if (value === 'False') {
+							typeFilters[k] = false;
+						} else {
+							typeFilters[k] = null;
+						}
+					},
+					typeFilters[k] === null ? '' : typeFilters[k] ? 'True' : 'False',
+					false
+				)
+			])
+		);
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {string[]} values
+	 * @param {(value: string | null) => void} setter
+	 * @param {string} selectedValue
+	 * @param {boolean} isAttribute
+	 */
+	function loadSelector(key, values, setter, selectedValue, isAttribute) {
+		const elementId = (isAttribute ? 'attribute-' : 'type-') + getIdFromValue(key);
+		const selectElement = document.getElementById(elementId);
+		if (!selectElement) {
+			throw new Error(`Unable to find selector element with key ${key}`);
+		}
+		selectElement.classList.remove('invisible');
+		const selector = new SlimSelect({
+			select: `#${elementId}`,
+			settings: {
+				showSearch: isAttribute,
+				allowDeselect: true,
+				ariaLabel: isAttribute ? `Selector for attribute ${key}` : `Selector for type ${key}`
+			},
+			events: {
+				afterChange: (selection) => {
+					const selectedOption = selection[0];
+					if (!selectedOption || selectedOption.placeholder) {
+						setter(null);
+					} else {
+						setter(selectedOption.value);
+					}
+				}
+			}
+		});
+		setSlimSelectOptions(selector, values);
+		selector.setSelected(selectedValue);
+		return selector;
+	}
+
+	/**
+	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
+	 * @param {SlimSelect|undefined} select
+	 * @param {Array<string>} values
+	 */
+	function setSlimSelectOptions(select, values) {
+		if (!select) {
+			return;
+		}
+		const options = values.map((v) => ({ text: v.toString(), value: v.toString() }));
+		select.setData([{ text: 'All', placeholder: true }, ...options]);
+	}
+
+	$: searchBtnActive =
+		Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
+		Object.values(typeFilters).filter((t) => t !== null).length > 0 ||
+		applyClicked;
+
+	let resetBtnActive = false;
 
 	/** @param {import('$lib/types-v2').ImagePage} imagePage */
 	function getAttributeFilterBaseValues(imagePage) {
@@ -48,6 +176,7 @@
 				k in attributeFilters ? attributeFilters[k] : null
 			])
 		);
+		loadAttributesSelectors();
 	}
 
 	/**
@@ -59,6 +188,7 @@
 		typeFilters = Object.fromEntries(
 			imagePage.types.map((k) => [k, k in typeFilters ? typeFilters[k] : null])
 		);
+		loadTypesSelector();
 	}
 
 	/**
@@ -76,6 +206,34 @@
 		return relativePath;
 	}
 
+	async function applySearchFields() {
+		searching = true;
+		const enableButtons =
+			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
+			Object.values(typeFilters).filter((t) => t !== null).length > 0;
+		applyClicked = enableButtons;
+		resetBtnActive = enableButtons;
+		await searchImages();
+		searching = false;
+	}
+
+	async function resetSearchFields() {
+		resetting = true;
+		attributeFilters = getAttributeFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
+		applyClicked = false;
+		resetBtnActive = false;
+		await tick();
+		await searchImages();
+		resetting = false;
+	}
+
+	async function reload() {
+		reloading = true;
+		await searchImages();
+		reloading = false;
+	}
+
 	/**
 	 * @param {number|null} currentPage
 	 * @param {number|null} pageSize
@@ -88,7 +246,6 @@
 			pageSize = imagePage.page_size;
 		}
 		errorAlert?.hide();
-		searching = true;
 		const filters = {};
 		let attributes = {};
 		for (const attributeKey of Object.keys(imagePage.attributes)) {
@@ -111,9 +268,6 @@
 			filters['types'] = types;
 		}
 		const params = { filters };
-		if (zarrUrlFilter) {
-			params['zarr_url'] = zarrUrlFilter;
-		}
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
@@ -125,11 +279,11 @@
 				body: JSON.stringify(params)
 			}
 		);
-		searching = false;
-		showSearchForm = true;
+		showTable = true;
 		const result = await response.json();
 		if (response.ok) {
 			imagePage = result;
+			await tick();
 			reloadAttributeFilters(imagePage);
 			reloadTypeFilters(imagePage);
 			// Go to first page if the search returns no values and we are not in the first page
@@ -143,20 +297,13 @@
 		}
 	}
 
-	async function resetSearchFields() {
-		zarrUrlFilter = '';
-		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		typeFilters = getTypeFilterBaseValues(imagePage);
-		await searchImages();
-	}
-
 	/**
 	 * Removes all the characters that can't be used as HTML element id
-	 * @param {string} zarrUrl
+	 * @param {string} value
 	 * @returns {string}
 	 */
-	function getIdFromZarrURL(zarrUrl) {
-		return zarrUrl.replaceAll(/[^\w]/g, '');
+	function getIdFromValue(value) {
+		return value.replaceAll(/[^\w]/g, '');
 	}
 
 	/**
@@ -210,7 +357,7 @@
 	</div>
 </div>
 
-{#if !showSearchForm}
+{#if !showTable}
 	<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
 	<button
 		class="btn btn-outline-secondary ms-4"
@@ -222,146 +369,148 @@
 	</button>
 {:else}
 	<div>
-		<div class="row mt-4 pt-2">
-			<label class="col-3 col-md-2 col-lg-1 col-form-label" for="zarr_url_filter"> Zarr URL </label>
-			<div class="col col-md-8 col-lg-6">
-				<input type="text" class="form-control" bind:value={zarrUrlFilter} id="zarr_url_filter" />
-			</div>
+		<div class="row">
 			<div class="col">
-				<button
-					class="btn btn-outline-secondary float-end"
-					data-bs-target="#datasetAddImageModal"
-					data-bs-toggle="modal"
-				>
-					<i class="bi bi-plus-circle" />
-					Add an image list entry
-				</button>
-			</div>
-		</div>
-		<div class="row row-cols-lg-auto">
-			{#each Object.keys(imagePage.attributes) as attributeKey}
-				<div class="col-12 mt-3">
-					<div class="input-group">
-						<span class="input-group-text">{attributeKey}</span>
-						<select
-							class="form-control"
-							bind:value={attributeFilters[attributeKey]}
-							aria-label="Value for {attributeKey}"
-						>
-							<option value={null}>Select...</option>
-							{#each imagePage.attributes[attributeKey] as value}
-								<option {value}>{value}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-			{/each}
-			{#each imagePage.types as typeKey}
-				<div class="col-12 mt-3">
-					<div class="input-group">
-						<span class="input-group-text">{typeKey}</span>
-						<select
-							class="form-control"
-							bind:value={typeFilters[typeKey]}
-							aria-label="Value for {typeKey}"
-						>
-							<option value={null}>Select...</option>
-							<option value={true}>True</option>
-							<option value={false}>False</option>
-						</select>
-					</div>
-				</div>
-			{/each}
-		</div>
-		<div class="row mb-4">
-			<div class="col mt-4">
-				<div id="searchError" class="mb-2" />
-				<button class="btn btn-primary" on:click={() => searchImages()} disabled={searching}>
-					{#if searching}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-					{:else}
-						<i class="bi bi-search" />
-					{/if}
-					Search images
-				</button>
-				<button class="btn btn-warning" on:click={resetSearchFields} disabled={searching}>
-					Reset
-				</button>
+				<div id="searchError" class="mt-2 mb-2" />
 			</div>
 		</div>
 
-		<div class="table-responsive">
-			{#if imagePage.images.length > 0}
-				<table class="table" id="dataset-images-table">
-					<thead>
+		<div class="table-responsive mt-2">
+			<table class="table" id="dataset-images-table">
+				<thead>
+					<tr>
+						<th>Zarr URL</th>
+						{#each Object.keys(imagePage.attributes) as attributeKey}
+							<th>
+								<label for="attribute-{getIdFromValue(attributeKey)}">
+									{attributeKey}
+								</label>
+							</th>
+						{/each}
+						{#each imagePage.types as typeKey}
+							<th>
+								<label for="type-{getIdFromValue(typeKey)}">
+									{typeKey}
+								</label>
+							</th>
+						{/each}
+						<th>Options</th>
+					</tr>
+					<tr>
+						<th />
+						{#each Object.keys(imagePage.attributes) as attributeKey}
+							<th><select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" /></th>
+						{/each}
+						{#each imagePage.types as typeKey}
+							<th><select id="type-{getIdFromValue(typeKey)}" class="invisible" /></th>
+						{/each}
+						<th>
+							<button
+								class="btn"
+								on:click={applySearchFields}
+								disabled={searching || !searchBtnActive}
+								class:btn-primary={searchBtnActive}
+								class:btn-secondary={!searchBtnActive}
+							>
+								{#if searching && searchBtnActive}
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+								{/if}
+								Apply
+							</button>
+							<button
+								class="btn"
+								on:click={resetSearchFields}
+								disabled={resetting || !resetBtnActive}
+								class:btn-warning={resetBtnActive}
+								class:btn-secondary={!resetBtnActive}
+							>
+								{#if resetting && resetBtnActive}
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+								{/if}
+								Reset
+							</button>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each imagePage.images as image}
 						<tr>
-							<th>Zarr URL</th>
-							{#each Object.keys(imagePage.attributes) as attributeKey}
-								<th>{attributeKey}</th>
+							<td>{getRelativePath(image.zarr_url)}</td>
+							{#each Object.keys(imagePage.attributes) as attribute}
+								<td>{image.attributes[attribute] || ''}</td>
 							{/each}
 							{#each imagePage.types as typeKey}
-								<th>{typeKey}</th>
+								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
-							<th>Options</th>
+							<td class="col-2">
+								<ConfirmActionButton
+									modalId={'deleteConfirmImageModal-' + getIdFromValue(image.zarr_url)}
+									style={'danger'}
+									btnStyle="danger"
+									buttonIcon="trash"
+									label={'Delete'}
+									message="Delete image {image.zarr_url}"
+									callbackAction={() => handleDeleteImage(image.zarr_url)}
+								/>
+							</td>
 						</tr>
-					</thead>
-					<tbody>
-						{#each imagePage.images as image}
-							<tr>
-								<td>{getRelativePath(image.zarr_url)}</td>
-								{#each Object.keys(imagePage.attributes) as attribute}
-									<td>{image.attributes[attribute] || ''}</td>
-								{/each}
-								{#each imagePage.types as typeKey}
-									<td><BooleanIcon value={image.types[typeKey]} /></td>
-								{/each}
-								<td class="col-2">
-									<ConfirmActionButton
-										modalId={'deleteConfirmImageModal-' + getIdFromZarrURL(image.zarr_url)}
-										style={'danger'}
-										btnStyle="danger"
-										buttonIcon="trash"
-										label={'Delete'}
-										message="Delete image {image.zarr_url}"
-										callbackAction={() => handleDeleteImage(image.zarr_url)}
-									/>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			{/if}
+					{/each}
+				</tbody>
+			</table>
 		</div>
 		<div class="sticky-bottom pb-2" id="dataset-filters-wrapper">
-			<input
-				type="radio"
-				class="btn-check"
-				name="filters-switch"
-				id="all-images"
-				autocomplete="off"
-				value={false}
-				bind:group={useDatasetFilters}
-				on:change={() => searchImages()}
-			/>
-			<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
-			<input
-				type="radio"
-				class="btn-check"
-				name="filters-switch"
-				id="dataset-filters"
-				autocomplete="off"
-				value={true}
-				bind:group={useDatasetFilters}
-				on:change={() => searchImages()}
-			/>
-			<label class="btn btn-white btn-outline-primary" for="dataset-filters">Dataset filters</label>
+			<div class="row">
+				<div class="col-lg-3">
+					<input
+						type="radio"
+						class="btn-check"
+						name="filters-switch"
+						id="all-images"
+						autocomplete="off"
+						value={false}
+						bind:group={useDatasetFilters}
+						on:change={reload}
+						disabled={reloading}
+					/>
+					<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
+					<input
+						type="radio"
+						class="btn-check"
+						name="filters-switch"
+						id="dataset-filters"
+						autocomplete="off"
+						value={true}
+						bind:group={useDatasetFilters}
+						on:change={reload}
+						disabled={reloading}
+					/>
+					<label class="btn btn-white btn-outline-primary" for="dataset-filters">
+						Dataset filters
+					</label>
+					{#if reloading}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					{/if}
+				</div>
+				<div class="col-lg-6">
+					<Paginator
+						currentPage={imagePage.current_page}
+						pageSize={imagePage.page_size}
+						totalCount={imagePage.total_count}
+						onPageChange={searchImages}
+					/>
+				</div>
+				<div class="col-lg-3">
+					<button
+						class="btn btn-outline-secondary float-end"
+						data-bs-target="#datasetAddImageModal"
+						data-bs-toggle="modal"
+					>
+						<i class="bi bi-plus-circle" />
+						Add an image list entry
+					</button>
+				</div>
+			</div>
 		</div>
-		<Paginator
-			currentPage={imagePage.current_page}
-			pageSize={imagePage.page_size}
-			totalCount={imagePage.total_count}
-			onPageChange={searchImages}
-		/>
 	</div>
 {/if}
 
@@ -377,7 +526,7 @@
 	}
 
 	#dataset-filters-wrapper {
-		display: inline-block;
+		background-color: #fff;
 	}
 
 	.btn-check:not(:checked) + .btn-white {

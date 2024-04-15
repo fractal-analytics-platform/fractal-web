@@ -42,8 +42,8 @@
 						})
 					}
 				);
-				saving = false;
 				if (!response.ok) {
+					saving = false;
 					throw new AlertError(await response.json());
 				}
 				success = true;
@@ -51,6 +51,7 @@
 			async () => {
 				if (success) {
 					await onImageSave();
+					saving = false;
 				}
 			}
 		);

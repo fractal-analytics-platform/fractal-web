@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
 import { expect, test } from './project_fixture.js';
 
 test('Dataset images [v2]', async ({ page, project }) => {
@@ -74,43 +74,39 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Verify created images count', async () => {
-		await expect(page.getByRole('row')).toHaveCount(6);
-	});
-
-	await test.step('Filter by Zarr URL', async () => {
-		await page.getByRole('textbox', { name: 'Zarr URL' }).first().fill('/tmp/img1');
-		await searchImages(page, 1);
+		await expect(page.getByRole('row')).toHaveCount(7);
 	});
 
 	await test.step('Filter by string attribute', async () => {
-		await page.getByRole('combobox', { name: 'k1' }).selectOption('v1');
+		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'v1');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Filter by numeric attribute', async () => {
-		await page.getByRole('combobox', { name: 'k2' }).selectOption('42');
+		await selectSlimSelect(page, page.getByLabel('Selector for attribute k2'), '42');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Filter by false type', async () => {
-		await page.getByRole('combobox', { name: 'k3' }).selectOption('False');
+		await selectSlimSelect(page, page.getByLabel('Selector for type k3'), 'False');
 		await searchImages(page, 4);
 	});
 
 	await test.step('Filter by true type', async () => {
-		await page.getByRole('combobox', { name: 'k3' }).selectOption('True');
+		await selectSlimSelect(page, page.getByLabel('Selector for type k3'), 'True');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Enable dataset filters', async () => {
-		expect(await page.getByRole('row').count()).toEqual(6);
-		const searchImagesBtn = page.getByRole('button', { name: 'Search images' });
-		await page.getByText('Dataset filters').first().click();
-		await expect(searchImagesBtn).toBeEnabled();
-		await expect(page.getByRole('row')).toHaveCount(2);
-		await page.getByText('All images').click();
-		await expect(searchImagesBtn).toBeEnabled();
-		await expect(page.getByRole('row')).toHaveCount(6);
+		expect(await page.getByRole('row').count()).toEqual(7);
+		const datasetFiltersBtn = page.getByText('Dataset filters').first();
+		await datasetFiltersBtn.click();
+		await expect(datasetFiltersBtn).toBeEnabled();
+		await expect(page.getByRole('row')).toHaveCount(3);
+		const allImagesBtn = page.getByText('All images');
+		await allImagesBtn.click();
+		await expect(allImagesBtn).toBeEnabled();
+		await expect(page.getByRole('row')).toHaveCount(7);
 	});
 
 	await test.step('Delete one image', async () => {
@@ -118,8 +114,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await page.getByRole('button', { name: 'Confirm' }).click();
-		await expect(page.getByRole('button', { name: 'Search images' })).toBeEnabled();
-		await expect(page.getByRole('row')).toHaveCount(5);
+		await expect(page.getByRole('row')).toHaveCount(6);
 	});
 });
 
@@ -145,11 +140,16 @@ async function createImage(page, zarr_url, filtersFunction) {
  * @param {number} expectedCount
  */
 async function searchImages(page, expectedCount) {
-	const searchImagesBtn = page.getByRole('button', { name: 'Search images' });
+	const initialCount = await page.getByRole('row').count();
+	const searchImagesBtn = page.getByRole('button', { name: 'Apply' });
 	await searchImagesBtn.click();
 	await expect(searchImagesBtn).toBeEnabled();
-	await expect(page.getByRole('row')).toHaveCount(expectedCount + 1);
+	await expect(page.getByRole('row')).toHaveCount(expectedCount + 2);
 	const resetBtn = page.getByRole('button', { name: 'Reset' });
 	await resetBtn.click();
-	await expect(searchImagesBtn).toBeEnabled();
+	await expect(searchImagesBtn).not.toBeEnabled();
+	await expect(resetBtn).not.toBeEnabled();
+	// wait spinner disappearing
+	await expect(resetBtn.getByRole('status')).toHaveCount(0);
+	await expect(page.getByRole('row')).toHaveCount(initialCount);
 }

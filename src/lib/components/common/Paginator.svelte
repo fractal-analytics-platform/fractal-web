@@ -66,7 +66,7 @@
 
 <div class="row row-cols-lg-auto justify-content-center">
 	{#if totalCount > 0}
-		<div class="col-12 mt-5">
+		<div class="col-12">
 			<nav aria-label="Page navigation">
 				<ul class="pagination justify-content-center">
 					<li class="page-item">
@@ -113,8 +113,8 @@
 				</ul>
 			</nav>
 		</div>
-		<div class="col-12 mt-5">
-			<div class="input-group mb-3">
+		<div class="col-12">
+			<div class="input-group mb-1">
 				<label class="input-group-text" for="page_size">Page size</label>
 				<select
 					class="form-control"
@@ -131,7 +131,7 @@
 	{/if}
 </div>
 <div class="row">
-	<div class="mt-3 col">
+	<div class="mt-1 col">
 		<p class="text-center">Total results: {totalCount}</p>
 	</div>
 </div>
