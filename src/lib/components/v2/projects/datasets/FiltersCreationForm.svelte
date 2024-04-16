@@ -117,7 +117,7 @@
 	function fieldTypeChanged(field) {
 		if (field.type === 'boolean') {
 			field.value = 'true';
-		} else {
+		} else if (field.type !== 'number' || !field.value.match(/^\d+\.*\d*$/)) {
 			field.value = '';
 		}
 	}

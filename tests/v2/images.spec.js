@@ -141,13 +141,13 @@ async function createImage(page, zarr_url, filtersFunction) {
  */
 async function searchImages(page, expectedCount) {
 	const initialCount = await page.getByRole('row').count();
-	const searchImagesBtn = page.getByRole('button', { name: 'Apply' });
-	await searchImagesBtn.click();
-	await expect(searchImagesBtn).toBeEnabled();
+	const applyBtn = page.getByRole('button', { name: 'Apply' });
+	await applyBtn.click();
+	await expect(applyBtn).not.toBeEnabled();
 	await expect(page.getByRole('row')).toHaveCount(expectedCount + 2);
 	const resetBtn = page.getByRole('button', { name: 'Reset' });
 	await resetBtn.click();
-	await expect(searchImagesBtn).not.toBeEnabled();
+	await expect(applyBtn).not.toBeEnabled();
 	await expect(resetBtn).not.toBeEnabled();
 	// wait spinner disappearing
 	await expect(resetBtn.getByRole('status')).toHaveCount(0);

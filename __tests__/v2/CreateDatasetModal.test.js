@@ -30,7 +30,7 @@ global.window.bootstrap = {
 import CreateDatasetModal from '../../src/lib/components/v2/projects/datasets/CreateDatasetModal.svelte';
 
 const defaultProps = {
-	props: { createDatasetCallback: vi.fn(), updateDatasetCallback: vi.fn() }
+	props: { createDatasetCallback: vi.fn() }
 };
 
 describe('CreateDatasetModal', () => {
@@ -56,7 +56,7 @@ describe('CreateDatasetModal', () => {
 	it('create dataset with string filter', async () => {
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }
@@ -86,7 +86,7 @@ describe('CreateDatasetModal', () => {
 	it('create dataset with number filter', async () => {
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }
@@ -117,7 +117,7 @@ describe('CreateDatasetModal', () => {
 	it('create dataset with type filter set to false', async () => {
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }
@@ -146,7 +146,7 @@ describe('CreateDatasetModal', () => {
 	it('create dataset with type filter set to true', async () => {
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }

@@ -1,5 +1,5 @@
 <script>
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import FiltersCreationForm from '../projects/datasets/FiltersCreationForm.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
