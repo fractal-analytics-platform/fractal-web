@@ -393,7 +393,7 @@
 		}
 		selectedWorkflowTask = wft;
 		await tick();
-		inputFiltersTab?.init();
+		await inputFiltersTab?.init();
 	}
 
 	function toggleUnsavedChangesModal() {
@@ -537,6 +537,12 @@
 
 	/** @type {NodeJS.Timer|undefined} */
 	let statusWatcherTimer;
+
+	async function selectedDatasetChanged() {
+		await tick();
+		await inputFiltersTab?.init();
+		loadJobsStatus();
+	}
 
 	async function loadJobsStatus() {
 		if (selectedDatasetId === undefined) {
@@ -706,7 +712,7 @@
 						class="form-control"
 						id="dataset"
 						bind:value={selectedDatasetId}
-						on:change={loadJobsStatus}
+						on:change={selectedDatasetChanged}
 					>
 						<option value={undefined}>Select...</option>
 						{#each datasets as dataset}
@@ -969,6 +975,7 @@
 									{workflow}
 									workflowTask={selectedWorkflowTask}
 									updateWorkflowTaskCallback={onInputFiltersUpdated}
+									{selectedDatasetId}
 									bind:this={inputFiltersTab}
 								/>
 							{/if}
