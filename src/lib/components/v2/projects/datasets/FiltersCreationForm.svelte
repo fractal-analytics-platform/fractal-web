@@ -7,8 +7,7 @@
 	let typeFields = [];
 
 	/**
-	 *
-	 * @param {{ [key: string]: string | number }} attributes
+	 * @param {{ [key: string]: string | number | boolean }} attributes
 	 * @param {{ [key: string]: boolean }} types
 	 */
 	export function init(attributes, types) {
@@ -21,7 +20,7 @@
 	}
 
 	/**
-	 * @returns {{ [key: string]: string | number }}
+	 * @returns {{ [key: string]: string | number | boolean }}
 	 */
 	export function getAttributes() {
 		return Object.fromEntries(
@@ -97,7 +96,7 @@
 
 	/**
 	 * @param {{ value: string, type: string }} filter
-	 * @returns {string | number}
+	 * @returns {string | number | boolean}
 	 */
 	export function getTypedAttributeValue(filter) {
 		switch (filter.type) {
@@ -105,8 +104,21 @@
 				return filter.value;
 			case 'number':
 				return parseFloat(filter.value);
+			case 'boolean':
+				return filter.value.toLowerCase() === 'true';
 			default:
 				throw new Error(`Unsupported type: ${filter.type}`);
+		}
+	}
+
+	/**
+	 * @param {{ key: string, value: string, type: string, error: string }} field
+	 */
+	function fieldTypeChanged(field) {
+		if (field.type === 'boolean') {
+			field.value = 'true';
+		} else {
+			field.value = '';
 		}
 	}
 
@@ -157,21 +169,30 @@
 			bind:value={field.key}
 			class:is-invalid={field.error}
 		/>
-		<input
-			type="text"
-			class="form-control"
-			class:is-invalid={field.error}
-			placeholder="Value"
-			bind:value={field.value}
-		/>
+		{#if field.type === 'boolean'}
+			<select class="form-control" bind:value={field.value} aria-label="Value">
+				<option value="true">True</option>
+				<option value="false">False</option>
+			</select>
+		{:else}
+			<input
+				type="text"
+				class="form-control"
+				class:is-invalid={field.error}
+				placeholder="Value"
+				bind:value={field.value}
+			/>
+		{/if}
 		<select
 			class="form-control"
 			bind:value={field.type}
 			class:is-invalid={field.error}
 			aria-label="Type"
+			on:change={() => fieldTypeChanged(field)}
 		>
 			<option value="string">String</option>
 			<option value="number">Number</option>
+			<option value="boolean">Boolean</option>
 		</select>
 		<button
 			class="btn btn-outline-danger"
