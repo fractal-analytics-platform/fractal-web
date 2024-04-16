@@ -387,6 +387,16 @@
 
 		<div class="table-responsive mt-2">
 			<table class="table" id="dataset-images-table">
+				<colgroup>
+					<col width="auto" />
+					{#each Object.keys(imagePage.attributes) as _}
+						<col width="190" />
+					{/each}
+					{#each imagePage.types as _}
+						<col width="110" />
+					{/each}
+					<col width="auto" />
+				</colgroup>
 				<thead>
 					<tr>
 						<th>Zarr URL</th>
@@ -409,10 +419,22 @@
 					<tr>
 						<th />
 						{#each Object.keys(imagePage.attributes) as attributeKey}
-							<th><select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" /></th>
+							<th>
+								<div class="row">
+									<div class="col">
+										<div class="attribute-select-wrapper mb-1">
+											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" />
+										</div>
+									</div>
+								</div>
+							</th>
 						{/each}
 						{#each imagePage.types as typeKey}
-							<th><select id="type-{getIdFromValue(typeKey)}" class="invisible" /></th>
+							<th>
+								<div class="type-select-wrapper mb-1">
+									<select id="type-{getIdFromValue(typeKey)}" class="invisible" />
+								</div>
+							</th>
 						{/each}
 						<th>
 							<button
@@ -546,6 +568,10 @@
 		white-space: nowrap;
 	}
 
+	#dataset-images-table thead tr:first-child th label {
+		word-break: break-all;
+	}
+
 	#dataset-filters-wrapper {
 		background-color: #fff;
 	}
@@ -557,5 +583,15 @@
 
 	.wrap {
 		white-space: normal;
+	}
+
+	.attribute-select-wrapper {
+		min-width: 180px;
+		max-width: 180px;
+	}
+
+	.type-select-wrapper {
+		min-width: 100px;
+		max-width: 100px;
 	}
 </style>

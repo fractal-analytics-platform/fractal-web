@@ -3,7 +3,7 @@
 	 * Maximum number of pages to be displayed on one side before displaying ellipsis (...)
 	 */
 	const maxPagesPerSide = 3;
-	const availablePageSizes = [10, 20, 50, 100, 500];
+	const availablePageSizes = [1, 10, 20, 50, 100, 500];
 
 	/** @type {(currentPage: number, pageSize: number) => Promise<void>} */
 	export let onPageChange;
@@ -17,13 +17,26 @@
 	/**
 	 * @param {number} newCurrentPage
 	 */
-	function setCurrentPage(newCurrentPage) {
-		onPageChange(newCurrentPage, pageSize);
+	async function setCurrentPage(newCurrentPage) {
+		await onPageChange(newCurrentPage, pageSize);
+		fixCurrentPageFocus();
 	}
 
-	function setPageSize() {
+	async function setPageSize() {
 		currentPage = 1;
-		onPageChange(currentPage, pageSize);
+		await onPageChange(currentPage, pageSize);
+		fixCurrentPageFocus();
+	}
+
+	/**
+	 * The focus of the current page button may be set on the wrong item due to the redrawing
+	 * of the component. This function force setting the focus to the correct active button.
+	 */
+	function fixCurrentPageFocus() {
+		const activeItem = document.querySelector('.pagination .page-item.active button');
+		if (activeItem instanceof HTMLButtonElement) {
+			activeItem.focus();
+		}
 	}
 
 	/**

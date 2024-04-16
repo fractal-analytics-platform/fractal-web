@@ -15,12 +15,14 @@
 	let name = '';
 	let editZarrDir = false;
 	let zarrDir = '';
+	let zarrDirError = '';
 
 	function onOpen() {
 		editName = false;
 		editZarrDir = false;
 		name = dataset.name;
 		zarrDir = dataset.zarr_dir;
+		zarrDirError = '';
 	}
 
 	let savingName = false;
@@ -30,10 +32,14 @@
 			return;
 		}
 		savingName = true;
-		await updateDataset({ name }, () => {
-			savingName = false;
+		try {
+			await updateDataset({ name });
 			editName = false;
-		});
+		} catch (err) {
+			modal.displayErrorAlert(err);
+		} finally {
+			savingName = false;
+		}
 	}
 
 	function undoEditName() {
@@ -47,23 +53,37 @@
 		if (!zarrDir) {
 			return;
 		}
+		zarrDirError = '';
 		savingZarrDir = true;
-		await updateDataset({ zarr_dir: zarrDir }, () => {
-			savingZarrDir = false;
+		try {
+			await updateDataset({ zarr_dir: zarrDir });
 			editZarrDir = false;
-		});
+		} catch (err) {
+			/** @type {string|null} */
+			let errorMessage = null;
+			if (err instanceof AlertError) {
+				errorMessage = err.getSimpleValidationMessage();
+			}
+			if (errorMessage === null) {
+				modal.displayErrorAlert(err);
+			} else {
+				zarrDirError = errorMessage;
+			}
+		} finally {
+			savingZarrDir = false;
+		}
 	}
 
 	function undoEditZarrDir() {
 		editZarrDir = false;
 		zarrDir = dataset.zarr_dir;
+		zarrDirError = '';
 	}
 
 	/**
 	 * @param {object} body
-	 * @param {() => void} onSuccess
 	 */
-	async function updateDataset(body, onSuccess) {
+	async function updateDataset(body) {
 		const projectId = $page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -75,11 +95,10 @@
 		});
 		const result = await response.json();
 		if (response.ok) {
-			onSuccess();
 			updateDatasetCallback(result);
 		} else {
 			console.log('Dataset update failed', result);
-			modal.displayErrorAlert(new AlertError(await response.json()));
+			throw new AlertError(result, response.status);
 		}
 	}
 </script>
@@ -147,11 +166,12 @@
 			</li>
 			<li class="list-group-item">
 				{#if editZarrDir}
-					<div class="input-group">
+					<div class="input-group has-validation">
 						<input
 							type="text"
 							bind:value={zarrDir}
 							class="form-control"
+							class:is-invalid={zarrDirError}
 							on:keydown={(e) => {
 								if (e.key === 'Enter') {
 									saveZarrDir();
@@ -172,6 +192,7 @@
 							{/if}
 							Save
 						</button>
+						<span class="invalid-feedback">{zarrDirError}</span>
 					</div>
 				{:else}
 					<span>

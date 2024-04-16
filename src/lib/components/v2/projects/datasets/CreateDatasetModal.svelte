@@ -25,7 +25,6 @@
 		filtersCreationForm.init({}, {});
 		submitted = false;
 		creatingDataset = false;
-		modal.show();
 	}
 
 	async function handleSave() {
