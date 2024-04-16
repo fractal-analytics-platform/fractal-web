@@ -3,7 +3,7 @@
 	 * Maximum number of pages to be displayed on one side before displaying ellipsis (...)
 	 */
 	const maxPagesPerSide = 3;
-	const availablePageSizes = [1, 10, 20, 50, 100, 500];
+	const availablePageSizes = [10, 20, 50, 100, 500];
 
 	/** @type {(currentPage: number, pageSize: number) => Promise<void>} */
 	export let onPageChange;
@@ -77,9 +77,9 @@
 	}
 </script>
 
-<div class="row row-cols-lg-auto justify-content-center">
-	{#if totalCount > 0}
-		<div class="col-6">
+<div class="row justify-content-center">
+	{#if numberOfPages > 1}
+		<div class="col">
 			<nav aria-label="Page navigation">
 				<ul class="pagination justify-content-center">
 					<li class="page-item">
@@ -126,25 +126,25 @@
 				</ul>
 			</nav>
 		</div>
-		<div class="col-6">
-			<div class="input-group mb-1">
-				<label class="input-group-text" for="page_size">Page size</label>
-				<select
-					class="form-control"
-					id="page_size"
-					bind:value={pageSize}
-					on:change={() => setPageSize()}
-				>
-					{#each availablePageSizes as pageSize}
-						<option value={pageSize}>{pageSize}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
 	{/if}
 </div>
-<div class="row">
-	<div class="mt-1 col">
+<div class="row row-cols-lg-auto justify-content-center">
+	<div class="col-6">
+		<div class="input-group">
+			<label class="input-group-text" for="page_size">Page size</label>
+			<select
+				class="form-control"
+				id="page_size"
+				bind:value={pageSize}
+				on:change={() => setPageSize()}
+			>
+				{#each availablePageSizes as pageSize}
+					<option value={pageSize}>{pageSize}</option>
+				{/each}
+			</select>
+		</div>
+	</div>
+	<div class="col-6 mt-2">
 		<p class="text-center">Total results: {totalCount}</p>
 	</div>
 </div>

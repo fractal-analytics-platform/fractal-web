@@ -18,11 +18,10 @@
 	/** @type {import('$lib/types-v2').ImagePage} */
 	let imagePage = $page.data.imagePage;
 	let showTable = $page.data.imagePage.total_count > 0;
-	let applyClicked = false;
 	let searching = false;
 	let resetting = false;
 	let reloading = false;
-	/** @type {{ [key: string]: null | string | number}} */
+	/** @type {{ [key: string]: null | string | number | boolean}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let typeFilters = getTypeFilterBaseValues(imagePage);
@@ -34,6 +33,11 @@
 	let attributesSelectors = {};
 	/** @type {{[key: string]: SlimSelect}} */
 	let typesSelectors = {};
+
+	/** @type {{ [key: string]: null | string | number | boolean}} */
+	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
+	/** @type {{ [key: string]: boolean | null }}} */
+	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
 
 	onMount(() => {
 		loadAttributesSelectors();
@@ -147,10 +151,28 @@
 		select.setData([{ text: 'All', placeholder: true }, ...options]);
 	}
 
-	$: searchBtnActive =
-		Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
-		Object.values(typeFilters).filter((t) => t !== null).length > 0 ||
-		applyClicked;
+	$: applyBtnActive =
+		filtersChanged(lastAppliedAttributeFilters, attributeFilters) ||
+		filtersChanged(lastAppliedTypeFilters, typeFilters);
+
+	/**
+	 * @param {{ [key: string]: null | string | number | boolean}} oldFilters
+	 * @param {{ [key: string]: null | string | number | boolean}} newFilters
+	 */
+	function filtersChanged(oldFilters, newFilters) {
+		if (Object.keys(oldFilters).length !== Object.keys(newFilters).length) {
+			return true;
+		}
+		for (const [oldKey, oldValue] of Object.entries(oldFilters)) {
+			if (!(oldKey in newFilters)) {
+				return true;
+			}
+			if (oldValue !== newFilters[oldKey]) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	let resetBtnActive = false;
 
@@ -208,11 +230,9 @@
 
 	async function applySearchFields() {
 		searching = true;
-		const enableButtons =
+		resetBtnActive =
 			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
 			Object.values(typeFilters).filter((t) => t !== null).length > 0;
-		applyClicked = enableButtons;
-		resetBtnActive = enableButtons;
 		await searchImages();
 		searching = false;
 	}
@@ -221,7 +241,6 @@
 		resetting = true;
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
-		applyClicked = false;
 		resetBtnActive = false;
 		await tick();
 		await searchImages();
@@ -292,6 +311,8 @@
 				imagePage.current_page = 1;
 				await searchImages();
 			}
+			lastAppliedAttributeFilters = { ...attributeFilters };
+			lastAppliedTypeFilters = { ...typeFilters };
 		} else {
 			errorAlert = displayStandardErrorAlert(result, 'searchError');
 		}
@@ -440,11 +461,11 @@
 							<button
 								class="btn"
 								on:click={applySearchFields}
-								disabled={searching || !searchBtnActive}
-								class:btn-primary={searchBtnActive}
-								class:btn-secondary={!searchBtnActive}
+								disabled={searching || !applyBtnActive}
+								class:btn-primary={applyBtnActive}
+								class:btn-secondary={!applyBtnActive}
 							>
-								{#if searching && searchBtnActive}
+								{#if searching && applyBtnActive}
 									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 								{/if}
 								Apply
