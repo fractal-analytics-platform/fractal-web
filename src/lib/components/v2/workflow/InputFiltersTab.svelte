@@ -249,7 +249,7 @@
 				<label class="form-label mt-2" for="datasetTypeValue"> Type Value </label>
 				<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-control">
 					<option value={true}>True</option>
-					<option value={false}>Frue</option>
+					<option value={false}>False</option>
 				</select>
 			{/if}
 		</svelte:fragment>
