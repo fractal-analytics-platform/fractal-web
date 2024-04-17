@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 
-import FiltersCreationForm from '../../src/lib/components/v2/projects/datasets/FiltersCreationForm.svelte';
+import AttributesTypesForm from '../../src/lib/components/v2/projects/datasets/AttributesTypesForm.svelte';
 import { tick } from 'svelte';
 
-describe('FiltersCreationForm', () => {
+describe('AttributesTypesForm', () => {
 	it('init with existing filters', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		result.component.init(
 			{
 				key1: 'value1',
@@ -29,7 +29,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('add and remove attribute filter', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(1);
@@ -38,7 +38,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('add and remove type filter', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
 		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(1);
@@ -47,7 +47,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('validate missing attribute filter key', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		result.component.init({}, {});
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		expect(result.component.validateFields()).false;
@@ -56,7 +56,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('validate missing attribute filter value', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		result.component.init({}, {});
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
@@ -66,7 +66,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('validate invalid number', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
@@ -77,7 +77,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('switch to boolean attribute', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
@@ -86,7 +86,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('validate duplicated attribute key', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
@@ -103,7 +103,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('validate missing type filter key', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		result.component.init({}, {});
 		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		expect(result.component.validateFields()).false;
@@ -112,7 +112,7 @@ describe('FiltersCreationForm', () => {
 	});
 
 	it('validate duplicated type filter key', async () => {
-		const result = render(FiltersCreationForm);
+		const result = render(AttributesTypesForm);
 		result.component.init({}, {});
 		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });

@@ -2,6 +2,8 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
+	export let filters = true;
+
 	/** @type {{ [key: string]: string | number | boolean }} */
 	let initialAttributeFields = {};
 	/** @type {{ [key: string]: boolean }} */
@@ -95,27 +97,27 @@
 	}
 
 	export function validateFields() {
-		let validFilters = true;
+		let validFields = true;
 		const keys = [];
 		for (const attributeField of attributeFields) {
 			if (!attributeField.key) {
 				attributeField.error = 'Key is required';
-				validFilters = false;
+				validFields = false;
 				continue;
 			}
 			if (!attributeField.value) {
 				attributeField.error = 'Value is required';
-				validFilters = false;
+				validFields = false;
 				continue;
 			}
 			if (attributeField.type === 'number' && !attributeField.value.match(/^\d+\.*\d*$/)) {
 				attributeField.error = 'Invalid number';
-				validFilters = false;
+				validFields = false;
 				continue;
 			}
 			if (keys.includes(attributeField.key)) {
 				attributeField.error = 'Duplicated key';
-				validFilters = false;
+				validFields = false;
 				continue;
 			} else {
 				keys.push(attributeField.key);
@@ -124,21 +126,21 @@
 		for (const typeField of typeFields) {
 			if (!typeField.key) {
 				typeField.error = 'Key is required';
-				validFilters = false;
+				validFields = false;
 				continue;
 			}
 			if (keys.includes(typeField.key)) {
 				typeField.error = 'Duplicated key';
-				validFilters = false;
+				validFields = false;
 				continue;
 			} else {
 				keys.push(typeField.key);
 			}
 		}
-		// Trigger filters update
+		// Trigger items update
 		attributeFields = attributeFields;
 		typeFields = typeFields;
-		return validFilters;
+		return validFields;
 	}
 
 	export function resetErrors() {
@@ -148,19 +150,19 @@
 	}
 
 	/**
-	 * @param {{ value: string, type: string }} filter
+	 * @param {{ value: string, type: string }} item
 	 * @returns {string | number | boolean}
 	 */
-	export function getTypedAttributeValue(filter) {
-		switch (filter.type) {
+	export function getTypedAttributeValue(item) {
+		switch (item.type) {
 			case 'string':
-				return filter.value;
+				return item.value;
 			case 'number':
-				return parseFloat(filter.value);
+				return parseFloat(item.value);
 			case 'boolean':
-				return filter.value.toLowerCase() === 'true';
+				return item.value.toLowerCase() === 'true';
 			default:
-				throw new Error(`Unsupported type: ${filter.type}`);
+				throw new Error(`Unsupported type: ${item.type}`);
 		}
 	}
 
@@ -175,22 +177,22 @@
 		}
 	}
 
-	async function addAttributeFilter() {
-		const filter = { key: '', value: '', type: 'string', error: '' };
-		attributeFields = [...attributeFields, filter];
-		// Set focus to last filter key input
+	async function addAttribute() {
+		const item = { key: '', value: '', type: 'string', error: '' };
+		attributeFields = [...attributeFields, item];
+		// Set focus to last key input
 		await tick();
-		const allKeyInputs = document.querySelectorAll('.attribute-filter-key');
+		const allKeyInputs = document.querySelectorAll('.attribute-key');
 		const lastKeyInput = /**@type {HTMLInputElement}*/ (allKeyInputs[allKeyInputs.length - 1]);
 		lastKeyInput.focus();
 	}
 
-	async function addTypeFilter() {
-		const filter = { key: '', value: false, error: '' };
-		typeFields = [...typeFields, filter];
-		// Set focus to last filter key input
+	async function addType() {
+		const item = { key: '', value: false, error: '' };
+		typeFields = [...typeFields, item];
+		// Set focus to last key input
 		await tick();
-		const allKeyInputs = document.querySelectorAll('.type-filter-key');
+		const allKeyInputs = document.querySelectorAll('.type-key');
 		const lastKeyInput = /**@type {HTMLInputElement}*/ (allKeyInputs[allKeyInputs.length - 1]);
 		lastKeyInput.focus();
 	}
@@ -198,26 +200,32 @@
 	/**
 	 * @param {number} index
 	 */
-	function removeAttributeFilter(index) {
+	function removeAttribute(index) {
 		attributeFields = attributeFields.filter((_, i) => i !== index);
 	}
 
 	/**
 	 * @param {number} index
 	 */
-	function removeTypeFilter(index) {
+	function removeType(index) {
 		typeFields = typeFields.filter((_, i) => i !== index);
 	}
 </script>
 
 {#if attributeFields.length > 0}
-	<h5>Attribute filters</h5>
+	<h5>
+		{#if filters}
+			Attribute filters
+		{:else}
+			Attributes
+		{/if}
+	</h5>
 {/if}
 {#each attributeFields as field, index}
 	<div class="input-group mb-3" class:has-validation={field.error}>
 		<input
 			type="text"
-			class="form-control attribute-filter-key"
+			class="form-control attribute-key"
 			placeholder="Key"
 			bind:value={field.key}
 			class:is-invalid={field.error}
@@ -250,8 +258,8 @@
 		<button
 			class="btn btn-outline-danger"
 			type="button"
-			on:click={() => removeAttributeFilter(index)}
-			aria-label="Remove attribute filter"
+			on:click={() => removeAttribute(index)}
+			aria-label={filters ? 'Remove attribute filter' : 'Remove attribute'}
 		>
 			<i class="bi bi-trash" />
 		</button>
@@ -262,7 +270,13 @@
 {/each}
 
 {#if typeFields.length > 0}
-	<h5>Type filters</h5>
+	<h5>
+		{#if filters}
+			Type filters
+		{:else}
+			Types
+		{/if}
+	</h5>
 {/if}
 {#each typeFields as field, index}
 	<div class="row">
@@ -270,7 +284,7 @@
 			<div class="input-group mb-3" class:has-validation={field.error}>
 				<input
 					type="text"
-					class="form-control type-filter-key"
+					class="form-control type-key"
 					placeholder="Key"
 					bind:value={field.key}
 					class:is-invalid={field.error}
@@ -289,8 +303,8 @@
 				<button
 					class="btn btn-outline-danger"
 					type="button"
-					on:click={() => removeTypeFilter(index)}
-					aria-label="Remove type filter"
+					on:click={() => removeType(index)}
+					aria-label={filters ? 'Remove type filter' : 'Remove type'}
 				>
 					<i class="bi bi-trash" />
 				</button>
@@ -304,11 +318,19 @@
 
 <div class="row mb-3">
 	<div class="col-12">
-		<button class="btn btn-outline-primary" type="button" on:click={addAttributeFilter}>
-			Add attribute filter
+		<button class="btn btn-outline-primary" type="button" on:click={addAttribute}>
+			{#if filters}
+				Add attribute filter
+			{:else}
+				Add attribute
+			{/if}
 		</button>
-		<button class="btn btn-outline-primary" type="button" on:click={addTypeFilter}>
-			Add type filter
+		<button class="btn btn-outline-primary" type="button" on:click={addType}>
+			{#if filters}
+				Add type filter
+			{:else}
+				Add type
+			{/if}
 		</button>
 	</div>
 </div>

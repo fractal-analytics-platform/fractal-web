@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '../../../common/Modal.svelte';
-	import FiltersCreationForm from './FiltersCreationForm.svelte';
+	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
 	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
 	export let createDatasetCallback;
@@ -16,7 +16,7 @@
 	let saving = false;
 	let creatingDataset = false;
 
-	/** @type {FiltersCreationForm} */
+	/** @type {AttributesTypesForm} */
 	let filtersCreationForm;
 
 	function onOpen() {
@@ -131,7 +131,7 @@
 					</div>
 				</div>
 			</div>
-			<FiltersCreationForm bind:this={filtersCreationForm} />
+			<AttributesTypesForm bind:this={filtersCreationForm} />
 		</form>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">

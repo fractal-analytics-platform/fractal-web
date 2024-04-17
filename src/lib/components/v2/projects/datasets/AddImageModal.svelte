@@ -1,7 +1,7 @@
 <script>
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import FiltersCreationForm from './FiltersCreationForm.svelte';
+	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2} */
 	export let dataset;
@@ -14,13 +14,13 @@
 	let zarr_url = '';
 	let saving = false;
 
-	/** @type {FiltersCreationForm} */
-	let filtersCreationForm;
+	/** @type {AttributesTypesForm} */
+	let attributesTypesForm;
 
 	function onOpen() {
 		zarr_url = '';
 		saving = false;
-		filtersCreationForm.init({}, {});
+		attributesTypesForm.init({}, {});
 	}
 
 	async function createNewImage() {
@@ -37,8 +37,8 @@
 						headers,
 						body: JSON.stringify({
 							zarr_url,
-							attributes: filtersCreationForm.getAttributes(),
-							types: filtersCreationForm.getTypes()
+							attributes: attributesTypesForm.getAttributes(),
+							types: attributesTypesForm.getTypes()
 						})
 					}
 				);
@@ -76,7 +76,7 @@
 				<input type="text" class="form-control" bind:value={zarr_url} id="new-image-zarr-url" />
 			</div>
 		</div>
-		<FiltersCreationForm bind:this={filtersCreationForm} />
+		<AttributesTypesForm bind:this={attributesTypesForm} filters={false} />
 		<div id="errorAlert-datasetAddImageModal" class="mt-3" />
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
