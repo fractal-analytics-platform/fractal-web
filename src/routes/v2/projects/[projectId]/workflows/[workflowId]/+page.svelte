@@ -583,6 +583,7 @@
 			statuses = {};
 			jobError = '';
 			failedJob = undefined;
+			selectedSubmittedJob = undefined;
 			return;
 		}
 		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
