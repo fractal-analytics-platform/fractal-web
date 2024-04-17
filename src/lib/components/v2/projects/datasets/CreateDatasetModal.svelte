@@ -6,14 +6,10 @@
 
 	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
 	export let createDatasetCallback;
-	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
-	export let updateDatasetCallback;
 
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {number|null} */
-	let datasetId = null;
 	let datasetName = '';
 	let zarrDir = '';
 	let submitted = false;
@@ -23,24 +19,12 @@
 	/** @type {FiltersCreationForm} */
 	let filtersCreationForm;
 
-	export function openForCreate() {
-		datasetId = null;
+	function onOpen() {
 		datasetName = '';
 		zarrDir = '';
 		filtersCreationForm.init({}, {});
 		submitted = false;
 		creatingDataset = false;
-		modal.show();
-	}
-
-	export function openForEdit(/** @type {import('$lib/types-v2').DatasetV2} */ dataset) {
-		datasetId = dataset.id;
-		datasetName = dataset.name;
-		zarrDir = dataset.zarr_dir;
-		filtersCreationForm.init(dataset.filters.attributes, dataset.filters.types);
-		submitted = false;
-		creatingDataset = false;
-		modal.show();
 	}
 
 	async function handleSave() {
@@ -59,16 +43,9 @@
 
 	async function save() {
 		try {
-			if (datasetId === null) {
-				creatingDataset = true;
-				const newDataset = await callCreateDataset();
-				datasetId = newDataset.id;
-				createDatasetCallback(newDataset);
-			} else {
-				creatingDataset = false;
-				const updatedDataset = await callUpdateDataset();
-				updateDatasetCallback(updatedDataset);
-			}
+			creatingDataset = true;
+			const newDataset = await callCreateDataset();
+			createDatasetCallback(newDataset);
 		} catch (err) {
 			modal.displayErrorAlert(err);
 			return;
@@ -104,48 +81,18 @@
 		return result;
 	}
 
-	/**
-	 * @returns {Promise<import('$lib/types-v2').DatasetV2>}
-	 */
-	async function callUpdateDataset() {
-		const projectId = $page.params.projectId;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v2/project/${projectId}/dataset/${datasetId}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				name: datasetName,
-				zarr_dir: zarrDir,
-				filters: {
-					attributes: filtersCreationForm.getAttributes(),
-					types: filtersCreationForm.getTypes()
-				}
-			})
-		});
-		const result = await response.json();
-		if (!response.ok) {
-			console.log('Dataset update failed', result);
-			throw new AlertError(result);
-		}
-		return result;
-	}
-
 	function fieldsAreValid() {
 		const validFilters = filtersCreationForm.validateFields();
 		return validFilters && !!datasetName.trim() && !!zarrDir.trim();
 	}
 </script>
 
-<Modal id="createUpdateDatasetModal" bind:this={modal} size="lg" centered={true}>
+<Modal id="createDatasetModal" bind:this={modal} size="lg" centered={true} {onOpen}>
 	<svelte:fragment slot="header">
-		<h4 class="modal-title">
-			{datasetId === null ? 'Create new dataset' : 'Edit dataset ' + datasetName}
-		</h4>
+		<h4 class="modal-title">Create new dataset</h4>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<span id="errorAlert-createUpdateDatasetModal" />
+		<span id="errorAlert-createDatasetModal" />
 		<form
 			class="row needs-validation"
 			novalidate

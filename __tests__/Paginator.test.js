@@ -87,16 +87,16 @@ describe('Paginator', () => {
 	});
 	it('previous is disabled on first page', async () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 3, currentPage: 1, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 13, currentPage: 1, onPageChange: () => {} }
 		});
-		expect(getPageItems(result)).toEqual(['«', '1', '»']);
+		expect(getPageItems(result)).toEqual(['«', '1', '2', '»']);
 		expect(result.queryByLabelText('Previous').disabled).true;
 	});
 	it('next is disabled on last page', async () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 3, currentPage: 1, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 13, currentPage: 2, onPageChange: () => {} }
 		});
-		expect(getPageItems(result)).toEqual(['«', '1', '»']);
+		expect(getPageItems(result)).toEqual(['«', '1', '2', '»']);
 		expect(result.queryByLabelText('Next').disabled).true;
 	});
 });

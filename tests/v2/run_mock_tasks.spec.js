@@ -159,7 +159,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await test.step('Verify that the dataset contains some images', async () => {
 		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${successDatasetId}`);
 		await waitPageLoading(page);
-		await expect(page.getByRole('table').getByRole('row')).toHaveCount(3);
+		await expect(page.getByRole('table').getByRole('row')).toHaveCount(4);
 	});
 
 	await test.step('Go back to workflow page', async () => {

@@ -27,13 +27,13 @@ global.window.bootstrap = {
 	Modal: MockModal
 };
 
-import CreateUpdateDatasetModal from '../../src/lib/components/v2/projects/datasets/CreateUpdateDatasetModal.svelte';
+import CreateDatasetModal from '../../src/lib/components/v2/projects/datasets/CreateDatasetModal.svelte';
 
 const defaultProps = {
-	props: { createDatasetCallback: vi.fn(), updateDatasetCallback: vi.fn() }
+	props: { createDatasetCallback: vi.fn() }
 };
 
-describe('CreateUpdateDatasetModal', () => {
+describe('CreateDatasetModal', () => {
 	fetch.mockResolvedValue({
 		ok: true,
 		status: 200,
@@ -48,15 +48,15 @@ describe('CreateUpdateDatasetModal', () => {
 	});
 
 	it('validate missing name and zarr dir', async () => {
-		const result = render(CreateUpdateDatasetModal, defaultProps);
+		const result = render(CreateDatasetModal, defaultProps);
 		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
 		expect(result.queryAllByText('Required field').length).eq(2);
 	});
 
 	it('create dataset with string filter', async () => {
 		const createDatasetCallback = vi.fn();
-		const result = render(CreateUpdateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+		const result = render(CreateDatasetModal, {
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }
@@ -85,8 +85,8 @@ describe('CreateUpdateDatasetModal', () => {
 
 	it('create dataset with number filter', async () => {
 		const createDatasetCallback = vi.fn();
-		const result = render(CreateUpdateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+		const result = render(CreateDatasetModal, {
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }
@@ -116,8 +116,8 @@ describe('CreateUpdateDatasetModal', () => {
 
 	it('create dataset with type filter set to false', async () => {
 		const createDatasetCallback = vi.fn();
-		const result = render(CreateUpdateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+		const result = render(CreateDatasetModal, {
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }
@@ -145,8 +145,8 @@ describe('CreateUpdateDatasetModal', () => {
 
 	it('create dataset with type filter set to true', async () => {
 		const createDatasetCallback = vi.fn();
-		const result = render(CreateUpdateDatasetModal, {
-			props: { createDatasetCallback, updateDatasetCallback: vi.fn() }
+		const result = render(CreateDatasetModal, {
+			props: { createDatasetCallback }
 		});
 		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
 			target: { value: 'my dataset' }

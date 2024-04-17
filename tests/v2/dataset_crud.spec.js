@@ -50,37 +50,12 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		expect(await datasetRow.getByRole('cell').nth(0).innerText()).toEqual('test-dataset');
 	});
 
-	await test.step('Open dataset for editing and verify the saved content', async () => {
-		await datasetRow.getByRole('button', { name: 'Edit' }).click();
-		await waitDatasetModal(page, 'Edit dataset test-dataset');
-		expect(await page.getByRole('textbox', { name: 'Dataset Name' }).inputValue()).toEqual(
-			'test-dataset'
-		);
-		expect(await page.getByRole('textbox', { name: 'Zarr dir' }).inputValue()).toEqual('/tmp');
-		expect(await page.getByPlaceholder('Key').nth(0).inputValue()).toEqual('key1');
-		expect(await page.getByPlaceholder('Value').inputValue()).toEqual('value1');
-		expect(await page.getByPlaceholder('Key').nth(1).inputValue()).toEqual('key2');
-	});
-
-	await test.step('Edit dataset', async () => {
-		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-renamed');
-		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp-renamed');
-		await page.getByPlaceholder('Key').nth(0).fill('key1-renamed');
-		await page.getByPlaceholder('Value').fill('value1-renamed');
-	});
-
-	await test.step('Save dataset', async () => {
-		let saveBtn = page.getByRole('button', { name: 'Save' });
-		await saveBtn.click();
-		await waitModalClosed(page);
-	});
-
 	await test.step('Filter dataset', async () => {
 		const datasetTable = page.getByRole('table').nth(0).locator('tbody');
 		expect(await datasetTable.getByRole('row').count()).toEqual(1);
 		await page.getByPlaceholder('Search dataset').fill('foo');
 		expect(await datasetTable.getByRole('row').count()).toEqual(0);
-		await page.getByPlaceholder('Search dataset').fill('test-dataset-renamed');
+		await page.getByPlaceholder('Search dataset').fill('test-dataset');
 		expect(await datasetTable.getByRole('row').count()).toEqual(1);
 	});
 
@@ -93,9 +68,28 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await page.getByRole('button', { name: 'Info' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await expect(modal.getByText('test-dataset-renamed')).toBeVisible();
-		await expect(modal.getByText('/tmp-renamed')).toBeVisible();
-		await modal.getByLabel('Close').click();
+		await expect(modal.getByText('test-dataset')).toBeVisible();
+		await expect(modal.getByText('/tmp')).toBeVisible();
+	});
+
+	await test.step('Edit dataset name', async () => {
+		const modal = page.locator('.modal.show');
+		await modal.getByRole('button', { name: 'Edit dataset name' }).click();
+		await modal.getByRole('textbox').fill('test-dataset-renamed');
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await expect(modal.getByRole('textbox')).toHaveCount(0);
+	});
+
+	await test.step('Edit Zarr dir', async () => {
+		const modal = page.locator('.modal.show');
+		await modal.getByRole('button', { name: 'Edit Zarr dir' }).click();
+		await modal.getByRole('textbox').fill('/tmp-renamed');
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await expect(modal.getByRole('textbox')).toHaveCount(0);
+	});
+
+	await test.step('Close info modal', async () => {
+		await page.locator('.modal.show').getByLabel('Close').click();
 		await waitModalClosed(page);
 	});
 
@@ -103,10 +97,25 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await page.getByRole('button', { name: 'Filters' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await expect(modal.getByText('key1-renamed')).toBeVisible();
-		await expect(modal.getByText('value1-renamed')).toBeVisible();
-		await expect(modal.getByText('key2')).toBeVisible();
-		await modal.getByLabel('Close').click();
+		expect(await page.getByPlaceholder('Key').nth(0).inputValue()).toEqual('key1');
+		expect(await page.getByPlaceholder('Value').inputValue()).toEqual('value1');
+		expect(await page.getByPlaceholder('Key').nth(1).inputValue()).toEqual('key2');
+	});
+
+	await test.step('Edit filters', async () => {
+		await page.getByPlaceholder('Key').nth(0).fill('key1-renamed');
+		await page.getByPlaceholder('Value').fill('value1-renamed');
+		await page.locator('.modal.show').getByRole('button', { name: 'Save' }).click();
+	});
+
+	await test.step('Open filters modal again and verify the saved content', async () => {
+		await page.getByRole('button', { name: 'Filters' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		expect(await page.getByPlaceholder('Key').nth(0).inputValue()).toEqual('key1-renamed');
+		expect(await page.getByPlaceholder('Value').inputValue()).toEqual('value1-renamed');
+		expect(await page.getByPlaceholder('Key').nth(1).inputValue()).toEqual('key2');
+		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});
 

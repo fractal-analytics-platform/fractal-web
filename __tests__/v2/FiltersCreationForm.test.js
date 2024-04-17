@@ -69,11 +69,20 @@ describe('FiltersCreationForm', () => {
 		const result = render(FiltersCreationForm);
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
+		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Invalid number')).toBeDefined();
+	});
+
+	it('switch to boolean attribute', async () => {
+		const result = render(FiltersCreationForm);
+		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
+		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
+		expect(result.getByLabelText('Value').value).eq('true');
+		expect(result.component.validateFields()).true;
 	});
 
 	it('validate duplicated attribute key', async () => {

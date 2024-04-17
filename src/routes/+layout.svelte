@@ -266,6 +266,7 @@
 	.loading.show {
 		visibility: visible;
 		opacity: 1;
+		z-index: 2000;
 	}
 
 	.loading .spinner-border {

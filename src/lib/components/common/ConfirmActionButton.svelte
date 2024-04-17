@@ -12,6 +12,7 @@
 	export let message = '';
 	/** @type {Modal} */
 	let modal;
+	let loading = false;
 
 	const onOpen = () => {
 		// Remove old errors
@@ -25,7 +26,10 @@
 	 * Executes the callback handling possible errors
 	 */
 	const handleCallbackAction = async () => {
-		modal.confirmAndHide(callbackAction);
+		loading = true;
+		modal.confirmAndHide(callbackAction, function () {
+			loading = false;
+		});
 	};
 </script>
 
@@ -34,16 +38,25 @@
 		<h1 class="modal-title fs-5">Confirm action</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<p>You're about to:</p>
-		<p class="badge bg-{style} fs-6 wrap">{message}</p>
-		<p>Do you confirm?</p>
+		{#if !!$$slots.body}
+			<slot name="body" />
+		{:else}
+			<p>You're about to:</p>
+			<p class="badge bg-{style} fs-6 wrap">{message}</p>
+			<p>Do you confirm?</p>
+		{/if}
 		<div class="container">
 			<div id="errorAlert-{modalId}" />
 		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary" on:click={handleCallbackAction}>Confirm</button>
+		<button class="btn btn-primary" on:click={handleCallbackAction}>
+			{#if loading}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Confirm
+		</button>
 	</svelte:fragment>
 </Modal>
 

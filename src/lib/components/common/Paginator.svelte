@@ -17,13 +17,26 @@
 	/**
 	 * @param {number} newCurrentPage
 	 */
-	function setCurrentPage(newCurrentPage) {
-		onPageChange(newCurrentPage, pageSize);
+	async function setCurrentPage(newCurrentPage) {
+		await onPageChange(newCurrentPage, pageSize);
+		fixCurrentPageFocus();
 	}
 
-	function setPageSize() {
+	async function setPageSize() {
 		currentPage = 1;
-		onPageChange(currentPage, pageSize);
+		await onPageChange(currentPage, pageSize);
+		fixCurrentPageFocus();
+	}
+
+	/**
+	 * The focus of the current page button may be set on the wrong item due to the redrawing
+	 * of the component. This function force setting the focus to the correct active button.
+	 */
+	function fixCurrentPageFocus() {
+		const activeItem = document.querySelector('.pagination .page-item.active button');
+		if (activeItem instanceof HTMLButtonElement) {
+			activeItem.focus();
+		}
 	}
 
 	/**
@@ -64,9 +77,9 @@
 	}
 </script>
 
-<div class="row row-cols-lg-auto justify-content-center">
-	{#if totalCount > 0}
-		<div class="col-12 mt-5">
+<div class="row justify-content-center">
+	{#if numberOfPages > 1}
+		<div class="col">
 			<nav aria-label="Page navigation">
 				<ul class="pagination justify-content-center">
 					<li class="page-item">
@@ -113,25 +126,25 @@
 				</ul>
 			</nav>
 		</div>
-		<div class="col-12 mt-5">
-			<div class="input-group mb-3">
-				<label class="input-group-text" for="page_size">Page size</label>
-				<select
-					class="form-control"
-					id="page_size"
-					bind:value={pageSize}
-					on:change={() => setPageSize()}
-				>
-					{#each availablePageSizes as pageSize}
-						<option value={pageSize}>{pageSize}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
 	{/if}
 </div>
-<div class="row">
-	<div class="mt-3 col">
+<div class="row row-cols-lg-auto justify-content-center">
+	<div class="col-6">
+		<div class="input-group">
+			<label class="input-group-text" for="page_size">Page size</label>
+			<select
+				class="form-control"
+				id="page_size"
+				bind:value={pageSize}
+				on:change={() => setPageSize()}
+			>
+				{#each availablePageSizes as pageSize}
+					<option value={pageSize}>{pageSize}</option>
+				{/each}
+			</select>
+		</div>
+	</div>
+	<div class="col-6 mt-2">
 		<p class="text-center">Total results: {totalCount}</p>
 	</div>
 </div>

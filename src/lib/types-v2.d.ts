@@ -12,24 +12,30 @@ export type DatasetV2 = {
   name: string
   project_id: number
   project: ProjectV2
-  history: Array<DatasetHistoryItem> | null
+  history: Array<DatasetHistoryItemV2> | null
   zarr_dir: string
   filters: {
-    attributes: { [key: string]: string | number },
+    attributes: { [key: string]: string | number | boolean }
     types: { [key: string]: boolean }
   },
   timestamp_created: string
+}
+
+export type DatasetHistoryItemV2 = {
+  workflowtask: WorkflowTaskV2
+  status: string
+  parallelization: object
 }
 
 export type ImagePage = {
   total_count: number
   page_size: number
   current_page: number
-  attributes: { [key: string]: Array<string | number> }
+  attributes: { [key: string]: Array<string | number | boolean> }
   types: Array<string>
   images: Array<{
     zarr_url: string
-    attributes: { [key: string]: string }
+    attributes: { [key: string]: string | number | boolean }
     types: { [key: string]: boolean }
   }>
 }
@@ -104,6 +110,10 @@ export type WorkflowTaskV2 = {
   order: number
   workflow_id: number
   task_type: TaskV2Type
+  input_filters: {
+    attributes: { [key: string]: string | number | boolean }
+    types: { [key: string]: boolean }
+  }
 } & ({
   is_legacy_task: false
   task_id: number

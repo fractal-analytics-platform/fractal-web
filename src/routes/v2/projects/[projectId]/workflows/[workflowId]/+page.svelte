@@ -1,6 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -20,6 +20,7 @@
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
 	import TaskInfoTabV1 from '$lib/components/v1/workflow/TaskInfoTab.svelte';
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
+	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -70,12 +71,17 @@
 	/** @type {WorkflowTaskSelection|undefined} */
 	let workflowTaskSelectionComponentV2 = undefined;
 
+	/** @type {InputFiltersTab|undefined} */
+	let inputFiltersTab = undefined;
+
 	// Update workflow modal
 	let updatedWorkflowName = '';
 
 	// Modals
 	/** @type {Modal} */
-	let unsavedChangesModal;
+	let argsUnsavedChangesModal;
+	/** @type {Modal} */
+	let filtersUnsavedChangesModal;
 	/** @type {Modal} */
 	let runWorkflowModal;
 	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
@@ -108,10 +114,30 @@
 		if (argsSchemaForm?.hasUnsavedChanges()) {
 			// Prevent navigation
 			navigation.cancel();
-			// Toggle the modal
-			toggleUnsavedChangesModal();
+			toggleArgsUnsavedChangesModal();
+		}
+
+		if (inputFiltersTab?.hasUnsavedChanges()) {
+			// Prevent navigation
+			navigation.cancel();
+			toggleFiltersUnsavedChangesModal();
 		}
 	});
+
+	/**
+	 * @param {number} id
+	 */
+	function setWorkflowTabContextId(id) {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
+			toggleArgsUnsavedChangesModal();
+			return;
+		}
+		if (inputFiltersTab?.hasUnsavedChanges()) {
+			toggleFiltersUnsavedChangesModal();
+			return;
+		}
+		workflowTabContextId = id;
+	}
 
 	/**
 	 * Exports a project's workflow from the server
@@ -179,10 +205,13 @@
 
 	async function loadAvailableTasksV1() {
 		workflowTaskSelectionComponentV1?.setLoadingTasks(true);
-		const responseV1 = await fetch(`/api/v2/task-legacy?args_schema=false&only_v2_compatible=true`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const responseV1 = await fetch(
+			`/api/v2/task-legacy?args_schema=false&only_v2_compatible=true`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
 
 		if (responseV1.ok) {
 			availableTasksV1 = await responseV1.json();
@@ -379,16 +408,30 @@
 	 * @param {import('$lib/types-v2').WorkflowTaskV2} wft
 	 */
 	async function setSelectedWorkflowTask(wft) {
+		await tick();
+		preventedSelectedTaskChange = wft;
 		if (argsSchemaForm?.hasUnsavedChanges()) {
-			toggleUnsavedChangesModal();
-			preventedSelectedTaskChange = wft;
-			throw new Error('Cannot change workflow task context while there are unsaved changes');
+			toggleArgsUnsavedChangesModal();
+			return;
 		}
-		selectedWorkflowTask = wft;
+		if (inputFiltersTab?.hasUnsavedChanges()) {
+			toggleFiltersUnsavedChangesModal();
+			return;
+		}
+		if (wft) {
+			selectedWorkflowTask = wft;
+		}
+		preventedSelectedTaskChange = undefined;
+		await tick();
+		await inputFiltersTab?.init();
 	}
 
-	function toggleUnsavedChangesModal() {
-		unsavedChangesModal.toggle();
+	function toggleArgsUnsavedChangesModal() {
+		argsUnsavedChangesModal.toggle();
+	}
+
+	function toggleFiltersUnsavedChangesModal() {
+		filtersUnsavedChangesModal.toggle();
 	}
 
 	let applyingWorkflow = false;
@@ -529,6 +572,12 @@
 	/** @type {NodeJS.Timer|undefined} */
 	let statusWatcherTimer;
 
+	async function selectedDatasetChanged() {
+		await tick();
+		await inputFiltersTab?.init();
+		loadJobsStatus();
+	}
+
 	async function loadJobsStatus() {
 		if (selectedDatasetId === undefined) {
 			statuses = {};
@@ -651,6 +700,15 @@
 		setTimeout(() => {
 			argsChangesSaved = false;
 		}, 3000);
+		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
+	}
+
+	/**
+	 * @param {import('$lib/types-v2').WorkflowTaskV2} updatedWft
+	 */
+	function onInputFiltersUpdated(updatedWft) {
+		selectedWorkflowTask = updatedWft;
+		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
 	}
 
 	onDestroy(() => {
@@ -688,7 +746,7 @@
 						class="form-control"
 						id="dataset"
 						bind:value={selectedDatasetId}
-						on:change={loadJobsStatus}
+						on:change={selectedDatasetChanged}
 					>
 						<option value={undefined}>Select...</option>
 						{#each datasets as dataset}
@@ -706,10 +764,12 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => {
-							if (!argsSchemaForm || !argsSchemaForm.hasUnsavedChanges()) {
-								runWorkflowModal.toggle();
+							if (argsSchemaForm?.hasUnsavedChanges()) {
+								toggleArgsUnsavedChangesModal();
+							} else if (inputFiltersTab?.hasUnsavedChanges()) {
+								toggleFiltersUnsavedChangesModal();
 							} else {
-								toggleUnsavedChangesModal();
+								runWorkflowModal.toggle();
 							}
 						}}
 						><i class="bi-play-fill" /> Run workflow
@@ -835,41 +895,41 @@
 								<ul class="nav nav-tabs card-header-tabs">
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#args-tab"
 											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 0)}
+											on:click={() => setWorkflowTabContextId(0)}
 											aria-current={workflowTabContextId === 0}
 											>Arguments
 										</button>
 									</li>
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#meta-tab"
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 1)}
+											on:click={() => setWorkflowTabContextId(1)}
 											aria-current={workflowTabContextId === 1}
 											>Meta
 										</button>
 									</li>
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#info-tab"
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 2)}
+											on:click={() => setWorkflowTabContextId(2)}
 											aria-current={workflowTabContextId === 2}
 											>Info
 										</button>
 									</li>
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#version-tab"
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 3)}
+											on:click={() => setWorkflowTabContextId(3)}
 											aria-current={workflowTabContextId === 3}
+											>Input Filters
+										</button>
+									</li>
+									<li class="nav-item">
+										<button
+											class="nav-link {workflowTabContextId === 4 ? 'active' : ''}"
+											on:click={() => setWorkflowTabContextId(4)}
+											aria-current={workflowTabContextId === 4}
 										>
 											Version
 											{#if newVersionsCount}
@@ -935,12 +995,22 @@
 									{/if}
 								</div>
 							</div>
+						{:else if workflowTabContextId === 3}
+							{#if selectedWorkflowTask}
+								<InputFiltersTab
+									{workflow}
+									workflowTask={selectedWorkflowTask}
+									updateWorkflowTaskCallback={onInputFiltersUpdated}
+									{selectedDatasetId}
+									bind:this={inputFiltersTab}
+								/>
+							{/if}
 						{/if}
 						<div
 							id="version-tab"
 							class="tab-pane"
-							class:show={workflowTabContextId === 3}
-							class:active={workflowTabContextId === 3}
+							class:show={workflowTabContextId === 4}
+							class:active={workflowTabContextId === 4}
 						>
 							<div class="card-body">
 								{#if selectedWorkflowTask}
@@ -1189,7 +1259,7 @@
 	</svelte:fragment>
 </Modal>
 
-<Modal id="changes-unsaved-dialog" bind:this={unsavedChangesModal}>
+<Modal id="args-changes-unsaved-dialog" bind:this={argsUnsavedChangesModal}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">There are argument changes unsaved</h5>
 	</svelte:fragment>
@@ -1208,7 +1278,8 @@
 				setSelectedWorkflowTask(preventedSelectedTaskChange);
 			}}
 			data-bs-dismiss="modal"
-			>Discard changes
+		>
+			Discard changes
 		</button>
 		<button
 			type="button"
@@ -1217,7 +1288,43 @@
 				argsSchemaForm?.saveChanges();
 			}}
 			data-bs-dismiss="modal"
-			>Save changes
+		>
+			Save changes
+		</button>
+	</svelte:fragment>
+</Modal>
+
+<Modal id="filters-changes-unsaved-dialog" bind:this={filtersUnsavedChangesModal}>
+	<svelte:fragment slot="header">
+		<h5 class="modal-title">There are filter changes unsaved</h5>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<p>
+			Do you want to save the changes made to the filters of the current selected workflow task?
+		</p>
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-warning"
+			on:click={() => {
+				inputFiltersTab?.discard();
+				setSelectedWorkflowTask(preventedSelectedTaskChange);
+			}}
+			data-bs-dismiss="modal"
+		>
+			Discard changes
+		</button>
+		<button
+			type="button"
+			class="btn btn-success"
+			on:click={async () => {
+				await inputFiltersTab?.save();
+			}}
+			data-bs-dismiss="modal"
+		>
+			Save changes
 		</button>
 	</svelte:fragment>
 </Modal>

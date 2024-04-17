@@ -59,6 +59,12 @@
 			validSchema = false;
 		}
 	}
+
+	$: {
+		if (!unsavedChanges) {
+			schemaComponent?.discardChanges(args);
+		}
+	}
 </script>
 
 <div id="workflow-arguments-schema-panel">

@@ -1,5 +1,11 @@
 <script>
+	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
+
+	/** @type {{ [key: string]: string | number | boolean }} */
+	let initialAttributeFields = {};
+	/** @type {{ [key: string]: boolean }} */
+	let initialTypeFields = {};
 
 	/** @type {Array<{ key: string, value: string, type: string, error: string }>} */
 	let attributeFields = [];
@@ -7,8 +13,7 @@
 	let typeFields = [];
 
 	/**
-	 *
-	 * @param {{ [key: string]: string | number }} attributes
+	 * @param {{ [key: string]: string | number | boolean }} attributes
 	 * @param {{ [key: string]: boolean }} types
 	 */
 	export function init(attributes, types) {
@@ -18,10 +23,57 @@
 		typeFields = Object.entries(types).map(([k, v]) => {
 			return { key: k, value: v, error: '' };
 		});
+		initialAttributeFields = getAttributes();
+		initialTypeFields = getTypes();
 	}
 
 	/**
-	 * @returns {{ [key: string]: string | number }}
+	 * @returns {boolean}
+	 */
+	export function hasUnsavedChanges() {
+		return (
+			objectChanged(initialAttributeFields, getAttributes()) ||
+			objectChanged(initialTypeFields, getTypes())
+		);
+	}
+
+	export function discardChanges() {
+		init(initialAttributeFields, initialTypeFields);
+	}
+
+	export function save() {
+		initialAttributeFields = getAttributes();
+		initialTypeFields = getTypes();
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {string|number|boolean} value
+	 */
+	export function importAttribute(key, value) {
+		const newAttribute = { key, value: value.toString(), type: typeof value, error: '' };
+		if (attributeFields.filter((a) => a.key === key).length > 0) {
+			attributeFields = attributeFields.map((a) => (a.key === key ? newAttribute : a));
+		} else {
+			attributeFields = [...attributeFields, newAttribute];
+		}
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {boolean} value
+	 */
+	export function importType(key, value) {
+		const newType = { key, value, error: '' };
+		if (typeFields.filter((t) => t.key === key).length > 0) {
+			typeFields = typeFields.map((t) => (t.key === key ? newType : t));
+		} else {
+			typeFields = [...typeFields, newType];
+		}
+	}
+
+	/**
+	 * @returns {{ [key: string]: string | number | boolean }}
 	 */
 	export function getAttributes() {
 		return Object.fromEntries(
@@ -97,7 +149,7 @@
 
 	/**
 	 * @param {{ value: string, type: string }} filter
-	 * @returns {string | number}
+	 * @returns {string | number | boolean}
 	 */
 	export function getTypedAttributeValue(filter) {
 		switch (filter.type) {
@@ -105,8 +157,21 @@
 				return filter.value;
 			case 'number':
 				return parseFloat(filter.value);
+			case 'boolean':
+				return filter.value.toLowerCase() === 'true';
 			default:
 				throw new Error(`Unsupported type: ${filter.type}`);
+		}
+	}
+
+	/**
+	 * @param {{ key: string, value: string, type: string, error: string }} field
+	 */
+	function fieldTypeChanged(field) {
+		if (field.type === 'boolean') {
+			field.value = 'true';
+		} else if (field.type !== 'number' || !field.value.match(/^\d+\.*\d*$/)) {
+			field.value = '';
 		}
 	}
 
@@ -157,21 +222,30 @@
 			bind:value={field.key}
 			class:is-invalid={field.error}
 		/>
-		<input
-			type="text"
-			class="form-control"
-			class:is-invalid={field.error}
-			placeholder="Value"
-			bind:value={field.value}
-		/>
+		{#if field.type === 'boolean'}
+			<select class="form-control" bind:value={field.value} aria-label="Value">
+				<option value="true">True</option>
+				<option value="false">False</option>
+			</select>
+		{:else}
+			<input
+				type="text"
+				class="form-control"
+				class:is-invalid={field.error}
+				placeholder="Value"
+				bind:value={field.value}
+			/>
+		{/if}
 		<select
 			class="form-control"
 			bind:value={field.type}
 			class:is-invalid={field.error}
 			aria-label="Type"
+			on:change={() => fieldTypeChanged(field)}
 		>
 			<option value="string">String</option>
 			<option value="number">Number</option>
+			<option value="boolean">Boolean</option>
 		</select>
 		<button
 			class="btn btn-outline-danger"

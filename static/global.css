@@ -1,11 +1,16 @@
-#json-schema > .properties-block > .property-block {
+#json-schema>.properties-block>.property-block {
     border-bottom: 1px solid #dee2e6;
 }
 
-#json-schema > .properties-block > .property-block:last-child {
+#json-schema>.properties-block>.property-block:last-child {
     border-bottom: none;
 }
 
 .popover {
     max-width: 500px !important;
+}
+
+.ss-content .ss-list .ss-option:hover {
+    color: #4d4d4d;
+    background-color: #e9ecef;
 }

@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -134,18 +134,7 @@ export class PageWithWorkflow extends PageWithProject {
 	 */
 	async addTask(modal, taskName, taskVersion) {
 		const selector = modal.getByRole('combobox').first();
-		await selector.click();
-		const items = await this.page.getByRole('option').all();
-		let testTaskItem = null;
-		for (const item of items) {
-			const itemText = await item.innerText();
-			if (itemText.includes(taskName)) {
-				testTaskItem = item;
-				break;
-			}
-		}
-		expect(testTaskItem).not.toBeNull();
-		await /** @type {import('@playwright/test').Locator} */ (testTaskItem).click();
+		await selectSlimSelect(this.page, selector, taskName);
 		await this.page.locator('#taskId').waitFor();
 		if (taskVersion) {
 			await this.page

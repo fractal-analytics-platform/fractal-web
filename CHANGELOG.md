@@ -13,6 +13,9 @@
     * added admin "Tasks V1/V2 compatibility" page (\#450);
     * supported adding V1 task in V2 workflow (\#450);
     * removed read only property from V2 datasets (\#450);
+    * added input filters tab in workflow task page (\#452);
+    * added searchable dropdowns for image filters (\#452);
+    * moved editing of dataset inside dataset page (\#452);
 
 # 0.10.2
 

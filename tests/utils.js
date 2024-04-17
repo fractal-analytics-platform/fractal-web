@@ -2,6 +2,7 @@ import * as crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import { expect } from '@playwright/test';
 
 export function generateUUID() {
 	return crypto.randomBytes(16).toString('hex');
@@ -52,4 +53,24 @@ export async function uploadFile(page, selectorText, fileName, data) {
 	await fileChooser.setFiles(file);
 
 	return file;
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} selector
+ * @param {string} optionValue
+ */
+export async function selectSlimSelect(page, selector, optionValue) {
+	await selector.click();
+	const items = await page.getByRole('option').all();
+	let selectedItem = null;
+	for (const item of items) {
+		const itemText = await item.innerText();
+		if (itemText.includes(optionValue)) {
+			selectedItem = item;
+			break;
+		}
+	}
+	expect(selectedItem).not.toBeNull();
+	await /** @type {import('@playwright/test').Locator} */ (selectedItem).click();
 }
