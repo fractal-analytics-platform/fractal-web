@@ -48,11 +48,15 @@
 
 	/**
 	 * @param {string} key
-	 * @param {string} value
-	 * @param {string} type
+	 * @param {string|number|boolean} value
 	 */
-	export function importAttribute(key, value, type) {
-		attributeFields = [...attributeFields, { key, value, type, error: '' }];
+	export function importAttribute(key, value) {
+		const newAttribute = { key, value: value.toString(), type: typeof value, error: '' };
+		if (attributeFields.filter((a) => a.key === key).length > 0) {
+			attributeFields = attributeFields.map((a) => (a.key === key ? newAttribute : a));
+		} else {
+			attributeFields = [...attributeFields, newAttribute];
+		}
 	}
 
 	/**
@@ -60,7 +64,12 @@
 	 * @param {boolean} value
 	 */
 	export function importType(key, value) {
-		typeFields = [...typeFields, { key, value, error: '' }];
+		const newType = { key, value, error: '' };
+		if (typeFields.filter((t) => t.key === key).length > 0) {
+			typeFields = typeFields.map((t) => (t.key === key ? newType : t));
+		} else {
+			typeFields = [...typeFields, newType];
+		}
 	}
 
 	/**

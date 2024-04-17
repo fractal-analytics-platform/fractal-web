@@ -25,6 +25,7 @@
 	/** @type {string[]} */
 	let datasetTypes = [];
 	let selectedDatasetAttributeKey = '';
+	/** @type {string|number|boolean} */
 	let selectedDatasetAttributeValue = '';
 	let selectedDatasetTypeKey = '';
 	let selectedDatasetTypeValue = true;
@@ -126,8 +127,7 @@
 	}
 
 	function addDatasetAttribute() {
-		const attributeType = typeof datasetAttributes[selectedDatasetAttributeKey];
-		form.importAttribute(selectedDatasetAttributeKey, selectedDatasetAttributeValue, attributeType);
+		form.importAttribute(selectedDatasetAttributeKey, selectedDatasetAttributeValue);
 	}
 
 	function onOpenAddDatasetTypeModal() {
@@ -144,7 +144,7 @@
 	<FiltersCreationForm bind:this={form} />
 
 	{#if loadingDatasetFilters}
-		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true" />
 	{:else}
 		{#if Object.keys(datasetAttributes).length > 0}
 			<button
@@ -213,7 +213,9 @@
 				>
 					<option value="">Select...</option>
 					{#each datasetAttributes[selectedDatasetAttributeKey] as value}
-						<option>{value}</option>
+						<option {value}>
+							{typeof value === 'boolean' ? (value ? 'True' : 'False') : value}
+						</option>
 					{/each}
 				</select>
 			{/if}
