@@ -7,7 +7,7 @@
 	/**
 	 * Returns the dataset history formatted in JSON hiding some values.
 	 *
-	 * @param {import('$lib/types').DatasetHistoryItem} historyItem
+	 * @param {import('$lib/types-v2').DatasetHistoryItemV2} historyItem
 	 * @returns {string}
 	 */
 	function formatDatasetHistory(historyItem) {
@@ -16,12 +16,29 @@
 				...historyItem,
 				workflowtask: {
 					...historyItem.workflowtask,
-					task: {
-						...historyItem.workflowtask.task,
-						args_schema: historyItem.workflowtask.task.args_schema ? '[HIDDEN]' : undefined,
-						docs_info: historyItem.workflowtask.task.docs_info ? '[HIDDEN]' : undefined,
-						docs_link: historyItem.workflowtask.task.docs_link ? '[HIDDEN]' : undefined
-					}
+					task: historyItem.workflowtask.is_legacy_task
+						? null
+						: {
+								...historyItem.workflowtask.task,
+								args_schema_non_parallel: historyItem.workflowtask.task.args_schema_non_parallel
+									? '[HIDDEN]'
+									: undefined,
+								args_schema_parallel: historyItem.workflowtask.task.args_schema_parallel
+									? '[HIDDEN]'
+									: undefined,
+								docs_info: historyItem.workflowtask.task.docs_info ? '[HIDDEN]' : undefined,
+								docs_link: historyItem.workflowtask.task.docs_link ? '[HIDDEN]' : undefined
+						  },
+					task_legacy: historyItem.workflowtask.is_legacy_task
+						? {
+								...historyItem.workflowtask.task_legacy,
+								args_schema: historyItem.workflowtask.task_legacy.args_schema
+									? '[HIDDEN]'
+									: undefined,
+								docs_info: historyItem.workflowtask.task_legacy.docs_info ? '[HIDDEN]' : undefined,
+								docs_link: historyItem.workflowtask.task_legacy.docs_link ? '[HIDDEN]' : undefined
+						  }
+						: null
 				}
 			},
 			null,
@@ -40,7 +57,9 @@
 				{#each Object.entries(dataset.history) as [_, value]}
 					<li class="list-group-item text-bg-light">
 						<span>
-							Task "{value.workflowtask.task.name}", status "{value.status}"
+							Task "{value.workflowtask.is_legacy_task
+								? value.workflowtask.task_legacy.name
+								: value.workflowtask.task.name}", status "{value.status}"
 						</span>
 					</li>
 					<li class="list-group-item text-break">

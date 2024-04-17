@@ -12,13 +12,19 @@ export type DatasetV2 = {
   name: string
   project_id: number
   project: ProjectV2
-  history: Array<DatasetHistoryItem> | null
+  history: Array<DatasetHistoryItemV2> | null
   zarr_dir: string
   filters: {
     attributes: { [key: string]: string | number | boolean }
     types: { [key: string]: boolean }
   },
   timestamp_created: string
+}
+
+export type DatasetHistoryItemV2 = {
+  workflowtask: WorkflowTaskV2
+  status: string
+  parallelization: object
 }
 
 export type ImagePage = {
