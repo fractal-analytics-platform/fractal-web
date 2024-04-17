@@ -250,3 +250,22 @@ export function downloadBlob(content, filename, contentType) {
 	downloader.setAttribute('download', filename);
 	downloader.click();
 }
+
+/**
+ * @param {{ [key: string]: null | string | number | boolean}} oldObject
+ * @param {{ [key: string]: null | string | number | boolean}} newObject
+ */
+export function objectChanged(oldObject, newObject) {
+	if (Object.keys(oldObject).length !== Object.keys(newObject).length) {
+		return true;
+	}
+	for (const [oldKey, oldValue] of Object.entries(oldObject)) {
+		if (!(oldKey in newObject)) {
+			return true;
+		}
+		if (oldValue !== newObject[oldKey]) {
+			return true;
+		}
+	}
+	return false;
+}

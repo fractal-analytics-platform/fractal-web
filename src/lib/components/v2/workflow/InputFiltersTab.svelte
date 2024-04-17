@@ -68,7 +68,7 @@
 		}
 	}
 
-	async function save() {
+	export async function save() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
@@ -101,11 +101,23 @@
 			setTimeout(() => {
 				successfullySaved = false;
 			}, 3000);
+			form.save();
 			updateWorkflowTaskCallback(await response.json());
 		} else {
 			errorAlert = displayStandardErrorAlert(await response.json(), `errorAlert-inputFilters`);
 		}
 		saving = false;
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	export function hasUnsavedChanges() {
+		return form.hasUnsavedChanges();
+	}
+
+	export function discard() {
+		form.discardChanges();
 	}
 
 	function onOpenAddDatasetAttributeModal() {
@@ -114,9 +126,8 @@
 	}
 
 	function addDatasetAttribute() {
-		const attributes = form.getAttributes();
-		attributes[selectedDatasetAttributeKey] = selectedDatasetAttributeValue;
-		form.init(attributes, form.getTypes());
+		const attributeType = typeof datasetAttributes[selectedDatasetAttributeKey];
+		form.importAttribute(selectedDatasetAttributeKey, selectedDatasetAttributeValue, attributeType);
 	}
 
 	function onOpenAddDatasetTypeModal() {
@@ -125,9 +136,7 @@
 	}
 
 	function addDatasetType() {
-		const types = form.getTypes();
-		types[selectedDatasetTypeKey] = selectedDatasetTypeValue;
-		form.init(form.getAttributes(), types);
+		form.importType(selectedDatasetTypeKey, selectedDatasetTypeValue);
 	}
 </script>
 

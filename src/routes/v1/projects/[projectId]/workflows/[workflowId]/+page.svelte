@@ -91,6 +91,17 @@
 	});
 
 	/**
+	 * @param {number} id
+	 */
+	function setWorkflowTabContextId(id) {
+		if (argumentsWithUnsavedChanges === true) {
+			toggleUnsavedChangesModal();
+			return;
+		}
+		workflowTabContextId = id;
+	}
+
+	/**
 	 * Exports a project's workflow from the server
 	 * @returns {Promise<void>}
 	 */
@@ -333,9 +344,12 @@
 		}
 		if (argumentsWithUnsavedChanges === true) {
 			toggleUnsavedChangesModal();
-			preventedTaskContextChange = wft;
+			if (wft) {
+				preventedTaskContextChange = wft;
+			}
 			throw new Error('Cannot change workflow task context while there are unsaved changes');
 		}
+		preventedTaskContextChange = undefined;
 		setWorkflowTaskContext(wft);
 	}
 
@@ -347,6 +361,9 @@
 	 * @param {import('$lib/types').WorkflowTask} wft
 	 */
 	function setWorkflowTaskContext(wft) {
+		if (!wft) {
+			return;
+		}
 		selectedWorkflowTask = wft;
 		// Check if args schema is available
 		argsSchemaAvailable =
@@ -673,40 +690,32 @@
 								<ul class="nav nav-tabs card-header-tabs">
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#args-tab"
 											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 0)}
+											on:click={() => setWorkflowTabContextId(0)}
 											aria-current={workflowTabContextId === 0}
 											>Arguments
 										</button>
 									</li>
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#meta-tab"
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 1)}
+											on:click={() => setWorkflowTabContextId(1)}
 											aria-current={workflowTabContextId === 1}
 											>Meta
 										</button>
 									</li>
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#info-tab"
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 2)}
+											on:click={() => setWorkflowTabContextId(2)}
 											aria-current={workflowTabContextId === 2}
 											>Info
 										</button>
 									</li>
 									<li class="nav-item">
 										<button
-											data-bs-toggle="tab"
-											data-bs-target="#version-tab"
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
-											on:click={() => (workflowTabContextId = 3)}
+											on:click={() => setWorkflowTabContextId(3)}
 											aria-current={workflowTabContextId === 3}
 										>
 											Version

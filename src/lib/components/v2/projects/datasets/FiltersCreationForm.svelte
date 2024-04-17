@@ -1,5 +1,11 @@
 <script>
+	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
+
+	/** @type {{ [key: string]: string | number | boolean }} */
+	let initialAttributeFields = {};
+	/** @type {{ [key: string]: boolean }} */
+	let initialTypeFields = {};
 
 	/** @type {Array<{ key: string, value: string, type: string, error: string }>} */
 	let attributeFields = [];
@@ -17,6 +23,44 @@
 		typeFields = Object.entries(types).map(([k, v]) => {
 			return { key: k, value: v, error: '' };
 		});
+		initialAttributeFields = getAttributes();
+		initialTypeFields = getTypes();
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	export function hasUnsavedChanges() {
+		return (
+			objectChanged(initialAttributeFields, getAttributes()) ||
+			objectChanged(initialTypeFields, getTypes())
+		);
+	}
+
+	export function discardChanges() {
+		init(initialAttributeFields, initialTypeFields);
+	}
+
+	export function save() {
+		initialAttributeFields = getAttributes();
+		initialTypeFields = getTypes();
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {string} value
+	 * @param {string} type
+	 */
+	export function importAttribute(key, value, type) {
+		attributeFields = [...attributeFields, { key, value, type, error: '' }];
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {boolean} value
+	 */
+	export function importType(key, value) {
+		typeFields = [...typeFields, { key, value, error: '' }];
 	}
 
 	/**

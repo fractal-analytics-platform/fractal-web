@@ -10,6 +10,7 @@
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import SlimSelect from 'slim-select';
 	import { onMount, tick } from 'svelte';
+	import { objectChanged } from '$lib/common/component_utilities';
 
 	let projectId = $page.params.projectId;
 
@@ -152,27 +153,8 @@
 	}
 
 	$: applyBtnActive =
-		filtersChanged(lastAppliedAttributeFilters, attributeFilters) ||
-		filtersChanged(lastAppliedTypeFilters, typeFilters);
-
-	/**
-	 * @param {{ [key: string]: null | string | number | boolean}} oldFilters
-	 * @param {{ [key: string]: null | string | number | boolean}} newFilters
-	 */
-	function filtersChanged(oldFilters, newFilters) {
-		if (Object.keys(oldFilters).length !== Object.keys(newFilters).length) {
-			return true;
-		}
-		for (const [oldKey, oldValue] of Object.entries(oldFilters)) {
-			if (!(oldKey in newFilters)) {
-				return true;
-			}
-			if (oldValue !== newFilters[oldKey]) {
-				return true;
-			}
-		}
-		return false;
-	}
+		objectChanged(lastAppliedAttributeFilters, attributeFilters) ||
+		objectChanged(lastAppliedTypeFilters, typeFilters);
 
 	let resetBtnActive = false;
 
