@@ -4,6 +4,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import FormBuilder from './FormBuilder.svelte';
 	import ImportExportArgs from './ImportExportArgs.svelte';
+	import { stripNullAndEmptyObjectsAndArrays } from '$lib/components/common/jschema/schema_management';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -94,7 +95,7 @@
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(payload)
+				body: JSON.stringify(stripNullAndEmptyObjectsAndArrays(payload))
 			}
 		);
 
