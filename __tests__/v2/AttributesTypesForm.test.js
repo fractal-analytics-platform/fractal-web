@@ -76,10 +76,40 @@ describe('AttributesTypesForm', () => {
 		expect(result.getByText('Invalid number')).toBeDefined();
 	});
 
-	it('switch to boolean attribute', async () => {
+	it('switch to number attribute from string containing a numeric value (number is preserved)', async () => {
 		const result = render(AttributesTypesForm);
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: '42' } });
+		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
+		expect(result.getByPlaceholderText('Value').value).eq('42');
+		expect(result.component.validateFields()).true;
+	});
+
+	it('switch to number attribute from string containing text (number is reset)', async () => {
+		const result = render(AttributesTypesForm);
+		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
+		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
+		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
+		expect(result.getByPlaceholderText('Value').value).eq('');
+		expect(result.component.validateFields()).false;
+	});
+
+	it('switch to boolean attribute, default to false', async () => {
+		const result = render(AttributesTypesForm);
+		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
+		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
+		expect(result.getByLabelText('Value').value).eq('false');
+		expect(result.component.validateFields()).true;
+	});
+
+	it('switch to boolean attribute from string equals to "true", true is set', async () => {
+		const result = render(AttributesTypesForm);
+		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
+		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'true' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
 		expect(result.getByLabelText('Value').value).eq('true');
 		expect(result.component.validateFields()).true;

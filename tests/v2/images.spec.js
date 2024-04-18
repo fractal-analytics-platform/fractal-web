@@ -57,7 +57,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await createImage(page, 'img5', async function (modal) {
 			await modal.getByRole('button', { name: 'Add type' }).click();
 			await modal.getByPlaceholder('Key').fill('k3');
-			await modal.getByRole('checkbox').check();
+			await modal.getByRole('switch').check();
 		});
 	});
 

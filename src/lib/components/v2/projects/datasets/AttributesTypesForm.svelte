@@ -168,13 +168,19 @@
 
 	/**
 	 * @param {{ key: string, value: string, type: string, error: string }} field
+	 * @param {number} index
 	 */
-	function fieldTypeChanged(field) {
+	function fieldTypeChanged(field, index) {
 		if (field.type === 'boolean') {
-			field.value = 'true';
+			if (field.value.toLowerCase() === 'true') {
+				field.value = 'true';
+			} else {
+				field.value = 'false';
+			}
 		} else if (field.type !== 'number' || !field.value.match(/^\d+\.*\d*$/)) {
 			field.value = '';
 		}
+		attributeFields = attributeFields.filter((f, i) => (i === index ? field : f));
 	}
 
 	async function addAttribute() {
@@ -249,7 +255,7 @@
 			bind:value={field.type}
 			class:is-invalid={field.error}
 			aria-label="Type"
-			on:change={() => fieldTypeChanged(field)}
+			on:change={() => fieldTypeChanged(field, index)}
 		>
 			<option value="string">String</option>
 			<option value="number">Number</option>
@@ -290,15 +296,16 @@
 					class:is-invalid={field.error}
 				/>
 				<div class="input-group-text">
-					<label>
+					<div class="form-check form-switch">
 						<input
-							class="form-check-input me-1"
+							id="type-{index}"
+							class="form-check-input"
 							type="checkbox"
 							bind:checked={field.value}
+							role="switch"
 							aria-label="Value for {field.key}"
 						/>
-						{field.value}
-					</label>
+					</div>
 				</div>
 				<button
 					class="btn btn-outline-danger"

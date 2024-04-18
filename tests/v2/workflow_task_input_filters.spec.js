@@ -38,6 +38,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await modal.getByRole('combobox').nth(1).selectOption('Number');
 		await modal.getByRole('button', { name: 'Add attribute' }).click();
 		await modal.getByPlaceholder('Key').nth(2).fill('k3');
+		await modal.getByPlaceholder('Value').nth(2).fill('true');
 		await modal.getByRole('combobox').nth(2).selectOption('Boolean');
 		await modal.getByRole('button', { name: 'Add type' }).click();
 		await modal.getByPlaceholder('Key').nth(3).fill('k4');
@@ -55,7 +56,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await modal.getByPlaceholder('Value').fill('value2');
 		await modal.getByRole('button', { name: 'Add type' }).click();
 		await modal.getByPlaceholder('Key').nth(1).fill('k4');
-		await modal.getByRole('checkbox').check();
+		await modal.getByRole('switch').check();
 		saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
 		await waitModalClosed(page);
@@ -235,7 +236,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 		await expect(page.getByPlaceholder('Key')).toHaveCount(4);
 		await expect(page.getByPlaceholder('Key').nth(3)).toHaveValue('k4');
-		await expect(page.getByRole('checkbox')).toBeChecked();
+		await expect(page.getByRole('switch')).toBeChecked();
 	});
 
 	await test.step('Add already existing type filter from dataset', async () => {
@@ -248,7 +249,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 		await expect(page.getByPlaceholder('Key')).toHaveCount(4);
 		await expect(page.getByPlaceholder('Key').nth(3)).toHaveValue('k4');
-		await expect(page.getByRole('checkbox')).not.toBeChecked();
+		await expect(page.getByRole('switch')).not.toBeChecked();
 	});
 
 	await test.step('Cleanup', async () => {
