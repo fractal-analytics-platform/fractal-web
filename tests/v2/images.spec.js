@@ -109,6 +109,26 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await expect(page.getByRole('row')).toHaveCount(7);
 	});
 
+	await test.step('Edit image', async () => {
+		await page.getByRole('button', { name: 'Edit' }).nth(1).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		const zarrUrlInput = modal.getByRole('textbox', { name: 'Zarr URL' });
+		await expect(zarrUrlInput).toHaveValue('/tmp/img2');
+		await expect(zarrUrlInput).toBeDisabled();
+		await expect(modal.getByPlaceholder('Key')).toHaveValue('k1');
+		await expect(modal.getByPlaceholder('Value')).toHaveValue('v1');
+		await modal.getByPlaceholder('Value').fill('v1-mod');
+		await modal.getByRole('button', { name: 'Add attribute' }).click();
+		await modal.getByPlaceholder('Key').nth(1).fill('k2');
+		await modal.getByPlaceholder('Value').nth(1).fill('9999');
+		await modal.getByRole('combobox').nth(1).selectOption('Number');
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await waitModalClosed(page);
+		await page.getByRole('cell', { name: 'v1-mod' }).waitFor();
+		await page.getByRole('cell', { name: '9999' }).waitFor();
+	});
+
 	await test.step('Delete one image', async () => {
 		await page.getByRole('button', { name: 'Delete' }).first().click();
 		const modal = page.locator('.modal.show');

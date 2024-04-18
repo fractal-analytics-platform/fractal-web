@@ -27,17 +27,19 @@ export type DatasetHistoryItemV2 = {
   parallelization: object
 }
 
+export type Image = {
+  zarr_url: string
+  attributes: { [key: string]: string | number | boolean }
+  types: { [key: string]: boolean }
+}
+
 export type ImagePage = {
   total_count: number
   page_size: number
   current_page: number
   attributes: { [key: string]: Array<string | number | boolean> }
   types: Array<string>
-  images: Array<{
-    zarr_url: string
-    attributes: { [key: string]: string | number | boolean }
-    types: { [key: string]: boolean }
-  }>
+  images: Array<Image>
 }
 
 export type TaskV2Type = 'non_parallel' | 'parallel' | 'compound'
