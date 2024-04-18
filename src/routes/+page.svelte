@@ -31,8 +31,8 @@
 
 	<p>
 		This is the new version 2 of Fractal. Your older projects and workflows are still available in
-		the legacy version that you can access here (links to legacy project page). We encourage you to
-		switch to Fractal V2 for all new projects and report any issues you find.
+		the legacy version that you can access in <a href="/v1/projects">the legacy project page</a>. We
+		encourage you to switch to Fractal V2 for all new projects and report any issues you find.
 	</p>
 	<p>
 		We strictly separate projects, datasets and workflows into Fractal V2 and legacy. You can use

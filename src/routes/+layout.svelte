@@ -9,7 +9,7 @@
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
 	/** @type {'v1'|'v2'} */
-	let apiVersion = $page.data.apiVersion;
+	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1': 'v2';
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
@@ -81,7 +81,6 @@
 	 * @param {'v1'|'v2'} version
 	 */
 	function setSelecteApiVersion(version) {
-		apiVersion = version;
 		reloadVersionedPage($page.url.pathname, version);
 	}
 

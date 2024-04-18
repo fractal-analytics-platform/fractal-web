@@ -1,10 +1,5 @@
 import { goto } from "$app/navigation";
 
-export const versionsLabels = {
-	v1: 'legacy',
-	v2: 'current'
-};
-
 /**
  * Save the selected API version in the cookie and reload the page.
  * This function is called from the Svelte frontend.

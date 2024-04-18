@@ -1,7 +1,7 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
 import { getCurrentUser } from '$lib/server/api/v1/auth_api';
 
-export async function load({ fetch, cookies, request }) {
+export async function load({ fetch, cookies }) {
 	// This is a mark to notify and log when the server is running SSR
 	console.log('SSR - Main layout');
 
@@ -16,8 +16,6 @@ export async function load({ fetch, cookies, request }) {
 			console.error(error);
 		});
 
-	const apiVersion = request.url.includes('/v1/') ? 'v1' : 'v2';
-
 	// Check user info
 	// Check auth cookie is present
 	const fastApiUsersAuth = cookies.get('fastapiusersauth');
@@ -25,8 +23,7 @@ export async function load({ fetch, cookies, request }) {
 		console.log('No auth cookie found');
 		return {
 			serverInfo,
-			userInfo: null,
-			apiVersion
+			userInfo: null
 		};
 	}
 
@@ -38,7 +35,6 @@ export async function load({ fetch, cookies, request }) {
 
 	return {
 		serverInfo,
-		userInfo,
-		apiVersion
+		userInfo
 	};
 }
