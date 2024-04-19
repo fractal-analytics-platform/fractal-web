@@ -588,7 +588,7 @@
 		}
 		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
 		const outputStatusResponse = await fetch(
-			`/api/v2/project/${project.id}/dataset/${selectedDatasetId}/status`,
+			`/api/v2/project/${project.id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
 			{
 				method: 'GET',
 				credentials: 'include'
