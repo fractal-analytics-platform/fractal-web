@@ -18,6 +18,7 @@
     * moved editing of dataset inside dataset page (\#452);
     * supported editing of single dataset images (\#457);
     * used switches to represent boolean flags (\#457);
+    * implemented continue/restart workflow (\#465);
 
 # 0.10.2
 

@@ -7,7 +7,6 @@
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
 	import WorkflowTaskSelection from '$lib/components/v2/workflow/WorkflowTaskSelection.svelte';
-	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
@@ -21,6 +20,7 @@
 	import TaskInfoTabV1 from '$lib/components/v1/workflow/TaskInfoTab.svelte';
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
+	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -49,13 +49,6 @@
 	let workflowSuccessMessage = '';
 	/** @type {import('$lib/types-v2').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = undefined;
-	let checkingConfiguration = false;
-	let setSlurmAccount = true;
-	let slurmAccount =
-		$page.data.userInfo.slurm_accounts.length === 0 ? '' : $page.data.userInfo.slurm_accounts[0];
-	let workerInitControl = '';
-	let firstTaskIndexControl = '';
-	let lastTaskIndexControl = '';
 	let preventedSelectedTaskChange = undefined;
 
 	/** @type {ArgumentsSchema|undefined} */
@@ -82,7 +75,7 @@
 	let argsUnsavedChangesModal;
 	/** @type {Modal} */
 	let filtersUnsavedChangesModal;
-	/** @type {Modal} */
+	/** @type {RunWorkflowModal} */
 	let runWorkflowModal;
 	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
 	let editTasksOrderModal;
@@ -434,69 +427,26 @@
 		filtersUnsavedChangesModal.toggle();
 	}
 
-	let applyingWorkflow = false;
-
 	/**
-	 * Requests the server to apply a project's workflow (i.e. run it)
-	 * @returns {Promise<void>}
+	 * @param {'run'|'restart'|'continue'} action
 	 */
-	async function handleApplyWorkflow() {
-		// reset previous errors
-		runWorkflowModal.hideErrorAlert();
-		if (!workflow) {
-			return;
-		}
-		if (selectedDatasetId === undefined) {
-			let message = 'Dataset is required. Select one from the list.';
-			console.error(message);
-			runWorkflowModal.displayErrorAlert(message);
+	function openRunWorkflowModal(action) {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
+			toggleArgsUnsavedChangesModal();
+		} else if (inputFiltersTab?.hasUnsavedChanges()) {
+			toggleFiltersUnsavedChangesModal();
 		} else {
-			const requestBody = {
-				worker_init: workerInitControl,
-				first_task_index: firstTaskIndexControl,
-				last_task_index: lastTaskIndexControl
-			};
-			if (setSlurmAccount && slurmAccount !== '') {
-				requestBody.slurm_account = slurmAccount;
-			}
-
-			applyingWorkflow = true;
-			const headers = new Headers();
-			headers.set('Content-Type', 'application/json');
-
-			const response = await fetch(
-				`/api/v2/project/${project.id}/job/submit?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`,
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers,
-					body: JSON.stringify(requestBody, replaceEmptyStrings)
-				}
-			);
-			applyingWorkflow = false;
-			checkingConfiguration = false;
-
-			// Handle API response
-			if (response.ok) {
-				// Successfully applied workflow
-				// @ts-ignore
-				// eslint-disable-next-line
-				runWorkflowModal.toggle();
-				const job = await response.json();
-				selectedSubmittedJob = job;
-				await loadJobsStatus();
-			} else {
-				console.error(response);
-				// Set an error message on the component
-				runWorkflowModal.displayErrorAlert(await response.json());
-			}
+			runWorkflowModal.open(action);
 		}
 	}
 
-	function resetLastTask() {
-		if (lastTaskIndexControl !== '' && firstTaskIndexControl > lastTaskIndexControl) {
-			lastTaskIndexControl = '';
-		}
+	/**
+	 *
+	 * @param {import('$lib/types-v2').ApplyWorkflowV2} job
+	 */
+	async function onJobSubmitted(job) {
+		selectedSubmittedJob = job;
+		await loadJobsStatus();
 	}
 
 	/**
@@ -568,6 +518,8 @@
 
 	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
 	let statuses = {};
+
+	$: hasAnyJobRun = Object.keys(statuses).length > 0;
 
 	/** @type {NodeJS.Timer|undefined} */
 	let statusWatcherTimer;
@@ -756,24 +708,31 @@
 					</select>
 				</div>
 			</div>
-			<div class="col-lg-4 col-md-12">
+			<div class="col-lg-8 col-md-12">
 				{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
 					<button class="btn btn-danger" on:click={stopWorkflow}>
 						<i class="bi-stop-circle-fill" /> Stop workflow
 					</button>
+				{:else if !hasAnyJobRun}
+					<button
+						class="btn btn-success"
+						on:click|preventDefault={() => openRunWorkflowModal('run')}
+						disabled={selectedDatasetId === undefined}
+					>
+						<i class="bi-play-fill" /> Run workflow
+					</button>
 				{:else}
 					<button
 						class="btn btn-success"
-						on:click|preventDefault={() => {
-							if (argsSchemaForm?.hasUnsavedChanges()) {
-								toggleArgsUnsavedChangesModal();
-							} else if (inputFiltersTab?.hasUnsavedChanges()) {
-								toggleFiltersUnsavedChangesModal();
-							} else {
-								runWorkflowModal.toggle();
-							}
-						}}
-						><i class="bi-play-fill" /> Run workflow
+						on:click|preventDefault={() => openRunWorkflowModal('continue')}
+					>
+						<i class="bi-play-fill" /> Continue workflow
+					</button>
+					<button
+						class="btn btn-primary"
+						on:click|preventDefault={() => openRunWorkflowModal('restart')}
+					>
+						<i class="bi bi-arrow-clockwise" /> Restart workflow
 					</button>
 				{/if}
 			</div>
@@ -1135,156 +1094,17 @@
 	bind:this={editTasksOrderModal}
 />
 
-<Modal id="runWorkflowModal" centered={true} bind:this={runWorkflowModal}>
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">Run workflow</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-runWorkflowModal" />
-		<form id="runWorkflowForm">
-			<div class="mb-3">
-				<label for="run-workflow-dataset" class="form-label">Dataset</label>
-				<select
-					id="run-workflow-dataset"
-					class="form-control"
-					disabled={checkingConfiguration}
-					bind:value={selectedDatasetId}
-				>
-					<option value={undefined}>Select a dataset</option>
-					{#each datasets as dataset}
-						<option value={dataset.id}>{dataset.name}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="mb-3">
-				<label for="firstTaskIndex" class="form-label">First task (Optional)</label>
-				<select
-					name="firstTaskIndex"
-					id="firstTaskIndex"
-					class="form-control"
-					disabled={checkingConfiguration}
-					bind:value={firstTaskIndexControl}
-					on:change={resetLastTask}
-				>
-					<option value="">Select first task</option>
-					{#each updatableWorkflowList as wft}
-						{#if wft.is_legacy_task}
-							<option value={wft.order}>{wft.task_legacy.name}</option>
-						{:else}
-							<option value={wft.order}>{wft.task.name}</option>
-						{/if}
-					{/each}
-				</select>
-			</div>
-			<div class="mb-3">
-				<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
-				<select
-					name="lastTaskIndex"
-					id="lastTaskIndex"
-					class="form-control"
-					disabled={checkingConfiguration}
-					bind:value={lastTaskIndexControl}
-				>
-					<option value="">Select last task</option>
-					{#each updatableWorkflowList as wft}
-						{#if firstTaskIndexControl === '' || wft.order >= parseInt(firstTaskIndexControl)}
-							{#if wft.is_legacy_task}
-								<option value={wft.order}>{wft.task_legacy.name}</option>
-							{:else}
-								<option value={wft.order}>{wft.task.name}</option>
-							{/if}
-						{/if}
-					{/each}
-				</select>
-			</div>
-			<div class="accordion" id="accordion-workflow-advanced-options">
-				<div class="accordion-item">
-					<h2 class="accordion-header">
-						<button
-							class="accordion-button collapsed"
-							type="button"
-							data-bs-toggle="collapse"
-							data-bs-target="#collapse-workflow-advanced-options"
-							aria-expanded="false"
-							aria-controls="collapse-workflow-advanced-options"
-						>
-							Advanced Options
-						</button>
-					</h2>
-					<div
-						id="collapse-workflow-advanced-options"
-						class="accordion-collapse collapse"
-						data-bs-parent="#accordion-workflow-advanced-options"
-					>
-						<div class="accordion-body">
-							<div class="mb-3">
-								<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-								<textarea
-									name="workerInit"
-									id="workerInit"
-									class="form-control font-monospace"
-									rows="5"
-									disabled={checkingConfiguration}
-									bind:value={workerInitControl}
-								/>
-							</div>
-							{#if $page.data.userInfo.slurm_accounts.length > 0}
-								<div class="mb-3">
-									<div class="form-check">
-										<input
-											class="form-check-input"
-											type="checkbox"
-											id="setSlurmAccount"
-											bind:checked={setSlurmAccount}
-										/>
-										<label class="form-check-label" for="setSlurmAccount">
-											Set SLURM account
-										</label>
-									</div>
-								</div>
-								{#if setSlurmAccount}
-									<div class="mb-3">
-										<label for="slurmAccount" class="form-label">SLURM account</label>
-										<select
-											name="slurmAccount"
-											id="slurmAccount"
-											class="form-control"
-											disabled={checkingConfiguration}
-											bind:value={slurmAccount}
-										>
-											{#each $page.data.userInfo.slurm_accounts as account}
-												<option>{account}</option>
-											{/each}
-										</select>
-									</div>
-								{/if}
-							{/if}
-						</div>
-					</div>
-				</div>
-			</div>
-		</form>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		{#if checkingConfiguration}
-			<button class="btn btn-warning" on:click={() => (checkingConfiguration = false)}>
-				Cancel
-			</button>
-			<button
-				class="btn btn-primary"
-				on:click|preventDefault={handleApplyWorkflow}
-				disabled={applyingWorkflow}
-			>
-				{#if applyingWorkflow}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Confirm
-			</button>
-		{:else}
-			<button class="btn btn-primary" on:click={() => (checkingConfiguration = true)}> Run </button>
-		{/if}
-	</svelte:fragment>
-</Modal>
+<RunWorkflowModal
+	{workflow}
+	{datasets}
+	{selectedDatasetId}
+	{onJobSubmitted}
+	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
+		datasets = updatedDatasets;
+		selectedDatasetId = newSelectedDatasetId;
+	}}
+	bind:this={runWorkflowModal}
+/>
 
 <Modal id="args-changes-unsaved-dialog" bind:this={argsUnsavedChangesModal}>
 	<svelte:fragment slot="header">
