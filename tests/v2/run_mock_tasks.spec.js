@@ -137,9 +137,16 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await expect(modal.getByRole('combobox', { name: 'Dataset', exact: true })).toHaveValue(
-			datasetId1.toString()
-		);
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.getByRole('option', { selected: true })
+		).toHaveText(datasetName1);
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('option', { selected: true })
+		).toHaveText('create_ome_zarr_compound');
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -221,11 +228,16 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await page
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('option', { selected: true })
+		).toHaveText('Select first task');
+		await modal
 			.getByRole('combobox', { name: 'First task (Optional)' })
 			.selectOption('generic_task');
-		await page.getByRole('button', { name: 'Run', exact: true }).click();
-		await page.getByRole('button', { name: 'Confirm' }).click();
+		await modal.getByRole('button', { name: 'Run', exact: true }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 	});
 
@@ -247,8 +259,13 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.getByRole('button', { name: 'Restart workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await page.getByRole('button', { name: 'Run', exact: true }).click();
-		await page.getByRole('button', { name: 'Confirm' }).click();
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('option', { selected: true })
+		).toHaveText('create_ome_zarr_compound');
+		await modal.getByRole('button', { name: 'Run', exact: true }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 	});
 

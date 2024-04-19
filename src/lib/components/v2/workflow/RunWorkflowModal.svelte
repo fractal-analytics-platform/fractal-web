@@ -41,7 +41,7 @@
 		mode = action;
 		replaceExistingDataset = true;
 		workerInitControl = '';
-		if (mode === 'run' && workflow.task_list.length > 0) {
+		if ((mode === 'run' || mode === 'restart') && workflow.task_list.length > 0) {
 			firstTaskIndex = 0;
 		} else {
 			firstTaskIndex = undefined;
