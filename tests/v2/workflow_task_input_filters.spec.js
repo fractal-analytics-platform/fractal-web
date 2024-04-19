@@ -28,7 +28,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await modal.waitFor();
 		await modal
 			.getByRole('textbox', { name: 'Zarr URL' })
-			.fill(`/tmp/playwight/datasets/${datasetName}/img1`);
+			.fill(`/tmp/playwright/datasets/${datasetName}/img1`);
 		await modal.getByRole('button', { name: 'Add attribute' }).click();
 		await modal.getByPlaceholder('Key').fill('k1');
 		await modal.getByPlaceholder('Value').fill('value1');
@@ -50,7 +50,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await modal.waitFor();
 		await modal
 			.getByRole('textbox', { name: 'Zarr URL' })
-			.fill(`/tmp/playwight/datasets/${datasetName}/img2`);
+			.fill(`/tmp/playwright/datasets/${datasetName}/img2`);
 		await modal.getByRole('button', { name: 'Add attribute' }).click();
 		await modal.getByPlaceholder('Key').fill('k1');
 		await modal.getByPlaceholder('Value').fill('value2');
@@ -111,6 +111,10 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await expect(page.getByPlaceholder('Value').first()).toHaveValue('value1-mod');
 	});
 
+	await test.step('Select dataset', async () => {
+		await page.getByRole('combobox', { name: 'Dataset', exact: true }).selectOption(datasetName);
+	});
+
 	await test.step('Trigger pending changes modal from clicking to "Run workflow" button', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = page.locator('.modal.show');
@@ -166,8 +170,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await expect(page.getByPlaceholder('Value').first()).toHaveValue('value1-mod');
 	});
 
-	await test.step('Select dataset and task2', async () => {
-		await page.getByRole('combobox', { name: 'Dataset', exact: true }).selectOption(datasetName);
+	await test.step('Select task2', async () => {
 		await workflow.selectTask(taskName2);
 	});
 

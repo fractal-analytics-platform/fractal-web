@@ -1,5 +1,9 @@
 import { it, expect } from 'vitest';
-import { extractJobErrorParts, extractRelevantJobError } from '$lib/common/job_utilities.js';
+import {
+	extractJobErrorParts,
+	extractRelevantJobError,
+	generateNewUniqueDatasetName
+} from '$lib/common/job_utilities.js';
 
 const completeTracebackError = `TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:
@@ -223,3 +227,21 @@ it('handles null or undefined inputs', () => {
 	expect(extractRelevantJobError(null)).eq('');
 	expect(extractRelevantJobError()).eq('');
 });
+
+it('generates new unique dataset name', () => {
+	expect(generateNewUniqueDatasetName(getMockedDatasets(['a', 'b']), 'a')).toEqual('a_1');
+	expect(generateNewUniqueDatasetName(getMockedDatasets(['a', 'a_1', 'b']), 'a')).toEqual('a_2');
+	expect(generateNewUniqueDatasetName(getMockedDatasets(['a', 'a_1', 'b']), 'a_1')).toEqual('a_2');
+	expect(generateNewUniqueDatasetName(getMockedDatasets(['a', 'a_1', 'a_2', 'b']), 'a_1')).toEqual(
+		'a_3'
+	);
+});
+
+/**
+ * @param {string[]} names
+ */
+function getMockedDatasets(names) {
+	return names.map((name, index) => {
+		return { id: index + 1, name };
+	});
+}
