@@ -583,11 +583,12 @@
 			statuses = {};
 			jobError = '';
 			failedJob = undefined;
+			selectedSubmittedJob = undefined;
 			return;
 		}
 		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
 		const outputStatusResponse = await fetch(
-			`/api/v2/project/${project.id}/dataset/${selectedDatasetId}/status`,
+			`/api/v2/project/${project.id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -1196,46 +1197,72 @@
 					{/each}
 				</select>
 			</div>
-			<div class="mb-3">
-				<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-				<textarea
-					name="workerInit"
-					id="workerInit"
-					class="form-control font-monospace"
-					rows="5"
-					disabled={checkingConfiguration}
-					bind:value={workerInitControl}
-				/>
-			</div>
-			{#if $page.data.userInfo.slurm_accounts.length > 0}
-				<div class="mb-3">
-					<div class="form-check">
-						<input
-							class="form-check-input"
-							type="checkbox"
-							id="setSlurmAccount"
-							bind:checked={setSlurmAccount}
-						/>
-						<label class="form-check-label" for="setSlurmAccount"> Set SLURM account </label>
+			<div class="accordion" id="accordion-workflow-advanced-options">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button
+							class="accordion-button collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapse-workflow-advanced-options"
+							aria-expanded="false"
+							aria-controls="collapse-workflow-advanced-options"
+						>
+							Advanced Options
+						</button>
+					</h2>
+					<div
+						id="collapse-workflow-advanced-options"
+						class="accordion-collapse collapse"
+						data-bs-parent="#accordion-workflow-advanced-options"
+					>
+						<div class="accordion-body">
+							<div class="mb-3">
+								<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
+								<textarea
+									name="workerInit"
+									id="workerInit"
+									class="form-control font-monospace"
+									rows="5"
+									disabled={checkingConfiguration}
+									bind:value={workerInitControl}
+								/>
+							</div>
+							{#if $page.data.userInfo.slurm_accounts.length > 0}
+								<div class="mb-3">
+									<div class="form-check">
+										<input
+											class="form-check-input"
+											type="checkbox"
+											id="setSlurmAccount"
+											bind:checked={setSlurmAccount}
+										/>
+										<label class="form-check-label" for="setSlurmAccount">
+											Set SLURM account
+										</label>
+									</div>
+								</div>
+								{#if setSlurmAccount}
+									<div class="mb-3">
+										<label for="slurmAccount" class="form-label">SLURM account</label>
+										<select
+											name="slurmAccount"
+											id="slurmAccount"
+											class="form-control"
+											disabled={checkingConfiguration}
+											bind:value={slurmAccount}
+										>
+											{#each $page.data.userInfo.slurm_accounts as account}
+												<option>{account}</option>
+											{/each}
+										</select>
+									</div>
+								{/if}
+							{/if}
+						</div>
 					</div>
 				</div>
-				{#if setSlurmAccount}
-					<div class="mb-3">
-						<label for="slurmAccount" class="form-label">SLURM account</label>
-						<select
-							name="slurmAccount"
-							id="slurmAccount"
-							class="form-control"
-							disabled={checkingConfiguration}
-							bind:value={slurmAccount}
-						>
-							{#each $page.data.userInfo.slurm_accounts as account}
-								<option>{account}</option>
-							{/each}
-						</select>
-					</div>
-				{/if}
-			{/if}
+			</div>
 		</form>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">

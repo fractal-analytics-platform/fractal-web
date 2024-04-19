@@ -2,18 +2,20 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
-	import { reloadVersionedPage, versionsLabels } from '$lib/common/selected_api_version';
+	import { reloadVersionedPage } from '$lib/common/selected_api_version';
 	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
-	let apiVersion = $page.data.apiVersion;
+	/** @type {'v1'|'v2'} */
+	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1': 'v2';
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
 
-	$: displayVersionSelector = !isSubPage($page.url.pathname, apiVersion);
+	$: displayVersionSelector =
+		!isSubPage($page.url.pathname, apiVersion) && selectedSection !== 'home';
 
 	/**
 	 * Returns true if the URL indicates a subpage.
@@ -76,14 +78,19 @@
 	}
 
 	/**
-	 * @param {string} version
+	 * @param {'v1'|'v2'} version
 	 */
 	function setSelecteApiVersion(version) {
-		apiVersion = version;
 		reloadVersionedPage($page.url.pathname, version);
 	}
 
 	let loading = true;
+
+	$: {
+		if (selectedSection === 'home') {
+			setSelecteApiVersion('v2');
+		}
+	}
 
 	onMount(() => {
 		loading = false;
@@ -94,7 +101,7 @@
 </script>
 
 <main>
-	<nav class="bg-light border-bottom">
+	<nav class="bg-light border-bottom" class:legacy={apiVersion === 'v1'}>
 		<div class="container d-flex flex-wrap">
 			<ul class="nav me-auto">
 				<li class="nav-item">
@@ -120,17 +127,17 @@
 						</a>
 					</li>
 					<li class="nav-item">
-						<a
-							href="/{apiVersion}/jobs"
-							class="nav-link"
-							class:active={selectedSection === 'jobs'}
-						>
+						<a href="/{apiVersion}/jobs" class="nav-link" class:active={selectedSection === 'jobs'}>
 							Jobs
 						</a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
-							<a href="/{apiVersion}/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
+							<a
+								href="/{apiVersion}/admin"
+								class="nav-link"
+								class:admin-active={selectedSection === 'admin'}
+							>
 								Admin area
 							</a>
 						</li>
@@ -140,33 +147,28 @@
 			<ul class="nav">
 				{#if userLoggedIn}
 					{#if displayVersionSelector}
-						<li class="nav-item dropdown">
-							<a
-								class="nav-link dropdown-toggle"
-								href="#api-version"
-								role="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false"
-							>
-								{versionsLabels[apiVersion]}
-							</a>
-							<ul class="dropdown-menu">
-								{#each Object.entries(versionsLabels) as [version, label]}
-									<li>
-										<button
-											class="dropdown-item"
-											type="button"
-											on:click={() => setSelecteApiVersion(version)}
-										>
-											{label}
-										</button>
-									</li>
-								{/each}
-							</ul>
+						<li class="nav-item">
+							{#if apiVersion === 'v1'}
+								<button
+									class="btn btn-info mt-1 pt-1 pb-1 border-primary"
+									type="button"
+									on:click={() => setSelecteApiVersion('v2')}
+								>
+									Switch to Fractal V2
+								</button>
+							{:else}
+								<button
+									class="btn btn-outline-secondary mt-1 pt-1 pb-1"
+									type="button"
+									on:click={() => setSelecteApiVersion('v1')}
+								>
+									Switch to legacy Fractal
+								</button>
+							{/if}
 						</li>
-					{:else}
+					{:else if apiVersion === 'v1'}
 						<li class="navbar-text me-3">
-							<span class="badge text-bg-info">{versionsLabels[apiVersion]}</span>
+							<span class="badge text-bg-secondary">legacy</span>
 						</li>
 					{/if}
 					<li class="nav-item dropdown">
@@ -195,6 +197,9 @@
 			</ul>
 		</div>
 	</nav>
+	{#if apiVersion === 'v1'}
+		<div class="legacy-border" />
+	{/if}
 	{#if selectedSection === 'admin'}
 		<div class="admin-border" />
 	{/if}
@@ -235,6 +240,20 @@
 </main>
 
 <style>
+	nav.legacy {
+		background-color: #e4e4e4 !important;
+		border-bottom-color: #888 !important;
+	}
+
+	nav.legacy .nav-link.active {
+		background-color: #d0d0d0 !important;
+	}
+
+	.legacy-border {
+		height: 6px;
+		background-color: #888;
+	}
+
 	.nav-link.active {
 		background-color: #eee;
 		border-bottom-width: 3px;
@@ -249,6 +268,7 @@
 		height: 8px;
 		background-color: #dc3545;
 	}
+
 	.loading {
 		position: fixed;
 		top: 0;

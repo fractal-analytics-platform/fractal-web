@@ -1,7 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
+import { readable } from 'svelte/store';
 
 import JSchema from '../../src/lib/components/v1/workflow/JSchema.svelte';
+
+// Mocking the page store
+vi.mock('$app/stores', () => {
+	return {
+		page: readable({
+			url: { pathname: '/v1/projects/1/workflows/1' }
+		})
+	};
+});
 
 describe('JSchema', () => {
 	it('Required NumberProperty with title', async () => {

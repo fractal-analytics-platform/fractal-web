@@ -178,7 +178,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Fill arguments', async () => {
-		await page.getByRole('checkbox').check();
+		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
 	});

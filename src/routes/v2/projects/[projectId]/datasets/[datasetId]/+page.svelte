@@ -6,7 +6,7 @@
 	import DatasetFiltersModal from '$lib/components/v2/projects/datasets/DatasetFiltersModal.svelte';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
-	import AddImageModal from '$lib/components/v2/projects/datasets/AddImageModal.svelte';
+	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import SlimSelect from 'slim-select';
 	import { onMount, tick } from 'svelte';
@@ -39,6 +39,9 @@
 	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
+
+	/** @type {CreateUpdateImageModal|undefined} */
+	let imageModal = undefined;
 
 	onMount(() => {
 		loadAttributesSelectors();
@@ -372,11 +375,7 @@
 
 {#if !showTable}
 	<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
-	<button
-		class="btn btn-outline-secondary ms-4"
-		data-bs-target="#datasetAddImageModal"
-		data-bs-toggle="modal"
-	>
+	<button class="btn btn-outline-secondary ms-4" on:click={() => imageModal?.openForCreate()}>
 		<i class="bi bi-plus-circle" />
 		Add an image list entry
 	</button>
@@ -472,12 +471,20 @@
 						<tr>
 							<td>{getRelativePath(image.zarr_url)}</td>
 							{#each Object.keys(imagePage.attributes) as attribute}
-								<td>{image.attributes[attribute] || ''}</td>
+								<td>
+									{#if image.attributes[attribute] !== null && image.attributes[attribute] !== undefined}
+										{image.attributes[attribute]}
+									{/if}
+								</td>
 							{/each}
 							{#each imagePage.types as typeKey}
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
+								<button class="btn btn-primary" on:click={() => imageModal?.openForEditing(image)}>
+									<i class="bi bi-pencil" />
+									Edit
+								</button>
 								<ConfirmActionButton
 									modalId={'deleteConfirmImageModal-' + getIdFromValue(image.zarr_url)}
 									style={'danger'}
@@ -548,8 +555,7 @@
 				<div class="col-lg-3">
 					<button
 						class="btn btn-outline-secondary float-end"
-						data-bs-target="#datasetAddImageModal"
-						data-bs-toggle="modal"
+						on:click={() => imageModal?.openForCreate()}
 					>
 						<i class="bi bi-plus-circle" />
 						Add an image list entry
@@ -563,7 +569,7 @@
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
 <DatasetFiltersModal {dataset} updateDatasetCallback={updateDatasetFiltersCallback} />
 <DatasetHistoryModal {dataset} />
-<AddImageModal {dataset} onImageSave={searchImages} />
+<CreateUpdateImageModal {dataset} onImageSave={searchImages} bind:this={imageModal} />
 
 <style>
 	#dataset-images-table td:last-child,

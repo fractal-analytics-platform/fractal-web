@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import FiltersCreationForm from '../projects/datasets/FiltersCreationForm.svelte';
+	import AttributesTypesForm from '../projects/datasets/AttributesTypesForm.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
@@ -13,7 +13,7 @@
 	/** @type {(wft: import("$lib/types-v2").WorkflowTaskV2) => void} */
 	export let updateWorkflowTaskCallback;
 
-	/** @type {FiltersCreationForm} */
+	/** @type {AttributesTypesForm} */
 	let form;
 
 	let saving = false;
@@ -141,7 +141,7 @@
 </script>
 
 <div class="p-3">
-	<FiltersCreationForm bind:this={form} />
+	<AttributesTypesForm bind:this={form} />
 
 	{#if loadingDatasetFilters}
 		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true" />

@@ -12,7 +12,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
-		await modal.getByRole('button', { name: 'Add attribute filter' }).click();
+		await modal.getByRole('button', { name: 'Add attribute' }).click();
 		await modal.getByPlaceholder('Key').fill('k1');
 		await modal.getByPlaceholder('Value').fill('v1');
 		await modal.getByRole('button', { name: 'Save' }).click();
@@ -31,7 +31,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Create an image with string attribute filter', async () => {
 		await createImage(page, 'img2', async function (modal) {
-			await modal.getByRole('button', { name: 'Add attribute filter' }).click();
+			await modal.getByRole('button', { name: 'Add attribute' }).click();
 			await modal.getByPlaceholder('Key').fill('k1');
 			await modal.getByPlaceholder('Value').fill('v1');
 		});
@@ -39,7 +39,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Create an image with numeric attribute filter', async () => {
 		await createImage(page, 'img3', async function (modal) {
-			await modal.getByRole('button', { name: 'Add attribute filter' }).click();
+			await modal.getByRole('button', { name: 'Add attribute' }).click();
 			await modal.getByPlaceholder('Key').fill('k2');
 			await modal.getByPlaceholder('Value').fill('42');
 			await modal.getByRole('combobox').selectOption('Number');
@@ -48,16 +48,16 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Create an image with false type filter', async () => {
 		await createImage(page, 'img4', async function (modal) {
-			await modal.getByRole('button', { name: 'Add type filter' }).click();
+			await modal.getByRole('button', { name: 'Add type' }).click();
 			await modal.getByPlaceholder('Key').fill('k3');
 		});
 	});
 
 	await test.step('Create an image with true type filter', async () => {
 		await createImage(page, 'img5', async function (modal) {
-			await modal.getByRole('button', { name: 'Add type filter' }).click();
+			await modal.getByRole('button', { name: 'Add type' }).click();
 			await modal.getByPlaceholder('Key').fill('k3');
-			await modal.getByRole('checkbox').check();
+			await modal.getByRole('switch').check();
 		});
 	});
 
@@ -107,6 +107,26 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await allImagesBtn.click();
 		await expect(allImagesBtn).toBeEnabled();
 		await expect(page.getByRole('row')).toHaveCount(7);
+	});
+
+	await test.step('Edit image', async () => {
+		await page.getByRole('button', { name: 'Edit' }).nth(1).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		const zarrUrlInput = modal.getByRole('textbox', { name: 'Zarr URL' });
+		await expect(zarrUrlInput).toHaveValue('/tmp/img2');
+		await expect(zarrUrlInput).toBeDisabled();
+		await expect(modal.getByPlaceholder('Key')).toHaveValue('k1');
+		await expect(modal.getByPlaceholder('Value')).toHaveValue('v1');
+		await modal.getByPlaceholder('Value').fill('v1-mod');
+		await modal.getByRole('button', { name: 'Add attribute' }).click();
+		await modal.getByPlaceholder('Key').nth(1).fill('k2');
+		await modal.getByPlaceholder('Value').nth(1).fill('9999');
+		await modal.getByRole('combobox').nth(1).selectOption('Number');
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await waitModalClosed(page);
+		await page.getByRole('cell', { name: 'v1-mod' }).waitFor();
+		await page.getByRole('cell', { name: '9999' }).waitFor();
 	});
 
 	await test.step('Delete one image', async () => {

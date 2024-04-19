@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import FiltersCreationForm from './FiltersCreationForm.svelte';
+	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2} */
 	export let dataset;
@@ -12,7 +12,7 @@
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {FiltersCreationForm} */
+	/** @type {AttributesTypesForm} */
 	let filtersCreationForm;
 
 	let saving = false;
@@ -72,7 +72,7 @@
 		<h5 class="modal-title">Dataset filters</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<FiltersCreationForm bind:this={filtersCreationForm} />
+		<AttributesTypesForm bind:this={filtersCreationForm} />
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		<button class="btn btn-primary" on:click={handleSave} disabled={saving}>
