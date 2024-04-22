@@ -34,6 +34,10 @@
 	let mode = 'run';
 	let replaceExistingDataset = true;
 
+	let newDatasetName = '';
+
+	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
+
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
@@ -175,8 +179,6 @@
 		}
 	}
 
-	let newDatasetName = '';
-
 	function computeNewDatasetName() {
 		newDatasetName = generateNewUniqueDatasetName(datasets, getSelectedDataset().name);
 	}
@@ -248,7 +250,7 @@
 				</select>
 			</div>
 			{#if mode === 'restart' && !replaceExistingDataset}
-				<div class="mb-3">
+				<div class="mb-3 has-validation">
 					<label for="newDatasetName" class="form-label">New dataset name</label>
 					<input
 						id="newDatasetName"
@@ -256,7 +258,11 @@
 						type="text"
 						bind:value={newDatasetName}
 						disabled={checkingConfiguration}
+						class:is-invalid={newDatasetName === selectedDataset?.name}
 					/>
+					<span class="invalid-feedback">
+						The new dataset name must be different than the original dataset name
+					</span>
 				</div>
 			{/if}
 			<div class="mb-3">
@@ -384,7 +390,15 @@
 				Confirm
 			</button>
 		{:else}
-			<button class="btn btn-primary" on:click={() => (checkingConfiguration = true)}> Run </button>
+			<button
+				class="btn btn-primary"
+				on:click={() => (checkingConfiguration = true)}
+				disabled={mode === 'restart' &&
+					!replaceExistingDataset &&
+					newDatasetName === selectedDataset?.name}
+			>
+				Run
+			</button>
 		{/if}
 	</svelte:fragment>
 </Modal>
