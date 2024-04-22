@@ -17,7 +17,7 @@ export async function createDataset(page, projectId) {
 
 	const randomDatasetName = Math.random().toString(36).substring(7);
 	await page.getByRole('textbox', { name: 'Dataset Name' }).fill(randomDatasetName);
-	await page.getByRole('textbox', { name: 'Zarr dir' }).fill(`/tmp/playwight/datasets/${randomDatasetName}`);
+	await page.getByRole('textbox', { name: 'Zarr dir' }).fill(`/tmp/playwright/datasets/${randomDatasetName}`);
 	const saveBtn = page.getByRole('button', { name: 'Save' });
 	await saveBtn.click();
 	await waitModalClosed(page);

@@ -114,3 +114,22 @@ export function extractRelevantJobError(completeJobError, maxLines = undefined) 
 	}
 	return relevantError;
 }
+
+/**
+ * @param {import("$lib/types-v2").DatasetV2[]} datasets
+ * @param {string} selectedDatasetName
+ * @returns {string}
+ */
+export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
+	let i = 1;
+	const match = selectedDatasetName.match(/^(.*)_(\d+)$/);
+	if (match) {
+		selectedDatasetName = match[1];
+	}
+	let newDatasetName;
+	do {
+		newDatasetName = `${selectedDatasetName}_${i}`;
+		i++;
+	} while (datasets.filter((d) => d.name === newDatasetName).length > 0);
+	return newDatasetName;
+}

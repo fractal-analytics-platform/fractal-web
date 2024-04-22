@@ -13,20 +13,20 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await waitPageLoading(page);
 
 	/** @type {string} */
-	let successDatasetName;
+	let datasetName1;
 	/** @type {number} */
-	let successDatasetId;
-	await test.step('Create test dataset for success task', async () => {
+	let datasetId1;
+	await test.step('Create first test dataset', async () => {
 		const { name, id } = await createDataset(page, workflow.projectId);
-		successDatasetName = name;
-		successDatasetId = id;
+		datasetName1 = name;
+		datasetId1 = id;
 	});
 
 	/** @type {string} */
-	let errorDatasetName;
-	await test.step('Create test dataset for error task', async () => {
+	let datasetName2;
+	await test.step('Create second test dataset', async () => {
 		const { name } = await createDataset(page, workflow.projectId);
-		errorDatasetName = name;
+		datasetName2 = name;
 	});
 
 	await test.step('Go to tasks page', async () => {
@@ -115,13 +115,20 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await waitPageLoading(page);
 	});
 
+	await test.step('Select the first dataset', async () => {
+		await page
+			.getByRole('combobox', { name: 'Dataset', exact: true })
+			.first()
+			.selectOption(datasetName1);
+	});
+
 	await test.step('Add and select create_ome_zarr_compound', async () => {
 		await workflow.addCollectedTask('create_ome_zarr_compound');
 		await workflow.selectTask('create_ome_zarr_compound');
 	});
 
-	await test.step('Fill arguments', async () => {
-		await page.getByRole('textbox', { name: 'Image Dir' }).fill('/tmp/test1');
+	await test.step('Fill create_ome_zarr_compound arguments', async () => {
+		await page.getByRole('textbox', { name: 'Image Dir' }).fill('/tmp/playwright/test1');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
 	});
@@ -130,9 +137,16 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await modal
-			.getByRole('combobox', { name: 'Dataset', exact: true })
-			.selectOption(successDatasetName);
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.getByRole('option', { selected: true })
+		).toHaveText(datasetName1);
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('option', { selected: true })
+		).toHaveText('create_ome_zarr_compound');
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -148,8 +162,8 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.locator('.job-status-icon.bi-check').waitFor();
 	});
 
-	await test.step('Open run workflow modal again', async () => {
-		await page.getByRole('button', { name: 'Run workflow' }).click();
+	await test.step('Open "Continue workflow" modal', async () => {
+		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		// Check that confirm mode has been reset
@@ -157,7 +171,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Verify that the dataset contains some images', async () => {
-		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${successDatasetId}`);
+		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${datasetId1}`);
 		await waitPageLoading(page);
 		await expect(page.getByRole('table').getByRole('row')).toHaveCount(4);
 	});
@@ -167,9 +181,11 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await waitPageLoading(page);
 	});
 
-	await test.step('Remove create_ome_zarr_compound task', async () => {
-		await workflow.selectTask('create_ome_zarr_compound');
-		await workflow.removeCurrentTask();
+	await test.step('Select the second dataset', async () => {
+		await page
+			.getByRole('combobox', { name: 'Dataset', exact: true })
+			.first()
+			.selectOption(datasetName2);
 	});
 
 	await test.step('Add and select generic_task', async () => {
@@ -177,21 +193,51 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await workflow.selectTask('generic_task');
 	});
 
-	await test.step('Fill arguments', async () => {
+	await test.step('Fill generic_task arguments, set "Raise Error" to true', async () => {
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
 	});
 
-	await test.step('Start the job', async () => {
+	await test.step('Start the new job', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await modal
-			.getByRole('combobox', { name: 'Dataset', exact: true })
-			.selectOption(errorDatasetName);
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Wait tasks submitted', async () => {
+		const spinners = page.locator('.job-status-submitted.spinner-border');
+		await expect(spinners).toHaveCount(2);
+	});
+
+	await test.step('Wait job failure', async () => {
+		await page.locator('.job-status-icon.bi-x').waitFor();
+		await page.getByText('The last job failed with the following error').waitFor();
+	});
+
+	await test.step('Fill generic_task arguments, set "Raise Error" to false', async () => {
+		await page.getByRole('switch').uncheck();
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByText('Arguments changes saved successfully').waitFor();
+	});
+
+	await test.step('Continue the workflow from failed task', async () => {
+		await page.getByRole('button', { name: 'Continue workflow' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('option', { selected: true })
+		).toHaveText('Select first task');
+		await modal
+			.getByRole('combobox', { name: 'First task (Optional)' })
+			.selectOption('generic_task');
+		await modal.getByRole('button', { name: 'Run', exact: true }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 	});
 
@@ -201,9 +247,67 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		expect(await spinners.count()).toEqual(1);
 	});
 
-	await test.step('Wait job failure', async () => {
-		await page.locator('.job-status-icon.bi-x').waitFor();
-		await page.getByText('The last job failed with the following error').waitFor();
+	await test.step('Wait tasks success', async () => {
+		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
+	});
+
+	await test.step('Cleanup zarr_dir', async () => {
+		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
+	});
+
+	await test.step('Restart the workflow replacing dataset', async () => {
+		await page.getByRole('button', { name: 'Restart workflow' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('option', { selected: true })
+		).toHaveText('create_ome_zarr_compound');
+		await modal.getByRole('button', { name: 'Run', exact: true }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Wait tasks submitted', async () => {
+		const spinners = page.locator('.job-status-submitted.spinner-border');
+		await expect(spinners).toHaveCount(2);
+	});
+
+	await test.step('Wait tasks success', async () => {
+		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
+	});
+
+	await test.step('Cleanup zarr_dir', async () => {
+		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
+	});
+
+	await test.step('Restart the workflow creating a new dataset', async () => {
+		await page.getByRole('button', { name: 'Restart workflow' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByRole('checkbox', { name: 'Replace existing dataset' }).uncheck();
+		await modal.getByRole('button', { name: 'Run', exact: true }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Check the new dataset name', async () => {
+		await expect(
+			page
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.first()
+				.getByRole('option', { selected: true })
+		).toHaveText(`${datasetName2}_1`);
+	});
+
+	await test.step('Wait tasks submitted', async () => {
+		const spinners = page.locator('.job-status-submitted.spinner-border');
+		await expect(spinners).toHaveCount(2);
+	});
+
+	await test.step('Wait tasks success', async () => {
+		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
 	});
 });
 

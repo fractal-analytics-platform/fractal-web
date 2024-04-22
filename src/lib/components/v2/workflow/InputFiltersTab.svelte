@@ -38,7 +38,9 @@
 	});
 
 	export async function init() {
-		form.init(workflowTask.input_filters.attributes, workflowTask.input_filters.types);
+		if (!form.hasUnsavedChanges()) {
+			form.init(workflowTask.input_filters.attributes, workflowTask.input_filters.types);
+		}
 
 		if (selectedDatasetId === undefined) {
 			datasetAttributes = {};
