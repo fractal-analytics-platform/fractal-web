@@ -232,10 +232,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 			modal
 				.getByRole('combobox', { name: 'First task (Optional)' })
 				.getByRole('option', { selected: true })
-		).toHaveText('Select first task');
-		await modal
-			.getByRole('combobox', { name: 'First task (Optional)' })
-			.selectOption('generic_task');
+		).toHaveText('generic_task');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);

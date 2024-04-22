@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
-	import { generateNewUniqueDatasetName } from '$lib/common/job_utilities';
+	import { generateNewUniqueDatasetName, getFirstTaskIndexForContinuingWorkflow } from '$lib/common/job_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
@@ -15,6 +15,8 @@
 	export let onJobSubmitted;
 	/** @type {(updatedDatasets: import('$lib/types-v2').DatasetV2[], newSelectedDatasetId: number) => void} */
 	export let onDatasetsUpdated;
+	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
+	export let statuses;
 
 	/** @type {Modal} */
 	let modal;
@@ -48,7 +50,7 @@
 		if ((mode === 'run' || mode === 'restart') && workflow.task_list.length > 0) {
 			firstTaskIndex = 0;
 		} else {
-			firstTaskIndex = undefined;
+			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses);
 		}
 		lastTaskIndex = undefined;
 		modal.show();
@@ -261,7 +263,7 @@
 						class:is-invalid={newDatasetName === selectedDataset?.name}
 					/>
 					<span class="invalid-feedback">
-						The new dataset name must be different than the original dataset name
+						The new dataset name must be different from the original dataset name
 					</span>
 				</div>
 			{/if}

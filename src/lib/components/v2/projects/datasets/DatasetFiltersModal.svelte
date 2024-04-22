@@ -49,7 +49,7 @@
 				const result = await response.json();
 				if (!response.ok) {
 					console.log('Dataset update failed', result);
-					throw new AlertError(await response.json());
+					throw new AlertError(result);
 				}
 				updateDatasetCallback(result);
 			},

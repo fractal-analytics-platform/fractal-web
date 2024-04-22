@@ -19,6 +19,7 @@
     * supported editing of single dataset images (\#457);
     * used switches to represent boolean flags (\#457);
     * implemented continue/restart workflow (\#465);
+    * set default first task when continuing a workflow (\#466);
 
 # 0.10.2
 
