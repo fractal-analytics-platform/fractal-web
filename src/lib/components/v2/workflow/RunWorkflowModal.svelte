@@ -40,6 +40,10 @@
 
 	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
 
+	$: runBtnDisabled =
+		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
+		(mode === 'continue' && firstTaskIndex === undefined);
+
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
@@ -268,7 +272,13 @@
 				</div>
 			{/if}
 			<div class="mb-3">
-				<label for="firstTaskIndex" class="form-label">First task (Optional)</label>
+				<label for="firstTaskIndex" class="form-label">
+					{#if mode === 'continue'}
+						First task (Required)
+					{:else}
+						First task (Optional)
+					{/if}
+				</label>
 				<select
 					name="firstTaskIndex"
 					id="firstTaskIndex"
@@ -395,9 +405,7 @@
 			<button
 				class="btn btn-primary"
 				on:click={() => (checkingConfiguration = true)}
-				disabled={mode === 'restart' &&
-					!replaceExistingDataset &&
-					newDatasetName === selectedDataset?.name}
+				disabled={runBtnDisabled}
 			>
 				Run
 			</button>
