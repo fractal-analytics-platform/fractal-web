@@ -133,3 +133,16 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 	} while (datasets.filter((d) => d.name === newDatasetName).length > 0);
 	return newDatasetName;
 }
+
+/**
+ * @param {Array<import("$lib/types-v2").WorkflowTaskV2>} workflowTasks
+ * @param {{[key: number]: import('$lib/types').JobStatus}} statuses
+ * @returns {number|undefined}
+ */
+export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses) {
+	if (workflowTasks.find((wft) => statuses[wft.id] === 'submitted')) {
+		// we can't re-submit while something is running
+		return undefined;
+	}
+	return workflowTasks.find((wft) => !(wft.id in statuses) || statuses[wft.id] === 'failed')?.order;
+}

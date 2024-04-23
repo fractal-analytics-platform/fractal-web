@@ -2,7 +2,8 @@ import { it, expect } from 'vitest';
 import {
 	extractJobErrorParts,
 	extractRelevantJobError,
-	generateNewUniqueDatasetName
+	generateNewUniqueDatasetName,
+	getFirstTaskIndexForContinuingWorkflow
 } from '$lib/common/job_utilities.js';
 
 const completeTracebackError = `TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0
@@ -237,6 +238,19 @@ it('generates new unique dataset name', () => {
 	);
 });
 
+it('get first task index for continuing workflow', () => {
+	expect(testGetFirstTaskIndexForContinuingWorkflow([null, null, null, null])).toEqual(0);
+	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', 'done', null, null])).toEqual(2);
+	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', 'failed', 'done', null])).toEqual(1);
+	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', null, 'done', null])).toEqual(1);
+	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', 'done', 'done', 'done'])).toEqual(
+		undefined
+	);
+	expect(testGetFirstTaskIndexForContinuingWorkflow(['submitted', 'failed', null, null])).toEqual(
+		undefined
+	);
+});
+
 /**
  * @param {string[]} names
  */
@@ -244,4 +258,21 @@ function getMockedDatasets(names) {
 	return names.map((name, index) => {
 		return { id: index + 1, name };
 	});
+}
+
+/**
+ * @param {Array<string|null>} values
+ * @returns {number|undefined}
+ */
+function testGetFirstTaskIndexForContinuingWorkflow(values) {
+	const workflowTasks = values.map((_, i) => {
+		return {
+			id: i + 1,
+			order: i
+		};
+	});
+	const statuses = Object.fromEntries(
+		values.map((v, i) => [i + 1, v]).filter((e) => e[1] !== null)
+	);
+	return getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses);
 }

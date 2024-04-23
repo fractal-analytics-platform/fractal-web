@@ -430,13 +430,14 @@
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
-	function openRunWorkflowModal(action) {
+	async function openRunWorkflowModal(action) {
 		if (argsSchemaForm?.hasUnsavedChanges()) {
 			toggleArgsUnsavedChangesModal();
 		} else if (inputFiltersTab?.hasUnsavedChanges()) {
 			toggleFiltersUnsavedChangesModal();
 		} else {
 			runWorkflowModal.open(action);
+			await reloadSelectedDataset();
 		}
 	}
 
@@ -557,9 +558,26 @@
 			clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = setTimeout(loadJobsStatus, updateJobsInterval);
 		} else {
+			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 		}
-		loadJobError();
+		await loadJobError();
+	}
+
+	async function reloadSelectedDataset() {
+		if (selectedDatasetId === undefined) {
+			return;
+		}
+		const response = await fetch(`/api/v2/project/${project.id}/dataset/${selectedDatasetId}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		const result = await response.json();
+		if (!response.ok) {
+			console.error(result);
+			return;
+		}
+		datasets = datasets.map((d) => (d.id === selectedDatasetId ? result : d));
 	}
 
 	async function loadJobError() {
@@ -717,7 +735,7 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => openRunWorkflowModal('run')}
-						disabled={selectedDatasetId === undefined}
+						disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
 					>
 						<i class="bi-play-fill" /> Run workflow
 					</button>
@@ -725,12 +743,14 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => openRunWorkflowModal('continue')}
+						disabled={workflow.task_list.length === 0}
 					>
 						<i class="bi-play-fill" /> Continue workflow
 					</button>
 					<button
 						class="btn btn-primary"
 						on:click|preventDefault={() => openRunWorkflowModal('restart')}
+						disabled={workflow.task_list.length === 0}
 					>
 						<i class="bi bi-arrow-clockwise" /> Restart workflow
 					</button>
@@ -1099,6 +1119,7 @@
 	{datasets}
 	{selectedDatasetId}
 	{onJobSubmitted}
+	{statuses}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;
