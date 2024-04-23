@@ -430,13 +430,14 @@
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
-	function openRunWorkflowModal(action) {
+	async function openRunWorkflowModal(action) {
 		if (argsSchemaForm?.hasUnsavedChanges()) {
 			toggleArgsUnsavedChangesModal();
 		} else if (inputFiltersTab?.hasUnsavedChanges()) {
 			toggleFiltersUnsavedChangesModal();
 		} else {
 			runWorkflowModal.open(action);
+			await reloadSelectedDataset();
 		}
 	}
 
@@ -557,9 +558,26 @@
 			clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = setTimeout(loadJobsStatus, updateJobsInterval);
 		} else {
+			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 		}
-		loadJobError();
+		await loadJobError();
+	}
+
+	async function reloadSelectedDataset() {
+		if (selectedDatasetId === undefined) {
+			return;
+		}
+		const response = await fetch(`/api/v2/project/${project.id}/dataset/${selectedDatasetId}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		const result = await response.json();
+		if (!response.ok) {
+			console.error(result);
+			return;
+		}
+		datasets = datasets.map((d) => (d.id === selectedDatasetId ? result : d));
 	}
 
 	async function loadJobError() {
