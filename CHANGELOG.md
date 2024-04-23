@@ -20,6 +20,7 @@
     * used switches to represent boolean flags (\#457);
     * implemented continue/restart workflow (\#465);
     * set default first task when continuing a workflow (\#466);
+    * displayed applied filters in workflow execution modal (\#466);
 
 # 0.10.2
 

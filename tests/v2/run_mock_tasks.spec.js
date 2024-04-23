@@ -230,7 +230,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await modal.waitFor();
 		await expect(
 			modal
-				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('combobox', { name: 'First task (Required)' })
 				.getByRole('option', { selected: true })
 		).toHaveText('generic_task');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();

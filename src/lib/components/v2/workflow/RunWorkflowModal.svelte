@@ -2,7 +2,11 @@
 	import { page } from '$app/stores';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
-	import { generateNewUniqueDatasetName, getFirstTaskIndexForContinuingWorkflow } from '$lib/common/job_utilities';
+	import {
+		generateNewUniqueDatasetName,
+		getFirstTaskIndexForContinuingWorkflow
+	} from '$lib/common/job_utilities';
+	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
@@ -50,8 +54,10 @@
 	export function open(action) {
 		mode = action;
 		replaceExistingDataset = true;
+		applyingWorkflow = false;
+		checkingConfiguration = false;
 		workerInitControl = '';
-		if ((mode === 'run' || mode === 'restart') && workflow.task_list.length > 0) {
+		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
 		} else {
 			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses);
@@ -121,7 +127,9 @@
 	}
 
 	async function replaceDataset() {
-		const { id, name, zarr_dir } = getSelectedDataset();
+		const { id, name, zarr_dir } = /** @type {import('$lib/types-v2').DatasetV2} */ (
+			selectedDataset
+		);
 		await handleDatasetDelete(id);
 		const newDatasets = datasets.filter((d) => d.id !== id);
 		const newDataset = await handleDatasetCreate(name, zarr_dir);
@@ -130,7 +138,7 @@
 	}
 
 	async function createNewDataset() {
-		const { zarr_dir } = getSelectedDataset();
+		const { zarr_dir } = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
 		const newDataset = await handleDatasetCreate(newDatasetName, zarr_dir);
 		onDatasetsUpdated([...datasets, newDataset], newDataset.id);
 	}
@@ -185,14 +193,27 @@
 		}
 	}
 
-	function computeNewDatasetName() {
-		newDatasetName = generateNewUniqueDatasetName(datasets, getSelectedDataset().name);
+	/** @type {{ [key: string]: string|number|boolean }} */
+	let appliedAttributeFilters = {};
+	/** @type {{ [key: string]: boolean }} */
+	let appliedTypeFilters = {};
+
+	function showConfirmRun() {
+		checkingConfiguration = true;
+		const wft = workflow.task_list[firstTaskIndex || 0];
+		if (mode === 'restart') {
+			appliedAttributeFilters = { ...wft.input_filters.attributes };
+			appliedTypeFilters = { ...wft.input_filters.types };
+		} else {
+			const dataset = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
+			appliedAttributeFilters = { ...dataset.filters.attributes, ...wft.input_filters.attributes };
+			appliedTypeFilters = { ...dataset.filters.types, ...wft.input_filters.types };
+		}
 	}
 
-	function getSelectedDataset() {
-		return /** @type {import('$lib/types-v2').DatasetV2}*/ (
-			datasets.find((d) => d.id === selectedDatasetId)
-		);
+	function computeNewDatasetName() {
+		const dataset = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
+		newDatasetName = generateNewUniqueDatasetName(datasets, dataset.name);
 	}
 </script>
 
@@ -384,6 +405,28 @@
 					</div>
 				</div>
 			</div>
+			{#if checkingConfiguration}
+				<hr />
+				<h6 class="mt-3">Applied filters</h6>
+				{#if Object.entries(appliedAttributeFilters).length > 0 || Object.entries(appliedTypeFilters).length > 0}
+					<p>
+						Currently, the following filters are applied to the image list before it is passed to
+						the first task:
+					</p>
+					<ul class="mb-0">
+						{#each Object.entries(appliedAttributeFilters) as [key, value]}
+							<li>{key}: <code>{value}</code></li>
+						{/each}
+					</ul>
+					<ul class="mt-0 mb-1">
+						{#each Object.entries(appliedTypeFilters) as [key, value]}
+							<li>{key}: <BooleanIcon {value} /></li>
+						{/each}
+					</ul>
+				{:else}
+					<p class="mb-0">No filters</p>
+				{/if}
+			{/if}
 		</form>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
@@ -402,13 +445,15 @@
 				Confirm
 			</button>
 		{:else}
-			<button
-				class="btn btn-primary"
-				on:click={() => (checkingConfiguration = true)}
-				disabled={runBtnDisabled}
-			>
+			<button class="btn btn-primary" on:click={showConfirmRun} disabled={runBtnDisabled}>
 				Run
 			</button>
 		{/if}
 	</svelte:fragment>
 </Modal>
+
+<style>
+	:global(.boolean-icon) {
+		vertical-align: top;
+	}
+</style>

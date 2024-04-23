@@ -717,7 +717,7 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => openRunWorkflowModal('run')}
-						disabled={selectedDatasetId === undefined}
+						disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
 					>
 						<i class="bi-play-fill" /> Run workflow
 					</button>
@@ -725,12 +725,14 @@
 					<button
 						class="btn btn-success"
 						on:click|preventDefault={() => openRunWorkflowModal('continue')}
+						disabled={workflow.task_list.length === 0}
 					>
 						<i class="bi-play-fill" /> Continue workflow
 					</button>
 					<button
 						class="btn btn-primary"
 						on:click|preventDefault={() => openRunWorkflowModal('restart')}
+						disabled={workflow.task_list.length === 0}
 					>
 						<i class="bi bi-arrow-clockwise" /> Restart workflow
 					</button>

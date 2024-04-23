@@ -19,6 +19,6 @@
 		font-weight: bold;
 		margin: 0 -5px -5px -5px;
 		line-height: 0;
-		display: block;
+		display: inline-block;
 	}
 </style>
