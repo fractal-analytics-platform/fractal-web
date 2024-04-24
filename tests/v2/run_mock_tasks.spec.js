@@ -126,13 +126,6 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		).toHaveText(datasetName2);
 	});
 
-	await test.step('Select the first dataset', async () => {
-		await page
-			.getByRole('combobox', { name: 'Dataset', exact: true })
-			.first()
-			.selectOption(datasetName1);
-	});
-
 	await test.step('Add and select create_ome_zarr_compound', async () => {
 		await workflow.addCollectedTask('create_ome_zarr_compound');
 		await workflow.selectTask('create_ome_zarr_compound');
@@ -142,6 +135,13 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill('/tmp/playwright/test1');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
+	});
+
+	await test.step('Select the first dataset', async () => {
+		await page
+			.getByRole('combobox', { name: 'Dataset', exact: true })
+			.first()
+			.selectOption(datasetName1);
 	});
 
 	await test.step('Start the job', async () => {

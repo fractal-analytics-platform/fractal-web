@@ -150,9 +150,6 @@
 	<div id="json-schema">
 		{#key schemaManager}
 			<PropertiesBlock properties={parsedSchema.properties} required={parsedSchema.required} />
-			{#if Object.entries(parsedSchema.properties).length === 0}
-				<span class="ps-2">-</span>
-			{/if}
 		{/key}
 	</div>
 {:else if parsedSchema === undefined}

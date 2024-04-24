@@ -541,6 +541,7 @@ export function stripSchemaProperties(schema, legacy = true) {
 	if (schema.required) {
 		schema.required = schema.required.filter((k) => !ignoreProperties.includes(k));
 	}
+	return schema;
 }
 
 /**

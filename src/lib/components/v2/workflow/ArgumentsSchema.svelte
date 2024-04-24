@@ -4,7 +4,10 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import FormBuilder from './FormBuilder.svelte';
 	import ImportExportArgs from './ImportExportArgs.svelte';
-	import { stripNullAndEmptyObjectsAndArrays } from '$lib/components/common/jschema/schema_management';
+	import {
+		stripNullAndEmptyObjectsAndArrays,
+		stripSchemaProperties
+	} from '$lib/components/common/jschema/schema_management';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -127,12 +130,27 @@
 	function argsSchemaVersionValid(argsSchemaVersion) {
 		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
 	}
+
+	$: showNonParallelTitle =
+		!workflowTask.is_legacy_task &&
+		workflowTask.task.args_schema_non_parallel &&
+		Object.keys(
+			stripSchemaProperties(workflowTask.task.args_schema_non_parallel, workflowTask.is_legacy_task)
+				.properties
+		).length;
+
+	$: showParallelTitle =
+		argsSchemaParallel &&
+		Object.keys(stripSchemaProperties(argsSchemaParallel, workflowTask.is_legacy_task).properties)
+			.length;
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="json-schema-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		<h5 class="ps-2 mt-3">Args non parallel</h5>
+		{#if showNonParallelTitle}
+			<h5 class="ps-2 mt-3">Initialisation Parameters</h5>
+		{/if}
 		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
@@ -153,17 +171,13 @@
 			</div>
 		{/if}
 	{/if}
-	{#if workflowTask.task_type === 'compound'}
+	{#if workflowTask.task_type === 'compound' && showParallelTitle}
 		<hr />
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		<h5 class="ps-2 mt-3">
-			{#if workflowTask.is_legacy_task}
-				Args (legacy task)
-			{:else}
-				Args parallel
-			{/if}
-		</h5>
+		{#if showParallelTitle}
+			<h5 class="ps-2 mt-3">Compute Parameters</h5>
+		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
@@ -183,6 +197,9 @@
 				/>
 			</div>
 		{/if}
+	{/if}
+	{#if !showNonParallelTitle && !showParallelTitle}
+		<p class="mt-3 ps-3">No arguments</p>
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
 		<ImportExportArgs
