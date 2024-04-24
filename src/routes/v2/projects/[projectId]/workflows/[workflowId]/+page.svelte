@@ -22,9 +22,12 @@
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
+	/** @type {number|undefined} */
+	let defaultDatasetId = $page.data.defaultDatasetId;
 	$: project = workflow.project;
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	let datasets = $page.data.datasets;
@@ -100,6 +103,7 @@
 		: 3000;
 
 	onMount(async () => {
+		selectedDatasetId = getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId);
 		await loadJobsStatus();
 		await checkNewVersions();
 	});
@@ -528,6 +532,7 @@
 
 	async function selectedDatasetChanged() {
 		await tick();
+		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
 		loadJobsStatus();
 	}
