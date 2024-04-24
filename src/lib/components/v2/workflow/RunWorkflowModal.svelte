@@ -292,7 +292,7 @@
 					</span>
 				</div>
 			{/if}
-			<div class="mb-3">
+			<div class="mb-3 has-validation">
 				<label for="firstTaskIndex" class="form-label">
 					{#if mode === 'continue'}
 						First task (Required)
@@ -307,6 +307,7 @@
 					disabled={checkingConfiguration}
 					bind:value={firstTaskIndex}
 					on:change={resetLastTask}
+					class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 				>
 					<option value={undefined}>Select first task</option>
 					{#each workflow.task_list as wft}
@@ -317,6 +318,7 @@
 						{/if}
 					{/each}
 				</select>
+				<span class="invalid-feedback"> The first task is required </span>
 			</div>
 			<div class="mb-3">
 				<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
