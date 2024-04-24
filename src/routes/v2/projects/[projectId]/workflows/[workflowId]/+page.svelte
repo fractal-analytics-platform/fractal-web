@@ -98,6 +98,8 @@
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
+	$: sortedDatasets = datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
@@ -726,7 +728,7 @@
 						on:change={selectedDatasetChanged}
 					>
 						<option value={undefined}>Select...</option>
-						{#each datasets as dataset}
+						{#each sortedDatasets as dataset}
 							<option value={dataset.id}>{dataset.name}</option>
 						{/each}
 					</select>
@@ -1125,7 +1127,7 @@
 
 <RunWorkflowModal
 	{workflow}
-	{datasets}
+	datasets={sortedDatasets}
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}

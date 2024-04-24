@@ -14,7 +14,9 @@
 	);
 
 	function createDatasetCallback(/** @type {import('$lib/types-v2').DatasetV2} */ newDataset) {
-		datasets = [...datasets, newDataset];
+		datasets = [...datasets, newDataset].sort((a, b) =>
+			a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+		);
 	}
 
 	/**
