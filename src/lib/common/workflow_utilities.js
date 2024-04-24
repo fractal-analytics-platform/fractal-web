@@ -29,7 +29,7 @@ export function getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId)
 		return selectedFromLocalStorage;
 	}
 	saveSelectedDataset(workflow, undefined);
-	return undefined;
+	return defaultDatasetId;
 }
 
 const LOCAL_STORAGE_SELECTED_DATASETS = 'SelectedDatasets';
