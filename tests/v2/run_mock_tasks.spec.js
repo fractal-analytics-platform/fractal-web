@@ -12,6 +12,8 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
+	test.slow();
+
 	/** @type {string} */
 	let datasetName1;
 	/** @type {number} */
@@ -84,7 +86,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		});
 
 		await test.step('Check tasks list', async () => {
-			await expect(page.getByRole('table').last().locator('tbody tr')).toHaveCount(rowsCount + 13);
+			await expect(page.getByRole('table').last().locator('tbody tr')).toHaveCount(rowsCount + 14);
 		});
 
 		await test.step('Delete task collection log', async () => {
@@ -113,6 +115,15 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await test.step('Go to workflow page', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
+	});
+
+	await test.step('Verify that the last dataset has been automatically selected', async () => {
+		await expect(
+			page
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.first()
+				.getByRole('option', { selected: true })
+		).toHaveText(datasetName2);
 	});
 
 	await test.step('Select the first dataset', async () => {
@@ -179,6 +190,15 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await test.step('Go back to workflow page', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
+	});
+
+	await test.step('Verify that the dataset used in the last job has been automatically selected', async () => {
+		await expect(
+			page
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.first()
+				.getByRole('option', { selected: true })
+		).toHaveText(datasetName1);
 	});
 
 	await test.step('Select the second dataset', async () => {
