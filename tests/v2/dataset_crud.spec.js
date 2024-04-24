@@ -1,5 +1,12 @@
 import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { expect, test } from './project_fixture.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
+import os from 'os';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await page.waitForURL(project.url);
@@ -119,6 +126,15 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await waitModalClosed(page);
 	});
 
+	let exportedDatasetFile;
+	await test.step('Export dataset', async () => {
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByLabel('Export dataset').click();
+		const download = await downloadPromise;
+		exportedDatasetFile = path.join(os.tmpdir(), download.suggestedFilename());
+		await download.saveAs(exportedDatasetFile);
+	});
+
 	await test.step('Go back to datasets page', async () => {
 		await page.goBack();
 	});
@@ -139,6 +155,55 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 
 		// Check table rows count
 		await verifyDatasetsCount(page, initialDatasetsCount);
+	});
+
+	await test.step('Attempt to import dataset without selecting a file', async () => {
+		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
+		await createDatasetButton.click();
+		await waitDatasetModal(page, 'Create new dataset');
+		await page.getByText('Import from file').click();
+		await page.getByRole('button', { name: 'Import' }).click();
+		await page.getByText('A file is required').waitFor();
+	});
+
+	await test.step('Attempt to import dataset with invalid JSON', async () => {
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select dataset file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
+		await page.getByRole('button', { name: 'Import' }).click();
+		await page.getByText('The selected file is not a valid JSON file').waitFor();
+	});
+
+	await test.step('Import exported dataset', async () => {
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select dataset file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(exportedDatasetFile);
+		await page.getByRole('button', { name: 'Import' }).click();
+		await waitModalClosed(page);
+		await verifyDatasetsCount(page, initialDatasetsCount + 1);
+		await page.getByRole('cell', { name: 'test-dataset-renamed' }).waitFor();
+	});
+
+	await test.step('Import exported dataset with renaming', async () => {
+		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
+		await createDatasetButton.click();
+		await waitDatasetModal(page, 'Create new dataset');
+		await page.getByText('Import from file').click();
+		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-renamed2');
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select dataset file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(exportedDatasetFile);
+		await page.getByRole('button', { name: 'Import' }).click();
+		await waitModalClosed(page);
+		await verifyDatasetsCount(page, initialDatasetsCount + 2);
+		await page.getByRole('cell', { name: 'test-dataset-renamed2' }).waitFor();
+	});
+
+	await test.step('Cleanup', async () => {
+		fs.rmSync(exportedDatasetFile);
 	});
 });
 
