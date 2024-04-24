@@ -83,6 +83,13 @@
 	 * @param {object} payload
 	 */
 	async function handleSaveChanges(payload) {
+		if (nonParallelSchemaComponent) {
+			nonParallelSchemaComponent.validateArguments(payload.args_non_parallel);
+		}
+		if (parallelSchemaComponent) {
+			parallelSchemaComponent.validateArguments(payload.args_parallel);
+		}
+
 		savingChanges = true;
 		const projectId = $page.params.projectId;
 

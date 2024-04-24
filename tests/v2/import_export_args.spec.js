@@ -1,9 +1,13 @@
 import { expect, test } from './workflow_fixture.js';
 import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
+import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
@@ -53,7 +57,8 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 						title: 'test_non_parallel'
 					}
 				},
-				type: 'object'
+				type: 'object',
+				required: ['test_non_parallel']
 			},
 			args_schema_parallel: {
 				properties: {
@@ -62,7 +67,8 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 						title: 'test_parallel'
 					}
 				},
-				type: 'object'
+				type: 'object',
+				required: ['test_parallel']
 			}
 		});
 	});
@@ -84,7 +90,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_non_parallel.key_non_parallel).toEqual('value_non_parallel');
 		expect(data.args_parallel).toEqual(null);
 		const newData = { args_non_parallel: { key_non_parallel: 'value_non_parallel-updated' } };
-		await importArgs(page, file, newData);
+		await importValidArgs(page, file, newData);
 		await page.getByText('value_non_parallel-updated').waitFor();
 		await workflow.removeCurrentTask();
 	});
@@ -102,7 +108,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_non_parallel).toEqual(null);
 		expect(data.args_parallel.key_parallel).toEqual('value_parallel');
 		const newData = { args_parallel: { key_parallel: 'value_parallel-updated' } };
-		await importArgs(page, file, newData);
+		await importValidArgs(page, file, newData);
 		await page.getByText('value_parallel-updated').waitFor();
 		await workflow.removeCurrentTask();
 	});
@@ -128,7 +134,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 			args_non_parallel: { key_non_parallel: 'value_non_parallel-updated' },
 			args_parallel: { key_parallel: 'value_parallel-updated' }
 		};
-		await importArgs(page, file, newData);
+		await importValidArgs(page, file, newData);
 		await page.getByText('value_non_parallel-updated').waitFor();
 		await page.getByText('value_parallel-updated').waitFor();
 		await workflow.removeCurrentTask();
@@ -143,7 +149,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_non_parallel.test_non_parallel).toEqual('value_non_parallel');
 		expect(data.args_parallel).toEqual(null);
 		const newData = { args_non_parallel: { test_non_parallel: 'value_non_parallel-updated' } };
-		await importArgs(page, file, newData);
+		await importValidArgs(page, file, newData);
 		expect(await page.getByRole('textbox', { name: 'test_non_parallel' }).inputValue()).toEqual(
 			'value_non_parallel-updated'
 		);
@@ -159,7 +165,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_non_parallel).toEqual(null);
 		expect(data.args_parallel.test_parallel).toEqual('value_parallel');
 		const newData = { args_parallel: { test_parallel: 'value_parallel-updated' } };
-		await importArgs(page, file, newData);
+		await importValidArgs(page, file, newData);
 		expect(await page.getByRole('textbox', { name: 'test_parallel' }).inputValue()).toEqual(
 			'value_parallel-updated'
 		);
@@ -179,13 +185,46 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 			args_non_parallel: { test_non_parallel: 'value_non_parallel-updated' },
 			args_parallel: { test_parallel: 'value_parallel-updated' }
 		};
-		await importArgs(page, file, newData);
+		await importValidArgs(page, file, newData);
 		expect(await page.getByRole('textbox', { name: 'test_non_parallel' }).inputValue()).toEqual(
 			'value_non_parallel-updated'
 		);
 		expect(await page.getByRole('textbox', { name: 'test_parallel' }).inputValue()).toEqual(
 			'value_parallel-updated'
 		);
+	});
+
+	await test.step('Attempt to import a file containing invalid JSON', async () => {
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await expect(modal.locator('.modal-title')).toHaveText('Import arguments');
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await page.getByText("File doesn't contain valid JSON").waitFor();
+		await modal.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Attempt to import a file containing invalid arguments', async () => {
+		const { file } = await exportArgs(page, compoundTaskWithArgsSchema);
+		const invalidData = { args_parallel: {}, args_non_parallel: {} };
+		fs.writeFileSync(file, JSON.stringify(invalidData));
+		await page.getByRole('button', { name: 'Import' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(file);
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await page.getByText('must have required property').waitFor();
+		await modal.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+		fs.rmSync(file);
 		await workflow.removeCurrentTask();
 	});
 
@@ -222,11 +261,11 @@ async function exportArgs(page, taskName) {
  * @param {string} file
  * @param {object} data
  */
-async function importArgs(page, file, data) {
+async function importValidArgs(page, file, data) {
 	fs.writeFileSync(file, JSON.stringify(data));
 	await page.getByRole('button', { name: 'Import' }).click();
-	const modalTitle = page.locator('.modal.show .modal-title');
-	await modalTitle.waitFor();
+	const modal = page.locator('.modal.show');
+	await modal.waitFor();
 	const fileChooserPromise = page.waitForEvent('filechooser');
 	await page.getByText('Select arguments file').click();
 	const fileChooser = await fileChooserPromise;
