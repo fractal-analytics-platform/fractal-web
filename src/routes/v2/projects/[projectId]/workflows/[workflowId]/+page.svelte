@@ -21,6 +21,7 @@
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
+	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -1040,6 +1041,9 @@
 					<label class="form-check-label" for="tasksV1">Legacy tasks</label>
 				</div>
 				{#if taskV1V2 === 'v1'}
+					<PropertyDescription
+						description="Only certain legacy tasks can be run within the new Fractal: if you want to add one of yours, ask an admin"
+					/>
 					<WorkflowTaskSelection
 						tasks={availableTasksV1}
 						bind:this={workflowTaskSelectionComponentV1}
