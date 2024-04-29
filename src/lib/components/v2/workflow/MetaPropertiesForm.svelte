@@ -14,15 +14,11 @@
 	export let workflowTask;
 
 	let metaPropertiesNonParallel = {};
-	let originalMetaPropertiesNonParallel = {};
-
 	let metaPropertiesParallel = {};
-	let originalMetaPropertiesParallel = {};
 
 	$: {
 		metaPropertiesNonParallel = workflowTask.meta_non_parallel || {};
 		metaPropertiesParallel = workflowTask.meta_parallel || {};
-		updateOriginalMetaProperties();
 	}
 
 	async function updateMetaNonParallel() {
@@ -62,19 +58,8 @@
 			workflowTask.meta_parallel = result.meta_parallel;
 			metaPropertiesNonParallel = result.meta_non_parallel || {};
 			metaPropertiesParallel = result.meta_parallel || {};
-			// Updating original properties again
-			updateOriginalMetaProperties();
 		} else {
 			displayStandardErrorAlert(result, 'metaPropertiesFormError');
-		}
-	}
-
-	function updateOriginalMetaProperties() {
-		for (let key in metaPropertiesNonParallel) {
-			originalMetaPropertiesNonParallel[key] = metaPropertiesNonParallel[key];
-		}
-		for (let key in metaPropertiesParallel) {
-			originalMetaPropertiesParallel[key] = metaPropertiesParallel[key];
 		}
 	}
 </script>
