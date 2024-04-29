@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.0.1
 
 * used payload containing all fields in meta properties PATCH endpoint (\#473).
 
