@@ -26,23 +26,23 @@ test('Workflow task meta properties [v2]', async ({ page, workflow }) => {
 
 	await test.step('Add first property', async () => {
 		await page.getByRole('button', { name: 'Add property' }).click();
-		await page.getByPlaceholder('Arg name').fill('k1');
-		await page.getByPlaceholder('Argument default value').fill('v1');
+		await page.getByPlaceholder('Arg name').fill('arg-k1');
+		await page.getByPlaceholder('Argument default value').fill('arg-v1');
 		await page.getByLabel('Save argument').click();
 	});
 
 	await test.step('Add second property', async () => {
 		await page.getByRole('button', { name: 'Add property' }).click();
-		await page.getByPlaceholder('Arg name').fill('k2');
-		await page.getByPlaceholder('Argument default value').fill('v2');
+		await page.getByPlaceholder('Arg name').fill('arg-k2');
+		await page.getByPlaceholder('Argument default value').fill('arg-v2');
 		await page.getByLabel('Save argument').click();
 	});
 
 	await test.step('Verify that meta contains the 2 properties', async () => {
-		await page.getByText('k1').waitFor();
-		await page.getByText('k2').waitFor();
-		await page.getByText('v1').waitFor();
-		await page.getByText('v2').waitFor();
+		await page.getByText('arg-k1').waitFor();
+		await page.getByText('arg-k2').waitFor();
+		await page.getByText('arg-v1').waitFor();
+		await page.getByText('arg-v2').waitFor();
 	});
 
 	await test.step('Cleanup', async () => {
