@@ -131,7 +131,7 @@
 		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
 	}
 
-	$: showNonParallelTitle =
+	$: hasNonParallelArgs =
 		!workflowTask.is_legacy_task &&
 		workflowTask.task.args_schema_non_parallel &&
 		Object.keys(
@@ -139,7 +139,7 @@
 				.properties
 		).length;
 
-	$: showParallelTitle =
+	$: hasParallelArgs =
 		argsSchemaParallel &&
 		Object.keys(stripSchemaProperties(argsSchemaParallel, workflowTask.is_legacy_task).properties)
 			.length;
@@ -148,7 +148,7 @@
 <div id="workflow-arguments-schema-panel">
 	<div id="json-schema-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		{#if showNonParallelTitle}
+		{#if hasNonParallelArgs && hasParallelArgs}
 			<h5 class="ps-2 mt-3">Initialisation Parameters</h5>
 		{/if}
 		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
@@ -171,11 +171,11 @@
 			</div>
 		{/if}
 	{/if}
-	{#if workflowTask.task_type === 'compound' && showParallelTitle}
+	{#if hasNonParallelArgs && hasParallelArgs}
 		<hr />
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		{#if showParallelTitle}
+		{#if hasParallelArgs && hasNonParallelArgs}
 			<h5 class="ps-2 mt-3">Compute Parameters</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
@@ -198,7 +198,7 @@
 			</div>
 		{/if}
 	{/if}
-	{#if !showNonParallelTitle && !showParallelTitle}
+	{#if !hasNonParallelArgs && !hasParallelArgs}
 		<p class="mt-3 ps-3">No arguments</p>
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
