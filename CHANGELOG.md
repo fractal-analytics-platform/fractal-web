@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.0.0
 
 * Supported fractal-server API V2:
     * added menu switch to support legacy and current API (\#434, \#457);
