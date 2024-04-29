@@ -17,6 +17,7 @@ test('Collect core tasks', async ({ page }) => {
 
 	await test.step('Start task collection', async () => {
 		await page.getByLabel('Package', { exact: true }).fill('fractal-tasks-core');
+		await page.getByRole('textbox', { name: 'Package Version' }).fill('0.14.3');
 
 		const collectBtn = page.getByRole('button', { name: /^Collect$/ });
 		await collectBtn.click();
