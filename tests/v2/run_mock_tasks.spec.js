@@ -12,6 +12,8 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
+	test.slow();
+
 	/** @type {string} */
 	let datasetName1;
 	/** @type {number} */
@@ -84,7 +86,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		});
 
 		await test.step('Check tasks list', async () => {
-			await expect(page.getByRole('table').last().locator('tbody tr')).toHaveCount(rowsCount + 13);
+			await expect(page.getByRole('table').last().locator('tbody tr')).toHaveCount(rowsCount + 14);
 		});
 
 		await test.step('Delete task collection log', async () => {
@@ -115,11 +117,13 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await waitPageLoading(page);
 	});
 
-	await test.step('Select the first dataset', async () => {
-		await page
-			.getByRole('combobox', { name: 'Dataset', exact: true })
-			.first()
-			.selectOption(datasetName1);
+	await test.step('Verify that the last dataset has been automatically selected', async () => {
+		await expect(
+			page
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.first()
+				.getByRole('option', { selected: true })
+		).toHaveText(datasetName2);
 	});
 
 	await test.step('Add and select create_ome_zarr_compound', async () => {
@@ -131,6 +135,13 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill('/tmp/playwright/test1');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
+	});
+
+	await test.step('Select the first dataset', async () => {
+		await page
+			.getByRole('combobox', { name: 'Dataset', exact: true })
+			.first()
+			.selectOption(datasetName1);
 	});
 
 	await test.step('Start the job', async () => {
@@ -181,6 +192,15 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 		await waitPageLoading(page);
 	});
 
+	await test.step('Verify that the dataset used in the last job has been automatically selected', async () => {
+		await expect(
+			page
+				.getByRole('combobox', { name: 'Dataset', exact: true })
+				.first()
+				.getByRole('option', { selected: true })
+		).toHaveText(datasetName1);
+	});
+
 	await test.step('Select the second dataset', async () => {
 		await page
 			.getByRole('combobox', { name: 'Dataset', exact: true })
@@ -216,6 +236,15 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await test.step('Wait job failure', async () => {
 		await page.locator('.job-status-icon.bi-x').waitFor();
 		await page.getByText('The last job failed with the following error').waitFor();
+	});
+
+	await test.step('Open error modal', async () => {
+		await page.getByRole('button', { name: 'Show complete log' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByText('This is the error message').waitFor();
+		await modal.getByLabel('Close').click();
+		await waitModalClosed(page);
 	});
 
 	await test.step('Fill generic_task arguments, set "Raise Error" to false', async () => {
@@ -306,6 +335,65 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	await test.step('Wait tasks success', async () => {
 		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
 	});
+
+	await test.step('Open the workflow jobs page', async () => {
+		await page.getByRole('link', { name: 'List jobs' }).click();
+		await page.waitForURL(
+			`/v2/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`
+		);
+		await page.locator('table tbody').waitFor();
+		expect(await page.locator('table tbody tr').count()).toEqual(5);
+	});
+
+	/** @type {string|null} */
+	let jobId = null;
+	await test.step('Open Info modal', async () => {
+		await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).first().click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toContainText(`Workflow Job #`);
+
+		const items = await page.locator('.modal.show').getByRole('listitem').allInnerTexts();
+		expect(items[0]).toEqual('Id');
+		jobId = items[1];
+		expect(items[2]).toEqual('Workflow');
+		expect(items[3]).toEqual(workflow.workflowName);
+		expect(items[4]).toEqual('Project');
+		expect(items[5]).toEqual(workflow.projectName);
+		expect(items[6]).toEqual('Dataset');
+		expect(items[7]).toEqual(`${datasetName2}_1`);
+		expect(items[8]).toEqual('Status');
+		expect(items[9]).toEqual('done');
+	});
+
+	let jobRow = null;
+	await test.step('Check generic jobs page', async () => {
+		await page.goto('/v2/jobs');
+		await waitPageLoading(page);
+		const rows = await page.locator('table tbody tr').all();
+		for (const row of rows) {
+			const id = await getJobId(page, row);
+			if (id === jobId) {
+				jobRow = row;
+				const cells = await row.locator('td').allInnerTexts();
+				expect(cells[4]).toEqual(workflow.projectName);
+				expect(cells[5]).toEqual(workflow.workflowName);
+				expect(cells[6]).toEqual(`${datasetName2}_1`);
+				break;
+			}
+		}
+		expect(jobRow).not.toBeNull();
+	});
+
+	await test.step('Open Logs modal', async () => {
+		/** @type {import('@playwright/test').Locator} */
+		const logsButton = jobRow?.getByRole('button', { name: 'Logs' });
+		await logsButton.waitFor();
+		await logsButton.click();
+		const modalTitle = page.locator('.modal.show .modal-title');
+		await modalTitle.waitFor();
+		await expect(modalTitle).toHaveText('Workflow Job logs');
+	});
 });
 
 /**
@@ -315,4 +403,20 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 async function getStatus(page) {
 	const statusCell = page.locator('table tbody tr:first-child td:nth-child(4)').first();
 	return await statusCell.innerText();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} row
+ * @returns {Promise<string>}
+ */
+async function getJobId(page, row) {
+	await row.getByRole('button', { name: 'Info' }).click();
+	const modalTitle = page.locator('.modal.show .modal-title');
+	await modalTitle.waitFor();
+	const text = await modalTitle.innerText();
+	const match = text.match('Workflow Job #(\\d+)');
+	expect(match).not.toBeNull();
+	await page.locator('.modal.show .modal-header [aria-label="Close"]').click();
+	return /** @type {RegExpMatchArray} */ (match)[1];
 }

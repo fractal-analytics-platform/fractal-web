@@ -21,6 +21,8 @@
     * implemented continue/restart workflow (\#465);
     * set default first task when continuing a workflow (\#466);
     * displayed applied filters in workflow execution modal (\#466);
+    * implemented import and export of datasets (\#467);
+    * handled selection of default dataset on workflow page (\#467);
 
 # 0.10.2
 

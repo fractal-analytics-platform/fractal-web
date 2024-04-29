@@ -4,7 +4,7 @@
 	import Modal from '../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 
-	/** @type {(workflow: import('$lib/types').Workflow) => void} */
+	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => void} */
 	export let handleWorkflowImported;
 
 	// Component properties

@@ -4,6 +4,7 @@
 	import { AlertError, getValidationMessagesMap } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
 	import Modal from '../../common/Modal.svelte';
+	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
 
 	// List of projects to be displayed
 	/** @type {import('$lib/types').Project[]} */
@@ -92,6 +93,7 @@
 			console.log('Project deleted successfully');
 			// If the response is successful
 			projects = projects.filter((p) => p.id !== projectId);
+			deleteDatasetSelectionsForProject(projectId);
 		} else {
 			const result = await response.json();
 			console.error(`Unable to delete project ${projectId}`);

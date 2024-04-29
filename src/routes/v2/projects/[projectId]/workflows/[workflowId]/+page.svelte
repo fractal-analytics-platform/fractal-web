@@ -21,9 +21,13 @@
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
+	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
+	/** @type {number|undefined} */
+	let defaultDatasetId = $page.data.defaultDatasetId;
 	$: project = workflow.project;
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	let datasets = $page.data.datasets;
@@ -94,11 +98,14 @@
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
+	$: sortedDatasets = datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
 
 	onMount(async () => {
+		selectedDatasetId = getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId);
 		await loadJobsStatus();
 		await checkNewVersions();
 	});
@@ -527,6 +534,7 @@
 
 	async function selectedDatasetChanged() {
 		await tick();
+		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
 		loadJobsStatus();
 	}
@@ -720,7 +728,7 @@
 						on:change={selectedDatasetChanged}
 					>
 						<option value={undefined}>Select...</option>
-						{#each datasets as dataset}
+						{#each sortedDatasets as dataset}
 							<option value={dataset.id}>{dataset.name}</option>
 						{/each}
 					</select>
@@ -1040,6 +1048,9 @@
 					<label class="form-check-label" for="tasksV1">Legacy tasks</label>
 				</div>
 				{#if taskV1V2 === 'v1'}
+					<PropertyDescription
+						description="Only certain legacy tasks can be run within the new Fractal: if you want to add one of yours, ask an admin"
+					/>
 					<WorkflowTaskSelection
 						tasks={availableTasksV1}
 						bind:this={workflowTaskSelectionComponentV1}
@@ -1116,7 +1127,7 @@
 
 <RunWorkflowModal
 	{workflow}
-	{datasets}
+	datasets={sortedDatasets}
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}

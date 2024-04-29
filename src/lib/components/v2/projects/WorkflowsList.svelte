@@ -4,9 +4,10 @@
 	import { AlertError } from '$lib/common/errors';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
+	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	// The list of workflows
-	/** @type {import('$lib/types').Workflow[]} */
+	/** @type {import('$lib/types-v2').WorkflowV2[]} */
 	export let workflows = [];
 	// Set the projectId prop to reference a specific project for each workflow
 	export let projectId = undefined;
@@ -33,9 +34,9 @@
 
 		if (response.ok) {
 			console.log('Workflow deleted');
-			workflows = workflows.filter((wkf) => {
-				return wkf.id !== workflowId;
-			});
+			const deletedWorkflow = workflows.filter((w) => w.id === workflowId)[0];
+			workflows = workflows.filter((w) => w.id !== workflowId);
+			saveSelectedDataset(deletedWorkflow, undefined);
 		} else {
 			const result = await response.json();
 			console.error('Workflow not deleted', result);
@@ -44,7 +45,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').Workflow} importedWorkflow
+	 * @param {import('$lib/types-v2').WorkflowV2} importedWorkflow
 	 */
 	function handleWorkflowImported(importedWorkflow) {
 		workflows.push(importedWorkflow);

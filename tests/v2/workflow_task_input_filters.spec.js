@@ -85,7 +85,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	await test.step('Add valid filters', async () => {
 		await page.getByPlaceholder('Key').fill('key1');
 		await page.getByPlaceholder('Value').fill('value1');
-		await page.getByRole('button', { name: 'Add type' }).click();
+		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
 		await page.getByPlaceholder('Key').nth(1).fill('key2');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.getByText('Input filters successfully updated').waitFor();

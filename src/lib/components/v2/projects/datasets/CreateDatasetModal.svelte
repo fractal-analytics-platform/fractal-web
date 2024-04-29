@@ -10,21 +10,35 @@
 	/** @type {Modal} */
 	let modal;
 
+	/** @type {'new'|'import'} */
+	let mode = 'new';
 	let datasetName = '';
 	let zarrDir = '';
 	let submitted = false;
 	let saving = false;
 	let creatingDataset = false;
 
+	/** @type {FileList|null} */
+	let files = null;
+	/** @type {HTMLInputElement|undefined} */
+	let fileInput;
+	let fileError = '';
+
 	/** @type {AttributesTypesForm} */
 	let filtersCreationForm;
 
 	function onOpen() {
+		mode = 'new';
 		datasetName = '';
 		zarrDir = '';
 		filtersCreationForm.init({}, {});
 		submitted = false;
 		creatingDataset = false;
+		files = null;
+		if (fileInput) {
+			fileInput.value = '';
+		}
+		fileError = '';
 	}
 
 	async function handleSave() {
@@ -37,11 +51,6 @@
 		}
 
 		saving = true;
-		await save();
-		saving = false;
-	}
-
-	async function save() {
 		try {
 			creatingDataset = true;
 			const newDataset = await callCreateDataset();
@@ -49,7 +58,64 @@
 		} catch (err) {
 			modal.displayErrorAlert(err);
 			return;
+		} finally {
+			saving = false;
 		}
+		modal.hide();
+	}
+
+	async function handleImport() {
+		modal.hideErrorAlert();
+
+		if (files === null || files.length === 0) {
+			fileError = 'A file is required';
+			return;
+		}
+
+		const datasetFile = /** @type {FileList}*/ (files)[0];
+
+		saving = true;
+		let workflowFileContent;
+		try {
+			workflowFileContent = await datasetFile.text();
+		} catch (err) {
+			saving = false;
+			fileError = 'Unable to read dataset file';
+			return;
+		}
+
+		let datasetData;
+		try {
+			datasetData = JSON.parse(workflowFileContent);
+		} catch (err) {
+			saving = false;
+			fileError = 'The selected file is not a valid JSON file';
+			return;
+		}
+
+		if (datasetName.trim()) {
+			console.log(`Overriding workflow name from ${datasetData.name} to ${datasetName.trim()}`);
+			datasetData.name = datasetName.trim();
+		}
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v2/project/${$page.params.projectId}/dataset/import`, {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(datasetData)
+		});
+
+		const result = await response.json();
+		saving = false;
+		if (!response.ok) {
+			modal.displayErrorAlert(result);
+			return;
+		}
+
+		createDatasetCallback(result);
 		modal.hide();
 	}
 
@@ -93,54 +159,123 @@
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<span id="errorAlert-createDatasetModal" />
-		<form
-			class="row needs-validation"
-			novalidate
-			on:submit|preventDefault={handleSave}
-			id="create-update-dataset-form"
-		>
-			<div class="col">
-				<div class="row mb-3">
-					<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
-					<div class="col-10">
-						<input
-							id="datasetName"
-							type="text"
-							bind:value={datasetName}
-							class="form-control"
-							class:is-invalid={submitted && !datasetName}
-						/>
-						{#if submitted && !datasetName}
-							<div class="invalid-feedback">Required field</div>
-						{/if}
-					</div>
+		<div class="row">
+			<div class="col-10">
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createDatasetMode"
+						id="createDatasetModeNew"
+						value="new"
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createDatasetModeNew">Create new</label>
 				</div>
-				<div class="row mb-3">
-					<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
-					<div class="col-10">
-						<input
-							id="zarrDir"
-							type="text"
-							bind:value={zarrDir}
-							class="form-control"
-							class:is-invalid={submitted && !zarrDir}
-						/>
-						{#if submitted && !zarrDir}
-							<div class="invalid-feedback">Required field</div>
-						{/if}
-					</div>
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createDatasetMode"
+						id="createDatasetModeImport"
+						value="import"
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createDatasetModeImport">Import from file</label>
 				</div>
 			</div>
-			<AttributesTypesForm bind:this={filtersCreationForm} />
-		</form>
+		</div>
+		{#if mode === 'new'}
+			<form
+				class="row needs-validation"
+				novalidate
+				on:submit|preventDefault={handleSave}
+				id="create-new-dataset-form"
+			>
+				<div class="col">
+					<div class="row mb-3">
+						<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
+						<div class="col-10">
+							<input
+								id="datasetName"
+								type="text"
+								bind:value={datasetName}
+								class="form-control"
+								class:is-invalid={submitted && !datasetName.trim()}
+							/>
+							{#if submitted && !datasetName.trim()}
+								<div class="invalid-feedback">Required field</div>
+							{/if}
+						</div>
+					</div>
+					<div class="row mb-3">
+						<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
+						<div class="col-10">
+							<input
+								id="zarrDir"
+								type="text"
+								bind:value={zarrDir}
+								class="form-control"
+								class:is-invalid={submitted && !zarrDir}
+							/>
+							{#if submitted && !zarrDir}
+								<div class="invalid-feedback">Required field</div>
+							{/if}
+						</div>
+					</div>
+				</div>
+				<AttributesTypesForm bind:this={filtersCreationForm} />
+			</form>
+		{:else}
+			<form
+				on:submit|preventDefault={handleImport}
+				class="row needs-validation"
+				id="import-dataset-form"
+				novalidate
+			>
+				<div class="col">
+					<div class="row mb-3">
+						<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
+						<div class="col-10">
+							<input id="datasetName" type="text" bind:value={datasetName} class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="mb-3">
+					<label for="datasetFile" class="form-label">Select dataset file</label>
+					<input
+						class="form-control"
+						accept="application/json"
+						type="file"
+						name="datasetFile"
+						id="datasetFile"
+						bind:this={fileInput}
+						bind:files
+						class:is-invalid={fileError}
+					/>
+					{#if fileError}
+						<div class="invalid-feedback">{fileError}</div>
+					{/if}
+				</div>
+			</form>
+		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" form="create-update-dataset-form" disabled={saving}>
-			{#if saving}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-			{/if}
-			Save
-		</button>
+		{#if mode === 'new'}
+			<button class="btn btn-primary" form="create-new-dataset-form" disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				Save
+			</button>
+		{:else}
+			<button class="btn btn-primary" form="import-dataset-form" disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				Import
+			</button>
+		{/if}
 		<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
 	</svelte:fragment>
 </Modal>

@@ -345,6 +345,40 @@
 			await reload();
 		}
 	}
+
+	async function handleExportDataset() {
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/export`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
+
+		if (!response.ok) {
+			console.error(await response.json());
+			return;
+		}
+
+		const datasetData = await response.json();
+
+		if (datasetData !== null) {
+			const file = new File(
+				[JSON.stringify(datasetData, null, 2)],
+				`dataset-export-${dataset.name}-${Date.now().toString()}.json`,
+				{
+					type: `application/json`
+				}
+			);
+			const fileUrl = URL.createObjectURL(file);
+			const linkElement = /** @type {HTMLAnchorElement} */ (
+				document.getElementById('downloadDatasetButton')
+			);
+			linkElement.download = `dataset-export-${dataset.name}-${Date.now().toString()}.json`;
+			linkElement.href = fileUrl;
+			linkElement.click();
+		}
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -370,6 +404,14 @@
 		<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
 			History
 		</button>
+		<button
+			class="btn btn-light"
+			on:click|preventDefault={handleExportDataset}
+			aria-label="Export dataset"
+		>
+			<i class="bi-download" />
+		</button>
+		<a id="downloadDatasetButton" class="d-none">Download dataset link</a>
 	</div>
 </div>
 
