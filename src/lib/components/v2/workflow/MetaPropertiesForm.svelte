@@ -8,7 +8,6 @@
 	// The form should be structured in multiple levels of depth, and support complex structure.
 	import { page } from '$app/stores';
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
-	import { getOnlyModifiedProperties } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
@@ -27,22 +26,14 @@
 	}
 
 	async function updateMetaNonParallel() {
-		const modifiedProperties = getOnlyModifiedProperties(
-			originalMetaPropertiesNonParallel,
-			metaPropertiesNonParallel
-		);
 		await handleEntryUpdate({
-			meta_non_parallel: modifiedProperties
+			meta_non_parallel: metaPropertiesNonParallel
 		});
 	}
 
 	async function updateMetaParallel() {
-		const modifiedProperties = getOnlyModifiedProperties(
-			originalMetaPropertiesParallel,
-			metaPropertiesParallel
-		);
 		await handleEntryUpdate({
-			meta_parallel: modifiedProperties
+			meta_parallel: metaPropertiesParallel
 		});
 	}
 
