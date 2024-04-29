@@ -111,17 +111,30 @@
 
 		const result = await response.json();
 		if (response.ok) {
+			const argsNonParallel = deepCopyArgs(result.args_non_parallel);
+			const argsParallel = deepCopyArgs(result.args_parallel);
 			if (result.args_non_parallel) {
-				nonParallelSchemaComponent?.setArguments(result.args_non_parallel);
+				nonParallelSchemaComponent?.setArguments(argsNonParallel);
 			}
 			if (result.args_parallel) {
-				parallelSchemaComponent?.setArguments(result.args_parallel);
+				parallelSchemaComponent?.setArguments(argsParallel);
 			}
 			onWorkflowTaskUpdated(result);
 		} else {
 			displayStandardErrorAlert(await result, 'json-schema-validation-errors');
 		}
 		savingChanges = false;
+	}
+
+	/**
+	 * Returns a deep copy of the arguments object to avoid side effects from the JSchema component.
+	 * @param {object|null} args
+	 */
+	function deepCopyArgs(args) {
+		if (typeof args === 'object') {
+			return JSON.parse(JSON.stringify(args));
+		}
+		return null;
 	}
 
 	/**

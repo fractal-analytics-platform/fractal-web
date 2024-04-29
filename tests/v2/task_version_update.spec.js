@@ -1,4 +1,4 @@
-import { test } from './workflow_fixture.js';
+import { expect, test } from './workflow_fixture.js';
 import { waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
 
@@ -16,7 +16,10 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 			version: '0.0.1',
 			args_schema_non_parallel: {
 				properties: {
-					p1: { type: 'string' }
+					p1: { type: 'string' },
+					// Optional arguments added to test bug #474
+					p2: { type: 'string', title: 'p2' },
+					p3: { type: 'string', title: 'p3' }
 				},
 				type: 'object'
 			}
@@ -27,7 +30,9 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 			version: '0.0.2',
 			args_schema_non_parallel: {
 				properties: {
-					p1: { type: 'string' }
+					p1: { type: 'string' },
+					p2: { type: 'string', title: 'p2' },
+					p3: { type: 'string', title: 'p3' }
 				},
 				type: 'object',
 				required: ['p1']
@@ -101,12 +106,19 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await workflow.selectTask(nonParallelTask);
 	});
 
+	await test.step('Fill optional argument p2', async () => {
+		await page.getByRole('textbox', { name: 'p2' }).fill('foo');
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByText('Arguments changes saved successfully').waitFor();
+	});
+
 	await test.step('Update non parallel task to v2', async () => {
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
 			.getByRole('combobox', { name: 'New versions of this task exist:' })
 			.selectOption('0.0.2');
 		await page.getByText('Following errors must be fixed before performing the update').waitFor();
+		await expect(page.locator('.alert-danger li')).toHaveCount(1);
 		await page
 			.getByRole('textbox', { name: 'Fix the non parallel arguments:' })
 			.fill('{"p1": "test"}');
