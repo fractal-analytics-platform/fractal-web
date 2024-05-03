@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.0.3
 
 * fixed issue in task version update when no arguments fix is needed (\#477).
 
