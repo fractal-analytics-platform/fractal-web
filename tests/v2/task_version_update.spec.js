@@ -43,7 +43,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 			version: '0.0.1',
 			args_schema_parallel: {
 				properties: {
-					p2: { type: 'string' }
+					p2: { type: 'string', title: 'p2' }
 				},
 				type: 'object'
 			}
@@ -54,7 +54,19 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 			version: '0.0.2',
 			args_schema_parallel: {
 				properties: {
-					p2: { type: 'string' }
+					p2: { type: 'string', title: 'p2' }
+				},
+				type: 'object',
+				required: ['p2']
+			}
+		});
+		await createFakeTask(page, {
+			name: parallelTask,
+			type: 'parallel',
+			version: '0.0.3',
+			args_schema_parallel: {
+				properties: {
+					p2: { type: 'string', title: 'p2' }
 				},
 				type: 'object',
 				required: ['p2']
@@ -144,7 +156,31 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Check' }).click();
 		await page.getByText('The arguments are valid').waitFor();
 		await page.getByRole('button', { name: 'Update' }).click();
+		await expect(
+			page.getByRole('combobox', { name: 'New versions of this task exist:' }).getByRole('option')
+		).toHaveCount(2);
+		await expect(
+			page
+				.getByRole('combobox', { name: 'New versions of this task exist:' })
+				.getByRole('option')
+				.nth(1)
+		).toHaveText('0.0.3');
+	});
+
+	await test.step('Update parallel task to v3 (no fix needed)', async () => {
+		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
+		await page.getByRole('textbox', { name: 'p2' }).fill('test-value');
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByRole('button', { name: 'Version' }).click();
+		await page
+			.getByRole('combobox', { name: 'New versions of this task exist:' })
+			.selectOption('0.0.3');
+		await page.getByText('The arguments are valid').waitFor();
+		await page.getByRole('button', { name: 'Update' }).click();
 		await page.getByText('No new versions available').waitFor();
+		// Verify that the arguments are preserved after the update
+		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
+		await expect(page.getByRole('textbox', { name: 'p2' })).toHaveValue('test-value');
 		await workflow.removeCurrentTask();
 	});
 

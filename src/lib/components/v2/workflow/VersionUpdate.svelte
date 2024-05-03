@@ -169,8 +169,8 @@
 					order: workflowTask.order,
 					meta_non_parallel: workflowTask.meta_non_parallel,
 					meta_parallel: workflowTask.meta_parallel,
-					args_non_parallel: fixArgsComponentNonParallel?.getNewArgs() || null,
-					args_parallel: fixArgsComponentParallel?.getNewArgs() || null,
+					args_non_parallel: fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
+					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel,
 					is_legacy_task: workflowTask.is_legacy_task
 				})
 			}
