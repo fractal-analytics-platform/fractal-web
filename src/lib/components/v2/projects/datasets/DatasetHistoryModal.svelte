@@ -52,24 +52,39 @@
 		<h5 class="modal-title">Dataset history</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<ul class="list-group">
-			{#if dataset.history && Object.keys(dataset.history).length > 0}
-				{#each Object.entries(dataset.history) as [_, value]}
-					<li class="list-group-item text-bg-light">
-						<span>
-							Task "{value.workflowtask.is_legacy_task
-								? value.workflowtask.task_legacy.name
-								: value.workflowtask.task.name}", status "{value.status}"
-						</span>
-					</li>
-					<li class="list-group-item text-break">
-						<code><pre>{formatDatasetHistory(value)}</pre></code>
-					</li>
+		{#if dataset.history && Object.keys(dataset.history).length > 0}
+			<div class="accordion" id="accordion-dataset-history">
+				{#each Object.entries(dataset.history) as [index, value]}
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapse-dataset-history-{index}"
+								aria-expanded="false"
+								aria-controls="collapse-dataset-history-{index}"
+							>
+								Task "{value.workflowtask.is_legacy_task
+									? value.workflowtask.task_legacy.name
+									: value.workflowtask.task.name}", status "{value.status}"
+							</button>
+						</h2>
+						<div
+							id="collapse-dataset-history-{index}"
+							class="accordion-collapse collapse"
+							data-bs-parent="#accordion-dataset-history"
+						>
+							<div class="accordion-body">
+								<code><pre>{formatDatasetHistory(value)}</pre></code>
+							</div>
+						</div>
+					</div>
 				{/each}
-			{:else}
-				<p>No history</p>
-			{/if}
-		</ul>
+			</div>
+		{:else}
+			<p>No history</p>
+		{/if}
 	</svelte:fragment>
 </Modal>
 
