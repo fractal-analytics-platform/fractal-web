@@ -57,6 +57,8 @@
 
 	/** @type {ArgumentsSchema|undefined} */
 	let argsSchemaForm = undefined;
+	/** @type {MetaPropertiesForm|undefined} */
+	let metaPropertiesForm = undefined;
 
 	let argsChangesSaved = false;
 
@@ -79,6 +81,8 @@
 	let argsUnsavedChangesModal;
 	/** @type {Modal} */
 	let filtersUnsavedChangesModal;
+	/** @type {Modal} */
+	let metaPropertiesUnsavedChangesModal;
 	/** @type {RunWorkflowModal} */
 	let runWorkflowModal;
 	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
@@ -122,6 +126,12 @@
 			navigation.cancel();
 			toggleFiltersUnsavedChangesModal();
 		}
+
+		if (metaPropertiesForm?.hasUnsavedChanges()) {
+			// Prevent navigation
+			navigation.cancel();
+			toggleMetaPropertiesUnsavedChangesModal();
+		}
 	});
 
 	/**
@@ -134,6 +144,10 @@
 		}
 		if (inputFiltersTab?.hasUnsavedChanges()) {
 			toggleFiltersUnsavedChangesModal();
+			return;
+		}
+		if (metaPropertiesForm?.hasUnsavedChanges()) {
+			toggleMetaPropertiesUnsavedChangesModal();
 			return;
 		}
 		workflowTabContextId = id;
@@ -385,6 +399,8 @@
 
 		// Discard unsaved changes when workflow task is deleted
 		argsSchemaForm?.discardChanges();
+		inputFiltersTab?.discardChanges();
+		metaPropertiesForm?.discardChanges();
 
 		// Get updated workflow with deleted task
 		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
@@ -418,6 +434,10 @@
 			toggleFiltersUnsavedChangesModal();
 			return;
 		}
+		if (metaPropertiesForm?.hasUnsavedChanges()) {
+			toggleMetaPropertiesUnsavedChangesModal();
+			return;
+		}
 		if (wft) {
 			selectedWorkflowTask = wft;
 		}
@@ -434,6 +454,10 @@
 		filtersUnsavedChangesModal.toggle();
 	}
 
+	function toggleMetaPropertiesUnsavedChangesModal() {
+		metaPropertiesUnsavedChangesModal.toggle();
+	}
+
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
@@ -442,6 +466,8 @@
 			toggleArgsUnsavedChangesModal();
 		} else if (inputFiltersTab?.hasUnsavedChanges()) {
 			toggleFiltersUnsavedChangesModal();
+		} else if (metaPropertiesForm?.hasUnsavedChanges()) {
+			toggleMetaPropertiesUnsavedChangesModal();
 		} else {
 			runWorkflowModal.open(action);
 			await reloadSelectedDataset();
@@ -963,10 +989,14 @@
 							</div>
 						{:else if workflowTabContextId === 1}
 							<div id="meta-tab" class="tab-pane show active">
-								<div class="card-body">
+								<div class="card-body p-0">
 									{#if selectedWorkflowTask}
 										{#key selectedWorkflowTask}
-											<MetaPropertiesForm workflowTask={selectedWorkflowTask} />
+											<MetaPropertiesForm
+												{onWorkflowTaskUpdated}
+												workflowTask={selectedWorkflowTask}
+												bind:this={metaPropertiesForm}
+											/>
 										{/key}
 									{/if}
 								</div>
@@ -1200,6 +1230,42 @@
 			class="btn btn-success"
 			on:click={async () => {
 				await inputFiltersTab?.save();
+			}}
+			data-bs-dismiss="modal"
+		>
+			Save changes
+		</button>
+	</svelte:fragment>
+</Modal>
+
+<Modal id="meta-properties-changes-unsaved-dialog" bind:this={metaPropertiesUnsavedChangesModal}>
+	<svelte:fragment slot="header">
+		<h5 class="modal-title">There are meta properties changes unsaved</h5>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<p>
+			Do you want to save the changes made to the meta properties of the current selected workflow
+			task?
+		</p>
+	</svelte:fragment>
+	<svelte:fragment slot="footer">
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-warning"
+			on:click={() => {
+				metaPropertiesForm?.discardChanges();
+				setSelectedWorkflowTask(preventedSelectedTaskChange);
+			}}
+			data-bs-dismiss="modal"
+		>
+			Discard changes
+		</button>
+		<button
+			type="button"
+			class="btn btn-success"
+			on:click={async () => {
+				await metaPropertiesForm?.saveChanges();
 			}}
 			data-bs-dismiss="modal"
 		>

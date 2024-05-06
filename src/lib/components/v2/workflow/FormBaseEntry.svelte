@@ -1,109 +1,65 @@
 <script>
-	// This is the base entry component of a form
-	// This component handles the updating / editing / events the user does on a single input element of a form.
-	// The component is responsible for handling the element form value and communicate it to external components.
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
-
-	export let entryName;
-	export let entryValue;
-	export let isListEntry = false;
-	export let listEntryIndex = undefined;
-
-	let entryType = typeof entryValue;
-
-	let editingEntry = false;
-
-	function saveEdits() {
-		// This function signals that the user wants to save the edits made to the entry
-		console.log(entryName, entryValue, entryType, isListEntry);
-
-		if (entryType === 'number') {
-			entryValue = Number.parseFloat(entryValue);
-		}
-		if (entryType === 'boolean') {
-			entryValue = JSON.parse(entryValue);
-		}
-
-		// The editing completed
-		dispatch('entryUpdated', {
-			name: entryName,
-			type: entryType,
-			value: entryValue,
-			listEntry: isListEntry,
-			index: listEntryIndex
-		});
-		editingEntry = false;
-	}
+	/** @type {import('./form-builder-types').FormBuilderEntry} */
+	export let entry;
+	/** @type {() => void} */
+	export let changeType;
+	/** @type {() => void} */
+	export let removeProperty;
+	/** @type {() => void} */
+	export let triggerChanges;
 </script>
 
-<div class="mb-2">
-	{#if !editingEntry}
-		<div class="d-flex align-items-center">
-			{#if !isListEntry}
-				<ul class="list-group list-group-horizontal flex-fill overflow-hidden">
-					<li class="list-group-item">
-						<div class="d-flex h-100 align-items-center">
-							<span class="">{entryName}</span>
-						</div>
-					</li>
-					<li class="list-group-item text-monospace bg-light flex-fill overflow-hidden">
-						<code>{entryValue}</code>
-					</li>
-				</ul>
-			{:else}
-				<div class="input-group">
-					<span class="input-group-text text-monospace bg-light flex-fill">{entryValue}</span>
-				</div>
-			{/if}
-			<div class="ps-2">
-				<button class="btn btn-secondary" on:click={() => (editingEntry = true)}
-					><i class="bi-pencil-square" /></button
-				>
-			</div>
-		</div>
-	{:else}
-		<div class="d-flex">
-			<form class="flex-fill">
-				<div class="input-group">
-					{#if !isListEntry}
-						<div class="input-group-text col-3">{entryName}</div>
-					{/if}
-					{#if entryType === 'string'}
-						<input
-							type="text"
-							class="form-control w-50 font-monospace"
-							placeholder="Default value"
-							bind:value={entryValue}
-						/>
-					{:else if entryType === 'number'}
-						<input
-							type="number"
-							class="form-control w-50 font-monospace"
-							placeholder="Default value"
-							bind:value={entryValue}
-							step="0.01"
-						/>
-					{:else if entryType === 'boolean'}
-						<select class="form-select" bind:value={entryValue}>
-							<option value="true" selected={entryValue}><code>true</code></option>
-							<option value="false" selected={!entryValue}><code>false</code></option>
-						</select>
-					{/if}
-					<select class="form-select col-2" bind:value={entryType}>
-						<option value="string">String</option>
-						<option value="number">Number</option>
-						<option value="boolean">Boolean</option>
-					</select>
-				</div>
-			</form>
-			<div class="ps-2">
-				<button class="btn btn-primary" on:click={saveEdits}><i class="bi-check-square" /></button>
-				<button class="btn btn-danger" on:click|preventDefault={null} disabled
-					><i class="bi-trash" /></button
-				>
-			</div>
-		</div>
+<div class="input-group mb-2" class:has-validation={entry.error}>
+	{#if 'key' in entry}
+		<input
+			type="text"
+			class="form-control"
+			placeholder="Arg name"
+			class:is-invalid={entry.error}
+			bind:value={entry.key}
+			on:input={triggerChanges}
+		/>
+	{/if}
+	{#if entry.type === 'string'}
+		<input
+			type="text"
+			class="form-control"
+			placeholder="Argument default value"
+			class:is-invalid={entry.error}
+			on:input={triggerChanges}
+			bind:value={entry.value}
+		/>
+	{:else if entry.type === 'number'}
+		<input
+			type="number"
+			class="form-control"
+			placeholder="Argument default value"
+			class:is-invalid={entry.error}
+			on:input={triggerChanges}
+			bind:value={entry.value}
+		/>
+	{:else if entry.type === 'boolean'}
+		<select class="form-control" bind:value={entry.value} on:change={triggerChanges}>
+			<option value={true}>True</option>
+			<option value={false}>False</option>
+		</select>
+	{/if}
+	<select class="form-control" bind:value={entry.type} on:change={changeType}>
+		<option value="string">String</option>
+		<option value="number">Number</option>
+		<option value="boolean">Boolean</option>
+		<option value="object">Object</option>
+		<option value="array">Array</option>
+	</select>
+	<button
+		class="btn btn-outline-danger"
+		type="button"
+		on:click={removeProperty}
+		aria-label="Remove property"
+	>
+		<i class="bi bi-trash" />
+	</button>
+	{#if entry.error}
+		<div class="invalid-feedback">{entry.error}</div>
 	{/if}
 </div>

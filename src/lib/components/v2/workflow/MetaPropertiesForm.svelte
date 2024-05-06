@@ -12,6 +12,16 @@
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
+	/** @type {(wft: import('$lib/types-v2').WorkflowTaskV2) => void} */
+	export let onWorkflowTaskUpdated;
+
+	/** @type {FormBuilder|undefined} */
+	let nonParallelFormBuilderComponent;
+	/** @type {FormBuilder|undefined} */
+	let parallelFormBuilderComponent;
+	let unsavedChangesFormBuilderParallel = false;
+	let unsavedChangesFormBuilderNonParallel = false;
+	let savingChanges = false;
 
 	let metaPropertiesNonParallel = {};
 	let metaPropertiesParallel = {};
@@ -21,16 +31,23 @@
 		metaPropertiesParallel = workflowTask.meta_parallel || {};
 	}
 
-	async function updateMetaNonParallel() {
-		await handleEntryUpdate({
-			meta_non_parallel: metaPropertiesNonParallel
-		});
-	}
+	$: unsavedChanges = unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel;
 
-	async function updateMetaParallel() {
-		await handleEntryUpdate({
-			meta_parallel: metaPropertiesParallel
-		});
+	export async function saveChanges() {
+		if (nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments()) {
+			return;
+		}
+		if (parallelFormBuilderComponent && !parallelFormBuilderComponent.validateArguments()) {
+			return;
+		}
+		const payload = {};
+		if (nonParallelFormBuilderComponent) {
+			payload.meta_non_parallel = nonParallelFormBuilderComponent.getArguments();
+		}
+		if (parallelFormBuilderComponent) {
+			payload.meta_parallel = parallelFormBuilderComponent.getArguments();
+		}
+		await handleEntryUpdate(payload);
 	}
 
 	/**
@@ -42,6 +59,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		savingChanges = true;
 		const response = await fetch(
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
@@ -51,30 +69,85 @@
 				body: JSON.stringify(payload)
 			}
 		);
+		savingChanges = false;
 
 		const result = await response.json();
 		if (response.ok) {
-			workflowTask.meta_non_parallel = result.meta_non_parallel;
-			workflowTask.meta_parallel = result.meta_parallel;
-			metaPropertiesNonParallel = result.meta_non_parallel || {};
-			metaPropertiesParallel = result.meta_parallel || {};
+			onWorkflowTaskUpdated(result);
 		} else {
 			displayStandardErrorAlert(result, 'metaPropertiesFormError');
 		}
 	}
+
+	function discardChanges() {
+		if (nonParallelFormBuilderComponent) {
+			nonParallelFormBuilderComponent.discardChanges(workflowTask.meta_non_parallel);
+		}
+		if (parallelFormBuilderComponent) {
+			parallelFormBuilderComponent.discardChanges(workflowTask.meta_parallel);
+		}
+	}
+
+	export function hasUnsavedChanges() {
+		return unsavedChanges;
+	}
 </script>
 
-<div>
+<div class="mt-2">
 	<span id="metaPropertiesFormError" />
-	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		<h5>Meta non parallel</h5>
-		<FormBuilder entry={metaPropertiesNonParallel} updateEntry={updateMetaNonParallel} />
-	{/if}
-	{#if workflowTask.task_type === 'compound'}
-		<hr />
-	{/if}
-	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		<h5>Meta parallel</h5>
-		<FormBuilder entry={metaPropertiesParallel} updateEntry={updateMetaParallel} />
-	{/if}
 </div>
+{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
+	{#if workflowTask.task_type === 'compound'}
+		<h5 class="ms-2">Meta non parallel</h5>
+	{/if}
+	<FormBuilder
+		args={metaPropertiesNonParallel}
+		bind:this={nonParallelFormBuilderComponent}
+		bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
+	/>
+{/if}
+{#if workflowTask.task_type === 'compound'}
+	<hr />
+{/if}
+{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
+	{#if workflowTask.task_type === 'compound'}
+		<h5 class="ms-2">Meta parallel</h5>
+	{/if}
+	<FormBuilder
+		args={metaPropertiesParallel}
+		bind:this={parallelFormBuilderComponent}
+		bind:unsavedChanges={unsavedChangesFormBuilderParallel}
+	/>
+{/if}
+<div class="p-3 clearfix metaproperties-controls-bar">
+	<div class="ms-1 float-end">
+		<button
+			class="btn btn-success"
+			type="button"
+			disabled={!unsavedChanges || savingChanges}
+			on:click={saveChanges}
+		>
+			{#if savingChanges}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Save changes
+		</button>
+	</div>
+	<div class="float-end">
+		<button
+			class="btn btn-warning"
+			disabled={!unsavedChanges || savingChanges}
+			on:click={discardChanges}
+		>
+			Discard changes
+		</button>
+	</div>
+</div>
+
+<style>
+	.metaproperties-controls-bar {
+		background-color: whitesmoke;
+		margin-top: 5px;
+		border-top: 1px solid lightgray;
+	}
+</style>
