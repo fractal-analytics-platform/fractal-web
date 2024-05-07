@@ -99,7 +99,7 @@
 </div>
 {#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
 	{#if workflowTask.task_type === 'compound'}
-		<h5 class="ms-2">Meta non parallel</h5>
+		<h5 class="ms-2">Initialisation Meta</h5>
 	{/if}
 	<FormBuilder
 		args={metaPropertiesNonParallel}
@@ -112,7 +112,7 @@
 {/if}
 {#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
 	{#if workflowTask.task_type === 'compound'}
-		<h5 class="ms-2">Meta parallel</h5>
+		<h5 class="ms-2">Compute Meta</h5>
 	{/if}
 	<FormBuilder
 		args={metaPropertiesParallel}

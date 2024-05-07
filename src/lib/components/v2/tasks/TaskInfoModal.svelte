@@ -129,7 +129,7 @@
 												aria-expanded="false"
 												aria-controls="collapse-meta-non-parallel"
 											>
-												Meta non parallel
+												Initialisation Meta
 											</button>
 										</h2>
 										<div
@@ -147,7 +147,7 @@
 								</div>
 							{:else}
 								<li class="list-group-item list-group-item-light fw-bold">
-									Meta non parallel
+									Initialisation Meta
 								</li>
 								<li class="list-group-item">-</li>
 							{/if}
@@ -172,7 +172,7 @@
 												aria-expanded="false"
 												aria-controls="collapse-meta-parallel"
 											>
-												Meta parallel
+												Compute Meta
 											</button>
 										</h2>
 										<div
@@ -190,7 +190,7 @@
 								</div>
 							{:else}
 								<li class="list-group-item list-group-item-light fw-bold">
-									Meta parallel
+									Compute Meta
 								</li>
 								<li class="list-group-item">-</li>
 							{/if}
