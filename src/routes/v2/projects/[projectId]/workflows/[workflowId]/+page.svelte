@@ -1218,7 +1218,7 @@
 			type="button"
 			class="btn btn-warning"
 			on:click={() => {
-				inputFiltersTab?.discard();
+				inputFiltersTab?.discardChanges();
 				setSelectedWorkflowTask(preventedSelectedTaskChange);
 			}}
 			data-bs-dismiss="modal"

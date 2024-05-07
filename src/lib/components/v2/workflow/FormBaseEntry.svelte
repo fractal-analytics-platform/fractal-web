@@ -26,8 +26,8 @@
 			class="form-control"
 			placeholder="Argument default value"
 			class:is-invalid={entry.error}
-			on:input={triggerChanges}
 			bind:value={entry.value}
+			on:input={triggerChanges}
 		/>
 	{:else if entry.type === 'number'}
 		<input
@@ -35,8 +35,8 @@
 			class="form-control"
 			placeholder="Argument default value"
 			class:is-invalid={entry.error}
-			on:input={triggerChanges}
 			bind:value={entry.value}
+			on:input={triggerChanges}
 		/>
 	{:else if entry.type === 'boolean'}
 		<select class="form-control" bind:value={entry.value} on:change={triggerChanges}>

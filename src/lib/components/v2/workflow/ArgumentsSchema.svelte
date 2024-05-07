@@ -69,10 +69,11 @@
 			displayStandardErrorAlert(err, 'task-args-validation-errors');
 			return;
 		}
-		if (nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments()) {
-			return;
-		}
-		if (parallelFormBuilderComponent && !parallelFormBuilderComponent.validateArguments()) {
+		const invalidFormBuilderNonParallel =
+			nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments();
+		const invalidFormBuilderParallel =
+			parallelFormBuilderComponent && !parallelFormBuilderComponent.validateArguments();
+		if (invalidFormBuilderNonParallel || invalidFormBuilderParallel) {
 			return;
 		}
 		const payload = {};
@@ -179,7 +180,7 @@
 <div id="workflow-arguments-schema-panel">
 	<div id="task-args-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		{#if hasNonParallelArgs && hasParallelArgs}
+		{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
 			<h5 class="ps-2 mt-3">Initialisation Parameters</h5>
 		{/if}
 		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
@@ -202,11 +203,11 @@
 			</div>
 		{/if}
 	{/if}
-	{#if hasNonParallelArgs && hasParallelArgs}
+	{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
 		<hr />
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		{#if hasParallelArgs && hasNonParallelArgs}
+		{#if (hasParallelArgs && hasNonParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel)}
 			<h5 class="ps-2 mt-3">Compute Parameters</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}

@@ -34,10 +34,11 @@
 	$: unsavedChanges = unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel;
 
 	export async function saveChanges() {
-		if (nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments()) {
-			return;
-		}
-		if (parallelFormBuilderComponent && !parallelFormBuilderComponent.validateArguments()) {
+		const invalidNonParallel =
+			nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments();
+		const invalidParallel =
+			parallelFormBuilderComponent && !parallelFormBuilderComponent.validateArguments();
+		if (invalidNonParallel || invalidParallel) {
 			return;
 		}
 		const payload = {};
@@ -79,7 +80,7 @@
 		}
 	}
 
-	function discardChanges() {
+	export function discardChanges() {
 		if (nonParallelFormBuilderComponent) {
 			nonParallelFormBuilderComponent.discardChanges(workflowTask.meta_non_parallel);
 		}

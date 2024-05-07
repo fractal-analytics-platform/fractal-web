@@ -84,14 +84,14 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Arg name').click();
 		await page.getByPlaceholder('Arg name').fill('key_non_parallel');
 		await page.getByPlaceholder('Argument default value').fill('value_non_parallel');
-		await page.getByLabel('Save argument').click();
+		await page.getByRole('button', { name: 'Save changes' }).click();
 
 		const { file, data } = await exportArgs(page, nonParallelTaskWithoutArgsSchema);
 		expect(data.args_non_parallel.key_non_parallel).toEqual('value_non_parallel');
 		expect(data.args_parallel).toEqual(null);
 		const newData = { args_non_parallel: { key_non_parallel: 'value_non_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		await page.getByText('value_non_parallel-updated').waitFor();
+		await page.getByText('Arguments changes saved successfully').waitFor();
 		await workflow.removeCurrentTask();
 	});
 
@@ -102,14 +102,14 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Arg name').click();
 		await page.getByPlaceholder('Arg name').fill('key_parallel');
 		await page.getByPlaceholder('Argument default value').fill('value_parallel');
-		await page.getByLabel('Save argument').click();
+		await page.getByRole('button', { name: 'Save changes' }).click();
 
 		const { file, data } = await exportArgs(page, parallelTaskWithoutArgsSchema);
 		expect(data.args_non_parallel).toEqual(null);
 		expect(data.args_parallel.key_parallel).toEqual('value_parallel');
 		const newData = { args_parallel: { key_parallel: 'value_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		await page.getByText('value_parallel-updated').waitFor();
+		await page.getByText('Arguments changes saved successfully').waitFor();
 		await workflow.removeCurrentTask();
 	});
 
@@ -119,12 +119,10 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Add property' }).first().click();
 		await page.getByPlaceholder('Arg name').fill('key_non_parallel');
 		await page.getByPlaceholder('Argument default value').fill('value_non_parallel');
-		await page.getByLabel('Save argument').click();
-		await page.getByText('Arguments changes saved successfully').waitFor();
 		await page.getByRole('button', { name: 'Add property' }).nth(1).click();
-		await page.getByPlaceholder('Arg name').fill('key_parallel');
-		await page.getByPlaceholder('Argument default value').fill('value_parallel');
-		await page.getByLabel('Save argument').click();
+		await page.getByPlaceholder('Arg name').nth(1).fill('key_parallel');
+		await page.getByPlaceholder('Argument default value').nth(1).fill('value_parallel');
+		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
 
 		const { file, data } = await exportArgs(page, compoundTaskWithoutArgsSchema);
@@ -135,8 +133,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 			args_parallel: { key_parallel: 'value_parallel-updated' }
 		};
 		await importValidArgs(page, file, newData);
-		await page.getByText('value_non_parallel-updated').waitFor();
-		await page.getByText('value_parallel-updated').waitFor();
+		await page.getByText('Arguments changes saved successfully').waitFor();
 		await workflow.removeCurrentTask();
 	});
 
