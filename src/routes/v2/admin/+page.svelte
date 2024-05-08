@@ -12,7 +12,7 @@
 
 <br />
 
-<a href="/v2/admin/tasks" class="btn btn-primary mt-3">
+<a href="/v2/admin/tasks-compatibility" class="btn btn-primary mt-3">
 	<i class="bi bi-list-task" />
 	Tasks V1/V2 compatibility
 </a>
