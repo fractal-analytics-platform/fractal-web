@@ -181,7 +181,7 @@
 	<div id="task-args-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
 		{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
-			<h5 class="ps-2 mt-3">Initialisation Parameters</h5>
+			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
 		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
@@ -208,7 +208,7 @@
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
 		{#if (hasParallelArgs && hasNonParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel)}
-			<h5 class="ps-2 mt-3">Compute Parameters</h5>
+			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
 			<div class="args-list">

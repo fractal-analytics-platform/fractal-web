@@ -29,17 +29,17 @@ test('Workflow task meta properties [v2]', async ({ page, workflow }) => {
 	await test.step('Add non parallel properties', async () => {
 		const addPropertyBtn = tab.getByRole('button', { name: 'Add property' }).nth(0);
 		await addPropertyBtn.click();
-		await tab.getByPlaceholder('Arg name').fill('k1');
-		await tab.getByPlaceholder('Argument default value').fill('v1');
+		await tab.getByPlaceholder('Argument name').fill('k1');
+		await tab.getByPlaceholder('Argument value').fill('v1');
 
 		await addPropertyBtn.click();
-		await tab.getByRole('textbox', { name: 'Arg name' }).nth(1).fill('k2');
+		await tab.getByRole('textbox', { name: 'Argument name' }).nth(1).fill('k2');
 		await tab.getByRole('combobox').nth(1).selectOption('Object');
 		await tab.locator('.accordion-button').click();
 		const objectContainer = tab.locator('.accordion-body');
 
 		await objectContainer.getByRole('button', { name: 'Add property' }).click();
-		await objectContainer.getByPlaceholder('Arg name').fill('k3');
+		await objectContainer.getByPlaceholder('Argument name').fill('k3');
 		await objectContainer.getByRole('combobox').selectOption('Number');
 		await objectContainer.getByRole('spinbutton').fill('42');
 
@@ -50,7 +50,7 @@ test('Workflow task meta properties [v2]', async ({ page, workflow }) => {
 	await test.step('Add parallel properties', async () => {
 		const addPropertyBtn = tab.getByRole('button', { name: 'Add property' }).nth(2);
 		await addPropertyBtn.click();
-		await tab.getByPlaceholder('Arg name').nth(4).fill('k4');
+		await tab.getByPlaceholder('Argument name').nth(4).fill('k4');
 		await tab.getByRole('combobox').nth(3).selectOption('Array');
 
 		await tab.locator('.accordion-button').nth(1).click();
@@ -87,8 +87,8 @@ test('Workflow task meta properties [v2]', async ({ page, workflow }) => {
 		await page.getByText('Meta', { exact: true }).click();
 
 		await expect(tab.getByLabel('Remove property')).toHaveCount(5);
-		await expect(tab.getByRole('textbox', { name: 'Arg name' }).first()).toHaveValue('k1');
-		await expect(tab.getByRole('textbox', { name: 'Argument default value' }).first()).toHaveValue(
+		await expect(tab.getByRole('textbox', { name: 'Argument name' }).first()).toHaveValue('k1');
+		await expect(tab.getByRole('textbox', { name: 'Argument value' }).first()).toHaveValue(
 			'v1'
 		);
 		await tab.locator('.accordion-button').first().click();

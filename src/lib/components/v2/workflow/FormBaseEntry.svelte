@@ -14,7 +14,7 @@
 		<input
 			type="text"
 			class="form-control"
-			placeholder="Arg name"
+			placeholder="Argument name"
 			class:is-invalid={entry.error}
 			bind:value={entry.key}
 			on:input={triggerChanges}
@@ -24,7 +24,7 @@
 		<input
 			type="text"
 			class="form-control"
-			placeholder="Argument default value"
+			placeholder="Argument value"
 			class:is-invalid={entry.error}
 			bind:value={entry.value}
 			on:input={triggerChanges}
@@ -33,7 +33,7 @@
 		<input
 			type="number"
 			class="form-control"
-			placeholder="Argument default value"
+			placeholder="Argument value"
 			class:is-invalid={entry.error}
 			bind:value={entry.value}
 			on:input={triggerChanges}

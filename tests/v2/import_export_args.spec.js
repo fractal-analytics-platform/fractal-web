@@ -81,9 +81,9 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await workflow.addUserTask(nonParallelTaskWithoutArgsSchema);
 		await workflow.selectTask(nonParallelTaskWithoutArgsSchema);
 		await page.getByRole('button', { name: 'Add property' }).click();
-		await page.getByPlaceholder('Arg name').click();
-		await page.getByPlaceholder('Arg name').fill('key_non_parallel');
-		await page.getByPlaceholder('Argument default value').fill('value_non_parallel');
+		await page.getByPlaceholder('Argument name').click();
+		await page.getByPlaceholder('Argument name').fill('key_non_parallel');
+		await page.getByPlaceholder('Argument value').fill('value_non_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 
 		const { file, data } = await exportArgs(page, nonParallelTaskWithoutArgsSchema);
@@ -99,9 +99,9 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await workflow.addUserTask(parallelTaskWithoutArgsSchema);
 		await workflow.selectTask(parallelTaskWithoutArgsSchema);
 		await page.getByRole('button', { name: 'Add property' }).click();
-		await page.getByPlaceholder('Arg name').click();
-		await page.getByPlaceholder('Arg name').fill('key_parallel');
-		await page.getByPlaceholder('Argument default value').fill('value_parallel');
+		await page.getByPlaceholder('Argument name').click();
+		await page.getByPlaceholder('Argument name').fill('key_parallel');
+		await page.getByPlaceholder('Argument value').fill('value_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 
 		const { file, data } = await exportArgs(page, parallelTaskWithoutArgsSchema);
@@ -117,11 +117,11 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await workflow.addUserTask(compoundTaskWithoutArgsSchema);
 		await workflow.selectTask(compoundTaskWithoutArgsSchema);
 		await page.getByRole('button', { name: 'Add property' }).first().click();
-		await page.getByPlaceholder('Arg name').fill('key_non_parallel');
-		await page.getByPlaceholder('Argument default value').fill('value_non_parallel');
+		await page.getByPlaceholder('Argument name').fill('key_non_parallel');
+		await page.getByPlaceholder('Argument value').fill('value_non_parallel');
 		await page.getByRole('button', { name: 'Add property' }).nth(1).click();
-		await page.getByPlaceholder('Arg name').nth(1).fill('key_parallel');
-		await page.getByPlaceholder('Argument default value').nth(1).fill('value_parallel');
+		await page.getByPlaceholder('Argument name').nth(1).fill('key_parallel');
+		await page.getByPlaceholder('Argument value').nth(1).fill('value_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
 

@@ -34,7 +34,7 @@
 							<input
 								type="text"
 								class="form-control"
-								placeholder="Arg name"
+								placeholder="Argument name"
 								class:is-invalid={entry.error}
 								bind:value={entry.key}
 								data-bs-toggle="collapse"
