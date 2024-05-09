@@ -2,12 +2,12 @@
 	import { page } from '$app/stores';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
-	import FormBuilder from './FormBuilder.svelte';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import {
 		stripNullAndEmptyObjectsAndArrays,
 		stripSchemaProperties
 	} from '$lib/components/common/jschema/schema_management';
+	import FormBuilder from './FormBuilder.svelte';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -22,9 +22,21 @@
 	let parallelSchemaComponent;
 	let unsavedChangesParallel = false;
 	let unsavedChangesNonParallel = false;
+
+	/** @type {FormBuilder|undefined} */
+	let nonParallelFormBuilderComponent;
+	/** @type {FormBuilder|undefined} */
+	let parallelFormBuilderComponent;
+	let unsavedChangesFormBuilderParallel = false;
+	let unsavedChangesFormBuilderNonParallel = false;
+
 	let savingChanges = false;
 
-	$: unsavedChanges = unsavedChangesParallel || unsavedChangesNonParallel;
+	$: unsavedChanges =
+		unsavedChangesParallel ||
+		unsavedChangesNonParallel ||
+		unsavedChangesFormBuilderParallel ||
+		unsavedChangesFormBuilderNonParallel;
 
 	$: isSchemaValid = argsSchemaVersionValid(
 		workflowTask.is_legacy_task
@@ -35,6 +47,10 @@
 	$: hasNonParallel =
 		workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound';
 	$: hasParallel = workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound';
+
+	$: argsSchemaNonParallel = workflowTask.is_legacy_task
+		? null
+		: workflowTask.task.args_schema_non_parallel;
 
 	$: argsSchemaParallel = workflowTask.is_legacy_task
 		? workflowTask.task_legacy.args_schema
@@ -49,16 +65,31 @@
 			nonParallelSchemaComponent?.validateArguments();
 			parallelSchemaComponent?.validateArguments();
 		} catch (err) {
-			console.log(err);
-			displayStandardErrorAlert(err, 'json-schema-validation-errors');
+			console.error(err);
+			displayStandardErrorAlert(err, 'task-args-validation-errors');
+			return;
+		}
+		const invalidFormBuilderNonParallel =
+			nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments();
+		const invalidFormBuilderParallel =
+			parallelFormBuilderComponent && !parallelFormBuilderComponent.validateArguments();
+		if (invalidFormBuilderNonParallel || invalidFormBuilderParallel) {
 			return;
 		}
 		const payload = {};
 		if (hasNonParallel) {
-			payload.args_non_parallel = nonParallelSchemaComponent?.getArguments();
+			if (nonParallelSchemaComponent) {
+				payload.args_non_parallel = nonParallelSchemaComponent.getArguments();
+			} else if (nonParallelFormBuilderComponent) {
+				payload.args_non_parallel = nonParallelFormBuilderComponent.getArguments();
+			}
 		}
 		if (hasParallel) {
-			payload.args_parallel = parallelSchemaComponent?.getArguments();
+			if (parallelSchemaComponent) {
+				payload.args_parallel = parallelSchemaComponent.getArguments();
+			} else if (parallelFormBuilderComponent) {
+				payload.args_parallel = parallelFormBuilderComponent.getArguments();
+			}
 		}
 		await handleSaveChanges(payload);
 	}
@@ -66,20 +97,8 @@
 	export function discardChanges() {
 		nonParallelSchemaComponent?.discardChanges(workflowTask.args_non_parallel);
 		parallelSchemaComponent?.discardChanges(workflowTask.args_parallel);
-	}
-
-	/**
-	 * @param {object} updatedEntry
-	 */
-	async function saveGenericFormEntryNonParallel(updatedEntry) {
-		await handleSaveChanges({ args_non_parallel: updatedEntry });
-	}
-
-	/**
-	 * @param {object} updatedEntry
-	 */
-	async function saveGenericFormEntryParallel(updatedEntry) {
-		await handleSaveChanges({ args_parallel: updatedEntry });
+		nonParallelFormBuilderComponent?.discardChanges(workflowTask.args_non_parallel);
+		parallelFormBuilderComponent?.discardChanges(workflowTask.args_parallel);
 	}
 
 	/**
@@ -121,7 +140,7 @@
 			}
 			onWorkflowTaskUpdated(result);
 		} else {
-			displayStandardErrorAlert(await result, 'json-schema-validation-errors');
+			displayStandardErrorAlert(await result, 'task-args-validation-errors');
 		}
 		savingChanges = false;
 	}
@@ -159,10 +178,10 @@
 </script>
 
 <div id="workflow-arguments-schema-panel">
-	<div id="json-schema-validation-errors" />
+	<div id="task-args-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		{#if hasNonParallelArgs && hasParallelArgs}
-			<h5 class="ps-2 mt-3">Initialisation Parameters</h5>
+		{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
+			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
 		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
@@ -176,20 +195,20 @@
 			</div>
 		{:else}
 			<div>
-				<span id="argsPropertiesFormError" />
 				<FormBuilder
-					entry={workflowTask.args_non_parallel}
-					updateEntry={saveGenericFormEntryNonParallel}
+					args={workflowTask.args_non_parallel}
+					bind:this={nonParallelFormBuilderComponent}
+					bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
 				/>
 			</div>
 		{/if}
 	{/if}
-	{#if hasNonParallelArgs && hasParallelArgs}
+	{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
 		<hr />
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		{#if hasParallelArgs && hasNonParallelArgs}
-			<h5 class="ps-2 mt-3">Compute Parameters</h5>
+		{#if (hasParallelArgs && hasNonParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel)}
+			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
 			<div class="args-list">
@@ -203,15 +222,15 @@
 			</div>
 		{:else}
 			<div class="mb-3">
-				<span id="argsPropertiesFormError" />
 				<FormBuilder
-					entry={workflowTask.args_parallel}
-					updateEntry={saveGenericFormEntryParallel}
+					args={workflowTask.args_parallel}
+					bind:this={parallelFormBuilderComponent}
+					bind:unsavedChanges={unsavedChangesFormBuilderParallel}
 				/>
 			</div>
 		{/if}
 	{/if}
-	{#if !hasNonParallelArgs && !hasParallelArgs}
+	{#if !hasNonParallelArgs && !hasParallelArgs && (argsSchemaParallel || argsSchemaNonParallel)}
 		<p class="mt-3 ps-3">No arguments</p>
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
@@ -220,7 +239,7 @@
 			onImport={handleSaveChanges}
 			exportDisabled={unsavedChanges || savingChanges}
 		/>
-		{#if ((!workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel) || argsSchemaParallel) && isSchemaValid}
+		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}
 			<div>
 				<button
 					class="btn btn-warning"

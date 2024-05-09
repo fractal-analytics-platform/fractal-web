@@ -305,7 +305,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Cleanup zarr_dir', async () => {
-		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
+		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true, force: true });
 	});
 
 	await test.step('Restart the workflow creating a new dataset', async () => {

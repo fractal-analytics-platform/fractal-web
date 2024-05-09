@@ -1,33 +1,241 @@
 <script>
-	import FormStructure from './FormStructure.svelte';
-	import NewEntryProperty from './NewEntryProperty.svelte';
+	import { onMount } from 'svelte';
+	import FormEntry from './FormEntry.svelte';
 
-	export let entry;
+	/** @type {object} */
+	export let args;
+	export let unsavedChanges = false;
 
-	if (entry == null || entry === undefined) {
-		entry = {};
+	/**
+	 * @type {Array<import('./form-builder-types').FormBuilderEntry>}
+	 */
+	let editableArgs = [];
+	let savedEditableArgs = '';
+	/**
+	 * Used to generate unique id in the form (needed for accordions).
+	 */
+	let counter = 0;
+
+	onMount(() => {
+		init(args);
+	});
+
+	/**
+	 * @param {object} newArgs
+	 */
+	function init(newArgs) {
+		for (const [k, v] of Object.entries(newArgs || {})) {
+			editableArgs.push(buildEditableEntry(v, k));
+		}
+		triggerChanges();
+		savedEditableArgs = JSON.stringify(editableArgs);
 	}
 
-	const submitNewEntry = (newEntry) => {
-		updateEntry(newEntry);
-	};
-
-	export let updateEntry;
-
-	function handleEntryUpdateEvent(event) {
-		updateEntry(event.detail.value);
+	$: {
+		unsavedChanges = savedEditableArgs !== JSON.stringify(editableArgs);
 	}
 
-	function handleEntryInserted(event) {
-		updateEntry(event.detail);
+	/**
+	 * @param {any} value
+	 * @param {string|null} key
+	 * @return {import('./form-builder-types').FormBuilderEntry}
+	 */
+	function buildEditableEntry(value, key) {
+		counter++;
+		let entry = {
+			id: `item-${counter}`,
+			error: ''
+		};
+		if (Array.isArray(value)) {
+			const children = [];
+			for (const item of value) {
+				children.push(buildEditableEntry(item, null));
+			}
+			entry.type = 'array';
+			entry.children = children;
+		} else if (typeof value === 'object') {
+			const children = [];
+			for (const [k, v] of Object.entries(value)) {
+				children.push(buildEditableEntry(v, k));
+			}
+			entry.type = 'object';
+			entry.children = children;
+		} else {
+			entry.type = typeof value;
+			entry.value = value;
+		}
+		if (key !== null) {
+			entry.key = key;
+		}
+		return /** @type {import('./form-builder-types').FormBuilderEntry} */ (entry);
+	}
+
+	/**
+	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @param {boolean} hasKey
+	 */
+	function addProperty(parent, hasKey) {
+		parent.push(buildEditableEntry('', hasKey ? '' : null));
+		triggerChanges();
+	}
+
+	/**
+	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @param {number} index
+	 */
+	function removeProperty(parent, index) {
+		parent.splice(index, 1);
+		triggerChanges();
+	}
+
+	/**
+	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @param {number} index
+	 * @param {string} type
+	 */
+	async function changeType(parent, index, type) {
+		parent[index] = buildEditableEntry(
+			getDefaultValue(type),
+			'key' in parent[index] ? parent[index].key || '' : null
+		);
+		parent[index].type = /** @type {import('./form-builder-types').FormBuilderEntryType} */ (type);
+		triggerChanges();
+	}
+
+	/**
+	 * @param {string} type
+	 */
+	function getDefaultValue(type) {
+		switch (type) {
+			case 'object':
+				return {};
+			case 'array':
+				return [];
+			case 'boolean':
+				return true;
+			default:
+				return '';
+		}
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	export function validateArguments() {
+		cleanErrors(editableArgs);
+		const errors = [];
+		validate(editableArgs, errors);
+		triggerChanges();
+		return errors.length === 0;
+	}
+
+	/**
+	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} values
+	 */
+	function cleanErrors(values) {
+		for (const value of values) {
+			value.error = '';
+			if (value.type === 'object' || value.type === 'array') {
+				cleanErrors(value.children);
+			}
+		}
+	}
+
+	/**
+	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} values
+	 * @param {Array<string>} errors
+	 */
+	function validate(values, errors) {
+		const keys = [];
+		for (const value of values) {
+			if ('key' in value && value.key !== undefined) {
+				if (value.key.trim() === '') {
+					value.error = `Property name can't be empty`;
+					errors.push(value.error);
+				} else if (keys.includes(value.key)) {
+					value.error = `Property name "${value.key}" is already used`;
+					errors.push(value.error);
+				} else {
+					keys.push(value.key);
+				}
+			}
+			if (value.type === 'object' || value.type === 'array') {
+				validate(value.children, errors);
+			}
+			if (
+				value.type === 'number' &&
+				typeof value.value === 'string' &&
+				!value.value.match(/^\d+\.*\d*$/)
+			) {
+				value.error = 'Invalid number';
+				errors.push(value.error);
+			}
+		}
+	}
+
+	/**
+	 * @returns {object}
+	 */
+	export function getArguments() {
+		const args = {};
+		for (const item of editableArgs) {
+			args[item.key] = toArgs(item);
+		}
+		return args;
+	}
+
+	/**
+	 * @param {import('./form-builder-types').FormBuilderEntry} item
+	 */
+	function toArgs(item) {
+		if (item.type === 'object') {
+			const args = {};
+			for (const child of item.children) {
+				args[child.key] = toArgs(child);
+			}
+			return args;
+		} else if (item.type === 'array') {
+			const args = [];
+			for (const child of item.children) {
+				args.push(toArgs(child));
+			}
+			return args;
+		} else if (item.type === 'number') {
+			return Number(item.value);
+		} else if (item.type === 'boolean' || item.type === 'string') {
+			return item.value;
+		}
+	}
+
+	/**
+	 * @param {object} args
+	 */
+	export function discardChanges(args) {
+		editableArgs = [];
+		init(args);
+	}
+
+	function triggerChanges() {
+		editableArgs = editableArgs;
 	}
 </script>
 
-<div>
-	<FormStructure
-		{entry}
-		on:entryUpdated={handleEntryUpdateEvent}
-		on:entryInserted={handleEntryInserted}
-	/>
-	<NewEntryProperty {entry} {submitNewEntry} />
+<div class="mt-2 p-2">
+	{#each editableArgs as item, index}
+		<FormEntry
+			entry={item}
+			{index}
+			parent={editableArgs}
+			{addProperty}
+			{changeType}
+			{removeProperty}
+			{triggerChanges}
+		/>
+	{/each}
+
+	<div class="d-flex justify-content-center align-items-center mt-3">
+		<button class="btn btn-secondary" on:click={() => addProperty(editableArgs, true)}>
+			Add property
+		</button>
+	</div>
 </div>

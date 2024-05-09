@@ -119,7 +119,7 @@
 		return form.hasUnsavedChanges();
 	}
 
-	export function discard() {
+	export function discardChanges() {
 		form.discardChanges();
 	}
 

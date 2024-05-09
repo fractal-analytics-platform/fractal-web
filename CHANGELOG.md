@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Improved form builder used in workflow tasks without JSON Schema and in Meta properties tab (\#481).
+* Used collapsible sections in dataset history modal (\#481).
+
 # 1.0.3
 
 * fixed issue in task version update when no arguments fix is needed (\#477).
