@@ -58,14 +58,15 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 			fs.writeFileSync(tasksMockWheelFile, body);
 		});
 
-		let rowsCount;
-
 		await test.step('Collect mock tasks', async () => {
-			rowsCount = await page.getByRole('table').last().locator('tbody tr').count();
-
 			await page.getByText('Local', { exact: true }).click();
 			await page.getByRole('textbox', { name: 'Package', exact: true }).fill(tasksMockWheelFile);
 			await page.getByRole('button', { name: 'Collect', exact: true }).click();
+
+			if (await page.getByText('Already installed').isVisible()) {
+				skipTasksCollection = true;
+				return;
+			}
 
 			// Wait for Task collections table
 			await page.waitForFunction(
@@ -78,34 +79,37 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 			expect(await getStatus(page)).toMatch(/^(pending|installing)$/);
 		});
 
-		await test.step('Wait tasks collection', async () => {
-			await page.waitForFunction(
-				() =>
-					document.querySelector('table tbody tr:first-child td:nth-child(4)')?.textContent === 'OK'
-			);
-		});
+		if (!skipTasksCollection) {
+			await test.step('Wait tasks collection', async () => {
+				await page.waitForFunction(
+					() =>
+						document.querySelector('table tbody tr:first-child td:nth-child(4)')?.textContent ===
+						'OK'
+				);
+			});
 
-		await test.step('Check tasks list', async () => {
-			await expect(page.getByRole('table').last().locator('tbody tr')).toHaveCount(rowsCount + 14);
-		});
+			await test.step('Check tasks list', async () => {
+				await page.getByRole('table').last().getByRole('cell', { name: 'MIP_compound' }).waitFor();
+			});
 
-		await test.step('Delete task collection log', async () => {
-			const deleteCollectionLogBtn = page.locator(
-				'table tr:first-child td:nth-child(5) button.btn-warning'
-			);
-			await deleteCollectionLogBtn.click();
+			await test.step('Delete task collection log', async () => {
+				const deleteCollectionLogBtn = page.locator(
+					'table tr:first-child td:nth-child(5) button.btn-warning'
+				);
+				await deleteCollectionLogBtn.click();
 
-			// Confirm action modal
-			const modalTitle = page.locator('.modal.show .modal-title');
-			await modalTitle.waitFor();
-			await expect(modalTitle).toHaveText('Confirm action');
-			await expect(page.locator('.modal.show .modal-body')).toContainText(
-				'Remove a task collection log'
-			);
+				// Confirm action modal
+				const modalTitle = page.locator('.modal.show .modal-title');
+				await modalTitle.waitFor();
+				await expect(modalTitle).toHaveText('Confirm action');
+				await expect(page.locator('.modal.show .modal-body')).toContainText(
+					'Remove a task collection log'
+				);
 
-			// Confirm the deletion
-			await page.getByRole('button', { name: 'Confirm' }).click();
-		});
+				// Confirm the deletion
+				await page.getByRole('button', { name: 'Confirm' }).click();
+			});
+		}
 
 		await test.step('Cleanup temporary wheel file', async () => {
 			fs.rmSync(tasksMockWheelFile);
@@ -164,13 +168,11 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		const spinners = page.locator('.job-status-submitted.spinner-border');
-		await spinners.waitFor();
-		expect(await spinners.count()).toEqual(1);
+		await waitTaskSubmitted(page, 1);
 	});
 
 	await test.step('Wait task success', async () => {
-		await page.locator('.job-status-icon.bi-check').waitFor();
+		await waitTasksSuccess(page, 1);
 	});
 
 	await test.step('Open "Continue workflow" modal', async () => {
@@ -202,10 +204,11 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Select the second dataset', async () => {
-		await page
-			.getByRole('combobox', { name: 'Dataset', exact: true })
-			.first()
-			.selectOption(datasetName2);
+		const datasetDropdown = page.getByRole('combobox', { name: 'Dataset', exact: true }).first();
+		await expect(
+			datasetDropdown.getByRole('option', { name: datasetName2, includeHidden: true })
+		).toBeHidden();
+		await datasetDropdown.selectOption(datasetName2);
 	});
 
 	await test.step('Add and select generic_task', async () => {
@@ -229,8 +232,7 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		const spinners = page.locator('.job-status-submitted.spinner-border');
-		await expect(spinners).toHaveCount(2);
+		await waitTaskSubmitted(page, 2);
 	});
 
 	await test.step('Wait job failure', async () => {
@@ -268,13 +270,11 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		const spinners = page.locator('.job-status-submitted.spinner-border');
-		await spinners.waitFor();
-		expect(await spinners.count()).toEqual(1);
+		await waitTaskSubmitted(page, 1);
 	});
 
 	await test.step('Wait tasks success', async () => {
-		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
+		await waitTasksSuccess(page, 2);
 	});
 
 	await test.step('Cleanup zarr_dir', async () => {
@@ -296,16 +296,21 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		const spinners = page.locator('.job-status-submitted.spinner-border');
-		await expect(spinners).toHaveCount(2);
+		await waitTaskSubmitted(page, 2);
 	});
 
 	await test.step('Wait tasks success', async () => {
-		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
+		await waitTasksSuccess(page, 2);
 	});
 
 	await test.step('Cleanup zarr_dir', async () => {
-		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true, force: true });
+		await expect
+			.poll(() => fs.existsSync(`/tmp/playwright/datasets/${datasetName2}`), {
+				timeout: 5000,
+				message: `File /tmp/playwright/datasets/${datasetName2} doesn't exist`
+			})
+			.toBeTruthy();
+		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
 	});
 
 	await test.step('Restart the workflow creating a new dataset', async () => {
@@ -328,12 +333,11 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		const spinners = page.locator('.job-status-submitted.spinner-border');
-		await expect(spinners).toHaveCount(2);
+		await waitTaskSubmitted(page, 2);
 	});
 
 	await test.step('Wait tasks success', async () => {
-		await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(2);
+		await waitTasksSuccess(page, 2);
 	});
 
 	await test.step('Open the workflow jobs page', async () => {
@@ -419,4 +423,34 @@ async function getJobId(page, row) {
 	expect(match).not.toBeNull();
 	await page.locator('.modal.show .modal-header [aria-label="Close"]').click();
 	return /** @type {RegExpMatchArray} */ (match)[1];
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {number} count
+ */
+async function waitTaskSubmitted(page, count) {
+	await expect(page.getByText('The last job failed with the following error')).toHaveCount(0);
+	if ((await page.locator('.job-status-icon.bi-check').count()) > 0) {
+		return;
+	}
+	const spinners = page.locator('.job-status-submitted.spinner-border');
+	await expect(spinners).toHaveCount(count);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {number} count
+ */
+async function waitTasksSuccess(page, count) {
+	const spinners = page.locator('.job-status-submitted.spinner-border');
+	await expect(spinners).toHaveCount(0);
+	const errorAlert = page.getByText('The last job failed with the following error');
+	if (await errorAlert.isVisible()) {
+		const error = await page.locator('.alert.border-danger').innerText();
+		console.error(error);
+	}
+	await expect(errorAlert).toHaveCount(0);
+	await page.locator('.job-status-icon.bi-check').first().waitFor();
+	await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(count);
 }

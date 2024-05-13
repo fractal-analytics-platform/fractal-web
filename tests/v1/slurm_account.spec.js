@@ -56,9 +56,10 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	});
 
 	await test.step('Run workflow with new SLURM account', async () => {
-		await page.selectOption('[name="inputDataset"]', 'input');
-		await page.selectOption('[name="outputDataset"]', 'output');
-		await page.selectOption('[name="slurmAccount"]', randomSlurmAccount);
+		const modal = page.locator('.modal.show');
+		await modal.getByRole('combobox', { name: 'Input dataset' }).selectOption('input');
+		await modal.getByRole('combobox', { name: 'Output dataset' }).selectOption('output');
+		await modal.getByRole('combobox', { name: 'SLURM account' }).selectOption(randomSlurmAccount);
 		const runBtn = page.locator('.modal.show').getByRole('button', { name: 'Run' });
 		await runBtn.click();
 		const confirmBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
@@ -66,7 +67,9 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	});
 
 	await test.step('Check SLURM account in workflow info modal', async () => {
-		await page.waitForURL(`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
+		await page.waitForURL(
+			`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`
+		);
 		await page.locator('table tbody').waitFor();
 		await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).click();
 		const modalTitle = page.locator('.modal.show .modal-title');

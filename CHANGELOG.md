@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Setup tests to use PostgreSQL instead of SQlite (\#484).
+* Implemented tasks admin page (\#484).
 * Improved form builder used in workflow tasks without JSON Schema and in Meta properties tab (\#481).
 * Used collapsible sections in dataset history modal (\#481).
 

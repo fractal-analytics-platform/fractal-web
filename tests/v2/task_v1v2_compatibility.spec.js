@@ -30,7 +30,7 @@ test('Tasks V1/V2 Compatibility', async ({ page, workflow }) => {
 
 	await test.step('Open "Tasks V1/V2 compatibility" page', async () => {
 		await page.getByText('Tasks V1/V2 compatibility').click();
-		await page.waitForURL('/v2/admin/tasks');
+		await page.waitForURL('/v2/admin/tasks-compatibility');
 		await waitPageLoading(page);
 	});
 

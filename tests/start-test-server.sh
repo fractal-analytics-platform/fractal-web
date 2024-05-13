@@ -15,16 +15,18 @@ fractal_server_test_path="/tmp/fractal-test-server"
 if [ ! -d "$fractal_server_test_path" ]; then
   # Create test folder
   mkdir "$fractal_server_test_path"
-  cd "$fractal_server_test_path"
 
   # Copy test configuration files
-  cp "$fractal_server_path/config_local.json" .
-  cp "$fractal_server_path/.fractal_server.env" .
+  cp "$(pwd)/lib/fractal-server/config_local.json" "$fractal_server_test_path"
+  cp "$(pwd)/tests/.fractal_server.env" "$fractal_server_test_path"
+
+  cd "$fractal_server_test_path"
 
   # Virtualenv, dependencies and db
   python3 -m venv myenv
   . myenv/bin/activate
   pip install "fractal-server==$1"
+  pip install fractal-server[postgres]
   fractalctl set-db
 fi
 

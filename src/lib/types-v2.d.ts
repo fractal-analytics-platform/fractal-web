@@ -125,3 +125,31 @@ export type WorkflowTaskV2 = {
   task_legacy_id: number
   task_legacy: Task
 })
+
+type TaskV2Minimal = {
+  id: number
+  name: string
+  type: string
+  command_non_parallel: string | null
+  command_parallel: string | null
+  source: string
+  source: string | null
+  owner: string | null
+  version: string | null
+}
+
+type TaskV2Relationship = {
+  workflow_id: number
+  workflow_name: string
+  project_id: number
+  project_name: string
+  project_users: Array<{
+    id: number
+    email: string
+  }> | null
+}
+
+export type TaskV2Info = {
+  task: TaskV2Minimal,
+  relationships: Array<TaskV2Relationship>
+}

@@ -22,6 +22,7 @@ export async function waitPageLoading(page) {
  */
 export async function waitModalClosed(page) {
 	await page.waitForFunction(() => document.querySelector('.modal.show') === null);
+	await expect(page.locator('.modal.show')).toHaveCount(0);
 }
 
 /**
@@ -73,4 +74,5 @@ export async function selectSlimSelect(page, selector, optionValue) {
 	}
 	expect(selectedItem).not.toBeNull();
 	await /** @type {import('@playwright/test').Locator} */ (selectedItem).click();
+	await expect(selector).toHaveText(optionValue);
 }

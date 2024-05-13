@@ -76,9 +76,9 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 		await page.getByText('Reset').click();
 		await page.selectOption('#status', 'submitted');
 		await search(page);
-		const statuses = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
-		expect(statuses.length).toEqual(1);
-		expect(statuses[0].trim()).toEqual('submitted');
+		const statuses = page.locator('table tbody tr td:nth-child(2)');
+		await expect(statuses).toHaveCount(1);
+		expect((await statuses.allInnerTexts())[0].trim()).toEqual('submitted');
 	});
 
 	await test.step('Wait job completion', async () => {
@@ -114,8 +114,7 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 	await test.step('Search by id', async () => {
 		await page.getByText('Reset').click();
 		await search(page);
-		const count = await page.locator('table tbody tr').count();
-		expect(count).toBeGreaterThan(1);
+		await expect(page.getByRole('table')).toBeVisible();
 		const firstRowId = await page.locator('table tbody tr td:first-child').first().innerText();
 		await page.getByRole('spinbutton', { name: 'Job Id' }).fill(firstRowId);
 		await search(page);

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
 	export let description = undefined;
+	export let html = false;
 
 	/** @type {HTMLElement|undefined} */
 	let element;
@@ -45,6 +46,7 @@
 			class="bi bi-info-circle text-primary"
 			data-bs-toggle="collapse"
 			data-bs-target
+			data-bs-html={html}
 			data-bs-content={description}
 		/>
 	{/if}
