@@ -100,8 +100,9 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Enable dataset filters', async () => {
-		expect(await page.getByRole('row').count()).toEqual(7);
+		await expect(page.getByRole('row')).toHaveCount(7);
 		const datasetFiltersBtn = page.getByText('Dataset filters').first();
+		await expect(datasetFiltersBtn).toBeEnabled();
 		await datasetFiltersBtn.click();
 		await expect(datasetFiltersBtn).toBeEnabled();
 		await expect(page.getByRole('row')).toHaveCount(3);
@@ -162,16 +163,18 @@ async function createImage(page, zarr_url, filtersFunction) {
  * @param {number} expectedCount
  */
 async function searchImages(page, expectedCount) {
-	const initialCount = await page.getByRole('row').count();
+	await expect(page.getByRole('row')).toHaveCount(7);
 	const applyBtn = page.getByRole('button', { name: 'Apply' });
 	await applyBtn.click();
 	await expect(applyBtn).not.toBeEnabled();
+	// wait spinner disappearing
+	await expect(applyBtn.getByRole('status')).toHaveCount(0);
 	await expect(page.getByRole('row')).toHaveCount(expectedCount + 2);
-	const resetBtn = page.getByRole('button', { name: 'Reset' });
+	const resetBtn = page.getByRole('button', { name: 'Reset', exact: true });
 	await resetBtn.click();
-	await expect(applyBtn).not.toBeEnabled();
 	await expect(resetBtn).not.toBeEnabled();
+	await expect(applyBtn).not.toBeEnabled();
 	// wait spinner disappearing
 	await expect(resetBtn.getByRole('status')).toHaveCount(0);
-	await expect(page.getByRole('row')).toHaveCount(initialCount);
+	await expect(page.getByRole('row')).toHaveCount(7);
 }

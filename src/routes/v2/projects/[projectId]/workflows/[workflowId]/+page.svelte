@@ -562,7 +562,7 @@
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
-		loadJobsStatus();
+		await loadJobsStatus();
 	}
 
 	async function loadJobsStatus() {

@@ -287,7 +287,7 @@
 				<col width="90" />
 				<col width="80" />
 				<col width="120" />
-				<col width="120" />
+				<col width="150" />
 				<col width="100" />
 			</colgroup>
 			<thead>

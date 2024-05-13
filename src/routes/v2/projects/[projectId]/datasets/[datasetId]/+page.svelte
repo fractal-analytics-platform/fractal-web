@@ -215,18 +215,21 @@
 
 	async function applySearchFields() {
 		searching = true;
+		await searchImages();
 		resetBtnActive =
 			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
 			Object.values(typeFilters).filter((t) => t !== null).length > 0;
-		await searchImages();
 		searching = false;
 	}
 
 	async function resetSearchFields() {
+		resetBtnActive = false;
 		resetting = true;
+		for (const selector of Object.values(attributesSelectors)) {
+			selector.setSelected('');
+		}
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
-		resetBtnActive = false;
 		await tick();
 		await searchImages();
 		resetting = false;
@@ -234,6 +237,9 @@
 
 	async function reload() {
 		reloading = true;
+		attributeFilters = getAttributeFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
+		await tick();
 		await searchImages();
 		reloading = false;
 	}
@@ -484,11 +490,11 @@
 							<button
 								class="btn"
 								on:click={applySearchFields}
-								disabled={searching || !applyBtnActive}
+								disabled={searching || resetting || !applyBtnActive}
 								class:btn-primary={applyBtnActive}
 								class:btn-secondary={!applyBtnActive}
 							>
-								{#if searching && applyBtnActive}
+								{#if searching}
 									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 								{/if}
 								Apply
@@ -496,11 +502,11 @@
 							<button
 								class="btn"
 								on:click={resetSearchFields}
-								disabled={resetting || !resetBtnActive}
+								disabled={resetting || searching || !resetBtnActive}
 								class:btn-warning={resetBtnActive}
 								class:btn-secondary={!resetBtnActive}
 							>
-								{#if resetting && resetBtnActive}
+								{#if resetting}
 									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 								{/if}
 								Reset
@@ -565,7 +571,7 @@
 						value={false}
 						bind:group={useDatasetFilters}
 						on:change={reload}
-						disabled={reloading}
+						disabled={reloading || searching || resetting}
 					/>
 					<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
 					<input
@@ -577,7 +583,7 @@
 						value={true}
 						bind:group={useDatasetFilters}
 						on:change={reload}
-						disabled={reloading}
+						disabled={reloading || searching || resetting}
 					/>
 					<label class="btn btn-white btn-outline-primary" for="dataset-filters">
 						Dataset filters

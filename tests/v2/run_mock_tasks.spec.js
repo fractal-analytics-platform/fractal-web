@@ -204,10 +204,11 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Select the second dataset', async () => {
-		await page
-			.getByRole('combobox', { name: 'Dataset', exact: true })
-			.first()
-			.selectOption(datasetName2);
+		const datasetDropdown = page.getByRole('combobox', { name: 'Dataset', exact: true }).first();
+		await expect(
+			datasetDropdown.getByRole('option', { name: datasetName2, includeHidden: true })
+		).toBeHidden();
+		await datasetDropdown.selectOption(datasetName2);
 	});
 
 	await test.step('Add and select generic_task', async () => {
@@ -303,6 +304,12 @@ test('Collect and run mock tasks [v2]', async ({ page, workflow, request }) => {
 	});
 
 	await test.step('Cleanup zarr_dir', async () => {
+		await expect
+			.poll(() => fs.existsSync(`/tmp/playwright/datasets/${datasetName2}`), {
+				timeout: 5000,
+				message: `File /tmp/playwright/datasets/${datasetName2} doesn't exist`
+			})
+			.toBeTruthy();
 		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
 	});
 
