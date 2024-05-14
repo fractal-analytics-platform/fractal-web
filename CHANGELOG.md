@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Included v1/v2 switcher in admin-area sub-pages (\#485).
+* Included v1/v2 switcher in admin-area job page (\#485).
 * Setup tests to use PostgreSQL instead of SQlite (\#484).
 * Implemented tasks admin page (\#484).
 * Improved form builder used in workflow tasks without JSON Schema and in Meta properties tab (\#481).

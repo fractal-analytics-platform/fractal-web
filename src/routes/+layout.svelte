@@ -15,10 +15,9 @@
 	let clientVersion = __APP_VERSION__;
 
 	$: displayVersionSelector =
-		((selectedSection === 'admin' &&
-			$page.url.pathname !== '/v2/admin/tasks' &&
-			$page.url.pathname !== '/v2/admin/tasks-compatibility') ||
-			!isSubPage($page.url.pathname, apiVersion)) &&
+		(!isSubPage($page.url.pathname, apiVersion) ||
+			$page.url.pathname === '/v2/admin/jobs' ||
+			$page.url.pathname === '/v1/admin/jobs') &&
 		selectedSection !== 'home';
 
 	/**
