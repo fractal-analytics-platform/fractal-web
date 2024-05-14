@@ -1,5 +1,7 @@
 import { waitPageLoading } from '../utils.js';
+import { createDataset } from './dataset_utils.js';
 import { expect, test } from './workflow_fixture.js';
+import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
 
 test('Add SLURM accounts for the admin and execute workflow using a specific account', async ({
 	page,
@@ -8,8 +10,12 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
+	await test.step('Create dataset', async () => {
+		await createDataset(page, workflow.projectId);
+	});
+
 	await test.step('Open the edit user page for admin user', async () => {
-		await page.goto('/v1/admin/users/1/edit');
+		await page.goto('/v2/admin/users/1/edit');
 		await waitPageLoading(page);
 	});
 
@@ -22,7 +28,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 			.last()
 			.fill(randomSlurmAccount);
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.waitForURL('/v1/admin/users');
+		await page.waitForURL('/v2/admin/users');
 		await waitPageLoading(page);
 	});
 
@@ -38,13 +44,11 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 		await page.getByText(randomSlurmAccount).waitFor();
 	});
 
-	await test.step('Open workflow page', async () => {
+	await test.step('Add task to workflow', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
-	});
-
-	await test.step('Add task to workflow', async () => {
-		await workflow.addFakeTask();
+		await workflow.addCollectedTask('generic_task');
+		await workflow.selectTask('generic_task');
 	});
 
 	await test.step('Open Run workflow modal', async () => {
@@ -57,8 +61,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 
 	await test.step('Run workflow with new SLURM account', async () => {
 		const modal = page.locator('.modal.show');
-		await modal.getByRole('combobox', { name: 'Input dataset' }).selectOption('input');
-		await modal.getByRole('combobox', { name: 'Output dataset' }).selectOption('output');
+		await modal.getByRole('button', { name: 'Advanced Options' }).click();
 		await modal.getByRole('combobox', { name: 'SLURM account' }).selectOption(randomSlurmAccount);
 		const runBtn = page.locator('.modal.show').getByRole('button', { name: 'Run' });
 		await runBtn.click();
@@ -66,22 +69,23 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 		await confirmBtn.click();
 	});
 
+	await test.step('Wait task submitted', async () => {
+		await waitTaskSubmitted(page, 1);
+	});
+
+	await test.step('Wait for job completion', async () => {
+		await waitTasksSuccess(page, 1);
+	});
+
 	await test.step('Check SLURM account in workflow info modal', async () => {
-		await page.waitForURL(
-			`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`
-		);
+		await page.goto(`/v2/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
 		await page.locator('table tbody').waitFor();
 		await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).click();
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
 		await expect(modalTitle).toContainText(`Workflow Job #`);
 		const items = await page.locator('.modal.show').getByRole('listitem').allInnerTexts();
-		expect(items[16]).toEqual('SLURM account');
-		expect(items[17]).toEqual(randomSlurmAccount);
-	});
-
-	await test.step('Wait for job completion', async () => {
-		await workflow.triggerTaskSuccess();
-		await page.getByRole('table').getByText('done', { exact: true }).waitFor();
+		expect(items[items.length - 2]).toEqual('SLURM account');
+		expect(items[items.length - 1]).toEqual(randomSlurmAccount);
 	});
 });

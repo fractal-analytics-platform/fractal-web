@@ -21,16 +21,8 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 		workflow2 = await createJob(page, request, 'input2', 'output2');
 	});
 
-	await test.step('Open the admin area', async () => {
-		await page.goto('/v1/admin');
-		await waitPageLoading(page);
-		await page.getByRole('link', { name: 'Admin area' }).click();
-		await waitPageLoading(page);
-		await page.getByRole('link', { name: 'Manage users' }).waitFor();
-	});
-
 	await test.step('Open the admin jobs', async () => {
-		await page.getByRole('link', { name: 'Jobs' }).nth(1).click();
+		await page.goto('/v1/admin/jobs');
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Search jobs' }).waitFor();
 	});

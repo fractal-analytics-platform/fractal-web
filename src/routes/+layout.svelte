@@ -9,13 +9,16 @@
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
 	/** @type {'v1'|'v2'} */
-	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1': 'v2';
+	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1' : 'v2';
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
 
 	$: displayVersionSelector =
-		!isSubPage($page.url.pathname, apiVersion) && selectedSection !== 'home';
+		(!isSubPage($page.url.pathname, apiVersion) ||
+			$page.url.pathname === '/v2/admin/jobs' ||
+			$page.url.pathname === '/v1/admin/jobs') &&
+		selectedSection !== 'home';
 
 	/**
 	 * Returns true if the URL indicates a subpage.
