@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.0.4
 
 * Removed users management section from admin area v1 (\#485).
 * Included v1/v2 switcher in admin-area job page (\#485).
