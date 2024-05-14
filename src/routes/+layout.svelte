@@ -9,13 +9,17 @@
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
 	/** @type {'v1'|'v2'} */
-	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1': 'v2';
+	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1' : 'v2';
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
 
 	$: displayVersionSelector =
-		!isSubPage($page.url.pathname, apiVersion) && selectedSection !== 'home';
+		((selectedSection === 'admin' &&
+			$page.url.pathname !== '/v2/admin/tasks' &&
+			$page.url.pathname !== '/v2/admin/tasks-compatibility') ||
+			!isSubPage($page.url.pathname, apiVersion)) &&
+		selectedSection !== 'home';
 
 	/**
 	 * Returns true if the URL indicates a subpage.
