@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Removed users management section from admin area v1 (\#485).
 * Included v1/v2 switcher in admin-area job page (\#485).
 * Setup tests to use PostgreSQL instead of SQlite (\#484).
 * Implemented tasks admin page (\#484).
