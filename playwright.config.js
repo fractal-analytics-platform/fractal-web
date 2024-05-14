@@ -20,6 +20,14 @@ export default defineConfig({
 			dependencies: ['auth']
 		},
 		{
+			name: 'collect_mock_tasks',
+			testMatch: /v2\/collect_mock_tasks\.setup\.js/,
+			use: {
+				storageState: 'tests/.auth/user.json'
+			},
+			dependencies: ['auth']
+		},
+		{
 			name: 'create_fake_task',
 			testMatch: /v1\/create_fake_task\.setup\.js/,
 			use: {
@@ -33,7 +41,7 @@ export default defineConfig({
 				...devices['Desktop Chrome'],
 				storageState: 'tests/.auth/user.json'
 			},
-			dependencies: ['create_fake_task']
+			dependencies: ['collect_mock_tasks', 'create_fake_task']
 		},
 		{
 			name: 'firefox',
