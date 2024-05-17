@@ -45,7 +45,8 @@ const config = defineConfig({
 			'semver/functions/coerce',
 			'semver/functions/gte',
 			'semver/functions/lte',
-			'semver/functions/valid'
+			'semver/functions/valid',
+			'@json-editor/json-editor'
 		]
 	}
 });

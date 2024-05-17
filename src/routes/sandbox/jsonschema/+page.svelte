@@ -1,6 +1,7 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
+	import JsonSchemaForm from '$lib/components/v2/workflow/JsonSchemaForm.svelte';
 
 	let schema = undefined;
 	let schemaData = {};
@@ -15,6 +16,10 @@
 
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = undefined;
+	/** @type {JsonSchemaForm|undefined} */
+	let jsonEditorComponent = undefined;
+
+	let componentType = 'fractal';
 
 	function handleJsonSchemaStringChanged() {
 		jsonSchemaError = '';
@@ -51,13 +56,22 @@
 	let valid = false;
 
 	function validate() {
-		try {
-			errorAlert?.hide();
-			valid = false;
-			jschemaComponent?.validateArguments();
-			valid = true;
-		} catch (err) {
-			errorAlert = displayStandardErrorAlert(err, `errorAlert-form`);
+		errorAlert?.hide();
+		valid = false;
+		if (componentType === 'fractal') {
+			try {
+				jschemaComponent?.validateArguments();
+				valid = true;
+			} catch (err) {
+				errorAlert = displayStandardErrorAlert(err, `errorAlert-form`);
+			}
+		} else {
+			const errors = jsonEditorComponent?.validate() || [];
+			if (errors.length === 0) {
+				valid = true;
+			} else {
+				errorAlert = displayStandardErrorAlert(errors, `errorAlert-form`);
+			}
 		}
 	}
 </script>
@@ -68,21 +82,50 @@
 <div class="row">
 	<div class="col-lg-6 mt-3">
 		<div class="row">
+			<label for="datasetType" class="col-3 col-sm-4 col-form-label">Component type</label>
 			<div class="col">
-				<div class="form-check form-switch">
+				<div class="form-check form-check-inline mt-2">
 					<input
 						class="form-check-input"
-						type="checkbox"
-						role="switch"
-						id="legacy"
-						bind:checked={legacy}
-						on:change={forceRedraw}
+						type="radio"
+						name="componentTypeOptions"
+						id="componentTypeFractal"
+						value="fractal"
+						bind:group={componentType}
 					/>
-					<label class="form-check-label" for="legacy"> Legacy</label>
+					<label class="form-check-label" for="componentTypeFractal">fractal</label>
 				</div>
-				<div class="form-text">Changes the set of ignored properties (v1 or v2)</div>
+				<div class="form-check form-check-inline mt-2">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="componentTypeOptions"
+						id="componentTypeJsonEditor"
+						value="json-editor"
+						bind:group={componentType}
+					/>
+					<label class="form-check-label" for="componentTypeJsonEditor">json-editor</label>
+				</div>
 			</div>
 		</div>
+		{#if componentType === 'fractal'}
+			<div class="row">
+				<div class="col">
+					<div class="form-check form-switch">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							role="switch"
+							id="legacy"
+							bind:checked={legacy}
+							on:change={forceRedraw}
+						/>
+						<label class="form-check-label" for="legacy"> Legacy</label>
+					</div>
+					<div class="form-text">Changes the set of ignored properties (v1 or v2)</div>
+				</div>
+			</div>
+		{/if}
 		<div class="row has-validation mt-3 mb-2">
 			<div class="col">
 				<label for="jschema">JSON Schema</label>
@@ -123,7 +166,11 @@
 	</div>
 	<div class="col-lg-6 mt-3">
 		{#if schema}
-			<JSchema {schema} {schemaData} {legacy} bind:this={jschemaComponent} />
+			{#if componentType === 'fractal'}
+				<JSchema {schema} {schemaData} {legacy} bind:this={jschemaComponent} />
+			{:else}
+				<JsonSchemaForm {schema} data={schemaData} bind:this={jsonEditorComponent} />
+			{/if}
 		{/if}
 	</div>
 </div>
