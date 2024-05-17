@@ -4,7 +4,11 @@ import { error } from '@sveltejs/kit';
 export async function handle({ event, resolve }) {
 	console.log(`[${event.request.method}] - ${event.url.pathname}`);
 
-	if (event.url.pathname == '/' || event.url.pathname.startsWith('/auth')) {
+	if (
+		event.url.pathname == '/' ||
+		event.url.pathname.startsWith('/auth') ||
+		event.url.pathname.startsWith('/sandbox/jsonschema')
+	) {
 		console.log('Public page - No auth required');
 		return await resolve(event);
 	}

@@ -1,20 +1,129 @@
 <script>
-	import SchemaInput from '$lib/components/common/jschema/SchemaInput.svelte';
-	import JSchema from '$lib/components/v1/workflow/JSchema.svelte';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 
 	let schema = undefined;
-	let schemaData = undefined;
+	let schemaData = {};
 
-	let jsonSchema = '{"title": "TaskArguments", "type": "object", "properties": {"a": {"title": "A", "description": "This is the description of argument a", "default": 0, "type": "integer"}, "b": {"title": "B", "type": "string"}, "c": {"title": "C", "description": "A boolean field", "default": true, "type": "boolean"}, "d": {"title": "D", "description": "A list of numbers", "default": [0, 1, 2], "type": "array", "items": {"type": "integer"}}, "e": {"title": "E", "description": "A list of strings", "default": ["hello", "this", "test"], "type": "array", "items": {"type": "string"}}, "f": {"title": "F", "description": "A list of bools", "default": [true, false, false], "type": "array", "items": {"type": "boolean"}}, "g": {"title": "G", "description": "A nested list of integers", "default": [[1, 2], [3, 4], [5], [6]], "type": "array", "items": {"type": "array", "items": {"type": "integer"}}}, "h": {"title": "H", "description": "A nested list of strings", "default": [["this", "is"], ["a", "list"], ["of"], ["strings"]], "type": "array", "items": {"type": "array", "items": {"type": "string"}}}, "i": {"title": "I", "description": "A nested list of bools", "type": "array", "items": {"type": "array", "items": {"type": "boolean"}}}, "l": {"title": "L", "description": "An infinite nesting of lists", "default": [[[0]]], "type": "array", "items": {"type": "array", "items": {"type": "array", "items": {"type": "integer"}}}}, "m": {"title": "M", "description": "An infinite nesting of lists", "default": [[[0]]], "type": "array", "items": {"type": "array", "items": {"type": "array", "items": {"$ref": "#/definitions/Argument"}}}}, "n": {"title": "N", "type": "array", "items": {"type": "array", "items": {"type": "array", "items": {"$ref": "#/definitions/Argument"}}}}, "obj1": {"$ref": "#/definitions/Argument"}, "obj2": {"$ref": "#/definitions/Argument"}, "obj3": {"title": "Obj3", "description": "A custom object schema", "allOf": [{"$ref": "#/definitions/Argument"}]}, "obj4": {"title": "Obj4", "description": "A list of arguments", "default": [], "type": "array", "items": {"$ref": "#/definitions/Argument"}}}, "required": ["i", "n", "obj2", "obj3"], "definitions": {"SubArgument": {"title": "SubArgument", "type": "object", "properties": {"subA": {"title": "Suba", "description": "A sub argument property", "default": 0, "type": "integer"}}}, "Argument": {"title": "Argument", "type": "object", "properties": {"a": {"title": "A", "description": "A integer property of an object", "default": 3, "type": "integer"}, "b": {"title": "B", "description": "A string property of an object", "default": "hello", "type": "string"}, "c": {"title": "C", "type": "boolean"}, "d": {"title": "D", "default": [1, 2, 3], "type": "array", "items": {"type": "integer"}}, "e": {"$ref": "#/definitions/SubArgument"}}, "required": ["c", "e"]}}}';
-	jsonSchema = '';
+	let jsonSchemaString = '';
+	let jsonDataString = '{}';
 
+	let jsonSchemaError = '';
+	let dataError = '';
+
+	let legacy = false;
+
+	/** @type {JSchema|undefined} */
+	let jschemaComponent = undefined;
+
+	function handleJsonSchemaStringChanged() {
+		jsonSchemaError = '';
+		if (jsonSchemaString === '') {
+			schema = undefined;
+			return;
+		}
+		try {
+			schema = JSON.parse(jsonSchemaString);
+		} catch (err) {
+			schema = undefined;
+			jsonSchemaError = 'Invalid JSON';
+		}
+	}
+
+	function handleDataStringChanged() {
+		dataError = '';
+		dataError = '';
+		try {
+			schemaData = JSON.parse(jsonDataString);
+		} catch (err) {
+			schemaData = {};
+			dataError = 'Invalid JSON';
+		}
+	}
+
+	function forceRedraw() {
+		handleJsonSchemaStringChanged();
+		handleDataStringChanged();
+	}
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert;
+	let valid = false;
+
+	function validate() {
+		try {
+			errorAlert?.hide();
+			valid = false;
+			jschemaComponent?.validateArguments();
+			valid = true;
+		} catch (err) {
+			errorAlert = displayStandardErrorAlert(err, `errorAlert-form`);
+		}
+	}
 </script>
 
-<h1 class="fw-light">Sandbox page for jsonschema</h1>
+<h1 class="fw-light">Sandbox page for JSON Schema</h1>
+<p>This is a test page for the JSON Schema component</p>
 
-<SchemaInput {jsonSchema} bind:parsedSchema={schema} bind:parsedData={schemaData}></SchemaInput>
-
-<JSchema
-  {schema}
-  {schemaData}
-></JSchema>
+<div class="row">
+	<div class="col-lg-6 mt-3">
+		<div class="row">
+			<div class="col">
+				<div class="form-check form-switch">
+					<input
+						class="form-check-input"
+						type="checkbox"
+						role="switch"
+						id="legacy"
+						bind:checked={legacy}
+						on:change={forceRedraw}
+					/>
+					<label class="form-check-label" for="legacy"> Legacy</label>
+				</div>
+				<div class="form-text">Changes the set of ignored properties (v1 or v2)</div>
+			</div>
+		</div>
+		<div class="row has-validation mt-3 mb-2">
+			<div class="col">
+				<label for="jschema">JSON Schema</label>
+				<textarea
+					id="jschema"
+					class="form-control"
+					bind:value={jsonSchemaString}
+					on:input={handleJsonSchemaStringChanged}
+					class:is-invalid={jsonSchemaError}
+					rows="10"
+				/>
+				<span class="invalid-feedback">{jsonSchemaError}</span>
+			</div>
+		</div>
+		<div class="row has-validation mt-3 mb-2">
+			<div class="col">
+				<label for="jdata">Initial JSON data</label>
+				<textarea
+					id="jdata"
+					class="form-control"
+					bind:value={jsonDataString}
+					on:input={handleDataStringChanged}
+					class:is-invalid={dataError}
+					rows="10"
+				/>
+				<span class="invalid-feedback">{dataError}</span>
+			</div>
+		</div>
+		<div class="row mt-3 mb-2">
+			<div class="col">
+				<div id="errorAlert-form" />
+				{#if valid}
+					<div class="alert alert-success">Data is valid</div>
+				{/if}
+				<button class="btn btn-primary" on:click={validate}>Validate</button>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-6 mt-3">
+		{#if schema}
+			<JSchema {schema} {schemaData} {legacy} bind:this={jschemaComponent} />
+		{/if}
+	</div>
+</div>
