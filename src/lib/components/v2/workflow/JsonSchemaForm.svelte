@@ -47,6 +47,10 @@
 	export function validate() {
 		return editor.validate();
 	}
+
+	export function getValue() {
+		return editor?.getValue();
+	}
 </script>
 
 <div id="json-editor-holder" />

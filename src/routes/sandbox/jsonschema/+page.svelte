@@ -2,6 +2,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import JsonSchemaForm from '$lib/components/v2/workflow/JsonSchemaForm.svelte';
+	import example from './example.json';
 
 	let schema = undefined;
 	let schemaData = {};
@@ -74,6 +75,19 @@
 			}
 		}
 	}
+
+	function loadExample() {
+		jsonSchemaString = JSON.stringify(example, null, 2);
+		handleJsonSchemaStringChanged();
+	}
+
+	function loadCurrentData() {
+		if (jschemaComponent) {
+			jsonDataString = JSON.stringify(jschemaComponent.getArguments(), null, 2);
+		} else if (jsonEditorComponent) {
+			jsonDataString = JSON.stringify(jsonEditorComponent.getValue(), null, 2);
+		}
+	}
 </script>
 
 <h1 class="fw-light">Sandbox page for JSON Schema</h1>
@@ -84,6 +98,9 @@
 		<div class="row">
 			<label for="datasetType" class="col-3 col-sm-4 col-form-label">Component type</label>
 			<div class="col">
+				<button class="btn btn-outline-primary float-end" on:click={loadExample}>
+					Load example
+				</button>
 				<div class="form-check form-check-inline mt-2">
 					<input
 						class="form-check-input"
@@ -160,6 +177,9 @@
 				{#if valid}
 					<div class="alert alert-success">Data is valid</div>
 				{/if}
+				<button class="btn btn-outline-primary float-end" on:click={loadCurrentData}>
+					Load current data
+				</button>
 				<button class="btn btn-primary" on:click={validate}>Validate</button>
 			</div>
 		</div>
