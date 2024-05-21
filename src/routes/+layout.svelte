@@ -18,6 +18,7 @@
 		(!isSubPage($page.url.pathname, apiVersion) ||
 			$page.url.pathname === '/v2/admin/jobs' ||
 			$page.url.pathname === '/v1/admin/jobs') &&
+		!$page.url.pathname.startsWith('/sandbox/jsonschema') &&
 		selectedSection !== 'home';
 
 	/**

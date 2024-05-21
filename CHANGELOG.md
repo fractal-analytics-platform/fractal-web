@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Improved JSON Schema Sandbox page (\#490).
+
 # 1.0.4
 
 * Removed users management section from admin area v1 (\#485).
