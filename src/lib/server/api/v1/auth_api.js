@@ -19,7 +19,7 @@ export async function userAuthentication(fetch, data) {
 	});
 
 	if (!response.ok) {
-		logger.info('Login failed');
+		logger.warn('Login failed');
 		await responseError(response);
 	}
 
@@ -39,7 +39,7 @@ export async function getCurrentUser(fetch) {
 	});
 
 	if (!response.ok) {
-		logger.info('Unable to retrieve the current user');
+		logger.warn('Unable to retrieve the current user');
 		await responseError(response);
 	}
 

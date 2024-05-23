@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import log4js from 'log4js';
 
-const logLevelConsole = env.LOG_LEVEL_CONSOLE || 'info';
+const logLevelConsole = env.LOG_LEVEL_CONSOLE || 'warn';
 
 /**
  * @param {string} pattern
@@ -39,7 +39,7 @@ let appenders = {
 
 let appendersList = ['filteredConsole'];
 
-const logLevelFile = env.LOG_LEVEL_FILE || 'debug';
+const logLevelFile = env.LOG_LEVEL_FILE || 'info';
 if (env.LOG_FILE) {
 	appenders = {
 		...appenders,

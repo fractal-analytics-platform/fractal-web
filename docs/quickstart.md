@@ -57,8 +57,8 @@ PUBLIC_OAUTH_CLIENT_NAME=
 
 # Logging configuration (used in Svelte backend)
 LOG_FILE=/tmp/fractal-web.log
-LOG_LEVEL_FILE=debug
-LOG_LEVEL_CONSOLE=info
+LOG_LEVEL_FILE=info
+LOG_LEVEL_CONSOLE=warn
 ```
 
 You can also add your customizations in a file named `.env.local` or `.env.development.local` to avoid writing on env files that are under version control.
