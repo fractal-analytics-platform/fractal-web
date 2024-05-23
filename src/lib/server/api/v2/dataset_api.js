@@ -5,26 +5,6 @@ import { getLogger } from '$lib/server/logger.js';
 const logger = getLogger('dataset API [v2]');
 
 /**
- * Fetches all the datasets of a user
- * @param {typeof fetch} fetch
- * @returns {Promise<*>}
- */
-export async function getUserDatasets(fetch) {
-	logger.debug('Fetching the list of the user datasets from the server');
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/dataset/?history=false`, {
-		method: 'GET',
-		credentials: 'include'
-	});
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	logger.error('Unable to fetch the list of user datasets from the server');
-	await responseError(response);
-}
-
-/**
  * Fetches project's dataset images from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId

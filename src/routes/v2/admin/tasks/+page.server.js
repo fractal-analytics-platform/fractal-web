@@ -6,7 +6,6 @@ const logger = getLogger('admin tasks page [v2]');
 export async function load({ fetch }) {
 	logger.trace('Loading admin tasks page');
 
-	/** @type {import('$lib/types').User[]} */
 	const usersList = await listUsers(fetch);
 
 	const users = /** @type {string[]} */ (

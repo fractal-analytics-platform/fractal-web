@@ -222,7 +222,8 @@ export function removeDuplicatedItems(allItems) {
 }
 
 /**
- * @param {import('$lib/types').Project[]} projects
+ * @template {import('$lib/types').Project|import('$lib/types-v2').ProjectV2} T
+ * @param {T[]} projects
  */
 export function sortProjectsByTimestampCreatedDesc(projects) {
 	projects.sort((p1, p2) =>

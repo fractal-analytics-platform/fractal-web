@@ -7,10 +7,7 @@ const logger = getLogger('admin jobs page [v2]');
 export async function load({ fetch }) {
 	logger.trace('Loading admin jobs page');
 
-	/** @type {import('$lib/types').Project[]} */
 	const projects = await listProjects(fetch);
-
-	/** @type {import('$lib/types').User[]} */
 	const users = await listUsers(fetch);
 
 	return {

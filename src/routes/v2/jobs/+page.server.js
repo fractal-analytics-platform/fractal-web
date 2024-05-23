@@ -10,11 +10,9 @@ const logger = getLogger('jobs page [v2]');
 export async function load({ fetch }) {
 	logger.trace('Loading jobs page');
 
-	/** @type {import('$lib/types').Project[]} */
 	const projects = await listProjects(fetch);
 	sortProjectsByTimestampCreatedDesc(projects);
 
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
 	const jobs = await getUserJobs(fetch);
 
 	const workflows = removeDuplicatedItems(

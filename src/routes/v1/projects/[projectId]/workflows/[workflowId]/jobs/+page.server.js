@@ -1,14 +1,12 @@
 import { removeDuplicatedItems } from '$lib/common/component_utilities';
-import { getProject, getWorkflow } from '$lib/server/api/v1/project_api';
-import { getWorkflowJobs } from '$lib/server/api/v1/workflow_api';
+import { getProject } from '$lib/server/api/v1/project_api';
+import { getWorkflow, getWorkflowJobs } from '$lib/server/api/v1/workflow_api';
 
 export async function load({ fetch, params }) {
 	const { projectId, workflowId } = params;
 
-	/** @type {import('$lib/types').Project} */
 	const project = await getProject(fetch, projectId);
 
-	/** @type {import('$lib/types').ApplyWorkflow[]} */
 	const jobs = await getWorkflowJobs(fetch, projectId, workflowId);
 
 	const workflows = removeDuplicatedItems(

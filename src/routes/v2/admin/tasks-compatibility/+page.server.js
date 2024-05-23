@@ -7,7 +7,6 @@ const logger = getLogger('admin tasks compatibility page');
 export async function load({ fetch }) {
 	logger.trace('Loding admin tasks compatibility page');
 
-	/** @type {import('$lib/types').Task[]} */
 	const tasks = await listLegacyTasks(fetch);
 
 	orderTasksByOwnerThenByNameThenByVersion(tasks, null, 'desc');

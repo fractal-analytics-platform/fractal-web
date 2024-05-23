@@ -9,7 +9,7 @@ const logger = getLogger('projects API [v2]');
 /**
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<import('$lib/types-v2').ProjectV2[]>}
  */
 export async function listProjects(fetch) {
 	logger.debug('Fetching the list of projects');
@@ -18,19 +18,19 @@ export async function listProjects(fetch) {
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch projects list');
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch projects list');
-	await responseError(response);
+	return await response.json();
 }
 
 /**
  * Fetches a project from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<*>}
+ * @returns {Promise<import('$lib/types-v2').ProjectV2>}
  */
 export async function getProject(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
@@ -39,13 +39,12 @@ export async function getProject(fetch, projectId) {
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		// Return fetched project as json object
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch project [project_id=%d]', projectId);
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch project [project_id=%d]', projectId);
-	await responseError(response);
+	return await response.json();
 }
 
 // DATASET ENDPOINTS
@@ -54,9 +53,10 @@ export async function getProject(fetch, projectId) {
  * Fetches all the project's datasets from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
- * @returns {Promise<*>}
+ * @returns {Promise<Array<import('$lib/types-v2').DatasetV2>>}
  */
 export async function getProjectDatasets(fetch, projectId) {
+	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
 	const response = await fetch(
 		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/?history=false`,
 		{
@@ -65,23 +65,23 @@ export async function getProjectDatasets(fetch, projectId) {
 		}
 	);
 
-	if (response.ok) {
-		// Return the dataset as json object
-		/** @type {import('$lib/types.js').Dataset[]} */
-		const datasets = await response.json();
-		datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-		return datasets;
+	if (!response.ok) {
+		logger.error('Unable to fetch project datasets [project_id=%d]', projectId);
+		await responseError(response);
 	}
 
-	await responseError(response);
+	/** @type {import('$lib/types-v2').DatasetV2[]} */
+	const datasets = await response.json();
+	datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+	return datasets;
 }
 
 /**
  * Fetches a project's dataset from the server
- * @param fetch
- * @param projectId
- * @param datasetId
- * @returns {Promise<*>}
+ * @param {typeof fetch} fetch
+ * @param {number|string} projectId
+ * @param {number|string} datasetId
+ * @returns {Promise<import('$lib/types-v2').DatasetV2>}
  */
 export async function getDataset(fetch, projectId, datasetId) {
 	logger.debug('Retrieving dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
@@ -93,93 +93,20 @@ export async function getDataset(fetch, projectId, datasetId) {
 		}
 	);
 
-	if (response.ok) {
-		// Return the dataset as json object
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
-	await responseError(response);
-}
-
-// WORKFLOW ENDPOINTS
-
-/**
- * Fetches the list of workflows of a project from the server
- * @param fetch
- * @param projectId
- * @returns {Promise<*>}
- */
-export async function getWorkflows(fetch, projectId) {
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
-
-	if (response.ok) {
-		// If the response is ok, return the workflows list as json
-		return await response.json();
-	}
-
-	await responseError(response);
-}
-
-/**
- * Fetches the list of workflows of a project from the server
- * @param {typeof fetch} fetch
- * @param {number|string}projectId
- * @param {number|string} workflowId
- * @returns {Promise<*>}
- */
-export async function getWorkflow(fetch, projectId, workflowId) {
-	logger.debug('Fetching project workflows [project_id=%d]', projectId);
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/${workflowId}/`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
-	);
-
-	if (response.ok) {
-		// If the response is ok, return the workflow as json
-		return await response.json();
-	}
-
-	logger.error('Unable to fetch project workflows [project_id=%d]', projectId);
-	await responseError(response);
+	return await response.json();
 }
 
 // JOB ENDPOINTS
 
 /**
- * Fetches the list of jobs of a project from the server
- * @param {typeof fetch} fetch
- * @param {number|string} projectId
- * @returns {Promise<*>}
- */
-export async function getProjectJobs(fetch, projectId) {
-	logger.debug('Fetching project jobs [project_id=%d]', projectId);
-	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/job/?log=false`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
-	);
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	logger.error('Unable to fetch project jobs [project_id=%d]', projectId);
-	await responseError(response);
-}
-
-/**
  * Fetches the list of all the jobs belonging to the current user
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<Array<import('$lib/types-v2').ApplyWorkflowV2>>}
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');
@@ -188,10 +115,10 @@ export async function getUserJobs(fetch) {
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch user jobs');
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch user jobs');
-	await responseError(response);
+	return await response.json();
 }

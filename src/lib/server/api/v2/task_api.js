@@ -7,7 +7,7 @@ const logger = getLogger('task API [v2]');
 /**
  * Fetches a list of tasks from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<Array<import('$lib/types-v2').TaskV2>>}
  */
 export async function listTasks(fetch) {
 	logger.debug('Fetching tasks');
@@ -22,17 +22,18 @@ export async function listTasks(fetch) {
 		}
 	);
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch tasks');
+		await responseError(response);
 	}
-	logger.error('Unable to fetch tasks');
-	await responseError(response);
+
+	return await response.json();
 }
 
 /**
  * Fetches a list of legacy tasks from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<Array<import('$lib/types').Task>>}
  */
 export async function listLegacyTasks(fetch) {
 	logger.debug('Fetching legacy tasks');
@@ -44,9 +45,10 @@ export async function listLegacyTasks(fetch) {
 		mode: 'cors'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch legacy tasks');
+		await responseError(response);
 	}
-	logger.error('Unable to fetch legacy tasks');
-	await responseError(response);
+
+	return await response.json();
 }

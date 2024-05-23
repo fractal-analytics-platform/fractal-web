@@ -3,7 +3,6 @@ import { getLogger } from '$lib/server/logger.js';
 
 const logger = getLogger('admin users page');
 
-/** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch }) {
 	logger.trace('Load users page');
 

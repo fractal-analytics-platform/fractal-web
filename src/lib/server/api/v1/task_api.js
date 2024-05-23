@@ -7,7 +7,7 @@ const logger = getLogger('task API [v1]');
 /**
  * Fetches a list of tasks from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<Array<import('$lib/types').Task>>}
  */
 export async function listTasks(fetch) {
 	logger.debug('Fetching tasks');
@@ -19,10 +19,10 @@ export async function listTasks(fetch) {
 		mode: 'cors'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch tasks');
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch tasks');
-	await responseError(response);
+	return await response.json();
 }

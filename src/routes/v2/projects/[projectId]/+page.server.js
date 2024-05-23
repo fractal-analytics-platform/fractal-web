@@ -1,4 +1,5 @@
-import { getProject, getProjectDatasets, getWorkflows } from '$lib/server/api/v2/project_api';
+import { getProject, getProjectDatasets } from '$lib/server/api/v2/project_api';
+import { getWorkflows } from '$lib/server/api/v2/workflow_api';
 import { getLogger } from '$lib/server/logger.js';
 
 const logger = getLogger('project page [v2]');

@@ -8,7 +8,7 @@ const logger = getLogger('auth API');
  * Request to authenticate user
  * @param {typeof fetch} fetch
  * @param {any} data
- * @returns {Promise<*>}
+ * @returns {Promise<{ access_token: string }>}
  */
 export async function userAuthentication(fetch, data) {
 	logger.debug('Performing login');
@@ -18,18 +18,18 @@ export async function userAuthentication(fetch, data) {
 		body: data
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.info('Login failed');
+		await responseError(response);
 	}
 
-	logger.info('Login failed');
-	await responseError(response);
+	return await response.json();
 }
 
 /**
  * Fetches user identity
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<import('$lib/types').User>}
  */
 export async function getCurrentUser(fetch) {
 	logger.debug('Retrieving current user');
@@ -38,12 +38,12 @@ export async function getCurrentUser(fetch) {
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.info('Unable to retrieve the current user');
+		await responseError(response);
 	}
 
-	logger.info('Unable to retrieve the current user');
-	await responseError(response);
+	return await response.json();
 }
 
 /**
@@ -59,19 +59,18 @@ export async function logout(fetch) {
 		mode: 'cors'
 	});
 
-	if (response.ok) {
-		logger.debug('Logout successful');
-		return;
+	if (!response.ok) {
+		logger.error('Logout failed');
+		await responseError(response);
 	}
 
-	logger.error('Logout failed');
-	await responseError(response);
+	logger.debug('Logout successful');
 }
 
 /**
  * Fetches the list of users from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<Array<import('$lib/types').User>>}
  */
 export async function listUsers(fetch) {
 	logger.debug('Fetching the list of users');
@@ -80,19 +79,19 @@ export async function listUsers(fetch) {
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch the list of users');
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch the list of users');
-	await responseError(response);
+	return await response.json();
 }
 
 /**
  * Fetches a user from the server
  * @param {typeof fetch} fetch
  * @param {number|string} userId
- * @returns {Promise<*>}
+ * @returns {Promise<import('$lib/types').User>}
  */
 export async function getUser(fetch, userId) {
 	logger.debug('Fetching user [user_id=%d]', userId);
@@ -101,10 +100,10 @@ export async function getUser(fetch, userId) {
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch user [user_id=%d]', userId);
+		await responseError(response);
 	}
 
-	logger.error('Unable to fetch user [user_id=%d]', userId);
-	await responseError(response);
+	return await response.json();
 }
