@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Added backend logging using Log4js (\#492).
 * Improved JSON Schema Sandbox page (\#490).
 
 # 1.0.4
