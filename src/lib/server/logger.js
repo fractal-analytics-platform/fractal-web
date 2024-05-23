@@ -11,6 +11,13 @@ function getLayout(pattern) {
 		type: 'pattern',
 		pattern,
 		tokens: {
+			timestamp: function (logEvent) {
+				return logEvent.startTime
+					.toISOString()
+					.replace('T', ' ')
+					.replace('Z', '')
+					.replace('.', ',');
+			},
 			component: function (logEvent) {
 				return logEvent.context?.component || 'general';
 			}
@@ -21,7 +28,7 @@ function getLayout(pattern) {
 let appenders = {
 	console: {
 		type: 'console',
-		layout: getLayout('%[[%d] [%p] (%x{component}) -%] %m')
+		layout: getLayout('%[%x{timestamp} - (%x{component}) - %p -%] %m')
 	},
 	filteredConsole: {
 		type: 'logLevelFilter',
@@ -39,7 +46,7 @@ if (env.LOG_FILE) {
 		file: {
 			type: 'file',
 			filename: env.LOG_FILE,
-			layout: getLayout('[%d] [%p] (%x{component}) - %m')
+			layout: getLayout('%x{timestamp} - (%x{component}) - %p - %m')
 		},
 		filteredFile: {
 			type: 'logLevelFilter',
