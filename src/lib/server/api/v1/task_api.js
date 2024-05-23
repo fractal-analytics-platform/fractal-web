@@ -1,5 +1,8 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
 import { responseError } from '$lib/common/errors.js';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('task API [v1]');
 
 /**
  * Fetches a list of tasks from the server
@@ -7,7 +10,7 @@ import { responseError } from '$lib/common/errors.js';
  * @returns {Promise<*>}
  */
 export async function listTasks(fetch) {
-	console.log('Server fetching tasks');
+	logger.debug('Fetching tasks');
 
 	// Compose request
 	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/task/?args_schema=false', {
@@ -19,5 +22,7 @@ export async function listTasks(fetch) {
 	if (response.ok) {
 		return await response.json();
 	}
+
+	logger.error('Unable to fetch tasks');
 	await responseError(response);
 }

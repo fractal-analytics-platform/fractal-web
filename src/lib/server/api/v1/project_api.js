@@ -1,5 +1,8 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
 import { responseError } from '$lib/common/errors';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('projects API [v1]');
 
 // PROJECT ENDPOINTS
 
@@ -9,6 +12,7 @@ import { responseError } from '$lib/common/errors';
  * @returns {Promise<*>}
  */
 export async function listProjects(fetch) {
+	logger.debug('Fetching the list of projects');
 	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project/', {
 		method: 'GET',
 		credentials: 'include'
@@ -18,7 +22,7 @@ export async function listProjects(fetch) {
 		return await response.json();
 	}
 
-	console.error('Client unable to fetch projects list');
+	logger.error('Unable to fetch projects list');
 	await responseError(response);
 }
 
@@ -29,6 +33,7 @@ export async function listProjects(fetch) {
  * @returns {Promise<*>}
  */
 export async function getProject(fetch, projectId) {
+	logger.debug('Fetching project [project_id=%d]', projectId);
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/`, {
 		method: 'GET',
 		credentials: 'include'
@@ -39,6 +44,7 @@ export async function getProject(fetch, projectId) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch project [project_id=%d]', projectId);
 	await responseError(response);
 }
 
@@ -51,6 +57,7 @@ export async function getProject(fetch, projectId) {
  * @returns {Promise<*>}
  */
 export async function getProjectDatasets(fetch, projectId) {
+	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
 	const response = await fetch(
 		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/?history=false`,
 		{
@@ -63,10 +70,11 @@ export async function getProjectDatasets(fetch, projectId) {
 		// Return the dataset as json object
 		/** @type {import('$lib/types.js').Dataset[]} */
 		const datasets = await response.json();
-		datasets.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+		datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 		return datasets;
 	}
 
+	logger.error('Unable to fetch project datasets [project_id=%d]', projectId);
 	await responseError(response);
 }
 
@@ -78,6 +86,7 @@ export async function getProjectDatasets(fetch, projectId) {
  * @returns {Promise<*>}
  */
 export async function getDataset(fetch, projectId, datasetId) {
+	logger.debug('Fetching dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
 	const response = await fetch(
 		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}/`,
 		{
@@ -91,6 +100,7 @@ export async function getDataset(fetch, projectId, datasetId) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
 	await responseError(response);
 }
 
@@ -103,6 +113,7 @@ export async function getDataset(fetch, projectId, datasetId) {
  * @returns {Promise<*>}
  */
 export async function getWorkflows(fetch, projectId) {
+	logger.debug('Fetching project workflows [project_id=%d]', projectId);
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
 		method: 'GET',
 		credentials: 'include'
@@ -113,6 +124,7 @@ export async function getWorkflows(fetch, projectId) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch project workflows [project_id=%d]', projectId);
 	await responseError(response);
 }
 
@@ -124,6 +136,7 @@ export async function getWorkflows(fetch, projectId) {
  * @returns {Promise<*>}
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
+	logger.debug('Fetching workflow [workflow_id=%d] [project_id=%d]', workflowId, projectId);
 	const response = await fetch(
 		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/`,
 		{
@@ -137,6 +150,7 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch workflow [workflow_id=%d] [project_id=%d]', workflowId, projectId);
 	await responseError(response);
 }
 
@@ -149,15 +163,20 @@ export async function getWorkflow(fetch, projectId, workflowId) {
  * @returns {Promise<*>}
  */
 export async function getProjectJobs(fetch, projectId) {
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/?log=false`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	logger.debug('Fetching project jobs [project_id=%d]', projectId);
+	const response = await fetch(
+		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/job/?log=false`,
+		{
+			method: 'GET',
+			credentials: 'include'
+		}
+	);
 
 	if (response.ok) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch project jobs [project_id=%d]', projectId);
 	await responseError(response);
 }
 
@@ -167,6 +186,7 @@ export async function getProjectJobs(fetch, projectId) {
  * @returns {Promise<*>}
  */
 export async function getUserJobs(fetch) {
+	logger.debug('Fetching user jobs');
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/?log=false`, {
 		method: 'GET',
 		credentials: 'include'
@@ -176,5 +196,6 @@ export async function getUserJobs(fetch) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch user jobs');
 	await responseError(response);
 }

@@ -1,7 +1,10 @@
 import { getDataset } from '$lib/server/api/v1/project_api';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('dataset page [v1]');
 
 export async function load({ fetch, params }) {
-	console.log('Load Dataset Page');
+	logger.trace('Load Dataset Page');
 
 	const { projectId, datasetId } = params;
 

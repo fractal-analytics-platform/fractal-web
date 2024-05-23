@@ -69,7 +69,7 @@ export default defineConfig({
 			reuseExistingServer: !process.env.CI
 		},
 		{
-			command: 'npm run build && ORIGIN=http://localhost:5173 PORT=5173 node build',
+			command: 'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 node build',
 			port: 5173,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI

@@ -1,5 +1,8 @@
 import { FRACTAL_SERVER_HOST } from '$env/static/private';
 import { responseError } from '$lib/common/errors';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('dataset API [v2]');
 
 /**
  * Fetches all the datasets of a user
@@ -7,6 +10,7 @@ import { responseError } from '$lib/common/errors';
  * @returns {Promise<*>}
  */
 export async function getUserDatasets(fetch) {
+	logger.debug('Fetching the list of the user datasets from the server');
 	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/dataset/?history=false`, {
 		method: 'GET',
 		credentials: 'include'
@@ -16,6 +20,7 @@ export async function getUserDatasets(fetch) {
 		return await response.json();
 	}
 
+	logger.error('Unable to fetch the list of user datasets from the server');
 	await responseError(response);
 }
 
@@ -30,6 +35,9 @@ export async function getUserDatasets(fetch) {
  * @returns {Promise<import('$lib/types-v2').ImagePage>}
  */
 export async function getDatasetImages(fetch, projectId, datasetId, page, pageSize, params) {
+	logger.debug(
+		`Fetching the list of dataset images [dataset_id=${datasetId}] [project_id=${projectId}] [page=${page}] [page_size=${pageSize}]`
+	);
 	const headers = new Headers();
 	headers.set('Content-Type', 'application/json');
 
@@ -45,6 +53,9 @@ export async function getDatasetImages(fetch, projectId, datasetId, page, pageSi
 	);
 
 	if (!response.ok) {
+		logger.error(
+			`Unable to fetch the list of dataset images [dataset_id=${datasetId}] [project_id=${projectId}] [page=${page}] [page_size=${pageSize}]`
+		);
 		await responseError(response);
 	}
 
