@@ -1,4 +1,4 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -13,7 +13,7 @@ const logger = getLogger('projects API [v1]');
  */
 export async function listProjects(fetch) {
 	logger.debug('Fetching the list of projects');
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v1/project/', {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + '/api/v1/project/', {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -34,7 +34,7 @@ export async function listProjects(fetch) {
  */
 export async function getProject(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/`, {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/`, {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -58,7 +58,7 @@ export async function getProject(fetch, projectId) {
 export async function getProjectDatasets(fetch, projectId) {
 	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/?history=false`,
+		env.FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/?history=false`,
 		{
 			method: 'GET',
 			credentials: 'include'
@@ -86,7 +86,7 @@ export async function getProjectDatasets(fetch, projectId) {
 export async function getDataset(fetch, projectId, datasetId) {
 	logger.debug('Fetching dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}/`,
+		env.FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/dataset/${datasetId}/`,
 		{
 			method: 'GET',
 			credentials: 'include'
@@ -110,7 +110,7 @@ export async function getDataset(fetch, projectId, datasetId) {
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/job/?log=false`, {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v1/job/?log=false`, {
 		method: 'GET',
 		credentials: 'include'
 	});

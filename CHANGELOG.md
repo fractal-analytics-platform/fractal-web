@@ -2,6 +2,9 @@
 
 # Unreleased
 
+Note: with this release all the environment variables will be read from the environment, when the service is started, not during build time. Remember to load in your environment all the variables that you need when you start the service in production. This will not affect development setup.
+
+* Imported all the environment variables dynamically (\#492).
 * Added backend logging using Log4js (\#492).
 * Improved JSON Schema Sandbox page (\#490).
 

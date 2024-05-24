@@ -1,4 +1,4 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -12,7 +12,7 @@ const logger = getLogger('workflow API [v1]');
  */
 export async function getWorkflows(fetch, projectId) {
 	logger.debug('Fetching project workflows [project_id=%d]', projectId);
-	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/`, {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -35,7 +35,7 @@ export async function getWorkflows(fetch, projectId) {
 export async function getWorkflow(fetch, projectId, workflowId) {
 	logger.debug('Fetching workflow [workflow_id=%d] [project_id=%d]', workflowId, projectId);
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/`,
+		env.FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/`,
 		{
 			method: 'GET',
 			credentials: 'include'
@@ -64,7 +64,7 @@ export async function getWorkflow(fetch, projectId, workflowId) {
 export async function getWorkflowJobs(fetch, projectId, workflowId) {
 	logger.debug('Fetching workflow jobs [workflow_id=%d] [project_id=%d]', workflowId, projectId);
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/job/`,
+		env.FRACTAL_SERVER_HOST + `/api/v1/project/${projectId}/workflow/${workflowId}/job/`,
 		{
 			method: 'GET',
 			credentials: 'include'

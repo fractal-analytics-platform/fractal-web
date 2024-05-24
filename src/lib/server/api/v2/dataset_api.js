@@ -1,4 +1,4 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -22,7 +22,7 @@ export async function getDatasetImages(fetch, projectId, datasetId, page, pageSi
 	headers.set('Content-Type', 'application/json');
 
 	const response = await fetch(
-		FRACTAL_SERVER_HOST +
+		env.FRACTAL_SERVER_HOST +
 			`/api/v2/project/${projectId}/dataset/${datasetId}/images/query/?page=${page}&page_size=${pageSize}`,
 		{
 			method: 'POST',

@@ -1,4 +1,4 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -31,7 +31,7 @@ export async function handle({ event, resolve }) {
 		});
 	}
 
-	const currentUser = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/current-user/`);
+	const currentUser = await event.fetch(`${env.FRACTAL_SERVER_HOST}/auth/current-user/`);
 	if (!currentUser.ok) {
 		logger.debug('Validation of authentication - Error loading user info');
 		return new Response(null, {
@@ -58,7 +58,7 @@ export async function handleFetch({ event, request, fetch }) {
 	2. https://kit.svelte.dev/docs/hooks#server-hooks-handlefetch
 	*/
 
-	if (request.url.startsWith(FRACTAL_SERVER_HOST)) {
+	if (request.url.startsWith(env.FRACTAL_SERVER_HOST)) {
 		logger.trace('Including cookie into request to %s, via handleFetch', request.url);
 		const cookie = event.request.headers.get('cookie');
 		if (cookie) {

@@ -1,4 +1,4 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -11,7 +11,7 @@ const logger = getLogger('admin API [v2]');
  */
 export async function listProjects(fetch) {
 	logger.debug('Fetching the list of projects');
-	const response = await fetch(FRACTAL_SERVER_HOST + '/admin/v2/project/', {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + '/admin/v2/project/', {
 		method: 'GET',
 		credentials: 'include'
 	});

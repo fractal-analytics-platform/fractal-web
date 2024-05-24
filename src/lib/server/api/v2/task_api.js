@@ -1,4 +1,4 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors.js';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -14,7 +14,7 @@ export async function listTasks(fetch) {
 
 	// Compose request
 	const response = await fetch(
-		FRACTAL_SERVER_HOST + '/api/v2/task/?args_schema_non_parallel=false&args_schema_parallel=false',
+		env.FRACTAL_SERVER_HOST + '/api/v2/task/?args_schema_non_parallel=false&args_schema_parallel=false',
 		{
 			method: 'GET',
 			credentials: 'include',
@@ -39,7 +39,7 @@ export async function listLegacyTasks(fetch) {
 	logger.debug('Fetching legacy tasks');
 
 	// Compose request
-	const response = await fetch(FRACTAL_SERVER_HOST + '/api/v2/task-legacy/?args_schema=false', {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + '/api/v2/task-legacy/?args_schema=false', {
 		method: 'GET',
 		credentials: 'include',
 		mode: 'cors'
