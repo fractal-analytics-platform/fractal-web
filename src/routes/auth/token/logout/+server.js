@@ -11,8 +11,8 @@ export async function POST({ fetch, request, cookies }) {
 		path: `${env.AUTH_COOKIE_PATH || '/'}`,
 		expires: new Date(0),
 		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${env.AUTH_COOKIE_SAME_SITE || 'lax'}`),
-		secure: `${env.AUTH_COOKIE_SECURE}` === 'true',
-		httpOnly: `${env.AUTH_COOKIE_HTTP_ONLY}` !== 'false'
+		secure: `${env.AUTH_COOKIE_SECURE}` !== 'false',
+		httpOnly: true
 	});
 
 	return new Response(null, { status: 204 });

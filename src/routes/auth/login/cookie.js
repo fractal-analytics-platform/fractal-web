@@ -16,8 +16,8 @@ export function setCookieFromToken(request, cookies, accessToken) {
 		path: `${env.AUTH_COOKIE_PATH || '/'}`,
 		expires: new Date(/** @type {number} */ (tokenClaims.exp) * 1000),
 		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${env.AUTH_COOKIE_SAME_SITE || 'lax'}`),
-		secure: `${env.AUTH_COOKIE_SECURE}` === 'true',
-		httpOnly: `${env.AUTH_COOKIE_HTTP_ONLY}` !== 'false'
+		secure: `${env.AUTH_COOKIE_SECURE}` !== 'false',
+		httpOnly: true
 	};
 	cookies.set(env.AUTH_COOKIE_NAME || 'fastapiusersauth', accessToken, cookieOptions);
 }
