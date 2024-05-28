@@ -77,8 +77,9 @@ Note that the `node` command relies on some environment variables, and
 especially on `ORIGIN`:
 > HTTP doesn't give SvelteKit a reliable way to know the URL that is currently
 > being requested. The simplest way to tell SvelteKit where the app is being
-> served is to set the `ORIGIN` environment variable.
-> (https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-and-hostheader)
+> served is to set the `ORIGIN` environment variable 
+> (see [SvelteKit node servers documentation](https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-hostheader-and-port-header)).
+> A wrong origin value will result in the error message "Cross-site POST form submissions are forbidden".
 
 For development, run the client application via
 ```bash

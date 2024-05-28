@@ -1,5 +1,5 @@
 {
-	"name": "fractal-app",
+	"name": "fractal-web",
 	"version": "1.0.4",
 	"private": true,
 	"scripts": {
@@ -47,5 +47,7 @@
 		"log4js": "^6.9.1",
 		"marked": "^7.0.4",
 		"slim-select": "^2.8.1"
-	}
+	},
+	"files": ["build"],
+	"bundledDependencies": true
 }
