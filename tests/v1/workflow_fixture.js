@@ -97,9 +97,10 @@ export class PageWithWorkflow extends PageWithProject {
 
 	/**
 	 * @param {string} taskName
+	 * @param {string|null} version
 	 * @returns {Promise<void>}
 	 */
-	async addUserTask(taskName) {
+	async addUserTask(taskName, version = null) {
 		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
@@ -119,6 +120,9 @@ export class PageWithWorkflow extends PageWithProject {
 		expect(testTaskItem).not.toBeNull();
 		await /** @type {import('@playwright/test').Locator} */ (testTaskItem).click();
 		await this.page.locator('#taskId').waitFor();
+		if (version) {
+			await this.page.getByRole('combobox', { name: 'Select task version' }).selectOption(version);
+		}
 		await this.page.getByRole('button', { name: 'Insert' }).click();
 		await waitModalClosed(this.page);
 	}

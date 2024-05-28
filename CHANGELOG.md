@@ -4,6 +4,7 @@
 
 Note: with this release all the environment variables will be read from the environment, when the service is started, not during build time. Remember to load in your environment all the variables that you need when you start the service in production. This will not affect development setup.
 
+* Fixed v1 workflow task version update bug (\#492).
 * Added `npm pack` artifacts to files published by the CI during the release (\#492).
 * Fixed v2 admin job download link (\#492).
 * Imported all the environment variables dynamically (\#492).
