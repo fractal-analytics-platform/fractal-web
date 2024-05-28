@@ -15,3 +15,4 @@ playwright-report/
 venv
 site
 *.log
+test-results/

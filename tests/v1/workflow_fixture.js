@@ -104,6 +104,7 @@ export class PageWithWorkflow extends PageWithProject {
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
 		await this.page.getByText('User tasks').click();
+		await expect(modal.locator('.spinner-border')).toHaveCount(0);
 		const selector = modal.getByRole('combobox').first();
 		await selector.click();
 		const items = await this.page.getByRole('option').all();

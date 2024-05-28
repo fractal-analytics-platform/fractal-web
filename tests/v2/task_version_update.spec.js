@@ -168,6 +168,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Update parallel task to v3 (no fix needed)', async () => {
+		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await page.getByRole('textbox', { name: 'p2' }).fill('test-value');
 		await page.getByRole('button', { name: 'Save changes' }).click();

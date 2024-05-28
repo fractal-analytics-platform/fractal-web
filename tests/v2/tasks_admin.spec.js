@@ -30,6 +30,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Open tasks admin page', async () => {
 		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
 	});
 
 	/** @type {number} */
@@ -39,8 +40,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await expect(page.getByRole('table')).toBeVisible();
 		total = await page.getByRole('row').count();
 		expect(total).toBeGreaterThan(0);
-		await page.getByRole('button', { name: 'Reset' }).click();
-		await expect(page.getByRole('row')).toHaveCount(0);
+		await reset(page);
 	});
 
 	let id;
@@ -50,14 +50,14 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await expect(page.getByRole('row')).toHaveCount(2);
 		// Retrieve task id
 		id = await page.getByRole('row').last().getByRole('cell').first().innerText();
-		await page.getByRole('button', { name: 'Reset' }).click();
+		await reset(page);
 	});
 
 	await test.step('Search tasks by id', async () => {
 		await page.getByRole('spinbutton', { name: 'Id' }).fill(id);
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
-		await page.getByRole('button', { name: 'Reset' }).click();
+		await reset(page);
 	});
 
 	await test.step('Search tasks by common kind', async () => {
@@ -67,7 +67,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		let count = await page.getByRole('row').count();
 		expect(count).toBeLessThan(total);
 		await page.getByRole('cell', { name: 'cellpose_segmentation', exact: true }).waitFor();
-		await page.getByRole('button', { name: 'Reset' }).click();
+		await reset(page);
 	});
 
 	await test.step('Search tasks by users kind', async () => {
@@ -77,7 +77,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		let count = await page.getByRole('row').count();
 		expect(count).toBeLessThan(total);
 		await page.getByText(taskName).waitFor();
-		await page.getByRole('button', { name: 'Reset' }).click();
+		await reset(page);
 	});
 
 	await test.step('Search tasks by owner', async () => {
@@ -86,14 +86,14 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await expect(page.getByRole('table')).toBeVisible();
 		const count = await page.getByRole('row').count();
 		expect(count).toBeLessThan(total);
-		await page.getByRole('button', { name: 'Reset' }).click();
+		await reset(page);
 	});
 
 	await test.step('Search tasks by source', async () => {
 		await page.getByRole('textbox', { name: 'Source' }).fill('cellpose_segmentation');
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
-		await page.getByRole('button', { name: 'Reset' }).click();
+		await reset(page);
 	});
 
 	await test.step('Search tasks by version', async () => {
@@ -130,4 +130,12 @@ async function searchTasks(page) {
 	// Increasing the results limit since during the tests many tasks may have been created
 	await page.getByRole('spinbutton', { name: 'Max number of results' }).fill('200');
 	await page.getByRole('button', { name: 'Search tasks' }).click();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+async function reset(page) {
+	await page.getByRole('button', { name: 'Reset' }).click();
+	await expect(page.getByRole('table')).not.toBeVisible();
 }

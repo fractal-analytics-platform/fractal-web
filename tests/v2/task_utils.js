@@ -99,12 +99,7 @@ export async function deleteTask(page, taskName, version = 'v2') {
  * @returns {Promise<import('@playwright/test').Locator>}
  */
 async function getTaskRow(page, taskName) {
-	const rows = await page.getByRole('table').last().getByRole('row').all();
-	for (const row of rows) {
-		const rowTaskName = (await row.getByRole('cell').first().innerText()).trim();
-		if (rowTaskName === taskName) {
-			return row;
-		}
-	}
-	throw new Error(`Unable to find task ${taskName} in tasks table`);
+	const row = page.getByRole('table').last().getByRole('row', { name: taskName });
+	await row.waitFor();
+	return row;
 }

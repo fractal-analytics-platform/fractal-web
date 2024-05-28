@@ -3,7 +3,7 @@ import { waitPageLoading } from '../utils.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
 
-test('Execute a job and show it on the job tables', async ({ page, request }) => {
+test('Execute a job and show it on the job tables [v1]', async ({ page, request }) => {
 	/** @type {PageWithWorkflow} */
 	let workflow1;
 	await test.step('Create first job and wait its failure', async () => {
@@ -45,6 +45,14 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 		expect(await cells2[9].innerText()).toEqual('admin@fractal.xy');
 	});
 
+	await test.step('Download job logs', async () => {
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByRole('row', { name: workflow1.workflowName }).getByRole('link').click();
+		const download = await downloadPromise;
+		const downloadedFile = await download.path();
+		expect(fs.statSync(downloadedFile).size).toBeGreaterThan(0);
+	});
+
 	await test.step('Download CSV', async () => {
 		const downloadPromise = page.waitForEvent('download');
 		await page.getByText('Download CSV').click();
@@ -56,6 +64,7 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 
 	await test.step('Search workflow2 job', async () => {
 		await page.getByText('Reset').click();
+		await expect(page.getByRole('table')).not.toBeVisible();
 		await page.selectOption('#user', '1');
 		await page.locator('#project').fill(workflow2.projectId?.toString() || '');
 		await page.locator('#workflow').fill(workflow2.workflowId?.toString() || '');
@@ -66,6 +75,7 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 
 	await test.step('Search running jobs', async () => {
 		await page.getByText('Reset').click();
+		await expect(page.getByRole('table')).not.toBeVisible();
 		await page.selectOption('#status', 'submitted');
 		await search(page);
 		const statuses = page.locator('table tbody tr td:nth-child(2)');
@@ -82,6 +92,7 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 
 	await test.step('Search failed jobs', async () => {
 		await page.getByText('Reset').click();
+		await expect(page.getByRole('table')).not.toBeVisible();
 		await page.selectOption('#status', 'failed');
 		await search(page);
 		const statuses = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
@@ -105,6 +116,7 @@ test('Execute a job and show it on the job tables', async ({ page, request }) =>
 
 	await test.step('Search by id', async () => {
 		await page.getByText('Reset').click();
+		await expect(page.getByRole('table')).not.toBeVisible();
 		await search(page);
 		await expect(page.getByRole('table')).toBeVisible();
 		const firstRowId = await page.locator('table tbody tr td:first-child').first().innerText();
