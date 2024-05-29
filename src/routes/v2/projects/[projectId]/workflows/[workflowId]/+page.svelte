@@ -38,7 +38,7 @@
 	let availableTasksV2 = [];
 
 	/** @type {number|undefined} */
-	let selectedDatasetId;
+	let selectedDatasetId = undefined;
 
 	let jobError = '';
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
