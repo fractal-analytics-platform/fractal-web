@@ -173,6 +173,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByRole('textbox', { name: 'p2' }).fill('test-value');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
 			.getByRole('combobox', { name: 'New versions of this task exist:' })

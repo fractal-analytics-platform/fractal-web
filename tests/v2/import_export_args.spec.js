@@ -123,7 +123,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Argument name').nth(1).fill('key_parallel');
 		await page.getByPlaceholder('Argument value').nth(1).fill('value_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
-		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 
 		const { file, data } = await exportArgs(page, compoundTaskWithoutArgsSchema);
 		expect(data.args_non_parallel.key_non_parallel).toEqual('value_non_parallel');
@@ -132,6 +132,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 			args_non_parallel: { key_non_parallel: 'value_non_parallel-updated' },
 			args_parallel: { key_parallel: 'value_parallel-updated' }
 		};
+		await expect(page.getByText('Arguments changes saved successfully')).toHaveCount(0);
 		await importValidArgs(page, file, newData);
 		await page.getByText('Arguments changes saved successfully').waitFor();
 		await workflow.removeCurrentTask();
