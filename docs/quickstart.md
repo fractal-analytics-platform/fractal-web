@@ -1,5 +1,7 @@
 # Quickstart instructions
 
+> This page describes how to install fractal-web from release packages. If you need to install it from the git repository see the [development setup page](./development/setup.md).
+
 ## Install node
 
 Versions 18 or 20 of Node.js are recommended (check your version with `node
@@ -14,11 +16,7 @@ nvm install 18
 nvm alias default 18
 ```
 
-## Install fractal-web
-
-There are 2 ways to install fractal-web: from release packages (more suited for production and testing) and from git repository (more suited for development).
-
-### Install fractal-web from release packages
+## Install fractal-web from release packages
 
 Starting from version 1.1.0, fractal-web releases provide tar.gz files containing the built files for each supported node version. You can install these packages with the following command:
 
@@ -30,60 +28,17 @@ FRACTAL_WEB_VERSION=1.1.0 && NODE_MAJOR_VERSION=20 && wget -qO- "https://github.
 
 To start the application installed in this way see the section "Run fractal-web from the build folder".
 
-### Install fractal-web from git repository
-
-Clone this repository
-```bash
-git clone https://github.com/fractal-analytics-platform/fractal-web.git
-cd fractal-web
-```
-then optionally checkout to a specific version tag
-```
-git checkout v0.6.0
-```
-and finally install via
-```bash
-npm install
-```
-
 ## Set environment variables
 
-To properly run fractal-web you have to configure some environment variables. The [environment variables page](./environment-variables.md) contains the complete list of supported environment variables and their default values.
+To properly run fractal-web you have to configure some environment variables. The [environment variables page](./environment-variables.md) contains the complete list of supported environment variables and their default values. It also includes some troubleshooting infomation about errors related to environment variables misconfiguration.
 
-If you want to run the application executing `node` in the `build` folder you have to export the environment variables in your shell. See the section "Run fractal-web from the build folder" for more details.
-
-When running the application from the git repository, environment variables are set either in `.env` or `.env.development` files, see
-[vite documentation](https://vitejs.dev/guide/env-and-mode.html#env-files)
-(briefly: `.env.development` is the relevant file when using `npm run dev` and `.env` is the relevant file when using `npm run preview`).
-
-You can also add your customizations in a file named `.env.local` or `.env.development.local` to avoid writing on env files that are under version control.
-
-### Common issues related to environment variables
-
-The `node` command relies on some extra environment variables, and especially on `ORIGIN`:
-
-> HTTP doesn't give SvelteKit a reliable way to know the URL that is currently
-> being requested. The simplest way to tell SvelteKit where the app is being
-> served is to set the `ORIGIN` environment variable 
-> (see [SvelteKit node servers documentation](https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-hostheader-and-port-header)).
-> A wrong origin value will result in the error message "Cross-site POST form submissions are forbidden".
-
-Unexpected behaviors can be related to wrong values of the `AUTH_COOKIE_DOMAIN` variable:
-
-> A typical gotcha: if there is a mismatch between the cookie domain and the
-> URL you are using (e.g. one points to localhost and the other one to
-> 127.0.0.1), then the cookie won't be set and this will fail silently,
-> therefore likely triggering other unexpected behaviors.
-> If you leave the `AUTH_COOKIE_DOMAIN` empty, the cookie domain will be
-> inferred from the HTTP call. This is useful to avoid domain mismatch issues
-> during testing and development, but in production is suggested to set it as
-> the name of the domain where the fractal-web server is running.
+If you want to run the application executing `node` in the `build` folder you have to export the environment variables in your shell. The following section provides an example on how to do that with a script.
 
 ## Run fractal-web from the build folder
 
 You can create a script with the following content to run fractal-web installed from a release package:
 
-```commandline
+```bash
 #!/bin/sh
 
 export FRACTAL_SERVER_HOST=http://localhost:8000
@@ -112,30 +67,6 @@ node build/
 
 **Note**: starting from Node 20 you can also load the environment variables from a file using the `--env-file` flag:
 
-```commandline
+```bash
 node --env-file=.env build
 ```
-
-## Run fractal-web from git repo
-
-For development, run the client application via
-
-```bash
-npm run dev
-```
-
-The application will run at `http://localhost:5173`.
-
-To test a production build, first execute
-
-```bash
-npm run build
-```
-
-And then
-
-```bash
-npm run preview
-```
-
-Also in this case the application runs at `http://localhost:5173`.

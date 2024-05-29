@@ -15,4 +15,30 @@ The following environment variables can be used to configure fractal-web.
 * `PUBLIC_OAUTH_CLIENT_NAME`: if set, the application enables the external account login via OAuth2; the name is used to create the authorization call sent to fractal-server;
 * `LOG_FILE`: the path of the file where logs will be written; by default is unset and no file will be created;
 * `LOG_LEVEL_FILE`: the log level of logs that will be written to the file; the default value is `info`;
-* `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`;
+* `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`.
+
+When running directly using `node` command these extra variables can also be configured:
+
+* `PORT`: specifies the port where Svelte server will run; the default value is 5173;
+* `ORIGIN` the URL where the app will be served (e.g. http://localhost:5173).
+
+## Common issues related to environment variables
+
+The `node` command relies on some extra environment variables, and especially on `ORIGIN`:
+
+> HTTP doesn't give SvelteKit a reliable way to know the URL that is currently
+> being requested. The simplest way to tell SvelteKit where the app is being
+> served is to set the `ORIGIN` environment variable 
+> (see [SvelteKit node servers documentation](https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-hostheader-and-port-header)).
+> A wrong origin value will result in the error message "Cross-site POST form submissions are forbidden".
+
+Unexpected behaviors can be related to wrong values of the `AUTH_COOKIE_DOMAIN` variable:
+
+> A typical gotcha: if there is a mismatch between the cookie domain and the
+> URL you are using (e.g. one points to localhost and the other one to
+> 127.0.0.1), then the cookie won't be set and this will fail silently,
+> therefore likely triggering other unexpected behaviors.
+> If you leave the `AUTH_COOKIE_DOMAIN` empty, the cookie domain will be
+> inferred from the HTTP call. This is useful to avoid domain mismatch issues
+> during testing and development, but in production is suggested to set it as
+> the name of the domain where the fractal-web server is running.
