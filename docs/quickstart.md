@@ -1,6 +1,6 @@
 # Quickstart instructions
 
-## Intall node
+## Install node
 
 Versions 18 or 20 of Node.js are recommended (check your version with `node
 -v`). Version 16 is known to work, but not recommended.
@@ -15,6 +15,22 @@ nvm alias default 18
 ```
 
 ## Install fractal-web
+
+There are 2 ways to install fractal-web: from release packages (more suited for production and testing) and from git repository (more suited for development).
+
+### Install fractal-web from release packages
+
+Starting from version 1.1.0, fractal-web releases provide tar.gz files containing the built files for each supported node version. You can install these packages with the following command:
+
+```
+FRACTAL_WEB_VERSION=1.1.0 && NODE_MAJOR_VERSION=20 && wget -qO- "https://github.com/fractal-analytics-platform/fractal-web/releases/download/v${FRACTAL_WEB_VERSION}/node-${NODE_MAJOR_VERSION}-fractal-web-v${FRACTAL_WEB_VERSION}.tar.gz" | tar -xz
+```
+
+**Note**: this will unpack in the current working directory the file `package.json` and the folders `build` and `node_modules`.
+
+To start the application installed in this way see the section "Run fractal-web from the build folder".
+
+### Install fractal-web from git repository
 
 Clone this repository
 ```bash
@@ -32,59 +48,27 @@ npm install
 
 ## Set environment variables
 
-Environment variables are set either in `.env` or `.env.development` files, see
+To properly run fractal-web you have to configure some environment variables. The [environment variables page](./environment-variables.md) contains the complete list of supported environment variables and their default values.
+
+If you want to run the application executing `node` in the `build` folder you have to export the environment variables in your shell. See the section "Run fractal-web from the build folder" for more details.
+
+When running the application from the git repository, environment variables are set either in `.env` or `.env.development` files, see
 [vite documentation](https://vitejs.dev/guide/env-and-mode.html#env-files)
-(briefly: `.env.development` is the relevant file when using `npm run dev`).
-
-Here is an example of a `.env` file:
-```bash
-FRACTAL_SERVER_HOST=http://localhost:8000
-
-# AUTH COOKIE
-AUTH_COOKIE_NAME=fastapiusersauth
-AUTH_COOKIE_SECURE=false
-# remember to set this in production
-AUTH_COOKIE_DOMAIN=
-AUTH_COOKIE_PATH=/
-AUTH_COOKIE_MAX_AGE=1800
-AUTH_COOKIE_SAME_SITE=lax
-AUTH_COOKIE_HTTP_ONLY=true
-
-# PUBLIC VARIABLES (accessible from client side)
-PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL=help@localhost
-PUBLIC_UPDATE_JOBS_INTERVAL=3000
-PUBLIC_OAUTH_CLIENT_NAME=
-
-# Logging configuration (used in Svelte backend)
-LOG_FILE=/tmp/fractal-web.log
-LOG_LEVEL_FILE=info
-LOG_LEVEL_CONSOLE=warn
-```
+(briefly: `.env.development` is the relevant file when using `npm run dev` and `.env` is the relevant file when using `npm run preview`).
 
 You can also add your customizations in a file named `.env.local` or `.env.development.local` to avoid writing on env files that are under version control.
 
-## Web client startup
+### Common issues related to environment variables
 
-For testing and production, start fractal-web executing
-```
-npm run build    # corresponding to `vite build`, which creates a `build` folder
-ORIGIN=http://localhost:5173 PORT=5173 node build
-```
+The `node` command relies on some extra environment variables, and especially on `ORIGIN`:
 
-The application is now running at `http://localhost:5173`.
-
-Note that the `node` command relies on some environment variables, and
-especially on `ORIGIN`:
 > HTTP doesn't give SvelteKit a reliable way to know the URL that is currently
 > being requested. The simplest way to tell SvelteKit where the app is being
 > served is to set the `ORIGIN` environment variable 
 > (see [SvelteKit node servers documentation](https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-hostheader-and-port-header)).
 > A wrong origin value will result in the error message "Cross-site POST form submissions are forbidden".
 
-For development, run the client application via
-```bash
-npm run dev
-```
+Unexpected behaviors can be related to wrong values of the `AUTH_COOKIE_DOMAIN` variable:
 
 > A typical gotcha: if there is a mismatch between the cookie domain and the
 > URL you are using (e.g. one points to localhost and the other one to
@@ -94,3 +78,64 @@ npm run dev
 > inferred from the HTTP call. This is useful to avoid domain mismatch issues
 > during testing and development, but in production is suggested to set it as
 > the name of the domain where the fractal-web server is running.
+
+## Run fractal-web from the build folder
+
+You can create a script with the following content to run fractal-web installed from a release package:
+
+```commandline
+#!/bin/sh
+
+export FRACTAL_SERVER_HOST=http://localhost:8000
+export PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL=help@localhost
+export PUBLIC_OAUTH_CLIENT_NAME=
+# remember to set this in production
+export AUTH_COOKIE_DOMAIN=
+# set this to true in production
+export AUTH_COOKIE_SECURE=false
+
+export ORIGIN=http://localhost:5173
+export PORT=5173
+
+export LOG_FILE=fractal-web.log
+export LOG_LEVEL_FILE=info
+export LOG_LEVEL_CONSOLE=warn
+
+# default values are usually fine for the following variables; remove comments if needed
+#export AUTH_COOKIE_NAME=fastapiusersauth
+#export AUTH_COOKIE_PATH=/
+#export AUTH_COOKIE_SAME_SITE=lax
+#export PUBLIC_UPDATE_JOBS_INTERVAL=3000
+
+node build/
+```
+
+**Note**: starting from Node 20 you can also load the environment variables from a file using the `--env-file` flag:
+
+```commandline
+node --env-file=.env build
+```
+
+## Run fractal-web from git repo
+
+For development, run the client application via
+
+```bash
+npm run dev
+```
+
+The application will run at `http://localhost:5173`.
+
+To test a production build, first execute
+
+```bash
+npm run build
+```
+
+And then
+
+```bash
+npm run preview
+```
+
+Also in this case the application runs at `http://localhost:5173`.
