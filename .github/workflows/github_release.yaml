@@ -36,10 +36,13 @@ jobs:
       - name: Generate the package
         run: npm pack
 
-      - name: Rename the package
-        run: mv fractal-web-*.tgz node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tgz
+      - name: Extract the package
+        run: tar -xzf fractal-web-*.tgz
+
+      - name: Repack the package removing parent folder
+        run: tar -C package -czf node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tar.gz build package.json node_modules LICENSE  
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tgz
+          files: node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tar.gz
