@@ -58,6 +58,10 @@ export async function handleFetch({ event, request, fetch }) {
 	2. https://kit.svelte.dev/docs/hooks#server-hooks-handlefetch
 	*/
 
+	if (env.FRACTAL_SERVER_HOST.endsWith('/')) {
+		env.FRACTAL_SERVER_HOST = env.FRACTAL_SERVER_HOST.substring(0, env.FRACTAL_SERVER_HOST.length - 1);
+	}
+
 	if (request.url.startsWith(env.FRACTAL_SERVER_HOST)) {
 		logger.trace('Including cookie into request to %s, via handleFetch', request.url);
 		const cookie = event.request.headers.get('cookie');

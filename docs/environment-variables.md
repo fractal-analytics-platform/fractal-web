@@ -4,7 +4,7 @@ The following environment variables can be used to configure fractal-web.
 
 > Only when using `npm run dev` or `npm run preview` these variables are automatically read from `.env.development` and `.env` files. In production they must be set in the shell that starts the node process.
 
-* `FRACTAL_SERVER_HOST`: represents the URL of the fractal-server application (e.g. http://localhost:8000, or http://subdomain.example.org:8000); this variable is **required** and it should not contain a final slash;
+* `FRACTAL_SERVER_HOST`: represents the URL of the fractal-server application (e.g. http://localhost:8000, or http://subdomain.example.org:8000); this variable is **required**;
 * `AUTH_COOKIE_NAME`: the name of the cookie used to store the user session; the default value is `fastapiusersauth`;
 * `AUTH_COOKIE_DOMAIN`: specifies which server can receive the cookie; **remember to set it in production**;
 * `AUTH_COOKIE_PATH`: the URL path where the cookie will be available; the default value is `/`;
