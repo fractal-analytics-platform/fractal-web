@@ -26,7 +26,7 @@ FRACTAL_WEB_VERSION=1.1.0 && NODE_MAJOR_VERSION=20 && wget -qO- "https://github.
 
 **Note**: this will unpack in the current working directory the file `package.json` and the folders `build` and `node_modules`.
 
-To start the application installed in this way see the section "Run fractal-web from the build folder".
+To start the application installed in this way see the section [Run fractal-web from the build folder](#run-fractal-web-from-the-build-folder) below.
 
 ## Set environment variables
 
@@ -44,17 +44,16 @@ You can create a script with the following content to run fractal-web installed 
 export FRACTAL_SERVER_HOST=http://localhost:8000
 export PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL=help@localhost
 export PUBLIC_OAUTH_CLIENT_NAME=
-# remember to set this in production
+# remember to set this in production (e.g. subdomain.example.org)
 export AUTH_COOKIE_DOMAIN=
-# set this to true in production
-export AUTH_COOKIE_SECURE=false
 
 export ORIGIN=http://localhost:5173
 export PORT=5173
 
 export LOG_FILE=fractal-web.log
-export LOG_LEVEL_FILE=info
-export LOG_LEVEL_CONSOLE=warn
+# default values for logging levels (uncomment if needed)
+# export LOG_LEVEL_FILE=info
+# export LOG_LEVEL_CONSOLE=warn
 
 # default values are usually fine for the following variables; remove comments if needed
 #export AUTH_COOKIE_NAME=fastapiusersauth
