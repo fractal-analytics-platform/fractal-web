@@ -2,7 +2,12 @@
 
 # 1.1.0
 
-Note: with this release all the environment variables will be read from the environment, when the service is started, not during build time. Remember to load in your environment all the variables that you need when you start the service in production. This will not affect development setup.
+> WARNING: with this release all the environment variables will be read from
+> the environment, when the service is started, not during build time. Remember
+> to load in your environment all the variables that you need when you start
+> the service in production. This will not affect development setup.
+> See https://fractal-analytics-platform.github.io/fractal-web/quickstart/ for
+> instructions.
 
 * Updated quickstart documenting the changes related to environment variables (\#492).
 * Fixed bug in default dataset selection when job references a deleted dataset (\#492).
