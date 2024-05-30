@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.1.0
 
 Note: with this release all the environment variables will be read from the environment, when the service is started, not during build time. Remember to load in your environment all the variables that you need when you start the service in production. This will not affect development setup.
 
