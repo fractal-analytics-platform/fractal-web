@@ -1,41 +1,25 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors';
+import { getLogger } from '$lib/server/logger.js';
 
-/**
- * Fetches the list of jobs from the server
- * @param {typeof fetch} fetch
- * @returns {Promise<*>}
- */
-export async function getJobs(fetch) {
-	console.log('Fetching job from server');
-
-	const response = await fetch(FRACTAL_SERVER_HOST + `/admin/v1/job/?log=false`, {
-		method: 'GET',
-		credentials: 'include'
-	});
-
-	if (response.ok) {
-		return await response.json();
-	}
-
-	await responseError(response);
-}
+const logger = getLogger('admin API [v1]');
 
 /**
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<*>}
+ * @returns {Promise<import('$lib/types').Project[]>}
  */
 export async function listProjects(fetch) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/admin/v1/project/', {
+	logger.debug('Fetching the list of projects');
+	const response = await fetch(env.FRACTAL_SERVER_HOST + '/admin/v1/project/', {
 		method: 'GET',
 		credentials: 'include'
 	});
 
-	if (response.ok) {
-		return await response.json();
+	if (!response.ok) {
+		logger.error('Unable to fetch the list of projects');
+		await responseError(response);
 	}
 
-	console.error('Client unable to fetch projects list');
-	await responseError(response);
+	return await response.json();
 }

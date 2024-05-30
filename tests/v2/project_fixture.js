@@ -10,6 +10,9 @@ export class PageWithProject {
 		this.projectName = Math.random().toString(36).substring(7);
 	}
 
+	/**
+	 * @returns {Promise<string>} project id
+	 */
 	async createProject() {
 		await this.page.goto('/v2/projects');
 		await waitPageLoading(this.page);
@@ -33,9 +36,11 @@ export class PageWithProject {
 		await this.page.waitForURL(/\/v2\/projects\/\d+/);
 		this.url = this.page.url();
 		const match = this.url.match(/\/v2\/projects\/(\d+)/);
+		expect(match).not.toBeNull();
 		if (match) {
 			this.projectId = match[1];
 		}
+		return /** @type {string} */ (this.projectId);
 	}
 
 	async deleteProject() {

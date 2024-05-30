@@ -2,10 +2,9 @@
 
 Here are some useful details for `fractal-web` developments:
 
+* [Development setup](setup.md)
 * [Code-base structure](structure.md)
-* [External dependencies](dependencies.md)
-* [Tests](tests.md)
+* [Testing](tests.md)
 * [Documentation](docs.md)
 * [Precommit](precommit.md)
-* [JSON Schema component](json_schemas.md)
 * [Release](release.md)

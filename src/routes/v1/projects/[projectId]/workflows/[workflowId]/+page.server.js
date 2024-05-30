@@ -1,8 +1,11 @@
 import { getWorkflow } from '$lib/server/api/v1/workflow_api';
 import { getProjectDatasets } from '$lib/server/api/v1/project_api';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('workflow page [v1]');
 
 export async function load({ fetch, params }) {
-	console.log('Load workflow page');
+	logger.trace('Load workflow page');
 
 	const { projectId, workflowId } = params;
 

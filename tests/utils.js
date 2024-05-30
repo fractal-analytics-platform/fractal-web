@@ -13,7 +13,7 @@ export function generateUUID() {
  * @param {import('@playwright/test').Page} page
  */
 export async function waitPageLoading(page) {
-	await page.waitForFunction(() => !document.querySelector('.loading')?.classList.contains('show'));
+	await expect(page.locator('.loading.show')).toHaveCount(0);
 }
 
 /**

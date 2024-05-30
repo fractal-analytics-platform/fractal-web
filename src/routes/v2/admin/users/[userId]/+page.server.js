@@ -1,10 +1,11 @@
 import { getUser } from '$lib/server/api/v1/auth_api';
+import { getLogger } from '$lib/server/logger.js';
 
-/** @type {import('./$types').PageServerLoad} */
+const logger = getLogger('admin user page');
+
 export async function load({ fetch, params }) {
-	console.log(`Loading user ${params.userId}`);
+	logger.debug('Loading user %d', params.userId);
 
-	/** @type {import('$lib/types').User} */
 	const user = await getUser(fetch, params.userId);
 
 	return {

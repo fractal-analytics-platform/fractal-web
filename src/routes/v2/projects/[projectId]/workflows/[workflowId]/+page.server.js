@@ -1,9 +1,12 @@
 import { getWorkflow, getWorkflowJobs } from '$lib/server/api/v2/workflow_api';
 import { getProjectDatasets } from '$lib/server/api/v2/project_api';
 import { getDefaultWorkflowDataset } from '$lib/common/workflow_utilities';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('workflow page [v2]');
 
 export async function load({ fetch, params }) {
-	console.log('Load workflow page');
+	logger.trace('Load workflow page');
 
 	const { projectId, workflowId } = params;
 

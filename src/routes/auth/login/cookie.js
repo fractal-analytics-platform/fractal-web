@@ -1,12 +1,5 @@
 import * as jose from 'jose';
-import {
-	AUTH_COOKIE_NAME,
-	AUTH_COOKIE_DOMAIN,
-	AUTH_COOKIE_PATH,
-	AUTH_COOKIE_SAME_SITE,
-	AUTH_COOKIE_SECURE,
-	AUTH_COOKIE_HTTP_ONLY
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * @param {Request} request
@@ -19,12 +12,12 @@ export function setCookieFromToken(request, cookies, accessToken) {
 
 	// Set the authentication cookie
 	const cookieOptions = {
-		domain: `${AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`,
-		path: `${AUTH_COOKIE_PATH}`,
+		domain: `${env.AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`,
+		path: `${env.AUTH_COOKIE_PATH || '/'}`,
 		expires: new Date(/** @type {number} */ (tokenClaims.exp) * 1000),
-		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${AUTH_COOKIE_SAME_SITE}`),
-		secure: `${AUTH_COOKIE_SECURE}` === 'true',
-		httpOnly: `${AUTH_COOKIE_HTTP_ONLY}` === 'true'
+		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${env.AUTH_COOKIE_SAME_SITE || 'lax'}`),
+		secure: `${env.AUTH_COOKIE_SECURE}` !== 'false',
+		httpOnly: true
 	};
-	cookies.set(AUTH_COOKIE_NAME, accessToken, cookieOptions);
+	cookies.set(env.AUTH_COOKIE_NAME || 'fastapiusersauth', accessToken, cookieOptions);
 }

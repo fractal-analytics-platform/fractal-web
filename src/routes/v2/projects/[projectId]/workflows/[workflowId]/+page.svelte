@@ -38,7 +38,7 @@
 	let availableTasksV2 = [];
 
 	/** @type {number|undefined} */
-	let selectedDatasetId;
+	let selectedDatasetId = undefined;
 
 	let jobError = '';
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
@@ -602,7 +602,8 @@
 		if (selectedDatasetId === undefined) {
 			return;
 		}
-		const response = await fetch(`/api/v2/project/${project.id}/dataset/${selectedDatasetId}`, {
+		const datasetId = selectedDatasetId;
+		const response = await fetch(`/api/v2/project/${project.id}/dataset/${datasetId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -611,7 +612,7 @@
 			console.error(result);
 			return;
 		}
-		datasets = datasets.map((d) => (d.id === selectedDatasetId ? result : d));
+		datasets = datasets.map((d) => (d.id === datasetId ? result : d));
 	}
 
 	async function loadJobError() {

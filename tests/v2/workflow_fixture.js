@@ -95,6 +95,7 @@ export class PageWithWorkflow extends PageWithProject {
 		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
+		await expect(modal.locator('.spinner-border')).toHaveCount(0);
 		await this.selectTaskV1V2(modal, legacy);
 		await this.page.getByText('Common tasks').click();
 		await this.addTask(modal, taskName, taskVersion);
@@ -110,6 +111,7 @@ export class PageWithWorkflow extends PageWithProject {
 		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
+		await expect(modal.locator('.spinner-border')).toHaveCount(0);
 		await this.selectTaskV1V2(modal, legacy);
 		await this.page.getByText('User tasks').click();
 		await this.addTask(modal, taskName, taskVersion);

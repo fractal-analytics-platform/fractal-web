@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -39,9 +39,7 @@ jobs:
           AUTH_COOKIE_SECURE: false
           AUTH_COOKIE_DOMAIN:
           AUTH_COOKIE_PATH: /
-          AUTH_COOKIE_MAX_AGE: 1800
           AUTH_COOKIE_SAME_SITE: lax
-          AUTH_COOKIE_HTTP_ONLY: true
           PUBLIC_OAUTH_CLIENT_NAME:
           PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL:
         run: npm run build

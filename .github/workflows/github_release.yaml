@@ -4,6 +4,7 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+[a-c][0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-[a-c][0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+alpha[0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+beta[0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
@@ -11,8 +12,37 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['16', '18', '20']
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate build artifacts
+        run: npm run build
+
+      - name: Generate the package
+        run: npm pack
+
+      - name: Extract the package
+        run: tar -xzf fractal-web-*.tgz
+
+      - name: Repack the package removing parent folder
+        run: tar -C package -czf node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tar.gz build package.json node_modules LICENSE  
+
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
+        with:
+          files: node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tar.gz

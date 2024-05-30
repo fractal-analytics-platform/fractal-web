@@ -148,7 +148,7 @@
 	 */
 	function getDownloadUrl(row) {
 		if (admin) {
-			return `/api/admin/job/${row.id}/download`;
+			return `/api/admin/v2/job/${row.id}/download`;
 		} else {
 			return `/api/v2/project/${row.project_id}/job/${row.id}/download`;
 		}

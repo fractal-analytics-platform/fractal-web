@@ -1,5 +1,5 @@
 <script>
-	import { PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import { page } from '$app/stores';
 
 	$: userLoggedIn = !!$page.data.userInfo;
@@ -40,11 +40,11 @@
 		find the task you require in Fractal V2, please reach out to the support.
 	</p>
 
-	{#if PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
+	{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 		<h3 class="fw-light">Where to get support</h3>
 		<p>
-			<a href="mailto:{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">
-				{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
+			<a href="mailto:{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">
+				{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 			</a>
 		</p>
 	{/if}

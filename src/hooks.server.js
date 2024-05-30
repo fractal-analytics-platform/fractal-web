@@ -1,15 +1,18 @@
-import { FRACTAL_SERVER_HOST } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
+import { getLogger } from '$lib/server/logger.js';
+
+const logger = getLogger('hooks');
 
 export async function handle({ event, resolve }) {
-	console.log(`[${event.request.method}] - ${event.url.pathname}`);
+	logger.info('[%s] - %s', event.request.method, event.url.pathname);
 
 	if (
 		event.url.pathname == '/' ||
 		event.url.pathname.startsWith('/auth') ||
 		event.url.pathname.startsWith('/sandbox/jsonschema')
 	) {
-		console.log('Public page - No auth required');
+		logger.debug('Public page - No auth required');
 		return await resolve(event);
 	}
 
@@ -21,16 +24,16 @@ export async function handle({ event, resolve }) {
 	// Authentication guard
 	const fastApiUsersAuth = event.cookies.get('fastapiusersauth');
 	if (!fastApiUsersAuth) {
-		console.log('Authentication required - No auth cookie found - Redirecting to login');
+		logger.debug('Authentication required - No auth cookie found - Redirecting to login');
 		return new Response(null, {
 			status: 302,
 			headers: { location: '/auth/login?invalidate=true' }
 		});
 	}
 
-	const currentUser = await event.fetch(`${FRACTAL_SERVER_HOST}/auth/current-user/`);
+	const currentUser = await event.fetch(`${env.FRACTAL_SERVER_HOST}/auth/current-user/`);
 	if (!currentUser.ok) {
-		console.log('Validation of authentication - Error loading user info');
+		logger.debug('Validation of authentication - Error loading user info');
 		return new Response(null, {
 			status: 302,
 			headers: { location: '/auth/login?invalidate=true' }
@@ -55,8 +58,12 @@ export async function handleFetch({ event, request, fetch }) {
 	2. https://kit.svelte.dev/docs/hooks#server-hooks-handlefetch
 	*/
 
-	if (request.url.startsWith(FRACTAL_SERVER_HOST)) {
-		console.log(`Including cookie into request to ${request.url}, via handleFetch`);
+	if (env.FRACTAL_SERVER_HOST.endsWith('/')) {
+		env.FRACTAL_SERVER_HOST = env.FRACTAL_SERVER_HOST.substring(0, env.FRACTAL_SERVER_HOST.length - 1);
+	}
+
+	if (request.url.startsWith(env.FRACTAL_SERVER_HOST)) {
+		logger.trace('Including cookie into request to %s, via handleFetch', request.url);
 		const cookie = event.request.headers.get('cookie');
 		if (cookie) {
 			request.headers.set('cookie', cookie);

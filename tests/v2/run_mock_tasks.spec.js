@@ -2,7 +2,7 @@ import { expect, test } from './workflow_fixture.js';
 import { waitModalClosed, waitPageLoading } from '../utils.js';
 import fs from 'fs';
 import { createDataset } from './dataset_utils.js';
-import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
+import { waitTaskFailure, waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
 
 test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
@@ -147,8 +147,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait job failure', async () => {
-		await page.locator('.job-status-icon.bi-x').waitFor();
-		await page.getByText('The last job failed with the following error').waitFor();
+		await waitTaskFailure(page);
 	});
 
 	await test.step('Open error modal', async () => {

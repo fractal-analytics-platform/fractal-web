@@ -1,11 +1,11 @@
 {
-	"name": "fractal-app",
+	"name": "fractal-web",
 	"version": "1.0.4",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"preview": "vite preview",
+		"preview": "vite preview --port 5173",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
@@ -44,7 +44,10 @@
 		"ajv": "^8.12.0",
 		"dompurify": "^3.0.5",
 		"jose": "^4.14.4",
+		"log4js": "^6.9.1",
 		"marked": "^7.0.4",
 		"slim-select": "^2.8.1"
-	}
+	},
+	"files": ["build"],
+	"bundledDependencies": true
 }

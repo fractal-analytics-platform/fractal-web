@@ -128,7 +128,7 @@
 			return;
 		}
 		let response = await fetch(
-			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
+			`/api/v1/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
@@ -147,7 +147,7 @@
 		headers.set('Content-Type', 'application/json');
 
 		response = await fetch(
-			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
+			`/api/v1/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
 			{
 				method: 'POST',
 				credentials: 'include',

@@ -29,3 +29,11 @@ export async function waitTasksSuccess(page, count) {
 	await page.locator('.job-status-icon.bi-check').first().waitFor();
 	await expect(page.locator('.job-status-icon.bi-check')).toHaveCount(count);
 }
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+export async function waitTaskFailure(page) {
+	await page.locator('.job-status-icon.bi-x').waitFor();
+	await page.getByText('The last job failed with the following error').waitFor();
+}

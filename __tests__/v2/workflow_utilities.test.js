@@ -72,4 +72,15 @@ describe('Workflow Utilities', () => {
 		// return default dataset
 		expect(datasetId).toEqual(3);
 	});
+
+	it('Handles jobs with deleted datasets', () => {
+		const id = getDefaultWorkflowDataset(
+			[],
+			[
+				{ start_timestamp: '2024-04-24T15:18:37.868655+00:00', dataset_id: null },
+				{ start_timestamp: '2024-04-24T10:18:37.868655+00:00', dataset_id: 1 }
+			]
+		);
+		expect(id).toEqual(1);
+	});
 });
