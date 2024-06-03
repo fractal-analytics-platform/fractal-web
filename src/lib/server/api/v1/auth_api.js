@@ -29,7 +29,7 @@ export async function userAuthentication(fetch, data) {
 /**
  * Fetches user identity
  * @param {typeof fetch} fetch
- * @returns {Promise<import('$lib/types').User>}
+ * @returns {Promise<import('$lib/types').User|null>}
  */
 export async function getCurrentUser(fetch) {
 	logger.debug('Retrieving current user');
@@ -40,7 +40,7 @@ export async function getCurrentUser(fetch) {
 
 	if (!response.ok) {
 		logger.warn('Unable to retrieve the current user');
-		await responseError(response);
+		return null;
 	}
 
 	return await response.json();

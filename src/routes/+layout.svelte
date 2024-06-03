@@ -1,5 +1,6 @@
 <script>
 	import { browser } from '$app/environment';
+	import { afterNavigate, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
 	import { reloadVersionedPage } from '$lib/common/selected_api_version';
@@ -100,6 +101,12 @@
 		loading = false;
 		if (sessionStorage && userLoggedIn) {
 			sessionStorage.setItem('userLoggedIn', 'true');
+		}
+	});
+
+	afterNavigate(async () => {
+		if (location.href.includes('invalidate=true')) {
+			await invalidateAll();
 		}
 	});
 </script>
@@ -208,6 +215,11 @@
 		<div class="admin-border" />
 	{/if}
 	<div class="container p-4">
+		{#if !server.alive}
+			<div class="alert alert-danger">
+				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
+			</div>
+		{/if}
 		{#if userLoggedIn && !$page.data.userInfo.is_verified}
 			<div class="row">
 				<div class="col">
@@ -235,7 +247,10 @@
 			<div class="col d-flex justify-content-center">
 				<div class="hstack gap-3">
 					<span class="font-monospace">
-						fractal-server {server.version}, fractal-web {clientVersion}
+						{#if server.version}
+							fractal-server {server.version},
+						{/if}
+						fractal-web {clientVersion}
 					</span>
 				</div>
 			</div>

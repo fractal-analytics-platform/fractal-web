@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added maintenance banner when fractal-server is down (\#504).
+
 # 1.1.0
 
 > WARNING: with this release all the environment variables will be read from
