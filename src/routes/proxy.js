@@ -9,7 +9,7 @@ const logger = getLogger('proxy');
 export function createGetProxy(path) {
 	return async function GET({ params, url, request }) {
 		try {
-			logger.trace('[GET] /%s/%s/%s', path, params.path, url.search);
+			logger.info('[GET] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'GET',
 				credentials: 'include',
@@ -28,7 +28,7 @@ export function createGetProxy(path) {
 export function createPostProxy(path) {
 	return async function POST({ params, url, request }) {
 		try {
-			logger.trace('[POST] /%s/%s/%s', path, params.path, url.search);
+			logger.info('[POST] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'POST',
 				credentials: 'include',
@@ -48,7 +48,7 @@ export function createPostProxy(path) {
 export function createPatchProxy(path) {
 	return async function PATCH({ params, url, request }) {
 		try {
-			logger.trace('[PATCH] /%s/%s/%s', path, params.path, url.search);
+			logger.info('[PATCH] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'PATCH',
 				credentials: 'include',
@@ -68,7 +68,7 @@ export function createPatchProxy(path) {
 export function createDeleteProxy(path) {
 	return async function DELETE({ params, url, request }) {
 		try {
-			logger.trace('[DELETE] /%s/%s/%s', path, params.path, url.search);
+			logger.info('[DELETE] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'DELETE',
 				credentials: 'include',
