@@ -491,6 +491,37 @@ describe('JSchema', () => {
 		expect(input.getAttribute('min')).eq('5');
 		expect(input.getAttribute('max')).eq('10');
 	});
+
+	it('enum without type', async () => {
+		const result = renderSchema({
+			title: 'TaskFunction2',
+			type: 'object',
+			properties: {
+				arg2: {
+					$ref: '#/definitions/Color',
+					title: 'Arg2',
+					description: 'Description of arg2.'
+				}
+			},
+			required: ['arg2'],
+			additionalProperties: false,
+			definitions: {
+				Color: {
+					title: 'Color',
+					description: 'An enumeration.',
+					enum: [1, 2]
+				}
+			}
+		});
+
+		const dropdowns = result.getAllByRole('combobox');
+		expect(dropdowns.length).eq(1);
+		const [dropdown] = dropdowns;
+		expect(dropdown.options.length).eq(3);
+		expect(dropdown.options[0].text).eq('Select...');
+		expect(dropdown.options[1].text).eq('1');
+		expect(dropdown.options[2].text).eq('2');
+	});
 });
 
 /**

@@ -15,23 +15,17 @@
 {#if schemaProperty}
 	<div id="block-{key}" class="property-block">
 		<div class="property-container">
-			{#if schemaProperty.type === 'integer' || schemaProperty.type === 'number'}
+			{#if Array.isArray(schemaProperty.enum)}
+				<EnumProperty {schemaProperty} />
+			{:else if schemaProperty.type === 'integer' || schemaProperty.type === 'number'}
 				<NumberProperty {schemaProperty} />
-			{/if}
-			{#if schemaProperty.type === 'string'}
-				{#if 'enum' in schemaProperty}
-					<EnumProperty {schemaProperty} />
-				{:else}
-					<StringProperty {schemaProperty} />
-				{/if}
-			{/if}
-			{#if schemaProperty.type === 'boolean'}
+			{:else if schemaProperty.type === 'string'}
+				<StringProperty {schemaProperty} />
+			{:else if schemaProperty.type === 'boolean'}
 				<BooleanProperty {schemaProperty} />
-			{/if}
-			{#if schemaProperty.type === 'array'}
+			{:else if schemaProperty.type === 'array'}
 				<ArrayProperty {schemaProperty} />
-			{/if}
-			{#if schemaProperty.type === 'object'}
+			{:else if schemaProperty.type === 'object'}
 				<ObjectProperty objectSchema={schemaProperty} />
 			{/if}
 		</div>
