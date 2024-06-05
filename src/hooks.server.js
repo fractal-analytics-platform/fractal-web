@@ -23,7 +23,7 @@ export async function handle({ event, resolve }) {
 		// reach this point if a not existing file is requested. That could happen after an update
 		// if the browser is loading a cached page that references to outdated contents.
 		// In that case we can just skip the whole function.
-		await resolve(event);
+		return await resolve(event);
 	}
 
 	if (event.url.pathname.startsWith('/api')) {
