@@ -17,19 +17,24 @@ if (env.FRACTAL_SERVER_HOST.endsWith('/')) {
 }
 
 export async function handle({ event, resolve }) {
-	if (event.url.pathname.startsWith('/_app')) {
-		// The _app folder contains static files that are the result of npm build.
-		// The hooks handle function is not called when loading valid static files, however we can
-		// reach this point if a not existing file is requested. That could happen after an update
-		// if the browser is loading a cached page that references to outdated contents.
-		// In that case we can just skip the whole function.
-		return await resolve(event);
-	}
-
 	if (event.url.pathname.startsWith('/api')) {
 		// API page - AJAX request - handled in proxy'
 		logger.trace('API endpoint detected, leaving the handling to the proxy');
 		return await resolve(event);
+	}
+
+	if (event.route.id === null) {
+		if (event.url.pathname.startsWith('/_app')) {
+			// The _app folder contains static files that are the result of npm build.
+			// The hooks handle function is not called when loading valid static files, however we can
+			// reach this point if a not existing file is requested. That could happen after an update
+			// if the browser is loading a cached page that references to outdated contents.
+			// In that case we can usually ignore the logs.
+			logger.trace('[%s] - %s - [NOT FOUND]', event.request.method, event.url.pathname);
+		} else {
+			logger.info('[%s] - %s - [NOT FOUND]', event.request.method, event.url.pathname);
+		}
+		throw error(404, 'Route not found');
 	}
 
 	logger.info('[%s] - %s', event.request.method, event.url.pathname);
