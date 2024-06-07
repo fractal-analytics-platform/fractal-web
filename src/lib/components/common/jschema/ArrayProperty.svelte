@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
 	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import { deepCopy } from '$lib/common/component_utilities';
 
 	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let schemaProperty;
@@ -141,7 +142,7 @@
 			}
 		} else {
 			for (let i = 0; i < schemaProperty.defaultValue.length; i++) {
-				addNestedProperty(JSON.parse(JSON.stringify(schemaProperty.defaultValue[i])));
+				addNestedProperty(deepCopy(schemaProperty.defaultValue[i]));
 			}
 		}
 	}

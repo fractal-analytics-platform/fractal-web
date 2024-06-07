@@ -31,6 +31,7 @@
 	import { SchemaValidator } from '$lib/common/jschema_validation.js';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
 	import { AlertError } from '$lib/common/errors';
+	import { deepCopy } from '$lib/common/component_utilities';
 
 	/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchema|undefined} */
 	export let schema = undefined;
@@ -69,7 +70,7 @@
 		if (schema !== undefined) {
 			validator = new SchemaValidator();
 			stripSchemaProperties(schema);
-			parsedSchema = JSON.parse(JSON.stringify(schema));
+			parsedSchema = deepCopy(schema);
 			console.log('Schema parsed', parsedSchema);
 			isSchemaValid = validator.loadSchema(parsedSchema);
 			console.log('Validator loaded schema. Is valid schema?', isSchemaValid);
@@ -120,7 +121,7 @@
 		// The following is required to remove all null values from the data object
 		// We suppose that null values are not valid, hence we remove them
 		// Deep copy the data object
-		const toStripData = JSON.parse(JSON.stringify(data));
+		const toStripData = deepCopy(data);
 		const strippedNullData = stripNullAndEmptyObjectsAndArrays(toStripData);
 		const isDataValid = validator.isValid(strippedNullData);
 		if (!isDataValid) {

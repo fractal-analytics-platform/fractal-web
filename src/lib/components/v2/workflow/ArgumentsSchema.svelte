@@ -8,6 +8,7 @@
 		stripSchemaProperties
 	} from '$lib/components/common/jschema/schema_management';
 	import FormBuilder from './FormBuilder.svelte';
+	import { deepCopy } from '$lib/common/component_utilities';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -124,14 +125,15 @@
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(stripNullAndEmptyObjectsAndArrays(payload))
+				body: JSON.stringify(stripNullAndEmptyObjectsAndArrays(deepCopy(payload)))
 			}
 		);
 
 		const result = await response.json();
 		if (response.ok) {
-			const argsNonParallel = deepCopyArgs(result.args_non_parallel);
-			const argsParallel = deepCopyArgs(result.args_parallel);
+			// deep copy the arguments objects to avoid side effects from the JSchema component
+			const argsNonParallel = deepCopy(result.args_non_parallel);
+			const argsParallel = deepCopy(result.args_parallel);
 			if (result.args_non_parallel) {
 				nonParallelSchemaComponent?.setArguments(argsNonParallel);
 			}
@@ -143,17 +145,6 @@
 			displayStandardErrorAlert(await result, 'task-args-validation-errors');
 		}
 		savingChanges = false;
-	}
-
-	/**
-	 * Returns a deep copy of the arguments object to avoid side effects from the JSchema component.
-	 * @param {object|null} args
-	 */
-	function deepCopyArgs(args) {
-		if (typeof args === 'object') {
-			return JSON.parse(JSON.stringify(args));
-		}
-		return null;
 	}
 
 	/**

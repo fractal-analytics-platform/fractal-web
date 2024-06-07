@@ -1,3 +1,5 @@
+import { deepCopy } from '$lib/common/component_utilities';
+
 export default class SchemaManager {
 	/**
 	 * @param {import('./jschema-types').JSONSchema|undefined} schema
@@ -41,7 +43,7 @@ export default class SchemaManager {
 			throw new Error('Schema data is undefined');
 		}
 		// Deep copy the schema data
-		return JSON.parse(JSON.stringify(schemaData));
+		return deepCopy(schemaData);
 	}
 
 	/**
@@ -243,7 +245,7 @@ export class SchemaProperty {
 
 			// Resolve the schema default value
 			if (schema.default !== undefined) {
-				this.defaultValue = JSON.parse(JSON.stringify(schema.default));
+				this.defaultValue = deepCopy(schema.default);
 			}
 			if (this.defaultValue === null) {
 				if (this.type === 'array') {
@@ -258,7 +260,7 @@ export class SchemaProperty {
 			if ('value' in schema && schema.value !== undefined) {
 				this.value = schema.value;
 			} else {
-				this.value = JSON.parse(JSON.stringify(this.defaultValue));
+				this.value = deepCopy(this.defaultValue);
 			}
 
 			if (currentValue !== undefined) {

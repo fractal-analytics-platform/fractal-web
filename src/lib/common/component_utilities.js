@@ -270,3 +270,10 @@ export function objectChanged(oldObject, newObject) {
 	}
 	return false;
 }
+
+/**
+ * @param {any} value
+ */
+export function deepCopy(value) {
+	return JSON.parse(JSON.stringify(value));
+}

@@ -1,5 +1,7 @@
 <script>
+	import { deepCopy } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { stripNullAndEmptyObjectsAndArrays } from '$lib/components/common/jschema/schema_management';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import example from './example.json';
 
@@ -71,7 +73,8 @@
 		if (!jschemaComponent) {
 			return;
 		}
-		jsonDataString = JSON.stringify(jschemaComponent.getArguments(), null, 2);
+		const deepCopyArgs = deepCopy(jschemaComponent.getArguments());
+		jsonDataString = JSON.stringify(stripNullAndEmptyObjectsAndArrays(deepCopyArgs), null, 2);
 	}
 </script>
 
