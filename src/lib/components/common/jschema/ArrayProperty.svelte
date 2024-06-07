@@ -1,8 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from '$lib/components/common/jschema/PropertyDiscriminator.svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 	import { deepCopy } from '$lib/common/component_utilities';
+	import PropertyLabel from './PropertyLabel.svelte';
 
 	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let schemaProperty;
@@ -168,10 +168,7 @@
 							data-bs-toggle="collapse"
 							data-bs-target="#{collapseSymbol}"
 						>
-							<span class={schemaProperty.isRequired() ? 'fw-bold' : ''}>
-								{schemaProperty.title || ''}
-							</span>
-							<PropertyDescription description={schemaProperty.description} />
+							<PropertyLabel {schemaProperty} tag="span" />
 						</button>
 					</div>
 					<div

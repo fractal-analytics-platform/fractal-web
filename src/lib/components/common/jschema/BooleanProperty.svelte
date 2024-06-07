@@ -1,7 +1,7 @@
 <script>
 	import { getContext } from 'svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
 	import { page } from '$app/stores';
+	import PropertyLabel from './PropertyLabel.svelte';
 
 	const schemaManager = getContext('schemaManager');
 
@@ -15,10 +15,7 @@
 
 <div class="d-flex align-items-center p-2">
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
-		<span class={schemaProperty.isRequired() ? 'fw-bold' : ''}>
-			{schemaProperty.title || 'Boolean argument'}
-		</span>
-		<PropertyDescription description={schemaProperty.description} />
+		<PropertyLabel {schemaProperty} defaultTitle="Boolean argument" tag="span" />
 	</div>
 	<div class="property-input ms-auto w-25">
 		{#if $page.url.pathname.startsWith('/v1')}

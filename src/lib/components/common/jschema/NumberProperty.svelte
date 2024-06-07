@@ -1,17 +1,14 @@
 <script>
 	import { getContext } from 'svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import PropertyLabel from './PropertyLabel.svelte';
 
 	const schemaManager = getContext('schemaManager');
 
 	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let schemaProperty;
 
-	let hasChanged = false;
-
 	function handleValueChange() {
 		schemaManager.updateValue(schemaProperty.key, schemaProperty.value);
-		hasChanged = true;
 		validate();
 	}
 
@@ -74,10 +71,7 @@
 
 <div class="d-flex align-items-center p-2">
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
-		<label class={schemaProperty.isRequired() ? 'fw-bold' : ''} for="property-{schemaProperty.key}">
-			{schemaProperty.title || 'Number argument'}
-		</label>
-		<PropertyDescription description={schemaProperty.description} />
+		<PropertyLabel {schemaProperty} defaultTitle="Number argument" />
 	</div>
 	<div class="property-input ms-auto w-25 has-validation">
 		<input
