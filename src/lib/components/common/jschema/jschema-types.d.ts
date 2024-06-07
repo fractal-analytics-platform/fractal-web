@@ -25,7 +25,7 @@ export type JSONSchemaObjectProperty = BaseJSONSchemaProperty<'object'> & {
 }
 
 export type JSONSchemaArrayProperty = BaseJSONSchemaProperty<'array'> & {
-  items: JSONSchemaProperty
+  items: JSONSchemaProperty | JSONSchemaProperty[]
 }
 
 export type JSONSchemaProperty =

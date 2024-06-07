@@ -243,7 +243,7 @@ export class SchemaProperty {
 
 			// Resolve the schema default value
 			if (schema.default !== undefined) {
-				this.defaultValue = schema.default;
+				this.defaultValue = JSON.parse(JSON.stringify(schema.default));
 			}
 			if (this.defaultValue === null) {
 				if (this.type === 'array') {
@@ -258,7 +258,7 @@ export class SchemaProperty {
 			if ('value' in schema && schema.value !== undefined) {
 				this.value = schema.value;
 			} else {
-				this.value = this.defaultValue;
+				this.value = JSON.parse(JSON.stringify(this.defaultValue));
 			}
 
 			if (currentValue !== undefined) {
@@ -298,7 +298,11 @@ export class SchemaProperty {
 		// Define the nested property schema
 		const propertySchema = {};
 
-		const items = /** @type {import('./jschema-types').JSONSchemaArrayProperty} */ (this).items;
+		let items = /** @type {import('./jschema-types').JSONSchemaArrayProperty} */ (this).items;
+
+		if (Array.isArray(items)) {
+			items = items[index];
+		}
 
 		// Set the nested property schema key
 		propertySchema.key = `${this.key}${this.keySeparator}${index}`;
