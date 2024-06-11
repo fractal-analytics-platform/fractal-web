@@ -52,7 +52,7 @@ nav:
   - OAuth2 integration: oauth2.md
   - Development: development/
   - Deployment examples: examples.md
-  - JSON Schema Sandbox: json-schema-sandbox.md
+  - Sandbox pages: sandbox-pages.md
 
 
 plugins:
