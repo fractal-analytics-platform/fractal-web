@@ -23,7 +23,7 @@
 	 *
 	 */
 
-	import { onMount, setContext } from 'svelte';
+	import { createEventDispatcher, onMount, setContext } from 'svelte';
 	import SchemaManager, {
 		stripSchemaProperties,
 		stripNullAndEmptyObjectsAndArrays
@@ -48,6 +48,11 @@
 
 	let schemaManager = undefined;
 	export let unsavedChanges = false;
+
+	// store JSON string data of last detected change, to trigger the change event only when needed
+	let previousValue = '';
+
+	const dispatch = createEventDispatcher();
 
 	onMount(() => {
 		// Load a default schema
@@ -87,8 +92,14 @@
 		if (parsedSchema !== undefined && isSchemaValid && isDataValid !== undefined) {
 			schemaManager = new SchemaManager(parsedSchema, schemaData);
 			setContext('schemaManager', schemaManager);
+			previousValue = JSON.stringify(schemaManager.data);
 			schemaManager.onPropertyChanges = (hasChanges) => {
 				unsavedChanges = hasChanges;
+				let newValue = JSON.stringify(schemaManager.data);
+				if (previousValue !== newValue) {
+					previousValue = newValue;
+					dispatch('change', { value: hasChanges });
+				}
 			};
 		}
 	}
@@ -143,6 +154,7 @@
 		schemaData = args;
 		// Mark changes as unsaved
 		unsavedChanges = false;
+		dispatch('change', { value: false });
 	}
 </script>
 
