@@ -3,6 +3,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { stripNullAndEmptyObjectsAndArrays } from '$lib/components/common/jschema/schema_management';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
+	import { tick } from 'svelte';
 	import example from './example.json';
 
 	let schema = undefined;
@@ -27,6 +28,7 @@
 		}
 		try {
 			schema = JSON.parse(jsonSchemaString);
+			handleDataChanged();
 		} catch (err) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
@@ -69,12 +71,17 @@
 		handleJsonSchemaStringChanged();
 	}
 
-	function loadCurrentData() {
+	async function handleDataChanged() {
+		await tick();
 		if (!jschemaComponent) {
 			return;
 		}
 		const deepCopyArgs = deepCopy(jschemaComponent.getArguments());
-		jsonDataString = JSON.stringify(stripNullAndEmptyObjectsAndArrays(deepCopyArgs), null, 2);
+		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(deepCopyArgs), null, 2);
+		// Update the data only if something is changed, to avoid triggering uneccessary events
+		if (updatedOldData !== jsonDataString) {
+			jsonDataString = updatedOldData;
+		}
 	}
 </script>
 
@@ -136,16 +143,19 @@
 				{#if valid}
 					<div class="alert alert-success">Data is valid</div>
 				{/if}
-				<button class="btn btn-outline-primary float-end" on:click={loadCurrentData}>
-					Load current data
-				</button>
 				<button class="btn btn-primary" on:click={validate}>Validate</button>
 			</div>
 		</div>
 	</div>
 	<div class="col-lg-6 mt-3">
 		{#if schema}
-			<JSchema {schema} {schemaData} {legacy} bind:this={jschemaComponent} />
+			<JSchema
+				{schema}
+				{schemaData}
+				{legacy}
+				bind:this={jschemaComponent}
+				on:change={handleDataChanged}
+			/>
 		{/if}
 	</div>
 </div>
