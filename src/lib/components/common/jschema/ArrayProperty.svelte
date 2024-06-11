@@ -26,7 +26,7 @@
 			const minItems = getMinItems(schemaProperty.referenceSchema);
 			if (minItems !== null) {
 				for (let i = count; i < minItems; i++) {
-					addNestedProperty();
+					addNestedProperty(undefined, false);
 				}
 			}
 		}
@@ -55,11 +55,11 @@
 		return null;
 	}
 
-	function addNestedProperty(value = undefined) {
+	function addNestedProperty(value = undefined, isNew = true) {
 		if (!canAddMoreItems(nestedProperties)) {
 			return;
 		}
-		schemaProperty.addNestedSchemaProperty(value, nestedProperties.length);
+		schemaProperty.addNestedSchemaProperty(value, nestedProperties.length, isNew);
 		nestedProperties = schemaProperty.nestedProperties;
 	}
 

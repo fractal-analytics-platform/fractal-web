@@ -287,9 +287,11 @@ export class SchemaProperty {
 	/**
 	 * @param {any} value
 	 * @param {number} index
+	 * @param {boolean} isNew true when the property is added by the user (so it is a new property),
+	 * false when the property is added during array initialization (so it is an existing property).
 	 * @returns {SchemaProperty}
 	 */
-	addNestedSchemaProperty(value, index) {
+	addNestedSchemaProperty(value, index, isNew = false) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
 			throw new Error('Schema property is not of type array');
@@ -335,6 +337,9 @@ export class SchemaProperty {
 		const nestedProperty = new SchemaProperty(propertySchema, this.manager);
 		this.manager.setDefaultValue(nestedProperty.key, nestedProperty.value);
 		this.nestedProperties.push(nestedProperty);
+		if (isNew) {
+			this.manager.changesNotSaved();
+		}
 		return nestedProperty;
 	}
 
@@ -400,8 +405,10 @@ export class SchemaProperty {
 	/**
 	 * @param {string} namedKey
 	 * @param {any} propertyValue
+	 * @param {boolean} isNew true when the property is added by the user (so it is a new property),
+	 * false when the property is added during array initialization (so it is an existing property).
 	 */
-	addProperty(namedKey, propertyValue = undefined) {
+	addProperty(namedKey, propertyValue = undefined, isNew = false) {
 		if (this.type !== 'object') {
 			throw new Error('Schema property is not of type object');
 		}
@@ -432,6 +439,10 @@ export class SchemaProperty {
 				parsedAdditionalProperties.value = propertyValue;
 				this.properties[namedKey] = parsedAdditionalProperties;
 			}
+
+			if (isNew) {
+				this.manager.changesNotSaved();
+			}
 		}
 	}
 
@@ -450,6 +461,7 @@ export class SchemaProperty {
 		if (this.properties && Object.keys(this.properties).includes(namedKey)) {
 			delete this.properties[namedKey];
 			this.manager.deleteNestedPropertyData(this.key, namedKey);
+			this.manager.changesNotSaved();
 		} else {
 			throw new Error('Schema property does not have a property with the same name');
 		}

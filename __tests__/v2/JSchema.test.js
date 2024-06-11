@@ -792,6 +792,114 @@ describe('JSchema', () => {
 		expect(inputs[0].value).eq('');
 		expect(result.component.getArguments()).deep.eq({ patch_size: [undefined, null] });
 	});
+
+	it('add array element', async function () {
+		const result = renderSchema({
+			title: 'test',
+			type: 'object',
+			properties: {
+				test: {
+					title: 'Array',
+					type: 'array',
+					items: {
+						type: 'string'
+					}
+				}
+			}
+		});
+
+		expect(result.component.getArguments()).deep.eq({ test: [] });
+		expect(result.component.unsavedChanges).toEqual(false);
+		await fireEvent.click(result.getByRole('button', { name: 'Add argument to list' }));
+		expect(result.component.getArguments()).deep.eq({ test: [null] });
+		expect(result.component.unsavedChanges).toEqual(true);
+	});
+
+	it('remove array element', async function () {
+		const result = renderSchema({
+			title: 'test',
+			type: 'object',
+			properties: {
+				test: {
+					title: 'Array',
+					type: 'array',
+					default: ['foo'],
+					items: {
+						type: 'string'
+					}
+				}
+			}
+		});
+
+		expect(result.component.getArguments()).deep.eq({ test: ['foo'] });
+		expect(result.component.unsavedChanges).toEqual(false);
+		await fireEvent.click(result.getByRole('button', { name: 'Remove' }));
+		expect(result.component.getArguments()).deep.eq({ test: [] });
+		expect(result.component.unsavedChanges).toEqual(true);
+	});
+
+	it('add object property', async function () {
+		const result = renderSchema({
+			title: 'test',
+			type: 'object',
+			properties: {
+				test: {
+					title: 'Object',
+					type: 'object',
+					additionalProperties: {
+						type: 'object',
+						properties: {
+							prop1: {
+								type: 'string'
+							}
+						}
+					}
+				}
+			}
+		});
+
+		expect(result.component.getArguments()).deep.eq({ test: {} });
+		expect(result.component.unsavedChanges).toEqual(false);
+		await fireEvent.input(result.getByPlaceholderText('Key'), {
+			target: { value: 'key1' }
+		});
+		await fireEvent.click(result.getByRole('button', { name: 'Add property' }));
+		expect(result.component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
+		expect(result.component.unsavedChanges).toEqual(true);
+	});
+
+	it('remove object property', async function () {
+		const result = renderSchema({
+			title: 'test',
+			type: 'object',
+			properties: {
+				test: {
+					title: 'Object',
+					type: 'object',
+					default: {
+						key1: { prop1: 'foo' }
+					},
+					additionalProperties: {
+						type: 'object',
+						properties: {
+							prop1: {
+								type: 'string'
+							}
+						}
+					}
+				}
+			}
+		});
+
+		expect(result.component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
+		expect(result.component.unsavedChanges).toEqual(false);
+		await fireEvent.input(result.getByPlaceholderText('Key'), {
+			target: { value: 'key1' }
+		});
+		await fireEvent.click(result.getByRole('button', { name: 'Remove Property Block' }));
+		expect(result.component.getArguments()).deep.eq({ test: {} });
+		expect(result.component.unsavedChanges).toEqual(true);
+	});
 });
 
 /**

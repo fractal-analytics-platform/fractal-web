@@ -17,7 +17,7 @@
 		if (objectSchema.hasCustomKeyValues) {
 			const keys = Object.keys(objectSchema.value);
 			keys.forEach((key) => {
-				objectSchema.addProperty(key, objectSchema.value[key]);
+				objectSchema.addProperty(key, objectSchema.value[key], false);
 			});
 			objectSchema = objectSchema;
 		}
@@ -26,7 +26,7 @@
 	function addNestedObjectProperty() {
 		try {
 			addNestedObjectError = undefined;
-			objectSchema.addProperty(customObjectPropertyKey);
+			objectSchema.addProperty(customObjectPropertyKey, undefined, true);
 			customObjectPropertyKey = '';
 			objectSchema = objectSchema;
 		} catch (e) {
