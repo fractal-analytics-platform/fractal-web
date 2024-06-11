@@ -5,7 +5,7 @@ const logger = getLogger('sandbox');
 
 export async function load() {
 	if (import.meta.env.MODE !== 'development') {
-		logger.warn('Sandbox page is disabled when mode is not development');
+		logger.warn('Sandbox pages are disabled when mode is not development');
 		throw redirect(307, '/');
 	}
 }
