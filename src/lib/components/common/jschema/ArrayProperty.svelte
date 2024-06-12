@@ -23,7 +23,7 @@
 		}
 		// Create mandatory fields in case of minItems
 		if (schemaProperty.isRequired()) {
-			const minItems = getMinItems(schemaProperty.referenceSchema);
+			const minItems = getMinItems();
 			if (minItems !== null) {
 				for (let i = count; i < minItems; i++) {
 					addNestedProperty(undefined, false);
@@ -34,23 +34,18 @@
 	});
 
 	/**
-	 * @param {object} referenceSchema
 	 * @returns {number|null}
 	 */
-	function getMinItems(referenceSchema) {
-		if ('minItems' in referenceSchema) {
-			return /** @type {number} */ (referenceSchema.minItems);
+	function getMinItems() {
+		if ('minItems' in schemaProperty) {
+			return /** @type {number} */ (schemaProperty.minItems);
 		}
 		return null;
 	}
 
-	/**
-	 * @param {object} referenceSchema
-	 * @returns {number|null}
-	 */
-	function getMaxItems(referenceSchema) {
-		if ('maxItems' in referenceSchema) {
-			return /** @type {number} */ (referenceSchema.maxItems);
+	function getMaxItems() {
+		if ('maxItems' in schemaProperty) {
+			return /** @type {number} */ (schemaProperty.maxItems);
 		}
 		return null;
 	}
@@ -97,17 +92,16 @@
 	 * @param {any[]} nestedProperties
 	 */
 	function canAddMoreItems(nestedProperties) {
-		const maxItems = getMaxItems(schemaProperty.referenceSchema);
+		const maxItems = getMaxItems();
 		return maxItems === null || nestedProperties.length < maxItems;
 	}
 
 	/**
-	 * @param {import('$lib/components/common/jschema/schema_management').SchemaProperty} schemaProperty
 	 * @returns {boolean} true if has fixed length (minItems === maxItems), false otherwise
 	 */
-	function isTuple(schemaProperty) {
-		const minItems = getMinItems(schemaProperty.referenceSchema);
-		const maxItems = getMaxItems(schemaProperty.referenceSchema);
+	function isTuple() {
+		const minItems = getMinItems();
+		const maxItems = getMaxItems();
 		return minItems !== null && maxItems !== null && minItems === maxItems;
 	}
 
@@ -116,13 +110,13 @@
 	 * @returns {boolean} true if the nested properties can be removed, false otherwise
 	 */
 	function showRemoveButton(schemaProperty) {
-		if (isTuple(schemaProperty)) {
+		if (isTuple()) {
 			return false;
 		}
 		if (!schemaProperty.isRequired()) {
 			return true;
 		}
-		const minItems = getMinItems(schemaProperty.referenceSchema);
+		const minItems = getMinItems();
 		if (minItems === null) {
 			return true;
 		}
@@ -132,7 +126,7 @@
 	$: addNestedPropertyBtnDisabled = !canAddMoreItems(nestedProperties);
 
 	function addTuple() {
-		const minItems = /** @type {number} */ (getMinItems(schemaProperty.referenceSchema));
+		const minItems = /** @type {number} */ (getMinItems());
 		if (
 			!Array.isArray(schemaProperty.defaultValue) ||
 			schemaProperty.defaultValue.length !== minItems
@@ -180,7 +174,7 @@
 					>
 						<div class="accordion-body p-1">
 							<div class="d-flex justify-content-center p-2">
-								{#if !isTuple(schemaProperty)}
+								{#if !isTuple()}
 									<button
 										class="btn btn-primary"
 										type="button"
@@ -229,7 +223,7 @@
 											<PropertyDiscriminator schemaProperty={nestedProperty} />
 										</div>
 										<div class="align-self-right mt-2 me-2">
-											{#if nestedProperties.length > 1 && !isTuple(schemaProperty)}
+											{#if nestedProperties.length > 1 && !isTuple()}
 												<button
 													class="btn btn-light"
 													on:click|preventDefault={() => moveUp(index)}

@@ -277,6 +277,13 @@ export class SchemaProperty {
 					this.hasCustomKeyValues = true;
 				}
 			}
+
+			if ('minItems' in propertySchema) {
+				this.minItems = propertySchema.minItems;
+			}
+			if ('maxItems' in propertySchema) {
+				this.maxItems = propertySchema.maxItems;
+			}
 		}
 	}
 

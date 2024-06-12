@@ -949,6 +949,31 @@ describe('JSchema', () => {
 		await fireEvent.click(result.getByRole('button', { name: 'Clear' }));
 		expect(result.component.getArguments()).deep.eq({ arg_A: [[[undefined]]] });
 	});
+
+	it('referenced tuple', async function () {
+		const result = renderSchemaWithReferencedProperty({
+			type: 'array',
+			minItems: 1,
+			maxItems: 1,
+			items: [
+				{
+					type: 'array',
+					minItems: 2,
+					maxItems: 2,
+					items: [{ type: 'string' }, { type: 'string' }]
+				}
+			]
+		});
+
+		expect(result.component.getArguments()).deep.eq({ testProp: [] });
+		expect(result.component.unsavedChanges).toEqual(false);
+		await fireEvent.click(result.getByRole('button', { name: 'Add tuple' }));
+		expect(result.component.unsavedChanges).toEqual(true);
+		expect(result.component.getArguments()).deep.eq({ testProp: [[]] });
+		await fireEvent.click(result.getByRole('button', { name: 'Add tuple' }));
+		expect(result.component.getArguments()).deep.eq({ testProp: [[null, null]] });
+		expect(result.getAllByRole('textbox').length).eq(2);
+	});
 });
 
 /**
