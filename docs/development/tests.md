@@ -43,7 +43,7 @@ LOCAL_PORT=8000
 REMOTE_USER=...
 REMOTE_HOST_IP=...
 
-ssh $REMOTE_USER@$REMOTE_HOST_IP -L $LOCAL_PORT:$REMOTE_HOST_IP:$REMOTE_PORT -N
+ssh $REMOTE_USER@$REMOTE_HOST_IP -L $LOCAL_PORT:127.0.0.1:$REMOTE_PORT -N
 ```
 should work and forward the remote port `REMOTE_PORT` to the `LOCAL_PORT` on
 localhost, so that `fractal-web` can use it from the local machine. Note that
