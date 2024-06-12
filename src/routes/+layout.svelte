@@ -75,7 +75,7 @@
 		if (pathname === '/') {
 			return 'home';
 		}
-		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
+		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth', 'sandbox']) {
 			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/${apiVersion}/${section}`)) {
 				return section;
 			}
@@ -118,6 +118,13 @@
 				<li class="nav-item">
 					<a href="/" class="nav-link" class:active={selectedSection === 'home'}> Home </a>
 				</li>
+				{#if import.meta.env.MODE === 'development' && selectedSection === 'sandbox'}
+					<li class="nav-item">
+						<a href="/sandbox" class="nav-link" class:active={selectedSection === 'sandbox'}>
+							Sandbox pages
+						</a>
+					</li>
+				{/if}
 				{#if userLoggedIn}
 					<li class="nav-item">
 						<a
@@ -215,7 +222,7 @@
 		<div class="admin-border" />
 	{/if}
 	<div class="container p-4">
-		{#if !server.alive}
+		{#if !server.alive && selectedSection !== 'sandbox'}
 			<div class="alert alert-danger">
 				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
 			</div>
