@@ -141,6 +141,23 @@
 			args_schema_parallel: newSchema
 		};
 	}
+
+	function loadExample() {
+		const oldSchemaExample = {
+			title: 'Test',
+			type: 'object',
+			properties: { foo: { title: 'foo', type: 'string' } },
+			required: ['foo']
+		};
+		const newSchemaExample = deepCopy(oldSchemaExample);
+		newSchemaExample.properties.bar = { title: 'bar', type: 'string' };
+		newSchemaExample.required.push('bar');
+		oldJsonSchemaString = JSON.stringify(oldSchemaExample, null, 2);
+		oldJsonDataString = JSON.stringify({ foo: 'something' }, null, 2);
+		newJsonSchemaString = JSON.stringify(newSchemaExample, null, 2);
+		forceRedrawOld();
+		handleNewJsonSchemaStringChanged();
+	}
 </script>
 
 <h1 class="fw-light">Sandbox page for task version update</h1>
@@ -152,6 +169,9 @@
 	<div class="col-lg-6 mt-3">
 		<div class="row">
 			<div class="col">
+				<button class="btn btn-outline-primary float-end" on:click={loadExample}>
+					Load example
+				</button>
 				<div class="form-check form-switch">
 					<input
 						class="form-check-input"
