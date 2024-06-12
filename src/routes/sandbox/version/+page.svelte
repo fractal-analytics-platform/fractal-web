@@ -1,6 +1,7 @@
 <script>
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { SchemaValidator } from '$lib/common/jschema_validation';
 	import { stripNullAndEmptyObjectsAndArrays } from '$lib/components/common/jschema/schema_management';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import VersionUpdateFixArgs from '$lib/components/v2/workflow/VersionUpdateFixArgs.svelte';
@@ -44,6 +45,11 @@
 			oldSchema = undefined;
 			oldJsonSchemaError = 'Invalid JSON';
 		}
+		const validator = new SchemaValidator();
+		if (!validator.loadSchema(oldSchema)) {
+			oldSchema = undefined;
+			oldJsonSchemaError = 'Invalid JSON Schema';
+		}
 	}
 
 	function handleOldDataStringChanged() {
@@ -75,6 +81,11 @@
 		} catch (err) {
 			newSchema = undefined;
 			newJsonSchemaError = 'Invalid JSON';
+		}
+		const validator = new SchemaValidator();
+		if (!validator.loadSchema(newSchema)) {
+			newSchema = undefined;
+			newJsonSchemaError = 'Invalid JSON Schema';
 		}
 	}
 

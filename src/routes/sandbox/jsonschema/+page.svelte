@@ -5,6 +5,7 @@
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
 	import { tick } from 'svelte';
 	import example from './example.json';
+	import { SchemaValidator } from '$lib/common/jschema_validation';
 
 	let schema = undefined;
 	let schemaData = {};
@@ -32,6 +33,11 @@
 		} catch (err) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
+		}
+		const validator = new SchemaValidator();
+		if (!validator.loadSchema(schema)) {
+			schema = undefined;
+			jsonSchemaError = 'Invalid JSON Schema';
 		}
 	}
 
