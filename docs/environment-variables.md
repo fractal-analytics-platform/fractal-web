@@ -15,7 +15,8 @@ The following environment variables can be used to configure fractal-web.
 * `PUBLIC_OAUTH_CLIENT_NAME`: if set, the application enables the external account login via OAuth2; the name is used to create the authorization call sent to fractal-server (see [configuration page](../oauth2/));
 * `LOG_FILE`: the path of the file where logs will be written; by default is unset and no file will be created;
 * `LOG_LEVEL_FILE`: the log level of logs that will be written to the file; the default value is `info`;
-* `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`.
+* `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`;
+* `FRACTAL_API_V1_MODE`: include/exclude V1 pages and version switcher; the default value is `include`.
 
 When running directly using `node` command these extra variables can also be configured:
 

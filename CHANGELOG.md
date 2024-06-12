@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Conditionally included V1 pages (\#513);
 * Added task version update sandbox page (\#509);
 * JSON Schema form improvements (\#509):
     * supported enums of any type;
