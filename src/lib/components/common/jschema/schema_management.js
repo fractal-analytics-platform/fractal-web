@@ -333,6 +333,12 @@ export class SchemaProperty {
 		if ('required' in items) {
 			propertySchema.required = items.required;
 		}
+		if ('minItems' in items) {
+			propertySchema.minItems = items.minItems;
+		}
+		if ('maxItems' in items) {
+			propertySchema.maxItems = items.maxItems;
+		}
 
 		const nestedProperty = new SchemaProperty(propertySchema, this.manager);
 		this.manager.setDefaultValue(nestedProperty.key, nestedProperty.value);

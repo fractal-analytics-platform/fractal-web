@@ -214,7 +214,7 @@
 													>
 														Remove
 													</button>
-												{:else}
+												{:else if nestedProperties[index].type !== 'array' && nestedProperties[index].type !== 'object'}
 													<button
 														class="btn btn-warning"
 														type="button"

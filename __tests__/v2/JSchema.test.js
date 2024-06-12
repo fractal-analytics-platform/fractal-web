@@ -900,6 +900,55 @@ describe('JSchema', () => {
 		expect(result.component.getArguments()).deep.eq({ test: {} });
 		expect(result.component.unsavedChanges).toEqual(true);
 	});
+
+	it('nested tuple', async function () {
+		const result = renderSchema({
+			title: 'TaskFunction',
+			type: 'object',
+			properties: {
+				arg_A: {
+					type: 'array',
+					minItems: 1,
+					maxItems: 1,
+					items: [
+						{
+							type: 'array',
+							minItems: 1,
+							maxItems: 1,
+							items: [
+								{
+									type: 'array',
+									minItems: 1,
+									maxItems: 1,
+									items: [
+										{
+											type: 'string'
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			},
+			required: ['arg_A'],
+			additionalProperties: false
+		});
+
+		expect(result.component.getArguments()).deep.eq({ arg_A: [[]] });
+		expect(result.component.unsavedChanges).toEqual(false);
+		await fireEvent.click(result.getByRole('button', { name: 'Add tuple' }));
+		expect(result.component.getArguments()).deep.eq({ arg_A: [[[]]] });
+		expect(result.component.unsavedChanges).toEqual(true);
+		expect(result.getAllByRole('button', { name: 'Remove tuple' }).length).toEqual(1);
+		await fireEvent.click(result.getByRole('button', { name: 'Add tuple' }));
+		expect(result.component.getArguments()).deep.eq({ arg_A: [[[null]]] });
+		expect(result.getAllByRole('button', { name: 'Remove tuple' }).length).toEqual(2);
+		await fireEvent.input(result.getByRole('textbox'), { target: { value: 'foo' } });
+		expect(result.component.getArguments()).deep.eq({ arg_A: [[['foo']]] });
+		await fireEvent.click(result.getByRole('button', { name: 'Clear' }));
+		expect(result.component.getArguments()).deep.eq({ arg_A: [[[undefined]]] });
+	});
 });
 
 /**
