@@ -5,6 +5,7 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import JSchema from '$lib/components/v1/workflow/JSchema.svelte';
+	import { deepCopy } from '$lib/common/component_utilities';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
 
@@ -38,7 +39,7 @@
 				'args'
 			);
 			args = response.args;
-			dispatch('argsSaved', { args: JSON.parse(JSON.stringify(response.args)) });
+			dispatch('argsSaved', { args: deepCopy(response.args) });
 			return args;
 		} catch (err) {
 			displayStandardErrorAlert(err, 'json-schema-validation-errors');

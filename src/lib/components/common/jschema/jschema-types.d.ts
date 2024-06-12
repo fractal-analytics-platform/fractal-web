@@ -7,11 +7,10 @@ export type BaseJSONSchemaProperty<JSONSchemaType> = {
   "$ref"?: string
   allOf?: Array<Partial<BaseJSONSchemaProperty<JSONSchemaType>>>
   default?: any
-}
-
-export type JSONSchemaStringProperty = BaseJSONSchemaProperty<'string'> & {
   enum?: string[]
 }
+
+export type JSONSchemaStringProperty = BaseJSONSchemaProperty<'string'>
 
 export type JSONSchemaNumberProperty = BaseJSONSchemaProperty<'number' | 'integer'>
 
@@ -26,7 +25,7 @@ export type JSONSchemaObjectProperty = BaseJSONSchemaProperty<'object'> & {
 }
 
 export type JSONSchemaArrayProperty = BaseJSONSchemaProperty<'array'> & {
-  items: JSONSchemaProperty
+  items: JSONSchemaProperty | JSONSchemaProperty[]
 }
 
 export type JSONSchemaProperty =

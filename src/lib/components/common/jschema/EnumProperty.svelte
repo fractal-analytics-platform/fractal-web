@@ -1,6 +1,6 @@
 <script>
 	import { getContext } from 'svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import PropertyLabel from './PropertyLabel.svelte';
 
 	const schemaManager = getContext('schemaManager');
 
@@ -25,10 +25,7 @@
 
 <div class="d-flex align-items-center p-2">
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
-		<label class={schemaProperty.isRequired() ? 'fw-bold' : ''} for="property-{schemaProperty.key}">
-			{schemaProperty.title || 'Enum argument'}
-		</label>
-		<PropertyDescription description={schemaProperty.description} />
+		<PropertyLabel {schemaProperty} defaultTitle="Enum argument" />
 	</div>
 	<div class="property-input ms-auto w-50 has-validation">
 		<select

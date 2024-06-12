@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { stripSchemaProperties } from '$lib/components/common/jschema/schema_management';
 	import { getNewVersions } from './version-checker';
+	import { deepCopy } from '$lib/common/component_utilities';
 
 	/** @type {import('$lib/types').WorkflowTask} */
 	export let workflowTask;
@@ -101,7 +102,7 @@
 		if ('properties' in newSchema) {
 			stripSchemaProperties(newSchema);
 		}
-		const parsedSchema = JSON.parse(JSON.stringify(newSchema));
+		const parsedSchema = deepCopy(newSchema);
 		const isSchemaValid = validator.loadSchema(parsedSchema);
 		if (!isSchemaValid) {
 			errorAlert = displayStandardErrorAlert('Invalid JSON schema', 'versionUpdateError');

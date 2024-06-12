@@ -1,7 +1,11 @@
 <script>
+	import { deepCopy } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { stripNullAndEmptyObjectsAndArrays } from '$lib/components/common/jschema/schema_management';
 	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
+	import { tick } from 'svelte';
 	import example from './example.json';
+	import { SchemaValidator } from '$lib/common/jschema_validation';
 
 	let schema = undefined;
 	let schemaData = {};
@@ -25,9 +29,15 @@
 		}
 		try {
 			schema = JSON.parse(jsonSchemaString);
+			handleDataChanged();
 		} catch (err) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
+		}
+		const validator = new SchemaValidator();
+		if (!validator.loadSchema(schema)) {
+			schema = undefined;
+			jsonSchemaError = 'Invalid JSON Schema';
 		}
 	}
 
@@ -67,11 +77,17 @@
 		handleJsonSchemaStringChanged();
 	}
 
-	function loadCurrentData() {
+	async function handleDataChanged() {
+		await tick();
 		if (!jschemaComponent) {
 			return;
 		}
-		jsonDataString = JSON.stringify(jschemaComponent.getArguments(), null, 2);
+		const deepCopyArgs = deepCopy(jschemaComponent.getArguments());
+		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(deepCopyArgs), null, 2);
+		// Update the data only if something is changed, to avoid triggering uneccessary events
+		if (updatedOldData !== jsonDataString) {
+			jsonDataString = updatedOldData;
+		}
 	}
 </script>
 
@@ -133,16 +149,19 @@
 				{#if valid}
 					<div class="alert alert-success">Data is valid</div>
 				{/if}
-				<button class="btn btn-outline-primary float-end" on:click={loadCurrentData}>
-					Load current data
-				</button>
 				<button class="btn btn-primary" on:click={validate}>Validate</button>
 			</div>
 		</div>
 	</div>
 	<div class="col-lg-6 mt-3">
 		{#if schema}
-			<JSchema {schema} {schemaData} {legacy} bind:this={jschemaComponent} />
+			<JSchema
+				{schema}
+				{schemaData}
+				{legacy}
+				bind:this={jschemaComponent}
+				on:change={handleDataChanged}
+			/>
 		{/if}
 	</div>
 </div>

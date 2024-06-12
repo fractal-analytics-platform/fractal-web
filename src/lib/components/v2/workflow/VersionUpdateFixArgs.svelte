@@ -1,4 +1,5 @@
 <script>
+	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import { SchemaValidator } from '$lib/common/jschema_validation';
 	import { stripSchemaProperties } from '$lib/components/common/jschema/schema_management';
@@ -79,7 +80,7 @@
 		if ('properties' in newSchema) {
 			stripSchemaProperties(newSchema, workflowTask.is_legacy_task);
 		}
-		const parsedSchema = JSON.parse(JSON.stringify(newSchema));
+		const parsedSchema = deepCopy(newSchema);
 		const isSchemaValid = validator.loadSchema(parsedSchema);
 		if (!isSchemaValid) {
 			throw new AlertError('Invalid JSON schema');

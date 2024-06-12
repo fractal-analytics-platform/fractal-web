@@ -2,6 +2,13 @@
 
 # Unreleased
 
+* Added task version update sandbox page (\#509);
+* JSON Schema form improvements (\#509):
+    * supported enums of any type;
+    * supported tuples;
+    * used grey color for optional properties that are unset;
+    * hided default label for fields without title.
+* Added docs about JSON Schema Sandbox page (\#509).
 * Added maintenance banner when fractal-server is down (\#504).
 
 # 1.1.0

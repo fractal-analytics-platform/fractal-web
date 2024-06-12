@@ -61,7 +61,7 @@ export async function handle({ event, resolve }) {
 	const isPublicPage =
 		event.url.pathname == '/' ||
 		event.url.pathname.startsWith('/auth') ||
-		event.url.pathname.startsWith('/sandbox/jsonschema');
+		event.url.pathname.startsWith('/sandbox');
 
 	if (isPublicPage) {
 		logger.debug('Public page - No auth required');

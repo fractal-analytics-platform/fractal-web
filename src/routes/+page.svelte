@@ -27,6 +27,9 @@
 		<a href="/v2/projects" class="btn btn-primary">Projects</a>
 		<a href="/v2/tasks" class="btn btn-primary">Tasks</a>
 		<a href="/v2/jobs" class="btn btn-primary">Jobs</a>
+		{#if import.meta.env.MODE === 'development'}
+			<a href="/sandbox" class="btn btn-primary">Sandbox</a>
+		{/if}
 	</div>
 
 	<p>

@@ -151,7 +151,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		await checkFirstArray(['a', 'b']);
-		await form.getByRole('button', { name: 'Remove' }).nth(1).click();
+		await form.getByRole('button', { name: 'Clear' }).nth(1).click();
 		await checkFirstArray(['a', '']);
 	});
 
@@ -176,10 +176,10 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await form.locator('id=property-optionalArrayWithMinMaxItems###0').fill('a');
 		await form.locator('id=property-optionalArrayWithMinMaxItems###1').fill('b');
 		await form.locator('id=property-optionalArrayWithMinMaxItems###2').fill('c');
-		await form.getByRole('button', { name: 'Remove' }).nth(4).click();
-		expect(await addBtn.isDisabled()).toEqual(false);
-		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
+		expect(await addBtn.isDisabled()).toEqual(false);
+		await form.getByRole('button', { name: 'Remove' }).nth(1).click();
+		await form.getByRole('button', { name: 'Remove' }).nth(0).click();
 		expect(form.locator('id=property-optionalArrayWithMinMaxItems###0')).toHaveCount(0);
 	});
 

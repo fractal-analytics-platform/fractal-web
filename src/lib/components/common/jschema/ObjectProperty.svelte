@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import PropertiesBlock from '$lib/components/common/jschema/PropertiesBlock.svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import PropertyLabel from './PropertyLabel.svelte';
 
 	/** @type {import('$lib/components/common/jschema/schema_management').SchemaProperty} */
 	export let objectSchema;
@@ -17,7 +17,7 @@
 		if (objectSchema.hasCustomKeyValues) {
 			const keys = Object.keys(objectSchema.value);
 			keys.forEach((key) => {
-				objectSchema.addProperty(key, objectSchema.value[key]);
+				objectSchema.addProperty(key, objectSchema.value[key], false);
 			});
 			objectSchema = objectSchema;
 		}
@@ -26,7 +26,7 @@
 	function addNestedObjectProperty() {
 		try {
 			addNestedObjectError = undefined;
-			objectSchema.addProperty(customObjectPropertyKey);
+			objectSchema.addProperty(customObjectPropertyKey, undefined, true);
 			customObjectPropertyKey = '';
 			objectSchema = objectSchema;
 		} catch (e) {
@@ -50,8 +50,7 @@
 							data-bs-toggle="collapse"
 							data-bs-target="#{collapseSymbol}"
 						>
-							<span class={objectSchema.isRequired() ? 'fw-bold' : ''}>{objectSchema.title}</span>
-							<PropertyDescription description={objectSchema.description} />
+							<PropertyLabel schemaProperty={objectSchema} tag="span" />
 						</button>
 					</div>
 					<div

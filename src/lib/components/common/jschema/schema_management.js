@@ -1,3 +1,5 @@
+import { deepCopy } from '$lib/common/component_utilities';
+
 export default class SchemaManager {
 	/**
 	 * @param {import('./jschema-types').JSONSchema|undefined} schema
@@ -41,7 +43,7 @@ export default class SchemaManager {
 			throw new Error('Schema data is undefined');
 		}
 		// Deep copy the schema data
-		return JSON.parse(JSON.stringify(schemaData));
+		return deepCopy(schemaData);
 	}
 
 	/**
@@ -243,7 +245,7 @@ export class SchemaProperty {
 
 			// Resolve the schema default value
 			if (schema.default !== undefined) {
-				this.defaultValue = schema.default;
+				this.defaultValue = deepCopy(schema.default);
 			}
 			if (this.defaultValue === null) {
 				if (this.type === 'array') {
@@ -258,7 +260,7 @@ export class SchemaProperty {
 			if ('value' in schema && schema.value !== undefined) {
 				this.value = schema.value;
 			} else {
-				this.value = this.defaultValue;
+				this.value = deepCopy(this.defaultValue);
 			}
 
 			if (currentValue !== undefined) {
@@ -275,6 +277,13 @@ export class SchemaProperty {
 					this.hasCustomKeyValues = true;
 				}
 			}
+
+			if ('minItems' in propertySchema) {
+				this.minItems = propertySchema.minItems;
+			}
+			if ('maxItems' in propertySchema) {
+				this.maxItems = propertySchema.maxItems;
+			}
 		}
 	}
 
@@ -285,9 +294,11 @@ export class SchemaProperty {
 	/**
 	 * @param {any} value
 	 * @param {number} index
+	 * @param {boolean} isNew true when the property is added by the user (so it is a new property),
+	 * false when the property is added during array initialization (so it is an existing property).
 	 * @returns {SchemaProperty}
 	 */
-	addNestedSchemaProperty(value, index) {
+	addNestedSchemaProperty(value, index, isNew = false) {
 		// Should check that this schema property is of type array and has items
 		if (this.type !== 'array') {
 			throw new Error('Schema property is not of type array');
@@ -298,7 +309,11 @@ export class SchemaProperty {
 		// Define the nested property schema
 		const propertySchema = {};
 
-		const items = /** @type {import('./jschema-types').JSONSchemaArrayProperty} */ (this).items;
+		let items = /** @type {import('./jschema-types').JSONSchemaArrayProperty} */ (this).items;
+
+		if (Array.isArray(items)) {
+			items = items[index];
+		}
 
 		// Set the nested property schema key
 		propertySchema.key = `${this.key}${this.keySeparator}${index}`;
@@ -325,10 +340,19 @@ export class SchemaProperty {
 		if ('required' in items) {
 			propertySchema.required = items.required;
 		}
+		if ('minItems' in items) {
+			propertySchema.minItems = items.minItems;
+		}
+		if ('maxItems' in items) {
+			propertySchema.maxItems = items.maxItems;
+		}
 
 		const nestedProperty = new SchemaProperty(propertySchema, this.manager);
 		this.manager.setDefaultValue(nestedProperty.key, nestedProperty.value);
 		this.nestedProperties.push(nestedProperty);
+		if (isNew) {
+			this.manager.changesNotSaved();
+		}
 		return nestedProperty;
 	}
 
@@ -394,8 +418,10 @@ export class SchemaProperty {
 	/**
 	 * @param {string} namedKey
 	 * @param {any} propertyValue
+	 * @param {boolean} isNew true when the property is added by the user (so it is a new property),
+	 * false when the property is added during array initialization (so it is an existing property).
 	 */
-	addProperty(namedKey, propertyValue = undefined) {
+	addProperty(namedKey, propertyValue = undefined, isNew = false) {
 		if (this.type !== 'object') {
 			throw new Error('Schema property is not of type object');
 		}
@@ -426,6 +452,10 @@ export class SchemaProperty {
 				parsedAdditionalProperties.value = propertyValue;
 				this.properties[namedKey] = parsedAdditionalProperties;
 			}
+
+			if (isNew) {
+				this.manager.changesNotSaved();
+			}
 		}
 	}
 
@@ -444,6 +474,7 @@ export class SchemaProperty {
 		if (this.properties && Object.keys(this.properties).includes(namedKey)) {
 			delete this.properties[namedKey];
 			this.manager.deleteNestedPropertyData(this.key, namedKey);
+			this.manager.changesNotSaved();
 		} else {
 			throw new Error('Schema property does not have a property with the same name');
 		}
