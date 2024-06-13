@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { getLogger } from '$lib/server/logger.js';
 
 const logger = getLogger('page layout');
@@ -15,5 +16,8 @@ export async function load({ locals, request, url }) {
 		logger.error('pageInfo is missing, it should have been loaded by hooks.server.js');
 	}
 
-	return pageInfo;
+	return {
+		...pageInfo,
+		v1Enabled: env.FRACTAL_API_V1_MODE !== 'exclude'
+	};
 }

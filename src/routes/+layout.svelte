@@ -16,6 +16,7 @@
 	let clientVersion = __APP_VERSION__;
 
 	$: displayVersionSelector =
+		$page.data.v1Enabled &&
 		(!isSubPage($page.url.pathname, apiVersion) ||
 			$page.url.pathname === '/v2/admin/jobs' ||
 			$page.url.pathname === '/v1/admin/jobs') &&

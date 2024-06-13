@@ -55,6 +55,8 @@ export LOG_FILE=fractal-web.log
 # export LOG_LEVEL_FILE=info
 # export LOG_LEVEL_CONSOLE=warn
 
+export FRACTAL_API_V1_MODE=include
+
 # default values are usually fine for the following variables; remove comments if needed
 #export AUTH_COOKIE_NAME=fastapiusersauth
 #export AUTH_COOKIE_PATH=/
