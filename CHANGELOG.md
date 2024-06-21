@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.2.0
 
 * Conditionally included V1 pages (\#514);
 * Added task version update sandbox page (\#509);
