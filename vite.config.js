@@ -22,6 +22,7 @@ const config = defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		include: ['**/__tests__/**/*\\.test\\.js'],
+		exclude: ['jschema/**', 'node_modules', 'build', '.idea', '.git', '.cache'],
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
@@ -33,6 +34,17 @@ const config = defineConfig({
 			// See https://github.com/vitest-dev/vitest/issues/2834#issuecomment-1439576110
 			{ find: /^svelte$/, replacement: 'svelte/internal' }
 		]
+	},
+	resolve: {
+		alias: {
+			'fractal-jschema': fileURLToPath(new URL('./jschema/src/lib/index.js', import.meta.url))
+		}
+	},
+	// Tells Vite to allow serving files from the jschema folder when running npm run dev
+	server: {
+		fs: {
+			allow: ['./jschema/src/lib']
+		}
 	},
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection

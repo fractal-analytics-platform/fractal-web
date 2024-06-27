@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
-	import JSchema from '$lib/components/v2/workflow/JSchema.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { JSchema, getPropertiesToIgnore } from 'fractal-jschema';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import {
 		stripNullAndEmptyObjectsAndArrays,
@@ -9,8 +9,13 @@
 	} from '$lib/components/common/jschema/schema_management';
 	import FormBuilder from './FormBuilder.svelte';
 	import { deepCopy } from '$lib/common/component_utilities';
+	import { tick } from 'svelte';
+	import { JsonSchemaDataError } from 'fractal-jschema/components/form_manager';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2}  */
 	export let workflowTask;
@@ -57,17 +62,20 @@
 		? workflowTask.task_legacy.args_schema
 		: workflowTask.task.args_schema_parallel;
 
+	function handleNonParallelChanged() {
+		unsavedChangesNonParallel = true;
+	}
+
+	function handleParallelChanged() {
+		unsavedChangesParallel = true;
+	}
+
 	export function hasUnsavedChanges() {
 		return unsavedChanges;
 	}
 
 	export async function saveChanges() {
-		try {
-			nonParallelSchemaComponent?.validateArguments();
-			parallelSchemaComponent?.validateArguments();
-		} catch (err) {
-			console.error(err);
-			displayStandardErrorAlert(err, 'task-args-validation-errors');
+		if (!validateArguments()) {
 			return;
 		}
 		const invalidFormBuilderNonParallel =
@@ -92,27 +100,64 @@
 				payload.args_parallel = parallelFormBuilderComponent.getArguments();
 			}
 		}
-		await handleSaveChanges(payload);
+		await patchWorkflow(payload);
 	}
 
 	export function discardChanges() {
-		nonParallelSchemaComponent?.discardChanges(workflowTask.args_non_parallel);
-		parallelSchemaComponent?.discardChanges(workflowTask.args_parallel);
-		nonParallelFormBuilderComponent?.discardChanges(workflowTask.args_non_parallel);
-		parallelFormBuilderComponent?.discardChanges(workflowTask.args_parallel);
+		workflowTask = workflowTask;
+		unsavedChangesNonParallel = false;
+		unsavedChangesParallel = false;
 	}
 
 	/**
 	 * @param {object} payload
 	 */
-	async function handleSaveChanges(payload) {
+	async function handleImport(payload) {
 		if (nonParallelSchemaComponent) {
-			nonParallelSchemaComponent.validateArguments(payload.args_non_parallel);
+			workflowTask.args_non_parallel = payload.args_non_parallel;
 		}
 		if (parallelSchemaComponent) {
-			parallelSchemaComponent.validateArguments(payload.args_parallel);
+			workflowTask.args_parallel = payload.args_parallel;
 		}
+		await tick();
+		try {
+			nonParallelSchemaComponent?.validateArguments();
+			parallelSchemaComponent?.validateArguments();
+		} catch (err) {
+			throw new AlertError(getValidationErrorMessage(err));
+		}
+		await patchWorkflow(payload);
+	}
 
+	function validateArguments() {
+		errorAlert?.hide();
+		try {
+			nonParallelSchemaComponent?.validateArguments();
+			parallelSchemaComponent?.validateArguments();
+		} catch (err) {
+			const errorAlertData = getValidationErrorMessage(err);
+			errorAlert = displayStandardErrorAlert(errorAlertData, 'task-args-validation-errors');
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param {any} err
+	 */
+	function getValidationErrorMessage(err) {
+		if (err instanceof JsonSchemaDataError) {
+			return err.errors.length === 1 ? err.errors[0] : err.errors;
+		} else {
+			console.error(err);
+			return /** @type {Error}*/ (err).message;
+		}
+	}
+
+	/**
+	 * @param {object} payload
+	 */
+	async function patchWorkflow(payload) {
 		savingChanges = true;
 		const projectId = $page.params.projectId;
 
@@ -131,15 +176,8 @@
 
 		const result = await response.json();
 		if (response.ok) {
-			// deep copy the arguments objects to avoid side effects from the JSchema component
-			const argsNonParallel = deepCopy(result.args_non_parallel);
-			const argsParallel = deepCopy(result.args_parallel);
-			if (result.args_non_parallel) {
-				nonParallelSchemaComponent?.setArguments(argsNonParallel);
-			}
-			if (result.args_parallel) {
-				parallelSchemaComponent?.setArguments(argsParallel);
-			}
+			unsavedChangesParallel = false;
+			unsavedChangesNonParallel = false;
 			onWorkflowTaskUpdated(result);
 		} else {
 			displayStandardErrorAlert(await result, 'task-args-validation-errors');
@@ -166,6 +204,8 @@
 		argsSchemaParallel &&
 		Object.keys(stripSchemaProperties(argsSchemaParallel, workflowTask.is_legacy_task).properties)
 			.length;
+
+	$: propertiesToIgnore = getPropertiesToIgnore(workflowTask.is_legacy_task);
 </script>
 
 <div id="workflow-arguments-schema-panel">
@@ -177,10 +217,11 @@
 		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
-					bind:unsavedChanges={unsavedChangesNonParallel}
+					componentId="jschema-non-parallel"
 					schema={workflowTask.task.args_schema_non_parallel}
 					schemaData={workflowTask.args_non_parallel}
-					legacy={workflowTask.is_legacy_task}
+					{propertiesToIgnore}
+					on:change={handleNonParallelChanged}
 					bind:this={nonParallelSchemaComponent}
 				/>
 			</div>
@@ -204,10 +245,11 @@
 		{#if argsSchemaParallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
-					bind:unsavedChanges={unsavedChangesParallel}
+					componentId="jschema-parallel"
 					schema={argsSchemaParallel}
 					schemaData={workflowTask.args_parallel}
-					legacy={workflowTask.is_legacy_task}
+					{propertiesToIgnore}
+					on:change={handleParallelChanged}
 					bind:this={parallelSchemaComponent}
 				/>
 			</div>
@@ -227,7 +269,7 @@
 	<div class="d-flex jschema-controls-bar p-3">
 		<ImportExportArgs
 			{workflowTask}
-			onImport={handleSaveChanges}
+			onImport={handleImport}
 			exportDisabled={unsavedChanges || savingChanges}
 		/>
 		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}

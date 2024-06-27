@@ -757,7 +757,6 @@
 													argumentsSchemaVersion={selectedWorkflowTask.task.args_schema_version}
 													taskName={selectedWorkflowTask.task.name}
 													args={selectedWorkflowTask.args}
-													bind:saveChanges={saveArgumentsChanges}
 													bind:validSchema={argsSchemaValid}
 													bind:unsavedChanges={argumentsWithUnsavedChanges}
 													on:argsSaved={handleArgsSaved}
