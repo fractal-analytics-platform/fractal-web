@@ -37,7 +37,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await workflow.selectTask(randomTaskName);
 	});
 
-	const form = page.locator('#json-schema');
+	const form = page.locator('#jschema-parallel');
 
 	await test.step('Fill required string', async () => {
 		const input = form.getByLabel('Required string', { exact: true });
@@ -58,16 +58,16 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	});
 
 	await test.step('Select required option', async () => {
-		await page.selectOption('id=property-requiredEnum', 'option1');
-		await page.selectOption('id=property-requiredEnum', 'null');
+		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
+		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('null');
 		expect(form.getByText('Field is required')).toHaveCount(1);
-		await page.selectOption('id=property-requiredEnum', 'option1');
+		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
 		expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Select optional option', async () => {
-		await page.selectOption('id=property-optionalEnum', 'option1');
-		await page.selectOption('id=property-optionalEnum', 'null');
+		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('option1');
+		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('null');
 		expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
@@ -119,7 +119,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 	});
 
 	await test.step('Required boolean', async () => {
-		const booleanSwitch = form.locator('id=property-requiredBoolean');
+		const booleanSwitch = form.getByRole('switch');
 		expect(await booleanSwitch.isChecked()).toEqual(false);
 		await booleanSwitch.check();
 		expect(await booleanSwitch.isChecked()).toEqual(true);
@@ -132,37 +132,39 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await addBtn.click();
 		await addBtn.click();
 		expect(await addBtn.isDisabled()).toEqual(true);
+		const block = form.locator('.property-block', {
+			has: page.getByText('requiredArrayWithMinMaxItems')
+		});
 		// Fill items
-		await form.locator('id=property-requiredArrayWithMinMaxItems###0').fill('a');
-		await form.locator('id=property-requiredArrayWithMinMaxItems###1').fill('b');
-		await form.locator('id=property-requiredArrayWithMinMaxItems###2').fill('c');
-		await form.locator('id=property-requiredArrayWithMinMaxItems###3').fill('d');
+		await block.getByRole('textbox').nth(0).fill('a');
+		await block.getByRole('textbox').nth(1).fill('b');
+		await block.getByRole('textbox').nth(2).fill('c');
+		await block.getByRole('textbox').nth(3).fill('d');
 		// Move "d" up
 		await page.getByRole('button', { name: 'Move item up' }).nth(3).click();
 		await page.getByRole('button', { name: 'Move item up' }).nth(2).click();
 		await page.getByRole('button', { name: 'Move item up' }).nth(1).click();
-		await checkFirstArray(['d', 'a', 'b', 'c']);
+		await checkFirstArray(block, ['d', 'a', 'b', 'c']);
 		// Move "d" down
 		await page.getByRole('button', { name: 'Move item down' }).first().click();
 		await page.getByRole('button', { name: 'Move item down' }).nth(1).click();
-		await checkFirstArray(['a', 'b', 'd', 'c']);
+		await checkFirstArray(block, ['a', 'b', 'd', 'c']);
 		// Remove items
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
 		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
-		await checkFirstArray(['a', 'b']);
+		await checkFirstArray(block, ['a', 'b']);
 		await form.getByRole('button', { name: 'Clear' }).nth(1).click();
-		await checkFirstArray(['a', '']);
+		await checkFirstArray(block, ['a', '']);
 	});
 
 	/**
+	 * @param {import('@playwright/test').Locator} block
 	 * @param {string[]} expectedValues
 	 */
-	async function checkFirstArray(expectedValues) {
+	async function checkFirstArray(block, expectedValues) {
 		for (let i = 0; i < expectedValues.length; i++) {
-			expect(
-				await form.locator('id=property-requiredArrayWithMinMaxItems###' + i).inputValue()
-			).toEqual(expectedValues[i]);
+			expect(await block.getByRole('textbox').nth(i).inputValue()).toEqual(expectedValues[i]);
 		}
 	}
 
@@ -173,20 +175,21 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await addBtn.click();
 		await addBtn.click();
 		expect(await addBtn.isDisabled()).toEqual(true);
-		await form.locator('id=property-optionalArrayWithMinMaxItems###0').fill('a');
-		await form.locator('id=property-optionalArrayWithMinMaxItems###1').fill('b');
-		await form.locator('id=property-optionalArrayWithMinMaxItems###2').fill('c');
+		const block = form.locator('.property-block', {
+			has: page.getByText('optionalArrayWithMinMaxItems')
+		});
+		await block.getByRole('textbox').nth(0).fill('a');
+		await block.getByRole('textbox').nth(1).fill('b');
+		await block.getByRole('textbox').nth(2).fill('c');
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(1).click();
 		await form.getByRole('button', { name: 'Remove' }).nth(0).click();
-		expect(form.locator('id=property-optionalArrayWithMinMaxItems###0')).toHaveCount(0);
+		expect(block.getByRole('textbox')).toHaveCount(0);
 	});
 
 	await test.step('Object with nested properties', async () => {
-		await page
-			.locator('[id="property-requiredObject###requiredNestedString"]')
-			.fill('nested string');
+		await page.getByRole('textbox', { name: 'requiredNestedString' }).fill('nested string');
 		await page.getByLabel('Required Min', { exact: true }).fill('1');
 		await page.getByLabel('Optional Max', { exact: true }).fill('5');
 	});
@@ -206,17 +209,20 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await stringInput.fill('foo');
 		const intInput = form.getByLabel('minMaxRequiredInt', { exact: true });
 		await intInput.fill('7');
-		await form.locator('id=property-requiredArrayWithMinMaxItems###1').fill('b');
+		const block = form.locator('.property-block', {
+			has: page.getByText('requiredArrayWithMinMaxItems')
+		});
+		await block.getByRole('textbox').nth(1).fill('b');
 		await page.getByRole('button', { name: 'Move item up' }).nth(1).click();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('Arguments changes saved successfully').waitFor();
 		await page.reload();
 		await waitPageLoading(page);
 		await workflow.selectTask(randomTaskName);
-		expect(await page.getByLabel('Required string', { exact: true }).inputValue()).toEqual('foo');
-		expect(await page.getByLabel('minMaxRequiredInt', { exact: true }).inputValue()).toEqual('7');
-		expect(await page.locator('id=property-requiredEnum').inputValue()).toEqual('option1');
-		await checkFirstArray(['b', 'a']);
+		await expect(page.getByLabel('Required string', { exact: true })).toHaveValue('foo');
+		await expect(page.getByLabel('minMaxRequiredInt', { exact: true })).toHaveValue('7');
+		await expect(page.getByRole('combobox', { name: 'Required enum' })).toHaveValue('option1');
+		await checkFirstArray(block, ['b', 'a']);
 	});
 
 	await test.step('Delete workflow task', async () => {
