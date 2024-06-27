@@ -1,0 +1,85 @@
+{
+	"title": "MyCustomTasksArguments",
+	"type": "object",
+	"invalid_properties": {
+		"id": {
+			"title": "Id",
+			"description": "Id of task argument",
+			"type": "integer"
+		},
+		"name": {
+			"title": "Name",
+			"type": "string"
+		},
+		"is_optional": {
+			"title": "Is Optional",
+			"description": "Whether this argumetns object is optional or not",
+			"default": true,
+			"type": "boolean"
+		},
+		"allowed_channels": {
+			"title": "Allowed Channels",
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/Channel"
+			}
+		},
+		"test_prop": {
+			"title": "Test Prop",
+			"default": {
+				"key1": "a string value"
+			},
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		}
+	},
+	"required": ["id", "name", "allowed_channels"],
+	"definitions": {
+		"InnerChannel": {
+			"title": "InnerChannel",
+			"type": "object",
+			"properties": {
+				"channel_id": {
+					"title": "Channel Id",
+					"default": 0,
+					"type": "integer"
+				},
+				"channel_name": {
+					"title": "Channel Name",
+					"default": "Default name",
+					"type": "string"
+				}
+			}
+		},
+		"Channel": {
+			"title": "Channel",
+			"type": "object",
+			"properties": {
+				"wavelength_id": {
+					"title": "Wavelength Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Channel label",
+					"description": "Description field",
+					"default": "This is the label",
+					"type": "string"
+				},
+				"start": {
+					"title": "Start",
+					"type": "integer"
+				},
+				"end": {
+					"title": "End",
+					"type": "integer"
+				},
+				"inner_channel": {
+					"$ref": "#/definitions/InnerChannel"
+				}
+			},
+			"required": ["wavelength_id", "inner_channel"]
+		}
+	}
+}

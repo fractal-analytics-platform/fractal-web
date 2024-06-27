@@ -1,0 +1,59 @@
+<script>
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { FormManager } from './form_manager.js';
+	import ObjectProperty from './properties/ObjectProperty.svelte';
+
+	/** @type {(type: string, detail?: any) => boolean} */
+	const dispatch = createEventDispatcher();
+
+	/** @type {object} */
+	export let schema;
+	/** @type {object} */
+	export let schemaData;
+	/** @type {string[]} */
+	export let propertiesToIgnore = [];
+	/** @type {string} */
+	export let componentId;
+
+	/** @type {FormManager|undefined} */
+	let formManager;
+	onMount(() => {
+		initFormManager();
+	});
+
+	export function getArguments() {
+		return formManager?.getFormData();
+	}
+
+	export function validateArguments() {
+		// Trigger validation on input fields
+		for (const field of document.querySelectorAll(
+			`#${componentId} input, #${componentId} select`
+		)) {
+			field.dispatchEvent(new Event('input'));
+		}
+		formManager?.validate();
+	}
+
+	$: {
+		if (schema || schemaData || propertiesToIgnore) {
+			initFormManager();
+		}
+	}
+
+	function initFormManager() {
+		if (schema) {
+			formManager = new FormManager(schema, dispatch, propertiesToIgnore, schemaData);
+		} else {
+			formManager = undefined;
+		}
+	}
+</script>
+
+{#if formManager}
+	{#key formManager}
+		<div id={componentId}>
+			<ObjectProperty formElement={formManager.root} />
+		</div>
+	{/key}
+{/if}
