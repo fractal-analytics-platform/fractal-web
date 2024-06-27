@@ -2,7 +2,7 @@
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import { SchemaValidator } from '$lib/common/jschema_validation';
-	import { stripSchemaProperties } from '$lib/components/common/jschema/schema_management';
+	import { stripIgnoredProperties, getPropertiesToIgnore } from 'fractal-jschema';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
@@ -68,8 +68,8 @@
 	 * @param {object} args
 	 */
 	function validateArguments(args) {
-		const newSchema =
-			/** @type {import('$lib/components/common/jschema/jschema-types').JSONSchemaObjectProperty} */ (
+		let newSchema =
+			/** @type {import('fractal-jschema/types/jschema').JSONSchemaObjectProperty} */ (
 				'args_schema' in updateCandidate
 					? updateCandidate.args_schema
 					: parallel
@@ -78,7 +78,10 @@
 			);
 		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
-			stripSchemaProperties(newSchema, workflowTask.is_legacy_task);
+			newSchema = stripIgnoredProperties(
+				newSchema,
+				getPropertiesToIgnore(workflowTask.is_legacy_task)
+			);
 		}
 		const parsedSchema = deepCopy(newSchema);
 		const isSchemaValid = validator.loadSchema(parsedSchema);

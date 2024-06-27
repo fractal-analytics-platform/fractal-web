@@ -1,12 +1,13 @@
 <script>
 	import { page } from '$app/stores';
-	import { JSchema, getPropertiesToIgnore } from 'fractal-jschema';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import {
+		JSchema,
 		stripNullAndEmptyObjectsAndArrays,
-		stripSchemaProperties
-	} from '$lib/components/common/jschema/schema_management';
+		stripIgnoredProperties,
+		getPropertiesToIgnore
+	} from 'fractal-jschema';
 	import FormBuilder from './FormBuilder.svelte';
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
@@ -196,14 +197,18 @@
 		!workflowTask.is_legacy_task &&
 		workflowTask.task.args_schema_non_parallel &&
 		Object.keys(
-			stripSchemaProperties(workflowTask.task.args_schema_non_parallel, workflowTask.is_legacy_task)
-				.properties
+			stripIgnoredProperties(
+				workflowTask.task.args_schema_non_parallel,
+				getPropertiesToIgnore(workflowTask.is_legacy_task)
+			).properties
 		).length;
 
 	$: hasParallelArgs =
 		argsSchemaParallel &&
-		Object.keys(stripSchemaProperties(argsSchemaParallel, workflowTask.is_legacy_task).properties)
-			.length;
+		Object.keys(
+			stripIgnoredProperties(argsSchemaParallel, getPropertiesToIgnore(workflowTask.is_legacy_task))
+				.properties
+		).length;
 
 	$: propertiesToIgnore = getPropertiesToIgnore(workflowTask.is_legacy_task);
 </script>

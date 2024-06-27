@@ -21,7 +21,7 @@
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import { PropertyDescription } from 'fractal-jschema';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
