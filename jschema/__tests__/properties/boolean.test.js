@@ -31,7 +31,7 @@ describe('Boolean properties', () => {
 
 	it('BooleanProperty without title', async () => {
 		const { component, onChange } = renderSchemaWithSingleProperty({ type: 'boolean' }, false);
-		const title = screen.getByText('Boolean argument');
+		const title = screen.getByText('testProp');
 		checkBold(title, false);
 		expect(title).toBeDefined();
 		const switcher = screen.getByRole('switch');
@@ -46,7 +46,7 @@ describe('Boolean properties', () => {
 
 	it('BooleanProperty referenced', async () => {
 		const { component, onChange } = renderSchemaWithReferencedProperty({ type: 'boolean' });
-		const title = screen.getByText('Boolean argument');
+		const title = screen.getByText('testProp');
 		checkBold(title, false);
 		expect(title).toBeDefined();
 		const switcher = screen.getByRole('switch');
@@ -59,7 +59,7 @@ describe('Boolean properties', () => {
 		expect(onChange).toHaveBeenCalledWith({ testProp: false });
 	});
 
-	it.only('Required BooleanProperty initialized to false', async () => {
+	it('Required BooleanProperty initialized to false', async () => {
 		const { component } = renderSchema(
 			{
 				type: 'object',
