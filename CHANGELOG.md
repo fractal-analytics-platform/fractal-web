@@ -1,5 +1,12 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+> Starting from this release the Sandbox pages are not included in fractal-web anymore, instead they are static pages published together with the documentation.
+
+* Moved JSON Schema components to a separated component (\#518);
+* Moved Sandbox pages to a separated component (\#518);
+
 # 1.2.0
 
 * Conditionally included V1 pages (\#514);
