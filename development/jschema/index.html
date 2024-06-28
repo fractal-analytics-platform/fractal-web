@@ -9,24 +9,24 @@
       
       
       
-        <link rel="prev" href="../changelog/">
+        <link rel="prev" href="../docs/">
       
       
-        <link rel="next" href="../development/">
+        <link rel="next" href="../precommit/">
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.21">
     
     
       
-        <title>OAuth2 integration - Fractal Web Client</title>
+        <title>JSON Schema form module - Fractal Web Client</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.eebd395e.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc896b0.min.css">
       
       
 
@@ -42,9 +42,9 @@
       
     
     
-      <link rel="stylesheet" href="../extra.css">
+      <link rel="stylesheet" href="../../extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -73,7 +73,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#integration-with-oauth2-providers" class="md-skip">
+        <a href="#json-schema-form-module" class="md-skip">
           Skip to content
         </a>
       
@@ -89,7 +89,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Fractal Web Client" class="md-header__button md-logo" aria-label="Fractal Web Client" data-md-component="logo">
+    <a href="../.." title="Fractal Web Client" class="md-header__button md-logo" aria-label="Fractal Web Client" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              OAuth2 integration
+              JSON Schema form module
             
           </span>
         </div>
@@ -213,7 +213,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Fractal Web Client" class="md-nav__button md-logo" aria-label="Fractal Web Client" data-md-component="logo">
+    <a href="../.." title="Fractal Web Client" class="md-nav__button md-logo" aria-label="Fractal Web Client" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -244,7 +244,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Home page
       </a>
     </li>
@@ -259,7 +259,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../quickstart/" class="md-nav__link">
         Quickstart
       </a>
     </li>
@@ -274,7 +274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../environment-variables/" class="md-nav__link">
+      <a href="../../environment-variables/" class="md-nav__link">
         Environment variables
       </a>
     </li>
@@ -289,7 +289,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../version-compatibility/" class="md-nav__link">
+      <a href="../../version-compatibility/" class="md-nav__link">
         Version compatibility
       </a>
     </li>
@@ -304,8 +304,23 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
+      <a href="../../changelog/" class="md-nav__link">
         CHANGELOG
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../oauth2/" class="md-nav__link">
+        OAuth2 integration
       </a>
     </li>
   
@@ -320,6 +335,55 @@
     
   
   
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../">Development</a>
+          
+            <label for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Development
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/" class="md-nav__link">
+        Documentation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -329,12 +393,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          OAuth2 integration
+          JSON Schema form module
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        OAuth2 integration
+        JSON Schema form module
       </a>
       
         
@@ -353,8 +417,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#full-details-for-local-example" class="md-nav__link">
-    Full details for local example
+  <a href="#structure-of-the-code" class="md-nav__link">
+    Structure of the code
   </a>
   
 </li>
@@ -366,54 +430,6 @@
     </li>
   
 
-    
-      
-      
-      
-
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
-      
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../development/">Development</a>
-          
-            <label for="__nav_7">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_7">
-          <span class="md-nav__icon md-icon"></span>
-          Development
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../development/docs/" class="md-nav__link">
-        Documentation
-      </a>
-    </li>
-  
-
             
           
             
@@ -422,21 +438,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development/jschema/" class="md-nav__link">
-        JSON Schema form module
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../development/precommit/" class="md-nav__link">
+      <a href="../precommit/" class="md-nav__link">
         Precommit
       </a>
     </li>
@@ -450,7 +452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development/release/" class="md-nav__link">
+      <a href="../release/" class="md-nav__link">
         Release
       </a>
     </li>
@@ -464,7 +466,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development/setup/" class="md-nav__link">
+      <a href="../setup/" class="md-nav__link">
         Development setup
       </a>
     </li>
@@ -478,7 +480,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development/structure/" class="md-nav__link">
+      <a href="../structure/" class="md-nav__link">
         Code-base structure
       </a>
     </li>
@@ -492,7 +494,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development/tests/" class="md-nav__link">
+      <a href="../tests/" class="md-nav__link">
         Testing
       </a>
     </li>
@@ -514,7 +516,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
+      <a href="../../examples/" class="md-nav__link">
         Deployment examples
       </a>
     </li>
@@ -529,7 +531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sandbox-pages/" class="md-nav__link">
+      <a href="../../sandbox-pages/" class="md-nav__link">
         Sandbox pages
       </a>
     </li>
@@ -563,8 +565,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#full-details-for-local-example" class="md-nav__link">
-    Full details for local example
+  <a href="#structure-of-the-code" class="md-nav__link">
+    Structure of the code
   </a>
   
 </li>
@@ -587,34 +589,39 @@
   
 
 
-<h1 id="integration-with-oauth2-providers">Integration with OAuth2 providers<a class="headerlink" href="#integration-with-oauth2-providers" title="Permanent link">&para;</a></h1>
-<p>Fractal supports OAuth2 login using GitHub, Google or custom providers.</p>
-<p>First, configure the server as described in <a href="https://fractal-analytics-platform.github.io/fractal-server/internals/users/#oauth2">OAuth2 documentation of fractal-server</a>.</p>
-<p>Fractal-web callback has to be defined using the following path: <code>/auth/login/oauth2</code>.</p>
-<p>Then, enable the desired provider on fractal-web using the <code>PUBLIC_OAUTH_CLIENT_NAME</code> environment variable, for example:</p>
-<div class="highlight"><pre><span></span><code>PUBLIC_OAUTH_CLIENT_NAME=github
+<h1 id="json-schema-form-module">JSON Schema form module<a class="headerlink" href="#json-schema-form-module" title="Permanent link">&para;</a></h1>
+<p>The <code>jschema</code> folder on this repository contains a Svelte project that provides the JSON Schema form component (<code>JSchema.svelte</code>) and its related functions and classes. The file <code>index.js</code> contains the list of components and functions that are exported for public usage, so that they can be included using <code>from 'fractal-jschema'</code> from the main project.</p>
+<p>The main project defines <code>fractal-jschema</code> in <code>vite.config.js</code>, as an alias pointing to <code>jschema/src/lib/index.js</code>. In this way the jschema module is automatically built when the main project is built and the Hot Module Reload feature still works.</p>
+<p>Moreover, the path to jschema module has been added as <code>server.fs.allow</code> Vite config option, to prevent the following error while serving the files using <code>npm run dev</code>:</p>
+<div class="highlight"><pre><span></span><code>The request url &quot;/path/to/fractal-web/jschema/src/lib/index.js&quot; is outside of Vite serving allow list.
 </code></pre></div>
-<p>This variable has to match the client name defined in fractal-server configuration.</p>
-<h2 id="full-details-for-local-example">Full details for local example<a class="headerlink" href="#full-details-for-local-example" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Register an OAuth2 app on GitHub with<ul>
-<li>Homepage URL: <a href="http://127.0.0.1:5173">http://127.0.0.1:5173</a></li>
-<li>Authorization callback URL: <a href="http://127.0.0.1:5173/auth/login/oauth2/">http://127.0.0.1:5173/auth/login/oauth2/</a></li>
+<blockquote>
+<p><strong>Important</strong>: When importing js files inside the <code>jschema</code> module it is necessary to use a relative path. The editor might autocomplete the imports using the <code>$lib</code> prefix, but that will not work when the module is included in the main application, since it redefines the <code>$lib</code> path again.</p>
+</blockquote>
+<h2 id="structure-of-the-code">Structure of the code<a class="headerlink" href="#structure-of-the-code" title="Permanent link">&para;</a></h2>
+<p>The <code>JSchema</code> Svelte component intializes a class named <code>FormManager</code>, that handles the following features:</p>
+<ul>
+<li>creates and stores an object (<code>root</code>) used to draw the form;</li>
+<li>provides the functions to create new form elements;</li>
+<li>attaches a <code>notifyChange()</code> function to each created form element; this function is used by each component to notify changes to the manager (e.g. the value of an input changes, a new element is added to an array, and so on), then the function dispatches a <code>change</code> event up to the <code>JSchema</code> component;</li>
+<li>wraps the <code>SchemaValidator</code> and provides a <code>validate()</code> function;</li>
+<li>provides a <code>getFormData()</code> function, that returns an object based on the data present in the form.</li>
 </ul>
-</li>
-<li>Set up the following env variables for fractal-server:
-<div class="highlight"><pre><span></span><code>OAUTH_GITHUB_CLIENT_ID=...
-OAUTH_GITHUB_CLIENT_SECRET=...
-OAUTH_GITHUB_REDIRECT_URL=http://127.0.0.1:5173/auth/login/oauth2/
-# [all other variables]
-</code></pre></div></li>
-<li>Set up the following env variables for fractal-web:
-<div class="highlight"><pre><span></span><code>FRACTAL_SERVER_HOST=http://127.0.0.1:8000
-AUTH_COOKIE_DOMAIN=127.0.0.1
-PUBLIC_OAUTH_CLIENT_NAME=github
-# [all other variables]
-</code></pre></div></li>
+<p>The creation of the <code>root</code> object requires 2 preliminary steps, that are useful to reduce the complexity of the subsequent object creation:</p>
+<ol>
+<li>provided JSON Schema is adapted, to create a simpler but equivalent JSON Schema (<code>jschema_adapter.js</code>);</li>
+<li>an object representing the initial form data is created, considering both the provided data (if any) and the default values (<code>jschema_initial_data.js</code>).</li>
 </ol>
+<p>The <code>adaptJsonSchema()</code> function does the following:</p>
+<ol>
+<li>removes the properties to ignore (e.g. <code>zarr_url</code>, <code>zarr_urls</code>, <code>init_args</code>, <code>zarr_dir</code>);</li>
+<li>resolves and replaces the schema references (<code>$ref</code> fields pointing to definitions);</li>
+<li>merges the <code>allOf</code> items.</li>
+</ol>
+<p>The <code>getJsonSchemaData()</code> function initializes an object representing the initial form data. If the <code>initialValue</code> parameter is not set the created object is populated using the default values. If an <code>initialValue</code> object is provided, the function adds to it all the optional fields set to null (this is needed to have an object that acts as a complete skeleton for the form).</p>
+<p>Using the adapted JSON Schema and the computed data object, the <code>FormManager</code> populates the <code>root</code> object, initializing a dedicated class for each form element (<code>NumberFormElement</code>, <code>ArrayFormElement</code>, <code>BooleanFormElement</code>, ...). These classes contain fields that are specific to each form element type and may contain additional functions to manipulate them (e.g. <code>addChild</code>, <code>removeChild</code>). Functions that add new children delegate the creation to the <code>FormManager</code>, since it is the class having the knowledge to create form elements of any type, and then add the new child to an internal array of children.</p>
+<p>Each form element is mapped to a dedicated Svelte component (e.g. the <code>NumberFormElement</code> class is passed to a <code>NumberProperty.svelte</code> component). Each property component can contain additional functions for validating the input values and display the validation errors, but delegates to the wrapped form element class any additional logic.</p>
+<p>This structure attempts to achieve a greater separation of concerns, needed to handle properly such a complex component.</p>
 
 
 
@@ -662,10 +669,10 @@ LICENSE
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "content.code.copy"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.code.copy"], "search": "../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      <script src="../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
     
   </body>
