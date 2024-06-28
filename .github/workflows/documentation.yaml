@@ -9,23 +9,8 @@ on:
 jobs:
 
   docs:
-    name: "Deploy docs"
+    name: "Generate docs"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REQUIREMENTS: docs/doc-requirements.txt
-
-  docs-build:
-    name: "Test docs build"
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'push' || github.ref != 'refs/heads/main' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -40,3 +25,34 @@ jobs:
 
       - name: MKDocs build
         run: mkdocs build --config-file mkdocs.yml --strict
+
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install jschema dependencies
+        run: |
+          cd jschema
+          npm install
+
+      - name: Install sandbox dependencies
+        run: |
+          cd sandbox
+          npm install
+
+      - name: Build sandbox
+        run: |
+          cd sandbox
+          npm run build
+
+      - name: Move sandbox built files in docs site
+        run: mv sandbox/build/ site/sandbox
+
+      - name: Deploy docs
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
