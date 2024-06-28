@@ -19,7 +19,10 @@
 
 <nav class="navbar navbar-expand-lg bg-light mb-3 border-bottom">
 	<div class="container">
-		<ul class="navbar-nav">
+		<a class="navbar-brand" href="https://fractal-analytics-platform.github.io/fractal-web/">
+			Documentation
+		</a>
+		<ul class="navbar-nav me-auto">
 			<li class="nav-item">
 				<a
 					class="nav-link"
