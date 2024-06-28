@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import PropertyDescription from '$lib/components/common/jschema/PropertyDescription.svelte';
+	import { PropertyDescription } from 'fractal-jschema';
 
 	let name = '';
 	let kind = '';

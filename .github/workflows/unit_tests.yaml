@@ -29,6 +29,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install jschema dependencies
+        run: |
+          cd jschema
+          npm install
+
+      - name: Run vitest tests on jschema module
+        run: |
+          cd jschema
+          npm run test
+
       - name: Run vitest tests
         run: npx vitest run
         env:
