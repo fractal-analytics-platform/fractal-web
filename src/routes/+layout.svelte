@@ -20,7 +20,6 @@
 		(!isSubPage($page.url.pathname, apiVersion) ||
 			$page.url.pathname === '/v2/admin/jobs' ||
 			$page.url.pathname === '/v1/admin/jobs') &&
-		!$page.url.pathname.startsWith('/sandbox') &&
 		selectedSection !== 'home';
 
 	/**
@@ -76,7 +75,7 @@
 		if (pathname === '/') {
 			return 'home';
 		}
-		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth', 'sandbox']) {
+		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
 			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/${apiVersion}/${section}`)) {
 				return section;
 			}
@@ -119,13 +118,6 @@
 				<li class="nav-item">
 					<a href="/" class="nav-link" class:active={selectedSection === 'home'}> Home </a>
 				</li>
-				{#if import.meta.env.MODE === 'development' && selectedSection === 'sandbox'}
-					<li class="nav-item">
-						<a href="/sandbox" class="nav-link" class:active={selectedSection === 'sandbox'}>
-							Sandbox pages
-						</a>
-					</li>
-				{/if}
 				{#if userLoggedIn}
 					<li class="nav-item">
 						<a
@@ -223,7 +215,7 @@
 		<div class="admin-border" />
 	{/if}
 	<div class="container p-4">
-		{#if !server.alive && selectedSection !== 'sandbox'}
+		{#if !server.alive}
 			<div class="alert alert-danger">
 				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
 			</div>
