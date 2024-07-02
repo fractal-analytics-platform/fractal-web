@@ -94,6 +94,7 @@ export class EnumFormElement extends ValueFormElement {
 }
 
 export class NumberFormElement extends ValueFormElement {
+	badInput = false;
 	/**
 	 * @param {import("../types/form").NumberFormElementFields} fields
 	 */
