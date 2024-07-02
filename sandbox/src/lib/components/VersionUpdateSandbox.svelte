@@ -164,11 +164,8 @@
 		handleNewJsonSchemaStringChanged();
 	}
 
-	/** @type {boolean} */
-	export let parallel;
-
-	export let canBeUpdated = false;
-	export let argsChanged = false;
+	let canBeUpdated = false;
+	let argsChanged = false;
 
 	$: {
 		canBeUpdated = validationErrors === null || validationErrors.length === 0;
@@ -246,6 +243,9 @@
 
 	$: propertiesToIgnore = getPropertiesToIgnore(legacy);
 </script>
+
+<h1 class="fw-light">Sandbox page for task version update</h1>
+<p>This is a test page for the task version update</p>
 
 <h2>Old schema</h2>
 
@@ -359,7 +359,7 @@
 						<ul id="validation-errors">
 							{#each validationErrors as error, index}
 								<li>
-									{#if error.instancePath !== ''}
+									{#if error.instancePath}
 										{error.instancePath}:
 									{/if}
 									{#if error.keyword === 'additionalProperties'}
@@ -396,12 +396,10 @@
 						<div class="alert alert-success mt-3">The arguments are valid</div>
 					{/if}
 					{#if displayTextarea}
-						<label class="form-label" for="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}">
-							Fix the {parallel ? '' : ' non'} parallel arguments:
-						</label>
+						<label class="form-label" for="fix-arguments"> Fix the arguments: </label>
 						<textarea
 							class="form-control"
-							id="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}"
+							id="fix-arguments"
 							class:is-invalid={!argsToBeFixedValidJson}
 							bind:value={argsToBeFixed}
 							rows="20"
