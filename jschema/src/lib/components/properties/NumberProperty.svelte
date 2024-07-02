@@ -15,7 +15,8 @@
 
 	function validate() {
 		validationError = '';
-		if (field.validity.badInput) {
+		formElement.badInput = field.validity.badInput;
+		if (formElement.badInput) {
 			validationError = 'Should be a number';
 			return;
 		}

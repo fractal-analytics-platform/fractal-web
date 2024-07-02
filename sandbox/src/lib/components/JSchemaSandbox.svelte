@@ -107,6 +107,9 @@
 	$: propertiesToIgnore = getPropertiesToIgnore(legacy);
 </script>
 
+<h1 class="fw-light">Sandbox page for JSON Schema</h1>
+<p>This is a test page for the JSON Schema component</p>
+
 <div class="row">
 	<div class="col-lg-6 mt-3">
 		<div class="row">

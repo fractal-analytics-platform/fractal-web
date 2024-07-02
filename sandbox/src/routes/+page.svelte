@@ -1,9 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
-	import JSchemaSandbox from '$lib/components/JSchemaSandbox.svelte';
-	import VersionUpdateSandbox from '$lib/components/VersionUpdateSandbox.svelte';
+	import JSchemaSandbox from '../lib/components/JSchemaSandbox.svelte';
+	import VersionUpdateSandbox from '../lib/components/VersionUpdateSandbox.svelte';
+	import TaskManifestSandbox from '../lib/components/TaskManifestSandbox.svelte';
 
-	const pages = ['jschema', 'version-update'];
+	const pages = ['jschema', 'version-update', 'task-manifest'];
 
 	let currentPage = 'jschema';
 
@@ -43,6 +44,16 @@
 					Version update
 				</a>
 			</li>
+			<li class="nav-item">
+				<a
+					class="nav-link"
+					class:active={currentPage === 'task-manifest'}
+					on:click={() => (currentPage = 'task-manifest')}
+					href="#task-manifest"
+				>
+					Task manifest
+				</a>
+			</li>
 		</ul>
 	</div>
 </nav>
@@ -52,5 +63,7 @@
 		<JSchemaSandbox />
 	{:else if currentPage === 'version-update'}
 		<VersionUpdateSandbox />
+	{:else if currentPage === 'task-manifest'}
+		<TaskManifestSandbox />
 	{/if}
 </div>
