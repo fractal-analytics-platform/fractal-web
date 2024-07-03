@@ -19,7 +19,6 @@
 	let selectedSchema;
 	/** @type {'parallel'|'non_parallel'} */
 	let selectedSchemaType = 'non_parallel';
-	let legacy = false;
 	let selectedTask;
 	let schemaData = undefined;
 	let jsonDataString = '';
@@ -181,7 +180,7 @@
 		}
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(legacy);
+	$: propertiesToIgnore = getPropertiesToIgnore(false);
 </script>
 
 <h1 class="fw-light">Sandbox page for task package manifest</h1>
@@ -248,20 +247,6 @@
 					on:change={() => loadTaskSchema('parallel')}
 				/>
 				<label class="form-check-label" for="schemaParallelSelector">parallel</label>
-			</div>
-		</div>
-		<div class="col-md-6">
-			<div class="form-check form-switch">
-				<input
-					class="form-check-input"
-					type="checkbox"
-					role="switch"
-					id="legacy"
-					bind:checked={legacy}
-					on:change={() => loadTaskSchema()}
-				/>
-				<label class="form-check-label" for="legacy"> Legacy</label>
-				<div class="form-text">Changes the set of ignored properties (v1 or v2)</div>
 			</div>
 		</div>
 	</div>
