@@ -61,6 +61,7 @@
 	 * @param {File} file
 	 */
 	async function processFile(file) {
+		fileError = '';
 		let content = await file.text();
 		try {
 			const data = validateFile(content);
