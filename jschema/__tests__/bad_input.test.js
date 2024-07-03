@@ -1,8 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { FormManager } from '../src/lib/components/form_manager';
-import { checkBadInputs } from '../src/lib/components/bad_input_checker';
 
-describe('bad_input_checker', () => {
+describe('badInput', () => {
 	it('Detect bad input in nested object', () => {
 		const manager = new FormManager(
 			{
@@ -21,9 +20,9 @@ describe('bad_input_checker', () => {
 			},
 			vi.fn()
 		);
-		expect(() => checkBadInputs(manager.root)).not.toThrowError();
+		expect(manager.getFormData()).deep.eq({ foo: { bar: null } });
 		manager.root.children[0].children[0].badInput = true;
-		expect(() => checkBadInputs(manager.root)).toThrowError('Invalid JSON Schema data');
+		expect(manager.getFormData()).deep.eq({ foo: { bar: 'invalid' } });
 	});
 
 	it('Detect bad input in nested array', () => {
@@ -43,9 +42,9 @@ describe('bad_input_checker', () => {
 			},
 			vi.fn()
 		);
-		expect(() => checkBadInputs(manager.root)).not.toThrowError();
+		expect(manager.getFormData()).deep.eq({ foo: [0] });
 		manager.root.children[0].children[0].badInput = true;
-		expect(() => checkBadInputs(manager.root)).toThrowError('Invalid JSON Schema data');
+		expect(manager.getFormData()).deep.eq({ foo: ['invalid'] });
 	});
 
 	it('Detect bad input in nested tuple', () => {
@@ -69,8 +68,8 @@ describe('bad_input_checker', () => {
 			},
 			vi.fn()
 		);
-		expect(() => checkBadInputs(manager.root)).not.toThrowError();
+		expect(manager.getFormData()).deep.eq({ foo: [0] });
 		manager.root.children[0].children[0].badInput = true;
-		expect(() => checkBadInputs(manager.root)).toThrowError('Invalid JSON Schema data');
+		expect(manager.getFormData()).deep.eq({ foo: ['invalid'] });
 	});
 });

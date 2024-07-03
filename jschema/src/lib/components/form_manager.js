@@ -19,7 +19,6 @@ import {
 	isTuple
 } from './property_utils.js';
 import { SchemaValidator } from './jschema_validation.js';
-import { checkBadInputs } from './bad_input_checker';
 
 /**
  * Creates the object used to draw the JSON Schema form, provides the functions to initialize new form elements,
@@ -380,7 +379,6 @@ export class FormManager {
 			const errors = this.validator.getErrors();
 			throw new JsonSchemaDataError(errors);
 		}
-		checkBadInputs(this.root);
 	}
 
 	/**
@@ -397,6 +395,9 @@ export class FormManager {
 				);
 			default:
 				if (element instanceof ValueFormElement) {
+					if (element instanceof NumberFormElement && element.badInput) {
+						return 'invalid';
+					}
 					return element.value;
 				}
 				throw new Error(`Unsupported type ${element.type}`);

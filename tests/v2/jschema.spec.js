@@ -225,7 +225,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await input.pressSequentially('e');
 		expect(form.getByText('Should be a number')).toHaveCount(1);
 		await page.getByRole('button', { name: 'Save changes' }).click();
-		await page.getByText('Form contains invalid input').waitFor();
+		await page.getByText('must be integer').waitFor();
 		await page.getByRole('button', { name: 'Discard changes' }).click();
 	});
 

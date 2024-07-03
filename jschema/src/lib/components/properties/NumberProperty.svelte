@@ -9,8 +9,8 @@
 	let validationError = '';
 
 	function handleValueChange() {
-		formElement.notifyChange();
 		validate();
+		formElement.notifyChange();
 	}
 
 	function validate() {
