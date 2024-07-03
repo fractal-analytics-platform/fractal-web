@@ -10,12 +10,7 @@
 	import manifestSchema from './manifest_v2.json';
 	import { adaptJsonSchema } from 'fractal-jschema/components/jschema_adapter';
 	import { tick } from 'svelte';
-
-	/** @type {FileList|null} */
-	let manifestFiles = null;
-	/** @type {HTMLInputElement|undefined} */
-	let manifestFileInput = undefined;
-	let manifestFileError = '';
+	import DragAndDropUploader from './DragAndDropUploader.svelte';
 
 	let manifest = null;
 	/** @type {string[]} */
@@ -37,7 +32,6 @@
 	let valid = false;
 
 	function clearFields() {
-		manifestFileError = '';
 		manifest = null;
 		valid = false;
 		validationError = '';
@@ -62,34 +56,33 @@
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = undefined;
 
-	function clearManifestFileUpload() {
-		manifestFiles = null;
-		if (manifestFileInput) {
-			manifestFileInput.value = '';
+	/**
+	 * @param {string} content
+	 * @returns {object}
+	 */
+	function validateManifestContent(content) {
+		let manifestData;
+		try {
+			manifestData = JSON.parse(content);
+		} catch (err) {
+			throw new Error("File doesn't contain valid JSON");
 		}
-		clearFields();
+		if (!isManifestValid(manifestData)) {
+			throw new Error('Invalid manifest format');
+		} else if (manifestData.manifest_version !== '2') {
+			throw new Error('Unsupported manifest version');
+		} else if (manifestData.args_schema_version !== 'pydantic_v1') {
+			throw new Error('Unsupported manifest args schema version');
+		} else {
+			return manifestData;
+		}
 	}
 
-	async function onManifestFileSelected() {
-		clearFields();
-		if (!manifestFiles || manifestFiles.length === 0) {
-			return;
-		}
-		const manifestFile = manifestFiles[0];
-		let content = await manifestFile.text();
-		try {
-			const manifestData = JSON.parse(content);
-			if (!isManifestValid(manifestData)) {
-				manifestFileError = 'Invalid manifest format';
-			} else if (manifestData.manifest_version !== '2') {
-				manifestFileError = 'Unsupported manifest version';
-			} else if (manifestData.args_schema_version !== 'pydantic_v1') {
-				manifestFileError = 'Unsupported manifest args schema version';
-			} else {
-				loadManifest(manifestData);
-			}
-		} catch (err) {
-			manifestFileError = "File doesn't contain valid JSON";
+	function onManifestChange({ detail }) {
+		if (detail.value === null) {
+			clearFields();
+		} else {
+			loadManifest(detail.value);
 		}
 	}
 
@@ -116,7 +109,7 @@
 	async function loadTaskSchema(type = undefined) {
 		dataError = '';
 		validationError = '';
-    valid = false;
+		valid = false;
 		if (!selectedTaskName) {
 			selectedSchema = null;
 			selectedTask = null;
@@ -196,28 +189,13 @@
 
 <div class="row">
 	<div class="col-lg-7">
-		<div class="input-group has-validation">
-			<label for="manifestFile" class="input-group-text">
-				<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload manifest file
-			</label>
-			<input
-				class="form-control"
-				accept="application/json"
-				type="file"
-				name="manifestFile"
-				id="manifestFile"
-				bind:this={manifestFileInput}
-				bind:files={manifestFiles}
-				class:is-invalid={manifestFileError}
-				on:change={onManifestFileSelected}
-			/>
-			{#if manifestFiles && manifestFiles.length > 0}
-				<button class="btn btn-outline-secondary" on:click={clearManifestFileUpload}>
-					Clear
-				</button>
-			{/if}
-			<span class="invalid-feedback">{manifestFileError}</span>
-		</div>
+		<DragAndDropUploader
+			description="Upload manifest file"
+			accept="application/json"
+			id="manifestFileUpload"
+			validateFile={validateManifestContent}
+			on:change={onManifestChange}
+		/>
 		<div class="form-text">An entire task package manifest</div>
 	</div>
 
@@ -298,7 +276,7 @@
 						class="form-control"
 						value={JSON.stringify(selectedSchema, null, 2)}
 						rows="10"
-            disabled
+						disabled
 					/>
 				</div>
 			</div>
