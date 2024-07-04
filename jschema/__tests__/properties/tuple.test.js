@@ -51,16 +51,6 @@ describe('Tuple properties', () => {
 
 		// verify that value has been reset to default
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [1300, 'foo', 1] });
-
-		expect(screen.getAllByRole('button', { name: 'Clear' }).length).eq(3);
-		inputs = screen.getAllByRole('spinbutton');
-		expect(inputs.length).eq(2);
-		expect(inputs[0]).toHaveValue(1300);
-		expect(screen.getByRole('textbox').value).eq('foo');
-		expect(inputs[1]).toHaveValue(1);
-		await fireEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
-		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, 'foo', 1] });
-		expect(inputs[0]).toHaveValue(null);
 	});
 
 	it('optional tuple without default values', async function () {
@@ -114,13 +104,6 @@ describe('Tuple properties', () => {
 		expect(inputs[1].value).eq('');
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, null] });
-
-		await fireEvent.input(inputs[1], { target: { value: 'bar' } });
-		expect(inputs[1].value).eq('bar');
-		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, 'bar'] });
-		await fireEvent.click(screen.getAllByRole('button', { name: 'Clear' })[1]);
-		expect(inputs[1].value).eq('');
-		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, null] });
 	});
 
 	it('required tuple with default values', async function () {
@@ -158,10 +141,10 @@ describe('Tuple properties', () => {
 		expect(inputs[1].value).eq('1500');
 		expect(inputs[2].value).eq('1');
 		expect(screen.queryAllByRole('button', { name: 'Remove tuple' }).length).eq(0);
-		await fireEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
-		expect(inputs[0].value).eq('');
-		expect(screen.getAllByRole('spinbutton').length).eq(3);
-		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, 1500, 1] });
+		await fireEvent.input(screen.getAllByRole('spinbutton')[0], { target: { value: 10 } });
+		expect(onChange).toHaveBeenCalledWith({ patch_size: [10, 1500, 1] });
+		await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+		expect(onChange).toHaveBeenCalledWith({ patch_size: [1300, 1500, 1] });
 	});
 
 	it('required tuple without default values', async function () {
@@ -197,9 +180,7 @@ describe('Tuple properties', () => {
 		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
 		expect(inputs[0].value).eq('foo');
 		expect(onChange).toHaveBeenCalledWith({ patch_size: ['foo', null] });
-		await fireEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
-		expect(inputs[0].value).eq('');
-		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, null] });
+		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
 	});
 
 	it('nested tuple', async function () {
@@ -247,8 +228,6 @@ describe('Tuple properties', () => {
 		expect(screen.getAllByRole('button', { name: 'Remove tuple' }).length).toEqual(2);
 		await fireEvent.input(screen.getByRole('textbox'), { target: { value: 'foo' } });
 		expect(onChange).toHaveBeenCalledWith({ arg_A: [[['foo']]] });
-		await fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
-		expect(onChange).toHaveBeenCalledWith({ arg_A: [[[null]]] });
 	});
 
 	it('referenced tuple', async function () {

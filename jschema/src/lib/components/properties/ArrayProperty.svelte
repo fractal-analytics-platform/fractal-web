@@ -8,6 +8,11 @@
 
 	export let children = [];
 
+	/**
+	 * @type {null|(() => void)}
+	 */
+	export let reset = null;
+
 	onMount(() => {
 		children = formElement.children;
 	});
@@ -41,14 +46,6 @@
 		children = formElement.children;
 	}
 
-	/**
-	 * @param {number} index
-	 */
-	function clearChild(index) {
-		formElement.clearChild(index);
-		children = formElement.children;
-	}
-
 	$: canAddChildren =
 		typeof formElement.maxItems !== 'number' || children.length < formElement.maxItems;
 
@@ -59,7 +56,7 @@
 	);
 </script>
 
-<CollapsibleProperty {formElement}>
+<CollapsibleProperty {formElement} {reset}>
 	<div class="d-flex justify-content-center p-2">
 		<button
 			class="btn btn-primary"
@@ -77,10 +74,6 @@
 					{#if canRemoveChildren}
 						<button class="btn btn-warning" type="button" on:click={() => removeChild(index)}>
 							Remove
-						</button>
-					{:else if children[index].type !== 'array' && children[index].type !== 'object'}
-						<button class="btn btn-warning" type="button" on:click={() => clearChild(index)}>
-							Clear
 						</button>
 					{/if}
 				</div>

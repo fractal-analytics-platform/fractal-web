@@ -22,9 +22,9 @@ export class BaseFormElement {
 	 */
 	removable;
 	/**
-	 * The default value of the field
+	 * @type {import("../types/jschema").JSONSchemaProperty}
 	 */
-	default;
+	property;
 
 	/**
 	 * @param {import("../types/form").BaseFormElementFields} fields
@@ -38,7 +38,7 @@ export class BaseFormElement {
 		this.required = fields.required;
 		this.description = fields.description;
 		this.removable = fields.removable;
-		this.default = fields.default;
+		this.property = fields.property;
 	}
 
 	notifyChange() {
@@ -175,6 +175,28 @@ export class ObjectFormElement extends BaseFormElement {
 		this.children = this.children.filter((c) => c.key !== key);
 		this.notifyChange();
 	}
+
+	/**
+	 * Reset a child to its default value (if it exists)
+	 * @param {number} index
+	 */
+	resetChild(index) {
+		const child = this.children[index];
+		const defaultValue = child.property.default;
+		if (defaultValue === undefined) {
+			return;
+		}
+		const newChild = this.manager.createFormElement({
+			key: child.key,
+			property: child.property,
+			required: child.required,
+			removable: child.removable,
+			value: defaultValue
+		});
+		newChild.collapsed = child.collapsed;
+		this.children[index] = newChild;
+		this.notifyChange();
+	}
 }
 
 export class ArrayFormElement extends BaseFormElement {
@@ -257,17 +279,6 @@ export class ArrayFormElement extends BaseFormElement {
 			this.notifyChange();
 		}
 	}
-
-	/**
-	 * @param {number} index
-	 */
-	clearChild(index) {
-		const child = this.children[index];
-		if ('value' in child) {
-			child.value = null;
-			this.notifyChange();
-		}
-	}
 }
 
 export class TupleFormElement extends BaseFormElement {
@@ -290,7 +301,12 @@ export class TupleFormElement extends BaseFormElement {
 		let value;
 		if (Array.isArray(this.items)) {
 			value = this.items.map((p, i) =>
-				getPropertyData(p, false, Array.isArray(this.default) ? this.default[i] : undefined, false)
+				getPropertyData(
+					p,
+					false,
+					Array.isArray(this.property.default) ? this.property.default[i] : undefined,
+					false
+				)
 			);
 		} else {
 			const property = this.items;
@@ -298,7 +314,7 @@ export class TupleFormElement extends BaseFormElement {
 				getPropertyData(
 					property,
 					false,
-					Array.isArray(this.default) ? this.default[i] : undefined,
+					Array.isArray(this.property.default) ? this.property.default[i] : undefined,
 					false
 				)
 			);
@@ -310,16 +326,5 @@ export class TupleFormElement extends BaseFormElement {
 	removeTuple() {
 		this.children = [];
 		this.notifyChange();
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	clearChild(index) {
-		const child = this.children[index];
-		if ('value' in child) {
-			child.value = null;
-			this.notifyChange();
-		}
 	}
 }

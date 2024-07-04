@@ -34,12 +34,15 @@ function getObjectPropertyData(property, initialValue, loadDefaults) {
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaProperty} property
+ * @param {import("../types/jschema.js").JSONSchemaProperty | null} property
  * @param {boolean} required
  * @param {any} initialValue
  * @param {boolean} loadDefaults
  */
 export function getPropertyData(property, required, initialValue, loadDefaults) {
+	if (!property) {
+		return null;
+	}
 	if (loadDefaults && 'default' in property) {
 		return getPropertyData(property, required, property.default, false);
 	}
@@ -128,10 +131,15 @@ function getTuplePropertyData(property, required, initialValue, loadDefaults) {
 /**
  * @param {import("../types/jschema.js").JSONSchemaArrayProperty} tupleProperty
  * @param {number} index
+ * @returns {import("../types/jschema.js").JSONSchemaProperty|null}
  */
 function getTupleChildProperty(tupleProperty, index) {
 	if (Array.isArray(tupleProperty.items)) {
-		return tupleProperty.items[index];
+		if (index < tupleProperty.items.length) {
+			return tupleProperty.items[index];
+		}
+		console.warn('Unable to retrieve tuple child on index %d', index);
+		return null;
 	} else {
 		return tupleProperty.items;
 	}

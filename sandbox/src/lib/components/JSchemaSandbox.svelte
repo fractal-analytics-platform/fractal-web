@@ -35,6 +35,7 @@
 		} catch (err) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
+			return;
 		}
 		const validator = new SchemaValidator();
 		if (!validator.loadSchema(schema)) {

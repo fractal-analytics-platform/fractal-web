@@ -9,6 +9,12 @@
 	import TupleProperty from './TupleProperty.svelte';
 
 	export let formElement;
+
+	/**
+	 * Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @type {null|(() => void)}
+	 */
+	 export let reset = null;
 </script>
 
 {#if formElement.type === 'string'}
@@ -20,13 +26,13 @@
 {:else if formElement.type === 'enum'}
 	<EnumProperty {formElement} />
 {:else if formElement.type === 'object'}
-	<CollapsibleProperty {formElement}>
+	<CollapsibleProperty {formElement} {reset}>
 		<ObjectProperty {formElement} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
-	<ArrayProperty {formElement} />
+	<ArrayProperty {formElement} {reset} />
 {:else if formElement.type === 'tuple'}
-	<TupleProperty {formElement} />
+	<TupleProperty {formElement} {reset} />
 {:else}
 	<p>Unsupported property type {formElement.type}</p>
 {/if}

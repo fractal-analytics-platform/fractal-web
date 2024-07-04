@@ -5,6 +5,8 @@
 	/** @type {import("../form_element.js").ObjectFormElement} */
 	export let formElement;
 
+	export let isRoot = false;
+
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
 	 * @type {Array<import("../../types/form").FormElement>}
@@ -36,6 +38,14 @@
 		formElement.removeChild(key);
 		children = formElement.children;
 	}
+
+	/**
+	 * @param {number} index
+	 */
+	function resetChild(index) {
+		formElement.resetChild(index);
+		children = formElement.children;
+	}
 </script>
 
 {#if formElement.additionalProperties}
@@ -61,22 +71,27 @@
 		</form>
 	</div>
 {/if}
-{#each children as child}
-	<div class="property-block">
-		{#if child.removable}
-			<button
-				class="btn btn-danger w-100"
-				type="button"
-				on:click={() => removeProperty(/**@type {string}*/ (child.key))}
-			>
-				Remove Property Block
-			</button>
-		{/if}
-		<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
-			<PropertyDiscriminator formElement={child} />
+{#key children}
+	{#each children as child, index}
+		<div class="property-block">
+			{#if child.removable}
+				<button
+					class="btn btn-danger w-100"
+					type="button"
+					on:click={() => removeProperty(/**@type {string}*/ (child.key))}
+				>
+					Remove Property Block
+				</button>
+			{/if}
+			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
+				<PropertyDiscriminator
+					formElement={child}
+					reset={isRoot ? () => resetChild(index) : null}
+				/>
+			</div>
 		</div>
-	</div>
-{/each}
+	{/each}
+{/key}
 
 <style>
 	.property-block:not(:last-child) {

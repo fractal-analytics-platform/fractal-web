@@ -43,7 +43,12 @@
 
 	function initFormManager() {
 		if (schema) {
-			formManager = new FormManager(schema, dispatch, propertiesToIgnore, schemaData);
+			try {
+				formManager = new FormManager(schema, dispatch, propertiesToIgnore, schemaData);
+			} catch (err) {
+				console.error(err);
+				formManager = undefined;
+			}
 		} else {
 			formManager = undefined;
 		}
@@ -53,7 +58,7 @@
 {#if formManager}
 	{#key formManager}
 		<div id={componentId}>
-			<ObjectProperty formElement={formManager.root} />
+			<ObjectProperty formElement={formManager.root} isRoot={true} />
 		</div>
 	{/key}
 {/if}
