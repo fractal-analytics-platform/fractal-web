@@ -4,6 +4,10 @@
 
 > Starting from this release the Sandbox pages are not included in fractal-web anymore, instead they are static pages published together with the documentation.
 
+* Removed "Clear" button from tuples (\#521);
+* Added "Reset" button on top-level properties having a default value (\#521);
+* Added task manifest sandbox (\#521);
+* Validated invalid text in numeric inputs (\#521);
 * Moved JSON Schema components to a separated component (\#518);
 * Moved Sandbox pages to a separated component (\#518);
 
