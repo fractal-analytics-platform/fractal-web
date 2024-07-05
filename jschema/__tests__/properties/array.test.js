@@ -35,24 +35,20 @@ describe('Array properties', () => {
 		checkBold(screen.getByText('ArrayProperty'), true);
 		let inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(3);
-		const clearBtns = screen.getAllByRole('button', { name: 'Clear' });
-		expect(clearBtns.length).eq(3);
+		expect(screen.queryAllByRole('button', { name: 'Remove' })).toHaveLength(0);
 		expect(component.getArguments()).deep.eq({ testProp: [null, null, null] });
 		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['foo', null, null] });
-		await fireEvent.click(clearBtns[0]);
-		expect(inputs[0]).toHaveValue('');
-		expect(onChange).toHaveBeenCalledWith({ testProp: [null, null, null] });
 		const addBtn = screen.getByRole('button', { name: 'Add argument to list' });
 		expect(addBtn.disabled).toBe(false);
 		await fireEvent.click(addBtn);
-		expect(onChange).toHaveBeenCalledWith({ testProp: [null, null, null, null] });
+		expect(onChange).toHaveBeenCalledWith({ testProp: ['foo', null, null, null] });
 		expect(screen.getAllByRole('button', { name: 'Remove' }).length).eq(4);
 		await fireEvent.click(addBtn);
 		inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(5);
 		expect(onChange).toHaveBeenCalledWith({
-			testProp: [null, null, null, null, null]
+			testProp: ['foo', null, null, null, null]
 		});
 		expect(addBtn.disabled).toBe(true);
 	});

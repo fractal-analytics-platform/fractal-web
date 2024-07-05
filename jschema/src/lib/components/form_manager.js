@@ -329,8 +329,8 @@ export class FormManager {
 			id: this.getUniqueId(),
 			type: property.type || null,
 			title: property.title || key || '',
-			default: deepCopy(property.default),
 			description: property.description || '',
+			property: deepCopy(property),
 			notifyChange: this.notifyChange
 		};
 	}
@@ -395,6 +395,9 @@ export class FormManager {
 				);
 			default:
 				if (element instanceof ValueFormElement) {
+					if (element instanceof NumberFormElement && element.badInput) {
+						return 'invalid';
+					}
 					return element.value;
 				}
 				throw new Error(`Unsupported type ${element.type}`);

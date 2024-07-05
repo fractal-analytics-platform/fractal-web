@@ -8,6 +8,11 @@
 
 	export let children = [];
 
+	/**
+	 * @type {null|(() => void)}
+	 */
+	export let reset = null;
+
 	onMount(() => {
 		children = formElement.children;
 	});
@@ -21,17 +26,9 @@
 		formElement.removeTuple();
 		children = formElement.children;
 	}
-
-	/**
-	 * @param {number} index
-	 */
-	function clearChild(index) {
-		formElement.clearChild(index);
-		children = formElement.children;
-	}
 </script>
 
-<CollapsibleProperty {formElement}>
+<CollapsibleProperty {formElement} {reset}>
 	<div class="d-flex justify-content-center p-2">
 		{#if !formElement.required}
 			{#if children.length > 0}
@@ -44,13 +41,6 @@
 	<div>
 		{#each children as nestedProperty, index (nestedProperty.id)}
 			<div class="d-flex">
-				<div class="align-self-center m-2">
-					{#if children[index].type !== 'array' && children[index].type !== 'tuple' && children[index].type !== 'object'}
-						<button class="btn btn-warning" type="button" on:click={() => clearChild(index)}>
-							Clear
-						</button>
-					{/if}
-				</div>
 				<div class="flex-fill">
 					<PropertyDiscriminator formElement={nestedProperty} />
 				</div>

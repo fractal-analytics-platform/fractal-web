@@ -162,8 +162,6 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		await checkFirstArray(block, ['a', 'b']);
-		await form.getByRole('button', { name: 'Clear' }).nth(1).click();
-		await checkFirstArray(block, ['a', '']);
 	});
 
 	/**

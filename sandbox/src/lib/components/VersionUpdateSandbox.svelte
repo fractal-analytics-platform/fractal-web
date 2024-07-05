@@ -19,8 +19,6 @@
 	let oldJsonSchemaError = '';
 	let oldDataError = '';
 
-	let legacy = false;
-
 	/** @type {JSchema|undefined} */
 	let oldJschemaComponent = undefined;
 
@@ -61,11 +59,6 @@
 			oldSchemaData = undefined;
 			oldDataError = 'Invalid JSON';
 		}
-	}
-
-	function forceRedrawOld() {
-		handleOldJsonSchemaStringChanged();
-		handleOldDataStringChanged();
 	}
 
 	function handleNewJsonSchemaStringChanged() {
@@ -139,7 +132,7 @@
 			id: 1,
 			args_parallel: deepCopy(oldSchemaData),
 			task_type: 'parallel',
-			is_legacy_task: legacy
+			is_legacy_task: false
 		};
 
 		dummyUpdateCandidate = {
@@ -160,15 +153,13 @@
 		oldJsonSchemaString = JSON.stringify(oldSchemaExample, null, 2);
 		oldJsonDataString = JSON.stringify({ foo: 'something' }, null, 2);
 		newJsonSchemaString = JSON.stringify(newSchemaExample, null, 2);
-		forceRedrawOld();
+		handleOldJsonSchemaStringChanged();
+		handleOldDataStringChanged();
 		handleNewJsonSchemaStringChanged();
 	}
 
-	/** @type {boolean} */
-	export let parallel;
-
-	export let canBeUpdated = false;
-	export let argsChanged = false;
+	let canBeUpdated = false;
+	let argsChanged = false;
 
 	$: {
 		canBeUpdated = validationErrors === null || validationErrors.length === 0;
@@ -223,7 +214,7 @@
 		const newSchema = dummyUpdateCandidate.args_schema_parallel;
 		const validator = new SchemaValidator(true);
 		if ('properties' in newSchema) {
-			stripIgnoredProperties(/**@type {any}*/ (newSchema), getPropertiesToIgnore(legacy));
+			stripIgnoredProperties(/**@type {any}*/ (newSchema), getPropertiesToIgnore(false));
 		}
 		const parsedSchema = deepCopy(newSchema);
 		const isSchemaValid = validator.loadSchema(parsedSchema);
@@ -244,33 +235,22 @@
 		return (validationErrors?.length || 0) > 0;
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(legacy);
+	$: propertiesToIgnore = getPropertiesToIgnore(false);
 </script>
 
-<h2>Old schema</h2>
+<h1 class="fw-light">Sandbox page for task version update</h1>
+<p>This is a test page for the task version update</p>
 
 <div class="row">
 	<div class="col-lg-6 mt-3">
-		<div class="row">
-			<div class="col">
-				<button class="btn btn-outline-primary float-end" on:click={loadExample}>
-					Load example
-				</button>
-				<div class="form-check form-switch">
-					<input
-						class="form-check-input"
-						type="checkbox"
-						role="switch"
-						id="legacy"
-						bind:checked={legacy}
-						on:change={forceRedrawOld}
-					/>
-					<label class="form-check-label" for="legacy"> Legacy</label>
-				</div>
-				<div class="form-text">Changes the set of ignored properties (v1 or v2)</div>
-			</div>
-		</div>
-		<div class="row has-validation mt-3 mb-2">
+		<button class="btn btn-outline-primary float-end" on:click={loadExample}> Load example </button>
+		<h2>Old schema</h2>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-6 mt-3">
+		<div class="row has-validation mb-2">
 			<div class="col">
 				<label for="jschema-old">JSON Schema</label>
 				<textarea
@@ -359,7 +339,7 @@
 						<ul id="validation-errors">
 							{#each validationErrors as error, index}
 								<li>
-									{#if error.instancePath !== ''}
+									{#if error.instancePath}
 										{error.instancePath}:
 									{/if}
 									{#if error.keyword === 'additionalProperties'}
@@ -396,12 +376,10 @@
 						<div class="alert alert-success mt-3">The arguments are valid</div>
 					{/if}
 					{#if displayTextarea}
-						<label class="form-label" for="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}">
-							Fix the {parallel ? '' : ' non'} parallel arguments:
-						</label>
+						<label class="form-label" for="fix-arguments"> Fix the arguments: </label>
 						<textarea
 							class="form-control"
-							id="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}"
+							id="fix-arguments"
 							class:is-invalid={!argsToBeFixedValidJson}
 							bind:value={argsToBeFixed}
 							rows="20"

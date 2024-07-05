@@ -9,13 +9,14 @@
 	let validationError = '';
 
 	function handleValueChange() {
-		formElement.notifyChange();
 		validate();
+		formElement.notifyChange();
 	}
 
 	function validate() {
 		validationError = '';
-		if (field.validity.badInput) {
+		formElement.badInput = field.validity.badInput;
+		if (formElement.badInput) {
 			validationError = 'Should be a number';
 			return;
 		}

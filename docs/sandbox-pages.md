@@ -6,6 +6,7 @@ The following sandbox pages are available:
 
 * [JSON Schema Sandbox page](../sandbox\#jschema)
 * [Task Version Update Sandbox page](../sandbox\#version-update)
+* [Task Manifest Sandbox page](../sandbox\#task-manifest)
 
 Both these pages provide a textarea for the JSON schemas. Notice that you can't paste the whole task manifest: you need to pick one of the `args_schema` values.
 

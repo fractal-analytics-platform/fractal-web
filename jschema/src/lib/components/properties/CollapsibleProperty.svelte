@@ -5,6 +5,12 @@
 	export let formElement;
 
 	/**
+	 * Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @type {null|(() => void)}
+	 */
+	export let reset = null;
+
+	/**
 	 * @param {MouseEvent} event
 	 */
 	function toggleCollapse(event) {
@@ -13,6 +19,17 @@
 			return;
 		}
 		formElement.collapsed = !formElement.collapsed;
+	}
+
+	/**
+	 * @param {Event} event
+	 */
+	function handleReset(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		if (reset) {
+			reset();
+		}
 	}
 </script>
 
@@ -27,7 +44,14 @@
 						type="button"
 						on:click={(event) => toggleCollapse(event)}
 					>
-						<PropertyLabel {formElement} tag="span" />
+						<div class="flex-fill">
+							<PropertyLabel {formElement} tag="span" />
+						</div>
+						<div>
+							{#if reset !== null && formElement.property.default !== undefined}
+								<button class="btn btn-warning me-3" on:click={handleReset}> Reset </button>
+							{/if}
+						</div>
 					</button>
 				</div>
 				<div

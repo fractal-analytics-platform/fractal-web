@@ -8,7 +8,7 @@ import { createFakeTask } from './task_utils.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-test('JSON Schema validation', async ({ page, browserName, workflow }) => {
+test('JSON Schema validation', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
@@ -73,11 +73,9 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Fill required integer with min and max', async () => {
 		const input = form.getByLabel('minMaxRequiredInt', { exact: true });
-		if (browserName === 'firefox') {
-			// chrome doesn't allow to insert text inside numeric inputs
-			await input.pressSequentially('foo');
-			expect(form.getByText('Should be a number')).toHaveCount(1);
-		}
+		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
+		await input.pressSequentially('e');
+		expect(form.getByText('Should be a number')).toHaveCount(1);
 		await input.fill('1');
 		expect(form.getByText('Should be greater or equal than 5')).toHaveCount(1);
 		await input.fill('15');
@@ -90,11 +88,9 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Fill optional integer with min and max', async () => {
 		const input = form.getByLabel('minMaxOptionalInt', { exact: true });
-		if (browserName === 'firefox') {
-			// chrome doesn't allow to insert text inside numeric inputs
-			await input.pressSequentially('foo');
-			expect(form.getByText('Should be a number')).toHaveCount(1);
-		}
+		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
+		await input.pressSequentially('e');
+		expect(form.getByText('Should be a number')).toHaveCount(1);
 		await input.fill('-7');
 		expect(form.getByText('Should be greater or equal than 0')).toHaveCount(1);
 		await input.fill('33');
@@ -105,11 +101,9 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Fill optional integer with exclusive min and max', async () => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
-		if (browserName === 'firefox') {
-			// chrome doesn't allow to insert text inside numeric inputs
-			await input.pressSequentially('foo');
-			expect(form.getByText('Should be a number')).toHaveCount(1);
-		}
+		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
+		await input.pressSequentially('e');
+		expect(form.getByText('Should be a number')).toHaveCount(1);
 		await input.fill('2');
 		expect(form.getByText('Should be greater or equal than 4')).toHaveCount(1);
 		await input.fill('99');
@@ -154,8 +148,6 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		expect(await addBtn.isDisabled()).toEqual(false);
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		await checkFirstArray(block, ['a', 'b']);
-		await form.getByRole('button', { name: 'Clear' }).nth(1).click();
-		await checkFirstArray(block, ['a', '']);
 	});
 
 	/**
@@ -223,6 +215,16 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 		await expect(page.getByLabel('minMaxRequiredInt', { exact: true })).toHaveValue('7');
 		await expect(page.getByRole('combobox', { name: 'Required enum' })).toHaveValue('option1');
 		await checkFirstArray(block, ['b', 'a']);
+	});
+
+	await test.step('Bad numeric input is validated', async () => {
+		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
+		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
+		await input.pressSequentially('e');
+		expect(form.getByText('Should be a number')).toHaveCount(1);
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByText('must be integer').waitFor();
+		await page.getByRole('button', { name: 'Discard changes' }).click();
 	});
 
 	await test.step('Delete workflow task', async () => {

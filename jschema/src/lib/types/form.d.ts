@@ -25,7 +25,7 @@ export type BaseFormElementFields = {
   description: string
   required: boolean
   removable: boolean
-  default: any
+  property: JSONSchemaProperty
   notifyChange: () => void
 }
 

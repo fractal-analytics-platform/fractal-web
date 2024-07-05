@@ -19,8 +19,6 @@
 	let jsonSchemaError = '';
 	let dataError = '';
 
-	let legacy = false;
-
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = undefined;
 
@@ -37,6 +35,7 @@
 		} catch (err) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
+			return;
 		}
 		const validator = new SchemaValidator();
 		if (!validator.loadSchema(schema)) {
@@ -54,11 +53,6 @@
 			schemaData = undefined;
 			dataError = 'Invalid JSON';
 		}
-	}
-
-	function forceRedraw() {
-		handleJsonSchemaStringChanged();
-		handleDataStringChanged();
 	}
 
 	let validationError = '';
@@ -104,8 +98,11 @@
 		}
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(legacy);
+	$: propertiesToIgnore = getPropertiesToIgnore(false);
 </script>
+
+<h1 class="fw-light">Sandbox page for JSON Schema</h1>
+<p>This is a test page for the JSON Schema component</p>
 
 <div class="row">
 	<div class="col-lg-6 mt-3">
@@ -114,25 +111,13 @@
 				<button class="btn btn-outline-primary float-end" on:click={loadExample}>
 					Load example
 				</button>
-				<div class="form-check form-switch">
-					<input
-						class="form-check-input"
-						type="checkbox"
-						role="switch"
-						id="legacy"
-						bind:checked={legacy}
-						on:change={forceRedraw}
-					/>
-					<label class="form-check-label" for="legacy"> Legacy</label>
-				</div>
-				<div class="form-text">Changes the set of ignored properties (v1 or v2)</div>
 			</div>
 		</div>
-		<div class="row has-validation mt-3 mb-2">
+		<div class="row has-validation mt-2 mb-2">
 			<div class="col">
-				<label for="jschema">JSON Schema</label>
+				<label for="json-schema">JSON Schema</label>
 				<textarea
-					id="jschema"
+					id="json-schema"
 					class="form-control"
 					bind:value={jsonSchemaString}
 					on:input={handleJsonSchemaStringChanged}
@@ -170,7 +155,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-lg-6 mt-3">
+	<div class="col-lg-6">
 		{#if schema}
 			<JSchema
 				componentId="json-schema-sandbox"

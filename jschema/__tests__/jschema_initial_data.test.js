@@ -466,4 +466,22 @@ describe('jschema_intial_data', () => {
 		);
 		expect(data).deep.eq({ b1: false, b2: null });
 	});
+
+	it('Handle tuple size/items mismatch (minItems = 2; items.length = 1)', () => {
+		const data = getJsonSchemaData({
+			title: 'test',
+			type: 'object',
+			properties: {
+				foo: {
+					default: [1, 2],
+					type: 'array',
+					minItems: 2,
+					maxItems: 2,
+					items: [{ type: 'integer' }]
+				}
+			},
+			required: ['foo']
+		});
+		expect(data).deep.eq({ foo: [1, null] });
+	});
 });
