@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 
 export class SchemaValidator {
 	/**
@@ -6,6 +7,7 @@ export class SchemaValidator {
 	 */
 	constructor(allErrors = false) {
 		this.ajv = new Ajv({ allErrors });
+		addFormats(this.ajv);
 		this.canValidate = false;
 	}
 

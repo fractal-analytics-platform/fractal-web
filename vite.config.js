@@ -53,6 +53,7 @@ const config = defineConfig({
 			'marked',
 			'dompurify',
 			'ajv',
+			'ajv-formats',
 			'@vincjo/datatables',
 			'semver/functions/coerce',
 			'semver/functions/gte',

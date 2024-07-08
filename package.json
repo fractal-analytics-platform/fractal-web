@@ -42,6 +42,7 @@
 	"dependencies": {
 		"@vincjo/datatables": "^1.6.0",
 		"ajv": "^8.12.0",
+		"ajv-formats": "^3.0.1",
 		"dompurify": "^3.0.5",
 		"jose": "^4.14.4",
 		"log4js": "^6.9.1",
@@ -51,5 +52,15 @@
 	"files": [
 		"build"
 	],
-	"bundledDependencies": true
+	"bundledDependencies": true,
+	"bundleDependencies": [
+		"@vincjo/datatables",
+		"ajv",
+		"ajv-formats",
+		"dompurify",
+		"jose",
+		"log4js",
+		"marked",
+		"slim-select"
+	]
 }
