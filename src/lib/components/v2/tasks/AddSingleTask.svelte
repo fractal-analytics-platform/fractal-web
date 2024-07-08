@@ -9,8 +9,8 @@
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TypesEditor from './TypesEditor.svelte';
 
-	/** @type {(task: import('$lib/types-v2').TaskV2) => void} */
-	export let addNewTask;
+	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
+	export let addNewTasks;
 
 	let taskSuccessMessage = '';
 
@@ -138,7 +138,7 @@
 		if (response.ok) {
 			// Add created task to the list
 			console.log('Task created', result);
-			addNewTask(result);
+			addNewTasks([result]);
 			taskSuccessMessage = 'Task created successfully';
 			resetFields();
 		} else {

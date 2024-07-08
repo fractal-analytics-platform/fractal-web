@@ -1,0 +1,268 @@
+<script>
+	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
+	import { SchemaValidator } from 'fractal-jschema';
+	import manifestSchema from './manifest_v2.json';
+	import { replaceEmptyStrings } from '$lib/common/component_utilities';
+	import {
+		displayStandardErrorAlert,
+		getValidationMessagesMap,
+		validateErrorMapKeys
+	} from '$lib/common/errors';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+
+	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
+	export let addNewTasks;
+
+	let python_interpreter = '';
+	let source = '';
+	let version = '';
+	let package_name = '';
+	let package_root = '';
+	let manifestData = null;
+	let successMessage = '';
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
+
+	/** @typedef {('python_interpreter'|'source'|'version'|'package_name'|'package_root')} ErrorKey **/
+	/** @type {ErrorKey[]} */
+	const handledErrorKeys = [
+		'python_interpreter',
+		'source',
+		'version',
+		'package_name',
+		'package_root'
+	];
+	/** @type {{[key in ErrorKey]?: string}} */
+	let validationErrors = {};
+
+	/**
+	 * @param {string} content
+	 * @returns {object}
+	 */
+	function validateManifestContent(content) {
+		let manifestData;
+		try {
+			manifestData = JSON.parse(content);
+		} catch (err) {
+			throw new Error("File doesn't contain valid JSON");
+		}
+		if (!isManifestValid(manifestData)) {
+			throw new Error('Invalid manifest format');
+		} else if (manifestData.manifest_version !== '2') {
+			throw new Error('Unsupported manifest version');
+		} else if (manifestData.args_schema_version !== 'pydantic_v1') {
+			throw new Error('Unsupported manifest args schema version');
+		} else {
+			return manifestData;
+		}
+	}
+
+	/**
+	 * @param {object} data
+	 */
+	function isManifestValid(data) {
+		const validator = new SchemaValidator();
+		validator.loadSchema(manifestSchema);
+		return validator.isValid(data);
+	}
+
+	function onManifestChange({ detail }) {
+		if (detail.value === null) {
+			manifestData = null;
+		} else {
+			manifestData = detail.value;
+		}
+	}
+
+	let collecting = false;
+
+	async function handleCollect() {
+		if (!manifestData) {
+			return;
+		}
+
+		collecting = true;
+		errorAlert?.hide();
+		successMessage = '';
+		try {
+			const body = {
+				python_interpreter,
+				source,
+				version,
+				package_name,
+				package_root,
+				manifest: manifestData
+			};
+
+			const headers = new Headers();
+			headers.append('Content-Type', 'application/json');
+
+			const response = await fetch(`/api/v2/task/collect/custom`, {
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify(body, replaceEmptyStrings)
+			});
+
+			const result = await response.json();
+			if (response.ok) {
+				addNewTasks(result);
+				successMessage = 'Tasks collected successfully';
+				python_interpreter = '';
+				source = '';
+				version = '';
+				package_name = '';
+				package_root = '';
+				manifestData = null;
+			} else {
+				const errorsMap = getValidationMessagesMap(result, response.status);
+				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
+					validationErrors = errorsMap;
+				} else {
+					errorAlert = displayStandardErrorAlert(result, 'errorAlert-customEnvTask');
+				}
+			}
+		} finally {
+			collecting = false;
+		}
+	}
+</script>
+
+<StandardDismissableAlert message={successMessage} />
+
+<form on:submit|preventDefault={handleCollect} class="mb-5">
+	<div class="row mb-2 pb-1">
+		<div class="col">
+			<div class="input-group has-validation">
+				<div class="input-group-text">
+					<label class="font-monospace" for="python_interpreter">Python Intepreter</label>
+				</div>
+				<input
+					bind:value={python_interpreter}
+					name="python_interpreter"
+					id="python_interpreter"
+					class="form-control"
+					type="text"
+					required
+					class:is-invalid={validationErrors['python_interpreter']}
+				/>
+				<span class="invalid-feedback">{validationErrors['python_interpreter']}</span>
+			</div>
+			<div class="form-text">
+				Absolute path to the Python interpreter to be used for running tasks
+			</div>
+		</div>
+	</div>
+	<div class="row mb-2 pb-1">
+		<div class="col">
+			<DragAndDropUploader
+				description="Manifest"
+				accept="application/json"
+				id="manifestFileUpload"
+				validateFile={validateManifestContent}
+				on:change={onManifestChange}
+				required={true}
+			/>
+			<div class="form-text">
+				Manifest of a Fractal task package (this is typically the content of <code
+					>__FRACTAL_MANIFEST__.json</code
+				>)
+			</div>
+		</div>
+		<div class="col">
+			<div class="input-group has-validation">
+				<div class="input-group-text">
+					<label class="font-monospace" for="source">Source</label>
+				</div>
+				<input
+					bind:value={source}
+					name="source"
+					id="source"
+					class="form-control"
+					type="text"
+					required
+					class:is-invalid={validationErrors['source']}
+				/>
+				<span class="invalid-feedback">{validationErrors['source']}</span>
+			</div>
+			<div class="form-text">
+				A common label identifying this package. For example:
+				<code>pip_remote:fractal_tasks_core:1.1.0:fractal-tasks:py39:cellpose_segmentation</code>
+			</div>
+		</div>
+	</div>
+	<div class="row mb-2 pb-1">
+		<div class="col">
+			<div class="input-group has-validation">
+				<div class="input-group-text">
+					<label class="font-monospace" for="package_name">Package Name</label>
+				</div>
+				<input
+					bind:value={package_name}
+					name="package_name"
+					id="package_name"
+					class="form-control"
+					type="text"
+					class:is-invalid={validationErrors['package_name']}
+				/>
+				<span class="invalid-feedback">{validationErrors['package_name']}</span>
+			</div>
+			<div class="form-text">
+				Name of the package, as used in <code>import &lt;package_name&gt;</code>; this is then used
+				to extract the package directory (<code>package_root</code>) via
+				<code>pip show &lt;package_name&gt;</code>
+			</div>
+		</div>
+		<div class="col">
+			<div class="input-group has-validation">
+				<div class="input-group-text">
+					<label class="font-monospace" for="version">Version</label>
+				</div>
+				<input
+					bind:value={version}
+					name="version"
+					id="version"
+					class="form-control"
+					type="text"
+					class:is-invalid={validationErrors['version']}
+				/>
+				<span class="invalid-feedback">{validationErrors['version']}</span>
+			</div>
+			<div class="form-text">Optional version of tasks to be collected</div>
+		</div>
+	</div>
+	<div class="row mb-2 pb-1">
+		<div class="col">
+			<div class="input-group has-validation">
+				<div class="input-group-text">
+					<label class="font-monospace" for="package_root">Package Folder</label>
+				</div>
+				<input
+					bind:value={package_root}
+					name="package_root"
+					id="package_root"
+					class="form-control"
+					type="text"
+					class:is-invalid={validationErrors['package_root']}
+				/>
+				<span class="invalid-feedback">{validationErrors['package_root']}</span>
+			</div>
+			<div class="form-text">
+				The folder where the package is installed. If not provided, it will be extracted via
+				<code>pip show</code> (requires <code>package_name</code> to be set)
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<div id="errorAlert-customEnvTask" />
+		</div>
+	</div>
+	<button type="submit" class="btn btn-primary" disabled={collecting}>
+		{#if collecting}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		{/if}
+		Collect
+	</button>
+</form>
