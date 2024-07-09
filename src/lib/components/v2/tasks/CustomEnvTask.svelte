@@ -24,6 +24,8 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
+	let dragAndDropUploader;
+
 	/** @typedef {('python_interpreter'|'source'|'version'|'package_name'|'package_root')} ErrorKey **/
 	/** @type {ErrorKey[]} */
 	const handledErrorKeys = [
@@ -115,6 +117,7 @@
 				package_name = '';
 				package_root = '';
 				manifestData = null;
+				dragAndDropUploader.clearSelectedFile();
 			} else {
 				const errorsMap = getValidationMessagesMap(result, response.status);
 				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
@@ -162,6 +165,7 @@
 				id="manifestFileUpload"
 				validateFile={validateManifestContent}
 				on:change={onManifestChange}
+				bind:this={dragAndDropUploader}
 				required={true}
 			/>
 			<div class="form-text">

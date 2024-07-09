@@ -31,7 +31,7 @@
 		await processFile(file);
 	}
 
-	function clearSelectedFile() {
+	export function clearSelectedFile() {
 		fileError = '';
 		files = null;
 		if (fileInput) {
