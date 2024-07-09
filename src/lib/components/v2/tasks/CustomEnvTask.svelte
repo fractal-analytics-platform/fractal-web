@@ -132,6 +132,15 @@
 	}
 </script>
 
+<div class="alert alert-warning">
+	<i class="bi bi-exclamation-triangle" />
+	Collecting tasks with a custom Python environment will use that environment for running the tasks.
+	Be careful about changing this environment, as that may break existing workflows. It is recommended
+	to use custom Python environments only during task development or when something needed for your environment
+	building isn't supported in Fractal server yet. Collect the task with regular Fractal task collection
+	for production setups.
+</div>
+
 <StandardDismissableAlert message={successMessage} />
 
 <form on:submit|preventDefault={handleCollect} class="mb-5">
