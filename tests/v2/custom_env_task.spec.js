@@ -29,8 +29,9 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	fs.mkdirSync(packageFolder);
 
 	let tmpManifest;
-	await test.step('Fill all the fields to trigger the validation error', async () => {
-		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('/usr/bin/python3');
+
+	await test.step('Test "Python interpreter path must be absolute" error', async () => {
+		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('foo');
 		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomName}-source`);
 		tmpManifest = await uploadFile(
 			page,
@@ -39,12 +40,21 @@ test('Custom Python env task [v2]', async ({ page }) => {
 			manifestData,
 			packageFolder
 		);
-		await page.getByRole('textbox', { name: 'Package Name' }).fill(randomName);
 		await page.getByRole('textbox', { name: 'Version' }).fill('0.0.1');
 		await page.getByRole('textbox', { name: 'Package Folder' }).fill(packageFolder);
 
 		await page.getByRole('button', { name: 'Collect' }).click();
 
+		await expect(page.getByText('Python interpreter path must be absolute')).toBeVisible();
+	});
+
+	await test.step("Test \"One and only one must be set between 'package_root' and 'package_name'\" error", async () => {
+		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('/usr/bin/python3');
+		await page.getByRole('textbox', { name: 'Package Name' }).fill(randomName);
+
+		await page.getByRole('button', { name: 'Collect' }).click();
+
+		await expect(page.getByText('Python interpreter path must be absolute')).not.toBeVisible();
 		await expect(
 			page.getByText("One and only one must be set between 'package_root' and 'package_name'")
 		).toBeVisible();
@@ -54,6 +64,9 @@ test('Custom Python env task [v2]', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Package Name' }).clear();
 		await page.getByRole('button', { name: 'Collect' }).click();
 		await expect(page.getByText('Tasks collected successfully')).toBeVisible();
+		await expect(
+			page.getByText("One and only one must be set between 'package_root' and 'package_name'")
+		).not.toBeVisible();
 	});
 
 	await test.step('Verify that fields have been cleaned', async () => {

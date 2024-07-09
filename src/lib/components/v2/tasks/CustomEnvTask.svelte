@@ -86,6 +86,7 @@
 
 		collecting = true;
 		errorAlert?.hide();
+		validationErrors = {};
 		successMessage = '';
 		try {
 			const body = {
