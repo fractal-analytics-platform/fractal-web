@@ -42,14 +42,18 @@ export async function waitStopSpinnerIn(page, selector) {
  * @param {string} selectorText
  * @param {string} fileName
  * @param {any} data
+ * @param {string|undefined} parentFolder
  * @returns {Promise<string>} the path of the created file
  */
-export async function uploadFile(page, selectorText, fileName, data) {
-	const file = path.join(os.tmpdir(), fileName);
+export async function uploadFile(page, selectorText, fileName, data, parentFolder = undefined) {
+	if (!parentFolder) {
+		parentFolder = os.tmpdir();
+	}
+	const file = path.join(parentFolder, fileName);
 	fs.writeFileSync(file, JSON.stringify(data));
 
 	const fileChooserPromise = page.waitForEvent('filechooser');
-	await page.getByText(selectorText).click();
+	await page.getByText(selectorText, { exact: true }).click();
 	const fileChooser = await fileChooserPromise;
 	await fileChooser.setFiles(file);
 
