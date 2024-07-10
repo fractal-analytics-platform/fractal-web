@@ -5,53 +5,83 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.development' });
 
+const v1Tests = [
+	{ name: 'auth', testMatch: /auth\.setup\.js/ },
+	{
+		name: 'collect_core_tasks',
+		testMatch: /v1\/collect_core_tasks\.setup\.js/,
+		use: {
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	},
+	{
+		name: 'create_fake_task',
+		testMatch: /v1\/create_fake_task\.setup\.js/,
+		use: {
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['collect_core_tasks', 'auth']
+	},
+	{
+		name: 'chromium',
+		testMatch: /v1\/.*\.spec\.js/,
+		use: {
+			...devices['Desktop Chrome'],
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['create_fake_task']
+	},
+	{
+		name: 'firefox',
+		testMatch: /v1\/.*\.spec\.js/,
+		use: {
+			...devices['Desktop Firefox'],
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['create_fake_task']
+	}
+];
+
+const v2Tests = [
+	{ name: 'auth', testMatch: /auth\.setup\.js/ },
+	{
+		name: 'collect_mock_tasks',
+		testMatch: /v2\/collect_mock_tasks\.setup\.js/,
+		use: {
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	},
+	{
+		name: 'chromium',
+		testMatch: /v2\/.*\.spec\.js/,
+		use: {
+			...devices['Desktop Chrome'],
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['collect_mock_tasks']
+	},
+	{
+		name: 'firefox',
+		testMatch: /v2\/.*\.spec\.js/,
+		use: {
+			...devices['Desktop Firefox'],
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['collect_mock_tasks']
+	}
+];
+
+const version = process.env.TEST_VERSION || 'v2';
+
+const tests = version === 'v2' ? v2Tests : v1Tests;
+
 export default defineConfig({
 	testDir: 'tests',
 	retries: 3,
 
-	projects: [
-		{ name: 'auth', testMatch: /auth\.setup\.js/ },
-		{
-			name: 'collect_core_tasks',
-			testMatch: /v1\/collect_core_tasks\.setup\.js/,
-			use: {
-				storageState: 'tests/.auth/user.json'
-			},
-			dependencies: ['auth']
-		},
-		{
-			name: 'collect_mock_tasks',
-			testMatch: /v2\/collect_mock_tasks\.setup\.js/,
-			use: {
-				storageState: 'tests/.auth/user.json'
-			},
-			dependencies: ['auth']
-		},
-		{
-			name: 'create_fake_task',
-			testMatch: /v1\/create_fake_task\.setup\.js/,
-			use: {
-				storageState: 'tests/.auth/user.json'
-			},
-			dependencies: ['collect_core_tasks', 'auth']
-		},
-		{
-			name: 'chromium',
-			use: {
-				...devices['Desktop Chrome'],
-				storageState: 'tests/.auth/user.json'
-			},
-			dependencies: ['collect_mock_tasks', 'create_fake_task']
-		},
-		{
-			name: 'firefox',
-			use: {
-				...devices['Desktop Firefox'],
-				storageState: 'tests/.auth/user.json'
-			},
-			dependencies: ['create_fake_task']
-		}
-	],
+	projects: tests,
 
 	webServer: [
 		{
@@ -69,7 +99,8 @@ export default defineConfig({
 			reuseExistingServer: !process.env.CI
 		},
 		{
-			command: 'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 node build',
+			command:
+				'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 node build',
 			port: 5173,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI

@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Used `postgres-psycopg` adapter in CI (\#525);
+* Used `FRACTAL_BACKEND_RUNNER=local_experimental` in CI for v2 tests (\#525);
+
 # 1.3.0
 
 > Starting from this release the Sandbox pages are not included in fractal-web anymore, instead they are static pages published together with the documentation.
