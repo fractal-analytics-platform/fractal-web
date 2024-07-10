@@ -26,7 +26,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   python3 -m venv myenv
   . myenv/bin/activate
   pip install "fractal-server==$1"
-  pip install fractal-server[postgres]
+  pip install fractal-server[postgres-psycopg-binary]
   fractalctl set-db
 else
   cd "$fractal_server_test_path"
