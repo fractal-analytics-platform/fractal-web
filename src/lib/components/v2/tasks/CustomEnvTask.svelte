@@ -138,7 +138,7 @@
 	Collecting tasks with a custom Python environment will use that environment for running the tasks.
 	Be careful about changing this environment, as that may break existing workflows. It is recommended
 	to use custom Python environments only during task development or when something needed for your environment
-	building isn't supported in Fractal server yet. Collect the task with regular Fractal task collection
+	building isn't supported in Fractal server yet. Collect the tasks with regular Fractal task collection
 	for production setups.
 </div>
 
@@ -201,8 +201,8 @@
 				<span class="invalid-feedback">{validationErrors['source']}</span>
 			</div>
 			<div class="form-text">
-				A common label identifying this package. For example:
-				<code>pip_remote:fractal_tasks_core:1.1.0:fractal-tasks:py39:cellpose_segmentation</code>
+				A common label identifying this package (e.g. if you set this to <code>"mypackage"</code>
+				then tasks will have source like <code>"myusername:mypackage:task_module_name"</code>)
 			</div>
 		</div>
 	</div>
