@@ -4,6 +4,7 @@
 
 > Starting from this release the Sandbox pages are not included in fractal-web anymore, instead they are static pages published together with the documentation.
 
+* Added Custom Python env task collection (\#523);
 * Fixed issue with ajv formats on sandbox (\#522);
 * Removed "Clear" button from tuples (\#521);
 * Added "Reset" button on top-level properties having a default value (\#521);

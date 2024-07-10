@@ -10,6 +10,7 @@
 	import AddSingleTask from '$lib/components/v2/tasks/AddSingleTask.svelte';
 	import { onDestroy } from 'svelte';
 	import TasksTable from '$lib/components/tasks/TasksTable.svelte';
+	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
 
 	// Error property to be set in order to show errors in UI
 	let errorReasons = undefined;
@@ -18,7 +19,7 @@
 	/** @type {import('$lib/types-v2').TaskV2[]} */
 	let tasks = $page.data.tasks;
 
-	/** @type {'pypi'|'local'|'single'} */
+	/** @type {'pypi'|'local'|'single'|'custom_env'} */
 	let packageType = 'pypi';
 
 	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default} */
@@ -60,10 +61,10 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskV2} task
+	 * @param {import('$lib/types-v2').TaskV2[]} newTasks
 	 */
-	function addNewTask(task) {
-		const updatedTasks = [...tasks, task];
+	function addNewTasks(newTasks) {
+		const updatedTasks = [...tasks, ...newTasks];
 		sortTasks(updatedTasks);
 		tasks = updatedTasks;
 	}
@@ -145,11 +146,23 @@
 	/>
 	<label class="btn btn-outline-secondary" for="single"> Single task </label>
 
+	<input
+		class="btn-check"
+		type="radio"
+		name="custom_env"
+		id="custom_env"
+		value="custom_env"
+		bind:group={packageType}
+	/>
+	<label class="btn btn-outline-secondary" for="custom_env"> Custom Python env </label>
+
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
 			<TaskCollection {packageType} {reloadTaskList} />
-		{:else}
-			<AddSingleTask {addNewTask} />
+		{:else if packageType === 'single'}
+			<AddSingleTask {addNewTasks} />
+		{:else if packageType === 'custom_env'}
+			<CustomEnvTask {addNewTasks} />
 		{/if}
 	</div>
 
@@ -180,7 +193,8 @@
 							class="btn btn-light"
 							data-bs-toggle="modal"
 							data-bs-target="#taskInfoModal"
-							on:click={() => taskInfoModal.open(/** @type {import('$lib/types-v2').TaskV2} */ (task))}
+							on:click={() =>
+								taskInfoModal.open(/** @type {import('$lib/types-v2').TaskV2} */ (task))}
 						>
 							<i class="bi bi-info-circle" />
 							Info
