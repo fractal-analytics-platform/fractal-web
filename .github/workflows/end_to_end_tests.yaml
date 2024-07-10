@@ -52,5 +52,13 @@ jobs:
         if: matrix.node-version == '18'
         run: echo "FRACTAL_SERVER_HOST=http://127.0.0.1:8000" >> $GITHUB_ENV
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests [v1]
         run: npx playwright test
+        env:
+          TEST_VERSION: v1
+
+      - name: Run Playwright tests [v2]
+        run: npx playwright test
+        env:
+          TEST_VERSION: v2
+          FRACTAL_RUNNER_BACKEND: local_experimental

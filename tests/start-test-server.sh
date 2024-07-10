@@ -28,9 +28,10 @@ if [ ! -d "$fractal_server_test_path" ]; then
   pip install "fractal-server==$1"
   pip install fractal-server[postgres]
   fractalctl set-db
+else
+  cd "$fractal_server_test_path"
+  . myenv/bin/activate
 fi
-
-cd "$fractal_server_test_path"
 
 # Start
 fractalctl start --port 8000
