@@ -70,7 +70,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(`${randomPath}/img1`);
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
-		await modal.getByText('There has been an error').waitFor();
+		await modal.getByText(/Image with zarr_url '.*' already in Dataset/).waitFor();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});
