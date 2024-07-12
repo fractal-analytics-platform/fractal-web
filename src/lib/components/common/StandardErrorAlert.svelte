@@ -12,11 +12,15 @@
 
 	function updateErrorMessage() {
 		if (error instanceof AlertError) {
-			if (typeof error.reason === 'string') {
+			const simpleMessage = error.getSimpleValidationMessage();
+			if (simpleMessage) {
+				errorString = simpleMessage;
+				formatAsPre = false;
+			} else if (typeof error.reason === 'string') {
 				errorString = error.reason;
 				formatAsPre = false;
-			} else if ('detail' in error.reason) {
-				errorString = /** @type {string}*/ (error.reason.detail);
+			} else if ('detail' in error.reason && typeof error.reason.detail === 'string') {
+				errorString = error.reason.detail;
 				formatAsPre = false;
 			} else {
 				errorString = JSON.stringify(error.reason, undefined, 2);
@@ -25,7 +29,7 @@
 		} else if (error instanceof Error) {
 			errorString = error.message;
 			formatAsPre = false;
-		} else if (typeof error === 'object' && 'detail' in error) {
+		} else if (typeof error === 'object' && 'detail' in error && typeof error.detail === 'string') {
 			errorString = error.detail;
 			formatAsPre = false;
 		} else {

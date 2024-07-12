@@ -6,7 +6,7 @@
 	import JobInfoModal from '$lib/components/v2/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
@@ -63,11 +63,7 @@
 	$: tableHandler.filter(statusFilter, 'status', check.isEqualTo);
 	$: tableHandler.filter(projectFilter, (row) => row.project_dump.id.toString(), check.isEqualTo);
 	$: tableHandler.filter(workflowFilter, (row) => row.workflow_dump.id.toString(), check.isEqualTo);
-	$: tableHandler.filter(
-		datasetFilter,
-		(row) => row.dataset_dump.id.toString(),
-		check.isEqualTo
-	);
+	$: tableHandler.filter(datasetFilter, (row) => row.dataset_dump.id.toString(), check.isEqualTo);
 
 	$: rebuildSlimSelectOptions($rows);
 
@@ -123,8 +119,11 @@
 			jobCancelledMessage = 'Job cancellation request received. The job will stop in a few seconds';
 		} else {
 			console.error('Error stopping job');
-			const errorResponse = await response.json();
-			errorAlert = displayStandardErrorAlert(errorResponse, 'jobUpdatesError');
+			const result = await response.json();
+			errorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'jobUpdatesError'
+			);
 		}
 	}
 

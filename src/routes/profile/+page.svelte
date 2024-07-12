@@ -1,6 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import { displayStandardErrorAlert, getValidationMessagesMap } from '$lib/common/errors';
+	import {
+		AlertError,
+		displayStandardErrorAlert,
+		getValidationMessagesMap
+	} from '$lib/common/errors';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
 	/** @type {import('$lib/types').User} */
@@ -98,7 +102,10 @@
 			if (errorMap && Object.keys(errorMap).length === 1 && errorKey in errorMap) {
 				onError(errorMap[errorKey]);
 			} else {
-				errorAlert = displayStandardErrorAlert(result, 'profileUpdate-error');
+				errorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					'profileUpdate-error'
+				);
 			}
 		}
 	}
@@ -194,7 +201,10 @@
 					<td>
 						{#if editSlurmAccounts}
 							<button class="btn btn-primary float-end" on:click={saveSlurmAccounts}> Save </button>
-							<button class="btn btn-outline-secondary float-end me-1" on:click={toggleEditSlurmAccounts}>
+							<button
+								class="btn btn-outline-secondary float-end me-1"
+								on:click={toggleEditSlurmAccounts}
+							>
 								<i class="bi bi-arrow-counterclockwise" /> Undo
 							</button>
 						{:else}

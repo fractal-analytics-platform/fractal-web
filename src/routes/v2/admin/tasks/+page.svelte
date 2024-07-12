@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { PropertyDescription } from 'fractal-jschema';
 
@@ -62,7 +62,10 @@
 			const response = await fetch(url);
 			const result = await response.json();
 			if (!response.ok) {
-				searchErrorAlert = displayStandardErrorAlert(result, 'searchError');
+				searchErrorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					'searchError'
+				);
 				return;
 			}
 			searched = true;

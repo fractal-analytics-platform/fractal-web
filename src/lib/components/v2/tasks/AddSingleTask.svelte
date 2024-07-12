@@ -2,6 +2,7 @@
 	import Ajv from 'ajv';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import {
+		AlertError,
 		displayStandardErrorAlert,
 		getValidationMessagesMap,
 		validateErrorMapKeys
@@ -147,7 +148,10 @@
 			if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
 				validationErrors = errorsMap;
 			} else {
-				errorAlert = displayStandardErrorAlert(result, 'errorAlert-createTask');
+				errorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					'errorAlert-createTask'
+				);
 			}
 		}
 	}

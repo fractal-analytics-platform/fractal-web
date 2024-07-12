@@ -4,6 +4,7 @@
 	import manifestSchema from './manifest_v2.json';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import {
+		AlertError,
 		displayStandardErrorAlert,
 		getValidationMessagesMap,
 		validateErrorMapKeys
@@ -124,7 +125,10 @@
 				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
 					validationErrors = errorsMap;
 				} else {
-					errorAlert = displayStandardErrorAlert(result, 'errorAlert-customEnvTask');
+					errorAlert = displayStandardErrorAlert(
+						new AlertError(result, response.status),
+						'errorAlert-customEnvTask'
+					);
 				}
 			}
 		} finally {

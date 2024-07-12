@@ -1,5 +1,5 @@
 <script>
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
@@ -25,7 +25,10 @@
 				logs = result.data.log;
 			} else {
 				console.error('Failed to fetch collection logs', result);
-				errorAlert = displayStandardErrorAlert(result, 'collectionTaskLogsError');
+				errorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					'collectionTaskLogsError'
+				);
 			}
 		}
 	});

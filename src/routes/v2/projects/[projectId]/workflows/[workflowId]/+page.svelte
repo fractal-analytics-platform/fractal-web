@@ -692,8 +692,11 @@
 			await loadJobsStatus();
 		} else {
 			console.error('Error stopping job');
-			const errorResponse = await response.json();
-			workflowErrorAlert = displayStandardErrorAlert(errorResponse, 'workflowErrorAlert');
+			const result = await response.json();
+			workflowErrorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'workflowErrorAlert'
+			);
 		}
 	}
 

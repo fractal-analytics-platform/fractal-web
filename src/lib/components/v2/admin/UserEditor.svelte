@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import {
+		AlertError,
 		displayStandardErrorAlert,
 		getValidationMessagesMap,
 		validateErrorMapKeys
@@ -75,7 +76,10 @@
 				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
 					validationErrors = errorsMap;
 				} else {
-					genericErrorAlert = displayStandardErrorAlert(result, 'genericError');
+					genericErrorAlert = displayStandardErrorAlert(
+						new AlertError(result, response.status),
+						'genericError'
+					);
 				}
 				return;
 			}

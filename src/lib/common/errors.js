@@ -73,8 +73,9 @@ function getSimpleValidationMessage(reason, statusCode) {
 	if (!isValueError(err)) {
 		return null;
 	}
+	const loc = err.loc.length > 1 && err.loc[0] === 'body' ? err.loc.slice(1) : err.loc;
 	return {
-		loc: err.loc.length > 1 && err.loc[0] === 'body' ? err.loc.slice(1) : err.loc,
+		loc: loc.length === 1 && loc[0] === '__root__' ? [] : loc,
 		msg: err.msg
 	};
 }
