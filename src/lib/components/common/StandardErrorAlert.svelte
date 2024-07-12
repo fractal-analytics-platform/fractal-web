@@ -49,7 +49,12 @@
 			<p>There has been an error, reason:</p>
 			<pre>{errorString}</pre>
 		{:else}
-			{errorString}
+			{#each errorString.split('\n') as line, index}
+				{#if index > 0}
+					<br />
+				{/if}
+				{line}
+			{/each}
 		{/if}
 		<button class="btn-close" data-bs-dismiss="alert" on:click={hide} />
 	</div>
