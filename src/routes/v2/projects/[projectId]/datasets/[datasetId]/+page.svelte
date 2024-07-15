@@ -305,7 +305,10 @@
 			lastAppliedAttributeFilters = { ...attributeFilters };
 			lastAppliedTypeFilters = { ...typeFilters };
 		} else {
-			errorAlert = displayStandardErrorAlert(result, 'searchError');
+			errorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'searchError'
+			);
 		}
 	}
 

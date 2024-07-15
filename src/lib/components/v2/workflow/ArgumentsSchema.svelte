@@ -181,7 +181,10 @@
 			unsavedChangesNonParallel = false;
 			onWorkflowTaskUpdated(result);
 		} else {
-			displayStandardErrorAlert(await result, 'task-args-validation-errors');
+			displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'task-args-validation-errors'
+			);
 		}
 		savingChanges = false;
 	}

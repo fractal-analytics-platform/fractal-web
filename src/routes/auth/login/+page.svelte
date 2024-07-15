@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { displayStandardErrorAlert } from '$lib/common/errors.js';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors.js';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
@@ -26,7 +26,10 @@
 		const response = await fetch(`/api/auth/${oauth2Provider}/authorize`);
 		const result = await response.json();
 		if (!response.ok) {
-			externalLoginErrorAlert = displayStandardErrorAlert(result, 'externalLoginError');
+			externalLoginErrorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'externalLoginError'
+			);
 			return;
 		}
 		window.location.replace(result.authorization_url);

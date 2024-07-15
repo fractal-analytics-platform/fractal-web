@@ -3,27 +3,59 @@
 
 	export let error = undefined;
 
-	/** @type {string | undefined} */
-	$: errorString = JSON.stringify(getErrorValue(), undefined, 2);
+	let errorString = '';
+	let formatAsPre = false;
 
-	function getErrorValue() {
+	$: if (error) {
+		updateErrorMessage();
+	}
+
+	function updateErrorMessage() {
 		if (error instanceof AlertError) {
-			return error.reason;
+			const simpleMessage = error.getSimpleValidationMessage();
+			if (simpleMessage) {
+				errorString = simpleMessage;
+				formatAsPre = false;
+			} else if (typeof error.reason === 'string') {
+				errorString = error.reason;
+				formatAsPre = false;
+			} else if ('detail' in error.reason && typeof error.reason.detail === 'string') {
+				errorString = error.reason.detail;
+				formatAsPre = false;
+			} else {
+				errorString = JSON.stringify(error.reason, undefined, 2);
+				formatAsPre = true;
+			}
 		} else if (error instanceof Error) {
-			return error.message;
+			errorString = error.message;
+			formatAsPre = false;
+		} else if (typeof error === 'object' && 'detail' in error && typeof error.detail === 'string') {
+			errorString = error.detail;
+			formatAsPre = false;
+		} else {
+			errorString = JSON.stringify(error, undefined, 2);
+			formatAsPre = true;
 		}
-		return error;
 	}
 
 	export function hide() {
-		errorString = undefined
+		errorString = '';
 	}
 </script>
 
 {#if errorString}
 	<div class="alert alert-danger alert-dismissible" role="alert">
-		<pre>There has been an error, reason:</pre>
-		<pre>{errorString}</pre>
+		{#if formatAsPre}
+			<p>There has been an error, reason:</p>
+			<pre>{errorString}</pre>
+		{:else}
+			{#each errorString.split('\n') as line, index}
+				{#if index > 0}
+					<br />
+				{/if}
+				{line}
+			{/each}
+		{/if}
 		<button class="btn-close" data-bs-dismiss="alert" on:click={hide} />
 	</div>
 {/if}

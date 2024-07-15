@@ -379,13 +379,18 @@
 					<div class="input-group-text">
 						<label class="font-monospace" for="python_version">Python Version</label>
 					</div>
-					<input
+					<select
 						id="python_version"
 						name="python_version"
-						type="text"
 						class="form-control"
 						bind:value={python_version}
-					/>
+					>
+						<option value="">Select...</option>
+						<option>3.9</option>
+						<option>3.10</option>
+						<option>3.11</option>
+						<option>3.12</option>
+					</select>
 				</div>
 				<div class="form-text">Python version to install and run the package tasks</div>
 			</div>

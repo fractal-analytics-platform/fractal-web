@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import TasksTable from '$lib/components/tasks/TasksTable.svelte';
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -43,8 +43,9 @@
 			task.is_v2_compatible = is_v2_compatible;
 			compatibilities = compatibilities;
 		} else {
+			const result = await response.json();
 			errorAlert = displayStandardErrorAlert(
-				await response.json(),
+				new AlertError(result, response.status),
 				`errorAlert-tasksCompatibility`
 			);
 			// reset input state in case of error

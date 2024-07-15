@@ -1,5 +1,5 @@
 <script>
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
@@ -150,7 +150,11 @@
 		);
 
 		if (!response.ok) {
-			errorAlert = displayStandardErrorAlert(await response.json(), 'versionUpdateError');
+			const result = await response.json();
+			errorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'versionUpdateError'
+			);
 			return;
 		}
 
@@ -169,7 +173,8 @@
 					order: workflowTask.order,
 					meta_non_parallel: workflowTask.meta_non_parallel,
 					meta_parallel: workflowTask.meta_parallel,
-					args_non_parallel: fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
+					args_non_parallel:
+						fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
 					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel,
 					is_legacy_task: workflowTask.is_legacy_task
 				})
@@ -178,7 +183,10 @@
 
 		const result = await response.json();
 		if (!response.ok) {
-			errorAlert = displayStandardErrorAlert(result, 'versionUpdateError');
+			errorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				'versionUpdateError'
+			);
 			return;
 		}
 		updateWorkflowCallback(result);

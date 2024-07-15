@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Added dropdown for Python version in tasks (\#526);
+* Improved formatting of errors in standard error alert component (\#526);
 * Used `postgres-psycopg` adapter in CI (\#525);
 * Used `FRACTAL_BACKEND_RUNNER=local_experimental` in CI for v2 tests (\#525);
 

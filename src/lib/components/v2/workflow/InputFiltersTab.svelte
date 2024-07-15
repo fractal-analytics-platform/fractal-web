@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import AttributesTypesForm from '../projects/datasets/AttributesTypesForm.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import("$lib/types-v2").WorkflowV2} */
@@ -65,7 +65,10 @@
 				datasetAttributes = imagePage.attributes;
 				datasetTypes = imagePage.types;
 			} else {
-				errorAlert = displayStandardErrorAlert(result, `errorAlert-inputFilters`);
+				errorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					`errorAlert-inputFilters`
+				);
 			}
 			loadingDatasetFilters = false;
 		}
@@ -99,15 +102,19 @@
 				})
 			}
 		);
+		const result = await response.json();
 		if (response.ok) {
 			successfullySaved = true;
 			setTimeout(() => {
 				successfullySaved = false;
 			}, 3000);
 			form.save();
-			updateWorkflowTaskCallback(await response.json());
+			updateWorkflowTaskCallback(result);
 		} else {
-			errorAlert = displayStandardErrorAlert(await response.json(), `errorAlert-inputFilters`);
+			errorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				`errorAlert-inputFilters`
+			);
 		}
 		saving = false;
 	}

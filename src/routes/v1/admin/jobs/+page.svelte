@@ -111,7 +111,10 @@
 			const response = await fetch(url);
 			const result = await response.json();
 			if (!response.ok) {
-				searchErrorAlert = displayStandardErrorAlert(result, 'searchError');
+				searchErrorAlert = displayStandardErrorAlert(
+					new AlertError(result, response.status),
+					'searchError'
+				);
 				return;
 			}
 			searched = true;
