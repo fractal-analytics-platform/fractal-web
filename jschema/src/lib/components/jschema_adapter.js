@@ -21,7 +21,7 @@ export function adaptJsonSchema(originalJsonSchema, propertiesToIgnore = []) {
  */
 export function stripIgnoredProperties(originalJsonSchema, propertiesToIgnore = []) {
 	const adaptedSchema = deepCopy(originalJsonSchema);
-	for (const k of Object.keys(adaptedSchema.properties)) {
+	for (const k of Object.keys(adaptedSchema.properties || {})) {
 		if (propertiesToIgnore.includes(k)) {
 			delete adaptedSchema.properties[k];
 		}
