@@ -242,4 +242,30 @@ describe('Object properties', () => {
 		expect(screen.getByRole('textbox', { name: 'key1' })).toHaveValue('foo');
 		expect(screen.getByRole('textbox', { name: 'key2' })).toHaveValue('');
 	});
+
+	it('Display object with custom key and title - key prevails over title', async function () {
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					map: {
+						type: 'object',
+						additionalProperties: {
+							type: 'object',
+							title: 'PropertyTitle',
+							properties: {
+								test: {
+									type: 'string'
+								}
+							}
+						}
+					}
+				}
+			},
+			{ map: { k1: { test: 'foo' } } }
+		);
+		expect(component.getArguments()).deep.eq({ map: { k1: { test: 'foo' } } });
+		expect(screen.queryByText('PropertyTitle')).toBeNull();
+		expect(screen.queryByText('k1')).not.toBeNull();
+	});
 });

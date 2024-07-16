@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Fixed custom key not displayed in JSON Schema form (\#529);
 * Added dropdown for Python version in tasks (\#526);
 * Improved formatting of errors in standard error alert component (\#526);
 * Used `postgres-psycopg` adapter in CI (\#525);

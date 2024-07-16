@@ -328,7 +328,7 @@ export class FormManager {
 			manager: this,
 			id: this.getUniqueId(),
 			type: property.type || null,
-			title: property.title || key || '',
+			title: key && removable ? key : property.title || key || '',
 			description: property.description || '',
 			property: deepCopy(property),
 			notifyChange: this.notifyChange
