@@ -268,4 +268,19 @@ describe('Object properties', () => {
 		expect(screen.queryByText('PropertyTitle')).toBeNull();
 		expect(screen.queryByText('k1')).not.toBeNull();
 	});
+
+	it('Display root schema having only additionalProperties', async function () {
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				additionalProperties: {
+					type: 'string'
+				}
+			},
+			{ k1: 'foo', k2: 'bar' }
+		);
+		expect(component.getArguments()).deep.eq({ k1: 'foo', k2: 'bar' });
+		expect(screen.queryByText('k1')).not.toBeNull();
+		expect(screen.queryByText('k2')).not.toBeNull();
+	});
 });
