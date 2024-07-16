@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.3.1
 
 * Fixed custom key not displayed in JSON Schema form (\#529);
 * Added dropdown for Python version in tasks (\#526);
