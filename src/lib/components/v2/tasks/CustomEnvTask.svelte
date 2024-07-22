@@ -54,7 +54,10 @@
 			throw new Error('Invalid manifest format');
 		} else if (manifestData.manifest_version !== '2') {
 			throw new Error('Unsupported manifest version');
-		} else if (manifestData.args_schema_version !== 'pydantic_v1') {
+		} else if (
+			manifestData.args_schema_version !== 'pydantic_v2' &&
+			manifestData.args_schema_version !== 'pydantic_v1'
+		) {
 			throw new Error('Unsupported manifest args schema version');
 		} else {
 			return manifestData;

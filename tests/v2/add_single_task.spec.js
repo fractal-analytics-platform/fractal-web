@@ -48,7 +48,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.source).toEqual(`admin:${randomTaskName1}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
-		expect(task.args_schema_version).toEqual('pydantic_v1');
+		expect(task.args_schema_version).toEqual('pydantic_v2');
 		expect(task.docs_info).toEqual('Task title');
 		expect(task.docs_link).toEqual('https://www.example.com');
 	});
@@ -81,7 +81,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.source).toEqual(`admin:${randomTaskName2}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
-		expect(task.args_schema_version).toEqual('pydantic_v1');
+		expect(task.args_schema_version).toEqual('pydantic_v2');
 		expect(task.docs_info).toEqual('Task title');
 		expect(task.docs_link).toEqual('https://www.example.com');
 	});
@@ -118,7 +118,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.source).toEqual(`admin:${randomTaskName3}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
-		expect(task.args_schema_version).toEqual('pydantic_v1');
+		expect(task.args_schema_version).toEqual('pydantic_v2');
 		expect(task.docs_info).toEqual('Task title');
 		expect(task.docs_link).toEqual('https://www.example.com');
 	});

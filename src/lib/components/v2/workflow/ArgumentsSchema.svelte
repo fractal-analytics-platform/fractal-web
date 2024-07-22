@@ -13,7 +13,7 @@
 	import { tick } from 'svelte';
 	import { JsonSchemaDataError } from 'fractal-jschema/components/form_manager';
 
-	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1'];
+	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;

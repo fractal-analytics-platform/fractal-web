@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Supported `pydantic_v2` schemas (\#532);
+
 # 1.3.1
 
 * Fixed custom key not displayed in JSON Schema form (\#529);
