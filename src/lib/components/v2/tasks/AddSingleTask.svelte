@@ -23,7 +23,7 @@
 	let version = '';
 	let docs_info = '';
 	let docs_link = '';
-	let args_schema_version = 'pydantic_v1';
+	let args_schema_version = 'pydantic_v2';
 	/** @type {import('$lib/types-v2').TaskV2Type} */
 	let taskType = 'non_parallel';
 
@@ -314,7 +314,7 @@
 		typesEditor.init({}, {});
 		docs_info = '';
 		docs_link = '';
-		args_schema_version = 'pydantic_v1';
+		args_schema_version = 'pydantic_v2';
 		clearArgsSchemaNonParallelFileUpload();
 		clearArgsSchemaParallelFileUpload();
 		clearMetaNonParallelFileUpload();

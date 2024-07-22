@@ -13,7 +13,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	const randomName = Math.random().toString(36).substring(7);
 
 	const manifestData = {
-		args_schema_version: 'pydantic_v1',
+		args_schema_version: 'pydantic_v2',
 		has_args_schemas: true,
 		manifest_version: '2',
 		task_list: [
