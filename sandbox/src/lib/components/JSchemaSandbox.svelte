@@ -19,6 +19,9 @@
 	let jsonSchemaError = '';
 	let dataError = '';
 
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	let schemaVersion = 'pydantic_v1';
+
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = undefined;
 
@@ -37,7 +40,7 @@
 			jsonSchemaError = 'Invalid JSON';
 			return;
 		}
-		const validator = new SchemaValidator();
+		const validator = new SchemaValidator(schemaVersion);
 		if (!validator.loadSchema(schema)) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON Schema';
@@ -161,6 +164,7 @@
 				componentId="json-schema-sandbox"
 				on:change={detectChange}
 				{schema}
+				{schemaVersion}
 				{schemaData}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}

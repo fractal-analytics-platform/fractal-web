@@ -33,6 +33,7 @@ describe('Reset properties to their default values', async () => {
 				},
 				required: ['key1']
 			},
+			'pydantic_v1',
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: { key1: { key2: 'foo' } } });
@@ -50,6 +51,7 @@ describe('Reset properties to their default values', async () => {
 				items: [{ type: 'integer' }, { type: 'integer' }],
 				default: [1, 2]
 			},
+			'pydantic_v1',
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [1, 2] });
@@ -73,6 +75,7 @@ describe('Reset properties to their default values', async () => {
 					{ type: 'integer', default: 2 }
 				]
 			},
+			'pydantic_v1',
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [1, 2] });
@@ -91,6 +94,7 @@ describe('Reset properties to their default values', async () => {
 				items: { type: 'string' },
 				default: ['a', 'b']
 			},
+			'pydantic_v1',
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: ['a', 'b'] });
@@ -110,6 +114,7 @@ describe('Reset properties to their default values', async () => {
 				items: { type: 'string', default: 'a' },
 				minItems: 2
 			},
+			'pydantic_v1',
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: ['a', 'a'] });

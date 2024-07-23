@@ -15,6 +15,7 @@ describe('Enum properties', () => {
 				enum: ['option1', 'option2'],
 				type: 'string'
 			},
+			'pydantic_v1',
 			true
 		);
 		checkBold(screen.getByText('Enum title'), true);
@@ -27,10 +28,13 @@ describe('Enum properties', () => {
 	});
 
 	it('Optional EnumProperty without title', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			enum: ['option1', 'option2'],
-			type: 'string'
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				enum: ['option1', 'option2'],
+				type: 'string'
+			},
+			'pydantic_v1'
+		);
 		checkBold(screen.getByText('testProp'), false);
 		const combobox = screen.getByRole('combobox', { name: 'testProp' });
 		const options = combobox.querySelectorAll('option');
@@ -58,26 +62,29 @@ describe('Enum properties', () => {
 	});
 
 	it('enum without type', async () => {
-		const { component, onChange } = renderSchema({
-			title: 'TaskFunction2',
-			type: 'object',
-			properties: {
-				arg2: {
-					$ref: '#/definitions/Color',
-					title: 'Arg2',
-					description: 'Description of arg2.'
+		const { component, onChange } = renderSchema(
+			{
+				title: 'TaskFunction2',
+				type: 'object',
+				properties: {
+					arg2: {
+						$ref: '#/definitions/Color',
+						title: 'Arg2',
+						description: 'Description of arg2.'
+					}
+				},
+				required: ['arg2'],
+				additionalProperties: false,
+				definitions: {
+					Color: {
+						title: 'Color',
+						description: 'An enumeration.',
+						enum: [1, 2]
+					}
 				}
 			},
-			required: ['arg2'],
-			additionalProperties: false,
-			definitions: {
-				Color: {
-					title: 'Color',
-					description: 'An enumeration.',
-					enum: [1, 2]
-				}
-			}
-		});
+			'pydantic_v1'
+		);
 
 		const dropdowns = screen.getAllByRole('combobox');
 		expect(dropdowns.length).eq(1);

@@ -55,7 +55,7 @@ export type TaskV2 = {
   version: string | null
   owner: string
   source: string
-  args_schema_version: string
+  args_schema_version: 'pydantic_v1' | 'pydantic_v2'
   args_schema_non_parallel: JSONSchemaObjectProperty | null
   args_schema_parallel: JSONSchemaObjectProperty | null
   docs_link: string

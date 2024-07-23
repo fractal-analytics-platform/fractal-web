@@ -4,30 +4,33 @@ import { fireEvent, screen } from '@testing-library/svelte';
 
 describe('Tuple properties', () => {
 	it('optional tuple with default values', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				patch_size: {
-					title: 'Patch Size',
-					default: [1300, 'foo', 1],
-					type: 'array',
-					minItems: 3,
-					maxItems: 3,
-					items: [
-						{
-							type: 'integer'
-						},
-						{
-							type: 'string'
-						},
-						{
-							type: 'integer'
-						}
-					]
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					patch_size: {
+						title: 'Patch Size',
+						default: [1300, 'foo', 1],
+						type: 'array',
+						minItems: 3,
+						maxItems: 3,
+						items: [
+							{
+								type: 'integer'
+							},
+							{
+								type: 'string'
+							},
+							{
+								type: 'integer'
+							}
+						]
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ patch_size: [1300, 'foo', 1] });
 
@@ -54,26 +57,29 @@ describe('Tuple properties', () => {
 	});
 
 	it('optional tuple without default values', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				patch_size: {
-					title: 'Patch Size',
-					type: 'array',
-					minItems: 2,
-					maxItems: 2,
-					items: [
-						{
-							type: 'string'
-						},
-						{
-							type: 'string'
-						}
-					]
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					patch_size: {
+						title: 'Patch Size',
+						type: 'array',
+						minItems: 2,
+						maxItems: 2,
+						items: [
+							{
+								type: 'string'
+							},
+							{
+								type: 'string'
+							}
+						]
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ patch_size: [] });
 
@@ -107,31 +113,34 @@ describe('Tuple properties', () => {
 	});
 
 	it('required tuple with default values', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				patch_size: {
-					title: 'Patch Size',
-					default: [1300, 1500, 1],
-					type: 'array',
-					minItems: 3,
-					maxItems: 3,
-					items: [
-						{
-							type: 'integer'
-						},
-						{
-							type: 'integer'
-						},
-						{
-							type: 'integer'
-						}
-					]
-				}
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					patch_size: {
+						title: 'Patch Size',
+						default: [1300, 1500, 1],
+						type: 'array',
+						minItems: 3,
+						maxItems: 3,
+						items: [
+							{
+								type: 'integer'
+							},
+							{
+								type: 'integer'
+							},
+							{
+								type: 'integer'
+							}
+						]
+					}
+				},
+				required: ['patch_size']
 			},
-			required: ['patch_size']
-		});
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ patch_size: [1300, 1500, 1] });
 
@@ -148,27 +157,30 @@ describe('Tuple properties', () => {
 	});
 
 	it('required tuple without default values', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				patch_size: {
-					title: 'Patch Size',
-					type: 'array',
-					minItems: 2,
-					maxItems: 2,
-					items: [
-						{
-							type: 'string'
-						},
-						{
-							type: 'string'
-						}
-					]
-				}
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					patch_size: {
+						title: 'Patch Size',
+						type: 'array',
+						minItems: 2,
+						maxItems: 2,
+						items: [
+							{
+								type: 'string'
+							},
+							{
+								type: 'string'
+							}
+						]
+					}
+				},
+				required: ['patch_size']
 			},
-			required: ['patch_size']
-		});
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ patch_size: [null, null] });
 
@@ -184,38 +196,41 @@ describe('Tuple properties', () => {
 	});
 
 	it('nested tuple', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'TaskFunction',
-			type: 'object',
-			properties: {
-				arg_A: {
-					type: 'array',
-					minItems: 1,
-					maxItems: 1,
-					items: [
-						{
-							type: 'array',
-							minItems: 1,
-							maxItems: 1,
-							items: [
-								{
-									type: 'array',
-									minItems: 1,
-									maxItems: 1,
-									items: [
-										{
-											type: 'string'
-										}
-									]
-								}
-							]
-						}
-					]
-				}
+		const { component, onChange } = renderSchema(
+			{
+				title: 'TaskFunction',
+				type: 'object',
+				properties: {
+					arg_A: {
+						type: 'array',
+						minItems: 1,
+						maxItems: 1,
+						items: [
+							{
+								type: 'array',
+								minItems: 1,
+								maxItems: 1,
+								items: [
+									{
+										type: 'array',
+										minItems: 1,
+										maxItems: 1,
+										items: [
+											{
+												type: 'string'
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				required: ['arg_A'],
+				additionalProperties: false
 			},
-			required: ['arg_A'],
-			additionalProperties: false
-		});
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ arg_A: [[]] });
 		expect(component.unsavedChanges).toEqual(false);
@@ -231,19 +246,22 @@ describe('Tuple properties', () => {
 	});
 
 	it('referenced tuple', async function () {
-		const { component, onChange } = renderSchemaWithReferencedProperty({
-			type: 'array',
-			minItems: 1,
-			maxItems: 1,
-			items: [
-				{
-					type: 'array',
-					minItems: 2,
-					maxItems: 2,
-					items: [{ type: 'string' }, { type: 'string' }]
-				}
-			]
-		});
+		const { component, onChange } = renderSchemaWithReferencedProperty(
+			{
+				type: 'array',
+				minItems: 1,
+				maxItems: 1,
+				items: [
+					{
+						type: 'array',
+						minItems: 2,
+						maxItems: 2,
+						items: [{ type: 'string' }, { type: 'string' }]
+					}
+				]
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ testProp: [] });
 		expect(component.unsavedChanges).toEqual(false);

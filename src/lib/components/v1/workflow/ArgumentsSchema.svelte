@@ -130,6 +130,7 @@
 		<JSchema
 			componentId="json-schema"
 			schema={argumentsSchema}
+			schemaVersion="pydantic_v1"
 			schemaData={args}
 			on:change={handleChanged}
 			propertiesToIgnore={getPropertiesToIgnore(true)}

@@ -16,7 +16,7 @@ export type Task = {
   version: string
   owner: string
   source: string
-  args_schema_version: string
+  args_schema_version: 'pydantic_v1'
   args_schema: JSONSchemaObjectProperty | null
   docs_link: string
   docs_info: string

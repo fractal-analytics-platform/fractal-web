@@ -50,25 +50,24 @@
 		} catch (err) {
 			throw new Error("File doesn't contain valid JSON");
 		}
-		if (!isManifestValid(manifestData)) {
+		const argsSchemaVersion = manifestData.args_schema_version;
+		if (argsSchemaVersion !== 'pydantic_v2' && argsSchemaVersion !== 'pydantic_v1') {
+			throw new Error('Unsupported manifest args schema version');
+		}
+		if (!isManifestValid(manifestData, argsSchemaVersion)) {
 			throw new Error('Invalid manifest format');
 		} else if (manifestData.manifest_version !== '2') {
 			throw new Error('Unsupported manifest version');
-		} else if (
-			manifestData.args_schema_version !== 'pydantic_v2' &&
-			manifestData.args_schema_version !== 'pydantic_v1'
-		) {
-			throw new Error('Unsupported manifest args schema version');
-		} else {
-			return manifestData;
 		}
+		return manifestData;
 	}
 
 	/**
 	 * @param {object} data
+	 * @param {'pydantic_v1'|'pydantic_v2'} argsSchemaVersion
 	 */
-	function isManifestValid(data) {
-		const validator = new SchemaValidator();
+	function isManifestValid(data, argsSchemaVersion) {
+		const validator = new SchemaValidator(argsSchemaVersion);
 		validator.loadSchema(manifestSchema);
 		return validator.isValid(data);
 	}

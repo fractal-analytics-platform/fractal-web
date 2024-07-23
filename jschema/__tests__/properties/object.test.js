@@ -4,74 +4,77 @@ import { checkBold, renderSchema } from './property_test_utils';
 
 describe('Object properties', () => {
 	it('Required nested objects', async () => {
-		const { component, onChange } = renderSchema({
-			title: 'Args',
-			type: 'object',
-			properties: {
-				requiredReferencedProperty: {
-					$ref: '#/definitions/Ref1'
+		const { component, onChange } = renderSchema(
+			{
+				title: 'Args',
+				type: 'object',
+				properties: {
+					requiredReferencedProperty: {
+						$ref: '#/definitions/Ref1'
+					},
+					optionalArray: {
+						title: 'array1 (optional)',
+						type: 'array',
+						items: {
+							title: 'array1 item title',
+							type: 'object',
+							properties: {
+								array1RequiredInteger: {
+									title: 'array1RequiredInteger',
+									type: 'integer'
+								},
+								array1OptionalInteger: {
+									title: 'array1OptionalInteger',
+									type: 'integer'
+								}
+							},
+							required: ['array1RequiredInteger']
+						}
+					}
 				},
-				optionalArray: {
-					title: 'array1 (optional)',
-					type: 'array',
-					items: {
-						title: 'array1 item title',
+				required: ['requiredReferencedProperty'],
+				definitions: {
+					Ref1: {
+						title: 'Ref1',
 						type: 'object',
 						properties: {
-							array1RequiredInteger: {
-								title: 'array1RequiredInteger',
-								type: 'integer'
+							ref1RequiredArray: {
+								title: 'ref1RequiredArray',
+								type: 'array',
+								items: {
+									$ref: '#/definitions/Ref2'
+								}
 							},
-							array1OptionalInteger: {
-								title: 'array1OptionalInteger',
-								type: 'integer'
+							ref1RequiredString: {
+								title: 'ref1RequiredString',
+								type: 'string'
+							},
+							ref1OptionalString: {
+								title: 'ref1OptionalString',
+								type: 'string'
 							}
 						},
-						required: ['array1RequiredInteger']
+						required: ['ref1RequiredArray', 'ref1RequiredString']
+					},
+					Ref2: {
+						title: 'Ref2',
+						type: 'object',
+						properties: {
+							ref2RequiredString: {
+								title: 'ref2RequiredString',
+								type: 'string'
+							},
+							ref2OptionalString: {
+								title: 'ref2OptionalString',
+								type: 'string'
+							}
+						},
+						required: ['ref2RequiredString']
 					}
 				}
 			},
-			required: ['requiredReferencedProperty'],
-			definitions: {
-				Ref1: {
-					title: 'Ref1',
-					type: 'object',
-					properties: {
-						ref1RequiredArray: {
-							title: 'ref1RequiredArray',
-							type: 'array',
-							items: {
-								$ref: '#/definitions/Ref2'
-							}
-						},
-						ref1RequiredString: {
-							title: 'ref1RequiredString',
-							type: 'string'
-						},
-						ref1OptionalString: {
-							title: 'ref1OptionalString',
-							type: 'string'
-						}
-					},
-					required: ['ref1RequiredArray', 'ref1RequiredString']
-				},
-				Ref2: {
-					title: 'Ref2',
-					type: 'object',
-					properties: {
-						ref2RequiredString: {
-							title: 'ref2RequiredString',
-							type: 'string'
-						},
-						ref2OptionalString: {
-							title: 'ref2OptionalString',
-							type: 'string'
-						}
-					},
-					required: ['ref2RequiredString']
-				}
-			}
-		});
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({
 			requiredReferencedProperty: {
@@ -120,24 +123,27 @@ describe('Object properties', () => {
 	});
 
 	it('add object property', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				test: {
-					title: 'Object',
-					type: 'object',
-					additionalProperties: {
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					test: {
+						title: 'Object',
 						type: 'object',
-						properties: {
-							prop1: {
-								type: 'string'
+						additionalProperties: {
+							type: 'object',
+							properties: {
+								prop1: {
+									type: 'string'
+								}
 							}
 						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ test: {} });
 		expect(component.unsavedChanges).toEqual(false);
@@ -151,27 +157,30 @@ describe('Object properties', () => {
 	});
 
 	it('remove default additional object property', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				test: {
-					title: 'Object',
-					type: 'object',
-					default: {
-						key1: { prop1: 'foo' }
-					},
-					additionalProperties: {
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					test: {
+						title: 'Object',
 						type: 'object',
-						properties: {
-							prop1: {
-								type: 'string'
+						default: {
+							key1: { prop1: 'foo' }
+						},
+						additionalProperties: {
+							type: 'object',
+							properties: {
+								prop1: {
+									type: 'string'
+								}
 							}
 						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
 		expect(component.unsavedChanges).toEqual(false);
@@ -181,24 +190,27 @@ describe('Object properties', () => {
 	});
 
 	it('add and remove additional object property', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				test: {
-					title: 'Object',
-					type: 'object',
-					additionalProperties: {
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					test: {
+						title: 'Object',
 						type: 'object',
-						properties: {
-							prop1: {
-								type: 'string'
+						additionalProperties: {
+							type: 'object',
+							properties: {
+								prop1: {
+									type: 'string'
+								}
 							}
 						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ test: {} });
 		expect(component.unsavedChanges).toEqual(false);
@@ -217,19 +229,22 @@ describe('Object properties', () => {
 	});
 
 	it('Object with additional properties and default value', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				test: {
-					default: { key1: 'foo' },
-					type: 'object',
-					additionalProperties: {
-						type: 'string'
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					test: {
+						default: { key1: 'foo' },
+						type: 'object',
+						additionalProperties: {
+							type: 'string'
+						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ test: { key1: 'foo' } });
 		await fireEvent.input(screen.getByPlaceholderText('Key'), {
@@ -262,6 +277,7 @@ describe('Object properties', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			{ map: { k1: { test: 'foo' } } }
 		);
 		expect(component.getArguments()).deep.eq({ map: { k1: { test: 'foo' } } });
@@ -277,6 +293,7 @@ describe('Object properties', () => {
 					type: 'string'
 				}
 			},
+			'pydantic_v1',
 			{ k1: 'foo', k2: 'bar' }
 		);
 		expect(component.getArguments()).deep.eq({ k1: 'foo', k2: 'bar' });

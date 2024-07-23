@@ -14,6 +14,7 @@ describe('Boolean properties', () => {
 				title: 'Boolean title',
 				type: 'boolean'
 			},
+			'pydantic_v1',
 			true
 		);
 		const title = screen.getByText('Boolean title');
@@ -30,7 +31,11 @@ describe('Boolean properties', () => {
 	});
 
 	it('BooleanProperty without title', async () => {
-		const { component, onChange } = renderSchemaWithSingleProperty({ type: 'boolean' }, false);
+		const { component, onChange } = renderSchemaWithSingleProperty(
+			{ type: 'boolean' },
+			'pydantic_v1',
+			false
+		);
 		const title = screen.getByText('testProp');
 		checkBold(title, false);
 		expect(title).toBeDefined();
@@ -68,6 +73,7 @@ describe('Boolean properties', () => {
 				},
 				required: ['b']
 			},
+			'pydantic_v1',
 			{ b: false }
 		);
 		expect(component.getArguments()).deep.eq({ b: false });

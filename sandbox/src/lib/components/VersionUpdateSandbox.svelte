@@ -19,10 +19,16 @@
 	let oldJsonSchemaError = '';
 	let oldDataError = '';
 
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	let oldSchemaVersion = 'pydantic_v1';
+
 	/** @type {JSchema|undefined} */
 	let oldJschemaComponent = undefined;
 
 	let newSchema = undefined;
+
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	let newSchemaVersion = 'pydantic_v1';
 
 	let newJsonSchemaString = '';
 	let newJsonSchemaError = '';
@@ -43,7 +49,7 @@
 			oldSchema = undefined;
 			oldJsonSchemaError = 'Invalid JSON';
 		}
-		const validator = new SchemaValidator();
+		const validator = new SchemaValidator(oldSchemaVersion);
 		if (!validator.loadSchema(oldSchema)) {
 			oldSchema = undefined;
 			oldJsonSchemaError = 'Invalid JSON Schema';
@@ -75,7 +81,7 @@
 			newSchema = undefined;
 			newJsonSchemaError = 'Invalid JSON';
 		}
-		const validator = new SchemaValidator();
+		const validator = new SchemaValidator(newSchemaVersion);
 		if (!validator.loadSchema(newSchema)) {
 			newSchema = undefined;
 			newJsonSchemaError = 'Invalid JSON Schema';
@@ -212,7 +218,7 @@
 	 */
 	function validateArguments(args) {
 		const newSchema = dummyUpdateCandidate.args_schema_parallel;
-		const validator = new SchemaValidator(true);
+		const validator = new SchemaValidator(newSchemaVersion, true);
 		if ('properties' in newSchema) {
 			stripIgnoredProperties(/**@type {any}*/ (newSchema), getPropertiesToIgnore(false));
 		}
@@ -298,6 +304,7 @@
 				componentId="json-schema-version-update-sandbox"
 				schema={oldSchema}
 				schemaData={oldSchemaData}
+				schemaVersion={oldSchemaVersion}
 				on:change={handleOldDataChanged}
 				{propertiesToIgnore}
 				bind:this={oldJschemaComponent}

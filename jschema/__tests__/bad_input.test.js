@@ -18,7 +18,8 @@ describe('badInput', () => {
 					}
 				}
 			},
-			vi.fn()
+			vi.fn(),
+			'pydantic_v1'
 		);
 		expect(manager.getFormData()).deep.eq({ foo: { bar: null } });
 		manager.root.children[0].children[0].badInput = true;
@@ -40,7 +41,8 @@ describe('badInput', () => {
 					}
 				}
 			},
-			vi.fn()
+			vi.fn(),
+			'pydantic_v1'
 		);
 		expect(manager.getFormData()).deep.eq({ foo: [0] });
 		manager.root.children[0].children[0].badInput = true;
@@ -66,7 +68,8 @@ describe('badInput', () => {
 					}
 				}
 			},
-			vi.fn()
+			vi.fn(),
+			'pydantic_v1'
 		);
 		expect(manager.getFormData()).deep.eq({ foo: [0] });
 		manager.root.children[0].children[0].badInput = true;

@@ -76,7 +76,7 @@
 					? updateCandidate.args_schema_parallel
 					: updateCandidate.args_schema_non_parallel
 			);
-		const validator = new SchemaValidator(true);
+		const validator = new SchemaValidator(updateCandidate.args_schema_version, true);
 		if ('properties' in newSchema) {
 			newSchema = stripIgnoredProperties(
 				newSchema,

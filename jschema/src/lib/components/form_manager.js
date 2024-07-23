@@ -40,13 +40,14 @@ export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
 	 * @param {(type: string, detail?: any) => boolean} dispatch
+	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
 	 */
-	constructor(originalJsonSchema, dispatch, propertiesToIgnore = [], initialValue = undefined) {
+	constructor(originalJsonSchema, dispatch, schemaVersion, propertiesToIgnore = [], initialValue = undefined) {
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
 
-		this.validator = new SchemaValidator();
+		this.validator = new SchemaValidator(schemaVersion);
 		const isSchemaValid = this.validator.loadSchema(this.jsonSchema);
 		if (!isSchemaValid) {
 			throw new Error('Invalid JSON Schema');
