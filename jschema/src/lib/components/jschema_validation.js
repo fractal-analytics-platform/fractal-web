@@ -1,4 +1,4 @@
-import Ajv from 'ajv';
+import Ajv from 'ajv/dist/ajv';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 
@@ -8,8 +8,8 @@ export class SchemaValidator {
 	 * @param {boolean} allErrors if true, check all rules collecting all errors. Default is to return after the first error.
 	 */
 	constructor(schemaVersion, allErrors = false) {
-		this.ajv =
-			schemaVersion === 'pydantic_v1' ? new Ajv({ allErrors }) : new Ajv2020({ allErrors });
+		const options = { strict: true, allErrors };
+		this.ajv = schemaVersion === 'pydantic_v1' ? new Ajv(options) : new Ajv2020(options);
 		addFormats(this.ajv);
 		this.canValidate = false;
 	}

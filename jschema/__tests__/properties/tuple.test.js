@@ -272,4 +272,46 @@ describe('Tuple properties', () => {
 		expect(onChange).toHaveBeenCalledWith({ testProp: [[null, null]] });
 		expect(screen.getAllByRole('textbox').length).eq(2);
 	});
+
+	it('tuple with prefixItems (pydantic_v2)', async function () {
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					testProp: {
+						default: [1, 1],
+						maxItems: 2,
+						minItems: 2,
+						prefixItems: [{ type: 'integer' }, { type: 'integer' }],
+						type: 'array'
+					}
+				},
+				required: ['foo']
+			},
+			'pydantic_v2',
+			{ testProp: [] }
+		);
+
+		expect(component.getArguments()).deep.eq({ testProp: [] });
+		expect(component.unsavedChanges).toEqual(false);
+
+		const addTupleBtn = screen.getByRole('button', { name: 'Add tuple' });
+		await fireEvent.click(addTupleBtn);
+
+		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 1] });
+		expect(component.unsavedChanges).toEqual(true);
+		const inputs = screen.getAllByRole('spinbutton');
+		expect(inputs.length).eq(2);
+
+		await fireEvent.input(inputs[0], { target: { value: '10' } });
+		expect(onChange).toHaveBeenCalledWith({ testProp: [10, 1] });
+
+		const removeTupleBtn = screen.getByRole('button', { name: 'Remove tuple' });
+		await fireEvent.click(removeTupleBtn);
+		await fireEvent.click(addTupleBtn);
+
+		// verify that value has been reset to default
+		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 1] });
+	});
 });

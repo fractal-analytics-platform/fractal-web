@@ -143,6 +143,7 @@ export class ObjectFormElement extends BaseFormElement {
 			removable: true,
 			value: getPropertyData(
 				this.additionalProperties,
+				this.manager.schemaVersion,
 				false,
 				this.additionalProperties.default,
 				false
@@ -226,7 +227,7 @@ export class ArrayFormElement extends BaseFormElement {
 			property: this.items,
 			required: false,
 			removable: true,
-			value: getPropertyData(this.items, false, undefined, true)
+			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true)
 		});
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -303,6 +304,7 @@ export class TupleFormElement extends BaseFormElement {
 			value = this.items.map((p, i) =>
 				getPropertyData(
 					p,
+					this.manager.schemaVersion,
 					false,
 					Array.isArray(this.property.default) ? this.property.default[i] : undefined,
 					false
@@ -313,6 +315,7 @@ export class TupleFormElement extends BaseFormElement {
 			value = Array(this.size).map((i) =>
 				getPropertyData(
 					property,
+					this.manager.schemaVersion,
 					false,
 					Array.isArray(this.property.default) ? this.property.default[i] : undefined,
 					false

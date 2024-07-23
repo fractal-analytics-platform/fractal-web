@@ -37,6 +37,9 @@ export class FormManager {
 	 */
 	ids = [];
 
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	schemaVersion;
+
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
 	 * @param {(type: string, detail?: any) => boolean} dispatch
@@ -45,6 +48,7 @@ export class FormManager {
 	 * @param {any} initialValue
 	 */
 	constructor(originalJsonSchema, dispatch, schemaVersion, propertiesToIgnore = [], initialValue = undefined) {
+		this.schemaVersion = schemaVersion;
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
 
 		this.validator = new SchemaValidator(schemaVersion);
@@ -53,7 +57,7 @@ export class FormManager {
 			throw new Error('Invalid JSON Schema');
 		}
 
-		const data = getJsonSchemaData(this.jsonSchema, initialValue);
+		const data = getJsonSchemaData(this.jsonSchema, schemaVersion, initialValue);
 		this.dispatch = dispatch;
 		this.notifyChange = () => {
 			const data = this.getFormData();
@@ -274,14 +278,15 @@ export class FormManager {
 	createTupleElement({ key, property, required, removable, value }) {
 		const fields = this.getBaseElementFields({ key, property, required, removable });
 		const size = /** @type {number} */ (property.minItems);
+		const items = this.schemaVersion === 'pydantic_v1' ? property.items : property.prefixItems;
 		const element = new TupleFormElement({
 			...fields,
 			type: 'tuple',
-			items: property.items,
+			items,
 			size,
 			children:
 				required || (Array.isArray(value) && value.length > 0)
-					? this.createTupleChildren({ items: property.items, size, value })
+					? this.createTupleChildren({ items, size, value })
 					: []
 		});
 		return element;
