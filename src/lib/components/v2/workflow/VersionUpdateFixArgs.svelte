@@ -1,8 +1,7 @@
 <script>
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
-	import { SchemaValidator } from '$lib/common/jschema_validation';
-	import { stripIgnoredProperties, getPropertiesToIgnore } from 'fractal-jschema';
+	import { stripIgnoredProperties, getPropertiesToIgnore, SchemaValidator } from 'fractal-jschema';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;

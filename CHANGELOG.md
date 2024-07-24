@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Supported `prefixItems` of JSON Schema Draft 2020-12 - `pydantic_v2` (\#535);
+
 # 1.3.2
 
 * Supported `pydantic_v2` schemas (\#532);

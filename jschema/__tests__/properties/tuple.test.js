@@ -286,8 +286,7 @@ describe('Tuple properties', () => {
 						prefixItems: [{ type: 'integer' }, { type: 'integer' }],
 						type: 'array'
 					}
-				},
-				required: ['foo']
+				}
 			},
 			'pydantic_v2',
 			{ testProp: [] }

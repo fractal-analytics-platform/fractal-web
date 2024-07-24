@@ -52,7 +52,6 @@
 	"files": [
 		"build"
 	],
-	"bundledDependencies": true,
 	"bundleDependencies": [
 		"@vincjo/datatables",
 		"ajv",
