@@ -38,5 +38,10 @@
 	},
 	"svelte": "./build/index.js",
 	"types": "./build/index.d.ts",
-	"type": "module"
+	"type": "module",
+	"bundleDependencies": [
+		"ajv/dist/ajv",
+		"ajv/dist/2020",
+		"ajv-formats"
+	]
 }

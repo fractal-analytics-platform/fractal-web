@@ -147,6 +147,8 @@
 	}
 
 	function loadExample() {
+		oldSchemaVersion = 'pydantic_v1';
+		newSchemaVersion = 'pydantic_v1';
 		const oldSchemaExample = {
 			title: 'Test',
 			type: 'object',
@@ -249,8 +251,34 @@
 
 <div class="row">
 	<div class="col-lg-6 mt-3">
-		<button class="btn btn-outline-primary float-end" on:click={loadExample}> Load example </button>
 		<h2>Old schema</h2>
+		<div class="form-check form-check-inline">
+			<input
+				class="form-check-input"
+				type="radio"
+				name="oldSchemaVersionOptions"
+				id="old_pydantic_v1"
+				value="pydantic_v1"
+				bind:group={oldSchemaVersion}
+				on:change={handleOldJsonSchemaStringChanged}
+			/>
+			<label class="form-check-label" for="old_pydantic_v1">pydantic_v1</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input
+				class="form-check-input"
+				type="radio"
+				name="oldSchemaVersionOptions"
+				id="old_pydantic_v2"
+				value="pydantic_v2"
+				bind:group={oldSchemaVersion}
+				on:change={handleOldJsonSchemaStringChanged}
+			/>
+			<label class="form-check-label" for="old_pydantic_v2">pydantic_v2</label>
+		</div>
+	</div>
+	<div class="col-lg-6 mt-5">
+		<button class="btn btn-outline-primary" on:click={loadExample}> Load example </button>
 	</div>
 </div>
 
@@ -315,9 +343,37 @@
 
 <hr />
 
-<h2 class="mt-2">New schema</h2>
-
 <div class="row">
+	<div class="col-lg-6 mt-2">
+		<h2>New schema</h2>
+		<div class="form-check form-check-inline">
+			<input
+				class="form-check-input"
+				type="radio"
+				name="newSchemaVersionOptions"
+				id="new_pydantic_v1"
+				value="pydantic_v1"
+				bind:group={newSchemaVersion}
+				on:change={handleNewJsonSchemaStringChanged}
+			/>
+			<label class="form-check-label" for="new_pydantic_v1">pydantic_v1</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input
+				class="form-check-input"
+				type="radio"
+				name="newSchemaVersionOptions"
+				id="new_pydantic_v2"
+				value="pydantic_v2"
+				bind:group={newSchemaVersion}
+				on:change={handleNewJsonSchemaStringChanged}
+			/>
+			<label class="form-check-label" for="new_pydantic_v2">pydantic_v2</label>
+		</div>
+	</div>
+</div>
+
+<div class="row mb-5">
 	<div class="col-lg-6 mt-3">
 		<div class="row has-validation mb-2">
 			<div class="col">
