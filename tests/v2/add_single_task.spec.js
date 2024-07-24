@@ -172,14 +172,14 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await page.getByLabel('Remove output type').click();
 	});
 
-	await test.step('Recognized valid pydantic_v2 schema', async () => {
+	await test.step('Recognize valid pydantic_v2 schema', async () => {
 		await setUploadFile(page, 'Upload non parallel args schema', pydanticV2Schema);
-		expect(page.getByRole('textbox', { name: 'Args schema version' })).toHaveValue('pydantic_v2');
+		expect(page.getByRole('combobox', { name: 'Args schema version' })).toHaveValue('pydantic_v2');
 	});
 
-	await test.step('Recognized valid pydantic_v1 schema', async () => {
+	await test.step('Recognize valid pydantic_v1 schema', async () => {
 		await setUploadFile(page, 'Upload non parallel args schema', pydanticV1Schema);
-		expect(page.getByRole('textbox', { name: 'Args schema version' })).toHaveValue('pydantic_v1');
+		expect(page.getByRole('combobox', { name: 'Args schema version' })).toHaveValue('pydantic_v1');
 	});
 
 	await test.step('Attempt to create task with invalid JSON files', async () => {
@@ -197,10 +197,36 @@ test('Add single tasks [v2]', async ({ page }) => {
 			.waitFor();
 	});
 
+	await test.step('Clear selections', async () => {
+		const clearBtn = page.getByRole('button', { name: 'Clear' }).first();
+		await clearBtn.click();
+		await clearBtn.click();
+		await clearBtn.click();
+		await clearBtn.click();
+	});
+
+	await test.step('Create a task with schema recognized as pydantic_v2 but manually set to pydantic_v1', async () => {
+		await setUploadFile(page, 'Upload non parallel args schema', validArgsSchemaFile);
+		await setUploadFile(page, 'Upload parallel args schema', validArgsSchemaFile);
+		const versionSelector = page.getByRole('combobox', { name: 'Args schema version' });
+		expect(versionSelector).toHaveValue('pydantic_v2');
+		await versionSelector.selectOption('pydantic_v1');
+		await createBtn.click();
+		await page.getByText('Task created successfully').waitFor();
+
+		const task = await getCreatedTaskModalData(page, randomTaskName4, 'compound');
+		expect(task.name).toEqual(randomTaskName4);
+		expect(task.command_non_parallel).toEqual('/tmp/test-np');
+		expect(task.command_parallel).toEqual('/tmp/test-p');
+		expect(task.source).toEqual(`admin:${randomTaskName4}-source`);
+		expect(task.args_schema_version).toEqual('pydantic_v1');
+	});
+
 	await test.step('Cleanup test tasks', async () => {
 		await deleteTask(page, randomTaskName1);
 		await deleteTask(page, randomTaskName2);
 		await deleteTask(page, randomTaskName3);
+		await deleteTask(page, randomTaskName4);
 	});
 });
 
@@ -307,7 +333,7 @@ async function getTaskDataCompound(page, items) {
 		output_types: await items[15].innerText(),
 		docs_link: await items[17].innerText(),
 		docs_info: await items[19].innerText(),
-		args_schema_version: await items[21].innerText()
+		args_schema_version: await items[items.length - 1].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
 	if ((await argsSchemaNonParallelBtn.count()) === 1) {

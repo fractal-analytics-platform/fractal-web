@@ -8,7 +8,7 @@
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TypesEditor from './TypesEditor.svelte';
-	import { detectSchemaVersion } from 'fractal-jschema';
+	import { detectSchemaVersion, SchemaValidator } from 'fractal-jschema';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
 	export let addNewTasks;
@@ -23,6 +23,7 @@
 	let version = '';
 	let docs_info = '';
 	let docs_link = '';
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
 	let args_schema_version = 'pydantic_v2';
 	/** @type {import('$lib/types-v2').TaskV2Type} */
 	let taskType = 'non_parallel';
@@ -65,12 +66,12 @@
 		}
 		validationErrors = {};
 
-		const argsSchemaNonParallel = await getArgsSchemaNonParallel();
+		const argsSchemaNonParallel = await getArgsSchemaNonParallel(false);
 		if (argsSchemaNonParallel instanceof Error) {
 			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
 		}
 
-		const argsSchemaParallel = await getArgsSchemaParallel();
+		const argsSchemaParallel = await getArgsSchemaParallel(false);
 		if (argsSchemaParallel instanceof Error) {
 			addValidationError('args_schema_parallel', argsSchemaParallel.message);
 		}
@@ -175,31 +176,34 @@
 	let metaFileInputParallel = undefined;
 
 	/**
+	 * @param {boolean} autodetectVersion
 	 * @returns {Promise<object|Error|undefined>}
 	 */
-	async function getArgsSchemaNonParallel() {
+	async function getArgsSchemaNonParallel(autodetectVersion) {
 		removeValidationError('args_schema_non_parallel');
 		if (!argsSchemaNonParallelFiles || argsSchemaNonParallelFiles.length === 0) {
 			return;
 		}
-		return parseArgsSchemaContent(argsSchemaNonParallelFiles);
+		return parseArgsSchemaContent(argsSchemaNonParallelFiles, autodetectVersion);
 	}
 
 	/**
+	 * @param {boolean} autodetectVersion
 	 * @returns {Promise<object|Error|undefined>}
 	 */
-	async function getArgsSchemaParallel() {
+	async function getArgsSchemaParallel(autodetectVersion) {
 		removeValidationError('args_schema_parallel');
 		if (!argsSchemaParallelFiles || argsSchemaParallelFiles.length === 0) {
 			return;
 		}
-		return parseArgsSchemaContent(argsSchemaParallelFiles);
+		return parseArgsSchemaContent(argsSchemaParallelFiles, autodetectVersion);
 	}
 
 	/**
 	 * @param {FileList} argsSchemaFiles
+	 * @param {boolean} autodetectVersion
 	 */
-	async function parseArgsSchemaContent(argsSchemaFiles) {
+	async function parseArgsSchemaContent(argsSchemaFiles, autodetectVersion) {
 		let content = '';
 		try {
 			const argsSchemaFile = argsSchemaFiles[0];
@@ -214,25 +218,37 @@
 			return new Error("File doesn't contain valid JSON");
 		}
 
-		try {
-			args_schema_version = detectSchemaVersion(json);
-			return json;
-		} catch (err) {
-			return new Error(
-				`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
-			);
+		if (autodetectVersion) {
+			try {
+				args_schema_version = detectSchemaVersion(json);
+				return json;
+			} catch (err) {
+				return new Error(
+					`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
+				);
+			}
+		} else {
+			try {
+				const schemaValidator = new SchemaValidator(args_schema_version);
+				schemaValidator.validateSchema(json);
+				return json;
+			} catch (err) {
+				return new Error(
+					`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
+				);
+			}
 		}
 	}
 
 	async function handleNonParallelSchemaChanged() {
-		const argsSchemaNonParallel = await getArgsSchemaNonParallel();
+		const argsSchemaNonParallel = await getArgsSchemaNonParallel(true);
 		if (argsSchemaNonParallel instanceof Error) {
 			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
 		}
 	}
 
 	async function handleParallelSchemaChanged() {
-		const argsSchemaParallel = await getArgsSchemaParallel();
+		const argsSchemaParallel = await getArgsSchemaParallel(true);
 		if (argsSchemaParallel instanceof Error) {
 			addValidationError('args_schema_parallel', argsSchemaParallel.message);
 		}
@@ -607,15 +623,17 @@
 			<div class="col-md-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="args_schema_version" class="input-group-text">Args schema version</label>
-					<input
+					<select
 						name="args_schema_version"
 						id="args_schema_version"
-						type="text"
 						class="form-control"
 						bind:value={args_schema_version}
 						class:is-invalid={validationErrors['args_schema_version']}
 						required
-					/>
+					>
+						<option>pydantic_v1</option>
+						<option>pydantic_v2</option>
+					</select>
 					<span class="invalid-feedback">{validationErrors['args_schema_version']}</span>
 				</div>
 				<div class="form-text">
