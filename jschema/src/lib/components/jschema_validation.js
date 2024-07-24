@@ -16,6 +16,13 @@ export class SchemaValidator {
 
 	/**
 	 * @param {any} schema
+	 */
+	validateSchema(schema) {
+		this.ajv.compile(schema);
+	}
+
+	/**
+	 * @param {any} schema
 	 * @returns {boolean}
 	 */
 	loadSchema(schema) {
@@ -49,5 +56,21 @@ export class SchemaValidator {
 		}
 		if (!this.canValidate) return null;
 		return this.validator.errors || null;
+	}
+}
+
+/**
+ * @param {any} schema
+ * @returns {'pydantic_v1'|'pydantic_v2'}
+ */
+export function detectSchemaVersion(schema) {
+	try {
+		const schemaValidatorV2 = new SchemaValidator('pydantic_v2');
+		schemaValidatorV2.validateSchema(schema);
+		return 'pydantic_v2';
+	} catch (_) {
+		const schemaValidatorV1 = new SchemaValidator('pydantic_v1');
+		schemaValidatorV1.validateSchema(schema);
+		return 'pydantic_v1';
 	}
 }

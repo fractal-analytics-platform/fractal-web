@@ -6,7 +6,8 @@
 		deepCopy,
 		getValidationErrorMessage,
 		stripIgnoredProperties,
-		getPropertiesToIgnore
+		getPropertiesToIgnore,
+		detectSchemaVersion
 	} from 'fractal-jschema';
 	import { tick } from 'svelte';
 
@@ -20,7 +21,7 @@
 	let oldDataError = '';
 
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let oldSchemaVersion = 'pydantic_v1';
+	let oldSchemaVersion = 'pydantic_v2';
 
 	/** @type {JSchema|undefined} */
 	let oldJschemaComponent = undefined;
@@ -28,7 +29,7 @@
 	let newSchema = undefined;
 
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let newSchemaVersion = 'pydantic_v1';
+	let newSchemaVersion = 'pydantic_v2';
 
 	let newJsonSchemaString = '';
 	let newJsonSchemaError = '';
@@ -49,10 +50,18 @@
 			oldSchema = undefined;
 			oldJsonSchemaError = 'Invalid JSON';
 		}
-		const validator = new SchemaValidator(oldSchemaVersion);
-		if (!validator.loadSchema(oldSchema)) {
-			oldSchema = undefined;
-			oldJsonSchemaError = 'Invalid JSON Schema';
+
+		try {
+			const schemaValidator = new SchemaValidator(oldSchemaVersion);
+			schemaValidator.validateSchema(oldSchema);
+		} catch (_) {
+			try {
+				oldSchemaVersion = detectSchemaVersion(oldSchema);
+			} catch (err) {
+				oldSchema = undefined;
+				oldJsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
+				return;
+			}
 		}
 	}
 
@@ -81,10 +90,18 @@
 			newSchema = undefined;
 			newJsonSchemaError = 'Invalid JSON';
 		}
-		const validator = new SchemaValidator(newSchemaVersion);
-		if (!validator.loadSchema(newSchema)) {
-			newSchema = undefined;
-			newJsonSchemaError = 'Invalid JSON Schema';
+
+		try {
+			const schemaValidator = new SchemaValidator(newSchemaVersion);
+			schemaValidator.validateSchema(newSchema);
+		} catch (_) {
+			try {
+				newSchemaVersion = detectSchemaVersion(newSchema);
+			} catch (err) {
+				newSchema = undefined;
+				newJsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
+				return;
+			}
 		}
 	}
 
@@ -147,8 +164,8 @@
 	}
 
 	function loadExample() {
-		oldSchemaVersion = 'pydantic_v1';
-		newSchemaVersion = 'pydantic_v1';
+		oldSchemaVersion = 'pydantic_v2';
+		newSchemaVersion = 'pydantic_v2';
 		const oldSchemaExample = {
 			title: 'Test',
 			type: 'object',

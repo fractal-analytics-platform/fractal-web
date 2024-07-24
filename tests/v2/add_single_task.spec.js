@@ -11,6 +11,8 @@ const validMetaFile = path.join(__dirname, '..', 'data', 'meta.json');
 const validArgsSchemaFile = path.join(__dirname, '..', 'data', 'create-ome-zarr-schema.json');
 const brokenJson = path.join(__dirname, '..', 'data', 'broken.json');
 const invalidArgsSchema = path.join(__dirname, '..', 'data', 'invalid-schema.json');
+const pydanticV1Schema = path.join(__dirname, '..', 'data', 'pydantic-v1-schema.json');
+const pydanticV2Schema = path.join(__dirname, '..', 'data', 'pydantic-v2-schema.json');
 
 test('Add single tasks [v2]', async ({ page }) => {
 	await page.goto('/v2/tasks');
@@ -168,6 +170,16 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await page.getByLabel('Remove input type').click();
 		await page.getByLabel('Remove output type').first().click();
 		await page.getByLabel('Remove output type').click();
+	});
+
+	await test.step('Recognized valid pydantic_v2 schema', async () => {
+		await setUploadFile(page, 'Upload non parallel args schema', pydanticV2Schema);
+		expect(page.getByRole('textbox', { name: 'Args schema version' })).toHaveValue('pydantic_v2');
+	});
+
+	await test.step('Recognized valid pydantic_v1 schema', async () => {
+		await setUploadFile(page, 'Upload non parallel args schema', pydanticV1Schema);
+		expect(page.getByRole('textbox', { name: 'Args schema version' })).toHaveValue('pydantic_v1');
 	});
 
 	await test.step('Attempt to create task with invalid JSON files', async () => {

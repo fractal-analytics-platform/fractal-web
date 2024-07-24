@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { it, expect } from 'vitest';
-import { SchemaValidator } from '../src/lib/components/jschema_validation.js';
+import { SchemaValidator, detectSchemaVersion } from '../src/lib/components/jschema_validation.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -148,4 +148,44 @@ it('should reject a null value if the schema property is a number', () => {
 	// Expect validation to be false
 	expect(validationResult2).toBe(false);
 	expect(validator.getErrors()).toBeDefined();
+});
+
+it('should detect valid pydantic_v2 schema', () => {
+	const version = detectSchemaVersion({
+		additionalProperties: false,
+		properties: {
+			testProp: {
+				default: [1],
+				maxItems: 1,
+				minItems: 1,
+				prefixItems: [{ type: 'integer' }],
+				type: 'array'
+			}
+		},
+		type: 'object'
+	});
+	expect(version).toEqual('pydantic_v2');
+});
+
+it('should detect valid pydantic_v1 schema', () => {
+	const version = detectSchemaVersion({
+		additionalProperties: false,
+		properties: {
+			testProp: {
+				type: 'array',
+				minItems: 1,
+				maxItems: 1,
+				additionalItems: false,
+				items: [{ type: 'string' }]
+			}
+		},
+		type: 'object'
+	});
+	expect(version).toEqual('pydantic_v1');
+});
+
+it('should detect invalid schema', () => {
+	expect(() => detectSchemaVersion({ foo: 'bar' })).toThrowError(
+		'strict mode: unknown keyword: "foo"'
+	);
 });

@@ -1,11 +1,12 @@
 <script>
 	import {
 		JSchema,
-		SchemaValidator,
 		stripNullAndEmptyObjectsAndArrays,
 		deepCopy,
 		getValidationErrorMessage,
-		getPropertiesToIgnore
+		getPropertiesToIgnore,
+		detectSchemaVersion,
+		SchemaValidator
 	} from 'fractal-jschema';
 	import { tick } from 'svelte';
 	import example from './example.json';
@@ -20,7 +21,7 @@
 	let dataError = '';
 
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let schemaVersion = 'pydantic_v1';
+	let schemaVersion = 'pydantic_v2';
 
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = undefined;
@@ -40,12 +41,20 @@
 			jsonSchemaError = 'Invalid JSON';
 			return;
 		}
-		const validator = new SchemaValidator(schemaVersion);
-		if (!validator.loadSchema(parsedSchema)) {
-			schema = undefined;
-			jsonSchemaError = 'Invalid JSON Schema';
-			return;
+
+		try {
+			const schemaValidator = new SchemaValidator(schemaVersion);
+			schemaValidator.validateSchema(parsedSchema);
+		} catch (_) {
+			try {
+				schemaVersion = detectSchemaVersion(parsedSchema);
+			} catch (err) {
+				schema = undefined;
+				jsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
+				return;
+			}
 		}
+
 		schema = parsedSchema;
 		handleDataChanged();
 	}
@@ -76,7 +85,7 @@
 	}
 
 	function loadExample() {
-		schemaVersion = 'pydantic_v1';
+		schemaVersion = 'pydantic_v2';
 		jsonSchemaString = JSON.stringify(example, null, 2);
 		handleJsonSchemaStringChanged();
 	}

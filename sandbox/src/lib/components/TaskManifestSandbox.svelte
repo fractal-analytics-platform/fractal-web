@@ -18,7 +18,7 @@
 	let selectedTaskName = '';
 	let selectedSchema;
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let schemaVersion = 'pydantic_v1';
+	let schemaVersion = 'pydantic_v2';
 	/** @type {'parallel'|'non_parallel'} */
 	let selectedSchemaType = 'non_parallel';
 	let selectedTask;

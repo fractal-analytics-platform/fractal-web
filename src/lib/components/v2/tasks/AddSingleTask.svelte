@@ -1,5 +1,4 @@
 <script>
-	import Ajv from 'ajv';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		AlertError,
@@ -9,6 +8,7 @@
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TypesEditor from './TypesEditor.svelte';
+	import { detectSchemaVersion } from 'fractal-jschema';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
 	export let addNewTasks;
@@ -213,15 +213,29 @@
 		} catch (err) {
 			return new Error("File doesn't contain valid JSON");
 		}
-		const ajv = new Ajv();
+
 		try {
-			ajv.compile(json);
+			args_schema_version = detectSchemaVersion(json);
+			return json;
 		} catch (err) {
 			return new Error(
 				`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
 			);
 		}
-		return json;
+	}
+
+	async function handleNonParallelSchemaChanged() {
+		const argsSchemaNonParallel = await getArgsSchemaNonParallel();
+		if (argsSchemaNonParallel instanceof Error) {
+			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
+		}
+	}
+
+	async function handleParallelSchemaChanged() {
+		const argsSchemaParallel = await getArgsSchemaParallel();
+		if (argsSchemaParallel instanceof Error) {
+			addValidationError('args_schema_parallel', argsSchemaParallel.message);
+		}
 	}
 
 	async function getMetaNonParallel() {
@@ -516,6 +530,7 @@
 						id="argsSchemaNonParallelFile"
 						bind:this={argsSchemaNonParallelFileInput}
 						bind:files={argsSchemaNonParallelFiles}
+						on:change={handleNonParallelSchemaChanged}
 						class:is-invalid={validationErrors['args_schema_non_parallel']}
 					/>
 					{#if argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0}
@@ -573,6 +588,7 @@
 						id="argsSchemaParallelFile"
 						bind:this={argsSchemaParallelFileInput}
 						bind:files={argsSchemaParallelFiles}
+						on:change={handleParallelSchemaChanged}
 						class:is-invalid={validationErrors['args_schema_parallel']}
 					/>
 					{#if argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0}

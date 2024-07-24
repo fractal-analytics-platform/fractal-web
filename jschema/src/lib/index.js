@@ -1,6 +1,6 @@
 import JSchema from './components/JSchema.svelte';
 import PropertyDescription from './components/properties/PropertyDescription.svelte';
-import { SchemaValidator } from './components/jschema_validation';
+import { SchemaValidator, detectSchemaVersion } from './components/jschema_validation';
 import { deepCopy, getValidationErrorMessage, stripNullAndEmptyObjectsAndArrays } from './utils';
 import { getPropertiesToIgnore } from './components/property_utils';
 import { JsonSchemaDataError } from './components/form_manager';
@@ -16,5 +16,6 @@ export {
 	getPropertiesToIgnore,
 	JsonSchemaDataError,
 	getValidationErrorMessage,
-	PropertyDescription
+	PropertyDescription,
+	detectSchemaVersion
 };
