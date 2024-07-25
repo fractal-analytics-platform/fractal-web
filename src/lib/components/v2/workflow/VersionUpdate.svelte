@@ -173,6 +173,7 @@
 					order: workflowTask.order,
 					meta_non_parallel: workflowTask.meta_non_parallel,
 					meta_parallel: workflowTask.meta_parallel,
+					input_filters: workflowTask.input_filters,
 					args_non_parallel:
 						fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
 					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel,

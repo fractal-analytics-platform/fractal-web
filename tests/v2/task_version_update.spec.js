@@ -124,6 +124,17 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByText('Arguments changes saved successfully').waitFor();
 	});
 
+	await test.step('Add Input Filters', async () => {
+		await page.getByText('Input Filters').click();
+		await page.getByRole('button', { name: 'Add attribute filter', exact: true }).click();
+		await page.getByPlaceholder('Key').fill('key1');
+		await page.getByPlaceholder('Value').fill('value1');
+		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
+		await page.getByPlaceholder('Key').nth(1).fill('key2');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByText('Input filters successfully updated').waitFor();
+	});
+
 	await test.step('Update non parallel task to v2', async () => {
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
@@ -138,6 +149,13 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByText('The arguments are valid').waitFor();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await page.getByText('No new versions available').waitFor();
+	});
+
+	await test.step('Verify that input filters have been preserved', async () => {
+		await page.getByText('Input Filters').click();
+		await expect(page.getByPlaceholder('Key').first()).toHaveValue('key1');
+		await expect(page.getByPlaceholder('Value')).toHaveValue('value1');
+		await expect(page.getByPlaceholder('Key').nth(1)).toHaveValue('key2');
 		await workflow.removeCurrentTask();
 	});
 
