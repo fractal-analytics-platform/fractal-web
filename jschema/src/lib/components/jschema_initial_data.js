@@ -7,7 +7,9 @@ import { getAllObjectProperties, isTuple } from './property_utils.js';
  * @param {any} initialValue
  */
 export function getJsonSchemaData(jsonSchema, schemaVersion, initialValue = undefined) {
-	return getPropertyData(jsonSchema, schemaVersion, true, initialValue, initialValue === undefined);
+	const loadDefaults =
+		initialValue === undefined || initialValue === null || Object.keys(initialValue).length === 0;
+	return getPropertyData(jsonSchema, schemaVersion, true, initialValue, loadDefaults);
 }
 
 /**

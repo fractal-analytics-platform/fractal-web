@@ -521,4 +521,80 @@ describe('jschema_intial_data', () => {
 		);
 		expect(data).deep.eq({ foo: [1, 1] });
 	});
+
+	it('Compute default for null initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			null
+		);
+		expect(data).deep.eq({ foo: 1 });
+	});
+
+	it('Compute default for undefined initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			undefined
+		);
+		expect(data).deep.eq({ foo: 1 });
+	});
+
+	it('Compute default for empty object initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			{}
+		);
+		expect(data).deep.eq({ foo: 1 });
+	});
+
+	it('Does not compute default for populated initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					},
+					bar: {
+						default: 2,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			{ foo: 5 }
+		);
+		expect(data).deep.eq({ foo: 5, bar: null });
+	});
 });
