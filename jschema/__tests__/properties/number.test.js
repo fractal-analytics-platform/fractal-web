@@ -13,6 +13,7 @@ describe('Number properties', () => {
 				title: 'Number title',
 				type: 'integer'
 			},
+			'pydantic_v1',
 			true
 		);
 		checkBold(screen.getByText('Number title'), true);
@@ -22,7 +23,7 @@ describe('Number properties', () => {
 	});
 
 	it('Optional NumberProperty without title', async () => {
-		const { component } = renderSchemaWithSingleProperty({ type: 'integer' });
+		const { component } = renderSchemaWithSingleProperty({ type: 'integer' }, 'pydantic_v1');
 		checkBold(screen.getByText('testProp'), false);
 		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
 		expect(spinbutton).toBeDefined();
@@ -38,11 +39,14 @@ describe('Number properties', () => {
 	});
 
 	it('NumberProperty with min and max constraints', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			type: 'integer',
-			minimum: 5,
-			maximum: 10
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				type: 'integer',
+				minimum: 5,
+				maximum: 10
+			},
+			'pydantic_v1'
+		);
 		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
 		expect(spinbutton).toBeDefined();
 		expect(spinbutton.getAttribute('min')).toBe('5');
@@ -51,11 +55,14 @@ describe('Number properties', () => {
 	});
 
 	it('NumberProperty with exclusive min and max constraints', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			type: 'integer',
-			exclusiveMinimum: 5,
-			exclusiveMaximum: 10
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				type: 'integer',
+				exclusiveMinimum: 5,
+				exclusiveMaximum: 10
+			},
+			'pydantic_v1'
+		);
 		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
 		expect(spinbutton).toBeDefined();
 		expect(spinbutton.getAttribute('min')).toBe('6');
@@ -64,10 +71,13 @@ describe('Number properties', () => {
 	});
 
 	it('NumberProperty initialized to zero', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: 0,
-			type: 'integer'
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: 0,
+				type: 'integer'
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: 0 });
 	});
 });

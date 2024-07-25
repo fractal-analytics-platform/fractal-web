@@ -1,11 +1,12 @@
 <script>
 	import {
 		JSchema,
-		SchemaValidator,
 		stripNullAndEmptyObjectsAndArrays,
 		deepCopy,
 		getValidationErrorMessage,
-		getPropertiesToIgnore
+		getPropertiesToIgnore,
+		detectSchemaVersion,
+		SchemaValidator
 	} from 'fractal-jschema';
 	import { tick } from 'svelte';
 	import example from './example.json';
@@ -19,6 +20,9 @@
 	let jsonSchemaError = '';
 	let dataError = '';
 
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	let schemaVersion = 'pydantic_v2';
+
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = undefined;
 
@@ -29,19 +33,30 @@
 			schema = undefined;
 			return;
 		}
+		let parsedSchema;
 		try {
-			schema = JSON.parse(jsonSchemaString);
-			handleDataChanged();
+			parsedSchema = JSON.parse(jsonSchemaString);
 		} catch (err) {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
 			return;
 		}
-		const validator = new SchemaValidator();
-		if (!validator.loadSchema(schema)) {
-			schema = undefined;
-			jsonSchemaError = 'Invalid JSON Schema';
+
+		try {
+			const schemaValidator = new SchemaValidator(schemaVersion);
+			schemaValidator.validateSchema(parsedSchema);
+		} catch (_) {
+			try {
+				schemaVersion = detectSchemaVersion(parsedSchema);
+			} catch (err) {
+				schema = undefined;
+				jsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
+				return;
+			}
 		}
+
+		schema = parsedSchema;
+		handleDataChanged();
 	}
 
 	function handleDataStringChanged() {
@@ -70,6 +85,7 @@
 	}
 
 	function loadExample() {
+		schemaVersion = 'pydantic_v2';
 		jsonSchemaString = JSON.stringify(example, null, 2);
 		handleJsonSchemaStringChanged();
 	}
@@ -108,6 +124,30 @@
 	<div class="col-lg-6 mt-3">
 		<div class="row">
 			<div class="col">
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="schemaVersionOptions"
+						id="pydantic_v1"
+						value="pydantic_v1"
+						bind:group={schemaVersion}
+						on:change={handleJsonSchemaStringChanged}
+					/>
+					<label class="form-check-label" for="pydantic_v1">pydantic_v1</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="schemaVersionOptions"
+						id="pydantic_v2"
+						value="pydantic_v2"
+						bind:group={schemaVersion}
+						on:change={handleJsonSchemaStringChanged}
+					/>
+					<label class="form-check-label" for="pydantic_v2">pydantic_v2</label>
+				</div>
 				<button class="btn btn-outline-primary float-end" on:click={loadExample}>
 					Load example
 				</button>
@@ -156,11 +196,12 @@
 		</div>
 	</div>
 	<div class="col-lg-6">
-		{#if schema}
+		{#if schema && !jsonSchemaError}
 			<JSchema
 				componentId="json-schema-sandbox"
 				on:change={detectChange}
 				{schema}
+				{schemaVersion}
 				{schemaData}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}

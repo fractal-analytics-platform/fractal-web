@@ -17,6 +17,8 @@
 	let tasks = [];
 	let selectedTaskName = '';
 	let selectedSchema;
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	let schemaVersion = 'pydantic_v2';
 	/** @type {'parallel'|'non_parallel'} */
 	let selectedSchemaType = 'non_parallel';
 	let selectedTask;
@@ -66,18 +68,19 @@
 		} catch (err) {
 			throw new Error("File doesn't contain valid JSON");
 		}
-		if (!isManifestValid(manifestData)) {
-			throw new Error('Invalid manifest format');
-		} else if (manifestData.manifest_version !== '2') {
-			throw new Error('Unsupported manifest version');
-		} else if (
+		if (
 			manifestData.args_schema_version !== 'pydantic_v2' &&
 			manifestData.args_schema_version !== 'pydantic_v1'
 		) {
 			throw new Error('Unsupported manifest args schema version');
-		} else {
-			return manifestData;
 		}
+		schemaVersion = manifestData.args_schema_version;
+		if (!isManifestValid(manifestData)) {
+			throw new Error('Invalid manifest format');
+		} else if (manifestData.manifest_version !== '2') {
+			throw new Error('Unsupported manifest version');
+		}
+		return manifestData;
 	}
 
 	function onManifestChange({ detail }) {
@@ -92,7 +95,7 @@
 	 * @param {object} data
 	 */
 	function isManifestValid(data) {
-		const validator = new SchemaValidator();
+		const validator = new SchemaValidator(schemaVersion);
 		validator.loadSchema(manifestSchema);
 		return validator.isValid(data);
 	}
@@ -301,6 +304,7 @@
 				componentId="json-schema-task-manifest-sandbox"
 				on:change={detectChange}
 				schema={selectedSchema}
+				{schemaVersion}
 				{schemaData}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}

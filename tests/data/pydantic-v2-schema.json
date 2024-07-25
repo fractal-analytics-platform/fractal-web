@@ -1,0 +1,23 @@
+{
+	"additionalProperties": false,
+	"properties": {
+		"arg_A": {
+			"default": [1, 1],
+			"maxItems": 2,
+			"minItems": 2,
+			"prefixItems": [
+				{
+					"type": "integer"
+				},
+				{
+					"type": "integer"
+				}
+			],
+			"title": "Arg A",
+			"type": "array",
+			"description": "Description of arg_A."
+		}
+	},
+	"type": "object",
+	"title": "TaskFunction"
+}

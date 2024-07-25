@@ -63,6 +63,10 @@
 		? workflowTask.task_legacy.args_schema
 		: workflowTask.task.args_schema_parallel;
 
+	$: schemaVersion = workflowTask.is_legacy_task
+		? workflowTask.task_legacy.args_schema_version
+		: workflowTask.task.args_schema_version;
+
 	function handleNonParallelChanged() {
 		unsavedChangesNonParallel = true;
 	}
@@ -228,6 +232,7 @@
 					componentId="jschema-non-parallel"
 					schema={workflowTask.task.args_schema_non_parallel}
 					schemaData={workflowTask.args_non_parallel}
+					{schemaVersion}
 					{propertiesToIgnore}
 					on:change={handleNonParallelChanged}
 					bind:this={nonParallelSchemaComponent}
@@ -256,6 +261,7 @@
 					componentId="jschema-parallel"
 					schema={argsSchemaParallel}
 					schemaData={workflowTask.args_parallel}
+					{schemaVersion}
 					{propertiesToIgnore}
 					on:change={handleParallelChanged}
 					bind:this={parallelSchemaComponent}

@@ -80,7 +80,7 @@ describe('jschema_intial_data', () => {
 	};
 
 	it('Generate default data with undefined initial value', () => {
-		const data = getJsonSchemaData(schema, undefined);
+		const data = getJsonSchemaData(schema, 'pydantic_v1', undefined);
 
 		expect(data.arrayProp.length).eq(0);
 		expect(data.objectProp.requiredArrayWithMinItems.length).eq(3);
@@ -112,7 +112,7 @@ describe('jschema_intial_data', () => {
 			}
 		};
 
-		const data = getJsonSchemaData(schema, initialValue);
+		const data = getJsonSchemaData(schema, 'pydantic_v1', initialValue);
 
 		expect(data.arrayProp.length).eq(1);
 		expect(data.arrayProp[0]).eq('x');
@@ -162,6 +162,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			{ a1: [{ p1: 'foo' }] }
 		);
 
@@ -189,6 +190,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			{ t1: [{ p1: 'foo' }, { p2: 'bar' }] }
 		);
 
@@ -214,6 +216,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			{ t1: ['a', 'b', 'c', 'd'] }
 		);
 
@@ -243,6 +246,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			{ obj: { key1: { prop1: 'foo' } } }
 		);
 
@@ -263,6 +267,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			{}
 		);
 
@@ -288,6 +293,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -317,6 +323,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -346,6 +353,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -373,6 +381,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -396,6 +405,7 @@ describe('jschema_intial_data', () => {
 					}
 				}
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -420,6 +430,7 @@ describe('jschema_intial_data', () => {
 				},
 				required: ['tuple']
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -447,6 +458,7 @@ describe('jschema_intial_data', () => {
 				},
 				required: ['tuple']
 			},
+			'pydantic_v1',
 			undefined
 		);
 
@@ -462,26 +474,127 @@ describe('jschema_intial_data', () => {
 					b2: { type: 'boolean' }
 				}
 			},
+			'pydantic_v1',
 			{ b1: false }
 		);
 		expect(data).deep.eq({ b1: false, b2: null });
 	});
 
 	it('Handle tuple size/items mismatch (minItems = 2; items.length = 1)', () => {
-		const data = getJsonSchemaData({
-			title: 'test',
-			type: 'object',
-			properties: {
-				foo: {
-					default: [1, 2],
-					type: 'array',
-					minItems: 2,
-					maxItems: 2,
-					items: [{ type: 'integer' }]
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: [1, 2],
+						type: 'array',
+						minItems: 2,
+						maxItems: 2,
+						items: [{ type: 'integer' }]
+					}
+				},
+				required: ['foo']
+			},
+			'pydantic_v1'
+		);
+		expect(data).deep.eq({ foo: [1, null] });
+	});
+
+	it('Tuple with prefixItems (pydantic_v2)', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: [1, 1],
+						maxItems: 2,
+						minItems: 2,
+						prefixItems: [{ type: 'integer' }, { type: 'integer' }],
+						type: 'array'
+					}
+				},
+				required: ['foo']
+			},
+			'pydantic_v2'
+		);
+		expect(data).deep.eq({ foo: [1, 1] });
+	});
+
+	it('Compute default for null initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					}
 				}
 			},
-			required: ['foo']
-		});
-		expect(data).deep.eq({ foo: [1, null] });
+			'pydantic_v2',
+			null
+		);
+		expect(data).deep.eq({ foo: 1 });
+	});
+
+	it('Compute default for undefined initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			undefined
+		);
+		expect(data).deep.eq({ foo: 1 });
+	});
+
+	it('Compute default for empty object initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			{}
+		);
+		expect(data).deep.eq({ foo: 1 });
+	});
+
+	it('Does not compute default for populated initial value', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						default: 1,
+						type: 'number'
+					},
+					bar: {
+						default: 2,
+						type: 'number'
+					}
+				}
+			},
+			'pydantic_v2',
+			{ foo: 5 }
+		);
+		expect(data).deep.eq({ foo: 5, bar: null });
 	});
 });

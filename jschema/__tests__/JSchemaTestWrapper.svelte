@@ -5,6 +5,8 @@
 	export let schema;
 	/** @type {any} */
 	export let schemaData;
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	export let schemaVersion;
 	/** @type {(data: any) => void} */
 	export let onChange = function () {};
 
@@ -26,4 +28,11 @@
 	}
 </script>
 
-<JSchema componentId="test" bind:this={jschema} {schema} {schemaData} on:change={innerOnChange} />
+<JSchema
+	componentId="test"
+	bind:this={jschema}
+	{schema}
+	{schemaData}
+	{schemaVersion}
+	on:change={innerOnChange}
+/>

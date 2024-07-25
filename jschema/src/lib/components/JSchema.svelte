@@ -10,6 +10,8 @@
 	export let schema;
 	/** @type {object} */
 	export let schemaData;
+	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	export let schemaVersion;
 	/** @type {string[]} */
 	export let propertiesToIgnore = [];
 	/** @type {string} */
@@ -44,7 +46,7 @@
 	function initFormManager() {
 		if (schema) {
 			try {
-				formManager = new FormManager(schema, dispatch, propertiesToIgnore, schemaData);
+				formManager = new FormManager(schema, dispatch, schemaVersion, propertiesToIgnore, schemaData);
 			} catch (err) {
 				console.error(err);
 				formManager = undefined;

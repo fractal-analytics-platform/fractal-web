@@ -11,6 +11,7 @@ describe('Array properties', () => {
 				items: { type: 'string' },
 				default: ['foo', 'bar']
 			},
+			'pydantic_v1',
 			false
 		);
 		checkBold(screen.getByText('ArrayProperty'), false);
@@ -30,6 +31,7 @@ describe('Array properties', () => {
 				minItems: 3,
 				maxItems: 5
 			},
+			'pydantic_v1',
 			true
 		);
 		checkBold(screen.getByText('ArrayProperty'), true);
@@ -62,6 +64,7 @@ describe('Array properties', () => {
 				minItems: 2,
 				maxItems: 3
 			},
+			'pydantic_v1',
 			false
 		);
 		checkBold(screen.getByText('ArrayProperty'), false);
@@ -83,39 +86,42 @@ describe('Array properties', () => {
 	});
 
 	it('Object with additional array propery', async () => {
-		const { component, onChange } = renderSchema({
-			title: 'Object with additionalProperties',
-			type: 'object',
-			properties: {
-				testProp: {
-					title: 'testProp',
-					type: 'object',
-					additionalProperties: {
-						type: 'array',
-						items: {
-							$ref: '#/definitions/Ref'
+		const { component, onChange } = renderSchema(
+			{
+				title: 'Object with additionalProperties',
+				type: 'object',
+				properties: {
+					testProp: {
+						title: 'testProp',
+						type: 'object',
+						additionalProperties: {
+							type: 'array',
+							items: {
+								$ref: '#/definitions/Ref'
+							}
 						}
+					}
+				},
+				definitions: {
+					Ref: {
+						title: 'argument',
+						type: 'object',
+						properties: {
+							required_string: {
+								title: 'Required String',
+								type: 'string'
+							},
+							optional_number: {
+								title: 'Optional Number',
+								type: 'integer'
+							}
+						},
+						required: ['required_string']
 					}
 				}
 			},
-			definitions: {
-				Ref: {
-					title: 'argument',
-					type: 'object',
-					properties: {
-						required_string: {
-							title: 'Required String',
-							type: 'string'
-						},
-						optional_number: {
-							title: 'Optional Number',
-							type: 'integer'
-						}
-					},
-					required: ['required_string']
-				}
-			}
-		});
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: {} });
 		const input = screen.getByRole('textbox');
 		await fireEvent.input(input, { target: { value: 'my-key' } });
@@ -146,19 +152,22 @@ describe('Array properties', () => {
 	});
 
 	it('add array element', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				test: {
-					title: 'Array',
-					type: 'array',
-					items: {
-						type: 'string'
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					test: {
+						title: 'Array',
+						type: 'array',
+						items: {
+							type: 'string'
+						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ test: [] });
 		expect(component.unsavedChanges).toEqual(false);
@@ -168,20 +177,23 @@ describe('Array properties', () => {
 	});
 
 	it('remove array element', async function () {
-		const { component, onChange } = renderSchema({
-			title: 'test',
-			type: 'object',
-			properties: {
-				test: {
-					title: 'Array',
-					type: 'array',
-					default: ['foo'],
-					items: {
-						type: 'string'
+		const { component, onChange } = renderSchema(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					test: {
+						title: 'Array',
+						type: 'array',
+						default: ['foo'],
+						items: {
+							type: 'string'
+						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		expect(component.getArguments()).deep.eq({ test: ['foo'] });
 		expect(component.unsavedChanges).toEqual(false);
@@ -191,13 +203,16 @@ describe('Array properties', () => {
 	});
 
 	it('A list of numbers', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [0, 1, 2],
-			type: 'array',
-			items: {
-				type: 'integer'
-			}
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [0, 1, 2],
+				type: 'array',
+				items: {
+					type: 'integer'
+				}
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: [0, 1, 2] });
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(3);
@@ -207,13 +222,16 @@ describe('Array properties', () => {
 	});
 
 	it('A list of strings', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: ['hello', 'this', 'test'],
-			type: 'array',
-			items: {
-				type: 'string'
-			}
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: ['hello', 'this', 'test'],
+				type: 'array',
+				items: {
+					type: 'string'
+				}
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: ['hello', 'this', 'test'] });
 		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(3);
@@ -223,13 +241,16 @@ describe('Array properties', () => {
 	});
 
 	it('A list of booleans', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [true, false, false],
-			type: 'array',
-			items: {
-				type: 'boolean'
-			}
-		});
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [true, false, false],
+				type: 'array',
+				items: {
+					type: 'boolean'
+				}
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: [true, false, false] });
 		const inputs = screen.getAllByRole('switch');
 		expect(inputs.length).eq(3);
@@ -239,16 +260,19 @@ describe('Array properties', () => {
 	});
 
 	it('A nested list of integers', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [[1, 2], [3, 4], [5], [6]],
-			type: 'array',
-			items: {
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [[1, 2], [3, 4], [5], [6]],
 				type: 'array',
 				items: {
-					type: 'integer'
+					type: 'array',
+					items: {
+						type: 'integer'
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: [[1, 2], [3, 4], [5], [6]] });
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(6);
@@ -261,16 +285,19 @@ describe('Array properties', () => {
 	});
 
 	it('A nested list of integers', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [[1, 2], [3, 4], [5], [6]],
-			type: 'array',
-			items: {
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [[1, 2], [3, 4], [5], [6]],
 				type: 'array',
 				items: {
-					type: 'integer'
+					type: 'array',
+					items: {
+						type: 'integer'
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: [[1, 2], [3, 4], [5], [6]] });
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(6);
@@ -283,16 +310,19 @@ describe('Array properties', () => {
 	});
 
 	it('A nested list of strings', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [['this', 'is'], ['a', 'list'], ['of'], ['strings']],
-			type: 'array',
-			items: {
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [['this', 'is'], ['a', 'list'], ['of'], ['strings']],
 				type: 'array',
 				items: {
-					type: 'string'
+					type: 'array',
+					items: {
+						type: 'string'
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({
 			testProp: [['this', 'is'], ['a', 'list'], ['of'], ['strings']]
 		});
@@ -307,16 +337,19 @@ describe('Array properties', () => {
 	});
 
 	it('A nested list of bools', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [[true], [false]],
-			type: 'array',
-			items: {
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [[true], [false]],
 				type: 'array',
 				items: {
-					type: 'boolean'
+					type: 'array',
+					items: {
+						type: 'boolean'
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({
 			testProp: [[true], [false]]
 		});
@@ -327,19 +360,22 @@ describe('Array properties', () => {
 	});
 
 	it('A highly nested list', async () => {
-		const { component } = renderSchemaWithSingleProperty({
-			default: [[[0]]],
-			type: 'array',
-			items: {
+		const { component } = renderSchemaWithSingleProperty(
+			{
+				default: [[[0]]],
 				type: 'array',
 				items: {
 					type: 'array',
 					items: {
-						type: 'integer'
+						type: 'array',
+						items: {
+							type: 'integer'
+						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 		expect(component.getArguments()).deep.eq({ testProp: [[[0]]] });
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(1);

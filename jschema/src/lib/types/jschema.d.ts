@@ -32,6 +32,7 @@ export type JSONSchemaObjectProperty = BaseJSONSchemaProperty<'object'> & {
 }
 
 export type JSONSchemaArrayProperty = BaseJSONSchemaProperty<'array'> & {
+  prefixItems: JSONSchemaProperty[], // draft 2020-12
   items: JSONSchemaProperty | JSONSchemaProperty[],
   minItems?: number
   maxItems?: number

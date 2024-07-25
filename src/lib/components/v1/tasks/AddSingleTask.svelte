@@ -1,11 +1,11 @@
 <script>
-	import Ajv from 'ajv';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		displayStandardErrorAlert,
 		getValidationMessagesMap,
 		validateErrorMapKeys
 	} from '$lib/common/errors';
+	import { SchemaValidator } from 'fractal-jschema';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 
 	/** @type {(task: import('$lib/types').Task) => void} */
@@ -142,9 +142,9 @@
 		} catch (err) {
 			return new Error("File doesn't contain valid JSON");
 		}
-		const ajv = new Ajv();
+		const schemaValidator = new SchemaValidator('pydantic_v1');
 		try {
-			ajv.compile(json);
+			schemaValidator.validateSchema(json);
 		} catch (err) {
 			return new Error(
 				`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`

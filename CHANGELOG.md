@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed input filters lost after version update (\#535);
+* JSON Schema form: computed default values also for empty object (\#535);
+* Supported `prefixItems` of JSON Schema Draft 2020-12 - `pydantic_v2` (\#535);
+
 # 1.3.2
 
 * Supported `pydantic_v2` schemas (\#532);

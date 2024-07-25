@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { it, expect } from 'vitest';
-import { SchemaValidator } from '../src/lib/components/jschema_validation.js';
+import { SchemaValidator, detectSchemaVersion } from '../src/lib/components/jschema_validation.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 it('should create a new instance of the validator', () => {
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	expect(validator).toBeDefined();
 });
 
@@ -17,7 +17,7 @@ it('should validate a valid schema', () => {
 	let jsonSchema = fs.readFileSync(path.join(__dirname, './data/ChannelJsonSchema.json'), 'utf8');
 	jsonSchema = JSON.parse(jsonSchema);
 
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	const result = validator.loadSchema(jsonSchema);
 
 	expect(result).toBe(true);
@@ -34,7 +34,7 @@ it('should reject an invalid schema', () => {
 	// Remove the required property
 	delete jsonSchema.required;
 
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	const result = validator.loadSchema(jsonSchema);
 
 	expect(result).toBe(false);
@@ -49,7 +49,7 @@ it('should validate a data object against a valid schema', () => {
 	let jsonData = fs.readFileSync(path.join(__dirname, './data/ChannelJsonData.json'), 'utf8');
 	jsonData = JSON.parse(jsonData);
 
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	const result = validator.loadSchema(jsonSchema);
 
 	expect(result).toBe(true);
@@ -71,7 +71,7 @@ it('should reject an invalid data object against a valid schema', () => {
 	);
 	jsonData = JSON.parse(jsonData);
 
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	const result = validator.loadSchema(jsonSchema);
 
 	expect(result).toBe(true);
@@ -89,7 +89,7 @@ it('should accept an empty data object against a valid schema without required p
 	// Load the json data from file
 	const jsonData = {};
 
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	const result = validator.loadSchema(jsonSchema);
 
 	expect(result).toBe(true);
@@ -107,7 +107,7 @@ it('should reject an empty data object against a valid schema with required prop
 	// Load the json data from file
 	const jsonData = {};
 
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	const result = validator.loadSchema(jsonSchema);
 
 	expect(result).toBe(true);
@@ -126,7 +126,7 @@ it('should reject a null value if the schema property is a number', () => {
 	let jsonData = {};
 
 	// Initialize the validator
-	const validator = new SchemaValidator();
+	const validator = new SchemaValidator('pydantic_v1');
 	// Schema should be valid
 	const result = validator.loadSchema(jsonSchema);
 	expect(result).toBe(true);
@@ -148,4 +148,44 @@ it('should reject a null value if the schema property is a number', () => {
 	// Expect validation to be false
 	expect(validationResult2).toBe(false);
 	expect(validator.getErrors()).toBeDefined();
+});
+
+it('should detect valid pydantic_v2 schema', () => {
+	const version = detectSchemaVersion({
+		additionalProperties: false,
+		properties: {
+			testProp: {
+				default: [1],
+				maxItems: 1,
+				minItems: 1,
+				prefixItems: [{ type: 'integer' }],
+				type: 'array'
+			}
+		},
+		type: 'object'
+	});
+	expect(version).toEqual('pydantic_v2');
+});
+
+it('should detect valid pydantic_v1 schema', () => {
+	const version = detectSchemaVersion({
+		additionalProperties: false,
+		properties: {
+			testProp: {
+				type: 'array',
+				minItems: 1,
+				maxItems: 1,
+				additionalItems: false,
+				items: [{ type: 'string' }]
+			}
+		},
+		type: 'object'
+	});
+	expect(version).toEqual('pydantic_v1');
+});
+
+it('should detect invalid schema', () => {
+	expect(() => detectSchemaVersion({ foo: 'bar' })).toThrowError(
+		'strict mode: unknown keyword: "foo"'
+	);
 });

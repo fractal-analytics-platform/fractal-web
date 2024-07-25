@@ -13,6 +13,6 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection
-		include: ['ajv']
+		include: ['ajv/dist/ajv', 'ajv/dist/2020', 'ajv-formats']
 	}
 });

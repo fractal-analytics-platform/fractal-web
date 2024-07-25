@@ -52,10 +52,10 @@
 	"files": [
 		"build"
 	],
-	"bundledDependencies": true,
 	"bundleDependencies": [
 		"@vincjo/datatables",
-		"ajv",
+		"ajv/dist/ajv",
+		"ajv/dist/2020",
 		"ajv-formats",
 		"dompurify",
 		"jose",

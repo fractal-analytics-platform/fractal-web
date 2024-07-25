@@ -4,37 +4,40 @@ import { screen } from '@testing-library/svelte';
 
 describe('allOf properties', () => {
 	it('allOf property with single $ref', async () => {
-		const { component } = renderSchema({
-			title: 'TaskFunction3',
-			type: 'object',
-			properties: {
-				normalizer: {
-					title: 'Normalizer',
-					default: {
-						type: 'B'
-					},
-					allOf: [
-						{
-							$ref: '#/definitions/Normalizer'
-						}
-					]
-				}
-			},
-			additionalProperties: false,
-			definitions: {
-				Normalizer: {
-					title: 'Normalizer',
-					type: 'object',
-					properties: {
-						type: {
-							title: 'Type',
-							enum: ['A', 'B'],
-							type: 'string'
+		const { component } = renderSchema(
+			{
+				title: 'TaskFunction3',
+				type: 'object',
+				properties: {
+					normalizer: {
+						title: 'Normalizer',
+						default: {
+							type: 'B'
+						},
+						allOf: [
+							{
+								$ref: '#/definitions/Normalizer'
+							}
+						]
+					}
+				},
+				additionalProperties: false,
+				definitions: {
+					Normalizer: {
+						title: 'Normalizer',
+						type: 'object',
+						properties: {
+							type: {
+								title: 'Type',
+								enum: ['A', 'B'],
+								type: 'string'
+							}
 						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		const dropdown = screen.getByRole('combobox');
 		expect(dropdown.options.length).eq(3);
@@ -47,47 +50,50 @@ describe('allOf properties', () => {
 	});
 
 	it('allOf property with multiple $ref', async () => {
-		const { component } = renderSchema({
-			title: 'TaskFunction3',
-			type: 'object',
-			properties: {
-				normalizer: {
-					title: 'Normalizer',
-					default: {
-						type1: 'A',
-						type2: 'C'
-					},
-					allOf: [{ $ref: '#/definitions/Normalizer1' }, { $ref: '#/definitions/Normalizer2' }]
-				}
-			},
-			additionalProperties: false,
-			definitions: {
-				Normalizer1: {
-					title: 'Normalizer1',
-					type: 'object',
-					properties: {
-						type1: {
-							title: 'Type1',
-							default: 'A',
-							enum: ['A', 'B'],
-							type: 'string'
-						}
+		const { component } = renderSchema(
+			{
+				title: 'TaskFunction3',
+				type: 'object',
+				properties: {
+					normalizer: {
+						title: 'Normalizer',
+						default: {
+							type1: 'A',
+							type2: 'C'
+						},
+						allOf: [{ $ref: '#/definitions/Normalizer1' }, { $ref: '#/definitions/Normalizer2' }]
 					}
 				},
-				Normalizer2: {
-					title: 'Normalizer2',
-					type: 'object',
-					properties: {
-						type2: {
-							title: 'Type2',
-							default: 'D',
-							enum: ['C', 'D'],
-							type: 'string'
+				additionalProperties: false,
+				definitions: {
+					Normalizer1: {
+						title: 'Normalizer1',
+						type: 'object',
+						properties: {
+							type1: {
+								title: 'Type1',
+								default: 'A',
+								enum: ['A', 'B'],
+								type: 'string'
+							}
+						}
+					},
+					Normalizer2: {
+						title: 'Normalizer2',
+						type: 'object',
+						properties: {
+							type2: {
+								title: 'Type2',
+								default: 'D',
+								enum: ['C', 'D'],
+								type: 'string'
+							}
 						}
 					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		const dropdowns = screen.getAllByRole('combobox');
 		expect(dropdowns.length).eq(2);
@@ -106,19 +112,22 @@ describe('allOf properties', () => {
 	});
 
 	it('allOf property with multiple inline schemas', async () => {
-		const { component } = renderSchema({
-			title: 'allOf test',
-			type: 'object',
-			properties: {
-				myNumber: {
-					title: 'My Number',
-					allOf: [
-						{ type: 'number', minimum: 5 },
-						{ type: 'number', maximum: 10 }
-					]
+		const { component } = renderSchema(
+			{
+				title: 'allOf test',
+				type: 'object',
+				properties: {
+					myNumber: {
+						title: 'My Number',
+						allOf: [
+							{ type: 'number', minimum: 5 },
+							{ type: 'number', maximum: 10 }
+						]
+					}
 				}
-			}
-		});
+			},
+			'pydantic_v1'
+		);
 
 		const input = screen.getByRole('spinbutton');
 		expect(input.getAttribute('min')).eq('5');
