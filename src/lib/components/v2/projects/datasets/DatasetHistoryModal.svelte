@@ -87,10 +87,3 @@
 		{/if}
 	</svelte:fragment>
 </Modal>
-
-<style type="text/css">
-	pre {
-		white-space: pre-wrap;
-		display: inline;
-	}
-</style>
