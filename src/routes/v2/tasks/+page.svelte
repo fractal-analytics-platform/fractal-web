@@ -1,19 +1,14 @@
 <script>
 	import { page } from '$app/stores';
 	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
-	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import TaskEditModal from '$lib/components/v2/tasks/TaskEditModal.svelte';
 	import TaskInfoModal from '$lib/components/v2/tasks/TaskInfoModal.svelte';
 	import TaskCollection from '$lib/components/v2/tasks/TaskCollection.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import AddSingleTask from '$lib/components/v2/tasks/AddSingleTask.svelte';
-	import { onDestroy } from 'svelte';
 	import TasksTable from '$lib/components/tasks/TasksTable.svelte';
 	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
-
-	// Error property to be set in order to show errors in UI
-	let errorReasons = undefined;
 
 	// Tasks property updated with respect to data store
 	/** @type {import('$lib/types-v2').TaskV2[]} */
@@ -26,16 +21,8 @@
 	let taskInfoModal;
 	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default} */
 	let taskEditModal;
-
-	// Store subscriptions
-	const unsubscribe = collectTaskErrorStore.subscribe((error) => {
-		if (error) setErrorReasons(error);
-	});
-
-	function setErrorReasons(value) {
-		errorReasons = value;
-		displayStandardErrorAlert(errorReasons, 'errorSection');
-	}
+	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default} */
+	let taskCollectionComponent;
 
 	/**
 	 * @param {import('$lib/types-v2').TaskV2[]} tasks
@@ -82,7 +69,7 @@
 			sortTasks(result);
 			tasks = result;
 		} else {
-			setErrorReasons(result);
+			displayStandardErrorAlert(result, 'errorSection');
 		}
 	}
 
@@ -105,8 +92,6 @@
 			throw new AlertError(result);
 		}
 	}
-
-	onDestroy(unsubscribe);
 </script>
 
 <div>
@@ -123,6 +108,7 @@
 		id="pypi"
 		value="pypi"
 		bind:group={packageType}
+		on:click={() => taskCollectionComponent?.clearForm()}
 	/>
 	<label class="btn btn-outline-secondary" for="pypi"> PyPI </label>
 
@@ -133,6 +119,7 @@
 		id="local"
 		value="local"
 		bind:group={packageType}
+		on:click={() => taskCollectionComponent?.clearForm()}
 	/>
 	<label class="btn btn-outline-secondary" for="local"> Local </label>
 
@@ -158,7 +145,7 @@
 
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
-			<TaskCollection {packageType} {reloadTaskList} />
+			<TaskCollection {packageType} {reloadTaskList} bind:this={taskCollectionComponent} />
 		{:else if packageType === 'single'}
 			<AddSingleTask {addNewTasks} />
 		{:else if packageType === 'custom_env'}

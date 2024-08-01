@@ -95,6 +95,17 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await expect(modal.getByRole('textbox')).toHaveCount(0);
 	});
 
+	await test.step('Attempt to set invalid Zarr dir', async () => {
+		const modal = page.locator('.modal.show');
+		await modal.getByRole('button', { name: 'Edit Zarr dir' }).click();
+		await modal.getByRole('textbox').fill('foo');
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await expect(modal.getByText(`URLs must begin with '/' or 's3'.`)).toBeVisible();
+		await expect(modal.getByRole('textbox')).toHaveCount(1);
+		await modal.getByRole('button', { name: 'Undo edit zarr dir' }).click();
+		await expect(modal.getByRole('textbox')).toHaveCount(0);
+	});
+
 	await test.step('Close info modal', async () => {
 		await page.locator('.modal.show').getByLabel('Close').click();
 		await waitModalClosed(page);
