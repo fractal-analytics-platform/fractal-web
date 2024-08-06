@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.development' });
 
 const v1Tests = [
-	{ name: 'auth', testMatch: /auth\.setup\.js/ },
 	{
 		name: 'collect_core_tasks',
 		testMatch: /v1\/collect_core_tasks\.setup\.js/,
@@ -44,7 +43,6 @@ const v1Tests = [
 ];
 
 const v2Tests = [
-	{ name: 'auth', testMatch: /auth\.setup\.js/ },
 	{
 		name: 'collect_mock_tasks',
 		testMatch: /v2\/collect_mock_tasks\.setup\.js/,
@@ -73,6 +71,30 @@ const v2Tests = [
 	}
 ];
 
+const commonTests = [
+	{ name: 'auth', testMatch: /auth\.setup\.js/ },
+	{
+		name: 'chromium',
+		testMatch: /.*\.spec\.js/,
+		testIgnore: /(v1|v2)\/.*\.spec\.js/,
+		use: {
+			...devices['Desktop Chrome'],
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	},
+	{
+		name: 'firefox',
+		testMatch: /.*\.spec\.js/,
+		testIgnore: /(v1|v2)\/.*\.spec\.js/,
+		use: {
+			...devices['Desktop Firefox'],
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	}
+]
+
 const version = process.env.TEST_VERSION || 'v2';
 
 const tests = version === 'v2' ? v2Tests : v1Tests;
@@ -81,15 +103,16 @@ export default defineConfig({
 	testDir: 'tests',
 	retries: 3,
 
-	projects: tests,
+	projects: [...commonTests, ...tests],
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh 2.3.0a1',
-			port: 8000,
+			command: './tests/start-test-server.sh 2.3.7',
+			port: 8001,
 			waitForPort: true,
 			stdout: 'pipe',
-			reuseExistingServer: !process.env.CI
+			reuseExistingServer: !process.env.CI,
+			timeout: 120000
 		},
 		{
 			command: 'node ./tests/fake-job-server.js',

@@ -16,6 +16,12 @@ To print Svelte webserver log set the environment variable `DEBUG=pw:webserver`.
 
 To execute the tests seeing the browser add the `--headed` flag or the `--debug` flag if you need to watch them step by step.
 
+By default v2 tests are run. These tests require running a fractal-server instance using `FRACTAL_RUNNER_BACKEND=local_experimental`.
+
+To run v1 tests start playwright setting the environment variable `TEST_VERSION` to `v1`. These tests require running a fractal-server instance using `FRACTAL_RUNNER_BACKEND=local`.
+
+OAuth2 test requires a running instance of dexidp test image and a fractal-server instance configured to use it. To skip OAuth2 test set the environment variable `SKIP_OAUTH_TEST` to `true`.
+
 ## Coverage
 
 > Warning: code coverage results are not reliable at the moment

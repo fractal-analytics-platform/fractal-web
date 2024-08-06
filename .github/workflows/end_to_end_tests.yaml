@@ -30,6 +30,11 @@ jobs:
         ports:
           - 5432:5432
 
+      oauth2:
+        image: ghcr.io/fractal-analytics-platform/oauth:0.1
+        ports:
+          - 5556:5556
+
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
