@@ -83,7 +83,7 @@
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
-				<th class="col-md-6 col-lg-8">Name</th>
+				<th class="col-7 col-lg-8">Name</th>
 				<th>Options</th>
 			</tr>
 		</thead>

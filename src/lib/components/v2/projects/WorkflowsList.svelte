@@ -93,8 +93,7 @@
 	<table class="table align-middle caption-top">
 		<thead class="table-light">
 			<tr>
-				<th class="col-4">Id</th>
-				<th class="col-4">Name</th>
+				<th class="col-7 col-lg-8">Name</th>
 				<th>Options</th>
 			</tr>
 		</thead>
@@ -102,7 +101,6 @@
 			{#key workflows}
 				{#each filteredWorkflows as { id, name }}
 					<tr>
-						<td>{id}</td>
 						<td>
 							<a href="/v2/projects/{projectId}/workflows/{id}">
 								{name}
