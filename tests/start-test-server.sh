@@ -41,4 +41,4 @@ else
 fi
 
 # Start
-fractalctl start --port 8001
+fractalctl start --port 8000
