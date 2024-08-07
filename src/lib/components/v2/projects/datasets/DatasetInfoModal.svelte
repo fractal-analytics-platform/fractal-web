@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError } from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2} */
@@ -15,14 +15,19 @@
 	let name = '';
 	let editZarrDir = false;
 	let zarrDir = '';
-	let zarrDirError = '';
+
+	const formErrorHandler = new FormErrorHandler('errorAlert-datasetInfoModal', [
+		'name',
+		'zarr_dir'
+	]);
+	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	function onOpen() {
 		editName = false;
 		editZarrDir = false;
 		name = dataset.name;
 		zarrDir = dataset.zarr_dir;
-		zarrDirError = '';
+		formErrorHandler.clearErrors();
 	}
 
 	let savingName = false;
@@ -32,14 +37,11 @@
 			return;
 		}
 		savingName = true;
-		try {
-			await updateDataset({ name });
+		const updated = await updateDataset({ name });
+		if (updated) {
 			editName = false;
-		} catch (err) {
-			modal.displayErrorAlert(err);
-		} finally {
-			savingName = false;
 		}
+		savingName = false;
 	}
 
 	function undoEditName() {
@@ -53,35 +55,24 @@
 		if (!zarrDir) {
 			return;
 		}
-		zarrDirError = '';
+		formErrorHandler.clearErrors();
 		savingZarrDir = true;
-		try {
-			await updateDataset({ zarr_dir: zarrDir });
+		const updated = await updateDataset({ zarr_dir: zarrDir });
+		if (updated) {
 			editZarrDir = false;
-		} catch (err) {
-			/** @type {string|null} */
-			let errorMessage = null;
-			if (err instanceof AlertError) {
-				errorMessage = err.getSimpleValidationMessage();
-			}
-			if (errorMessage === null) {
-				modal.displayErrorAlert(err);
-			} else {
-				zarrDirError = errorMessage;
-			}
-		} finally {
-			savingZarrDir = false;
 		}
+		savingZarrDir = false;
 	}
 
 	function undoEditZarrDir() {
 		editZarrDir = false;
 		zarrDir = dataset.zarr_dir;
-		zarrDirError = '';
+		formErrorHandler.removeValidationError('zarr_dir');
 	}
 
 	/**
 	 * @param {object} body
+	 * @returns {Promise<boolean>} true if the update was successful, false otherwise
 	 */
 	async function updateDataset(body) {
 		const projectId = $page.params.projectId;
@@ -93,13 +84,14 @@
 			headers,
 			body: JSON.stringify(body)
 		});
-		const result = await response.json();
 		if (response.ok) {
+			const result = await response.json();
 			updateDatasetCallback(result);
 		} else {
-			console.log('Dataset update failed', result);
-			throw new AlertError(result, response.status);
+			console.log('Dataset update failed');
+			await formErrorHandler.handleErrorResponse(response);
 		}
+		return response.ok;
 	}
 </script>
 
@@ -121,18 +113,24 @@
 			</li>
 			<li class="list-group-item">
 				{#if editName}
-					<div class="input-group">
+					<div class="input-group has-validation">
 						<input
 							type="text"
 							bind:value={name}
 							class="form-control"
+							class:is-invalid={$validationErrors['name']}
 							on:keydown={(e) => {
 								if (e.key === 'Enter') {
 									saveName();
 								}
 							}}
 						/>
-						<button class="btn btn-outline-secondary" type="button" on:click={undoEditName}>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							on:click={undoEditName}
+							aria-label="Undo edit name"
+						>
 							<i class="bi bi-arrow-counterclockwise" />
 						</button>
 						<button
@@ -146,6 +144,7 @@
 							{/if}
 							Save
 						</button>
+						<span class="invalid-feedback">{$validationErrors['name']}</span>
 					</div>
 				{:else}
 					<span>
@@ -171,14 +170,19 @@
 							type="text"
 							bind:value={zarrDir}
 							class="form-control"
-							class:is-invalid={zarrDirError}
+							class:is-invalid={$validationErrors['zarr_dir']}
 							on:keydown={(e) => {
 								if (e.key === 'Enter') {
 									saveZarrDir();
 								}
 							}}
 						/>
-						<button class="btn btn-outline-secondary" type="button" on:click={undoEditZarrDir}>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							on:click={undoEditZarrDir}
+							aria-label="Undo edit zarr dir"
+						>
 							<i class="bi bi-arrow-counterclockwise" />
 						</button>
 						<button
@@ -192,7 +196,7 @@
 							{/if}
 							Save
 						</button>
-						<span class="invalid-feedback">{zarrDirError}</span>
+						<span class="invalid-feedback">{$validationErrors['zarr_dir']}</span>
 					</div>
 				{:else}
 					<span>

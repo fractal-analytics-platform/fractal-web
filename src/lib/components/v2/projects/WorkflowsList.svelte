@@ -93,8 +93,7 @@
 	<table class="table align-middle caption-top">
 		<thead class="table-light">
 			<tr>
-				<th class="col-4">Id</th>
-				<th class="col-4">Name</th>
+				<th class="col-7 col-lg-8">Name</th>
 				<th>Options</th>
 			</tr>
 		</thead>
@@ -102,13 +101,12 @@
 			{#key workflows}
 				{#each filteredWorkflows as { id, name }}
 					<tr>
-						<td>{id}</td>
-						<td>{name}</td>
 						<td>
-							<a href="/v2/projects/{projectId}/workflows/{id}" class="btn btn-light">
-								<i class="bi bi-arrow-up-right-square" />
-								Open
+							<a href="/v2/projects/{projectId}/workflows/{id}">
+								{name}
 							</a>
+						</td>
+						<td>
 							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
 								<i class="bi-journal-code" /> List jobs
 							</a>

@@ -15,6 +15,15 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 		await waitPageLoading(page);
 	});
 
+	await test.step('Attempt to collect tasks with invalid path', async () => {
+		await page.getByText('Local', { exact: true }).click();
+		await page.getByRole('textbox', { name: 'Package', exact: true }).fill('./foo');
+		await page.getByRole('button', { name: 'Collect', exact: true }).click();
+		await expect(
+			page.getByText('Local-package path must be a wheel file (given ./foo).')
+		).toBeVisible();
+	});
+
 	if ((await page.getByRole('table').last().getByText('MIP_compound').count()) > 0) {
 		console.warn('WARNING: Mock tasks V2 already collected. Skipping tasks collection');
 		return;
@@ -36,7 +45,6 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 	});
 
 	await test.step('Collect mock tasks', async () => {
-		await page.getByText('Local', { exact: true }).click();
 		await page.getByRole('textbox', { name: 'Package', exact: true }).fill(tasksMockWheelFile);
 		await page.getByRole('button', { name: 'Collect', exact: true }).click();
 

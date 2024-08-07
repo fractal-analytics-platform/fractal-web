@@ -1,5 +1,5 @@
 <script>
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 
 	export let id;
@@ -78,9 +78,6 @@
 	}
 
 	export function displayErrorAlert(/** @type {any} */ error) {
-		if (error instanceof AlertError && error.getSimpleValidationMessage()) {
-			error = error.getSimpleValidationMessage();
-		}
 		errorAlert = displayStandardErrorAlert(error, `errorAlert-${id}`);
 	}
 

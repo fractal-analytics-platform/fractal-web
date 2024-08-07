@@ -177,10 +177,3 @@
 		</svelte:fragment>
 	</Modal>
 {/if}
-
-<style type="text/css">
-	pre {
-		white-space: pre-wrap;
-		display: inline;
-	}
-</style>

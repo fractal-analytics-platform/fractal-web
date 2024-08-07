@@ -14,3 +14,7 @@
     color: #4d4d4d;
     background-color: #e9ecef;
 }
+
+pre {
+    white-space: pre-wrap;
+}

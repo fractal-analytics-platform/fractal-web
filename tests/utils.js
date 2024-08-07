@@ -71,7 +71,7 @@ export async function selectSlimSelect(page, selector, optionValue) {
 	let selectedItem = null;
 	for (const item of items) {
 		const itemText = await item.innerText();
-		if (itemText.includes(optionValue)) {
+		if (itemText === optionValue) {
 			selectedItem = item;
 			break;
 		}

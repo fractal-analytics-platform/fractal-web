@@ -71,3 +71,41 @@ node build/
 ```bash
 node --env-file=.env build
 ```
+
+## Systemd service
+
+To run fractal-web as a Systemd service create the file `/etc/systemd/system/fractal-web.service` with the following content:
+
+```
+[Unit]
+Description=Fractal Web
+After=syslog.target
+
+[Service]
+User=fractal
+EnvironmentFile=/path/to/fractal-web/.env
+ExecStart=/path/to/node /path/to/fractal-web/build
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable the service:
+
+```sh
+sudo systemctl enable fractal-web
+```
+
+Start the service:
+
+```sh
+sudo systemctl start fractal-web
+```
+
+Check the service logs:
+
+```sh
+sudo journalctl -u fractal-web
+```

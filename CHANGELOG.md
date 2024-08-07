@@ -1,5 +1,13 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Used links instead of the "Open" button (\#542); 
+* Added documentation about systemd service config (\#542);
+* Added e2e testing of OAuth2 login (\#542);
+* Improved handling of validation errors on forms and documentation about error handling (\#542);
+* Added `white-space: pre-wrap` on all `pre` tags (\#542);
+
 # 1.4.0
 
 * Fixed input filters lost after version update (\#535);

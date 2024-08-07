@@ -248,38 +248,3 @@ about [server-only modules](https://kit.svelte.dev/docs/server-only-modules)
 _Stores_ are modules that export svelte store objects that are used by components to manage the state of the
 application.
 > Note that stores are currently not well-organized or used due to the youth of the client.
-
-## Error handling
-
-The errors received from fractal-server are displayed in error modals without changing the content of their messages. The `displayStandardErrorAlert()` function can be used to easily display an error message alert in a div having a specific id. This function returns a `StandardErrorAlert` object that can be stored in a variable and then used to hide previous error messages calling its `hide()` method.
-
-Here an example:
-
-```javascript
-async function myFunction() {
-  // remove previous error
-  if (errorAlert) {
-    errorAlert.hide();
-  }
-
-  const response = await fetch(`/api/v1/something`);
-  if (response.ok) {
-    // do something with the result
-  } else {
-    const error = await response.json();
-    // add error alert inside the element having 'errorElement' as id
-    errorAlert = displayStandardErrorAlert(error, 'errorElement');
-  }
-}
-```
-
-When the displaying of the error alert should be handled by the caller function it is possible to throw an `AlertError` that has to be caught by the caller in order to display the message.
-
-Errors happening during SSR should be considered fatal and propagated using the `responseError()` utility function:
-
-```javascript
-if (response.ok) {
-  return await response.json();
-}
-await responseError(response);
-```

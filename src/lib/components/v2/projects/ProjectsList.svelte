@@ -129,7 +129,7 @@
 		<table class="table table-hover align-middle">
 			<thead class="table-light">
 				<tr>
-					<th>Name</th>
+					<th class="col-7 col-lg-8">Name</th>
 					<th>Options</th>
 				</tr>
 			</thead>
@@ -137,8 +137,12 @@
 				{#key projects}
 					{#each filteredProjects as { id, name }}
 						<tr>
-							<td class="col-6">{name}</td>
-							<td class="col-4">
+							<td>
+								<a href={'/v2/projects/' + id}>
+									{name}
+								</a>
+							</td>
+							<td>
 								<button
 									class="btn btn-light"
 									data-bs-toggle="modal"
@@ -147,9 +151,6 @@
 								>
 									<i class="bi bi-info-circle" /> Info
 								</button>
-								<a href={'/v2/projects/' + id} class="btn btn-light">
-									<i class="bi bi-arrow-up-right-square" /> Open
-								</a>
 								<ConfirmActionButton
 									modalId={'confirmDeleteProject' + id}
 									style={'danger'}
