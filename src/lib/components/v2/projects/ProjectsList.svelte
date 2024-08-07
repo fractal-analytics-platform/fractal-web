@@ -137,7 +137,11 @@
 				{#key projects}
 					{#each filteredProjects as { id, name }}
 						<tr>
-							<td class="col-6">{name}</td>
+							<td class="col-6">
+								<a href={'/v2/projects/' + id}>
+									{name}
+								</a>
+							</td>
 							<td class="col-4">
 								<button
 									class="btn btn-light"
@@ -147,9 +151,6 @@
 								>
 									<i class="bi bi-info-circle" /> Info
 								</button>
-								<a href={'/v2/projects/' + id} class="btn btn-light">
-									<i class="bi bi-arrow-up-right-square" /> Open
-								</a>
 								<ConfirmActionButton
 									modalId={'confirmDeleteProject' + id}
 									style={'danger'}

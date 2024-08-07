@@ -103,12 +103,12 @@
 				{#each filteredWorkflows as { id, name }}
 					<tr>
 						<td>{id}</td>
-						<td>{name}</td>
 						<td>
-							<a href="/v2/projects/{projectId}/workflows/{id}" class="btn btn-light">
-								<i class="bi bi-arrow-up-right-square" />
-								Open
+							<a href="/v2/projects/{projectId}/workflows/{id}">
+								{name}
 							</a>
+						</td>
+						<td>
 							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
 								<i class="bi-journal-code" /> List jobs
 							</a>

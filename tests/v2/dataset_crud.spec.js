@@ -67,7 +67,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Open dataset page', async () => {
-		await datasetRow.getByRole('link', { name: 'Open' }).click();
+		await datasetRow.getByRole('link', { name: 'test-dataset' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
 	});
 
