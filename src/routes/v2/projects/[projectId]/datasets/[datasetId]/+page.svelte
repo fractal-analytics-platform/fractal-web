@@ -11,6 +11,11 @@
 	import SlimSelect from 'slim-select';
 	import { onMount, tick } from 'svelte';
 	import { objectChanged } from '$lib/common/component_utilities';
+	import { env } from '$env/dynamic/public';
+
+	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
+		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
+		: null;
 
 	let projectId = $page.params.projectId;
 
@@ -532,6 +537,16 @@
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
+								{#if vizarrViewerUrl}
+									<a
+										class="btn btn-info"
+										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{image.zarr_url}"
+										target="_blank"
+									>
+										<i class="bi bi-eye" />
+										View
+									</a>
+								{/if}
 								<button class="btn btn-primary" on:click={() => imageModal?.openForEditing(image)}>
 									<i class="bi bi-pencil" />
 									Edit
