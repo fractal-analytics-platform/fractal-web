@@ -1,15 +1,13 @@
 
 # Fractal Web Client
 
-Fractal is a framework to process high-content imaging data at scale and prepare it for interactive visualization.
+[Fractal](https://fractal-analytics-platform.github.io/) is a framework developed at the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.
 
-![Fractal_Overview](https://fractal-analytics-platform.github.io/assets/fractal_overview.jpg)
-
-Fractal provides distributed workflows that convert TBs of image data into OME-Zarr files. The platform then processes the 3D image data by applying tasks like illumination correction, maximum intensity projection, 3D segmentation using [cellpose](https://cellpose.readthedocs.io/en/latest/) and measurements using [napari workflows](https://github.com/haesleinhuepf/napari-workflows). The pyramidal OME-Zarr files enable interactive visualization in the napari viewer.
+![Fractal_overview](https://github.com/user-attachments/assets/fb69b6e1-518f-4df0-a9b0-11bc1ae49d78)
 
 This is the repository that contains the **Fractal web client**. Find more information about Fractal in general and the other repositories at the [Fractal home page](https://fractal-analytics-platform.github.io).
 
-Documentation for `fractal-web` (in progress) is available at https://fractal-analytics-platform.github.io/fractal-web.
+Documentation for `fractal-web` is available at https://fractal-analytics-platform.github.io/fractal-web.
 
 ## License and contributors
 
