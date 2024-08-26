@@ -1,6 +1,8 @@
 <script>
 	export let message;
 	export let autoDismiss = true;
+	/** @type {'success'|'warning'} */
+	export let alertType = 'success';
 
 	let timeout;
 
@@ -20,7 +22,10 @@
 </script>
 
 {#if message}
-	<div class="alert alert-success alert-dismissible fade show" role="alert">
+	<div class="alert alert-{alertType} alert-dismissible fade show" role="alert">
+		{#if alertType === 'warning'}
+			<i class="bi bi-exclamation-triangle" />
+		{/if}
 		{message}
 		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
 	</div>
