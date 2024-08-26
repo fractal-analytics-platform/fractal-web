@@ -22,7 +22,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Open test dataset', async () => {
-		await page.getByRole('link', { name: 'Open' }).click();
+		await page.getByRole('link', { name: 'test-dataset' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
 		expect(await page.getByText('No entries in the image list yet').isVisible()).toEqual(true);
 	});
@@ -70,7 +70,19 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(`${randomPath}/img1`);
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
-		await modal.getByText(/Image with zarr_url '.*' already in Dataset/).waitFor();
+		await expect(modal.getByText(/Image with zarr_url '.*' already in Dataset/)).toBeVisible();
+		await modal.getByRole('button', { name: 'Cancel' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Attempt to create an image with invalid Zarr URL', async () => {
+		await page.getByRole('button', { name: 'Add an image list entry' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('foo');
+		const saveBtn = modal.getByRole('button', { name: 'Save' });
+		await saveBtn.click();
+		await expect(modal.getByText(`URLs must begin with '/' or 's3'.`)).toBeVisible();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});

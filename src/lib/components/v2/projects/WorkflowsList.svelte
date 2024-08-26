@@ -5,6 +5,7 @@
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	// The list of workflows
 	/** @type {import('$lib/types-v2').WorkflowV2[]} */
@@ -13,6 +14,8 @@
 	export let projectId = undefined;
 
 	let workflowSearch = '';
+
+	let customTaskWarning = '';
 
 	$: filteredWorkflows = workflows.filter((p) =>
 		p.name.toLowerCase().includes(workflowSearch.toLowerCase())
@@ -46,11 +49,16 @@
 
 	/**
 	 * @param {import('$lib/types-v2').WorkflowV2} importedWorkflow
+	 * @param {string} warningMessage
 	 */
-	function handleWorkflowImported(importedWorkflow) {
+	function handleWorkflowImported(importedWorkflow, warningMessage) {
 		workflows.push(importedWorkflow);
 		workflows = workflows;
-		goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+		if (warningMessage) {
+			customTaskWarning = warningMessage;
+		} else {
+			goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+		}
 	}
 
 	onMount(() => {
@@ -82,7 +90,10 @@
 					<button
 						class="btn btn-primary float-end"
 						type="submit"
-						on:click={() => createWorkflowModal.show()}
+						on:click={() => {
+							customTaskWarning = '';
+							createWorkflowModal.show();
+						}}
 					>
 						Create new workflow
 					</button>
@@ -90,11 +101,13 @@
 			</div>
 		</div>
 	</div>
+
+	<StandardDismissableAlert message={customTaskWarning} alertType="warning" autoDismiss={false} />
+
 	<table class="table align-middle caption-top">
 		<thead class="table-light">
 			<tr>
-				<th class="col-4">Id</th>
-				<th class="col-4">Name</th>
+				<th class="col-7 col-lg-8">Name</th>
 				<th>Options</th>
 			</tr>
 		</thead>
@@ -102,13 +115,12 @@
 			{#key workflows}
 				{#each filteredWorkflows as { id, name }}
 					<tr>
-						<td>{id}</td>
-						<td>{name}</td>
 						<td>
-							<a href="/v2/projects/{projectId}/workflows/{id}" class="btn btn-light">
-								<i class="bi bi-arrow-up-right-square" />
-								Open
+							<a href="/v2/projects/{projectId}/workflows/{id}">
+								{name}
 							</a>
+						</td>
+						<td>
 							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
 								<i class="bi-journal-code" /> List jobs
 							</a>

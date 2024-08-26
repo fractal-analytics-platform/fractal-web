@@ -1,11 +1,6 @@
 <script>
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import {
-		AlertError,
-		displayStandardErrorAlert,
-		getValidationMessagesMap,
-		validateErrorMapKeys
-	} from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TypesEditor from './TypesEditor.svelte';
 	import { detectSchemaVersion, SchemaValidator } from 'fractal-jschema';
@@ -31,12 +26,7 @@
 	/** @type {TypesEditor} */
 	let typesEditor;
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
-
-	/** @typedef {('name'|'command_non_parallel'|'command_parallel'|'version'|'source'|'input_type'|'output_type'|'args_schema_non_parallel'|'args_schema_parallel'|'args_schema_version'|'meta_non_parallel'|'meta_parallel'|'docs_info'|'docs_link')} ErrorKey **/
-	/** @type {ErrorKey[]} */
-	const handledErrorKeys = [
+	const formErrorHandler = new FormErrorHandler('errorAlert-createTask', [
 		'name',
 		'command_non_parallel',
 		'command_parallel',
@@ -51,9 +41,9 @@
 		'meta_parallel',
 		'docs_info',
 		'docs_link'
-	];
-	/** @type {{[key in ErrorKey]?: string}} */
-	let validationErrors = {};
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/**
 	 * Creates a new task in the server
@@ -61,34 +51,34 @@
 	 */
 	async function handleCreateTask() {
 		taskSuccessMessage = '';
-		if (errorAlert) {
-			errorAlert.hide();
-		}
-		validationErrors = {};
+		formErrorHandler.clearErrors();
 
 		const argsSchemaNonParallel = await getArgsSchemaNonParallel(false);
 		if (argsSchemaNonParallel instanceof Error) {
-			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
+			formErrorHandler.addValidationError(
+				'args_schema_non_parallel',
+				argsSchemaNonParallel.message
+			);
 		}
 
 		const argsSchemaParallel = await getArgsSchemaParallel(false);
 		if (argsSchemaParallel instanceof Error) {
-			addValidationError('args_schema_parallel', argsSchemaParallel.message);
+			formErrorHandler.addValidationError('args_schema_parallel', argsSchemaParallel.message);
 		}
 
 		const metaNonParallel = await getMetaNonParallel();
 		if (metaNonParallel instanceof Error) {
-			addValidationError('meta_non_parallel', metaNonParallel.message);
+			formErrorHandler.addValidationError('meta_non_parallel', metaNonParallel.message);
 		}
 
 		const metaParallel = await getMetaParallel();
 		if (metaParallel instanceof Error) {
-			addValidationError('meta_parallel', metaParallel.message);
+			formErrorHandler.addValidationError('meta_parallel', metaParallel.message);
 		}
 
 		const typesValid = typesEditor.validate();
 
-		if (Object.keys(validationErrors).length > 0 || !typesValid) {
+		if (Object.keys($validationErrors).length > 0 || !typesValid) {
 			return;
 		}
 
@@ -136,24 +126,16 @@
 			body: JSON.stringify(bodyData, replaceEmptyStrings)
 		});
 
-		const result = await response.json();
 		if (response.ok) {
+			const result = await response.json();
 			// Add created task to the list
 			console.log('Task created', result);
 			addNewTasks([result]);
 			taskSuccessMessage = 'Task created successfully';
 			resetFields();
 		} else {
-			console.error('Unable to create task', result);
-			const errorsMap = getValidationMessagesMap(result, response.status);
-			if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
-				validationErrors = errorsMap;
-			} else {
-				errorAlert = displayStandardErrorAlert(
-					new AlertError(result, response.status),
-					'errorAlert-createTask'
-				);
-			}
+			console.error('Unable to create task');
+			await formErrorHandler.handleErrorResponse(response);
 		}
 	}
 
@@ -180,7 +162,7 @@
 	 * @returns {Promise<object|Error|undefined>}
 	 */
 	async function getArgsSchemaNonParallel(autodetectVersion) {
-		removeValidationError('args_schema_non_parallel');
+		formErrorHandler.removeValidationError('args_schema_non_parallel');
 		if (!argsSchemaNonParallelFiles || argsSchemaNonParallelFiles.length === 0) {
 			return;
 		}
@@ -192,7 +174,7 @@
 	 * @returns {Promise<object|Error|undefined>}
 	 */
 	async function getArgsSchemaParallel(autodetectVersion) {
-		removeValidationError('args_schema_parallel');
+		formErrorHandler.removeValidationError('args_schema_parallel');
 		if (!argsSchemaParallelFiles || argsSchemaParallelFiles.length === 0) {
 			return;
 		}
@@ -243,24 +225,27 @@
 	async function handleNonParallelSchemaChanged() {
 		const argsSchemaNonParallel = await getArgsSchemaNonParallel(true);
 		if (argsSchemaNonParallel instanceof Error) {
-			addValidationError('args_schema_non_parallel', argsSchemaNonParallel.message);
+			formErrorHandler.addValidationError(
+				'args_schema_non_parallel',
+				argsSchemaNonParallel.message
+			);
 		}
 	}
 
 	async function handleParallelSchemaChanged() {
 		const argsSchemaParallel = await getArgsSchemaParallel(true);
 		if (argsSchemaParallel instanceof Error) {
-			addValidationError('args_schema_parallel', argsSchemaParallel.message);
+			formErrorHandler.addValidationError('args_schema_parallel', argsSchemaParallel.message);
 		}
 	}
 
 	async function getMetaNonParallel() {
-		removeValidationError('meta_non_parallel');
+		formErrorHandler.removeValidationError('meta_non_parallel');
 		return await getMeta(metaFilesNonParallel);
 	}
 
 	async function getMetaParallel() {
-		removeValidationError('meta_parallel');
+		formErrorHandler.removeValidationError('meta_parallel');
 		return await getMeta(metaFilesParallel);
 	}
 
@@ -291,7 +276,7 @@
 		if (argsSchemaNonParallelFileInput) {
 			argsSchemaNonParallelFileInput.value = '';
 		}
-		removeValidationError('args_schema_non_parallel');
+		formErrorHandler.removeValidationError('args_schema_non_parallel');
 	}
 
 	function clearArgsSchemaParallelFileUpload() {
@@ -299,7 +284,7 @@
 		if (argsSchemaParallelFileInput) {
 			argsSchemaParallelFileInput.value = '';
 		}
-		removeValidationError('args_schema_parallel');
+		formErrorHandler.removeValidationError('args_schema_parallel');
 	}
 
 	function clearMetaNonParallelFileUpload() {
@@ -307,7 +292,7 @@
 		if (metaFileInputNonParallel) {
 			metaFileInputNonParallel.value = '';
 		}
-		removeValidationError('meta_non_parallel');
+		formErrorHandler.removeValidationError('meta_non_parallel');
 	}
 
 	function clearMetaParallelFileUpload() {
@@ -315,24 +300,7 @@
 		if (metaFileInputParallel) {
 			metaFileInputParallel.value = '';
 		}
-		removeValidationError('meta_parallel');
-	}
-
-	/**
-	 * @param {ErrorKey} key
-	 * @param {string} value
-	 */
-	function addValidationError(key, value) {
-		validationErrors = { ...validationErrors, [key]: value };
-	}
-
-	/**
-	 * @param {ErrorKey} key
-	 */
-	function removeValidationError(key) {
-		const newErrors = { ...validationErrors };
-		delete newErrors[key];
-		validationErrors = newErrors;
+		formErrorHandler.removeValidationError('meta_parallel');
 	}
 
 	function resetFields() {
@@ -414,10 +382,10 @@
 					type="text"
 					class="form-control"
 					bind:value={name}
-					class:is-invalid={validationErrors['name']}
+					class:is-invalid={$validationErrors['name']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['name']}</span>
+				<span class="invalid-feedback">{$validationErrors['name']}</span>
 			</div>
 		</div>
 	</div>
@@ -432,10 +400,10 @@
 						type="text"
 						class="form-control"
 						bind:value={command_non_parallel}
-						class:is-invalid={validationErrors['command_non_parallel']}
+						class:is-invalid={$validationErrors['command_non_parallel']}
 						required
 					/>
-					<span class="invalid-feedback">{validationErrors['command_non_parallel']}</span>
+					<span class="invalid-feedback">{$validationErrors['command_non_parallel']}</span>
 				</div>
 			</div>
 		</div>
@@ -451,10 +419,10 @@
 						type="text"
 						class="form-control"
 						bind:value={command_parallel}
-						class:is-invalid={validationErrors['command_parallel']}
+						class:is-invalid={$validationErrors['command_parallel']}
 						required
 					/>
-					<span class="invalid-feedback">{validationErrors['command_parallel']}</span>
+					<span class="invalid-feedback">{$validationErrors['command_parallel']}</span>
 				</div>
 			</div>
 		</div>
@@ -469,10 +437,10 @@
 					type="text"
 					class="form-control"
 					bind:value={source}
-					class:is-invalid={validationErrors['source']}
+					class:is-invalid={$validationErrors['source']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['source']}</span>
+				<span class="invalid-feedback">{$validationErrors['source']}</span>
 			</div>
 			<div class="form-text">
 				Used to match tasks across installations when a workflow is imported
@@ -499,9 +467,9 @@
 					type="text"
 					class="form-control"
 					bind:value={version}
-					class:is-invalid={validationErrors['version']}
+					class:is-invalid={$validationErrors['version']}
 				/>
-				<span class="invalid-feedback">{validationErrors['version']}</span>
+				<span class="invalid-feedback">{$validationErrors['version']}</span>
 			</div>
 		</div>
 	</div>
@@ -520,14 +488,14 @@
 						id="metaFileNonParallel"
 						bind:this={metaFileInputNonParallel}
 						bind:files={metaFilesNonParallel}
-						class:is-invalid={validationErrors['meta_non_parallel']}
+						class:is-invalid={$validationErrors['meta_non_parallel']}
 					/>
 					{#if metaFilesNonParallel && metaFilesNonParallel.length > 0}
 						<button class="btn btn-outline-secondary" on:click={clearMetaNonParallelFileUpload}>
 							Clear
 						</button>
 					{/if}
-					<span class="invalid-feedback">{validationErrors['meta_non_parallel']}</span>
+					<span class="invalid-feedback">{$validationErrors['meta_non_parallel']}</span>
 				</div>
 				<div class="form-text">
 					Additional metadata related to execution (e.g. computational resources)
@@ -547,7 +515,7 @@
 						bind:this={argsSchemaNonParallelFileInput}
 						bind:files={argsSchemaNonParallelFiles}
 						on:change={handleNonParallelSchemaChanged}
-						class:is-invalid={validationErrors['args_schema_non_parallel']}
+						class:is-invalid={$validationErrors['args_schema_non_parallel']}
 					/>
 					{#if argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0}
 						<button
@@ -557,7 +525,7 @@
 							Clear
 						</button>
 					{/if}
-					<span class="invalid-feedback">{validationErrors['args_schema_non_parallel']}</span>
+					<span class="invalid-feedback">{$validationErrors['args_schema_non_parallel']}</span>
 				</div>
 				<div class="form-text">JSON schema of task arguments - non parallel</div>
 			</div>
@@ -578,14 +546,14 @@
 						id="metaFileParallel"
 						bind:this={metaFileInputParallel}
 						bind:files={metaFilesParallel}
-						class:is-invalid={validationErrors['meta_parallel']}
+						class:is-invalid={$validationErrors['meta_parallel']}
 					/>
 					{#if metaFilesParallel && metaFilesParallel.length > 0}
 						<button class="btn btn-outline-secondary" on:click={clearMetaParallelFileUpload}>
 							Clear
 						</button>
 					{/if}
-					<span class="invalid-feedback">{validationErrors['meta_parallel']}</span>
+					<span class="invalid-feedback">{$validationErrors['meta_parallel']}</span>
 				</div>
 				<div class="form-text">
 					Additional metadata related to execution (e.g. computational resources)
@@ -605,14 +573,14 @@
 						bind:this={argsSchemaParallelFileInput}
 						bind:files={argsSchemaParallelFiles}
 						on:change={handleParallelSchemaChanged}
-						class:is-invalid={validationErrors['args_schema_parallel']}
+						class:is-invalid={$validationErrors['args_schema_parallel']}
 					/>
 					{#if argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0}
 						<button class="btn btn-outline-secondary" on:click={clearArgsSchemaParallelFileUpload}>
 							Clear
 						</button>
 					{/if}
-					<span class="invalid-feedback">{validationErrors['args_schema_parallel']}</span>
+					<span class="invalid-feedback">{$validationErrors['args_schema_parallel']}</span>
 				</div>
 				<div class="form-text">JSON schema of task arguments - parallel</div>
 			</div>
@@ -628,13 +596,13 @@
 						id="args_schema_version"
 						class="form-control"
 						bind:value={args_schema_version}
-						class:is-invalid={validationErrors['args_schema_version']}
+						class:is-invalid={$validationErrors['args_schema_version']}
 						required
 					>
 						<option>pydantic_v1</option>
 						<option>pydantic_v2</option>
 					</select>
-					<span class="invalid-feedback">{validationErrors['args_schema_version']}</span>
+					<span class="invalid-feedback">{$validationErrors['args_schema_version']}</span>
 				</div>
 				<div class="form-text">
 					Label pointing at how the JSON schema of task arguments was generated
@@ -665,7 +633,7 @@
 								class="form-control"
 								id="docs_info"
 								bind:value={docs_info}
-								class:is-invalid={validationErrors['docs_info']}
+								class:is-invalid={$validationErrors['docs_info']}
 								rows="10"
 							/>
 						</div>
@@ -680,9 +648,9 @@
 									type="text"
 									class="form-control"
 									bind:value={docs_link}
-									class:is-invalid={validationErrors['docs_link']}
+									class:is-invalid={$validationErrors['docs_link']}
 								/>
-								<span class="invalid-feedback">{validationErrors['docs_link']}</span>
+								<span class="invalid-feedback">{$validationErrors['docs_link']}</span>
 							</div>
 							<div class="form-text">Link to task docs</div>
 						</div>

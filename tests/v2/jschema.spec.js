@@ -47,7 +47,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await input.fill('bar');
 		expect(form.getByText('Field is required')).toHaveCount(0);
 		// Check that export button is disabled when there are some pending changes
-		expect(await page.getByRole('button', { name: 'Export' }).isDisabled()).toEqual(true);
+		expect(await page.getByRole('button', { name: /.*Export$/ }).isDisabled()).toEqual(true);
 	});
 
 	await test.step('Fill optional string', async () => {

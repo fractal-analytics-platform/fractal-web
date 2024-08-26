@@ -83,7 +83,7 @@
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
-				<th class="col-md-6 col-lg-8">Name</th>
+				<th class="col-7 col-lg-8">Name</th>
 				<th>Options</th>
 			</tr>
 		</thead>
@@ -91,14 +91,12 @@
 			{#key datasets}
 				{#each filteredDatasets as dataset}
 					<tr>
-						<td>{dataset.name}</td>
 						<td>
-							<a
-								class="btn btn-light"
-								href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}"
-							>
-								<i class="bi bi-arrow-up-right-square" /> Open
+							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
+								{dataset.name}
 							</a>
+						</td>
+						<td>
 							<ConfirmActionButton
 								modalId="confirmDatasetDeleteModal{dataset.id}"
 								style={'danger'}

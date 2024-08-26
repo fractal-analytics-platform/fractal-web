@@ -16,7 +16,8 @@ The following environment variables can be used to configure fractal-web.
 * `LOG_FILE`: the path of the file where logs will be written; by default is unset and no file will be created;
 * `LOG_LEVEL_FILE`: the log level of logs that will be written to the file; the default value is `info`;
 * `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`;
-* `FRACTAL_API_V1_MODE`: include/exclude V1 pages and version switcher; the default value is `include`.
+* `FRACTAL_API_V1_MODE`: include/exclude V1 pages and version switcher; the default value is `include`;
+* `PUBLIC_FRACTAL_VIZARR_VIEWER_URL`: URL to [fractal-vizarr-viewer](https://github.com/fractal-analytics-platform/fractal-vizarr-viewer) service (e.g. http://localhost:3000/vizarr for testing).
 
 When running directly using `node` command these extra variables can also be configured:
 

@@ -2,12 +2,7 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
-	import {
-		AlertError,
-		displayStandardErrorAlert,
-		getValidationMessagesMap,
-		validateErrorMapKeys
-	} from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 
@@ -21,9 +16,17 @@
 
 	let saving = false;
 	let formSubmitted = false;
-	let validationErrors = {};
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let genericErrorAlert = undefined;
+
+	const formErrorHandler = new FormErrorHandler('genericError', [
+		'email',
+		'username',
+		'slurm_user',
+		'cache_dir',
+		'password',
+		'slurm_accounts'
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/** @type {Modal} */
 	let confirmSuperuserChange;
@@ -36,9 +39,9 @@
 		saving = true;
 		try {
 			formSubmitted = true;
-			genericErrorAlert?.hide();
+			formErrorHandler.clearErrors();
 			validateFields();
-			if (Object.keys(validationErrors).length > 0) {
+			if (Object.keys($validationErrors).length > 0) {
 				return;
 			}
 			if (user.is_superuser === initialSuperuserValue) {
@@ -53,15 +56,6 @@
 		}
 	}
 
-	const handledErrorKeys = [
-		'email',
-		'username',
-		'slurm_user',
-		'cache_dir',
-		'password',
-		'slurm_accounts'
-	];
-
 	async function confirmSave() {
 		saving = true;
 		try {
@@ -70,19 +64,11 @@
 			}
 			const userData = removeNullValues(nullifyEmptyStrings(user));
 			const response = await save(userData);
-			const result = await response.json();
 			if (!response.ok) {
-				const errorsMap = getValidationMessagesMap(result, response.status);
-				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
-					validationErrors = errorsMap;
-				} else {
-					genericErrorAlert = displayStandardErrorAlert(
-						new AlertError(result, response.status),
-						'genericError'
-					);
-				}
+				await formErrorHandler.handleErrorResponse(response);
 				return;
 			}
+			const result = await response.json();
 			if (result.id === $page.data.userInfo.id) {
 				// If the user modifies their own account the userInfo cached in the store has to be reloaded
 				await invalidateAll();
@@ -94,9 +80,8 @@
 	}
 
 	function validateFields() {
-		validationErrors = {};
 		if (!user.email) {
-			addValidationError('email', 'Field is required');
+			formErrorHandler.addValidationError('email', 'Field is required');
 		}
 		validatePassword();
 	}
@@ -106,19 +91,11 @@
 			return;
 		}
 		if (!password) {
-			addValidationError('password', 'Field is required');
+			formErrorHandler.addValidationError('password', 'Field is required');
 		}
 		if (password !== confirmPassword) {
-			addValidationError('confirmPassword', "Passwords don't match");
+			formErrorHandler.addValidationError('confirmPassword', "Passwords don't match");
 		}
-	}
-
-	/**
-	 * @param {string} key
-	 * @param {string} value
-	 */
-	function addValidationError(key, value) {
-		validationErrors = { ...validationErrors, [key]: value };
 	}
 
 	function addSlurmAccount() {
@@ -162,10 +139,10 @@
 					class="form-control"
 					id="email"
 					bind:value={user.email}
-					class:is-invalid={formSubmitted && validationErrors['email']}
+					class:is-invalid={formSubmitted && $validationErrors['email']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['email']}</span>
+				<span class="invalid-feedback">{$validationErrors['email']}</span>
 			</div>
 		</div>
 		{#if user.id && user.id !== $page.data.userInfo.id}
@@ -220,10 +197,10 @@
 					class="form-control"
 					id="password"
 					bind:value={password}
-					class:is-invalid={formSubmitted && validationErrors['password']}
+					class:is-invalid={formSubmitted && $validationErrors['password']}
 				/>
 				<span class="form-text">Create a new password for this Fractal user</span>
-				<span class="invalid-feedback">{validationErrors['password']}</span>
+				<span class="invalid-feedback">{$validationErrors['password']}</span>
 			</div>
 		</div>
 		<div class="row mb-3 has-validation">
@@ -236,9 +213,9 @@
 					class="form-control"
 					id="confirmPassword"
 					bind:value={confirmPassword}
-					class:is-invalid={formSubmitted && validationErrors['confirmPassword']}
+					class:is-invalid={formSubmitted && $validationErrors['confirmPassword']}
 				/>
-				<span class="invalid-feedback">{validationErrors['confirmPassword']}</span>
+				<span class="invalid-feedback">{$validationErrors['confirmPassword']}</span>
 			</div>
 		</div>
 		<div class="row mb-3 has-validation">
@@ -251,12 +228,12 @@
 					class="form-control"
 					id="slurmUser"
 					bind:value={user.slurm_user}
-					class:is-invalid={formSubmitted && validationErrors['slurm_user']}
+					class:is-invalid={formSubmitted && $validationErrors['slurm_user']}
 				/>
 				<div class="form-text">
 					The user who will be impersonated by Fractal when running SLURM jobs
 				</div>
-				<span class="invalid-feedback">{validationErrors['slurm_user']}</span>
+				<span class="invalid-feedback">{$validationErrors['slurm_user']}</span>
 			</div>
 		</div>
 		<div class="row mb-3 has-validation">
@@ -267,7 +244,7 @@
 				{#each user.slurm_accounts as slurmAccount, i}
 					<div
 						class="input-group mb-2"
-						class:is-invalid={formSubmitted && validationErrors['slurm_accounts']}
+						class:is-invalid={formSubmitted && $validationErrors['slurm_accounts']}
 					>
 						<input
 							type="text"
@@ -275,7 +252,7 @@
 							id={`slurmAccount-${i}`}
 							bind:value={slurmAccount}
 							aria-label={`SLURM account #${i + 1}`}
-							class:is-invalid={formSubmitted && validationErrors['slurm_accounts']}
+							class:is-invalid={formSubmitted && $validationErrors['slurm_accounts']}
 							required
 						/>
 						<button
@@ -289,7 +266,7 @@
 						</button>
 					</div>
 				{/each}
-				<span class="invalid-feedback mb-2">{validationErrors['slurm_accounts']}</span>
+				<span class="invalid-feedback mb-2">{$validationErrors['slurm_accounts']}</span>
 				<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
 					<i class="bi bi-plus-circle" />
 					Add SLURM account
@@ -310,14 +287,14 @@
 					type="text"
 					class="form-control"
 					id="username"
-					class:is-invalid={formSubmitted && validationErrors['username']}
+					class:is-invalid={formSubmitted && $validationErrors['username']}
 					bind:value={user.username}
 				/>
 				<span class="form-text">
 					Optional property (useful if the user creates their own tasks), not required if the SLURM
 					user is set
 				</span>
-				<span class="invalid-feedback">{validationErrors['username']}</span>
+				<span class="invalid-feedback">{$validationErrors['username']}</span>
 			</div>
 		</div>
 		<div class="row mb-3 has-validation">
@@ -330,12 +307,12 @@
 					class="form-control"
 					id="cacheDir"
 					bind:value={user.cache_dir}
-					class:is-invalid={formSubmitted && validationErrors['cache_dir']}
+					class:is-invalid={formSubmitted && $validationErrors['cache_dir']}
 				/>
 				<div class="form-text">
 					Absolute path to a user-owned folder that will be used as a cache for job-related files
 				</div>
-				<span class="invalid-feedback">{validationErrors['cache_dir']}</span>
+				<span class="invalid-feedback">{$validationErrors['cache_dir']}</span>
 			</div>
 		</div>
 		<div class="row mb-3">

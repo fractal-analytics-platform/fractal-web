@@ -1,12 +1,11 @@
 <script>
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount } from 'svelte';
-	import { collectTaskErrorStore } from '$lib/stores/errorStores';
 	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import TaskCollectionLogsModal from '$lib/components/v2/tasks/TaskCollectionLogsModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, FormErrorHandler } from '$lib/common/errors';
 
 	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollectionsV2';
 
@@ -44,6 +43,24 @@
 	/** @type {{key: string, value: string}[]} */
 	let pinnedPackageVersions = [];
 
+	const formErrorHandler = new FormErrorHandler('taskCollectionError', [
+		'package',
+		'package_version',
+		'package_extras',
+		'python_version'
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
+
+	export function clearForm() {
+		formErrorHandler.clearErrors();
+		python_package = '';
+		package_version = '';
+		python_version = '';
+		package_extras = '';
+		pinnedPackageVersions = [];
+	}
+
 	const updateTasksCollectionInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
@@ -66,6 +83,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleTaskCollection() {
+		formErrorHandler.clearErrors();
 		taskCollectionAlreadyPresent = undefined;
 
 		const headers = new Headers();
@@ -73,11 +91,13 @@
 
 		const requestData = {
 			package: python_package,
-			// Optional
-			package_version,
 			python_version,
 			package_extras
 		};
+
+		if (packageType === 'pypi') {
+			requestData.package_version = package_version;
+		}
 
 		const ppv = getPinnedPackageVersionsMap();
 		if (ppv) {
@@ -118,9 +138,8 @@
 			package_extras = '';
 			pinnedPackageVersions = [];
 		} else {
-			const result = await response.json();
-			console.error('Task collection request failed: ', result);
-			collectTaskErrorStore.set(result);
+			console.error('Task collection request failed');
+			await formErrorHandler.handleErrorResponse(response);
 		}
 	}
 
@@ -194,7 +213,7 @@
 			updates.find((u) => u.status === 'rejected')
 		);
 		if (failure) {
-			collectTaskErrorStore.set(failure.reason);
+			formErrorHandler.setGenericError(failure.reason);
 		}
 
 		const successfulUpdates =
@@ -330,7 +349,7 @@
 				class:col-md-6={packageType === 'pypi'}
 				class:col-md-12={packageType === 'local'}
 			>
-				<div class="input-group">
+				<div class="input-group has-validation">
 					<div class="input-group-text">
 						<label class="font-monospace" for="package">Package</label>
 					</div>
@@ -340,8 +359,10 @@
 						type="text"
 						class="form-control"
 						required
+						class:is-invalid={$validationErrors['package']}
 						bind:value={python_package}
 					/>
+					<span class="invalid-feedback">{$validationErrors['package']}</span>
 				</div>
 				<div class="form-text">
 					{#if packageType === 'pypi'}
@@ -353,7 +374,7 @@
 			</div>
 			{#if packageType === 'pypi'}
 				<div class="col-md-6 mb-2">
-					<div class="input-group">
+					<div class="input-group has-validation">
 						<div class="input-group-text">
 							<label class="font-monospace" for="package_version">Package Version</label>
 						</div>
@@ -362,8 +383,10 @@
 							name="package_version"
 							type="text"
 							class="form-control"
+							class:is-invalid={$validationErrors['package_version']}
 							bind:value={package_version}
 						/>
+						<span class="invalid-feedback">{$validationErrors['package_version']}</span>
 					</div>
 				</div>
 			{/if}
@@ -375,7 +398,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6 mb-2">
-				<div class="input-group">
+				<div class="input-group has-validation">
 					<div class="input-group-text">
 						<label class="font-monospace" for="python_version">Python Version</label>
 					</div>
@@ -384,6 +407,7 @@
 						name="python_version"
 						class="form-control"
 						bind:value={python_version}
+						class:is-invalid={$validationErrors['python_version']}
 					>
 						<option value="">Select...</option>
 						<option>3.9</option>
@@ -391,11 +415,12 @@
 						<option>3.11</option>
 						<option>3.12</option>
 					</select>
+					<span class="invalid-feedback">{$validationErrors['python_version']}</span>
 				</div>
 				<div class="form-text">Python version to install and run the package tasks</div>
 			</div>
 			<div class="col-md-6 mb-2">
-				<div class="input-group">
+				<div class="input-group has-validation">
 					<div class="input-group-text">
 						<label class="font-monospace" for="package_extras">Package extras</label>
 					</div>
@@ -404,8 +429,10 @@
 						name="package_extras"
 						type="text"
 						class="form-control"
+						class:is-invalid={$validationErrors['package_extras']}
 						bind:value={package_extras}
 					/>
+					<span class="invalid-feedback">{$validationErrors['package_extras']}</span>
 				</div>
 				<div class="form-text">
 					Package extras to include in the <code>pip install</code> command
@@ -456,9 +483,11 @@
 			</div>
 		</div>
 
+		<div id="taskCollectionError" class="mt-3" />
+
 		<div class="row">
 			<div class="col-auto">
-				<button type="submit" class="btn btn-primary mt-3 mb-3" disabled={taskCollectionInProgress}>
+				<button type="submit" class="btn btn-primary mb-3" disabled={taskCollectionInProgress}>
 					{#if taskCollectionInProgress}
 						<div class="spinner-border spinner-border-sm" role="status">
 							<span class="visually-hidden">Collecting...</span>

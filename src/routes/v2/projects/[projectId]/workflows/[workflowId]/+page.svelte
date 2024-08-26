@@ -100,6 +100,8 @@
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
 
+	let customTaskWarning = '';
+
 	$: updatableWorkflowList = workflow.task_list || [];
 
 	$: sortedDatasets = datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
@@ -160,6 +162,16 @@
 	async function handleExportWorkflow() {
 		if (!workflow) {
 			return;
+		}
+
+		customTaskWarning = '';
+		await tick();
+		const customTasks = workflow.task_list
+			.map((w) => (w.is_legacy_task ? w.task_legacy : w.task))
+			.filter((t) => t.owner);
+
+		if (customTasks.length > 0) {
+			customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; re-importing this workflow may not work as expected.`;
 		}
 
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/export`, {
@@ -802,7 +814,11 @@
 			<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
 				<i class="bi-journal-code" /> List jobs
 			</a>
-			<button class="btn btn-light" on:click|preventDefault={handleExportWorkflow}>
+			<button
+				class="btn btn-light"
+				on:click|preventDefault={handleExportWorkflow}
+				aria-label="Export workflow"
+			>
 				<i class="bi-download" />
 			</button>
 			<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
@@ -817,6 +833,8 @@
 		</div>
 	</div>
 </div>
+
+<StandardDismissableAlert message={customTaskWarning} alertType="warning" autoDismiss={false} />
 
 {#if workflow}
 	<StandardDismissableAlert message={workflowSuccessMessage} />

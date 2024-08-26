@@ -3,12 +3,7 @@
 	import { SchemaValidator } from 'fractal-jschema';
 	import manifestSchema from './manifest_v2.json';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import {
-		AlertError,
-		displayStandardErrorAlert,
-		getValidationMessagesMap,
-		validateErrorMapKeys
-	} from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
@@ -22,22 +17,17 @@
 	let manifestData = null;
 	let successMessage = '';
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
-
-	let dragAndDropUploader;
-
-	/** @typedef {('python_interpreter'|'source'|'version'|'package_name'|'package_root')} ErrorKey **/
-	/** @type {ErrorKey[]} */
-	const handledErrorKeys = [
+	const formErrorHandler = new FormErrorHandler('errorAlert-customEnvTask', [
 		'python_interpreter',
 		'source',
 		'version',
 		'package_name',
 		'package_root'
-	];
-	/** @type {{[key in ErrorKey]?: string}} */
-	let validationErrors = {};
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
+
+	let dragAndDropUploader;
 
 	/**
 	 * @param {string} content
@@ -88,8 +78,7 @@
 		}
 
 		collecting = true;
-		errorAlert?.hide();
-		validationErrors = {};
+		formErrorHandler.clearErrors();
 		successMessage = '';
 		try {
 			const body = {
@@ -111,8 +100,8 @@
 				body: JSON.stringify(body, replaceEmptyStrings)
 			});
 
-			const result = await response.json();
 			if (response.ok) {
+				const result = await response.json();
 				addNewTasks(result);
 				successMessage = 'Tasks collected successfully';
 				python_interpreter = '';
@@ -123,15 +112,7 @@
 				manifestData = null;
 				dragAndDropUploader.clearSelectedFile();
 			} else {
-				const errorsMap = getValidationMessagesMap(result, response.status);
-				if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
-					validationErrors = errorsMap;
-				} else {
-					errorAlert = displayStandardErrorAlert(
-						new AlertError(result, response.status),
-						'errorAlert-customEnvTask'
-					);
-				}
+				await formErrorHandler.handleErrorResponse(response);
 			}
 		} finally {
 			collecting = false;
@@ -164,9 +145,9 @@
 					class="form-control"
 					type="text"
 					required
-					class:is-invalid={validationErrors['python_interpreter']}
+					class:is-invalid={$validationErrors['python_interpreter']}
 				/>
-				<span class="invalid-feedback">{validationErrors['python_interpreter']}</span>
+				<span class="invalid-feedback">{$validationErrors['python_interpreter']}</span>
 			</div>
 			<div class="form-text">
 				Absolute path to the Python interpreter to be used for running tasks
@@ -202,9 +183,9 @@
 					class="form-control"
 					type="text"
 					required
-					class:is-invalid={validationErrors['source']}
+					class:is-invalid={$validationErrors['source']}
 				/>
-				<span class="invalid-feedback">{validationErrors['source']}</span>
+				<span class="invalid-feedback">{$validationErrors['source']}</span>
 			</div>
 			<div class="form-text">
 				A common label identifying this package (e.g. if you set this to <code>"mypackage"</code>
@@ -224,9 +205,9 @@
 					id="package_name"
 					class="form-control"
 					type="text"
-					class:is-invalid={validationErrors['package_name']}
+					class:is-invalid={$validationErrors['package_name']}
 				/>
-				<span class="invalid-feedback">{validationErrors['package_name']}</span>
+				<span class="invalid-feedback">{$validationErrors['package_name']}</span>
 			</div>
 			<div class="form-text">
 				Name of the package, as used in <code>import &lt;package_name&gt;</code>; this is then used
@@ -245,9 +226,9 @@
 					id="version"
 					class="form-control"
 					type="text"
-					class:is-invalid={validationErrors['version']}
+					class:is-invalid={$validationErrors['version']}
 				/>
-				<span class="invalid-feedback">{validationErrors['version']}</span>
+				<span class="invalid-feedback">{$validationErrors['version']}</span>
 			</div>
 			<div class="form-text">Optional version of tasks to be collected</div>
 		</div>
@@ -264,9 +245,9 @@
 					id="package_root"
 					class="form-control"
 					type="text"
-					class:is-invalid={validationErrors['package_root']}
+					class:is-invalid={$validationErrors['package_root']}
 				/>
-				<span class="invalid-feedback">{validationErrors['package_root']}</span>
+				<span class="invalid-feedback">{$validationErrors['package_root']}</span>
 			</div>
 			<div class="form-text">
 				The folder where the package is installed. If not provided, it will be extracted via

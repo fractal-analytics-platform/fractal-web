@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+import { writable } from 'svelte/store';
 
 /**
  * Propagates an error response.
@@ -70,6 +71,9 @@ function getSimpleValidationMessage(reason, statusCode) {
 		return null;
 	}
 	const err = reason.detail[0];
+	if (typeof err === 'string') {
+		return err;
+	}
 	if (!isValueError(err)) {
 		return null;
 	}
@@ -128,23 +132,6 @@ function isValueError(err) {
 }
 
 /**
- * Returns true if all the keys of the error map are handled by the current page or component.
- * Used to decide if it possible to show user friendly validation messages
- * or if it is necessary to display a generic error message.
- * @param {{[key:string]: string}} errorsMap
- * @param {string[]} handledErrorKeys
- * @return {boolean}
- */
-export function validateErrorMapKeys(errorsMap, handledErrorKeys) {
-	for (const key of Object.keys(errorsMap)) {
-		if (!handledErrorKeys.includes(key)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-/**
  * Display a standard error alert on the desired HTML element.
  * @param {any} error
  * @param {string} targetElementId
@@ -161,5 +148,105 @@ export function displayStandardErrorAlert(error, targetElementId) {
 		});
 	} else {
 		console.warn(`Unable to display the error: element ${targetElementId} not found`);
+	}
+}
+
+/**
+ * Handle errors associated with a form, considering both error related to specific fields
+ * and a generic error, displayed in a standard error alert component.
+ */
+export class FormErrorHandler {
+	validationErrors = writable({});
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	errorAlert = undefined;
+
+	/**
+	 * @param {string} errorAlertId id of the generic error alert component
+	 * @param {string[]} handledErrorKeys keys associated with form fields
+	 */
+	constructor(errorAlertId, handledErrorKeys) {
+		this.errorAlertId = errorAlertId;
+		this.handledErrorKeys = handledErrorKeys;
+	}
+
+	/**
+	 * @returns the store containing the map of validation errors
+	 */
+	getValidationErrorStore() {
+		return this.validationErrors;
+	}
+
+	/**
+	 * Manually add a validation error (e.g. for checks performed by the frontend
+	 * before sending any request to the server).
+	 * @param {string} key
+	 * @param {string} value
+	 */
+	addValidationError(key, value) {
+		this.validationErrors.update((errors) => ({ ...errors, [key]: value }));
+	}
+
+	/**
+	 * @param {any} error
+	 */
+	setGenericError(error) {
+		this.errorAlert = displayStandardErrorAlert(new AlertError(error), this.errorAlertId);
+	}
+
+	/**
+	 * Manually remove a validation error.
+	 * @param {string} key
+	 */
+	removeValidationError(key) {
+		this.validationErrors.update((errors) => {
+			const newErrors = { ...errors };
+			delete newErrors[key];
+			return newErrors;
+		});
+	}
+
+	/**
+	 * Extract the errors from the response and assign them to the validationErrors
+	 * map or display the standard error alert in case of generic error.
+	 * @param {Response} response
+	 */
+	async handleErrorResponse(response) {
+		let result;
+		try {
+			result = await response.json();
+		} catch (_) {
+			result = `Invalid JSON response. Response status is ${response.status}.`;
+		}
+		const errorsMap = getValidationMessagesMap(result, response.status);
+		if (errorsMap && this.validateErrorMapKeys(errorsMap)) {
+			this.validationErrors.set(errorsMap);
+		} else {
+			this.errorAlert = displayStandardErrorAlert(
+				new AlertError(result, response.status),
+				this.errorAlertId
+			);
+		}
+	}
+
+	/**
+	 * @private
+	 * Returns true if all the keys of the error map are handled by the current page or component.
+	 * Used to decide if it possible to show user friendly validation messages
+	 * or if it is necessary to display a generic error message.
+	 * @param {{[key:string]: string}} errorsMap
+	 * @return {boolean}
+	 */
+	validateErrorMapKeys(errorsMap) {
+		for (const key of Object.keys(errorsMap)) {
+			if (!this.handledErrorKeys.includes(key)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	clearErrors() {
+		this.validationErrors.set({});
+		this.errorAlert?.hide();
 	}
 }

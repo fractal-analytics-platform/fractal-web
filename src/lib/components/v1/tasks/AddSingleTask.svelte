@@ -1,10 +1,6 @@
 <script>
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import {
-		displayStandardErrorAlert,
-		getValidationMessagesMap,
-		validateErrorMapKeys
-	} from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import { SchemaValidator } from 'fractal-jschema';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 
@@ -24,12 +20,7 @@
 	let docs_link = '';
 	let args_schema_version = 'pydantic_v1';
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
-
-	/** @typedef {('name'|'command'|'version'|'source'|'input_type'|'output_type'|'args_schema'|'args_schema_version'|'meta'|'docs_info'|'docs_link')} ErrorKey **/
-	/** @type {ErrorKey[]} */
-	const handledErrorKeys = [
+	const formErrorHandler = new FormErrorHandler('errorAlert-createTask', [
 		'name',
 		'command',
 		'version',
@@ -41,9 +32,9 @@
 		'meta',
 		'docs_info',
 		'docs_link'
-	];
-	/** @type {{[key in ErrorKey]?: string}} */
-	let validationErrors = {};
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/**
 	 * Creates a new task in the server
@@ -51,20 +42,17 @@
 	 */
 	async function handleCreateTask() {
 		taskSuccessMessage = '';
-		if (errorAlert) {
-			errorAlert.hide();
-		}
-		validationErrors = {};
+		formErrorHandler.clearErrors();
 
 		const argsSchema = await getArgsSchema();
 		if (argsSchema instanceof Error) {
-			addValidationError('args_schema', argsSchema.message);
+			formErrorHandler.addValidationError('args_schema', argsSchema.message);
 			return;
 		}
 
 		const meta = await getMeta();
 		if (meta instanceof Error) {
-			addValidationError('meta', meta.message);
+			formErrorHandler.addValidationError('meta', meta.message);
 			return;
 		}
 
@@ -98,21 +86,16 @@
 			body: JSON.stringify(bodyData, replaceEmptyStrings)
 		});
 
-		const result = await response.json();
 		if (response.ok) {
+			const result = await response.json();
 			// Add created task to the list
 			console.log('Task created', result);
 			addNewTask(result);
 			taskSuccessMessage = 'Task created successfully';
 			resetFields();
 		} else {
-			console.error('Unable to create task', result);
-			const errorsMap = getValidationMessagesMap(result, response.status);
-			if (errorsMap && validateErrorMapKeys(errorsMap, handledErrorKeys)) {
-				validationErrors = errorsMap;
-			} else {
-				errorAlert = displayStandardErrorAlert(result, 'errorAlert-createTask');
-			}
+			console.error('Unable to create task');
+			await formErrorHandler.handleErrorResponse(response);
 		}
 	}
 
@@ -130,7 +113,7 @@
 	 * @returns {Promise<object|Error|undefined>}
 	 */
 	async function getArgsSchema() {
-		removeValidationError('args_schema');
+		formErrorHandler.removeValidationError('args_schema');
 		if (!argsSchemaFiles || argsSchemaFiles.length === 0) {
 			return;
 		}
@@ -157,7 +140,7 @@
 	 * @returns {Promise<object|Error|undefined>}
 	 */
 	async function getMeta() {
-		removeValidationError('meta');
+		formErrorHandler.removeValidationError('meta');
 		if (!metaFiles || metaFiles.length === 0) {
 			return;
 		}
@@ -175,7 +158,7 @@
 		if (argsSchemaFileInput) {
 			argsSchemaFileInput.value = '';
 		}
-		removeValidationError('args_schema');
+		formErrorHandler.removeValidationError('args_schema');
 	}
 
 	function clearMetaFileUpload() {
@@ -183,24 +166,7 @@
 		if (metaFileInput) {
 			metaFileInput.value = '';
 		}
-		removeValidationError('meta');
-	}
-
-	/**
-	 * @param {ErrorKey} key
-	 * @param {string} value
-	 */
-	function addValidationError(key, value) {
-		validationErrors = { ...validationErrors, [key]: value };
-	}
-
-	/**
-	 * @param {ErrorKey} key
-	 */
-	function removeValidationError(key) {
-		const newErrors = { ...validationErrors };
-		delete newErrors[key];
-		validationErrors = newErrors;
+		formErrorHandler.removeValidationError('meta');
 	}
 
 	function resetFields() {
@@ -242,10 +208,10 @@
 					type="text"
 					class="form-control"
 					bind:value={name}
-					class:is-invalid={validationErrors['name']}
+					class:is-invalid={$validationErrors['name']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['name']}</span>
+				<span class="invalid-feedback">{$validationErrors['name']}</span>
 			</div>
 		</div>
 	</div>
@@ -259,10 +225,10 @@
 					type="text"
 					class="form-control"
 					bind:value={command}
-					class:is-invalid={validationErrors['command']}
+					class:is-invalid={$validationErrors['command']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['command']}</span>
+				<span class="invalid-feedback">{$validationErrors['command']}</span>
 			</div>
 		</div>
 	</div>
@@ -276,10 +242,10 @@
 					type="text"
 					class="form-control"
 					bind:value={source}
-					class:is-invalid={validationErrors['source']}
+					class:is-invalid={$validationErrors['source']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['source']}</span>
+				<span class="invalid-feedback">{$validationErrors['source']}</span>
 			</div>
 			<div class="form-text">
 				Used to match tasks across installations when a workflow is imported
@@ -296,10 +262,10 @@
 					type="text"
 					class="form-control"
 					bind:value={input_type}
-					class:is-invalid={validationErrors['input_type']}
+					class:is-invalid={$validationErrors['input_type']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['input_type']}</span>
+				<span class="invalid-feedback">{$validationErrors['input_type']}</span>
 			</div>
 			<div class="form-text">
 				Expected type of input dataset; use <code>Any</code> for a generic type
@@ -314,10 +280,10 @@
 					type="text"
 					class="form-control"
 					bind:value={output_type}
-					class:is-invalid={validationErrors['output_type']}
+					class:is-invalid={$validationErrors['output_type']}
 					required
 				/>
-				<span class="invalid-feedback">{validationErrors['output_type']}</span>
+				<span class="invalid-feedback">{$validationErrors['output_type']}</span>
 			</div>
 			<div class="form-text">
 				Expected type of output dataset; use <code>Any</code> for a generic type
@@ -339,9 +305,9 @@
 					type="text"
 					class="form-control"
 					bind:value={version}
-					class:is-invalid={validationErrors['version']}
+					class:is-invalid={$validationErrors['version']}
 				/>
-				<span class="invalid-feedback">{validationErrors['version']}</span>
+				<span class="invalid-feedback">{$validationErrors['version']}</span>
 			</div>
 		</div>
 	</div>
@@ -359,14 +325,14 @@
 					id="argsSchemaFile"
 					bind:this={argsSchemaFileInput}
 					bind:files={argsSchemaFiles}
-					class:is-invalid={validationErrors['args_schema']}
+					class:is-invalid={$validationErrors['args_schema']}
 				/>
 				{#if argsSchemaFiles && argsSchemaFiles.length > 0}
 					<button class="btn btn-outline-secondary" on:click={clearArgsSchemaFileUpload}>
 						Clear
 					</button>
 				{/if}
-				<span class="invalid-feedback">{validationErrors['args_schema']}</span>
+				<span class="invalid-feedback">{$validationErrors['args_schema']}</span>
 			</div>
 			<div class="form-text">JSON schema of task arguments</div>
 		</div>
@@ -383,12 +349,12 @@
 					id="metaFile"
 					bind:this={metaFileInput}
 					bind:files={metaFiles}
-					class:is-invalid={validationErrors['meta']}
+					class:is-invalid={$validationErrors['meta']}
 				/>
 				{#if metaFiles && metaFiles.length > 0}
 					<button class="btn btn-outline-secondary" on:click={clearMetaFileUpload}> Clear </button>
 				{/if}
-				<span class="invalid-feedback">{validationErrors['meta']}</span>
+				<span class="invalid-feedback">{$validationErrors['meta']}</span>
 			</div>
 			<div class="form-text">
 				Additional metadata related to execution (e.g. computational resources)
@@ -406,10 +372,10 @@
 						type="text"
 						class="form-control"
 						bind:value={args_schema_version}
-						class:is-invalid={validationErrors['args_schema_version']}
+						class:is-invalid={$validationErrors['args_schema_version']}
 						required
 					/>
-					<span class="invalid-feedback">{validationErrors['args_schema_version']}</span>
+					<span class="invalid-feedback">{$validationErrors['args_schema_version']}</span>
 				</div>
 				<div class="form-text">
 					Label pointing at how the JSON schema of task arguments was generated
@@ -440,7 +406,7 @@
 								class="form-control"
 								id="docs_info"
 								bind:value={docs_info}
-								class:is-invalid={validationErrors['docs_info']}
+								class:is-invalid={$validationErrors['docs_info']}
 								rows="10"
 							/>
 						</div>
@@ -455,9 +421,9 @@
 									type="text"
 									class="form-control"
 									bind:value={docs_link}
-									class:is-invalid={validationErrors['docs_link']}
+									class:is-invalid={$validationErrors['docs_link']}
 								/>
-								<span class="invalid-feedback">{validationErrors['docs_link']}</span>
+								<span class="invalid-feedback">{$validationErrors['docs_link']}</span>
 							</div>
 							<div class="form-text">Link to task docs</div>
 						</div>
