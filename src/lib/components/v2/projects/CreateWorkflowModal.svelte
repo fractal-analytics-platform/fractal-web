@@ -103,7 +103,7 @@
 				.filter((t) => t.owner);
 
 			if (customTasks.length > 0) {
-				customTaskWarning = `Custom tasks (like the one with id=${customTasks[0].id} and source="${customTasks[0].source}") are not meant to be portable; importing this workflow may not work as expected.`;
+				customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; workflow "${workflow.name}" was imported, but it may not work as expected.`;
 			}
 
 			handleWorkflowImported(workflow, customTaskWarning);
