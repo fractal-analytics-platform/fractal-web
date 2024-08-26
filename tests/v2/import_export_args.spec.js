@@ -243,7 +243,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
  */
 async function exportArgs(page, taskName) {
 	const downloadPromise = page.waitForEvent('download');
-	await page.getByRole('button', { name: 'Export' }).click();
+	await page.getByRole('button', { name: /.*Export$/ }).click();
 	const download = await downloadPromise;
 	const file = path.join(os.tmpdir(), `${taskName}-args-${download.suggestedFilename()}`);
 	await download.saveAs(file);
