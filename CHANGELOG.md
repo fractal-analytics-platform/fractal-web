@@ -1,8 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.4.1
 
-* Used links instead of the "Open" button (\#542); 
+* Raised a warning upon import/export of a workflow with a custom task (\#542);
+* Experimental feature: added vizarr viewer links to dataset page (\#542);
+* Used links instead of the "Open" button (\#542);
 * Added documentation about systemd service config (\#542);
 * Added e2e testing of OAuth2 login (\#542);
 * Improved handling of validation errors on forms and documentation about error handling (\#542);
