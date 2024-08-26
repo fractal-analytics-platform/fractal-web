@@ -9,17 +9,17 @@
       
       
       
-        <link rel="prev" href="../precommit/">
+        <link rel="prev" href="../docs/">
       
       
-        <link rel="next" href="../setup/">
+        <link rel="next" href="../jschema/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.21">
     
     
       
-        <title>Release - Fractal Web Client</title>
+        <title>Error handling - Fractal Web Client</title>
       
     
     
@@ -73,7 +73,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#release" class="md-skip">
+        <a href="#error-handling" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Release
+              Error handling
             
           </span>
         </div>
@@ -381,11 +381,93 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../error-handling/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Error handling
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Error handling
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fractal-server-errors-structure" class="md-nav__link">
+    Fractal-server errors structure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-responses-in-svelte-backend-ssr" class="md-nav__link">
+    Error responses in Svelte backend (SSR)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-responses-in-svelte-frontend" class="md-nav__link">
+    Error responses in Svelte frontend
+  </a>
+  
+    <nav class="md-nav" aria-label="Error responses in Svelte frontend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-alerterror-class" class="md-nav__link">
+    The AlertError class
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-standard-error-alert" class="md-nav__link">
+    The standard error alert
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#form-validation-errors" class="md-nav__link">
+    Form validation errors
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -423,48 +505,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Release
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../release/" class="md-nav__link">
         Release
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#release" class="md-nav__link">
-    Release
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -565,6 +610,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -573,9 +620,50 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#release" class="md-nav__link">
-    Release
+  <a href="#fractal-server-errors-structure" class="md-nav__link">
+    Fractal-server errors structure
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-responses-in-svelte-backend-ssr" class="md-nav__link">
+    Error responses in Svelte backend (SSR)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-responses-in-svelte-frontend" class="md-nav__link">
+    Error responses in Svelte frontend
+  </a>
+  
+    <nav class="md-nav" aria-label="Error responses in Svelte frontend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-alerterror-class" class="md-nav__link">
+    The AlertError class
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-standard-error-alert" class="md-nav__link">
+    The standard error alert
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#form-validation-errors" class="md-nav__link">
+    Form validation errors
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -597,25 +685,120 @@
   
 
 
-  <h1>Release</h1>
-
-<h2 id="release">Release<a class="headerlink" href="#release" title="Permanent link">&para;</a></h2>
-<p>Steps to release a new <code>fractal-web</code> version:</p>
-<ul>
-<li>Update <code>CHANGELOG.md</code> on <code>main</code> branch, replacing the "Unreleased" temporary title with the desidered version number</li>
-<li>Update the <code>version-compatibility.md</code> doc page</li>
-<li>Commit the changes</li>
-<li>Execute <code>npm version &lt;major|minor|patch&gt;</code></li>
-<li>Execute <code>git push origin main</code></li>
-<li>Execute <code>git push origin &lt;new-version-tag&gt;</code></li>
-<li>Update the GitHub release page with the information from <code>CHANGELOG.md</code></li>
-</ul>
-<blockquote>
-<p>NOTE: Pushing a new version tag (like v5.6.7) triggers <a href="https://github.com/fractal-analytics-platform/fractal-web/blob/main/.github/workflows/github_release.yaml">a dedicated GitHub
-action</a>,
-which also creates build artifacts (based on <code>npm pack</code>) and attaches them to
-the GitHub release.</p>
-</blockquote>
+<h1 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h1>
+<p>This page describes which coding patterns are used by fractal-web to handle various error cases.</p>
+<h2 id="fractal-server-errors-structure">Fractal-server errors structure<a class="headerlink" href="#fractal-server-errors-structure" title="Permanent link">&para;</a></h2>
+<p>Fractal-server error responses payloads are usually JSON structures having the error under a <code>detail</code> key. This is not true for the 500 Internal Server Error, which doesn't provide a JSON payload.</p>
+<p>Generic fractal-server errors contain the error message string directly as <code>detail</code> value or as an array of values:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;this is the error message&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;this is also an error&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Validation errors associated with a specific request field are represented using a <code>loc</code> array that describes the position of the invalid field in the request payload:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;loc&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;body&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;zarr_url&quot;</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;URLs must begin with &#39;/&#39; or &#39;s3&#39;.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;value_error&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Some validation errors may not be associated with a specific field and in that case their <code>loc</code> array will reference a <code>__root__</code> element:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;loc&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;body&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;__root__&quot;</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;error message&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;value_error&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The goal of fractal-web is to extract the error message and display it inside an alert component or directly near the invalid form field, when possible. If an unexpected JSON structure is received, fractal-web will display the error JSON payload as it is, but that should happen rarely, except for the JSON Schema form, whose errors may result in some complex payloads.</p>
+<h2 id="error-responses-in-svelte-backend-ssr">Error responses in Svelte backend (SSR)<a class="headerlink" href="#error-responses-in-svelte-backend-ssr" title="Permanent link">&para;</a></h2>
+<p>Files in <code>src/lib/server/api</code> provide API calls to fractal-server to be used from Svelte backend. These calls are usually required to be successful in order to properly display the page, since they retrieve the main resources of the page. A failure at this level is usually a 404 error (e.g. attempting to open a project with a non existent id) or something really severe (500 errors). For this reason the API calls errors happening on Svelte backend should usually be directly propagated, in order to display the error code inside the page.</p>
+<p>The utility function <code>responseError()</code> (in <code>error.js</code>) can be used to propagate the error in these cases. It will throw an exception if an error response is detected, automatically extracting the <code>detail</code>.</p>
+<p>It is suggested to handle the unsuccessful response first, in order to return the payload at the end of the function.</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">responseError</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">return</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+</code></pre></div>
+<p>In this way it is easier to define properly the type of the response using JSDoc annotation.</p>
+<h2 id="error-responses-in-svelte-frontend">Error responses in Svelte frontend<a class="headerlink" href="#error-responses-in-svelte-frontend" title="Permanent link">&para;</a></h2>
+<h3 id="the-alerterror-class">The AlertError class<a class="headerlink" href="#the-alerterror-class" title="Permanent link">&para;</a></h3>
+<p>The <code>AlertError</code> class represents errors handled by fractal-web that has to be displayed somewhere. It has a constructor that receives an object or string representing the error and an optional status code (if the error was originated from an unsuccessful API call).</p>
+<p>It can be used to istantiate a new error message; this is mostly used when we need to propagate an error from a component to another, that will catch the error:</p>
+<div class="highlight"><pre><span></span><code><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AlertError</span><span class="p">(</span><span class="s1">&#39;Invalid JSON schema&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p>Most of the time it is used to handle an unsuccessful API response; the status code is used to check if it is a validation error (status is equals to 422) and it automatically extracts the message from the detail:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AlertError</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+</code></pre></div>
+<h3 id="the-standard-error-alert">The standard error alert<a class="headerlink" href="#the-standard-error-alert" title="Permanent link">&para;</a></h3>
+<p>It is possible to use the <code>displayStandardErrorAlert()</code> function to display a generic error inside an Bootstrap alert component. The function returns a reference to a <code>StandardErrorAlert</code> component, that can be used to hide the error invoking its <code>hide()</code> function.</p>
+<p>Inside the page we have to add a div for the alert component, with a defined id:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;errorAlert-projectInfoModal&quot;</span> <span class="p">/&gt;</span>
+</code></pre></div>
+<p>Then we have to define a variable for the alert component:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/** @type {import(&#39;$lib/components/common/StandardErrorAlert.svelte&#39;).default|undefined} */</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">errorAlert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">undefined</span><span class="p">;</span>
+</code></pre></div>
+<p>Finally, we invoke the function to display the error:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">errorAlert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">displayStandardErrorAlert</span><span class="p">(</span>
+<span class="w">  </span><span class="ow">new</span><span class="w"> </span><span class="nx">AlertError</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">),</span>
+<span class="w">  </span><span class="s1">&#39;errorAlert-projectInfoModal&#39;</span>
+<span class="p">);</span>
+</code></pre></div>
+<p>If we need to hide the error (for example before clicking a submit button again), we can invoke the <code>hide()</code> function.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">errorAlert</span><span class="o">?</span><span class="p">.</span><span class="nx">hide</span><span class="p">();</span>
+</code></pre></div>
+<p>Notice that we are using the optional chaining operator (<code>?.</code>), since the variable might be undefined if no error happened previously.</p>
+<h3 id="form-validation-errors">Form validation errors<a class="headerlink" href="#form-validation-errors" title="Permanent link">&para;</a></h3>
+<p>A form usually needs an error alert component to display generic errors and a mechanism to display errors associated with specific form fields. This logic has been incapsulated in the <code>FormErrorHandler</code> class.</p>
+<p>The constructor accepts as first argument the id of the div that will contain the generic error message and as second argument an array containing all the fields that correspond with some input fields in the form.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">formErrorHandler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">FormErrorHandler</span><span class="p">(</span><span class="s1">&#39;taskCollectionError&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="s1">&#39;package&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;package_version&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;package_extras&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;python_version&#39;</span>
+<span class="p">]);</span>
+</code></pre></div>
+<p>Once created, it is possible to retrieve the <code>validationErrors</code> object from the form error handler:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">validationErrors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">formErrorHandler</span><span class="p">.</span><span class="nx">getValidationErrorStore</span><span class="p">();</span>
+</code></pre></div>
+<p>This is a Svelte store referencing a map of errors, so it has to be accessed prepending the <code>$</code> symbol: <code>$validationErrors</code>, as shown in the example above.</p>
+<p>The Bootstrap validation classes are used inside the form: <code>has-validation</code> on parent, <code>is-invalid</code> on the invalid field and <code>invalid-feedback</code> for the message.</p>
+<div class="highlight"><pre><span></span><code>&lt;div class=&quot;input-group has-validation&quot;&gt;
+  &lt;div class=&quot;input-group-text&quot;&gt;
+    &lt;label class=&quot;font-monospace&quot; for=&quot;package&quot;&gt;Package&lt;/label&gt;
+  &lt;/div&gt;
+  &lt;input
+    name=&quot;package&quot;
+    id=&quot;package&quot;
+    type=&quot;text&quot;
+    class=&quot;form-control&quot;
+    required
+    class:is-invalid={$validationErrors[&#39;package&#39;]}
+    bind:value={python_package}
+  /&gt;
+  &lt;span class=&quot;invalid-feedback&quot;&gt;{$validationErrors[&#39;package&#39;]}&lt;/span&gt;
+&lt;/div&gt;
+</code></pre></div>
+<p>The <code>handleErrorResponse()</code> function is used to populate the fields from an error response:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">formErrorHandler</span><span class="p">.</span><span class="nx">handleErrorResponse</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The class also provides a <code>clearErrors()</code> function and some functions to manually add or remove errors (<code>addValidationError()</code>, <code>removeValidationError()</code>, <code>setGenericError()</code>); these are useful to handle some validation directly on the frontend (e.g. required fields), without performing any API calls.</p>
 
 
 

@@ -383,6 +383,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        Error handling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../jschema/" class="md-nav__link">
         JSON Schema form module
       </a>
@@ -513,13 +527,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    Error handling
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -642,13 +649,6 @@
         <li class="md-nav__item">
   <a href="#application-library" class="md-nav__link">
     Application library
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    Error handling
   </a>
   
 </li>
@@ -880,32 +880,6 @@ application.</p>
 <blockquote>
 <p>Note that stores are currently not well-organized or used due to the youth of the client.</p>
 </blockquote>
-<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<p>The errors received from fractal-server are displayed in error modals without changing the content of their messages. The <code>displayStandardErrorAlert()</code> function can be used to easily display an error message alert in a div having a specific id. This function returns a <code>StandardErrorAlert</code> object that can be stored in a variable and then used to hide previous error messages calling its <code>hide()</code> method.</p>
-<p>Here an example:</p>
-<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">myFunction</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">// remove previous error</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">errorAlert</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">errorAlert</span><span class="p">.</span><span class="nx">hide</span><span class="p">();</span>
-<span class="w">  </span><span class="p">}</span>
-
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`/api/v1/something`</span><span class="p">);</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// do something with the result</span>
-<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
-<span class="w">    </span><span class="c1">// add error alert inside the element having &#39;errorElement&#39; as id</span>
-<span class="w">    </span><span class="nx">errorAlert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">displayStandardErrorAlert</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;errorElement&#39;</span><span class="p">);</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>When the displaying of the error alert should be handled by the caller function it is possible to throw an <code>AlertError</code> that has to be caught by the caller in order to display the message.</p>
-<p>Errors happening during SSR should be considered fatal and propagated using the <code>responseError()</code> utility function:</p>
-<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
-<span class="p">}</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">responseError</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
-</code></pre></div>
 
 
 

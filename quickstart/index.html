@@ -320,6 +320,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#systemd-service" class="md-nav__link">
+    Systemd service
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -431,6 +438,20 @@
     <li class="md-nav__item">
       <a href="../development/docs/" class="md-nav__link">
         Documentation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/error-handling/" class="md-nav__link">
+        Error handling
       </a>
     </li>
   
@@ -611,6 +632,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#systemd-service" class="md-nav__link">
+    Systemd service
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -682,6 +710,31 @@ node<span class="w"> </span>build/
 </code></pre></div>
 <p><strong>Note</strong>: starting from Node 20 you can also load the environment variables from a file using the <code>--env-file</code> flag:</p>
 <div class="highlight"><pre><span></span><code>node<span class="w"> </span>--env-file<span class="o">=</span>.env<span class="w"> </span>build
+</code></pre></div>
+<h2 id="systemd-service">Systemd service<a class="headerlink" href="#systemd-service" title="Permanent link">&para;</a></h2>
+<p>To run fractal-web as a Systemd service create the file <code>/etc/systemd/system/fractal-web.service</code> with the following content:</p>
+<div class="highlight"><pre><span></span><code>[Unit]
+Description=Fractal Web
+After=syslog.target
+
+[Service]
+User=fractal
+EnvironmentFile=/path/to/fractal-web/.env
+ExecStart=/path/to/node /path/to/fractal-web/build
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+</code></pre></div>
+<p>Enable the service:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>fractal-web
+</code></pre></div>
+<p>Start the service:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>fractal-web
+</code></pre></div>
+<p>Check the service logs:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>fractal-web
 </code></pre></div>
 
 
