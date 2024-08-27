@@ -1,27 +1,33 @@
 <div class="row">
-	<div class="col-xl-3 col-lg-4 col-md-5">
-		<a href="/v2/admin/users" class="btn btn-primary mt-3 w-100">
+	<div class="col">
+
+		<h2 class="fw-light">Users</h2>
+
+		<a href="/v2/admin/users" class="btn btn-primary">
 			<i class="bi bi-people-fill" />
 			Manage users
 		</a>
 
-		<br />
+		<h2 class="fw-light mt-3">Jobs</h2>
 
-		<a href="/v2/admin/jobs" class="btn btn-primary mt-3 w-100">
-			<i class="bi bi-gear-fill" />
-			Jobs
+		<a href="/v2/admin/jobs" class="btn btn-primary me-2">
+			<i class="bi bi-search" />
+			Search jobs
 		</a>
 
-		<br />
-
-		<a href="/v2/admin/tasks" class="btn btn-primary mt-3 w-100">
-			<i class="bi bi-list-task" />
-			Tasks
+		<a href="/v2/admin/jobs/healthcheck" class="btn btn-primary">
+			<i class="bi bi-heart-pulse-fill"></i>
+			Job submission healthcheck
 		</a>
 
-		<br />
+		<h2 class="fw-light mt-3">Tasks</h2>
 
-		<a href="/v2/admin/tasks-compatibility" class="btn btn-primary mt-3 w-100">
+		<a href="/v2/admin/tasks" class="btn btn-primary me-2">
+			<i class="bi bi-search" />
+			Search tasks
+		</a>
+
+		<a href="/v2/admin/tasks-compatibility" class="btn btn-primary">
 			<i class="bi bi-ui-checks" />
 			Tasks V1/V2 compatibility
 		</a>
