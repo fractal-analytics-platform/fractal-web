@@ -1,6 +1,5 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
@@ -39,8 +38,7 @@
 
 	async function createProject() {
 		const randomPart = new Date().getTime();
-		const userInfo = $page.data.userInfo;
-		const projectName = `test_${userInfo.username || userInfo.id}_${randomPart}`;
+		const projectName = `test_${randomPart}`;
 
 		stepMessage = `Creating project ${projectName}`;
 
@@ -196,7 +194,25 @@
 <div>
 	<h1 class="fw-light mb-3">Job submission healthcheck</h1>
 
-	<div class="row">
+	<p>This page performs the following steps:</p>
+
+	<ul>
+		<li>creates a project with name <code>test_&#123;random_integer&#125;</code>;</li>
+		<li>creates a dataset, with the provided zarr directory;</li>
+		<li>creates a workflow;</li>
+		<li>
+			if not existing, creates a non-parallel task with a source named
+			<code>job_submission_health_check</code>, with <code>command_non_parallel="echo"</code>.
+		</li>
+		<li>adds the task to the workflow;</li>
+		<li>submits the workflow;</li>
+		<li>
+			if all up to here was successful, redirects to the workflow page; if anything failed, stops the
+			procedure and displays an error.
+		</li>
+	</ul>
+
+	<div class="row mt-4">
 		<div class="col">
 			<div class="input-group mb-3" class:has-validation={invalidZarrDir}>
 				<label class="input-group-text" for="zarrDir">Zarr directory</label>
