@@ -45,6 +45,7 @@
 
 {#if errorString}
 	<div class="alert alert-danger alert-dismissible" role="alert">
+		<slot />
 		{#if formatAsPre}
 			<p>There has been an error, reason:</p>
 			<pre>{errorString}</pre>
