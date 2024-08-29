@@ -1,7 +1,13 @@
 <div class="row">
 	<div class="col">
+		<h2 class="fw-light">Settings</h2>
 
-		<h2 class="fw-light">Users</h2>
+		<a href="/v2/admin/settings" class="btn btn-primary me-2">
+			<i class="bi bi-gear-fill" />
+			Settings
+		</a>
+
+		<h2 class="fw-light mt-3">Users</h2>
 
 		<a href="/v2/admin/users" class="btn btn-primary">
 			<i class="bi bi-people-fill" />
@@ -16,7 +22,7 @@
 		</a>
 
 		<a href="/v2/admin/jobs/healthcheck" class="btn btn-primary">
-			<i class="bi bi-heart-pulse-fill"></i>
+			<i class="bi bi-heart-pulse-fill" />
 			Job submission healthcheck
 		</a>
 

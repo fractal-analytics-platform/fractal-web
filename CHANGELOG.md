@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added settings page to admin area (\#544);
+
 # 1.4.2
 
 * Added admin page for job submission healthcheck (\#543);

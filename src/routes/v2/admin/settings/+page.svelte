@@ -1,0 +1,37 @@
+<script>
+	import { page } from '$app/stores';
+
+	const settings = $page.data.settings;
+
+	let showObfuscated = false;
+</script>
+
+<h1 class="fw-light mb-2">Settings</h1>
+
+<div class="row mb-3">
+	<div class="col">
+		<div class="form-check form-switch float-end">
+			<input
+				class="form-check-input"
+				bind:checked={showObfuscated}
+				type="checkbox"
+				role="switch"
+				id="showObfuscatedSwitch"
+			/>
+			<label class="form-check-label" for="showObfuscatedSwitch">Show obfuscated fields</label>
+		</div>
+	</div>
+</div>
+
+<table class="table table-striped">
+	<tbody>
+		{#each Object.entries(settings) as [key, value]}
+			{#if showObfuscated || value !== '***'}
+				<tr>
+					<th>{key}</th>
+					<td>{value}</td>
+				</tr>
+			{/if}
+		{/each}
+	</tbody>
+</table>
