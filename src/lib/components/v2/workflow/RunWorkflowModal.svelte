@@ -311,11 +311,7 @@
 				>
 					<option value={undefined}>Select first task</option>
 					{#each workflow.task_list as wft}
-						{#if wft.is_legacy_task}
-							<option value={wft.order}>{wft.task_legacy.name}</option>
-						{:else}
-							<option value={wft.order}>{wft.task.name}</option>
-						{/if}
+						<option value={wft.order}>{wft.task.name}</option>
 					{/each}
 				</select>
 				<span class="invalid-feedback"> The first task is required </span>
@@ -332,11 +328,7 @@
 					<option value={undefined}>Select last task</option>
 					{#each workflow.task_list as wft}
 						{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
-							{#if wft.is_legacy_task}
-								<option value={wft.order}>{wft.task_legacy.name}</option>
-							{:else}
-								<option value={wft.order}>{wft.task.name}</option>
-							{/if}
+							<option value={wft.order}>{wft.task.name}</option>
 						{/if}
 					{/each}
 				</select>

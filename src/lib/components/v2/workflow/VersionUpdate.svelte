@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
-	import { getNewVersions as getNewVersionsV1 } from '$lib/components/v1/workflow/version-checker';
 	import { getNewVersions as getNewVersionsV2 } from '$lib/components/v2/workflow/version-checker';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
@@ -27,11 +26,9 @@
 
 	let displayCheckAndCancelBtn = true;
 
-	$: task = workflowTask.is_legacy_task ? workflowTask.task_legacy : workflowTask.task;
+	$: task = workflowTask.task;
 
-	/**
-	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
-	 * @type {T[]} */
+	/** @type {import('$lib/types-v2').TaskV2[]} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
 
@@ -51,9 +48,9 @@
 
 	$: cancelEnabled = nonParallelArgsChanged || parallelArgsChanged;
 
-	$: taskHasArgsSchema = workflowTask.is_legacy_task
-		? !!workflowTask.task_legacy.args_schema
-		: !!(workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel);
+	$: taskHasArgsSchema = !!(
+		workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel
+	);
 
 	$: updateCandidateType =
 		updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel';
@@ -81,13 +78,7 @@
 		}
 
 		try {
-			if (workflowTask.is_legacy_task) {
-				// @ts-ignore
-				updateCandidates = await getNewVersionsV1(workflowTask.task_legacy, true);
-			} else {
-				// @ts-ignore
-				updateCandidates = await getNewVersionsV2(workflowTask.task);
-			}
+			updateCandidates = await getNewVersionsV2(workflowTask.task);
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
@@ -176,8 +167,7 @@
 					input_filters: workflowTask.input_filters,
 					args_non_parallel:
 						fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
-					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel,
-					is_legacy_task: workflowTask.is_legacy_task
+					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel
 				})
 			}
 		);

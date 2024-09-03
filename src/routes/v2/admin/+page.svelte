@@ -37,10 +37,5 @@
 			<i class="bi bi-search" />
 			Search tasks
 		</a>
-
-		<a href="/v2/admin/tasks-compatibility" class="btn btn-primary">
-			<i class="bi bi-ui-checks" />
-			Tasks V1/V2 compatibility
-		</a>
 	</div>
 </div>

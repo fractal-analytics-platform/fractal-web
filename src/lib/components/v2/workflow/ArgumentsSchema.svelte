@@ -45,27 +45,17 @@
 		unsavedChangesFormBuilderParallel ||
 		unsavedChangesFormBuilderNonParallel;
 
-	$: isSchemaValid = argsSchemaVersionValid(
-		workflowTask.is_legacy_task
-			? workflowTask.task_legacy.args_schema_version
-			: workflowTask.task.args_schema_version
-	);
+	$: isSchemaValid = argsSchemaVersionValid(workflowTask.task.args_schema_version);
 
 	$: hasNonParallel =
 		workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound';
 	$: hasParallel = workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound';
 
-	$: argsSchemaNonParallel = workflowTask.is_legacy_task
-		? null
-		: workflowTask.task.args_schema_non_parallel;
+	$: argsSchemaNonParallel = workflowTask.task.args_schema_non_parallel;
 
-	$: argsSchemaParallel = workflowTask.is_legacy_task
-		? workflowTask.task_legacy.args_schema
-		: workflowTask.task.args_schema_parallel;
+	$: argsSchemaParallel = workflowTask.task.args_schema_parallel;
 
-	$: schemaVersion = workflowTask.is_legacy_task
-		? workflowTask.task_legacy.args_schema_version
-		: workflowTask.task.args_schema_version;
+	$: schemaVersion = workflowTask.task.args_schema_version;
 
 	function handleNonParallelChanged() {
 		unsavedChangesNonParallel = true;
@@ -201,32 +191,29 @@
 	}
 
 	$: hasNonParallelArgs =
-		!workflowTask.is_legacy_task &&
 		workflowTask.task.args_schema_non_parallel &&
 		Object.keys(
 			stripIgnoredProperties(
 				workflowTask.task.args_schema_non_parallel,
-				getPropertiesToIgnore(workflowTask.is_legacy_task)
+				getPropertiesToIgnore(false)
 			).properties
 		).length;
 
 	$: hasParallelArgs =
 		argsSchemaParallel &&
-		Object.keys(
-			stripIgnoredProperties(argsSchemaParallel, getPropertiesToIgnore(workflowTask.is_legacy_task))
-				.properties
-		).length;
+		Object.keys(stripIgnoredProperties(argsSchemaParallel, getPropertiesToIgnore(false)).properties)
+			.length;
 
-	$: propertiesToIgnore = getPropertiesToIgnore(workflowTask.is_legacy_task);
+	$: propertiesToIgnore = getPropertiesToIgnore(false);
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="task-args-validation-errors" />
 	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
+		{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !workflowTask.task.args_schema_non_parallel)}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
-		{#if !workflowTask.is_legacy_task && workflowTask.task.args_schema_non_parallel && isSchemaValid}
+		{#if workflowTask.task.args_schema_non_parallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-non-parallel"
@@ -248,7 +235,7 @@
 			</div>
 		{/if}
 	{/if}
-	{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel && !workflowTask.is_legacy_task && !workflowTask.task.args_schema_non_parallel)}
+	{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel && !workflowTask.task.args_schema_non_parallel)}
 		<hr />
 	{/if}
 	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}

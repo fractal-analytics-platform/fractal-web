@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Deprecated support for legacy tasks in V2 workflows (\#554);
+
 # 1.5.0
 
 * Implemented functionality for creating and displaying user groups (\#551);

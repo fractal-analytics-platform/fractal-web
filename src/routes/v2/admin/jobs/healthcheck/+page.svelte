@@ -158,7 +158,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify({ is_legacy_task: false })
+				body: JSON.stringify({})
 			}
 		);
 		const result = await response.json();
@@ -207,8 +207,8 @@
 		<li>adds the task to the workflow;</li>
 		<li>submits the workflow;</li>
 		<li>
-			if all up to here was successful, redirects to the workflow page; if anything failed, stops the
-			procedure and displays an error.
+			if all up to here was successful, redirects to the workflow page; if anything failed, stops
+			the procedure and displays an error.
 		</li>
 	</ul>
 

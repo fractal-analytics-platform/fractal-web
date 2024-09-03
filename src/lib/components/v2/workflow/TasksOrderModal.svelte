@@ -21,7 +21,7 @@
 	export function show(originalTasksList) {
 		editableTasksList = originalTasksList.map((wt) => ({
 			id: wt.id,
-			name: wt.is_legacy_task ? wt.task_legacy.name : wt.task.name
+			name: wt.task.name
 		}));
 		editWorkflowTasksOrderModal.show();
 	}

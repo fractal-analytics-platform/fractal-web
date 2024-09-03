@@ -116,15 +116,9 @@ export type WorkflowTaskV2 = {
     attributes: { [key: string]: string | number | boolean }
     types: { [key: string]: boolean }
   }
-} & ({
-  is_legacy_task: false
   task_id: number
   task: TaskV2
-} | {
-  is_legacy_task: true
-  task_legacy_id: number
-  task_legacy: Task
-})
+}
 
 type TaskV2Minimal = {
   id: number
