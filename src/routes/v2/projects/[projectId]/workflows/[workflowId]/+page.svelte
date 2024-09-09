@@ -628,11 +628,13 @@
 	}
 
 	async function loadJobError() {
-		const failedStatus = Object.values(statuses).find((s) => s === 'failed');
-		if (!failedStatus) {
-			jobError = '';
-			failedJob = undefined;
-			return;
+		if (Object.values(statuses).length > 0) {
+			const failedStatus = Object.values(statuses).find((s) => s === 'failed');
+			if (!failedStatus) {
+				jobError = '';
+				failedJob = undefined;
+				return;
+			}
 		}
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
 			method: 'GET',
@@ -647,6 +649,8 @@
 			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
 			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
 		if (failedJobs.length === 0) {
+			jobError = '';
+			failedJob = undefined;
 			return;
 		}
 		failedJob = failedJobs[0];

@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Displayed an error when job submission failed before starting execution of tasks (\#548);
+
 # 1.4.3
 
 * Added settings page to admin area (\#544);
