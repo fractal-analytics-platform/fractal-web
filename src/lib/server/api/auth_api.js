@@ -29,15 +29,12 @@ export async function userAuthentication(fetch, data) {
 /**
  * Fetches user identity
  * @param {typeof fetch} fetch
- * @param {boolean} groupNames
+ * @param {boolean} groupNames indicates whether to load the list of group names.
  * @returns {Promise<import('$lib/types').User|null>}
  */
 export async function getCurrentUser(fetch, groupNames = false) {
 	logger.debug('Retrieving current user');
-	let url = env.FRACTAL_SERVER_HOST + '/auth/current-user/';
-	if (groupNames) {
-		url += '?group_names=true';
-	}
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/?group_names=${groupNames}`;
 	const response = await fetch(url, {
 		method: 'GET',
 		credentials: 'include'
@@ -107,6 +104,50 @@ export async function getUser(fetch, userId) {
 
 	if (!response.ok) {
 		logger.error('Unable to fetch user [user_id=%d]', userId);
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * Fetches the list of groups from the server
+ * @param {typeof fetch} fetch
+ * @param {boolean} userIds indicates whether to load the list of user IDs.
+ * @returns {Promise<Array<import('$lib/types').Group>>}
+ */
+export async function listGroups(fetch, userIds = false) {
+	logger.debug('Fetching groups');
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/group/?user_ids=${userIds}`;
+	const response = await fetch(url, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to fetch groups');
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * Fetches a group from the server
+ * @param {typeof fetch} fetch
+ * @param {number|string} groupId
+ * @returns {Promise<Array<import('$lib/types').Group>>}
+ */
+export async function getGroup(fetch, groupId) {
+	logger.debug('Fetching group %d', groupId);
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/group/${groupId}/`;
+	const response = await fetch(url, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to fetch group %d', groupId);
 		await responseError(response);
 	}
 

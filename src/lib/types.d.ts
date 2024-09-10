@@ -116,6 +116,14 @@ export type User = {
   cache_dir: string | null
   password?: string
   slurm_accounts: string[]
+  group_names?: string[]
+}
+
+export type Group = {
+  id: number
+  name: string
+  timestamp_created: string
+  user_ids?: number[]
 }
 
 export type TaskCollectStatus = 'pending' | 'installing' | 'collecting' | 'fail' | 'OK';
