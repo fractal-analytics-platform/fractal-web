@@ -18,3 +18,14 @@
 pre {
     white-space: pre-wrap;
 }
+
+.droparea {
+    outline: 2px dashed #00b3bb;
+    outline-offset: -8px;
+    padding: 10px;
+    border-radius: 3px;
+}
+
+.droparea.active {
+    background-color: #c8e5ff !important;
+}
