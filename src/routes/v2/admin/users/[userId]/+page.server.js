@@ -1,4 +1,4 @@
-import { getUser } from '$lib/server/api/v1/auth_api';
+import { getUser } from '$lib/server/api/auth_api';
 import { getLogger } from '$lib/server/logger.js';
 
 const logger = getLogger('admin user page');

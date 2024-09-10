@@ -1,4 +1,4 @@
-import { logout } from '$lib/server/api/v1/auth_api';
+import { logout } from '$lib/server/api/auth_api';
 import { env } from '$env/dynamic/private';
 
 export async function POST({ fetch, request, cookies }) {

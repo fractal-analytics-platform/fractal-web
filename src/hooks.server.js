@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { getCurrentUser } from '$lib/server/api/v1/auth_api';
+import { getCurrentUser } from '$lib/server/api/auth_api';
 import { getLogger } from '$lib/server/logger.js';
 import { error, redirect } from '@sveltejs/kit';
 

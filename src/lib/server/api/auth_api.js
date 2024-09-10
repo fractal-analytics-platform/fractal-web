@@ -29,11 +29,16 @@ export async function userAuthentication(fetch, data) {
 /**
  * Fetches user identity
  * @param {typeof fetch} fetch
+ * @param {boolean} groupNames
  * @returns {Promise<import('$lib/types').User|null>}
  */
-export async function getCurrentUser(fetch) {
+export async function getCurrentUser(fetch, groupNames = false) {
 	logger.debug('Retrieving current user');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/current-user/', {
+	let url = env.FRACTAL_SERVER_HOST + '/auth/current-user/';
+	if (groupNames) {
+		url += '?group_names=true';
+	}
+	const response = await fetch(url, {
 		method: 'GET',
 		credentials: 'include'
 	});
