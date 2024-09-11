@@ -9,9 +9,14 @@
 
 		<h2 class="fw-light mt-3">Users</h2>
 
-		<a href="/v2/admin/users" class="btn btn-primary">
-			<i class="bi bi-people-fill" />
+		<a href="/v2/admin/users" class="btn btn-primary me-2">
+			<i class="bi bi-person-fill" />
 			Manage users
+		</a>
+
+		<a href="/v2/admin/groups" class="btn btn-primary">
+			<i class="bi bi-people-fill" />
+			Manage groups
 		</a>
 
 		<h2 class="fw-light mt-3">Jobs</h2>
