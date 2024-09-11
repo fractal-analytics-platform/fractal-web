@@ -11,7 +11,7 @@
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
-	import SlimSelect from 'slim-select';
+	import { setSlimSelect, setSlimSelectOptions } from '$lib/common/slim_select';
 
 	/** @type {() => Promise<import('$lib/types').ApplyWorkflow[]>} */
 	export let jobUpdater;
@@ -44,15 +44,15 @@
 	let rows = tableHandler.getRows();
 
 	// Selectors
-	/** @type {SlimSelect|undefined} */
+	/** @type {import('slim-select').default|undefined} */
 	let statusSelect;
-	/** @type {SlimSelect|undefined} */
+	/** @type {import('slim-select').default|undefined} */
 	let projectSelect;
-	/** @type {SlimSelect|undefined} */
+	/** @type {import('slim-select').default|undefined} */
 	let workflowSelect;
-	/** @type {SlimSelect|undefined} */
+	/** @type {import('slim-select').default|undefined} */
 	let inputDatasetSelect;
-	/** @type {SlimSelect|undefined} */
+	/** @type {import('slim-select').default|undefined} */
 	let outputDatasetSelect;
 
 	// Filters
@@ -207,44 +207,6 @@
 	});
 
 	/**
-	 * Initializes slim-select dropdown on a given HTML element.
-	 * @param {string} id id of HTML element where slim-select has to be configured
-	 * @param {Array<{ name: string, id: number|string }>} values
-	 * @param {(value: string) => void} setter function executed when a dropdown value is selected
-	 * @param {boolean} showSearch
-	 * @returns the SlimSelect instance
-	 */
-	function setSlimSelect(id, values, setter, showSearch = true) {
-		if (!values) {
-			return;
-		}
-		const selectElement = document.getElementById(id);
-		if (!selectElement) {
-			return;
-		}
-		selectElement.classList.remove('invisible');
-		const select = new SlimSelect({
-			select: `#${id}`,
-			settings: {
-				showSearch,
-				allowDeselect: true
-			},
-			events: {
-				afterChange: (selection) => {
-					const selectedOption = selection[0];
-					if (!selectedOption || selectedOption.placeholder) {
-						setter('');
-					} else {
-						setter(selectedOption.value);
-					}
-				}
-			}
-		});
-		setSlimSelectOptions(select, values);
-		return select;
-	}
-
-	/**
 	 * Rebuilds valid slim-select options according to the visible rows.
 	 * Example: if a project filter is selected the user can select only the workflows belonging to that project.
 	 * @param {import('$lib/types').ApplyWorkflow[]} rows
@@ -267,7 +229,7 @@
 	/**
 	 * Updates the available options only when needed, to avoid unsetting the selected value when the desired list of
 	 * options is already set (e.g. if we change the selected dataset we don't want to change the selected workflow).
-	 * @param {SlimSelect|undefined} select
+	 * @param {import('slim-select').default|undefined} select
 	 * @param {{id: number, name: string}[]} validValues
 	 */
 	function setValidSlimSelectOptions(select, validValues) {
@@ -278,19 +240,6 @@
 		if (!selected || !validValues.map((v) => v.id.toString()).includes(selected)) {
 			setSlimSelectOptions(select, validValues);
 		}
-	}
-
-	/**
-	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
-	 * @param {SlimSelect|undefined} select
-	 * @param {Array<{ name: string, id: number|string }>} values
-	 */
-	function setSlimSelectOptions(select, values) {
-		if (!select) {
-			return;
-		}
-		const options = values.map((p) => ({ text: p.name, value: p.id.toString() }));
-		select.setData([{ text: 'All', placeholder: true }, ...options]);
 	}
 
 	onDestroy(() => {
