@@ -88,6 +88,32 @@
 
 <div class="row mt-4">
 	<div class="col-6">
+		<h4 class="fw-light">Members of the group</h4>
+		<div
+			class="droparea bg-light p-2"
+			id="members-container"
+			class:hovering
+			on:dragenter={() => (hovering = true)}
+			on:dragleave={() => (hovering = false)}
+			on:drop={(event) => handleDrop(event)}
+			on:dragover={(event) => {
+				event.preventDefault();
+			}}
+		>
+			<div class="p-2">
+				{#each members as user}
+					<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
+						{user.email}
+						{#if addingUser && addingUser.id === user.id}
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+						{/if}
+					</span>
+				{/each}
+			</div>
+			<p class="text-center mt-1 mb-1">drag the users here</p>
+		</div>
+	</div>
+	<div class="col-6">
 		<h4 class="fw-light mb-3">Available users</h4>
 		{#if availableUsers.length > 0}
 			<div class="mb-2">
@@ -117,31 +143,5 @@
 		{:else}
 			<p>No more users available</p>
 		{/if}
-	</div>
-	<div class="col-6">
-		<h4 class="fw-light">Members of the group</h4>
-		<div
-			class="droparea bg-light p-2"
-			id="members-container"
-			class:hovering
-			on:dragenter={() => (hovering = true)}
-			on:dragleave={() => (hovering = false)}
-			on:drop={(event) => handleDrop(event)}
-			on:dragover={(event) => {
-				event.preventDefault();
-			}}
-		>
-			<div class="p-2">
-				{#each members as user}
-					<span class="badge text-bg-secondary me-2">
-						{user.email}
-						{#if addingUser && addingUser.id === user.id}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-						{/if}
-					</span>
-				{/each}
-			</div>
-			<p class="text-center mt-1 mb-1">drag the users here</p>
-		</div>
 	</div>
 </div>

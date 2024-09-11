@@ -31,7 +31,7 @@
 	Edit
 </a>
 
-<h2 class="fw-light mb-3">Members of the group</h2>
+<h4 class="fw-light mt-4 mb-3">Members of the group</h4>
 
 {#if group.user_ids.length === 0}
 	<p>
@@ -39,9 +39,11 @@
 		<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary ms-3">Edit</a>
 	</p>
 {:else}
-	<ul>
+	<div class="col-6 bg-light p-2 rounded">
 		{#each groupUsers as user}
-			<li><a href="/v2/admin/users/{user.id}">{user.email}</a></li>
+			<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
+				<a href="/v2/admin/users/{user.id}" class="text-light">{user.email}</a>
+			</span>
 		{/each}
-	</ul>
+	</div>
 {/if}
