@@ -2,14 +2,26 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler, getFieldValidationError } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
+	import { setSlimSelect, setSlimSelectOptions } from '$lib/common/slim_select';
 
-	/** @type {import('$lib/types').User} */
+	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	export let user;
+	/** @type {Array<import('$lib/types').Group>} */
+	export let groups;
 	/** @type {(user: import('$lib/types').User) => Promise<Response>} */
 	export let save;
+
+	$: userGroups = user.group_ids
+		.map((id) => groups.filter((g) => g.id === id)[0])
+		.sort(sortGroupByNameComparator);
+
+	$: availableGroups = groups
+		.filter((g) => !user.group_ids.includes(g.id))
+		.sort(sortGroupByNameComparator);
 
 	let password = '';
 	let confirmPassword = '';
@@ -109,8 +121,75 @@
 		user.slurm_accounts = user.slurm_accounts.filter((_, i) => i !== index);
 	}
 
+	/** @type {Modal} */
+	let addGroupModal;
+	/** @type {import('slim-select').default|undefined} */
+	let groupSelector;
+	/** @type {number|null} */
+	let groupToAdd = null;
+	let addGroupError = '';
+	let addingGroup = false;
+
+	function openAddGroupModal() {
+		groupToAdd = null;
+		addGroupError = '';
+		setSlimSelectOptions(groupSelector, getGroupSlimSelectOptions(), 'Select...');
+		addGroupModal.show();
+	}
+
+	function getGroupSlimSelectOptions() {
+		return availableGroups.map((g) => ({ id: g.id, name: g.name }));
+	}
+
+	async function addGroupToUser() {
+		addGroupError = '';
+		if (groupToAdd === null) {
+			addGroupError = 'Group is required';
+			return;
+		}
+
+		addingGroup = true;
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/auth/users/${user.id}/`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				new_group_ids: [groupToAdd]
+			})
+		});
+
+		const result = await response.json();
+
+		addingGroup = false;
+
+		if (response.ok) {
+			user = result;
+			addGroupModal.hide();
+			return;
+		}
+
+		const error = getFieldValidationError(result, response.status);
+		if (error) {
+			addGroupError = error;
+		} else {
+			addGroupModal.displayErrorAlert(result);
+		}
+	}
+
 	onMount(() => {
 		initialSuperuserValue = user.is_superuser;
+
+		groupSelector = setSlimSelect(
+			'group-select',
+			getGroupSlimSelectOptions(),
+			(value) => (groupToAdd = value === '' ? null : Number(value)),
+			true,
+			'Select...'
+		);
 	});
 </script>
 
@@ -315,6 +394,24 @@
 				<span class="invalid-feedback">{$validationErrors['cache_dir']}</span>
 			</div>
 		</div>
+		{#if user.id}
+			<div class="row mb-3 has-validation">
+				<span class="col-sm-3 col-form-label text-end fw-bold">Groups</span>
+				<div class="col-sm-9">
+					<div>
+						{#each userGroups as group}
+							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group.name}</span>
+						{/each}
+						{#if availableGroups.length > 0}
+							<button class="btn btn-light" type="button" on:click={openAddGroupModal}>
+								<i class="bi bi-plus-circle" />
+								Add group
+							</button>
+						{/if}
+					</div>
+				</div>
+			</div>
+		{/if}
 		<div class="row mb-3">
 			<div class="col-sm-9 offset-sm-3">
 				<input type="submit" value="Save" class="btn btn-primary" disabled={saving} />
@@ -341,6 +438,28 @@
 		<svelte:fragment slot="footer">
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 			<button class="btn btn-primary" on:click={confirmSave}>Confirm</button>
+		</svelte:fragment>
+	</Modal>
+
+	<Modal id="addGroupModal" centered={true} bind:this={addGroupModal} focus={false}>
+		<svelte:fragment slot="header">
+			<h1 class="modal-title fs-5">Add group</h1>
+		</svelte:fragment>
+		<svelte:fragment slot="body">
+			<select id="group-select" class="invisible" class:border-danger={addGroupError} />
+			{#if addGroupError}
+				<span class="text-danger">{addGroupError}</span>
+			{/if}
+			<div id="errorAlert-addGroupModal" class="mt-3" />
+		</svelte:fragment>
+		<svelte:fragment slot="footer">
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" on:click={addGroupToUser} disabled={addingGroup}>
+				{#if addingGroup}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				Add
+			</button>
 		</svelte:fragment>
 	</Modal>
 </div>

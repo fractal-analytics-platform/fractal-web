@@ -1,9 +1,16 @@
 <script>
 	import { page } from '$app/stores';
+	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').User} */
+	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	const user = $page.data.user;
+	/** @type {Array<import('$lib/types').Group>} */
+	const groups = $page.data.groups;
+
+	$: userGroups = user.group_ids
+		.map((id) => groups.filter((g) => g.id === id)[0])
+		.sort(sortGroupByNameComparator);
 </script>
 
 <nav aria-label="breadcrumb">
@@ -19,6 +26,11 @@
 		</li>
 	</ol>
 </nav>
+
+<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary float-end">
+	<i class="bi bi-pencil" />
+	Edit
+</a>
 
 <div class="row mt-4">
 	<div class="col-md-8 col-lg-6">
@@ -68,6 +80,14 @@
 				<tr>
 					<th>Cache dir</th>
 					<td>{user.cache_dir || '-'}</td>
+				</tr>
+				<tr>
+					<th>Groups</th>
+					<td>
+						{#each userGroups as group}
+							<a href="/v2/admin/groups/{group.id}" class="me-2">{group.name}</a>
+						{/each}
+					</td>
 				</tr>
 			</tbody>
 		</table>

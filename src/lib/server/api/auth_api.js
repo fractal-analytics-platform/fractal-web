@@ -93,11 +93,12 @@ export async function listUsers(fetch) {
  * Fetches a user from the server
  * @param {typeof fetch} fetch
  * @param {number|string} userId
+ * @param {boolean} groupIds indicates whether to load the list of group IDs.
  * @returns {Promise<import('$lib/types').User>}
  */
-export async function getUser(fetch, userId) {
+export async function getUser(fetch, userId, groupIds = true) {
 	logger.debug('Fetching user [user_id=%d]', userId);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/${userId}/`, {
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/${userId}/?group_ids=${groupIds}`, {
 		method: 'GET',
 		credentials: 'include'
 	});

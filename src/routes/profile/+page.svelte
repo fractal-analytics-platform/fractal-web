@@ -258,7 +258,7 @@
 					<th>Groups</th>
 					<td>
 						{#each user.group_names as group}
-							<span class="badge text-bg-secondary me-2">{group}</span>
+							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group}</span>
 						{/each}
 					</td>
 					<td />

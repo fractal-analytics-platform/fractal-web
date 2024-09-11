@@ -117,6 +117,7 @@ export type User = {
   password?: string
   slurm_accounts: string[]
   group_names?: string[]
+  group_ids?: number[]
 }
 
 export type Group = {

@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { getValidationMessagesMap } from '$lib/common/errors';
+	import { getFieldValidationError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {Array<import('$lib/types').Group & {user_ids: number[]}>} */
@@ -46,11 +46,9 @@
 			createGroupModal.hide();
 			goto(`/v2/admin/groups/${result.id}/edit`);
 		} else {
-			const errors = getValidationMessagesMap(result, response.status);
-			if (errors != null && 'name' in errors) {
-				newGroupNameError = errors['name'];
-			} else if ('detail' in result) {
-				newGroupNameError = result['detail'];
+			const error = getFieldValidationError(result, response.status);
+			if (error) {
+				newGroupNameError = error;
 			} else {
 				createGroupModal.displayErrorAlert(result);
 			}
