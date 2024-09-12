@@ -64,8 +64,9 @@ export async function uploadFile(page, selectorText, fileName, data, parentFolde
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator} selector
  * @param {string} optionValue
+ * @param {boolean} multiple
  */
-export async function selectSlimSelect(page, selector, optionValue) {
+export async function selectSlimSelect(page, selector, optionValue, multiple = false) {
 	await selector.click();
 	const items = await page.getByRole('option').all();
 	let selectedItem = null;
@@ -78,5 +79,9 @@ export async function selectSlimSelect(page, selector, optionValue) {
 	}
 	expect(selectedItem).not.toBeNull();
 	await /** @type {import('@playwright/test').Locator} */ (selectedItem).click();
-	await expect(selector).toHaveText(optionValue);
+	if (multiple) {
+		await expect(selector).toHaveText(new RegExp(`(${optionValue}$)|(^\\d+ selected$)`));
+	} else {
+		await expect(selector).toHaveText(optionValue);
+	}
 }
