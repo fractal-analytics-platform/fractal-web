@@ -272,7 +272,6 @@
 					id="email"
 					bind:value={user.email}
 					class:is-invalid={formSubmitted && $validationErrors['email']}
-					disabled={!!user.id}
 					required
 				/>
 				<span class="invalid-feedback">{$validationErrors['email']}</span>

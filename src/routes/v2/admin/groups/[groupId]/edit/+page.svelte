@@ -38,6 +38,8 @@
 			return;
 		}
 
+		const previousUserIs = [...group.user_ids]; // copy the old values
+
 		addingUser = draggedUser;
 		group = { ...group, user_ids: [...group.user_ids, draggedUser.id] };
 
@@ -52,7 +54,6 @@
 			})
 		});
 
-		const previousUserIs = [...group.user_ids]; // copy the old values
 		const result = await response.json();
 		if (response.ok) {
 			group = result;
