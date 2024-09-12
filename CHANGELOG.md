@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.5.0
 
 * Implemented functionality for creating and displaying user groups (\#551);
 * Displayed an error when job submission failed before starting execution of tasks (\#548);
