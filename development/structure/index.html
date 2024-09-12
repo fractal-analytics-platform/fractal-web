@@ -745,7 +745,7 @@ is serving the application. This request, with the attached cookies, is then use
 <p>Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under <code>src/lib/server/api/v1</code>. Here requests are grouped by contexts as <code>auth_api</code>, <code>admin_api</code>, [...].</p>
 <h3 id="an-example-using-actions">An example using actions<a class="headerlink" href="#an-example-using-actions" title="Permanent link">&para;</a></h3>
 <p>The login is still using the Svelte action approach, in which we have to extract the data from a formData object and then use it to build a JSON payload to be forwarded to fractal-server.</p>
-<p>Consider the code at <code>src/lib/server/api/v1/auth_api.js:5</code>:</p>
+<p>Consider the code at <code>src/lib/server/api/auth_api.js:5</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="cm">/**</span>
 <span class="cm"> * Request to authenticate user</span>
 <span class="cm"> * @param fetch</span>
