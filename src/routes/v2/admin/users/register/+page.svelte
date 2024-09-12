@@ -2,7 +2,7 @@
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('$lib/types').User} */
+	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	let user = {
 		email: '',
 		is_active: true,
@@ -12,7 +12,8 @@
 		slurm_user: '',
 		cache_dir: '',
 		password: '',
-		slurm_accounts: []
+		slurm_accounts: [],
+		group_ids: []
 	};
 
 	/** @type {undefined|boolean} */
@@ -85,4 +86,4 @@
 	</div>
 {/if}
 
-<UserEditor {user} {save} />
+<UserEditor {user} groups={[]} {save} />

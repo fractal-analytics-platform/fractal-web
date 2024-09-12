@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Implemented functionality for creating and displaying user groups (\#551);
 * Displayed an error when job submission failed before starting execution of tasks (\#548);
 
 # 1.4.3

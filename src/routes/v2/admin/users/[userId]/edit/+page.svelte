@@ -2,8 +2,11 @@
 	import { page } from '$app/stores';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
-	/** @type {import('$lib/types').User} */
+	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	let user = $page.data.user;
+
+	/** @type {Array<import('$lib/types').Group>} */
+	let groups = $page.data.groups;
 
 	/**
 	 * @param {import('$lib/types').User} user
@@ -36,4 +39,4 @@
 	</ol>
 </nav>
 
-<UserEditor {user} {save} />
+<UserEditor {user} {groups} {save} />

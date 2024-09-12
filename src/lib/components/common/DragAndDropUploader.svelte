@@ -90,11 +90,11 @@
 </script>
 
 <div
-	class="dropZone bg-light"
+	class="droparea bg-light"
 	on:drop={handleDrop}
 	on:dragover={handleDragOver}
 	on:dragleave={handleDragLeave}
-	class:dragOver
+	class:active={dragOver}
 >
 	<div class="m-1">
 		<div class="input-group has-validation">
@@ -123,16 +123,3 @@
 		<i class="bi bi-file-earmark-arrow-up" /> or drag file here
 	</p>
 </div>
-
-<style>
-	.dropZone {
-		outline: 2px dashed #00b3bb;
-		outline-offset: -8px;
-		padding: 10px;
-		border-radius: 3px;
-	}
-
-	.dragOver {
-		background-color: #c8e5ff !important;
-	}
-</style>

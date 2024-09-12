@@ -97,7 +97,7 @@ Other than the AJAX calls, there are also some calls to fractal-server API done 
 
 The login is still using the Svelte action approach, in which we have to extract the data from a formData object and then use it to build a JSON payload to be forwarded to fractal-server.
 
-Consider the code at `src/lib/server/api/v1/auth_api.js:5`:
+Consider the code at `src/lib/server/api/auth_api.js:5`:
 
 ```javascript
 /**

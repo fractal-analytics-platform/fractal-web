@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { userAuthentication } from '$lib/server/api/v1/auth_api';
+import { userAuthentication } from '$lib/server/api/auth_api';
 import { setCookieFromToken } from './cookie';
 import { getLogger } from '$lib/server/logger.js';
 

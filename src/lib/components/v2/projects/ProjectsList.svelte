@@ -1,7 +1,7 @@
 <script>
 	import { projectInfoModalV2 } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError, getValidationMessagesMap } from '$lib/common/errors';
+	import { AlertError, getFieldValidationError } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
 	import Modal from '../../common/Modal.svelte';
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
@@ -65,11 +65,9 @@
 			newProjectModal.hide();
 			goto(`/v2/projects/${result.id}`);
 		} else {
-			const errors = getValidationMessagesMap(result, response.status);
-			if (errors != null && 'name' in errors) {
-				newProjectNameError = errors['name'];
-			} else if ('detail' in result) {
-				newProjectNameError = result['detail'];
+			const error = getFieldValidationError(result, response.status);
+			if (error) {
+				newProjectNameError = error;
 			} else {
 				newProjectModal.displayErrorAlert(result);
 			}

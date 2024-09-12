@@ -35,21 +35,7 @@ export class AlertError extends Error {
 	 * @returns {string | null} the validation message, if found
 	 */
 	getSimpleValidationMessage(...loc) {
-		if (!this.simpleValidationMessage) {
-			return null;
-		}
-		if (typeof this.simpleValidationMessage === 'string') {
-			return this.simpleValidationMessage;
-		}
-		if (this.simpleValidationMessage.loc.length !== loc.length) {
-			return null;
-		}
-		for (let i = 0; i < loc.length; i++) {
-			if (this.simpleValidationMessage.loc[i] !== loc[i]) {
-				return null;
-			}
-		}
-		return this.simpleValidationMessage.msg;
+		return extractFieldValidationError(this.simpleValidationMessage, loc);
 	}
 }
 
@@ -74,7 +60,7 @@ function getSimpleValidationMessage(reason, statusCode) {
 	if (typeof err === 'string') {
 		return err;
 	}
-	if (!isValueError(err)) {
+	if (!hasValidationErrorPayload(err)) {
 		return null;
 	}
 	const loc = err.loc.length > 1 && err.loc[0] === 'body' ? err.loc.slice(1) : err.loc;
@@ -82,6 +68,47 @@ function getSimpleValidationMessage(reason, statusCode) {
 		loc: loc.length === 1 && loc[0] === '__root__' ? [] : loc,
 		msg: err.msg
 	};
+}
+
+/**
+ * Extract the validation error, assuming that the call can fail only for on one
+ * field. Returns null if there is no error or if there are multiple errors.
+ * @param {any} reason
+ * @param {number | null} statusCode
+ * @param {string[] | undefined} loc expected location of the validation message,
+ * undefined if any location is considered valid
+ * @returns {string | null}
+ */
+export function getFieldValidationError(reason, statusCode, loc = undefined) {
+	const simpleValidationMessage = getSimpleValidationMessage(reason, statusCode);
+	return extractFieldValidationError(simpleValidationMessage, loc);
+}
+
+/**
+ * @param {{ loc: string[], msg: string } | string|null} simpleValidationMessage
+ * @param {string[] | undefined} loc expected location of the validation message,
+ * undefined if any location is considered valid
+ * @returns {string | null} the validation message, if found
+ */
+function extractFieldValidationError(simpleValidationMessage, loc) {
+	if (!simpleValidationMessage) {
+		return null;
+	}
+	if (typeof simpleValidationMessage === 'string') {
+		return simpleValidationMessage;
+	}
+	if (loc === undefined) {
+		return simpleValidationMessage.msg;
+	}
+	if (simpleValidationMessage.loc.length !== loc.length) {
+		return null;
+	}
+	for (let i = 0; i < loc.length; i++) {
+		if (simpleValidationMessage.loc[i] !== loc[i]) {
+			return null;
+		}
+	}
+	return simpleValidationMessage.msg;
 }
 
 /**
@@ -99,7 +126,7 @@ export function getValidationMessagesMap(reason, statusCode) {
 	/** @type {{[key: string]: string}} */
 	const map = {};
 	for (const error of reason.detail) {
-		if (!isValueError(error)) {
+		if (!hasValidationErrorPayload(error)) {
 			return null;
 		}
 		if (error.loc.length !== 2 || error.loc[0] !== 'body') {
@@ -127,8 +154,8 @@ function isValidationError(reason, statusCode) {
  * @param {any} err
  * @returns {boolean}
  */
-function isValueError(err) {
-	return Array.isArray(err.loc) && !!err.msg && err.type.startsWith('value_error');
+function hasValidationErrorPayload(err) {
+	return Array.isArray(err.loc) && typeof err.msg === 'string' && typeof err.type === 'string';
 }
 
 /**

@@ -1,4 +1,4 @@
-import { listUsers } from '$lib/server/api/v1/auth_api.js';
+import { listUsers } from '$lib/server/api/auth_api.js';
 import { listProjects } from '$lib/server/api/v1/admin_api.js';
 import { getLogger } from '$lib/server/logger';
 

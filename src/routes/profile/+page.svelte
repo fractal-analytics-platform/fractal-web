@@ -7,8 +7,8 @@
 	} from '$lib/common/errors';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').User} */
-	$: user = $page.data.userInfo;
+	/** @type {import('$lib/types').User & {group_names: string[]}} */
+	$: user = $page.data.user;
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -253,6 +253,15 @@
 							</button>
 						{/if}
 					</td>
+				</tr>
+				<tr>
+					<th>Groups</th>
+					<td>
+						{#each user.group_names as group}
+							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group}</span>
+						{/each}
+					</td>
+					<td />
 				</tr>
 			</tbody>
 		</table>
