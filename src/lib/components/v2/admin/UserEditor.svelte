@@ -2,11 +2,11 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
-	import { FormErrorHandler, getFieldValidationError } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
-	import { setSlimSelect, setSlimSelectOptions } from '$lib/common/slim_select';
+	import SlimSelect from 'slim-select';
 
 	/** @type {import('$lib/types').User & {group_ids: number[]}} */
 	export let user;
@@ -15,12 +15,23 @@
 	/** @type {(user: import('$lib/types').User) => Promise<Response>} */
 	export let save;
 
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
+
+	/** @type {number[]} */
+	let groupIdsToAdd = [];
+
 	$: userGroups = user.group_ids
 		.map((id) => groups.filter((g) => g.id === id)[0])
 		.sort(sortGroupByNameComparator);
 
 	$: availableGroups = groups
 		.filter((g) => !user.group_ids.includes(g.id))
+		.filter((g) => !groupIdsToAdd.includes(g.id))
+		.sort(sortGroupByNameComparator);
+
+	$: groupsToAdd = groupIdsToAdd
+		.map((id) => groups.filter((g) => g.id === id)[0])
 		.sort(sortGroupByNameComparator);
 
 	let password = '';
@@ -71,6 +82,10 @@
 	async function confirmSave() {
 		saving = true;
 		try {
+			const groupsSuccess = await addGroups();
+			if (!groupsSuccess) {
+				return;
+			}
 			if (password) {
 				user.password = password;
 			}
@@ -123,17 +138,16 @@
 
 	/** @type {Modal} */
 	let addGroupModal;
-	/** @type {import('slim-select').default|undefined} */
-	let groupSelector;
-	/** @type {number|null} */
-	let groupToAdd = null;
+	/** @type {SlimSelect|undefined} */
+	let groupsSelector;
 	let addGroupError = '';
-	let addingGroup = false;
+	/** @type {number[]} */
+	let selectedGroupsToAdd = [];
 
 	function openAddGroupModal() {
-		groupToAdd = null;
+		selectedGroupsToAdd = [];
 		addGroupError = '';
-		setSlimSelectOptions(groupSelector, getGroupSlimSelectOptions(), 'Select...');
+		setSlimSelectOptions(groupsSelector, getGroupSlimSelectOptions());
 		addGroupModal.show();
 	}
 
@@ -143,12 +157,28 @@
 
 	async function addGroupToUser() {
 		addGroupError = '';
-		if (groupToAdd === null) {
+		if (selectedGroupsToAdd.length === 0) {
 			addGroupError = 'Group is required';
 			return;
 		}
 
-		addingGroup = true;
+		groupIdsToAdd = [...groupIdsToAdd, ...selectedGroupsToAdd];
+		selectedGroupsToAdd = [];
+		addGroupModal.hide();
+	}
+
+	/**
+	 * @param {number} groupId
+	 */
+	function removeGroupToAdd(groupId) {
+		groupIdsToAdd = groupIdsToAdd.filter((id) => id !== groupId);
+	}
+
+	async function addGroups() {
+		errorAlert?.hide();
+		if (groupIdsToAdd.length === 0) {
+			return true;
+		}
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -158,39 +188,62 @@
 			credentials: 'include',
 			headers,
 			body: JSON.stringify({
-				new_group_ids: [groupToAdd]
+				new_group_ids: groupIdsToAdd
 			})
 		});
 
 		const result = await response.json();
 
-		addingGroup = false;
-
 		if (response.ok) {
-			user = result;
-			addGroupModal.hide();
-			return;
+			user = { ...user, group_ids: result.group_ids };
+			groupIdsToAdd = [];
+			return true;
 		}
 
-		const error = getFieldValidationError(result, response.status);
-		if (error) {
-			addGroupError = error;
-		} else {
-			addGroupModal.displayErrorAlert(result);
-		}
+		errorAlert = displayStandardErrorAlert(new AlertError(result, response.status), 'genericError');
+		return false;
 	}
 
 	onMount(() => {
 		initialSuperuserValue = user.is_superuser;
-
-		groupSelector = setSlimSelect(
-			'group-select',
-			getGroupSlimSelectOptions(),
-			(value) => (groupToAdd = value === '' ? null : Number(value)),
-			true,
-			'Select...'
-		);
+		setGroupsSlimSelect();
 	});
+
+	function setGroupsSlimSelect() {
+		const elementId = 'group-select';
+		const selectElement = document.getElementById(elementId);
+		selectElement?.classList.remove('invisible');
+		groupsSelector = new SlimSelect({
+			select: `#${elementId}`,
+			settings: {
+				showSearch: true,
+				allowDeselect: true,
+				ariaLabel: 'Select groups'
+			},
+			events: {
+				afterChange: (selection) => {
+					if (selection.length === 0 || selection[0].value === 'Select...') {
+						selectedGroupsToAdd = [];
+					} else {
+						selectedGroupsToAdd = selection.map((o) => Number(o.value));
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
+	 * @param {SlimSelect|undefined} select
+	 * @param {Array<{ name: string, id: number|string }>} values
+	 */
+	export function setSlimSelectOptions(select, values) {
+		if (!select) {
+			return;
+		}
+		const options = values.map((p) => ({ text: p.name, value: p.id.toString() }));
+		select.setData([{ text: 'Select...', placeholder: true }, ...options]);
+	}
 </script>
 
 <div id="genericError" />
@@ -219,6 +272,7 @@
 					id="email"
 					bind:value={user.email}
 					class:is-invalid={formSubmitted && $validationErrors['email']}
+					disabled={!!user.id}
 					required
 				/>
 				<span class="invalid-feedback">{$validationErrors['email']}</span>
@@ -402,6 +456,19 @@
 						{#each userGroups as group}
 							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group.name}</span>
 						{/each}
+						{#each groupsToAdd as groupToAdd}
+							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">
+								{groupToAdd.name}
+								<button
+									class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
+									type="button"
+									aria-label="Remove group {groupToAdd.name}"
+									on:click={() => removeGroupToAdd(groupToAdd.id)}
+								>
+									&times;
+								</button>
+							</span>
+						{/each}
 						{#if availableGroups.length > 0}
 							<button class="btn btn-light" type="button" on:click={openAddGroupModal}>
 								<i class="bi bi-plus-circle" />
@@ -414,7 +481,12 @@
 		{/if}
 		<div class="row mb-3">
 			<div class="col-sm-9 offset-sm-3">
-				<input type="submit" value="Save" class="btn btn-primary" disabled={saving} />
+				<button type="submit" class="btn btn-primary" disabled={saving}>
+					{#if saving}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					{/if}
+					Save
+				</button>
 			</div>
 		</div>
 	</form>
@@ -446,7 +518,7 @@
 			<h1 class="modal-title fs-5">Add group</h1>
 		</svelte:fragment>
 		<svelte:fragment slot="body">
-			<select id="group-select" class="invisible" class:border-danger={addGroupError} />
+			<select id="group-select" class="invisible" class:border-danger={addGroupError} multiple />
 			{#if addGroupError}
 				<span class="text-danger">{addGroupError}</span>
 			{/if}
@@ -454,12 +526,13 @@
 		</svelte:fragment>
 		<svelte:fragment slot="footer">
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" on:click={addGroupToUser} disabled={addingGroup}>
-				{#if addingGroup}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Add
-			</button>
+			<button class="btn btn-primary" on:click={addGroupToUser}> Add </button>
 		</svelte:fragment>
 	</Modal>
 </div>
+
+<style>
+	.remove-badge {
+		line-height: 0;
+	}
+</style>
