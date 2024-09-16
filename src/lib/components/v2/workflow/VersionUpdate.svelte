@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
-	import { getNewVersions as getNewVersionsV2 } from '$lib/components/v2/workflow/version-checker';
+	import { getNewVersions } from './version-checker';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
@@ -78,7 +78,7 @@
 		}
 
 		try {
-			updateCandidates = await getNewVersionsV2(workflowTask.task);
+			updateCandidates = await getNewVersions(workflowTask.task);
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;

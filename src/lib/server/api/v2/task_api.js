@@ -29,26 +29,3 @@ export async function listTasks(fetch) {
 
 	return await response.json();
 }
-
-/**
- * Fetches a list of legacy tasks from the server
- * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('$lib/types').Task>>}
- */
-export async function listLegacyTasks(fetch) {
-	logger.debug('Fetching legacy tasks');
-
-	// Compose request
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/api/v2/task-legacy/?args_schema=false', {
-		method: 'GET',
-		credentials: 'include',
-		mode: 'cors'
-	});
-
-	if (!response.ok) {
-		logger.error('Unable to fetch legacy tasks');
-		await responseError(response);
-	}
-
-	return await response.json();
-}

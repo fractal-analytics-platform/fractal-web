@@ -154,8 +154,7 @@
 		dummyWorkflowTask = {
 			id: 1,
 			args_parallel: deepCopy(oldSchemaData),
-			task_type: 'parallel',
-			is_legacy_task: false
+			task_type: 'parallel'
 		};
 
 		dummyUpdateCandidate = {
