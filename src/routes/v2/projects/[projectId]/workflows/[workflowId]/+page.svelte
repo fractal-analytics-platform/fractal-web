@@ -12,16 +12,13 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
 	import { getAllNewVersions as getAllNewVersionsV2 } from '$lib/components/v2/workflow/version-checker';
-	import { getAllNewVersions as getAllNewVersionsV1 } from '$lib/components/v1/workflow/version-checker';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import TaskInfoTabV1 from '$lib/components/v1/workflow/TaskInfoTab.svelte';
 	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
-	import { PropertyDescription } from 'fractal-jschema';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
@@ -32,10 +29,7 @@
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	let datasets = $page.data.datasets;
 	// List of available tasks to be inserted into workflow
-	/** @type {'v1'|'v2'} */
-	let taskV1V2 = 'v2';
-	let availableTasksV1 = [];
-	let availableTasksV2 = [];
+	let availableTasks = [];
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
@@ -66,9 +60,7 @@
 	/** @type {number|undefined} */
 	let taskOrder = undefined;
 	/** @type {WorkflowTaskSelection|undefined} */
-	let workflowTaskSelectionComponentV1 = undefined;
-	/** @type {WorkflowTaskSelection|undefined} */
-	let workflowTaskSelectionComponentV2 = undefined;
+	let workflowTaskSelectionComponent = undefined;
 
 	/** @type {InputFiltersTab|undefined} */
 	let inputFiltersTab = undefined;
@@ -92,10 +84,8 @@
 	/** @type {Modal} */
 	let editWorkflowModal;
 
-	/** @type {{ [id: string]: import('$lib/types').Task[] }} */
-	let newVersionsMapV1 = {};
 	/** @type {{ [id: string]: import('$lib/types-v2').TaskV2[] }} */
-	let newVersionsMapV2 = {};
+	let newVersionsMap = {};
 
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
@@ -166,9 +156,7 @@
 
 		customTaskWarning = '';
 		await tick();
-		const customTasks = workflow.task_list
-			.map((w) => (w.is_legacy_task ? w.task_legacy : w.task))
-			.filter((t) => t.owner);
+		const customTasks = workflow.task_list.map((w) => w.task).filter((t) => t.owner);
 
 		if (customTasks.length > 0) {
 			customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; re-importing this workflow may not work as expected.`;
@@ -206,13 +194,12 @@
 
 	async function getAvailableTasks() {
 		resetCreateWorkflowTaskModal();
-		await loadAvailableTasksV2();
-		await loadAvailableTasksV1();
+		await loadAvailableTasks();
 	}
 
-	async function loadAvailableTasksV2() {
-		workflowTaskSelectionComponentV2?.setLoadingTasks(true);
-		const responseV2 = await fetch(
+	async function loadAvailableTasks() {
+		workflowTaskSelectionComponent?.setLoadingTasks(true);
+		const response = await fetch(
 			`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`,
 			{
 				method: 'GET',
@@ -220,32 +207,13 @@
 			}
 		);
 
-		if (responseV2.ok) {
-			availableTasksV2 = await responseV2.json();
+		if (response.ok) {
+			availableTasks = await response.json();
 		} else {
-			console.error(responseV2);
-			availableTasksV2 = [];
+			console.error(response);
+			availableTasks = [];
 		}
-		workflowTaskSelectionComponentV2?.setLoadingTasks(false);
-	}
-
-	async function loadAvailableTasksV1() {
-		workflowTaskSelectionComponentV1?.setLoadingTasks(true);
-		const responseV1 = await fetch(
-			`/api/v2/task-legacy?args_schema=false&only_v2_compatible=true`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
-		);
-
-		if (responseV1.ok) {
-			availableTasksV1 = await responseV1.json();
-		} else {
-			console.error(responseV1);
-			availableTasksV1 = [];
-		}
-		workflowTaskSelectionComponentV1?.setLoadingTasks(false);
+		workflowTaskSelectionComponent?.setLoadingTasks(false);
 	}
 
 	function resetWorkflowUpdateModal() {
@@ -300,8 +268,7 @@
 	function resetCreateWorkflowTaskModal() {
 		taskOrder = undefined;
 		insertTaskModal.hideErrorAlert();
-		workflowTaskSelectionComponentV1?.reset();
-		workflowTaskSelectionComponentV2?.reset();
+		workflowTaskSelectionComponent?.reset();
 	}
 
 	let creatingWorkflowTask = false;
@@ -319,7 +286,7 @@
 				workflowSuccessMessage = '';
 				creatingWorkflowTask = true;
 
-				const taskId = getSelectedTaskId();
+				const taskId = workflowTaskSelectionComponent?.getSelectedTaskId();
 				if (taskId === undefined) {
 					console.error('Missing selected task id');
 					return;
@@ -336,8 +303,7 @@
 						credentials: 'include',
 						headers,
 						body: JSON.stringify({
-							order: taskOrder,
-							is_legacy_task: taskV1V2 === 'v1'
+							order: taskOrder
 						})
 					}
 				);
@@ -377,14 +343,6 @@
 				creatingWorkflowTask = false;
 			}
 		);
-	}
-
-	function getSelectedTaskId() {
-		if (taskV1V2 === 'v1') {
-			return workflowTaskSelectionComponentV1?.getSelectedTaskId();
-		} else if (taskV1V2 === 'v2') {
-			return workflowTaskSelectionComponentV2?.getSelectedTaskId();
-		}
 	}
 
 	/**
@@ -531,25 +489,7 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMapV1 = await getAllNewVersionsV1(
-				workflow.task_list
-					.filter((wt) => wt.is_legacy_task)
-					.map(
-						(wt) =>
-							/** @type {import('$lib/types-v2').WorkflowTaskV2 & {is_legacy_task: true}} */ (wt)
-								.task_legacy
-					),
-				true
-			);
-			newVersionsMapV2 = await getAllNewVersionsV2(
-				workflow.task_list
-					.filter((wt) => !wt.is_legacy_task)
-					.map(
-						(wt) =>
-							/** @type {import('$lib/types-v2').WorkflowTaskV2 & {is_legacy_task: false}} */ (wt)
-								.task
-					)
-			);
+			newVersionsMap = await getAllNewVersionsV2(workflow.task_list.map((wt) => wt.task));
 		}
 	}
 
@@ -901,22 +841,11 @@
 									data-fs-target={workflowTask.id}
 									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
 								>
-									{workflowTask.is_legacy_task
-										? workflowTask.task_legacy.name
-										: workflowTask.task.name}
-									{#if workflowTask.is_legacy_task}
-										<span class="badge rounded-pill text-bg-warning">legacy</span>
-									{/if}
+									{workflowTask.task.name}
 									<span class="float-end ps-2">
 										<JobStatusIcon status={statuses[workflowTask.id]} />
 									</span>
-									{#if workflowTask.is_legacy_task}
-										{#if newVersionsMapV1[workflowTask.task_legacy.id]?.length > 0}
-											<span class="float-end text-warning" title="new version available">
-												<i class="bi bi-exclamation-triangle-fill" />
-											</span>
-										{/if}
-									{:else if newVersionsMapV2[workflowTask.task.id]?.length > 0}
+									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-warning" title="new version available">
 											<i class="bi bi-exclamation-triangle-fill" />
 										</span>
@@ -982,9 +911,7 @@
 									modalId="confirmDeleteWorkflowTask"
 									btnStyle="danger"
 									buttonIcon="trash"
-									message="Delete a workflow task {selectedWorkflowTask.is_legacy_task
-										? selectedWorkflowTask.task_legacy.name
-										: selectedWorkflowTask.task.name}"
+									message="Delete a workflow task {selectedWorkflowTask.task.name}"
 									callbackAction={handleDeleteWorkflowTask}
 									ariaLabel="Delete workflow task"
 								/>
@@ -1031,11 +958,7 @@
 							<div id="info-tab" class="tab-pane show active">
 								<div class="card-body">
 									{#if selectedWorkflowTask}
-										{#if selectedWorkflowTask.is_legacy_task}
-											<TaskInfoTabV1 task={selectedWorkflowTask.task_legacy} />
-										{:else}
-											<TaskInfoTabV2 task={selectedWorkflowTask.task} />
-										{/if}
+										<TaskInfoTabV2 task={selectedWorkflowTask.task} />
 									{/if}
 								</div>
 							</div>
@@ -1081,42 +1004,7 @@
 		<div id="errorAlert-insertTaskModal" />
 		<form on:submit|preventDefault={handleCreateWorkflowTask}>
 			<div class="mb-3">
-				<div class="form-check form-check-inline">
-					<input
-						class="form-check-input"
-						type="radio"
-						name="taskV1V2"
-						id="tasksV2"
-						value="v2"
-						bind:group={taskV1V2}
-					/>
-					<label class="form-check-label" for="tasksV2">Current tasks</label>
-				</div>
-				<div class="form-check form-check-inline mb-3">
-					<input
-						class="form-check-input"
-						type="radio"
-						name="taskV1V2"
-						id="tasksV1"
-						value="v1"
-						bind:group={taskV1V2}
-					/>
-					<label class="form-check-label" for="tasksV1">Legacy tasks</label>
-				</div>
-				{#if taskV1V2 === 'v1'}
-					<PropertyDescription
-						description="Only certain legacy tasks can be run within the new Fractal: if you want to add one of yours, ask an admin"
-					/>
-					<WorkflowTaskSelection
-						tasks={availableTasksV1}
-						bind:this={workflowTaskSelectionComponentV1}
-					/>
-				{:else if taskV1V2 === 'v2'}
-					<WorkflowTaskSelection
-						tasks={availableTasksV2}
-						bind:this={workflowTaskSelectionComponentV2}
-					/>
-				{/if}
+				<WorkflowTaskSelection tasks={availableTasks} bind:this={workflowTaskSelectionComponent} />
 			</div>
 
 			<div class="mb-3">

@@ -21,7 +21,6 @@ export type Task = {
   docs_link: string
   docs_info: string
   meta: object
-  is_v2_compatible: boolean
 }
 
 export type Workflow = {

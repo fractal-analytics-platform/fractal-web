@@ -79,7 +79,7 @@
 		if ('properties' in newSchema) {
 			newSchema = stripIgnoredProperties(
 				newSchema,
-				getPropertiesToIgnore(workflowTask.is_legacy_task)
+				getPropertiesToIgnore(false)
 			);
 		}
 		const parsedSchema = deepCopy(newSchema);

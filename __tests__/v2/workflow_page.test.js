@@ -48,8 +48,6 @@ describe('Workflow page', () => {
 					switch (url) {
 						case '/api/v2/task':
 							return [{ id: 1, workflow_id: 1, task_id: 1, task: { id: 1, name: 'test' } }];
-						case '/api/v2/task-legacy':
-							return { data: [] };
 						case '/api/v2/project/1/dataset/1':
 							return { id: 1, name: 'test' };
 						case '/api/v2/project/1/status?dataset_id=1&workflow_id=1':

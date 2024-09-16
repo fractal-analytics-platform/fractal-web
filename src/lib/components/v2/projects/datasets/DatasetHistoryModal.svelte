@@ -16,29 +16,17 @@
 				...historyItem,
 				workflowtask: {
 					...historyItem.workflowtask,
-					task: historyItem.workflowtask.is_legacy_task
-						? null
-						: {
-								...historyItem.workflowtask.task,
-								args_schema_non_parallel: historyItem.workflowtask.task.args_schema_non_parallel
-									? '[HIDDEN]'
-									: undefined,
-								args_schema_parallel: historyItem.workflowtask.task.args_schema_parallel
-									? '[HIDDEN]'
-									: undefined,
-								docs_info: historyItem.workflowtask.task.docs_info ? '[HIDDEN]' : undefined,
-								docs_link: historyItem.workflowtask.task.docs_link ? '[HIDDEN]' : undefined
-						  },
-					task_legacy: historyItem.workflowtask.is_legacy_task
-						? {
-								...historyItem.workflowtask.task_legacy,
-								args_schema: historyItem.workflowtask.task_legacy.args_schema
-									? '[HIDDEN]'
-									: undefined,
-								docs_info: historyItem.workflowtask.task_legacy.docs_info ? '[HIDDEN]' : undefined,
-								docs_link: historyItem.workflowtask.task_legacy.docs_link ? '[HIDDEN]' : undefined
-						  }
-						: null
+					task: {
+						...historyItem.workflowtask.task,
+						args_schema_non_parallel: historyItem.workflowtask.task.args_schema_non_parallel
+							? '[HIDDEN]'
+							: undefined,
+						args_schema_parallel: historyItem.workflowtask.task.args_schema_parallel
+							? '[HIDDEN]'
+							: undefined,
+						docs_info: historyItem.workflowtask.task.docs_info ? '[HIDDEN]' : undefined,
+						docs_link: historyItem.workflowtask.task.docs_link ? '[HIDDEN]' : undefined
+					}
 				}
 			},
 			null,
@@ -65,9 +53,7 @@
 								aria-expanded="false"
 								aria-controls="collapse-dataset-history-{index}"
 							>
-								Task "{value.workflowtask.is_legacy_task
-									? value.workflowtask.task_legacy.name
-									: value.workflowtask.task.name}", status "{value.status}"
+								Task "{value.workflowtask.task.name}", status "{value.status}"
 							</button>
 						</h2>
 						<div

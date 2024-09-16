@@ -88,15 +88,13 @@ export class PageWithWorkflow extends PageWithProject {
 	/**
 	 * @param {string} taskName
 	 * @param {string|null=} taskVersion
-	 * @param {boolean|false=} legacy
 	 * @returns {Promise<void>}
 	 */
-	async addCollectedTask(taskName, taskVersion = null, legacy = false) {
+	async addCollectedTask(taskName, taskVersion = null) {
 		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
 		await expect(modal.locator('.spinner-border')).toHaveCount(0);
-		await this.selectTaskV1V2(modal, legacy);
 		await this.page.getByText('Common tasks').click();
 		await this.addTask(modal, taskName, taskVersion);
 	}
@@ -104,29 +102,15 @@ export class PageWithWorkflow extends PageWithProject {
 	/**
 	 * @param {string} taskName
 	 * @param {string|null=} taskVersion
-	 * @param {boolean|false=} legacy
 	 * @returns {Promise<void>}
 	 */
-	async addUserTask(taskName, taskVersion = null, legacy = false) {
+	async addUserTask(taskName, taskVersion = null) {
 		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
 		await expect(modal.locator('.spinner-border')).toHaveCount(0);
-		await this.selectTaskV1V2(modal, legacy);
 		await this.page.getByText('User tasks').click();
 		await this.addTask(modal, taskName, taskVersion);
-	}
-
-	/**
-	 * @param {import('@playwright/test').Locator} modal
-	 * @param {boolean} legacy
-	 */
-	async selectTaskV1V2(modal, legacy) {
-		if (legacy) {
-			await modal.getByText('Legacy tasks').click();
-		} else {
-			await modal.getByText('Current tasks').click();
-		}
 	}
 
 	/**

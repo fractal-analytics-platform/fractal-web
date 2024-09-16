@@ -98,9 +98,7 @@
 
 			let customTaskWarning = '';
 			await tick();
-			const customTasks = workflow.task_list
-				.map((w) => (w.is_legacy_task ? w.task_legacy : w.task))
-				.filter((t) => t.owner);
+			const customTasks = workflow.task_list.map((w) => w.task).filter((t) => t.owner);
 
 			if (customTasks.length > 0) {
 				customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; workflow "${workflow.name}" was imported, but it may not work as expected.`;
