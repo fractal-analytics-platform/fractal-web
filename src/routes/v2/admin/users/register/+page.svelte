@@ -13,7 +13,8 @@
 		cache_dir: '',
 		password: '',
 		slurm_accounts: [],
-		group_ids: []
+		group_ids: [],
+		oauth_accounts: []
 	};
 
 	/** @type {undefined|boolean} */
