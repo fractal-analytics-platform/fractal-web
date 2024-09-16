@@ -4,7 +4,7 @@ import { waitPageLoading } from './utils.js';
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test('Login using OAuth2 provider', async ({ page }) => {
+test('OAuth2 account', async ({ page }) => {
 	if (process.env.SKIP_OAUTH_TEST === 'true') {
 		console.warn(
 			`WARNING: Skipping OAuth2 test since SKIP_OAUTH_TEST environment variable is set to true`
@@ -12,20 +12,31 @@ test('Login using OAuth2 provider', async ({ page }) => {
 		return;
 	}
 
-	await page.goto('/');
-	expect(await page.textContent('h1')).toBe('Welcome to Fractal web client.');
+	await test.step('Login using OAuth2 provider', async () => {
+		await page.goto('/');
+		expect(await page.textContent('h1')).toBe('Welcome to Fractal web client.');
 
-	await page.getByRole('link', { name: 'Login' }).first().click();
+		await page.getByRole('link', { name: 'Login' }).first().click();
 
-	await waitPageLoading(page);
+		await waitPageLoading(page);
 
-	await page.getByText('Login with OAuth2 provider').click();
-	await expect(page.getByText('as a non-verified user, you have limited access')).toBeVisible();
+		await page.getByText('Login with OAuth2 provider').click();
+		await expect(page.getByText('as a non-verified user, you have limited access')).toBeVisible();
+	});
 
-	await page.getByRole('button', { name: 'kilgore@kilgore.trout' }).click();
-	await page.getByRole('link', { name: 'Logout' }).click();
-	await page.waitForURL('/');
+	await test.step('Check that OAuth2 account is listed on profile', async () => {
+		await page.goto('/profile');
+		const row = page.getByRole('row', { name: 'OAuth2 accounts' });
+		await expect(row).toContainText('kilgore@kilgore.trout');
+		await expect(row).toContainText('openid');
+	});
 
-	await expect(page.getByText('kilgore@kilgore.trout')).toHaveCount(0);
-	await expect(page.getByText('Login')).toHaveCount(2);
+	await test.step('Logout', async () => {
+		await page.getByRole('button', { name: 'kilgore@kilgore.trout' }).click();
+		await page.getByRole('link', { name: 'Logout' }).click();
+		await page.waitForURL('/');
+
+		await expect(page.getByText('kilgore@kilgore.trout')).toHaveCount(0);
+		await expect(page.getByText('Login')).toHaveCount(2);
+	});
 });
