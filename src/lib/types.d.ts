@@ -117,6 +117,11 @@ export type User = {
   slurm_accounts: string[]
   group_names?: string[]
   group_ids?: number[]
+  oauth_accounts: Array<{
+    id: number
+    account_email: string
+    oauth_name: string
+  }>
 }
 
 export type Group = {

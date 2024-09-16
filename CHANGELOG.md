@@ -2,6 +2,9 @@
 
 # Unreleased
 
+* Displayed OAuth2 accounts in user profile page (\#557);
+* Supported `FRACTAL_API_V1_MODE=include_read_only` (\#557);
+* Added support for displaying temporary warning banner using the `WARNING_BANNER_PATH` environment variable (\#557);
 * Deprecated support for legacy tasks in V2 workflows (\#554);
 
 # 1.5.0

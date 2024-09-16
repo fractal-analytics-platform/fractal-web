@@ -263,6 +263,23 @@
 					</td>
 					<td />
 				</tr>
+				<tr>
+					<th>OAuth2 accounts</th>
+					<td colspan="2">
+						{#if user.oauth_accounts.length === 0}
+							-
+						{:else}
+							<table class="table mb-0">
+								{#each user.oauth_accounts as account}
+									<tr>
+										<th>{account.oauth_name}</th>
+										<td>{account.account_email}</td>
+									</tr>
+								{/each}
+							</table>
+						{/if}
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		<div id="profileUpdate-error" />

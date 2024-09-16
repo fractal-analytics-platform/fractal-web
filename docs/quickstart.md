@@ -57,6 +57,9 @@ export LOG_FILE=fractal-web.log
 
 export FRACTAL_API_V1_MODE=include
 
+#export PUBLIC_FRACTAL_VIZARR_VIEWER_URL=
+#export WARNING_BANNER_PATH=
+
 # default values are usually fine for the following variables; remove comments if needed
 #export AUTH_COOKIE_NAME=fastapiusersauth
 #export AUTH_COOKIE_PATH=/

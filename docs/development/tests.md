@@ -20,7 +20,24 @@ By default v2 tests are run. These tests require running a fractal-server instan
 
 To run v1 tests start playwright setting the environment variable `TEST_VERSION` to `v1`. These tests require running a fractal-server instance using `FRACTAL_RUNNER_BACKEND=local`.
 
-OAuth2 test requires a running instance of dexidp test image and a fractal-server instance configured to use it. To skip OAuth2 test set the environment variable `SKIP_OAUTH_TEST` to `true`.
+OAuth2 test requires a running instance of dexidp test image and a fractal-server instance configured to use it.
+
+To skip OAuth2 test set the environment variable `SKIP_OAUTH_TEST` to `true`.
+
+To run the OAuth2 test locally add the following configuration to `.fractal_server.env`:
+
+```
+OAUTH_DEXIDP_CLIENT_ID=client_test_web_id
+OAUTH_DEXIDP_CLIENT_SECRET=client_test_web_secret
+OAUTH_DEXIDP_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
+OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration
+```
+
+And then start the test IdP container:
+
+```sh
+docker run -d --rm -p 5556:5556 ghcr.io/fractal-analytics-platform/oauth:0.1
+```
 
 ## Coverage
 
