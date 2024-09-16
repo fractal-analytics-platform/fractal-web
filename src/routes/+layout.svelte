@@ -11,6 +11,7 @@
 	$: server = $page.data.serverInfo || {};
 	/** @type {'v1'|'v2'} */
 	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1' : 'v2';
+	$: warningBanner = $page.data.warningBanner;
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
@@ -218,6 +219,16 @@
 		{#if !server.alive}
 			<div class="alert alert-danger">
 				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
+			</div>
+		{/if}
+		{#if warningBanner}
+			<div class="alert alert-warning">
+				{#each warningBanner.split('\n') as line, index}
+					{#if index > 0}
+						<br />
+					{/if}
+					{line}
+				{/each}
 			</div>
 		{/if}
 		{#if userLoggedIn && !$page.data.userInfo.is_verified}
