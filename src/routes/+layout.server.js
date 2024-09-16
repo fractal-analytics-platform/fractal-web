@@ -22,7 +22,7 @@ export async function load({ locals, request, url }) {
 	return {
 		...pageInfo,
 		warningBanner,
-		v1Enabled: env.FRACTAL_API_V1_MODE !== 'exclude'
+		apiV1Mode: env.FRACTAL_API_V1_MODE
 	};
 }
 

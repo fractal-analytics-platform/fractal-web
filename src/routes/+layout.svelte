@@ -17,7 +17,7 @@
 	let clientVersion = __APP_VERSION__;
 
 	$: displayVersionSelector =
-		$page.data.v1Enabled &&
+		$page.data.apiV1Mode !== 'exclude' &&
 		(!isSubPage($page.url.pathname, apiVersion) ||
 			$page.url.pathname === '/v2/admin/jobs' ||
 			$page.url.pathname === '/v1/admin/jobs') &&
@@ -220,6 +220,9 @@
 			<div class="alert alert-danger">
 				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
 			</div>
+		{/if}
+		{#if apiVersion === 'v1' && $page.data.apiV1Mode === 'include_read_only'}
+			<div class="alert alert-warning">Warning: legacy API is in read-only mode.</div>
 		{/if}
 		{#if warningBanner}
 			<div class="alert alert-warning">
