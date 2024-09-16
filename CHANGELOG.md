@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.6.0
 
 * Displayed OAuth2 accounts in user profile page (\#557);
 * Supported `FRACTAL_API_V1_MODE=include_read_only` (\#557);
