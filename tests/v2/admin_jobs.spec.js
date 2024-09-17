@@ -100,7 +100,9 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 
 	await test.step('Search running jobs', async () => {
 		await page.getByText('Reset').click();
-		await page.selectOption('#status', 'submitted');
+		await page.getByRole('combobox', { name: 'Status' }).selectOption('submitted');
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(workflow2.projectId || '');
+		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(workflow2.workflowId || '');
 		await search(page);
 		const statuses = page.locator('table tbody tr td:nth-child(2)');
 		await expect(statuses).toHaveCount(1);

@@ -95,7 +95,7 @@ test('Admin groups management', async ({ page }) => {
 		}
 		await modal.getByRole('button', { name: 'Add' }).click();
 		await waitModalClosed(page);
-		finalCount = selectableGroups.length + 2;
+		finalCount = selectableGroups1 + 2;
 		await expect(groupBadges).toHaveCount(finalCount);
 		await expect(page.getByRole('button', { name: 'Add group' })).not.toBeVisible();
 	});
