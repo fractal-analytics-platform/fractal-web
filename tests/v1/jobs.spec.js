@@ -25,7 +25,9 @@ test('Execute jobs', async ({ page, workflow }) => {
 	});
 
 	await test.step('Check workflow jobs page', async () => {
-		await page.waitForURL(`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`);
+		await page.waitForURL(
+			`/v1/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs`
+		);
 		await page.locator('table tbody').waitFor();
 		expect(await page.locator('table tbody tr').count()).toEqual(1);
 		const cells = await page.locator('table tbody tr td').allInnerTexts();
@@ -82,7 +84,7 @@ test('Execute jobs', async ({ page, workflow }) => {
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
 		await expect(modalTitle).toHaveText('Workflow Job logs');
-		await workflow.triggerTaskFailure();
+		await workflow.triggerTaskFailure(jobId);
 		await page.waitForFunction(() => {
 			const modalBody = document.querySelector('.modal.show .modal-body');
 			return modalBody instanceof HTMLElement && modalBody.innerText.includes('TASK ERROR');
