@@ -60,7 +60,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 
 		const row1 = await getWorkflowRow(page, workflow1.workflowName);
 		const cells1 = await row1.locator('td').all();
-		expect(await cells1[5].innerText()).toEqual('-');
+		expect(await cells1[5].innerText()).toEqual(workflow1.projectName);
 		expect(await cells1[7].innerText()).toEqual(dataset1);
 		expect(await cells1[8].innerText()).toEqual('admin@fractal.xy');
 
