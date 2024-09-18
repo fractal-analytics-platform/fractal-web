@@ -499,7 +499,7 @@
 	</div>
 </div>
 
-{#if plates.length > 0}
+{#if vizarrViewerUrl && plates.length > 0}
 	<div class="border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
