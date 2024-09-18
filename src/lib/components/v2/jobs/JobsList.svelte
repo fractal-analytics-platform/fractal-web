@@ -427,10 +427,10 @@
 							<td>
 								{#if projects && row.project_id !== null && row.user_email === $page.data.userInfo.email}
 									<a href={`/v2/projects/${row.project_id}`}>
-										{projects.find((project) => project.id === row.project_id)?.name}
+										{row.project_dump.name}
 									</a>
 								{:else}
-									{projects.find((project) => project.id === row.project_id)?.name || '-'}
+									{row.project_dump.name || '-'}
 								{/if}
 							</td>
 						{/if}

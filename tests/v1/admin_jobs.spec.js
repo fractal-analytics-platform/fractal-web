@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
 
@@ -7,8 +7,9 @@ test('Execute a job and show it on the job tables [v1]', async ({ page, request 
 	/** @type {PageWithWorkflow} */
 	let workflow1;
 	await test.step('Create first job and wait its failure', async () => {
-		workflow1 = await createJob(page, request, 'input', 'output');
-		await workflow1.triggerTaskFailure();
+		const job = await createJob(page, request, 'input', 'output');
+		workflow1 = job.workflow;
+		await workflow1.triggerTaskFailure(job.jobId);
 		const jobBadge = page.locator('.badge.text-bg-danger');
 		await jobBadge.waitFor();
 		expect(await jobBadge.innerText()).toEqual('failed');
@@ -17,8 +18,12 @@ test('Execute a job and show it on the job tables [v1]', async ({ page, request 
 
 	/** @type {PageWithWorkflow} */
 	let workflow2;
+	/** @type {number} */
+	let jobId2;
 	await test.step('Create second job', async () => {
-		workflow2 = await createJob(page, request, 'input2', 'output2');
+		const job = await createJob(page, request, 'input2', 'output2');
+		workflow2 = job.workflow;
+		jobId2 = job.jobId;
 	});
 
 	await test.step('Open the admin jobs', async () => {
@@ -84,7 +89,7 @@ test('Execute a job and show it on the job tables [v1]', async ({ page, request 
 	});
 
 	await test.step('Wait job completion', async () => {
-		await workflow2.triggerTaskSuccess();
+		await workflow2.triggerTaskSuccess(jobId2);
 		const jobBadge = page.locator('.badge.text-bg-success');
 		await jobBadge.waitFor();
 		expect(await jobBadge.innerText()).toEqual('done');
@@ -161,9 +166,12 @@ async function getWorkflowRow(page, workflowName) {
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {string} inputDataset
  * @param {string} outputDataset
+ * @returns {Promise<{ workflow: PageWithWorkflow, jobId: number }>}
  */
 async function createJob(page, request, inputDataset, outputDataset) {
 	const workflow = new PageWithWorkflow(page, request);
+	/** @type {number|undefined} */
+	let jobId;
 	await test.step('Create workflow', async () => {
 		await workflow.createProject();
 		await workflow.createDataset(inputDataset, 'image');
@@ -171,9 +179,9 @@ async function createJob(page, request, inputDataset, outputDataset) {
 		await workflow.createWorkflow();
 		await page.waitForURL(/** @type {string} */ (workflow.url));
 		await addTaskToWorkflow(workflow);
-		await runWorkflow(page, inputDataset, outputDataset);
+		jobId = await runWorkflow(page, inputDataset, outputDataset);
 	});
-	return workflow;
+	return { workflow, jobId: /** @type {number} */ (jobId) };
 }
 
 /**
@@ -189,8 +197,11 @@ async function addTaskToWorkflow(workflow) {
  * @param {import('@playwright/test').Page} page
  * @param {string} inputDataset
  * @param {string} outputDataset
+ * @returns {Promise<number>} the id of the job
  */
 async function runWorkflow(page, inputDataset, outputDataset) {
+	/** @type {number|undefined} */
+	let jobId;
 	await test.step('Run workflow', async () => {
 		const runWorkflowBtn = page.getByRole('button', { name: 'Run workflow' });
 		await runWorkflowBtn.click();
@@ -204,5 +215,16 @@ async function runWorkflow(page, inputDataset, outputDataset) {
 		const confirmBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
 		await confirmBtn.click();
 		await page.waitForURL(new RegExp(`/v1/projects/(\\d+)/workflows/(\\d+)/jobs`));
+		await page
+			.getByRole('row', { name: 'submitted' })
+			.getByRole('button', { name: 'Info' })
+			.click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		const value = await modal.getByRole('listitem').nth(1).textContent();
+		jobId = Number(value?.trim());
+		await modal.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
 	});
+	return /** @type {number} */ (jobId);
 }

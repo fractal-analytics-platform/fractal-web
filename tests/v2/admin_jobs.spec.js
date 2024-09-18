@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
 import { createDataset } from './dataset_utils.js';
@@ -37,12 +37,15 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	let workflow2;
 	/** @type {string} */
 	let dataset2;
+	/** @type {number} */
+	let jobId2;
 	await test.step('Create second job', async () => {
 		const job = await createJob(page, request, async function (workflow) {
 			await workflow.addUserTask(taskName);
 		});
 		workflow2 = job.workflow;
 		dataset2 = job.dataset;
+		jobId2 = job.jobId;
 		await waitTaskSubmitted(page, 1);
 	});
 
@@ -57,7 +60,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 
 		const row1 = await getWorkflowRow(page, workflow1.workflowName);
 		const cells1 = await row1.locator('td').all();
-		expect(await cells1[5].innerText()).toEqual('-');
+		expect(await cells1[5].innerText()).toEqual(workflow1.projectName);
 		expect(await cells1[7].innerText()).toEqual(dataset1);
 		expect(await cells1[8].innerText()).toEqual('admin@fractal.xy');
 
@@ -97,7 +100,9 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 
 	await test.step('Search running jobs', async () => {
 		await page.getByText('Reset').click();
-		await page.selectOption('#status', 'submitted');
+		await page.getByRole('combobox', { name: 'Status' }).selectOption('submitted');
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(workflow2.projectId || '');
+		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(workflow2.workflowId || '');
 		await search(page);
 		const statuses = page.locator('table tbody tr td:nth-child(2)');
 		await expect(statuses).toHaveCount(1);
@@ -105,7 +110,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	});
 
 	await test.step('Wait job completion', async () => {
-		await workflow2.triggerTaskSuccess();
+		await workflow2.triggerTaskSuccess(jobId2);
 		const jobBadge = page.locator('.badge.text-bg-success');
 		await jobBadge.waitFor();
 		expect(await jobBadge.innerText()).toEqual('done');
@@ -179,11 +184,13 @@ async function getWorkflowRow(page, workflowName) {
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {(workflow: PageWithWorkflow) => Promise<void>} addTask
- * @returns {Promise<{ workflow: PageWithWorkflow, dataset: string }>}
+ * @returns {Promise<{ workflow: PageWithWorkflow, dataset: string, jobId: number }>}
  */
 async function createJob(page, request, addTask) {
 	const workflow = new PageWithWorkflow(page, request);
 	let datasetName = '';
+	/** @type {number|undefined} */
+	let jobId;
 	await test.step('Create workflow', async () => {
 		const projectId = await workflow.createProject();
 		const datasetResult = await createDataset(page, projectId);
@@ -191,16 +198,19 @@ async function createJob(page, request, addTask) {
 		await workflow.createWorkflow();
 		await page.waitForURL(/** @type {string} */ (workflow.url));
 		await addTask(workflow);
-		await runWorkflow(page, datasetName);
+		jobId = await runWorkflow(page, datasetName);
 	});
-	return { workflow, dataset: datasetName };
+	return { workflow, dataset: datasetName, jobId: /** @type {number} */ (jobId) };
 }
 
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} dataset
+ * @returns {Promise<number>} the id of the job
  */
 async function runWorkflow(page, dataset) {
+	/** @type {number|undefined} */
+	let jobId;
 	await test.step('Run workflow', async () => {
 		await page
 			.getByRole('combobox', { name: 'Dataset', exact: true })
@@ -215,5 +225,19 @@ async function runWorkflow(page, dataset) {
 		await runBtn.click();
 		const confirmBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
 		await confirmBtn.click();
+		await page.getByRole('link', { name: 'List jobs' }).click();
+		await waitPageLoading(page);
+		await page
+			.getByRole('row', { name: 'submitted' })
+			.getByRole('button', { name: 'Info' })
+			.click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		const value = await modal.getByRole('listitem').nth(1).textContent();
+		jobId = Number(value?.trim());
+		await modal.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+		await page.goBack();
 	});
+	return /** @type {number} */ (jobId);
 }

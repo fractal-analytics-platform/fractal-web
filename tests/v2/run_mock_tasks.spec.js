@@ -259,6 +259,16 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		expect(await page.locator('table tbody tr').count()).toEqual(5);
 	});
 
+	await test.step('Ensure jobs are ended', async () => {
+		const running = await page.getByRole('row', { name: 'submitted' }).count();
+		if (running > 0) {
+			console.warn(
+				`WARNING: waiting for the completion of a job that should have already been completed!`
+			);
+			await expect(page.getByRole('row', { name: 'submitted' })).toHaveCount(0, { timeout: 10000 });
+		}
+	});
+
 	/** @type {string|null} */
 	let jobId = null;
 	await test.step('Open Info modal', async () => {

@@ -71,19 +71,26 @@ export class PageWithWorkflow extends PageWithProject {
 		await this.addUserTask('Fake Task');
 	}
 
-	async triggerTaskSuccess() {
-		await this.setTaskStatus('done');
-	}
-
-	async triggerTaskFailure() {
-		await this.setTaskStatus('failed');
+	/**
+	 * @param {number} jobId
+	 */
+	async triggerTaskSuccess(jobId) {
+		await this.setTaskStatus(jobId, 'done');
 	}
 
 	/**
+	 * @param {number} jobId
+	 */
+	async triggerTaskFailure(jobId) {
+		await this.setTaskStatus(jobId, 'failed');
+	}
+
+	/**
+	 * @param {number} jobId
 	 * @param {import('$lib/types.js').JobStatus} status
 	 */
-	async setTaskStatus(status) {
-		const response = await this.request.put(`http://localhost:8080/${status}`);
+	async setTaskStatus(jobId, status) {
+		const response = await this.request.put(`http://localhost:8080/v1/${jobId}?status=${status}`);
 		expect(response.ok()).toEqual(true);
 	}
 
