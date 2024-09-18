@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Improved stability of end to end tests (\#560);
+
 # 1.6.0
 
 * Displayed OAuth2 accounts in user profile page (\#557);
