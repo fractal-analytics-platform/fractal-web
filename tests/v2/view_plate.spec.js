@@ -117,7 +117,7 @@ async function createImageWithPlate(page, zarrUrl, plate) {
  * @param  {...string} expectedOptions
  */
 async function checkPlateSelector(page, ...expectedOptions) {
-	await expect(page.getByText(`Detected ${expectedOptions.length} plate`)).toBeVisible();
+	await expect(page.getByText(`This dataset contains ${expectedOptions.length} plate`)).toBeVisible();
 	const options = await page
 		.getByRole('combobox', { name: 'Select plate' })
 		.getByRole('option')

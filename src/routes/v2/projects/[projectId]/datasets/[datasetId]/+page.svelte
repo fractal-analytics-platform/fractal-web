@@ -503,9 +503,8 @@
 	<div class="border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
-				Detected {plates.length}
-				{plates.length === 1 ? 'plate' : 'plates'}. Select one plate to display the "View plate"
-				button.
+				This dataset contains {plates.length}
+				{plates.length === 1 ? 'plate' : 'plates'}. Select which plate you want to view
 			</div>
 		</div>
 		<div class="row row-cols-md-auto g-3 align-items-center">
