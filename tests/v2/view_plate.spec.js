@@ -21,7 +21,7 @@ test('View plate', async ({ page, project }) => {
 	await test.step('Open test dataset', async () => {
 		await page.getByRole('link', { name: 'test-dataset' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
-		expect(await page.getByText('No entries in the image list yet').isVisible()).toEqual(true);
+		await expect(page.getByText('No entries in the image list yet')).toBeVisible();
 	});
 
 	await test.step('Create test images', async () => {
@@ -83,7 +83,7 @@ test('View plate', async ({ page, project }) => {
 	await test.step('Open test dataset 2 and create new image', async () => {
 		await page.getByRole('link', { name: 'test-dataset-2' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
-		expect(await page.getByText('No entries in the image list yet').isVisible()).toEqual(true);
+		await expect(page.getByText('No entries in the image list yet')).toBeVisible();
 		await createImageWithPlate(page, '/tmp/invalid', 'plate1');
 		await checkPlateSelector(page, 'plate1');
 		await page.getByRole('combobox', { name: 'Select plate' }).selectOption('plate1');

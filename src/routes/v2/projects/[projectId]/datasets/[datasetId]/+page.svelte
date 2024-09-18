@@ -48,7 +48,9 @@
 	/** @type {CreateUpdateImageModal|undefined} */
 	let imageModal = undefined;
 
-	$: plates = imagePage.attributes['plate'] || [];
+	$: plates = Array.isArray(imagePage.attributes['plate'])
+		? imagePage.attributes['plate'].sort()
+		: [];
 	let selectedPlate = '';
 	let platePath = '';
 	let platePathLoading = false;
