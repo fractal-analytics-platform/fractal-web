@@ -8,9 +8,9 @@ export async function load({ fetch }) {
 
 	const usersList = await listUsers(fetch);
 
-	const users = /** @type {string[]} */ (
-		usersList.map((u) => (u.username ? u.username : u.slurm_user)).filter((u) => !!u)
-	);
+	const users = /** @type {string[]} */ ([
+		...new Set(usersList.map((u) => (u.username ? u.username : u.slurm_user)).filter((u) => !!u))
+	]);
 
 	users.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 

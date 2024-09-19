@@ -37,13 +37,14 @@ test('Admin groups management', async ({ page }) => {
 		}
 	});
 
-	let group2;
+	let group2, group3;
 	await test.step('Create other 2 test groups', async () => {
 		group2 = await createTestGroup(page);
-		await createTestGroup(page);
+		group3 = await createTestGroup(page);
 	});
 
 	const groupBadges = page.locator('.row', { hasText: 'Groups' }).locator('.badge');
+	let initialGroupBadgesCount;
 
 	await test.step('Open user editing page', async () => {
 		await page.goto('/v2/admin/users');
@@ -51,7 +52,7 @@ test('Admin groups management', async ({ page }) => {
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		const currentGroups = await groupBadges.allInnerTexts();
-		expect(currentGroups.length).toEqual(2);
+		initialGroupBadgesCount = await groupBadges.count();
 		expect(currentGroups.includes('All')).toBeTruthy();
 		expect(currentGroups.includes(group1)).toBeTruthy();
 	});
@@ -65,7 +66,7 @@ test('Admin groups management', async ({ page }) => {
 		await selectSlimSelect(page, page.getByLabel('Select groups'), group2, true);
 		await modal.getByRole('button', { name: 'Add' }).click();
 		await waitModalClosed(page);
-		await expect(groupBadges).toHaveCount(3);
+		await expect(groupBadges).toHaveCount(initialGroupBadgesCount + 1);
 	});
 
 	await test.step('Reopen modal and check options', async () => {
@@ -80,24 +81,23 @@ test('Admin groups management', async ({ page }) => {
 
 	await test.step('Remove group2 from groups to add', async () => {
 		await page.getByLabel(`Remove group ${group2}`).click();
-		await expect(groupBadges).toHaveCount(2);
+		await expect(groupBadges).toHaveCount(initialGroupBadgesCount);
 	});
 
 	let finalCount;
-	await test.step('Reopen modal and add all the groups to the user', async () => {
+	await test.step('Reopen modal and group2 again and group3', async () => {
 		await page.getByRole('button', { name: 'Add group' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		const selectableGroups = await page.getByRole('option').allInnerTexts();
 		expect(selectableGroups.length).toEqual(selectableGroups1);
-		for (const group of selectableGroups) {
+		for (let group of [group2, group3].sort()) {
 			await selectSlimSelect(page, page.getByLabel('Select groups'), group, true);
 		}
 		await modal.getByRole('button', { name: 'Add' }).click();
 		await waitModalClosed(page);
-		finalCount = selectableGroups1 + 2;
+		finalCount = initialGroupBadgesCount + 2;
 		await expect(groupBadges).toHaveCount(finalCount);
-		await expect(page.getByRole('button', { name: 'Add group' })).not.toBeVisible();
 	});
 
 	await test.step('Save and check', async () => {

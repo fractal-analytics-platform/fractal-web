@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Fixed duplicated entries in owner dropdown (\#562);
+* Added "View plate" button on dataset page (\#562);
 * Improved stability of end to end tests (\#560);
 
 # 1.6.0

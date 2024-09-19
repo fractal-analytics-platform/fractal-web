@@ -24,7 +24,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	await test.step('Open test dataset', async () => {
 		await page.getByRole('link', { name: 'test-dataset' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
-		expect(await page.getByText('No entries in the image list yet').isVisible()).toEqual(true);
+		await expect(page.getByText('No entries in the image list yet')).toBeVisible();
 	});
 
 	await test.step('Create an image without filters', async () => {
