@@ -132,7 +132,6 @@ export type UserSettings = {
   ssh_private_key_path: string | null
   ssh_tasks_dir: string | null
   ssh_jobs_dir: string | null
-  slurm_accounts: string | null
 }
 
 export type Group = {
