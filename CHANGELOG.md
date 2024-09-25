@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.7.0
 
 * Added "My Settings" page and updated admin user editor (\#564);
 * Fixed duplicated entries in owner dropdown (\#562);
