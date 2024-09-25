@@ -122,10 +122,17 @@ export type User = {
 }
 
 export type UserSettings = {
-  slurm_user: string | null
-  ssh_username: string | null
   cache_dir: string | null
   slurm_accounts: string[]
+  // Slurm
+  slurm_user: string | null
+  // Slurm SSH
+  ssh_host: string | null
+  ssh_username: string | null
+  ssh_private_key_path: string | null
+  ssh_tasks_dir: string | null
+  ssh_jobs_dir: string | null
+  slurm_accounts: string | null
 }
 
 export type Group = {

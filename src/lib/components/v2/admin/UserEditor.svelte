@@ -59,10 +59,14 @@
 	]);
 
 	const settingsFormErrorHandler = new FormErrorHandler('genericSettingsError', [
-		'slurm_user',
-		'ssh_username',
 		'cache_dir',
-		'slurm_accounts'
+		'slurm_accounts',
+		'slurm_user',
+		'ssh_host',
+		'ssh_username',
+		'ssh_private_key_path',
+		'ssh_tasks_dir',
+		'ssh_jobs_dir'
 	]);
 
 	const userValidationErrors = userFormErrorHandler.getValidationErrorStore();
@@ -247,11 +251,7 @@
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					...stripNullAndEmptyObjectsAndArrays({
-						cache_dir: settings?.cache_dir,
-						slurm_user: settings?.slurm_user,
-						ssh_username: settings?.ssh_username
-					}),
+					...stripNullAndEmptyObjectsAndArrays({ ...settings, id: undefined }),
 					slurm_accounts: settings?.slurm_accounts
 				})
 			});
@@ -464,6 +464,12 @@
 					</div>
 				</div>
 			</div>
+		{:else}
+			<div class="row">
+				<div class="col-sm-9 offset-sm-3">
+					<div class="alert alert-info">User settings can be modified after creating the user</div>
+				</div>
+			</div>
 		{/if}
 		<div class="row mb-3">
 			<div class="col-sm-9 offset-sm-3">
@@ -504,12 +510,30 @@
 							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['slurm_user']}
 						/>
 						<div class="form-text">
-							The user on the local SLURM cluster who will be impersonated by Fractal  through <code>sudo -u</code>
+							The user on the local SLURM cluster who will be impersonated by Fractal through <code
+								>sudo -u</code
+							>
 						</div>
 						<span class="invalid-feedback">{$settingsValidationErrors['slurm_user']}</span>
 					</div>
 				</div>
 			{:else if runnerBackend === 'slurm_ssh'}
+				<div class="row mb-3 has-validation">
+					<label for="sshHost" class="col-sm-3 col-form-label text-end">
+						<strong>SSH host</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							type="text"
+							class="form-control"
+							id="sshHost"
+							bind:value={settings.ssh_host}
+							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_host']}
+						/>
+						<div class="form-text">SSH-reachable host where a SLURM client is available</div>
+						<span class="invalid-feedback">{$settingsValidationErrors['ssh_host']}</span>
+					</div>
+				</div>
 				<div class="row mb-3 has-validation">
 					<label for="sshUsername" class="col-sm-3 col-form-label text-end">
 						<strong>SSH username</strong>
@@ -523,9 +547,66 @@
 							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_username']}
 						/>
 						<div class="form-text">
-							The user on the remote SLURM cluster who will be impersonated by Fractal through <code>ssh</code>
+							The user on the remote SLURM cluster who will be impersonated by Fractal through
+							<code>ssh</code>
 						</div>
 						<span class="invalid-feedback">{$settingsValidationErrors['ssh_username']}</span>
+					</div>
+				</div>
+				<div class="row mb-3 has-validation">
+					<label for="sshPrivateKeyPath" class="col-sm-3 col-form-label text-end">
+						<strong>SSH Private Key Path</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							type="text"
+							class="form-control"
+							id="sshPrivateKeyPath"
+							bind:value={settings.ssh_private_key_path}
+							class:is-invalid={settingsFormSubmitted &&
+								$settingsValidationErrors['ssh_private_key_path']}
+						/>
+						<div class="form-text">
+							Path of private SSH key for <code>ssh_username</code>
+						</div>
+						<span class="invalid-feedback">{$settingsValidationErrors['ssh_private_key_path']}</span
+						>
+					</div>
+				</div>
+				<div class="row mb-3 has-validation">
+					<label for="sshTasksDir" class="col-sm-3 col-form-label text-end">
+						<strong>SSH Tasks Dir</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							type="text"
+							class="form-control"
+							id="sshTasksDir"
+							bind:value={settings.ssh_tasks_dir}
+							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_tasks_dir']}
+						/>
+						<div class="form-text">
+							Task-venvs base folder on <code>ssh_host</code>
+						</div>
+						<span class="invalid-feedback">{$settingsValidationErrors['ssh_tasks_dir']}</span>
+					</div>
+				</div>
+				<div class="row mb-3 has-validation">
+					<label for="sshJobsDir" class="col-sm-3 col-form-label text-end">
+						<strong>SSH Jobs Dir</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							type="text"
+							class="form-control"
+							id="sshJobsDir"
+							bind:value={settings.ssh_jobs_dir}
+							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_jobs_dir']}
+						/>
+						<div class="form-text">
+							Jobs base folder on <code>ssh_host</code>
+						</div>
+						<span class="invalid-feedback">{$settingsValidationErrors['ssh_jobs_dir']}</span>
 					</div>
 				</div>
 			{/if}
