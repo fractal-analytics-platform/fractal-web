@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 
-test('Create, update and delete a user', async ({ page }) => {
+test('Create and update a user', async ({ page }) => {
 	await test.step('Open the admin area', async () => {
 		await page.goto('/v2/admin');
 		await waitPageLoading(page);
@@ -40,15 +40,15 @@ test('Create, update and delete a user', async ({ page }) => {
 
 	await test.step('Create user', async () => {
 		await page.getByLabel('Confirm password').fill('test');
-		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm');
-		await page.getByLabel('Cache dir').fill('/tmp/test');
-
 		await page.getByRole('button', { name: 'Save' }).click();
 		await waitPageLoading(page);
-		await page.getByText('Users list').waitFor();
+		await page.getByText('Editing user').waitFor();
+	});
 
-		await expect(page.getByRole('cell', { name: randomUserName })).toHaveCount(3);
-
+	await test.step('Check user in users list', async () => {
+		await page.goto('/v2/admin/users');
+		await waitPageLoading(page);
+		await expect(page.getByRole('cell', { name: randomUserName })).toHaveCount(2);
 		const userRowCells = await getUserRowCells(page, randomUserName);
 		userId = (await userRowCells[0].innerText()).trim();
 		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
@@ -56,7 +56,6 @@ test('Create, update and delete a user', async ({ page }) => {
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);
 		verifyChecked(userRowCells, 5, true);
-		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm');
 	});
 
 	expect(userId).not.toBeNull();
@@ -72,9 +71,10 @@ test('Create, update and delete a user', async ({ page }) => {
 		verifyChecked(cells, 3, true);
 		verifyChecked(cells, 4, false);
 		verifyChecked(cells, 5, true);
-		expect(await cells[6].innerText()).toEqual(randomUserName + '_slurm');
+		expect(await cells[6].innerText()).toEqual('All');
 		expect(await cells[7].innerText()).toEqual('-');
-		expect(await cells[8].innerText()).toEqual('/tmp/test');
+		expect(await cells[8].innerText()).toEqual('-');
+		expect(await cells[9].innerText()).toEqual('-');
 	});
 
 	await test.step('Go back to previous page', async () => {
@@ -90,7 +90,7 @@ test('Create, update and delete a user', async ({ page }) => {
 
 	await test.step('Test cache dir validation error', async () => {
 		await page.getByLabel('Cache dir').fill('foo');
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).nth(1).click();
 		await page.waitForFunction(() => {
 			const invalidFeeback = document
 				.querySelector('#cacheDir')
@@ -115,30 +115,37 @@ test('Create, update and delete a user', async ({ page }) => {
 		await page
 			.getByRole('textbox', { name: /^SLURM account #2/ })
 			.fill(randomUserName + '-slurm-account');
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).nth(1).click();
 		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
 		await page.getByLabel('Remove SLURM account').first().click();
 	});
 
 	await test.step('Rename username and unset verified checkbox', async () => {
+		await page.getByLabel('Username').fill(randomUserName + '-renamed');
 		const verifiedCheckbox = page.getByLabel('Verified');
 		await verifiedCheckbox.waitFor();
 		expect(await verifiedCheckbox.isChecked()).toEqual(true);
 		await verifiedCheckbox.uncheck();
+		await page.getByRole('button', { name: 'Save' }).first().click();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
+	});
+
+	await test.step('Update settings', async () => {
 		await page.getByLabel('Cache dir').fill('/tmp/test');
-		await page.getByLabel('Username').fill(randomUserName + '-renamed');
 		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).nth(1).click();
+		await expect(page.getByText('Settings successfully updated')).toBeVisible();
+	});
 
+	await test.step('Check user in users list', async () => {
+		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
-
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
 		expect(await userRowCells[2].innerText()).toEqual(randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);
 		verifyChecked(userRowCells, 5, false);
-		expect(await userRowCells[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
 	});
 
 	await test.step('Display the user info page', async () => {
@@ -152,9 +159,10 @@ test('Create, update and delete a user', async ({ page }) => {
 		verifyChecked(cells, 3, true);
 		verifyChecked(cells, 4, false);
 		verifyChecked(cells, 5, false);
-		expect(await cells[6].innerText()).toEqual(randomUserName + '_slurm-renamed');
-		expect(await cells[7].innerText()).toContain(randomUserName + '-slurm-account');
+		expect(await cells[6].innerText()).toEqual('All');
+		expect(await cells[7].innerText()).toEqual(randomUserName + '_slurm-renamed');
 		expect(await cells[8].innerText()).toEqual('/tmp/test');
+		expect(await cells[9].innerText()).toContain(randomUserName + '-slurm-account');
 	});
 
 	await test.step('Go back clicking on breadcrumb', async () => {
@@ -167,7 +175,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.locator('#superuser').check();
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).first().click();
 
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
@@ -176,11 +184,12 @@ test('Create, update and delete a user', async ({ page }) => {
 			'Do you really want to grant superuser privilege to this user?'
 		);
 		await page.locator('.modal.show').getByRole('button', { name: 'Confirm' }).click();
-		await page.getByText('Users list').waitFor();
-		await page.reload();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
+	});
 
+	await test.step('Check user in users list', async () => {
+		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
-
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, true);
@@ -193,7 +202,7 @@ test('Create, update and delete a user', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.getByText('Editing user #').waitFor();
 		await page.locator('#superuser').uncheck();
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).first().click();
 
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
@@ -202,12 +211,13 @@ test('Create, update and delete a user', async ({ page }) => {
 			'Do you really want to revoke superuser privilege to this user?'
 		);
 		await page.locator('.modal.show').getByRole('button', { name: 'Confirm' }).click();
-		await waitPageLoading(page);
-		await page.getByText('Users list').waitFor();
-		await page.reload();
+		await waitModalClosed(page);
+		await expect(page.getByText('User successfully updated')).toBeVisible();
+	});
 
+	await test.step('Check user in users list', async () => {
+		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
-
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);

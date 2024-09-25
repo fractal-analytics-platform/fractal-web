@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Added "My Settings" page and updated admin user editor (\#564);
 * Fixed duplicated entries in owner dropdown (\#562);
 * Added "View plate" button on dataset page (\#562);
 * Improved stability of end to end tests (\#560);

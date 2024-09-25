@@ -3,7 +3,7 @@ import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js'
 
 test('Admin groups management', async ({ page }) => {
 	let user1;
-	await test.step('Create test users', async () => {
+	await test.step('Create test user', async () => {
 		user1 = await createTestUser(page);
 	});
 
@@ -101,8 +101,10 @@ test('Admin groups management', async ({ page }) => {
 	});
 
 	await test.step('Save and check', async () => {
-		await page.getByRole('button', { name: 'Save' }).click();
-		await page.getByText('Users list').waitFor();
+		await page.getByRole('button', { name: 'Save' }).first().click();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
+		await page.goto('/v2/admin/users');
+		await waitPageLoading(page);
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Info' }).click();
 		await waitPageLoading(page);
 		await expect(page.getByRole('row', { name: 'Groups' }).getByRole('link')).toHaveCount(
@@ -136,8 +138,8 @@ async function createTestUser(page) {
 	await page.getByLabel('Password', { exact: true }).fill('test');
 	await page.getByLabel('Confirm password').fill('test');
 	await page.getByRole('button', { name: 'Save' }).click();
+	await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	await waitPageLoading(page);
-	await page.getByText('Users list').waitFor();
 	return randomEmail;
 }
 

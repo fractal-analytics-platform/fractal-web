@@ -56,6 +56,7 @@ export LOG_FILE=fractal-web.log
 # export LOG_LEVEL_CONSOLE=warn
 
 export FRACTAL_API_V1_MODE=include
+export FRACTAL_RUNNER_BACKEND=local
 
 #export PUBLIC_FRACTAL_VIZARR_VIEWER_URL=
 #export WARNING_BANNER_PATH=
