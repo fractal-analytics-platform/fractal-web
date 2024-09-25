@@ -510,9 +510,8 @@
 							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['slurm_user']}
 						/>
 						<div class="form-text">
-							The user on the local SLURM cluster who will be impersonated by Fractal through <code
-								>sudo -u</code
-							>
+							The user on the local SLURM cluster who will be impersonated by Fractal through
+							<code>sudo -u</code>
 						</div>
 						<span class="invalid-feedback">{$settingsValidationErrors['slurm_user']}</span>
 					</div>
