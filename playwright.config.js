@@ -123,7 +123,7 @@ export default defineConfig({
 		},
 		{
 			command:
-				'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 node build',
+				'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 FRACTAL_RUNNER_BACKEND=slurm node build',
 			port: 5173,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI
