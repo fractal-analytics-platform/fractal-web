@@ -161,8 +161,8 @@ test('Create and update a user', async ({ page }) => {
 		verifyChecked(cells, 5, false);
 		expect(await cells[6].innerText()).toEqual('All');
 		expect(await cells[7].innerText()).toEqual(randomUserName + '_slurm-renamed');
-		expect(await cells[8].innerText()).toContain(randomUserName + '-slurm-account');
-		expect(await cells[9].innerText()).toEqual('/tmp/test');
+		expect(await cells[8].innerText()).toEqual('/tmp/test');
+		expect(await cells[9].innerText()).toContain(randomUserName + '-slurm-account');
 	});
 
 	await test.step('Go back clicking on breadcrumb', async () => {
