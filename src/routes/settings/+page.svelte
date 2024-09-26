@@ -45,15 +45,17 @@
 		cacheDirError = '';
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const payload = nullifyEmptyStrings({
-			slurm_accounts: slurmAccounts,
-			cache_dir: cacheDir
-		});
+		const payload = {
+			slurm_accounts: slurmAccounts
+		};
+		if ($page.data.runnerBackend === 'slurm') {
+			payload.cache_dir = cacheDir;
+		}
 		const response = await fetch(`/api/auth/current-user/settings`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(payload)
+			body: JSON.stringify(nullifyEmptyStrings(payload))
 		});
 		const result = await response.json();
 		if (response.ok) {
