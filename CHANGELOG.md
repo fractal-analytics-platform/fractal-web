@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.7.1
 
 * Allowed null values in settings API requests (\#570);
 * Hided cache dir from user settings page when using SSH Slurm (\#570);
