@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Allowed null values in settings API requests (\#570);
+* Hided cache dir from user settings page when using SSH Slurm (\#570);
+* Made FRACTAL_RUNNER_BACKEND environment variable mandatory (\#570);
+
 # 1.7.0
 
 * Added "My Settings" page and updated admin user editor (\#564);
