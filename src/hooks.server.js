@@ -5,6 +5,10 @@ import { error, redirect } from '@sveltejs/kit';
 
 const logger = getLogger('hooks');
 
+if (!env.FRACTAL_RUNNER_BACKEND) {
+	throw new Error('Environment variable FRACTAL_RUNNER_BACKEND is mandatory');
+}
+
 if (env.FRACTAL_SERVER_HOST.endsWith('/')) {
 	env.FRACTAL_SERVER_HOST = env.FRACTAL_SERVER_HOST.substring(
 		0,

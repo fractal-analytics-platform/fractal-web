@@ -11,6 +11,6 @@ export async function load({ fetch }) {
 
 	return {
 		settings,
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND || 'local'
+		runnerBackend: env.FRACTAL_RUNNER_BACKEND
 	};
 }
