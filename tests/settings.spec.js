@@ -45,17 +45,26 @@ test('User settings', async ({ page }) => {
 		await expect(page.getByText('User settings successfully updated')).toBeVisible();
 	});
 
-	await test.step('Attempt to remove cache dir', async () => {
+	await test.step('Attempt to set cache dir to non absolute path', async () => {
+		await page.getByRole('textbox', { name: 'Cache dir' }).fill('xxx');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await page
+			.getByText("String attribute 'cache_dir' must be an absolute path (given 'xxx').")
+			.waitFor();
+		await expect(page.getByText('`slurm_accounts` list has repetitions')).not.toBeVisible();
+	});
+
+	await test.step('Remove cache dir', async () => {
 		await page.getByRole('textbox', { name: 'Cache dir' }).fill('');
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.getByText("String attribute 'cache_dir' cannot be empty").waitFor();
+		await expect(page.getByText('User settings successfully updated')).toBeVisible();
 	});
 
 	await test.step('Verify data was updated', async () => {
 		await page.reload();
 		await waitPageLoading(page);
 		await expect(page.getByLabel('SLURM account 1')).toHaveValue(randomSlurmAccount);
-		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue('/tmp');
+		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue('');
 	});
 
 	await test.step('Logout test user', async () => {
