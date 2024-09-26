@@ -106,6 +106,23 @@
 				{settings.slurm_user || '-'}
 			</div>
 		</div>
+		<div class="row mb-3">
+			<label class="col-lg-2 col-sm-4 fw-bold" for="cache-dir">Cache dir</label>
+			<div class="col-lg-6 col-sm-8">
+				<div class="input-group" class:has-validation={cacheDirError}>
+					<input
+						type="text"
+						class="form-control"
+						id="cache-dir"
+						bind:value={cacheDir}
+						class:is-invalid={cacheDirError}
+					/>
+					{#if cacheDirError}
+						<div class="invalid-feedback">{cacheDirError}</div>
+					{/if}
+				</div>
+			</div>
+		</div>
 	{/if}
 	{#if $page.data.runnerBackend === 'slurm_ssh'}
 		<div class="row mb-4">
@@ -146,24 +163,6 @@
 					<i class="bi bi-plus-circle" />
 					Add SLURM account
 				</button>
-			</div>
-		</div>
-	</div>
-
-	<div class="row mb-3">
-		<label class="col-lg-2 col-sm-4 fw-bold" for="cache-dir">Cache dir</label>
-		<div class="col-lg-6 col-sm-8">
-			<div class="input-group" class:has-validation={cacheDirError}>
-				<input
-					type="text"
-					class="form-control"
-					id="cache-dir"
-					bind:value={cacheDir}
-					class:is-invalid={cacheDirError}
-				/>
-				{#if cacheDirError}
-					<div class="invalid-feedback">{cacheDirError}</div>
-				{/if}
 			</div>
 		</div>
 	</div>
