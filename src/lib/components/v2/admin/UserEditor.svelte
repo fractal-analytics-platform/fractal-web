@@ -7,7 +7,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
 	import SlimSelect from 'slim-select';
-	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-jschema';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {import('$lib/types').User & {group_ids: number[]}} */
@@ -250,10 +249,7 @@
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify({
-					...stripNullAndEmptyObjectsAndArrays({ ...settings, id: undefined }),
-					slurm_accounts: settings?.slurm_accounts
-				})
+				body: JSON.stringify(nullifyEmptyStrings({ ...settings, id: undefined }))
 			});
 			if (!response.ok) {
 				await settingsFormErrorHandler.handleErrorResponse(response);

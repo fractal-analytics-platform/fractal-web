@@ -156,6 +156,12 @@ export function nullifyEmptyStrings(inputValues) {
 	for (let key in inputValues) {
 		if (typeof inputValues[key] === 'string' && inputValues[key].trim() === '') {
 			clearedValues[key] = null;
+		} else if (
+			inputValues[key] !== null &&
+			typeof inputValues[key] === 'object' &&
+			!Array.isArray(inputValues[key])
+		) {
+			clearedValues[key] = nullifyEmptyStrings(inputValues[key]);
 		} else {
 			clearedValues[key] = inputValues[key];
 		}

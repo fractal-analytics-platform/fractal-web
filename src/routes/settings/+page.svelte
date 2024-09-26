@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		AlertError,
 		displayStandardErrorAlert,
@@ -22,8 +23,6 @@
 	let cacheDir = '';
 	let cacheDirError = '';
 
-	let cacheDirSet = false;
-
 	let settingsUpdatedMessage = '';
 
 	function addSlurmAccount() {
@@ -42,14 +41,14 @@
 			errorAlert.hide();
 		}
 		settingsUpdatedMessage = '';
+		slurmAccountsError = '';
+		cacheDirError = '';
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const payload = {
-			slurm_accounts: slurmAccounts
-		};
-		if (cacheDirSet || cacheDir) {
-			payload.cache_dir = cacheDir;
-		}
+		const payload = nullifyEmptyStrings({
+			slurm_accounts: slurmAccounts,
+			cache_dir: cacheDir
+		});
 		const response = await fetch(`/api/auth/current-user/settings`, {
 			method: 'PATCH',
 			credentials: 'include',
@@ -88,7 +87,6 @@
 	function initFields(settings) {
 		slurmAccounts = settings.slurm_accounts;
 		cacheDir = settings.cache_dir || '';
-		cacheDirSet = !!settings.cache_dir;
 	}
 
 	onMount(() => {

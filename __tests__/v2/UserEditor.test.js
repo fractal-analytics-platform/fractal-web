@@ -78,9 +78,14 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
+					slurm_accounts: [],
 					slurm_user: 'user',
 					cache_dir: '/path/to/cache/dir',
-					slurm_accounts: []
+					ssh_host: null,
+					ssh_username: null,
+					ssh_private_key_path: null,
+					ssh_tasks_dir: null,
+					ssh_jobs_dir: null
 				})
 			})
 		);
@@ -123,8 +128,14 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
+					slurm_accounts: [],
+					slurm_user: null,
 					cache_dir: 'xxx',
-					slurm_accounts: []
+					ssh_host: null,
+					ssh_username: null,
+					ssh_private_key_path: null,
+					ssh_tasks_dir: null,
+					ssh_jobs_dir: null
 				})
 			})
 		);
@@ -170,12 +181,14 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
+					slurm_accounts: [],
+					slurm_user: null,
+					cache_dir: null,
 					ssh_host: 'localhost',
 					ssh_username: 'username',
 					ssh_private_key_path: 'xxx',
 					ssh_tasks_dir: 'yyy',
-					ssh_jobs_dir: 'zzz',
-					slurm_accounts: []
+					ssh_jobs_dir: 'zzz'
 				})
 			})
 		);
@@ -237,12 +250,14 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
+					slurm_accounts: [],
+					slurm_user: null,
+					cache_dir: null,
 					ssh_host: 'localhost',
 					ssh_username: 'username',
 					ssh_private_key_path: '/path/to/private/key',
 					ssh_tasks_dir: '/path/to/tasks/dir',
-					ssh_jobs_dir: '/path/to/jobs/dir',
-					slurm_accounts: []
+					ssh_jobs_dir: '/path/to/jobs/dir'
 				})
 			})
 		);
