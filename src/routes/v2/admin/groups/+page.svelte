@@ -68,6 +68,7 @@
 			<th>Id</th>
 			<th>Name</th>
 			<th>Number of users</th>
+			<th>Number of viewer paths</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
@@ -77,6 +78,7 @@
 				<td>{group.id}</td>
 				<td>{group.name}</td>
 				<td>{group.user_ids.length}</td>
+				<td>{group.viewer_paths.length}</td>
 				<td>
 					<a href="/v2/admin/groups/{group.id}" class="btn btn-light">
 						<i class="bi-info-circle" /> Info
