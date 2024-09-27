@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added viewer paths editor in admin area (\#571);
+* Added user viewer paths page (\#571);
+
 # 1.7.1
 
 * Allowed null values in settings API requests (\#570);

@@ -139,6 +139,7 @@ export type Group = {
   name: string
   timestamp_created: string
   user_ids?: number[]
+  viewer_paths: string[]
 }
 
 export type TaskCollectStatus = 'pending' | 'installing' | 'collecting' | 'fail' | 'OK';

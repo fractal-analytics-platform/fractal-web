@@ -70,6 +70,27 @@ export async function getCurrentUserSettings(fetch) {
 }
 
 /**
+ * Fetches user viewer paths
+ * @param {typeof fetch} fetch
+ * @returns {Promise<string[]>}
+ */
+export async function getCurrentUserViewerPaths(fetch) {
+	logger.debug('Retrieving current user viewer paths');
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/viewer-paths/`;
+	const response = await fetch(url, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to retrieve the current user viewer paths');
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
  * Requests to close a user session on the server
  * @param {typeof fetch} fetch
  * @returns {Promise<void>}

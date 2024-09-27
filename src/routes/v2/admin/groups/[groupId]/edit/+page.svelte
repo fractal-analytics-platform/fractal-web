@@ -1,12 +1,14 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types').Group & {user_ids: number[]}} */
-	$: group = $page.data.group;
+	let group = $page.data.group;
 	/** @type {Array<import('$lib/types').User & {id: number}>} */
-	$: users = $page.data.users;
+	let users = $page.data.users;
 
 	/** @type {import('$lib/types').User & {id: number}|null} */
 	let draggedUser = null;
@@ -69,6 +71,49 @@
 		addingUser = null;
 		hovering = false;
 	}
+
+	/** @type {string[]} */
+	let editableViewPaths = [];
+	let viewerPathsUpdatedMessage = '';
+	const viewerPathsErrorHandler = new FormErrorHandler('viewerPathGenericError', ['viewer_paths']);
+	const viewerPathsValidationErrors = viewerPathsErrorHandler.getValidationErrorStore();
+
+	function addViewerPath() {
+		editableViewPaths = [...editableViewPaths, ''];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeViewerPath(index) {
+		editableViewPaths = editableViewPaths.filter((_, i) => i !== index);
+	}
+
+	async function saveViewerPaths() {
+		viewerPathsUpdatedMessage = '';
+		viewerPathsErrorHandler.clearErrors();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/auth/group/${group.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				viewer_paths: [...editableViewPaths]
+			})
+		});
+		if (!response.ok) {
+			await viewerPathsErrorHandler.handleErrorResponse(response);
+			return;
+		}
+		const { viewer_paths } = await response.json();
+		editableViewPaths = viewer_paths;
+		viewerPathsUpdatedMessage = 'Paths successfully updated';
+	}
+
+	onMount(() => {
+		editableViewPaths = [...group.viewer_paths];
+	});
 </script>
 
 <nav aria-label="breadcrumb">
@@ -144,5 +189,41 @@
 		{:else}
 			<p>No more users available</p>
 		{/if}
+	</div>
+</div>
+
+<div class="row mt-4">
+	<div class="col-lg-9">
+		<h4 class="fw-light">Viewer paths</h4>
+		{#each editableViewPaths as viewerPath, i}
+			<div class="input-group mb-2">
+				<input
+					type="text"
+					class="form-control"
+					id={`viewerPath-${i}`}
+					bind:value={viewerPath}
+					aria-label={`Viewer path #${i + 1}`}
+					required
+				/>
+				<button
+					class="btn btn-outline-secondary"
+					type="button"
+					id="viewer_path_remove_{i}"
+					aria-label={`Remove viewer path #${i + 1}`}
+					on:click={() => removeViewerPath(i)}
+				>
+					<i class="bi bi-trash" />
+				</button>
+			</div>
+		{/each}
+		<button class="btn btn-secondary mb-2" on:click={addViewerPath}>Add viewer path</button>
+		<div id="viewerPathGenericError" />
+		{#if $viewerPathsValidationErrors['viewer_paths']}
+			<div class="alert alert-danger mb-2">
+				{$viewerPathsValidationErrors['viewer_paths']}
+			</div>
+		{/if}
+		<StandardDismissableAlert message={viewerPathsUpdatedMessage} />
+		<button class="btn btn-primary" on:click={saveViewerPaths}>Save</button>
 	</div>
 </div>

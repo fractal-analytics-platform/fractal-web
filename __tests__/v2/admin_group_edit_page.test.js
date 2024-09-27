@@ -16,7 +16,8 @@ vi.mock('$app/stores', () => {
 				],
 				group: {
 					name: 'test',
-					user_ids: [1]
+					user_ids: [1],
+					viewer_paths: []
 				}
 			}
 		})

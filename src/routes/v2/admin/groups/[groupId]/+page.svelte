@@ -34,10 +34,7 @@
 <h4 class="fw-light mt-4 mb-3">Members of the group</h4>
 
 {#if group.user_ids.length === 0}
-	<p>
-		This group has no users.
-		<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary ms-3">Edit</a>
-	</p>
+	<p>This group has no users.</p>
 {:else}
 	<div class="col-6 bg-light p-2 rounded">
 		{#each groupUsers as user}
@@ -47,3 +44,18 @@
 		{/each}
 	</div>
 {/if}
+
+<div class="row mt-4">
+	<div class="col">
+		<h4 class="fw-light mb-3">Viewer paths</h4>
+		{#if group.viewer_paths.length > 0}
+			<ul>
+				{#each group.viewer_paths as viewerPath}
+					<li><code>{viewerPath}</code></li>
+				{/each}
+			</ul>
+		{:else}
+			This group has no viewer paths.
+		{/if}
+	</div>
+</div>
