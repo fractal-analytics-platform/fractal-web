@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.7.2
 
 * Added viewer paths editor in admin area (\#571);
 * Added user viewer paths page (\#571);
