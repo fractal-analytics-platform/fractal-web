@@ -463,6 +463,13 @@
 			linkElement.click();
 		}
 	}
+
+	/**
+	 * @param {import('$lib/types-v2').Image} image
+	 */
+	function getImageUrl(image) {
+		return encodeURIComponent(image.zarr_url.replace('#', '%23'));
+	}
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -649,7 +656,7 @@
 								{#if vizarrViewerUrl}
 									<a
 										class="btn btn-info"
-										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{image.zarr_url}"
+										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{getImageUrl(image)}"
 										target="_blank"
 									>
 										<i class="bi bi-eye" />
