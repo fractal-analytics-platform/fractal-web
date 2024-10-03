@@ -64,6 +64,7 @@
 		"jose",
 		"log4js",
 		"marked",
+		"semver",
 		"slim-select"
 	]
 }
