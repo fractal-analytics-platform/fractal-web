@@ -1,5 +1,20 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Drop Node 16 support (\#574);
+* Upgraded dependencies (\#574):
+    * svelte: 3.x -> 4.x
+    * @sveltejs/kit: 1.x -> 2.x
+    * @sveltejs/adapter-node: 1.x -> 2.x
+    * @sveltejs/adapter-static: 2.x -> 3.x
+    * eslint: 8.x -> 9.x
+    * typescript: 4.x -> 5.x
+    * vite: 4.x -> 5.x
+    * vitest: 0.x -> 1.x
+    * @vincjo/datatables: 1.6.0 -> 1.14.10
+    * bootstrap: 5.2.3 -> 5.3.3
+
 # 1.7.2
 
 * Added viewer paths editor in admin area (\#571);
