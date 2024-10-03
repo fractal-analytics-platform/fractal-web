@@ -63,6 +63,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Display the user info page', async () => {
 		const userRow = await getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Info' }).click();
+		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
 		expect(await cells[0].innerText()).toEqual(userId);
@@ -80,12 +81,14 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Go back to previous page', async () => {
 		await page.getByRole('link', { name: 'Manage users' }).click();
 		await waitPageLoading(page);
+		await expect(page.getByText('Users list')).toBeVisible();
 	});
 
 	await test.step('Open edit user page', async () => {
 		const userRow = await getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
+		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 	});
 
 	await test.step('Test cache dir validation error', async () => {
@@ -151,6 +154,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Display the user info page', async () => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Info' }).click();
+		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
 		expect(await cells[0].innerText()).toEqual(userId);
@@ -168,7 +172,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Go back clicking on breadcrumb', async () => {
 		await page.getByText('Manage users').click();
 		await waitPageLoading(page);
-		await page.getByText('Users list').waitFor();
+		await expect(page.getByText('Users list')).toBeVisible();
 	});
 
 	await test.step('Grant superuser privilege', async () => {
@@ -190,6 +194,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Check user in users list', async () => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
+		await expect(page.getByText('Users list')).toBeVisible();
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, true);
@@ -200,7 +205,7 @@ test('Create and update a user', async ({ page }) => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
-		await page.getByText('Editing user #').waitFor();
+		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await page.locator('#superuser').uncheck();
 		await page.getByRole('button', { name: 'Save' }).first().click();
 
@@ -218,6 +223,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Check user in users list', async () => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
+		await expect(page.getByText('Users list')).toBeVisible();
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);

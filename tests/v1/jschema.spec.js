@@ -67,7 +67,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Select required option', async () => {
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
-		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('null');
+		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('');
 		expect(form.getByText('Field is required')).toHaveCount(1);
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
 		expect(form.getByText('Field is required')).toHaveCount(0);
@@ -75,7 +75,7 @@ test('JSON Schema validation', async ({ page, browserName, workflow }) => {
 
 	await test.step('Select optional option', async () => {
 		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('option1');
-		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('null');
+		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('');
 		expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 

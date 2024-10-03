@@ -83,8 +83,10 @@ export async function createFakeTask(page, task) {
  * @param {'v1'|'v2'} version
  */
 export async function deleteTask(page, taskName, version = 'v2') {
-	await page.goto(`/${version}/tasks`);
-	await waitPageLoading(page);
+	if (!page.url().endsWith(`/${version}/tasks`)) {
+		await page.goto(`/${version}/tasks`);
+		await waitPageLoading(page);
+	}
 	const row = await getTaskRow(page, taskName);
 	await row.getByRole('button', { name: 'Delete' }).click();
 	const modal = page.locator('.modal.show');

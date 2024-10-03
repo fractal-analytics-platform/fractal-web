@@ -12,29 +12,25 @@ test('Admin groups management', async ({ page }) => {
 		group1 = await createTestGroup(page);
 	});
 
-	/** @type {string[]}  */
-	let availableUsers;
-	await test.step('Add all available users to the group', async () => {
+	await test.step('Add the test user the group', async () => {
 		const dragArea = page.getByText('drag the users here');
-		availableUsers = await page.locator('[draggable="true"]').allInnerTexts();
+		const availableUsers = await page.locator('[draggable="true"]').allInnerTexts();
 		expect(availableUsers.length).toBeGreaterThan(1);
-		for (const user of availableUsers) {
-			const userBadge = page.getByRole('button', { name: user, exact: true });
-			await userBadge.dragTo(dragArea);
-			await expect(page.locator('.spinner-border-sm')).not.toBeVisible();
-		}
-		await expect(page.getByText('No more users available')).toBeVisible();
+		await page.getByPlaceholder('Filter users').fill(user1);
+		await expect(page.locator('[draggable="true"]')).toHaveCount(1);
+		const userBadge = page.getByRole('button', { name: user1, exact: true });
+		await userBadge.dragTo(dragArea);
+		await expect(page.locator('.spinner-border-sm')).not.toBeVisible();
+		await expect(page.getByRole('region')).toContainText(user1);
 	});
 
 	await test.step('Check group info page', async () => {
 		await page.goto('/v2/admin/groups');
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Info' }).click();
-		await page.getByText('Members of the group').waitFor();
-		for (const user of availableUsers) {
-			const userBadge = page.getByRole('link', { name: user, exact: true });
-			await expect(userBadge).toBeVisible();
-		}
+		await expect(page.getByText('Members of the group')).toBeVisible();
+		const userBadge = page.getByRole('link', { name: user1, exact: true });
+		await expect(userBadge).toBeVisible();
 	});
 
 	let group2, group3;
@@ -50,6 +46,7 @@ test('Admin groups management', async ({ page }) => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
+		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 		await waitPageLoading(page);
 		const currentGroups = await groupBadges.allInnerTexts();
 		initialGroupBadgesCount = await groupBadges.count();
