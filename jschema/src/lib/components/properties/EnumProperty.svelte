@@ -11,7 +11,7 @@
 	function handleValueChange() {
 		formElement.notifyChange();
 		validationError = '';
-		if (formElement.required && field.value === 'null') {
+		if (formElement.required && field.value === '') {
 			validationError = 'Field is required';
 		}
 	}
@@ -31,7 +31,7 @@
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}
 		>
-			<option value={null}>Select...</option>
+			<option value="">Select...</option>
 			{#each formElement.options as optionValue}
 				<option>{optionValue}</option>
 			{/each}

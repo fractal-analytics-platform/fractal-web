@@ -6,38 +6,28 @@ import { getPropertyData } from './jschema_initial_data';
  * @abstract
  */
 export class BaseFormElement {
-	manager;
-	/**
-	 * Unique identifier associated with the HTML element
-	 */
-	id;
-	key;
-	type;
-	title;
-	description;
-	required;
-	/**
-	 * Tells if the property can be removed from an object: true for custom properties
-	 * of schema objects having additionalProperties set to true.
-	 */
-	removable;
-	/**
-	 * @type {import("../types/jschema").JSONSchemaProperty}
-	 */
-	property;
-
 	/**
 	 * @param {import("../types/form").BaseFormElementFields} fields
 	 */
 	constructor(fields) {
 		this.manager = fields.manager;
+		/**
+		 * Unique identifier associated with the HTML element
+		 */
 		this.id = fields.id;
 		this.key = fields.key;
 		this.type = fields.type;
 		this.title = fields.title;
 		this.required = fields.required;
 		this.description = fields.description;
+		/**
+		 * Tells if the property can be removed from an object: true for custom properties
+		 * of schema objects having additionalProperties set to true.
+		 */
 		this.removable = fields.removable;
+		/**
+		 * @type {import("../types/jschema").JSONSchemaProperty}
+		 */
 		this.property = fields.property;
 	}
 
@@ -52,8 +42,6 @@ export class BaseFormElement {
  * @abstract
  */
 export class ValueFormElement extends BaseFormElement {
-	value;
-
 	/**
 	 * @param {import("../types/form").ValueFormElementFields<T>} fields
 	 */
@@ -82,8 +70,6 @@ export class BooleanFormElement extends ValueFormElement {
 }
 
 export class EnumFormElement extends ValueFormElement {
-	options;
-
 	/**
 	 * @param {import("../types/form").EnumFormElementFields} fields
 	 */
@@ -94,7 +80,6 @@ export class EnumFormElement extends ValueFormElement {
 }
 
 export class NumberFormElement extends ValueFormElement {
-	badInput = false;
 	/**
 	 * @param {import("../types/form").NumberFormElementFields} fields
 	 */
@@ -102,21 +87,19 @@ export class NumberFormElement extends ValueFormElement {
 		super(fields);
 		this.min = fields.min;
 		this.max = fields.max;
+		this.badInput = false;
 	}
 }
 
 export class ObjectFormElement extends BaseFormElement {
-	children;
-	/**
-	 * @type {import("../types/jschema").JSONSchemaProperty | false}
-	 */
-	additionalProperties = false;
-
 	/**
 	 * @param {import("../types/form").ObjectFormElementFields} fields
 	 */
 	constructor(fields) {
 		super(fields);
+		/**
+		 * @type {import("../types/jschema").JSONSchemaProperty | false}
+		 */
 		this.additionalProperties = fields.additionalProperties;
 		this.children = fields.children;
 		this.collapsed = !fields.required;
@@ -201,11 +184,6 @@ export class ObjectFormElement extends BaseFormElement {
 }
 
 export class ArrayFormElement extends BaseFormElement {
-	children;
-	items;
-	minItems;
-	maxItems;
-
 	/**
 	 * @param {import("../types/form").ArrayFormElementFields} fields
 	 */
@@ -283,10 +261,6 @@ export class ArrayFormElement extends BaseFormElement {
 }
 
 export class TupleFormElement extends BaseFormElement {
-	children;
-	items;
-	size;
-
 	/**
 	 * @param {import("../types/form").TupleFormElementFields} fields
 	 */

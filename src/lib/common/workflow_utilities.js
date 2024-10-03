@@ -97,7 +97,7 @@ function getDatasetSelectionsFromLocalStorage() {
 			if (Array.isArray(parsedValue)) {
 				return parsedValue;
 			}
-		} catch (ex) {
+		} catch {
 			console.error(`Invalid JSON inside localStorage item ${LOCAL_STORAGE_SELECTED_DATASETS}`);
 		}
 	}

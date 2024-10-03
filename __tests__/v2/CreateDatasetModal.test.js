@@ -18,8 +18,10 @@ vi.mock('$app/stores', () => {
 
 // Mocking bootstrap.Modal
 class MockModal {
-	show = vi.fn();
-	hide = vi.fn();
+	constructor() {
+		this.show = vi.fn();
+		this.hide = vi.fn();
+	}
 }
 MockModal.getInstance = vi.fn();
 

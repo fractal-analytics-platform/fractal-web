@@ -506,7 +506,6 @@
 			if (response.ok) {
 				// Successfully applied workflow
 				// @ts-ignore
-				// eslint-disable-next-line
 				runWorkflowModal.toggle();
 				// Navigate to project jobs page
 				// Define URL to navigate to
@@ -908,9 +907,9 @@
 			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 		{:else if workflow !== undefined}
 			{#key updatableWorkflowList}
-				<ul class="list-group list-group-flush">
+				<div class="list-group list-group-flush">
 					{#each updatableWorkflowList as workflowTask, i}
-						<li class="list-group-item" data-fs-target={workflowTask.id}>
+						<button class="list-group-item" data-fs-target={workflowTask.id}>
 							<div class="d-flex justify-content-between align-items-center">
 								<div>
 									{workflowTask.task.name} #{workflowTask.id}
@@ -934,9 +933,9 @@
 									{/if}
 								</div>
 							</div>
-						</li>
+						</button>
 					{/each}
-				</ul>
+				</div>
 			{/key}
 		{/if}
 	</svelte:fragment>

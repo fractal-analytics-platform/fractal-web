@@ -8,7 +8,9 @@ vi.mock('$env/dynamic/public', () => {
 
 // Mocking bootstrap.Modal
 class MockModal {
-	show = vi.fn();
+	constructor() {
+		this.show = vi.fn();
+	}
 }
 MockModal.getInstance = vi.fn();
 

@@ -94,6 +94,7 @@
 	on:dragover={handleDragOver}
 	on:dragleave={handleDragLeave}
 	class:dragOver
+	role="region"
 >
 	<div class="m-1">
 		<div class="input-group has-validation">

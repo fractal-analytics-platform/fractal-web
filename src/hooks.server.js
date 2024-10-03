@@ -38,7 +38,7 @@ export async function handle({ event, resolve }) {
 		} else {
 			logger.info('[%s] - %s - [NOT FOUND]', event.request.method, event.url.pathname);
 		}
-		throw error(404, 'Route not found');
+		error(404, 'Route not found');
 	}
 
 	logger.info('[%s] - %s', event.request.method, event.url.pathname);
@@ -73,19 +73,19 @@ export async function handle({ event, resolve }) {
 
 	if (!serverInfo.alive && !isPublicPage) {
 		// If fractal-server is not available, redirect to the home page to display the maintenance banner
-		throw redirect(302, '/?invalidate=true');
+		redirect(302, '/?invalidate=true');
 	}
 
 	// Authentication guard
 	if (!isPublicPage && userInfo === null) {
 		logger.debug('Authentication required - No auth cookie found - Redirecting to login');
-		throw redirect(302, '/auth/login?invalidate=true');
+		redirect(302, '/auth/login?invalidate=true');
 	}
 
 	// Admin area check
 	if (event.url.pathname.startsWith('/v1/admin') || event.url.pathname.startsWith('/v2/admin')) {
 		if (!(/** @type {import('$lib/types').User} */ (userInfo).is_superuser)) {
-			throw error(403, `Only superusers can access the admin area`);
+			error(403, `Only superusers can access the admin area`);
 		}
 	}
 

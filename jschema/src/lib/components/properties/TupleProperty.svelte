@@ -39,7 +39,7 @@
 		{/if}
 	</div>
 	<div>
-		{#each children as nestedProperty, index (nestedProperty.id)}
+		{#each children as nestedProperty}
 			<div class="d-flex">
 				<div class="flex-fill">
 					<PropertyDiscriminator formElement={nestedProperty} />

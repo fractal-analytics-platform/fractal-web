@@ -76,7 +76,7 @@
 		let args;
 		try {
 			args = JSON.parse(argsToBeFixed);
-		} catch (err) {
+		} catch {
 			argsToBeFixedValidJson = false;
 			return;
 		}
