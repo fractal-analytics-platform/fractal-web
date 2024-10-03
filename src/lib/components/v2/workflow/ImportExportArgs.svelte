@@ -36,7 +36,7 @@
 		let json;
 		try {
 			json = JSON.parse(content);
-		} catch (err) {
+		} catch {
 			importArgsError = "File doesn't contain valid JSON";
 			return;
 		}

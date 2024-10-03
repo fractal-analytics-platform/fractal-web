@@ -1,4 +1,4 @@
-import { waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
@@ -19,16 +19,25 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 		await waitPageLoading(page);
 	});
 
-	const randomSlurmAccount = Math.random().toString(36).substring(7);
+	let randomSlurmAccount;
 
-	await test.step('Add SLURM account to the admin', async () => {
-		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page
-			.getByLabel(/^SLURM account #/)
-			.last()
-			.fill(randomSlurmAccount);
-		await page.getByRole('button', { name: 'Save' }).nth(1).click();
-		await expect(page.getByText('Settings successfully updated')).toBeVisible();
+	await test.step('Add SLURM account to the admin or detect existing SLURM account', async () => {
+		await expect(page.getByRole('button', { name: 'Add SLURM account' })).toBeVisible();
+		const inputs = await page.getByLabel(/^SLURM account/).all();
+		if (inputs.length > 0) {
+			// If a SLURM account already exists, pick the exising one to avoid concurrent
+			// modifications of the SLURM accounts list
+			randomSlurmAccount = await inputs[0].inputValue();
+		} else {
+			randomSlurmAccount = Math.random().toString(36).substring(7);
+			await page.getByRole('button', { name: 'Add SLURM account' }).click();
+			await page
+				.getByLabel(/^SLURM account #/)
+				.last()
+				.fill(randomSlurmAccount);
+			await page.getByRole('button', { name: 'Save' }).nth(1).click();
+			await expect(page.getByText('Settings successfully updated')).toBeVisible();
+		}
 	});
 
 	await test.step('Add task to workflow', async () => {
@@ -51,7 +60,9 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 		await modal.getByRole('button', { name: 'Advanced Options' }).click();
 		await modal.getByRole('combobox', { name: 'SLURM account' }).selectOption(randomSlurmAccount);
 		await modal.getByRole('button', { name: 'Run' }).click();
+		await expect(modal.getByRole('combobox', { name: 'SLURM account' })).toBeDisabled();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
 	});
 
 	await test.step('Wait task submitted', async () => {

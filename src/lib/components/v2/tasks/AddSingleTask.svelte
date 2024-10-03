@@ -190,13 +190,13 @@
 		try {
 			const argsSchemaFile = argsSchemaFiles[0];
 			content = await argsSchemaFile.text();
-		} catch (err) {
+		} catch {
 			return new Error('Unable to read file');
 		}
 		let json;
 		try {
 			json = JSON.parse(content);
-		} catch (err) {
+		} catch {
 			return new Error("File doesn't contain valid JSON");
 		}
 
@@ -261,12 +261,12 @@
 		try {
 			const metaFile = metaFiles[0];
 			content = await metaFile.text();
-		} catch (err) {
+		} catch {
 			return new Error('Unable to read file');
 		}
 		try {
 			return JSON.parse(content);
-		} catch (err) {
+		} catch {
 			return new Error("File doesn't contain valid JSON");
 		}
 	}

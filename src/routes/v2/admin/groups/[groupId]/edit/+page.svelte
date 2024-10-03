@@ -138,6 +138,7 @@
 		<div
 			class="droparea bg-light p-2"
 			id="members-container"
+			role="region"
 			class:hovering
 			on:dragenter={() => (hovering = true)}
 			on:dragleave={() => (hovering = false)}

@@ -163,7 +163,7 @@ export const actions = {
 		console.log(cookieOptions);
 		cookies.set(AUTH_COOKIE_NAME, authData.access_token, cookieOptions);
 
-		throw redirect(302, '/');
+		redirect(302, '/');
 	}
 };
 ```

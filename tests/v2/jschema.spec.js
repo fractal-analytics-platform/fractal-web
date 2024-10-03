@@ -43,89 +43,89 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		const input = form.getByLabel('Required string', { exact: true });
 		await input.fill('foo');
 		await input.fill('');
-		expect(form.getByText('Field is required')).toHaveCount(1);
+		await expect(form.getByText('Field is required')).toHaveCount(1);
 		await input.fill('bar');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 		// Check that export button is disabled when there are some pending changes
-		expect(await page.getByRole('button', { name: /.*Export$/ }).isDisabled()).toEqual(true);
+		await expect(page.getByRole('button', { name: /.*Export$/ })).toBeDisabled();
 	});
 
 	await test.step('Fill optional string', async () => {
 		const input = form.getByLabel('Optional string', { exact: true });
 		await input.fill('foo');
 		await input.fill('');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Select required option', async () => {
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
-		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('null');
-		expect(form.getByText('Field is required')).toHaveCount(1);
+		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('');
+		await expect(form.getByText('Field is required')).toHaveCount(1);
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Select optional option', async () => {
 		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('option1');
-		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('null');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await page.getByRole('combobox', { name: 'Optional enum' }).selectOption('');
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Fill required integer with min and max', async () => {
 		const input = form.getByLabel('minMaxRequiredInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('Should be a number')).toHaveCount(1);
 		await input.fill('1');
-		expect(form.getByText('Should be greater or equal than 5')).toHaveCount(1);
+		await expect(form.getByText('Should be greater or equal than 5')).toHaveCount(1);
 		await input.fill('15');
-		expect(form.getByText('Should be lower or equal than 10')).toHaveCount(1);
+		await expect(form.getByText('Should be lower or equal than 10')).toHaveCount(1);
 		await input.fill('');
-		expect(form.getByText('Field is required')).toHaveCount(1);
+		await expect(form.getByText('Field is required')).toHaveCount(1);
 		await input.fill('8');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Fill optional integer with min and max', async () => {
 		const input = form.getByLabel('minMaxOptionalInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('Should be a number')).toHaveCount(1);
 		await input.fill('-7');
-		expect(form.getByText('Should be greater or equal than 0')).toHaveCount(1);
+		await expect(form.getByText('Should be greater or equal than 0')).toHaveCount(1);
 		await input.fill('33');
-		expect(form.getByText('Should be lower or equal than 8')).toHaveCount(1);
+		await expect(form.getByText('Should be lower or equal than 8')).toHaveCount(1);
 		await input.fill('');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Fill optional integer with exclusive min and max', async () => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('Should be a number')).toHaveCount(1);
 		await input.fill('2');
-		expect(form.getByText('Should be greater or equal than 4')).toHaveCount(1);
+		await expect(form.getByText('Should be greater or equal than 4')).toHaveCount(1);
 		await input.fill('99');
-		expect(form.getByText('Should be lower or equal than 41')).toHaveCount(1);
+		await expect(form.getByText('Should be lower or equal than 41')).toHaveCount(1);
 		await input.fill('');
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 	});
 
 	await test.step('Required boolean', async () => {
 		const booleanSwitch = form.getByRole('switch');
-		expect(await booleanSwitch.isChecked()).toEqual(false);
+		await expect(booleanSwitch).not.toBeChecked();
 		await booleanSwitch.check();
-		expect(await booleanSwitch.isChecked()).toEqual(true);
+		await expect(booleanSwitch).toBeChecked();
 		await booleanSwitch.uncheck();
-		expect(await booleanSwitch.isChecked()).toEqual(false);
+		await expect(booleanSwitch).not.toBeChecked();
 	});
 
 	await test.step('Required array with minItems and maxItems', async () => {
 		const addBtn = form.getByRole('button', { name: 'Add argument to list' }).first();
 		await addBtn.click();
 		await addBtn.click();
-		expect(await addBtn.isDisabled()).toEqual(true);
+		await expect( addBtn).toBeDisabled();
 		const block = form.locator('.property-block', {
 			has: page.getByText('requiredArrayWithMinMaxItems')
 		});
@@ -145,7 +145,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await checkFirstArray(block, ['a', 'b', 'd', 'c']);
 		// Remove items
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
-		expect(await addBtn.isDisabled()).toEqual(false);
+		await expect( addBtn).not.toBeDisabled();
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		await checkFirstArray(block, ['a', 'b']);
 	});
@@ -156,7 +156,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	 */
 	async function checkFirstArray(block, expectedValues) {
 		for (let i = 0; i < expectedValues.length; i++) {
-			expect(await block.getByRole('textbox').nth(i).inputValue()).toEqual(expectedValues[i]);
+			await expect(block.getByRole('textbox').nth(i)).toHaveValue(expectedValues[i]);
 		}
 	}
 
@@ -166,7 +166,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await addBtn.click();
 		await addBtn.click();
 		await addBtn.click();
-		expect(await addBtn.isDisabled()).toEqual(true);
+		await expect(addBtn).toBeDisabled();
 		const block = form.locator('.property-block', {
 			has: page.getByText('optionalArrayWithMinMaxItems')
 		});
@@ -174,10 +174,10 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await block.getByRole('textbox').nth(1).fill('b');
 		await block.getByRole('textbox').nth(2).fill('c');
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
-		expect(await addBtn.isDisabled()).toEqual(false);
+		await expect(addBtn).not.toBeDisabled();
 		await form.getByRole('button', { name: 'Remove' }).nth(1).click();
 		await form.getByRole('button', { name: 'Remove' }).nth(0).click();
-		expect(block.getByRole('textbox')).toHaveCount(0);
+		await expect(block.getByRole('textbox')).toHaveCount(0);
 	});
 
 	await test.step('Object with nested properties', async () => {
@@ -187,13 +187,13 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	});
 
 	await test.step('Attempt to save with missing required fields', async () => {
-		expect(form.getByText('Field is required')).toHaveCount(0);
+		await expect(form.getByText('Field is required')).toHaveCount(0);
 		const stringInput = form.getByLabel('Required string', { exact: true });
 		await stringInput.fill('');
 		const intInput = form.getByLabel('minMaxRequiredInt', { exact: true });
 		await intInput.fill('');
 		await page.getByRole('button', { name: 'Save changes' }).click();
-		expect(form.getByText('Field is required')).toHaveCount(2);
+		await expect(form.getByText('Field is required')).toHaveCount(2);
 	});
 
 	await test.step('Save values', async () => {

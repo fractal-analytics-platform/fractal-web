@@ -22,6 +22,7 @@
 	<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
 	<li class="list-group-item">
 		{#if task.docs_info}
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html formatMarkdown(task.docs_info)}
 		{:else}
 			-

@@ -84,6 +84,7 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 	} else {
 		await expect(selector).toHaveText(optionValue);
 	}
+	await expect(page.getByRole('option', { name: optionValue, exact: true })).toHaveAttribute('aria-selected', 'true');
 }
 
 /**
@@ -109,4 +110,5 @@ export async function logout(page, email) {
 	await page.getByRole('button', { name: email }).click();
 	await page.getByRole('link', { name: 'Logout' }).click();
 	await waitPageLoading(page);
+	await expect(page.getByRole('link', {name: 'Login'}).first()).toBeVisible();
 }

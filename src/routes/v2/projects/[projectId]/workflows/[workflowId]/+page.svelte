@@ -507,7 +507,7 @@
 
 	$: hasAnyJobRun = Object.keys(statuses).length > 0;
 
-	/** @type {NodeJS.Timer|undefined} */
+	/** @type {number|undefined} */
 	let statusWatcherTimer;
 
 	async function selectedDatasetChanged() {
@@ -541,8 +541,8 @@
 		statuses = outputStatus.status;
 		const submitted = Object.values(statuses).filter((s) => s === 'submitted');
 		if (submitted.length > 0) {
-			clearTimeout(statusWatcherTimer);
-			statusWatcherTimer = setTimeout(loadJobsStatus, updateJobsInterval);
+			window.clearTimeout(statusWatcherTimer);
+			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;

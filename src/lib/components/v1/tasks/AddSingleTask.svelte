@@ -122,7 +122,7 @@
 		let json;
 		try {
 			json = JSON.parse(content);
-		} catch (err) {
+		} catch {
 			return new Error("File doesn't contain valid JSON");
 		}
 		const schemaValidator = new SchemaValidator('pydantic_v1');
@@ -148,7 +148,7 @@
 		let content = await metaFile.text();
 		try {
 			return JSON.parse(content);
-		} catch (err) {
+		} catch {
 			return new Error("File doesn't contain valid JSON");
 		}
 	}

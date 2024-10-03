@@ -26,21 +26,6 @@ import { SchemaValidator } from './jschema_validation.js';
  */
 export class FormManager {
 	/**
-	 * The root of the object representing the form.
-	 * @type {ObjectFormElement}
-	 */
-	root;
-
-	/**
-	 * List of unique identifiers generated for elements
-	 * @type {string[]}
-	 */
-	ids = [];
-
-	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	schemaVersion;
-
-	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
 	 * @param {(type: string, detail?: any) => boolean} dispatch
 	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
@@ -48,6 +33,7 @@ export class FormManager {
 	 * @param {any} initialValue
 	 */
 	constructor(originalJsonSchema, dispatch, schemaVersion, propertiesToIgnore = [], initialValue = undefined) {
+		/** @type {'pydantic_v1'|'pydantic_v2'} */
 		this.schemaVersion = schemaVersion;
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
 
@@ -57,6 +43,12 @@ export class FormManager {
 			throw new Error('Invalid JSON Schema');
 		}
 
+		/**
+		 * List of unique identifiers generated for elements
+		 * @type {string[]}
+		 */
+		this.ids = [];
+
 		const data = getJsonSchemaData(this.jsonSchema, schemaVersion, initialValue);
 		this.dispatch = dispatch;
 		this.notifyChange = () => {
@@ -64,6 +56,10 @@ export class FormManager {
 			this.dispatch('change', { value: data });
 		};
 
+		/**
+		 * The root of the object representing the form.
+		 * @type {ObjectFormElement}
+		 */
 		this.root = this.createObjectElement({
 			key: null,
 			property: this.jsonSchema,

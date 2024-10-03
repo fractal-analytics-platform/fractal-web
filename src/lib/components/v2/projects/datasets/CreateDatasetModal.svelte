@@ -16,7 +16,6 @@
 	let zarrDir = '';
 	let submitted = false;
 	let saving = false;
-	let creatingDataset = false;
 
 	/** @type {FileList|null} */
 	let files = null;
@@ -33,7 +32,6 @@
 		zarrDir = '';
 		filtersCreationForm.init({}, {});
 		submitted = false;
-		creatingDataset = false;
 		files = null;
 		if (fileInput) {
 			fileInput.value = '';
@@ -52,7 +50,6 @@
 
 		saving = true;
 		try {
-			creatingDataset = true;
 			const newDataset = await callCreateDataset();
 			createDatasetCallback(newDataset);
 		} catch (err) {
@@ -78,7 +75,7 @@
 		let workflowFileContent;
 		try {
 			workflowFileContent = await datasetFile.text();
-		} catch (err) {
+		} catch {
 			saving = false;
 			fileError = 'Unable to read dataset file';
 			return;
@@ -87,7 +84,7 @@
 		let datasetData;
 		try {
 			datasetData = JSON.parse(workflowFileContent);
-		} catch (err) {
+		} catch {
 			saving = false;
 			fileError = 'The selected file is not a valid JSON file';
 			return;

@@ -556,9 +556,11 @@
 			<table class="table" id="dataset-images-table">
 				<colgroup>
 					<col width="auto" />
+					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each Object.keys(imagePage.attributes) as _}
 						<col width="190" />
 					{/each}
+					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each imagePage.types as _}
 						<col width="110" />
 					{/each}

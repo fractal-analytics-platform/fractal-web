@@ -37,7 +37,7 @@
 		let manifestData;
 		try {
 			manifestData = JSON.parse(content);
-		} catch (err) {
+		} catch {
 			throw new Error("File doesn't contain valid JSON");
 		}
 		const argsSchemaVersion = manifestData.args_schema_version;

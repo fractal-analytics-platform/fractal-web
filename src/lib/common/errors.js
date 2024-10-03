@@ -11,7 +11,7 @@ export async function responseError(response) {
 	if ('detail' in errorResponse) {
 		errorResponse = errorResponse.detail;
 	}
-	throw error(response.status, errorResponse);
+	error(response.status, errorResponse);
 }
 
 /**
@@ -183,15 +183,14 @@ export function displayStandardErrorAlert(error, targetElementId) {
  * and a generic error, displayed in a standard error alert component.
  */
 export class FormErrorHandler {
-	validationErrors = writable({});
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	errorAlert = undefined;
-
 	/**
 	 * @param {string} errorAlertId id of the generic error alert component
 	 * @param {string[]} handledErrorKeys keys associated with form fields
 	 */
 	constructor(errorAlertId, handledErrorKeys) {
+		this.validationErrors = writable({});
+		/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+		this.errorAlert = undefined;
 		this.errorAlertId = errorAlertId;
 		this.handledErrorKeys = handledErrorKeys;
 	}
@@ -241,7 +240,7 @@ export class FormErrorHandler {
 		let result;
 		try {
 			result = await response.json();
-		} catch (_) {
+		} catch {
 			result = `Invalid JSON response. Response status is ${response.status}.`;
 		}
 		const errorsMap = getValidationMessagesMap(result, response.status);
