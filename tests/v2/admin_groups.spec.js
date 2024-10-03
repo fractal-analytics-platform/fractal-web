@@ -62,6 +62,12 @@ test('Admin groups management', async ({ page }) => {
 		selectableGroups1 = await page.getByRole('option').count();
 		await selectSlimSelect(page, page.getByLabel('Select groups'), group2, true);
 		await modal.getByRole('button', { name: 'Add' }).click();
+		if (await modal.getByText('Group is required').isVisible()) {
+			// Sometimes playwright clicks the "Add" button before the slim-select change event
+			// is propagated; in that case no group is selected and the error appears.
+			console.warn('"Group is required" message was displayed. Retrying to add group.');
+			await modal.getByRole('button', { name: 'Add' }).click();
+		}
 		await waitModalClosed(page);
 		await expect(groupBadges).toHaveCount(initialGroupBadgesCount + 1);
 	});
@@ -91,6 +97,8 @@ test('Admin groups management', async ({ page }) => {
 		for (let group of [group2, group3].sort()) {
 			await selectSlimSelect(page, page.getByLabel('Select groups'), group, true);
 		}
+		// Await slim-select change events are propagated before clicking the Add button
+		await new Promise(r => setTimeout(r, 500));
 		await modal.getByRole('button', { name: 'Add' }).click();
 		await waitModalClosed(page);
 		finalCount = initialGroupBadgesCount + 2;
