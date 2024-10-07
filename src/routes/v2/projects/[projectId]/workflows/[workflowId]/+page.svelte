@@ -28,7 +28,10 @@
 	$: project = workflow.project;
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	let datasets = $page.data.datasets;
-	// List of available tasks to be inserted into workflow
+	/**
+	 * List of available tasks to be inserted into workflow
+	 * @type {Array<import('$lib/types-v2').TaskV2>}
+	 */
 	let availableTasks = [];
 
 	/** @type {number|undefined} */
@@ -156,7 +159,7 @@
 
 		customTaskWarning = '';
 		await tick();
-		const customTasks = workflow.task_list.map((w) => w.task).filter((t) => t.owner);
+		const customTasks = workflow.task_list.map((w) => w.task);
 
 		if (customTasks.length > 0) {
 			customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; re-importing this workflow may not work as expected.`;

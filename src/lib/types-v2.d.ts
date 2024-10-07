@@ -53,7 +53,7 @@ export type TaskV2 = {
   input_types: { [key: string]: boolean }
   output_types: { [key: string]: boolean }
   version: string | null
-  owner: string
+  taskgroupv2_id: number
   source: string
   args_schema_version: 'pydantic_v1' | 'pydantic_v2'
   args_schema_non_parallel: JSONSchemaObjectProperty | null
@@ -128,7 +128,6 @@ type TaskV2Minimal = {
   command_parallel: string | null
   source: string
   source: string | null
-  owner: string | null
   version: string | null
 }
 

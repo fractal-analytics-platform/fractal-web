@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { orderTasksByOwnerThenByNameThenByVersion } from '$lib/common/component_utilities.js';
+	import { orderTasksByGroupThenByNameThenByVersion } from '$lib/common/component_utilities.js';
 	import TaskEditModal from '$lib/components/v2/tasks/TaskEditModal.svelte';
 	import TaskInfoModal from '$lib/components/v2/tasks/TaskInfoModal.svelte';
 	import TaskCollection from '$lib/components/v2/tasks/TaskCollection.svelte';
@@ -28,7 +28,7 @@
 	 * @param {import('$lib/types-v2').TaskV2[]} tasks
 	 */
 	function sortTasks(tasks) {
-		return orderTasksByOwnerThenByNameThenByVersion(tasks, null, 'desc');
+		return orderTasksByGroupThenByNameThenByVersion(tasks, 'desc');
 	}
 
 	/**
@@ -161,20 +161,17 @@
 					<colgroup>
 						<col width="auto" />
 						<col width="100" />
-						<col width="auto" />
 						<col width="350" />
 					</colgroup>
 					<thead class="table-light">
 						<tr>
 							<th>Name</th>
 							<th>Version</th>
-							<th>Owner</th>
 							<th>Options</th>
 						</tr>
 					</thead>
 				</svelte:fragment>
 				<svelte:fragment slot="custom-columns-right" let:task>
-					<td>{task.owner || '–'}</td>
 					<td>
 						<button
 							class="btn btn-light"

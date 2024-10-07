@@ -1,15 +1,13 @@
 <script>
-	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import SlimSelect from 'slim-select';
 	import {
 		greatestVersionDesc,
-		orderTasksByOwnerThenByNameThenByVersion
+		orderTasksByGroupThenByNameThenByVersion
 	} from '$lib/common/component_utilities.js';
 
 	/**
-	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
-	 * @type {T[]}
+	 * @type {Array<import('$lib/types-v2').TaskV2>}
 	 */
 	export let tasks;
 	let loadingTasks = false;
@@ -30,8 +28,7 @@
 	let selectedMapTaskVersions = undefined;
 	let selectionControl = undefined;
 	/**
-	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
-	 * @type {T[]}
+	 * @type {Array<import('$lib/types-v2').TaskV2>}
 	 */
 	let filteredTasks = [];
 
@@ -58,11 +55,6 @@
 					if (!selectedOption.placeholder) {
 						selectedMapKey = selectedOption.value;
 						selectedMapTaskVersions = selectionTasks.get(selectedMapKey);
-						if (selectedOption.data.owner !== undefined) {
-							selectedMapTaskVersions = selectedMapTaskVersions.filter(
-								(t) => t.owner === selectedOption.data.owner
-							);
-						}
 						if (selectedOption.data.package !== undefined) {
 							selectedMapTaskVersions = selectedMapTaskVersions.filter(
 								(t) => t.package === selectedOption.data.package
@@ -77,8 +69,7 @@
 	});
 
 	/**
-	 * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
-	 * @param {T[]} tasks
+	 * @param {Array<import('$lib/types-v2').TaskV2>} tasks
 	 * @param {'common'|'user'} group
 	 */
 	function setSelectionTasks(group, tasks) {
@@ -89,8 +80,7 @@
 		filteredTasks = [];
 
 		if (group === 'common') {
-			// @ts-ignore
-			filteredTasks = tasks.filter((task) => task.owner === null);
+			filteredTasks = [...tasks];
 			filteredTasks.forEach((task) => {
 				let taskPackage = task.source.split(':')[1];
 				if (!selectionTasks.has(task.name)) {
@@ -132,8 +122,7 @@
 		}
 
 		if (group === 'user') {
-			// @ts-ignore
-			filteredTasks = tasks.filter((task) => task.owner !== null);
+			filteredTasks = [...tasks];
 			filteredTasks.forEach((task) => {
 				if (!selectionTasks.has(task.name)) {
 					selectionTasks.set(task.name, [
@@ -141,16 +130,20 @@
 							id: task.id,
 							version: task.version,
 							source: task.source,
-							owner: task.owner
+							taskgroupv2_id: task.taskgroupv2_id
 						}
 					]);
 				} else {
 					const taskVersions = selectionTasks.get(task.name);
 
-					if (taskVersions.find((t) => t.version === task.version && t.owner === task.owner)) {
-						// Set the version to null of previous tasks within taskVersions
+					if (
+						taskVersions.find(
+							(t) => t.version === task.version && t.taskgroupv2_id === task.taskgroupv2_id
+						)
+					) {
+						// Set the version to null of previous tasks within taskgroupv2_id
 						taskVersions.forEach((t) => {
-							if (t.owner === task.owner) {
+							if (t.taskgroupv2_id === task.taskgroupv2_id) {
 								t.version = null;
 							}
 						});
@@ -159,14 +152,14 @@
 							id: task.id,
 							version: null,
 							source: task.source,
-							owner: task.owner
+							taskgroupv2_id: task.taskgroupv2_id
 						});
 					} else {
 						taskVersions.push({
 							id: task.id,
 							version: task.version,
 							source: task.source,
-							owner: task.owner
+							taskgroupv2_id: task.taskgroupv2_id
 						});
 					}
 				}
@@ -203,29 +196,14 @@
 		}
 
 		if (selectedTypeOfTask === 'user') {
-			filteredTasks = orderTasksByOwnerThenByNameThenByVersion(
-				filteredTasks,
-				$page.data.userInfo.username
-			);
+			filteredTasks = orderTasksByGroupThenByNameThenByVersion(filteredTasks);
 			optionsMap = filteredTasks.reduce((dataOptions, task) => {
-				const source = task.owner;
-				const sourceIndex = dataOptions.findIndex((d) => d.label === source);
-				if (sourceIndex === -1) {
-					dataOptions.push({
-						label: source,
-						options: [{ text: task.name, value: task.name, data: { owner: task.owner } }]
-					});
-				} else {
-					// If task name already exists in options, don't add it again
-					if (!dataOptions[sourceIndex].options.find((o) => o.text === task.name))
-						dataOptions[sourceIndex].options.push({
-							text: task.name,
-							value: task.name,
-							data: { owner: task.owner }
-						});
-				}
+				dataOptions.push({
+					text: task.name,
+					value: task.name
+				});
 				return dataOptions;
-			}, /** @type {NestedOptions[]} */ ([]));
+			}, /** @type {Option[]} */ ([]));
 		}
 
 		optionsMap = [{ text: 'Task selection', placeholder: true }, ...optionsMap];

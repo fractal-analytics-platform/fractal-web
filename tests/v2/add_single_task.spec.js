@@ -271,14 +271,13 @@ async function getTaskDataNonParallel(page, items) {
 	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
-		owner: await items[5].innerText(),
-		command_non_parallel: await items[7].innerText(),
-		source: await items[9].innerText(),
-		input_types: await items[11].innerText(),
-		output_types: await items[13].innerText(),
-		docs_link: await items[15].innerText(),
-		docs_info: await items[17].innerText(),
-		args_schema_version: await items[19].innerText()
+		command_non_parallel: await items[5].innerText(),
+		source: await items[7].innerText(),
+		input_types: await items[9].innerText(),
+		output_types: await items[11].innerText(),
+		docs_link: await items[13].innerText(),
+		docs_info: await items[15].innerText(),
+		args_schema_version: await items[17].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
 	if ((await argsSchemaNonParallelBtn.count()) === 1) {
@@ -298,14 +297,13 @@ async function getTaskDataParallel(page, items) {
 	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
-		owner: await items[5].innerText(),
-		command_parallel: await items[7].innerText(),
-		source: await items[9].innerText(),
-		input_types: await items[11].innerText(),
-		output_types: await items[13].innerText(),
-		docs_link: await items[15].innerText(),
-		docs_info: await items[17].innerText(),
-		args_schema_version: await items[19].innerText()
+		command_parallel: await items[5].innerText(),
+		source: await items[7].innerText(),
+		input_types: await items[9].innerText(),
+		output_types: await items[11].innerText(),
+		docs_link: await items[13].innerText(),
+		docs_info: await items[15].innerText(),
+		args_schema_version: await items[17].innerText()
 	};
 	const argsSchemaParallelBtn = page.getByRole('button', { name: 'Args schema parallel' });
 	if ((await argsSchemaParallelBtn.count()) === 1) {
@@ -325,14 +323,13 @@ async function getTaskDataCompound(page, items) {
 	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
-		owner: await items[5].innerText(),
-		command_non_parallel: await items[7].innerText(),
-		command_parallel: await items[9].innerText(),
-		source: await items[11].innerText(),
-		input_types: await items[13].innerText(),
-		output_types: await items[15].innerText(),
-		docs_link: await items[17].innerText(),
-		docs_info: await items[19].innerText(),
+		command_non_parallel: await items[5].innerText(),
+		command_parallel: await items[7].innerText(),
+		source: await items[9].innerText(),
+		input_types: await items[11].innerText(),
+		output_types: await items[13].innerText(),
+		docs_link: await items[15].innerText(),
+		docs_info: await items[17].innerText(),
 		args_schema_version: await items[items.length - 1].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });

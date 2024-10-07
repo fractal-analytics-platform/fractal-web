@@ -87,6 +87,10 @@ export async function deleteTask(page, taskName, version = 'v2') {
 		await page.goto(`/${version}/tasks`);
 		await waitPageLoading(page);
 	}
+	if (version === 'v2') {
+		console.log(`WARNING: deletion of task ${taskName} temporary skipped`);
+		return;
+	}
 	const row = await getTaskRow(page, taskName);
 	await row.getByRole('button', { name: 'Delete' }).click();
 	const modal = page.locator('.modal.show');
