@@ -5,9 +5,12 @@
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
 	export let addNewTasks;
+	/** @type {import('$lib/types').User} */
+	export let user;
 
 	let python_interpreter = '';
 	let source = '';
@@ -15,6 +18,8 @@
 	let package_name = '';
 	let package_root = '';
 	let manifestData = null;
+	let privateTask = false;
+	let selectedGroup = null;
 	let successMessage = '';
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-customEnvTask', [
@@ -93,7 +98,12 @@
 			const headers = new Headers();
 			headers.append('Content-Type', 'application/json');
 
-			const response = await fetch(`/api/v2/task/collect/custom`, {
+			let url = `/api/v2/task/collect/custom?private=${privateTask}`;
+			if (!privateTask) {
+				url += `&user_group_id=${selectedGroup}`;
+			}
+
+			const response = await fetch(url, {
 				method: 'POST',
 				credentials: 'include',
 				headers,
@@ -193,7 +203,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="row mb-2 pb-1">
+	<div class="row mb-1 pb-1">
 		<div class="col">
 			<div class="input-group has-validation">
 				<div class="input-group-text">
@@ -233,7 +243,7 @@
 			<div class="form-text">Optional version of tasks to be collected</div>
 		</div>
 	</div>
-	<div class="row mb-2 pb-1">
+	<div class="row mb-1">
 		<div class="col">
 			<div class="input-group has-validation">
 				<div class="input-group-text">
@@ -260,6 +270,9 @@
 			<div id="errorAlert-customEnvTask" />
 		</div>
 	</div>
+
+	<TaskGroupSelector {user} bind:privateTask bind:selectedGroup />
+
 	<button type="submit" class="btn btn-primary" disabled={collecting}>
 		{#if collecting}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />

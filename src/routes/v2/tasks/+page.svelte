@@ -145,11 +145,16 @@
 
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
-			<TaskCollection {packageType} {reloadTaskList} bind:this={taskCollectionComponent} />
+			<TaskCollection
+				{packageType}
+				{reloadTaskList}
+				bind:this={taskCollectionComponent}
+				user={$page.data.user}
+			/>
 		{:else if packageType === 'single'}
-			<AddSingleTask {addNewTasks} />
+			<AddSingleTask {addNewTasks} user={$page.data.user} />
 		{:else if packageType === 'custom_env'}
-			<CustomEnvTask {addNewTasks} />
+			<CustomEnvTask {addNewTasks} user={$page.data.user} />
 		{/if}
 	</div>
 

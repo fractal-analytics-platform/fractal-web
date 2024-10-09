@@ -144,6 +144,22 @@ type TaskV2Relationship = {
 }
 
 export type TaskV2Info = {
-  task: TaskV2Minimal,
+  task: TaskV2Minimal
   relationships: Array<TaskV2Relationship>
+}
+
+export type TaskGroupV2 = {
+  id: number
+  task_list: TaskV2
+  user_id: number
+  user_group_id: number
+  origin: string
+  pkg_name: string
+  version: string
+  python_version: string
+  path: string
+  venv_path: string
+  pip_extras: string
+  active: boolean
+  timestamp_created: string
 }
