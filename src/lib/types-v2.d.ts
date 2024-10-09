@@ -118,6 +118,7 @@ export type WorkflowTaskV2 = {
   }
   task_id: number
   task: TaskV2
+  warning: string | null
 }
 
 type TaskV2Minimal = {

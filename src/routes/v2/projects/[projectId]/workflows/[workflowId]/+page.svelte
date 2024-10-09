@@ -848,7 +848,11 @@
 									<span class="float-end ps-2">
 										<JobStatusIcon status={statuses[workflowTask.id]} />
 									</span>
-									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
+									{#if workflowTask.warning}
+										<span class="float-end text-warning" title={workflowTask.warning}>
+											<i class="bi bi-exclamation-triangle-fill" />
+										</span>
+									{:else if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-warning" title="new version available">
 											<i class="bi bi-exclamation-triangle-fill" />
 										</span>
@@ -860,6 +864,12 @@
 				</div>
 			</div>
 			<div class="col-8">
+				{#if selectedWorkflowTask?.warning}
+					<div class="alert alert-warning">
+						<i class="bi bi-exclamation-triangle-fill" />
+						{selectedWorkflowTask.warning}
+					</div>
+				{/if}
 				<div class="card">
 					<div class="card-header py-1">
 						{#if selectedWorkflowTask}
