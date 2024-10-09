@@ -150,7 +150,7 @@ export type TaskV2Info = {
 
 export type TaskGroupV2 = {
   id: number
-  task_list: TaskV2
+  task_list: TaskV2[]
   user_id: number
   user_group_id: number
   origin: string
@@ -162,4 +162,14 @@ export type TaskGroupV2 = {
   pip_extras: string
   active: boolean
   timestamp_created: string
+}
+
+export type TasksTableRow = {
+  groupTitle: string
+  tasks: Array<{
+    selectedVersion: string
+    taskVersions: {
+      [version: string]: { [key: string]: string }
+    }
+  }>
 }

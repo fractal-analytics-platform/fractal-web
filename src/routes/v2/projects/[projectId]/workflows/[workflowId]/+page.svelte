@@ -6,7 +6,6 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
-	import WorkflowTaskSelection from '$lib/components/v2/workflow/WorkflowTaskSelection.svelte';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
@@ -20,6 +19,7 @@
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
+	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -28,11 +28,6 @@
 	$: project = workflow.project;
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	let datasets = $page.data.datasets;
-	/**
-	 * List of available tasks to be inserted into workflow
-	 * @type {Array<import('$lib/types-v2').TaskV2>}
-	 */
-	let availableTasks = [];
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
@@ -59,12 +54,6 @@
 
 	let argsChangesSaved = false;
 
-	// Create workflow task modal
-	/** @type {number|undefined} */
-	let taskOrder = undefined;
-	/** @type {WorkflowTaskSelection|undefined} */
-	let workflowTaskSelectionComponent = undefined;
-
 	/** @type {InputFiltersTab|undefined} */
 	let inputFiltersTab = undefined;
 
@@ -82,8 +71,8 @@
 	let runWorkflowModal;
 	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
 	let editTasksOrderModal;
-	/** @type {Modal} */
-	let insertTaskModal;
+	/** @type {AddWorkflowTaskModal} */
+	let addWorkflowTaskModal;
 	/** @type {Modal} */
 	let editWorkflowModal;
 
@@ -92,8 +81,6 @@
 
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
-
-	let customTaskWarning = '';
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
@@ -157,14 +144,6 @@
 			return;
 		}
 
-		customTaskWarning = '';
-		await tick();
-		const customTasks = workflow.task_list.map((w) => w.task);
-
-		if (customTasks.length > 0) {
-			customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; re-importing this workflow may not work as expected.`;
-		}
-
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/export`, {
 			method: 'GET',
 			credentials: 'include'
@@ -193,30 +172,6 @@
 			linkElement.href = fileUrl;
 			linkElement.click();
 		}
-	}
-
-	async function getAvailableTasks() {
-		resetCreateWorkflowTaskModal();
-		await loadAvailableTasks();
-	}
-
-	async function loadAvailableTasks() {
-		workflowTaskSelectionComponent?.setLoadingTasks(true);
-		const response = await fetch(
-			`/api/v2/task?args_schema_parallel=false&args_schema_non_parallel=false`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
-		);
-
-		if (response.ok) {
-			availableTasks = await response.json();
-		} else {
-			console.error(response);
-			availableTasks = [];
-		}
-		workflowTaskSelectionComponent?.setLoadingTasks(false);
 	}
 
 	function resetWorkflowUpdateModal() {
@@ -268,84 +223,13 @@
 		);
 	}
 
-	function resetCreateWorkflowTaskModal() {
-		taskOrder = undefined;
-		insertTaskModal.hideErrorAlert();
-		workflowTaskSelectionComponent?.reset();
-	}
-
-	let creatingWorkflowTask = false;
-
 	/**
-	 * Creates a new project's workflow task in the server.
-	 * @returns {Promise<void>}
+	 * @param {import('$lib/types-v2').WorkflowV2} updatedWorkflow
 	 */
-	async function handleCreateWorkflowTask() {
-		insertTaskModal.confirmAndHide(
-			async () => {
-				if (!workflow) {
-					return;
-				}
-				workflowSuccessMessage = '';
-				creatingWorkflowTask = true;
-
-				const taskId = workflowTaskSelectionComponent?.getSelectedTaskId();
-				if (taskId === undefined) {
-					console.error('Missing selected task id');
-					return;
-				}
-
-				const headers = new Headers();
-				headers.set('Content-Type', 'application/json');
-
-				// Creating workflow task
-				const workflowTaskResponse = await fetch(
-					`/api/v2/project/${project.id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
-					{
-						method: 'POST',
-						credentials: 'include',
-						headers,
-						body: JSON.stringify({
-							order: taskOrder
-						})
-					}
-				);
-
-				const workflowTaskResult = await workflowTaskResponse.json();
-
-				if (!workflowTaskResponse.ok) {
-					console.error('Error while creating workflow task', workflowTaskResult);
-					throw new AlertError(workflowTaskResult);
-				}
-				console.log('Workflow task created');
-
-				// Get updated workflow with created task
-				const workflowResponse = await fetch(
-					`/api/v2/project/${project.id}/workflow/${workflow.id}`,
-					{
-						method: 'GET',
-						credentials: 'include'
-					}
-				);
-
-				const workflowResult = await workflowResponse.json();
-
-				if (!workflowResponse.ok) {
-					console.error('Error while retrieving workflow', workflowResult);
-					throw new AlertError(workflowResult);
-				}
-
-				// Update workflow
-				workflow = workflowResult;
-				// UI Feedback
-				workflowSuccessMessage = 'Workflow task created';
-				resetCreateWorkflowTaskModal();
-				await checkNewVersions();
-			},
-			() => {
-				creatingWorkflowTask = false;
-			}
-		);
+	async function onWorkflowTaskAdded(updatedWorkflow) {
+		workflow = updatedWorkflow;
+		workflowSuccessMessage = 'Workflow task created';
+		await checkNewVersions();
 	}
 
 	/**
@@ -781,8 +665,6 @@
 	</div>
 </div>
 
-<StandardDismissableAlert message={customTaskWarning} alertType="warning" autoDismiss={false} />
-
 {#if workflow}
 	<StandardDismissableAlert message={workflowSuccessMessage} />
 
@@ -814,10 +696,11 @@
 							<div>
 								<button
 									class="btn btn-light"
-									data-bs-toggle="modal"
-									data-bs-target="#insertTaskModal"
 									aria-label="Add task to workflow"
-									on:click={getAvailableTasks}
+									on:click={() => {
+										workflowSuccessMessage = '';
+										addWorkflowTaskModal.show();
+									}}
 								>
 									<i class="bi-plus-lg" />
 								</button>
@@ -1009,40 +892,7 @@
 	</div>
 {/if}
 
-<Modal id="insertTaskModal" centered={true} bind:this={insertTaskModal} focus={false}>
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">New workflow task</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-insertTaskModal" />
-		<form on:submit|preventDefault={handleCreateWorkflowTask}>
-			<div class="mb-3">
-				<WorkflowTaskSelection tasks={availableTasks} bind:this={workflowTaskSelectionComponent} />
-			</div>
-
-			<div class="mb-3">
-				<label for="taskOrder" class="form-label">Task order in workflow</label>
-				<input
-					id="taskOrder"
-					type="number"
-					name="taskOrder"
-					class="form-control"
-					placeholder="Leave it blank to append at the end"
-					min="0"
-					max={workflow?.task_list.length}
-					bind:value={taskOrder}
-				/>
-			</div>
-
-			<button class="btn btn-primary" type="submit" disabled={creatingWorkflowTask}>
-				{#if creatingWorkflowTask}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Insert
-			</button>
-		</form>
-	</svelte:fragment>
-</Modal>
+<AddWorkflowTaskModal bind:this={addWorkflowTaskModal} {onWorkflowTaskAdded} {workflow} />
 
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	<svelte:fragment slot="header">

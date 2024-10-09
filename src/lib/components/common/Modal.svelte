@@ -14,6 +14,8 @@
 	// Set to false to avoid issues in modals containing slim-select dropdowns
 	// As a side effect, it prevents closing the modal with the esc key, unless the user has clicked inside the modal before
 	export let focus = true;
+	// Automatically set the focus on the first input element inside the modal when the modal is shown
+	export let inputAutofocus = true;
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
@@ -26,9 +28,11 @@
 			});
 			modal.addEventListener('shown.bs.modal', () => {
 				// Automatically set focus on first input element (if any)
-				const firstInput = document.querySelector(`#${id} input`);
-				if (firstInput instanceof HTMLElement) {
-					firstInput.focus();
+				if (inputAutofocus) {
+					const firstInput = document.querySelector(`#${id} input`);
+					if (firstInput instanceof HTMLElement) {
+						firstInput.focus();
+					}
 				}
 			});
 			modal.addEventListener('hidden.bs.modal', onClose);
