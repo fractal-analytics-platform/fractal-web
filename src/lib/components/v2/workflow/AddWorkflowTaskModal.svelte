@@ -1,7 +1,7 @@
 <script>
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import sort from 'semver/functions/sort';
+	import compareLoose from 'semver/functions/compare-loose';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
@@ -24,14 +24,11 @@
 	/** @type {number|undefined} */
 	let taskOrder = undefined;
 
-	export function show() {
-		modal.hideErrorAlert();
+	export async function show() {
 		taskOrder = undefined;
-		modal.show();
-	}
-
-	async function onOpen() {
 		loading = true;
+		modal.hideErrorAlert();
+		modal.show();
 		const response = await fetch(`/api/v2/task-group`, {
 			method: 'GET',
 			credentials: 'include'
@@ -56,8 +53,8 @@
 			for (const task of taskGroup.task_list) {
 				const groupValue = taskGroup[groupBy];
 				let groupRow = rows.find((r) => r.groupTitle === groupValue);
-				const taskProperties = getTaskTableProperties(task, taskGroup.pkg_name);
-				const taskVersion = task.version || '';
+				const taskProperties = getTaskTableProperties(taskGroup, task);
+				const taskVersion = taskGroup.version || '';
 				if (groupRow) {
 					let groupTask = groupRow.tasks.find((t) =>
 						Object.values(t.taskVersions).find((o) => o['name'] === task.name)
@@ -98,7 +95,8 @@
 				const versions = Object.keys(task.taskVersions);
 				if (versions.length > 1) {
 					const validVersions = versions.filter((v) => v !== '');
-					task.selectedVersion = sort(validVersions)[validVersions.length - 1];
+					sortVersions(validVersions);
+					task.selectedVersion = validVersions[0];
 				}
 			}
 			row.tasks.sort((t1, t2) =>
@@ -117,17 +115,28 @@
 	}
 
 	/**
-	 *
+	 * @param {string[]} versions
+	 */
+	function sortVersions(versions) {
+		try {
+			versions.sort((v1, v2) => compareLoose(v1, v2)).reverse();
+		} catch (err) {
+			console.warn('Semver error:', err);
+		}
+		return versions;
+	}
+
+	/**
+	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroup
 	 * @param {import('$lib/types-v2').TaskV2} task
-	 * @param {string} pkg_name
 	 * @returns {{[key: string]: string}}
 	 */
-	function getTaskTableProperties(task, pkg_name) {
+	function getTaskTableProperties(taskGroup, task) {
 		return {
-			pkg_name,
+			pkg_name: taskGroup.pkg_name,
 			id: task.id.toString(),
 			name: task.name,
-			version: task.version || ''
+			version: taskGroup.version || ''
 		};
 	}
 
@@ -192,7 +201,6 @@
 	id="addWorkflowTaskModal"
 	centered={true}
 	scrollable={true}
-	{onOpen}
 	bind:this={modal}
 	inputAutofocus={false}
 >
@@ -232,7 +240,7 @@
 													]}"
 													bind:value={task.selectedVersion}
 												>
-													{#each Object.keys(task.taskVersions) as version}
+													{#each sortVersions(Object.keys(task.taskVersions)) as version}
 														<option value={version}>{version || 'None'}</option>
 													{/each}
 												</select>

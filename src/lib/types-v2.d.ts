@@ -155,7 +155,7 @@ export type TaskGroupV2 = {
   user_group_id: number
   origin: string
   pkg_name: string
-  version: string
+  version: string | null
   python_version: string
   path: string
   venv_path: string
