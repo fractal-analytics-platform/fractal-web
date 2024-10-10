@@ -1,5 +1,14 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Alignment with fractal-server 2.7 (\#583):
+    * Removed owner from v2 tasks;
+    * Displayed workflow task warning message;
+    * Implemented selection of group in task creation;
+    * First implementation of new workflow task modal;
+    * Used new group_ids_names field;
+
 # 1.8.0
 
 * Drop Node 16 support (\#574);
