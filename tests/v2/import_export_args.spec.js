@@ -78,7 +78,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Non parallel task without args schema', async () => {
-		await workflow.addUserTask(nonParallelTaskWithoutArgsSchema);
+		await workflow.addTask(nonParallelTaskWithoutArgsSchema);
 		await workflow.selectTask(nonParallelTaskWithoutArgsSchema);
 		await page.getByRole('button', { name: 'Add property' }).click();
 		await page.getByPlaceholder('Argument name').click();
@@ -96,7 +96,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Parallel task without args schema', async () => {
-		await workflow.addUserTask(parallelTaskWithoutArgsSchema);
+		await workflow.addTask(parallelTaskWithoutArgsSchema);
 		await workflow.selectTask(parallelTaskWithoutArgsSchema);
 		await page.getByRole('button', { name: 'Add property' }).click();
 		await page.getByPlaceholder('Argument name').click();
@@ -114,7 +114,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Compound task without args schema', async () => {
-		await workflow.addUserTask(compoundTaskWithoutArgsSchema);
+		await workflow.addTask(compoundTaskWithoutArgsSchema);
 		await workflow.selectTask(compoundTaskWithoutArgsSchema);
 		await page.getByRole('button', { name: 'Add property' }).first().click();
 		await page.getByPlaceholder('Argument name').fill('key_non_parallel');
@@ -139,7 +139,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Non parallel task with args schema', async () => {
-		await workflow.addUserTask(nonParallelTaskWithArgsSchema);
+		await workflow.addTask(nonParallelTaskWithArgsSchema);
 		await workflow.selectTask(nonParallelTaskWithArgsSchema);
 		await page.getByRole('textbox', { name: 'test_non_parallel' }).fill('value_non_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
@@ -155,7 +155,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Parallel task with args schema', async () => {
-		await workflow.addUserTask(parallelTaskWithArgsSchema);
+		await workflow.addTask(parallelTaskWithArgsSchema);
 		await workflow.selectTask(parallelTaskWithArgsSchema);
 		await page.getByRole('textbox', { name: 'test_parallel' }).fill('value_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
@@ -171,7 +171,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Compound task with args schema', async () => {
-		await workflow.addUserTask(compoundTaskWithArgsSchema);
+		await workflow.addTask(compoundTaskWithArgsSchema);
 		await workflow.selectTask(compoundTaskWithArgsSchema);
 		await page.getByRole('textbox', { name: 'test_non_parallel' }).fill('value_non_parallel');
 		await page.getByRole('textbox', { name: 'test_parallel' }).fill('value_parallel');

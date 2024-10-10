@@ -270,7 +270,6 @@
 					<th>Id</th>
 					<th>Name</th>
 					<th>Source</th>
-					<th>Owner</th>
 					<th>Version</th>
 					<th># Workflows</th>
 					<th># Users</th>
@@ -283,7 +282,6 @@
 						<td>{taskInfo.task.id}</td>
 						<td>{taskInfo.task.name}</td>
 						<td>{taskInfo.task.source || '-'}</td>
-						<td>{taskInfo.task.owner || '-'}</td>
 						<td>{taskInfo.task.version || '-'}</td>
 						<td>
 							{taskInfo.relationships.length || '-'}
@@ -353,8 +351,6 @@
 								<li class="list-group-item">{selectedTaskInfo.task.name}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Task type</li>
 								<li class="list-group-item">{selectedTaskInfo.task.type}</li>
-								<li class="list-group-item list-group-item-light fw-bold">Task owner</li>
-								<li class="list-group-item">{selectedTaskInfo.task.owner || '-'}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Task source</li>
 								<li class="list-group-item">{selectedTaskInfo.task.source}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>

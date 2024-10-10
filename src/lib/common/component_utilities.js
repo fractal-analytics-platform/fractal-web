@@ -77,11 +77,9 @@ export function compareTaskNameAscAndVersionDesc(t1, t2) {
 }
 
 /**
- * @template {import('$lib/types').Task|import('$lib/types-v2').TaskV2} T
- * @param {Array<T>} tasks
- * @param {string|null} ownerName
+ * @param {Array<import('$lib/types').Task>} tasks
  * @param {'asc'|'desc'} order
- * @returns {Array<T>}
+ * @returns {Array<import('$lib/types').Task>}
  */
 export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null, order = 'asc') {
 	const sortingFunction = getVersionSortingFunction(order);
@@ -118,6 +116,24 @@ export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null
 			// Owners are equal, sort by name
 			return sortingFunction(t1, t2);
 		}
+	});
+}
+
+/**
+ * @param {Array<import('$lib/types-v2').TaskV2>} tasks
+ * @param {'asc'|'desc'} order
+ * @returns {Array<import('$lib/types-v2').TaskV2>}
+ */
+export function orderTasksByGroupThenByNameThenByVersion(tasks, order = 'asc') {
+	const sortingFunction = getVersionSortingFunction(order);
+	return tasks.sort((t1, t2) => {
+		if (t1.taskgroupv2_id < t2.taskgroupv2_id) {
+			return -1;
+		}
+		if (t1.taskgroupv2_id > t2.taskgroupv2_id) {
+			return 1;
+		}
+		return sortingFunction(t1, t2);
 	});
 }
 

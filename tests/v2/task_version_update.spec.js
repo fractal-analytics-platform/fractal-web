@@ -114,7 +114,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add non parallel task v1', async () => {
-		await workflow.addUserTask(nonParallelTask, 'v0.0.1');
+		await workflow.addTask(nonParallelTask, '0.0.1');
 		await workflow.selectTask(nonParallelTask);
 	});
 
@@ -160,7 +160,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add parallel task v1', async () => {
-		await workflow.addUserTask(parallelTask, 'v0.0.1');
+		await workflow.addTask(parallelTask, '0.0.1');
 		await workflow.selectTask(parallelTask);
 	});
 
@@ -206,7 +206,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add compound task v1', async () => {
-		await workflow.addUserTask(compoundTask, 'v0.0.1');
+		await workflow.addTask(compoundTask, '0.0.1');
 		await workflow.selectTask(compoundTask);
 	});
 
@@ -233,11 +233,11 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Cleanup test tasks', async () => {
-		await deleteTask(page, nonParallelTask); // v0.0.1
-		await deleteTask(page, nonParallelTask); // v0.0.2
-		await deleteTask(page, parallelTask); // v0.0.1
-		await deleteTask(page, parallelTask); // v0.0.2
-		await deleteTask(page, compoundTask); // v0.0.1
-		await deleteTask(page, compoundTask); // v0.0.2
+		await deleteTask(page, nonParallelTask); // 0.0.1
+		await deleteTask(page, nonParallelTask); // 0.0.2
+		await deleteTask(page, parallelTask); // 0.0.1
+		await deleteTask(page, parallelTask); // 0.0.2
+		await deleteTask(page, compoundTask); // 0.0.1
+		await deleteTask(page, compoundTask); // 0.0.2
 	});
 });

@@ -3,7 +3,7 @@
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('$lib/types').User & {group_ids: number[]}} */
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	let user = {
 		email: '',
 		is_active: true,
@@ -11,7 +11,7 @@
 		is_verified: false,
 		username: '',
 		password: '',
-		group_ids: [],
+		group_ids_names: [],
 		oauth_accounts: []
 	};
 

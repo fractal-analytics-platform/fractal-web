@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { uploadFile, waitModalClosed, waitPageLoading } from '../utils.js';
+import { uploadFile, waitPageLoading } from '../utils.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import { deleteTask } from './task_utils.js';
 
 test('Custom Python env task [v2]', async ({ page }) => {
 	await page.goto('/v2/tasks');
@@ -81,11 +82,10 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	await test.step('Check task in the table and delete it', async () => {
 		const taskRow = page.getByRole('row', { name: randomName });
 		await expect(taskRow).toBeVisible();
-		await taskRow.getByRole('button', { name: 'Delete' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
+	});
+
+	await test.step('Delete task', async () => {
+		await deleteTask(page, randomName);
 	});
 
 	await test.step('Remove temporary file and folder', async () => {

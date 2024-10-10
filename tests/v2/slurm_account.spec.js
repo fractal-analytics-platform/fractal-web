@@ -43,7 +43,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	await test.step('Add task to workflow', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
-		await workflow.addCollectedTask('generic_task');
+		await workflow.addTask('generic_task');
 		await workflow.selectTask('generic_task');
 	});
 

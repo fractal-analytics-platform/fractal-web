@@ -5,7 +5,6 @@
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	// The list of workflows
 	/** @type {import('$lib/types-v2').WorkflowV2[]} */
@@ -14,8 +13,6 @@
 	export let projectId = undefined;
 
 	let workflowSearch = '';
-
-	let customTaskWarning = '';
 
 	$: filteredWorkflows = workflows.filter((p) =>
 		p.name.toLowerCase().includes(workflowSearch.toLowerCase())
@@ -49,16 +46,11 @@
 
 	/**
 	 * @param {import('$lib/types-v2').WorkflowV2} importedWorkflow
-	 * @param {string} warningMessage
 	 */
-	function handleWorkflowImported(importedWorkflow, warningMessage) {
+	function handleWorkflowImported(importedWorkflow) {
 		workflows.push(importedWorkflow);
 		workflows = workflows;
-		if (warningMessage) {
-			customTaskWarning = warningMessage;
-		} else {
-			goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
-		}
+		goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
 	}
 
 	onMount(() => {
@@ -91,7 +83,6 @@
 						class="btn btn-primary float-end"
 						type="submit"
 						on:click={() => {
-							customTaskWarning = '';
 							createWorkflowModal.show();
 						}}
 					>
@@ -101,8 +92,6 @@
 			</div>
 		</div>
 	</div>
-
-	<StandardDismissableAlert message={customTaskWarning} alertType="warning" autoDismiss={false} />
 
 	<table class="table align-middle caption-top">
 		<thead class="table-light">

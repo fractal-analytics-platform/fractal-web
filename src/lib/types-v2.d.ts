@@ -53,7 +53,7 @@ export type TaskV2 = {
   input_types: { [key: string]: boolean }
   output_types: { [key: string]: boolean }
   version: string | null
-  owner: string
+  taskgroupv2_id: number
   source: string
   args_schema_version: 'pydantic_v1' | 'pydantic_v2'
   args_schema_non_parallel: JSONSchemaObjectProperty | null
@@ -118,6 +118,7 @@ export type WorkflowTaskV2 = {
   }
   task_id: number
   task: TaskV2
+  warning: string | null
 }
 
 type TaskV2Minimal = {
@@ -128,7 +129,6 @@ type TaskV2Minimal = {
   command_parallel: string | null
   source: string
   source: string | null
-  owner: string | null
   version: string | null
 }
 
@@ -144,6 +144,32 @@ type TaskV2Relationship = {
 }
 
 export type TaskV2Info = {
-  task: TaskV2Minimal,
+  task: TaskV2Minimal
   relationships: Array<TaskV2Relationship>
+}
+
+export type TaskGroupV2 = {
+  id: number
+  task_list: TaskV2[]
+  user_id: number
+  user_group_id: number
+  origin: string
+  pkg_name: string
+  version: string | null
+  python_version: string
+  path: string
+  venv_path: string
+  pip_extras: string
+  active: boolean
+  timestamp_created: string
+}
+
+export type TasksTableRow = {
+  groupTitle: string
+  tasks: Array<{
+    selectedVersion: string
+    taskVersions: {
+      [version: string]: { [key: string]: string }
+    }
+  }>
 }

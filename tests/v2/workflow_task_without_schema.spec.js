@@ -16,7 +16,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add tasks to workflow', async () => {
-		await workflow.addUserTask(taskName);
+		await workflow.addTask(taskName);
 		await workflow.selectTask(taskName);
 	});
 

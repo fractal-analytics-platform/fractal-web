@@ -42,7 +42,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add and select create_ome_zarr_compound', async () => {
-		await workflow.addCollectedTask('create_ome_zarr_compound');
+		await workflow.addTask('create_ome_zarr_compound');
 		await workflow.selectTask('create_ome_zarr_compound');
 	});
 
@@ -123,7 +123,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add and select generic_task', async () => {
-		await workflow.addCollectedTask('generic_task');
+		await workflow.addTask('generic_task');
 		await workflow.selectTask('generic_task');
 	});
 

@@ -1,9 +1,9 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitPageLoading } from '../utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
-import { createFakeTask } from './task_utils.js';
+import { createFakeTask, deleteTask } from './task_utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +33,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Add task to workflow and select it', async () => {
 		await workflow.openWorkflowPage();
-		await workflow.addUserTask(randomTaskName);
+		await workflow.addTask(randomTaskName);
 		await workflow.selectTask(randomTaskName);
 	});
 
@@ -232,33 +232,6 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	});
 
 	await test.step('Delete task', async () => {
-		await page.goto('/v2/tasks');
-		await waitPageLoading(page);
-		const taskRow = /** @type {import('@playwright/test').Locator} */ (
-			await getTaskRow(page, randomTaskName)
-		);
-		const deleteBtn = taskRow.getByRole('button', { name: 'Delete' });
-		await deleteBtn.click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
-		expect(await getTaskRow(page, randomTaskName)).toBeNull();
+		await deleteTask(page, randomTaskName);
 	});
 });
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} taskName
- * @returns {Promise<import('@playwright/test').Locator|null>}
- */
-async function getTaskRow(page, taskName) {
-	const rows = await page.getByRole('table').last().getByRole('row').all();
-	for (const row of rows) {
-		const rowText = await row.innerText();
-		if (rowText.includes(taskName)) {
-			return row;
-		}
-	}
-	return null;
-}

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').User & {group_names: string[]}} */
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	$: user = $page.data.user;
 </script>
 
@@ -43,8 +43,9 @@
 				<tr>
 					<th>Groups</th>
 					<td>
-						{#each user.group_names as group}
-							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group}</span>
+						<!-- eslint-disable-next-line no-unused-vars -->
+						{#each user.group_ids_names as [_, group_name]}
+							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group_name}</span>
 						{/each}
 					</td>
 				</tr>

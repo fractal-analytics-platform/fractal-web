@@ -2,11 +2,14 @@
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
+	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import TypesEditor from './TypesEditor.svelte';
 	import { detectSchemaVersion, SchemaValidator } from 'fractal-jschema';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
 	export let addNewTasks;
+	/** @type {import('$lib/types').User} */
+	export let user;
 
 	let taskSuccessMessage = '';
 
@@ -22,6 +25,8 @@
 	let args_schema_version = 'pydantic_v2';
 	/** @type {import('$lib/types-v2').TaskV2Type} */
 	let taskType = 'non_parallel';
+	let privateTask = false;
+	let selectedGroup = null;
 
 	/** @type {TypesEditor} */
 	let typesEditor;
@@ -119,7 +124,12 @@
 			bodyData.meta_parallel = metaParallel;
 		}
 
-		const response = await fetch(`/api/v2/task`, {
+		let url = `/api/v2/task?private=${privateTask}`;
+		if (!privateTask) {
+			url += `&user_group_id=${selectedGroup}`;
+		}
+
+		const response = await fetch(url, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -659,10 +669,13 @@
 			</div>
 		</div>
 	</div>
+
+	<TaskGroupSelector {user} bind:privateTask bind:selectedGroup />
+
 	<div class="row">
 		<div id="errorAlert-createTask" />
 		<div class="col-auto">
-			<button type="submit" class="btn btn-primary mt-2 mb-3">Create</button>
+			<button type="submit" class="btn btn-primary mt-1 mb-3">Create</button>
 		</div>
 	</div>
 </form>

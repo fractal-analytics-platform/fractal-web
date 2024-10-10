@@ -28,8 +28,6 @@
 			-
 		{/if}
 	</li>
-	<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-	<li class="list-group-item">{task.owner || '–'}</li>
 	{#if task.command_non_parallel !== null}
 		<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
 		<li class="list-group-item">

@@ -153,13 +153,6 @@
 						</div>
 					</div>
 
-					<div class="mb-2 row">
-						<label for="owner" class="col-2 col-form-label text-end">Owner</label>
-						<div class="col-10">
-							<input id="owner" type="text" bind:value={task.owner} disabled class="form-control" />
-						</div>
-					</div>
-
 					{#if task.command_non_parallel !== null}
 						<div class="mb-2 row">
 							<label for="command_non_parallel" class="col-2 col-form-label text-end">

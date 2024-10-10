@@ -9,7 +9,7 @@
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids: number[]}} */
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	export let user;
 	/** @type {Array<import('$lib/types').Group>} */
 	export let groups = [];
@@ -26,12 +26,12 @@
 	/** @type {number[]} */
 	let groupIdsToAdd = [];
 
-	$: userGroups = user.group_ids
-		.map((id) => groups.filter((g) => g.id === id)[0])
+	$: userGroups = user.group_ids_names
+		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
 		.sort(sortGroupByNameComparator);
 
 	$: availableGroups = groups
-		.filter((g) => !user.group_ids.includes(g.id))
+		.filter((g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id))
 		.filter((g) => !groupIdsToAdd.includes(g.id))
 		.sort(sortGroupByNameComparator);
 
@@ -225,7 +225,7 @@
 		const result = await response.json();
 
 		if (response.ok) {
-			user = { ...user, group_ids: result.group_ids };
+			user = { ...user, group_ids_names: result.group_ids_names };
 			groupIdsToAdd = [];
 			return true;
 		}

@@ -3,7 +3,7 @@
 	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids: number[]}} */
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $page.data.user;
 	/** @type {import('$lib/types').UserSettings} */
 	const settings = $page.data.settings;
@@ -12,8 +12,8 @@
 	/** @type {string} */
 	const runnerBackend = $page.data.runnerBackend;
 
-	$: userGroups = user.group_ids
-		.map((id) => groups.filter((g) => g.id === id)[0])
+	$: userGroups = user.group_ids_names
+		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
 		.sort(sortGroupByNameComparator);
 </script>
 

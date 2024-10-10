@@ -29,7 +29,7 @@ describe('UserEditor', () => {
 
 	const selectedUser = {
 		id: 1,
-		group_ids: []
+		group_ids_names: []
 	};
 
 	const initialSettings = {

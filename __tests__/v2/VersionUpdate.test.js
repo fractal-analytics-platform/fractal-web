@@ -210,11 +210,6 @@ describe('VersionUpdate', () => {
 		expect(screen.getByText('Invalid JSON')).toBeDefined();
 	});
 
-	it('no new versions available for null owner', async () => {
-		const task = getTask('My Other Task', '1.2.3');
-		await checkVersions(task, 0);
-	});
-
 	it('no new versions available for admin owner', async () => {
 		const task = getTask('My Other Task', '1.3.0');
 		await checkVersions(task, 0);
