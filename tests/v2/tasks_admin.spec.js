@@ -119,7 +119,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
  */
 async function searchTasks(page) {
 	// Increasing the results limit since during the tests many tasks may have been created
-	await page.getByRole('spinbutton', { name: 'Max number of results' }).fill('200');
+	await page.getByRole('spinbutton', { name: 'Max number of results' }).fill('500');
 	await page.getByRole('button', { name: 'Search tasks' }).click();
 }
 

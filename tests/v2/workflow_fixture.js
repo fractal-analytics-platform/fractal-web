@@ -117,7 +117,10 @@ export class PageWithWorkflow extends PageWithProject {
 	 * @param {string} taskName
 	 */
 	async getTaskRow(modal, taskName) {
-		const rows = await modal.getByRole('row', { name: 'Add task' }).all();
+		const rows = await modal
+			.getByRole('row', { name: taskName })
+			.filter({ hasText: /Add task/ })
+			.all();
 		for (const row of rows) {
 			const cellContent = (await row.getByRole('cell').first().innerText()).trim();
 			if (cellContent === taskName) {

@@ -356,7 +356,7 @@ async function getTaskDataCompound(page, items) {
  */
 async function getCreatedTaskRow(page, taskName) {
 	const table = page.getByRole('table').last();
-	const rows = await table.getByRole('row').all();
+	const rows = await table.getByRole('row', { name: taskName }).all();
 	let taskRow;
 	for (const row of rows) {
 		const text = await row.getByRole('cell').first().innerText();
