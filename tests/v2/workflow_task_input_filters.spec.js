@@ -67,8 +67,8 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add tasks to workflow', async () => {
-		await workflow.addUserTask(taskName1);
-		await workflow.addUserTask(taskName2);
+		await workflow.addTask(taskName1);
+		await workflow.addTask(taskName2);
 		await workflow.selectTask(taskName1);
 	});
 

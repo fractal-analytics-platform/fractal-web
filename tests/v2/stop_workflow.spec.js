@@ -17,7 +17,7 @@ test('Stop workflow [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add and select generic_task', async () => {
-		await workflow.addCollectedTask('generic_task');
+		await workflow.addTask('generic_task');
 		await workflow.selectTask('generic_task');
 	});
 

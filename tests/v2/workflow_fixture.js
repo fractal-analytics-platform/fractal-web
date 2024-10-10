@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -51,7 +51,7 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 
 	async addFakeTask() {
-		await this.addUserTask('Fake Task');
+		await this.addTask('Fake Task');
 	}
 
 	/**
@@ -95,47 +95,36 @@ export class PageWithWorkflow extends PageWithProject {
 	/**
 	 * @param {string} taskName
 	 * @param {string|null=} taskVersion
-	 * @returns {Promise<void>}
 	 */
-	async addCollectedTask(taskName, taskVersion = null) {
+	async addTask(taskName, taskVersion = null) {
 		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
 		const modal = this.page.locator('.modal.show');
 		await modal.waitFor();
 		await expect(modal.locator('.spinner-border')).toHaveCount(0);
-		await this.page.getByText('Common tasks').click();
-		await this.addTask(modal, taskName, taskVersion);
-	}
-
-	/**
-	 * @param {string} taskName
-	 * @param {string|null=} taskVersion
-	 * @returns {Promise<void>}
-	 */
-	async addUserTask(taskName, taskVersion = null) {
-		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
-		const modal = this.page.locator('.modal.show');
-		await modal.waitFor();
-		await expect(modal.locator('.spinner-border')).toHaveCount(0);
-		await this.page.getByText('User tasks').click();
-		await this.addTask(modal, taskName, taskVersion);
+		const row = await this.getTaskRow(modal, taskName);
+		await row.scrollIntoViewIfNeeded();
+		if (taskVersion) {
+			await row
+				.getByRole('combobox', { name: `Version for task ${taskName}` })
+				.selectOption(taskVersion);
+		}
+		await row.getByRole('button', { name: 'Add task' }).click();
+		await waitModalClosed(this.page);
 	}
 
 	/**
 	 * @param {import('@playwright/test').Locator} modal
 	 * @param {string} taskName
-	 * @param {string|null} taskVersion
 	 */
-	async addTask(modal, taskName, taskVersion) {
-		const selector = modal.getByRole('combobox').first();
-		await selectSlimSelect(this.page, selector, taskName);
-		await this.page.locator('#taskId').waitFor();
-		if (taskVersion) {
-			await this.page
-				.getByRole('combobox', { name: 'Select task version' })
-				.selectOption(taskVersion);
+	async getTaskRow(modal, taskName) {
+		const rows = await modal.getByRole('row', { name: 'Add task' }).all();
+		for (const row of rows) {
+			const cellContent = (await row.getByRole('cell').first().innerText()).trim();
+			if (cellContent === taskName) {
+				return row;
+			}
 		}
-		await this.page.getByRole('button', { name: 'Insert' }).click();
-		await waitModalClosed(this.page);
+		throw new Error(`Unable to find row for task ${taskName}`);
 	}
 
 	async removeCurrentTask() {

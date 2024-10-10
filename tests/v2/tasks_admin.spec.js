@@ -25,7 +25,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addUserTask(taskName);
+		await workflow.addTask(taskName);
 	});
 
 	await test.step('Open tasks admin page', async () => {

@@ -20,7 +20,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	let dataset1;
 	await test.step('Create first job and wait its failure', async () => {
 		const job = await createJob(page, request, async function (workflow) {
-			await workflow.addCollectedTask('generic_task');
+			await workflow.addTask('generic_task');
 			await workflow.selectTask('generic_task');
 			await page.getByRole('switch').check();
 			await page.getByRole('button', { name: 'Save changes' }).click();
@@ -41,7 +41,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	let jobId2;
 	await test.step('Create second job', async () => {
 		const job = await createJob(page, request, async function (workflow) {
-			await workflow.addUserTask(taskName);
+			await workflow.addTask(taskName);
 		});
 		workflow2 = job.workflow;
 		dataset2 = job.dataset;
