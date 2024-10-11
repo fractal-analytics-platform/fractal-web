@@ -13,7 +13,7 @@
 	export let user;
 
 	let python_interpreter = '';
-	let source = '';
+	let label = '';
 	let version = '';
 	let package_name = '';
 	let package_root = '';
@@ -24,7 +24,7 @@
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-customEnvTask', [
 		'python_interpreter',
-		'source',
+		'label',
 		'version',
 		'package_name',
 		'package_root'
@@ -88,7 +88,7 @@
 		try {
 			const body = {
 				python_interpreter,
-				source,
+				label,
 				version,
 				package_name,
 				package_root,
@@ -115,7 +115,7 @@
 				addNewTasks(result);
 				successMessage = 'Tasks collected successfully';
 				python_interpreter = '';
-				source = '';
+				label = '';
 				version = '';
 				package_name = '';
 				package_root = '';
@@ -184,23 +184,20 @@
 		<div class="col">
 			<div class="input-group has-validation">
 				<div class="input-group-text">
-					<label class="font-monospace" for="source">Source</label>
+					<label class="font-monospace" for="label">Label</label>
 				</div>
 				<input
-					bind:value={source}
-					name="source"
-					id="source"
+					bind:value={label}
+					name="label"
+					id="label"
 					class="form-control"
 					type="text"
 					required
-					class:is-invalid={$validationErrors['source']}
+					class:is-invalid={$validationErrors['label']}
 				/>
-				<span class="invalid-feedback">{$validationErrors['source']}</span>
+				<span class="invalid-feedback">{$validationErrors['label']}</span>
 			</div>
-			<div class="form-text">
-				A common label identifying this package (e.g. if you set this to <code>"mypackage"</code>
-				then tasks will have source like <code>"myusername:mypackage:task_module_name"</code>)
-			</div>
+			<div class="form-text">A common label identifying this package.</div>
 		</div>
 	</div>
 	<div class="row mb-1 pb-1">

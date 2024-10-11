@@ -131,7 +131,6 @@ type TaskV2Minimal = {
   type: string
   command_non_parallel: string | null
   command_parallel: string | null
-  source: string
   source: string | null
   version: string | null
 }

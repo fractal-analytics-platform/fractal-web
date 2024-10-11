@@ -33,7 +33,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 
 	await test.step('Test "Python interpreter path must be absolute" error', async () => {
 		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('foo');
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomName}-source`);
+		await page.getByRole('textbox', { name: 'Label' }).fill(`${randomName}-label`);
 		tmpManifest = await uploadFile(
 			page,
 			'Manifest',
@@ -72,7 +72,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 
 	await test.step('Verify that fields have been cleaned', async () => {
 		await expect(page.getByRole('textbox', { name: 'Python Intepreter' })).toHaveValue('');
-		await expect(page.getByRole('textbox', { name: 'Source' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Label' })).toHaveValue('');
 		await expect(page.getByLabel('Manifest')).toHaveValue('');
 		await expect(page.getByRole('textbox', { name: 'Package Name' })).toHaveValue('');
 		await expect(page.getByRole('textbox', { name: 'Version' })).toHaveValue('');
