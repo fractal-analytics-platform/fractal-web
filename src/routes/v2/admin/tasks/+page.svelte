@@ -4,7 +4,6 @@
 	import { PropertyDescription } from 'fractal-jschema';
 
 	let name = '';
-	let kind = '';
 	let id = '';
 	let source = '';
 	let version = '';
@@ -39,9 +38,6 @@
 			if (id) {
 				url.searchParams.append('id', id);
 			}
-			if (kind) {
-				url.searchParams.append('kind', kind);
-			}
 			if (source) {
 				url.searchParams.append('source', source);
 			}
@@ -72,7 +68,6 @@
 			searchErrorAlert.hide();
 		}
 		name = '';
-		kind = '';
 		id = '';
 		source = '';
 		version = '';
@@ -142,24 +137,6 @@
 					</div>
 					<div class="col-xl-8 col-lg-7 col-9">
 						<input type="text" class="form-control" bind:value={name} id="name" />
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="kind">Kind</label>
-						<PropertyDescription
-							description="If <code>Common</code>, only include tasks with null <code>owner</code>.<br/>If <code>Users</code>, only include tasks with non-null <code>owner.</code>"
-							html={true}
-						/>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-control" bind:value={kind} id="kind">
-							<option value="">All</option>
-							<option value="common">Common</option>
-							<option value="users">Users</option>
-						</select>
 					</div>
 				</div>
 			</div>
@@ -270,7 +247,6 @@
 					<th>Id</th>
 					<th>Name</th>
 					<th>Source</th>
-					<th>Owner</th>
 					<th>Version</th>
 					<th># Workflows</th>
 					<th># Users</th>
@@ -283,7 +259,6 @@
 						<td>{taskInfo.task.id}</td>
 						<td>{taskInfo.task.name}</td>
 						<td>{taskInfo.task.source || '-'}</td>
-						<td>{taskInfo.task.owner || '-'}</td>
 						<td>{taskInfo.task.version || '-'}</td>
 						<td>
 							{taskInfo.relationships.length || '-'}
@@ -353,8 +328,6 @@
 								<li class="list-group-item">{selectedTaskInfo.task.name}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Task type</li>
 								<li class="list-group-item">{selectedTaskInfo.task.type}</li>
-								<li class="list-group-item list-group-item-light fw-bold">Task owner</li>
-								<li class="list-group-item">{selectedTaskInfo.task.owner || '-'}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Task source</li>
 								<li class="list-group-item">{selectedTaskInfo.task.source}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>

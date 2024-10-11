@@ -112,8 +112,7 @@ export type User = {
   is_verified: boolean
   username: string | null
   password?: string
-  group_names?: string[]
-  group_ids?: number[]
+  group_ids_names : Array<[number, string]> | null
   oauth_accounts: Array<{
     id: number
     account_email: string

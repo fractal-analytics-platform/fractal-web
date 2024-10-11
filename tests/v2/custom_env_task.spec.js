@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { uploadFile, waitModalClosed, waitPageLoading } from '../utils.js';
+import { uploadFile, waitPageLoading } from '../utils.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import { deleteTask } from './task_utils.js';
 
 test('Custom Python env task [v2]', async ({ page }) => {
 	await page.goto('/v2/tasks');
@@ -32,7 +33,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 
 	await test.step('Test "Python interpreter path must be absolute" error', async () => {
 		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('foo');
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomName}-source`);
+		await page.getByRole('textbox', { name: 'Label' }).fill(`${randomName}-label`);
 		tmpManifest = await uploadFile(
 			page,
 			'Manifest',
@@ -71,7 +72,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 
 	await test.step('Verify that fields have been cleaned', async () => {
 		await expect(page.getByRole('textbox', { name: 'Python Intepreter' })).toHaveValue('');
-		await expect(page.getByRole('textbox', { name: 'Source' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Label' })).toHaveValue('');
 		await expect(page.getByLabel('Manifest')).toHaveValue('');
 		await expect(page.getByRole('textbox', { name: 'Package Name' })).toHaveValue('');
 		await expect(page.getByRole('textbox', { name: 'Version' })).toHaveValue('');
@@ -81,11 +82,10 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	await test.step('Check task in the table and delete it', async () => {
 		const taskRow = page.getByRole('row', { name: randomName });
 		await expect(taskRow).toBeVisible();
-		await taskRow.getByRole('button', { name: 'Delete' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
+	});
+
+	await test.step('Delete task', async () => {
+		await deleteTask(page, randomName);
 	});
 
 	await test.step('Remove temporary file and folder', async () => {

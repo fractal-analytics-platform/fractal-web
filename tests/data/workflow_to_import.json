@@ -2,11 +2,11 @@
   "name": "My Workflow",
   "task_list": [
     {
-      "meta": {
+      "meta_non_parallel": {
         "cpus_per_task": 1,
         "mem": 4000
       },
-      "args": {
+      "args_non_parallel": {
         "image_extension": "png",
         "num_levels": 5,
         "coarsening_xy": 2,
@@ -45,12 +45,12 @@
       }
     },
     {
-      "meta": {
+      "meta_non_parallel": {
         "cpus_per_task": 1,
         "mem": 4000,
         "parallelization_level": "image"
       },
-      "args": {
+      "args_non_parallel": {
         "delete_input": false
       },
       "task": {
@@ -58,11 +58,11 @@
       }
     },
     {
-      "meta": {
+      "meta_non_parallel": {
         "cpus_per_task": 1,
         "mem": 1000
       },
-      "args": {
+      "args_non_parallel": {
         "project_to_2D": true,
         "suffix": "mip"
       },
@@ -71,24 +71,24 @@
       }
     },
     {
-      "meta": {
+      "meta_non_parallel": {
         "cpus_per_task": 1,
         "mem": 4000,
         "parallelization_level": "image"
       },
-      "args": null,
+      "args_non_parallel": null,
       "task": {
         "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::maximum_intensity_projection"
       }
     },
     {
-      "meta": {
+      "meta_non_parallel": {
         "cpus_per_task": 1,
         "mem": 4000,
         "needs_gpu": true,
         "parallelization_level": "image"
       },
-      "args": {
+      "args_non_parallel": {
         "input_ROI_table": "well_ROI_table",
         "use_masks": true,
         "relabeling": true,
@@ -111,12 +111,12 @@
       }
     },
     {
-      "meta": {
+      "meta_non_parallel": {
         "cpus_per_task": 1,
         "mem": 4000,
         "parallelization_level": "image"
       },
-      "args": {
+      "args_non_parallel": {
         "input_ROI_table": "well_ROI_table",
         "level": 0,
         "relabeling": true,

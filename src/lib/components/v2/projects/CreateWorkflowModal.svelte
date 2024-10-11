@@ -5,7 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 
-	/** @type {(workflow: import('$lib/types-v2').WorkflowV2, warning: string) => void} */
+	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => void} */
 	export let handleWorkflowImported;
 
 	// Component properties
@@ -96,15 +96,9 @@
 			/** @type {import('$lib/types-v2').WorkflowV2} */
 			const workflow = result;
 
-			let customTaskWarning = '';
 			await tick();
-			const customTasks = workflow.task_list.map((w) => w.task).filter((t) => t.owner);
 
-			if (customTasks.length > 0) {
-				customTaskWarning = `Custom tasks (e.g. "${customTasks[0].name}") are not meant to be portable; workflow "${workflow.name}" was imported, but it may not work as expected.`;
-			}
-
-			handleWorkflowImported(workflow, customTaskWarning);
+			handleWorkflowImported(workflow);
 		} else {
 			console.error('Import workflow failed', result);
 			throw new AlertError(result, response.status);

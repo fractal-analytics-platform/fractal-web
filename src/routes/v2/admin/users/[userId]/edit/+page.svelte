@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids: number[]}} */
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	let user = $page.data.user;
 
 	/** @type {import('$lib/types').UserSettings} */

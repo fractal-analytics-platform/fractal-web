@@ -47,7 +47,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		const task = await getCreatedTaskModalData(page, randomTaskName1, 'non_parallel');
 		expect(task.name).toEqual(randomTaskName1);
 		expect(task.command_non_parallel).toEqual('/tmp/test');
-		expect(task.source).toEqual(`admin:${randomTaskName1}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
 		expect(task.args_schema_version).toEqual('pydantic_v2');
@@ -80,7 +79,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		const task = await getCreatedTaskModalData(page, randomTaskName2, 'parallel');
 		expect(task.name).toEqual(randomTaskName2);
 		expect(task.command_parallel).toEqual('/tmp/test');
-		expect(task.source).toEqual(`admin:${randomTaskName2}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
 		expect(task.args_schema_version).toEqual('pydantic_v2');
@@ -117,7 +115,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.name).toEqual(randomTaskName3);
 		expect(task.command_non_parallel).toEqual('/tmp/test-np');
 		expect(task.command_parallel).toEqual('/tmp/test-p');
-		expect(task.source).toEqual(`admin:${randomTaskName3}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
 		expect(task.args_schema_version).toEqual('pydantic_v2');
@@ -127,21 +124,13 @@ test('Add single tasks [v2]', async ({ page }) => {
 
 	const randomTaskName4 = Math.random().toString(36).substring(7);
 
-	await test.step('Attempt to create task reusing task source', async () => {
-		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName4);
-		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
-		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName1}-source`);
-		await createBtn.click();
-		await page
-			.getByText(`Source 'admin:${randomTaskName1}-source' already used by some TaskV2`)
-			.waitFor();
-	});
-
 	const addInputTypeBtn = page.getByRole('button', { name: 'Add input type' });
 	const addOutputTypeBtn = page.getByRole('button', { name: 'Add output type' });
 
 	await test.step('Attempt to create task with types with empty keys', async () => {
+		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName4);
+		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
+		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
 		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName4}-source`);
 		await addInputTypeBtn.click();
 		await addOutputTypeBtn.click();
@@ -218,7 +207,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.name).toEqual(randomTaskName4);
 		expect(task.command_non_parallel).toEqual('/tmp/test-np');
 		expect(task.command_parallel).toEqual('/tmp/test-p');
-		expect(task.source).toEqual(`admin:${randomTaskName4}-source`);
 		expect(task.args_schema_version).toEqual('pydantic_v1');
 	});
 
@@ -271,14 +259,13 @@ async function getTaskDataNonParallel(page, items) {
 	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
-		owner: await items[5].innerText(),
-		command_non_parallel: await items[7].innerText(),
-		source: await items[9].innerText(),
-		input_types: await items[11].innerText(),
-		output_types: await items[13].innerText(),
-		docs_link: await items[15].innerText(),
-		docs_info: await items[17].innerText(),
-		args_schema_version: await items[19].innerText()
+		command_non_parallel: await items[5].innerText(),
+		source: await items[7].innerText(),
+		input_types: await items[9].innerText(),
+		output_types: await items[11].innerText(),
+		docs_link: await items[13].innerText(),
+		docs_info: await items[15].innerText(),
+		args_schema_version: await items[17].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
 	if ((await argsSchemaNonParallelBtn.count()) === 1) {
@@ -298,14 +285,13 @@ async function getTaskDataParallel(page, items) {
 	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
-		owner: await items[5].innerText(),
-		command_parallel: await items[7].innerText(),
-		source: await items[9].innerText(),
-		input_types: await items[11].innerText(),
-		output_types: await items[13].innerText(),
-		docs_link: await items[15].innerText(),
-		docs_info: await items[17].innerText(),
-		args_schema_version: await items[19].innerText()
+		command_parallel: await items[5].innerText(),
+		source: await items[7].innerText(),
+		input_types: await items[9].innerText(),
+		output_types: await items[11].innerText(),
+		docs_link: await items[13].innerText(),
+		docs_info: await items[15].innerText(),
+		args_schema_version: await items[17].innerText()
 	};
 	const argsSchemaParallelBtn = page.getByRole('button', { name: 'Args schema parallel' });
 	if ((await argsSchemaParallelBtn.count()) === 1) {
@@ -325,14 +311,13 @@ async function getTaskDataCompound(page, items) {
 	const data = {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
-		owner: await items[5].innerText(),
-		command_non_parallel: await items[7].innerText(),
-		command_parallel: await items[9].innerText(),
-		source: await items[11].innerText(),
-		input_types: await items[13].innerText(),
-		output_types: await items[15].innerText(),
-		docs_link: await items[17].innerText(),
-		docs_info: await items[19].innerText(),
+		command_non_parallel: await items[5].innerText(),
+		command_parallel: await items[7].innerText(),
+		source: await items[9].innerText(),
+		input_types: await items[11].innerText(),
+		output_types: await items[13].innerText(),
+		docs_link: await items[15].innerText(),
+		docs_info: await items[17].innerText(),
 		args_schema_version: await items[items.length - 1].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
@@ -359,7 +344,7 @@ async function getTaskDataCompound(page, items) {
  */
 async function getCreatedTaskRow(page, taskName) {
 	const table = page.getByRole('table').last();
-	const rows = await table.getByRole('row').all();
+	const rows = await table.getByRole('row', { name: taskName }).all();
 	let taskRow;
 	for (const row of rows) {
 		const text = await row.getByRole('cell').first().innerText();

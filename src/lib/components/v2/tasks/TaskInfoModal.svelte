@@ -54,8 +54,6 @@
 						<li class="list-group-item">{task.name}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Version</li>
 						<li class="list-group-item">{task.version || '-'}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Owner</li>
-						<li class="list-group-item">{task.owner || '-'}</li>
 						{#if task.command_non_parallel !== null}
 							<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
 							<li class="list-group-item"><code>{task.command_non_parallel}</code></li>

@@ -6,6 +6,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, FormErrorHandler } from '$lib/common/errors';
+	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollectionsV2';
 
@@ -32,9 +33,10 @@
 
 	/** @type {'pypi'|'local'} */
 	export let packageType = 'pypi';
-
 	/** @type {() => Promise<void>} */
 	export let reloadTaskList;
+	/** @type {import('$lib/types').User} */
+	export let user;
 
 	let python_package = '';
 	let package_version = '';
@@ -42,6 +44,8 @@
 	let package_extras = '';
 	/** @type {{key: string, value: string}[]} */
 	let pinnedPackageVersions = [];
+	let privateTask = false;
+	let selectedGroup = null;
 
 	const formErrorHandler = new FormErrorHandler('taskCollectionError', [
 		'package',
@@ -104,8 +108,13 @@
 			requestData.pinned_package_versions = ppv;
 		}
 
+		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
+		if (!privateTask) {
+			url += `&user_group_id=${selectedGroup}`;
+		}
+
 		taskCollectionInProgress = true;
-		const response = await fetch(`/api/v2/task/collect/pip`, {
+		const response = await fetch(url, {
 			method: 'POST',
 			credentials: 'include',
 			headers: headers,
@@ -482,6 +491,8 @@
 				</button>
 			</div>
 		</div>
+
+		<TaskGroupSelector {user} bind:privateTask bind:selectedGroup />
 
 		<div id="taskCollectionError" class="mt-3" />
 

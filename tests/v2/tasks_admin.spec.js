@@ -25,7 +25,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addUserTask(taskName);
+		await workflow.addTask(taskName);
 	});
 
 	await test.step('Open tasks admin page', async () => {
@@ -55,33 +55,6 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Search tasks by id', async () => {
 		await page.getByRole('spinbutton', { name: 'Id' }).fill(id);
-		await searchTasks(page);
-		await expect(page.getByRole('row')).toHaveCount(2);
-		await reset(page);
-	});
-
-	await test.step('Search tasks by common kind', async () => {
-		await page.getByRole('combobox', { name: 'Kind' }).selectOption('Common');
-		await searchTasks(page);
-		await expect(page.getByRole('table')).toBeVisible();
-		let count = await page.getByRole('row').count();
-		expect(count).toBeLessThan(total);
-		await page.getByRole('cell', { name: 'cellpose_segmentation', exact: true }).waitFor();
-		await reset(page);
-	});
-
-	await test.step('Search tasks by users kind', async () => {
-		await page.getByRole('combobox', { name: 'Kind' }).selectOption('Users');
-		await searchTasks(page);
-		await expect(page.getByRole('table')).toBeVisible();
-		let count = await page.getByRole('row').count();
-		expect(count).toBeLessThan(total);
-		await page.getByText(taskName).waitFor();
-		await reset(page);
-	});
-
-	await test.step('Search tasks by source', async () => {
-		await page.getByRole('textbox', { name: 'Source' }).fill('cellpose_segmentation');
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 		await reset(page);
@@ -119,7 +92,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
  */
 async function searchTasks(page) {
 	// Increasing the results limit since during the tests many tasks may have been created
-	await page.getByRole('spinbutton', { name: 'Max number of results' }).fill('200');
+	await page.getByRole('spinbutton', { name: 'Max number of results' }).fill('500');
 	await page.getByRole('button', { name: 'Search tasks' }).click();
 }
 
