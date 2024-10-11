@@ -8,6 +8,9 @@
     * Implemented selection of group in task creation;
     * First implementation of new workflow task modal;
     * Used new group_ids_names field;
+    * Changed "new version available" icon;
+    * Renamed source to label in custom python env task creation;
+    * Removed kind from admin tasks page;
 
 # 1.8.0
 
