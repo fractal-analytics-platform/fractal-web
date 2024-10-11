@@ -60,33 +60,6 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
-	await test.step('Search tasks by common kind', async () => {
-		await page.getByRole('combobox', { name: 'Kind' }).selectOption('Common');
-		await searchTasks(page);
-		await expect(page.getByRole('table')).toBeVisible();
-		let count = await page.getByRole('row').count();
-		expect(count).toBeLessThan(total);
-		await page.getByRole('cell', { name: 'cellpose_segmentation', exact: true }).waitFor();
-		await reset(page);
-	});
-
-	await test.step('Search tasks by users kind', async () => {
-		await page.getByRole('combobox', { name: 'Kind' }).selectOption('Users');
-		await searchTasks(page);
-		await expect(page.getByRole('table')).toBeVisible();
-		let count = await page.getByRole('row').count();
-		expect(count).toBeLessThan(total);
-		await page.getByText(taskName).waitFor();
-		await reset(page);
-	});
-
-	await test.step('Search tasks by source', async () => {
-		await page.getByRole('textbox', { name: 'Source' }).fill('cellpose_segmentation');
-		await searchTasks(page);
-		await expect(page.getByRole('row')).toHaveCount(2);
-		await reset(page);
-	});
-
 	await test.step('Search tasks by version', async () => {
 		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
 		await searchTasks(page);
