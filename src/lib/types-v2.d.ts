@@ -62,6 +62,10 @@ export type TaskV2 = {
   docs_info: string
   meta_non_parallel: object
   meta_parallel: object
+  category: string | null
+  modality: string | null
+  authors: string | null
+  tags: string[]
 }
 
 export type ApplyWorkflowV2 = {
@@ -164,12 +168,23 @@ export type TaskGroupV2 = {
   timestamp_created: string
 }
 
-export type TasksTableRow = {
+export type TasksTableRowGroup = {
   groupTitle: string
   tasks: Array<{
     selectedVersion: string
     taskVersions: {
-      [version: string]: { [key: string]: string }
+      [version: string]: TasksTableRow
     }
   }>
+}
+
+export type TasksTableRow = {
+  pkg_name: string
+  task_id: number
+  task_name: string
+  version: string
+  category: string | null
+  modality: string | null
+  authors: string | null
+  tags: string[]
 }

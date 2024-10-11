@@ -11,7 +11,7 @@
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {import('$lib/types-v2').TasksTableRow[]} */
+	/** @type {import('$lib/types-v2').TasksTableRowGroup[]} */
 	let rows = [];
 	let loading = false;
 	let addingTask = false;
@@ -44,10 +44,10 @@
 
 	/**
 	 * @param {import('$lib/types-v2').TaskGroupV2[]} taskGroups
-	 * @returns {import('$lib/types-v2').TasksTableRow[]}
+	 * @returns {import('$lib/types-v2').TasksTableRowGroup[]}
 	 */
 	function buildTaskTableRows(taskGroups) {
-		/** @type {import('$lib/types-v2').TasksTableRow[]} */
+		/** @type {import('$lib/types-v2').TasksTableRowGroup[]} */
 		const rows = [];
 		for (const taskGroup of taskGroups) {
 			for (const task of taskGroup.task_list) {
@@ -57,7 +57,7 @@
 				const taskVersion = taskGroup.version || '';
 				if (groupRow) {
 					let groupTask = groupRow.tasks.find((t) =>
-						Object.values(t.taskVersions).find((o) => o['name'] === task.name)
+						Object.values(t.taskVersions).find((r) => r.task_name === task.name)
 					);
 					if (groupTask) {
 						groupTask.taskVersions[taskVersion] = taskProperties;
@@ -87,7 +87,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow[]} rows
+	 * @param {import('$lib/types-v2').TasksTableRowGroup[]} rows
 	 */
 	function sortTasksTableRows(rows) {
 		for (const row of rows) {
@@ -100,8 +100,8 @@
 				}
 			}
 			row.tasks.sort((t1, t2) =>
-				t1.taskVersions[t1.selectedVersion]['name'].localeCompare(
-					t2.taskVersions[t2.selectedVersion]['name'],
+				t1.taskVersions[t1.selectedVersion].task_name.localeCompare(
+					t2.taskVersions[t2.selectedVersion].task_name,
 					undefined,
 					{
 						sensitivity: 'base'
@@ -129,19 +129,23 @@
 	/**
 	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroup
 	 * @param {import('$lib/types-v2').TaskV2} task
-	 * @returns {{[key: string]: string}}
+	 * @returns {import('$lib/types-v2').TasksTableRow}
 	 */
 	function getTaskTableProperties(taskGroup, task) {
 		return {
 			pkg_name: taskGroup.pkg_name,
-			id: task.id.toString(),
-			name: task.name,
-			version: taskGroup.version || ''
+			task_id: task.id,
+			task_name: task.name,
+			version: taskGroup.version || '',
+			category: task.category,
+			modality: task.modality,
+			authors: task.authors,
+			tags: task.tags
 		};
 	}
 
 	/**
-	 * @param {string} taskId
+	 * @param {number} taskId
 	 */
 	async function addTaskToWorkflow(taskId) {
 		modal.confirmAndHide(
@@ -194,6 +198,25 @@
 			}
 		);
 	}
+
+	/**
+	 * @param {import('$lib/types-v2').TasksTableRow} taskProperties
+	 */
+	function getMetadataCell(taskProperties) {
+		const values = [];
+		//category, modality, authors, tags
+		if (taskProperties.category) {
+			values.push(taskProperties.category);
+		}
+		if (taskProperties.modality) {
+			values.push(taskProperties.modality);
+		}
+		values.push(...taskProperties.tags);
+		if (taskProperties.authors) {
+			values.push(taskProperties.authors);
+		}
+		return values.join(', ');
+	}
 </script>
 
 <Modal
@@ -220,6 +243,7 @@
 						<thead>
 							<tr>
 								<th class="bg-transparent">{groupByLabels[groupBy]}</th>
+								<th>Metadata</th>
 								<th class="bg-transparent" colspan="2">Version</th>
 							</tr>
 						</thead>
@@ -230,14 +254,16 @@
 								</tr>
 								{#each row.tasks as task}
 									<tr>
-										<td>{task.taskVersions[task.selectedVersion]['name']}</td>
+										<td>{task.taskVersions[task.selectedVersion].task_name}</td>
+										<td class="metadata-cell">
+											{getMetadataCell(task.taskVersions[task.selectedVersion])}
+										</td>
 										<td>
 											{#if Object.keys(task.taskVersions).length > 1}
 												<select
 													class="form-control"
-													aria-label="Version for task {task.taskVersions[task.selectedVersion][
-														'name'
-													]}"
+													aria-label="Version for task {task.taskVersions[task.selectedVersion]
+														.task_name}"
 													bind:value={task.selectedVersion}
 												>
 													{#each sortVersions(Object.keys(task.taskVersions)) as version}
@@ -245,7 +271,7 @@
 													{/each}
 												</select>
 											{:else}
-												{task.taskVersions[task.selectedVersion]['version']}
+												{task.taskVersions[task.selectedVersion].version}
 											{/if}
 										</td>
 										<td>
@@ -253,7 +279,7 @@
 												class="btn btn-primary"
 												disabled={addingTask}
 												on:click={() =>
-													addTaskToWorkflow(task.taskVersions[task.selectedVersion]['id'])}
+													addTaskToWorkflow(task.taskVersions[task.selectedVersion].task_id)}
 											>
 												Add task
 											</button>
@@ -296,5 +322,9 @@
 	#workflow-tasks-table tr th {
 		padding-top: 18px;
 		padding-bottom: 12px;
+	}
+	.metadata-cell {
+		font-size: 85%;
+		max-width: 150px;
 	}
 </style>
