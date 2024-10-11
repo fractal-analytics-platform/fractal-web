@@ -75,3 +75,9 @@ jobs:
         env:
           TEST_VERSION: v2
           FRACTAL_RUNNER_BACKEND: local_experimental
+
+      - name: Archive test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-folder
+          path: test-results
