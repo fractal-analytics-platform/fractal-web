@@ -47,7 +47,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		const task = await getCreatedTaskModalData(page, randomTaskName1, 'non_parallel');
 		expect(task.name).toEqual(randomTaskName1);
 		expect(task.command_non_parallel).toEqual('/tmp/test');
-		expect(task.source).toEqual(`admin:${randomTaskName1}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
 		expect(task.args_schema_version).toEqual('pydantic_v2');
@@ -80,7 +79,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		const task = await getCreatedTaskModalData(page, randomTaskName2, 'parallel');
 		expect(task.name).toEqual(randomTaskName2);
 		expect(task.command_parallel).toEqual('/tmp/test');
-		expect(task.source).toEqual(`admin:${randomTaskName2}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
 		expect(task.args_schema_version).toEqual('pydantic_v2');
@@ -117,7 +115,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.name).toEqual(randomTaskName3);
 		expect(task.command_non_parallel).toEqual('/tmp/test-np');
 		expect(task.command_parallel).toEqual('/tmp/test-p');
-		expect(task.source).toEqual(`admin:${randomTaskName3}-source`);
 		expect(task.input_types).toContain('input_type');
 		expect(task.output_types).toContain('output_type');
 		expect(task.args_schema_version).toEqual('pydantic_v2');
@@ -127,21 +124,13 @@ test('Add single tasks [v2]', async ({ page }) => {
 
 	const randomTaskName4 = Math.random().toString(36).substring(7);
 
-	await test.step('Attempt to create task reusing task source', async () => {
-		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName4);
-		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
-		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName1}-source`);
-		await createBtn.click();
-		await page
-			.getByText(`Source 'admin:${randomTaskName1}-source' already used by some TaskV2`)
-			.waitFor();
-	});
-
 	const addInputTypeBtn = page.getByRole('button', { name: 'Add input type' });
 	const addOutputTypeBtn = page.getByRole('button', { name: 'Add output type' });
 
 	await test.step('Attempt to create task with types with empty keys', async () => {
+		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName4);
+		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
+		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
 		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName4}-source`);
 		await addInputTypeBtn.click();
 		await addOutputTypeBtn.click();
@@ -218,7 +207,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.name).toEqual(randomTaskName4);
 		expect(task.command_non_parallel).toEqual('/tmp/test-np');
 		expect(task.command_parallel).toEqual('/tmp/test-p');
-		expect(task.source).toEqual(`admin:${randomTaskName4}-source`);
 		expect(task.args_schema_version).toEqual('pydantic_v1');
 	});
 

@@ -140,7 +140,7 @@
 		if (!response.ok) {
 			throw new AlertError(result);
 		}
-		const tasks = result.filter((t) => t.source.endsWith(':job_submission_health_check'));
+		const tasks = result.filter((t) => t.name === 'job_submission_health_check');
 		return tasks.length > 0 ? tasks[0].id : undefined;
 	}
 
