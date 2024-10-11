@@ -731,12 +731,13 @@
 									<span class="float-end ps-2">
 										<JobStatusIcon status={statuses[workflowTask.id]} />
 									</span>
+									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
+										<span class="float-end text-info" title="new version available">
+											<i class="bi bi-arrow-up-circle-fill" />
+										</span>
+									{/if}
 									{#if workflowTask.warning}
 										<span class="float-end text-warning" title={workflowTask.warning}>
-											<i class="bi bi-exclamation-triangle-fill" />
-										</span>
-									{:else if newVersionsMap[workflowTask.task.id]?.length > 0}
-										<span class="float-end text-warning" title="new version available">
 											<i class="bi bi-exclamation-triangle-fill" />
 										</span>
 									{/if}
