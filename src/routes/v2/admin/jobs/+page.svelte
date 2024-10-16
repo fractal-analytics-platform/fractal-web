@@ -278,7 +278,7 @@
 			<div class="row mt-1">
 				<label class="col-3 col-form-label" for="status">Status</label>
 				<div class="col-9">
-					<select class="form-control" bind:value={status} id="status">
+					<select class="form-select" bind:value={status} id="status">
 						<option value="">All</option>
 						<option value="submitted">Submitted</option>
 						<option value="done">Done</option>
@@ -291,7 +291,7 @@
 			<div class="row mt-1">
 				<label class="col-3 col-form-label" for="user">User</label>
 				<div class="col-9">
-					<select class="form-control" bind:value={userId} id="user">
+					<select class="form-select" bind:value={userId} id="user">
 						<option value="">All</option>
 						{#each users as user}
 							<option value={user.id}>{user.email}</option>

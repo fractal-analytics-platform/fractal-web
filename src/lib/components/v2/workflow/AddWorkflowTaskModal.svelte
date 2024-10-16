@@ -160,7 +160,7 @@
 											<td>
 												{#if Object.keys(task.taskVersions).length > 1}
 													<select
-														class="form-control"
+														class="form-select"
 														aria-label="Version for task {task.taskVersions[task.selectedVersion]
 															.task_name}"
 														bind:value={task.selectedVersion}

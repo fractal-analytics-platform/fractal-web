@@ -414,7 +414,7 @@
 					<select
 						id="python_version"
 						name="python_version"
-						class="form-control"
+						class="form-select"
 						bind:value={python_version}
 						class:is-invalid={$validationErrors['python_version']}
 					>

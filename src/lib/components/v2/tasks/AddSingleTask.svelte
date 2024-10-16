@@ -580,7 +580,7 @@
 					<select
 						name="args_schema_version"
 						id="args_schema_version"
-						class="form-control"
+						class="form-select"
 						bind:value={args_schema_version}
 						class:is-invalid={$validationErrors['args_schema_version']}
 						required

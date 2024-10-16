@@ -209,7 +209,7 @@
 			<div class="input-group">
 				<label for="selectedTask" class="input-group-text"> Task </label>
 				<select
-					class="form-control"
+					class="form-select"
 					name="selectedTask"
 					id="selectedTask"
 					bind:value={selectedTaskName}

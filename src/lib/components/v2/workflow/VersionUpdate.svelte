@@ -197,7 +197,7 @@
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection"> New versions of this task exist: </label>
 			<select
-				class="form-control"
+				class="form-select"
 				bind:value={selectedUpdateVersion}
 				id="updateSelection"
 				on:change={checkArgumentsWithNewSchema}

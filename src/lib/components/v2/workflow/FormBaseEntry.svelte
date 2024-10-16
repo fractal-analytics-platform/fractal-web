@@ -39,12 +39,12 @@
 			on:input={triggerChanges}
 		/>
 	{:else if entry.type === 'boolean'}
-		<select class="form-control" bind:value={entry.value} on:change={triggerChanges}>
+		<select class="form-select" bind:value={entry.value} on:change={triggerChanges}>
 			<option value={true}>True</option>
 			<option value={false}>False</option>
 		</select>
 	{/if}
-	<select class="form-control" bind:value={entry.type} on:change={changeType}>
+	<select class="form-select" bind:value={entry.type} on:change={changeType}>
 		<option value="string">String</option>
 		<option value="number">Number</option>
 		<option value="boolean">Boolean</option>

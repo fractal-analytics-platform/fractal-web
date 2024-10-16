@@ -285,7 +285,7 @@
 				</label>
 				<select
 					id="run-workflow-dataset"
-					class="form-control"
+					class="form-select"
 					disabled
 					bind:value={selectedDatasetId}
 				>
@@ -322,7 +322,7 @@
 				<select
 					name="firstTaskIndex"
 					id="firstTaskIndex"
-					class="form-control"
+					class="form-select"
 					disabled={checkingConfiguration}
 					bind:value={firstTaskIndex}
 					on:change={resetLastTask}
@@ -340,7 +340,7 @@
 				<select
 					name="lastTaskIndex"
 					id="lastTaskIndex"
-					class="form-control"
+					class="form-select"
 					disabled={checkingConfiguration}
 					bind:value={lastTaskIndex}
 				>
@@ -403,7 +403,7 @@
 										<select
 											name="slurmAccount"
 											id="slurmAccount"
-											class="form-control"
+											class="form-select"
 											disabled={checkingConfiguration}
 											bind:value={slurmAccount}
 										>

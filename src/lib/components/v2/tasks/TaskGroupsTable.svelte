@@ -128,7 +128,7 @@
 		<col width="auto" />
 		<col width="90" />
 		<col width="100" />
-		<col width="100" />
+		<col width="120" />
 		<col width="100" />
 		<col width="350" />
 	</colgroup>
@@ -155,7 +155,7 @@
 				<td>
 					{#if Object.keys(taskGroupRow.groups).length > 1}
 						<select
-							class="form-control"
+							class="form-select"
 							aria-label="Version for {taskGroupRow.groupTitle}"
 							on:change={() => handleSwitchVersion(i)}
 							bind:value={taskGroupRow.selectedVersion}

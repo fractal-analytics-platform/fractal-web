@@ -51,7 +51,7 @@
 			<div class="col-12">
 				<div class="input-group">
 					<label class="input-group-text" for="task-group-selector">Group</label>
-					<select class="form-control" id="task-group-selector" bind:value={selectedGroup}>
+					<select class="form-select" id="task-group-selector" bind:value={selectedGroup}>
 						{#if user.group_ids_names}
 							{#each user.group_ids_names as [groupId, groupName]}
 								<option value={groupId}>{groupName}</option>

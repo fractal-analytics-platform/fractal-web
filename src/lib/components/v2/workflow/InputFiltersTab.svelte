@@ -205,7 +205,7 @@
 			<select
 				bind:value={selectedDatasetAttributeKey}
 				id="datasetAttributeKey"
-				class="form-control"
+				class="form-select"
 				on:change={() => (selectedDatasetAttributeValue = '')}
 			>
 				<option value="">Select...</option>
@@ -218,7 +218,7 @@
 				<select
 					bind:value={selectedDatasetAttributeValue}
 					id="datasetAttributeValue"
-					class="form-control"
+					class="form-select"
 				>
 					<option value="">Select...</option>
 					{#each datasetAttributes[selectedDatasetAttributeKey] as value}
@@ -248,7 +248,7 @@
 		</svelte:fragment>
 		<svelte:fragment slot="body">
 			<label class="form-label" for="datasetTypeKey"> Type Key </label>
-			<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-control">
+			<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
 				<option value="">Select...</option>
 				{#each datasetTypes as t}
 					<option>{t}</option>
@@ -256,7 +256,7 @@
 			</select>
 			{#if selectedDatasetTypeKey !== ''}
 				<label class="form-label mt-2" for="datasetTypeValue"> Type Value </label>
-				<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-control">
+				<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-select">
 					<option value={true}>True</option>
 					<option value={false}>False</option>
 				</select>
