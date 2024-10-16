@@ -3,20 +3,13 @@
 	import { AlertError } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
-	let zarrDir = '';
 	let inProgress = false;
 	let stepMessage = '';
-	let invalidZarrDir = false;
 	let error = undefined;
 
 	async function startTest() {
 		error = undefined;
 		stepMessage = '';
-		if (!zarrDir) {
-			invalidZarrDir = true;
-			return;
-		}
-		invalidZarrDir = false;
 		inProgress = true;
 		try {
 			const projectId = await createProject();
@@ -70,7 +63,7 @@
 			headers,
 			body: JSON.stringify({
 				name: 'test',
-				zarr_dir: zarrDir,
+				zarr_dir: '/invalid/zarr/dir/not/to/be/used/',
 				filters: { attributes: {}, types: {} }
 			})
 		});
@@ -116,9 +109,9 @@
 			credentials: 'include',
 			headers,
 			body: JSON.stringify({
-				name: 'job_submission_health_check',
+				name: '__TEST_ECHO_TASK__',
 				command_non_parallel: 'echo',
-				source: 'job_submission_health_check',
+				version: '9.9.9',
 				input_types: {},
 				output_types: {}
 			})
@@ -140,7 +133,7 @@
 		if (!response.ok) {
 			throw new AlertError(result);
 		}
-		const tasks = result.filter((t) => t.name === 'job_submission_health_check');
+		const tasks = result.filter((t) => t.name === '__TEST_ECHO_TASK__');
 		return tasks.length > 0 ? tasks[0].id : undefined;
 	}
 
@@ -201,8 +194,8 @@
 		<li>creates a dataset, with the provided zarr directory;</li>
 		<li>creates a workflow;</li>
 		<li>
-			if not existing, creates a non-parallel task with a source named
-			<code>job_submission_health_check</code>, with <code>command_non_parallel="echo"</code>.
+			if not existing, creates a non-parallel task with <code>name=__TEST_ECHO_TASK__</code>,
+			<code>version=9.9.9</code> and <code>command_non_parallel="echo"</code>.
 		</li>
 		<li>adds the task to the workflow;</li>
 		<li>submits the workflow;</li>
@@ -211,24 +204,6 @@
 			the procedure and displays an error.
 		</li>
 	</ul>
-
-	<div class="row mt-4">
-		<div class="col">
-			<div class="input-group mb-3" class:has-validation={invalidZarrDir}>
-				<label class="input-group-text" for="zarrDir">Zarr directory</label>
-				<input
-					type="text"
-					class="form-control"
-					id="zarrDir"
-					bind:value={zarrDir}
-					class:is-invalid={invalidZarrDir}
-				/>
-				{#if invalidZarrDir}
-					<div class="invalid-feedback">Zarr directory is required</div>
-				{/if}
-			</div>
-		</div>
-	</div>
 
 	<StandardErrorAlert {error}>
 		<p>An error happened while executing the following step: <strong>{stepMessage}</strong></p>
