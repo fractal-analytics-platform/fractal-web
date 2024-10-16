@@ -167,7 +167,7 @@ export type TaskGroupV2 = {
   timestamp_created: string
 }
 
-export type TasksTableRowGroup = {
+export type WorkflowTasksTableRowGroup = {
   groupTitle: string
   tasks: Array<{
     selectedVersion: string
@@ -175,6 +175,12 @@ export type TasksTableRowGroup = {
       [version: string]: TasksTableRow
     }
   }>
+}
+
+export type TasksTableRowGroup = {
+  groupTitle: string
+  selectedVersion: string
+  groups: { [version: string]: TaskGroupV2 }
 }
 
 export type TasksTableRow = {

@@ -17,7 +17,6 @@
 	let name = '';
 	let command_non_parallel = '';
 	let command_parallel = '';
-	let source = '';
 	let version = '';
 	let docs_info = '';
 	let docs_link = '';
@@ -36,7 +35,6 @@
 		'command_non_parallel',
 		'command_parallel',
 		'version',
-		'source',
 		'input_type',
 		'output_type',
 		'args_schema_parallel',
@@ -95,7 +93,6 @@
 			command_non_parallel,
 			command_parallel,
 			version,
-			source,
 			input_types: typesEditor.getInputTypes(),
 			output_types: typesEditor.getOutputTypes(),
 			docs_info,
@@ -318,7 +315,6 @@
 		command_non_parallel = '';
 		command_parallel = '';
 		version = '';
-		source = '';
 		typesEditor.init({}, {});
 		docs_info = '';
 		docs_link = '';
@@ -437,26 +433,6 @@
 			</div>
 		</div>
 	{/if}
-	<div class="row">
-		<div class="col-md-6 mb-2">
-			<div class="input-group has-validation">
-				<label for="source" class="input-group-text">Source</label>
-				<input
-					name="source"
-					id="source"
-					type="text"
-					class="form-control"
-					bind:value={source}
-					class:is-invalid={$validationErrors['source']}
-					required
-				/>
-				<span class="invalid-feedback">{$validationErrors['source']}</span>
-			</div>
-			<div class="form-text">
-				Used to match tasks across installations when a workflow is imported
-			</div>
-		</div>
-	</div>
 	<div class="row">
 		<div class="col-xl-8">
 			<TypesEditor bind:this={typesEditor} />
@@ -670,7 +646,7 @@
 		</div>
 	</div>
 
-	<TaskGroupSelector {user} bind:privateTask bind:selectedGroup />
+	<TaskGroupSelector id="add-single-task" {user} bind:privateTask bind:selectedGroup />
 
 	<div class="row">
 		<div id="errorAlert-createTask" />
