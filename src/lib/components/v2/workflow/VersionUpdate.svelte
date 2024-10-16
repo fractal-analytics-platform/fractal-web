@@ -161,7 +161,6 @@
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					order: workflowTask.order,
 					meta_non_parallel: workflowTask.meta_non_parallel,
 					meta_parallel: workflowTask.meta_parallel,
 					input_filters: workflowTask.input_filters,
