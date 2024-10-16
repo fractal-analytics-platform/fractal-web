@@ -17,11 +17,13 @@
 	/** @type {import('$lib/types-v2').TaskGroupV2|undefined} */
 	let taskGroup = undefined;
 	let active = true;
+	let originalActive = true;
 
 	let privateTask = false;
 	let selectedGroup = null;
 
 	let saving = false;
+	let askConfirm = false;
 
 	/**
 	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroupToEdit
@@ -31,6 +33,8 @@
 		privateTask = taskGroupToEdit.user_group_id === null;
 		selectedGroup = taskGroupToEdit.user_group_id;
 		active = taskGroupToEdit.active;
+		originalActive = taskGroupToEdit.active;
+		askConfirm = false;
 		modal.show();
 	}
 
@@ -40,6 +44,14 @@
 	]);
 
 	const validationErrors = formErrorHandler.getValidationErrorStore();
+
+	async function handleUpdate() {
+		if (!active && originalActive) {
+			askConfirm = true;
+			return;
+		}
+		await handleEditTaskGroup();
+	}
 
 	async function handleEditTaskGroup() {
 		modal.confirmAndHide(
@@ -76,10 +88,21 @@
 
 <Modal id="taskGroupEditModal" bind:this={modal} size="lg">
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Task group {taskGroup?.pkg_name}</h1>
+		{#if taskGroup}
+			<h1 class="h5 modal-title">
+				Task group {taskGroup.pkg_name}
+				(version {taskGroup.version ? taskGroup.version : 'None'})
+			</h1>
+		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		{#if taskGroup}
+		{#if askConfirm}
+			<div class="alert alert-warning">
+				<i class="bi bi-exclamation-triangle" />
+				Warning: after a task-group is marked as non-active, jobs that include its tasks cannot be submitted
+				any more. Do you want to proceed?
+			</div>
+		{:else if taskGroup}
 			<div class="mb-2 row">
 				<div class="col">
 					<TaskGroupSelector
@@ -110,12 +133,21 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click={handleEditTaskGroup} disabled={saving}>
-			{#if saving}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-			{/if}
-			Update
-		</button>
-		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		{#if askConfirm}
+			<button class="btn btn-primary" on:click={handleEditTaskGroup} disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				Confirm
+			</button>
+		{:else}
+			<button class="btn btn-primary" on:click={handleUpdate} disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+				Update
+			</button>
+		{/if}
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	</svelte:fragment>
 </Modal>
