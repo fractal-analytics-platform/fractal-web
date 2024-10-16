@@ -5,7 +5,6 @@
 
 	let name = '';
 	let id = '';
-	let source = '';
 	let version = '';
 	let max_number_of_results = '25';
 
@@ -38,9 +37,6 @@
 			if (id) {
 				url.searchParams.append('id', id);
 			}
-			if (source) {
-				url.searchParams.append('source', source);
-			}
 			if (version) {
 				url.searchParams.append('version', version);
 			}
@@ -69,7 +65,6 @@
 		}
 		name = '';
 		id = '';
-		source = '';
 		version = '';
 		max_number_of_results = '25';
 		searched = false;
@@ -154,23 +149,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class="row mt-lg-3">
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="source">Source</label>
-						<PropertyDescription
-							description="Only include a task if its <code>source</code> contains this value (case insensitive)."
-							html={true}
-						/>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<input type="text" class="form-control" bind:value={source} id="source" />
-					</div>
-				</div>
-			</div>
 			<div class="col-lg-4 pe-5">
 				<div class="row mt-1">
 					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -234,10 +212,8 @@
 		<table class="table tasks-table mt-4">
 			<colgroup>
 				<col width="60" />
-				<col width="160" />
-				<col width="160" />
+				<col width="auto" />
 				<col width="90" />
-				<col width="80" />
 				<col width="120" />
 				<col width="150" />
 				<col width="100" />
@@ -246,7 +222,6 @@
 				<tr>
 					<th>Id</th>
 					<th>Name</th>
-					<th>Source</th>
 					<th>Version</th>
 					<th># Workflows</th>
 					<th># Users</th>
@@ -258,7 +233,6 @@
 					<tr class:row-grey={taskInfoIndex % 2 === 0}>
 						<td>{taskInfo.task.id}</td>
 						<td>{taskInfo.task.name}</td>
-						<td>{taskInfo.task.source || '-'}</td>
 						<td>{taskInfo.task.version || '-'}</td>
 						<td>
 							{taskInfo.relationships.length || '-'}
@@ -328,8 +302,6 @@
 								<li class="list-group-item">{selectedTaskInfo.task.name}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Task type</li>
 								<li class="list-group-item">{selectedTaskInfo.task.type}</li>
-								<li class="list-group-item list-group-item-light fw-bold">Task source</li>
-								<li class="list-group-item">{selectedTaskInfo.task.source}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
 								<li class="list-group-item">{selectedTaskInfo.task.command_non_parallel || '-'}</li>
 								<li class="list-group-item list-group-item-light fw-bold">Command parallel</li>
