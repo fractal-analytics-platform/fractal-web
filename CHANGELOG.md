@@ -2,15 +2,20 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.7 (\#583):
-    * Removed owner from v2 tasks;
-    * Displayed workflow task warning message;
-    * Implemented selection of group in task creation;
-    * First implementation of new workflow task modal;
-    * Used new group_ids_names field;
-    * Changed "new version available" icon;
-    * Renamed source to label in custom python env task creation;
-    * Removed kind from admin tasks page;
+* Alignment with fractal-server 2.7 (\#583, \#601):
+    * Removed owner from v2 tasks (\#583);
+    * Displayed workflow task warning message (\#583);
+    * Implemented selection of group in task creation (\#583);
+    * First implementation of new workflow task modal (\#583);
+    * Used new group_ids_names field (\#583);
+    * Changed "new version available" icon (\#583);
+    * Renamed source to label in custom python env task creation (\#583);
+    * Changes to admin tasks page (\#583, \#601);
+    * Changed task list to use task groups (\#601);
+    * Changes to job submission healthcheck page (\#601);
+    * Fixed dropdown style (\#601);
+    * Implemented task group modal info, edit and delete (\#601);
+    * Removed usage of source field (\#601);
 
 # 1.8.0
 
