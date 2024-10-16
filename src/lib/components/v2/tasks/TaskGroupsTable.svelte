@@ -173,9 +173,15 @@
 					<button
 						class="btn btn-link"
 						on:click={() => handleToggleTasks(i)}
-						aria-label="Expand tasks"
+						aria-label={expandedTaskGroupRow === taskGroupRow.groupTitle
+							? 'Collapse tasks'
+							: 'Expand tasks'}
 					>
-						<i class="bi bi-plus-circle" />
+						{#if expandedTaskGroupRow === taskGroupRow.groupTitle}
+							<i class="bi bi-dash-circle" />
+						{:else}
+							<i class="bi bi-plus-circle" />
+						{/if}
 					</button>
 				</td>
 				<td>
