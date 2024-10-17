@@ -62,8 +62,6 @@
 							<li class="list-group-item list-group-item-light fw-bold">Command parallel</li>
 							<li class="list-group-item"><code>{task.command_parallel}</code></li>
 						{/if}
-						<li class="list-group-item list-group-item-light fw-bold">Source</li>
-						<li class="list-group-item"><code>{task.source}</code></li>
 						<li class="list-group-item list-group-item-light fw-bold">Input Types</li>
 						<li class="list-group-item">
 							<table class="table table-borderless mb-0">

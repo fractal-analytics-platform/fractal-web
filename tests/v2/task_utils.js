@@ -2,6 +2,7 @@ import { uploadFile, waitModalClosed, waitPageLoading } from '../utils';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import { expect } from '@playwright/test';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,9 +29,6 @@ export async function createFakeTask(page, task) {
 		}
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);
-
-		const randomTaskSource = Math.random().toString(36).substring(7);
-		await page.getByRole('textbox', { name: 'Source' }).fill(randomTaskSource);
 
 		const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
 		if (task.type === 'non_parallel' || task.type === 'compound') {
@@ -87,11 +85,12 @@ export async function deleteTask(page, taskName, version = 'v2') {
 		await page.goto(`/${version}/tasks`);
 		await waitPageLoading(page);
 	}
-	if (version === 'v2') {
-		console.log(`WARNING: deletion of task ${taskName} temporary skipped`);
-		return;
+	let row;
+	if (version === 'v1') {
+		row = await getTaskRow(page, taskName);
+	} else {
+		row = await getTaskGroupRow(page, taskName);
 	}
-	const row = await getTaskRow(page, taskName);
 	await row.getByRole('button', { name: 'Delete' }).click();
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
@@ -108,4 +107,29 @@ async function getTaskRow(page, taskName) {
 	const row = page.getByRole('table').last().getByRole('row', { name: taskName });
 	await row.waitFor();
 	return row;
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} taskName
+ * @returns {Promise<import('@playwright/test').Locator>}
+ */
+async function getTaskGroupRow(page, taskName) {
+	await collapseExpandedRows(page);
+	const row = page.getByRole('table').last().getByRole('row', { name: taskName });
+	await expect(row).toBeVisible();
+	return row;
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+export async function collapseExpandedRows(page) {
+	const table = page.getByRole('table').last();
+	const totalRows = await table.getByRole('row').count();
+	const collapseButton = page.getByRole('button', { name: 'Collapse tasks' });
+	if (await collapseButton.isVisible()) {
+		await collapseButton.click();
+		await expect(table.getByRole('row')).toHaveCount(totalRows - 1);
+	}
 }

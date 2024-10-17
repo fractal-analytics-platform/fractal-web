@@ -38,7 +38,6 @@ describe('AddSingleTask', () => {
 
 		await user.type(screen.getByRole('textbox', { name: 'Task name' }), 'test-task');
 		await user.type(screen.getByRole('textbox', { name: 'Command non parallel' }), 'command');
-		await user.type(screen.getByRole('textbox', { name: 'Source' }), 'task-source');
 		await user.selectOptions(screen.getByRole('combobox', { name: 'Group' }), 'Group2');
 		await user.click(screen.getByRole('button', { name: 'Create' }));
 
@@ -48,7 +47,6 @@ describe('AddSingleTask', () => {
 				body: JSON.stringify({
 					name: 'test-task',
 					command_non_parallel: 'command',
-					source: 'task-source',
 					input_types: {},
 					output_types: {}
 				})
@@ -74,7 +72,6 @@ describe('AddSingleTask', () => {
 
 		await user.type(screen.getByRole('textbox', { name: 'Task name' }), 'test-task');
 		await user.type(screen.getByRole('textbox', { name: 'Command non parallel' }), 'command');
-		await user.type(screen.getByRole('textbox', { name: 'Source' }), 'task-source');
 		await user.click(screen.getByText('Private task'));
 		await user.click(screen.getByRole('button', { name: 'Create' }));
 
@@ -84,7 +81,6 @@ describe('AddSingleTask', () => {
 				body: JSON.stringify({
 					name: 'test-task',
 					command_non_parallel: 'command',
-					source: 'task-source',
 					input_types: {},
 					output_types: {}
 				})

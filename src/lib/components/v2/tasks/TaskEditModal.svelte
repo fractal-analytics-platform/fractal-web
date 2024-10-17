@@ -1,6 +1,6 @@
 <script>
-	import { getOnlyModifiedProperties, nullifyEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError } from '$lib/common/errors';
+	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 	import TypesEditor from './TypesEditor.svelte';
@@ -9,18 +9,29 @@
 
 	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let task;
-	/** @type {import('$lib/types-v2').TaskV2|undefined} */
-	let originalTask;
 
 	$: updateEnabled = !loading && !saving && task && task.name;
 	/** @type {Modal} */
 	let modal;
 	let loading = false;
-	let saved = false;
 	let saving = false;
+
+	let name = '';
+	/** @type {string|null} */
+	let command_parallel = null;
+	/** @type {string|null} */
+	let command_non_parallel = null;
 
 	/** @type {TypesEditor} */
 	let typesEditor;
+
+	const formErrorHandler = new FormErrorHandler('taskEditModalError', [
+		'name',
+		'command_parallel',
+		'command_non_parallel'
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/**
 	 * Edits a task on the server
@@ -31,41 +42,37 @@
 			return;
 		}
 
-		modal.confirmAndHide(
-			async () => {
-				if (!task) {
-					return;
-				}
-				saving = true;
+		saving = true;
 
-				let taskProperties = nullifyEmptyStrings(task);
-				taskProperties = getOnlyModifiedProperties(originalTask, taskProperties);
+		let taskProperties = { name };
+		if (command_parallel !== null) {
+			taskProperties.command_parallel = command_parallel;
+		}
+		if (command_non_parallel !== null) {
+			taskProperties.command_non_parallel = command_non_parallel;
+		}
 
-				taskProperties.input_types = typesEditor.getInputTypes();
-				taskProperties.output_types = typesEditor.getOutputTypes();
+		taskProperties.input_types = typesEditor.getInputTypes();
+		taskProperties.output_types = typesEditor.getOutputTypes();
 
-				const headers = new Headers();
-				headers.append('Content-Type', 'application/json');
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/json');
 
-				const response = await fetch(`/api/v2/task/${task.id}`, {
-					method: 'PATCH',
-					credentials: 'include',
-					headers,
-					body: JSON.stringify(taskProperties)
-				});
+		const response = await fetch(`/api/v2/task/${task?.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(nullifyEmptyStrings(taskProperties))
+		});
 
-				if (!response.ok) {
-					throw new AlertError(await response.json());
-				}
-
-				console.log('Task updated successfully');
-				updateEditedTask(await response.json());
-				saved = true;
-			},
-			() => {
-				saving = false;
-			}
-		);
+		if (response.ok) {
+			console.log('Task updated successfully');
+			updateEditedTask(await response.json());
+			modal.hide();
+		} else {
+			await formErrorHandler.handleErrorResponse(response);
+		}
+		saving = false;
 	}
 
 	/**
@@ -73,7 +80,6 @@
 	 */
 	export async function open(taskToEdit) {
 		loading = true;
-		saved = false;
 		modal.show();
 
 		// Retrieving the args_schema field
@@ -87,7 +93,9 @@
 
 		if (response.ok) {
 			task = /** @type {import('$lib/types-v2').TaskV2} */ (result);
-			originalTask = { ...result };
+			name = task.name;
+			command_parallel = task.command_parallel;
+			command_non_parallel = task.command_non_parallel;
 			// wait the typesEditor element rendering, that happens after task is defined
 			await tick();
 			typesEditor.init(task.input_types, task.output_types);
@@ -95,24 +103,11 @@
 			modal.displayErrorAlert('Unable to load task');
 			task = undefined;
 			typesEditor.init({}, {});
-			originalTask = undefined;
-		}
-	}
-
-	async function onClose() {
-		if (!task) {
-			return;
-		}
-		if (saved) {
-			return;
-		}
-		for (let key in originalTask) {
-			task[key] = originalTask[key];
 		}
 	}
 </script>
 
-<Modal id="taskEditModal" {onClose} bind:this={modal} size="xl">
+<Modal id="taskEditModal" bind:this={modal} size="xl">
 	<svelte:fragment slot="header">
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
@@ -128,7 +123,7 @@
 				<div class="col-12">
 					<p class="lead">Task properties</p>
 
-					<span id="errorAlert-taskEditModal" />
+					<span id="taskEditModalError" />
 
 					<div class="mb-2 row">
 						<label for="taskName" class="col-2 col-form-label text-end">Name</label>
@@ -136,20 +131,11 @@
 							<input
 								id="taskName"
 								type="text"
-								bind:value={task.name}
+								bind:value={name}
 								class="form-control"
-								class:is-invalid={!task.name}
+								class:is-invalid={$validationErrors['name']}
 							/>
-							{#if !task.name}
-								<div class="invalid-feedback">Required field</div>
-							{/if}
-						</div>
-					</div>
-
-					<div class="mb-2 row">
-						<label for="version" class="col-2 col-form-label text-end">Version</label>
-						<div class="col-10">
-							<input id="version" type="text" bind:value={task.version} class="form-control" />
+							<span class="invalid-feedback">{$validationErrors['name']}</span>
 						</div>
 					</div>
 
@@ -162,9 +148,11 @@
 								<input
 									id="command_non_parallel"
 									type="text"
-									bind:value={task.command_non_parallel}
+									bind:value={command_non_parallel}
 									class="form-control"
+									class:is-invalid={$validationErrors['command_non_parallel']}
 								/>
+								<span class="invalid-feedback">{$validationErrors['command_non_parallel']}</span>
 							</div>
 						</div>
 					{/if}
@@ -178,25 +166,14 @@
 								<input
 									id="command_parallel"
 									type="text"
-									bind:value={task.command_parallel}
+									bind:value={command_parallel}
 									class="form-control"
+									class:is-invalid={$validationErrors['command_parallel']}
 								/>
+								<span class="invalid-feedback">{$validationErrors['command_parallel']}</span>
 							</div>
 						</div>
 					{/if}
-
-					<div class="mb-2 row">
-						<label for="source" class="col-2 col-form-label text-end">Source</label>
-						<div class="col-10">
-							<input
-								id="source"
-								type="text"
-								bind:value={task.source}
-								disabled
-								class="form-control"
-							/>
-						</div>
-					</div>
 
 					<TypesEditor bind:this={typesEditor} />
 
@@ -206,7 +183,7 @@
 						</label>
 						<div class="col-10">
 							<input
-								id="ar$gsSchemaVersion"
+								id="argsSchemaVersion"
 								type="text"
 								bind:value={task.args_schema_version}
 								disabled
@@ -283,14 +260,12 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		{#if task}
-			<button class="btn btn-primary" on:click={handleEditTask} disabled={!updateEnabled}>
-				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Update
-			</button>
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-		{/if}
+		<button class="btn btn-primary" on:click={handleEditTask} disabled={!updateEnabled}>
+			{#if saving}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Update
+		</button>
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 	</svelte:fragment>
 </Modal>

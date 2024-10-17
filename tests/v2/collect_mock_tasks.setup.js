@@ -54,7 +54,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 			2
 		);
 		await expect(page.locator('table tbody tr:first-child td:nth-child(2)').first()).toContainText(
-			'fractal_tasks_mock'
+			'fractal-tasks-mock'
 		);
 		expect(await getStatus(page)).toMatch(/^(pending|installing)$/);
 	});
@@ -67,7 +67,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 	});
 
 	await test.step('Check tasks list', async () => {
-		await page.getByRole('table').last().getByRole('cell', { name: 'MIP_compound' }).waitFor();
+		await expect(page.getByRole('row', { name: 'fractal-tasks-mock' })).toBeVisible();
 	});
 
 	await test.step('Delete task collection log', async () => {

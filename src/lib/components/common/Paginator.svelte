@@ -133,7 +133,7 @@
 		<div class="input-group">
 			<label class="input-group-text" for="page_size">Page size</label>
 			<select
-				class="form-control"
+				class="form-select"
 				id="page_size"
 				bind:value={pageSize}
 				on:change={() => setPageSize()}

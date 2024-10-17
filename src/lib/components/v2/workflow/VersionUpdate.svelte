@@ -161,7 +161,6 @@
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					order: workflowTask.order,
 					meta_non_parallel: workflowTask.meta_non_parallel,
 					meta_parallel: workflowTask.meta_parallel,
 					input_filters: workflowTask.input_filters,
@@ -198,7 +197,7 @@
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection"> New versions of this task exist: </label>
 			<select
-				class="form-control"
+				class="form-select"
 				bind:value={selectedUpdateVersion}
 				id="updateSelection"
 				on:change={checkArgumentsWithNewSchema}

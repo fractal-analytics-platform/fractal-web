@@ -237,7 +237,7 @@
 			class:is-invalid={field.error}
 		/>
 		{#if field.type === 'boolean'}
-			<select class="form-control" bind:value={field.value} aria-label="Value">
+			<select class="form-select" bind:value={field.value} aria-label="Value">
 				<option value="true">True</option>
 				<option value="false">False</option>
 			</select>
@@ -251,7 +251,7 @@
 			/>
 		{/if}
 		<select
-			class="form-control"
+			class="form-select"
 			bind:value={field.type}
 			class:is-invalid={field.error}
 			aria-label="Type"

@@ -595,7 +595,7 @@
 				<div class="input-group mb-3">
 					<label for="dataset" class="input-group-text">Dataset</label>
 					<select
-						class="form-control"
+						class="form-select"
 						id="dataset"
 						bind:value={selectedDatasetId}
 						on:change={selectedDatasetChanged}

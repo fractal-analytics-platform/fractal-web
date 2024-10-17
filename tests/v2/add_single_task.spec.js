@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { waitModalClosed, waitPageLoading, waitStopSpinnerIn } from '../utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { deleteTask } from './task_utils.js';
+import { collapseExpandedRows, deleteTask } from './task_utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +28,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 
 	await test.step('Create non parallel task', async () => {
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName1);
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName1}-source`);
 		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test');
 		await page.getByRole('button', { name: 'Add input type' }).click();
 		await page.getByPlaceholder('Key').fill('input_type');
@@ -60,7 +59,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await page.getByText('Parallel', { exact: true }).click();
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName2);
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName2}-source`);
 		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test');
 		await page.getByRole('button', { name: 'Add input type' }).click();
 		await page.getByPlaceholder('Key').fill('input_type');
@@ -92,7 +90,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await page.getByText('Compound', { exact: true }).click();
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName3);
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName3}-source`);
 		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
 		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
 		await page.getByRole('button', { name: 'Add input type' }).click();
@@ -131,7 +128,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName4);
 		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
 		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName4}-source`);
 		await addInputTypeBtn.click();
 		await addOutputTypeBtn.click();
 		await createBtn.click();
@@ -140,7 +136,6 @@ test('Add single tasks [v2]', async ({ page }) => {
 	});
 
 	await test.step('Attempt to create task with types with duplicated keys', async () => {
-		await page.getByRole('textbox', { name: 'Source' }).fill(`${randomTaskName4}-source`);
 		await addInputTypeBtn.click();
 		await addOutputTypeBtn.click();
 		const inputs = await page.getByPlaceholder('Key').all();
@@ -260,12 +255,11 @@ async function getTaskDataNonParallel(page, items) {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
 		command_non_parallel: await items[5].innerText(),
-		source: await items[7].innerText(),
-		input_types: await items[9].innerText(),
-		output_types: await items[11].innerText(),
-		docs_link: await items[13].innerText(),
-		docs_info: await items[15].innerText(),
-		args_schema_version: await items[17].innerText()
+		input_types: await items[7].innerText(),
+		output_types: await items[9].innerText(),
+		docs_link: await items[11].innerText(),
+		docs_info: await items[13].innerText(),
+		args_schema_version: await items[15].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
 	if ((await argsSchemaNonParallelBtn.count()) === 1) {
@@ -286,12 +280,11 @@ async function getTaskDataParallel(page, items) {
 		name: await items[1].innerText(),
 		version: await items[3].innerText(),
 		command_parallel: await items[5].innerText(),
-		source: await items[7].innerText(),
-		input_types: await items[9].innerText(),
-		output_types: await items[11].innerText(),
-		docs_link: await items[13].innerText(),
-		docs_info: await items[15].innerText(),
-		args_schema_version: await items[17].innerText()
+		input_types: await items[7].innerText(),
+		output_types: await items[9].innerText(),
+		docs_link: await items[11].innerText(),
+		docs_info: await items[13].innerText(),
+		args_schema_version: await items[15].innerText()
 	};
 	const argsSchemaParallelBtn = page.getByRole('button', { name: 'Args schema parallel' });
 	if ((await argsSchemaParallelBtn.count()) === 1) {
@@ -313,11 +306,10 @@ async function getTaskDataCompound(page, items) {
 		version: await items[3].innerText(),
 		command_non_parallel: await items[5].innerText(),
 		command_parallel: await items[7].innerText(),
-		source: await items[9].innerText(),
-		input_types: await items[11].innerText(),
-		output_types: await items[13].innerText(),
-		docs_link: await items[15].innerText(),
-		docs_info: await items[17].innerText(),
+		input_types: await items[9].innerText(),
+		output_types: await items[11].innerText(),
+		docs_link: await items[13].innerText(),
+		docs_info: await items[15].innerText(),
 		args_schema_version: await items[items.length - 1].innerText()
 	};
 	const argsSchemaNonParallelBtn = page.getByRole('button', { name: 'Args schema non parallel' });
@@ -344,17 +336,35 @@ async function getTaskDataCompound(page, items) {
  */
 async function getCreatedTaskRow(page, taskName) {
 	const table = page.getByRole('table').last();
-	const rows = await table.getByRole('row', { name: taskName }).all();
-	let taskRow;
+	const rowsLocator = table.getByRole('row', { name: taskName });
+	await expect(rowsLocator.first()).toBeVisible();
+	await collapseExpandedRows(page);
+	const rows = await rowsLocator.all();
+	const totalRows = await table.getByRole('row').count();
 	for (const row of rows) {
 		const text = await row.getByRole('cell').first().innerText();
 		if (text === taskName) {
-			taskRow = row;
-			break;
+			await row.getByRole('button', { name: 'Expand tasks' }).click();
+			await expect(table.getByRole('row')).toHaveCount(totalRows + 1);
+			return await getExpandedTaskRow(page);
 		}
 	}
-	expect(taskRow).not.toBeUndefined();
-	return /** @type {import('@playwright/test').Locator} */ (taskRow);
+	throw new Error(`Unable to find task group ${taskName} row`);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @returns {Promise<import('@playwright/test').Locator>}
+ */
+async function getExpandedTaskRow(page) {
+	const table = page.getByRole('table').last();
+	const rows = await table.getByRole('row', { name: 'Info' }).all();
+	for (const row of rows) {
+		if (!(await row.getByRole('button', { name: 'Delete' }).isVisible())) {
+			return row;
+		}
+	}
+	throw new Error('Unable to find expanded task row');
 }
 
 /**

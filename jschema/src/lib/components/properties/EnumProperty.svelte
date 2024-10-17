@@ -27,7 +27,7 @@
 			bind:value={formElement.value}
 			on:change={handleValueChange}
 			on:input={handleValueChange}
-			class="form-control"
+			class="form-select"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}
 		>

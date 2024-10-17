@@ -34,7 +34,7 @@
 	/** @type {'pypi'|'local'} */
 	export let packageType = 'pypi';
 	/** @type {() => Promise<void>} */
-	export let reloadTaskList;
+	export let reloadTaskGroupsList;
 	/** @type {import('$lib/types').User} */
 	export let user;
 
@@ -327,7 +327,7 @@
 				(t) => collectionsToCheckIds.includes(t.id) && t.status === 'OK'
 			).length;
 			if (newOkTasks > 0) {
-				await reloadTaskList();
+				await reloadTaskGroupsList();
 			}
 		}
 		clearTimeout(updateTasksCollectionTimeout);
@@ -414,7 +414,7 @@
 					<select
 						id="python_version"
 						name="python_version"
-						class="form-control"
+						class="form-select"
 						bind:value={python_version}
 						class:is-invalid={$validationErrors['python_version']}
 					>
@@ -492,7 +492,7 @@
 			</div>
 		</div>
 
-		<TaskGroupSelector {user} bind:privateTask bind:selectedGroup />
+		<TaskGroupSelector id="task-collection" {user} bind:privateTask bind:selectedGroup />
 
 		<div id="taskCollectionError" class="mt-3" />
 

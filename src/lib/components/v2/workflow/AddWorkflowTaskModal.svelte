@@ -1,7 +1,7 @@
 <script>
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import compareLoose from 'semver/functions/compare-loose';
+	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
@@ -11,7 +11,7 @@
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {import('$lib/types-v2').TasksTableRowGroup[]} */
+	/** @type {import('$lib/types-v2').WorkflowTasksTableRowGroup[]} */
 	let rows = [];
 	let loading = false;
 	let addingTask = false;
@@ -29,7 +29,7 @@
 		loading = true;
 		modal.hideErrorAlert();
 		modal.show();
-		const response = await fetch(`/api/v2/task-group`, {
+		const response = await fetch(`/api/v2/task-group?only_active=true`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -39,109 +39,7 @@
 			modal.displayErrorAlert(result);
 			return;
 		}
-		rows = buildTaskTableRows(result);
-	}
-
-	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2[]} taskGroups
-	 * @returns {import('$lib/types-v2').TasksTableRowGroup[]}
-	 */
-	function buildTaskTableRows(taskGroups) {
-		/** @type {import('$lib/types-v2').TasksTableRowGroup[]} */
-		const rows = [];
-		for (const taskGroup of taskGroups) {
-			for (const task of taskGroup.task_list) {
-				const groupValue = taskGroup[groupBy];
-				let groupRow = rows.find((r) => r.groupTitle === groupValue);
-				const taskProperties = getTaskTableProperties(taskGroup, task);
-				const taskVersion = taskGroup.version || '';
-				if (groupRow) {
-					let groupTask = groupRow.tasks.find((t) =>
-						Object.values(t.taskVersions).find((r) => r.task_name === task.name)
-					);
-					if (groupTask) {
-						groupTask.taskVersions[taskVersion] = taskProperties;
-					} else {
-						groupTask = {
-							selectedVersion: taskVersion,
-							taskVersions: { [taskVersion]: taskProperties }
-						};
-						groupRow.tasks.push(groupTask);
-					}
-				} else {
-					groupRow = {
-						groupTitle: taskGroup[groupBy],
-						tasks: [
-							{
-								selectedVersion: taskVersion,
-								taskVersions: { [taskVersion]: taskProperties }
-							}
-						]
-					};
-					rows.push(groupRow);
-				}
-			}
-		}
-		sortTasksTableRows(rows);
-		return rows;
-	}
-
-	/**
-	 * @param {import('$lib/types-v2').TasksTableRowGroup[]} rows
-	 */
-	function sortTasksTableRows(rows) {
-		for (const row of rows) {
-			for (const task of row.tasks) {
-				const versions = Object.keys(task.taskVersions);
-				if (versions.length > 1) {
-					const validVersions = versions.filter((v) => v !== '');
-					sortVersions(validVersions);
-					task.selectedVersion = validVersions[0];
-				}
-			}
-			row.tasks.sort((t1, t2) =>
-				t1.taskVersions[t1.selectedVersion].task_name.localeCompare(
-					t2.taskVersions[t2.selectedVersion].task_name,
-					undefined,
-					{
-						sensitivity: 'base'
-					}
-				)
-			);
-		}
-		rows.sort((r1, r2) =>
-			r1.groupTitle.localeCompare(r2.groupTitle, undefined, { sensitivity: 'base' })
-		);
-	}
-
-	/**
-	 * @param {string[]} versions
-	 */
-	function sortVersions(versions) {
-		try {
-			versions.sort((v1, v2) => compareLoose(v1, v2)).reverse();
-		} catch (err) {
-			console.warn('Semver error:', err);
-		}
-		return versions;
-	}
-
-	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroup
-	 * @param {import('$lib/types-v2').TaskV2} task
-	 * @returns {import('$lib/types-v2').TasksTableRow}
-	 */
-	function getTaskTableProperties(taskGroup, task) {
-		return {
-			pkg_name: taskGroup.pkg_name,
-			task_id: task.id,
-			task_name: task.name,
-			version: taskGroup.version || '',
-			category: task.category,
-			modality: task.modality,
-			authors: task.authors,
-			tags: task.tags
-		};
+		rows = buildWorkflowTaskTableRows(result, groupBy);
 	}
 
 	/**
@@ -253,38 +151,40 @@
 									<th colspan="3">{row.groupTitle}</th>
 								</tr>
 								{#each row.tasks as task}
-									<tr>
-										<td>{task.taskVersions[task.selectedVersion].task_name}</td>
-										<td class="metadata-cell">
-											{getMetadataCell(task.taskVersions[task.selectedVersion])}
-										</td>
-										<td>
-											{#if Object.keys(task.taskVersions).length > 1}
-												<select
-													class="form-control"
-													aria-label="Version for task {task.taskVersions[task.selectedVersion]
-														.task_name}"
-													bind:value={task.selectedVersion}
+									{#if task.taskVersions[task.selectedVersion]}
+										<tr>
+											<td>{task.taskVersions[task.selectedVersion].task_name}</td>
+											<td class="metadata-cell">
+												{getMetadataCell(task.taskVersions[task.selectedVersion])}
+											</td>
+											<td>
+												{#if Object.keys(task.taskVersions).length > 1}
+													<select
+														class="form-select"
+														aria-label="Version for task {task.taskVersions[task.selectedVersion]
+															.task_name}"
+														bind:value={task.selectedVersion}
+													>
+														{#each sortVersions(Object.keys(task.taskVersions)) as version}
+															<option value={version}>{version || 'None'}</option>
+														{/each}
+													</select>
+												{:else}
+													{task.taskVersions[task.selectedVersion].version}
+												{/if}
+											</td>
+											<td>
+												<button
+													class="btn btn-primary"
+													disabled={addingTask}
+													on:click={() =>
+														addTaskToWorkflow(task.taskVersions[task.selectedVersion].task_id)}
 												>
-													{#each sortVersions(Object.keys(task.taskVersions)) as version}
-														<option value={version}>{version || 'None'}</option>
-													{/each}
-												</select>
-											{:else}
-												{task.taskVersions[task.selectedVersion].version}
-											{/if}
-										</td>
-										<td>
-											<button
-												class="btn btn-primary"
-												disabled={addingTask}
-												on:click={() =>
-													addTaskToWorkflow(task.taskVersions[task.selectedVersion].task_id)}
-											>
-												Add task
-											</button>
-										</td>
-									</tr>
+													Add task
+												</button>
+											</td>
+										</tr>
+									{/if}
 								{/each}
 							{/each}
 						</tbody>
