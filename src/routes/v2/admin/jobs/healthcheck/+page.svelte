@@ -6,6 +6,8 @@
 	let inProgress = false;
 	let stepMessage = '';
 	let error = undefined;
+	
+	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
 
 	async function startTest() {
 		error = undefined;
@@ -63,7 +65,7 @@
 			headers,
 			body: JSON.stringify({
 				name: 'test',
-				zarr_dir: '/invalid/zarr/dir/not/to/be/used/',
+				zarr_dir: zarrDir,
 				filters: { attributes: {}, types: {} }
 			})
 		});
@@ -191,7 +193,7 @@
 
 	<ul>
 		<li>creates a project with name <code>test_&#123;random_integer&#125;</code>;</li>
-		<li>creates a dataset, with the provided zarr directory;</li>
+		<li>creates a dataset with <code>zarr_dir={zarrDir}</code></li>
 		<li>creates a workflow;</li>
 		<li>
 			if not existing, creates a non-parallel task with <code>name=__TEST_ECHO_TASK__</code>,
