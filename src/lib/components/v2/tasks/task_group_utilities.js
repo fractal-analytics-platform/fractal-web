@@ -51,9 +51,8 @@ export function buildWorkflowTaskTableRows(taskGroups, groupBy) {
 function sortWorkflowTasksTableRows(rows) {
 	for (const row of rows) {
 		for (const task of row.tasks) {
-			const versions = Object.keys(task.taskVersions);
-			if (versions.length > 1) {
-				const validVersions = versions.filter((v) => v !== '');
+			const validVersions = Object.keys(task.taskVersions).filter((v) => v !== '');
+			if (validVersions.length > 0) {
 				sortVersions(validVersions);
 				task.selectedVersion = validVersions[0];
 			}
@@ -104,6 +103,13 @@ export function buildTaskTableRows(taskGroups, groupBy) {
  * @param {import('$lib/types-v2').TasksTableRowGroup[]} rows
  */
 function sortTasksTableRows(rows) {
+	for (const row of rows) {
+		const validVersions = Object.keys(row.groups).filter((v) => v !== '');
+		if (validVersions.length > 0) {
+			sortVersions(validVersions);
+			row.selectedVersion = validVersions[0];
+		}
+	}
 	rows.sort((r1, r2) =>
 		r1.groupTitle.localeCompare(r2.groupTitle, undefined, { sensitivity: 'base' })
 	);
