@@ -893,7 +893,12 @@
 	</div>
 {/if}
 
-<AddWorkflowTaskModal bind:this={addWorkflowTaskModal} {onWorkflowTaskAdded} {workflow} />
+<AddWorkflowTaskModal
+	bind:this={addWorkflowTaskModal}
+	{onWorkflowTaskAdded}
+	{workflow}
+	user={$page.data.user}
+/>
 
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	<svelte:fragment slot="header">

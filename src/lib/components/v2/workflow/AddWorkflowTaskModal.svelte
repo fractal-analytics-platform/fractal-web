@@ -1,10 +1,12 @@
 <script>
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
+	import { buildWorkflowTaskTableRows, removeIdenticalTaskGroups, sortVersions } from '../tasks/task_group_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	export let user;
 	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => Promise<void>} */
 	export let onWorkflowTaskAdded;
 
@@ -39,7 +41,8 @@
 			modal.displayErrorAlert(result);
 			return;
 		}
-		rows = buildWorkflowTaskTableRows(result, groupBy);
+		const filteredGroups = removeIdenticalTaskGroups(result, user);
+		rows = buildWorkflowTaskTableRows(filteredGroups, groupBy);
 	}
 
 	/**
