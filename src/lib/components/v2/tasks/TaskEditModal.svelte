@@ -16,7 +16,6 @@
 	let loading = false;
 	let saving = false;
 
-	let name = '';
 	/** @type {string|null} */
 	let command_parallel = null;
 	/** @type {string|null} */
@@ -26,7 +25,6 @@
 	let typesEditor;
 
 	const formErrorHandler = new FormErrorHandler('taskEditModalError', [
-		'name',
 		'command_parallel',
 		'command_non_parallel'
 	]);
@@ -44,7 +42,7 @@
 
 		saving = true;
 
-		let taskProperties = { name };
+		let taskProperties = {};
 		if (command_parallel !== null) {
 			taskProperties.command_parallel = command_parallel;
 		}
@@ -93,7 +91,6 @@
 
 		if (response.ok) {
 			task = /** @type {import('$lib/types-v2').TaskV2} */ (result);
-			name = task.name;
 			command_parallel = task.command_parallel;
 			command_non_parallel = task.command_non_parallel;
 			// wait the typesEditor element rendering, that happens after task is defined
@@ -131,11 +128,10 @@
 							<input
 								id="taskName"
 								type="text"
-								bind:value={name}
+								bind:value={task.name}
 								class="form-control"
-								class:is-invalid={$validationErrors['name']}
+								disabled
 							/>
-							<span class="invalid-feedback">{$validationErrors['name']}</span>
 						</div>
 					</div>
 
