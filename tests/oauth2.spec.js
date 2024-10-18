@@ -20,7 +20,7 @@ test('OAuth2 account', async ({ page }) => {
 
 		await waitPageLoading(page);
 
-		await page.getByText('Login with OAuth2 provider').click();
+		await page.getByText('Log in with institutional account').click();
 		await expect(page.getByText('as a non-verified user, you have limited access')).toBeVisible();
 	});
 

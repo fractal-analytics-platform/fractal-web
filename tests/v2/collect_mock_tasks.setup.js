@@ -67,7 +67,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 	});
 
 	await test.step('Check tasks list', async () => {
-		await expect(page.getByRole('row', { name: 'fractal-tasks-mock' })).toBeVisible();
+		await expect(page.getByRole('row', { name: 'fractal-tasks-mock' }).first()).toBeVisible();
 	});
 
 	await test.step('Delete task collection log', async () => {

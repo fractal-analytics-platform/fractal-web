@@ -1,10 +1,12 @@
 <script>
 	import { AlertError } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
+	import { buildWorkflowTaskTableRows, removeIdenticalTaskGroups, sortVersions } from '../tasks/task_group_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	export let user;
 	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => Promise<void>} */
 	export let onWorkflowTaskAdded;
 
@@ -21,11 +23,7 @@
 		pkg_name: 'Package Name'
 	};
 
-	/** @type {number|undefined} */
-	let taskOrder = undefined;
-
 	export async function show() {
-		taskOrder = undefined;
 		loading = true;
 		modal.hideErrorAlert();
 		modal.show();
@@ -39,7 +37,8 @@
 			modal.displayErrorAlert(result);
 			return;
 		}
-		rows = buildWorkflowTaskTableRows(result, groupBy);
+		const filteredGroups = removeIdenticalTaskGroups(result, user);
+		rows = buildWorkflowTaskTableRows(filteredGroups, groupBy);
 	}
 
 	/**
@@ -60,9 +59,7 @@
 						method: 'POST',
 						credentials: 'include',
 						headers,
-						body: JSON.stringify({
-							order: taskOrder
-						})
+						body: JSON.stringify({})
 					}
 				);
 
@@ -194,20 +191,7 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<div id="errorAlert-addWorkflowTaskModal" class="flex-fill" />
-		<div class="input-group m-0">
-			<label for="taskOrder" class="input-group-text">Task order in workflow</label>
-			<input
-				id="taskOrder"
-				type="number"
-				name="taskOrder"
-				class="form-control"
-				placeholder="Leave it blank to append at the end"
-				min="0"
-				max={workflow?.task_list.length}
-				bind:value={taskOrder}
-			/>
-		</div>
+		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill" />
 	</svelte:fragment>
 </Modal>
 
