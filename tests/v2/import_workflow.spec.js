@@ -39,7 +39,7 @@ test('Import workflow', async ({ page, project }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'workflow_to_import.json'));
 		await importWorkflowBtn.click();
-		await page.getByText(/Found 0 tasks with source='pip_remote:fractal_tasks_core/).waitFor();
+		await page.getByText(/Could not find a task matching/).waitFor();
 	});
 
 	const randomWorkflowName1 = Math.random().toString(36).substring(7);

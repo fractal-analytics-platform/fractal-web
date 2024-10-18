@@ -23,11 +23,7 @@
 		pkg_name: 'Package Name'
 	};
 
-	/** @type {number|undefined} */
-	let taskOrder = undefined;
-
 	export async function show() {
-		taskOrder = undefined;
 		loading = true;
 		modal.hideErrorAlert();
 		modal.show();
@@ -63,9 +59,7 @@
 						method: 'POST',
 						credentials: 'include',
 						headers,
-						body: JSON.stringify({
-							order: taskOrder
-						})
+						body: JSON.stringify({})
 					}
 				);
 
@@ -197,20 +191,7 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		<div id="errorAlert-addWorkflowTaskModal" class="flex-fill" />
-		<div class="input-group m-0">
-			<label for="taskOrder" class="input-group-text">Task order in workflow</label>
-			<input
-				id="taskOrder"
-				type="number"
-				name="taskOrder"
-				class="form-control"
-				placeholder="Leave it blank to append at the end"
-				min="0"
-				max={workflow?.task_list.length}
-				bind:value={taskOrder}
-			/>
-		</div>
+		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill" />
 	</svelte:fragment>
 </Modal>
 
