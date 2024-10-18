@@ -84,7 +84,10 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 	} else {
 		await expect(selector).toHaveText(optionValue);
 	}
-	await expect(page.getByRole('option', { name: optionValue, exact: true })).toHaveAttribute('aria-selected', 'true');
+	await expect(page.getByRole('option', { name: optionValue, exact: true })).toHaveAttribute(
+		'aria-selected',
+		'true'
+	);
 }
 
 /**
@@ -95,9 +98,10 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 export async function login(page, email, password) {
 	await page.goto('/auth/login');
 	await waitPageLoading(page);
+	await page.getByRole('button', { name: 'Log in with username & password' }).click();
 	await page.getByLabel('Email address').fill(email);
 	await page.getByLabel('Password').fill(password);
-	await page.getByRole('button', { name: 'Submit' }).click();
+	await page.getByRole('button', { name: 'Login' }).click();
 	await page.waitForURL('/v2/projects');
 	await waitPageLoading(page);
 }
@@ -110,5 +114,5 @@ export async function logout(page, email) {
 	await page.getByRole('button', { name: email }).click();
 	await page.getByRole('link', { name: 'Logout' }).click();
 	await waitPageLoading(page);
-	await expect(page.getByRole('link', {name: 'Login'}).first()).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Login' }).first()).toBeVisible();
 }

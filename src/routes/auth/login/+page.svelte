@@ -56,7 +56,7 @@
 		</div>
 	{:else}
 		<div class="row">
-			<h1 class="fw-light">Login</h1>
+			<h1 class="fw-light mb-4">Login</h1>
 		</div>
 		{#if showSessionExpiredMessage}
 			<div class="row">
@@ -65,55 +65,83 @@
 				</div>
 			</div>
 		{/if}
-		<div class="row">
-			<div class="col-md-4">
-				<h3 class="mt-2 fw-light">Local account</h3>
-				<form method="POST">
-					<div class="mb-3">
-						<label for="userEmail" class="form-label">Email address</label>
-						<input
-							name="username"
-							type="email"
-							class="form-control {loginError ? 'is-invalid' : ''}"
-							id="userEmail"
-							aria-describedby="emailHelp"
-							required
-						/>
-						<div id="emailHelp" class="form-text">The email you provided to the IT manager</div>
-						<div class="invalid-feedback">
-							{form?.invalidMessage}
-						</div>
-					</div>
-					<div class="mb-3">
-						<label for="userPassword" class="form-label">Password</label>
-						<input
-							name="password"
-							type="password"
-							class="form-control"
-							id="userPassword"
-							required
-						/>
-					</div>
-					<button class="btn btn-primary">Submit</button>
-				</form>
-			</div>
-		</div>
 		{#if oauth2Provider}
 			<div class="row">
-				<div class="col mt-5">
-					<h3 class="fw-light">External account</h3>
+				<div class="col mb-4 pb-3">
+					<h3 class="fw-light">Institutional login</h3>
 					<div id="externalLoginError" />
 					<button type="button" on:click={oauth2Login} class="btn btn-primary">
 						{#if oauth2Provider === 'github'}
-							Login with GitHub
+							Log in with GitHub
 						{:else if oauth2Provider === 'google'}
-							Login with Google
+							Log in with Google
 						{:else}
-							Login with OAuth2 provider
+							Log in with institutional account
 						{/if}
 					</button>
 				</div>
 			</div>
 		{/if}
+
+		<div class="row">
+			<div class="col-xl-4 col-lg-7 col-md-9">
+				<div class="accordion">
+					<div class="accordion-item">
+						{#if oauth2Provider}
+							<h2 class="accordion-header">
+								<button
+									class="accordion-button collapsed"
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target="#localLoginCollapse"
+									aria-expanded="false"
+									aria-controls="localLoginCollapse"
+								>
+									Log in with username & password
+								</button>
+							</h2>
+						{/if}
+						<div
+							id="localLoginCollapse"
+							class="accordion-collapse collapse"
+							class:show={!oauth2Provider}
+						>
+							<div class="accordion-body">
+								<form method="POST">
+									<div class="mb-3">
+										<p class="fw-light">
+											Log in with Fractal specific email & password provided to you by the Fractal
+											admin
+										</p>
+										<label for="userEmail" class="form-label">Email address</label>
+										<input
+											name="username"
+											type="email"
+											class="form-control {loginError ? 'is-invalid' : ''}"
+											id="userEmail"
+											required
+										/>
+										<div class="invalid-feedback">
+											{form?.invalidMessage}
+										</div>
+									</div>
+									<div class="mb-3">
+										<label for="userPassword" class="form-label">Password</label>
+										<input
+											name="password"
+											type="password"
+											class="form-control"
+											id="userPassword"
+											required
+										/>
+									</div>
+									<button class="btn btn-primary">Login</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	{/if}
 </div>
