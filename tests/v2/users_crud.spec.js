@@ -191,18 +191,26 @@ test('Create and update a user', async ({ page }) => {
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
 
+	await test.step('Edit user after having granted superuser privilege', async () => {
+		await page.getByRole('button', { name: 'Close' }).click();
+		await expect(page.getByText('User successfully updated')).not.toBeVisible();
+		await page.getByRole('textbox', { name: 'Username' }).fill(`${randomUserName}-renamed-2`);
+		await page.getByRole('button', { name: 'Save' }).first().click();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
+	});
+
 	await test.step('Check user in users list', async () => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
 		await expect(page.getByText('Users list')).toBeVisible();
-		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
+		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed-2');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, true);
 		verifyChecked(userRowCells, 5, false);
 	});
 
 	await test.step('Revoke superuser privilege', async () => {
-		const userRow = await getUserRow(page, randomUserName + '-renamed');
+		const userRow = await getUserRow(page, randomUserName + '-renamed-2');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
@@ -224,7 +232,7 @@ test('Create and update a user', async ({ page }) => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
 		await expect(page.getByText('Users list')).toBeVisible();
-		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
+		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed-2');
 		verifyChecked(userRowCells, 3, true);
 		verifyChecked(userRowCells, 4, false);
 		verifyChecked(userRowCells, 5, false);

@@ -106,6 +106,7 @@
 			}
 			if (existing) {
 				user = { ...result };
+				initialSuperuserValue = user.is_superuser;
 				userUpdatedMessage = 'User successfully updated';
 			} else {
 				await goto(`/v2/admin/users/${result.id}/edit`);
