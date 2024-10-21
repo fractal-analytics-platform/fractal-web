@@ -3,12 +3,14 @@
 	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import UserSettingsEditor from '$lib/components/v2/admin/UserSettingsEditor.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {import('$lib/types').Group & {user_ids: number[]}} */
 	let group = $page.data.group;
 	/** @type {Array<import('$lib/types').User & {id: number}>} */
 	let users = $page.data.users;
+	let runnerBackend = $page.data.runnerBackend;
 
 	/** @type {import('$lib/types').User & {id: number}|null} */
 	let draggedUser = null;
@@ -16,6 +18,9 @@
 	let addingUser = null;
 	let hovering = false;
 	let userFilter = '';
+
+	/** @type {import('$lib/types').UserSettings} */
+	let settings = createEmptySettings();
 
 	$: availableUsers = users
 		.filter((u) => !group.user_ids.includes(u.id))
@@ -114,6 +119,26 @@
 	onMount(() => {
 		editableViewPaths = [...group.viewer_paths];
 	});
+
+	/**
+	 * @returns {import('$lib/types').UserSettings}
+	 */
+	function createEmptySettings() {
+		return {
+			slurm_accounts: [],
+			slurm_user: '',
+			cache_dir: '',
+			ssh_host: '',
+			ssh_username: '',
+			ssh_private_key_path: '',
+			ssh_tasks_dir: '',
+			ssh_jobs_dir: ''
+		};
+	}
+
+	async function onSettingsUpdated() {
+		settings = createEmptySettings();
+	}
 </script>
 
 <nav aria-label="breadcrumb">
@@ -193,7 +218,7 @@
 	</div>
 </div>
 
-<div class="row mt-4">
+<div class="row mt-4 mb-4">
 	<div class="col-lg-9">
 		<h4 class="fw-light">Viewer paths</h4>
 		{#each editableViewPaths as viewerPath, i}
@@ -228,3 +253,31 @@
 		<button class="btn btn-primary" on:click={saveViewerPaths}>Save</button>
 	</div>
 </div>
+
+{#if runnerBackend !== 'local' && runnerBackend !== 'local_experimental'}
+	<hr />
+	<div class="row">
+		<div class="mt-4 col-lg-7">
+			<div class="row">
+				<div class="offset-sm-3">
+					<h4 class="fw-light">Users settings</h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="offset-sm-3 col-10">
+					<div class="alert alert-warning">
+						<i class="bi bi-exclamation-triangle" />
+						<strong>Warning</strong>: this PATCH will be applied to all the {group.user_ids.length} users
+						of this user group.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<UserSettingsEditor
+		{settings}
+		{runnerBackend}
+		settingsApiEndpoint="/api/auth/group/{group.id}/user-settings"
+		{onSettingsUpdated}
+	/>
+{/if}

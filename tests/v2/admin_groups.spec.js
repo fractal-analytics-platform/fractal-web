@@ -98,7 +98,7 @@ test('Admin groups management', async ({ page }) => {
 			await selectSlimSelect(page, page.getByLabel('Select groups'), group, true);
 		}
 		// Await slim-select change events are propagated before clicking the Add button
-		await new Promise(r => setTimeout(r, 500));
+		await new Promise((r) => setTimeout(r, 500));
 		await modal.getByRole('button', { name: 'Add' }).click();
 		await waitModalClosed(page);
 		finalCount = initialGroupBadgesCount + 2;
@@ -128,6 +128,29 @@ test('Admin groups management', async ({ page }) => {
 		await expect(modal.getByText('A group with the same name already exists')).toBeVisible();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
+	});
+
+	await test.step('Edit user settings in group page', async () => {
+		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
+		await waitPageLoading(page);
+		await page.getByRole('textbox', { name: 'SLURM user' }).fill('test-slurm-user');
+		await page.getByRole('textbox', { name: 'Cache dir' }).fill('/tmp/test');
+		await page.getByRole('button', { name: 'Add SLURM account' }).click();
+		await page.getByLabel('SLURM account #1', { exact: true }).fill('test-slurm-account');
+		await page.getByRole('button', { name: 'Save' }).nth(1).click();
+		await expect(page.getByText('Settings successfully updated')).toBeVisible();
+	});
+
+	await test.step('Check user settings have been updated', async () => {
+		await page.goto('/v2/admin/users');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
+		await waitPageLoading(page);
+		await expect(page.getByRole('textbox', { name: 'SLURM user' })).toHaveValue('test-slurm-user');
+		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue('/tmp/test');
+		await expect(page.getByLabel('SLURM account #1', { exact: true })).toHaveValue(
+			'test-slurm-account'
+		);
 	});
 });
 
