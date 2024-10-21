@@ -152,7 +152,28 @@ test('Admin groups management', async ({ page }) => {
 			'test-slurm-account'
 		);
 	});
+
+	await test.step('Delete test groups', async () => {
+		await page.goto('/v2/admin/groups');
+		await waitPageLoading(page);
+		await deleteGroup(page, group1);
+		await deleteGroup(page, group2);
+		await deleteGroup(page, group3);
+	});
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} groupName
+ */
+async function deleteGroup(page, groupName) {
+	await page.getByRole('row', { name: groupName }).getByRole('button', { name: 'Delete' }).click();
+	const modal = page.locator('.modal.show');
+	await modal.waitFor();
+	await modal.getByRole('button', { name: 'Confirm' }).click();
+	await waitModalClosed(page);
+	await expect(page.getByRole('row', { name: groupName })).not.toBeVisible();
+}
 
 /**
  * @param {import('@playwright/test').Page} page
