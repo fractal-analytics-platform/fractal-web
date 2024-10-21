@@ -101,7 +101,7 @@ export async function login(page, email, password) {
 	await page.getByRole('button', { name: 'Log in with username & password' }).click();
 	await page.getByLabel('Email address').fill(email);
 	await page.getByLabel('Password').fill(password);
-	await page.getByRole('button', { name: 'Login' }).click();
+	await page.getByRole('button', { name: 'Log in', exact: true }).click();
 	await page.waitForURL('/v2/projects');
 	await waitPageLoading(page);
 }
