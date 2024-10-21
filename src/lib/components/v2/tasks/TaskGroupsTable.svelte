@@ -1,6 +1,6 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { buildTaskTableRows, sortVersions } from './task_group_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import TaskInfoModal from './TaskInfoModal.svelte';
@@ -59,8 +59,7 @@
 	/**
 	 * @param {number} index
 	 */
-	async function handleSwitchVersion(index) {
-		await tick();
+	function handleSwitchVersion(index) {
 		const version = taskGroupRows[index].selectedVersion;
 		taskGroupRows = taskGroupRows.map((r, i) => {
 			if (i === index) {
@@ -157,8 +156,8 @@
 						<select
 							class="form-select"
 							aria-label="Version for {taskGroupRow.groupTitle}"
-							on:change={() => handleSwitchVersion(i)}
 							bind:value={taskGroupRow.selectedVersion}
+							on:change={() => handleSwitchVersion(i)}
 						>
 							{#each sortVersions(Object.keys(taskGroupRow.groups)) as version}
 								<option value={version}>{version || 'None'}</option>
