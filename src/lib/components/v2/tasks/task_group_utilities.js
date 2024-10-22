@@ -58,13 +58,9 @@ function sortWorkflowTasksTableRows(rows) {
 			}
 		}
 		row.tasks.sort((t1, t2) =>
-			t1.taskVersions[t1.selectedVersion].task_name.localeCompare(
-				t2.taskVersions[t2.selectedVersion].task_name,
-				undefined,
-				{
-					sensitivity: 'base'
-				}
-			)
+			t1.taskVersions[t1.selectedVersion].task_id < t2.taskVersions[t2.selectedVersion].task_id
+				? -1
+				: 1
 		);
 	}
 	rows.sort((r1, r2) =>
@@ -108,6 +104,9 @@ function sortTasksTableRows(rows) {
 		if (validVersions.length > 0) {
 			sortVersions(validVersions);
 			row.selectedVersion = validVersions[0];
+		}
+		for (const taskGroup of Object.values(row.groups)) {
+			taskGroup.task_list.sort((t1, t2) => (t1.id < t2.id ? -1 : 1));
 		}
 	}
 	rows.sort((r1, r2) =>
