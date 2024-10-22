@@ -154,7 +154,7 @@ export type TasksCollections = {
 
 export type TasksCollectionsStateData = {
   package: string
-  package_version: string
+  version: string
   status: TaskCollectStatus
   logs?: string
   info?: string
