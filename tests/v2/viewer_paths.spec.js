@@ -15,7 +15,7 @@ test('Viewer paths', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
 		await page.getByRole('textbox', { name: 'Password', exact: true }).fill('1234');
 		await page.getByRole('textbox', { name: 'Confirm password' }).fill('1234');
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).first().click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	});
 
@@ -49,7 +49,7 @@ test('Viewer paths', async ({ page }) => {
 		const addViewerPathBtn = page.getByRole('button', { name: 'Add viewer path' });
 		await addViewerPathBtn.click();
 		await addViewerPathBtn.click();
-		const saveBtn = page.getByRole('button', { name: 'Save' });
+		const saveBtn = page.getByRole('button', { name: 'Save' }).first();
 		await saveBtn.click();
 		await expect(
 			page.getByText("String attribute 'viewer_paths[0]' cannot be empty")
@@ -61,11 +61,11 @@ test('Viewer paths', async ({ page }) => {
 	});
 
 	await test.step('Remove viewer paths', async () => {
-		await expect(page.getByRole('textbox')).toHaveCount(3);
+		await expect(page.getByRole('textbox')).toHaveCount(5);
 		await page.getByLabel('Remove viewer path #2').click();
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: 'Save' }).first().click();
 		await expect(page.getByText('Paths successfully updated')).toBeVisible();
-		await expect(page.getByRole('textbox')).toHaveCount(2);
+		await expect(page.getByRole('textbox')).toHaveCount(4);
 	});
 
 	await test.step('Check viewer paths in info page', async () => {

@@ -1,7 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { getFieldValidationError } from '$lib/common/errors';
+	import { AlertError, getFieldValidationError } from '$lib/common/errors';
+	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {Array<import('$lib/types').Group & {user_ids: number[]}>} */
@@ -54,6 +55,23 @@
 			}
 		}
 	}
+
+	/**
+	 * @param {number} groupId
+	 */
+	async function handleGroupDelete(groupId) {
+		const response = await fetch(`/api/auth/group/${groupId}`, {
+			method: 'DELETE',
+			credentials: 'include'
+		});
+		if (response.ok) {
+			groups = groups.filter((g) => g.id !== groupId);
+		} else {
+			const result = await response.json();
+			console.error('Error while deleting group', result);
+			throw new AlertError(result);
+		}
+	}
 </script>
 
 <button class="btn btn-primary float-end" on:click={openCreateGroupModal}>
@@ -86,6 +104,17 @@
 					<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary">
 						<i class="bi bi-pencil" /> Edit
 					</a>
+					{#if group.name !== 'All'}
+						<ConfirmActionButton
+							modalId="confirmGroupDeleteModal{group.id}"
+							style={'danger'}
+							btnStyle="danger"
+							buttonIcon="trash"
+							label={'Delete'}
+							message={`Delete group ${group.name}`}
+							callbackAction={() => handleGroupDelete(group.id)}
+						/>
+					{/if}
 				</td>
 			</tr>
 		{/each}

@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.7 (\#583, \#601, \#605):
+* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612):
     * Removed owner from v2 tasks (\#583);
     * Displayed workflow task warning message (\#583);
     * Implemented selection of group in task creation (\#583);
@@ -20,6 +20,9 @@
     * Removed order field from workflow task modal (\#605);
     * Login page layout improvements (\#605);
     * Disabled editing of task name (\#605);
+    * Added user group setting editor form (\#612);
+    * Fixed issue when editing user after setting the superuser privilege (\#612);
+    * Supported deletion of groups (\#612);
 
 # 1.8.0
 

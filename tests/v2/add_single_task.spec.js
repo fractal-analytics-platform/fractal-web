@@ -205,6 +205,27 @@ test('Add single tasks [v2]', async ({ page }) => {
 		expect(task.args_schema_version).toEqual('pydantic_v1');
 	});
 
+	await test.step('Create different version of parallel task', async () => {
+		await page.getByText('Parallel', { exact: true }).click();
+		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName2);
+		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test2');
+		await page.getByRole('textbox', { name: 'Version' }).fill('0.0.2');
+		await createBtn.click();
+		await page.getByText('Task created successfully').waitFor();
+		const versionSelector = page.getByRole('row', { name: randomTaskName2 }).getByRole('combobox');
+		await expect(versionSelector).toHaveValue('0.0.2');
+		let task = await getCreatedTaskModalData(page, randomTaskName2, 'parallel');
+		expect(task.name).toEqual(randomTaskName2);
+		expect(task.command_parallel).toEqual('/tmp/test2');
+		expect(task.args_schema_version).toEqual('-');
+		await versionSelector.selectOption('0.0.1');
+		await expect(versionSelector).toHaveValue('0.0.1');
+		task = await getCreatedTaskModalData(page, randomTaskName2, 'parallel');
+		expect(task.name).toEqual(randomTaskName2);
+		expect(task.command_parallel).toEqual('/tmp/test');
+		expect(task.args_schema_version).toEqual('pydantic_v2');
+	});
+
 	await test.step('Cleanup test tasks', async () => {
 		await deleteTask(page, randomTaskName1);
 		await deleteTask(page, randomTaskName2);
