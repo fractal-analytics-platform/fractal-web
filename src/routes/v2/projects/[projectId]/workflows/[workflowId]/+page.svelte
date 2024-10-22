@@ -706,6 +706,7 @@
 								</button>
 								<button
 									class="btn btn-light"
+									aria-label="Edit tasks order"
 									on:click={() => editTasksOrderModal.show(updatableWorkflowList)}
 								>
 									<i class="bi-arrow-down-up" />
