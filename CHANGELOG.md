@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612):
+* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612, \#616):
     * Removed owner from v2 tasks (\#583);
     * Displayed workflow task warning message (\#583);
     * Implemented selection of group in task creation (\#583);
@@ -23,6 +23,12 @@
     * Added user group setting editor form (\#612);
     * Fixed issue when editing user after setting the superuser privilege (\#612);
     * Supported deletion of groups (\#612);
+    * Used response.data.version when displaying task collections (\#616);
+    * Sorted tasks by id (\#616);
+    * Implemented reordering of tasks in workflow using drag and drop (\#616);
+    * Created healthcheck task as private (\#616);
+    * Used args_schema=false in GET /api/v2/task-group/ (\#616);
+    * Ignored empty task groups (\#616);
 
 # 1.8.0
 
