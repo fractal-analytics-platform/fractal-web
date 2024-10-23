@@ -27,7 +27,7 @@
 		loading = true;
 		modal.hideErrorAlert();
 		modal.show();
-		const response = await fetch(`/api/v2/task-group?only_active=true`, {
+		const response = await fetch(`/api/v2/task-group?only_active=true&args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});

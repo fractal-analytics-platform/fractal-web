@@ -32,15 +32,19 @@ export async function listTasks(fetch) {
 /**
  * Fetches a list of task groups from the server
  * @param {typeof fetch} fetch
+ * @param {boolean|false=} loadArgsSchema
  * @returns {Promise<Array<import('$lib/types-v2').TaskGroupV2>>}
  */
-export async function listTaskGroups(fetch) {
+export async function listTaskGroups(fetch, loadArgsSchema = false) {
 	logger.debug('Fetching task groups');
 
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/api/v2/task-group/', {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(
+		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/?args_schema=${loadArgsSchema}`,
+		{
+			method: 'GET',
+			credentials: 'include'
+		}
+	);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch task groups');
