@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
 
 test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
@@ -86,10 +86,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 		// Add duplicated child object property (invalid)
 		childObjectContainer.getByRole('button', { name: 'Add property' }).click();
 		await childObjectContainer.getByRole('textbox', { name: 'Argument name' }).nth(1).fill('k6');
-		await childObjectContainer
-			.getByRole('textbox', { name: 'Argument value' })
-			.nth(1)
-			.fill('k6');
+		await childObjectContainer.getByRole('textbox', { name: 'Argument value' }).nth(1).fill('k6');
 	});
 
 	await test.step('Check validation', async () => {
@@ -116,9 +113,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 		await workflow.selectTask(taskName);
 		await expect(tab.getByLabel('Remove property')).toHaveCount(8);
 		await expect(tab.getByRole('textbox', { name: 'Argument name' }).first()).toHaveValue('k1');
-		await expect(tab.getByRole('textbox', { name: 'Argument value' }).first()).toHaveValue(
-			'foo'
-		);
+		await expect(tab.getByRole('textbox', { name: 'Argument value' }).first()).toHaveValue('foo');
 		await expect(
 			tab.getByRole('combobox').nth(2).getByRole('option', { selected: true })
 		).toHaveText('False');
@@ -126,9 +121,34 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 		const objectContainer = tab.locator('.accordion-body').first();
 		await objectContainer.locator('.accordion-button').first().click();
 		const arrayContainer = objectContainer.locator('.accordion-body');
-		await expect(
-			arrayContainer.getByRole('textbox', { name: 'Argument value' })
-		).toHaveValue('bar');
+		await expect(arrayContainer.getByRole('textbox', { name: 'Argument value' })).toHaveValue(
+			'bar'
+		);
+	});
+
+	await test.step('Trigger the unsaved arguments modal and discard the changes', async () => {
+		await tab.getByLabel('Remove property').first().click();
+		await page.getByRole('button', { name: 'Meta', exact: true }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Discard changes' }).click();
+		await waitModalClosed(page);
+		await page.getByRole('button', { name: 'Meta', exact: true }).click();
+		await expect(page.getByText('Initialisation Meta')).toBeVisible();
+	});
+
+	await test.step('Trigger the unsaved arguments modal and save the changes', async () => {
+		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
+		await tab.getByLabel('Remove property').first().click();
+		await page.getByRole('button', { name: 'Meta', exact: true }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Save changes' }).click();
+		await waitModalClosed(page);
+		await page.getByRole('button', { name: 'Meta', exact: true }).click();
+		await expect(page.getByText('Initialisation Meta')).toBeVisible();
+		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
+		await expect(tab.getByLabel('Remove property')).toHaveCount(7);
 	});
 
 	await test.step('Cleanup', async () => {

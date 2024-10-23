@@ -102,6 +102,8 @@
 		workflowTask = workflowTask;
 		unsavedChangesNonParallel = false;
 		unsavedChangesParallel = false;
+		unsavedChangesFormBuilderParallel = false;
+		unsavedChangesFormBuilderNonParallel = false;
 	}
 
 	/**
