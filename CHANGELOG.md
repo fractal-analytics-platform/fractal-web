@@ -23,6 +23,7 @@
     * Created healthcheck task as private (\#616);
     * Used args_schema=false in GET /api/v2/task-group/ (\#616);
     * Ignored empty task groups (\#616);
+    * Checked pkg_name while computing workflow task update candidates (\#616);
 * Fixed dropdown style (\#601);
 * Changed "new version available" icon (\#583);
 * Login page layout improvements (\#605);

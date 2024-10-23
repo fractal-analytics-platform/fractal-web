@@ -10,7 +10,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
-	import { getAllNewVersions as getAllNewVersionsV2 } from '$lib/components/v2/workflow/version-checker';
+	import { getAllNewVersions } from '$lib/components/v2/workflow/version-checker';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
@@ -376,7 +376,7 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMap = await getAllNewVersionsV2(workflow.task_list.map((wt) => wt.task));
+			newVersionsMap = await getAllNewVersions(workflow.task_list.map((wt) => wt.task));
 		}
 	}
 

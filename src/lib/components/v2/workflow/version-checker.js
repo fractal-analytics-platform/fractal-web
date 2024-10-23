@@ -15,17 +15,23 @@ export async function getNewVersions(task) {
  * @returns {Promise<{ [id: string]: import('$lib/types-v2').TaskV2[] }>} the list of update candidates, for each task received as input
  */
 export async function getAllNewVersions(tasks) {
-	const response = await fetch(`/api/v2/task`);
+	const response = await fetch(`/api/v2/task-group?only_active=true`);
 
 	if (!response.ok) {
 		throw new AlertError(await response.json());
 	}
 
-	/** @type {import('$lib/types-v2').TaskV2[]} */
-	const result = await response.json();
+	/** @type {import('$lib/types-v2').TaskGroupV2[]} */
+	const taskGroups = await response.json();
 
-	return tasks.reduce(function (map, task) {
-		map[task.id] = result
+	const tasksWithPackage = tasks.map((t) => ({
+		...t,
+		pkg_name: taskGroups.find((tg) => tg.id === t.taskgroupv2_id)?.pkg_name
+	}));
+
+	return tasksWithPackage.reduce(function (map, task) {
+		map[task.id] = taskGroups
+			.flatMap((tg) => tg.task_list.map((t) => ({ ...t, pkg_name: tg.pkg_name })))
 			.filter((t) => {
 				return (
 					(task.args_schema_non_parallel !== null || task.args_schema_parallel !== null) &&
@@ -34,6 +40,7 @@ export async function getAllNewVersions(tasks) {
 					t.type === task.type &&
 					t.version &&
 					(t.args_schema_non_parallel || t.args_schema_parallel) &&
+					t.pkg_name === task.pkg_name &&
 					greatestVersionAsc(t, task) === 1
 				);
 			})

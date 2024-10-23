@@ -49,7 +49,8 @@ const tasks = [
 		version: '1.2.3',
 		type: 'non_parallel',
 		args_schema_non_parallel: {},
-		args_schema_parallel: null
+		args_schema_parallel: null,
+		taskgroupv2_id: 1
 	},
 	{
 		id: 2,
@@ -58,7 +59,8 @@ const tasks = [
 		version: '1.2.4',
 		type: 'non_parallel',
 		args_schema_non_parallel: {},
-		args_schema_parallel: null
+		args_schema_parallel: null,
+		taskgroupv2_id: 1
 	},
 	{
 		id: 3,
@@ -67,7 +69,8 @@ const tasks = [
 		version: '2.0.0',
 		type: 'non_parallel',
 		args_schema_non_parallel: newArgsSchema,
-		args_schema_parallel: null
+		args_schema_parallel: null,
+		taskgroupv2_id: 1
 	},
 	{
 		id: 3,
@@ -76,7 +79,8 @@ const tasks = [
 		version: '2.5.0',
 		type: 'compound',
 		args_schema_non_parallel: {},
-		args_schema_parallel: {}
+		args_schema_parallel: {},
+		taskgroupv2_id: 1
 	},
 	{
 		id: 5,
@@ -85,7 +89,8 @@ const tasks = [
 		version: '1.2.3',
 		type: 'parallel',
 		args_schema_non_parallel: null,
-		args_schema_parallel: {}
+		args_schema_parallel: {},
+		taskgroupv2_id: 1
 	},
 	{
 		id: 6,
@@ -94,12 +99,15 @@ const tasks = [
 		version: '1.3.0',
 		type: 'parallel',
 		args_schema_non_parallel: null,
-		args_schema_parallel: {}
+		args_schema_parallel: {},
+		taskgroupv2_id: 1
 	}
 ];
 
-function mockTaskList() {
-	fetch.mockResolvedValue(createFetchResponse(tasks));
+const taskGroups = [{ id: 1, pkg_name: 'group1', task_list: tasks }];
+
+function mockTaskGroupsList() {
+	fetch.mockResolvedValue(createFetchResponse(taskGroups));
 }
 
 function getTask(name, version) {
@@ -261,7 +269,7 @@ function renderVersionUpdate(
 ) {
 	workflowTask.task = task;
 	const nop = function () {};
-	mockTaskList();
+	mockTaskGroupsList();
 	return render(VersionUpdate, {
 		props: { workflowTask, updateWorkflowCallback: nop, updateNewVersionsCount: nop }
 	});
