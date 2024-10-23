@@ -107,7 +107,7 @@
 			} else {
 				console.log('Task collection created', result);
 				if (package_version) {
-					result.data.package_version = package_version;
+					result.data.version = package_version;
 				}
 				// Add task collection to local storage
 				storeCreatedTaskCollection(result);
@@ -149,7 +149,7 @@
 			id: taskCollection.id,
 			status: taskCollection.data.status,
 			pkg: taskCollection.data.package,
-			package_version: taskCollection.data.package_version,
+			package_version: taskCollection.data.version,
 			timestamp: taskCollection.timestamp
 		});
 		updateTaskCollections(taskCollections);
