@@ -77,18 +77,20 @@ export function buildTaskTableRows(taskGroups, groupBy) {
 	/** @type {import('$lib/types-v2').TasksTableRowGroup[]} */
 	const rows = [];
 	for (const taskGroup of taskGroups) {
-		const groupValue = taskGroup[groupBy];
-		let groupRow = rows.find((r) => r.groupTitle === groupValue);
-		const version = taskGroup.version || '';
-		if (groupRow) {
-			groupRow.groups[version] = taskGroup;
-		} else {
-			groupRow = {
-				groupTitle: groupValue,
-				selectedVersion: version,
-				groups: { [version]: taskGroup }
-			};
-			rows.push(groupRow);
+		if (taskGroup.task_list.length > 0) {
+			const groupValue = taskGroup[groupBy];
+			let groupRow = rows.find((r) => r.groupTitle === groupValue);
+			const version = taskGroup.version || '';
+			if (groupRow) {
+				groupRow.groups[version] = taskGroup;
+			} else {
+				groupRow = {
+					groupTitle: groupValue,
+					selectedVersion: version,
+					groups: { [version]: taskGroup }
+				};
+				rows.push(groupRow);
+			}
 		}
 	}
 	sortTasksTableRows(rows);
