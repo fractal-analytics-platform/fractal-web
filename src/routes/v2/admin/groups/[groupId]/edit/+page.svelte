@@ -18,6 +18,11 @@
 	let addingUser = null;
 	let hovering = false;
 	let userFilter = '';
+	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default} */
+	let userSettingsEditor;
+	let settingsUpdatedMessage = '';
+	let settingsPendingChanges = false;
+	let savingSettings = false;
 
 	/** @type {import('$lib/types').UserSettings} */
 	let settings = createEmptySettings();
@@ -31,6 +36,9 @@
 	);
 
 	$: members = users.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator);
+
+	$: saveViewerPathsEnabled =
+		JSON.stringify(originalViewPaths) !== JSON.stringify(editableViewPaths);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -79,6 +87,8 @@
 
 	/** @type {string[]} */
 	let editableViewPaths = [];
+	/** @type {string[]} */
+	let originalViewPaths = [];
 	let viewerPathsUpdatedMessage = '';
 	const viewerPathsErrorHandler = new FormErrorHandler('viewerPathGenericError', ['viewer_paths']);
 	const viewerPathsValidationErrors = viewerPathsErrorHandler.getValidationErrorStore();
@@ -112,12 +122,14 @@
 			return;
 		}
 		const { viewer_paths } = await response.json();
-		editableViewPaths = viewer_paths;
+		editableViewPaths = [...viewer_paths];
+		originalViewPaths = [...viewer_paths];
 		viewerPathsUpdatedMessage = 'Paths successfully updated';
 	}
 
 	onMount(() => {
 		editableViewPaths = [...group.viewer_paths];
+		originalViewPaths = [...group.viewer_paths];
 	});
 
 	/**
@@ -138,6 +150,17 @@
 
 	async function onSettingsUpdated() {
 		settings = createEmptySettings();
+		settingsUpdatedMessage = 'Settings successfully updated';
+	}
+
+	async function handleSaveSettings() {
+		settingsUpdatedMessage = '';
+		savingSettings = true;
+		try {
+			await userSettingsEditor.handleSaveSettings();
+		} finally {
+			savingSettings = false;
+		}
 	}
 </script>
 
@@ -250,7 +273,9 @@
 			</div>
 		{/if}
 		<StandardDismissableAlert message={viewerPathsUpdatedMessage} />
-		<button class="btn btn-primary" on:click={saveViewerPaths}>Save</button>
+		<button class="btn btn-primary" on:click={saveViewerPaths} disabled={!saveViewerPathsEnabled}>
+			Save
+		</button>
 	</div>
 </div>
 
@@ -275,9 +300,31 @@
 		</div>
 	</div>
 	<UserSettingsEditor
+		bind:this={userSettingsEditor}
+		bind:pendingChanges={settingsPendingChanges}
 		{settings}
 		{runnerBackend}
 		settingsApiEndpoint="/api/auth/group/{group.id}/user-settings"
 		{onSettingsUpdated}
 	/>
+	<div class="row">
+		<div class="mt-2 col-lg-7">
+			<div class="row mb-3">
+				<div class="col-sm-9 offset-sm-3">
+					<StandardDismissableAlert message={settingsUpdatedMessage} />
+					<button
+						type="button"
+						on:click={handleSaveSettings}
+						class="btn btn-primary"
+						disabled={savingSettings || !settingsPendingChanges}
+					>
+						{#if savingSettings}
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+						{/if}
+						Save
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 {/if}

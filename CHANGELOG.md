@@ -31,6 +31,7 @@
 * Used response.data.version when displaying task collections (\#616);
 * Implemented reordering of tasks in workflow using drag and drop (\#616);
 * Fixed broken unsaved changes modal, for non-JSON-schema-based workflowtask edits (\#616);
+* Refactored user editing form using only one save button (\#616);
 
 # 1.8.0
 
