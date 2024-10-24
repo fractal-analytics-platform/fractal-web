@@ -19,6 +19,19 @@ vi.mock('$app/stores', () => {
 	};
 });
 
+// Mocking bootstrap.Modal
+class MockModal {
+	constructor() {
+		this.show = vi.fn();
+		this.hide = vi.fn();
+	}
+}
+MockModal.getInstance = vi.fn();
+
+global.window.bootstrap = {
+	Modal: MockModal
+};
+
 // The component to be tested must be imported after the mock setup
 import UserEditor from '../../src/lib/components/v2/admin/UserEditor.svelte';
 
@@ -29,6 +42,8 @@ describe('UserEditor', () => {
 
 	const selectedUser = {
 		id: 1,
+		email: 'test@example.com',
+		is_superuser: false,
 		group_ids_names: []
 	};
 
@@ -52,7 +67,7 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				save: () => {}
+				saveUser: () => {}
 			}
 		});
 
@@ -71,8 +86,8 @@ describe('UserEditor', () => {
 
 		await user.type(screen.getByRole('textbox', { name: 'SLURM user' }), 'user');
 		await user.type(screen.getByRole('textbox', { name: 'Cache dir' }), '/path/to/cache/dir');
-		await user.click(screen.getAllByRole('button', { name: 'Save' })[1]);
-		await screen.findByText('Settings successfully updated');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await screen.findByText('User successfully updated');
 
 		expect(mockRequest).toHaveBeenCalledWith(
 			expect.anything(),
@@ -99,7 +114,7 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				save: () => {}
+				saveUser: () => {}
 			}
 		});
 
@@ -121,7 +136,7 @@ describe('UserEditor', () => {
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Cache dir' }), 'xxx');
-		await user.click(screen.getAllByRole('button', { name: 'Save' })[1]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('mocked_error');
 
 		expect(mockRequest).toHaveBeenCalledWith(
@@ -149,7 +164,7 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm_ssh',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				save: () => {}
+				saveUser: () => {}
 			}
 		});
 
@@ -174,8 +189,8 @@ describe('UserEditor', () => {
 		await user.type(screen.getByRole('textbox', { name: 'SSH Private Key Path' }), 'xxx');
 		await user.type(screen.getByRole('textbox', { name: 'SSH Tasks Dir' }), 'yyy');
 		await user.type(screen.getByRole('textbox', { name: 'SSH Jobs Dir' }), 'zzz');
-		await user.click(screen.getAllByRole('button', { name: 'Save' })[1]);
-		await screen.findByText('Settings successfully updated');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await screen.findByText('User successfully updated');
 
 		expect(mockRequest).toHaveBeenCalledWith(
 			expect.anything(),
@@ -202,7 +217,7 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm_ssh',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				save: () => {}
+				saveUser: () => {}
 			}
 		});
 
@@ -241,7 +256,7 @@ describe('UserEditor', () => {
 		);
 		await user.type(screen.getByRole('textbox', { name: 'SSH Tasks Dir' }), '/path/to/tasks/dir');
 		await user.type(screen.getByRole('textbox', { name: 'SSH Jobs Dir' }), '/path/to/jobs/dir');
-		await user.click(screen.getAllByRole('button', { name: 'Save' })[1]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('mock_error_ssh_private_key_path');
 		await screen.findByText('mock_error_ssh_tasks_dir');
 		await screen.findByText('mock_error_ssh_jobs_dir');

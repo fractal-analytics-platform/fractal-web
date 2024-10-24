@@ -81,3 +81,4 @@ jobs:
         with:
           name: test-results-folder
           path: test-results
+          overwrite: true

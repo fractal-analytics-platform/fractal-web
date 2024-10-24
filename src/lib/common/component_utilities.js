@@ -6,13 +6,13 @@ import lte from 'semver/functions/lte';
 import valid from 'semver/functions/valid';
 
 /**
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
+ * @param {string | null} version1
+ * @param {string | null} version2
  * @returns {-1|0|1}
  */
-export function greatestVersionAsc(t1, t2) {
-	const t1Version = validateVersion(t1.version);
-	const t2Version = validateVersion(t2.version);
+export function greatestVersionAsc(version1, version2) {
+	const t1Version = validateVersion(version1);
+	const t2Version = validateVersion(version2);
 	if (t1Version !== null && t2Version !== null) {
 		const t1VersionLt = lte(t1Version, t2Version);
 		return t1VersionLt ? -1 : 1;
@@ -21,13 +21,13 @@ export function greatestVersionAsc(t1, t2) {
 }
 
 /**
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
+ * @param {string | null} version1
+ * @param {string | null} version2
  * @returns {-1|0|1}
  */
-export function greatestVersionDesc(t1, t2) {
-	const t1Version = validateVersion(t1.version);
-	const t2Version = validateVersion(t2.version);
+export function greatestVersionDesc(version1, version2) {
+	const t1Version = validateVersion(version1);
+	const t2Version = validateVersion(version2);
 	if (t1Version !== null && t2Version !== null) {
 		const t1VersionGt = gte(t1Version, t2Version);
 		return t1VersionGt ? -1 : 1;
@@ -53,27 +53,27 @@ function validateVersion(version) {
 }
 
 /**
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
+ * @param {import('$lib/types').Task} t1
+ * @param {import('$lib/types').Task} t2
  * @returns {-1|0|1}
  */
 export function compareTaskNameAscAndVersionAsc(t1, t2) {
 	if (t1.name.toLowerCase() < t2.name.toLowerCase()) return -1;
 	if (t1.name.toLowerCase() > t2.name.toLowerCase()) return 1;
 	// Names are equal, sort by version
-	return greatestVersionAsc(t1, t2);
+	return greatestVersionAsc(t1.version, t2.version);
 }
 
 /**
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t1
- * @param {import('$lib/types').Task|import('$lib/types-v2').TaskV2} t2
+ * @param {import('$lib/types').Task} t1
+ * @param {import('$lib/types').Task} t2
  * @returns {-1|0|1}
  */
 export function compareTaskNameAscAndVersionDesc(t1, t2) {
 	if (t1.name.toLowerCase() < t2.name.toLowerCase()) return -1;
 	if (t1.name.toLowerCase() > t2.name.toLowerCase()) return 1;
 	// Names are equal, sort by version
-	return greatestVersionDesc(t1, t2);
+	return greatestVersionDesc(t1.version, t2.version);
 }
 
 /**
@@ -116,24 +116,6 @@ export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null
 			// Owners are equal, sort by name
 			return sortingFunction(t1, t2);
 		}
-	});
-}
-
-/**
- * @param {Array<import('$lib/types-v2').TaskV2>} tasks
- * @param {'asc'|'desc'} order
- * @returns {Array<import('$lib/types-v2').TaskV2>}
- */
-export function orderTasksByGroupThenByNameThenByVersion(tasks, order = 'asc') {
-	const sortingFunction = getVersionSortingFunction(order);
-	return tasks.sort((t1, t2) => {
-		if (t1.taskgroupv2_id < t2.taskgroupv2_id) {
-			return -1;
-		}
-		if (t1.taskgroupv2_id > t2.taskgroupv2_id) {
-			return 1;
-		}
-		return sortingFunction(t1, t2);
 	});
 }
 

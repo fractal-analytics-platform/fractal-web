@@ -89,6 +89,61 @@
 			editWorkflowTasksOrderModal.displayErrorAlert(result);
 		}
 	}
+
+	/** @type {number|undefined} */
+	let draggedWftId = undefined;
+	/** @type {number|undefined} */
+	let draggedWftIndex = undefined;
+
+	/**
+	 * @param {number} workflowTaskId
+	 * @param {number} index
+	 * @param {DragEvent} event
+	 */
+	function handleDragStart(workflowTaskId, index, event) {
+		draggedWftId = workflowTaskId;
+		draggedWftIndex = index;
+		// hide drag image
+		if (event.dataTransfer && event.target instanceof Element) {
+			event.dataTransfer.setDragImage(event.target, window.outerWidth, window.outerHeight);
+		}
+	}
+
+	/**
+	 * @param {DragEvent} event
+	 */
+	function handleDragOver(event) {
+		if (draggedWftId === undefined || event.dataTransfer === null) {
+			return;
+		}
+
+		const buttons = document.querySelectorAll('#workflow-tasks-order .btn-draggable');
+
+		const mouseY = event.clientY;
+		const draggedWftPos = editableTasksList.indexOf(
+			editableTasksList.filter((wft) => wft.id === draggedWftId)[0]
+		);
+
+		let position = 0;
+		for (const button of buttons) {
+			const { y, height } = button.getBoundingClientRect();
+			if (mouseY < y + height) {
+				break;
+			}
+			position++;
+		}
+
+		if (position !== draggedWftPos) {
+			moveWorkflowTask(draggedWftPos, position > draggedWftPos ? 'down' : 'up');
+		}
+
+		event.preventDefault();
+	}
+
+	function handleDragEnd() {
+		draggedWftId = undefined;
+		draggedWftIndex = undefined;
+	}
 </script>
 
 <Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
@@ -100,37 +155,30 @@
 		{#if workflow !== undefined && editableTasksList.length == 0}
 			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 		{:else if workflow !== undefined}
-			{#key editableTasksList}
-				<div class="list-group list-group-flush">
-					{#each editableTasksList as workflowTask, i}
-						<button class="list-group-item" data-fs-target={workflowTask.id}>
-							<div class="d-flex justify-content-between align-items-center">
-								<div>
-									{workflowTask.name} #{workflowTask.id}
-								</div>
-								<div>
-									{#if i !== 0}
-										<button
-											class="btn btn-light"
-											on:click|preventDefault={() => moveWorkflowTask(i, 'up')}
-										>
-											<i class="bi-arrow-up" />
-										</button>
-									{/if}
-									{#if i !== editableTasksList.length - 1}
-										<button
-											class="btn btn-light"
-											on:click|preventDefault={() => moveWorkflowTask(i, 'down')}
-										>
-											<i class="bi-arrow-down" />
-										</button>
-									{/if}
-								</div>
-							</div>
-						</button>
-					{/each}
-				</div>
-			{/key}
+			<div class="fw-light mb-3">Sort the elements by dragging them to the desired position.</div>
+			<div
+				id="workflow-tasks-order"
+				role="region"
+				tabindex="-1"
+				on:dragover={handleDragOver}
+				on:drop={handleDragEnd}
+			>
+				{#each editableTasksList as workflowTask, i}
+					<div
+						class="btn w-100 mt-2 border border-secondary btn-draggable"
+						data-fs-target={workflowTask.id}
+						draggable={true}
+						role="button"
+						tabindex="0"
+						class:active={draggedWftIndex === i}
+						class:dragged={workflowTask.id === draggedWftId}
+						on:dragstart={(event) => handleDragStart(workflowTask.id, i, event)}
+						on:dragend={handleDragEnd}
+					>
+						{workflowTask.name} #{workflowTask.id}
+					</div>
+				{/each}
+			</div>
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
@@ -146,3 +194,10 @@
 		</button>
 	</svelte:fragment>
 </Modal>
+
+<style>
+	.dragged,
+	.btn-draggable:hover:not(.active) {
+		background-color: #c8e5ff !important;
+	}
+</style>

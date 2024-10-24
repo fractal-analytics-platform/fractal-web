@@ -41,69 +41,138 @@ const newArgsSchema = {
 	additionalProperties: false
 };
 
-const tasks = [
+const taskGroups = [
 	{
 		id: 1,
-		name: 'My Task',
-		owner: null,
+		pkg_name: 'group1',
 		version: '1.2.3',
-		type: 'non_parallel',
-		args_schema_non_parallel: {},
-		args_schema_parallel: null
+		task_list: [
+			{
+				id: 1,
+				name: 'My Task',
+				type: 'non_parallel',
+				args_schema_non_parallel: {},
+				args_schema_parallel: null,
+				taskgroupv2_id: 1
+			}
+		]
 	},
 	{
 		id: 2,
-		name: 'My Task',
-		owner: null,
+		pkg_name: 'group1',
 		version: '1.2.4',
-		type: 'non_parallel',
-		args_schema_non_parallel: {},
-		args_schema_parallel: null
+		task_list: [
+			{
+				id: 2,
+				name: 'My Task',
+				type: 'non_parallel',
+				args_schema_non_parallel: {},
+				args_schema_parallel: null,
+				taskgroupv2_id: 2
+			}
+		]
 	},
 	{
 		id: 3,
-		name: 'My Task',
-		owner: null,
+		pkg_name: 'group1',
 		version: '2.0.0',
-		type: 'non_parallel',
-		args_schema_non_parallel: newArgsSchema,
-		args_schema_parallel: null
+		task_list: [
+			{
+				id: 3,
+				name: 'My Task',
+				type: 'non_parallel',
+				args_schema_non_parallel: newArgsSchema,
+				args_schema_parallel: null,
+				taskgroupv2_id: 3
+			}
+		]
 	},
 	{
-		id: 3,
-		name: 'My Task',
-		owner: null,
+		id: 4,
+		pkg_name: 'group1',
 		version: '2.5.0',
-		type: 'compound',
-		args_schema_non_parallel: {},
-		args_schema_parallel: {}
+		task_list: [
+			{
+				id: 3,
+				name: 'My Task',
+				type: 'compound',
+				args_schema_non_parallel: {},
+				args_schema_parallel: {},
+				taskgroupv2_id: 4
+			}
+		]
 	},
 	{
 		id: 5,
-		name: 'My Other Task',
-		owner: null,
+		pkg_name: 'group1',
 		version: '1.2.3',
-		type: 'parallel',
-		args_schema_non_parallel: null,
-		args_schema_parallel: {}
+		task_list: [
+			{
+				id: 5,
+				name: 'My Other Task',
+				type: 'parallel',
+				args_schema_non_parallel: null,
+				args_schema_parallel: {},
+				taskgroupv2_id: 5
+			}
+		]
 	},
 	{
 		id: 6,
-		name: 'My Other Task',
-		owner: 'admin',
+		pkg_name: 'group1',
 		version: '1.3.0',
-		type: 'parallel',
-		args_schema_non_parallel: null,
-		args_schema_parallel: {}
+		task_list: [
+			{
+				id: 6,
+				name: 'My Other Task',
+				type: 'parallel',
+				args_schema_non_parallel: null,
+				args_schema_parallel: {},
+				taskgroupv2_id: 6
+			}
+		]
+	},
+	{
+		id: 7,
+		pkg_name: 'group1',
+		version: null,
+		task_list: [
+			{
+				id: 7,
+				name: 'null version task',
+				type: 'parallel',
+				args_schema_non_parallel: null,
+				args_schema_parallel: {},
+				taskgroupv2_id: 7
+			}
+		]
+	},
+	{
+		id: 8,
+		pkg_name: 'group1',
+		version: '1.5.0',
+		task_list: [
+			{
+				id: 8,
+				name: 'no args schema task',
+				type: 'parallel',
+				args_schema_non_parallel: null,
+				args_schema_parallel: null,
+				taskgroupv2_id: 8
+			}
+		]
 	}
 ];
 
-function mockTaskList() {
-	fetch.mockResolvedValue(createFetchResponse(tasks));
+function mockTaskGroupsList() {
+	fetch.mockResolvedValue(createFetchResponse(taskGroups));
 }
 
 function getTask(name, version) {
-	return tasks.filter((t) => t.name === name && t.version === version)[0];
+	const taskGroup = taskGroups.find(
+		(tg) => tg.version === version && tg.task_list.find((t) => t.name === name)
+	);
+	return taskGroup.task_list.find((t) => t.name === name);
 }
 
 describe('VersionUpdate', () => {
@@ -210,13 +279,13 @@ describe('VersionUpdate', () => {
 		expect(screen.getByText('Invalid JSON')).toBeDefined();
 	});
 
-	it('no new versions available for admin owner', async () => {
+	it('no new versions available', async () => {
 		const task = getTask('My Other Task', '1.3.0');
 		await checkVersions(task, 0);
 	});
 
 	it('display warning if task has no version', () => {
-		renderVersionUpdate({ id: 1, name: 'task', owner: null, version: null, args_schema: {} });
+		renderVersionUpdate(getTask('null version task', null));
 		expect(
 			screen.getByText(
 				'It is not possible to check for new versions because task version is not set.'
@@ -225,7 +294,7 @@ describe('VersionUpdate', () => {
 	});
 
 	it('display warning if task has no args_schema', () => {
-		renderVersionUpdate({ id: 1, name: 'task', owner: null, version: '1.2.3', args_schema: null });
+		renderVersionUpdate(getTask('no args schema task', '1.5.0'));
 		expect(
 			screen.getByText(
 				'It is not possible to check for new versions because task has no args_schema.'
@@ -261,7 +330,7 @@ function renderVersionUpdate(
 ) {
 	workflowTask.task = task;
 	const nop = function () {};
-	mockTaskList();
+	mockTaskGroupsList();
 	return render(VersionUpdate, {
 		props: { workflowTask, updateWorkflowCallback: nop, updateNewVersionsCount: nop }
 	});

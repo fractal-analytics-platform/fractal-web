@@ -19,7 +19,7 @@
 	let expandedTaskGroupRow = undefined;
 
 	async function reloadTaskGroupsList() {
-		const response = await fetch(`/api/v2/task-group`, {
+		const response = await fetch(`/api/v2/task-group?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});

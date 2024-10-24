@@ -10,12 +10,12 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
-	import { getAllNewVersions as getAllNewVersionsV2 } from '$lib/components/v2/workflow/version-checker';
+	import { getAllNewVersions } from '$lib/components/v2/workflow/version-checker';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import TaskInfoTabV2 from '$lib/components/v2/workflow/TaskInfoTab.svelte';
+	import TaskInfoTab from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
@@ -78,6 +78,8 @@
 
 	/** @type {{ [id: string]: import('$lib/types-v2').TaskV2[] }} */
 	let newVersionsMap = {};
+	/** @type {{ [id: string]: string | null }} */
+	let tasksVersions = {};
 
 	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
@@ -376,7 +378,11 @@
 
 	async function checkNewVersions() {
 		if (workflow) {
-			newVersionsMap = await getAllNewVersionsV2(workflow.task_list.map((wt) => wt.task));
+			const { updateCandidates, enrichedTasks } = await getAllNewVersions(
+				workflow.task_list.map((wt) => wt.task)
+			);
+			newVersionsMap = updateCandidates;
+			tasksVersions = Object.fromEntries(enrichedTasks.map((t) => [t.id, t.version]));
 		}
 	}
 
@@ -706,6 +712,7 @@
 								</button>
 								<button
 									class="btn btn-light"
+									aria-label="Edit tasks order"
 									on:click={() => editTasksOrderModal.show(updatableWorkflowList)}
 								>
 									<i class="bi-arrow-down-up" />
@@ -855,7 +862,10 @@
 							<div id="info-tab" class="tab-pane show active">
 								<div class="card-body">
 									{#if selectedWorkflowTask}
-										<TaskInfoTabV2 task={selectedWorkflowTask.task} />
+										<TaskInfoTab
+											task={selectedWorkflowTask.task}
+											taskVersion={tasksVersions[selectedWorkflowTask.task.id]}
+										/>
 									{/if}
 								</div>
 							</div>

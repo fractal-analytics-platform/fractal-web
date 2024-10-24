@@ -34,10 +34,10 @@ export async function getAllNewVersions(tasks) {
 					t.owner === task.owner &&
 					t.version &&
 					t.args_schema &&
-					greatestVersionAsc(t, task) === 1
+					greatestVersionAsc(t.version, task.version) === 1
 				);
 			})
-			.sort(greatestVersionDesc);
+			.sort((t1, t2) => greatestVersionDesc(t1.version, t2.version));
 		return map;
 	}, {});
 }

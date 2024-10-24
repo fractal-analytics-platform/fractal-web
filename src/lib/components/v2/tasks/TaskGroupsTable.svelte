@@ -229,7 +229,7 @@
 							<button
 								class="btn btn-light"
 								on:click={() => {
-									taskInfoModal.open(task);
+									taskInfoModal.open(task, taskGroupRow.selectedVersion);
 								}}
 							>
 								<i class="bi bi-info-circle" />

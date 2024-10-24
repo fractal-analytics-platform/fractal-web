@@ -58,13 +58,9 @@ function sortWorkflowTasksTableRows(rows) {
 			}
 		}
 		row.tasks.sort((t1, t2) =>
-			t1.taskVersions[t1.selectedVersion].task_name.localeCompare(
-				t2.taskVersions[t2.selectedVersion].task_name,
-				undefined,
-				{
-					sensitivity: 'base'
-				}
-			)
+			t1.taskVersions[t1.selectedVersion].task_id < t2.taskVersions[t2.selectedVersion].task_id
+				? -1
+				: 1
 		);
 	}
 	rows.sort((r1, r2) =>
@@ -81,18 +77,20 @@ export function buildTaskTableRows(taskGroups, groupBy) {
 	/** @type {import('$lib/types-v2').TasksTableRowGroup[]} */
 	const rows = [];
 	for (const taskGroup of taskGroups) {
-		const groupValue = taskGroup[groupBy];
-		let groupRow = rows.find((r) => r.groupTitle === groupValue);
-		const version = taskGroup.version || '';
-		if (groupRow) {
-			groupRow.groups[version] = taskGroup;
-		} else {
-			groupRow = {
-				groupTitle: groupValue,
-				selectedVersion: version,
-				groups: { [version]: taskGroup }
-			};
-			rows.push(groupRow);
+		if (taskGroup.task_list.length > 0) {
+			const groupValue = taskGroup[groupBy];
+			let groupRow = rows.find((r) => r.groupTitle === groupValue);
+			const version = taskGroup.version || '';
+			if (groupRow) {
+				groupRow.groups[version] = taskGroup;
+			} else {
+				groupRow = {
+					groupTitle: groupValue,
+					selectedVersion: version,
+					groups: { [version]: taskGroup }
+				};
+				rows.push(groupRow);
+			}
 		}
 	}
 	sortTasksTableRows(rows);
@@ -108,6 +106,9 @@ function sortTasksTableRows(rows) {
 		if (validVersions.length > 0) {
 			sortVersions(validVersions);
 			row.selectedVersion = validVersions[0];
+		}
+		for (const taskGroup of Object.values(row.groups)) {
+			taskGroup.task_list.sort((t1, t2) => (t1.id < t2.id ? -1 : 1));
 		}
 	}
 	rows.sort((r1, r2) =>

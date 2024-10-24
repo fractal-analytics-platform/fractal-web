@@ -106,7 +106,7 @@
 
 		stepMessage = `Creating health check test task`;
 
-		const response = await fetch(`/api/v2/task`, {
+		const response = await fetch(`/api/v2/task?private=true`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,

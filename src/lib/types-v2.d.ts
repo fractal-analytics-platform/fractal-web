@@ -52,7 +52,6 @@ export type TaskV2 = {
   command_parallel: string | null
   input_types: { [key: string]: boolean }
   output_types: { [key: string]: boolean }
-  version: string | null
   taskgroupv2_id: number
   source: string
   args_schema_version: 'pydantic_v1' | 'pydantic_v2'

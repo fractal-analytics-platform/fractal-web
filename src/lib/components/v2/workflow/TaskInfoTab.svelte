@@ -4,13 +4,15 @@
 
 	/** @type {import("$lib/types-v2").TaskV2} */
 	export let task;
+	/** @type {string | null} */
+	export let taskVersion;
 </script>
 
 <ul class="list-group">
 	<li class="list-group-item list-group-item-light fw-bold">Name</li>
 	<li class="list-group-item">{task.name}</li>
 	<li class="list-group-item list-group-item-light fw-bold">Version</li>
-	<li class="list-group-item">{task.version || '–'}</li>
+	<li class="list-group-item">{taskVersion || '–'}</li>
 	<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
 	<li class="list-group-item">
 		{#if task.docs_link}
