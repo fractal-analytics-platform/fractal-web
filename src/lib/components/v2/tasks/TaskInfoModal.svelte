@@ -5,6 +5,8 @@
 
 	/** @type {import('$lib/types-v2').TaskV2|undefined} */
 	let task;
+	/** @type {string | null} */
+	let taskVersion;
 
 	/** @type {Modal} */
 	let modal;
@@ -13,10 +15,12 @@
 	/**
 	 *
 	 * @param {import('$lib/types-v2').TaskV2} taskToLoad
+	 * @param {string | null} taskGroupVersion
 	 */
-	export async function open(taskToLoad) {
+	export async function open(taskToLoad, taskGroupVersion) {
 		modal.show();
 		task = taskToLoad;
+		taskVersion = taskGroupVersion;
 
 		// Retrieving the args_schema field
 		loading = true;
@@ -53,7 +57,7 @@
 						<li class="list-group-item list-group-item-light fw-bold">Name</li>
 						<li class="list-group-item">{task.name}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Version</li>
-						<li class="list-group-item">{task.version || '-'}</li>
+						<li class="list-group-item">{taskVersion || '-'}</li>
 						{#if task.command_non_parallel !== null}
 							<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
 							<li class="list-group-item"><code>{task.command_non_parallel}</code></li>

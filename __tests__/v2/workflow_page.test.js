@@ -15,7 +15,16 @@ vi.mock('$app/stores', () => {
 					name: 'test',
 					project_id: 1,
 					task_list: [
-						{ id: 1, workflow_id: 1, task_id: 1, task: { id: 1, name: 'test' }, taskgroupv2_id: 1 }
+						{
+							id: 1,
+							workflow_id: 1,
+							task_id: 1,
+							task: {
+								id: 1,
+								name: 'test',
+								taskgroupv2_id: 1
+							}
+						}
 					],
 					project: { id: 1, name: 'test' }
 				},
@@ -53,12 +62,11 @@ describe('Workflow page', () => {
 								{
 									id: 1,
 									pkg_name: 'group1',
+									version: null,
 									task_list: [
 										{
 											id: 1,
-											workflow_id: 1,
-											task_id: 1,
-											task: { id: 1, name: 'test' },
+											name: 'test',
 											taskgroupv2_id: 1
 										}
 									]

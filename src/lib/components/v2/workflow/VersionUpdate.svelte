@@ -27,8 +27,9 @@
 	let displayCheckAndCancelBtn = true;
 
 	$: task = workflowTask.task;
+	let taskVersion = '';
 
-	/** @type {import('$lib/types-v2').TaskV2[]} */
+	/** @type {Array<import('$lib/types-v2').TaskV2 & { version: string }>} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
 
@@ -73,12 +74,14 @@
 		fixArgsComponentParallel?.reset();
 
 		await tick(); // wait taskHasArgsSchema is set
-		if (!taskHasArgsSchema || !task.version) {
+		if (!taskHasArgsSchema) {
 			return;
 		}
 
 		try {
-			updateCandidates = await getNewVersions(workflowTask.task);
+			const newVersionsResult = await getNewVersions(workflowTask.task);
+			updateCandidates = newVersionsResult.updateCandidates;
+			taskVersion = newVersionsResult.enrichedTask.version || '';
 		} catch (error) {
 			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
 			return;
@@ -193,7 +196,7 @@
 
 <div>
 	<div id="versionUpdateError" />
-	{#if taskHasArgsSchema && task.version}
+	{#if taskHasArgsSchema && taskVersion}
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection"> New versions of this task exist: </label>
 			<select
@@ -209,7 +212,7 @@
 			</select>
 			{#if selectedUpdateVersion}
 				<div class="alert alert-warning mt-3">
-					You are updating version from {task.version} to {selectedUpdateVersion}<br />
+					You are updating version from {taskVersion} to {selectedUpdateVersion}<br />
 					{#if getSelectedUpdateCandidate()?.docs_link}
 						Information on different version may be found on
 						<a href={getSelectedUpdateCandidate()?.docs_link} target="_blank">
@@ -261,13 +264,13 @@
 		{:else}
 			<p>No new versions available</p>
 		{/if}
-	{:else if !task.version}
-		<div class="alert alert-warning">
-			It is not possible to check for new versions because task version is not set.
-		</div>
 	{:else if !taskHasArgsSchema}
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task has no args_schema.
+		</div>
+	{:else if !taskVersion}
+		<div class="alert alert-warning">
+			It is not possible to check for new versions because task version is not set.
 		</div>
 	{/if}
 </div>

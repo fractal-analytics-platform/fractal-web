@@ -14,7 +14,6 @@ describe('Version checker', () => {
 			{
 				id: 1,
 				name: 'task1',
-				version: '1.0.0',
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
 				taskgroupv2_id: 1
@@ -22,37 +21,27 @@ describe('Version checker', () => {
 			{
 				id: 2,
 				name: 'task1',
-				version: '1.5.0',
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
-				taskgroupv2_id: 1
+				taskgroupv2_id: 2
 			},
 			{
 				id: 3,
 				name: 'task1',
-				version: '2.0.0',
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
-				taskgroupv2_id: 2
+				taskgroupv2_id: 3
 			}
 		];
 
 		const taksGroups = [
 			{
 				id: 1,
+				version: '1.0.0',
 				task_list: [
 					{
 						id: 1,
 						name: 'task1',
-						version: '1.0.0',
-						args_schema_non_parallel: {},
-						type: 'non_parallel',
-						taskgroupv2_id: 1
-					},
-					{
-						id: 2,
-						name: 'task1',
-						version: '1.5.0',
 						args_schema_non_parallel: {},
 						type: 'non_parallel',
 						taskgroupv2_id: 1
@@ -62,14 +51,28 @@ describe('Version checker', () => {
 			},
 			{
 				id: 2,
+				version: '1.5.0',
+				task_list: [
+					{
+						id: 2,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						type: 'non_parallel',
+						taskgroupv2_id: 2
+					}
+				],
+				pkg_name: 'group1'
+			},
+			{
+				id: 3,
+				version: '2.0.0',
 				task_list: [
 					{
 						id: 3,
 						name: 'task1',
-						version: '2.0.0',
 						args_schema_non_parallel: {},
 						type: 'non_parallel',
-						taskgroupv2_id: 2
+						taskgroupv2_id: 3
 					}
 				],
 				pkg_name: 'group2'
@@ -82,7 +85,7 @@ describe('Version checker', () => {
 			json: async () => taksGroups
 		});
 
-		const updateCandidates = await getAllNewVersions(workflowTasks);
+		const { updateCandidates } = await getAllNewVersions(workflowTasks);
 
 		expect(updateCandidates['1']).toHaveLength(1);
 		expect(updateCandidates['1'][0].version).eq('1.5.0');
@@ -95,7 +98,6 @@ describe('Version checker', () => {
 			{
 				id: 1,
 				name: 'task1',
-				version: '1.0.0',
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
 				taskgroupv2_id: 1
@@ -103,22 +105,63 @@ describe('Version checker', () => {
 			{
 				id: 2,
 				name: 'task1',
-				version: '1.5.0',
 				args_schema_parallel: {},
 				type: 'parallel',
-				taskgroupv2_id: 1
+				taskgroupv2_id: 2
 			},
 			{
 				id: 3,
 				name: 'task1',
-				version: '1.2.0',
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
-				taskgroupv2_id: 1
+				taskgroupv2_id: 3
 			}
 		];
 
-		const taksGroups = [{ id: 1, task_list: workflowTasks, pkg_name: 'group1' }];
+		const taksGroups = [
+			{
+				id: 1,
+				version: '1.0.0',
+				task_list: [
+					{
+						id: 1,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						type: 'non_parallel',
+						taskgroupv2_id: 1
+					}
+				],
+				pkg_name: 'group1'
+			},
+			{
+				id: 2,
+				version: '1.5.0',
+				task_list: [
+					{
+						id: 2,
+						name: 'task1',
+						args_schema_parallel: {},
+						type: 'parallel',
+						taskgroupv2_id: 2
+					}
+				],
+				pkg_name: 'group1'
+			},
+			{
+				id: 3,
+				version: '1.2.0',
+				task_list: [
+					{
+						id: 3,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						type: 'non_parallel',
+						taskgroupv2_id: 3
+					}
+				],
+				pkg_name: 'group1'
+			}
+		];
 
 		fetch.mockResolvedValue({
 			ok: true,
@@ -126,7 +169,7 @@ describe('Version checker', () => {
 			json: async () => taksGroups
 		});
 
-		const updateCandidates = await getAllNewVersions(workflowTasks);
+		const { updateCandidates } = await getAllNewVersions(workflowTasks);
 
 		expect(updateCandidates['1']).toHaveLength(1);
 		expect(updateCandidates['1'][0].version).eq('1.2.0');
@@ -139,7 +182,6 @@ describe('Version checker', () => {
 			{
 				id: 1,
 				name: 'task1',
-				version: '1.0.0',
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
 				taskgroupv2_id: 1
@@ -147,14 +189,42 @@ describe('Version checker', () => {
 			{
 				id: 2,
 				name: 'task1',
-				version: null,
 				args_schema_non_parallel: {},
 				type: 'non_parallel',
-				taskgroupv2_id: 1
+				taskgroupv2_id: 2
 			}
 		];
 
-		const taksGroups = [{ id: 1, task_list: workflowTasks, pkg_name: 'group1' }];
+		const taksGroups = [
+			{
+				id: 1,
+				version: '1.0.0',
+				task_list: [
+					{
+						id: 1,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						type: 'non_parallel',
+						taskgroupv2_id: 1
+					}
+				],
+				pkg_name: 'group1'
+			},
+			{
+				id: 2,
+				version: null,
+				task_list: [
+					{
+						id: 2,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						type: 'non_parallel',
+						taskgroupv2_id: 2
+					}
+				],
+				pkg_name: 'group1'
+			}
+		];
 
 		fetch.mockResolvedValue({
 			ok: true,
@@ -162,7 +232,7 @@ describe('Version checker', () => {
 			json: async () => taksGroups
 		});
 
-		const updateCandidates = await getAllNewVersions(workflowTasks);
+		const { updateCandidates } = await getAllNewVersions(workflowTasks);
 
 		expect(updateCandidates['1']).toHaveLength(0);
 		expect(updateCandidates['2']).toHaveLength(0);
@@ -173,30 +243,76 @@ describe('Version checker', () => {
 			{
 				id: 1,
 				name: 'task1',
-				version: '1.0.0',
 				args_schema_non_parallel: {},
+				args_schema_parallel: null,
 				type: 'non_parallel',
 				taskgroupv2_id: 1
 			},
 			{
 				id: 2,
 				name: 'task1',
-				version: '1.2.0',
 				args_schema_non_parallel: {},
+				args_schema_parallel: null,
 				type: 'non_parallel',
-				taskgroupv2_id: 1
+				taskgroupv2_id: 2
 			},
 			{
 				id: 3,
 				name: 'task1',
-				version: '1.3.0',
 				args_schema_non_parallel: null,
+				args_schema_parallel: null,
 				type: 'non_parallel',
-				taskgroupv2_id: 1
+				taskgroupv2_id: 3
 			}
 		];
 
-		const taksGroups = [{ id: 1, task_list: workflowTasks, pkg_name: 'group1' }];
+		const taksGroups = [
+			{
+				id: 1,
+				version: '1.0.0',
+				task_list: [
+					{
+						id: 1,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						args_schema_parallel: null,
+						type: 'non_parallel',
+						taskgroupv2_id: 1
+					}
+				],
+				pkg_name: 'group1'
+			},
+			{
+				id: 2,
+				version: '1.2.0',
+				task_list: [
+					{
+						id: 2,
+						name: 'task1',
+						args_schema_non_parallel: {},
+						args_schema_parallel: null,
+						type: 'non_parallel',
+						taskgroupv2_id: 2
+					}
+				],
+				pkg_name: 'group1'
+			},
+			{
+				id: 3,
+				version: '1.3.0',
+				task_list: [
+					{
+						id: 3,
+						name: 'task1',
+						args_schema_non_parallel: null,
+						args_schema_parallel: null,
+						type: 'non_parallel',
+						taskgroupv2_id: 3
+					}
+				],
+				pkg_name: 'group1'
+			}
+		];
 
 		fetch.mockResolvedValue({
 			ok: true,
@@ -204,7 +320,7 @@ describe('Version checker', () => {
 			json: async () => taksGroups
 		});
 
-		const updateCandidates = await getAllNewVersions(workflowTasks);
+		const { updateCandidates } = await getAllNewVersions(workflowTasks);
 
 		expect(updateCandidates['1']).toHaveLength(1);
 		expect(updateCandidates['1'][0].version).eq('1.2.0');
