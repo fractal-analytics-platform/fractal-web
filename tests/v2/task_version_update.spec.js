@@ -138,7 +138,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	await test.step('Update non parallel task to v2', async () => {
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
-			.getByRole('combobox', { name: 'New versions of this task exist:' })
+			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
 		await page.getByText('Following errors must be fixed before performing the update').waitFor();
 		await expect(page.locator('.alert-danger li')).toHaveCount(1);
@@ -167,7 +167,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	await test.step('Update parallel task to v2', async () => {
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
-			.getByRole('combobox', { name: 'New versions of this task exist:' })
+			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
 		await page.getByText('Following errors must be fixed before performing the update').waitFor();
 		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).fill('{"p2": "test"}');
@@ -175,11 +175,11 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByText('The arguments are valid').waitFor();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(
-			page.getByRole('combobox', { name: 'New versions of this task exist:' }).getByRole('option')
+			page.getByRole('combobox', { name: /New versions of this task exist/ }).getByRole('option')
 		).toHaveCount(2);
 		await expect(
 			page
-				.getByRole('combobox', { name: 'New versions of this task exist:' })
+				.getByRole('combobox', { name: /New versions of this task exist/ })
 				.getByRole('option')
 				.nth(1)
 		).toHaveText('0.0.3');
@@ -194,7 +194,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
-			.getByRole('combobox', { name: 'New versions of this task exist:' })
+			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.3');
 		await page.getByText('The arguments are valid').waitFor();
 		await page.getByRole('button', { name: 'Update' }).click();
@@ -213,7 +213,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	await test.step('Update compound task to v2', async () => {
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
-			.getByRole('combobox', { name: 'New versions of this task exist:' })
+			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
 		await page
 			.getByText('Following errors must be fixed before performing the update')

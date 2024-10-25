@@ -198,7 +198,9 @@
 	<div id="versionUpdateError" />
 	{#if taskHasArgsSchema && taskVersion}
 		{#if updateCandidates.length > 0}
-			<label class="form-label" for="updateSelection"> New versions of this task exist: </label>
+			<label class="form-label" for="updateSelection">
+				New versions of this task exist (current version is {taskVersion}):
+			</label>
 			<select
 				class="form-select"
 				bind:value={selectedUpdateVersion}
