@@ -1,7 +1,7 @@
 <script>
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
+	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -17,15 +17,22 @@
 	/** @type {import('$lib/types').UserSettings|null} */
 	export let settings = null;
 	/** @type {(user: import('$lib/types').User) => Promise<Response>} */
-	export let save;
+	export let saveUser;
 	/** @type {string} */
 	export let runnerBackend;
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
+	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	let originalUser;
+	let userPendingChanges = false;
 	/** @type {number[]} */
 	let groupIdsToAdd = [];
+
+	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
+	let userSettingsEditor;
+	let settingsPendingChanges;
 
 	$: userGroups = user.group_ids_names
 		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
@@ -40,10 +47,18 @@
 		.map((id) => groups.filter((g) => g.id === id)[0])
 		.sort(sortGroupByNameComparator);
 
+	$: if (user) {
+		userPendingChanges = JSON.stringify(originalUser) !== JSON.stringify(nullifyEmptyStrings(user));
+	}
+
+	$: enableSave =
+		!saving &&
+		(userPendingChanges || settingsPendingChanges || groupIdsToAdd.length > 0 || password);
+
 	let password = '';
 	let confirmPassword = '';
 
-	let savingUser = false;
+	let saving = false;
 	let userFormSubmitted = false;
 
 	let userUpdatedMessage = '';
@@ -58,10 +73,9 @@
 
 	/** @type {Modal} */
 	let confirmSuperuserChange;
-	let initialSuperuserValue = false;
 
-	async function handleSaveUser() {
-		savingUser = true;
+	async function handleSave() {
+		saving = true;
 		userUpdatedMessage = '';
 		try {
 			userFormSubmitted = true;
@@ -70,19 +84,18 @@
 			if (Object.keys($userValidationErrors).length > 0) {
 				return;
 			}
-			if (user.is_superuser === initialSuperuserValue) {
-				await confirmSaveUser();
+			if (user.is_superuser === originalUser.is_superuser) {
+				await confirmSave();
 			} else {
-				savingUser = false;
 				confirmSuperuserChange.show();
 			}
 		} finally {
-			savingUser = false;
+			saving = false;
 		}
 	}
 
-	async function confirmSaveUser() {
-		savingUser = true;
+	async function confirmSave() {
+		saving = true;
 		confirmSuperuserChange.hide();
 		try {
 			let existing = !!user.id;
@@ -90,29 +103,38 @@
 			if (!groupsSuccess) {
 				return;
 			}
-			if (password) {
-				user.password = password;
+			if (userPendingChanges || password) {
+				if (password) {
+					user.password = password;
+				}
+				const response = await saveUser(user);
+				if (!response.ok) {
+					await userFormErrorHandler.handleErrorResponse(response);
+					return;
+				}
+				const result = await response.json();
+				if (result.id === $page.data.userInfo.id) {
+					// If the user modifies their own account the userInfo cached in the store has to be reloaded
+					await invalidateAll();
+				}
+				password = '';
+				confirmPassword = '';
+				if (existing) {
+					user = { ...result };
+					originalUser = deepCopy(user);
+				} else {
+					await goto(`/v2/admin/users/${result.id}/edit`);
+				}
 			}
-			const userData = removeNullValues(nullifyEmptyStrings(user));
-			const response = await save(userData);
-			if (!response.ok) {
-				await userFormErrorHandler.handleErrorResponse(response);
-				return;
+			if (settingsPendingChanges && userSettingsEditor) {
+				const settingsSuccess = await userSettingsEditor.handleSaveSettings();
+				if (!settingsSuccess) {
+					return;
+				}
 			}
-			const result = await response.json();
-			if (result.id === $page.data.userInfo.id) {
-				// If the user modifies their own account the userInfo cached in the store has to be reloaded
-				await invalidateAll();
-			}
-			if (existing) {
-				user = { ...result };
-				initialSuperuserValue = user.is_superuser;
-				userUpdatedMessage = 'User successfully updated';
-			} else {
-				await goto(`/v2/admin/users/${result.id}/edit`);
-			}
+			userUpdatedMessage = 'User successfully updated';
 		} finally {
-			savingUser = false;
+			saving = false;
 		}
 	}
 
@@ -195,6 +217,7 @@
 
 		if (response.ok) {
 			user = { ...user, group_ids_names: result.group_ids_names };
+			originalUser = deepCopy(nullifyEmptyStrings(user));
 			groupIdsToAdd = [];
 			return true;
 		}
@@ -215,7 +238,7 @@
 	}
 
 	onMount(() => {
-		initialSuperuserValue = user.is_superuser;
+		originalUser = deepCopy(nullifyEmptyStrings(user));
 		setGroupsSlimSelect();
 	});
 
@@ -255,8 +278,6 @@
 		select.setData([{ text: 'Select...', placeholder: true }, ...options]);
 	}
 </script>
-
-<div id="genericUserError" />
 
 <div class="row">
 	<div class="col-lg-7 needs-validation">
@@ -418,22 +439,6 @@
 				</div>
 			</div>
 		{/if}
-		<div class="row mb-3">
-			<div class="col-sm-9 offset-sm-3">
-				<StandardDismissableAlert message={userUpdatedMessage} />
-				<button
-					type="button"
-					on:click={handleSaveUser}
-					class="btn btn-primary"
-					disabled={savingUser}
-				>
-					{#if savingUser}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-					{/if}
-					Save
-				</button>
-			</div>
-		</div>
 	</div>
 
 	{#if settings && runnerBackend !== 'local' && runnerBackend !== 'local_experimental'}
@@ -447,12 +452,36 @@
 			</div>
 		</div>
 		<UserSettingsEditor
+			bind:this={userSettingsEditor}
+			bind:pendingChanges={settingsPendingChanges}
 			{settings}
 			{runnerBackend}
 			settingsApiEndpoint="/api/auth/users/{user.id}/settings"
 			{onSettingsUpdated}
 		/>
 	{/if}
+
+	<div class="row">
+		<div class="col-lg-7">
+			<div class="row mb-3 mt-2">
+				<div class="col-sm-9 offset-sm-3">
+					<StandardDismissableAlert message={userUpdatedMessage} />
+					<div id="genericUserError" />
+					<button
+						type="button"
+						on:click={handleSave}
+						class="btn btn-primary"
+						disabled={!enableSave}
+					>
+						{#if saving}
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+						{/if}
+						Save
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<Modal
 		id="confirmSuperuserChangeModal"
@@ -472,7 +501,7 @@
 		</svelte:fragment>
 		<svelte:fragment slot="footer">
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" on:click={confirmSaveUser}>Confirm</button>
+			<button class="btn btn-primary" on:click={confirmSave}>Confirm</button>
 		</svelte:fragment>
 	</Modal>
 

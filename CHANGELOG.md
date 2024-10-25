@@ -2,27 +2,36 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612):
+* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612, \#616):
     * Removed owner from v2 tasks (\#583);
     * Displayed workflow task warning message (\#583);
     * Implemented selection of group in task creation (\#583);
     * First implementation of new workflow task modal (\#583);
     * Used new group_ids_names field (\#583);
-    * Changed "new version available" icon (\#583);
     * Renamed source to label in custom python env task creation (\#583);
     * Changes to admin tasks page (\#583, \#601);
     * Changed task list to use task groups (\#601);
     * Changes to job submission healthcheck page (\#601);
-    * Fixed dropdown style (\#601);
     * Implemented task group modal info, edit and delete (\#601);
     * Removed usage of source field (\#601);
     * Filtered identical task groups (\#605);
     * Removed order field from workflow task modal (\#605);
-    * Login page layout improvements (\#605);
     * Disabled editing of task name (\#605);
     * Added user group setting editor form (\#612);
-    * Fixed issue when editing user after setting the superuser privilege (\#612);
     * Supported deletion of groups (\#612);
+    * Sorted tasks by id (\#616);
+    * Created healthcheck task as private (\#616);
+    * Used args_schema=false in GET /api/v2/task-group/ (\#616);
+    * Ignored empty task groups (\#616);
+    * Checked pkg_name while computing workflow task update candidates (\#616);
+* Fixed dropdown style (\#601);
+* Changed "new version available" icon (\#583);
+* Login page layout improvements (\#605);
+* Fixed issue when editing user after setting the superuser privilege (\#612);
+* Used response.data.version when displaying task collections (\#616);
+* Implemented reordering of tasks in workflow using drag and drop (\#616);
+* Fixed broken unsaved changes modal, for non-JSON-schema-based workflowtask edits (\#616);
+* Refactored user editing form using only one save button (\#616);
 
 # 1.8.0
 

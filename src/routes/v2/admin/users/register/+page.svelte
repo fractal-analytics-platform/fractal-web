@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
@@ -34,7 +35,15 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(user)
+			body: JSON.stringify(
+				removeNullValues(
+					nullifyEmptyStrings({
+						email: user.email,
+						password: user.password,
+						username: user.username
+					})
+				)
+			)
 		});
 
 		if (!createResponse.ok) {
@@ -85,4 +94,4 @@
 	</div>
 {/if}
 
-<UserEditor {user} {save} runnerBackend={$page.data.runnerBackend} />
+<UserEditor {user} saveUser={save} runnerBackend={$page.data.runnerBackend} />

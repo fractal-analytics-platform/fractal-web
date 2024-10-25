@@ -22,11 +22,10 @@ test('Create and update a user', async ({ page }) => {
 	const randomUserName = Math.random().toString(36).substring(7);
 
 	await test.step('Test required fields validation errors', async () => {
+		await page.getByLabel('Username').fill(randomUserName);
 		await page.getByRole('button', { name: 'Save' }).click();
 		expect(await page.getByText('Field is required').count()).toEqual(2);
-
 		await page.getByLabel('E-mail').fill(randomUserName + '@example.com');
-		await page.getByLabel('Username').fill(randomUserName);
 	});
 
 	await test.step('Test password confirm validation errors', async () => {
@@ -93,7 +92,7 @@ test('Create and update a user', async ({ page }) => {
 
 	await test.step('Test cache dir validation error', async () => {
 		await page.getByLabel('Cache dir').fill('foo');
-		await page.getByRole('button', { name: 'Save' }).nth(1).click();
+		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForFunction(() => {
 			const invalidFeeback = document
 				.querySelector('#cacheDir')
@@ -118,7 +117,7 @@ test('Create and update a user', async ({ page }) => {
 		await page
 			.getByRole('textbox', { name: /^SLURM account #2/ })
 			.fill(randomUserName + '-slurm-account');
-		await page.getByRole('button', { name: 'Save' }).nth(1).click();
+		await page.getByRole('button', { name: 'Save' }).click();
 		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
 		await page.getByLabel('Remove SLURM account').first().click();
 	});
@@ -129,15 +128,15 @@ test('Create and update a user', async ({ page }) => {
 		await verifiedCheckbox.waitFor();
 		expect(await verifiedCheckbox.isChecked()).toEqual(true);
 		await verifiedCheckbox.uncheck();
-		await page.getByRole('button', { name: 'Save' }).first().click();
+		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
 
 	await test.step('Update settings', async () => {
 		await page.getByLabel('Cache dir').fill('/tmp/test');
 		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
-		await page.getByRole('button', { name: 'Save' }).nth(1).click();
-		await expect(page.getByText('Settings successfully updated')).toBeVisible();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
 
 	await test.step('Check user in users list', async () => {
@@ -179,7 +178,7 @@ test('Create and update a user', async ({ page }) => {
 		const userRow = await getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.locator('#superuser').check();
-		await page.getByRole('button', { name: 'Save' }).first().click();
+		await page.getByRole('button', { name: 'Save' }).click();
 
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
@@ -195,7 +194,7 @@ test('Create and update a user', async ({ page }) => {
 		await page.getByRole('button', { name: 'Close' }).click();
 		await expect(page.getByText('User successfully updated')).not.toBeVisible();
 		await page.getByRole('textbox', { name: 'Username' }).fill(`${randomUserName}-renamed-2`);
-		await page.getByRole('button', { name: 'Save' }).first().click();
+		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
 
@@ -215,7 +214,7 @@ test('Create and update a user', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await page.locator('#superuser').uncheck();
-		await page.getByRole('button', { name: 'Save' }).first().click();
+		await page.getByRole('button', { name: 'Save' }).click();
 
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();

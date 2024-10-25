@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
@@ -23,7 +24,18 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(user)
+			body: JSON.stringify(
+				removeNullValues(
+					nullifyEmptyStrings({
+						email: user.email,
+						password: user.password,
+						username: user.username,
+						is_active: user.is_active,
+						is_superuser: user.is_superuser,
+						is_verified: user.is_verified
+					})
+				)
+			)
 		});
 	}
 </script>
@@ -42,4 +54,4 @@
 	</ol>
 </nav>
 
-<UserEditor {user} {settings} {groups} {save} runnerBackend={$page.data.runnerBackend} />
+<UserEditor {user} {settings} {groups} saveUser={save} runnerBackend={$page.data.runnerBackend} />

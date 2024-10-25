@@ -14,7 +14,18 @@ vi.mock('$app/stores', () => {
 					id: 1,
 					name: 'test',
 					project_id: 1,
-					task_list: [{ id: 1, workflow_id: 1, task_id: 1, task: { id: 1, name: 'test' } }],
+					task_list: [
+						{
+							id: 1,
+							workflow_id: 1,
+							task_id: 1,
+							task: {
+								id: 1,
+								name: 'test',
+								taskgroupv2_id: 1
+							}
+						}
+					],
 					project: { id: 1, name: 'test' }
 				},
 				datasets: [{ id: 1, name: 'test' }],
@@ -46,8 +57,21 @@ describe('Workflow page', () => {
 				status: 200,
 				json: async () => {
 					switch (url) {
-						case '/api/v2/task':
-							return [{ id: 1, workflow_id: 1, task_id: 1, task: { id: 1, name: 'test' } }];
+						case '/api/v2/task-group?only_active=true':
+							return [
+								{
+									id: 1,
+									pkg_name: 'group1',
+									version: null,
+									task_list: [
+										{
+											id: 1,
+											name: 'test',
+											taskgroupv2_id: 1
+										}
+									]
+								}
+							];
 						case '/api/v2/project/1/dataset/1':
 							return { id: 1, name: 'test' };
 						case '/api/v2/project/1/status?dataset_id=1&workflow_id=1':

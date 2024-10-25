@@ -35,8 +35,8 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 				.getByLabel(/^SLURM account #/)
 				.last()
 				.fill(randomSlurmAccount);
-			await page.getByRole('button', { name: 'Save' }).nth(1).click();
-			await expect(page.getByText('Settings successfully updated')).toBeVisible();
+			await page.getByRole('button', { name: 'Save' }).click();
+			await expect(page.getByText('User successfully updated')).toBeVisible();
 		}
 	});
 

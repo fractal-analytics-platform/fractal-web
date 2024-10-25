@@ -1,7 +1,7 @@
 <script>
-	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
+	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {string} */
 	export let runnerBackend;
@@ -12,9 +12,21 @@
 	/** @type {(response: Response) => Promise<void>} */
 	export let onSettingsUpdated = async () => {};
 
-	let settingsUpdatedMessage = '';
-	let savingSettings = false;
 	let settingsFormSubmitted = false;
+
+	/** @type {import('$lib/types').UserSettings} */
+	let originalSettings;
+
+	export let pendingChanges = false;
+
+	$: if (settings) {
+		pendingChanges =
+			JSON.stringify(originalSettings) !== JSON.stringify(nullifyEmptyStrings(settings));
+	}
+
+	onMount(() => {
+		originalSettings = deepCopy(nullifyEmptyStrings(settings));
+	});
 
 	const settingsFormErrorHandler = new FormErrorHandler('genericSettingsError', [
 		'cache_dir',
@@ -39,29 +51,24 @@
 		settings.slurm_accounts = settings.slurm_accounts.filter((_, i) => i !== index);
 	}
 
-	async function handleSaveSettings() {
-		savingSettings = true;
-		settingsUpdatedMessage = '';
-		try {
-			settingsFormSubmitted = true;
-			settingsFormErrorHandler.clearErrors();
-			const headers = new Headers();
-			headers.set('Content-Type', 'application/json');
-			const response = await fetch(settingsApiEndpoint, {
-				method: 'PATCH',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify(nullifyEmptyStrings({ ...settings, id: undefined }))
-			});
-			if (!response.ok) {
-				await settingsFormErrorHandler.handleErrorResponse(response);
-				return;
-			}
-			await onSettingsUpdated(response);
-			settingsUpdatedMessage = 'Settings successfully updated';
-		} finally {
-			savingSettings = false;
+	export async function handleSaveSettings() {
+		settingsFormSubmitted = true;
+		settingsFormErrorHandler.clearErrors();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(settingsApiEndpoint, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify(nullifyEmptyStrings({ ...settings, id: undefined }))
+		});
+		if (!response.ok) {
+			await settingsFormErrorHandler.handleErrorResponse(response);
+			return false;
 		}
+		await onSettingsUpdated(response);
+		originalSettings = deepCopy(nullifyEmptyStrings(settings));
+		return true;
 	}
 </script>
 
@@ -238,21 +245,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="row mb-3">
+		<div class="row">
 			<div class="col-sm-9 offset-sm-3">
 				<div id="genericSettingsError" />
-				<StandardDismissableAlert message={settingsUpdatedMessage} />
-				<button
-					type="button"
-					on:click={handleSaveSettings}
-					class="btn btn-primary"
-					disabled={savingSettings}
-				>
-					{#if savingSettings}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-					{/if}
-					Save
-				</button>
 			</div>
 		</div>
 	</div>
