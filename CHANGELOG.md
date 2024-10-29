@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612, \#616):
+* Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612, \#616, \#620):
     * Removed owner from v2 tasks (\#583);
     * Displayed workflow task warning message (\#583);
     * Implemented selection of group in task creation (\#583);
@@ -24,6 +24,7 @@
     * Used args_schema=false in GET /api/v2/task-group/ (\#616);
     * Ignored empty task groups (\#616);
     * Checked pkg_name while computing workflow task update candidates (\#616);
+    * Added admin task groups page (\#620);
 * Fixed dropdown style (\#601);
 * Changed "new version available" icon (\#583);
 * Login page layout improvements (\#605);
@@ -32,6 +33,7 @@
 * Implemented reordering of tasks in workflow using drag and drop (\#616);
 * Fixed broken unsaved changes modal, for non-JSON-schema-based workflowtask edits (\#616);
 * Refactored user editing form using only one save button (\#616);
+* Allowed same key for attribute and type in input filters (\#620);
 
 # 1.8.0
 
