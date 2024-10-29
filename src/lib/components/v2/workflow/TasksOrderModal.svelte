@@ -175,7 +175,7 @@
 						on:dragstart={(event) => handleDragStart(workflowTask.id, i, event)}
 						on:dragend={handleDragEnd}
 					>
-						{workflowTask.name} #{workflowTask.id}
+						{workflowTask.name}
 					</div>
 				{/each}
 			</div>
