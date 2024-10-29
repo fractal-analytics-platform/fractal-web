@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.9.0
 
 * Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612, \#616, \#620):
     * Removed owner from v2 tasks (\#583);
