@@ -25,3 +25,16 @@ export function sortUsers(users, currentAdminId, prioritizeSuperusers = true) {
 	});
 	return users;
 }
+
+/**
+ * Sort groups by name, but keeping the All group first.
+ * @param {import('$lib/types').Group} g1
+ * @param {import('$lib/types').Group} g2
+ */
+export const sortGroupByNameAllFirstComparator = function (g1, g2) {
+	return g1.name === 'All'
+		? -1
+		: g2.name === 'All'
+		? 1
+		: g1.name.localeCompare(g2.name, undefined, { sensitivity: 'base' });
+};

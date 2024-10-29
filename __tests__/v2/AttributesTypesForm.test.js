@@ -132,6 +132,18 @@ describe('AttributesTypesForm', () => {
 		expect(result.getByText('Duplicated key')).toBeDefined();
 	});
 
+	it('allow same key for attribute and type', async () => {
+		const result = render(AttributesTypesForm);
+		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
+		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
+		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
+		await fireEvent.input(result.queryAllByPlaceholderText('Key')[1], {
+			target: { value: 'my-key' }
+		});
+		expect(result.component.validateFields()).true;
+	});
+
 	it('validate missing type filter key', async () => {
 		const result = render(AttributesTypesForm);
 		result.component.init({}, {});

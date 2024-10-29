@@ -489,7 +489,12 @@
 			</div>
 		</div>
 
-		<TaskGroupSelector id="task-collection" {user} bind:privateTask bind:selectedGroup />
+		<TaskGroupSelector
+			id="task-collection"
+			groupIdsNames={user.group_ids_names || []}
+			bind:privateTask
+			bind:selectedGroup
+		/>
 
 		<div id="taskCollectionError" class="mt-3" />
 

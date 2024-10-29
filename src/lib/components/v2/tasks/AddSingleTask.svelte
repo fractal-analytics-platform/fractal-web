@@ -646,7 +646,12 @@
 		</div>
 	</div>
 
-	<TaskGroupSelector id="add-single-task" {user} bind:privateTask bind:selectedGroup />
+	<TaskGroupSelector
+		id="add-single-task"
+		groupIdsNames={user.group_ids_names || []}
+		bind:privateTask
+		bind:selectedGroup
+	/>
 
 	<div class="row">
 		<div id="errorAlert-createTask" />

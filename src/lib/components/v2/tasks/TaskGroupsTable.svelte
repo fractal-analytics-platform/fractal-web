@@ -253,7 +253,11 @@
 </table>
 
 <TaskGroupInfoModal bind:this={taskGroupInfoModal} {user} />
-<TaskGroupEditModal bind:this={taskGroupEditModal} {updateEditedTaskGroup} {user} />
+<TaskGroupEditModal
+	bind:this={taskGroupEditModal}
+	{updateEditedTaskGroup}
+	groupIdsNames={user.group_ids_names || []}
+/>
 <TaskInfoModal bind:this={taskInfoModal} />
 <TaskEditModal bind:this={taskEditModal} {updateEditedTask} />
 

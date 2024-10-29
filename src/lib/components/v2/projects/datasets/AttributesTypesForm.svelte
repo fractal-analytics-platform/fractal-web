@@ -98,7 +98,8 @@
 
 	export function validateFields() {
 		let validFields = true;
-		const keys = [];
+		const attributeKeys = [];
+		const typesKey = [];
 		for (const attributeField of attributeFields) {
 			if (!attributeField.key) {
 				attributeField.error = 'Key is required';
@@ -115,12 +116,12 @@
 				validFields = false;
 				continue;
 			}
-			if (keys.includes(attributeField.key)) {
+			if (attributeKeys.includes(attributeField.key)) {
 				attributeField.error = 'Duplicated key';
 				validFields = false;
 				continue;
 			} else {
-				keys.push(attributeField.key);
+				attributeKeys.push(attributeField.key);
 			}
 		}
 		for (const typeField of typeFields) {
@@ -129,12 +130,12 @@
 				validFields = false;
 				continue;
 			}
-			if (keys.includes(typeField.key)) {
+			if (typesKey.includes(typeField.key)) {
 				typeField.error = 'Duplicated key';
 				validFields = false;
 				continue;
 			} else {
-				keys.push(typeField.key);
+				typesKey.push(typeField.key);
 			}
 		}
 		// Trigger items update

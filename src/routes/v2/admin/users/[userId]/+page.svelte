@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
+	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
@@ -14,7 +14,7 @@
 
 	$: userGroups = user.group_ids_names
 		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-		.sort(sortGroupByNameComparator);
+		.sort(sortGroupByNameAllFirstComparator);
 </script>
 
 <nav aria-label="breadcrumb">

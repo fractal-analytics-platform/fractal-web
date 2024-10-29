@@ -21,6 +21,7 @@ const config = defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
+		setupFiles: ['./setupTests.js'],
 		include: ['**/__tests__/**/*\\.test\\.js'],
 		exclude: ['jschema/**', 'node_modules', 'build', '.idea', '.git', '.cache'],
 		coverage: {
