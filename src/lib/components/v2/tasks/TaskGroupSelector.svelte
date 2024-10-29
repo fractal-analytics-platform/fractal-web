@@ -1,8 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 
-	/** @type {import('$lib/types').User} */
-	export let user;
+	/** @type {Array<[number, string]>} */
+	export let groupIdsNames;
 	/** @type {string} */
 	export let id;
 
@@ -12,13 +12,17 @@
 	export let wrapperClass = 'mt-3 mb-3';
 
 	onMount(() => {
-		if (user.group_ids_names && selectedGroup === null) {
-			const groupAll = user.group_ids_names.find((i) => i[1] === 'All');
+		selectAllGroup();
+	});
+
+	function selectAllGroup() {
+		if (selectedGroup === null) {
+			const groupAll = groupIdsNames.find((i) => i[1] === 'All');
 			if (groupAll) {
 				selectedGroup = groupAll[0];
 			}
 		}
-	});
+	}
 </script>
 
 <div class={wrapperClass}>
@@ -32,6 +36,7 @@
 					id="taskSelectorShared-{id}"
 					value={false}
 					bind:group={privateTask}
+					on:change={selectAllGroup}
 				/>
 				<label class="form-check-label" for="taskSelectorShared-{id}">Shared task</label>
 			</div>
@@ -52,8 +57,8 @@
 				<div class="input-group">
 					<label class="input-group-text" for="task-group-selector">Group</label>
 					<select class="form-select" id="task-group-selector" bind:value={selectedGroup}>
-						{#if user.group_ids_names}
-							{#each user.group_ids_names as [groupId, groupName]}
+						{#if groupIdsNames}
+							{#each groupIdsNames as [groupId, groupName]}
 								<option value={groupId}>{groupName}</option>
 							{/each}
 						{/if}

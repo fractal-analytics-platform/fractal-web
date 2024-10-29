@@ -268,7 +268,12 @@
 		</div>
 	</div>
 
-	<TaskGroupSelector id="custom-env-task" {user} bind:privateTask bind:selectedGroup />
+	<TaskGroupSelector
+		id="custom-env-task"
+		groupIdsNames={user.group_ids_names || []}
+		bind:privateTask
+		bind:selectedGroup
+	/>
 
 	<button type="submit" class="btn btn-primary" disabled={collecting}>
 		{#if collecting}

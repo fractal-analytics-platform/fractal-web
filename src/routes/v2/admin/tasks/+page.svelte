@@ -28,9 +28,6 @@
 				searchErrorAlert.hide();
 			}
 			const url = new URL('/api/admin/v2/task', window.location.origin);
-			if (id) {
-				url.searchParams.append('id', id);
-			}
 			if (name) {
 				url.searchParams.append('name', name);
 			}
@@ -383,6 +380,7 @@
 <style>
 	.tasks-table {
 		table-layout: fixed;
+		min-width: 900px;
 	}
 
 	.tasks-table thead {

@@ -4,8 +4,8 @@
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	/** @type {import('$lib/types').User} */
-	export let user;
+	/** @type {Array<[number, string]>} */
+	export let groupIdsNames;
 	/**
 	 * @type {(updatedGroups: import('$lib/types-v2').TaskGroupV2) => void}
 	 */
@@ -25,6 +25,13 @@
 	let saving = false;
 	let askConfirm = false;
 
+	const formErrorHandler = new FormErrorHandler('taskGroupUpdateError', [
+		'user_group_id',
+		'active'
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
+
 	/**
 	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroupToEdit
 	 */
@@ -35,15 +42,9 @@
 		active = taskGroupToEdit.active;
 		originalActive = taskGroupToEdit.active;
 		askConfirm = false;
+		formErrorHandler.clearErrors();
 		modal.show();
 	}
-
-	const formErrorHandler = new FormErrorHandler('taskGroupUpdateError', [
-		'user_group_id',
-		'active'
-	]);
-
-	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	async function handleUpdate() {
 		if (!active && originalActive) {
@@ -105,13 +106,15 @@
 		{:else if taskGroup}
 			<div class="mb-2 row">
 				<div class="col">
-					<TaskGroupSelector
-						id="edit-{taskGroup.id}"
-						{user}
-						bind:privateTask
-						bind:selectedGroup
-						wrapperClass="mb-1"
-					/>
+					{#key taskGroup}
+						<TaskGroupSelector
+							id="edit-{taskGroup.id}"
+							{groupIdsNames}
+							bind:privateTask
+							bind:selectedGroup
+							wrapperClass="mb-1"
+						/>
+					{/key}
 					<span class="invalid-feedback">{$validationErrors['user_group_id']}</span>
 				</div>
 			</div>
