@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { sortUsers } from '$lib/components/admin/user_utilities';
+import { sortUsers, sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities';
 
 it('should sort user by current superuser, then by superuser, then by email', () => {
 	let users = [
@@ -29,4 +29,18 @@ it('should sort user by current superuser, then by superuser, then by email', ()
 	expect(users[0].id).eq(2);
 	expect(users[1].id).eq(1);
 	expect(users[2].id).eq(3);
+});
+
+it('should sort groups by name, but keeping the All group first', () => {
+	const groups = [
+		{ id: 2, name: 'g2' },
+		{ id: 1, name: 'All' },
+		{ id: 3, name: 'g3' }
+	];
+
+	groups.sort(sortGroupByNameAllFirstComparator);
+
+	expect(groups[0].name).eq('All');
+	expect(groups[1].name).eq('g2');
+	expect(groups[2].name).eq('g3');
 });

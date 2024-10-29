@@ -1,3 +1,5 @@
+import { sortUserByEmailComparator } from '$lib/common/user_utilities.js';
+import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 import { listGroups, listUsers } from '$lib/server/api/auth_api';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -10,7 +12,7 @@ export async function load({ fetch }) {
 	const users = await listUsers(fetch);
 
 	return {
-		groups,
-		users
+		groups: groups.sort(sortGroupByNameAllFirstComparator),
+		users: users.sort(sortUserByEmailComparator)
 	};
 }

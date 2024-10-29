@@ -5,7 +5,7 @@
 	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { sortGroupByNameComparator } from '$lib/common/user_utilities';
+	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
@@ -36,16 +36,16 @@
 
 	$: userGroups = user.group_ids_names
 		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-		.sort(sortGroupByNameComparator);
+		.sort(sortGroupByNameAllFirstComparator);
 
 	$: availableGroups = groups
 		.filter((g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id))
 		.filter((g) => !groupIdsToAdd.includes(g.id))
-		.sort(sortGroupByNameComparator);
+		.sort(sortGroupByNameAllFirstComparator);
 
 	$: groupsToAdd = groupIdsToAdd
 		.map((id) => groups.filter((g) => g.id === id)[0])
-		.sort(sortGroupByNameComparator);
+		.sort(sortGroupByNameAllFirstComparator);
 
 	$: if (user) {
 		userPendingChanges = JSON.stringify(originalUser) !== JSON.stringify(nullifyEmptyStrings(user));
