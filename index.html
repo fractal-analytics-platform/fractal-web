@@ -12,7 +12,7 @@
       
         <link rel="next" href="quickstart/">
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="assets/fractal_favicon.png">
       <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.21">
     
     
@@ -89,8 +89,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="Fractal Web Client" class="md-header__button md-logo" aria-label="Fractal Web Client" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="assets/fractal_logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -213,8 +212,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="Fractal Web Client" class="md-nav__button md-logo" aria-label="Fractal Web Client" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="assets/fractal_logo.png" alt="logo">
 
     </a>
     Fractal Web Client
@@ -629,9 +627,12 @@
 
 <h1 id="fractal-web-client">Fractal Web Client<a class="headerlink" href="#fractal-web-client" title="Permanent link">&para;</a></h1>
 <h2 id="fractal">Fractal<a class="headerlink" href="#fractal" title="Permanent link">&para;</a></h2>
-<p>Fractal is a framework to process high-content imaging data at scale and prepare it for interactive visualization.</p>
-<p><img alt="Fractal_Overview" src="https://fractal-analytics-platform.github.io/assets/fractal_overview.jpg" /></p>
-<p>Fractal provides distributed workflows that convert TBs of image data into OME-Zarr files. The platform then processes the 3D image data by applying tasks like illumination correction, maximum intensity projection, 3D segmentation using <a href="https://cellpose.readthedocs.io/en/latest/">cellpose</a> and measurements using <a href="https://github.com/haesleinhuepf/napari-workflows">napari workflows</a>. The pyramidal OME-Zarr files enable interactive visualization in the napari viewer.</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/984e89fe-b536-4414-8949-58029056e53c" alt="Fractal web" width="400">
+</p>
+
+<p>Fractal is a framework developed at the <a href="https://www.biovisioncenter.uzh.ch/en.html">BioVisionCenter</a> to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.</p>
+<p><img alt="Fractal overview" src="https://github.com/user-attachments/assets/666c8797-2594-4b8e-b1d2-b43fca66d1df" /></p>
 <p>This is the repository that contains the <strong>Fractal web client</strong>. Find more information about Fractal in general and the other repositories at the <a href="https://fractal-analytics-platform.github.io">Fractal home page</a>.</p>
 <h2 id="web-client-architecture">Web client architecture<a class="headerlink" href="#web-client-architecture" title="Permanent link">&para;</a></h2>
 <p>The client is a Svelte application that uses <a href="https://kit.svelte.dev">SvelteKit</a> as a framework.
@@ -639,17 +640,8 @@ The application is composed of a set of pages that are rendered by a node server
 The node server acts as a proxy to the fractal server, forwarding the requests to the server and returning the responses to the client.
 Find more details in specific pages.</p>
 <h2 id="license-and-contributors">License and contributors<a class="headerlink" href="#license-and-contributors" title="Permanent link">&para;</a></h2>
-<p>Unless otherwise stated in each individual module, all Fractal components are
-released according to a BSD 3-Clause License, and Copyright is with Friedrich
-Miescher Institute for Biomedical Research and University of Zurich.</p>
-<p>Fractal was conceived in the Liberali Lab at the Friedrich Miescher Institute
-for Biomedical Research and in the Pelkmans Lab at the University of Zurich by
-<a href="https://github.com/jluethi">@jluethi</a> and
-<a href="https://github.com/gusqgm">@gusqgm</a>. The Fractal project is now developed at
-the <a href="https://www.biovisioncenter.uzh.ch/en.html">BioVisionCenter</a> at the
-University of Zurich and the project lead is with
-<a href="https://github.com/jluethi">@jluethi</a>. The core development is done under
-contract by <a href="https://www.exact-lab.it/">eXact lab S.r.l.</a>.</p>
+<p>Fractal was conceived in the Liberali Lab at the Friedrich Miescher Institute for Biomedical Research and in the Pelkmans Lab at the University of Zurich by <a href="https://github.com/jluethi">@jluethi</a> and <a href="https://github.com/gusqgm">@gusqgm</a>. The Fractal project is now developed at the <a href="https://www.biovisioncenter.uzh.ch/en.html">BioVisionCenter</a> at the University of Zurich and the project lead is with <a href="https://github.com/jluethi">@jluethi</a>. The core development is done under contract by <a href="https://www.exact-lab.it">eXact lab S.r.l.</a>.</p>
+<p>Unless otherwise specified, Fractal components are released under the BSD 3-Clause License, and copyright is with the BioVisionCenter at the University of Zurich.</p>
 
 
 
