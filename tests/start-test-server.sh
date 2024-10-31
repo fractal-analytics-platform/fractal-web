@@ -20,12 +20,10 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cp "$(pwd)/lib/fractal-server/config_local.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/.fractal_server.env" "$fractal_server_test_path"
 
-  if [ "$SKIP_OAUTH_TEST" != "true" ]; then
-    echo "\nOAUTH_DEXIDP_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_DEXIDP_CLIENT_SECRET=client_test_web_secret" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_DEXIDP_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
-  fi
+  echo "\nOAUTH_DEXIDP_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
+  echo "OAUTH_DEXIDP_CLIENT_SECRET=client_test_web_secret" >> "${fractal_server_test_path}/.fractal_server.env"
+  echo "OAUTH_DEXIDP_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/" >> "${fractal_server_test_path}/.fractal_server.env"
+  echo "OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
 
   cd "$fractal_server_test_path"
 
@@ -33,7 +31,6 @@ if [ ! -d "$fractal_server_test_path" ]; then
   python3 -m venv myenv
   . myenv/bin/activate
   pip install "fractal-server==$1"
-  pip install fractal-server[postgres-psycopg-binary]
   fractalctl set-db
 else
   cd "$fractal_server_test_path"
