@@ -15,7 +15,7 @@
 			}
 			logs = '';
 
-			const response = await fetch(`/api/v2/task/collect/${taskCollectionId}?verbose=True`, {
+			const response = await fetch(`/api/v2/task/collect/${taskCollectionId}`, {
 				method: 'GET',
 				credentials: 'include'
 			});

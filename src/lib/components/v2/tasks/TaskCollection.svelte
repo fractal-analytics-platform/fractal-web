@@ -186,7 +186,7 @@
 	 * @returns {Promise<import('$lib/types').TasksCollectionsState|undefined>}
 	 */
 	async function getTaskCollection(taskCollectionId) {
-		const response = await fetch(`/api/v2/task/collect/${taskCollectionId}?verbose=True`, {
+		const response = await fetch(`/api/v2/task/collect/${taskCollectionId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});
