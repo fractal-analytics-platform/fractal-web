@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added fractal logo (\#626);
+* Removed usage of pip extras when installing fractal-server for testing (\#626);
+* Removed usage of verbose query parameter in task collection (\#626);
+
 # 1.9.0
 
 * Alignment with fractal-server 2.7 (\#583, \#601, \#605, \#612, \#616, \#620):
