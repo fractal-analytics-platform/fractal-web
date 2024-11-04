@@ -75,59 +75,61 @@
 			</tbody>
 		</table>
 
-		{#if runnerBackend === 'slurm' || runnerBackend === 'slurm_ssh'}
-			<h4 class="fw-light ms-2 mt-4">Settings</h4>
-			<table class="table">
-				<tbody>
-					{#if runnerBackend === 'slurm'}
-						<tr>
-							<th>SLURM user</th>
-							<td>{settings.slurm_user || '-'}</td>
-						</tr>
-						<tr>
-							<th>Cache dir</th>
-							<td>{settings.cache_dir || '-'}</td>
-						</tr>
-					{/if}
-					{#if runnerBackend === 'slurm_ssh'}
-						<tr>
-							<th>SSH host</th>
-							<td>{settings.ssh_host || '-'}</td>
-						</tr>
-						<tr>
-							<th>SSH username</th>
-							<td>{settings.ssh_username || '-'}</td>
-						</tr>
-						<tr>
-							<th>SSH Private Key Path</th>
-							<td>{settings.ssh_private_key_path || '-'}</td>
-						</tr>
-						<tr>
-							<th>SSH Tasks Dir</th>
-							<td>{settings.ssh_tasks_dir || '-'}</td>
-						</tr>
-						<tr>
-							<th>SSH Jobs Dir</th>
-							<td>{settings.ssh_jobs_dir || '-'}</td>
-						</tr>
-					{/if}
-					{#if runnerBackend === 'slurm' || runnerBackend === 'slurm_ssh'}
-						<tr>
-							<th>SLURM accounts</th>
-							<td>
-								{#if settings.slurm_accounts.length > 0}
-									{#each settings.slurm_accounts as account}
-										<span class="badge text-bg-light fw-normal fs-6">{account}</span>
-										&nbsp;
-									{/each}
-								{:else}
-									-
-								{/if}
-							</td>
-						</tr>
-					{/if}
-				</tbody>
-			</table>
-		{/if}
+		<h4 class="fw-light ms-2 mt-4">Settings</h4>
+		<table class="table">
+			<tbody>
+				<tr>
+					<th>Project dir</th>
+					<td>{settings.project_dir || '-'}</td>
+				</tr>
+				{#if runnerBackend === 'slurm'}
+					<tr>
+						<th>SLURM user</th>
+						<td>{settings.slurm_user || '-'}</td>
+					</tr>
+					<tr>
+						<th>Cache dir</th>
+						<td>{settings.cache_dir || '-'}</td>
+					</tr>
+				{/if}
+				{#if runnerBackend === 'slurm_ssh'}
+					<tr>
+						<th>SSH host</th>
+						<td>{settings.ssh_host || '-'}</td>
+					</tr>
+					<tr>
+						<th>SSH username</th>
+						<td>{settings.ssh_username || '-'}</td>
+					</tr>
+					<tr>
+						<th>SSH Private Key Path</th>
+						<td>{settings.ssh_private_key_path || '-'}</td>
+					</tr>
+					<tr>
+						<th>SSH Tasks Dir</th>
+						<td>{settings.ssh_tasks_dir || '-'}</td>
+					</tr>
+					<tr>
+						<th>SSH Jobs Dir</th>
+						<td>{settings.ssh_jobs_dir || '-'}</td>
+					</tr>
+				{/if}
+				{#if runnerBackend === 'slurm' || runnerBackend === 'slurm_ssh'}
+					<tr>
+						<th>SLURM accounts</th>
+						<td>
+							{#if settings.slurm_accounts.length > 0}
+								{#each settings.slurm_accounts as account}
+									<span class="badge text-bg-light fw-normal fs-6">{account}</span>
+									&nbsp;
+								{/each}
+							{:else}
+								-
+							{/if}
+						</td>
+					</tr>
+				{/if}
+			</tbody>
+		</table>
 	</div>
 </div>

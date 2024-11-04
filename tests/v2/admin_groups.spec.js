@@ -133,8 +133,9 @@ test('Admin groups management', async ({ page }) => {
 	await test.step('Edit user settings in group page', async () => {
 		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
+		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp/test/project-dir');
 		await page.getByRole('textbox', { name: 'SLURM user' }).fill('test-slurm-user');
-		await page.getByRole('textbox', { name: 'Cache dir' }).fill('/tmp/test');
+		await page.getByRole('textbox', { name: 'Cache dir' }).fill('/tmp/test/cache-dir');
 		await page.getByRole('button', { name: 'Add SLURM account' }).click();
 		await page.getByLabel('SLURM account #1', { exact: true }).fill('test-slurm-account');
 		await page.getByRole('button', { name: 'Save' }).nth(1).click();
@@ -146,8 +147,9 @@ test('Admin groups management', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
+		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue('/tmp/test/project-dir');
 		await expect(page.getByRole('textbox', { name: 'SLURM user' })).toHaveValue('test-slurm-user');
-		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue('/tmp/test');
+		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue('/tmp/test/cache-dir');
 		await expect(page.getByLabel('SLURM account #1', { exact: true })).toHaveValue(
 			'test-slurm-account'
 		);

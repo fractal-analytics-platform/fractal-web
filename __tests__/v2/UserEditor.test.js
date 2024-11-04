@@ -50,6 +50,7 @@ describe('UserEditor', () => {
 	const initialSettings = {
 		id: 1,
 		slurm_accounts: [],
+		project_dir: null,
 		slurm_user: null,
 		cache_dir: null,
 		ssh_host: null,
@@ -79,11 +80,13 @@ describe('UserEditor', () => {
 					resolve({
 						...initialSettings,
 						slurm_user: 'user',
-						cache_dir: '/path/to/cache/dir'
+						cache_dir: '/path/to/cache/dir',
+						project_dir: '/path/to/project/dir',
 					})
 				)
 		});
 
+		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), '/path/to/project/dir');
 		await user.type(screen.getByRole('textbox', { name: 'SLURM user' }), 'user');
 		await user.type(screen.getByRole('textbox', { name: 'Cache dir' }), '/path/to/cache/dir');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -94,6 +97,7 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
+					project_dir: '/path/to/project/dir',
 					slurm_user: 'user',
 					cache_dir: '/path/to/cache/dir',
 					ssh_host: null,
@@ -144,6 +148,7 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
+					project_dir: null,
 					slurm_user: null,
 					cache_dir: 'xxx',
 					ssh_host: null,
@@ -197,6 +202,7 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
+					project_dir: null,
 					slurm_user: null,
 					cache_dir: null,
 					ssh_host: 'localhost',
@@ -266,6 +272,7 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
+					project_dir: null,
 					slurm_user: null,
 					cache_dir: null,
 					ssh_host: 'localhost',

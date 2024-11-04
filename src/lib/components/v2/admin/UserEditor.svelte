@@ -441,7 +441,7 @@
 		{/if}
 	</div>
 
-	{#if settings && runnerBackend !== 'local' && runnerBackend !== 'local_experimental'}
+	{#if settings}
 		<div class="row">
 			<div class="mt-3 col-lg-7">
 				<div class="row">

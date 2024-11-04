@@ -98,6 +98,12 @@
 
 <h1 class="fw-light mb-4">My settings</h1>
 
+<div class="row mb-4">
+	<div class="col-lg-2 col-sm-4 fw-bold">Project dir</div>
+	<div class="col-lg-6 col-sm-8">
+		{settings.project_dir || '-'}
+	</div>
+</div>
 {#if $page.data.runnerBackend !== 'local' && $page.data.runnerBackend !== 'local_experimental'}
 	{#if $page.data.runnerBackend === 'slurm'}
 		<div class="row mb-4">
