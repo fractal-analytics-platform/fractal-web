@@ -1,4 +1,5 @@
 <script>
+	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
 	import { afterNavigate, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -118,7 +119,9 @@
 		<div class="container d-flex flex-wrap">
 			<ul class="nav me-auto">
 				<li class="nav-item">
-					<a href="/" class="nav-link" class:active={selectedSection === 'home'}> Home </a>
+					<a href="/" class="nav-link" id="home-link" class:active={selectedSection === 'home'}>
+						<img alt="Fractal logo" src={logoSmall} />
+					</a>
 				</li>
 				{#if userLoggedIn}
 					<li class="nav-item">
@@ -280,6 +283,14 @@
 </main>
 
 <style>
+	#home-link img {
+		height: 24px;
+	}
+
+	#home-link:hover img {
+		transform: rotate(-7deg) scale(1.2);
+	}
+
 	nav.legacy {
 		background-color: #e4e4e4 !important;
 		border-bottom-color: #888 !important;

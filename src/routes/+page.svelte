@@ -1,16 +1,21 @@
 <script>
 	import { env } from '$env/dynamic/public';
 	import { page } from '$app/stores';
+	import logoMedium from '$lib/assets/fractal-logo-medium.png';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 </script>
+
+<img alt="Fractal logo" src={logoMedium} class="float-end" id="fractal-logo-home" />
 
 <h1 class="fw-light">Welcome to Fractal web client.</h1>
 
 <div>
 	<p>
-		Welcome to the web client of Fractal, a framework to process high-content imaging data at scale
-		and prepare it for interactive visualization.
+		Fractal is a framework developed at the
+		<a href="https://www.biovisioncenter.uzh.ch/en.html">BioVisionCenter</a>
+		to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive
+		visualization.
 	</p>
 	<p>
 		To access Fractal features, you should first log-in as a registered user. Navigate to the
@@ -67,3 +72,17 @@
 		</li>
 	</ul>
 </div>
+
+<style>
+	#fractal-logo-home {
+		margin-top: 20px;
+		margin-left: 30px;
+		height: 220px;
+	}
+
+	@media (max-width: 768px) {
+		#fractal-logo-home {
+			height: 140px;
+		}
+	}
+</style>
