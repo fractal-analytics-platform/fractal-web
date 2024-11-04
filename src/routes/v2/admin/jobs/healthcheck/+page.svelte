@@ -127,7 +127,7 @@
 	}
 
 	async function getHealthCheckTask() {
-		const response = await fetch(`/api/v2/task`, {
+		const response = await fetch(`/api/v2/task?args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
