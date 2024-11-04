@@ -3,17 +3,20 @@
 	import { AlertError } from '$lib/common/errors';
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {import('$lib/types-v2').DatasetV2[]} */
 	export let datasets = [];
 
 	let datasetSearch = '';
+	let datasetCreatedMessage = '';
 
 	$: filteredDatasets = datasets.filter((p) =>
 		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
 	);
 
 	function createDatasetCallback(/** @type {import('$lib/types-v2').DatasetV2} */ newDataset) {
+		datasetCreatedMessage = `Created new dataset with Zarr dir ${newDataset.zarr_dir}`;
 		datasets = [...datasets, newDataset].sort((a, b) =>
 			a.name < b.name ? -1 : a.name > b.name ? 1 : 0
 		);
@@ -48,6 +51,8 @@
 	});
 </script>
 
+<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
+
 <div class="container p-0 mt-4">
 	<div class="row">
 		<div class="col-sm-2">
@@ -72,6 +77,7 @@
 						type="button"
 						data-bs-target="#createDatasetModal"
 						data-bs-toggle="modal"
+						on:click={() => (datasetCreatedMessage = '')}
 					>
 						Create new dataset
 					</button>

@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { AlertError } from '$lib/common/errors';
+	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
 	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
@@ -13,6 +14,8 @@
 	/** @type {'new'|'import'} */
 	let mode = 'new';
 	let datasetName = '';
+	/** @type {string|null} */
+	let projectDir = null;
 	let zarrDir = '';
 	let submitted = false;
 	let saving = false;
@@ -123,18 +126,21 @@
 		const projectId = $page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
+		const body = {
+			name: datasetName,
+			filters: {
+				attributes: filtersCreationForm.getAttributes(),
+				types: filtersCreationForm.getTypes()
+			}
+		};
+		if (zarrDir) {
+			body.zarr_dir = zarrDir;
+		}
 		const response = await fetch(`/api/v2/project/${projectId}/dataset`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
-				name: datasetName,
-				zarr_dir: zarrDir,
-				filters: {
-					attributes: filtersCreationForm.getAttributes(),
-					types: filtersCreationForm.getTypes()
-				}
-			})
+			body: JSON.stringify(body)
 		});
 		const result = await response.json();
 		if (!response.ok) {
@@ -146,7 +152,21 @@
 
 	function fieldsAreValid() {
 		const validFilters = filtersCreationForm.validateFields();
-		return validFilters && !!datasetName.trim() && !!zarrDir.trim();
+		return validFilters && !!datasetName.trim() && (projectDir !== null || !!zarrDir.trim());
+	}
+
+	onMount(async () => {
+		await loadProjectDir();
+	});
+
+	async function loadProjectDir() {
+		const response = await fetch('/api/auth/current-user/settings');
+		if (!response.ok) {
+			return;
+		}
+		/** @type {import('$lib/types').UserSettings} */
+		const result = await response.json();
+		projectDir = result.project_dir;
 	}
 </script>
 
@@ -198,9 +218,9 @@
 								type="text"
 								bind:value={datasetName}
 								class="form-control"
-								class:is-invalid={submitted && !datasetName.trim()}
+								class:is-invalid={submitted && projectDir === null && !datasetName.trim()}
 							/>
-							{#if submitted && !datasetName.trim()}
+							{#if submitted && projectDir === null && !datasetName.trim()}
 								<div class="invalid-feedback">Required field</div>
 							{/if}
 						</div>
@@ -215,6 +235,12 @@
 								class="form-control"
 								class:is-invalid={submitted && !zarrDir}
 							/>
+							<div class="form-text">
+								The main folder for OME-Zarrs of this dataset.
+								{#if projectDir !== null}
+									If not set, a default subfolder of <code>{projectDir}</code> will be used.
+								{/if}
+							</div>
 							{#if submitted && !zarrDir}
 								<div class="invalid-feedback">Required field</div>
 							{/if}

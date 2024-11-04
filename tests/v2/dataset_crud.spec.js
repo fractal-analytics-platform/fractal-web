@@ -42,6 +42,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		const saveBtn = page.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
 		await waitModalClosed(page);
+		await expect(page.getByText(/Created new dataset with Zarr dir \/tmp/)).toBeVisible();
 	});
 
 	/** @type {import('@playwright/test').Locator} */
