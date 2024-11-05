@@ -32,6 +32,12 @@ async function getWarningBanner() {
 		return null;
 	}
 	try {
+		try {
+			await fs.stat(env.WARNING_BANNER_PATH);
+		} catch {
+			logger.error("Warning banner file %s doesn't exist", env.WARNING_BANNER_PATH);
+			return null;
+		}
 		const bannerData = await fs.readFile(env.WARNING_BANNER_PATH, { encoding: 'utf-8' });
 		return bannerData.trim();
 	} catch (err) {
