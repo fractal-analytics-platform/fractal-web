@@ -2,6 +2,12 @@
 
 # Unreleased
 
+* Added project dir setting (\#634);
+* Made zarr_dir optional when creating dataset (\#634);
+* Updated query parameters of GET /api/v2/task/ (\#634);
+* Displayed task collection logs also in install phase (\#634);
+* Handled missing banner file error (\#634);
+* Used fractal-logos sources for README and docs (\#634);
 * Added fractal logo (\#626);
 * Removed usage of pip extras when installing fractal-server for testing (\#626);
 * Removed usage of verbose query parameter in task collection (\#626);

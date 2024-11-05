@@ -192,3 +192,26 @@ export type TasksTableRow = {
   authors: string | null
   tags: string[]
 }
+
+export type TasksCollections = {
+  id: number
+  package_version: string
+  pkg: string
+  status: TaskCollectStatus
+  timestamp: string
+  log?: string
+}
+
+export type TasksCollectionsStateData = {
+  package: string
+  version: string
+  status: TaskCollectStatus
+  log?: string
+  info?: string
+}
+
+export type TasksCollectionsState = {
+  id: number
+  data: TasksCollectionsStateData
+  timestamp: string
+}

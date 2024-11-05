@@ -1,7 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount } from 'svelte';
-	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import TaskCollectionLogsModal from '$lib/components/v2/tasks/TaskCollectionLogsModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
@@ -26,9 +25,9 @@
 	// If a collection status is installing, the component shall fetch update
 
 	// Component properties
-	/** @type {import('$lib/types').TasksCollections[]} */
+	/** @type {import('$lib/types-v2').TasksCollections[]} */
 	let taskCollections = [];
-	/** @type {import('$lib/types').TasksCollectionsStateData|undefined} */
+	/** @type {import('$lib/types-v2').TasksCollectionsStateData|undefined} */
 	let taskCollectionAlreadyPresent = undefined;
 
 	/** @type {'pypi'|'local'} */
@@ -46,6 +45,10 @@
 	let pinnedPackageVersions = [];
 	let privateTask = false;
 	let selectedGroup = null;
+	/** @type {TaskCollectionLogsModal} */
+	let taskCollectionLogsModal;
+	/** @type {number|null} */
+	let openedTaskCollectionLogId = null;
 
 	const formErrorHandler = new FormErrorHandler('taskCollectionError', [
 		'package',
@@ -123,7 +126,7 @@
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('$lib/types').TasksCollectionsState} */ (
+			const result = /** @type {import('$lib/types-v2').TasksCollectionsState} */ (
 				await response.json()
 			);
 			if (response.status === 200) {
@@ -167,7 +170,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').TasksCollectionsState} taskCollection
+	 * @param {import('$lib/types-v2').TasksCollectionsState} taskCollection
 	 */
 	function storeCreatedTaskCollection(taskCollection) {
 		taskCollections.push({
@@ -183,7 +186,7 @@
 	/**
 	 * Fetches a task collection from the server
 	 * @param {number} taskCollectionId
-	 * @returns {Promise<import('$lib/types').TasksCollectionsState|undefined>}
+	 * @returns {Promise<import('$lib/types-v2').TasksCollectionsState|undefined>}
 	 */
 	async function getTaskCollection(taskCollectionId) {
 		const response = await fetch(`/api/v2/task/collect/${taskCollectionId}`, {
@@ -209,7 +212,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').TasksCollections[]|null} collectionsToUpdate
+	 * @param {import('$lib/types-v2').TasksCollections[]|null} collectionsToUpdate
 	 */
 	async function updateTaskCollectionsState(collectionsToUpdate = null) {
 		const collections = collectionsToUpdate ?? taskCollections;
@@ -223,7 +226,7 @@
 		}
 
 		const successfulUpdates =
-			/** @type {PromiseFulfilledResult<import('$lib/types').TasksCollectionsState|undefined>[]} */ (
+			/** @type {PromiseFulfilledResult<import('$lib/types-v2').TasksCollectionsState|undefined>[]} */ (
 				updates.filter((u) => u.status === 'fulfilled')
 			).map((u) => u.value);
 
@@ -238,7 +241,13 @@
 				continue;
 			}
 			oldTaskCollection.status = updatedTaskCollection.data.status;
-			oldTaskCollection.logs = updatedTaskCollection.data.logs;
+			oldTaskCollection.log = updatedTaskCollection.data.log;
+			if (
+				updatedTaskCollection.id === openedTaskCollectionLogId &&
+				updatedTaskCollection.data.log
+			) {
+				await taskCollectionLogsModal.updateLog(updatedTaskCollection.data.log);
+			}
 			updatedTaskCollections.push(oldTaskCollection);
 		}
 
@@ -247,7 +256,7 @@
 	}
 
 	/**
-	 * @returns {import('$lib/types').TasksCollections[]}
+	 * @returns {import('$lib/types-v2').TasksCollections[]}
 	 */
 	function loadTaskCollectionsFromStorage() {
 		// Parse local storage task collections value
@@ -259,7 +268,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').TasksCollections[]} updatedCollectionTasks
+	 * @param {import('$lib/types-v2').TasksCollections[]} updatedCollectionTasks
 	 */
 	function updateTaskCollections(updatedCollectionTasks) {
 		window.localStorage.setItem(
@@ -297,9 +306,12 @@
 		}
 	}
 
-	function setTaskCollectionLogsModal(event) {
-		const id = event.currentTarget.getAttribute('data-fc-tc');
-		modalTaskCollectionId.set(id);
+	/**
+	 * @param {number} taskCollectionId
+	 */
+	async function openTaskCollectionLogsModal(taskCollectionId) {
+		openedTaskCollectionLogId = taskCollectionId;
+		await taskCollectionLogsModal.open(taskCollectionId);
 	}
 
 	function addPackageVersion() {
@@ -339,7 +351,7 @@
 	});
 </script>
 
-<TaskCollectionLogsModal />
+<TaskCollectionLogsModal bind:this={taskCollectionLogsModal} />
 
 <div>
 	{#if taskCollectionAlreadyPresent}
@@ -539,7 +551,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each taskCollections as { timestamp, status, package_version, pkg, id, logs }}
+					{#each taskCollections as { timestamp, status, package_version, pkg, id, log }}
 						<tr>
 							<td class="col-2">{new Date(timestamp).toLocaleString()}</td>
 							<td>{pkg}</td>
@@ -555,14 +567,8 @@
 									message="Remove a task collection log"
 									callbackAction={async () => removeTaskCollection(id)}
 								/>
-								{#if status == 'fail' || (status == 'OK' && logs !== '')}
-									<button
-										class="btn btn-info"
-										data-fc-tc={id}
-										data-bs-toggle="modal"
-										data-bs-target="#collectionTaskLogsModal"
-										on:click={setTaskCollectionLogsModal}
-									>
+								{#if status !== 'pending' && log}
+									<button class="btn btn-info" on:click={() => openTaskCollectionLogsModal(id)}>
 										<i class="bi bi-info-circle" />
 									</button>
 								{/if}

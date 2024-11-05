@@ -2,7 +2,7 @@
 # Fractal Web Client
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/984e89fe-b536-4414-8949-58029056e53c" alt="Fractal web" width="400">
+  <img src="https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/projects/fractal_web.png" alt="Fractal web" width="400">
 </p>
 
 [Fractal](https://fractal-analytics-platform.github.io/) is a framework developed at the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.

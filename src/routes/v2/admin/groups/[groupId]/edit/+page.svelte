@@ -138,6 +138,7 @@
 	function createEmptySettings() {
 		return {
 			slurm_accounts: [],
+			project_dir: '',
 			slurm_user: '',
 			cache_dir: '',
 			ssh_host: '',
@@ -279,52 +280,50 @@
 	</div>
 </div>
 
-{#if runnerBackend !== 'local' && runnerBackend !== 'local_experimental'}
-	<hr />
-	<div class="row">
-		<div class="mt-4 col-lg-7">
-			<div class="row">
-				<div class="offset-sm-3">
-					<h4 class="fw-light">Users settings</h4>
-				</div>
+<hr />
+<div class="row">
+	<div class="mt-4 col-lg-7">
+		<div class="row">
+			<div class="offset-sm-3">
+				<h4 class="fw-light">Users settings</h4>
 			</div>
-			<div class="row">
-				<div class="offset-sm-3 col-10">
-					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle" />
-						<strong>Warning</strong>: this PATCH will be applied to all the {group.user_ids.length} users
-						of this user group.
-					</div>
+		</div>
+		<div class="row">
+			<div class="offset-sm-3 col-10">
+				<div class="alert alert-warning">
+					<i class="bi bi-exclamation-triangle" />
+					<strong>Warning</strong>: this PATCH will be applied to all the {group.user_ids.length} users
+					of this user group.
 				</div>
 			</div>
 		</div>
 	</div>
-	<UserSettingsEditor
-		bind:this={userSettingsEditor}
-		bind:pendingChanges={settingsPendingChanges}
-		{settings}
-		{runnerBackend}
-		settingsApiEndpoint="/api/auth/group/{group.id}/user-settings"
-		{onSettingsUpdated}
-	/>
-	<div class="row">
-		<div class="mt-2 col-lg-7">
-			<div class="row mb-3">
-				<div class="col-sm-9 offset-sm-3">
-					<StandardDismissableAlert message={settingsUpdatedMessage} />
-					<button
-						type="button"
-						on:click={handleSaveSettings}
-						class="btn btn-primary"
-						disabled={savingSettings || !settingsPendingChanges}
-					>
-						{#if savingSettings}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-						{/if}
-						Save
-					</button>
-				</div>
+</div>
+<UserSettingsEditor
+	bind:this={userSettingsEditor}
+	bind:pendingChanges={settingsPendingChanges}
+	{settings}
+	{runnerBackend}
+	settingsApiEndpoint="/api/auth/group/{group.id}/user-settings"
+	{onSettingsUpdated}
+/>
+<div class="row">
+	<div class="mt-2 col-lg-7">
+		<div class="row mb-3">
+			<div class="col-sm-9 offset-sm-3">
+				<StandardDismissableAlert message={settingsUpdatedMessage} />
+				<button
+					type="button"
+					on:click={handleSaveSettings}
+					class="btn btn-primary"
+					disabled={savingSettings || !settingsPendingChanges}
+				>
+					{#if savingSettings}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					{/if}
+					Save
+				</button>
 			</div>
 		</div>
 	</div>
-{/if}
+</div>
