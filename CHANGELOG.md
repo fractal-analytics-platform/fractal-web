@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.10.0
 
 * Added project dir setting (\#634);
 * Made zarr_dir optional when creating dataset (\#634);
