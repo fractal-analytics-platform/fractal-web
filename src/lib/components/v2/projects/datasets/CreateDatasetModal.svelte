@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError } from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
 	import AttributesTypesForm from './AttributesTypesForm.svelte';
@@ -26,24 +26,32 @@
 	let fileInput;
 	let fileError = '';
 
-	/** @type {AttributesTypesForm} */
+	/** @type {AttributesTypesForm|undefined} */
 	let filtersCreationForm;
+
+	const formErrorHandler = new FormErrorHandler('errorAlert-createDatasetModal', [
+		'name',
+		'zarr_dir'
+	]);
+
+	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	function onOpen() {
 		mode = 'new';
 		datasetName = '';
 		zarrDir = '';
-		filtersCreationForm.init({}, {});
+		filtersCreationForm?.init({}, {});
 		submitted = false;
 		files = null;
 		if (fileInput) {
 			fileInput.value = '';
 		}
 		fileError = '';
+		formErrorHandler.clearErrors();
 	}
 
 	async function handleSave() {
-		filtersCreationForm.resetErrors();
+		filtersCreationForm?.resetErrors();
 
 		submitted = true;
 		modal.hideErrorAlert();
@@ -52,15 +60,12 @@
 		}
 
 		saving = true;
-		try {
-			const newDataset = await callCreateDataset();
-			createDatasetCallback(newDataset);
-		} catch (err) {
-			modal.displayErrorAlert(err);
+		const newDataset = await callCreateDataset();
+		saving = false;
+		if (newDataset === null) {
 			return;
-		} finally {
-			saving = false;
 		}
+		createDatasetCallback(newDataset);
 		modal.hide();
 	}
 
@@ -120,7 +125,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('$lib/types-v2').DatasetV2>}
+	 * @returns {Promise<import('$lib/types-v2').DatasetV2|null>}
 	 */
 	async function callCreateDataset() {
 		const projectId = $page.params.projectId;
@@ -129,8 +134,8 @@
 		const body = {
 			name: datasetName,
 			filters: {
-				attributes: filtersCreationForm.getAttributes(),
-				types: filtersCreationForm.getTypes()
+				attributes: filtersCreationForm?.getAttributes(),
+				types: filtersCreationForm?.getTypes()
 			}
 		};
 		if (zarrDir) {
@@ -142,16 +147,16 @@
 			headers,
 			body: JSON.stringify(body)
 		});
-		const result = await response.json();
 		if (!response.ok) {
-			console.log('Dataset creation failed', result);
-			throw new AlertError(result);
+			console.log('Dataset creation failed');
+			await formErrorHandler.handleErrorResponse(response);
+			return null;
 		}
-		return result;
+		return await response.json();
 	}
 
 	function fieldsAreValid() {
-		const validFilters = filtersCreationForm.validateFields();
+		const validFilters = filtersCreationForm?.validateFields();
 		return validFilters && !!datasetName.trim() && (projectDir !== null || !!zarrDir.trim());
 	}
 
@@ -218,10 +223,16 @@
 								type="text"
 								bind:value={datasetName}
 								class="form-control"
-								class:is-invalid={submitted && projectDir === null && !datasetName.trim()}
+								class:is-invalid={submitted && (!datasetName.trim() || $validationErrors['name'])}
 							/>
-							{#if submitted && projectDir === null && !datasetName.trim()}
-								<div class="invalid-feedback">Required field</div>
+							{#if submitted && !datasetName.trim()}
+								<div class="invalid-feedback">
+									{#if !datasetName.trim()}
+										Required field
+									{:else}
+										{$validationErrors['name']}
+									{/if}
+								</div>
 							{/if}
 						</div>
 					</div>
@@ -233,7 +244,8 @@
 								type="text"
 								bind:value={zarrDir}
 								class="form-control"
-								class:is-invalid={submitted && !zarrDir}
+								class:is-invalid={submitted &&
+									((projectDir === null && !zarrDir) || $validationErrors['zarr_dir'])}
 							/>
 							<div class="form-text">
 								The main folder for OME-Zarrs of this dataset.
@@ -241,8 +253,14 @@
 									If not set, a default subfolder of <code>{projectDir}</code> will be used.
 								{/if}
 							</div>
-							{#if submitted && !zarrDir}
-								<div class="invalid-feedback">Required field</div>
+							{#if submitted && ((projectDir === null && !zarrDir) || $validationErrors['zarr_dir'])}
+								<div class="invalid-feedback">
+									{#if projectDir === null && !zarrDir}
+										Required field
+									{:else}
+										{$validationErrors['zarr_dir']}
+									{/if}
+								</div>
 							{/if}
 						</div>
 					</div>
