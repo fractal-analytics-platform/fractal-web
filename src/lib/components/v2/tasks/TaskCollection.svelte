@@ -1,7 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount } from 'svelte';
-	import { modalTaskCollectionId } from '$lib/stores/taskStores';
 	import TaskCollectionLogsModal from '$lib/components/v2/tasks/TaskCollectionLogsModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
@@ -46,6 +45,10 @@
 	let pinnedPackageVersions = [];
 	let privateTask = false;
 	let selectedGroup = null;
+	/** @type {TaskCollectionLogsModal} */
+	let taskCollectionLogsModal;
+	/** @type {number|null} */
+	let openedTaskCollectionLogId = null;
 
 	const formErrorHandler = new FormErrorHandler('taskCollectionError', [
 		'package',
@@ -238,7 +241,13 @@
 				continue;
 			}
 			oldTaskCollection.status = updatedTaskCollection.data.status;
-			oldTaskCollection.logs = updatedTaskCollection.data.logs;
+			oldTaskCollection.log = updatedTaskCollection.data.log;
+			if (
+				updatedTaskCollection.id === openedTaskCollectionLogId &&
+				updatedTaskCollection.data.log
+			) {
+				await taskCollectionLogsModal.updateLog(updatedTaskCollection.data.log);
+			}
 			updatedTaskCollections.push(oldTaskCollection);
 		}
 
@@ -297,9 +306,12 @@
 		}
 	}
 
-	function setTaskCollectionLogsModal(event) {
-		const id = event.currentTarget.getAttribute('data-fc-tc');
-		modalTaskCollectionId.set(id);
+	/**
+	 * @param {number} taskCollectionId
+	 */
+	async function openTaskCollectionLogsModal(taskCollectionId) {
+		openedTaskCollectionLogId = taskCollectionId;
+		await taskCollectionLogsModal.open(taskCollectionId);
 	}
 
 	function addPackageVersion() {
@@ -339,7 +351,7 @@
 	});
 </script>
 
-<TaskCollectionLogsModal />
+<TaskCollectionLogsModal bind:this={taskCollectionLogsModal} />
 
 <div>
 	{#if taskCollectionAlreadyPresent}
@@ -539,7 +551,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each taskCollections as { timestamp, status, package_version, pkg, id, logs }}
+					{#each taskCollections as { timestamp, status, package_version, pkg, id, log }}
 						<tr>
 							<td class="col-2">{new Date(timestamp).toLocaleString()}</td>
 							<td>{pkg}</td>
@@ -555,14 +567,8 @@
 									message="Remove a task collection log"
 									callbackAction={async () => removeTaskCollection(id)}
 								/>
-								{#if status == 'fail' || (status == 'OK' && logs !== '')}
-									<button
-										class="btn btn-info"
-										data-fc-tc={id}
-										data-bs-toggle="modal"
-										data-bs-target="#collectionTaskLogsModal"
-										on:click={setTaskCollectionLogsModal}
-									>
+								{#if status !== 'pending' && log}
+									<button class="btn btn-info" on:click={() => openTaskCollectionLogsModal(id)}>
 										<i class="bi bi-info-circle" />
 									</button>
 								{/if}

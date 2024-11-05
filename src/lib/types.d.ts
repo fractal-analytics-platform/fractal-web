@@ -150,14 +150,14 @@ export type TasksCollections = {
   pkg: string
   status: TaskCollectStatus
   timestamp: string
-  logs?: string
+  log?: string
 }
 
 export type TasksCollectionsStateData = {
   package: string
   version: string
   status: TaskCollectStatus
-  logs?: string
+  log?: string
   info?: string
 }
 
