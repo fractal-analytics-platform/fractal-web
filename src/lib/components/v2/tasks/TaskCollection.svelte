@@ -25,9 +25,9 @@
 	// If a collection status is installing, the component shall fetch update
 
 	// Component properties
-	/** @type {import('$lib/types').TasksCollections[]} */
+	/** @type {import('$lib/types-v2').TasksCollections[]} */
 	let taskCollections = [];
-	/** @type {import('$lib/types').TasksCollectionsStateData|undefined} */
+	/** @type {import('$lib/types-v2').TasksCollectionsStateData|undefined} */
 	let taskCollectionAlreadyPresent = undefined;
 
 	/** @type {'pypi'|'local'} */
@@ -126,7 +126,7 @@
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('$lib/types').TasksCollectionsState} */ (
+			const result = /** @type {import('$lib/types-v2').TasksCollectionsState} */ (
 				await response.json()
 			);
 			if (response.status === 200) {
@@ -170,7 +170,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').TasksCollectionsState} taskCollection
+	 * @param {import('$lib/types-v2').TasksCollectionsState} taskCollection
 	 */
 	function storeCreatedTaskCollection(taskCollection) {
 		taskCollections.push({
@@ -186,7 +186,7 @@
 	/**
 	 * Fetches a task collection from the server
 	 * @param {number} taskCollectionId
-	 * @returns {Promise<import('$lib/types').TasksCollectionsState|undefined>}
+	 * @returns {Promise<import('$lib/types-v2').TasksCollectionsState|undefined>}
 	 */
 	async function getTaskCollection(taskCollectionId) {
 		const response = await fetch(`/api/v2/task/collect/${taskCollectionId}`, {
@@ -212,7 +212,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').TasksCollections[]|null} collectionsToUpdate
+	 * @param {import('$lib/types-v2').TasksCollections[]|null} collectionsToUpdate
 	 */
 	async function updateTaskCollectionsState(collectionsToUpdate = null) {
 		const collections = collectionsToUpdate ?? taskCollections;
@@ -226,7 +226,7 @@
 		}
 
 		const successfulUpdates =
-			/** @type {PromiseFulfilledResult<import('$lib/types').TasksCollectionsState|undefined>[]} */ (
+			/** @type {PromiseFulfilledResult<import('$lib/types-v2').TasksCollectionsState|undefined>[]} */ (
 				updates.filter((u) => u.status === 'fulfilled')
 			).map((u) => u.value);
 
@@ -256,7 +256,7 @@
 	}
 
 	/**
-	 * @returns {import('$lib/types').TasksCollections[]}
+	 * @returns {import('$lib/types-v2').TasksCollections[]}
 	 */
 	function loadTaskCollectionsFromStorage() {
 		// Parse local storage task collections value
@@ -268,7 +268,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').TasksCollections[]} updatedCollectionTasks
+	 * @param {import('$lib/types-v2').TasksCollections[]} updatedCollectionTasks
 	 */
 	function updateTaskCollections(updatedCollectionTasks) {
 		window.localStorage.setItem(
