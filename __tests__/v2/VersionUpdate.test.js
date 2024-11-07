@@ -332,6 +332,14 @@ function renderVersionUpdate(
 	const nop = function () {};
 	mockTaskGroupsList();
 	return render(VersionUpdate, {
-		props: { workflowTask, updateWorkflowCallback: nop, updateNewVersionsCount: nop }
+		props: {
+			workflow: {
+				id: 1,
+				task_list: [workflowTask]
+			},
+			workflowTask,
+			updateWorkflowCallback: nop,
+			updateNewVersionsCount: nop
+		}
 	});
 }

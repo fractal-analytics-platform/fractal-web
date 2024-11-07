@@ -80,6 +80,7 @@ describe('AddWorkflowTaskModal', () => {
 
 		const result = render(AddWorkflowTaskModal, {
 			props: {
+				user: { id: 1 },
 				workflow: mockedWorkflow,
 				onWorkflowTaskAdded: vi.fn()
 			}
@@ -88,7 +89,10 @@ describe('AddWorkflowTaskModal', () => {
 		result.component.show();
 
 		await waitFor(() => screen.getByText(/Add new workflow task/));
-		expect(fetch).toHaveBeenCalledWith('/api/v2/task-group?only_active=true&args_schema=false', expect.anything());
+		expect(fetch).toHaveBeenCalledWith(
+			'/api/v2/task-group?only_active=true&args_schema=false',
+			expect.anything()
+		);
 		await waitFor(() => screen.getAllByText(/test_task/));
 
 		const dropdown = screen.getByRole('combobox');
@@ -146,6 +150,7 @@ describe('AddWorkflowTaskModal', () => {
 
 		const result = render(AddWorkflowTaskModal, {
 			props: {
+				user: { id: 1 },
 				workflow: mockedWorkflow,
 				onWorkflowTaskAdded: vi.fn()
 			}
@@ -154,7 +159,10 @@ describe('AddWorkflowTaskModal', () => {
 		result.component.show();
 
 		await waitFor(() => screen.getByText(/Add new workflow task/));
-		expect(fetch).toHaveBeenCalledWith('/api/v2/task-group?only_active=true&args_schema=false', expect.anything());
+		expect(fetch).toHaveBeenCalledWith(
+			'/api/v2/task-group?only_active=true&args_schema=false',
+			expect.anything()
+		);
 		await waitFor(() => screen.getAllByText(/test_task/));
 
 		const dropdown = screen.getByRole('combobox');

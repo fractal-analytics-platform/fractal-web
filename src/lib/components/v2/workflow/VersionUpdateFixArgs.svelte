@@ -77,10 +77,7 @@
 			);
 		const validator = new SchemaValidator(updateCandidate.args_schema_version, true);
 		if ('properties' in newSchema) {
-			newSchema = stripIgnoredProperties(
-				newSchema,
-				getPropertiesToIgnore(false)
-			);
+			newSchema = stripIgnoredProperties(newSchema, getPropertiesToIgnore(false));
 		}
 		const parsedSchema = deepCopy(newSchema);
 		const isSchemaValid = validator.loadSchema(parsedSchema);
@@ -142,7 +139,13 @@
 {/if}
 {#if originalArgs}
 	{#if !validationErrors}
-		<div class="alert alert-success mt-3">The arguments are valid</div>
+		<div class="alert alert-success mt-3">
+			{#if workflowTask.task_type === 'compound'}
+				The {parallel ? '' : ' non'} parallel arguments are valid
+			{:else}
+				The arguments are valid
+			{/if}
+		</div>
 	{/if}
 	{#if displayTextarea}
 		<label class="form-label" for="fix-arguments-{parallel ? 'parallel' : 'non-parallel'}">

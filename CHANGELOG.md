@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed wrong workflow tasks order after task version update (\#637);
+
 # 1.10.0
 
 * Added project dir setting (\#634);

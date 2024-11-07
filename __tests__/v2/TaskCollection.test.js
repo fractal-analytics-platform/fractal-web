@@ -37,7 +37,7 @@ describe('TaskCollection', () => {
 		render(TaskCollection, {
 			props: {
 				user: mockedUser,
-				reloadTaskList: vi.fn()
+				reloadTaskGroupsList: vi.fn()
 			}
 		});
 
@@ -65,7 +65,7 @@ describe('TaskCollection', () => {
 		render(TaskCollection, {
 			props: {
 				user: mockedUser,
-				reloadTaskList: vi.fn()
+				reloadTaskGroupsList: vi.fn()
 			}
 		});
 
