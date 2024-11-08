@@ -724,7 +724,7 @@
 					{#if workflow.task_list.length == 0}
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 					{:else}
-						<div class="list-group list-group-flush">
+						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
 							{#each workflow.task_list as workflowTask}
 								<button
 									style="cursor: pointer"
@@ -889,6 +889,7 @@
 							<div class="card-body">
 								{#if selectedWorkflowTask}
 									<VersionUpdate
+										{workflow}
 										workflowTask={selectedWorkflowTask}
 										updateWorkflowCallback={taskUpdated}
 										{updateNewVersionsCount}

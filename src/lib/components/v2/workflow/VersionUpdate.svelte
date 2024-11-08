@@ -5,6 +5,8 @@
 	import { tick } from 'svelte';
 	import { getNewVersions } from './version-checker';
 
+	/** @type {import('$lib/types-v2').WorkflowV2} */
+	export let workflow;
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
 
@@ -135,29 +137,44 @@
 		) {
 			return;
 		}
-		let response = await fetch(
+
+		try {
+			await deleteOldWorkflowTask();
+			const updatedWorkflowTask = await createNewWorkflowTask();
+			await setNewWorkflowTaskPosition(updatedWorkflowTask);
+			updateWorkflowCallback(updatedWorkflowTask);
+		} catch (err) {
+			if (err instanceof AlertError) {
+				errorAlert = displayStandardErrorAlert(err, 'versionUpdateError');
+			} else {
+				console.error(err);
+			}
+		}
+	}
+
+	async function deleteOldWorkflowTask() {
+		const response = await fetch(
 			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'DELETE',
 				credentials: 'include'
 			}
 		);
-
 		if (!response.ok) {
-			const result = await response.json();
-			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
-				'versionUpdateError'
-			);
-			return;
+			throw new AlertError(await response.json(), response.status);
 		}
+	}
 
+	/**
+	 * @returns {Promise<import('$lib/types-v2').WorkflowTaskV2>}
+	 */
+	async function createNewWorkflowTask() {
 		const newTaskId = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0].id;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		response = await fetch(
+		const response = await fetch(
 			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
 			{
 				method: 'POST',
@@ -175,14 +192,39 @@
 		);
 
 		const result = await response.json();
+
 		if (!response.ok) {
-			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
-				'versionUpdateError'
-			);
-			return;
+			throw new AlertError(result, response.status);
 		}
-		updateWorkflowCallback(result);
+
+		return result;
+	}
+
+	/**
+	 * @param {import('$lib/types-v2').WorkflowTaskV2}  newWorkflowTask
+	 */
+	async function setNewWorkflowTaskPosition(newWorkflowTask) {
+		const reordered_workflowtask_ids = workflow.task_list.map((wft) =>
+			wft.id === workflowTask.id ? newWorkflowTask.id : wft.id
+		);
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(
+			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}`,
+			{
+				method: 'PATCH',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify({ reordered_workflowtask_ids })
+			}
+		);
+
+		if (!response.ok) {
+			const result = await response.json();
+			throw new AlertError(result, response.status);
+		}
 	}
 
 	function getSelectedUpdateCandidate() {

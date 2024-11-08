@@ -113,8 +113,10 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await workflow.openWorkflowPage();
 	});
 
-	await test.step('Add non parallel task v1', async () => {
+	await test.step('Add tasks and select non parallel v1 task', async () => {
 		await workflow.addTask(nonParallelTask, '0.0.1');
+		await workflow.addTask(parallelTask, '0.0.1');
+		await workflow.addTask(compoundTask, '0.0.1');
 		await workflow.selectTask(nonParallelTask);
 	});
 
@@ -156,11 +158,13 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await expect(page.getByPlaceholder('Key').first()).toHaveValue('key1');
 		await expect(page.getByPlaceholder('Value')).toHaveValue('value1');
 		await expect(page.getByPlaceholder('Key').nth(1)).toHaveValue('key2');
-		await workflow.removeCurrentTask();
 	});
 
-	await test.step('Add parallel task v1', async () => {
-		await workflow.addTask(parallelTask, '0.0.1');
+	await test.step('Verify that task order is preserved', async () => {
+		await checkTasksOrder(page, nonParallelTask, parallelTask, compoundTask);
+	});
+
+	await test.step('Select parallel task v1', async () => {
 		await workflow.selectTask(parallelTask);
 	});
 
@@ -202,11 +206,13 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		// Verify that the arguments are preserved after the update
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await expect(page.getByRole('textbox', { name: 'p2' })).toHaveValue('test-value');
-		await workflow.removeCurrentTask();
 	});
 
-	await test.step('Add compound task v1', async () => {
-		await workflow.addTask(compoundTask, '0.0.1');
+	await test.step('Verify that task order is preserved', async () => {
+		await checkTasksOrder(page, nonParallelTask, parallelTask, compoundTask);
+	});
+
+	await test.step('Select compound task v1', async () => {
 		await workflow.selectTask(compoundTask);
 	});
 
@@ -226,13 +232,18 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).click();
 		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).fill('{"p2": "test"}');
 		await page.getByRole('button', { name: 'Check' }).click();
-		await page.getByText('The arguments are valid').first().waitFor();
+		await expect(page.getByText('The parallel arguments are valid')).toBeVisible();
+		await expect(page.getByText('The non parallel arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await page.getByText('No new versions available').waitFor();
-		await workflow.removeCurrentTask();
 	});
 
 	await test.step('Cleanup test tasks', async () => {
+		await workflow.removeCurrentTask();
+		await workflow.selectTask(nonParallelTask);
+		await workflow.removeCurrentTask();
+		await workflow.selectTask(parallelTask);
+		await workflow.removeCurrentTask();
 		await deleteTask(page, nonParallelTask); // 0.0.1
 		await deleteTask(page, nonParallelTask); // 0.0.2
 		await deleteTask(page, parallelTask); // 0.0.1
@@ -241,3 +252,16 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await deleteTask(page, compoundTask); // 0.0.2
 	});
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} expectedNames
+ */
+async function checkTasksOrder(page, ...expectedNames) {
+	const tasksListContainer = page.getByTestId('workflow-tasks-list');
+	const names = await tasksListContainer.getByRole('button').allInnerTexts();
+	expect(names.length).toEqual(expectedNames.length);
+	for (let i = 0; i < expectedNames.length; i++) {
+		expect(names[i]).toEqual(expectedNames[i]);
+	}
+}
