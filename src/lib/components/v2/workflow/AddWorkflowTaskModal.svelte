@@ -1,7 +1,11 @@
 <script>
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { buildWorkflowTaskTableRows, removeIdenticalTaskGroups, sortVersions } from '../tasks/task_group_utilities';
+	import {
+		buildWorkflowTaskTableRows,
+		removeIdenticalTaskGroups,
+		sortVersions
+	} from '../tasks/task_group_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
@@ -63,11 +67,9 @@
 					}
 				);
 
-				const workflowTaskResult = await workflowTaskResponse.json();
-
 				if (!workflowTaskResponse.ok) {
-					console.error('Error while creating workflow task', workflowTaskResult);
-					throw new AlertError(workflowTaskResult);
+					console.error('Error while creating workflow task');
+					throw await getAlertErrorFromResponse(workflowTaskResponse);
 				}
 
 				// Get updated workflow with created task
@@ -79,13 +81,12 @@
 					}
 				);
 
-				const workflowResult = await workflowResponse.json();
-
 				if (!workflowResponse.ok) {
-					console.error('Error while retrieving workflow', workflowResult);
-					throw new AlertError(workflowResult);
+					console.error('Error while retrieving workflow');
+					throw await getAlertErrorFromResponse(workflowResponse);
 				}
 
+				const workflowResult = await workflowResponse.json();
 				await onWorkflowTaskAdded(workflowResult);
 			},
 			() => {

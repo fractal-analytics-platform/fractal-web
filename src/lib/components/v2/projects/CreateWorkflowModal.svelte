@@ -1,5 +1,5 @@
 <script>
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import Modal from '../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
@@ -84,7 +84,6 @@
 			body: JSON.stringify(workflowMetadata)
 		});
 
-		const result = await response.json();
 		if (response.ok) {
 			// Return a workflow item
 			importSuccess = true;
@@ -94,14 +93,14 @@
 			reset();
 
 			/** @type {import('$lib/types-v2').WorkflowV2} */
-			const workflow = result;
+			const workflow = await response.json();
 
 			await tick();
 
 			handleWorkflowImported(workflow);
 		} else {
-			console.error('Import workflow failed', result);
-			throw new AlertError(result, response.status);
+			console.error('Import workflow failed');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 
@@ -127,12 +126,12 @@
 			})
 		});
 
-		const result = await response.json();
 		if (response.ok) {
+			const result = await response.json();
 			workflowName = '';
 			goto(`/v2/projects/${projectId}/workflows/${result.id}`);
 		} else {
-			throw new AlertError(result, response.status);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 </script>

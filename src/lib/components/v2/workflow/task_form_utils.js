@@ -1,4 +1,4 @@
-import { AlertError } from "$lib/common/errors";
+import { AlertError, getAlertErrorFromResponse } from "$lib/common/errors";
 
 /**
  * Updates the workflow task properties.
@@ -70,13 +70,12 @@ async function updateWorkflowTaskArguments(
 		}
 	);
 
-	const result = await response.json();
 	if (response.ok) {
-		console.log('workflow task arguments updated successfully', result);
-		return result
+		console.log('workflow task arguments updated successfully');
+		return await response.json();
 	}
 
-	throw new AlertError(result);
+	throw await getAlertErrorFromResponse(response);
 }
 
 /**
@@ -110,11 +109,10 @@ async function updateWorkflowTaskMetadata(
 		}
 	);
 
-	const result = await response.json();
 	if (response.ok) {
-		console.log('workflow task metadata updated successfully', result);
-		return result
+		console.log('workflow task metadata updated successfully');
+		return await response.json()
 	}
 
-	throw new AlertError(result);
+	throw await getAlertErrorFromResponse(response);
 }

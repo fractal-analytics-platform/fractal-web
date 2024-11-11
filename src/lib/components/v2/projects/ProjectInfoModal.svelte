@@ -1,5 +1,5 @@
 <script>
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 
 	// ProjectInfoModal component
 	import { projectInfoModalV2 } from '$lib/stores/projectStores';
@@ -30,14 +30,14 @@
 				method: 'GET',
 				credentials: 'include'
 			});
-			const result = await response.json();
 			if (response.ok) {
 				/** @type {import('$lib/types-v2.js').DatasetV2[]} */
+				const result = await response.json();
 				result.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 				datasets = result;
 			} else {
 				datasetErrorAlert = displayStandardErrorAlert(
-					new AlertError(result, response.status),
+					await getAlertErrorFromResponse(response),
 					'errorAlert-projectInfoModal'
 				);
 			}

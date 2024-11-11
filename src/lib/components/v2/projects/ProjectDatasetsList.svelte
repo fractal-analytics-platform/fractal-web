@@ -1,6 +1,6 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
@@ -40,9 +40,8 @@
 				return d.id !== datasetId;
 			});
 		} else {
-			const result = await response.json();
-			console.error('Error while deleting dataset:', result);
-			throw new AlertError(result);
+			console.error('Error while deleting dataset');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 

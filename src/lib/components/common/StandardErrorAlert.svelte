@@ -1,5 +1,5 @@
 <script>
-	import { AlertError } from '$lib/common/errors';
+	import { AlertError, extractErrorDetail } from '$lib/common/errors';
 
 	export let error = undefined;
 
@@ -13,14 +13,15 @@
 	function updateErrorMessage() {
 		if (error instanceof AlertError) {
 			const simpleMessage = error.getSimpleValidationMessage();
+			const errorDetail = extractErrorDetail(error.reason);
 			if (simpleMessage) {
 				errorString = simpleMessage;
 				formatAsPre = false;
 			} else if (typeof error.reason === 'string') {
 				errorString = error.reason;
 				formatAsPre = false;
-			} else if ('detail' in error.reason && typeof error.reason.detail === 'string') {
-				errorString = error.reason.detail;
+			} else if (typeof errorDetail === 'string') {
+				errorString = errorDetail;
 				formatAsPre = false;
 			} else {
 				errorString = JSON.stringify(error.reason, undefined, 2);
@@ -29,8 +30,8 @@
 		} else if (error instanceof Error) {
 			errorString = error.message;
 			formatAsPre = false;
-		} else if (typeof error === 'object' && 'detail' in error && typeof error.detail === 'string') {
-			errorString = error.detail;
+		} else if (typeof error === 'object' && typeof extractErrorDetail(error) === 'string') {
+			errorString = extractErrorDetail(error);
 			formatAsPre = false;
 		} else {
 			errorString = JSON.stringify(error, undefined, 2);

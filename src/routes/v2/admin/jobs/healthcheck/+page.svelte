@@ -1,12 +1,12 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 
 	let inProgress = false;
 	let stepMessage = '';
 	let error = undefined;
-	
+
 	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
 
 	async function startTest() {
@@ -46,10 +46,10 @@
 			})
 		});
 
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
+		const result = await response.json();
 		return result.id;
 	}
 
@@ -70,10 +70,10 @@
 			})
 		});
 
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
+		const result = await response.json();
 		return result.id;
 	}
 
@@ -90,10 +90,10 @@
 			body: JSON.stringify({ name: 'test' })
 		});
 
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
+		const result = await response.json();
 		return result.id;
 	}
 
@@ -119,10 +119,10 @@
 			})
 		});
 
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
+		const result = await response.json();
 		return result.id;
 	}
 
@@ -131,10 +131,10 @@
 			method: 'GET',
 			credentials: 'include'
 		});
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
+		const result = await response.json();
 		const tasks = result.filter((t) => t.name === '__TEST_ECHO_TASK__');
 		return tasks.length > 0 ? tasks[0].id : undefined;
 	}
@@ -156,9 +156,8 @@
 				body: JSON.stringify({})
 			}
 		);
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 
@@ -179,9 +178,8 @@
 				body: JSON.stringify({ first_task_index: 0 })
 			}
 		);
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 </script>

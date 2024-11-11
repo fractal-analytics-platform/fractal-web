@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
+	import { displayStandardErrorAlert, FormErrorHandler, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from '$lib/components/v2/admin/UserSettingsEditor.svelte';
@@ -69,13 +69,12 @@
 			})
 		});
 
-		const result = await response.json();
 		if (response.ok) {
-			group = result;
+			group = await response.json();
 		} else {
 			// restore the old situation putting the user back to the available users list
 			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'editGroupError'
 			);
 			group = { ...group, user_ids: previousUserIs };

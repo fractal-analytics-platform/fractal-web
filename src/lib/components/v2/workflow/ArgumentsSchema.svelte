@@ -1,6 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import {
+		AlertError,
+		displayStandardErrorAlert,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import {
 		JSchema,
@@ -171,14 +175,14 @@
 			}
 		);
 
-		const result = await response.json();
 		if (response.ok) {
 			unsavedChangesParallel = false;
 			unsavedChangesNonParallel = false;
+			const result = await response.json();
 			onWorkflowTaskUpdated(result);
 		} else {
 			displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'task-args-validation-errors'
 			);
 		}

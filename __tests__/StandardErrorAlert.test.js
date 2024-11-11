@@ -21,6 +21,15 @@ describe('StandardErrorAlert', () => {
 		expect(result.container.textContent).not.toContain('There has been an error');
 	});
 
+	it('AlertError with array detail', async () => {
+		const result = render(StandardErrorAlert, {
+			error: new AlertError({ detail: ['error message'] })
+		});
+		expect(result.container.textContent).toContain('error message');
+		expect(result.container.textContent).not.toContain('detail');
+		expect(result.container.textContent).not.toContain('There has been an error');
+	});
+
 	it('AlertError with object detail and __root__ loc', async () => {
 		const result = render(StandardErrorAlert, {
 			error: new AlertError(

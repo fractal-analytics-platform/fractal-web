@@ -59,6 +59,29 @@ export class AlertError extends Error {
 }
 
 /**
+ * @param {any} errorResponse
+ * @returns {string | object | null}
+ */
+export function extractErrorDetail(errorResponse) {
+	if (typeof errorResponse !== 'object') {
+		return null;
+	}
+	if (!('detail' in errorResponse)) {
+		return null;
+	}
+	if (typeof errorResponse.detail === 'string') {
+		return errorResponse.detail;
+	}
+	if (!Array.isArray(errorResponse.detail)) {
+		return null;
+	}
+	if (errorResponse.detail.length !== 1) {
+		return null;
+	}
+	return errorResponse.detail[0];
+}
+
+/**
  * Detects if the error message is a simple validation message for one field.
  *
  * @param {any} reason
@@ -69,14 +92,8 @@ function getSimpleValidationMessage(reason, statusCode) {
 	if (!isValidationError(reason, statusCode)) {
 		return null;
 	}
-	if (typeof reason.detail === 'string') {
-		return reason.detail;
-	}
-	if (reason.detail.length !== 1) {
-		return null;
-	}
-	const err = reason.detail[0];
-	if (typeof err === 'string') {
+	const err = extractErrorDetail(reason);
+	if (err === null || typeof err === 'string') {
 		return err;
 	}
 	if (!hasValidationErrorPayload(err)) {

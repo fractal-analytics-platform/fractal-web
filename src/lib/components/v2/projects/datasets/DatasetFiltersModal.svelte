@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
@@ -46,11 +46,11 @@
 						}
 					})
 				});
-				const result = await response.json();
 				if (!response.ok) {
-					console.log('Dataset update failed', result);
-					throw new AlertError(result);
+					console.log('Dataset update failed');
+					throw await getAlertErrorFromResponse(response);
 				}
+				const result = await response.json();
 				updateDatasetCallback(result);
 			},
 			function () {

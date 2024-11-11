@@ -4,7 +4,7 @@
 	import WorkflowsList from '$lib/components/v2/projects/WorkflowsList.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	// Component properties
 	let project = $page.data.project;
@@ -40,14 +40,14 @@
 					})
 				});
 
-				const result = await response.json();
 				if (response.ok) {
 					console.log('Project updated successfully');
 					projectUpdatesSuccessMessage = 'Project properties successfully updated';
+					const result = await response.json();
 					project.name = result.name;
 				} else {
-					console.error('Error while updating project', result);
-					throw new AlertError(result);
+					console.error('Error while updating project');
+					throw await getAlertErrorFromResponse(response);
 				}
 			},
 			() => {

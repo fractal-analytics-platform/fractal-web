@@ -1,7 +1,7 @@
 <script>
 	import { projectInfoModalV2 } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError, getFieldValidationError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
 	import { goto } from '$app/navigation';
 	import Modal from '../../common/Modal.svelte';
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
@@ -93,9 +93,8 @@
 			projects = projects.filter((p) => p.id !== projectId);
 			deleteDatasetSelectionsForProject(projectId);
 		} else {
-			const result = await response.json();
 			console.error(`Unable to delete project ${projectId}`);
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 </script>

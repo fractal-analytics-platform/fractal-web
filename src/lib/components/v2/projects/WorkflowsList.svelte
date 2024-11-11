@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
@@ -38,9 +38,8 @@
 			workflows = workflows.filter((w) => w.id !== workflowId);
 			saveSelectedDataset(deletedWorkflow, undefined);
 		} else {
-			const result = await response.json();
-			console.error('Workflow not deleted', result);
-			throw new AlertError(result);
+			console.error('Workflow not deleted');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 

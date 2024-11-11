@@ -84,8 +84,7 @@ throw new AlertError('Invalid JSON schema');
 Most of the time it is used to handle an unsuccessful API response; the status code is used to check if it is a validation error (status is equals to 422) and it automatically extracts the message from the detail:
 
 ```javascript
-const result = await response.json();
-throw new AlertError(result, response.status);
+throw await getAlertErrorFromResponse(response);
 ```
 
 ### The standard error alert

@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { AlertError, getFieldValidationError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 
@@ -67,9 +67,8 @@
 		if (response.ok) {
 			groups = groups.filter((g) => g.id !== groupId);
 		} else {
-			const result = await response.json();
-			console.error('Error while deleting group', result);
-			throw new AlertError(result);
+			console.error('Error while deleting group');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 </script>

@@ -2,7 +2,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 	import { buildTaskTableRows, sortVersions } from './task_group_utilities';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import TaskInfoModal from './TaskInfoModal.svelte';
 	import TaskEditModal from './TaskEditModal.svelte';
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
@@ -85,9 +85,8 @@
 			console.log('Task group deleted successfully');
 			updateTaskGroups(taskGroups.filter((g) => g.id !== groupId));
 		} else {
-			const result = await response.json();
-			console.error('Error deleting the task group', result);
-			throw new AlertError(result);
+			console.error('Error deleting the task group');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 

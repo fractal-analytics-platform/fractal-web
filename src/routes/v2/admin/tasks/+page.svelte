@@ -1,5 +1,5 @@
 <script>
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { PropertyDescription } from 'fractal-jschema';
 
@@ -41,16 +41,15 @@
 				url.searchParams.append('max_number_of_results', max_number_of_results);
 			}
 			const response = await fetch(url);
-			const result = await response.json();
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
-					new AlertError(result, response.status),
+					await getAlertErrorFromResponse(response),
 					'searchError'
 				);
 				return;
 			}
 			searched = true;
-			results = result;
+			results = await response.json();
 		} finally {
 			searching = false;
 		}
