@@ -15,6 +15,25 @@ export async function responseError(response) {
 }
 
 /**
+ * @param {Response} response
+ */
+async function parseErrorResponse(response) {
+	try {
+		return await response.json();
+	} catch {
+		return `Invalid JSON response. Response status is ${response.status}.`;
+	}
+}
+
+/**
+ * @param {Response} response
+ */
+export async function getAlertErrorFromResponse(response) {
+	const result = await parseErrorResponse(response);
+	return new AlertError(result, response.status);
+}
+
+/**
  * Class that can be used by front-end to propagate an error from a component to another.
  * Used for example to handle the displaying of the error alert when using the ConfirmActionButton.
  */
@@ -237,12 +256,7 @@ export class FormErrorHandler {
 	 * @param {Response} response
 	 */
 	async handleErrorResponse(response) {
-		let result;
-		try {
-			result = await response.json();
-		} catch {
-			result = `Invalid JSON response. Response status is ${response.status}.`;
-		}
+		const result = await parseErrorResponse(response);
 		const errorsMap = getValidationMessagesMap(result, response.status);
 		if (errorsMap && this.validateErrorMapKeys(errorsMap)) {
 			this.validationErrors.set(errorsMap);

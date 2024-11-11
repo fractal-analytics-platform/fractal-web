@@ -28,11 +28,17 @@ describe('TaskCollection', () => {
 	it('Add single task associated with specific group', async () => {
 		const user = userEvent.setup();
 
-		fetch.mockResolvedValue({
-			ok: true,
-			status: 200,
-			json: async () => ({ data: {} })
-		});
+		fetch
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				json: async () => []
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				json: async () => ({ id: 1, status: 'ongoing' })
+			});
 
 		render(TaskCollection, {
 			props: {
@@ -56,11 +62,17 @@ describe('TaskCollection', () => {
 	it('Add private task', async () => {
 		const user = userEvent.setup();
 
-		fetch.mockResolvedValue({
-			ok: true,
-			status: 200,
-			json: async () => ({ data: {} })
-		});
+		fetch
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				json: async () => []
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				json: async () => ({ id: 1, status: 'ongoing' })
+			});
 
 		render(TaskCollection, {
 			props: {

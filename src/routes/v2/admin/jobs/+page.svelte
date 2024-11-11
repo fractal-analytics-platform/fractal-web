@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { downloadBlob } from '$lib/common/component_utilities';
+	import { downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -119,21 +119,6 @@
 		} finally {
 			searching = false;
 		}
-	}
-
-	/**
-	 * @param {string|undefined} date
-	 * @param {string|undefined} time
-	 * @returns {string|undefined}
-	 */
-	function getTimestamp(date, time) {
-		if (date === undefined || date === '') {
-			return undefined;
-		}
-		if (time === undefined || time === '') {
-			return new Date(`${date}T00:00:00`).toISOString();
-		}
-		return new Date(`${date}T${time}:00`).toISOString();
 	}
 
 	function resetSearchFields() {

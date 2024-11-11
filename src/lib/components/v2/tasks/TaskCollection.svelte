@@ -1,34 +1,20 @@
 <script>
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount } from 'svelte';
-	import TaskCollectionLogsModal from '$lib/components/v2/tasks/TaskCollectionLogsModal.svelte';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import TaskGroupActivityLogsModal from '$lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError, FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '$lib/common/errors';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
+	import {
+		getTaskActivityStatusBadgeClass,
+		getTaskGroupActivitiesToUpdate
+	} from './task_group_utilities';
 
-	const LOCAL_STORAGE_TASK_COLLECTIONS = 'TaskCollectionsV2';
+	// This component automatically fecthes updates for task collections activities
+	// in pending and ongoing status
 
-	// This component, when receives a collectTaskAction successful result
-	// should store in local storage the collection request id
-	// successive reloads of the list of collection requests shall update
-	// the status of collections
-	// List of collection status:
-	// -  installing
-	// -  collecting
-	// -  fail
-	// -  ok
-	// If a collection status is ok, the component shall remove the collection
-	// request from the localStorage
-	// If a collection status is fail, the component shall request the logs
-	// If a collection status is collecting, the component shall fetch update
-	// If a collection status is installing, the component shall fetch update
-
-	// Component properties
-	/** @type {import('$lib/types-v2').TasksCollections[]} */
-	let taskCollections = [];
-	/** @type {import('$lib/types-v2').TasksCollectionsStateData|undefined} */
-	let taskCollectionAlreadyPresent = undefined;
+	/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
+	let recentActivities = [];
 
 	/** @type {'pypi'|'local'} */
 	export let packageType = 'pypi';
@@ -45,8 +31,8 @@
 	let pinnedPackageVersions = [];
 	let privateTask = false;
 	let selectedGroup = null;
-	/** @type {TaskCollectionLogsModal} */
-	let taskCollectionLogsModal;
+	/** @type {TaskGroupActivityLogsModal} */
+	let taskGroupActivitiesLogsModal;
 	/** @type {number|null} */
 	let openedTaskCollectionLogId = null;
 
@@ -75,13 +61,30 @@
 
 	// On component load set the taskCollections from the local storage
 	onMount(async () => {
-		taskCollections = loadTaskCollectionsFromStorage();
-		await updateTaskCollectionsState();
+		recentActivities = await loadRecentTaskCollections();
 		updateTasksCollectionTimeout = setTimeout(
 			updateTasksCollectionInBackground,
 			updateTasksCollectionInterval
 		);
 	});
+
+	async function loadRecentTaskCollections() {
+		const date = new Date();
+		date.setTime(date.getTime() - 24 * 3600 * 1000); // yesterday
+		const response = await fetch(
+			`/api/v2/task-group/activity?timestamp_started_min=${date.toISOString()}`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
+		const result = await response.json();
+		if (response.ok) {
+			return result;
+		}
+		console.error('Unable to load recent task collections', result);
+		return [];
+	}
 
 	let taskCollectionInProgress = false;
 
@@ -91,7 +94,6 @@
 	 */
 	async function handleTaskCollection() {
 		formErrorHandler.clearErrors();
-		taskCollectionAlreadyPresent = undefined;
 
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/json');
@@ -126,21 +128,10 @@
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('$lib/types-v2').TasksCollectionsState} */ (
+			const result = /** @type {import('$lib/types-v2').TaskGroupActivityV2} */ (
 				await response.json()
 			);
-			if (response.status === 200) {
-				console.log('Task collection already exists');
-				taskCollectionAlreadyPresent = result.data;
-				taskCollectionAlreadyPresent.package = python_package;
-				setTimeout(() => {
-					taskCollectionAlreadyPresent = undefined;
-				}, 5500);
-			} else {
-				console.log('Task collection created', result);
-				// Add task collection to local storage
-				storeCreatedTaskCollection(result);
-			}
+			recentActivities = [...recentActivities, result];
 			python_package = '';
 			package_version = '';
 			python_version = '';
@@ -170,148 +161,27 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksCollectionsState} taskCollection
+	 * @param {import('$lib/types-v2').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
-	function storeCreatedTaskCollection(taskCollection) {
-		taskCollections.push({
-			id: taskCollection.id,
-			status: taskCollection.data.status,
-			pkg: taskCollection.data.package,
-			package_version: taskCollection.data.version,
-			timestamp: taskCollection.timestamp
+	async function updateTaskCollectionsState(activitiesToUpdate) {
+		recentActivities = recentActivities.map((a) => {
+			const updatedActivity = activitiesToUpdate.find((u) => u.id === a.id);
+			return updatedActivity ?? a;
 		});
-		updateTaskCollections(taskCollections);
-	}
-
-	/**
-	 * Fetches a task collection from the server
-	 * @param {number} taskCollectionId
-	 * @returns {Promise<import('$lib/types-v2').TasksCollectionsState|undefined>}
-	 */
-	async function getTaskCollection(taskCollectionId) {
-		const response = await fetch(`/api/v2/task/collect/${taskCollectionId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-
-		const result = await response.json();
-		if (response.ok) {
-			console.log('Retrieved collection status', result);
-			return result;
-		} else {
-			if (response.status === 404) {
-				console.log(
-					`Missing task collection ${taskCollectionId} will be deleted from local storage`
-				);
-				return undefined;
-			} else {
-				console.error('Failed to fetch task collection status', result);
-				throw new AlertError(result);
-			}
+		const openedTaskCollectionLogToUpdate = activitiesToUpdate.find(
+			(u) => u.id === openedTaskCollectionLogId
+		)?.log;
+		if (openedTaskCollectionLogToUpdate) {
+			await taskGroupActivitiesLogsModal.updateLog(openedTaskCollectionLogToUpdate);
 		}
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksCollections[]|null} collectionsToUpdate
+	 * @param {number} taskGroupActivityId
 	 */
-	async function updateTaskCollectionsState(collectionsToUpdate = null) {
-		const collections = collectionsToUpdate ?? taskCollections;
-		const updates = await Promise.allSettled(collections.map((tc) => getTaskCollection(tc.id)));
-
-		const failure = /** @type {PromiseRejectedResult|undefined} */ (
-			updates.find((u) => u.status === 'rejected')
-		);
-		if (failure) {
-			formErrorHandler.setGenericError(failure.reason);
-		}
-
-		const successfulUpdates =
-			/** @type {PromiseFulfilledResult<import('$lib/types-v2').TasksCollectionsState|undefined>[]} */ (
-				updates.filter((u) => u.status === 'fulfilled')
-			).map((u) => u.value);
-
-		const updatedTaskCollections = [];
-
-		for (const oldTaskCollection of taskCollections) {
-			const updatedTaskCollection = successfulUpdates.find(
-				(u) => u !== undefined && u.id === oldTaskCollection.id
-			);
-			if (!updatedTaskCollection) {
-				updatedTaskCollections.push(oldTaskCollection);
-				continue;
-			}
-			oldTaskCollection.status = updatedTaskCollection.data.status;
-			oldTaskCollection.log = updatedTaskCollection.data.log;
-			if (
-				updatedTaskCollection.id === openedTaskCollectionLogId &&
-				updatedTaskCollection.data.log
-			) {
-				await taskCollectionLogsModal.updateLog(updatedTaskCollection.data.log);
-			}
-			updatedTaskCollections.push(oldTaskCollection);
-		}
-
-		// Update task collections list
-		updateTaskCollections(updatedTaskCollections);
-	}
-
-	/**
-	 * @returns {import('$lib/types-v2').TasksCollections[]}
-	 */
-	function loadTaskCollectionsFromStorage() {
-		// Parse local storage task collections value
-		const storageContent = window.localStorage.getItem(LOCAL_STORAGE_TASK_COLLECTIONS);
-		if (storageContent) {
-			return JSON.parse(storageContent) || [];
-		}
-		return [];
-	}
-
-	/**
-	 * @param {import('$lib/types-v2').TasksCollections[]} updatedCollectionTasks
-	 */
-	function updateTaskCollections(updatedCollectionTasks) {
-		window.localStorage.setItem(
-			LOCAL_STORAGE_TASK_COLLECTIONS,
-			JSON.stringify(updatedCollectionTasks)
-		);
-		taskCollections = updatedCollectionTasks;
-	}
-
-	async function clearTaskCollections() {
-		updateTaskCollections([]);
-	}
-
-	/**
-	 * @param {number} taskCollectionId
-	 */
-	function removeTaskCollection(taskCollectionId) {
-		updateTaskCollections(taskCollections.filter((tc) => tc.id != taskCollectionId));
-	}
-
-	/**
-	 * @param {import('$lib/types').TaskCollectStatus} status
-	 */
-	function statusBadge(status) {
-		switch (status.toLowerCase()) {
-			case 'pending':
-				return 'text-bg-light';
-			case 'installing':
-			case 'collecting':
-				return 'text-bg-primary';
-			case 'fail':
-				return 'text-bg-danger';
-			case 'ok':
-				return 'text-bg-success';
-		}
-	}
-
-	/**
-	 * @param {number} taskCollectionId
-	 */
-	async function openTaskCollectionLogsModal(taskCollectionId) {
-		openedTaskCollectionLogId = taskCollectionId;
-		await taskCollectionLogsModal.open(taskCollectionId);
+	async function openTaskGroupActivityLogsModal(taskGroupActivityId) {
+		openedTaskCollectionLogId = taskGroupActivityId;
+		await taskGroupActivitiesLogsModal.open(taskGroupActivityId);
 	}
 
 	function addPackageVersion() {
@@ -326,14 +196,11 @@
 	}
 
 	async function updateTasksCollectionInBackground() {
-		const collectionsToCheck = taskCollections.filter(
-			(t) => t.status !== 'OK' && t.status !== 'fail'
-		);
-		if (collectionsToCheck.length > 0) {
-			const collectionsToCheckIds = collectionsToCheck.map((c) => c.id);
-			await updateTaskCollectionsState(collectionsToCheck);
-			const newOkTasks = taskCollections.filter(
-				(t) => collectionsToCheckIds.includes(t.id) && t.status === 'OK'
+		const activitiesToUpdate = await getTaskGroupActivitiesToUpdate(recentActivities, false);
+		if (activitiesToUpdate.length > 0) {
+			await updateTaskCollectionsState(activitiesToUpdate);
+			const newOkTasks = recentActivities.filter(
+				(a) => activitiesToUpdate.map((u) => u.id).includes(a.id) && a.status === 'OK'
 			).length;
 			if (newOkTasks > 0) {
 				await reloadTaskGroupsList();
@@ -351,15 +218,9 @@
 	});
 </script>
 
-<TaskCollectionLogsModal bind:this={taskCollectionLogsModal} />
+<TaskGroupActivityLogsModal bind:this={taskGroupActivitiesLogsModal} admin={false} />
 
 <div>
-	{#if taskCollectionAlreadyPresent}
-		<div id="task-collection-already-present" class="alert alert-success">
-			<div>{taskCollectionAlreadyPresent.package}</div>
-			<div class="mt-2 fw-bold">{taskCollectionAlreadyPresent.info}</div>
-		</div>
-	{/if}
 	<form on:submit|preventDefault={handleTaskCollection}>
 		<div class="row">
 			<div
@@ -523,52 +384,58 @@
 			</div>
 		</div>
 	</form>
-	{#if taskCollections.length > 0}
+	{#if recentActivities.length > 0}
+		<a href="/v2/tasks/activities" class="btn btn-light float-end">
+			<i class="bi bi-info-circle" />
+			Show all activities
+		</a>
+	{/if}
+	<h4 class="fw-light mt-3">Task collections</h4>
+	{#if recentActivities.length === 0}
+		<p class="mb-5">
+			No recent activities
+			<a href="/v2/tasks/activities" class="btn btn-light ms-3">
+				<i class="bi bi-info-circle" />
+				Show all activities
+			</a>
+		</p>
+	{:else}
 		<div class="mb-5">
-			<table class="table table-hover caption-top align-middle">
-				<caption class="text-bg-light border-top border-bottom pe-3 ps-3">
-					<div class="d-flex align-items-center justify-content-between">
-						<span class="fw-normal">Task collections</span>
-						<div>
-							<ConfirmActionButton
-								modalId="confirmClearTaskCollections"
-								btnStyle="outline-secondary"
-								buttonIcon="trash"
-								label="Clear"
-								message="Clear task collections requests"
-								callbackAction={clearTaskCollections}
-							/>
-						</div>
-					</div>
-				</caption>
+			<table class="table table-hover align-middle">
 				<thead>
 					<tr>
-						<th>Timestamp</th>
 						<th>Package</th>
 						<th>Version</th>
 						<th>Status</th>
+						<th>Started</th>
+						<th>Ended</th>
 						<th>Options</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each taskCollections as { timestamp, status, package_version, pkg, id, log }}
+					{#each recentActivities as taskGroupActivity}
 						<tr>
-							<td class="col-2">{new Date(timestamp).toLocaleString()}</td>
-							<td>{pkg}</td>
-							<td class="col-1">
-								<code>{package_version ? package_version : 'Unspecified'}</code>
+							<td>{taskGroupActivity.pkg_name}</td>
+							<td>
+								<code>{taskGroupActivity.version || 'Unspecified'}</code>
 							</td>
-							<td class="col-1"><span class="badge {statusBadge(status)}">{status}</span></td>
-							<td class="col-2">
-								<ConfirmActionButton
-									modalId="removeTaskCollectionModal{id}"
-									btnStyle="warning"
-									buttonIcon="trash"
-									message="Remove a task collection log"
-									callbackAction={async () => removeTaskCollection(id)}
-								/>
-								{#if status !== 'pending' && log}
-									<button class="btn btn-info" on:click={() => openTaskCollectionLogsModal(id)}>
+							<td>
+								<span class="badge {getTaskActivityStatusBadgeClass(taskGroupActivity.status)}">
+									{taskGroupActivity.status}
+								</span>
+							</td>
+							<td>{new Date(taskGroupActivity.timestamp_started).toLocaleString()}</td>
+							<td>
+								{taskGroupActivity.timestamp_ended
+									? new Date(taskGroupActivity.timestamp_ended).toLocaleString()
+									: '-'}
+							</td>
+							<td>
+								{#if taskGroupActivity.status !== 'pending' && taskGroupActivity.log}
+									<button
+										class="btn btn-info"
+										on:click={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
+									>
 										<i class="bi bi-info-circle" />
 									</button>
 								{/if}

@@ -53,51 +53,20 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 			(expectedCount) => document.querySelectorAll('table').length === expectedCount,
 			2
 		);
-		await expect(page.locator('table tbody tr:first-child td:nth-child(2)').first()).toContainText(
-			'fractal-tasks-mock'
-		);
-		expect(await getStatus(page)).toMatch(/^(pending|installing)$/);
+		await expect(page.getByRole('row', { name: /pending|ongoing/ })).toBeVisible();
 	});
 
 	await test.step('Wait tasks collection', async () => {
-		await page.waitForFunction(
-			() =>
-				document.querySelector('table tbody tr:first-child td:nth-child(4)')?.textContent === 'OK'
-		);
+		await expect(page.getByRole('row', { name: /pending|ongoing/ })).not.toBeVisible({
+			timeout: 30000
+		});
 	});
 
 	await test.step('Check tasks list', async () => {
 		await expect(page.getByRole('row', { name: 'fractal-tasks-mock' }).first()).toBeVisible();
 	});
 
-	await test.step('Delete task collection log', async () => {
-		const deleteCollectionLogBtn = page.locator(
-			'table tr:first-child td:nth-child(5) button.btn-warning'
-		);
-		await deleteCollectionLogBtn.click();
-
-		// Confirm action modal
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Confirm action');
-		await expect(page.locator('.modal.show .modal-body')).toContainText(
-			'Remove a task collection log'
-		);
-
-		// Confirm the deletion
-		await page.getByRole('button', { name: 'Confirm' }).click();
-	});
-
 	await test.step('Cleanup temporary wheel file', async () => {
 		fs.rmSync(tasksMockWheelFile);
 	});
 });
-
-/**
- * @param {import('@playwright/test').Page} page
- * @return {Promise<string>}
- */
-async function getStatus(page) {
-	const statusCell = page.locator('table tbody tr:first-child td:nth-child(4)').first();
-	return await statusCell.innerText();
-}
