@@ -46,11 +46,11 @@ describe('TaskGroupActivities', () => {
 		});
 
 		const row = await screen.findByRole('row', { name: /fractal-tasks-core/ });
-		expect(within(row).getAllByRole('cell')[2]).toHaveTextContent('ongoing');
+		expect(within(row).getAllByRole('cell')[3]).toHaveTextContent('ongoing');
 
 		await waitFor(() => {
 			const row = screen.getByRole('row', { name: /fractal-tasks-core/ });
-			expect(within(row).getAllByRole('cell')[2]).toHaveTextContent('OK');
+			expect(within(row).getAllByRole('cell')[3]).toHaveTextContent('OK');
 		});
 	});
 
@@ -75,11 +75,11 @@ describe('TaskGroupActivities', () => {
 		await user.click(screen.getByRole('button', { name: /Search activities/ }));
 
 		const row = await screen.findByRole('row', { name: /fractal-tasks-core/ });
-		expect(within(row).getAllByRole('cell')[2]).toHaveTextContent('ongoing');
+		expect(within(row).getAllByRole('cell')[3]).toHaveTextContent('ongoing');
 
 		await waitFor(() => {
 			const row = screen.getByRole('row', { name: /fractal-tasks-core/ });
-			expect(within(row).getAllByRole('cell')[2]).toHaveTextContent('OK');
+			expect(within(row).getAllByRole('cell')[3]).toHaveTextContent('OK');
 		});
 	});
 
