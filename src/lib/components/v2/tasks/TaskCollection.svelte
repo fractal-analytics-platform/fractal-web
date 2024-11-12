@@ -72,7 +72,7 @@
 		const date = new Date();
 		date.setTime(date.getTime() - 24 * 3600 * 1000); // yesterday
 		const response = await fetch(
-			`/api/v2/task-group/activity?timestamp_started_min=${date.toISOString()}`,
+			`/api/v2/task-group/activity?timestamp_started_min=${date.toISOString()}&action=collect`,
 			{
 				method: 'GET',
 				credentials: 'include'

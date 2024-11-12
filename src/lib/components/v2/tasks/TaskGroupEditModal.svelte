@@ -16,19 +16,13 @@
 
 	/** @type {import('$lib/types-v2').TaskGroupV2|undefined} */
 	let taskGroup = undefined;
-	let active = true;
-	let originalActive = true;
 
 	let privateTask = false;
 	let selectedGroup = null;
 
 	let saving = false;
-	let askConfirm = false;
 
-	const formErrorHandler = new FormErrorHandler('taskGroupUpdateError', [
-		'user_group_id',
-		'active'
-	]);
+	const formErrorHandler = new FormErrorHandler('taskGroupUpdateError', ['user_group_id']);
 
 	const validationErrors = formErrorHandler.getValidationErrorStore();
 
@@ -39,29 +33,17 @@
 		taskGroup = taskGroupToEdit;
 		privateTask = taskGroupToEdit.user_group_id === null;
 		selectedGroup = taskGroupToEdit.user_group_id;
-		active = taskGroupToEdit.active;
-		originalActive = taskGroupToEdit.active;
-		askConfirm = false;
 		formErrorHandler.clearErrors();
 		modal.show();
 	}
 
 	async function handleUpdate() {
-		if (!active && originalActive) {
-			askConfirm = true;
-			return;
-		}
-		await handleEditTaskGroup();
-	}
-
-	async function handleEditTaskGroup() {
 		modal.confirmAndHide(
 			async () => {
 				saving = true;
 
 				const taskGroupProperties = nullifyEmptyStrings({
-					user_group_id: privateTask ? null : selectedGroup,
-					active
+					user_group_id: privateTask ? null : selectedGroup
 				});
 
 				const headers = new Headers();
@@ -97,13 +79,7 @@
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		{#if askConfirm}
-			<div class="alert alert-warning">
-				<i class="bi bi-exclamation-triangle" />
-				Warning: after a task-group is marked as non-active, jobs that include its tasks cannot be submitted
-				any more. Do you want to proceed?
-			</div>
-		{:else if taskGroup}
+		{#if taskGroup}
 			<div class="mb-2 row">
 				<div class="col">
 					{#key taskGroup}
@@ -118,39 +94,16 @@
 					<span class="invalid-feedback">{$validationErrors['user_group_id']}</span>
 				</div>
 			</div>
-			<div class="mb-2 row">
-				<div class="col">
-					<div class="form-check">
-						<input
-							class="form-check-input"
-							type="checkbox"
-							id="edit-task-active"
-							bind:checked={active}
-						/>
-						<label class="form-check-label" for="edit-task-active"> Active </label>
-					</div>
-					<span class="invalid-feedback">{$validationErrors['active']}</span>
-				</div>
-			</div>
 			<span id="taskGroupUpdateError" />
 		{/if}
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
-		{#if askConfirm}
-			<button class="btn btn-primary" on:click={handleEditTaskGroup} disabled={saving}>
-				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Confirm
-			</button>
-		{:else}
-			<button class="btn btn-primary" on:click={handleUpdate} disabled={saving}>
-				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Update
-			</button>
-		{/if}
+		<button class="btn btn-primary" on:click={handleUpdate} disabled={saving}>
+			{#if saving}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			{/if}
+			Update
+		</button>
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	</svelte:fragment>
 </Modal>

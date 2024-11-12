@@ -255,6 +255,7 @@
 			<tr>
 				<th>Package</th>
 				<th>Version</th>
+				<th>Action</th>
 				<th>Status</th>
 				<th>Started</th>
 				<th>Ended</th>
@@ -266,7 +267,10 @@
 				<tr>
 					<td>{taskGroupActivity.pkg_name}</td>
 					<td>
-						<code>{taskGroupActivity.version || 'Unspecified'}</code>
+						{taskGroupActivity.version || '-'}
+					</td>
+					<td>
+						{taskGroupActivity.action}
 					</td>
 					<td>
 						<span class="badge {getTaskActivityStatusBadgeClass(taskGroupActivity.status)}">

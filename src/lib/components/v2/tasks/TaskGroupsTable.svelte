@@ -8,6 +8,7 @@
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/** @type {import('$lib/types').User} */
 	export let user;
@@ -26,6 +27,8 @@
 	let taskGroupInfoModal;
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
 	let taskGroupEditModal;
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
+	let taskGroupManageModal;
 	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default} */
 	let taskInfoModal;
 	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default} */
@@ -128,7 +131,7 @@
 		<col width="100" />
 		<col width="120" />
 		<col width="100" />
-		<col width="350" />
+		<col width="400" />
 	</colgroup>
 	<thead class="table-light">
 		<tr>
@@ -199,6 +202,16 @@
 						<i class="bi bi-pencil" />
 						Edit
 					</button>
+					{#if taskGroupRow.groups[taskGroupRow.selectedVersion].origin === 'other'}
+						<button
+							class="btn btn-info"
+							on:click={() =>
+								taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+						>
+							<i class="bi bi-gear" />
+							Manage
+						</button>
+					{/if}
 					<ConfirmActionButton
 						modalId="confirmTaskGroupDeleteModal{taskGroupRow.groupTitle}"
 						style={'danger'}
@@ -257,6 +270,7 @@
 	{updateEditedTaskGroup}
 	groupIdsNames={user.group_ids_names || []}
 />
+<TaskGroupManageModal bind:this={taskGroupManageModal} />
 <TaskInfoModal bind:this={taskInfoModal} />
 <TaskEditModal bind:this={taskEditModal} {updateEditedTask} />
 
