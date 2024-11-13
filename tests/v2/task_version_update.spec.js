@@ -6,6 +6,8 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
+	test.slow();
+
 	let nonParallelTask;
 	let parallelTask;
 	let compoundTask;
@@ -123,7 +125,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	await test.step('Fill optional argument p2', async () => {
 		await page.getByRole('textbox', { name: 'p2' }).fill('foo');
 		await page.getByRole('button', { name: 'Save changes' }).click();
-		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Add Input Filters', async () => {
@@ -134,7 +136,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
 		await page.getByPlaceholder('Key').nth(1).fill('key2');
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.getByText('Input filters successfully updated').waitFor();
+		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
 	});
 
 	await test.step('Update non parallel task to v2', async () => {
@@ -142,15 +144,17 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await page.getByText('Following errors must be fixed before performing the update').waitFor();
+		await expect(
+			page.getByText('Following errors must be fixed before performing the update')
+		).toBeVisible();
 		await expect(page.locator('.alert-danger li')).toHaveCount(1);
 		await page
 			.getByRole('textbox', { name: 'Fix the non parallel arguments:' })
 			.fill('{"p1": "test"}');
 		await page.getByRole('button', { name: 'Check' }).click();
-		await page.getByText('The arguments are valid').waitFor();
+		await expect(page.getByText('The arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
-		await page.getByText('No new versions available').waitFor();
+		await expect(page.getByText('No new versions available')).toBeVisible();
 	});
 
 	await test.step('Verify that input filters have been preserved', async () => {
@@ -173,10 +177,12 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await page.getByText('Following errors must be fixed before performing the update').waitFor();
+		await expect(
+			page.getByText('Following errors must be fixed before performing the update')
+		).toBeVisible();
 		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).fill('{"p2": "test"}');
 		await page.getByRole('button', { name: 'Check' }).click();
-		await page.getByText('The arguments are valid').waitFor();
+		await expect(page.getByText('The arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(
 			page.getByRole('combobox', { name: /New versions of this task exist/ }).getByRole('option')
@@ -194,15 +200,15 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await page.getByRole('textbox', { name: 'p2' }).fill('test-value');
 		await page.getByRole('button', { name: 'Save changes' }).click();
-		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await page.getByRole('button', { name: 'Version' }).click();
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.3');
-		await page.getByText('The arguments are valid').waitFor();
+		await expect(page.getByText('The arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
-		await page.getByText('No new versions available').waitFor();
+		await expect(page.getByText('No new versions available')).toBeVisible();
 		// Verify that the arguments are preserved after the update
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await expect(page.getByRole('textbox', { name: 'p2' })).toHaveValue('test-value');
@@ -221,10 +227,9 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await page
-			.getByText('Following errors must be fixed before performing the update')
-			.first()
-			.waitFor();
+		await expect(
+			page.getByText('Following errors must be fixed before performing the update').first()
+		).toBeVisible();
 		await page.getByRole('textbox', { name: 'Fix the non parallel arguments:' }).click();
 		await page
 			.getByRole('textbox', { name: 'Fix the non parallel arguments:' })
@@ -235,7 +240,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await expect(page.getByText('The parallel arguments are valid')).toBeVisible();
 		await expect(page.getByText('The non parallel arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
-		await page.getByText('No new versions available').waitFor();
+		await expect(page.getByText('No new versions available')).toBeVisible();
 	});
 
 	await test.step('Cleanup test tasks', async () => {

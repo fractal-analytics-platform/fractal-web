@@ -8,13 +8,14 @@ test('Admin task group activities page', async ({ page }) => {
 	});
 
 	await test.step('Search fractal-tasks-mock', async () => {
+		const searchButton = page.getByRole('button', { name: 'Search activities' });
+		await expect(searchButton).toBeEnabled();
 		await page.getByRole('textbox', { name: 'Package name' }).fill('fractal-tasks-mock');
 		await page.getByRole('combobox', { name: 'Status' }).selectOption('OK');
 		await page.getByRole('combobox', { name: 'Action' }).selectOption('Collect');
 		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
-    const searchButton = page.getByRole('button', { name: 'Search activities' });
 		await searchButton.click();
-    await expect(searchButton).toBeEnabled();
+		await expect(searchButton).toBeEnabled();
 		await expect(page.getByText(/The query returned 1 matching result/)).toBeVisible();
 	});
 
@@ -33,9 +34,9 @@ test('Admin task group activities page', async ({ page }) => {
 	await test.step('Reset', async () => {
 		await page.getByRole('button', { name: 'Reset' }).click();
 		await expect(page.getByText(/The query returned \d+ matching result/)).not.toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Package name' })).toHaveValue('');
-    await expect(page.getByRole('combobox', { name: 'Status' })).toHaveValue('');
-    await expect(page.getByRole('combobox', { name: 'Action' })).toHaveValue('');
-    await expect(page.getByRole('combobox', { name: 'User' })).toHaveValue('');
-  });
+		await expect(page.getByRole('textbox', { name: 'Package name' })).toHaveValue('');
+		await expect(page.getByRole('combobox', { name: 'Status' })).toHaveValue('');
+		await expect(page.getByRole('combobox', { name: 'Action' })).toHaveValue('');
+		await expect(page.getByRole('combobox', { name: 'User' })).toHaveValue('');
+	});
 });

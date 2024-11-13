@@ -18,6 +18,8 @@ test('Add single tasks [v2]', async ({ page }) => {
 	await page.goto('/v2/tasks');
 	await waitPageLoading(page);
 
+	test.slow();
+
 	await test.step('Select "Add a single task" form', async () => {
 		await page.getByText('Single task').click();
 	});
@@ -172,7 +174,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 		await setUploadFile(page, 'Upload non parallel args schema', brokenJson);
 		await setUploadFile(page, 'Upload parallel args schema', invalidArgsSchema);
 		await createBtn.click();
-		await page.getByText("File doesn't contain valid JSON").first().waitFor();
+		await page.getByText("File doesn't contain valid JSON").first().scrollIntoViewIfNeeded();
 		expect(
 			await page.getByText("File doesn't contain valid JSON", { exact: true }).count()
 		).toEqual(3);
