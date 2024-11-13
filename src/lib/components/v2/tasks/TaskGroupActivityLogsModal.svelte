@@ -78,7 +78,7 @@
 	bodyCss="bg-tertiary text-secondary"
 >
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Task collection logs</h1>
+		<h1 class="h5 modal-title">Task group activity logs</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="collectionTaskLogsError" />

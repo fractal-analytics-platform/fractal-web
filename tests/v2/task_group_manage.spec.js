@@ -17,8 +17,9 @@ test('Task group manage (deactivate / reactivate)', async ({ page, workflow }) =
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
+		await expect(modal.getByText('The task group is currently active')).toBeVisible();
 		await modal.getByText('active').click();
-		await modal.getByRole('button', { name: 'Update' }).click();
+		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 	});
 
@@ -36,7 +37,7 @@ test('Task group manage (deactivate / reactivate)', async ({ page, workflow }) =
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByText('active').click();
-		await modal.getByRole('button', { name: 'Update' }).click();
+		await modal.getByRole('button', { name: 'Reactivate task group' }).click();
 	});
 
 	await test.step('Verify that page loads the proper activity', async () => {
