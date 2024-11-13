@@ -161,6 +161,8 @@ export type TaskGroupV2 = {
 	python_version: string;
 	path: string;
 	venv_path: string;
+	venv_file_number: number;
+	venv_size_in_kB: number;
 	pip_extras: string;
 	active: boolean;
 	timestamp_created: string;

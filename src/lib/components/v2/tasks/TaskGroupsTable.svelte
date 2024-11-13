@@ -202,16 +202,14 @@
 						<i class="bi bi-pencil" />
 						Edit
 					</button>
-					{#if taskGroupRow.groups[taskGroupRow.selectedVersion].origin === 'other'}
-						<button
-							class="btn btn-info"
-							on:click={() =>
-								taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
-						>
-							<i class="bi bi-gear" />
-							Manage
-						</button>
-					{/if}
+					<button
+						class="btn btn-info"
+						on:click={() =>
+							taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+					>
+						<i class="bi bi-gear" />
+						Manage
+					</button>
 					<ConfirmActionButton
 						modalId="confirmTaskGroupDeleteModal{taskGroupRow.groupTitle}"
 						style={'danger'}
