@@ -60,8 +60,8 @@
 						<li class="list-group-item">{taskGroup.venv_path || '-'}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
 						<li class="list-group-item">{taskGroup.venv_file_number || '-'}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Size (kB)</li>
-						<li class="list-group-item">{taskGroup.venv_size_in_kB || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
+						<li class="list-group-item">{(taskGroup.venv_size_in_kB / 1000).toFixed(2)}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
 						<li class="list-group-item">{taskGroup.pip_extras || '-'}</li>
 					</ul>
