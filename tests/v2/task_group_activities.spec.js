@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { waitModalClosed, waitPageLoading } from '../utils';
 
-test('Task group activities page', async ({ page }) => {
-	await test.step('Open task group activities page', async () => {
+test('Task-group activities page', async ({ page }) => {
+	await test.step('Open task-group activities page', async () => {
 		await page.goto('/v2/tasks/activities');
 		await waitPageLoading(page);
 		const regexResult = /The query returned (\d+) matching result/;

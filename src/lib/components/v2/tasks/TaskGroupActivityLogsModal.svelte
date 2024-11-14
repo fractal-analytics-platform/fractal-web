@@ -42,7 +42,7 @@
 			const activities = await response.json();
 			if (activities.length === 0) {
 				errorAlert = displayStandardErrorAlert(
-					new AlertError('Task group activity not found'),
+					new AlertError('Task-group activity not found'),
 					'collectionTaskLogsError'
 				);
 			} else if (activities[0].log) {
@@ -78,7 +78,7 @@
 	bodyCss="bg-tertiary text-secondary"
 >
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Task group activity logs</h1>
+		<h1 class="h5 modal-title">Task-group activity logs</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="collectionTaskLogsError" />

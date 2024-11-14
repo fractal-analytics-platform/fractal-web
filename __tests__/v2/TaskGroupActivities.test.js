@@ -98,7 +98,7 @@ describe('TaskGroupActivities', () => {
 		await user.type(screen.getByRole('textbox', { name: /Package name/ }), 'pkg');
 		await user.selectOptions(screen.getByRole('combobox', { name: /Status/ }), 'OK');
 		await user.selectOptions(screen.getByRole('combobox', { name: /Action/ }), 'Collect');
-		await user.type(screen.getByRole('spinbutton', { name: /Task group id/ }), '1');
+		await user.type(screen.getByRole('spinbutton', { name: /Task-group id/ }), '1');
 		await user.selectOptions(screen.getByRole('combobox', { name: /User/ }), 'admin@fractal.xy');
 
 		await user.click(screen.getByRole('button', { name: /Search activities/ }));

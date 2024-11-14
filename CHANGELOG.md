@@ -3,7 +3,7 @@
 # Unreleased
 
 * Alignment with fractal-server 2.9.0 (\#640):
-    * Updated task collections logic and created task group activities pages for standard users and administrators (\#640);
+    * Updated task collections logic and created task-group activities pages for standard users and administrators (\#640);
     * Removed active checkbox from task group edit modal (\#640);
     * Added Manage button to deactivate and reactivate task groups (\#640);
 

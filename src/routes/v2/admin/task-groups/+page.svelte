@@ -333,7 +333,7 @@
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title flex-grow-1">Task group info</h1>
+		<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		{#if selectedTaskGroup}

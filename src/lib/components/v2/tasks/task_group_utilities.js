@@ -250,7 +250,7 @@ async function getTaskActivity(taskGroupActivityId) {
 			console.log('Missing task collection %d', taskGroupActivityId);
 			return undefined;
 		} else {
-			console.error('Failed to fetch task group activity');
+			console.error('Failed to fetch task-group activity');
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
@@ -277,7 +277,7 @@ async function getAdminTaskActivity(taskGroupActivityId) {
 		}
 		return activities[0];
 	}
-	console.error('Failed to fetch task group activity');
+	console.error('Failed to fetch task-group activity');
 	throw await getAlertErrorFromResponse(response);
 }
 

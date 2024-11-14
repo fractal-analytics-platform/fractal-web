@@ -168,7 +168,7 @@
 	});
 </script>
 
-<h1 class="fw-light mb-4 fs-2">Task groups activities</h1>
+<h1 class="fw-light mb-4 fs-2">Task-groups activities</h1>
 
 <div class="row">
 	<div class="col mb-3">
@@ -205,7 +205,7 @@
 <div class="row">
 	<div class="col-lg-3 mb-3">
 		<div class="input-group">
-			<label class="input-group-text" for="taskgroupv2_id"> Task group id </label>
+			<label class="input-group-text" for="taskgroupv2_id"> Task-group id </label>
 			<input type="number" class="form-control" id="taskgroupv2_id" bind:value={taskgroupv2_id} />
 		</div>
 	</div>
