@@ -1,7 +1,13 @@
 <script>
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import {
+		AlertError,
+		displayStandardErrorAlert,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
+
+	export let admin;
 
 	let log = '';
 	let errorAlert = undefined;
@@ -10,9 +16,9 @@
 	let modal;
 
 	/**
-	 * @param {number} taskCollectionId
+	 * @param {number} taskGroupActivityId
 	 */
-	export async function open(taskCollectionId) {
+	export async function open(taskGroupActivityId) {
 		// remove previous error
 		if (errorAlert) {
 			errorAlert.hide();
@@ -21,20 +27,31 @@
 
 		modal.show();
 
-		const response = await fetch(`/api/v2/task/collect/${taskCollectionId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(
+			admin
+				? `/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`
+				: `/api/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`,
+			{
+				method: 'GET',
+				credentials: 'include'
+			}
+		);
 
-		const result = await response.json();
 		if (response.ok) {
-			if (result.data.log) {
-				log = result.data.log;
+			/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
+			const activities = await response.json();
+			if (activities.length === 0) {
+				errorAlert = displayStandardErrorAlert(
+					new AlertError('Task-group activity not found'),
+					'collectionTaskLogsError'
+				);
+			} else if (activities[0].log) {
+				log = activities[0].log;
 			}
 		} else {
-			console.error('Failed to fetch collection logs', result);
+			console.error('Failed to fetch collection logs');
 			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'collectionTaskLogsError'
 			);
 		}
@@ -61,7 +78,7 @@
 	bodyCss="bg-tertiary text-secondary"
 >
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Task collection logs</h1>
+		<h1 class="h5 modal-title">Task-group activity logs</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="collectionTaskLogsError" />

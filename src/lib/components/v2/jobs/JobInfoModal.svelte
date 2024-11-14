@@ -1,6 +1,6 @@
 <script>
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import Modal from '../../common/Modal.svelte';
 
@@ -33,12 +33,11 @@
 			credentials: 'include'
 		});
 
-		const result = await response.json();
 		if (response.ok) {
-			job = result;
+			job = await response.json();
 		} else {
 			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'workflowJobError'
 			);
 		}

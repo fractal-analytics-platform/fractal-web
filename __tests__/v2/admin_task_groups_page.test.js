@@ -50,7 +50,7 @@ function mockTaskGroups() {
 	});
 }
 
-describe('Admin task groups page', () => {
+describe('Admin task-groups page', () => {
 	beforeEach(() => {
 		fetch.mockClear();
 	});

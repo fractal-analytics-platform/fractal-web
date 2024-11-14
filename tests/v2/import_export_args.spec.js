@@ -13,6 +13,8 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
+	test.slow();
+
 	let nonParallelTaskWithoutArgsSchema;
 	let parallelTaskWithoutArgsSchema;
 	let compoundTaskWithoutArgsSchema;
@@ -91,7 +93,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_parallel).toEqual(null);
 		const newData = { args_non_parallel: { key_non_parallel: 'value_non_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 		await workflow.removeCurrentTask();
 	});
 
@@ -102,6 +104,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Argument name').click();
 		await page.getByPlaceholder('Argument name').fill('key_parallel');
 		await page.getByPlaceholder('Argument value').fill('value_parallel');
+		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 
 		const { file, data } = await exportArgs(page, parallelTaskWithoutArgsSchema);
@@ -109,7 +112,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_parallel.key_parallel).toEqual('value_parallel');
 		const newData = { args_parallel: { key_parallel: 'value_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 		await workflow.removeCurrentTask();
 	});
 
@@ -122,6 +125,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Add property' }).nth(1).click();
 		await page.getByPlaceholder('Argument name').nth(1).fill('key_parallel');
 		await page.getByPlaceholder('Argument value').nth(1).fill('value_parallel');
+		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 
@@ -132,9 +136,9 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 			args_non_parallel: { key_non_parallel: 'value_non_parallel-updated' },
 			args_parallel: { key_parallel: 'value_parallel-updated' }
 		};
-		await expect(page.getByText('Arguments changes saved successfully')).toHaveCount(0);
+		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await importValidArgs(page, file, newData);
-		await page.getByText('Arguments changes saved successfully').waitFor();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 		await workflow.removeCurrentTask();
 	});
 
@@ -148,7 +152,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_parallel).toEqual(null);
 		const newData = { args_non_parallel: { test_non_parallel: 'value_non_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		expect(await page.getByRole('textbox', { name: 'test_non_parallel' }).inputValue()).toEqual(
+		await expect(await page.getByRole('textbox', { name: 'test_non_parallel' })).toHaveValue(
 			'value_non_parallel-updated'
 		);
 		await workflow.removeCurrentTask();
@@ -164,7 +168,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_parallel.test_parallel).toEqual('value_parallel');
 		const newData = { args_parallel: { test_parallel: 'value_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		expect(await page.getByRole('textbox', { name: 'test_parallel' }).inputValue()).toEqual(
+		await expect(page.getByRole('textbox', { name: 'test_parallel' })).toHaveValue(
 			'value_parallel-updated'
 		);
 		await workflow.removeCurrentTask();
@@ -184,10 +188,10 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 			args_parallel: { test_parallel: 'value_parallel-updated' }
 		};
 		await importValidArgs(page, file, newData);
-		expect(await page.getByRole('textbox', { name: 'test_non_parallel' }).inputValue()).toEqual(
+		await expect(page.getByRole('textbox', { name: 'test_non_parallel' })).toHaveValue(
 			'value_non_parallel-updated'
 		);
-		expect(await page.getByRole('textbox', { name: 'test_parallel' }).inputValue()).toEqual(
+		await expect(page.getByRole('textbox', { name: 'test_parallel' })).toHaveValue(
 			'value_parallel-updated'
 		);
 	});
@@ -202,7 +206,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		await page.getByRole('button', { name: 'Confirm' }).click();
-		await page.getByText("File doesn't contain valid JSON").waitFor();
+		await expect(page.getByText("File doesn't contain valid JSON")).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -219,7 +223,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(file);
 		await page.getByRole('button', { name: 'Confirm' }).click();
-		await page.getByText('must have required property').waitFor();
+		await expect(page.getByText('must have required property')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 		fs.rmSync(file);

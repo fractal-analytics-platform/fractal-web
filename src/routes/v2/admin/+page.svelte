@@ -42,5 +42,10 @@
 			<i class="bi bi-search" />
 			Search task groups
 		</a>
+
+		<a href="/v2/admin/task-groups/activities" class="btn btn-primary me-2">
+			<i class="bi bi-search" />
+			Search activities
+		</a>
 	</div>
 </div>

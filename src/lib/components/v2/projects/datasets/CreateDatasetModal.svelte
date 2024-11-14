@@ -236,34 +236,78 @@
 							{/if}
 						</div>
 					</div>
-					<div class="row mb-3">
-						<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
-						<div class="col-10">
-							<input
-								id="zarrDir"
-								type="text"
-								bind:value={zarrDir}
-								class="form-control"
-								class:is-invalid={submitted &&
-									((projectDir === null && !zarrDir) || $validationErrors['zarr_dir'])}
-							/>
-							<div class="form-text">
-								The main folder for OME-Zarrs of this dataset.
-								{#if projectDir !== null}
-									If not set, a default subfolder of <code>{projectDir}</code> will be used.
+					{#if projectDir === null}
+						<div class="row mb-3">
+							<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
+							<div class="col-10">
+								<input
+									id="zarrDir"
+									type="text"
+									bind:value={zarrDir}
+									class="form-control"
+									class:is-invalid={submitted && (!zarrDir || $validationErrors['zarr_dir'])}
+								/>
+								<div class="form-text">The main folder for OME-Zarrs of this dataset.</div>
+								{#if submitted && (!zarrDir || $validationErrors['zarr_dir'])}
+									<div class="invalid-feedback">
+										{#if !zarrDir}
+											Required field
+										{:else}
+											{$validationErrors['zarr_dir']}
+										{/if}
+									</div>
 								{/if}
 							</div>
-							{#if submitted && ((projectDir === null && !zarrDir) || $validationErrors['zarr_dir'])}
-								<div class="invalid-feedback">
-									{#if projectDir === null && !zarrDir}
-										Required field
-									{:else}
-										{$validationErrors['zarr_dir']}
-									{/if}
-								</div>
-							{/if}
 						</div>
-					</div>
+					{:else}
+						<div class="row mb-3">
+							<div class="accordion" id="zarrDirAccordion">
+								<div class="accordion-item">
+									<h2 class="accordion-header">
+										<button
+											class="accordion-button collapsed"
+											type="button"
+											data-bs-toggle="collapse"
+											data-bs-target="#zarrDirCollapse"
+											aria-expanded="false"
+											aria-controls="zarrDirCollapse"
+										>
+											Advanced options
+										</button>
+									</h2>
+									<div
+										id="zarrDirCollapse"
+										class="accordion-collapse collapse"
+										data-bs-parent="#zarrDirAccordion"
+									>
+										<div class="accordion-body">
+											<div class="row">
+												<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
+												<div class="col-10">
+													<input
+														id="zarrDir"
+														type="text"
+														bind:value={zarrDir}
+														class="form-control"
+														class:is-invalid={submitted && $validationErrors['zarr_dir']}
+													/>
+													<div class="form-text">
+														The main folder for OME-Zarrs of this dataset. If not set, a default
+														subfolder of <code>{projectDir}</code> will be used.
+													</div>
+													{#if submitted && $validationErrors['zarr_dir']}
+														<div class="invalid-feedback">
+															{$validationErrors['zarr_dir']}
+														</div>
+													{/if}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{/if}
 				</div>
 				<AttributesTypesForm bind:this={filtersCreationForm} />
 			</form>

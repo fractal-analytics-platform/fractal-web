@@ -1,6 +1,6 @@
 <script>
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import {
 		generateNewUniqueDatasetName,
 		getFirstTaskIndexForContinuingWorkflow
@@ -161,12 +161,11 @@
 				zarr_dir: zarrDir
 			})
 		});
-		const result = await response.json();
 		if (!response.ok) {
-			console.log('Dataset creation failed', result);
-			throw new AlertError(result);
+			console.log('Dataset creation failed');
+			throw await getAlertErrorFromResponse(response);
 		}
-		return result;
+		return await response.json();
 	}
 
 	/**
@@ -178,9 +177,8 @@
 			credentials: 'include'
 		});
 		if (!response.ok) {
-			const result = await response.json();
-			console.error('Error while deleting dataset:', result);
-			throw new AlertError(result);
+			console.error('Error while deleting dataset:');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 

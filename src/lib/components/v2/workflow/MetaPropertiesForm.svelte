@@ -8,7 +8,7 @@
 	// The form should be structured in multiple levels of depth, and support complex structure.
 	import { page } from '$app/stores';
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
@@ -72,11 +72,14 @@
 		);
 		savingChanges = false;
 
-		const result = await response.json();
 		if (response.ok) {
+			const result = await response.json();
 			onWorkflowTaskUpdated(result);
 		} else {
-			displayStandardErrorAlert(new AlertError(result, response.status), 'metaPropertiesFormError');
+			displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'metaPropertiesFormError'
+			);
 		}
 	}
 

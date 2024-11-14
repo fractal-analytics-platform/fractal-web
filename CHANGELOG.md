@@ -1,5 +1,12 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Alignment with fractal-server 2.9.0 (\#640):
+    * Updated task collections logic and created task-group activities pages for standard users and administrators (\#640);
+    * Removed active checkbox from task group edit modal (\#640);
+    * Added Manage button to deactivate and reactivate task groups (\#640);
+
 # 1.10.1
 
 * Fixed wrong workflow tasks order after task version update (\#637);

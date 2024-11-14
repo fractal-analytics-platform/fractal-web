@@ -1,7 +1,7 @@
 <script>
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 	import { page } from '$app/stores';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	/** @type {import('$lib/types-v2').ProjectV2} */
 	let project = $page.data.project;
@@ -17,11 +17,10 @@
 			credentials: 'include',
 			mode: 'cors'
 		});
-		const result = await response.json();
 		if (!response.ok) {
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
-		return result;
+		return await response.json();
 	}
 </script>
 

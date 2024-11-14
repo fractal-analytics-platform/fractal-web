@@ -21,8 +21,7 @@ export async function waitPageLoading(page) {
  * @param {import('@playwright/test').Page} page
  */
 export async function waitModalClosed(page) {
-	await page.waitForFunction(() => document.querySelector('.modal.show') === null);
-	await expect(page.locator('.modal.show')).toHaveCount(0);
+	await expect(page.locator('.modal.show')).not.toBeVisible();
 }
 
 /**

@@ -6,7 +6,7 @@
 	import JobInfoModal from '$lib/components/v2/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
 	import Th from '$lib/components/common/filterable/Th.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
@@ -119,9 +119,8 @@
 			jobCancelledMessage = 'Job cancellation request received. The job will stop in a few seconds';
 		} else {
 			console.error('Error stopping job');
-			const result = await response.json();
 			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'jobUpdatesError'
 			);
 		}

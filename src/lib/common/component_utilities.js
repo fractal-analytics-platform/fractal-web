@@ -281,3 +281,18 @@ export function objectChanged(oldObject, newObject) {
 export function deepCopy(value) {
 	return JSON.parse(JSON.stringify(value));
 }
+
+/**
+ * @param {string|undefined} date
+ * @param {string|undefined} time
+ * @returns {string|undefined}
+ */
+export function getTimestamp(date, time) {
+	if (date === undefined || date === '') {
+		return undefined;
+	}
+	if (time === undefined || time === '') {
+		return new Date(`${date}T00:00:00`).toISOString();
+	}
+	return new Date(`${date}T${time}:00`).toISOString();
+}

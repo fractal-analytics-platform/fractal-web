@@ -2,7 +2,11 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
-	import { AlertError, displayStandardErrorAlert, FormErrorHandler } from '$lib/common/errors';
+	import {
+		displayStandardErrorAlert,
+		FormErrorHandler,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
@@ -213,9 +217,8 @@
 			})
 		});
 
-		const result = await response.json();
-
 		if (response.ok) {
+			const result = await response.json();
 			user = { ...user, group_ids_names: result.group_ids_names };
 			originalUser = deepCopy(nullifyEmptyStrings(user));
 			groupIdsToAdd = [];
@@ -223,7 +226,7 @@
 		}
 
 		errorAlert = displayStandardErrorAlert(
-			new AlertError(result, response.status),
+			await getAlertErrorFromResponse(response),
 			'genericUserError'
 		);
 		return false;

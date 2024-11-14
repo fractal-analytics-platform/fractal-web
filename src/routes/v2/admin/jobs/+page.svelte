@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
-	import { downloadBlob } from '$lib/common/component_utilities';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { downloadBlob, getTimestamp } from '$lib/common/component_utilities';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
@@ -105,35 +105,19 @@
 				url.searchParams.append('dataset_id', datasetId);
 			}
 			const response = await fetch(url);
-			const result = await response.json();
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
-					new AlertError(result, response.status),
+					await getAlertErrorFromResponse(response),
 					'searchError'
 				);
 				return;
 			}
 			searched = true;
-			jobs = result;
+			jobs = await response.json();
 			jobsListComponent.setJobs(jobs);
 		} finally {
 			searching = false;
 		}
-	}
-
-	/**
-	 * @param {string|undefined} date
-	 * @param {string|undefined} time
-	 * @returns {string|undefined}
-	 */
-	function getTimestamp(date, time) {
-		if (date === undefined || date === '') {
-			return undefined;
-		}
-		if (time === undefined || time === '') {
-			return new Date(`${date}T00:00:00`).toISOString();
-		}
-		return new Date(`${date}T${time}:00`).toISOString();
 	}
 
 	function resetSearchFields() {
@@ -244,7 +228,7 @@
 				});
 
 				if (!response.ok) {
-					throw new AlertError(await response.json());
+					throw await getAlertErrorFromResponse(response);
 				}
 
 				jobs = jobs.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));

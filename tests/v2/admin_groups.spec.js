@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
+import { addUserToGroup, createTestGroup, deleteGroup } from './group_utils.js';
 
 test('Admin groups management', async ({ page }) => {
 	let user1;
@@ -13,15 +14,7 @@ test('Admin groups management', async ({ page }) => {
 	});
 
 	await test.step('Add the test user the group', async () => {
-		const dragArea = page.getByText('drag the users here');
-		const availableUsers = await page.locator('[draggable="true"]').allInnerTexts();
-		expect(availableUsers.length).toBeGreaterThan(1);
-		await page.getByPlaceholder('Filter users').fill(user1);
-		await expect(page.locator('[draggable="true"]')).toHaveCount(1);
-		const userBadge = page.getByRole('button', { name: user1, exact: true });
-		await userBadge.dragTo(dragArea);
-		await expect(page.locator('.spinner-border-sm')).not.toBeVisible();
-		await expect(page.getByRole('region')).toContainText(user1);
+		await addUserToGroup(page, user1);
 	});
 
 	await test.step('Check group info page', async () => {
@@ -147,35 +140,24 @@ test('Admin groups management', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
-		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue('/tmp/test/project-dir');
+		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue(
+			'/tmp/test/project-dir'
+		);
 		await expect(page.getByRole('textbox', { name: 'SLURM user' })).toHaveValue('test-slurm-user');
-		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue('/tmp/test/cache-dir');
+		await expect(page.getByRole('textbox', { name: 'Cache dir' })).toHaveValue(
+			'/tmp/test/cache-dir'
+		);
 		await expect(page.getByLabel('SLURM account #1', { exact: true })).toHaveValue(
 			'test-slurm-account'
 		);
 	});
 
 	await test.step('Delete test groups', async () => {
-		await page.goto('/v2/admin/groups');
-		await waitPageLoading(page);
 		await deleteGroup(page, group1);
 		await deleteGroup(page, group2);
 		await deleteGroup(page, group3);
 	});
 });
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} groupName
- */
-async function deleteGroup(page, groupName) {
-	await page.getByRole('row', { name: groupName }).getByRole('button', { name: 'Delete' }).click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
-	await modal.getByRole('button', { name: 'Confirm' }).click();
-	await waitModalClosed(page);
-	await expect(page.getByRole('row', { name: groupName })).not.toBeVisible();
-}
 
 /**
  * @param {import('@playwright/test').Page} page
@@ -192,21 +174,4 @@ async function createTestUser(page) {
 	await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	await waitPageLoading(page);
 	return randomEmail;
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @returns {Promise<string>}
- */
-async function createTestGroup(page) {
-	const randomGroupName = Math.random().toString(36).substring(7);
-	await page.goto('/v2/admin/groups');
-	await waitPageLoading(page);
-	await page.getByRole('button', { name: 'Create new group' }).click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
-	await modal.getByRole('textbox', { name: 'Group name' }).fill(randomGroupName);
-	await modal.getByRole('button', { name: 'Create' }).click();
-	await page.getByText('Members of the group').waitFor();
-	return randomGroupName;
 }

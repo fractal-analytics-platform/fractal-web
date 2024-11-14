@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -20,8 +20,7 @@
 			credentials: 'include'
 		});
 		if (!response.ok) {
-			const result = await response.json();
-			throw new AlertError(result);
+			throw await getAlertErrorFromResponse(response);
 		}
 		users = sortUsers(
 			users.filter((u) => u.id !== userId),

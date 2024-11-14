@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -62,16 +62,15 @@
 				url.searchParams.append('active', active.toString());
 			}
 			const response = await fetch(url);
-			const result = await response.json();
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
-					new AlertError(result, response.status),
+					await getAlertErrorFromResponse(response),
 					'searchError'
 				);
 				return;
 			}
 			searched = true;
-			results = result;
+			results = await response.json();
 		} finally {
 			searching = false;
 		}
@@ -132,9 +131,8 @@
 			console.log('Task group deleted successfully');
 			await searchTaskGroups();
 		} else {
-			const result = await response.json();
-			console.error('Error deleting the task group', result);
-			throw new AlertError(result);
+			console.error('Error deleting the task group');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 </script>
@@ -335,7 +333,7 @@
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>
 	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title flex-grow-1">Task group info</h1>
+		<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		{#if selectedTaskGroup}

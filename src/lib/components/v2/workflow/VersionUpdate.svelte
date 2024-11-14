@@ -1,5 +1,5 @@
 <script>
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { AlertError, displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
@@ -161,7 +161,7 @@
 			}
 		);
 		if (!response.ok) {
-			throw new AlertError(await response.json(), response.status);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 
@@ -191,13 +191,11 @@
 			}
 		);
 
-		const result = await response.json();
-
 		if (!response.ok) {
-			throw new AlertError(result, response.status);
+			throw await getAlertErrorFromResponse(response);
 		}
 
-		return result;
+		return await response.json();
 	}
 
 	/**
@@ -222,8 +220,7 @@
 		);
 
 		if (!response.ok) {
-			const result = await response.json();
-			throw new AlertError(result, response.status);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 

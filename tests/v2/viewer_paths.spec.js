@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login, logout, waitPageLoading } from '../utils.js';
+import { addUserToGroup } from './group_utils.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -39,10 +40,7 @@ test('Viewer paths', async ({ page }) => {
 	});
 
 	await test.step('Add test user to the group', async () => {
-		const dragArea = page.getByText('drag the users here');
-		const userBadge = page.getByRole('button', { name: randomEmail, exact: true });
-		await userBadge.dragTo(dragArea);
-		await expect(page.locator('.spinner-border-sm')).not.toBeVisible();
+		await addUserToGroup(page, randomEmail);
 	});
 
 	await test.step('Add viewer paths', async () => {

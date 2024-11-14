@@ -1,5 +1,5 @@
 import { greatestVersionAsc, greatestVersionDesc } from '$lib/common/component_utilities';
-import { AlertError } from '$lib/common/errors';
+import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 /**
  * @param {import('$lib/types-v2').TaskV2} task
@@ -29,7 +29,7 @@ export async function getAllNewVersions(tasks) {
 	const response = await fetch(`/api/v2/task-group?only_active=true`);
 
 	if (!response.ok) {
-		throw new AlertError(await response.json());
+		throw await getAlertErrorFromResponse(response);
 	}
 
 	/** @type {import('$lib/types-v2').TaskGroupV2[]} */

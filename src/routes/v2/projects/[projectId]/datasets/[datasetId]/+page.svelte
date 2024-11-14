@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import DatasetFiltersModal from '$lib/components/v2/projects/datasets/DatasetFiltersModal.svelte';
@@ -365,9 +365,8 @@
 			}
 		);
 		showTable = true;
-		const result = await response.json();
 		if (response.ok) {
-			imagePage = result;
+			imagePage = await response.json();
 			await tick();
 			reloadAttributeFilters(imagePage);
 			reloadTypeFilters(imagePage);
@@ -381,7 +380,7 @@
 			lastAppliedTypeFilters = { ...typeFilters };
 		} else {
 			errorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'searchError'
 			);
 		}
@@ -416,7 +415,7 @@
 			}
 			await searchImages();
 		} else {
-			throw new AlertError(await response.json());
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 

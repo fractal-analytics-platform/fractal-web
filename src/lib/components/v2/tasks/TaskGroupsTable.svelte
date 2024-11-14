@@ -2,12 +2,13 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 	import { buildTaskTableRows, sortVersions } from './task_group_utilities';
-	import { AlertError } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import TaskInfoModal from './TaskInfoModal.svelte';
 	import TaskEditModal from './TaskEditModal.svelte';
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/** @type {import('$lib/types').User} */
 	export let user;
@@ -26,6 +27,8 @@
 	let taskGroupInfoModal;
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
 	let taskGroupEditModal;
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
+	let taskGroupManageModal;
 	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default} */
 	let taskInfoModal;
 	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default} */
@@ -85,9 +88,8 @@
 			console.log('Task group deleted successfully');
 			updateTaskGroups(taskGroups.filter((g) => g.id !== groupId));
 		} else {
-			const result = await response.json();
-			console.error('Error deleting the task group', result);
-			throw new AlertError(result);
+			console.error('Error deleting the task group');
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 
@@ -129,7 +131,7 @@
 		<col width="100" />
 		<col width="120" />
 		<col width="100" />
-		<col width="350" />
+		<col width="400" />
 	</colgroup>
 	<thead class="table-light">
 		<tr>
@@ -200,6 +202,14 @@
 						<i class="bi bi-pencil" />
 						Edit
 					</button>
+					<button
+						class="btn btn-info"
+						on:click={() =>
+							taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+					>
+						<i class="bi bi-gear" />
+						Manage
+					</button>
 					<ConfirmActionButton
 						modalId="confirmTaskGroupDeleteModal{taskGroupRow.groupTitle}"
 						style={'danger'}
@@ -258,6 +268,7 @@
 	{updateEditedTaskGroup}
 	groupIdsNames={user.group_ids_names || []}
 />
+<TaskGroupManageModal bind:this={taskGroupManageModal} />
 <TaskInfoModal bind:this={taskInfoModal} />
 <TaskEditModal bind:this={taskEditModal} {updateEditedTask} />
 

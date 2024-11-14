@@ -6,7 +6,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
-	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
@@ -210,13 +210,12 @@
 					})
 				});
 
-				const result = await response.json();
 				if (response.ok) {
-					workflow = result;
+					workflow = await response.json();
 					workflowSuccessMessage = 'Workflow updated correctly';
 				} else {
-					console.error('Error updating workflow properties', result);
-					throw new AlertError(result);
+					console.error('Error updating workflow properties');
+					throw await getAlertErrorFromResponse(response);
 				}
 			},
 			() => {
@@ -251,9 +250,8 @@
 		);
 
 		if (!response.ok) {
-			const error = await response.json();
-			console.error('Unable to delete workflow task', error);
-			throw new AlertError(error);
+			console.error('Unable to delete workflow task');
+			throw await getAlertErrorFromResponse(response);
 		}
 
 		// Discard unsaved changes when workflow task is deleted
@@ -267,15 +265,13 @@
 			credentials: 'include'
 		});
 
-		const workflowResult = await workflowResponse.json();
-
-		if (!response.ok) {
-			console.error('Unable to retrieve workflow', workflowResult);
-			throw new AlertError(workflowResult);
+		if (!workflowResponse.ok) {
+			console.error('Unable to retrieve workflow');
+			throw await getAlertErrorFromResponse(workflowResponse);
 		}
 
 		// Successfully deleted task
-		workflow = workflowResult;
+		workflow = await workflowResponse.json();
 		selectedWorkflowTask = undefined;
 	}
 
@@ -541,9 +537,8 @@
 			await loadJobsStatus();
 		} else {
 			console.error('Error stopping job');
-			const result = await response.json();
 			workflowErrorAlert = displayStandardErrorAlert(
-				new AlertError(result, response.status),
+				await getAlertErrorFromResponse(response),
 				'workflowErrorAlert'
 			);
 		}
