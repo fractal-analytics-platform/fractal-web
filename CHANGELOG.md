@@ -8,6 +8,7 @@
     * Added Manage button to deactivate and reactivate task groups (\#640);
     * Removed usage of DB_ENGINE and SQLITE_PATH variables (\#643);
     * Displayed `timestamp_last_used` property in task-group info modal (\#643);
+    * Viewer paths page improvements (\#643);
 
 # 1.10.1
 
