@@ -2,10 +2,12 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.9.0 (\#640):
+* Alignment with fractal-server 2.9.0 (\#640, \#643):
     * Updated task collections logic and created task-group activities pages for standard users and administrators (\#640);
     * Removed active checkbox from task group edit modal (\#640);
     * Added Manage button to deactivate and reactivate task groups (\#640);
+    * Removed usage of DB_ENGINE and SQLITE_PATH variables (\#643);
+    * Displayed `timestamp_last_used` property in task-group info modal (\#643);
 
 # 1.10.1
 
