@@ -1,5 +1,6 @@
 <script>
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {import('$lib/types').User} */
@@ -64,6 +65,10 @@
 						<li class="list-group-item">{(taskGroup.venv_size_in_kB / 1000).toFixed(2)}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
 						<li class="list-group-item">{taskGroup.pip_extras || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Last used</li>
+						<li class="list-group-item">
+							<TimestampCell timestamp={taskGroup.timestamp_last_used} />
+						</li>
 					</ul>
 				</div>
 			</div>

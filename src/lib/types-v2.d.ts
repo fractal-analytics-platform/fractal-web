@@ -166,6 +166,7 @@ export type TaskGroupV2 = {
 	pip_extras: string;
 	active: boolean;
 	timestamp_created: string;
+	timestamp_last_used: string;
 };
 
 export type WorkflowTasksTableRowGroup = {

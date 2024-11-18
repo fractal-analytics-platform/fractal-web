@@ -4,6 +4,7 @@
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 
 	/** @type {Array<import('$lib/types').User>} */
@@ -331,7 +332,7 @@
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
 />
 
-<Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>
+<Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
 	<svelte:fragment slot="header">
 		<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
 	</svelte:fragment>
@@ -360,8 +361,16 @@
 				<li class="list-group-item">{selectedTaskGroup.path || '-'}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
 				<li class="list-group-item">{selectedTaskGroup.venv_path || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
+				<li class="list-group-item">{selectedTaskGroup.venv_file_number || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
+				<li class="list-group-item">{(selectedTaskGroup.venv_size_in_kB / 1000).toFixed(2)}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
 				<li class="list-group-item">{selectedTaskGroup.pip_extras || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Last used</li>
+				<li class="list-group-item">
+					<TimestampCell timestamp={selectedTaskGroup.timestamp_last_used} />
+				</li>
 			</ul>
 		{/if}
 	</svelte:fragment>
