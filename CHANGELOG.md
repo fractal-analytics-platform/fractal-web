@@ -9,6 +9,7 @@
     * Removed usage of DB_ENGINE and SQLITE_PATH variables (\#643);
     * Displayed `timestamp_last_used` property in task-group info modal (\#643);
     * Viewer paths page improvements (\#643);
+    * Added manage buttons on admin task-groups page (\#643);
 
 # 1.10.1
 

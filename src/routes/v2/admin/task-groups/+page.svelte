@@ -6,6 +6,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
+	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/** @type {Array<import('$lib/types').User>} */
 	const users = $page.data.users;
@@ -36,6 +37,8 @@
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
 	let taskGroupEditModal;
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
+	let taskGroupManageModal;
 
 	async function searchTaskGroups() {
 		searching = true;
@@ -267,7 +270,7 @@
 				<col width="90" />
 				<col width="90" />
 				<col width="90" />
-				<col width="270" />
+				<col width="400" />
 			</colgroup>
 			<thead>
 				<tr>
@@ -304,6 +307,10 @@
 								<i class="bi bi-pencil" />
 								Edit
 							</button>
+							<button class="btn btn-info" on:click={() => taskGroupManageModal.open(taskGroup)}>
+								<i class="bi bi-gear" />
+								Manage
+							</button>
 							<ConfirmActionButton
 								modalId="confirmTaskGroupDeleteModal{taskGroup.pkg_name}"
 								style={'danger'}
@@ -331,6 +338,7 @@
 	updateEditedTaskGroup={searchTaskGroups}
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
 />
+<TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} />
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
 	<svelte:fragment slot="header">
