@@ -10,6 +10,7 @@
     * Displayed `timestamp_last_used` property in task-group info modal (\#643);
     * Viewer paths page improvements (\#643);
     * Added manage buttons on admin task-groups page (\#643);
+    * Added last used timestamp filter to task-group admin page (\#643);
 
 # 1.10.1
 

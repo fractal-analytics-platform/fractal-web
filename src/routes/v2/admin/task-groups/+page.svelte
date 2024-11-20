@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -21,6 +22,10 @@
 	let privateGroup = null;
 	/** @type {boolean|null} */
 	let active = null;
+	let lastUsedDateMin;
+	let lastUsedTimeMin = '';
+	let lastUsedDateMax = '';
+	let lastUsedTimeMax = '';
 
 	let searched = false;
 	let searching = false;
@@ -65,6 +70,14 @@
 			if (active !== null) {
 				url.searchParams.append('active', active.toString());
 			}
+			const lasUsedTimestampMin = getTimestamp(lastUsedDateMin, lastUsedTimeMin);
+			if (lasUsedTimestampMin) {
+				url.searchParams.append('timestamp_last_used_min', lasUsedTimestampMin);
+			}
+			const lasUsedTimestampMax = getTimestamp(lastUsedDateMax, lastUsedTimeMax);
+			if (lasUsedTimestampMax) {
+				url.searchParams.append('timestamp_last_used_max', lasUsedTimestampMax);
+			}
 			const response = await fetch(url);
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
@@ -88,6 +101,10 @@
 		user_group_id = '';
 		pkg_name = '';
 		origin = '';
+		lastUsedDateMin = '';
+		lastUsedTimeMin = '';
+		lastUsedDateMax = '';
+		lastUsedTimeMax = '';
 		privateGroup = null;
 		active = null;
 		searched = false;
@@ -233,6 +250,48 @@
 							<option value="wheel-file">Wheel file</option>
 							<option value="other">Other</option>
 						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mt-3">
+			<div class="col-md-3 col-lg-2 mt-2">Last used</div>
+			<div class="col-md-9 col-lg-10">
+				<div class="row row-cols-md-auto">
+					<div class="col-12 mt-1">
+						<div class="input-group">
+							<div class="input-group-text">Min</div>
+							<input
+								type="date"
+								class="form-control"
+								bind:value={lastUsedDateMin}
+								id="last_used_date_min"
+							/>
+							<input
+								type="time"
+								class="form-control"
+								bind:value={lastUsedTimeMin}
+								id="last_used_time_min"
+							/>
+						</div>
+					</div>
+					<div class="col-12 mt-1">
+						<div class="input-group">
+							<div class="input-group-text">Max</div>
+							<input
+								type="date"
+								class="form-control"
+								bind:value={lastUsedDateMax}
+								id="last_used_date_max"
+							/>
+							<input
+								type="time"
+								class="form-control"
+								bind:value={lastUsedTimeMax}
+								id="last_used_time_max"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -404,5 +463,9 @@
 
 	.row-grey {
 		background-color: #f2f2f2;
+	}
+
+	input[type='date'] {
+		min-width: 190px;
 	}
 </style>
