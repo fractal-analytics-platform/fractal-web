@@ -11,8 +11,6 @@ FRACTAL_TASKS_DIR=tasks
 FRACTAL_LOGGING_LEVEL=00
 FRACTAL_RUNNER_BACKEND=local
 FRACTAL_RUNNER_WORKING_BASE_DIR=artifacts
-DB_ENGINE=sqlite
-SQLITE_PATH=fractal_server.db
 ```
 
 Set-up and start-up command:
@@ -27,7 +25,6 @@ Logs include
 fractal_server.app.db
 INFO:     Started server process [32375]
 INFO:     Waiting for application startup.
-2023-06-13 08:23:13,678 - fractal_server.app.db - WARNING - SQLite is supported but discouraged in production. Given its partial support for ForeignKey constraints, consistency of the database cannot be guaranteed.
 2023-06-13 08:23:13,736 - fractal_server.main - WARNING - User admin@fractal.xy already exists
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://fractal.XXX.ch:8000 (Press CTRL+C to quit)

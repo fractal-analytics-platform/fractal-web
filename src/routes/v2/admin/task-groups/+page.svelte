@@ -1,10 +1,13 @@
 <script>
 	import { page } from '$app/stores';
+	import { getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
+	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/** @type {Array<import('$lib/types').User>} */
 	const users = $page.data.users;
@@ -19,6 +22,10 @@
 	let privateGroup = null;
 	/** @type {boolean|null} */
 	let active = null;
+	let lastUsedDateMin;
+	let lastUsedTimeMin = '';
+	let lastUsedDateMax = '';
+	let lastUsedTimeMax = '';
 
 	let searched = false;
 	let searching = false;
@@ -35,6 +42,8 @@
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
 	let taskGroupEditModal;
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
+	let taskGroupManageModal;
 
 	async function searchTaskGroups() {
 		searching = true;
@@ -61,6 +70,14 @@
 			if (active !== null) {
 				url.searchParams.append('active', active.toString());
 			}
+			const lasUsedTimestampMin = getTimestamp(lastUsedDateMin, lastUsedTimeMin);
+			if (lasUsedTimestampMin) {
+				url.searchParams.append('timestamp_last_used_min', lasUsedTimestampMin);
+			}
+			const lasUsedTimestampMax = getTimestamp(lastUsedDateMax, lastUsedTimeMax);
+			if (lasUsedTimestampMax) {
+				url.searchParams.append('timestamp_last_used_max', lasUsedTimestampMax);
+			}
 			const response = await fetch(url);
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
@@ -84,6 +101,10 @@
 		user_group_id = '';
 		pkg_name = '';
 		origin = '';
+		lastUsedDateMin = '';
+		lastUsedTimeMin = '';
+		lastUsedDateMax = '';
+		lastUsedTimeMax = '';
 		privateGroup = null;
 		active = null;
 		searched = false;
@@ -233,6 +254,48 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="row mt-3">
+			<div class="col-md-3 col-lg-2 mt-2">Last used</div>
+			<div class="col-md-9 col-lg-10">
+				<div class="row row-cols-md-auto">
+					<div class="col-12 mt-1">
+						<div class="input-group">
+							<div class="input-group-text">Min</div>
+							<input
+								type="date"
+								class="form-control"
+								bind:value={lastUsedDateMin}
+								id="last_used_date_min"
+							/>
+							<input
+								type="time"
+								class="form-control"
+								bind:value={lastUsedTimeMin}
+								id="last_used_time_min"
+							/>
+						</div>
+					</div>
+					<div class="col-12 mt-1">
+						<div class="input-group">
+							<div class="input-group-text">Max</div>
+							<input
+								type="date"
+								class="form-control"
+								bind:value={lastUsedDateMax}
+								id="last_used_date_max"
+							/>
+							<input
+								type="time"
+								class="form-control"
+								bind:value={lastUsedTimeMax}
+								id="last_used_time_max"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -266,7 +329,7 @@
 				<col width="90" />
 				<col width="90" />
 				<col width="90" />
-				<col width="270" />
+				<col width="400" />
 			</colgroup>
 			<thead>
 				<tr>
@@ -303,6 +366,10 @@
 								<i class="bi bi-pencil" />
 								Edit
 							</button>
+							<button class="btn btn-info" on:click={() => taskGroupManageModal.open(taskGroup)}>
+								<i class="bi bi-gear" />
+								Manage
+							</button>
 							<ConfirmActionButton
 								modalId="confirmTaskGroupDeleteModal{taskGroup.pkg_name}"
 								style={'danger'}
@@ -330,8 +397,9 @@
 	updateEditedTaskGroup={searchTaskGroups}
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
 />
+<TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} />
 
-<Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>
+<Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
 	<svelte:fragment slot="header">
 		<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
 	</svelte:fragment>
@@ -360,8 +428,20 @@
 				<li class="list-group-item">{selectedTaskGroup.path || '-'}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
 				<li class="list-group-item">{selectedTaskGroup.venv_path || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
+				<li class="list-group-item">{selectedTaskGroup.venv_file_number || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
+				<li class="list-group-item">
+					{selectedTaskGroup.venv_size_in_kB
+						? (selectedTaskGroup.venv_size_in_kB / 1000).toFixed(2)
+						: '-'}
+				</li>
 				<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
 				<li class="list-group-item">{selectedTaskGroup.pip_extras || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Last used</li>
+				<li class="list-group-item">
+					<TimestampCell timestamp={selectedTaskGroup.timestamp_last_used} />
+				</li>
 			</ul>
 		{/if}
 	</svelte:fragment>
@@ -383,5 +463,9 @@
 
 	.row-grey {
 		background-color: #f2f2f2;
+	}
+
+	input[type='date'] {
+		min-width: 190px;
 	}
 </style>

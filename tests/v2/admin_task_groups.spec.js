@@ -65,4 +65,20 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 		await expect(page.getByText('The query returned 0 matching results')).toBeVisible();
 	});
+
+	await test.step('Search by date', async () => {
+		await page.getByText('Reset').click();
+		await expect(page.getByText('The query returned 0 matching results')).not.toBeVisible();
+		await page.locator('#last_used_date_min').fill('2020-01-01');
+		await page.locator('#last_used_time_min').fill('10:00');
+		await page.locator('#last_used_date_max').fill('2020-01-03');
+		await page.locator('#last_used_time_max').fill('23:00');
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await expect(page.getByText('The query returned 0 matching results')).toBeVisible();
+		await page.getByText('Reset').click();
+		await expect(page.locator('#last_used_date_min')).toHaveValue('');
+		await expect(page.locator('#last_used_time_min')).toHaveValue('');
+		await expect(page.locator('#last_used_date_max')).toHaveValue('');
+		await expect(page.locator('#last_used_time_max')).toHaveValue('');
+	});
 });

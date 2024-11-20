@@ -43,6 +43,11 @@ test('Viewer paths', async ({ page }) => {
 		await addUserToGroup(page, randomEmail);
 	});
 
+	await test.step('Add project dir to the group', async () => {
+		await page.getByRole('textbox', { name: 'Project dir' }).fill('/path/to/project_dir');
+		await page.getByRole('button', { name: 'Save' }).nth(1).click();
+	});
+
 	await test.step('Add viewer paths', async () => {
 		const addViewerPathBtn = page.getByRole('button', { name: 'Add viewer path' });
 		await addViewerPathBtn.click();
@@ -79,6 +84,7 @@ test('Viewer paths', async ({ page }) => {
 		await page.getByRole('link', { name: 'Viewer paths' }).click();
 		await waitPageLoading(page);
 		await expect(page.getByText('/path/to/1')).toBeVisible();
+		await expect(page.getByText('/path/to/project_dir')).toBeVisible();
 		await logout(page, randomEmail);
 	});
 });

@@ -154,7 +154,7 @@
 		if (activityId && !isNaN(Number(activityId))) {
 			task_group_activity_id = Number(activityId);
 		}
-		if (!admin) {
+		if (!admin || task_group_activity_id !== null) {
 			await searchActivities();
 		}
 		updateTasksCollectionTimeout = setTimeout(

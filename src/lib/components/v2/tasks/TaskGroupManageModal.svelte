@@ -3,6 +3,9 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
 
+	/** @type {boolean} */
+	export let admin;
+
 	/** @type {Modal} */
 	let modal;
 
@@ -36,7 +39,9 @@
 		headers.append('Content-Type', 'application/json');
 
 		const response = await fetch(
-			`/api/v2/task-group/${taskGroup?.id}/${active ? 'reactivate' : 'deactivate'}/`,
+			`/api/${admin ? 'admin/' : ''}v2/task-group/${taskGroup?.id}/${
+				active ? 'reactivate' : 'deactivate'
+			}/`,
 			{
 				method: 'POST',
 				credentials: 'include',
@@ -48,7 +53,8 @@
 
 		if (response.ok) {
 			const result = await response.json();
-			goto(`/v2/tasks/activities?activity_id=${result.id}`);
+			const page = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
+			goto(`${page}?activity_id=${result.id}`);
 			modal.hide();
 		} else {
 			errorAlert = displayStandardErrorAlert(

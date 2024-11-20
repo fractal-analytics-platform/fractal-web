@@ -268,7 +268,7 @@
 	{updateEditedTaskGroup}
 	groupIdsNames={user.group_ids_names || []}
 />
-<TaskGroupManageModal bind:this={taskGroupManageModal} />
+<TaskGroupManageModal bind:this={taskGroupManageModal} admin={false} />
 <TaskInfoModal bind:this={taskInfoModal} />
 <TaskEditModal bind:this={taskEditModal} {updateEditedTask} />
 
