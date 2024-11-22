@@ -17,7 +17,7 @@
 	Note that access to image data is restricted to OME-Zarrs within certain paths (and their
 	subfolders).
 	{#if viewerPaths.length > 0}
-		The list of paths accessible to the current user includes:
+		These are the accessible paths:
 	{:else}
 		The list of paths accessible to the current user is empty.
 	{/if}
@@ -30,7 +30,6 @@
 </ul>
 
 <p>
-	Depending on the Fractal configuration, you may also have access to additional paths.<br />
 	Please contact an admin if you see an error message like <code>403 Forbidden</code> when opening the
 	image viewer.
 </p>
