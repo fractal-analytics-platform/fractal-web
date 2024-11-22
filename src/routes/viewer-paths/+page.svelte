@@ -3,8 +3,6 @@
 
 	/** @type {string[]} */
 	const viewerPaths = $page.data.viewerPaths;
-	/** @type {import('$lib/types').UserSettings} */
-	const settings = $page.data.settings;
 </script>
 
 <h1 class="fw-light mb-3">Viewer paths</h1>
@@ -18,7 +16,7 @@
 <p>
 	Note that access to image data is restricted to OME-Zarrs within certain paths (and their
 	subfolders).
-	{#if settings.project_dir || viewerPaths.length > 0}
+	{#if viewerPaths.length > 0}
 		The list of paths accessible to the current user includes:
 	{:else}
 		The list of paths accessible to the current user is empty.
@@ -26,9 +24,6 @@
 </p>
 
 <ul>
-	{#if settings.project_dir}
-		<li><code>{settings.project_dir}</code></li>
-	{/if}
 	{#each viewerPaths as viewerPath}
 		<li><code>{viewerPath}</code></li>
 	{/each}

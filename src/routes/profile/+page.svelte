@@ -68,5 +68,7 @@
 				</tr>
 			</tbody>
 		</table>
+
+		<a class="btn btn-primary mt-3" href="/profile/token" download>Download token</a>
 	</div>
 </div>
