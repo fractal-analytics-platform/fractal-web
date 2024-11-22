@@ -74,16 +74,16 @@ export async function getCurrentUserSettings(fetch) {
  * @param {typeof fetch} fetch
  * @returns {Promise<string[]>}
  */
-export async function getCurrentUserViewerPaths(fetch) {
+export async function getCurrentUserAllowedViewerPaths(fetch) {
 	logger.debug('Retrieving current user viewer paths');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/viewer-paths/`;
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/allowed-viewer-paths/`;
 	const response = await fetch(url, {
 		method: 'GET',
 		credentials: 'include'
 	});
 
 	if (!response.ok) {
-		logger.error('Unable to retrieve the current user viewer paths');
+		logger.error('Unable to retrieve the current user allowed viewer paths');
 		await responseError(response);
 	}
 
