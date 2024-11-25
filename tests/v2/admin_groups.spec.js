@@ -152,6 +152,17 @@ test('Admin groups management', async ({ page }) => {
 		);
 	});
 
+	await test.step('Remove user from group1 by editing group', async () => {
+		await page.goto('/v2/admin/groups');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
+		await waitPageLoading(page);
+		const container = page.locator('#members-container');
+		await expect(container).toContainText(user1);
+		await page.getByLabel(`Remove user ${user1}`).click();
+		await expect(container).not.toContainText(user1);
+	});
+
 	await test.step('Delete test groups', async () => {
 		await deleteGroup(page, group1);
 		await deleteGroup(page, group2);

@@ -208,7 +208,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/auth/users/${user.id}/`, {
+		const response = await fetch(`/api/auth/users/${user.id}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,

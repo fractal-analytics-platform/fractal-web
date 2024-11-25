@@ -1,6 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import { displayStandardErrorAlert, FormErrorHandler, getAlertErrorFromResponse } from '$lib/common/errors';
+	import {
+		displayStandardErrorAlert,
+		FormErrorHandler,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from '$lib/components/v2/admin/UserSettingsEditor.svelte';
@@ -13,16 +17,19 @@
 	let runnerBackend = $page.data.runnerBackend;
 
 	/** @type {import('$lib/types').User & {id: number}|null} */
-	let draggedUser = null;
+	let draggedUserToAdd = null;
 	/** @type {import('$lib/types').User & {id: number}|null} */
 	let addingUser = null;
-	let hovering = false;
+	let addUserHovering = false;
 	let userFilter = '';
 	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default} */
 	let userSettingsEditor;
 	let settingsUpdatedMessage = '';
 	let settingsPendingChanges = false;
 	let savingSettings = false;
+
+	/** @type {import('$lib/types').User & {id: number}|null} */
+	let draggedUserToRemove = null;
 
 	/** @type {import('$lib/types').UserSettings} */
 	let settings = createEmptySettings();
@@ -49,24 +56,22 @@
 	async function handleDrop(event) {
 		event.preventDefault();
 		errorAlert?.hide();
-		if (!draggedUser) {
+		if (!draggedUserToAdd) {
 			return;
 		}
 
 		const previousUserIs = [...group.user_ids]; // copy the old values
 
-		addingUser = draggedUser;
-		group = { ...group, user_ids: [...group.user_ids, draggedUser.id] };
+		addingUser = draggedUserToAdd;
+		group = { ...group, user_ids: [...group.user_ids, draggedUserToAdd.id] };
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/auth/group/${group.id}`, {
-			method: 'PATCH',
+		const response = await fetch(`/api/auth/group/${group.id}/add-user/${addingUser.id}`, {
+			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
-				new_user_ids: [addingUser.id]
-			})
+			body: JSON.stringify({})
 		});
 
 		if (response.ok) {
@@ -81,7 +86,53 @@
 		}
 
 		addingUser = null;
-		hovering = false;
+		draggedUserToAdd = null;
+		addUserHovering = false;
+	}
+
+	async function handleDroppedUserToRemove(event) {
+		if (!draggedUserToRemove || isMouseInMembersContainer(event)) {
+			return;
+		}
+		await removeUser(draggedUserToRemove.id);
+		draggedUserToRemove = null;
+	}
+
+	/**
+	 * @param {number} userId
+	 */
+	async function removeUser(userId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/auth/group/${group.id}/remove-user/${userId}`, {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({})
+		});
+
+		if (response.ok) {
+			group = await response.json();
+		} else {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'editGroupError'
+			);
+		}
+	}
+
+	function isMouseInMembersContainer(event) {
+		const container = document.getElementById('members-container');
+		if (!container) {
+			return false;
+		}
+		const rect = container.getBoundingClientRect();
+		return (
+			event.clientX >= rect.left &&
+			event.clientX <= rect.right &&
+			event.clientY >= rect.top &&
+			event.clientY <= rect.bottom
+		);
 	}
 
 	/** @type {string[]} */
@@ -187,9 +238,9 @@
 			class="droparea bg-light p-2"
 			id="members-container"
 			role="region"
-			class:hovering
-			on:dragenter={() => (hovering = true)}
-			on:dragleave={() => (hovering = false)}
+			class:addUserHovering
+			on:dragenter={() => (addUserHovering = true)}
+			on:dragleave={() => (addUserHovering = false)}
 			on:drop={(event) => handleDrop(event)}
 			on:dragover={(event) => {
 				event.preventDefault();
@@ -197,12 +248,31 @@
 		>
 			<div class="p-2">
 				{#each members as user}
-					<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
-						{user.email}
+					<button
+						class="btn btn-secondary ps-1 pe-0 pt-0 pb-0 me-2 mb-2 user-badge"
+						draggable={true}
+						on:dragstart={() => (draggedUserToRemove = user)}
+						on:dragend={(event) => handleDroppedUserToRemove(event)}
+					>
+						<span class="user-text">
+							{user.email}
+						</span>
 						{#if addingUser && addingUser.id === user.id}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							<span
+								class="spinner-border spinner-border-sm me-2"
+								role="status"
+								aria-hidden="true"
+							/>
+						{:else}
+							<button
+								class="text-danger remove-user-btn btn ms-1 ps-1 pe-1"
+								aria-label="Remove user {user.email}"
+								on:click={() => removeUser(user.id)}
+							>
+								<i class="bi bi-x" />
+							</button>
 						{/if}
-					</span>
+					</button>
 				{/each}
 			</div>
 			<p class="text-center mt-1 mb-1">drag the users here</p>
@@ -224,10 +294,10 @@
 					<button
 						class="btn btn-outline-secondary ps-1 pe-2 pt-0 pb-0 me-2 mb-2"
 						draggable={true}
-						on:dragstart={() => (draggedUser = user)}
+						on:dragstart={() => (draggedUserToAdd = user)}
 						on:dragend={() => {
-							draggedUser = null;
-							hovering = false;
+							draggedUserToAdd = null;
+							addUserHovering = false;
 						}}
 						disabled={addingUser !== null}
 					>
@@ -326,3 +396,17 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.user-badge {
+		padding-right: 0;
+		cursor: pointer;
+	}
+
+	.remove-user-btn {
+		padding-top: 2px;
+		padding-bottom: 1px;
+		background-color: #eee;
+		border-radius: 0 5px 5px 0;
+	}
+</style>
