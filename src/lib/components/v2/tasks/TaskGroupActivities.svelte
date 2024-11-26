@@ -93,7 +93,10 @@
 				);
 				return;
 			}
-			results = await response.json();
+			/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
+			const activities = await response.json();
+			activities.sort((a1, a2) => (a1.timestamp_started < a2.timestamp_started ? 1 : -1));
+			results = activities;
 		} finally {
 			searching = false;
 			searched = true;
