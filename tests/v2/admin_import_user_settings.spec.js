@@ -42,6 +42,12 @@ test('Import user settings from another user', async ({ page }) => {
 		await modal.waitFor();
 		await selectSlimSelect(page, modal.getByLabel('Select user'), user1);
 		await modal.getByRole('button', { name: 'Import settings' }).click();
+		if (await modal.getByText('User is required').isVisible()) {
+			// Sometimes playwright clicks the "Import settings" button before the slim-select
+			// change event is propagated; in that case no user is selected and the error appears.
+			console.warn('"User is required" message was displayed. Retrying to add user.');
+			await modal.getByRole('button', { name: 'Import settings' }).click();
+		}
 		await waitModalClosed(page);
 		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue(
 			'/test/import/proj_dir'
