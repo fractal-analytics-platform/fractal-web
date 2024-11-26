@@ -42,7 +42,10 @@ test('Admin groups management', async ({ page }) => {
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 		await waitPageLoading(page);
-		const currentGroups = await groupBadges.allInnerTexts();
+		const currentGroups = (await groupBadges.allInnerTexts()).map(
+			// extract the group name from the element without the removal button text content
+			(t) => /** @type {RegExpMatchArray} */ (t.match(/^\S+/))[0]
+		);
 		initialGroupBadgesCount = await groupBadges.count();
 		expect(currentGroups.includes('All')).toBeTruthy();
 		expect(currentGroups.includes(group1)).toBeTruthy();
