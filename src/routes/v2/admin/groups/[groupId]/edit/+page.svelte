@@ -248,31 +248,40 @@
 		>
 			<div class="p-2">
 				{#each members as user}
-					<button
-						class="btn btn-secondary ps-1 pe-0 pt-0 pb-0 me-2 mb-2 user-badge"
-						draggable={true}
-						on:dragstart={() => (draggedUserToRemove = user)}
-						on:dragend={(event) => handleDroppedUserToRemove(event)}
-					>
-						<span class="user-text">
+					{#if group.name === 'All'}
+						<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 							{user.email}
+							{#if addingUser && addingUser.id === user.id}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							{/if}
 						</span>
-						{#if addingUser && addingUser.id === user.id}
-							<span
-								class="spinner-border spinner-border-sm me-2"
-								role="status"
-								aria-hidden="true"
-							/>
-						{:else}
-							<button
-								class="text-danger remove-user-btn btn ms-1 ps-1 pe-1"
-								aria-label="Remove user {user.email}"
-								on:click={() => removeUser(user.id)}
-							>
-								<i class="bi bi-x" />
-							</button>
-						{/if}
-					</button>
+					{:else}
+						<button
+							class="btn btn-secondary ps-1 pe-0 pt-0 pb-0 me-2 mb-2 user-badge"
+							draggable={true}
+							on:dragstart={() => (draggedUserToRemove = user)}
+							on:dragend={(event) => handleDroppedUserToRemove(event)}
+						>
+							<span class="user-text">
+								{user.email}
+							</span>
+							{#if addingUser && addingUser.id === user.id}
+								<span
+									class="spinner-border spinner-border-sm me-2"
+									role="status"
+									aria-hidden="true"
+								/>
+							{:else}
+								<button
+									class="text-danger remove-user-btn btn ms-1 ps-1 pe-1"
+									aria-label="Remove user {user.email}"
+									on:click={() => removeUser(user.id)}
+								>
+									<i class="bi bi-x" />
+								</button>
+							{/if}
+						</button>
+					{/if}
 				{/each}
 			</div>
 			<p class="text-center mt-1 mb-1">drag the users here</p>
