@@ -44,7 +44,7 @@ describe('Admin group edit page', () => {
 		fireEvent.drop(result.getByText(/drag the users here/i));
 
 		await result.findByText(/No more users available/);
-		expect(result.queryByRole('button', { name: 'mario@fractal.xy' })).null;
+		expect(await result.findByLabelText('Remove user mario@fractal.xy')).not.null;
 	});
 
 	it('Error happens when user is dragged and dropped', async () => {
@@ -61,5 +61,6 @@ describe('Admin group edit page', () => {
 
 		await result.findByText(/An error happened/);
 		expect(result.queryByRole('button', { name: 'mario@fractal.xy' })).not.null;
+		expect(result.queryByRole('button', { name: 'Remove user mario@fractal.xy' })).null;
 	});
 });

@@ -13,6 +13,7 @@
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
+	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	export let user;
@@ -37,6 +38,9 @@
 	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
 	let userSettingsEditor;
 	let settingsPendingChanges;
+
+	/** @type {UserSettingsImportModal} */
+	let userSettingsImportModal;
 
 	$: userGroups = user.group_ids_names
 		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
@@ -280,6 +284,13 @@
 		const options = values.map((p) => ({ text: p.name, value: p.id.toString() }));
 		select.setData([{ text: 'Select...', placeholder: true }, ...options]);
 	}
+
+	/**
+	 * @param {import('$lib/types').UserSettings} importedSettings
+	 */
+	function onSettingsImported(importedSettings) {
+		settings = importedSettings;
+	}
 </script>
 
 <div class="row">
@@ -448,8 +459,18 @@
 		<div class="row">
 			<div class="mt-3 col-lg-7">
 				<div class="row">
-					<div class="offset-sm-3">
-						<h4 class="fw-light">Settings</h4>
+					<div class="col offset-sm-3">
+						<button
+							class="btn btn-primary float-end mb-2"
+							on:click={() =>
+								userSettingsImportModal.open([
+									...groups.filter((g) => g.name !== 'All').map((g) => g.id),
+									...groupIdsToAdd
+								])}
+						>
+							Import from another user
+						</button>
+						<h4 class="fw-light mt-2">Settings</h4>
 					</div>
 				</div>
 			</div>
@@ -524,6 +545,12 @@
 			<button class="btn btn-primary" on:click={addGroupToUser}> Add </button>
 		</svelte:fragment>
 	</Modal>
+
+	<UserSettingsImportModal
+		currentUserId={Number(user.id)}
+		bind:this={userSettingsImportModal}
+		{onSettingsImported}
+	/>
 </div>
 
 <style>
