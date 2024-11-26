@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Alignment with fractal-server 2.9.0 (\#640, \#643, \#652):
+* Alignment with fractal-server 2.9.0 (\#640, \#643, \#652, \#655):
     * Updated task collections logic and created task-group activities pages for standard users and administrators (\#640);
     * Removed active checkbox from task group edit modal (\#640);
     * Added Manage button to deactivate and reactivate task groups (\#640);
@@ -13,6 +13,10 @@
     * Added last used timestamp filter to task-group admin page (\#643);
     * Used new `GET /auth/current-user/allowed-viewer-paths/` endpoint (\#652);
     * Added "Download token" button in "My profile" page (\#652);
+    * Implemented removal of users from group (\#655);
+    * Implemented import of user settings from another user (\#655);
+    * Used new set-groups endpoint (\#655);
+    * Sorted task-group activities by timestamp_started (more recent first) (\#655);
 
 # 1.10.1
 
