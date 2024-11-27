@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.11.0
 
 * Alignment with fractal-server 2.9.0 (\#640, \#643, \#652, \#655):
     * Updated task collections logic and created task-group activities pages for standard users and administrators (\#640);
