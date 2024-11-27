@@ -1,5 +1,9 @@
 import { it, expect } from 'vitest';
-import { sortUsers, sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities';
+import {
+	sortUsers,
+	sortGroupByNameAllFirstComparator,
+	sortUserToImportSettings
+} from '$lib/components/admin/user_utilities';
 
 it('should sort user by current superuser, then by superuser, then by email', () => {
 	let users = [
@@ -43,4 +47,28 @@ it('should sort groups by name, but keeping the All group first', () => {
 	expect(groups[0].name).eq('All');
 	expect(groups[1].name).eq('g2');
 	expect(groups[2].name).eq('g3');
+});
+
+it('should sort users to import settings', () => {
+	const users = [
+		{ id: 1, email: 'aaa@fractal.xy' }, // groups: 1
+		{ id: 2, email: 'bbb@fractal.xy' }, // groups: 1, 2, 4
+		{ id: 3, email: 'ccc@fractal.xy' }, // groups: 1, 3
+		{ id: 4, email: 'ddd@fractal.xy' }  // groups: 1, 4
+	];
+
+	const desiredGroups = [2, 3];
+	const allGroups = [
+		{ id: 1, name: 'All', user_ids: [1, 2, 3, 4] },
+		{ id: 2, name: 'g2', user_ids: [2] },
+		{ id: 3, name: 'g3', user_ids: [3] },
+		{ id: 4, name: 'g4', user_ids: [2, 4] }
+	];
+
+	const sortedUsers = sortUserToImportSettings(users, desiredGroups, allGroups);
+
+	expect(sortedUsers[0].email).eq('ccc@fractal.xy');
+	expect(sortedUsers[1].email).eq('bbb@fractal.xy');
+	expect(sortedUsers[2].email).eq('aaa@fractal.xy');
+	expect(sortedUsers[3].email).eq('ddd@fractal.xy');
 });

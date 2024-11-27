@@ -38,3 +38,28 @@ export const sortGroupByNameAllFirstComparator = function (g1, g2) {
 		? 1
 		: g1.name.localeCompare(g2.name, undefined, { sensitivity: 'base' });
 };
+
+/**
+ * @param {Array<import('$lib/types').User & {id: number}>} users
+ * @param {number[]} desiredGroups
+ * @param {Array<import('$lib/types').Group & {user_ids: number[]}>} allGroups
+ * @returns
+ */
+export const sortUserToImportSettings = function (users, desiredGroups, allGroups) {
+	users.sort((u1, u2) => {
+		const u1Groups = allGroups.filter((g) => g.user_ids.includes(u1.id)).map((g) => g.id);
+		const u2Groups = allGroups.filter((g) => g.user_ids.includes(u2.id)).map((g) => g.id);
+		for (const u1g of u1Groups) {
+			if (desiredGroups.includes(u1g)) {
+				return -1;
+			}
+		}
+		for (const u2g of u2Groups) {
+			if (desiredGroups.includes(u2g)) {
+				return 1;
+			}
+		}
+		return 0;
+	});
+	return users;
+};

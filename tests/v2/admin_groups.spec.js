@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
 import { addUserToGroup, createTestGroup, deleteGroup } from './group_utils.js';
+import { addGroupToUser, createTestUser } from './user_utils.js';
 
 test('Admin groups management', async ({ page }) => {
 	let user1;
@@ -41,7 +42,10 @@ test('Admin groups management', async ({ page }) => {
 		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 		await waitPageLoading(page);
-		const currentGroups = await groupBadges.allInnerTexts();
+		const currentGroups = (await groupBadges.allInnerTexts()).map(
+			// extract the group name from the element without the removal button text content
+			(t) => /** @type {RegExpMatchArray} */ (t.match(/^\S+/))[0]
+		);
 		initialGroupBadgesCount = await groupBadges.count();
 		expect(currentGroups.includes('All')).toBeTruthy();
 		expect(currentGroups.includes(group1)).toBeTruthy();
@@ -49,19 +53,7 @@ test('Admin groups management', async ({ page }) => {
 
 	let selectableGroups1;
 	await test.step('Select group2 from "Add group" modal', async () => {
-		await page.getByRole('button', { name: 'Add group' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		selectableGroups1 = await page.getByRole('option').count();
-		await selectSlimSelect(page, page.getByLabel('Select groups'), group2, true);
-		await modal.getByRole('button', { name: 'Add' }).click();
-		if (await modal.getByText('Group is required').isVisible()) {
-			// Sometimes playwright clicks the "Add" button before the slim-select change event
-			// is propagated; in that case no group is selected and the error appears.
-			console.warn('"Group is required" message was displayed. Retrying to add group.');
-			await modal.getByRole('button', { name: 'Add' }).click();
-		}
-		await waitModalClosed(page);
+		selectableGroups1 = await addGroupToUser(page, group2);
 		await expect(groupBadges).toHaveCount(initialGroupBadgesCount + 1);
 	});
 
@@ -152,26 +144,20 @@ test('Admin groups management', async ({ page }) => {
 		);
 	});
 
+	await test.step('Remove user from group1 by editing group', async () => {
+		await page.goto('/v2/admin/groups');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
+		await waitPageLoading(page);
+		const container = page.locator('#members-container');
+		await expect(container).toContainText(user1);
+		await page.getByLabel(`Remove user ${user1}`).click();
+		await expect(container).not.toContainText(user1);
+	});
+
 	await test.step('Delete test groups', async () => {
 		await deleteGroup(page, group1);
 		await deleteGroup(page, group2);
 		await deleteGroup(page, group3);
 	});
 });
-
-/**
- * @param {import('@playwright/test').Page} page
- * @returns {Promise<string>}
- */
-async function createTestUser(page) {
-	const randomEmail = Math.random().toString(36).substring(7) + '@example.com';
-	await page.goto('/v2/admin/users/register');
-	await waitPageLoading(page);
-	await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
-	await page.getByLabel('Password', { exact: true }).fill('test');
-	await page.getByLabel('Confirm password').fill('test');
-	await page.getByRole('button', { name: 'Save' }).click();
-	await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
-	await waitPageLoading(page);
-	return randomEmail;
-}

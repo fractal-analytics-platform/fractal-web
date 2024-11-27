@@ -13,6 +13,7 @@
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
+	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	export let user;
@@ -31,24 +32,27 @@
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	let originalUser;
 	let userPendingChanges = false;
-	/** @type {number[]} */
-	let groupIdsToAdd = [];
 
 	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
 	let userSettingsEditor;
 	let settingsPendingChanges;
 
-	$: userGroups = user.group_ids_names
-		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-		.sort(sortGroupByNameAllFirstComparator);
+	/** @type {UserSettingsImportModal} */
+	let userSettingsImportModal;
+
+	/** @type {Array<import('$lib/types').Group>} */
+	let userGroups = [];
+
+	$: addedGroups = userGroups.filter(
+		(g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id)
+	);
+
+	$: removedGroups = user.group_ids_names
+		.map((ni) => ni[0])
+		.filter((gi) => !userGroups.map((ug) => ug.id).includes(gi));
 
 	$: availableGroups = groups
-		.filter((g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id))
-		.filter((g) => !groupIdsToAdd.includes(g.id))
-		.sort(sortGroupByNameAllFirstComparator);
-
-	$: groupsToAdd = groupIdsToAdd
-		.map((id) => groups.filter((g) => g.id === id)[0])
+		.filter((g) => !userGroups.map((ug) => ug.id).includes(g.id))
 		.sort(sortGroupByNameAllFirstComparator);
 
 	$: if (user) {
@@ -57,7 +61,11 @@
 
 	$: enableSave =
 		!saving &&
-		(userPendingChanges || settingsPendingChanges || groupIdsToAdd.length > 0 || password);
+		(userPendingChanges ||
+			settingsPendingChanges ||
+			addedGroups.length > 0 ||
+			removedGroups.length > 0 ||
+			password);
 
 	let password = '';
 	let confirmPassword = '';
@@ -103,7 +111,7 @@
 		confirmSuperuserChange.hide();
 		try {
 			let existing = !!user.id;
-			const groupsSuccess = await addGroups();
+			const groupsSuccess = await setGroups();
 			if (!groupsSuccess) {
 				return;
 			}
@@ -167,10 +175,10 @@
 	let groupsSelector;
 	let addGroupError = '';
 	/** @type {number[]} */
-	let selectedGroupsToAdd = [];
+	let selectedGroupIdsToAdd = [];
 
 	function openAddGroupModal() {
-		selectedGroupsToAdd = [];
+		selectedGroupIdsToAdd = [];
 		addGroupError = '';
 		setSlimSelectOptions(groupsSelector, getGroupSlimSelectOptions());
 		addGroupModal.show();
@@ -182,38 +190,47 @@
 
 	async function addGroupToUser() {
 		addGroupError = '';
-		if (selectedGroupsToAdd.length === 0) {
+		if (selectedGroupIdsToAdd.length === 0) {
 			addGroupError = 'Group is required';
 			return;
 		}
 
-		groupIdsToAdd = [...groupIdsToAdd, ...selectedGroupsToAdd];
-		selectedGroupsToAdd = [];
+		const selectedGroupToAdd = selectedGroupIdsToAdd.map(
+			(id) => groups.filter((g) => g.id === id)[0]
+		);
+
+		const newUserGroups = [...userGroups, ...selectedGroupToAdd];
+		newUserGroups.sort(sortGroupByNameAllFirstComparator);
+
+		userGroups = newUserGroups;
+		selectedGroupIdsToAdd = [];
 		addGroupModal.hide();
 	}
 
 	/**
 	 * @param {number} groupId
 	 */
-	function removeGroupToAdd(groupId) {
-		groupIdsToAdd = groupIdsToAdd.filter((id) => id !== groupId);
+	function removeGroup(groupId) {
+		const newUserGroups = userGroups.filter((g) => g.id !== groupId);
+		newUserGroups.sort(sortGroupByNameAllFirstComparator);
+		userGroups = newUserGroups;
 	}
 
-	async function addGroups() {
+	async function setGroups() {
 		errorAlert?.hide();
-		if (groupIdsToAdd.length === 0) {
+		if (addedGroups.length === 0 && removedGroups.length === 0) {
 			return true;
 		}
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/auth/users/${user.id}/`, {
-			method: 'PATCH',
+		const response = await fetch(`/api/auth/users/${user.id}/set-groups`, {
+			method: 'POST',
 			credentials: 'include',
 			headers,
 			body: JSON.stringify({
-				new_group_ids: groupIdsToAdd
+				group_ids: userGroups.map((g) => g.id)
 			})
 		});
 
@@ -221,7 +238,7 @@
 			const result = await response.json();
 			user = { ...user, group_ids_names: result.group_ids_names };
 			originalUser = deepCopy(nullifyEmptyStrings(user));
-			groupIdsToAdd = [];
+			loadUserGroups();
 			return true;
 		}
 
@@ -242,8 +259,15 @@
 
 	onMount(() => {
 		originalUser = deepCopy(nullifyEmptyStrings(user));
+		loadUserGroups();
 		setGroupsSlimSelect();
 	});
+
+	function loadUserGroups() {
+		userGroups = user.group_ids_names
+			.map((ni) => groups.filter((g) => g.id === ni[0])[0])
+			.sort(sortGroupByNameAllFirstComparator);
+	}
 
 	function setGroupsSlimSelect() {
 		const elementId = 'group-select';
@@ -259,9 +283,9 @@
 			events: {
 				afterChange: (selection) => {
 					if (selection.length === 0 || selection[0].value === 'Select...') {
-						selectedGroupsToAdd = [];
+						selectedGroupIdsToAdd = [];
 					} else {
-						selectedGroupsToAdd = selection.map((o) => Number(o.value));
+						selectedGroupIdsToAdd = selection.map((o) => Number(o.value));
 					}
 				}
 			}
@@ -279,6 +303,13 @@
 		}
 		const options = values.map((p) => ({ text: p.name, value: p.id.toString() }));
 		select.setData([{ text: 'Select...', placeholder: true }, ...options]);
+	}
+
+	/**
+	 * @param {import('$lib/types').UserSettings} importedSettings
+	 */
+	function onSettingsImported(importedSettings) {
+		settings = importedSettings;
 	}
 </script>
 
@@ -411,19 +442,18 @@
 				<div class="col-sm-9">
 					<div>
 						{#each userGroups as group}
-							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group.name}</span>
-						{/each}
-						{#each groupsToAdd as groupToAdd}
 							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">
-								{groupToAdd.name}
-								<button
-									class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
-									type="button"
-									aria-label="Remove group {groupToAdd.name}"
-									on:click={() => removeGroupToAdd(groupToAdd.id)}
-								>
-									&times;
-								</button>
+								{group.name}
+								{#if group.name !== 'All'}
+									<button
+										class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
+										type="button"
+										aria-label="Remove group {group.name}"
+										on:click={() => removeGroup(group.id)}
+									>
+										&times;
+									</button>
+								{/if}
 							</span>
 						{/each}
 						{#if availableGroups.length > 0}
@@ -448,8 +478,17 @@
 		<div class="row">
 			<div class="mt-3 col-lg-7">
 				<div class="row">
-					<div class="offset-sm-3">
-						<h4 class="fw-light">Settings</h4>
+					<div class="col offset-sm-3">
+						<button
+							class="btn btn-primary float-end mb-2"
+							on:click={() =>
+								userSettingsImportModal.open(
+									userGroups.filter((g) => g.name !== 'All').map((g) => g.id)
+								)}
+						>
+							Import from another user
+						</button>
+						<h4 class="fw-light mt-2">Settings</h4>
 					</div>
 				</div>
 			</div>
@@ -524,6 +563,12 @@
 			<button class="btn btn-primary" on:click={addGroupToUser}> Add </button>
 		</svelte:fragment>
 	</Modal>
+
+	<UserSettingsImportModal
+		currentUserId={Number(user.id)}
+		bind:this={userSettingsImportModal}
+		{onSettingsImported}
+	/>
 </div>
 
 <style>
