@@ -556,7 +556,7 @@
 <p><em>Note: Numbers like (#123) point to closed Pull Requests on the fractal-web repository.</em></p>
 <h1 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h1>
 <ul>
-<li>Alignment with fractal-server 2.9.0 (#640, #643, #652):<ul>
+<li>Alignment with fractal-server 2.9.0 (#640, #643, #652, #655):<ul>
 <li>Updated task collections logic and created task-group activities pages for standard users and administrators (#640);</li>
 <li>Removed active checkbox from task group edit modal (#640);</li>
 <li>Added Manage button to deactivate and reactivate task groups (#640);</li>
@@ -567,6 +567,10 @@
 <li>Added last used timestamp filter to task-group admin page (#643);</li>
 <li>Used new <code>GET /auth/current-user/allowed-viewer-paths/</code> endpoint (#652);</li>
 <li>Added "Download token" button in "My profile" page (#652);</li>
+<li>Implemented removal of users from group (#655);</li>
+<li>Implemented import of user settings from another user (#655);</li>
+<li>Used new set-groups endpoint (#655);</li>
+<li>Sorted task-group activities by timestamp_started (more recent first) (#655);</li>
 </ul>
 </li>
 </ul>
