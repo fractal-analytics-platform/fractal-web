@@ -46,6 +46,7 @@
 		"@vincjo/datatables": "^1.14.10",
 		"ajv": "^8.12.0",
 		"ajv-formats": "^3.0.1",
+		"color-hash": "^2.0.2",
 		"dompurify": "^3.0.5",
 		"jose": "^4.14.4",
 		"log4js": "^6.9.1",

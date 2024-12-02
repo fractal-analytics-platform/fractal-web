@@ -1,3 +1,4 @@
+import { formatMarkdown } from '$lib/common/component_utilities';
 import { getAlertErrorFromResponse } from '$lib/common/errors';
 import compareLoose from 'semver/functions/compare-loose';
 
@@ -153,7 +154,9 @@ function getTaskTableProperties(taskGroup, task) {
 		category: task.category,
 		modality: task.modality,
 		authors: task.authors,
-		tags: task.tags
+		tags: task.tags,
+		input_types: task.input_types,
+		docs_info: formatMarkdown(task.docs_info || '')
 	};
 }
 
