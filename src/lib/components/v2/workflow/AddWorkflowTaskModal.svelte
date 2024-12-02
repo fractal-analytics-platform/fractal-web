@@ -96,6 +96,7 @@
 	centered={true}
 	scrollable={true}
 	bind:this={modal}
+	focus={false}
 	inputAutofocus={false}
 >
 	<svelte:fragment slot="header">

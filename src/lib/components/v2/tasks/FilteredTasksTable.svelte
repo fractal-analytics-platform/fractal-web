@@ -368,7 +368,7 @@
 									<td>
 										<ColouredBadge value={task.taskVersions[task.selectedVersion].modality} />
 									</td>
-									<td class="metadata-cell">
+									<td class="metadata-col">
 										{#each Object.entries(task.taskVersions[task.selectedVersion].input_types) as [input_type_key, input_type_value]}
 											<div class="d-flex flex-row">
 												<div class="input-type-text me-1">{input_type_key}</div>
@@ -376,25 +376,31 @@
 											</div>
 										{/each}
 									</td>
-									<td class="metadata-cell">
+									<td class="metadata-col">
 										{getMetadataCell(task.taskVersions[task.selectedVersion])}
 									</td>
-									<td>
-										{#if Object.keys(task.taskVersions).length > 1}
-											<select
-												class="form-select"
-												aria-label="Version for task {task.taskVersions[task.selectedVersion]
-													.task_name}"
-												bind:value={task.selectedVersion}
-											>
-												{#each sortVersions(Object.keys(task.taskVersions)) as version}
-													<option value={version}>{version || 'None'}</option>
-												{/each}
-											</select>
-										{:else}
-											{task.taskVersions[task.selectedVersion].version}
-										{/if}
-										<slot name="docs-info" task={task.taskVersions[task.selectedVersion]} />
+									<td class="version-col">
+										<div class="d-flex align-items-center">
+											<div class="">
+												{#if Object.keys(task.taskVersions).length > 1}
+													<select
+														class="form-select"
+														aria-label="Version for task {task.taskVersions[task.selectedVersion]
+															.task_name}"
+														bind:value={task.selectedVersion}
+													>
+														{#each sortVersions(Object.keys(task.taskVersions)) as version}
+															<option value={version}>{version || 'None'}</option>
+														{/each}
+													</select>
+												{:else}
+													{task.taskVersions[task.selectedVersion].version}
+												{/if}
+											</div>
+											<div>
+												<slot name="docs-info" task={task.taskVersions[task.selectedVersion]} />
+											</div>
+										</div>
 									</td>
 									<slot name="extra-columns" task={task.taskVersions[task.selectedVersion]} />
 								</tr>
@@ -406,7 +412,6 @@
 		</div>
 	</div>
 {/if}
-<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill" />
 
 <style>
 	#filtered-tasks-table td {
@@ -420,13 +425,17 @@
 		padding-top: 18px;
 		padding-bottom: 12px;
 	}
-	.metadata-cell {
+	.metadata-col {
 		font-size: 85%;
 		max-width: 150px;
 	}
 
 	.task-name-col {
 		max-width: 180px;
+	}
+
+	.version-col {
+		max-width: 100px;
 	}
 
 	.input-type-text {

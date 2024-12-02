@@ -47,7 +47,9 @@ describe('AddWorkflowTaskModal', () => {
 							category: null,
 							modality: null,
 							authors: null,
-							tags: []
+							tags: [],
+							input_types: {},
+							docs_info: ''
 						}
 					],
 					user_id: 1,
@@ -66,7 +68,9 @@ describe('AddWorkflowTaskModal', () => {
 							category: null,
 							modality: null,
 							authors: null,
-							tags: []
+							tags: [],
+							input_types: {},
+							docs_info: ''
 						}
 					],
 					user_id: 1,
@@ -117,7 +121,9 @@ describe('AddWorkflowTaskModal', () => {
 							category: null,
 							modality: null,
 							authors: null,
-							tags: []
+							tags: [],
+							input_types: {},
+							docs_info: ''
 						}
 					],
 					user_id: 1,
@@ -136,7 +142,9 @@ describe('AddWorkflowTaskModal', () => {
 							category: null,
 							modality: null,
 							authors: null,
-							tags: []
+							tags: [],
+							input_types: {},
+							docs_info: ''
 						}
 					],
 					user_id: 1,
@@ -165,7 +173,7 @@ describe('AddWorkflowTaskModal', () => {
 		);
 		await waitFor(() => screen.getAllByText(/test_task/));
 
-		const dropdown = screen.getByRole('combobox');
+		const dropdown = await screen.findByRole('combobox');
 		expect(dropdown.options.length).eq(2);
 		expect(dropdown.options[0].text).eq('0.0.1');
 		expect(dropdown.options[1].text).eq('INVALID');
