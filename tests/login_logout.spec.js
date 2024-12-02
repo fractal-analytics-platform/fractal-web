@@ -34,7 +34,7 @@ test.describe(() => {
 		await page.goto('/auth/login');
 		await login(page, 'admin@fractal.xy', '1234');
 		await page.context().clearCookies();
-		await page.getByRole('link', { name: 'Tasks' }).click();
+		await page.getByRole('link', { name: 'Tasks management' }).click();
 		await page.waitForURL('/auth/login?invalidate=true');
 		await verifySessionExpiredMessage(page);
 	});

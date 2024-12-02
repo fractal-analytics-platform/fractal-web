@@ -15,7 +15,7 @@ const pydanticV1Schema = path.join(__dirname, '..', 'data', 'pydantic-v1-schema.
 const pydanticV2Schema = path.join(__dirname, '..', 'data', 'pydantic-v2-schema.json');
 
 test('Add single tasks [v2]', async ({ page }) => {
-	await page.goto('/v2/tasks');
+	await page.goto('/v2/tasks-management');
 	await waitPageLoading(page);
 
 	test.slow();
