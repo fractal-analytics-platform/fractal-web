@@ -24,6 +24,7 @@
 		"@testing-library/jest-dom": "^6.6.2",
 		"@testing-library/svelte": "^4.0.4",
 		"@testing-library/user-event": "^14.5.2",
+		"@types/color-hash": "^2.0.0",
 		"@types/dompurify": "^3.0.2",
 		"@types/node": "^22.7.4",
 		"dotenv": "^16.3.1",

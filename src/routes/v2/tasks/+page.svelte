@@ -1,119 +1,43 @@
 <script>
 	import { page } from '$app/stores';
-	import TaskCollection from '$lib/components/v2/tasks/TaskCollection.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
-	import AddSingleTask from '$lib/components/v2/tasks/AddSingleTask.svelte';
-	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
-	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
+	import { formatMarkdown } from '$lib/common/component_utilities';
+	import Modal from '$lib/components/common/Modal.svelte';
+	import FilteredTasksTable from '$lib/components/v2/tasks/FilteredTasksTable.svelte';
 
 	/** @type {import('$lib/types-v2').TaskGroupV2[]} */
 	let taskGroups = $page.data.taskGroups;
 
-	/** @type {'pypi'|'local'|'single'|'custom_env'} */
-	let packageType = 'pypi';
+	/** @type {Modal} */
+	let modal;
 
-	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default} */
-	let taskCollectionComponent;
-
-	/** @type {string|undefined} */
-	let expandedTaskGroupRow = undefined;
-
-	async function reloadTaskGroupsList() {
-		const response = await fetch(`/api/v2/task-group?args_schema=false`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		const result = await response.json();
-		if (response.ok) {
-			taskGroups = result;
-		} else {
-			displayStandardErrorAlert(result, 'errorSection');
-		}
-	}
+	/** @type {import('$lib/types-v2').TasksTableRow|null} */
+	let selectedTaskRow = null;
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2[]} updatedGroups
+	 * @param {import('$lib/types-v2').TasksTableRow} taskRow
 	 */
-	function updateTaskGroups(updatedGroups) {
-		taskGroups = updatedGroups;
+	function showDocsInfoModal(taskRow) {
+		selectedTaskRow = taskRow;
+		modal.show();
 	}
 </script>
 
-<div>
-	<div class="mb-2" id="errorSection" />
-
-	<h3 class="fw-light">Add tasks</h3>
-
-	<div class="form-check-inline">Package type:</div>
-
-	<input
-		class="btn-check"
-		type="radio"
-		name="pypi"
-		id="pypi"
-		value="pypi"
-		bind:group={packageType}
-		on:click={() => taskCollectionComponent?.clearForm()}
-	/>
-	<label class="btn btn-outline-secondary" for="pypi"> PyPI </label>
-
-	<input
-		class="btn-check"
-		type="radio"
-		name="local"
-		id="local"
-		value="local"
-		bind:group={packageType}
-		on:click={() => taskCollectionComponent?.clearForm()}
-	/>
-	<label class="btn btn-outline-secondary" for="local"> Local </label>
-
-	<input
-		class="btn-check"
-		type="radio"
-		name="single"
-		id="single"
-		value="single"
-		bind:group={packageType}
-	/>
-	<label class="btn btn-outline-secondary" for="single"> Single task </label>
-
-	<input
-		class="btn-check"
-		type="radio"
-		name="custom_env"
-		id="custom_env"
-		value="custom_env"
-		bind:group={packageType}
-	/>
-	<label class="btn btn-outline-secondary" for="custom_env"> Custom Python env </label>
-
-	<div class="mt-3">
-		{#if packageType === 'pypi' || packageType === 'local'}
-			<TaskCollection
-				{packageType}
-				{reloadTaskGroupsList}
-				bind:this={taskCollectionComponent}
-				user={$page.data.user}
-			/>
-		{:else if packageType === 'single'}
-			<AddSingleTask addNewTasks={reloadTaskGroupsList} user={$page.data.user} />
-		{:else if packageType === 'custom_env'}
-			<CustomEnvTask addNewTasks={reloadTaskGroupsList} user={$page.data.user} />
+<FilteredTasksTable {taskGroups}>
+	<svelte:fragment slot="docs-info" let:task>
+		{#if task.docs_info}
+			<button class="btn btn-info ms-2" on:click={() => showDocsInfoModal(task)}>
+				<i class="bi bi-info-circle" />
+			</button>
 		{/if}
-	</div>
+	</svelte:fragment>
+</FilteredTasksTable>
 
-	<div class="row mt-4">
-		<h3 class="fw-light">Task List</h3>
-		<div class="col-12">
-			{#key taskGroups}
-				<TaskGroupsTable
-					{taskGroups}
-					{updateTaskGroups}
-					user={$page.data.user}
-					bind:expandedTaskGroupRow
-				/>
-			{/key}
-		</div>
-	</div>
-</div>
+<Modal id="task-docs-info-modal" size="xl" scrollable={true} bind:this={modal}>
+	<svelte:fragment slot="header">
+		<h5 class="modal-title">{selectedTaskRow?.task_name}</h5>
+	</svelte:fragment>
+	<svelte:fragment slot="body">
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		{@html formatMarkdown(selectedTaskRow?.docs_info)}
+	</svelte:fragment>
+</Modal>

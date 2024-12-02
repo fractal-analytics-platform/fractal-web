@@ -7,7 +7,7 @@ export async function load({ fetch }) {
 		/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */ (
 			await getCurrentUser(fetch, true)
 		);
-	const taskGroups = removeIdenticalTaskGroups(await listTaskGroups(fetch, false, true), user);
+	const taskGroups = removeIdenticalTaskGroups(await listTaskGroups(fetch), user);
 
 	return {
 		user,

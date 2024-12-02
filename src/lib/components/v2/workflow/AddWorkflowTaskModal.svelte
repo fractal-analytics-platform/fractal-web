@@ -1,7 +1,10 @@
 <script>
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import PropertyDescription from 'fractal-jschema/components/properties/PropertyDescription.svelte';
 	import FilteredTasksTable from '../tasks/FilteredTasksTable.svelte';
+	import { removeIdenticalTaskGroups } from '../tasks/task_group_utilities';
+	import { formatMarkdown } from '$lib/common/component_utilities';
 
 	/** @type {import('$lib/types-v2').WorkflowV2} */
 	export let workflow;
@@ -32,7 +35,8 @@
 			modal.displayErrorAlert(await response.json());
 			return;
 		}
-		taskGroups = await response.json();
+		const allTaskGroups = await response.json();
+		taskGroups = removeIdenticalTaskGroups(allTaskGroups, user);
 	}
 
 	/**
@@ -102,7 +106,7 @@
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 		{/if}
 		<div class:invisible={loading} class:collapse={loading}>
-			<FilteredTasksTable {taskGroups} {user}>
+			<FilteredTasksTable {taskGroups}>
 				<svelte:fragment slot="extra-columns-header">
 					<th />
 				</svelte:fragment>
@@ -116,6 +120,11 @@
 							Add task
 						</button>
 					</td>
+				</svelte:fragment>
+				<svelte:fragment slot="docs-info" let:task>
+					{#if task.docs_info}
+						<PropertyDescription description={formatMarkdown(task.docs_info)} html={true} />
+					{/if}
 				</svelte:fragment>
 			</FilteredTasksTable>
 		</div>

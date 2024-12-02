@@ -1,19 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
-	import {
-		buildWorkflowTaskTableRows,
-		removeIdenticalTaskGroups,
-		sortVersions
-	} from '../tasks/task_group_utilities';
+	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
 	import ColouredBadge from '$lib/components/common/ColouredBadge.svelte';
 	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
-	import PropertyDescription from 'fractal-jschema/components/properties/PropertyDescription.svelte';
 
 	/** @type {Array<import('$lib/types-v2').TaskGroupV2>} */
 	export let taskGroups;
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
-	export let user;
 
 	/** @type {import('$lib/types-v2').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
@@ -43,10 +36,7 @@
 	};
 
 	$: if (taskGroups) {
-		const filteredGroups = removeIdenticalTaskGroups(taskGroups, user);
-		setFiltersValues(filteredGroups);
-		allRows = buildWorkflowTaskTableRows(filteredGroups, groupBy);
-		filterRows();
+		setup();
 	}
 
 	$: if (
@@ -60,6 +50,15 @@
 		filterRows();
 	} else {
 		filteredRows = allRows;
+	}
+
+	function setup() {
+		if (!taskGroups) {
+			return;
+		}
+		setFiltersValues(taskGroups);
+		allRows = buildWorkflowTaskTableRows(taskGroups, groupBy);
+		filterRows();
 	}
 
 	function filterRows() {
@@ -83,6 +82,7 @@
 			categoryMatch(row) &&
 			modalityMatch(row) &&
 			tagMatch(row) &&
+			packageMatch(row) &&
 			inputTypeMatch(row)
 		);
 	}
@@ -127,6 +127,17 @@
 			return true;
 		}
 		return row.modality !== null && row.modality === modalityFilter;
+	}
+
+	/**
+	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @returns {boolean}
+	 */
+	function packageMatch(row) {
+		if (!packageFilter) {
+			return true;
+		}
+		return row.pkg_name === packageFilter;
 	}
 
 	/**
@@ -259,6 +270,7 @@
 				inputTypeFilter = value;
 			}
 		);
+		setup();
 	});
 
 	/**
@@ -382,10 +394,7 @@
 										{:else}
 											{task.taskVersions[task.selectedVersion].version}
 										{/if}
-										<PropertyDescription
-											description={task.taskVersions[task.selectedVersion].docs_info}
-											html={true}
-										/>
+										<slot name="docs-info" task={task.taskVersions[task.selectedVersion]} />
 									</td>
 									<slot name="extra-columns" task={task.taskVersions[task.selectedVersion]} />
 								</tr>

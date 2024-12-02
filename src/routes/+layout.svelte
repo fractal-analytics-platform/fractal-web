@@ -78,7 +78,7 @@
 		if (pathname === '/') {
 			return 'home';
 		}
-		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
+		for (const section of ['projects', 'tasks-management', 'tasks', 'jobs', 'admin', 'auth']) {
 			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/${apiVersion}/${section}`)) {
 				return section;
 			}
@@ -140,6 +140,15 @@
 							class:active={selectedSection === 'tasks'}
 						>
 							Tasks
+						</a>
+					</li>
+					<li class="nav-item">
+						<a
+							href="/{apiVersion}/tasks-management"
+							class="nav-link"
+							class:active={selectedSection === 'tasks-management'}
+						>
+							Tasks management
 						</a>
 					</li>
 					<li class="nav-item">

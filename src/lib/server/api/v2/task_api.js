@@ -8,13 +8,14 @@ const logger = getLogger('task API [v2]');
  * Fetches a list of task groups from the server
  * @param {typeof fetch} fetch
  * @param {boolean|false=} loadArgsSchema
+ * @param {boolean|false=} onlyActive
  * @returns {Promise<Array<import('$lib/types-v2').TaskGroupV2>>}
  */
-export async function listTaskGroups(fetch, loadArgsSchema = false) {
+export async function listTaskGroups(fetch, loadArgsSchema = false, onlyActive = false) {
 	logger.debug('Fetching task groups');
 
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/?args_schema=${loadArgsSchema}`,
+		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/?args_schema=${loadArgsSchema}&only_active=${onlyActive}`,
 		{
 			method: 'GET',
 			credentials: 'include'
