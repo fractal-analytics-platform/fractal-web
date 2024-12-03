@@ -13,7 +13,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	await test.step('Go to "Add a single task" form', async () => {
-		await page.goto('/v2/tasks');
+		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
 		await page.getByText('Single task').click();
 	});

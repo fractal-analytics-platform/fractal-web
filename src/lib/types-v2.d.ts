@@ -194,6 +194,8 @@ export type TasksTableRow = {
 	modality: string | null;
 	authors: string | null;
 	tags: string[];
+	input_types: { [key: string]: boolean };
+	docs_info: string;
 };
 
 export type TaskGroupActivityStatusV2 = 'pending' | 'ongoing' | 'failed' | 'OK';

@@ -9,11 +9,18 @@
 	import TaskGroupActivityLogsModal from './TaskGroupActivityLogsModal.svelte';
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { page } from '$app/stores';
+	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
+	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
 
 	export let admin = false;
 
-	/** @type {import('$lib/types').User[]} */
+	/** @type {Array<import('$lib/types').User & {id: number}>} */
 	export let users = [];
+	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	let sortedUsers = [];
+	$: if (users) {
+		sortedUsers = [...users].sort(sortUserByEmailComparator);
+	}
 
 	/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
 	let results = [];
@@ -95,7 +102,7 @@
 			}
 			/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
 			const activities = await response.json();
-			activities.sort((a1, a2) => (a1.timestamp_started < a2.timestamp_started ? 1 : -1));
+			activities.sort(sortActivitiesByTimestampStarted);
 			results = activities;
 		} finally {
 			searching = false;
@@ -150,6 +157,13 @@
 			updateTaskCollectionsInBackground,
 			updateTasksCollectionInterval
 		);
+	}
+
+	/**
+	 * @param {number} userId
+	 */
+	function getUserEmail(userId) {
+		return users.find((u) => u.id === userId)?.email || '-';
 	}
 
 	onMount(async () => {
@@ -225,7 +239,7 @@
 				<label class="input-group-text" for="user"> User </label>
 				<select class="form-select" id="user" bind:value={user_id}>
 					<option value={null}>Select...</option>
-					{#each users as user}
+					{#each sortedUsers as user}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>
@@ -262,6 +276,9 @@
 				<th>Status</th>
 				<th>Started</th>
 				<th>Ended</th>
+				{#if admin}
+					<th>User</th>
+				{/if}
 				<th>Options</th>
 			</tr>
 		</thead>
@@ -286,6 +303,9 @@
 							? new Date(taskGroupActivity.timestamp_ended).toLocaleString()
 							: '-'}
 					</td>
+					{#if admin}
+						<td>{getUserEmail(taskGroupActivity.user_id)}</td>
+					{/if}
 					<td>
 						{#if taskGroupActivity.status !== 'pending' && taskGroupActivity.log}
 							<button

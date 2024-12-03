@@ -11,7 +11,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 	test.slow();
 
 	await test.step('Go to tasks page', async () => {
-		await page.goto('/v2/tasks');
+		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
 	});
 

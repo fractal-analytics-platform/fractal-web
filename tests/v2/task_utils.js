@@ -18,7 +18,7 @@ export async function createFakeTask(page, task) {
 	const tmpFiles = [];
 
 	try {
-		await page.goto('/v2/tasks');
+		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
 		await page.getByText('Single task').click();
 
@@ -81,8 +81,8 @@ export async function createFakeTask(page, task) {
  * @param {'v1'|'v2'} version
  */
 export async function deleteTask(page, taskName, version = 'v2') {
-	if (!page.url().endsWith(`/${version}/tasks`)) {
-		await page.goto(`/${version}/tasks`);
+	if (!page.url().endsWith(`/${version}/tasks/management`)) {
+		await page.goto(`/${version}/tasks/management`);
 		await waitPageLoading(page);
 	}
 	let row;

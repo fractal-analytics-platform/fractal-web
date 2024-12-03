@@ -73,7 +73,7 @@
 			},
 			events: {
 				afterChange: (selection) => {
-					if (selection[0].value === 'Select...') {
+					if (selection.length === 0 || selection[0].value === 'Select...') {
 						selectedUserId = null;
 					} else {
 						selectedUserId = Number(selection[0].value);
