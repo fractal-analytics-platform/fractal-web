@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Removed usage of `cache_dir` field (\#666);
+* Removed usage of `cache_dir` field (\#667);
 
 # 1.11.1
 
