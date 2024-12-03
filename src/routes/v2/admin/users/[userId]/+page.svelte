@@ -87,10 +87,6 @@
 						<th>SLURM user</th>
 						<td>{settings.slurm_user || '-'}</td>
 					</tr>
-					<tr>
-						<th>Cache dir</th>
-						<td>{settings.cache_dir || '-'}</td>
-					</tr>
 				{/if}
 				{#if runnerBackend === 'slurm_ssh'}
 					<tr>

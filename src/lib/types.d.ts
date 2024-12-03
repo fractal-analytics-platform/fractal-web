@@ -125,7 +125,6 @@ export type UserSettings = {
   project_dir: string | null
   // Slurm
   slurm_user: string | null
-  cache_dir: string | null
   // Slurm SSH
   ssh_host: string | null
   ssh_username: string | null

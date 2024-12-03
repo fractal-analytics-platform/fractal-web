@@ -52,7 +52,6 @@ describe('UserEditor', () => {
 		slurm_accounts: [],
 		project_dir: null,
 		slurm_user: null,
-		cache_dir: null,
 		ssh_host: null,
 		ssh_username: null,
 		ssh_private_key_path: null,
@@ -80,7 +79,6 @@ describe('UserEditor', () => {
 					resolve({
 						...initialSettings,
 						slurm_user: 'user',
-						cache_dir: '/path/to/cache/dir',
 						project_dir: '/path/to/project/dir',
 					})
 				)
@@ -88,7 +86,6 @@ describe('UserEditor', () => {
 
 		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), '/path/to/project/dir');
 		await user.type(screen.getByRole('textbox', { name: 'SLURM user' }), 'user');
-		await user.type(screen.getByRole('textbox', { name: 'Cache dir' }), '/path/to/cache/dir');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
@@ -99,7 +96,6 @@ describe('UserEditor', () => {
 					slurm_accounts: [],
 					project_dir: '/path/to/project/dir',
 					slurm_user: 'user',
-					cache_dir: '/path/to/cache/dir',
 					ssh_host: null,
 					ssh_username: null,
 					ssh_private_key_path: null,
@@ -130,7 +126,7 @@ describe('UserEditor', () => {
 					resolve({
 						detail: [
 							{
-								loc: ['body', 'cache_dir'],
+								loc: ['body', 'project_dir'],
 								msg: 'mocked_error',
 								type: 'value_error'
 							}
@@ -139,7 +135,7 @@ describe('UserEditor', () => {
 				)
 		});
 
-		await user.type(screen.getByRole('textbox', { name: 'Cache dir' }), 'xxx');
+		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), 'xxx');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('mocked_error');
 
@@ -148,9 +144,8 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
-					project_dir: null,
+					project_dir: 'xxx',
 					slurm_user: null,
-					cache_dir: 'xxx',
 					ssh_host: null,
 					ssh_username: null,
 					ssh_private_key_path: null,
@@ -204,7 +199,6 @@ describe('UserEditor', () => {
 					slurm_accounts: [],
 					project_dir: null,
 					slurm_user: null,
-					cache_dir: null,
 					ssh_host: 'localhost',
 					ssh_username: 'username',
 					ssh_private_key_path: 'xxx',
@@ -274,7 +268,6 @@ describe('UserEditor', () => {
 					slurm_accounts: [],
 					project_dir: null,
 					slurm_user: null,
-					cache_dir: null,
 					ssh_host: 'localhost',
 					ssh_username: 'username',
 					ssh_private_key_path: '/path/to/private/key',
