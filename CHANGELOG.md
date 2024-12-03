@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.11.1
 
 * Added tasks search filters (\#658);
 * Split standard-user tasks page into "tasks page" vs "tasks management page" (\#658);
