@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { getServerInfo } from '$lib/server/api/alive';
 import { getCurrentUser } from '$lib/server/api/auth_api';
 import { getLogger } from '$lib/server/logger.js';
 import { error, redirect } from '@sveltejs/kit';
@@ -64,7 +65,8 @@ export async function handle({ event, resolve }) {
 
 	const isPublicPage =
 		event.url.pathname == '/' ||
-		event.url.pathname.startsWith('/auth');
+		event.url.pathname.startsWith('/auth') ||
+		event.url.pathname.startsWith('/alive');
 
 	if (isPublicPage) {
 		logger.debug('Public page - No auth required');
@@ -107,31 +109,6 @@ export async function handleFetch({ event, request, fetch }) {
 		}
 	}
 	return fetch(request);
-}
-
-/**
- * @param {typeof fetch} fetch
- * @returns {Promise<{ alive: boolean, version: string | null }>}
- */
-async function getServerInfo(fetch) {
-	let serverInfo = { alive: false, version: null };
-
-	try {
-		const serverInfoResponse = await fetch(env.FRACTAL_SERVER_HOST + '/api/alive/');
-		if (serverInfoResponse.ok) {
-			serverInfo = await serverInfoResponse.json();
-			logger.debug('Server info loaded: Alive %s - %s', serverInfo.alive, serverInfo.version);
-		} else {
-			logger.error(
-				'Alive endpoint replied with unsuccessful status code %d',
-				serverInfoResponse.status
-			);
-		}
-	} catch (error) {
-		logger.fatal('Error loading server info', error);
-	}
-
-	return serverInfo;
 }
 
 /**
