@@ -319,25 +319,28 @@
 		</div>
 		<div class="row">
 			<div class="col">
+				<select id="package-filter" class="invisible" />
+			</div>
+			<div class="col">
 				<select id="category-filter" class="invisible" />
 			</div>
 			<div class="col">
 				<select id="modality-filter" class="invisible" />
 			</div>
 			<div class="col">
-				<select id="package-filter" class="invisible" />
+				<select id="input-type-filter" class="invisible" />
 			</div>
 			<div class="col">
 				<select id="tag-filter" class="invisible" />
-			</div>
-			<div class="col">
-				<select id="input-type-filter" class="invisible" />
 			</div>
 		</div>
 	</div>
 </div>
 {#if allRows.length === 0}
-	<p>There are no tasks.</p>
+	<p>
+		There are no available tasks. You can add new tasks on the 
+		<a href="/v2/tasks-management">Tasks management</a> page.
+	</p>
 {:else}
 	<div class="card">
 		<div class="card-body p-0">
