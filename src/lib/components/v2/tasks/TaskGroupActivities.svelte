@@ -10,6 +10,7 @@
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { page } from '$app/stores';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
+	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
 
 	export let admin = false;
 
@@ -101,7 +102,7 @@
 			}
 			/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
 			const activities = await response.json();
-			activities.sort((a1, a2) => (a1.timestamp_started < a2.timestamp_started ? 1 : -1));
+			activities.sort(sortActivitiesByTimestampStarted);
 			results = activities;
 		} finally {
 			searching = false;
