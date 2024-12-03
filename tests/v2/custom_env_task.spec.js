@@ -6,7 +6,7 @@ import os from 'os';
 import { deleteTask } from './task_utils.js';
 
 test('Custom Python env task [v2]', async ({ page }) => {
-	await page.goto('/v2/tasks-management');
+	await page.goto('/v2/tasks/management');
 	await waitPageLoading(page);
 
 	await page.getByText('Custom Python env').click();
