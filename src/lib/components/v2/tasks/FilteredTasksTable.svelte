@@ -32,7 +32,7 @@
 	let inputTypeFilter = '';
 
 	let groupByLabels = {
-		pkg_name: 'Package Name'
+		pkg_name: 'Task'
 	};
 
 	$: if (taskGroups) {
@@ -160,6 +160,16 @@
 			return true;
 		}
 		return Object.keys(row.input_types).find((t) => t === inputTypeFilter) !== undefined;
+	}
+
+	function resetFilters() {
+		genericSearch = '';
+		categoryFilter = '';
+		categorySelector?.setSelected('');
+		modalitySelector?.setSelected('');
+		packageSelector?.setSelected('');
+		tagSelector?.setSelected('');
+		inputTypeSelector?.setSelected('');
 	}
 
 	/**
@@ -291,7 +301,7 @@
 			},
 			events: {
 				afterChange: (selection) => {
-					if (selection[0].value === placeholder) {
+					if (selection.length === 0 || selection[0].value === placeholder) {
 						afterChange('');
 					} else {
 						afterChange(selection[0].value);
@@ -305,15 +315,24 @@
 <div class="card mb-2" class:invisible={allRows.length === 0} class:collapse={allRows.length === 0}>
 	<div class="card-body">
 		<div class="row mb-2">
-			<div class="col">Filter tasks</div>
-			<div class="col">
-				<div class="input-group input-group-sm">
-					<input
-						type="text"
-						bind:value={genericSearch}
-						class="form-control ms-auto"
-						placeholder="Search..."
-					/>
+			<div class="col-3 col-lg-6">Filter tasks</div>
+			<div class="col-9 col-lg-6">
+				<div class="d-flex">
+					<div class="flex-fill">
+						<div class="input-group input-group-sm">
+							<input
+								type="text"
+								bind:value={genericSearch}
+								class="form-control ms-auto"
+								placeholder="Search..."
+							/>
+						</div>
+					</div>
+					<div>
+						<button class="btn btn-outline-secondary btn-sm ms-3" on:click={resetFilters}>
+							Reset
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -338,7 +357,7 @@
 </div>
 {#if allRows.length === 0}
 	<p>
-		There are no available tasks. You can add new tasks on the 
+		There are no available tasks. You can add new tasks on the
 		<a href="/v2/tasks/management">Tasks management</a> page.
 	</p>
 {:else}

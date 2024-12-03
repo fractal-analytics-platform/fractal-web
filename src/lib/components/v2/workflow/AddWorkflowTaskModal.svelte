@@ -20,7 +20,7 @@
 	let addingTask = false;
 
 	/** @type {Array<import('$lib/types-v2').TaskGroupV2>} */
-	let taskGroups;
+	let taskGroups = [];
 
 	export async function show() {
 		loading = true;

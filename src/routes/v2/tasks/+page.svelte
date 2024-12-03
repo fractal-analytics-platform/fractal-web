@@ -22,16 +22,18 @@
 	}
 </script>
 
-<div class="row mt-2 mb-2">
-	<div class="col">
-		Here is the list of currently available tasks. You can add new tasks or edit the current ones at
-		the <a href="/v2/tasks/management">Tasks management</a> page.
-		<a href="/v2/tasks/management" class="btn btn-primary float-end">
-			<i class="bi bi-gear-fill" />
-			Manage tasks
-		</a>
+{#if taskGroups.length > 0}
+	<div class="row mt-2 mb-2">
+		<div class="col">
+			Here is the list of currently available tasks. You can add new tasks or edit the current ones
+			at the <a href="/v2/tasks/management">Tasks management</a> page.
+			<a href="/v2/tasks/management" class="btn btn-primary float-end">
+				<i class="bi bi-gear-fill" />
+				Manage tasks
+			</a>
+		</div>
 	</div>
-</div>
+{/if}
 
 <FilteredTasksTable {taskGroups}>
 	<svelte:fragment slot="docs-info" let:task>
