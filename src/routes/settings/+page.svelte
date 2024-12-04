@@ -20,9 +20,6 @@
 	let slurmAccounts = [];
 	let slurmAccountsError = '';
 
-	let cacheDir = '';
-	let cacheDirError = '';
-
 	let settingsUpdatedMessage = '';
 
 	function addSlurmAccount() {
@@ -42,15 +39,11 @@
 		}
 		settingsUpdatedMessage = '';
 		slurmAccountsError = '';
-		cacheDirError = '';
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const payload = {
 			slurm_accounts: slurmAccounts
 		};
-		if ($page.data.runnerBackend === 'slurm') {
-			payload.cache_dir = cacheDir;
-		}
 		const response = await fetch(`/api/auth/current-user/settings`, {
 			method: 'PATCH',
 			credentials: 'include',
@@ -69,10 +62,6 @@
 					slurmAccountsError = errorMap['slurm_accounts'];
 					errorShown = true;
 				}
-				if ('cache_dir' in errorMap) {
-					cacheDirError = errorMap['cache_dir'];
-					errorShown = true;
-				}
 			}
 			if (!errorShown) {
 				errorAlert = displayStandardErrorAlert(
@@ -88,7 +77,6 @@
 	 */
 	function initFields(settings) {
 		slurmAccounts = settings.slurm_accounts;
-		cacheDir = settings.cache_dir || '';
 	}
 
 	onMount(() => {
@@ -110,23 +98,6 @@
 			<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
 			<div class="col-lg-6 col-sm-8">
 				{settings.slurm_user || '-'}
-			</div>
-		</div>
-		<div class="row mb-3">
-			<label class="col-lg-2 col-sm-4 fw-bold" for="cache-dir">Cache dir</label>
-			<div class="col-lg-6 col-sm-8">
-				<div class="input-group" class:has-validation={cacheDirError}>
-					<input
-						type="text"
-						class="form-control"
-						id="cache-dir"
-						bind:value={cacheDir}
-						class:is-invalid={cacheDirError}
-					/>
-					{#if cacheDirError}
-						<div class="invalid-feedback">{cacheDirError}</div>
-					{/if}
-				</div>
 			</div>
 		</div>
 	{/if}

@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Removed usage of `cache_dir` field (\#667);
+
 # 1.11.1
 
 * Added tasks search filters (\#658);

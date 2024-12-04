@@ -90,22 +90,22 @@ test('Create and update a user', async ({ page }) => {
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 	});
 
-	await test.step('Test cache dir validation error', async () => {
-		await page.getByLabel('Cache dir').fill('foo');
+	await test.step('Test project dir validation error', async () => {
+		await page.getByLabel('Project dir').fill('foo');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForFunction(() => {
 			const invalidFeeback = document
-				.querySelector('#cacheDir')
+				.querySelector('#projectDir')
 				?.closest('div')
 				?.querySelector('.invalid-feedback');
 			if (invalidFeeback instanceof HTMLElement) {
 				return invalidFeeback.innerText.includes(
-					"String attribute 'cache_dir' must be an absolute path (given 'foo')"
+					"String attribute 'project_dir' must be an absolute path (given 'foo')"
 				);
 			}
 			return false;
 		});
-		await page.getByLabel('Cache dir').fill('/tmp/test');
+		await page.getByLabel('Project dir').fill('/tmp/test/project-dir');
 	});
 
 	await test.step('SLURM account validation error', async () => {
@@ -134,7 +134,6 @@ test('Create and update a user', async ({ page }) => {
 
 	await test.step('Update settings', async () => {
 		await page.getByLabel('Project dir').fill('/tmp/test/project-dir');
-		await page.getByLabel('Cache dir').fill('/tmp/test/cache-dir');
 		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('User successfully updated')).toBeVisible();
@@ -166,8 +165,7 @@ test('Create and update a user', async ({ page }) => {
 		expect(await cells[6].innerText()).toEqual('All');
 		expect(await cells[7].innerText()).toEqual('/tmp/test/project-dir');
 		expect(await cells[8].innerText()).toEqual(randomUserName + '_slurm-renamed');
-		expect(await cells[9].innerText()).toEqual('/tmp/test/cache-dir');
-		expect(await cells[10].innerText()).toContain(randomUserName + '-slurm-account');
+		expect(await cells[9].innerText()).toContain(randomUserName + '-slurm-account');
 	});
 
 	await test.step('Go back clicking on breadcrumb', async () => {

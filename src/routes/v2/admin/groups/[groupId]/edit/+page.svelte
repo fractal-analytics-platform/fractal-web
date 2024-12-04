@@ -190,7 +190,6 @@
 			slurm_accounts: [],
 			project_dir: '',
 			slurm_user: '',
-			cache_dir: '',
 			ssh_host: '',
 			ssh_username: '',
 			ssh_private_key_path: '',

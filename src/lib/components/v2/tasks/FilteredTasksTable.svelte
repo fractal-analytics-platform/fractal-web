@@ -371,7 +371,7 @@
 						<th>Modality</th>
 						<th>Input Types</th>
 						<th>Metadata</th>
-						<th>Version</th>
+						<th colspan="2">Version</th>
 						<slot name="extra-columns-header" />
 					</tr>
 				</thead>
@@ -402,27 +402,23 @@
 										{getMetadataCell(task.taskVersions[task.selectedVersion])}
 									</td>
 									<td class="version-col">
-										<div class="d-flex align-items-center">
-											<div class="">
-												{#if Object.keys(task.taskVersions).length > 1}
-													<select
-														class="form-select"
-														aria-label="Version for task {task.taskVersions[task.selectedVersion]
-															.task_name}"
-														bind:value={task.selectedVersion}
-													>
-														{#each sortVersions(Object.keys(task.taskVersions)) as version}
-															<option value={version}>{version || 'None'}</option>
-														{/each}
-													</select>
-												{:else}
-													{task.taskVersions[task.selectedVersion].version}
-												{/if}
-											</div>
-											<div>
-												<slot name="docs-info" task={task.taskVersions[task.selectedVersion]} />
-											</div>
-										</div>
+										{#if Object.keys(task.taskVersions).length > 1}
+											<select
+												class="form-select"
+												aria-label="Version for task {task.taskVersions[task.selectedVersion]
+													.task_name}"
+												bind:value={task.selectedVersion}
+											>
+												{#each sortVersions(Object.keys(task.taskVersions)) as version}
+													<option value={version}>{version || 'None'}</option>
+												{/each}
+											</select>
+										{:else}
+											{task.taskVersions[task.selectedVersion].version}
+										{/if}
+									</td>
+									<td class="docs-info-col">
+										<slot name="docs-info" task={task.taskVersions[task.selectedVersion]} />
 									</td>
 									<slot name="extra-columns" task={task.taskVersions[task.selectedVersion]} />
 								</tr>
@@ -457,7 +453,7 @@
 	}
 
 	.version-col {
-		max-width: 100px;
+		max-width: 90px;
 	}
 
 	.input-type-text {

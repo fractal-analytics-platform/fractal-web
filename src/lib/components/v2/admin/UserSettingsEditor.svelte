@@ -29,7 +29,6 @@
 	});
 
 	const settingsFormErrorHandler = new FormErrorHandler('genericSettingsError', [
-		'cache_dir',
 		'slurm_accounts',
 		'project_dir',
 		'slurm_user',
@@ -111,24 +110,6 @@
 						<code>sudo -u</code>
 					</div>
 					<span class="invalid-feedback">{$settingsValidationErrors['slurm_user']}</span>
-				</div>
-			</div>
-			<div class="row mb-3 has-validation">
-				<label for="cacheDir" class="col-sm-3 col-form-label text-end">
-					<strong>Cache dir</strong>
-				</label>
-				<div class="col-sm-9">
-					<input
-						type="text"
-						class="form-control"
-						id="cacheDir"
-						bind:value={settings.cache_dir}
-						class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['cache_dir']}
-					/>
-					<div class="form-text">
-						Absolute path to a user-owned folder that will be used as a cache for job-related files
-					</div>
-					<span class="invalid-feedback">{$settingsValidationErrors['cache_dir']}</span>
 				</div>
 			</div>
 		{:else if runnerBackend === 'slurm_ssh'}
