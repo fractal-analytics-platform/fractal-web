@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.11.2
 
 * Removed usage of `cache_dir` field (\#667);
 
