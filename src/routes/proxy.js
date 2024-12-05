@@ -33,7 +33,10 @@ export function createPostProxy(path) {
 				method: 'POST',
 				credentials: 'include',
 				headers: filterHeaders(request.headers),
-				body: JSON.stringify(await request.json())
+				body: request.body,
+				// To avoid error "RequestInit: duplex option is required when sending a body"
+				// @ts-ignore, not standard, but supported by undici; enable re-streaming of request
+				duplex: 'half'
 			});
 		} catch (err) {
 			logger.debug(err);
@@ -53,7 +56,9 @@ export function createPatchProxy(path) {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: filterHeaders(request.headers),
-				body: JSON.stringify(await request.json())
+				body: request.body,
+				// @ts-ignore, not standard, but supported by undici; enable re-streaming of request
+				duplex: 'half'
 			});
 		} catch (err) {
 			logger.debug(err);
