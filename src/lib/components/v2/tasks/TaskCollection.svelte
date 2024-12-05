@@ -2,7 +2,6 @@
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount } from 'svelte';
 	import TaskGroupActivityLogsModal from '$lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
-	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import {
@@ -34,6 +33,12 @@
 	let pinnedPackageVersions = [];
 	let privateTask = false;
 	let selectedGroup = null;
+
+	/** @type {FileList|null} */
+	let wheelFiles = null;
+	/** @type {HTMLInputElement|undefined} */
+	let wheelFileInput = undefined;
+
 	/** @type {TaskGroupActivityLogsModal} */
 	let taskGroupActivitiesLogsModal;
 	/** @type {number|null} */
@@ -98,22 +103,34 @@
 	async function handleTaskCollection() {
 		formErrorHandler.clearErrors();
 
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/json');
+		if (packageType === 'local' && (wheelFiles === null || wheelFiles.length === 0)) {
+			formErrorHandler.addValidationError('file', 'Required field');
+			return;
+		}
 
-		const requestData = {
-			package: python_package,
-			python_version,
-			package_extras
-		};
+		const formData = new FormData();
 
 		if (packageType === 'pypi') {
-			requestData.package_version = package_version;
+			formData.append('package', python_package);
+		} else if (wheelFiles?.length === 1) {
+			formData.append('file', wheelFiles[0]);
+		}
+
+		if (python_version) {
+			formData.append('python_version', python_version);
+		}
+
+		if (package_extras) {
+			formData.append('package_extras', package_extras);
+		}
+
+		if (packageType === 'pypi' && package_version) {
+			formData.append('package_version', package_version);
 		}
 
 		const ppv = getPinnedPackageVersionsMap();
 		if (ppv) {
-			requestData.pinned_package_versions = ppv;
+			formData.append('pinned_package_versions', JSON.stringify(ppv));
 		}
 
 		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
@@ -125,9 +142,9 @@
 		const response = await fetch(url, {
 			method: 'POST',
 			credentials: 'include',
-			headers: headers,
-			body: JSON.stringify(requestData, replaceEmptyStrings)
+			body: formData
 		});
+
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
@@ -140,6 +157,7 @@
 			python_version = '';
 			package_extras = '';
 			pinnedPackageVersions = [];
+			clearWheelFileUpload();
 		} else {
 			console.error('Task collection request failed');
 			await formErrorHandler.handleErrorResponse(response);
@@ -216,6 +234,14 @@
 		);
 	}
 
+	function clearWheelFileUpload() {
+		wheelFiles = null;
+		if (wheelFileInput) {
+			wheelFileInput.value = '';
+		}
+		formErrorHandler.removeValidationError('file');
+	}
+
 	onDestroy(() => {
 		clearTimeout(updateTasksCollectionTimeout);
 	});
@@ -226,34 +252,50 @@
 <div>
 	<form on:submit|preventDefault={handleTaskCollection}>
 		<div class="row">
-			<div
-				class="mb-2"
-				class:col-md-6={packageType === 'pypi'}
-				class:col-md-12={packageType === 'local'}
-			>
-				<div class="input-group has-validation">
-					<div class="input-group-text">
-						<label class="font-monospace" for="package">Package</label>
+			{#if packageType === 'pypi'}
+				<div class="mb-2 col-md-6">
+					<div class="input-group has-validation">
+						<div class="input-group-text">
+							<label class="font-monospace" for="package">Package</label>
+						</div>
+						<input
+							name="package"
+							id="package"
+							type="text"
+							class="form-control"
+							required
+							class:is-invalid={$validationErrors['package']}
+							bind:value={python_package}
+						/>
+						<span class="invalid-feedback">{$validationErrors['package']}</span>
 					</div>
-					<input
-						name="package"
-						id="package"
-						type="text"
-						class="form-control"
-						required
-						class:is-invalid={$validationErrors['package']}
-						bind:value={python_package}
-					/>
-					<span class="invalid-feedback">{$validationErrors['package']}</span>
+					<div class="form-text">The name of a package published on PyPI</div>
 				</div>
-				<div class="form-text">
-					{#if packageType === 'pypi'}
-						The name of a package published on PyPI
-					{:else}
-						The full path to a wheel file
-					{/if}
+			{:else if packageType === 'local'}
+				<div class="mb-2 col-md-6">
+					<div class="input-group has-validation">
+						<label for="wheelFile" class="input-group-text">
+							<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload a wheel file
+						</label>
+						<input
+							class="form-control"
+							accept=".whl"
+							type="file"
+							name="wheelFile"
+							id="wheelFile"
+							bind:this={wheelFileInput}
+							bind:files={wheelFiles}
+							class:is-invalid={$validationErrors['file']}
+						/>
+						{#if wheelFiles && wheelFiles.length > 0}
+							<button class="btn btn-outline-secondary" on:click={clearWheelFileUpload}>
+								Clear
+							</button>
+						{/if}
+						<span class="invalid-feedback">{$validationErrors['file']}</span>
+					</div>
 				</div>
-			</div>
+			{/if}
 			{#if packageType === 'pypi'}
 				<div class="col-md-6 mb-2">
 					<div class="input-group has-validation">
