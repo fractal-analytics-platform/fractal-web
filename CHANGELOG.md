@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.12.0
 
 * Used form data in tasks collection endpoint (\#669);
 
