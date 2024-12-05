@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { adaptJsonSchema } from '../src/lib/components/jschema_adapter';
+import { adaptJsonSchema } from '../../src/lib/jschema/jschema_adapter';
 
 describe('jschema_adapter', () => {
 	it('Replace references', () => {

@@ -1,10 +1,10 @@
-import JSchema from './components/JSchema.svelte';
-import PropertyDescription from './components/properties/PropertyDescription.svelte';
-import { SchemaValidator, detectSchemaVersion } from './components/jschema_validation';
+import JSchema from './jschema/JSchema.svelte';
+import PropertyDescription from './jschema/properties/PropertyDescription.svelte';
+import { SchemaValidator, detectSchemaVersion } from './jschema/jschema_validation';
 import { deepCopy, getValidationErrorMessage, stripNullAndEmptyObjectsAndArrays } from './utils';
-import { getPropertiesToIgnore } from './components/property_utils';
-import { JsonSchemaDataError } from './components/form_manager';
-import { stripIgnoredProperties } from './components/jschema_adapter';
+import { getPropertiesToIgnore } from './jschema/property_utils';
+import { JsonSchemaDataError } from './jschema/form_manager';
+import { stripIgnoredProperties } from './jschema/jschema_adapter';
 
 // Exporting components for public usage
 export {
