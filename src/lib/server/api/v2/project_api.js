@@ -9,7 +9,7 @@ const logger = getLogger('projects API [v2]');
 /**
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<import('$lib/types-v2').ProjectV2[]>}
+ * @returns {Promise<import('fractal-components/types/api').ProjectV2[]>}
  */
 export async function listProjects(fetch) {
 	logger.debug('Fetching the list of projects');
@@ -30,7 +30,7 @@ export async function listProjects(fetch) {
  * Fetches a project from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('$lib/types-v2').ProjectV2>}
+ * @returns {Promise<import('fractal-components/types/api').ProjectV2>}
  */
 export async function getProject(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
@@ -53,7 +53,7 @@ export async function getProject(fetch, projectId) {
  * Fetches all the project's datasets from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
- * @returns {Promise<Array<import('$lib/types-v2').DatasetV2>>}
+ * @returns {Promise<Array<import('fractal-components/types/api').DatasetV2>>}
  */
 export async function getProjectDatasets(fetch, projectId) {
 	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
@@ -70,7 +70,7 @@ export async function getProjectDatasets(fetch, projectId) {
 		await responseError(response);
 	}
 
-	/** @type {import('$lib/types-v2').DatasetV2[]} */
+	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	const datasets = await response.json();
 	datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 	return datasets;
@@ -81,7 +81,7 @@ export async function getProjectDatasets(fetch, projectId) {
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
  * @param {number|string} datasetId
- * @returns {Promise<import('$lib/types-v2').DatasetV2>}
+ * @returns {Promise<import('fractal-components/types/api').DatasetV2>}
  */
 export async function getDataset(fetch, projectId, datasetId) {
 	logger.debug('Retrieving dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
@@ -106,7 +106,7 @@ export async function getDataset(fetch, projectId, datasetId) {
 /**
  * Fetches the list of all the jobs belonging to the current user
  * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('$lib/types-v2').ApplyWorkflowV2>>}
+ * @returns {Promise<Array<import('fractal-components/types/api').ApplyWorkflowV2>>}
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');

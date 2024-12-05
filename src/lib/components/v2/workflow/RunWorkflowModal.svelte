@@ -5,19 +5,19 @@
 		generateNewUniqueDatasetName,
 		getFirstTaskIndexForContinuingWorkflow
 	} from '$lib/common/job_utilities';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('$lib/types-v2').DatasetV2[]} */
+	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets;
-	/** @type {import('$lib/types-v2').WorkflowV2} */
+	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	export let workflow;
 	/** @type {number|undefined} */
 	export let selectedDatasetId;
-	/** @type {(job: import('$lib/types-v2').ApplyWorkflowV2) => Promise<void>} */
+	/** @type {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} */
 	export let onJobSubmitted;
-	/** @type {(updatedDatasets: import('$lib/types-v2').DatasetV2[], newSelectedDatasetId: number) => void} */
+	/** @type {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} */
 	export let onDatasetsUpdated;
 	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
 	export let statuses;
@@ -128,7 +128,7 @@
 	}
 
 	async function replaceDataset() {
-		const { id, name, zarr_dir } = /** @type {import('$lib/types-v2').DatasetV2} */ (
+		const { id, name, zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (
 			selectedDataset
 		);
 		await handleDatasetDelete(id);
@@ -139,7 +139,7 @@
 	}
 
 	async function createNewDataset() {
-		const { zarr_dir } = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
+		const { zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
 		const newDataset = await handleDatasetCreate(newDatasetName, zarr_dir);
 		onDatasetsUpdated([...datasets, newDataset], newDataset.id);
 	}
@@ -147,7 +147,7 @@
 	/**
 	 * @param {string} datasetName
 	 * @param {string} zarrDir
-	 * @returns {Promise<import('$lib/types-v2').DatasetV2>}
+	 * @returns {Promise<import('fractal-components/types/api').DatasetV2>}
 	 */
 	async function handleDatasetCreate(datasetName, zarrDir) {
 		const headers = new Headers();
@@ -204,14 +204,14 @@
 			appliedAttributeFilters = { ...wft.input_filters.attributes };
 			appliedTypeFilters = { ...wft.input_filters.types };
 		} else {
-			const dataset = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
+			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
 			appliedAttributeFilters = { ...dataset.filters.attributes, ...wft.input_filters.attributes };
 			appliedTypeFilters = { ...dataset.filters.types, ...wft.input_filters.types };
 		}
 	}
 
 	function computeNewDatasetName() {
-		const dataset = /** @type {import('$lib/types-v2').DatasetV2} */ (selectedDataset);
+		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
 		newDatasetName = generateNewUniqueDatasetName(datasets, dataset.name);
 	}
 

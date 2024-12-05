@@ -1,25 +1,25 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
-	import { buildTaskTableRows, sortVersions } from './task_group_utilities';
+	import { buildTaskTableRows, sortVersions } from 'fractal-components/tasks/task_group_utilities';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import TaskInfoModal from './TaskInfoModal.svelte';
 	import TaskEditModal from './TaskEditModal.svelte';
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/** @type {import('$lib/types').User} */
 	export let user;
 	/**
-	 * @type {import('$lib/types-v2').TaskGroupV2[]}
+	 * @type {import('fractal-components/types/api').TaskGroupV2[]}
 	 */
 	export let taskGroups;
 	/** @type {string|undefined} */
 	export let expandedTaskGroupRow;
 	/**
-	 * @type {(updatedGroups: import('$lib/types-v2').TaskGroupV2[]) => void}
+	 * @type {(updatedGroups: import('fractal-components/types/api').TaskGroupV2[]) => void}
 	 */
 	export let updateTaskGroups;
 
@@ -35,7 +35,7 @@
 	let taskEditModal;
 
 	/**
-	 * @type {import('$lib/types-v2').TasksTableRowGroup[]}
+	 * @type {import('fractal-components/types/api').TasksTableRowGroup[]}
 	 */
 	let taskGroupRows = [];
 
@@ -94,14 +94,14 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} updatedGroup
+	 * @param {import('fractal-components/types/api').TaskGroupV2} updatedGroup
 	 */
 	function updateEditedTaskGroup(updatedGroup) {
 		updateTaskGroups(taskGroups.map((g) => (g.id === updatedGroup.id ? updatedGroup : g)));
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskV2} editedTask
+	 * @param {import('fractal-components/types/api').TaskV2} editedTask
 	 */
 	function updateEditedTask(editedTask) {
 		updateTaskGroups(
@@ -113,7 +113,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
 	 */
 	function getGroupName(taskGroup) {
 		const group = user.group_ids_names?.find((i) => i[0] === taskGroup?.user_group_id);

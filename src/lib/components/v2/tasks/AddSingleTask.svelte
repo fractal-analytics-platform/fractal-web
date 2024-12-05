@@ -6,7 +6,7 @@
 	import TypesEditor from './TypesEditor.svelte';
 	import { detectSchemaVersion, SchemaValidator } from 'fractal-components';
 
-	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
+	/** @type {(task: import('fractal-components/types/api').TaskV2[]) => void} */
 	export let addNewTasks;
 	/** @type {import('$lib/types').User} */
 	export let user;
@@ -22,7 +22,7 @@
 	let docs_link = '';
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
 	let args_schema_version = 'pydantic_v2';
-	/** @type {import('$lib/types-v2').TaskV2Type} */
+	/** @type {import('fractal-components/types/api').TaskV2Type} */
 	let taskType = 'non_parallel';
 	let privateTask = false;
 	let selectedGroup = null;

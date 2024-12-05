@@ -5,7 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 
-	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => void} */
+	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => void} */
 	export let handleWorkflowImported;
 
 	// Component properties
@@ -92,7 +92,7 @@
 			}, 3000);
 			reset();
 
-			/** @type {import('$lib/types-v2').WorkflowV2} */
+			/** @type {import('fractal-components/types/api').WorkflowV2} */
 			const workflow = await response.json();
 
 			await tick();

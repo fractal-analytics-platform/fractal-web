@@ -7,7 +7,7 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
+	/** @type {(task: import('fractal-components/types/api').TaskV2[]) => void} */
 	export let addNewTasks;
 	/** @type {import('$lib/types').User} */
 	export let user;

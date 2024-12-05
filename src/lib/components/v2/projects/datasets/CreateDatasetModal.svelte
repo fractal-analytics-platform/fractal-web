@@ -5,7 +5,7 @@
 	import Modal from '../../../common/Modal.svelte';
 	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
-	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
+	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
 	export let createDatasetCallback;
 
 	/** @type {Modal} */
@@ -125,7 +125,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('$lib/types-v2').DatasetV2|null>}
+	 * @returns {Promise<import('fractal-components/types/api').DatasetV2|null>}
 	 */
 	async function callCreateDataset() {
 		const projectId = $page.params.projectId;

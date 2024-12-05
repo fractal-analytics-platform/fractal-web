@@ -22,9 +22,9 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @type {import('$lib/types-v2').WorkflowTaskV2}  */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2}  */
 	export let workflowTask;
-	/** @type {(wft: import('$lib/types-v2').WorkflowTaskV2) => void} */
+	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
 
 	/** @type {JSchema|undefined} */

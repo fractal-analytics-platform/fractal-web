@@ -3,9 +3,9 @@
 	import { AlertError } from '$lib/common/errors';
 	import { stripIgnoredProperties, getPropertiesToIgnore, SchemaValidator } from 'fractal-components';
 
-	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
-	/** @type {import('$lib/types').Task|import('$lib/types-v2').TaskV2} */
+	/** @type {import('$lib/types').Task|import('fractal-components/types/api').TaskV2} */
 	export let updateCandidate;
 	/** @type {boolean} */
 	export let parallel;

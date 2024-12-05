@@ -4,9 +4,9 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
-	/** @type {import('$lib/types-v2').DatasetV2} */
+	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
-	/** @type {(dataset: import('$lib/types-v2').DatasetV2) => void} */
+	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
 	export let updateDatasetCallback;
 
 	/** @type {Modal} */

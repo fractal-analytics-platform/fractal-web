@@ -2,15 +2,15 @@
 	import { onMount } from 'svelte';
 	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
-	import ColouredBadge from '$lib/components/common/ColouredBadge.svelte';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import ColouredBadge from '../common/ColouredBadge.svelte';
+	import BooleanIcon from '../common/BooleanIcon.svelte';
 
-	/** @type {Array<import('$lib/types-v2').TaskGroupV2>} */
+	/** @type {Array<import('../types/api').TaskGroupV2>} */
 	export let taskGroups;
 
-	/** @type {import('$lib/types-v2').WorkflowTasksTableRowGroup[]} */
+	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
-	/** @type {import('$lib/types-v2').WorkflowTasksTableRowGroup[]} */
+	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let filteredRows = [];
 	let groupBy = 'pkg_name';
 
@@ -74,7 +74,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 */
 	function filterRow(row) {
 		return (
@@ -88,7 +88,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function genericSearchMatch(row) {
@@ -108,7 +108,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function categoryMatch(row) {
@@ -119,7 +119,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function modalityMatch(row) {
@@ -130,7 +130,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function packageMatch(row) {
@@ -141,7 +141,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function tagMatch(row) {
@@ -152,7 +152,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function inputTypeMatch(row) {
@@ -173,7 +173,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2[]} taskGroups
+	 * @param {import('../types/api').TaskGroupV2[]} taskGroups
 	 */
 	function setFiltersValues(taskGroups) {
 		setSelectorData(
@@ -224,8 +224,8 @@
 	}
 
 	/**
-	 * @param {Array<import('$lib/types-v2').TaskGroupV2>} taskGroups
-	 * @param {(task: import('$lib/types-v2').TaskV2) => string | null} mapper
+	 * @param {Array<import('../types/api').TaskGroupV2>} taskGroups
+	 * @param {(task: import('../types/api').TaskV2) => string | null} mapper
 	 * @returns {string[]}
 	 */
 	function extractSlimSelectTaskValues(taskGroups, mapper) {
@@ -247,7 +247,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} taskProperties
+	 * @param {import('../types/api').TasksTableRow} taskProperties
 	 */
 	function getMetadataCell(taskProperties) {
 		const values = [];

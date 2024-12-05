@@ -7,7 +7,7 @@ const logger = getLogger('admin API [v2]');
 /**
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<import('$lib/types-v2').ProjectV2[]>}
+ * @returns {Promise<import('fractal-components/types/api').ProjectV2[]>}
  */
 export async function listProjects(fetch) {
 	logger.debug('Fetching the list of projects');

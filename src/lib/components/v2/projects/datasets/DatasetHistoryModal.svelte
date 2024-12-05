@@ -1,13 +1,13 @@
 <script>
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import('$lib/types-v2').DatasetV2} */
+	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
 
 	/**
 	 * Returns the dataset history formatted in JSON hiding some values.
 	 *
-	 * @param {import('$lib/types-v2').DatasetHistoryItemV2} historyItem
+	 * @param {import('fractal-components/types/api').DatasetHistoryItemV2} historyItem
 	 * @returns {string}
 	 */
 	function formatDatasetHistory(historyItem) {

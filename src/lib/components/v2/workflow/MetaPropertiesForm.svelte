@@ -10,9 +10,9 @@
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 
-	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
-	/** @type {(wft: import('$lib/types-v2').WorkflowTaskV2) => void} */
+	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
 
 	/** @type {FormBuilder|undefined} */
