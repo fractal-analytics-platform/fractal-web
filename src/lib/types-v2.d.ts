@@ -1,4 +1,4 @@
-import type { JSONSchemaObjectProperty } from 'fractal-jschema/types/jschema';
+import type { JSONSchemaObjectProperty } from 'fractal-components/types/jschema';
 import { DatasetHistoryItem, type Task } from './types';
 
 export type ProjectV2 = {

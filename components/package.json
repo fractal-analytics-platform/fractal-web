@@ -1,5 +1,5 @@
 {
-	"name": "fractal-jschema",
+	"name": "fractal-components",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",

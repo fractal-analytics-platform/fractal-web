@@ -1,7 +1,7 @@
 <script>
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import PropertyDescription from 'fractal-jschema/components/properties/PropertyDescription.svelte';
+	import PropertyDescription from 'fractal-components/components/properties/PropertyDescription.svelte';
 	import FilteredTasksTable from '../tasks/FilteredTasksTable.svelte';
 	import { removeIdenticalTaskGroups } from '../tasks/task_group_utilities';
 	import { formatMarkdown } from '$lib/common/component_utilities';

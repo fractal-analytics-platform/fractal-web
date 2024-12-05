@@ -8,7 +8,7 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			'fractal-jschema': fileURLToPath(new URL('../jschema/src/lib/index.js', import.meta.url))
+			'fractal-components': fileURLToPath(new URL('../components/src/lib/index.js', import.meta.url))
 		}
 	},
 	optimizeDeps: {

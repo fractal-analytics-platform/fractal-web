@@ -1,7 +1,7 @@
 <script>
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
-	import { stripIgnoredProperties, getPropertiesToIgnore, SchemaValidator } from 'fractal-jschema';
+	import { stripIgnoredProperties, getPropertiesToIgnore, SchemaValidator } from 'fractal-components';
 
 	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
 	export let workflowTask;
@@ -68,7 +68,7 @@
 	 */
 	function validateArguments(args) {
 		let newSchema =
-			/** @type {import('fractal-jschema/types/jschema').JSONSchemaObjectProperty} */ (
+			/** @type {import('fractal-components/types/jschema').JSONSchemaObjectProperty} */ (
 				'args_schema' in updateCandidate
 					? updateCandidate.args_schema
 					: parallel

@@ -4,7 +4,7 @@
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import TypesEditor from './TypesEditor.svelte';
-	import { detectSchemaVersion, SchemaValidator } from 'fractal-jschema';
+	import { detectSchemaVersion, SchemaValidator } from 'fractal-components';
 
 	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
 	export let addNewTasks;

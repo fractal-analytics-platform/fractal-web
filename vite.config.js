@@ -23,7 +23,7 @@ const config = defineConfig({
 		environment: 'jsdom',
 		setupFiles: ['./setupTests.js'],
 		include: ['**/__tests__/**/*\\.test\\.js'],
-		exclude: ['jschema/**', 'node_modules', 'build', '.idea', '.git', '.cache'],
+		exclude: ['components/**', 'node_modules', 'build', '.idea', '.git', '.cache'],
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
@@ -38,13 +38,13 @@ const config = defineConfig({
 	},
 	resolve: {
 		alias: {
-			'fractal-jschema': fileURLToPath(new URL('./jschema/src/lib/index.js', import.meta.url))
+			'fractal-components': fileURLToPath(new URL('./components/src/lib/index.js', import.meta.url))
 		}
 	},
-	// Tells Vite to allow serving files from the jschema folder when running npm run dev
+	// Tells Vite to allow serving files from the components folder when running npm run dev
 	server: {
 		fs: {
-			allow: ['./jschema/src/lib']
+			allow: ['./components/src/lib']
 		}
 	},
 	optimizeDeps: {

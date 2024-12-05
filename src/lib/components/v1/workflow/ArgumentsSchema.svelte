@@ -4,9 +4,9 @@
 	import { updateFormEntry } from '$lib/components/v1/workflow/task_form_utils';
 	import { AlertError, displayStandardErrorAlert } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
-	import { JSchema, getPropertiesToIgnore } from 'fractal-jschema';
+	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
 	import { deepCopy } from '$lib/common/component_utilities';
-	import { JsonSchemaDataError } from 'fractal-jschema/components/form_manager';
+	import { JsonSchemaDataError } from 'fractal-components/components/form_manager';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 

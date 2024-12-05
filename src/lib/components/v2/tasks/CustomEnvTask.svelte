@@ -1,6 +1,6 @@
 <script>
 	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
-	import { SchemaValidator } from 'fractal-jschema';
+	import { SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';

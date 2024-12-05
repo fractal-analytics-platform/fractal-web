@@ -1,7 +1,7 @@
 <script>
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { PropertyDescription } from 'fractal-jschema';
+	import { PropertyDescription } from 'fractal-components';
 
 	let name = '';
 	let id = '';

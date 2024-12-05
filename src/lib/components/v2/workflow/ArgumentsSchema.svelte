@@ -11,11 +11,11 @@
 		stripNullAndEmptyObjectsAndArrays,
 		stripIgnoredProperties,
 		getPropertiesToIgnore
-	} from 'fractal-jschema';
+	} from 'fractal-components';
 	import FormBuilder from './FormBuilder.svelte';
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
-	import { JsonSchemaDataError } from 'fractal-jschema/components/form_manager';
+	import { JsonSchemaDataError } from 'fractal-components/components/form_manager';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
