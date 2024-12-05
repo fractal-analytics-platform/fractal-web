@@ -35,7 +35,7 @@ export function createPostProxy(path) {
 				headers: filterHeaders(request.headers),
 				body: request.body,
 				// To avoid error "RequestInit: duplex option is required when sending a body"
-				// @ts-ignore, not standard, but supported by undici; enable restraming of request
+				// @ts-ignore, not standard, but supported by undici; enable re-streaming of request
 				duplex: 'half'
 			});
 		} catch (err) {
@@ -57,7 +57,7 @@ export function createPatchProxy(path) {
 				credentials: 'include',
 				headers: filterHeaders(request.headers),
 				body: request.body,
-				// @ts-ignore, not standard, but supported by undici; enable restraming of request
+				// @ts-ignore, not standard, but supported by undici; enable re-streaming of request
 				duplex: 'half'
 			});
 		} catch (err) {

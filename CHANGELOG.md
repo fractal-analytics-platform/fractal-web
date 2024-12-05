@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Used form data in tasks collection endpoint (\#669);
+
 # 1.11.2
 
 * Removed usage of `cache_dir` field (\#667);
