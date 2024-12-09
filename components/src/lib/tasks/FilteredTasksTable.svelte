@@ -39,6 +39,9 @@
 		setup();
 	}
 
+	$: selectedTasksCount = filteredRows.reduce((acc, row) => acc + row.tasks.length, 0);
+	$: tasksCount = allRows.reduce((acc, row) => acc + row.tasks.length, 0);
+
 	$: if (
 		genericSearch ||
 		categoryFilter ||
@@ -429,6 +432,10 @@
 			</table>
 		</div>
 	</div>
+	<p class="mt-3 text-center mb-0">
+		Showing {selectedTasksCount} of {tasksCount}
+		{tasksCount === 1 ? 'task' : 'tasks'}
+	</p>
 {/if}
 
 <style>
