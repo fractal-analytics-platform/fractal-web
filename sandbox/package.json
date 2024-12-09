@@ -24,7 +24,7 @@
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/package": "^2.3.5",
+		"@sveltejs/package": "^2.0.0",
 		"eslint": "^9.11.1",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.44.1",

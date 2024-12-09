@@ -2,10 +2,10 @@ import { greatestVersionAsc, greatestVersionDesc } from '$lib/common/component_u
 import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 /**
- * @param {import('$lib/types-v2').TaskV2} task
+ * @param {import('fractal-components/types/api').TaskV2} task
  * @returns {Promise<{
- *  updateCandidates: Array<import('$lib/types-v2').TaskV2 & { version: string }>
- *  enrichedTask: import('$lib/types-v2').TaskV2 & { version: string | null, pkg_name: string }
+ *  updateCandidates: Array<import('fractal-components/types/api').TaskV2 & { version: string }>
+ *  enrichedTask: import('fractal-components/types/api').TaskV2 & { version: string | null, pkg_name: string }
  * }>} updateCandidates is the list of update candidates for the given task,
  * enrichedTask it the task passed as input with additional fields extracted from related task group
  */
@@ -18,10 +18,10 @@ export async function getNewVersions(task) {
 }
 
 /**
- * @param {import('$lib/types-v2').TaskV2[]} tasks list of tasks inserted into a workflow
+ * @param {import('fractal-components/types/api').TaskV2[]} tasks list of tasks inserted into a workflow
  * @returns {Promise<{
- *  updateCandidates: { [id: string]: Array<import('$lib/types-v2').TaskV2 & { version: string }> }
- *  enrichedTasks: Array<import('$lib/types-v2').TaskV2 & { version: string | null, pkg_name: string }>
+ *  updateCandidates: { [id: string]: Array<import('fractal-components/types/api').TaskV2 & { version: string }> }
+ *  enrichedTasks: Array<import('fractal-components/types/api').TaskV2 & { version: string | null, pkg_name: string }>
  * }>} updateCandidates is a map having tasks ids as keys and update candidates list as values;
  * enrichedTasks is the list of tasks passed as input with additional fields extracted from related task groups
  */
@@ -32,11 +32,11 @@ export async function getAllNewVersions(tasks) {
 		throw await getAlertErrorFromResponse(response);
 	}
 
-	/** @type {import('$lib/types-v2').TaskGroupV2[]} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	const taskGroups = await response.json();
 
 	const enrichedTasks = tasks.map((t) => {
-		const taskGroup = /** @type {import('$lib/types-v2').TaskGroupV2} */ (
+		const taskGroup = /** @type {import('fractal-components/types/api').TaskGroupV2} */ (
 			taskGroups.find((tg) => tg.id === t.taskgroupv2_id)
 		);
 		return {

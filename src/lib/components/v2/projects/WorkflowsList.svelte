@@ -7,7 +7,7 @@
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	// The list of workflows
-	/** @type {import('$lib/types-v2').WorkflowV2[]} */
+	/** @type {import('fractal-components/types/api').WorkflowV2[]} */
 	export let workflows = [];
 	// Set the projectId prop to reference a specific project for each workflow
 	export let projectId = undefined;
@@ -44,7 +44,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowV2} importedWorkflow
+	 * @param {import('fractal-components/types/api').WorkflowV2} importedWorkflow
 	 */
 	function handleWorkflowImported(importedWorkflow) {
 		workflows.push(importedWorkflow);

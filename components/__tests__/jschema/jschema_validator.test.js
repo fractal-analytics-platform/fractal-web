@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { it, expect } from 'vitest';
-import { SchemaValidator, detectSchemaVersion } from '../src/lib/components/jschema_validation.js';
+import { SchemaValidator, detectSchemaVersion } from '../../src/lib/jschema/jschema_validation.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 

@@ -8,7 +8,7 @@ const logger = getLogger('workflow API [v2]');
  * Fetches the list of workflows of a project from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
- * @returns {Promise<Array<import('$lib/types-v2').WorkflowV2>>}
+ * @returns {Promise<Array<import('fractal-components/types/api').WorkflowV2>>}
  */
 export async function getWorkflows(fetch, projectId) {
 	logger.debug('Fetching project workflows [project_id=%d]', projectId);
@@ -30,7 +30,7 @@ export async function getWorkflows(fetch, projectId) {
  * @param {typeof fetch} fetch
  * @param {string} projectId
  * @param {string} workflowId
- * @returns {Promise<import('$lib/types-v2').WorkflowV2>}
+ * @returns {Promise<import('fractal-components/types/api').WorkflowV2>}
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
 	logger.debug('Fetching workflow [workflow_id=%d] [project_id=%d]', workflowId, projectId);
@@ -59,7 +59,7 @@ export async function getWorkflow(fetch, projectId, workflowId) {
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
  * @param {number|string} workflowId
- * @returns {Promise<Array<import('$lib/types-v2').ApplyWorkflowV2>>}
+ * @returns {Promise<Array<import('fractal-components/types/api').ApplyWorkflowV2>>}
  */
 export async function getWorkflowJobs(fetch, projectId, workflowId) {
 	logger.debug('Fetching workflow jobs [workflow_id=%d] [project_id=%d]', workflowId, projectId);

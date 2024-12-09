@@ -11,7 +11,7 @@
 	let modal;
 	/** Show/hide complete stack trace */
 	let showDetails = false;
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
 	let job;
 	let admin = false;
 	let log = '';
@@ -24,7 +24,7 @@
 	let updateJobTimeout = undefined;
 
 	/**
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2} selectedJob
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} selectedJob
 	 * @param {boolean} isAdminPage
 	 */
 	export async function show(selectedJob, isAdminPage) {

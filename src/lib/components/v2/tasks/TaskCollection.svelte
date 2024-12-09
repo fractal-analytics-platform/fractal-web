@@ -4,16 +4,14 @@
 	import TaskGroupActivityLogsModal from '$lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
-	import {
-		getTaskActivityStatusBadgeClass,
-		getTaskGroupActivitiesToUpdate
-	} from './task_group_utilities';
+	import { getTaskGroupActivitiesToUpdate } from './task_group_utilities';
+	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
 	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
 
 	// This component automatically fecthes updates for task collections activities
 	// in pending and ongoing status
 
-	/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
+	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
 	let recentActivities = [];
 
 	$: sortedRecentActivities = [...recentActivities].sort(sortActivitiesByTimestampStarted);
@@ -148,7 +146,7 @@
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('$lib/types-v2').TaskGroupActivityV2} */ (
+			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
 			recentActivities = [...recentActivities, result];
@@ -182,7 +180,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupActivityV2[]} activitiesToUpdate
+	 * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
 	async function updateTaskCollectionsState(activitiesToUpdate) {
 		recentActivities = recentActivities.map((a) => {

@@ -1,5 +1,26 @@
-import type { JSONSchemaObjectProperty } from 'fractal-jschema/types/jschema';
-import { DatasetHistoryItem, type Task } from './types';
+import type { JSONSchemaObjectProperty } from './jschema';
+
+export type User = {
+  id?: number
+  email: string
+  is_active: boolean
+  is_superuser: boolean
+  is_verified: boolean
+  username: string | null
+  password?: string
+  group_ids_names : Array<[number, string]> | null
+  oauth_accounts: Array<{
+    id: number
+    account_email: string
+    oauth_name: string
+  }>
+}
+
+export type DatasetHistoryItem = {
+  workflowtask: WorkflowTask
+  status: string
+  parallelization: object
+}
 
 export type ProjectV2 = {
 	id: number;

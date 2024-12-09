@@ -7,7 +7,7 @@
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import SlimSelect from 'slim-select';
 	import { onMount, tick } from 'svelte';
 	import { objectChanged } from '$lib/common/component_utilities';
@@ -19,9 +19,9 @@
 
 	let projectId = $page.params.projectId;
 
-	/** @type {import('$lib/types-v2').DatasetV2} */
+	/** @type {import('fractal-components/types/api').DatasetV2} */
 	let dataset = $page.data.dataset;
-	/** @type {import('$lib/types-v2').ImagePage} */
+	/** @type {import('fractal-components/types/api').ImagePage} */
 	let imagePage = $page.data.imagePage;
 	let showTable = $page.data.imagePage.total_count > 0;
 	let searching = false;
@@ -88,7 +88,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('$lib/types-v2').Image|undefined>}
+	 * @returns {Promise<import('fractal-components/types/api').Image|undefined>}
 	 */
 	async function loadImageForSelectedPlate() {
 		const params = { filters: { attributes: { plate: selectedPlate } } };
@@ -107,7 +107,7 @@
 			console.error(`Unable to load image for plate ${selectedPlate}`);
 			return undefined;
 		}
-		/** @type {import('$lib/types-v2').ImagePage}*/
+		/** @type {import('fractal-components/types/api').ImagePage}*/
 		const result = await response.json();
 		if (result.images.length === 0) {
 			console.error(
@@ -236,12 +236,12 @@
 
 	let resetBtnActive = false;
 
-	/** @param {import('$lib/types-v2').ImagePage} imagePage */
+	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
 	function getAttributeFilterBaseValues(imagePage) {
 		return Object.fromEntries(Object.keys(imagePage.attributes).map((k) => [k, null]));
 	}
 
-	/** @param {import('$lib/types-v2').ImagePage} imagePage */
+	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
 	function getTypeFilterBaseValues(imagePage) {
 		return Object.fromEntries(imagePage.types.map((k) => [k, null]));
 	}
@@ -249,7 +249,7 @@
 	/**
 	 * Reload the attribute filters according to the received imagePage
 	 * preserving the values selected by the user
-	 * @param {import('$lib/types-v2').ImagePage} imagePage
+	 * @param {import('fractal-components/types/api').ImagePage} imagePage
 	 */
 	function reloadAttributeFilters(imagePage) {
 		attributeFilters = Object.fromEntries(
@@ -264,7 +264,7 @@
 	/**
 	 * Reload the type filters according to the received imagePage
 	 * preserving the values selected by the user
-	 * @param {import('$lib/types-v2').ImagePage} imagePage
+	 * @param {import('fractal-components/types/api').ImagePage} imagePage
 	 */
 	function reloadTypeFilters(imagePage) {
 		typeFilters = Object.fromEntries(
@@ -420,7 +420,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').DatasetV2} updatedDataset
+	 * @param {import('fractal-components/types/api').DatasetV2} updatedDataset
 	 */
 	async function updateDatasetFiltersCallback(updatedDataset) {
 		dataset = updatedDataset;

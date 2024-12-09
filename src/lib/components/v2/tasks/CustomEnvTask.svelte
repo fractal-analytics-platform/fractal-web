@@ -1,13 +1,13 @@
 <script>
 	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
-	import { SchemaValidator } from 'fractal-jschema';
+	import { SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	/** @type {(task: import('$lib/types-v2').TaskV2[]) => void} */
+	/** @type {(task: import('fractal-components/types/api').TaskV2[]) => void} */
 	export let addNewTasks;
 	/** @type {import('$lib/types').User} */
 	export let user;

@@ -1,18 +1,18 @@
 <script>
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {import('$lib/types').User} */
 	export let user;
-	/** @type {import('$lib/types-v2').TaskGroupV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
 	let taskGroup;
 
 	/** @type {Modal} */
 	let modal;
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroupToLoad
+	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToLoad
 	 */
 	export async function open(taskGroupToLoad) {
 		taskGroup = taskGroupToLoad;
@@ -20,7 +20,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
 	 */
 	function getGroupName(taskGroup) {
 		const group = user.group_ids_names?.find((i) => i[0] === taskGroup?.user_group_id);

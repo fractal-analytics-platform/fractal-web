@@ -4,13 +4,13 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import("$lib/types-v2").WorkflowV2} */
+	/** @type {import("fractal-components/types/api").WorkflowV2} */
 	export let workflow;
-	/** @type {import("$lib/types-v2").WorkflowTaskV2} */
+	/** @type {import("fractal-components/types/api").WorkflowTaskV2} */
 	export let workflowTask;
 	/** @type {number|undefined} */
 	export let selectedDatasetId;
-	/** @type {(wft: import("$lib/types-v2").WorkflowTaskV2) => void} */
+	/** @type {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} */
 	export let updateWorkflowTaskCallback;
 
 	/** @type {AttributesTypesForm} */
@@ -59,7 +59,7 @@
 				}
 			);
 			if (response.ok) {
-				/** @type {import('$lib/types-v2').ImagePage} */
+				/** @type {import('fractal-components/types/api').ImagePage} */
 				const imagePage = await response.json();
 				datasetAttributes = imagePage.attributes;
 				datasetTypes = imagePage.types;

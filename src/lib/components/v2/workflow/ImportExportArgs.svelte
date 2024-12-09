@@ -2,7 +2,7 @@
 	import { downloadBlob } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
 	/** @type {(json: object) => Promise<void>} */
 	export let onImport;

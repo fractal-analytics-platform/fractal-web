@@ -1,5 +1,5 @@
 <script>
-	import JSchema from '../src/lib/components/JSchema.svelte';
+	import JSchema from '../../src/lib/jschema/JSchema.svelte';
 
 	/** @type {any} */
 	export let schema;

@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Moved `jschema` and other common components to a dedicated`components` module (\#671);
+* Added `tasks-list` module to generate the tasks-list static page (\#671);
+
 # 1.12.0
 
 * Used form data in tasks collection endpoint (\#669);

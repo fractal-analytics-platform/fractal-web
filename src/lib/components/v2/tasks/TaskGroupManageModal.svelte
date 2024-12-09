@@ -9,7 +9,7 @@
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {import('$lib/types-v2').TaskGroupV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
 	let taskGroup = undefined;
 	let originalActive = true;
 
@@ -20,7 +20,7 @@
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroupToEdit
+	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToEdit
 	 */
 	export async function open(taskGroupToEdit) {
 		taskGroup = taskGroupToEdit;

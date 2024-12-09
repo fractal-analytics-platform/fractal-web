@@ -9,7 +9,7 @@ const logger = getLogger('task API [v2]');
  * @param {typeof fetch} fetch
  * @param {boolean|false=} loadArgsSchema
  * @param {boolean|false=} onlyActive
- * @returns {Promise<Array<import('$lib/types-v2').TaskGroupV2>>}
+ * @returns {Promise<Array<import('fractal-components/types/api').TaskGroupV2>>}
  */
 export async function listTaskGroups(fetch, loadArgsSchema = false, onlyActive = false) {
 	logger.debug('Fetching task groups');

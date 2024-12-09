@@ -1,6 +1,6 @@
 /**
- * @param {Array<import("$lib/types-v2").DatasetV2>} datasets
- * @param {Array<import("$lib/types-v2").ApplyWorkflowV2>} jobs
+ * @param {Array<import("fractal-components/types/api").DatasetV2>} datasets
+ * @param {Array<import("fractal-components/types/api").ApplyWorkflowV2>} jobs
  * @returns {number|undefined}
  */
 export function getDefaultWorkflowDataset(datasets, jobs) {
@@ -15,8 +15,8 @@ export function getDefaultWorkflowDataset(datasets, jobs) {
 }
 
 /**
- * @param {import("$lib/types-v2").WorkflowV2} workflow
- * @param {Array<import("$lib/types-v2").DatasetV2>} datasets
+ * @param {import("fractal-components/types/api").WorkflowV2} workflow
+ * @param {Array<import("fractal-components/types/api").DatasetV2>} datasets
  * @param {number|undefined} defaultDatasetId
  * @returns {number|undefined}
  */
@@ -36,7 +36,7 @@ export function getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId)
 const LOCAL_STORAGE_SELECTED_DATASETS = 'SelectedDatasets';
 
 /**
- * @param {import("$lib/types-v2").WorkflowV2} workflow
+ * @param {import("fractal-components/types/api").WorkflowV2} workflow
  * @param {number|undefined} datasetId
  */
 export function saveSelectedDataset(workflow, datasetId) {
@@ -72,7 +72,7 @@ export function deleteDatasetSelectionsForProject(projectId) {
 }
 
 /**
- * @param {import("$lib/types-v2").WorkflowV2} workflow
+ * @param {import("fractal-components/types/api").WorkflowV2} workflow
  * @returns {number|undefined}
  */
 function getDatasetIdFromLocalStorage(workflow) {

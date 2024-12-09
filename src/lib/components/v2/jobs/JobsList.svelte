@@ -13,7 +13,7 @@
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
 	import SlimSelect from 'slim-select';
 
-	/** @type {() => Promise<import('$lib/types-v2').ApplyWorkflowV2[]>} */
+	/** @type {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} */
 	export let jobUpdater;
 	/** @type {('project'|'workflow'|'user_email'|'id')[]} */
 	export let columnsToHide = [];
@@ -29,7 +29,7 @@
 	let projects = $page.data.projects;
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $page.data.workflows || [];
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 	let jobs = $page.data.jobs || [];
 	/** @type {{ id: number, name: string }[]} */
 	let datasets = $page.data.datasets || [];
@@ -38,7 +38,7 @@
 	let tableHandler = new DataHandler(jobs);
 	tableHandler.sortDesc('id');
 
-	/** @type {import('svelte/store').Readable<import('$lib/types-v2').ApplyWorkflowV2[]>} */
+	/** @type {import('svelte/store').Readable<import('fractal-components/types/api').ApplyWorkflowV2[]>} */
 	let rows = tableHandler.getRows();
 
 	// Selectors
@@ -71,7 +71,7 @@
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2[]} newJobs
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2[]} newJobs
 	 */
 	export function setJobs(newJobs) {
 		jobs = newJobs;
@@ -92,7 +92,7 @@
 
 	/**
 	 * Requests the server to stop a job execution
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2} job
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
 	 * @returns {Promise<void>}
 	 */
 	async function handleJobCancel(job) {
@@ -142,7 +142,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2} row
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} row
 	 */
 	function getDownloadUrl(row) {
 		if (admin) {
@@ -228,7 +228,7 @@
 	/**
 	 * Rebuilds valid slim-select options according to the visible rows.
 	 * Example: if a project filter is selected the user can select only the workflows belonging to that project.
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2[]} rows
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2[]} rows
 	 */
 	function rebuildSlimSelectOptions(rows) {
 		setValidSlimSelectOptions(

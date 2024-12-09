@@ -3,13 +3,13 @@
 	import { page } from '$app/stores';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
-	/** @type {import('$lib/types-v2').ProjectV2} */
+	/** @type {import('fractal-components/types/api').ProjectV2} */
 	let project = $page.data.project;
 	/** @type {import('$lib/types').Workflow} */
 	let workflow = $page.data.workflow;
 
 	/**
-	 * @returns {Promise<import('$lib/types-v2').ApplyWorkflowV2[]>}
+	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
 	 */
 	async function jobUpdater() {
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {

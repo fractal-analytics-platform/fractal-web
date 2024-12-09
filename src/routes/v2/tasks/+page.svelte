@@ -2,19 +2,19 @@
 	import { page } from '$app/stores';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import FilteredTasksTable from '$lib/components/v2/tasks/FilteredTasksTable.svelte';
+	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 
-	/** @type {import('$lib/types-v2').TaskGroupV2[]} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	let taskGroups = $page.data.taskGroups;
 
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {import('$lib/types-v2').TasksTableRow|null} */
+	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = null;
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} taskRow
+	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
 	 */
 	function showDocsInfoModal(taskRow) {
 		selectedTaskRow = taskRow;

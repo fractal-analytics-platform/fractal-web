@@ -5,7 +5,7 @@ import { writable } from 'svelte/store';
 // inside the store, will also update the to-be-displayed project in a modal.
 /** @type {import('svelte/store').Writable<import('$lib/types').Project|undefined>}} */
 export const projectInfoModal = writable(undefined);
-/** @type {import('svelte/store').Writable<import('$lib/types-v2').ProjectV2|undefined>}} */
+/** @type {import('svelte/store').Writable<import('fractal-components/types/api').ProjectV2|undefined>}} */
 export const projectInfoModalV2 = writable(undefined);
 
 // Context project store

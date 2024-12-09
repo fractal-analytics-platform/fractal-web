@@ -7,7 +7,7 @@ export default defineConfig({
 		outDir: './build',
 		emptyOutDir: true,
 		lib: {
-			name: 'fractal-jschema',
+			name: 'fractal-components',
 			entry: './src/lib/index.js'
 		}
 	},

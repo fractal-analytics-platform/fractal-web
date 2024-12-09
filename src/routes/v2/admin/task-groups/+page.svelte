@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
@@ -32,12 +32,12 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('$lib/types-v2').TaskGroupV2[]} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	let results = [];
 
 	/** @type {Modal} */
 	let infoModal;
-	/** @type {import('$lib/types-v2').TaskGroupV2|null} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2|null} */
 	let selectedTaskGroup = null;
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
@@ -113,7 +113,7 @@
 
 	/**
 	 *
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
 	 */
 	function openInfoModal(taskGroup) {
 		selectedTaskGroup = taskGroup;

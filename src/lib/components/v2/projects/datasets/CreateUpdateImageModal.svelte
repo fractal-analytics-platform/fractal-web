@@ -3,7 +3,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
-	/** @type {import('$lib/types-v2').DatasetV2} */
+	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
 	/** @type {() => Promise<void>} */
 	export let onImageSave;
@@ -34,7 +34,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').Image} image
+	 * @param {import('fractal-components/types/api').Image} image
 	 */
 	export function openForEditing(image) {
 		isNew = false;

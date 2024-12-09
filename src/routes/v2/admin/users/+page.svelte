@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 

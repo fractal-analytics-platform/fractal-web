@@ -29,14 +29,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install jschema dependencies
+      - name: Install components dependencies
         run: |
-          cd jschema
+          cd components
           npm install
 
-      - name: Run static code analysis on jschema module
+      - name: Run static code analysis on components module
         run: |
-          cd jschema
+          cd components
           npx eslint .
 
       - name: Run static code analysis

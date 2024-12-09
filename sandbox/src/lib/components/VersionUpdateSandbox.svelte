@@ -8,7 +8,7 @@
 		stripIgnoredProperties,
 		getPropertiesToIgnore,
 		detectSchemaVersion
-	} from 'fractal-jschema';
+	} from 'fractal-components';
 	import { tick } from 'svelte';
 
 	let oldSchema = undefined;

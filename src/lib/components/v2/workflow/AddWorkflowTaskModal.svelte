@@ -1,16 +1,16 @@
 <script>
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import PropertyDescription from 'fractal-jschema/components/properties/PropertyDescription.svelte';
-	import FilteredTasksTable from '../tasks/FilteredTasksTable.svelte';
-	import { removeIdenticalTaskGroups } from '../tasks/task_group_utilities';
+	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
+	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import { removeIdenticalTaskGroups } from 'fractal-components/tasks/task_group_utilities';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 
-	/** @type {import('$lib/types-v2').WorkflowV2} */
+	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	export let workflow;
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	export let user;
-	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => Promise<void>} */
+	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} */
 	export let onWorkflowTaskAdded;
 
 	/** @type {Modal} */
@@ -19,7 +19,7 @@
 	let loading = false;
 	let addingTask = false;
 
-	/** @type {Array<import('$lib/types-v2').TaskGroupV2>} */
+	/** @type {Array<import('fractal-components/types/api').TaskGroupV2>} */
 	let taskGroups = [];
 
 	export async function show() {

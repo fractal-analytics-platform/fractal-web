@@ -21,19 +21,19 @@
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
 
-	/** @type {import('$lib/types-v2').WorkflowV2} */
+	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
 	/** @type {number|undefined} */
 	let defaultDatasetId = $page.data.defaultDatasetId;
 	$: project = workflow.project;
-	/** @type {import('$lib/types-v2').DatasetV2[]} */
+	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	let datasets = $page.data.datasets;
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
 
 	let jobError = '';
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let failedJob;
 	/** @type {JobLogsModal} */
 	let jobLogsModal;
@@ -43,7 +43,7 @@
 
 	let workflowTabContextId = 0;
 	let workflowSuccessMessage = '';
-	/** @type {import('$lib/types-v2').WorkflowTaskV2|undefined} */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = undefined;
 	let preventedSelectedTaskChange = undefined;
 
@@ -76,12 +76,12 @@
 	/** @type {Modal} */
 	let editWorkflowModal;
 
-	/** @type {{ [id: string]: import('$lib/types-v2').TaskV2[] }} */
+	/** @type {{ [id: string]: import('fractal-components/types/api').TaskV2[] }} */
 	let newVersionsMap = {};
 	/** @type {{ [id: string]: string | null }} */
 	let tasksVersions = {};
 
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
 
 	$: updatableWorkflowList = workflow.task_list || [];
@@ -225,7 +225,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowV2} updatedWorkflow
+	 * @param {import('fractal-components/types/api').WorkflowV2} updatedWorkflow
 	 */
 	async function onWorkflowTaskAdded(updatedWorkflow) {
 		workflow = updatedWorkflow;
@@ -276,7 +276,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowTaskV2} wft
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} wft
 	 */
 	async function setSelectedWorkflowTask(wft) {
 		await tick();
@@ -331,7 +331,7 @@
 
 	/**
 	 *
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2} job
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
 	 */
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = job;
@@ -340,7 +340,7 @@
 
 	/**
 	 * Called by VersionUpdate component at the end of the update to reload the workflow.
-	 * @param workflowTask {import('$lib/types-v2').WorkflowTaskV2}
+	 * @param workflowTask {import('fractal-components/types/api').WorkflowTaskV2}
 	 */
 	async function taskUpdated(workflowTask) {
 		if (!workflow) {
@@ -473,7 +473,7 @@
 			console.error('Error retrieving workflow jobs', await response.json());
 			return;
 		}
-		const jobs = /** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */ (await response.json());
+		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (await response.json());
 		const failedJobs = jobs
 			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
 			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
@@ -495,7 +495,7 @@
 
 	/**
 	 * @param {number} datasetId
-	 * @return {Promise<import('$lib/types-v2').ApplyWorkflowV2|undefined>}
+	 * @return {Promise<import('fractal-components/types/api').ApplyWorkflowV2|undefined>}
 	 */
 	async function getSelectedSubmittedJob(datasetId) {
 		if (selectedSubmittedJob && selectedSubmittedJob.dataset_id === datasetId) {
@@ -506,7 +506,7 @@
 			credentials: 'include'
 		});
 		if (response.ok) {
-			/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
+			/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 			const allJobs = await response.json();
 			const jobs = allJobs
 				.filter((j) => j.dataset_id === datasetId)
@@ -545,7 +545,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowTaskV2} updatedWft
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
 	function onWorkflowTaskUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
@@ -557,7 +557,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowTaskV2} updatedWft
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
 	function onInputFiltersUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;

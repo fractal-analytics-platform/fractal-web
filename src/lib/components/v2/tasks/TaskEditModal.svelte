@@ -7,7 +7,7 @@
 
 	export let updateEditedTask;
 
-	/** @type {import('$lib/types-v2').TaskV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
 	let task;
 
 	$: updateEnabled = !loading && !saving && task && task.name;
@@ -74,7 +74,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskV2} taskToEdit
+	 * @param {import('fractal-components/types/api').TaskV2} taskToEdit
 	 */
 	export async function open(taskToEdit) {
 		loading = true;
@@ -90,7 +90,7 @@
 		loading = false;
 
 		if (response.ok) {
-			task = /** @type {import('$lib/types-v2').TaskV2} */ (result);
+			task = /** @type {import('fractal-components/types/api').TaskV2} */ (result);
 			command_parallel = task.command_parallel;
 			command_non_parallel = task.command_non_parallel;
 			// wait the typesEditor element rendering, that happens after task is defined

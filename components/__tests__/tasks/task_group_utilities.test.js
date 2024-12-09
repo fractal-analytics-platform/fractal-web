@@ -3,7 +3,7 @@ import {
 	buildTaskTableRows,
 	buildWorkflowTaskTableRows,
 	removeIdenticalTaskGroups
-} from '$lib/components/v2/tasks/task_group_utilities.js';
+} from '../../src/lib/tasks/task_group_utilities.js';
 
 describe('task_group_utilities', () => {
 	it('buildTaskTableRows', async () => {

@@ -6,7 +6,7 @@
 	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
 	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
 
-	/** @type {import('$lib/types-v2').TaskGroupV2[]} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	let taskGroups = $page.data.taskGroups;
 
 	/** @type {'pypi'|'local'|'single'|'custom_env'} */
@@ -32,7 +32,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2[]} updatedGroups
+	 * @param {import('fractal-components/types/api').TaskGroupV2[]} updatedGroups
 	 */
 	function updateTaskGroups(updatedGroups) {
 		taskGroups = updatedGroups;

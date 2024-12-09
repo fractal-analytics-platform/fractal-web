@@ -1,9 +1,9 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('$lib/types-v2').TaskV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
 	let task;
 	/** @type {string | null} */
 	let taskVersion;
@@ -14,7 +14,7 @@
 
 	/**
 	 *
-	 * @param {import('$lib/types-v2').TaskV2} taskToLoad
+	 * @param {import('fractal-components/types/api').TaskV2} taskToLoad
 	 * @param {string | null} taskGroupVersion
 	 */
 	export async function open(taskToLoad, taskGroupVersion) {

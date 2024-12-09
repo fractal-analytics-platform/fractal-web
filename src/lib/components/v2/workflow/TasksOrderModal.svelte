@@ -3,10 +3,10 @@
 
 	/** @type {number} */
 	export let projectId;
-	/** @type {import('$lib/types-v2').WorkflowV2} */
+	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	export let workflow;
 
-	/** @type {(workflow: import('$lib/types-v2').WorkflowV2) => void} */
+	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => void} */
 	export let workflowUpdater;
 
 	/** @type {Modal} */
@@ -16,7 +16,7 @@
 	let editableTasksList = [];
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowTaskV2[]} originalTasksList
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2[]} originalTasksList
 	 */
 	export function show(originalTasksList) {
 		editableTasksList = originalTasksList.map((wt) => ({
