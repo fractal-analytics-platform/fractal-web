@@ -602,13 +602,13 @@
 
 
 <h1 id="json-schema-form-module">JSON Schema form module<a class="headerlink" href="#json-schema-form-module" title="Permanent link">&para;</a></h1>
-<p>The <code>jschema</code> folder on this repository contains a Svelte project that provides the JSON Schema form component (<code>JSchema.svelte</code>) and its related functions and classes. The file <code>index.js</code> contains the list of components and functions that are exported for public usage, so that they can be included using <code>from 'fractal-jschema'</code> from the main project.</p>
-<p>The main project defines <code>fractal-jschema</code> in <code>vite.config.js</code>, as an alias pointing to <code>jschema/src/lib/index.js</code>. In this way the jschema module is automatically built when the main project is built and the Hot Module Reload feature still works.</p>
-<p>Moreover, the path to jschema module has been added as <code>server.fs.allow</code> Vite config option, to prevent the following error while serving the files using <code>npm run dev</code>:</p>
-<div class="highlight"><pre><span></span><code>The request url &quot;/path/to/fractal-web/jschema/src/lib/index.js&quot; is outside of Vite serving allow list.
+<p>The <code>components</code> folder on this repository contains a Svelte project that provides the JSON Schema form component (<code>JSchema.svelte</code>) and its related functions and classes. The file <code>index.js</code> contains the list of components and functions that are exported for public usage, so that they can be included using <code>from 'fractal-components'</code> from the main project.</p>
+<p>The main project defines <code>fractal-components</code> in <code>vite.config.js</code>, as an alias pointing to <code>components/src/lib/index.js</code>. In this way the components module is automatically built when the main project is built and the Hot Module Reload feature still works.</p>
+<p>Moreover, the path to components module has been added as <code>server.fs.allow</code> Vite config option, to prevent the following error while serving the files using <code>npm run dev</code>:</p>
+<div class="highlight"><pre><span></span><code>The request url &quot;/path/to/fractal-web/components/src/lib/index.js&quot; is outside of Vite serving allow list.
 </code></pre></div>
 <blockquote>
-<p><strong>Important</strong>: When importing js files inside the <code>jschema</code> module it is necessary to use a relative path. The editor might autocomplete the imports using the <code>$lib</code> prefix, but that will not work when the module is included in the main application, since it redefines the <code>$lib</code> path again.</p>
+<p><strong>Important</strong>: When importing js files inside the <code>components</code> module it is necessary to use a relative path. The editor might autocomplete the imports using the <code>$lib</code> prefix, but that will not work when the module is included in the main application, since it redefines the <code>$lib</code> path again.</p>
 </blockquote>
 <h2 id="structure-of-the-code">Structure of the code<a class="headerlink" href="#structure-of-the-code" title="Permanent link">&para;</a></h2>
 <p>The <code>JSchema</code> Svelte component intializes a class named <code>FormManager</code>, that handles the following features:</p>
