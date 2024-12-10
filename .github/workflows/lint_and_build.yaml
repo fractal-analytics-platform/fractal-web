@@ -53,3 +53,13 @@ jobs:
           PUBLIC_OAUTH_CLIENT_NAME:
           PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL:
         run: npm run build
+
+      - name: Install tasks-list dependencies
+        run: |
+          cd tasks-list
+          npm install
+
+      - name: Build tasks-list
+        run: |
+          cd tasks-list
+          npm run build

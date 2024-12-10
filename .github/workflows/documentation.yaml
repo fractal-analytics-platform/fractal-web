@@ -32,6 +32,9 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Install components dependencies
         run: |
           cd components
