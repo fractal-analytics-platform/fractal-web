@@ -15,7 +15,7 @@ const config = {
 			fallback: 'index.html'
 		}),
 		paths: {
-			base: '/fractal-tasks'
+			base: '/task-table'
 		},
 		alias: {
 			'fractal-components': '../components/src/lib'
