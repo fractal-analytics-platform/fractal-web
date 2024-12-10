@@ -1,7 +1,7 @@
 <script>
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
-	import { SchemaValidator } from 'fractal-jschema';
+	import { SchemaValidator } from 'fractal-components';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 
 	/** @type {(task: import('$lib/types').Task) => void} */

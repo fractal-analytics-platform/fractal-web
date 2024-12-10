@@ -2,10 +2,8 @@
 	import { env } from '$env/dynamic/public';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
-	import {
-		getTaskActivityStatusBadgeClass,
-		getTaskGroupActivitiesToUpdate
-	} from './task_group_utilities';
+	import { getTaskGroupActivitiesToUpdate } from './task_group_utilities';
+	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
 	import TaskGroupActivityLogsModal from './TaskGroupActivityLogsModal.svelte';
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { page } from '$app/stores';
@@ -22,7 +20,7 @@
 		sortedUsers = [...users].sort(sortUserByEmailComparator);
 	}
 
-	/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
+	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
 	let results = [];
 
 	let pkg_name = '';
@@ -100,7 +98,7 @@
 				);
 				return;
 			}
-			/** @type {import('$lib/types-v2').TaskGroupActivityV2[]} */
+			/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
 			const activities = await response.json();
 			activities.sort(sortActivitiesByTimestampStarted);
 			results = activities;
@@ -132,7 +130,7 @@
 	let updateTasksCollectionTimeout = undefined;
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupActivityV2[]} activitiesToUpdate
+	 * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
 	async function updateTaskCollectionsState(activitiesToUpdate) {
 		results = results.map((a) => {

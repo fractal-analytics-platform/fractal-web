@@ -7,14 +7,14 @@
 	/** @type {Array<[number, string]>} */
 	export let groupIdsNames;
 	/**
-	 * @type {(updatedGroups: import('$lib/types-v2').TaskGroupV2) => void}
+	 * @type {(updatedGroups: import('fractal-components/types/api').TaskGroupV2) => void}
 	 */
 	export let updateEditedTaskGroup;
 
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {import('$lib/types-v2').TaskGroupV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
 	let taskGroup = undefined;
 
 	let privateTask = false;
@@ -27,7 +27,7 @@
 	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2} taskGroupToEdit
+	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToEdit
 	 */
 	export async function open(taskGroupToEdit) {
 		taskGroup = taskGroupToEdit;

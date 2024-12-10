@@ -17,7 +17,7 @@ git checkout v0.6.0
 ```
 and finally install via
 ```bash
-cd jschema
+cd components
 npm install
 cd ..
 npm install

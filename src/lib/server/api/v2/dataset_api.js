@@ -12,7 +12,7 @@ const logger = getLogger('dataset API [v2]');
  * @param {number} page
  * @param {number} pageSize
  * @param {object} params
- * @returns {Promise<import('$lib/types-v2').ImagePage>}
+ * @returns {Promise<import('fractal-components/types/api').ImagePage>}
  */
 export async function getDatasetImages(fetch, projectId, datasetId, page, pageSize, params) {
 	logger.debug(

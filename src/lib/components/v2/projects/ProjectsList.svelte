@@ -32,7 +32,7 @@
 	 * @param {number} projectId
 	 */
 	function setProjectInfoModal(projectId) {
-		/** @type {import('$lib/types-v2').ProjectV2} */
+		/** @type {import('fractal-components/types/api').ProjectV2} */
 		const project = projects.filter((p) => p.id === projectId)[0];
 		projectInfoModalV2.set(project);
 	}

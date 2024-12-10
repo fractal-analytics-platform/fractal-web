@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $page.data.user;

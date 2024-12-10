@@ -116,7 +116,7 @@ export function extractRelevantJobError(completeJobError, maxLines = undefined) 
 }
 
 /**
- * @param {import("$lib/types-v2").DatasetV2[]} datasets
+ * @param {import("fractal-components/types/api").DatasetV2[]} datasets
  * @param {string} selectedDatasetName
  * @returns {string}
  */
@@ -135,7 +135,7 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 }
 
 /**
- * @param {Array<import("$lib/types-v2").WorkflowTaskV2>} workflowTasks
+ * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
  * @param {{[key: number]: import('$lib/types').JobStatus}} statuses
  * @returns {number|undefined}
  */

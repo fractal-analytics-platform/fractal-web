@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { FormManager } from '../src/lib/components/form_manager';
+import { FormManager } from '../../src/lib/jschema/form_manager';
 
 describe('badInput', () => {
 	it('Detect bad input in nested object', () => {

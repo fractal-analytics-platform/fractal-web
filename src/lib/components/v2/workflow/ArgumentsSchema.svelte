@@ -11,20 +11,20 @@
 		stripNullAndEmptyObjectsAndArrays,
 		stripIgnoredProperties,
 		getPropertiesToIgnore
-	} from 'fractal-jschema';
+	} from 'fractal-components';
 	import FormBuilder from './FormBuilder.svelte';
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
-	import { JsonSchemaDataError } from 'fractal-jschema/components/form_manager';
+	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @type {import('$lib/types-v2').WorkflowTaskV2}  */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2}  */
 	export let workflowTask;
-	/** @type {(wft: import('$lib/types-v2').WorkflowTaskV2) => void} */
+	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
 
 	/** @type {JSchema|undefined} */

@@ -5,7 +5,7 @@
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
-	/** @type {import('$lib/types-v2').DatasetV2[]} */
+	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets = [];
 
 	let datasetSearch = '';
@@ -15,7 +15,7 @@
 		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
 	);
 
-	function createDatasetCallback(/** @type {import('$lib/types-v2').DatasetV2} */ newDataset) {
+	function createDatasetCallback(/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset) {
 		datasetCreatedMessage = `Created new dataset with Zarr dir ${newDataset.zarr_dir}`;
 		datasets = [...datasets, newDataset].sort((a, b) =>
 			a.name < b.name ? -1 : a.name > b.name ? 1 : 0

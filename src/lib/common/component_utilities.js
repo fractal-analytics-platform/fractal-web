@@ -226,7 +226,7 @@ export function removeDuplicatedItems(allItems) {
 }
 
 /**
- * @template {import('$lib/types').Project|import('$lib/types-v2').ProjectV2} T
+ * @template {import('$lib/types').Project|import('fractal-components/types/api').ProjectV2} T
  * @param {T[]} projects
  */
 export function sortProjectsByTimestampCreatedDesc(projects) {

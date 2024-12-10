@@ -1,7 +1,7 @@
 <script>
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { PropertyDescription } from 'fractal-jschema';
+	import { PropertyDescription } from 'fractal-components';
 
 	let name = '';
 	let id = '';
@@ -13,12 +13,12 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('$lib/types-v2').TaskV2Info[]} */
+	/** @type {import('fractal-components/types/api').TaskV2Info[]} */
 	let results = [];
 
 	/** @type {Modal} */
 	let infoModal;
-	/** @type {import('$lib/types-v2').TaskV2Info|null} */
+	/** @type {import('fractal-components/types/api').TaskV2Info|null} */
 	let selectedTaskInfo = null;
 
 	async function searchTasks() {
@@ -69,7 +69,7 @@
 
 	/**
 	 *
-	 * @param {import('$lib/types-v2').TaskV2Info} taskInfo
+	 * @param {import('fractal-components/types/api').TaskV2Info} taskInfo
 	 */
 	function openInfoModal(taskInfo) {
 		selectedTaskInfo = taskInfo;
@@ -93,7 +93,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskV2Info} taskInfo
+	 * @param {import('fractal-components/types/api').TaskV2Info} taskInfo
 	 */
 	function getUsers(taskInfo) {
 		const allEntries = /** @type {string[]} */ (

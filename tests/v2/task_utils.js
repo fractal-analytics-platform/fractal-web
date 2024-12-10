@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {Partial<import('$lib/types-v2').TaskV2 & { version: string | null }>} task
+ * @param {Partial<import('fractal-components/types/api').TaskV2 & { version: string | null }>} task
  * @returns {Promise<string>} the name of the created task
  */
 export async function createFakeTask(page, task) {

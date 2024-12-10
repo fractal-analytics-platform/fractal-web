@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let job = undefined;
 
 	let errorAlert = undefined;
@@ -12,7 +12,7 @@
 	let modal;
 
 	/**
-	 * @param jobToDisplay {import('$lib/types-v2').ApplyWorkflowV2}
+	 * @param jobToDisplay {import('fractal-components/types/api').ApplyWorkflowV2}
 	 */
 	export async function show(jobToDisplay) {
 		job = jobToDisplay;

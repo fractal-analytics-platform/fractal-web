@@ -13,7 +13,7 @@
 
 	/** @type {JobsList} */
 	let jobsListComponent;
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 	let jobs = [];
 
 	let status;
@@ -35,12 +35,12 @@
 	let datasetId;
 
 	/**
-	 * @returns {Promise<import('$lib/types-v2').ApplyWorkflowV2[]>}
+	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
 	 */
 	async function jobUpdater() {
-		/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
+		/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
-		/** @type {import('$lib/types-v2').ApplyWorkflowV2[]} */
+		/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 		const updatedJobs = [];
 		for (const job of jobsToCheck) {
 			const url = new URL('/api/admin/v2/job', window.location.origin);
@@ -198,11 +198,11 @@
 
 	/** @type {Modal} */
 	let statusModal;
-	/** @type {import('$lib/types-v2').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let jobInEditing;
 
 	/**
-	 * @param {import('$lib/types-v2').ApplyWorkflowV2} row
+	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} row
 	 */
 	function openEditStatusModal(row) {
 		jobInEditing = row;
@@ -215,7 +215,7 @@
 		statusModal.confirmAndHide(
 			async () => {
 				updatingStatus = true;
-				const jobId = /** @type {import('$lib/types-v2').ApplyWorkflowV2} */ (jobInEditing).id;
+				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (jobInEditing).id;
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');

@@ -1,16 +1,16 @@
 # JSON Schema form module
 
-The `jschema` folder on this repository contains a Svelte project that provides the JSON Schema form component (`JSchema.svelte`) and its related functions and classes. The file `index.js` contains the list of components and functions that are exported for public usage, so that they can be included using `from 'fractal-jschema'` from the main project.
+The `components` folder on this repository contains a Svelte project that provides the JSON Schema form component (`JSchema.svelte`) and its related functions and classes. The file `index.js` contains the list of components and functions that are exported for public usage, so that they can be included using `from 'fractal-components'` from the main project.
 
-The main project defines `fractal-jschema` in `vite.config.js`, as an alias pointing to `jschema/src/lib/index.js`. In this way the jschema module is automatically built when the main project is built and the Hot Module Reload feature still works.
+The main project defines `fractal-components` in `vite.config.js`, as an alias pointing to `components/src/lib/index.js`. In this way the components module is automatically built when the main project is built and the Hot Module Reload feature still works.
 
-Moreover, the path to jschema module has been added as `server.fs.allow` Vite config option, to prevent the following error while serving the files using `npm run dev`:
+Moreover, the path to components module has been added as `server.fs.allow` Vite config option, to prevent the following error while serving the files using `npm run dev`:
 
 ```
-The request url "/path/to/fractal-web/jschema/src/lib/index.js" is outside of Vite serving allow list.
+The request url "/path/to/fractal-web/components/src/lib/index.js" is outside of Vite serving allow list.
 ```
 
-> **Important**: When importing js files inside the `jschema` module it is necessary to use a relative path. The editor might autocomplete the imports using the `$lib` prefix, but that will not work when the module is included in the main application, since it redefines the `$lib` path again.
+> **Important**: When importing js files inside the `components` module it is necessary to use a relative path. The editor might autocomplete the imports using the `$lib` prefix, but that will not work when the module is included in the main application, since it redefines the `$lib` path again.
 
 ## Structure of the code
 

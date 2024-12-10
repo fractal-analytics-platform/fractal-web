@@ -7,7 +7,7 @@
 		getPropertiesToIgnore,
 		detectSchemaVersion,
 		SchemaValidator
-	} from 'fractal-jschema';
+	} from 'fractal-components';
 	import { tick } from 'svelte';
 	import example from './example.json';
 

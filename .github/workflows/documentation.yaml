@@ -32,9 +32,12 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install jschema dependencies
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install components dependencies
         run: |
-          cd jschema
+          cd components
           npm install
 
       - name: Install sandbox dependencies

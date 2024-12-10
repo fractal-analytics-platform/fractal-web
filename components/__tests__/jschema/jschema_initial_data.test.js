@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getJsonSchemaData } from '../src/lib/components/jschema_initial_data';
+import { getJsonSchemaData } from '../../src/lib/jschema/jschema_initial_data';
 
 describe('jschema_intial_data', () => {
 	const schema = {

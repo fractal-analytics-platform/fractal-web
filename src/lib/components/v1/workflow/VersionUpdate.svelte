@@ -1,7 +1,7 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { page } from '$app/stores';
-	import { SchemaValidator, stripIgnoredProperties, getPropertiesToIgnore } from 'fractal-jschema';
+	import { SchemaValidator, stripIgnoredProperties, getPropertiesToIgnore } from 'fractal-components';
 	import { getNewVersions } from './version-checker';
 	import { deepCopy } from '$lib/common/component_utilities';
 
@@ -94,7 +94,7 @@
 	function validateArguments(args) {
 		const updateCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
 		let newSchema =
-			/** @type {import('fractal-jschema/types/jschema').JSONSchemaObjectProperty} */ (
+			/** @type {import('fractal-components/types/jschema').JSONSchemaObjectProperty} */ (
 				updateCandidate.args_schema
 			);
 		const validator = new SchemaValidator(updateCandidate.args_schema_version, true);

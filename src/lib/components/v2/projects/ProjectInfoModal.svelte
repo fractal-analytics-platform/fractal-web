@@ -7,11 +7,11 @@
 	import Modal from '../../common/Modal.svelte';
 
 	// Project to be displayed
-	/** @type {import('$lib/types-v2').ProjectV2|undefined} */
+	/** @type {import('fractal-components/types/api').ProjectV2|undefined} */
 	let project = undefined;
 
 	let loadingDatasets = true;
-	/** @type {import('$lib/types-v2').DatasetV2[]|undefined} */
+	/** @type {import('fractal-components/types/api').DatasetV2[]|undefined} */
 	let datasets = undefined;
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -31,7 +31,7 @@
 				credentials: 'include'
 			});
 			if (response.ok) {
-				/** @type {import('$lib/types-v2.js').DatasetV2[]} */
+				/** @type {import('fractal-components/types/api.js').DatasetV2[]} */
 				const result = await response.json();
 				result.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 				datasets = result;

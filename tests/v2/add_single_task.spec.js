@@ -239,7 +239,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} taskName
- * @param {import('$lib/types-v2.js').TaskV2Type} taskType
+ * @param {import('fractal-components/types/api.js').TaskV2Type} taskType
  */
 async function getCreatedTaskModalData(page, taskName, taskType) {
 	const row = await getCreatedTaskRow(page, taskName);

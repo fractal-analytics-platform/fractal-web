@@ -18,7 +18,7 @@ const config = {
 			base: '/fractal-web/sandbox'
 		},
 		alias: {
-			'fractal-jschema': '../jschema/src/lib'
+			'fractal-components': '../components/src/lib'
 		}
 	}
 };

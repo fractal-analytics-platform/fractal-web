@@ -5,12 +5,12 @@
 	import { tick } from 'svelte';
 	import { getNewVersions } from './version-checker';
 
-	/** @type {import('$lib/types-v2').WorkflowV2} */
+	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	export let workflow;
-	/** @type {import('$lib/types-v2').WorkflowTaskV2} */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
 
-	/** @type {(workflowTask: import('$lib/types-v2').WorkflowTaskV2) => void} */
+	/** @type {(workflowTask: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let updateWorkflowCallback;
 	/** @type {(count: number) => Promise<void>} */
 	export let updateNewVersionsCount;
@@ -31,7 +31,7 @@
 	$: task = workflowTask.task;
 	let taskVersion = '';
 
-	/** @type {Array<import('$lib/types-v2').TaskV2 & { version: string }>} */
+	/** @type {Array<import('fractal-components/types/api').TaskV2 & { version: string }>} */
 	let updateCandidates = [];
 	let selectedUpdateVersion = '';
 
@@ -166,7 +166,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('$lib/types-v2').WorkflowTaskV2>}
+	 * @returns {Promise<import('fractal-components/types/api').WorkflowTaskV2>}
 	 */
 	async function createNewWorkflowTask() {
 		const newTaskId = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0].id;
@@ -199,7 +199,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').WorkflowTaskV2}  newWorkflowTask
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2}  newWorkflowTask
 	 */
 	async function setNewWorkflowTaskPosition(newWorkflowTask) {
 		const reordered_workflowtask_ids = workflow.task_list.map((wft) =>

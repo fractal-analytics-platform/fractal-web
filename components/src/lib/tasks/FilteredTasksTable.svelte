@@ -2,15 +2,15 @@
 	import { onMount } from 'svelte';
 	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
-	import ColouredBadge from '$lib/components/common/ColouredBadge.svelte';
-	import BooleanIcon from '$lib/components/common/BooleanIcon.svelte';
+	import ColouredBadge from '../common/ColouredBadge.svelte';
+	import BooleanIcon from '../common/BooleanIcon.svelte';
 
-	/** @type {Array<import('$lib/types-v2').TaskGroupV2>} */
+	/** @type {Array<import('../types/api').TaskGroupV2>} */
 	export let taskGroups;
 
-	/** @type {import('$lib/types-v2').WorkflowTasksTableRowGroup[]} */
+	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
-	/** @type {import('$lib/types-v2').WorkflowTasksTableRowGroup[]} */
+	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let filteredRows = [];
 	let groupBy = 'pkg_name';
 
@@ -38,6 +38,9 @@
 	$: if (taskGroups) {
 		setup();
 	}
+
+	$: selectedTasksCount = filteredRows.reduce((acc, row) => acc + row.tasks.length, 0);
+	$: tasksCount = allRows.reduce((acc, row) => acc + row.tasks.length, 0);
 
 	$: if (
 		genericSearch ||
@@ -74,7 +77,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 */
 	function filterRow(row) {
 		return (
@@ -88,7 +91,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function genericSearchMatch(row) {
@@ -108,7 +111,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function categoryMatch(row) {
@@ -119,7 +122,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function modalityMatch(row) {
@@ -130,7 +133,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function packageMatch(row) {
@@ -141,7 +144,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function tagMatch(row) {
@@ -152,7 +155,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} row
+	 * @param {import('../types/api').TasksTableRow} row
 	 * @returns {boolean}
 	 */
 	function inputTypeMatch(row) {
@@ -173,7 +176,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TaskGroupV2[]} taskGroups
+	 * @param {import('../types/api').TaskGroupV2[]} taskGroups
 	 */
 	function setFiltersValues(taskGroups) {
 		setSelectorData(
@@ -224,8 +227,8 @@
 	}
 
 	/**
-	 * @param {Array<import('$lib/types-v2').TaskGroupV2>} taskGroups
-	 * @param {(task: import('$lib/types-v2').TaskV2) => string | null} mapper
+	 * @param {Array<import('../types/api').TaskGroupV2>} taskGroups
+	 * @param {(task: import('../types/api').TaskV2) => string | null} mapper
 	 * @returns {string[]}
 	 */
 	function extractSlimSelectTaskValues(taskGroups, mapper) {
@@ -247,7 +250,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types-v2').TasksTableRow} taskProperties
+	 * @param {import('../types/api').TasksTableRow} taskProperties
 	 */
 	function getMetadataCell(taskProperties) {
 		const values = [];
@@ -385,10 +388,30 @@
 								<tr>
 									<td class="task-name-col">{task.taskVersions[task.selectedVersion].task_name}</td>
 									<td>
-										<ColouredBadge value={task.taskVersions[task.selectedVersion].category} />
+										{#if task.taskVersions[task.selectedVersion].category}
+											<button
+												on:click={() =>
+													categorySelector?.setSelected(
+														/** @type {string} */ (task.taskVersions[task.selectedVersion].category)
+													)}
+												class="btn btn-link p-0"
+											>
+												<ColouredBadge value={task.taskVersions[task.selectedVersion].category} />
+											</button>
+										{/if}
 									</td>
 									<td>
-										<ColouredBadge value={task.taskVersions[task.selectedVersion].modality} />
+										{#if task.taskVersions[task.selectedVersion].modality}
+											<button
+												on:click={() =>
+													modalitySelector?.setSelected(
+														/** @type {string} */ (task.taskVersions[task.selectedVersion].modality)
+													)}
+												class="btn btn-link p-0"
+											>
+												<ColouredBadge value={task.taskVersions[task.selectedVersion].modality} />
+											</button>
+										{/if}
 									</td>
 									<td class="metadata-col">
 										{#each Object.entries(task.taskVersions[task.selectedVersion].input_types) as [input_type_key, input_type_value]}
@@ -429,6 +452,10 @@
 			</table>
 		</div>
 	</div>
+	<p class="mt-3 text-center mb-0">
+		Showing {selectedTasksCount} of {tasksCount}
+		{tasksCount === 1 ? 'task' : 'tasks'}
+	</p>
 {/if}
 
 <style>

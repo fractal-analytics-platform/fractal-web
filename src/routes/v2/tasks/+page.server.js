@@ -1,4 +1,4 @@
-import { removeIdenticalTaskGroups } from '$lib/components/v2/tasks/task_group_utilities';
+import { removeIdenticalTaskGroups } from 'fractal-components/tasks/task_group_utilities';
 import { getCurrentUser } from '$lib/server/api/auth_api.js';
 import { listTaskGroups } from '$lib/server/api/v2/task_api';
 
