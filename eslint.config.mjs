@@ -21,6 +21,7 @@ export default [{
         "components/.svelte-kit",
         "coverage-unit",
         "sandbox",
+        "tasks-list",
         "site",
         ".svelte-kit",
         "package",

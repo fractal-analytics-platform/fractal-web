@@ -388,10 +388,30 @@
 								<tr>
 									<td class="task-name-col">{task.taskVersions[task.selectedVersion].task_name}</td>
 									<td>
-										<ColouredBadge value={task.taskVersions[task.selectedVersion].category} />
+										{#if task.taskVersions[task.selectedVersion].category}
+											<button
+												on:click={() =>
+													categorySelector?.setSelected(
+														/** @type {string} */ (task.taskVersions[task.selectedVersion].category)
+													)}
+												class="btn btn-link p-0"
+											>
+												<ColouredBadge value={task.taskVersions[task.selectedVersion].category} />
+											</button>
+										{/if}
 									</td>
 									<td>
-										<ColouredBadge value={task.taskVersions[task.selectedVersion].modality} />
+										{#if task.taskVersions[task.selectedVersion].modality}
+											<button
+												on:click={() =>
+													modalitySelector?.setSelected(
+														/** @type {string} */ (task.taskVersions[task.selectedVersion].modality)
+													)}
+												class="btn btn-link p-0"
+											>
+												<ColouredBadge value={task.taskVersions[task.selectedVersion].modality} />
+											</button>
+										{/if}
 									</td>
 									<td class="metadata-col">
 										{#each Object.entries(task.taskVersions[task.selectedVersion].input_types) as [input_type_key, input_type_value]}
