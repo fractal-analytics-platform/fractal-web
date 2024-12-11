@@ -430,8 +430,7 @@
 					bind:value={user.username}
 				/>
 				<span class="form-text">
-					Optional property (useful if the user creates their own tasks), not required if the SLURM
-					user is set
+					Optional property
 				</span>
 				<span class="invalid-feedback">{$userValidationErrors['username']}</span>
 			</div>
