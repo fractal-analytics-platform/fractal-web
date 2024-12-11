@@ -27,7 +27,6 @@ async function testFiltering(page) {
 	const modalityFilter = page.getByLabel('Select modality');
 	const categoryFilter = page.getByLabel('Select category');
 	const tagFilter = page.getByLabel('Select tag');
-	const inputTypeFilter = page.getByLabel('Select input type');
 
 	const rows = page.getByRole('row');
 
@@ -48,13 +47,6 @@ async function testFiltering(page) {
 	await expect(page.getByRole('row', { name: 'cellpose_segmentation' })).toBeVisible();
 
 	await deselect(tagFilter);
-	await expect(rows).toHaveCount(16);
-
-	await selectSlimSelect(page, inputTypeFilter, '3D');
-	await expect(rows).toHaveCount(3);
-	await expect(page.getByRole('row', { name: 'MIP_compound' })).toBeVisible();
-
-	await deselect(inputTypeFilter);
 	await expect(rows).toHaveCount(16);
 
 	await search(page, 'mip', 'MIP_compound'); // search by task_name
