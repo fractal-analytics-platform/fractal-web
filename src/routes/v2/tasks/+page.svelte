@@ -36,12 +36,20 @@
 {/if}
 
 <FilteredTasksTable {taskGroups}>
-	<svelte:fragment slot="docs-info" let:task>
-		{#if task.docs_info}
-			<button class="btn btn-info ms-2" on:click={() => showDocsInfoModal(task)}>
-				<i class="bi bi-info-circle" />
-			</button>
-		{/if}
+	<svelte:fragment slot="extra-columns-colgroup">
+		<col width="60" />
+	</svelte:fragment>
+	<svelte:fragment slot="extra-columns-header">
+		<th />
+	</svelte:fragment>
+	<svelte:fragment slot="extra-columns" let:task>
+		<td>
+			{#if task.docs_info}
+				<button class="btn btn-info" on:click={() => showDocsInfoModal(task)}>
+					<i class="bi bi-info-circle" />
+				</button>
+			{/if}
+		</td>
 	</svelte:fragment>
 </FilteredTasksTable>
 

@@ -86,6 +86,7 @@ export type TaskV2 = {
 	modality: string | null;
 	authors: string | null;
 	tags: string[];
+	install_instructions: string | undefined;
 };
 
 export type ApplyWorkflowV2 = {
@@ -217,6 +218,8 @@ export type TasksTableRow = {
 	tags: string[];
 	input_types: { [key: string]: boolean };
 	docs_info: string;
+	docs_link: string | null;
+	install_instructions: string | undefined;
 };
 
 export type TaskGroupActivityStatusV2 = 'pending' | 'ongoing' | 'failed' | 'OK';

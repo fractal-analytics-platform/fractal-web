@@ -108,10 +108,20 @@
 		{/if}
 		<div class:invisible={loading} class:collapse={loading}>
 			<FilteredTasksTable {taskGroups}>
+				<svelte:fragment slot="extra-columns-colgroup">
+					<col width="40" />
+					<col width="120" />
+				</svelte:fragment>
 				<svelte:fragment slot="extra-columns-header">
+					<th />
 					<th />
 				</svelte:fragment>
 				<svelte:fragment slot="extra-columns" let:task>
+					<td>
+						{#if task.docs_info}
+							<PropertyDescription description={formatMarkdown(task.docs_info)} html={true} />
+						{/if}
+					</td>
 					<td>
 						<button
 							class="btn btn-primary"
@@ -121,11 +131,6 @@
 							Add task
 						</button>
 					</td>
-				</svelte:fragment>
-				<svelte:fragment slot="docs-info" let:task>
-					{#if task.docs_info}
-						<PropertyDescription description={formatMarkdown(task.docs_info)} html={true} />
-					{/if}
 				</svelte:fragment>
 			</FilteredTasksTable>
 		</div>

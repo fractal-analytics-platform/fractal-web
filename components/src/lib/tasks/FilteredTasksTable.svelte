@@ -3,7 +3,6 @@
 	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
 	import ColouredBadge from '../common/ColouredBadge.svelte';
-	import BooleanIcon from '../common/BooleanIcon.svelte';
 
 	/** @type {Array<import('../types/api').TaskGroupV2>} */
 	export let taskGroups;
@@ -27,8 +26,6 @@
 	/** @type {SlimSelect|undefined} */
 	let tagSelector = undefined;
 	let tagFilter = '';
-	/** @type {SlimSelect|undefined} */
-	let inputTypeSelector = undefined;
 	let inputTypeFilter = '';
 
 	let groupByLabels = {
@@ -172,7 +169,6 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
-		inputTypeSelector?.setSelected('');
 	}
 
 	/**
@@ -205,15 +201,6 @@
 				)
 			]),
 			'Tag'
-		);
-		setSelectorData(
-			inputTypeSelector,
-			buildSlimSelectOptions([
-				...new Set(
-					taskGroups.flatMap((tg) => tg.task_list).flatMap((t) => Object.keys(t.input_types))
-				)
-			]),
-			'Input type'
 		);
 	}
 
@@ -275,14 +262,6 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
-		inputTypeSelector = setSlimSelect(
-			'input-type-filter',
-			'Select input type',
-			'Input type',
-			(value) => {
-				inputTypeFilter = value;
-			}
-		);
 		setup();
 	});
 
@@ -350,9 +329,6 @@
 				<select id="modality-filter" class="invisible" />
 			</div>
 			<div class="col">
-				<select id="input-type-filter" class="invisible" />
-			</div>
-			<div class="col">
 				<select id="tag-filter" class="invisible" />
 			</div>
 		</div>
@@ -367,14 +343,21 @@
 	<div class="card">
 		<div class="card-body p-0">
 			<table class="table table-borderless" id="filtered-tasks-table">
+				<colgroup>
+					<col />
+					<col />
+					<col />
+					<col />
+					<col width="120" />
+					<slot name="extra-columns-colgroup" />
+				</colgroup>
 				<thead>
 					<tr>
 						<th>{groupByLabels[groupBy]}</th>
 						<th>Category</th>
 						<th>Modality</th>
-						<th>Input Types</th>
 						<th>Metadata</th>
-						<th colspan="2">Version</th>
+						<th>Version</th>
 						<slot name="extra-columns-header" />
 					</tr>
 				</thead>
@@ -386,7 +369,15 @@
 						{#each row.tasks as task}
 							{#if task.taskVersions[task.selectedVersion]}
 								<tr>
-									<td class="task-name-col">{task.taskVersions[task.selectedVersion].task_name}</td>
+									<td class="task-name-col">
+										{#if task.taskVersions[task.selectedVersion].docs_link}
+											<a href={task.taskVersions[task.selectedVersion].docs_link} target="_blank">
+												{task.taskVersions[task.selectedVersion].task_name}
+											</a>
+										{:else}
+											{task.taskVersions[task.selectedVersion].task_name}
+										{/if}
+									</td>
 									<td>
 										{#if task.taskVersions[task.selectedVersion].category}
 											<button
@@ -414,14 +405,6 @@
 										{/if}
 									</td>
 									<td class="metadata-col">
-										{#each Object.entries(task.taskVersions[task.selectedVersion].input_types) as [input_type_key, input_type_value]}
-											<div class="d-flex flex-row">
-												<div class="input-type-text me-1">{input_type_key}</div>
-												<div><BooleanIcon value={input_type_value} /></div>
-											</div>
-										{/each}
-									</td>
-									<td class="metadata-col">
 										{getMetadataCell(task.taskVersions[task.selectedVersion])}
 									</td>
 									<td class="version-col">
@@ -440,9 +423,6 @@
 											{task.taskVersions[task.selectedVersion].version}
 										{/if}
 									</td>
-									<td class="docs-info-col">
-										<slot name="docs-info" task={task.taskVersions[task.selectedVersion]} />
-									</td>
 									<slot name="extra-columns" task={task.taskVersions[task.selectedVersion]} />
 								</tr>
 							{/if}
@@ -459,16 +439,17 @@
 {/if}
 
 <style>
-	#filtered-tasks-table td {
+	:global(#filtered-tasks-table td) {
 		vertical-align: middle;
 	}
 	#filtered-tasks-table tr th:first-child,
 	#filtered-tasks-table tr td:first-child {
 		padding-left: 15px;
 	}
-	#filtered-tasks-table tr th {
+	:global(#filtered-tasks-table tr th) {
 		padding-top: 18px;
 		padding-bottom: 12px;
+		background: transparent;
 	}
 	.metadata-col {
 		font-size: 85%;
@@ -481,9 +462,5 @@
 
 	.version-col {
 		max-width: 90px;
-	}
-
-	.input-type-text {
-		overflow-wrap: anywhere;
 	}
 </style>

@@ -6,13 +6,15 @@
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = null;
+	let modalText = '';
 
 	/**
 	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
 	 */
-	function showDocsInfoModal(taskRow) {
+	function showSelectedTaskModal(taskRow, text) {
 		selectedTaskRow = taskRow;
-		getBootstrapModal('docs-info-modal').show();
+		modalText = text;
+		getBootstrapModal('task-info-modal').show();
 	}
 
 	function getBootstrapModal(id) {
@@ -37,16 +39,36 @@
 </script>
 
 <FilteredTasksTable taskGroups={tasks}>
-	<svelte:fragment slot="docs-info" let:task>
-		{#if task.docs_info}
-			<button class="btn btn-info ms-2" on:click={() => showDocsInfoModal(task)}>
-				<i class="bi bi-info-circle" />
-			</button>
-		{/if}
+	<svelte:fragment slot="extra-columns-colgroup">
+		<col width="60" />
+		<col width="60" />
+	</svelte:fragment>
+	<svelte:fragment slot="extra-columns-header">
+		<th />
+		<th />
+	</svelte:fragment>
+	<svelte:fragment slot="extra-columns" let:task>
+		<td>
+			{#if task.docs_info}
+				<button class="btn btn-info" on:click={() => showSelectedTaskModal(task, task.docs_info)}>
+					<i class="bi bi-info-circle" />
+				</button>
+			{/if}
+		</td>
+		<td>
+			{#if task.install_instructions}
+				<button
+					class="btn btn-primary me-2"
+					on:click={() => showSelectedTaskModal(task, task.install_instructions)}
+				>
+					<i class="bi bi-plus-circle" />
+				</button>
+			{/if}
+		</td>
 	</svelte:fragment>
 </FilteredTasksTable>
 
-<div class="modal modal-xl" id="docs-info-modal" tabindex="-1">
+<div class="modal modal-xl" id="task-info-modal" tabindex="-1">
 	<div class="modal-dialog modal-dialog-scrollable">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -55,7 +77,7 @@
 			</div>
 			<div class="modal-body">
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html formatMarkdown(selectedTaskRow?.docs_info)}
+				{@html formatMarkdown(modalText)}
 			</div>
 		</div>
 	</div>
