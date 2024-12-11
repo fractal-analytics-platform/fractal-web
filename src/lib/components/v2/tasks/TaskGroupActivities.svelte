@@ -321,4 +321,4 @@
 	</table>
 </div>
 
-<TaskGroupActivityLogsModal bind:this={taskGroupActivityLogsModal} admin={true} />
+<TaskGroupActivityLogsModal bind:this={taskGroupActivityLogsModal} {admin} />
