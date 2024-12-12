@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.13.1
 
 * Tasks table improvements (\#677):
     * Handled install instructions (\#677);
