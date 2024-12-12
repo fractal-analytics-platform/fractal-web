@@ -57,7 +57,7 @@ describe('Workflow page', () => {
 				status: 200,
 				json: async () => {
 					switch (url) {
-						case '/api/v2/task-group?only_active=true':
+						case '/api/v2/task-group?only_active=false':
 							return [
 								{
 									id: 1,
