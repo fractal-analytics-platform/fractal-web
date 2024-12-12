@@ -1,5 +1,15 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Tasks table improvements (\#677):
+    * Handled install instructions (\#677);
+    * Made task name a link pointing to `docs_link` (\#677);
+    * Removed `input_types` column (\#677);
+* Fixed task group activity wrong admin API call (\#677);
+* Used new replace-task endpoint for version update (\#677);
+* Fixed version update for deactivated tasks (\#677);
+
 # 1.13.0
 
 * Moved `jschema` and other common components to a dedicated`components` module (\#671);
