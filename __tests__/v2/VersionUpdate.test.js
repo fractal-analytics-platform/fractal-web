@@ -55,7 +55,8 @@ const taskGroups = [
 				args_schema_parallel: null,
 				taskgroupv2_id: 1
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 2,
@@ -70,7 +71,8 @@ const taskGroups = [
 				args_schema_parallel: null,
 				taskgroupv2_id: 2
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 3,
@@ -85,7 +87,8 @@ const taskGroups = [
 				args_schema_parallel: null,
 				taskgroupv2_id: 3
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 4,
@@ -100,7 +103,8 @@ const taskGroups = [
 				args_schema_parallel: {},
 				taskgroupv2_id: 4
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 5,
@@ -115,7 +119,8 @@ const taskGroups = [
 				args_schema_parallel: {},
 				taskgroupv2_id: 5
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 6,
@@ -130,7 +135,8 @@ const taskGroups = [
 				args_schema_parallel: {},
 				taskgroupv2_id: 6
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 7,
@@ -145,7 +151,8 @@ const taskGroups = [
 				args_schema_parallel: {},
 				taskgroupv2_id: 7
 			}
-		]
+		],
+		active: true
 	},
 	{
 		id: 8,
@@ -160,7 +167,8 @@ const taskGroups = [
 				args_schema_parallel: null,
 				taskgroupv2_id: 8
 			}
-		]
+		],
+		active: true
 	}
 ];
 
