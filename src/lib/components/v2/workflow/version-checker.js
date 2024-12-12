@@ -26,7 +26,7 @@ export async function getNewVersions(task) {
  * enrichedTasks is the list of tasks passed as input with additional fields extracted from related task groups
  */
 export async function getAllNewVersions(tasks) {
-	const response = await fetch(`/api/v2/task-group?only_active=true`);
+	const response = await fetch(`/api/v2/task-group?only_active=false`);
 
 	if (!response.ok) {
 		throw await getAlertErrorFromResponse(response);
