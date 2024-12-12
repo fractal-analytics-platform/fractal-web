@@ -884,7 +884,6 @@
 							<div class="card-body">
 								{#if selectedWorkflowTask}
 									<VersionUpdate
-										{workflow}
 										workflowTask={selectedWorkflowTask}
 										updateWorkflowCallback={taskUpdated}
 										{updateNewVersionsCount}

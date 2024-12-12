@@ -26,7 +26,7 @@ export async function getNewVersions(task) {
  * enrichedTasks is the list of tasks passed as input with additional fields extracted from related task groups
  */
 export async function getAllNewVersions(tasks) {
-	const response = await fetch(`/api/v2/task-group?only_active=true`);
+	const response = await fetch(`/api/v2/task-group?only_active=false`);
 
 	if (!response.ok) {
 		throw await getAlertErrorFromResponse(response);
@@ -49,7 +49,12 @@ export async function getAllNewVersions(tasks) {
 	const updateCandidates = enrichedTasks.reduce(function (map, task) {
 		map[task.id] = taskGroups
 			.flatMap((tg) =>
-				tg.task_list.map((t) => ({ ...t, version: tg.version, pkg_name: tg.pkg_name }))
+				tg.task_list.map((t) => ({
+					...t,
+					version: tg.version,
+					pkg_name: tg.pkg_name,
+					active: tg.active
+				}))
 			)
 			.filter((t) => {
 				return (
@@ -60,7 +65,8 @@ export async function getAllNewVersions(tasks) {
 					t.name === task.name &&
 					t.type === task.type &&
 					t.pkg_name === task.pkg_name &&
-					greatestVersionAsc(t.version, task.version) === 1
+					greatestVersionAsc(t.version, task.version) === 1 &&
+					t.active
 				);
 			})
 			.sort((t1, t2) => greatestVersionDesc(t1.version, t2.version));

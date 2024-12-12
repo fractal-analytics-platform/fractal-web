@@ -74,6 +74,19 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 				required: ['p2']
 			}
 		});
+		// test for type mismatch: from parallel to non_parallel
+		await createFakeTask(page, {
+			name: parallelTask,
+			type: 'non_parallel',
+			version: '0.0.4',
+			args_schema_non_parallel: {
+				properties: {
+					p2: { type: 'string', title: 'p2' }
+				},
+				type: 'object',
+				required: ['p2']
+			}
+		});
 		compoundTask = await createFakeTask(page, {
 			type: 'compound',
 			version: '0.0.1',
@@ -113,6 +126,12 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 
 	await test.step('Open workflow page', async () => {
 		await workflow.openWorkflowPage();
+	});
+
+	await test.step('Verify that parallelTask 0.0.4 (type mismatch) can be selected', async () => {
+		await workflow.addTask(parallelTask, '0.0.4');
+		await workflow.selectTask(parallelTask);
+		await workflow.removeCurrentTask();
 	});
 
 	await test.step('Add tasks and select non parallel v1 task', async () => {
@@ -208,6 +227,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 			.selectOption('0.0.3');
 		await expect(page.getByText('The arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
+		// Task version 0.0.4 is ignored, since it has a different type
 		await expect(page.getByText('No new versions available')).toBeVisible();
 		// Verify that the arguments are preserved after the update
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
@@ -249,12 +269,14 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await workflow.removeCurrentTask();
 		await workflow.selectTask(parallelTask);
 		await workflow.removeCurrentTask();
-		await deleteTask(page, nonParallelTask); // 0.0.1
 		await deleteTask(page, nonParallelTask); // 0.0.2
-		await deleteTask(page, parallelTask); // 0.0.1
+		await deleteTask(page, nonParallelTask); // 0.0.1
+		await deleteTask(page, parallelTask); // 0.0.4
+		await deleteTask(page, parallelTask); // 0.0.3
 		await deleteTask(page, parallelTask); // 0.0.2
-		await deleteTask(page, compoundTask); // 0.0.1
+		await deleteTask(page, parallelTask); // 0.0.1
 		await deleteTask(page, compoundTask); // 0.0.2
+		await deleteTask(page, compoundTask); // 0.0.1
 	});
 });
 

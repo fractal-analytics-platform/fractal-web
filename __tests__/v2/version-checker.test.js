@@ -47,7 +47,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 1
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 2,
@@ -61,7 +62,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 2
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 3,
@@ -75,7 +77,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 3
 					}
 				],
-				pkg_name: 'group2'
+				pkg_name: 'group2',
+				active: true
 			}
 		];
 
@@ -131,7 +134,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 1
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 2,
@@ -145,7 +149,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 2
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 3,
@@ -159,7 +164,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 3
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			}
 		];
 
@@ -208,7 +214,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 1
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 2,
@@ -222,7 +229,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 2
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			}
 		];
 
@@ -280,7 +288,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 1
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 2,
@@ -295,7 +304,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 2
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			},
 			{
 				id: 3,
@@ -310,7 +320,8 @@ describe('Version checker', () => {
 						taskgroupv2_id: 3
 					}
 				],
-				pkg_name: 'group1'
+				pkg_name: 'group1',
+				active: true
 			}
 		];
 

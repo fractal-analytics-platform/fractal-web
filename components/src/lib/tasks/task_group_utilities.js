@@ -154,7 +154,9 @@ function getTaskTableProperties(taskGroup, task) {
 		authors: task.authors,
 		tags: task.tags,
 		input_types: task.input_types,
-		docs_info: task.docs_info || ''
+		docs_info: task.docs_info || '',
+		docs_link: task.docs_link,
+		install_instructions: task.install_instructions
 	};
 }
 
