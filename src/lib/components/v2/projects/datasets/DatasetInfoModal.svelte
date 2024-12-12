@@ -95,7 +95,7 @@
 	}
 </script>
 
-<Modal id="datasetInfoModal" centered={true} scrollable={true} {onOpen} bind:this={modal}>
+<Modal id="datasetInfoModal" centered={true} scrollable={true} {onOpen} bind:this={modal} size="lg">
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Dataset properties</h5>
 	</svelte:fragment>
@@ -200,7 +200,6 @@
 					</div>
 				{:else}
 					<span>
-						{dataset.zarr_dir}
 						<button
 							class="btn btn-primary float-end pt-0 pb-0"
 							on:click={() => (editZarrDir = true)}
@@ -209,6 +208,7 @@
 							<i class="bi bi-pencil" />
 							Edit
 						</button>
+						<pre>{dataset.zarr_dir}</pre>
 					</span>
 				{/if}
 			</li>
