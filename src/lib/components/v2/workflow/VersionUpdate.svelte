@@ -1,12 +1,14 @@
 <script>
-	import { AlertError, displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import {
+		AlertError,
+		displayStandardErrorAlert,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
 	import { getNewVersions } from './version-checker';
 
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
 
@@ -139,9 +141,7 @@
 		}
 
 		try {
-			await deleteOldWorkflowTask();
-			const updatedWorkflowTask = await createNewWorkflowTask();
-			await setNewWorkflowTaskPosition(updatedWorkflowTask);
+			const updatedWorkflowTask = await replaceWorkflowTask();
 			updateWorkflowCallback(updatedWorkflowTask);
 		} catch (err) {
 			if (err instanceof AlertError) {
@@ -152,76 +152,30 @@
 		}
 	}
 
-	async function deleteOldWorkflowTask() {
-		const response = await fetch(
-			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
-			{
-				method: 'DELETE',
-				credentials: 'include'
-			}
-		);
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
-	}
-
-	/**
-	 * @returns {Promise<import('fractal-components/types/api').WorkflowTaskV2>}
-	 */
-	async function createNewWorkflowTask() {
+	async function replaceWorkflowTask() {
 		const newTaskId = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0].id;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
 		const response = await fetch(
-			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask?task_id=${newTaskId}`,
+			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/replace-task/?workflow_task_id=${workflowTask.id}&task_id=${newTaskId}`,
 			{
 				method: 'POST',
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					meta_non_parallel: workflowTask.meta_non_parallel,
-					meta_parallel: workflowTask.meta_parallel,
-					input_filters: workflowTask.input_filters,
 					args_non_parallel:
 						fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
 					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel
 				})
 			}
 		);
-
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);
 		}
 
 		return await response.json();
-	}
-
-	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2}  newWorkflowTask
-	 */
-	async function setNewWorkflowTaskPosition(newWorkflowTask) {
-		const reordered_workflowtask_ids = workflow.task_list.map((wft) =>
-			wft.id === workflowTask.id ? newWorkflowTask.id : wft.id
-		);
-
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-
-		const response = await fetch(
-			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}`,
-			{
-				method: 'PATCH',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({ reordered_workflowtask_ids })
-			}
-		);
-
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
 	}
 
 	function getSelectedUpdateCandidate() {
