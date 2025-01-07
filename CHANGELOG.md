@@ -3,6 +3,7 @@
 # Unreleased
 
 * Removed legacy version support (\#684);
+    * Removed the environment variables `FRACTAL_API_V1_MODE` and `TEST_VERSION`;
 
 # 1.13.1
 
