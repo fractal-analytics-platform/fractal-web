@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.14.0
 
 * Removed legacy version support (\#684);
     * Removed the environment variables `FRACTAL_API_V1_MODE` and `TEST_VERSION`;
