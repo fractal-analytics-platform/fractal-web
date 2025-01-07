@@ -78,35 +78,18 @@ export async function createFakeTask(page, task) {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} taskName
- * @param {'v1'|'v2'} version
  */
-export async function deleteTask(page, taskName, version = 'v2') {
-	if (!page.url().endsWith(`/${version}/tasks/management`)) {
-		await page.goto(`/${version}/tasks/management`);
+export async function deleteTask(page, taskName) {
+	if (!page.url().endsWith(`/v2/tasks/management`)) {
+		await page.goto(`/v2/tasks/management`);
 		await waitPageLoading(page);
 	}
-	let row;
-	if (version === 'v1') {
-		row = await getTaskRow(page, taskName);
-	} else {
-		row = await getTaskGroupRow(page, taskName);
-	}
+	const row = await getTaskGroupRow(page, taskName);
 	await row.getByRole('button', { name: 'Delete' }).click();
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
 	await modal.getByRole('button', { name: 'Confirm' }).click();
 	await waitModalClosed(page);
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} taskName
- * @returns {Promise<import('@playwright/test').Locator>}
- */
-async function getTaskRow(page, taskName) {
-	const row = page.getByRole('table').last().getByRole('row', { name: taskName });
-	await row.waitFor();
-	return row;
 }
 
 /**

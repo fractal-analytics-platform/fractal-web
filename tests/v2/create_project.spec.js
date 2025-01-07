@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { waitPageLoading } from '../utils.js';
 
 test('Create and delete a project', async ({ page }) => {
-	await page.goto('/v1/projects');
+	await page.goto('/v2/projects');
 	await waitPageLoading(page);
 
 	const randomProjectName = Math.random().toString(36).substring(7);
@@ -22,7 +22,7 @@ test('Create and delete a project', async ({ page }) => {
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page
-		await page.waitForURL(/\/v1\/projects\/\d+/);
+		await page.waitForURL(/\/v2\/projects\/\d+/);
 		await expect(page.locator('h1:not(.modal-title)')).toHaveText(
 			new RegExp('Project ' + randomProjectName + ' #\\d+')
 		);
@@ -30,7 +30,7 @@ test('Create and delete a project', async ({ page }) => {
 
 	await test.step('Verify that new project is visible in projects page', async () => {
 		// Go back to projects list
-		await page.goto('/v1/projects');
+		await page.goto('/v2/projects');
 		await waitPageLoading(page);
 		await expect(page.getByRole('cell', { name: randomProjectName })).toHaveCount(1);
 
@@ -47,21 +47,16 @@ test('Create and delete a project', async ({ page }) => {
 		let modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
 		await expect(modalTitle).toHaveText('Project ' + randomProjectName);
-		const items = await page.locator('.modal.show .modal-body').getByRole('listitem').all();
-		expect(items.length).toEqual(4);
-		expect(await items[1].innerText()).toEqual(randomProjectName);
-		expect(await items[3].innerText()).toEqual('No');
-
 		let closeModalBtn = page.locator('.modal.show').getByRole('button', { name: 'Close' });
 		await closeModalBtn.click();
 	});
 
 	await test.step('Search the project', async () => {
 		await page.getByPlaceholder('Search').fill(randomProjectName);
-		expect(await page.getByRole('row').count()).toEqual(2);
+		await expect(page.getByRole('row')).toHaveCount(2);
 
 		await page.getByPlaceholder('Search').fill(`${randomProjectName}-foo`);
-		expect(await page.getByRole('row').count()).toEqual(1);
+		await expect(page.getByRole('row')).toHaveCount(1);
 
 		await page.getByPlaceholder('Search').fill('');
 	});

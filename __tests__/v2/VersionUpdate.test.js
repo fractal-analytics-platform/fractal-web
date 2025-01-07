@@ -341,10 +341,6 @@ function renderVersionUpdate(
 	mockTaskGroupsList();
 	return render(VersionUpdate, {
 		props: {
-			workflow: {
-				id: 1,
-				task_list: [workflowTask]
-			},
 			workflowTask,
 			updateWorkflowCallback: nop,
 			updateNewVersionsCount: nop

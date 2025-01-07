@@ -5,42 +5,15 @@
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
 	import { env } from '$env/dynamic/public';
-	import { reloadVersionedPage } from '$lib/common/selected_api_version';
 	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
 	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
 	$: server = $page.data.serverInfo || {};
-	/** @type {'v1'|'v2'} */
-	$: apiVersion = $page.url.pathname.startsWith('/v1') ? 'v1' : 'v2';
 	$: warningBanner = $page.data.warningBanner;
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
-
-	$: displayVersionSelector =
-		$page.data.apiV1Mode !== 'exclude' &&
-		(!isSubPage($page.url.pathname, apiVersion) ||
-			$page.url.pathname === '/v2/admin/jobs' ||
-			$page.url.pathname === '/v1/admin/jobs') &&
-		selectedSection !== 'home';
-
-	/**
-	 * Returns true if the URL indicates a subpage.
-	 * Values need to be passed to trigger the reactivity.
-	 * @param {string} pathname
-	 * @param {string} version
-	 * @returns {boolean}
-	 */
-	function isSubPage(pathname, version) {
-		if (!pathname.startsWith(`/${version}/`)) {
-			return false;
-		}
-		if (pathname.endsWith('/')) {
-			pathname = pathname.substring(0, pathname.length - 1);
-		}
-		return pathname.substring(4).includes('/');
-	}
 
 	// Detects page change
 	$: if ($navigating) cleanupModalBackdrop();
@@ -79,26 +52,13 @@
 			return 'home';
 		}
 		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
-			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/${apiVersion}/${section}`)) {
+			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/$v2/${section}`)) {
 				return section;
 			}
 		}
 	}
 
-	/**
-	 * @param {'v1'|'v2'} version
-	 */
-	function setSelecteApiVersion(version) {
-		reloadVersionedPage($page.url.pathname, version);
-	}
-
 	let loading = true;
-
-	$: {
-		if (selectedSection === 'home') {
-			setSelecteApiVersion('v2');
-		}
-	}
 
 	onMount(() => {
 		loading = false;
@@ -115,7 +75,7 @@
 </script>
 
 <main>
-	<nav class="bg-light border-bottom" class:legacy={apiVersion === 'v1'}>
+	<nav class="bg-light border-bottom">
 		<div class="container d-flex flex-wrap">
 			<ul class="nav me-auto">
 				<li class="nav-item">
@@ -126,7 +86,7 @@
 				{#if userLoggedIn}
 					<li class="nav-item">
 						<a
-							href="/{apiVersion}/projects"
+							href="/v2/projects"
 							class="nav-link"
 							class:active={selectedSection === 'projects'}
 						>
@@ -135,7 +95,7 @@
 					</li>
 					<li class="nav-item">
 						<a
-							href="/{apiVersion}/tasks"
+							href="/v2/tasks"
 							class="nav-link"
 							class:active={selectedSection === 'tasks'}
 						>
@@ -143,14 +103,14 @@
 						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/{apiVersion}/jobs" class="nav-link" class:active={selectedSection === 'jobs'}>
+						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}>
 							Jobs
 						</a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
 							<a
-								href="/{apiVersion}/admin"
+								href="/v2/admin"
 								class="nav-link"
 								class:admin-active={selectedSection === 'admin'}
 							>
@@ -162,31 +122,6 @@
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
-					{#if displayVersionSelector}
-						<li class="nav-item">
-							{#if apiVersion === 'v1'}
-								<button
-									class="btn btn-info mt-1 pt-1 pb-1 border-primary"
-									type="button"
-									on:click={() => setSelecteApiVersion('v2')}
-								>
-									Switch to Fractal V2
-								</button>
-							{:else}
-								<button
-									class="btn btn-outline-secondary mt-1 pt-1 pb-1"
-									type="button"
-									on:click={() => setSelecteApiVersion('v1')}
-								>
-									Switch to legacy Fractal
-								</button>
-							{/if}
-						</li>
-					{:else if apiVersion === 'v1'}
-						<li class="navbar-text me-3">
-							<span class="badge text-bg-secondary">legacy</span>
-						</li>
-					{/if}
 					<li class="nav-item dropdown">
 						<a
 							class="nav-link dropdown-toggle"
@@ -217,9 +152,6 @@
 			</ul>
 		</div>
 	</nav>
-	{#if apiVersion === 'v1'}
-		<div class="legacy-border" />
-	{/if}
 	{#if selectedSection === 'admin'}
 		<div class="admin-border" />
 	{/if}
@@ -228,9 +160,6 @@
 			<div class="alert alert-danger">
 				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
 			</div>
-		{/if}
-		{#if apiVersion === 'v1' && $page.data.apiV1Mode === 'include_read_only'}
-			<div class="alert alert-warning">Warning: legacy API is in read-only mode.</div>
 		{/if}
 		{#if warningBanner}
 			<div class="alert alert-warning">
@@ -287,20 +216,6 @@
 
 	#home-link:hover img {
 		transform: rotate(-7deg) scale(1.2);
-	}
-
-	nav.legacy {
-		background-color: #e4e4e4 !important;
-		border-bottom-color: #888 !important;
-	}
-
-	nav.legacy .nav-link.active {
-		background-color: #d0d0d0 !important;
-	}
-
-	.legacy-border {
-		height: 6px;
-		background-color: #888;
 	}
 
 	.nav-link.active {

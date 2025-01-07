@@ -34,19 +34,6 @@
 		<a href="/v2/jobs" class="btn btn-primary">Jobs</a>
 	</div>
 
-	{#if $page.data.v1Enabled}
-		<p>
-			This is the new version 2 of Fractal. Your older projects and workflows are still available in
-			the legacy version that you can access in <a href="/v1/projects">the legacy project page</a>.
-			We encourage you to switch to Fractal V2 for all new projects and report any issues you find.
-		</p>
-		<p>
-			We strictly separate projects, datasets and workflows into Fractal V2 and legacy. You can use
-			many of your existing tasks in the Fractal V2 version without any changes required. If you
-			don't find the task you require in Fractal V2, please reach out to the support.
-		</p>
-	{/if}
-
 	{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 		<h3 class="fw-light">Where to get support</h3>
 		<p>
