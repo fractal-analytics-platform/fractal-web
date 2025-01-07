@@ -5,40 +5,27 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.development' });
 
-const v1Tests = [
+const commonTests = [
+	{ name: 'auth', testMatch: /auth\.setup\.js/ },
 	{
-		name: 'collect_core_tasks',
-		testMatch: /v1\/collect_core_tasks\.setup\.js/,
+		name: 'chromium',
+		testMatch: /.*\.spec\.js/,
+		testIgnore: /v2\/.*\.spec\.js/,
 		use: {
+			...devices['Desktop Chrome'],
 			storageState: 'tests/.auth/user.json'
 		},
 		dependencies: ['auth']
 	},
 	{
-		name: 'create_fake_task',
-		testMatch: /v1\/create_fake_task\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['collect_core_tasks', 'auth']
-	},
-	{
-		name: 'chromium',
-		testMatch: /v1\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['create_fake_task']
-	},
-	{
 		name: 'firefox',
-		testMatch: /v1\/.*\.spec\.js/,
+		testMatch: /.*\.spec\.js/,
+		testIgnore: /v2\/.*\.spec\.js/,
 		use: {
 			...devices['Desktop Firefox'],
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['create_fake_task']
+		dependencies: ['auth']
 	}
 ];
 
@@ -52,13 +39,21 @@ const v2Tests = [
 		dependencies: ['auth']
 	},
 	{
+		name: 'create_fake_task',
+		testMatch: /v2\/create_fake_task\.setup\.js/,
+		use: {
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	},
+	{
 		name: 'chromium',
 		testMatch: /v2\/.*\.spec\.js/,
 		use: {
 			...devices['Desktop Chrome'],
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['collect_mock_tasks']
+		dependencies: ['collect_mock_tasks', 'create_fake_task']
 	},
 	{
 		name: 'firefox',
@@ -67,43 +62,15 @@ const v2Tests = [
 			...devices['Desktop Firefox'],
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['collect_mock_tasks']
+		dependencies: ['collect_mock_tasks', 'create_fake_task']
 	}
 ];
-
-const commonTests = [
-	{ name: 'auth', testMatch: /auth\.setup\.js/ },
-	{
-		name: 'chromium',
-		testMatch: /.*\.spec\.js/,
-		testIgnore: /(v1|v2)\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
-	{
-		name: 'firefox',
-		testMatch: /.*\.spec\.js/,
-		testIgnore: /(v1|v2)\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Firefox'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	}
-]
-
-const version = process.env.TEST_VERSION || 'v2';
-
-const tests = version === 'v2' ? v2Tests : v1Tests;
 
 export default defineConfig({
 	testDir: 'tests',
 	retries: 3,
 
-	projects: [...commonTests, ...tests],
+	projects: [...commonTests, ...v2Tests],
 
 	webServer: [
 		{
