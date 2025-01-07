@@ -85,7 +85,7 @@ export async function handle({ event, resolve }) {
 	}
 
 	// Admin area check
-	if (event.url.pathname.startsWith('/v1/admin') || event.url.pathname.startsWith('/v2/admin')) {
+	if (event.url.pathname.startsWith('/v2/admin')) {
 		if (!(/** @type {import('$lib/types').User} */ (userInfo).is_superuser)) {
 			error(403, `Only superusers can access the admin area`);
 		}
