@@ -1,14 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, beforeEach, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 
 // Mocking fetch
 global.fetch = vi.fn();
-
-fetch.mockResolvedValue({
-	ok: true,
-	status: 200,
-	json: () => new Promise((resolve) => resolve({ slurm_accounts: [] }))
-});
 
 // Mocking bootstrap.Modal
 class MockModal {
@@ -54,6 +48,30 @@ const workflow1 = {
 };
 
 describe('RunWorkflowModal', () => {
+	beforeEach(() => {
+		fetch
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				json: () => new Promise((resolve) => resolve({ slurm_accounts: [] }))
+			})
+			.mockResolvedValue({
+				ok: true,
+				status: 200,
+				json: () =>
+					new Promise((resolve) =>
+						resolve({
+							total_count: 0,
+							page_size: 10,
+							current_page: 1,
+							attributes: {},
+							types: [],
+							images: []
+						})
+					)
+			});
+	});
+
 	it('When continuing a workflow, show applied filters prioritizing the first workflow task filters', async () => {
 		const result = render(RunWorkflowModal, {
 			datasets: [dataset1],
@@ -61,7 +79,8 @@ describe('RunWorkflowModal', () => {
 			workflow: workflow1,
 			onJobSubmitted: vi.fn(),
 			onDatasetsUpdated: vi.fn(),
-			statuses: { 1: 'failed' }
+			statuses: { 1: 'failed' },
+			attributeFiltersEnabled: false
 		});
 
 		result.component.open('continue');
@@ -85,7 +104,8 @@ describe('RunWorkflowModal', () => {
 			workflow: workflow1,
 			onJobSubmitted: vi.fn(),
 			onDatasetsUpdated: vi.fn(),
-			statuses: { 1: 'done' }
+			statuses: { 1: 'done' },
+			attributeFiltersEnabled: false
 		});
 
 		result.component.open('restart');
@@ -121,7 +141,8 @@ describe('RunWorkflowModal', () => {
 			},
 			onJobSubmitted: vi.fn(),
 			onDatasetsUpdated: vi.fn(),
-			statuses: { 1: 'failed' }
+			statuses: { 1: 'failed' },
+			attributeFiltersEnabled: false
 		});
 
 		result.component.open('continue');

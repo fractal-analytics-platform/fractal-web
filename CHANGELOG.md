@@ -1,6 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
 # Unreleased
+
+* Displayed list of images that would be processed by the first task of a job (\#686);
+* Added environment variable `ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS`, to enable attribute filters on the "Run workflow" modal (\#686);
 * Fixed findings based on `zizmor 1.0.1` audit (\#687).
 
 # 1.14.0

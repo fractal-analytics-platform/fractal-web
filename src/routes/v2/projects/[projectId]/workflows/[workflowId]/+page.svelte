@@ -28,6 +28,7 @@
 	$: project = workflow.project;
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	let datasets = $page.data.datasets;
+	let attributeFiltersEnabled = $page.data.attributeFiltersEnabled;
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
@@ -324,8 +325,9 @@
 		} else if (metaPropertiesForm?.hasUnsavedChanges()) {
 			toggleMetaPropertiesUnsavedChangesModal();
 		} else {
-			runWorkflowModal.open(action);
 			await reloadSelectedDataset();
+			await tick();
+			runWorkflowModal.open(action);
 		}
 	}
 
@@ -949,6 +951,7 @@
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}
+	{attributeFiltersEnabled}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;
