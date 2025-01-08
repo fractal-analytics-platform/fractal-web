@@ -182,6 +182,8 @@ async function searchImages(page, expectedCount) {
 	// wait spinner disappearing
 	await expect(applyBtn.getByRole('status')).toHaveCount(0);
 	await expect(page.getByRole('row')).toHaveCount(expectedCount + 2);
+	// Await slim-select change events are propagated before clicking the Reset button
+	await new Promise((r) => setTimeout(r, 500));
 	const resetBtn = page.getByRole('button', { name: 'Reset', exact: true });
 	await resetBtn.click();
 	await expect(resetBtn).not.toBeEnabled();
