@@ -18,14 +18,14 @@ jobs:
         node-version: ['18', '20']
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -40,9 +40,13 @@ jobs:
         run: tar -xzf fractal-web-*.tgz
 
       - name: Repack the package removing parent folder
-        run: tar -C package -czf node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tar.gz build package.json node_modules LICENSE  
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: tar -C package -czf "node-${{ matrix.node-version }}-fractal-web-${GITHUB_REF_NAME}.tar.gz" build package.json node_modules LICENSE  
 
       - name: Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         with:
-          files: node-${{ matrix.node-version }}-fractal-web-${{ github.ref_name }}.tar.gz
+          files: node-${{ matrix.node-version }}-fractal-web-${GITHUB_REF_NAME}.tar.gz

@@ -44,8 +44,9 @@ jobs:
           - 5556:5556
 
     steps:
-      - name: Check out repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up node
         uses: actions/setup-node@v4

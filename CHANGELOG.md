@@ -1,5 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+* Fixed findings based on `zizmor 1.0.1` audit (\#687).
+
 # 1.14.0
 
 * Removed legacy version support (\#684);
