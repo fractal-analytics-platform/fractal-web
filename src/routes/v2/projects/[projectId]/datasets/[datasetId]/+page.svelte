@@ -64,7 +64,7 @@
 	 * @returns {Promise<import('fractal-components/types/api').Image|undefined>}
 	 */
 	async function loadImageForSelectedPlate() {
-		const params = { filters: { attributes: { plate: selectedPlate } } };
+		const params = { attribute_filters: { plate: [selectedPlate] } };
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
@@ -211,7 +211,7 @@
 
 <DatasetImagesTable
 	{dataset}
-	bind:imagePage={imagePage}
+	bind:imagePage
 	{vizarrViewerUrl}
 	{useDatasetFilters}
 	runWorkflowModal={false}

@@ -1,7 +1,7 @@
 <script>
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import AttributesTypesForm from './AttributesTypesForm.svelte';
+	import ImageAttributesTypesForm from './ImageAttributesTypesForm.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -15,7 +15,7 @@
 	let saving = false;
 	let isNew = false;
 
-	/** @type {AttributesTypesForm} */
+	/** @type {ImageAttributesTypesForm} */
 	let attributesTypesForm;
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-datasetCreateUpdateImageModal', [
@@ -136,7 +136,7 @@
 				<span class="invalid-feedback">{$validationErrors['zarr_url']}</span>
 			</div>
 		</div>
-		<AttributesTypesForm bind:this={attributesTypesForm} filters={false} />
+		<ImageAttributesTypesForm bind:this={attributesTypesForm} />
 		<div id="errorAlert-datasetCreateUpdateImageModal" class="mt-3" />
 	</svelte:fragment>
 	<svelte:fragment slot="footer">

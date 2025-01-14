@@ -53,7 +53,7 @@
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = null;
-	/** @type {{ attributes: { [key: string]: null | string | number | boolean }, types: { [key: string]: boolean | null }} | null} */
+	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	let initialFilterValues = null;
 
 	/**
@@ -101,7 +101,8 @@
 		const requestBody = {
 			worker_init: workerInitControl,
 			first_task_index: firstTaskIndex,
-			last_task_index: lastTaskIndex
+			last_task_index: lastTaskIndex,
+			attribute_filters: appliedAttributeFilters
 		};
 		if (setSlurmAccount && slurmAccount !== '') {
 			requestBody.slurm_account = slurmAccount;
@@ -202,7 +203,7 @@
 		}
 	}
 
-	/** @type {{ [key: string]: string|number|boolean }} */
+	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
 	let appliedAttributeFilters = {};
 	/** @type {{ [key: string]: boolean }} */
 	let appliedTypeFilters = {};
@@ -211,14 +212,14 @@
 		checkingConfiguration = true;
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
-			appliedAttributeFilters = { ...wft.input_filters.attributes };
-			appliedTypeFilters = { ...wft.input_filters.types };
+			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };
+			appliedTypeFilters = { ...wft.type_filters };
 		} else {
 			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
 				selectedDataset
 			);
-			appliedAttributeFilters = { ...dataset.filters.attributes, ...wft.input_filters.attributes };
-			appliedTypeFilters = { ...dataset.filters.types, ...wft.input_filters.types };
+			appliedAttributeFilters = { ...dataset.attribute_filters };
+			appliedTypeFilters = { ...dataset.type_filters, ...wft.type_filters };
 		}
 	}
 
@@ -257,13 +258,12 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		initialFilterValues = {
-			attributes: {
-				...dataset.filters.attributes,
-				...task.input_filters.attributes
+			attribute_filters: {
+				...dataset.attribute_filters
 			},
-			types: {
-				...dataset.filters.types,
-				...task.input_filters.types
+			type_filters: {
+				...dataset.type_filters,
+				...task.type_filters
 			}
 		};
 		const response = await fetch(
@@ -272,7 +272,7 @@
 				method: 'POST',
 				headers,
 				credentials: 'include',
-				body: JSON.stringify({ filters: initialFilterValues })
+				body: JSON.stringify(initialFilterValues)
 			}
 		);
 		if (response.ok) {

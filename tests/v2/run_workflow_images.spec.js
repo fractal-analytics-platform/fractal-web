@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('View images in run workflow modal', async ({ page, workflow }) => {
@@ -75,8 +75,10 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Add attribute filter' }).click();
-		await modal.getByPlaceholder('Key').last().fill('k1');
-		await modal.getByPlaceholder('Value').last().fill('v1');
+		await modal.getByRole('combobox').first().selectOption('k1');
+		await selectSlimSelect(page, modal.getByLabel('Value'), 'v1');
+		// Await slim-select change events are propagated before clicking the Save button
+		await new Promise((r) => setTimeout(r, 500));
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -96,9 +98,9 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await test.step('Add input filter', async () => {
 		await workflow.selectTask('generic_task');
 		await page.getByText('Input Filters').click();
-		await page.getByRole('button', { name: 'Add attribute filter' }).click();
-		await page.getByPlaceholder('Key').last().fill('k1');
-		await page.getByPlaceholder('Value').last().fill('v2');
+		await page.getByRole('button', { name: 'Add type filter' }).click();
+		await page.getByPlaceholder('Key').last().fill('t1');
+		await page.getByRole('switch').click();
 		await page.getByRole('button', { name: 'Save' }).click();
 	});
 

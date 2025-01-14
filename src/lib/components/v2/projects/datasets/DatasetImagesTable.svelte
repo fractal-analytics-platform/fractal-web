@@ -7,6 +7,7 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onMount, tick } from 'svelte';
+	import { attributesChanged } from './attributes_utilities';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -23,7 +24,7 @@
 	 */
 	export let runWorkflowModal;
 	export let attributeFiltersEnabled = true;
-	/** @type {{ attributes: { [key: string]: null | string | number | boolean }, types: { [key: string]: boolean | null }} | null} */
+	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 
 	let showTable = imagePage.total_count > 0;
@@ -35,7 +36,7 @@
 	let resetting = false;
 
 	let reloading = false;
-	/** @type {{ [key: string]: null | string | number | boolean}} */
+	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 
 	/** @type {{ [key: string]: boolean | null }}} */
@@ -55,7 +56,7 @@
 		if (initialFilterValues === null) {
 			return null;
 		}
-		return initialFilterValues.attributes[key] || null;
+		return initialFilterValues.attribute_filters[key];
 	}
 
 	/**
@@ -66,7 +67,7 @@
 		if (initialFilterValues === null) {
 			return null;
 		}
-		const value = initialFilterValues.types[key];
+		const value = initialFilterValues.type_filters[key];
 		return value === true || value === false ? value : null;
 	}
 
@@ -82,13 +83,13 @@
 		return Object.fromEntries(imagePage.types.map((k) => [k, getInitialTypeFilterValue(k)]));
 	}
 
-	/** @type {{ [key: string]: null | string | number | boolean}} */
+	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
 	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
 
 	$: applyBtnActive =
-		objectChanged(lastAppliedAttributeFilters, attributeFilters) ||
+		attributesChanged(lastAppliedAttributeFilters, attributeFilters) ||
 		objectChanged(lastAppliedTypeFilters, typeFilters);
 
 	let resetBtnActive = false;
@@ -150,21 +151,17 @@
 		attributesSelectors = Object.fromEntries(
 			Object.keys(imagePage.attributes).map((k) => [
 				k,
-				loadSelector(
+				loadAttributeSelector(
 					k,
 					imagePage.attributes[k]
 						.map((a) => a.toString())
 						.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })),
 					(value) => {
-						if (value === null) {
-							attributeFilters[k] = null;
-						} else {
-							const values = imagePage.attributes[k];
-							attributeFilters[k] = values.filter((v) => value === v.toString())[0];
-						}
+						attributeFilters[k] = value === null ? null : value.length > 0 ? value : null;
 					},
-					attributeFilters[k]?.toString() || '',
-					true
+					attributeFilters[k] === null || attributeFilters[k] === undefined
+						? []
+						: attributeFilters[k].map((v) => v.toString())
 				)
 			])
 		);
@@ -179,7 +176,7 @@
 		typesSelectors = Object.fromEntries(
 			imagePage.types.map((k) => [
 				k,
-				loadSelector(
+				loadTypeSelector(
 					k,
 					['True', 'False'],
 					(value) => {
@@ -191,8 +188,7 @@
 							typeFilters[k] = null;
 						}
 					},
-					typeFilters[k] === null ? '' : typeFilters[k] ? 'True' : 'False',
-					false
+					typeFilters[k] === null ? '' : typeFilters[k] ? 'True' : 'False'
 				)
 			])
 		);
@@ -214,12 +210,11 @@
 	/**
 	 * @param {string} key
 	 * @param {string[]} values
-	 * @param {(value: string | null) => void} setter
-	 * @param {string} selectedValue
-	 * @param {boolean} isAttribute
+	 * @param {(value: Array<string | boolean | number> | null) => void} setter
+	 * @param {string[]} selectedValues
 	 */
-	function loadSelector(key, values, setter, selectedValue, isAttribute) {
-		const elementId = (isAttribute ? 'attribute-' : 'type-') + getIdFromValue(key);
+	function loadAttributeSelector(key, values, setter, selectedValues) {
+		const elementId = 'attribute-' + getIdFromValue(key);
 		const selectElement = document.getElementById(elementId);
 		if (!selectElement) {
 			throw new Error(`Unable to find selector element with key ${key}`);
@@ -228,9 +223,42 @@
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
-				showSearch: isAttribute,
+				showSearch: true,
 				allowDeselect: true,
-				ariaLabel: isAttribute ? `Selector for attribute ${key}` : `Selector for type ${key}`
+				isMultiple: true,
+				ariaLabel: `Selector for attribute ${key}`
+			},
+			events: {
+				afterChange: (selection) => {
+					const value = selection.map((s) => s.value);
+					setter(getTypedValues(key, value));
+				}
+			}
+		});
+		setSlimSelectOptions(selector, values);
+		selector.setSelected(selectedValues);
+		return selector;
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {string[]} values
+	 * @param {(value: string | null) => void} setter
+	 * @param {string} selectedValue
+	 */
+	function loadTypeSelector(key, values, setter, selectedValue) {
+		const elementId = 'type-' + getIdFromValue(key);
+		const selectElement = document.getElementById(elementId);
+		if (!selectElement) {
+			throw new Error(`Unable to find selector element with key ${key}`);
+		}
+		selectElement.classList.remove('invisible');
+		const selector = new SlimSelect({
+			select: `#${elementId}`,
+			settings: {
+				showSearch: false,
+				allowDeselect: true,
+				ariaLabel: `Selector for type ${key}`
 			},
 			events: {
 				afterChange: (selection) => {
@@ -288,7 +316,7 @@
 			pageSize = imagePage.page_size;
 		}
 		errorAlert?.hide();
-		const filters = {};
+		const params = {};
 		let attributes = {};
 		for (const attributeKey of Object.keys(imagePage.attributes)) {
 			const filter = attributeFilters[attributeKey];
@@ -297,7 +325,7 @@
 			}
 		}
 		if (Object.entries(attributes).length > 0) {
-			filters['attributes'] = attributes;
+			params.attribute_filters = attributes;
 		}
 		let types = {};
 		for (const typeKey of imagePage.types) {
@@ -307,9 +335,8 @@
 			}
 		}
 		if (Object.entries(types).length > 0) {
-			filters['types'] = types;
+			params.type_filters = types;
 		}
-		const params = { filters };
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
@@ -344,6 +371,28 @@
 	}
 
 	/**
+	 * @param {string} key
+	 * @param {string[]} values
+	 * @returns {Array<string | boolean | number> | null}
+	 */
+	function getTypedValues(key, values) {
+		const allValues = imagePage.attributes[key];
+		if (!allValues || allValues.length === 0) {
+			return null;
+		}
+		if (values.length === 0) {
+			return null;
+		}
+		const firstValue = allValues[0];
+		if (typeof firstValue === 'number') {
+			return values.map((v) => parseFloat(v));
+		} else if (typeof firstValue === 'boolean') {
+			return values.map((v) => v === 'true');
+		}
+		return values;
+	}
+
+	/**
 	 * Reload the type filters according to the received imagePage
 	 * preserving the values selected by the user
 	 * @param {import('fractal-components/types/api').ImagePage} imagePage
@@ -365,7 +414,7 @@
 	}
 
 	/**
-	 * @param  {string} zarrUrl
+	 * @param {string} zarrUrl
 	 */
 	async function handleDeleteImage(zarrUrl) {
 		const response = await fetch(
@@ -445,7 +494,11 @@
 								<div class="row">
 									<div class="col">
 										<div class="attribute-select-wrapper mb-1">
-											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" />
+											<select
+												id="attribute-{getIdFromValue(attributeKey)}"
+												class="invisible"
+												multiple
+											/>
 										</div>
 									</div>
 								</div>
