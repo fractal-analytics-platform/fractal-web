@@ -4,8 +4,12 @@
 set -e
 
 # Check fractal-server version argument
-if [ $# -ne 1 ]; then
-  echo "Usage: $0 <fractal-server-version>"
+if [ $# -eq 2 ] && [ "$1" = "--branch" ]; then
+  pip_arg="git+https://github.com/fractal-analytics-platform/fractal-server.git@$2"
+elif [ $# -eq 1 ]; then
+  pip_arg="fractal-server==$1"
+else
+  echo "Usage: $0 [--branch] <fractal-server-version>"
   exit 2
 fi
 
@@ -30,7 +34,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   # Virtualenv, dependencies and db
   python3 -m venv myenv
   . myenv/bin/activate
-  pip install "fractal-server==$1"
+  pip install "$pip_arg"
   fractalctl set-db
 else
   cd "$fractal_server_test_path"

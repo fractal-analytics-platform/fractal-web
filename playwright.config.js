@@ -74,7 +74,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh 2.10.1',
+			command: './tests/start-test-server.sh --branch 2153-data-structure-for-filters',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
