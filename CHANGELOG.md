@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Refactored code to new filters format and sent selected filters in run workflow modal (\#686);
 * Displayed list of images that would be processed by the first task of a job (\#686);
 * Added environment variable `ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS`, to enable attribute filters on the "Run workflow" modal (\#686);
 * Fixed findings based on `zizmor 1.0.1` audit (\#687).
