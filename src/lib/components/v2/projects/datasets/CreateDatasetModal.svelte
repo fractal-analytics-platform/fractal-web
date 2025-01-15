@@ -3,7 +3,6 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
-	import AttributesTypesForm from './AttributesTypesForm.svelte';
 
 	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
 	export let createDatasetCallback;
@@ -26,9 +25,6 @@
 	let fileInput;
 	let fileError = '';
 
-	/** @type {AttributesTypesForm|undefined} */
-	let filtersCreationForm;
-
 	const formErrorHandler = new FormErrorHandler('errorAlert-createDatasetModal', [
 		'name',
 		'zarr_dir'
@@ -40,7 +36,6 @@
 		mode = 'new';
 		datasetName = '';
 		zarrDir = '';
-		filtersCreationForm?.init({}, {});
 		submitted = false;
 		files = null;
 		if (fileInput) {
@@ -51,8 +46,6 @@
 	}
 
 	async function handleSave() {
-		filtersCreationForm?.resetErrors();
-
 		submitted = true;
 		modal.hideErrorAlert();
 		if (!fieldsAreValid()) {
@@ -132,11 +125,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const body = {
-			name: datasetName,
-			filters: {
-				attributes: filtersCreationForm?.getAttributes(),
-				types: filtersCreationForm?.getTypes()
-			}
+			name: datasetName
 		};
 		if (zarrDir) {
 			body.zarr_dir = zarrDir;
@@ -156,8 +145,7 @@
 	}
 
 	function fieldsAreValid() {
-		const validFilters = filtersCreationForm?.validateFields();
-		return validFilters && !!datasetName.trim() && (projectDir !== null || !!zarrDir.trim());
+		return !!datasetName.trim() && (projectDir !== null || !!zarrDir.trim());
 	}
 
 	onMount(async () => {
@@ -309,7 +297,6 @@
 						</div>
 					{/if}
 				</div>
-				<AttributesTypesForm bind:this={filtersCreationForm} />
 			</form>
 		{:else}
 			<form

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import AttributesTypesForm from './AttributesTypesForm.svelte';
+	import DatasetFiltersForm from './DatasetFiltersForm.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -12,13 +12,31 @@
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {AttributesTypesForm} */
+	/** @type {DatasetFiltersForm} */
 	let filtersCreationForm;
 
 	let saving = false;
 
-	function onOpen() {
-		filtersCreationForm.init(dataset.filters.attributes, dataset.filters.types);
+	async function onOpen() {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=1`,
+			{
+				method: 'POST',
+				headers,
+				credentials: 'include',
+				body: JSON.stringify({})
+			}
+		);
+		if (!response.ok) {
+			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			return;
+		}
+
+		/** @type {import('fractal-components/types/api').ImagePage} */
+		const imagePage = await response.json();
+		filtersCreationForm.init(dataset.attribute_filters, dataset.type_filters, imagePage.attributes, imagePage.types);
 	}
 
 	async function handleSave() {
@@ -40,10 +58,8 @@
 					credentials: 'include',
 					headers,
 					body: JSON.stringify({
-						filters: {
-							attributes: filtersCreationForm.getAttributes(),
-							types: filtersCreationForm.getTypes()
-						}
+						attribute_filters: filtersCreationForm.getAttributes(),
+						type_filters: filtersCreationForm.getTypes()
 					})
 				});
 				if (!response.ok) {
@@ -72,7 +88,8 @@
 		<h5 class="modal-title">Dataset filters</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<AttributesTypesForm bind:this={filtersCreationForm} />
+		<DatasetFiltersForm bind:this={filtersCreationForm} />
+		<div id="errorAlert-datasetFiltersModal" />
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		<button class="btn btn-primary" on:click={handleSave} disabled={saving}>

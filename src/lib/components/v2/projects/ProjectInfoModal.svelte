@@ -91,11 +91,11 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each datasets as { name, filters }}
+								{#each datasets as { name, attribute_filters, type_filters }}
 									<tr>
 										<td>{name}</td>
-										<td>{Object.entries(filters.attributes).length}</td>
-										<td>{Object.entries(filters.types).length}</td>
+										<td>{Object.entries(attribute_filters).length}</td>
+										<td>{Object.entries(type_filters).length}</td>
 									</tr>
 								{/each}
 							</tbody>

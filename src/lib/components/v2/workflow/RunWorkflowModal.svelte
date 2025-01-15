@@ -8,6 +8,7 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { onMount } from 'svelte';
+	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets;
@@ -21,9 +22,13 @@
 	export let onDatasetsUpdated;
 	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
 	export let statuses;
+	export let attributeFiltersEnabled;
 
 	/** @type {Modal} */
 	let modal;
+
+	/** @type {DatasetImagesTable|undefined} */
+	let datasetImagesTable;
 
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
@@ -49,10 +54,15 @@
 		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
 		(mode === 'continue' && firstTaskIndex === undefined);
 
+	/** @type {import('fractal-components/types/api').ImagePage|null} */
+	let imagePage = null;
+	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
+	let initialFilterValues = null;
+
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
-	export function open(action) {
+	export async function open(action) {
 		mode = action;
 		replaceExistingDataset = true;
 		applyingWorkflow = false;
@@ -64,6 +74,7 @@
 			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses);
 		}
 		lastTaskIndex = undefined;
+		await loadDatasetImages();
 		modal.show();
 	}
 
@@ -93,7 +104,8 @@
 		const requestBody = {
 			worker_init: workerInitControl,
 			first_task_index: firstTaskIndex,
-			last_task_index: lastTaskIndex
+			last_task_index: lastTaskIndex,
+			attribute_filters: appliedAttributeFilters
 		};
 		if (setSlurmAccount && slurmAccount !== '') {
 			requestBody.slurm_account = slurmAccount;
@@ -139,7 +151,9 @@
 	}
 
 	async function createNewDataset() {
-		const { zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
+		const { zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+			selectedDataset
+		);
 		const newDataset = await handleDatasetCreate(newDatasetName, zarr_dir);
 		onDatasetsUpdated([...datasets, newDataset], newDataset.id);
 	}
@@ -192,26 +206,34 @@
 		}
 	}
 
-	/** @type {{ [key: string]: string|number|boolean }} */
+	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
 	let appliedAttributeFilters = {};
 	/** @type {{ [key: string]: boolean }} */
 	let appliedTypeFilters = {};
 
 	function showConfirmRun() {
-		checkingConfiguration = true;
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
-			appliedAttributeFilters = { ...wft.input_filters.attributes };
-			appliedTypeFilters = { ...wft.input_filters.types };
+			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };
+			appliedTypeFilters = { ...wft.type_filters };
 		} else {
-			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
-			appliedAttributeFilters = { ...dataset.filters.attributes, ...wft.input_filters.attributes };
-			appliedTypeFilters = { ...dataset.filters.types, ...wft.input_filters.types };
+			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+				selectedDataset
+			);
+			if (datasetImagesTable) {
+				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
+			} else {
+				appliedAttributeFilters = { ...dataset.attribute_filters };
+			}
+			appliedTypeFilters = { ...dataset.type_filters, ...wft.type_filters };
 		}
+		checkingConfiguration = true;
 	}
 
 	function computeNewDatasetName() {
-		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
+		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+			selectedDataset
+		);
 		newDatasetName = generateNewUniqueDatasetName(datasets, dataset.name);
 	}
 
@@ -229,12 +251,58 @@
 		}
 	}
 
+	async function loadDatasetImages() {
+		if (firstTaskIndex === undefined) {
+			return;
+		}
+
+		const task = workflow.task_list[firstTaskIndex];
+
+		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+			selectedDataset
+		);
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		initialFilterValues = {
+			attribute_filters: {
+				...dataset.attribute_filters
+			},
+			type_filters: {
+				...dataset.type_filters,
+				...task.type_filters
+			}
+		};
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10&use_dataset_filters=false`,
+			{
+				method: 'POST',
+				headers,
+				credentials: 'include',
+				body: JSON.stringify(initialFilterValues)
+			}
+		);
+		if (response.ok) {
+			imagePage = await response.json();
+		}
+	}
+
 	onMount(async () => {
 		await loadSlurmAccounts();
 	});
+
+	let opened = false;
 </script>
 
-<Modal id="runWorkflowModal" centered={true} bind:this={modal}>
+<Modal
+	id="runWorkflowModal"
+	centered={true}
+	bind:this={modal}
+	size="xl"
+	onOpen={() => (opened = true)}
+	onClose={() => (opened = false)}
+	scrollable={true}
+>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">
 			{#if mode === 'run'}
@@ -350,72 +418,114 @@
 					{/each}
 				</select>
 			</div>
-			<div class="accordion" id="accordion-workflow-advanced-options">
-				<div class="accordion-item">
-					<h2 class="accordion-header">
-						<button
-							class="accordion-button collapsed"
-							type="button"
-							data-bs-toggle="collapse"
-							data-bs-target="#collapse-workflow-advanced-options"
-							aria-expanded="false"
-							aria-controls="collapse-workflow-advanced-options"
+			{#key opened}
+				<div class="accordion" id="accordion-run-workflow">
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapse-workflow-advanced-options"
+								aria-expanded="false"
+								aria-controls="collapse-workflow-advanced-options"
+							>
+								Advanced options
+							</button>
+						</h2>
+						<div
+							id="collapse-workflow-advanced-options"
+							class="accordion-collapse collapse"
+							data-bs-parent="#accordion-run-workflow"
 						>
-							Advanced Options
-						</button>
-					</h2>
-					<div
-						id="collapse-workflow-advanced-options"
-						class="accordion-collapse collapse"
-						data-bs-parent="#accordion-workflow-advanced-options"
-					>
-						<div class="accordion-body">
-							<div class="mb-3">
-								<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-								<textarea
-									name="workerInit"
-									id="workerInit"
-									class="form-control font-monospace"
-									rows="5"
-									disabled={checkingConfiguration}
-									bind:value={workerInitControl}
-								/>
-							</div>
-							{#if slurmAccounts.length > 0}
+							<div class="accordion-body">
 								<div class="mb-3">
-									<div class="form-check">
-										<input
-											class="form-check-input"
-											type="checkbox"
-											id="setSlurmAccount"
-											bind:checked={setSlurmAccount}
-										/>
-										<label class="form-check-label" for="setSlurmAccount">
-											Set SLURM account
-										</label>
-									</div>
+									<label for="workerInit" class="form-label">Worker initialization (Optional)</label
+									>
+									<textarea
+										name="workerInit"
+										id="workerInit"
+										class="form-control font-monospace"
+										rows="5"
+										disabled={checkingConfiguration}
+										bind:value={workerInitControl}
+									/>
 								</div>
-								{#if setSlurmAccount}
+								{#if slurmAccounts.length > 0}
 									<div class="mb-3">
-										<label for="slurmAccount" class="form-label">SLURM account</label>
-										<select
-											name="slurmAccount"
-											id="slurmAccount"
-											class="form-select"
-											disabled={checkingConfiguration}
-											bind:value={slurmAccount}
-										>
-											{#each slurmAccounts as account}
-												<option>{account}</option>
-											{/each}
-										</select>
+										<div class="form-check">
+											<input
+												class="form-check-input"
+												type="checkbox"
+												id="setSlurmAccount"
+												bind:checked={setSlurmAccount}
+											/>
+											<label class="form-check-label" for="setSlurmAccount">
+												Set SLURM account
+											</label>
+										</div>
 									</div>
+									{#if setSlurmAccount}
+										<div class="mb-3">
+											<label for="slurmAccount" class="form-label">SLURM account</label>
+											<select
+												name="slurmAccount"
+												id="slurmAccount"
+												class="form-select"
+												disabled={checkingConfiguration}
+												bind:value={slurmAccount}
+											>
+												{#each slurmAccounts as account}
+													<option>{account}</option>
+												{/each}
+											</select>
+										</div>
+									{/if}
 								{/if}
-							{/if}
+							</div>
 						</div>
 					</div>
+					{#if selectedDataset && imagePage && imagePage.images.length > 0 && firstTaskIndex !== undefined && mode !== 'restart'}
+						<div class="accordion-item">
+							<h2 class="accordion-header">
+								<button
+									class="accordion-button collapsed"
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target="#collapse-workflow-image-list"
+									aria-expanded="false"
+									aria-controls="collapse-workflow-image-list"
+								>
+									Image list
+								</button>
+							</h2>
+							<div
+								id="collapse-workflow-image-list"
+								class="accordion-collapse collapse"
+								data-bs-parent="#accordion-run-workflow"
+							>
+								<div class="accordion-body">
+									{#if checkingConfiguration}
+										This job will process {imagePage.total_count}
+										{imagePage.total_count === 1 ? 'image' : 'images'}.
+									{:else}
+										<DatasetImagesTable
+											bind:this={datasetImagesTable}
+											dataset={selectedDataset}
+											bind:imagePage
+											{initialFilterValues}
+											{attributeFiltersEnabled}
+											useDatasetFilters={false}
+											vizarrViewerUrl={null}
+											runWorkflowModal={true}
+										/>
+									{/if}
+								</div>
+							</div>
+						</div>
+					{/if}
 				</div>
-			</div>
+			{/key}
 			{#if checkingConfiguration}
 				<hr />
 				<h6 class="mt-3">Applied filters</h6>

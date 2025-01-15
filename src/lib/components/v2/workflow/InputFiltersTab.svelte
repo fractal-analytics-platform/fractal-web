@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import AttributesTypesForm from '../projects/datasets/AttributesTypesForm.svelte';
+	import InputFiltersTypesForm from '../projects/datasets/InputFiltersTypesForm.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
@@ -13,20 +13,15 @@
 	/** @type {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} */
 	export let updateWorkflowTaskCallback;
 
-	/** @type {AttributesTypesForm} */
+	/** @type {InputFiltersTypesForm} */
 	let form;
 
 	let saving = false;
 	let successfullySaved = false;
 
 	let loadingDatasetFilters = false;
-	/** @type {{ [key: string]: Array<string | number | boolean> }} */
-	let datasetAttributes = {};
 	/** @type {string[]} */
 	let datasetTypes = [];
-	let selectedDatasetAttributeKey = '';
-	/** @type {string|number|boolean} */
-	let selectedDatasetAttributeValue = '';
 	let selectedDatasetTypeKey = '';
 	let selectedDatasetTypeValue = true;
 
@@ -39,11 +34,10 @@
 
 	export async function init() {
 		if (!form.hasUnsavedChanges()) {
-			form.init(workflowTask.input_filters.attributes, workflowTask.input_filters.types);
+			form.init(workflowTask.type_filters);
 		}
 
 		if (selectedDatasetId === undefined) {
-			datasetAttributes = {};
 			datasetTypes = [];
 		} else {
 			const headers = new Headers();
@@ -61,7 +55,6 @@
 			if (response.ok) {
 				/** @type {import('fractal-components/types/api').ImagePage} */
 				const imagePage = await response.json();
-				datasetAttributes = imagePage.attributes;
 				datasetTypes = imagePage.types;
 			} else {
 				errorAlert = displayStandardErrorAlert(
@@ -94,10 +87,7 @@
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					input_filters: {
-						attributes: form.getAttributes(),
-						types: form.getTypes()
-					}
+					type_filters: form.getTypes()
 				})
 			}
 		);
@@ -129,15 +119,6 @@
 		form.discardChanges();
 	}
 
-	function onOpenAddDatasetAttributeModal() {
-		selectedDatasetAttributeKey = '';
-		selectedDatasetAttributeValue = '';
-	}
-
-	function addDatasetAttribute() {
-		form.importAttribute(selectedDatasetAttributeKey, selectedDatasetAttributeValue);
-	}
-
 	function onOpenAddDatasetTypeModal() {
 		selectedDatasetTypeKey = '';
 		selectedDatasetTypeValue = true;
@@ -149,31 +130,19 @@
 </script>
 
 <div class="p-3">
-	<AttributesTypesForm bind:this={form} />
+	<InputFiltersTypesForm bind:this={form} />
 
 	{#if loadingDatasetFilters}
 		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true" />
-	{:else}
-		{#if Object.keys(datasetAttributes).length > 0}
-			<button
-				class="btn btn-outline-primary mb-3"
-				type="button"
-				data-bs-toggle="modal"
-				data-bs-target="#add-attribute-filter-from-dataset-modal"
-			>
-				Add attribute filter from dataset
-			</button>
-		{/if}
-		{#if datasetTypes.length > 0}
-			<button
-				class="btn btn-outline-primary mb-3"
-				type="button"
-				data-bs-toggle="modal"
-				data-bs-target="#add-type-filter-from-dataset-modal"
-			>
-				Add type filter from dataset
-			</button>
-		{/if}
+	{:else if datasetTypes.length > 0}
+		<button
+			class="btn btn-outline-primary mb-3"
+			type="button"
+			data-bs-toggle="modal"
+			data-bs-target="#add-type-filter-from-dataset-modal"
+		>
+			Add type filter from dataset
+		</button>
 	{/if}
 
 	<div id="errorAlert-inputFilters" />
@@ -190,56 +159,6 @@
 		{/if}
 		Save
 	</button>
-
-	<Modal
-		id="add-attribute-filter-from-dataset-modal"
-		onOpen={onOpenAddDatasetAttributeModal}
-		centered={true}
-	>
-		<svelte:fragment slot="header">
-			<h1 class="modal-title fs-5">Add attribute filter from dataset</h1>
-		</svelte:fragment>
-		<svelte:fragment slot="body">
-			<label class="form-label" for="datasetAttributeKey"> Attribute Key </label>
-			<select
-				bind:value={selectedDatasetAttributeKey}
-				id="datasetAttributeKey"
-				class="form-select"
-				on:change={() => (selectedDatasetAttributeValue = '')}
-			>
-				<option value="">Select...</option>
-				{#each Object.keys(datasetAttributes) as k}
-					<option>{k}</option>
-				{/each}
-			</select>
-			{#if selectedDatasetAttributeKey !== ''}
-				<label class="form-label mt-2" for="datasetAttributeValue"> Attribute Value </label>
-				<select
-					bind:value={selectedDatasetAttributeValue}
-					id="datasetAttributeValue"
-					class="form-select"
-				>
-					<option value="">Select...</option>
-					{#each datasetAttributes[selectedDatasetAttributeKey] as value}
-						<option {value}>
-							{typeof value === 'boolean' ? (value ? 'True' : 'False') : value}
-						</option>
-					{/each}
-				</select>
-			{/if}
-		</svelte:fragment>
-		<svelte:fragment slot="footer">
-			<button
-				class="btn btn-primary"
-				on:click={addDatasetAttribute}
-				data-bs-dismiss="modal"
-				disabled={selectedDatasetAttributeKey === '' || selectedDatasetAttributeValue === ''}
-			>
-				Add
-			</button>
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		</svelte:fragment>
-	</Modal>
 
 	<Modal id="add-type-filter-from-dataset-modal" onOpen={onOpenAddDatasetTypeModal} centered={true}>
 		<svelte:fragment slot="header">

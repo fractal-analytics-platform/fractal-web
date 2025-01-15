@@ -14,9 +14,6 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
-		await modal.getByRole('button', { name: 'Add attribute' }).click();
-		await modal.getByPlaceholder('Key').fill('k1');
-		await modal.getByPlaceholder('Value').fill('v1');
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -111,6 +108,19 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await searchImages(page, 1);
 	});
 
+	await test.step('Set dataset filters', async () => {
+		await page.getByRole('button', { name: 'Filters', exact: true }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Add attribute filter' }).click();
+		await modal.getByRole('combobox').first().selectOption('k1');
+		await selectSlimSelect(page, modal.getByLabel('Value'), 'v1');
+		// Await slim-select change events are propagated before clicking the Save button
+		await new Promise((r) => setTimeout(r, 500));
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await waitModalClosed(page);
+	});
+
 	await test.step('Enable dataset filters', async () => {
 		await expect(page.getByRole('row')).toHaveCount(7);
 		const datasetFiltersBtn = page.getByText('Dataset filters').first();
@@ -182,6 +192,8 @@ async function searchImages(page, expectedCount) {
 	// wait spinner disappearing
 	await expect(applyBtn.getByRole('status')).toHaveCount(0);
 	await expect(page.getByRole('row')).toHaveCount(expectedCount + 2);
+	// Await slim-select change events are propagated before clicking the Reset button
+	await new Promise((r) => setTimeout(r, 500));
 	const resetBtn = page.getByRole('button', { name: 'Reset', exact: true });
 	await resetBtn.click();
 	await expect(resetBtn).not.toBeEnabled();

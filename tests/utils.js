@@ -69,7 +69,7 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 	await selector.click();
 	const items = await page.getByRole('option').all();
 	let selectedItem = null;
-	for (const item of items) {
+	for (const item of items.reverse()) {
 		const itemText = await item.innerText();
 		if (itemText === optionValue) {
 			selectedItem = item;
@@ -83,7 +83,7 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 	} else {
 		await expect(selector).toHaveText(optionValue);
 	}
-	await expect(page.getByRole('option', { name: optionValue, exact: true })).toHaveAttribute(
+	await expect(page.getByRole('option', { name: optionValue, exact: true }).last()).toHaveAttribute(
 		'aria-selected',
 		'true'
 	);

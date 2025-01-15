@@ -74,7 +74,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh 2.10.1',
+			command: './tests/start-test-server.sh --branch dev-2.11',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
