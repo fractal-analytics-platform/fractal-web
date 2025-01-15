@@ -27,6 +27,9 @@
 	/** @type {Modal} */
 	let modal;
 
+	/** @type {DatasetImagesTable|undefined} */
+	let datasetImagesTable;
+
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
 	let setSlurmAccount = true;
@@ -209,7 +212,6 @@
 	let appliedTypeFilters = {};
 
 	function showConfirmRun() {
-		checkingConfiguration = true;
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
 			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };
@@ -218,9 +220,14 @@
 			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
 				selectedDataset
 			);
-			appliedAttributeFilters = { ...dataset.attribute_filters };
+			if (datasetImagesTable) {
+				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
+			} else {
+				appliedAttributeFilters = { ...dataset.attribute_filters };
+			}
 			appliedTypeFilters = { ...dataset.type_filters, ...wft.type_filters };
 		}
+		checkingConfiguration = true;
 	}
 
 	function computeNewDatasetName() {
@@ -478,7 +485,7 @@
 							</div>
 						</div>
 					</div>
-					{#if selectedDataset && imagePage && imagePage.images.length > 0 && firstTaskIndex !== undefined}
+					{#if selectedDataset && imagePage && imagePage.images.length > 0 && firstTaskIndex !== undefined && mode !== 'restart'}
 						<div class="accordion-item">
 							<h2 class="accordion-header">
 								<button
@@ -498,15 +505,21 @@
 								data-bs-parent="#accordion-run-workflow"
 							>
 								<div class="accordion-body">
-									<DatasetImagesTable
-										dataset={selectedDataset}
-										{imagePage}
-										{initialFilterValues}
-										{attributeFiltersEnabled}
-										useDatasetFilters={false}
-										vizarrViewerUrl={null}
-										runWorkflowModal={true}
-									/>
+									{#if checkingConfiguration}
+										This job will process {imagePage.total_count}
+										{imagePage.total_count === 1 ? 'image' : 'images'}.
+									{:else}
+										<DatasetImagesTable
+											bind:this={datasetImagesTable}
+											dataset={selectedDataset}
+											bind:imagePage
+											{initialFilterValues}
+											{attributeFiltersEnabled}
+											useDatasetFilters={false}
+											vizarrViewerUrl={null}
+											runWorkflowModal={true}
+										/>
+									{/if}
 								</div>
 							</div>
 						</div>

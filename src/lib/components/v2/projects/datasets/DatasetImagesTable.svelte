@@ -39,6 +39,10 @@
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 
+	export function getAttributeFilters() {
+		return attributeFilters;
+	}
+
 	/** @type {{ [key: string]: boolean | null }}} */
 	let typeFilters = getTypeFilterBaseValues(imagePage);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -494,7 +498,7 @@
 								</label>
 								<button
 									class="ps-0 btn btn-link"
-									on:click={() => toggleAll(attributeKey)}
+									on:click|preventDefault={() => toggleAll(attributeKey)}
 									title="Toggle all"
 								>
 									<i class="bi bi-check-all" />
