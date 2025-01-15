@@ -436,6 +436,22 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
+	/**
+	 * @param {string} attributeKey
+	 */
+	function toggleAll(attributeKey) {
+		const selector = attributesSelectors[attributeKey];
+		const values = imagePage.attributes[attributeKey];
+		if (!selector || !values) {
+			return;
+		}
+		if (selector.getSelected().length === values.length) {
+			selector.setSelected([]);
+		} else {
+			selector.setSelected(values.map((v) => v.toString()));
+		}
+	}
 </script>
 
 {#if !showTable}
@@ -476,6 +492,13 @@
 								<label for="attribute-{getIdFromValue(attributeKey)}">
 									{attributeKey}
 								</label>
+								<button
+									class="ps-0 btn btn-link"
+									on:click={() => toggleAll(attributeKey)}
+									title="Toggle all"
+								>
+									<i class="bi bi-check-all" />
+								</button>
 							</th>
 						{/each}
 						{#each imagePage.types as typeKey}
