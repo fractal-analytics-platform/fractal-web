@@ -44,7 +44,7 @@
 			headers.set('Content-Type', 'application/json');
 			loadingDatasetFilters = true;
 			const response = await fetch(
-				`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/query?page=1&page_size=1&use_dataset_filters=false`,
+				`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/query?page=1&page_size=1`,
 				{
 					method: 'POST',
 					headers,

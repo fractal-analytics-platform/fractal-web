@@ -274,7 +274,7 @@
 			}
 		};
 		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10&use_dataset_filters=false`,
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
 			{
 				method: 'POST',
 				headers,

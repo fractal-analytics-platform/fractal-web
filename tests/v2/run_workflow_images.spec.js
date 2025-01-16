@@ -35,23 +35,23 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await createImage(
 			page,
 			`${randomPath}/plate1.zarr/B/03/0`,
-			{ k1: 'v1', k2: 'v1' },
+			{ k1: 'k1v1', k2: 'k2v1' },
 			{ t1: false }
 		);
 		await createImage(
 			page,
 			`${randomPath}/plate1.zarr/B/03/1`,
-			{ k1: 'v1', k2: 'v2' },
+			{ k1: 'k1v1', k2: 'k2v2' },
 			{ t1: true }
 		);
 		await createImage(
 			page,
 			`${randomPath}/plate1.zarr/B/03/2`,
-			{ k1: 'v2', k2: 'v3' },
+			{ k1: 'k1v2', k2: 'k2v3' },
 			{ t1: false }
 		);
-		await createImage(page, `${randomPath}/plate1.zarr/B/03/3`, { k3: 'v1', k4: 'v1' });
-		await createImage(page, `${randomPath}/plate1.zarr/B/03/4`, { k3: 'v2', k4: 'v2' });
+		await createImage(page, `${randomPath}/plate1.zarr/B/03/3`, { k3: 'k3v1', k4: 'k4v1' });
+		await createImage(page, `${randomPath}/plate1.zarr/B/03/4`, { k3: 'k3v2', k4: 'k4v2' });
 	});
 
 	await test.step('Open workflow page', async () => {
@@ -71,16 +71,13 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await test.step('Add dataset filters', async () => {
 		await page.goto(datasetUrl);
 		await waitPageLoading(page);
-		await page.getByRole('button', { name: 'Filters', exact: true }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Add attribute filter' }).click();
-		await modal.getByRole('combobox').first().selectOption('k1');
-		await selectSlimSelect(page, modal.getByLabel('Value'), 'v1');
+		await page.getByText('Dataset filters').click();
+		await expect(page.getByRole('button', { name: 'Save filters' })).toBeDisabled();
+		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'k1v1');
 		// Await slim-select change events are propagated before clicking the Save button
-		await new Promise((r) => setTimeout(r, 500));
-		await modal.getByRole('button', { name: 'Save' }).click();
-		await waitModalClosed(page);
+		//await new Promise((r) => setTimeout(r, 500));
+		await page.getByRole('button', { name: 'Apply', exact: true }).click();
+		await page.getByRole('button', { name: 'Save filters' }).click();
 	});
 
 	await test.step('Check images with dataset filter', async () => {

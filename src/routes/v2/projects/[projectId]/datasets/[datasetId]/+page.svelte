@@ -1,10 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import DatasetFiltersModal from '$lib/components/v2/projects/datasets/DatasetFiltersModal.svelte';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -17,6 +17,11 @@
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	let imagePage = $page.data.imagePage;
 	let useDatasetFilters = false;
+	let datasetFiltersChanged = false;
+	let savingDatasetFilters = false;
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
 
 	/** @type {DatasetImagesTable} */
 	let imagesTable;
@@ -91,14 +96,31 @@
 		return result.images[0];
 	}
 
-	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} updatedDataset
-	 */
-	async function updateDatasetFiltersCallback(updatedDataset) {
-		dataset = updatedDataset;
-		if (useDatasetFilters) {
-			await imagesTable.reload();
+	async function saveDatasetFilters() {
+		errorAlert?.hide();
+		savingDatasetFilters = true;
+		const projectId = $page.params.projectId;
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/v2/project/${projectId}/dataset/${dataset.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				attribute_filters: imagesTable.getAttributeFilters(),
+				type_filters: imagesTable.getTypeFilters()
+			})
+		});
+		if (response.ok) {
+			const result = await response.json();
+			dataset = result;
+		} else {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'datasetUpdateError'
+			);
 		}
+		savingDatasetFilters = false;
 	}
 
 	async function handleExportDataset() {
@@ -153,9 +175,22 @@
 		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal">
 			Info
 		</button>
-		<button class="btn btn-light" data-bs-target="#datasetFiltersModal" data-bs-toggle="modal">
-			Filters
-		</button>
+		{#if useDatasetFilters}
+			<button
+				class="btn btn-primary"
+				disabled={!datasetFiltersChanged || savingDatasetFilters}
+				on:click={saveDatasetFilters}
+			>
+				Save filters
+				{#if savingDatasetFilters}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+			</button>
+		{:else}
+			<button class="btn btn-light" on:click={() => (useDatasetFilters = true)}>
+				Edit filters
+			</button>
+		{/if}
 		<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
 			History
 		</button>
@@ -209,15 +244,17 @@
 	</div>
 {/if}
 
+<div id="datasetUpdateError" />
+
 <DatasetImagesTable
 	{dataset}
 	bind:imagePage
 	{vizarrViewerUrl}
-	{useDatasetFilters}
+	bind:useDatasetFilters
+	bind:datasetFiltersChanged
 	runWorkflowModal={false}
 	bind:this={imagesTable}
 />
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
-<DatasetFiltersModal {dataset} updateDatasetCallback={updateDatasetFiltersCallback} />
 <DatasetHistoryModal {dataset} />

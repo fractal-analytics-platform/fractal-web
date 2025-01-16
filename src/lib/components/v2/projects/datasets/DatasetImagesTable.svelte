@@ -7,7 +7,6 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onMount, tick } from 'svelte';
-	import { attributesChanged } from './attributes_utilities';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -17,6 +16,7 @@
 	export let vizarrViewerUrl;
 	/** @type {boolean} */
 	export let useDatasetFilters;
+	export let datasetFiltersChanged = false;
 	/**
 	 * Set to true if the table is displayed inside the "Run workflow" modal.
 	 * Used to disable some buttons.
@@ -40,7 +40,11 @@
 	let attributeFilters = getAttributeFilterBaseValues(imagePage);
 
 	export function getAttributeFilters() {
-		return attributeFilters;
+		return removeNullValues(attributeFilters);
+	}
+
+	export function getTypeFilters() {
+		return removeNullValues(typeFilters);
 	}
 
 	/** @type {{ [key: string]: boolean | null }}} */
@@ -134,8 +138,13 @@
 
 	export async function reload() {
 		reloading = true;
-		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		typeFilters = getTypeFilterBaseValues(imagePage);
+		if (useDatasetFilters) {
+			attributeFilters = dataset.attribute_filters;
+			typeFilters = dataset.type_filters;
+		} else {
+			attributeFilters = getAttributeFilterBaseValues(imagePage);
+			typeFilters = getTypeFilterBaseValues(imagePage);
+		}
 		await tick();
 		await searchImages();
 		reloading = false;
@@ -344,7 +353,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}&use_dataset_filters=${useDatasetFilters}`,
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
 			{
 				method: 'POST',
 				headers,
@@ -455,6 +464,53 @@
 		} else {
 			selector.setSelected(values.map((v) => v.toString()));
 		}
+	}
+
+	$: if (attributeFilters && typeFilters) {
+		datasetFiltersChanged =
+			!applyBtnActive &&
+			(attributesChanged(dataset.attribute_filters, removeNullValues(attributeFilters)) ||
+				objectChanged(dataset.type_filters, removeNullValues(typeFilters)));
+	}
+
+	$: if (dataset) {
+		resetBtnActive = false;
+	}
+
+	/**
+	 * @param {{ [key: string]: any }} map
+	 */
+	function removeNullValues(map) {
+		return Object.fromEntries(Object.entries(map).filter(([, v]) => v !== null));
+	}
+
+	/**
+	 * @param {{ [key: string]: null | Array<string | number | boolean> }} oldObject
+	 * @param {{ [key: string]: null | Array<string | number | boolean> }} newObject
+	 */
+	function attributesChanged(oldObject, newObject) {
+		if (Object.keys(oldObject).length !== Object.keys(newObject).length) {
+			return true;
+		}
+		for (const [oldKey, oldValue] of Object.entries(oldObject)) {
+			if (!(oldKey in newObject)) {
+				return true;
+			}
+			const newValue = newObject[oldKey];
+			if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+				if (oldValue.length !== newValue.length) {
+					return true;
+				}
+				for (let i = 0; i < oldValue.length; i++) {
+					if (oldValue[i] !== newValue[i]) {
+						return true;
+					}
+				}
+			} else if (oldValue !== newValue) {
+				return true;
+			}
+		}
+		return false;
 	}
 </script>
 
