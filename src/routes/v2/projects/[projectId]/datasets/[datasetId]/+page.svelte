@@ -5,6 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { onMount } from 'svelte';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -156,6 +157,10 @@
 			linkElement.click();
 		}
 	}
+
+	onMount(() => {
+		imagesTable.reload();
+	});
 </script>
 
 <div class="d-flex justify-content-between align-items-center">

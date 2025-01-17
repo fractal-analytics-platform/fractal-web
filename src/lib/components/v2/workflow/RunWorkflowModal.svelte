@@ -7,7 +7,7 @@
 	} from '$lib/common/job_utilities';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
@@ -291,24 +291,22 @@
 			imagePage = await response.json();
 		}
 		datasetImagesLoading = false;
+		await tick();
+		datasetImagesTable?.reload();
+	}
+
+	async function cancel() {
+		checkingConfiguration = false;
+		await tick();
+		datasetImagesTable?.reload();
 	}
 
 	onMount(async () => {
 		await loadSlurmAccounts();
 	});
-
-	let opened = false;
 </script>
 
-<Modal
-	id="runWorkflowModal"
-	centered={true}
-	bind:this={modal}
-	size="xl"
-	onOpen={() => (opened = true)}
-	onClose={() => (opened = false)}
-	scrollable={true}
->
+<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">
 			{#if mode === 'run'}
@@ -424,117 +422,114 @@
 					{/each}
 				</select>
 			</div>
-			{#key opened}
-				<div class="accordion" id="accordion-run-workflow">
+			<div class="accordion" id="accordion-run-workflow">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button
+							class="accordion-button collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapse-workflow-advanced-options"
+							aria-expanded="false"
+							aria-controls="collapse-workflow-advanced-options"
+						>
+							Advanced options
+						</button>
+					</h2>
+					<div
+						id="collapse-workflow-advanced-options"
+						class="accordion-collapse collapse"
+						data-bs-parent="#accordion-run-workflow"
+					>
+						<div class="accordion-body">
+							<div class="mb-3">
+								<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
+								<textarea
+									name="workerInit"
+									id="workerInit"
+									class="form-control font-monospace"
+									rows="5"
+									disabled={checkingConfiguration}
+									bind:value={workerInitControl}
+								/>
+							</div>
+							{#if slurmAccounts.length > 0}
+								<div class="mb-3">
+									<div class="form-check">
+										<input
+											class="form-check-input"
+											type="checkbox"
+											id="setSlurmAccount"
+											bind:checked={setSlurmAccount}
+										/>
+										<label class="form-check-label" for="setSlurmAccount">
+											Set SLURM account
+										</label>
+									</div>
+								</div>
+								{#if setSlurmAccount}
+									<div class="mb-3">
+										<label for="slurmAccount" class="form-label">SLURM account</label>
+										<select
+											name="slurmAccount"
+											id="slurmAccount"
+											class="form-select"
+											disabled={checkingConfiguration}
+											bind:value={slurmAccount}
+										>
+											{#each slurmAccounts as account}
+												<option>{account}</option>
+											{/each}
+										</select>
+									</div>
+								{/if}
+							{/if}
+						</div>
+					</div>
+				</div>
+				{#if selectedDataset && imagePage && imagePage.images.length > 0 && firstTaskIndex !== undefined && mode !== 'restart'}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button
 								class="accordion-button collapsed"
 								type="button"
 								data-bs-toggle="collapse"
-								data-bs-target="#collapse-workflow-advanced-options"
+								data-bs-target="#collapse-workflow-image-list"
 								aria-expanded="false"
-								aria-controls="collapse-workflow-advanced-options"
+								aria-controls="collapse-workflow-image-list"
 							>
-								Advanced options
+								Image list
 							</button>
 						</h2>
 						<div
-							id="collapse-workflow-advanced-options"
+							id="collapse-workflow-image-list"
 							class="accordion-collapse collapse"
 							data-bs-parent="#accordion-run-workflow"
 						>
 							<div class="accordion-body">
-								<div class="mb-3">
-									<label for="workerInit" class="form-label">Worker initialization (Optional)</label
-									>
-									<textarea
-										name="workerInit"
-										id="workerInit"
-										class="form-control font-monospace"
-										rows="5"
-										disabled={checkingConfiguration}
-										bind:value={workerInitControl}
+								{#if checkingConfiguration}
+									This job will process {imagePage.total_count}
+									{imagePage.total_count === 1 ? 'image' : 'images'}.
+								{:else}
+									<DatasetImagesTable
+										bind:this={datasetImagesTable}
+										dataset={selectedDataset}
+										bind:imagePage
+										{initialFilterValues}
+										{attributeFiltersEnabled}
+										useDatasetFilters={false}
+										vizarrViewerUrl={null}
+										runWorkflowModal={true}
 									/>
-								</div>
-								{#if slurmAccounts.length > 0}
-									<div class="mb-3">
-										<div class="form-check">
-											<input
-												class="form-check-input"
-												type="checkbox"
-												id="setSlurmAccount"
-												bind:checked={setSlurmAccount}
-											/>
-											<label class="form-check-label" for="setSlurmAccount">
-												Set SLURM account
-											</label>
-										</div>
-									</div>
-									{#if setSlurmAccount}
-										<div class="mb-3">
-											<label for="slurmAccount" class="form-label">SLURM account</label>
-											<select
-												name="slurmAccount"
-												id="slurmAccount"
-												class="form-select"
-												disabled={checkingConfiguration}
-												bind:value={slurmAccount}
-											>
-												{#each slurmAccounts as account}
-													<option>{account}</option>
-												{/each}
-											</select>
-										</div>
-									{/if}
 								{/if}
 							</div>
 						</div>
 					</div>
-					{#if selectedDataset && imagePage && imagePage.images.length > 0 && firstTaskIndex !== undefined && mode !== 'restart'}
-						<div class="accordion-item">
-							<h2 class="accordion-header">
-								<button
-									class="accordion-button collapsed"
-									type="button"
-									data-bs-toggle="collapse"
-									data-bs-target="#collapse-workflow-image-list"
-									aria-expanded="false"
-									aria-controls="collapse-workflow-image-list"
-								>
-									Image list
-								</button>
-							</h2>
-							<div
-								id="collapse-workflow-image-list"
-								class="accordion-collapse collapse"
-								data-bs-parent="#accordion-run-workflow"
-							>
-								<div class="accordion-body">
-									{#if checkingConfiguration}
-										This job will process {imagePage.total_count}
-										{imagePage.total_count === 1 ? 'image' : 'images'}.
-									{:else}
-										<DatasetImagesTable
-											bind:this={datasetImagesTable}
-											dataset={selectedDataset}
-											bind:imagePage
-											{initialFilterValues}
-											{attributeFiltersEnabled}
-											useDatasetFilters={false}
-											vizarrViewerUrl={null}
-											runWorkflowModal={true}
-										/>
-									{/if}
-								</div>
-							</div>
-						</div>
-					{/if}
-					{#if datasetImagesLoading}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-					{/if}
-				</div>
-			{/key}
+				{/if}
+				{#if datasetImagesLoading}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
+			</div>
 			{#if checkingConfiguration}
 				<hr />
 				<h6 class="mt-3">Applied filters</h6>
@@ -561,9 +556,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		{#if checkingConfiguration}
-			<button class="btn btn-warning" on:click={() => (checkingConfiguration = false)}>
-				Cancel
-			</button>
+			<button class="btn btn-warning" on:click={cancel}> Cancel </button>
 			<button
 				class="btn btn-primary"
 				on:click|preventDefault={handleApplyWorkflow}

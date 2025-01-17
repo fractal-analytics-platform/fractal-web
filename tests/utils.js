@@ -91,6 +91,32 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 
 /**
  * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} selector
+ * @returns {Promise<string | string[] | null>}
+ */
+export async function getSlimSelectValues(page, selector) {
+	const dataId = await selector.getAttribute('data-id');
+	if (dataId === null) {
+		throw new Error(`Unable to retrieve slim select data-id`);
+	}
+	const dropdown = page.locator(`select[data-id="${dataId}"]`);
+	const id = await dropdown.getAttribute('id');
+	if (id === null) {
+		throw new Error(`Unable to retrieve slim select id`);
+	}
+
+	return await page.evaluate((id) => {
+		const element = document.getElementById(id);
+		if (element && 'slim' in element) {
+			const slimSelect = /** @type {any} */ (element.slim);
+			return slimSelect.getSelected();
+		}
+		return null;
+	}, id);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
  * @param {string} email
  * @param {string} password
  */

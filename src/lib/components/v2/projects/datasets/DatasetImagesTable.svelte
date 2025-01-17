@@ -6,7 +6,7 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import { objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
-	import { onMount, tick } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -37,7 +37,7 @@
 
 	let reloading = false;
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
-	let attributeFilters = getAttributeFilterBaseValues(imagePage);
+	let attributeFilters = {};
 
 	export function getAttributeFilters() {
 		return removeNullValues(attributeFilters);
@@ -48,7 +48,7 @@
 	}
 
 	/** @type {{ [key: string]: boolean | null }}} */
-	let typeFilters = getTypeFilterBaseValues(imagePage);
+	let typeFilters = {};
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
@@ -150,9 +150,17 @@
 		reloading = false;
 	}
 
-	onMount(() => {
-		loadAttributesSelectors();
-		loadTypesSelector();
+	onDestroy(() => {
+		for (const selector of Object.values(attributesSelectors)) {
+			selector.destroy();
+		}
+		for (const selector of Object.values(typesSelectors)) {
+			selector.destroy();
+		}
+		attributesSelectors = {};
+		typesSelectors = {};
+		attributeFilters = {};
+		typeFilters = {};
 	});
 
 	function loadAttributesSelectors() {
@@ -233,6 +241,7 @@
 			throw new Error(`Unable to find selector element with key ${key}`);
 		}
 		selectElement.classList.remove('invisible');
+		selectElement.setAttribute('multiple', 'multiple');
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
@@ -577,11 +586,7 @@
 								<div class="row">
 									<div class="col">
 										<div class="attribute-select-wrapper mb-1">
-											<select
-												id="attribute-{getIdFromValue(attributeKey)}"
-												class="invisible"
-												multiple
-											/>
+											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" />
 										</div>
 									</div>
 								</div>
