@@ -196,7 +196,9 @@
 		}
 	}
 
-	function resetLastTask() {
+	async function firstTaskIndexChanged() {
+		await loadDatasetImages();
+		// reset last task
 		if (
 			lastTaskIndex !== undefined &&
 			firstTaskIndex !== undefined &&
@@ -251,11 +253,14 @@
 		}
 	}
 
+	let datasetImagesLoading = false;
+
 	async function loadDatasetImages() {
 		if (firstTaskIndex === undefined) {
 			return;
 		}
 
+		datasetImagesLoading = true;
 		const task = workflow.task_list[firstTaskIndex];
 
 		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
@@ -285,6 +290,7 @@
 		if (response.ok) {
 			imagePage = await response.json();
 		}
+		datasetImagesLoading = false;
 	}
 
 	onMount(async () => {
@@ -391,7 +397,7 @@
 					class="form-select"
 					disabled={checkingConfiguration}
 					bind:value={firstTaskIndex}
-					on:change={resetLastTask}
+					on:change={firstTaskIndexChanged}
 					class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 				>
 					<option value={undefined}>Select first task</option>
@@ -523,6 +529,9 @@
 								</div>
 							</div>
 						</div>
+					{/if}
+					{#if datasetImagesLoading}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 					{/if}
 				</div>
 			{/key}
