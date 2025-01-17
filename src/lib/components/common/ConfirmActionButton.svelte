@@ -10,6 +10,7 @@
 	export let buttonIcon = undefined;
 	export let modalId = undefined;
 	export let message = '';
+	export let disabled = false;
 	/** @type {Modal} */
 	let modal;
 	let loading = false;
@@ -65,6 +66,7 @@
 	data-bs-toggle="modal"
 	data-bs-target="#{modalId}"
 	aria-label={ariaLabel}
+	{disabled}
 >
 	{#if buttonIcon}
 		<i class="bi bi-{buttonIcon}" />

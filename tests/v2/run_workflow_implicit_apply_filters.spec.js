@@ -1,11 +1,18 @@
 import { expect, test } from './workflow_fixture.js';
-import { getSlimSelectValues, selectSlimSelect, waitPageLoading } from '../utils.js';
+import {
+	getSlimSelectValues,
+	selectSlimSelect,
+	waitModalClosed,
+	waitPageLoading
+} from '../utils.js';
 import { createImage } from './image_utils.js';
 import { createDataset } from './dataset_utils.js';
 
 test('Run workflow implicit applies changed filters [#694]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
+
+	const modal = page.locator('.modal.show');
 
 	let datasetName;
 	await test.step('Create test dataset1 and open dataset page', async () => {
@@ -21,14 +28,15 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 	});
 
 	await test.step('Create filters for dataset1', async () => {
-		await page.getByText('Dataset filters').click();
+		await page.getByText('Current selection').click();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute a1'), 'v1');
 		await page.getByRole('button', { name: 'Apply' }).click();
-		await page.getByRole('button', { name: 'Save filters' }).click();
-		await expect(page.getByRole('button', { name: 'Save filters' })).toBeDisabled();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
 	});
-
-	const modal = page.locator('.modal.show');
 
 	await test.step('Open "Run workflow" modal', async () => {
 		await page.goto(workflow.url);

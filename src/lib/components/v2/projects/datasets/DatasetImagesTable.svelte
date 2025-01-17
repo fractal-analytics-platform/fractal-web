@@ -4,9 +4,10 @@
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { objectChanged } from '$lib/common/component_utilities';
+	import { deepCopy, objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
+	import Tooltip from '$lib/components/common/Tooltip.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -16,7 +17,6 @@
 	export let vizarrViewerUrl;
 	/** @type {boolean} */
 	export let useDatasetFilters;
-	export let datasetFiltersChanged = false;
 	/**
 	 * Set to true if the table is displayed inside the "Run workflow" modal.
 	 * Used to disable some buttons.
@@ -27,13 +27,21 @@
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 
+	let datasetFiltersChanged = false;
+	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
+	export let onDatasetsUpdated = () => {};
+
 	let showTable = imagePage.total_count > 0;
+
+	/** @type {Tooltip|undefined} */
+	let currentSelectionTooltip;
 
 	/** @type {CreateUpdateImageModal|undefined} */
 	let imageModal = undefined;
 
 	let searching = false;
 	let resetting = false;
+	let savingDatasetFilters = false;
 
 	let reloading = false;
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
@@ -129,8 +137,13 @@
 	async function resetSearchFields() {
 		resetBtnActive = false;
 		resetting = true;
-		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		typeFilters = getTypeFilterBaseValues(imagePage);
+		if (useDatasetFilters) {
+			attributeFilters = deepCopy(dataset.attribute_filters);
+			typeFilters = deepCopy(dataset.type_filters);
+		} else {
+			attributeFilters = getAttributeFilterBaseValues(imagePage);
+			typeFilters = getTypeFilterBaseValues(imagePage);
+		}
 		await tick();
 		await searchImages();
 		resetting = false;
@@ -138,9 +151,10 @@
 
 	export async function reload() {
 		reloading = true;
+		currentSelectionTooltip?.setEnabled(!useDatasetFilters);
 		if (useDatasetFilters) {
-			attributeFilters = dataset.attribute_filters;
-			typeFilters = dataset.type_filters;
+			attributeFilters = deepCopy(dataset.attribute_filters);
+			typeFilters = deepCopy(dataset.type_filters);
 		} else {
 			attributeFilters = getAttributeFilterBaseValues(imagePage);
 			typeFilters = getTypeFilterBaseValues(imagePage);
@@ -387,7 +401,7 @@
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'searchError'
+				'datasetImagesError'
 			);
 		}
 	}
@@ -476,6 +490,7 @@
 	}
 
 	$: if (attributeFilters && typeFilters) {
+		//console.log(dataset.attribute_filters, removeNullValues(attributeFilters))
 		datasetFiltersChanged =
 			!applyBtnActive &&
 			(attributesChanged(dataset.attribute_filters, removeNullValues(attributeFilters)) ||
@@ -510,8 +525,8 @@
 				if (oldValue.length !== newValue.length) {
 					return true;
 				}
-				for (let i = 0; i < oldValue.length; i++) {
-					if (oldValue[i] !== newValue[i]) {
+				for (const ov of oldValue) {
+					if (!newValue.includes(ov)) {
 						return true;
 					}
 				}
@@ -520,6 +535,33 @@
 			}
 		}
 		return false;
+	}
+
+	async function saveDatasetFilters() {
+		errorAlert?.hide();
+		savingDatasetFilters = true;
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				attribute_filters: getAttributeFilters(),
+				type_filters: getTypeFilters()
+			})
+		});
+		if (response.ok) {
+			const result = await response.json();
+			dataset = result;
+			onDatasetsUpdated(dataset);
+		} else {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'datasetImagesError'
+			);
+		}
+		savingDatasetFilters = false;
 	}
 </script>
 
@@ -535,7 +577,7 @@
 	<div>
 		<div class="row">
 			<div class="col">
-				<div id="searchError" class="mt-2 mb-2" />
+				<div id="datasetImagesError" class="mt-2 mb-2" />
 			</div>
 		</div>
 
@@ -624,6 +666,17 @@
 								{/if}
 								Reset
 							</button>
+							{#if !runWorkflowModal && useDatasetFilters}
+								<ConfirmActionButton
+									modalId="confirmSaveDatasetFilters"
+									label="Save"
+									message="Save dataset filters"
+									disabled={!datasetFiltersChanged || savingDatasetFilters}
+									callbackAction={async () => {
+										await saveDatasetFilters();
+									}}
+								/>
+							{/if}
 						</th>
 					</tr>
 				</thead>
@@ -704,20 +757,27 @@
 							disabled={reloading || searching || resetting}
 						/>
 						<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
-						<input
-							type="radio"
-							class="btn-check"
-							name="filters-switch"
-							id="dataset-filters"
-							autocomplete="off"
-							value={true}
-							bind:group={useDatasetFilters}
-							on:change={reload}
-							disabled={reloading || searching || resetting}
-						/>
-						<label class="btn btn-white btn-outline-primary" for="dataset-filters">
-							Dataset filters
-						</label>
+						<Tooltip
+							id="current-selection-label"
+							title="These are default selection for images on which a workflow will be run"
+							placement="bottom"
+							bind:this={currentSelectionTooltip}
+						>
+							<input
+								type="radio"
+								class="btn-check"
+								name="filters-switch"
+								id="current-selection"
+								autocomplete="off"
+								value={true}
+								bind:group={useDatasetFilters}
+								on:change={reload}
+								disabled={reloading || searching || resetting}
+							/>
+							<label class="btn btn-white btn-outline-primary" for="current-selection">
+								Current selection
+							</label>
+						</Tooltip>
 						{#if reloading}
 							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 						{/if}

@@ -13,10 +13,11 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	page,
 	workflow
 }) => {
-  test.slow();
+	test.slow();
 
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
+	const modal = page.locator('.modal.show');
 
 	let datasetName1;
 	await test.step('Create test dataset1 and open dataset page', async () => {
@@ -32,11 +33,14 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	});
 
 	await test.step('Create filters for dataset1', async () => {
-		await page.getByText('Dataset filters').click();
+		await page.getByText('Current selection').click();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute d1a1'), 'd1v1');
 		await page.getByRole('button', { name: 'Apply' }).click();
-		await page.getByRole('button', { name: 'Save filters' }).click();
-		await expect(page.getByRole('button', { name: 'Save filters' })).toBeDisabled();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
 	});
 
 	let datasetName2;
@@ -53,11 +57,14 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	});
 
 	await test.step('Create filters for dataset2', async () => {
-		await page.getByText('Dataset filters').click();
+		await page.getByText('Current selection').click();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute d2a1'), 'd2v2');
 		await page.getByRole('button', { name: 'Apply' }).click();
-		await page.getByRole('button', { name: 'Save filters' }).click();
-		await expect(page.getByRole('button', { name: 'Save filters' })).toBeDisabled();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
 	});
 
 	await test.step('Run workflow', async () => {
@@ -65,7 +72,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await waitPageLoading(page);
 		await workflow.addTask('generic_task');
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 
 		// check images and selected filters
@@ -101,7 +107,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	await test.step('Check Run workflow modal', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('combobox', { name: 'First task' }).selectOption('generic_task');
 
@@ -135,7 +140,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	await test.step('Check continue workflow modal', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('combobox', { name: 'First task' }).selectOption('generic_task');
 

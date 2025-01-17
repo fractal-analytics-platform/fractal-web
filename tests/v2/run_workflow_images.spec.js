@@ -10,11 +10,11 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	const randomPath = `/tmp/${Math.random().toString(36).substring(7)}`;
+	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
@@ -63,7 +63,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 
 	await test.step('Check images', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
@@ -72,20 +71,22 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await test.step('Add dataset filters', async () => {
 		await page.goto(datasetUrl);
 		await waitPageLoading(page);
-		await page.getByText('Dataset filters').click();
-		await expect(page.getByRole('button', { name: 'Save filters' })).toBeDisabled();
+		await page.getByText('Current selection').click();
+		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'k1v1');
 		// Await slim-select change events are propagated before clicking the Save button
 		//await new Promise((r) => setTimeout(r, 500));
 		await page.getByRole('button', { name: 'Apply', exact: true }).click();
-		await page.getByRole('button', { name: 'Save filters' }).click();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
 	});
 
 	await test.step('Check images with dataset filter', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(4);
@@ -106,7 +107,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.waitForURL(workflow.url);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(3);

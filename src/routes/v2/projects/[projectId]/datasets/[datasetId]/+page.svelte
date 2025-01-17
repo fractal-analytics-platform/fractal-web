@@ -4,7 +4,6 @@
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
@@ -18,11 +17,6 @@
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	let imagePage = $page.data.imagePage;
 	let useDatasetFilters = false;
-	let datasetFiltersChanged = false;
-	let savingDatasetFilters = false;
-
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
 
 	/** @type {DatasetImagesTable} */
 	let imagesTable;
@@ -97,33 +91,6 @@
 		return result.images[0];
 	}
 
-	async function saveDatasetFilters() {
-		errorAlert?.hide();
-		savingDatasetFilters = true;
-		const projectId = $page.params.projectId;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v2/project/${projectId}/dataset/${dataset.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				attribute_filters: imagesTable.getAttributeFilters(),
-				type_filters: imagesTable.getTypeFilters()
-			})
-		});
-		if (response.ok) {
-			const result = await response.json();
-			dataset = result;
-		} else {
-			errorAlert = displayStandardErrorAlert(
-				await getAlertErrorFromResponse(response),
-				'datasetUpdateError'
-			);
-		}
-		savingDatasetFilters = false;
-	}
-
 	async function handleExportDataset() {
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/export`,
@@ -180,22 +147,6 @@
 		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal">
 			Info
 		</button>
-		{#if useDatasetFilters}
-			<button
-				class="btn btn-primary"
-				disabled={!datasetFiltersChanged || savingDatasetFilters}
-				on:click={saveDatasetFilters}
-			>
-				Save filters
-				{#if savingDatasetFilters}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-			</button>
-		{:else}
-			<button class="btn btn-light" on:click={() => (useDatasetFilters = true)}>
-				Edit filters
-			</button>
-		{/if}
 		<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
 			History
 		</button>
@@ -256,9 +207,9 @@
 	bind:imagePage
 	{vizarrViewerUrl}
 	bind:useDatasetFilters
-	bind:datasetFiltersChanged
 	runWorkflowModal={false}
 	bind:this={imagesTable}
+	onDatasetsUpdated={(updated) => (dataset = updated)}
 />
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
