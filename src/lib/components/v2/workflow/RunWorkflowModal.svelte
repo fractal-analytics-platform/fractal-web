@@ -213,7 +213,10 @@
 	/** @type {{ [key: string]: boolean }} */
 	let appliedTypeFilters = {};
 
-	function showConfirmRun() {
+	async function showConfirmRun() {
+		if (datasetImagesTable) {
+			await datasetImagesTable.applySearchFields();
+		}
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
 			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };

@@ -117,7 +117,7 @@
 		return relativePath;
 	}
 
-	async function applySearchFields() {
+	export async function applySearchFields() {
 		searching = true;
 		await searchImages();
 		resetBtnActive =
