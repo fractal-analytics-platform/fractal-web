@@ -42,36 +42,6 @@
 			<code>{task.command_parallel}</code>
 		</li>
 	{/if}
-	<li class="list-group-item list-group-item-light fw-bold">Input Type</li>
-	<li class="list-group-item">
-		<table class="table table-borderless mb-0">
-			<tbody>
-				{#each Object.keys(task.input_types) as key}
-					<tr class="d-flex">
-						<td><code>{key}</code></td>
-						<td class="flex-grow">
-							<BooleanIcon value={task.input_types[key]} />
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</li>
-	<li class="list-group-item list-group-item-light fw-bold">Output Type</li>
-	<li class="list-group-item">
-		<table class="table table-borderless mb-0">
-			<tbody>
-				{#each Object.keys(task.output_types) as key}
-					<tr class="d-flex">
-						<td><code>{key}</code></td>
-						<td class="flex-grow">
-							<BooleanIcon value={task.output_types[key]} />
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</li>
 	<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
 	<li class="list-group-item">
 		{task.args_schema_version || '–'}
