@@ -56,6 +56,7 @@
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = null;
+	let hasImages = false;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	let initialFilterValues = null;
 
@@ -290,18 +291,23 @@
 				body: JSON.stringify(initialFilterValues)
 			}
 		);
-		if (response.ok) {
-			imagePage = await response.json();
+		if (!response.ok) {
+			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			datasetImagesLoading = false;
+			return;
 		}
+		imagePage = await response.json();
+		hasImages =
+			/** @type {import('fractal-components/types/api').ImagePage} */ (imagePage).total_count > 0;
 		datasetImagesLoading = false;
 		await tick();
-		datasetImagesTable?.reload();
+		datasetImagesTable?.load();
 	}
 
 	async function cancel() {
 		checkingConfiguration = false;
 		await tick();
-		datasetImagesTable?.reload();
+		datasetImagesTable?.load();
 	}
 
 	onMount(async () => {
@@ -490,7 +496,7 @@
 						</div>
 					</div>
 				</div>
-				{#if selectedDataset && imagePage && imagePage.images.length > 0 && firstTaskIndex !== undefined && mode !== 'restart'}
+				{#if selectedDataset && imagePage && hasImages && firstTaskIndex !== undefined && mode !== 'restart'}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button

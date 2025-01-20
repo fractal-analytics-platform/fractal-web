@@ -126,7 +126,7 @@
 	}
 
 	onMount(() => {
-		imagesTable.reload();
+		imagesTable.load();
 	});
 </script>
 

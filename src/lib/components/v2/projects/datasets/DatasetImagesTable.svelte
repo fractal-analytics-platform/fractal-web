@@ -31,7 +31,8 @@
 	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
 	export let onDatasetsUpdated = () => {};
 
-	let showTable = imagePage.total_count > 0;
+	let showTable = false;
+	let firstLoad = true;
 
 	/** @type {Tooltip|undefined} */
 	let currentSelectionTooltip;
@@ -43,7 +44,7 @@
 	let resetting = false;
 	let savingDatasetFilters = false;
 
-	let reloading = false;
+	let loading = false;
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = {};
 
@@ -149,8 +150,8 @@
 		resetting = false;
 	}
 
-	export async function reload() {
-		reloading = true;
+	export async function load() {
+		loading = true;
 		currentSelectionTooltip?.setEnabled(!useDatasetFilters);
 		if (useDatasetFilters) {
 			attributeFilters = deepCopy(dataset.attribute_filters);
@@ -161,7 +162,7 @@
 		}
 		await tick();
 		await searchImages();
-		reloading = false;
+		loading = false;
 	}
 
 	onDestroy(() => {
@@ -384,7 +385,12 @@
 				body: JSON.stringify(params)
 			}
 		);
-		showTable = true;
+		if (firstLoad) {
+			showTable = imagePage.total_count > 0;
+			firstLoad = false;
+		} else {
+			showTable = true;
+		}
 		if (response.ok) {
 			imagePage = await response.json();
 			await tick();
@@ -490,7 +496,6 @@
 	}
 
 	$: if (attributeFilters && typeFilters) {
-		//console.log(dataset.attribute_filters, removeNullValues(attributeFilters))
 		datasetFiltersChanged =
 			!applyBtnActive &&
 			(attributesChanged(dataset.attribute_filters, removeNullValues(attributeFilters)) ||
@@ -753,8 +758,8 @@
 							autocomplete="off"
 							value={false}
 							bind:group={useDatasetFilters}
-							on:change={reload}
-							disabled={reloading || searching || resetting}
+							on:change={load}
+							disabled={loading || searching || resetting}
 						/>
 						<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
 						<Tooltip
@@ -771,14 +776,14 @@
 								autocomplete="off"
 								value={true}
 								bind:group={useDatasetFilters}
-								on:change={reload}
-								disabled={reloading || searching || resetting}
+								on:change={load}
+								disabled={loading || searching || resetting}
 							/>
 							<label class="btn btn-white btn-outline-primary" for="current-selection">
 								Current selection
 							</label>
 						</Tooltip>
-						{#if reloading}
+						{#if loading}
 							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 						{/if}
 					{/if}
