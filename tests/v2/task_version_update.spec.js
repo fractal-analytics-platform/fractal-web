@@ -148,7 +148,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add Input Filters', async () => {
-		await page.getByText('Input Filters').click();
+		await page.getByText('Types').click();
 		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
 		await page.getByPlaceholder('Key').fill('key2');
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -174,7 +174,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Verify that input filters have been preserved', async () => {
-		await page.getByText('Input Filters').click();
+		await page.getByText('Types').click();
 		await expect(page.getByPlaceholder('Key')).toHaveValue('key2');
 	});
 

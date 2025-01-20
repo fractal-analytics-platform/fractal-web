@@ -96,7 +96,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 
 	await test.step('Add input filter', async () => {
 		await workflow.selectTask('generic_task');
-		await page.getByText('Input Filters').click();
+		await page.getByText('Types').click();
 		await page.getByRole('button', { name: 'Add type filter' }).click();
 		await page.getByPlaceholder('Key').last().fill('t1');
 		await page.getByRole('switch').click();

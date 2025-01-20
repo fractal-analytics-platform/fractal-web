@@ -3,6 +3,7 @@
 	import InputFiltersTypesForm from '../projects/datasets/InputFiltersTypesForm.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import("fractal-components/types/api").WorkflowV2} */
 	export let workflow;
@@ -193,3 +194,40 @@
 		</svelte:fragment>
 	</Modal>
 </div>
+
+<ul class="list-group p-3">
+	<li class="list-group-item list-group-item-light fw-bold">Input Types</li>
+	<li class="list-group-item">
+		{#if Object.keys(workflowTask.task.input_types).length === 0}
+			-
+		{:else}
+			<table class="table table-borderless mb-0">
+				<tbody>
+					{#each Object.keys(workflowTask.task.input_types) as key}
+						<tr class="d-flex">
+							<td><code>{key}</code></td>
+							<td class="flex-grow"><BooleanIcon value={workflowTask.task.input_types[key]} /></td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</li>
+	<li class="list-group-item list-group-item-light fw-bold">Output Types</li>
+	<li class="list-group-item">
+		{#if Object.keys(workflowTask.task.output_types).length === 0}
+			-
+		{:else}
+			<table class="table table-borderless mb-0">
+				<tbody>
+					{#each Object.keys(workflowTask.task.output_types) as key}
+						<tr class="d-flex">
+							<td><code>{key}</code></td>
+							<td class="flex-grow"><BooleanIcon value={workflowTask.task.output_types[key]} /></td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</li>
+</ul>

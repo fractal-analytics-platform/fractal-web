@@ -73,7 +73,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Open Input Filters tab', async () => {
-		await page.getByText('Input Filters').click();
+		await page.getByText('Types').click();
 	});
 
 	await test.step('Add empty attribute filter and trigger validation', async () => {
@@ -91,7 +91,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	await test.step('Reload the page and check saved filters', async () => {
 		await page.reload();
 		await workflow.selectTask(taskName1);
-		await page.getByText('Input Filters').click();
+		await page.getByText('Types').click();
 		await expect(page.getByPlaceholder('Key')).toHaveValue('key2');
 	});
 

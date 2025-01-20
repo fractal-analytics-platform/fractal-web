@@ -45,6 +45,7 @@ test('Image list visibility in run workflow modal', async ({ page, workflow }) =
 		await expect(page.getByText(/Total results: 2/)).toBeVisible();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute a1'), 'v1');
 		await page.getByRole('button', { name: 'Apply' }).click();
+		await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute a2'), 'v2');
 		await page.getByRole('button', { name: 'Apply' }).click();
 		await expect(page.getByText(/Total results: 0/)).toBeVisible();
