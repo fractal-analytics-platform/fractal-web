@@ -385,7 +385,7 @@
 				body: JSON.stringify(params)
 			}
 		);
-		if (firstLoad) {
+		if (firstLoad && !runWorkflowModal) {
 			showTable = imagePage.total_count > 0;
 			firstLoad = false;
 		} else {

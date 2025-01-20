@@ -282,7 +282,7 @@
 				...task.type_filters
 			}
 		};
-		const response = await fetch(
+		let response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
 			{
 				method: 'POST',
@@ -299,6 +299,26 @@
 		imagePage = await response.json();
 		hasImages =
 			/** @type {import('fractal-components/types/api').ImagePage} */ (imagePage).total_count > 0;
+		if (!hasImages) {
+			// Verify if dataset without filters has images
+			let response = await fetch(
+				`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
+				{
+					method: 'POST',
+					headers,
+					credentials: 'include',
+					body: JSON.stringify({})
+				}
+			);
+			if (!response.ok) {
+				modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+				datasetImagesLoading = false;
+				return;
+			}
+			/** @type {import('fractal-components/types/api').ImagePage} */
+			const result = await response.json();
+			hasImages = result.total_count > 0;
+		}
 		datasetImagesLoading = false;
 		await tick();
 		datasetImagesTable?.load();
