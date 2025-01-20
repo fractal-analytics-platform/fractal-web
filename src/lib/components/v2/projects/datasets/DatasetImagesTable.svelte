@@ -263,6 +263,7 @@
 				showSearch: true,
 				allowDeselect: true,
 				isMultiple: true,
+				closeOnSelect: false,
 				ariaLabel: `Selector for attribute ${key}`
 			},
 			events: {
