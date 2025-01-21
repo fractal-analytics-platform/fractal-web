@@ -1,4 +1,5 @@
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
+import { createImage } from './image_utils.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('View images in run workflow modal', async ({ page, workflow }) => {
@@ -9,11 +10,11 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	const randomPath = `/tmp/${Math.random().toString(36).substring(7)}`;
+	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
@@ -35,23 +36,23 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await createImage(
 			page,
 			`${randomPath}/plate1.zarr/B/03/0`,
-			{ k1: 'v1', k2: 'v1' },
+			{ k1: 'k1v1', k2: 'k2v1' },
 			{ t1: false }
 		);
 		await createImage(
 			page,
 			`${randomPath}/plate1.zarr/B/03/1`,
-			{ k1: 'v1', k2: 'v2' },
+			{ k1: 'k1v1', k2: 'k2v2' },
 			{ t1: true }
 		);
 		await createImage(
 			page,
 			`${randomPath}/plate1.zarr/B/03/2`,
-			{ k1: 'v2', k2: 'v3' },
+			{ k1: 'k1v2', k2: 'k2v3' },
 			{ t1: false }
 		);
-		await createImage(page, `${randomPath}/plate1.zarr/B/03/3`, { k3: 'v1', k4: 'v1' });
-		await createImage(page, `${randomPath}/plate1.zarr/B/03/4`, { k3: 'v2', k4: 'v2' });
+		await createImage(page, `${randomPath}/plate1.zarr/B/03/3`, { k3: 'k3v1', k4: 'k4v1' });
+		await createImage(page, `${randomPath}/plate1.zarr/B/03/4`, { k3: 'k3v2', k4: 'k4v2' });
 	});
 
 	await test.step('Open workflow page', async () => {
@@ -62,7 +63,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 
 	await test.step('Check images', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
@@ -71,15 +71,15 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await test.step('Add dataset filters', async () => {
 		await page.goto(datasetUrl);
 		await waitPageLoading(page);
-		await page.getByRole('button', { name: 'Filters', exact: true }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Add attribute filter' }).click();
-		await modal.getByRole('combobox').first().selectOption('k1');
-		await selectSlimSelect(page, modal.getByLabel('Value'), 'v1');
+		await page.getByText('Current selection').click();
+		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
+		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'k1v1');
 		// Await slim-select change events are propagated before clicking the Save button
-		await new Promise((r) => setTimeout(r, 500));
-		await modal.getByRole('button', { name: 'Save' }).click();
+		//await new Promise((r) => setTimeout(r, 500));
+		await page.getByRole('button', { name: 'Apply', exact: true }).click();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 	});
 
@@ -87,7 +87,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(4);
@@ -97,7 +96,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 
 	await test.step('Add input filter', async () => {
 		await workflow.selectTask('generic_task');
-		await page.getByText('Input Filters').click();
+		await page.getByText('Types').click();
 		await page.getByRole('button', { name: 'Add type filter' }).click();
 		await page.getByPlaceholder('Key').last().fill('t1');
 		await page.getByRole('switch').click();
@@ -108,7 +107,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.waitForURL(workflow.url);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(3);
@@ -116,32 +114,3 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 	});
 });
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} zarrUrl
- * @param {{[key: string]: string}} attributes
- * @param {{[key: string]: boolean}} types
- */
-async function createImage(page, zarrUrl, attributes = {}, types = {}) {
-	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
-	await newImageBtn.waitFor();
-	await newImageBtn.click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
-	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(zarrUrl);
-	for (const [key, value] of Object.entries(attributes)) {
-		await modal.getByRole('button', { name: 'Add attribute' }).click();
-		await modal.getByPlaceholder('Key').last().fill(key);
-		await modal.getByPlaceholder('Value').last().fill(value);
-	}
-	for (const [key, value] of Object.entries(types)) {
-		await modal.getByRole('button', { name: 'Add type' }).click();
-		await modal.getByPlaceholder('Key').last().fill(key);
-		if (value) {
-			await modal.getByRole('switch').last().click();
-		}
-	}
-	await modal.getByRole('button', { name: 'Save' }).click();
-	await waitModalClosed(page);
-}

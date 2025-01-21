@@ -1,10 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import DatasetFiltersModal from '$lib/components/v2/projects/datasets/DatasetFiltersModal.svelte';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
+	import { onMount } from 'svelte';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -91,16 +91,6 @@
 		return result.images[0];
 	}
 
-	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} updatedDataset
-	 */
-	async function updateDatasetFiltersCallback(updatedDataset) {
-		dataset = updatedDataset;
-		if (useDatasetFilters) {
-			await imagesTable.reload();
-		}
-	}
-
 	async function handleExportDataset() {
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/export`,
@@ -134,6 +124,10 @@
 			linkElement.click();
 		}
 	}
+
+	onMount(() => {
+		imagesTable.load();
+	});
 </script>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -152,9 +146,6 @@
 	<div>
 		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal">
 			Info
-		</button>
-		<button class="btn btn-light" data-bs-target="#datasetFiltersModal" data-bs-toggle="modal">
-			Filters
 		</button>
 		<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
 			History
@@ -209,15 +200,17 @@
 	</div>
 {/if}
 
+<div id="datasetUpdateError" />
+
 <DatasetImagesTable
 	{dataset}
 	bind:imagePage
 	{vizarrViewerUrl}
-	{useDatasetFilters}
+	bind:useDatasetFilters
 	runWorkflowModal={false}
 	bind:this={imagesTable}
+	onDatasetsUpdated={(updated) => (dataset = updated)}
 />
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
-<DatasetFiltersModal {dataset} updateDatasetCallback={updateDatasetFiltersCallback} />
 <DatasetHistoryModal {dataset} />

@@ -6,11 +6,11 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	await waitPageLoading(page);
 
 	const randomPath = `/tmp/${Math.random().toString(36).substring(7)}`;
+	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
@@ -22,6 +22,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await page.getByRole('link', { name: 'test-dataset' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
 		await expect(page.getByText('No entries in the image list yet')).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Apply' })).not.toBeVisible();
 	});
 
 	await test.step('Create an image without filters', async () => {
@@ -62,7 +63,6 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Attempt to create an image with existing Zarr URL', async () => {
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(`${randomPath}/img1`);
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
@@ -74,7 +74,6 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Attempt to create an image with invalid Zarr URL', async () => {
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('foo');
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
@@ -109,24 +108,22 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Set dataset filters', async () => {
-		await page.getByRole('button', { name: 'Filters', exact: true }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Add attribute filter' }).click();
-		await modal.getByRole('combobox').first().selectOption('k1');
-		await selectSlimSelect(page, modal.getByLabel('Value'), 'v1');
-		// Await slim-select change events are propagated before clicking the Save button
-		await new Promise((r) => setTimeout(r, 500));
-		await modal.getByRole('button', { name: 'Save' }).click();
-		await waitModalClosed(page);
-	});
-
-	await test.step('Enable dataset filters', async () => {
 		await expect(page.getByRole('row')).toHaveCount(7);
-		const datasetFiltersBtn = page.getByText('Dataset filters').first();
+		const datasetFiltersBtn = page.getByText('Current selection').first();
 		await expect(datasetFiltersBtn).toBeEnabled();
 		await datasetFiltersBtn.click();
 		await expect(datasetFiltersBtn).toBeEnabled();
+		await expect(page.getByRole('row')).toHaveCount(7);
+		await page.getByText('Current selection').click();
+		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
+		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'v1');
+		await page.getByRole('button', { name: 'Apply', exact: true }).click();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+		await expect(page.getByRole('button', { name: 'Apply', exact: true })).toBeDisabled();
+		await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
 		await expect(page.getByRole('row')).toHaveCount(3);
 		const allImagesBtn = page.getByText('All images');
 		await allImagesBtn.click();
@@ -135,8 +132,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Edit image', async () => {
-		await page.getByRole('button', { name: 'Edit' }).nth(1).click();
-		const modal = page.locator('.modal.show');
+		await page.getByRole('row', { name: 'img2' }).getByRole('button', { name: 'Edit' }).click();
 		await modal.waitFor();
 		const zarrUrlInput = modal.getByRole('textbox', { name: 'Zarr URL' });
 		await expect(zarrUrlInput).toHaveValue(`${randomPath}/img2`);
@@ -156,7 +152,6 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Delete one image', async () => {
 		await page.getByRole('button', { name: 'Delete' }).first().click();
-		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByRole('row')).toHaveCount(6);

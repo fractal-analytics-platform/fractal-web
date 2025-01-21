@@ -475,7 +475,9 @@
 			console.error('Error retrieving workflow jobs', await response.json());
 			return;
 		}
-		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (await response.json());
+		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (
+			await response.json()
+		);
 		const failedJobs = jobs
 			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
 			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
@@ -792,7 +794,8 @@
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
 											on:click={() => setWorkflowTabContextId(3)}
 											aria-current={workflowTabContextId === 3}
-											>Input Filters
+										>
+											Types
 										</button>
 									</li>
 									<li class="nav-item">

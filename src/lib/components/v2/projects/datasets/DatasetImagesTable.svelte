@@ -4,10 +4,10 @@
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { objectChanged } from '$lib/common/component_utilities';
+	import { deepCopy, objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
-	import { onMount, tick } from 'svelte';
-	import { attributesChanged } from './attributes_utilities';
+	import { onDestroy, tick } from 'svelte';
+	import Tooltip from '$lib/components/common/Tooltip.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -27,24 +27,37 @@
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 
-	let showTable = imagePage.total_count > 0;
+	let datasetFiltersChanged = false;
+	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
+	export let onDatasetsUpdated = () => {};
+
+	let showTable = false;
+	let firstLoad = true;
+
+	/** @type {Tooltip|undefined} */
+	let currentSelectionTooltip;
 
 	/** @type {CreateUpdateImageModal|undefined} */
 	let imageModal = undefined;
 
 	let searching = false;
 	let resetting = false;
+	let savingDatasetFilters = false;
 
-	let reloading = false;
+	let loading = false;
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
-	let attributeFilters = getAttributeFilterBaseValues(imagePage);
+	let attributeFilters = {};
 
 	export function getAttributeFilters() {
-		return attributeFilters;
+		return removeNullValues(attributeFilters);
+	}
+
+	export function getTypeFilters() {
+		return removeNullValues(typeFilters);
 	}
 
 	/** @type {{ [key: string]: boolean | null }}} */
-	let typeFilters = getTypeFilterBaseValues(imagePage);
+	let typeFilters = {};
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
@@ -113,7 +126,7 @@
 		return relativePath;
 	}
 
-	async function applySearchFields() {
+	export async function applySearchFields() {
 		searching = true;
 		await searchImages();
 		resetBtnActive =
@@ -125,25 +138,44 @@
 	async function resetSearchFields() {
 		resetBtnActive = false;
 		resetting = true;
-		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		typeFilters = getTypeFilterBaseValues(imagePage);
+		if (useDatasetFilters) {
+			attributeFilters = deepCopy(dataset.attribute_filters);
+			typeFilters = deepCopy(dataset.type_filters);
+		} else {
+			attributeFilters = getAttributeFilterBaseValues(imagePage);
+			typeFilters = getTypeFilterBaseValues(imagePage);
+		}
 		await tick();
 		await searchImages();
 		resetting = false;
 	}
 
-	export async function reload() {
-		reloading = true;
-		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		typeFilters = getTypeFilterBaseValues(imagePage);
+	export async function load() {
+		loading = true;
+		currentSelectionTooltip?.setEnabled(!useDatasetFilters);
+		if (useDatasetFilters) {
+			attributeFilters = deepCopy(dataset.attribute_filters);
+			typeFilters = deepCopy(dataset.type_filters);
+		} else {
+			attributeFilters = getAttributeFilterBaseValues(imagePage);
+			typeFilters = getTypeFilterBaseValues(imagePage);
+		}
 		await tick();
 		await searchImages();
-		reloading = false;
+		loading = false;
 	}
 
-	onMount(() => {
-		loadAttributesSelectors();
-		loadTypesSelector();
+	onDestroy(() => {
+		for (const selector of Object.values(attributesSelectors)) {
+			selector.destroy();
+		}
+		for (const selector of Object.values(typesSelectors)) {
+			selector.destroy();
+		}
+		attributesSelectors = {};
+		typesSelectors = {};
+		attributeFilters = {};
+		typeFilters = {};
 	});
 
 	function loadAttributesSelectors() {
@@ -224,12 +256,14 @@
 			throw new Error(`Unable to find selector element with key ${key}`);
 		}
 		selectElement.classList.remove('invisible');
+		selectElement.setAttribute('multiple', 'multiple');
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
 				showSearch: true,
 				allowDeselect: true,
 				isMultiple: true,
+				closeOnSelect: false,
 				ariaLabel: `Selector for attribute ${key}`
 			},
 			events: {
@@ -344,7 +378,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}&use_dataset_filters=${useDatasetFilters}`,
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
 			{
 				method: 'POST',
 				headers,
@@ -352,7 +386,12 @@
 				body: JSON.stringify(params)
 			}
 		);
-		showTable = true;
+		if (firstLoad && !runWorkflowModal) {
+			showTable = imagePage.total_count > 0;
+			firstLoad = false;
+		} else {
+			showTable = true;
+		}
 		if (response.ok) {
 			imagePage = await response.json();
 			await tick();
@@ -369,7 +408,7 @@
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'searchError'
+				'datasetImagesError'
 			);
 		}
 	}
@@ -456,6 +495,80 @@
 			selector.setSelected(values.map((v) => v.toString()));
 		}
 	}
+
+	$: if (attributeFilters && typeFilters) {
+		datasetFiltersChanged =
+			!applyBtnActive &&
+			(attributesChanged(dataset.attribute_filters, removeNullValues(attributeFilters)) ||
+				objectChanged(dataset.type_filters, removeNullValues(typeFilters)));
+	}
+
+	$: if (dataset) {
+		resetBtnActive = false;
+	}
+
+	/**
+	 * @param {{ [key: string]: any }} map
+	 */
+	function removeNullValues(map) {
+		return Object.fromEntries(Object.entries(map).filter(([, v]) => v !== null));
+	}
+
+	/**
+	 * @param {{ [key: string]: null | Array<string | number | boolean> }} oldObject
+	 * @param {{ [key: string]: null | Array<string | number | boolean> }} newObject
+	 */
+	function attributesChanged(oldObject, newObject) {
+		if (Object.keys(oldObject).length !== Object.keys(newObject).length) {
+			return true;
+		}
+		for (const [oldKey, oldValue] of Object.entries(oldObject)) {
+			if (!(oldKey in newObject)) {
+				return true;
+			}
+			const newValue = newObject[oldKey];
+			if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+				if (oldValue.length !== newValue.length) {
+					return true;
+				}
+				for (const ov of oldValue) {
+					if (!newValue.includes(ov)) {
+						return true;
+					}
+				}
+			} else if (oldValue !== newValue) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	async function saveDatasetFilters() {
+		errorAlert?.hide();
+		savingDatasetFilters = true;
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify({
+				attribute_filters: getAttributeFilters(),
+				type_filters: getTypeFilters()
+			})
+		});
+		if (response.ok) {
+			const result = await response.json();
+			dataset = result;
+			onDatasetsUpdated(dataset);
+		} else {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'datasetImagesError'
+			);
+		}
+		savingDatasetFilters = false;
+	}
 </script>
 
 {#if !showTable}
@@ -470,7 +583,7 @@
 	<div>
 		<div class="row">
 			<div class="col">
-				<div id="searchError" class="mt-2 mb-2" />
+				<div id="datasetImagesError" class="mt-2 mb-2" />
 			</div>
 		</div>
 
@@ -521,11 +634,7 @@
 								<div class="row">
 									<div class="col">
 										<div class="attribute-select-wrapper mb-1">
-											<select
-												id="attribute-{getIdFromValue(attributeKey)}"
-												class="invisible"
-												multiple
-											/>
+											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" />
 										</div>
 									</div>
 								</div>
@@ -563,6 +672,17 @@
 								{/if}
 								Reset
 							</button>
+							{#if !runWorkflowModal && useDatasetFilters}
+								<ConfirmActionButton
+									modalId="confirmSaveDatasetFilters"
+									label="Save"
+									message="Save dataset filters"
+									disabled={!datasetFiltersChanged || savingDatasetFilters}
+									callbackAction={async () => {
+										await saveDatasetFilters();
+									}}
+								/>
+							{/if}
 						</th>
 					</tr>
 				</thead>
@@ -639,25 +759,32 @@
 							autocomplete="off"
 							value={false}
 							bind:group={useDatasetFilters}
-							on:change={reload}
-							disabled={reloading || searching || resetting}
+							on:change={load}
+							disabled={loading || searching || resetting}
 						/>
 						<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
-						<input
-							type="radio"
-							class="btn-check"
-							name="filters-switch"
-							id="dataset-filters"
-							autocomplete="off"
-							value={true}
-							bind:group={useDatasetFilters}
-							on:change={reload}
-							disabled={reloading || searching || resetting}
-						/>
-						<label class="btn btn-white btn-outline-primary" for="dataset-filters">
-							Dataset filters
-						</label>
-						{#if reloading}
+						<Tooltip
+							id="current-selection-label"
+							title="These are default selection for images on which a workflow will be run"
+							placement="bottom"
+							bind:this={currentSelectionTooltip}
+						>
+							<input
+								type="radio"
+								class="btn-check"
+								name="filters-switch"
+								id="current-selection"
+								autocomplete="off"
+								value={true}
+								bind:group={useDatasetFilters}
+								on:change={load}
+								disabled={loading || searching || resetting}
+							/>
+							<label class="btn btn-white btn-outline-primary" for="current-selection">
+								Current selection
+							</label>
+						</Tooltip>
+						{#if loading}
 							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 						{/if}
 					{/if}

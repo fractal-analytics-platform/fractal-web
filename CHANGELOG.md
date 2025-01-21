@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Displayed input/output task type in "Type" tab on workflow page (\#691);
+* Removed dataset filters modal, implemented editing of dataset filters directly inside the image list table (\#691);
 * Refactored code to new filters format and sent selected filters in run workflow modal (\#686);
 * Displayed list of images that would be processed by the first task of a job (\#686);
 * Added environment variable `ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS`, to enable attribute filters on the "Run workflow" modal (\#686);
