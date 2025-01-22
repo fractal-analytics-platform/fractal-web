@@ -650,13 +650,15 @@
 
 	<div class="col-lg-4 mb-2">
 		<div class="float-end">
-			<button
-				class="btn btn-light"
-				on:click|preventDefault={() => typeFiltersFlowModal.open()}
-				disabled={workflow.task_list.length === 0}
-			>
-				Type filters flow
-			</button>
+			{#if $page.data.userInfo.is_superuser}
+				<button
+					class="btn btn-light"
+					on:click|preventDefault={() => typeFiltersFlowModal.open()}
+					disabled={workflow.task_list.length === 0}
+				>
+					Type filters flow
+				</button>
+			{/if}
 			<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
 				<i class="bi-journal-code" /> List jobs
 			</a>

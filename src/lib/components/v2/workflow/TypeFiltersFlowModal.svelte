@@ -22,6 +22,9 @@
 	let firstTaskIndex = undefined;
 	/** @type {number|undefined} */
 	let lastTaskIndex = undefined;
+	let selectedTypeFilter = '';
+	/** @type {string[]} */
+	let typeFilters = [];
 
 	export async function open() {
 		firstTaskIndex = undefined;
@@ -55,11 +58,25 @@
 
 		if (response.ok) {
 			typeFiltersFlow = await response.json();
+			typeFilters = getUniqueTypeFilters();
+			if (!typeFilters.includes(selectedTypeFilter)) {
+				selectedTypeFilter = '';
+			}
 		} else {
 			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 
 		loading = false;
+	}
+
+	function getUniqueTypeFilters() {
+		if (!typeFiltersFlow) {
+			return [];
+		}
+		const allTypeFilters = typeFiltersFlow.dataset_filters.flatMap((f) => Object.keys(f));
+		return [...new Set(allTypeFilters)].sort((t1, t2) =>
+			t1.localeCompare(t2, undefined, { sensitivity: 'base' })
+		);
 	}
 
 	async function onFirstTaskChanged() {
@@ -140,16 +157,29 @@
 						</select>
 					</div>
 				</div>
+				<div class="col">
+					<div class="input-group mb-3">
+						<label class="input-group-text" for="typeFiltersFlowTypeFilter">Type</label>
+						<select
+							class="form-select"
+							id="typeFiltersFlowTypeFilter"
+							bind:value={selectedTypeFilter}
+						>
+							<option value="">Select...</option>
+							{#each typeFilters as type}
+								<option value={type}>{type}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
 			</div>
 			<div class="table-responsive">
 				<table class="table table-striped table-bordered">
 					<thead>
 						<tr>
 							<th>Task</th>
-							<th>Dataset filters</th>
-							<th>Input filters</th>
-							<th>Output filters</th>
-							<th>Dataset filters</th>
+							<th>Pre</th>
+							<th>Post</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -163,16 +193,16 @@
 										].task.name}
 									</td>
 									<td>
-										<TypeFiltersCell filters={typeFiltersFlow.dataset_filters[index]} />
+										<TypeFiltersCell
+											{selectedTypeFilter}
+											filters={typeFiltersFlow.dataset_filters[index]}
+										/>
 									</td>
 									<td>
-										<TypeFiltersCell filters={typeFiltersFlow.input_filters[index]} />
-									</td>
-									<td>
-										<TypeFiltersCell filters={typeFiltersFlow.output_filters[index]} />
-									</td>
-									<td>
-										<TypeFiltersCell filters={typeFiltersFlow.dataset_filters[index + 1]} />
+										<TypeFiltersCell
+											{selectedTypeFilter}
+											filters={typeFiltersFlow.dataset_filters[index + 1]}
+										/>
 									</td>
 								</tr>
 							{/each}

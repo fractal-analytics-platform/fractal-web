@@ -61,16 +61,11 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 		await expect(rows.nth(1).getByRole('cell').nth(0)).toHaveText('cellpose_segmentation');
 		await expect(rows.nth(1).getByRole('cell').nth(1)).toContainText('t1');
 		await expect(rows.nth(1).getByRole('cell').nth(2)).toContainText('t1');
-		await expect(rows.nth(1).getByRole('cell').nth(4)).toContainText('t1');
 		// Second row
 		await expect(rows.nth(2).getByRole('cell').nth(0)).toHaveText('MIP_compound');
 		await expect(rows.nth(2).getByRole('cell').nth(1)).toContainText('t1');
 		await expect(rows.nth(2).getByRole('cell').nth(2)).toContainText('t1');
 		await expect(rows.nth(2).getByRole('cell').nth(2)).toContainText('3D');
-		await expect(rows.nth(2).getByRole('cell').nth(3)).toContainText('3D');
-		await expect(rows.nth(2).getByRole('cell').nth(3)).not.toContainText('t1');
-		await expect(rows.nth(2).getByRole('cell').nth(4)).toContainText('t1');
-		await expect(rows.nth(2).getByRole('cell').nth(4)).toContainText('3D');
 		// Third row
 		await expect(rows.nth(3).getByRole('cell').nth(0)).toHaveText('illumination_correction');
 		await expect(rows.nth(3).getByRole('cell').nth(1)).toContainText('t1');
