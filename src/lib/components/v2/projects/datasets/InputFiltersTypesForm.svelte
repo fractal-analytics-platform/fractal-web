@@ -2,7 +2,8 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	export let filters = true;
+	/** @type {import("fractal-components/types/api").TaskV2} */
+	export let task;
 
 	/** @type {{ [key: string]: boolean }} */
 	let initialTypeFields = {};
@@ -68,11 +69,17 @@
 				validFields = false;
 				continue;
 			}
+			if (Object.keys(task.input_types).includes(typeField.key)) {
+				typeField.error = 'Filter already present in task.input_types';
+				validFields = false;
+				continue;
+			}
 			if (typesKey.includes(typeField.key)) {
 				typeField.error = 'Duplicated key';
 				validFields = false;
 				continue;
 			} else {
+				typeField.error = '';
 				typesKey.push(typeField.key);
 			}
 		}
@@ -98,7 +105,7 @@
 		}
 	}
 
-	async function addType() {
+	async function addTypeFilter() {
 		const item = { key: '', value: false, error: '' };
 		typeFields = [...typeFields, item];
 		// Set focus to last key input
@@ -117,13 +124,7 @@
 </script>
 
 {#if typeFields.length > 0}
-	<h5>
-		{#if filters}
-			Type filters
-		{:else}
-			Types
-		{/if}
-	</h5>
+	<h5>Type filters</h5>
 {/if}
 {#each typeFields as field, index}
 	<div class="row">
@@ -152,7 +153,7 @@
 					class="btn btn-outline-danger"
 					type="button"
 					on:click={() => removeType(index)}
-					aria-label={filters ? 'Remove type filter' : 'Remove type'}
+					aria-label="Remove type filter"
 				>
 					<i class="bi bi-trash" />
 				</button>
@@ -166,12 +167,8 @@
 
 <div class="row mb-3">
 	<div class="col-12">
-		<button class="btn btn-outline-primary" type="button" on:click={addType}>
-			{#if filters}
-				Add type filter
-			{:else}
-				Add type
-			{/if}
+		<button class="btn btn-outline-primary" type="button" on:click={addTypeFilter}>
+			Add type filter
 		</button>
 	</div>
 </div>

@@ -131,7 +131,7 @@
 </script>
 
 <div class="p-3">
-	<InputFiltersTypesForm bind:this={form} />
+	<InputFiltersTypesForm task={workflowTask.task} bind:this={form} />
 
 	{#if loadingDatasetFilters}
 		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true" />
