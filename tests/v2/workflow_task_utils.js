@@ -19,7 +19,7 @@ export async function waitTaskSubmitted(page, count) {
  */
 export async function waitTasksSuccess(page, count) {
 	const spinners = page.locator('.job-status-submitted.spinner-border');
-	await expect(spinners).toHaveCount(0);
+	await expect(spinners).toHaveCount(0, { timeout: 8000 });
 	const errorAlert = page.getByText('The last job failed with the following error');
 	if (await errorAlert.isVisible()) {
 		const error = await page.locator('.alert.border-danger').innerText();

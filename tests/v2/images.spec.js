@@ -64,6 +64,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	await test.step('Attempt to create an image with existing Zarr URL', async () => {
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
 		await modal.waitFor();
+		await expect(modal.getByRole('textbox', { name: 'Zarr URL' })).toHaveValue(`${randomPath}/`);
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(`${randomPath}/img1`);
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
