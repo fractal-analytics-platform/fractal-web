@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Pre-populated the image zarr_url (\#703);
+* Added validation for type filters and input types compatibility (\#703);
 * Displayed input/output task type in "Type" tab on workflow page (\#691);
 * Removed dataset filters modal, implemented editing of dataset filters directly inside the image list table (\#691);
 * Refactored code to new filters format and sent selected filters in run workflow modal (\#686);
