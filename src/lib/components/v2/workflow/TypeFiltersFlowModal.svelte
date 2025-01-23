@@ -179,6 +179,8 @@
 						<tr>
 							<th>Task</th>
 							<th>Pre</th>
+							<th>Input</th>
+							<th>Output</th>
 							<th>Post</th>
 						</tr>
 					</thead>
@@ -196,6 +198,18 @@
 										<TypeFiltersCell
 											{selectedTypeFilter}
 											filters={typeFiltersFlow.dataset_filters[index]}
+										/>
+									</td>
+									<td>
+										<TypeFiltersCell
+											{selectedTypeFilter}
+											filters={typeFiltersFlow.input_filters[index]}
+										/>
+									</td>
+									<td>
+										<TypeFiltersCell
+											{selectedTypeFilter}
+											filters={typeFiltersFlow.output_filters[index]}
 										/>
 									</td>
 									<td>
