@@ -5,6 +5,7 @@
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 	import { removeIdenticalTaskGroups } from 'fractal-components/tasks/task_group_utilities';
 	import { formatMarkdown } from '$lib/common/component_utilities';
+	import { tick } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	export let workflow;
@@ -37,6 +38,11 @@
 		}
 		const allTaskGroups = await response.json();
 		taskGroups = removeIdenticalTaskGroups(allTaskGroups, user);
+		await tick();
+		const searchInput = document.querySelector('#addWorkflowTaskModal input');
+		if (searchInput instanceof HTMLElement) {
+			searchInput.focus();
+		}
 	}
 
 	/**
