@@ -4,7 +4,7 @@ import { waitModalClosed, waitPageLoading } from '../utils';
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} projectId
- * @returns {Promise<{name: string, id: number}>} the name and the id of the created dataset
+ * @returns {Promise<{name: string, id: number, zarrDir: string}>} the name and the id of the created dataset
  */
 export async function createDataset(page, projectId) {
 	await page.goto(`/v2/projects/${projectId}`);
@@ -16,8 +16,10 @@ export async function createDataset(page, projectId) {
 	await modal.waitFor();
 
 	const randomDatasetName = Math.random().toString(36).substring(7);
+	const zarrDir = `/tmp/playwright/datasets/${randomDatasetName}`;
+
 	await page.getByRole('textbox', { name: 'Dataset Name' }).fill(randomDatasetName);
-	await page.getByRole('textbox', { name: 'Zarr dir' }).fill(`/tmp/playwright/datasets/${randomDatasetName}`);
+	await page.getByRole('textbox', { name: 'Zarr dir' }).fill(zarrDir);
 	const saveBtn = page.getByRole('button', { name: 'Save' });
 	await saveBtn.click();
 	await waitModalClosed(page);
@@ -28,9 +30,7 @@ export async function createDataset(page, projectId) {
 	for (const row of datasetRows) {
 		const firstCellContent = await row.getByRole('cell').first().innerText();
 		if (randomDatasetName === firstCellContent.trim()) {
-			datasetPageLink = /**@type {string}*/ (
-				await row.getByRole('link').getAttribute('href')
-			);
+			datasetPageLink = /**@type {string}*/ (await row.getByRole('link').getAttribute('href'));
 			break;
 		}
 	}
@@ -42,5 +42,5 @@ export async function createDataset(page, projectId) {
 		throw new Error('Unable to extract dataset id');
 	}
 	const datasetId = match[1];
-	return { name: randomDatasetName, id: Number(datasetId) };
+	return { name: randomDatasetName, id: Number(datasetId), zarrDir };
 }

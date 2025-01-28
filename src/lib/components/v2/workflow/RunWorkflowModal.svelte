@@ -231,7 +231,7 @@
 			} else {
 				appliedAttributeFilters = { ...dataset.attribute_filters };
 			}
-			appliedTypeFilters = { ...dataset.type_filters, ...wft.type_filters };
+			appliedTypeFilters = getTypeFilterValues(dataset, wft);
 		}
 		checkingConfiguration = true;
 	}
@@ -277,11 +277,7 @@
 			attribute_filters: {
 				...dataset.attribute_filters
 			},
-			type_filters: {
-				...dataset.type_filters,
-				...workflowTask.type_filters,
-				...workflowTask.task.input_types
-			}
+			type_filters: getTypeFilterValues(dataset, workflowTask)
 		};
 		let response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
@@ -323,6 +319,18 @@
 		datasetImagesLoading = false;
 		await tick();
 		datasetImagesTable?.load();
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 */
+	function getTypeFilterValues(dataset, workflowTask) {
+		return {
+			...dataset.type_filters,
+			...workflowTask.type_filters,
+			...workflowTask.task.input_types
+		};
 	}
 
 	async function cancel() {
