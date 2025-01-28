@@ -305,6 +305,7 @@
 						<div class="input-group input-group-sm">
 							<input
 								type="text"
+								id="taskGenericSearchInput"
 								bind:value={genericSearch}
 								class="form-control ms-auto"
 								placeholder="Search..."
