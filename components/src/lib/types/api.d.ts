@@ -1,25 +1,25 @@
 import type { JSONSchemaObjectProperty } from './jschema';
 
 export type User = {
-  id?: number
-  email: string
-  is_active: boolean
-  is_superuser: boolean
-  is_verified: boolean
-  username: string | null
-  password?: string
-  group_ids_names : Array<[number, string]> | null
-  oauth_accounts: Array<{
-    id: number
-    account_email: string
-    oauth_name: string
-  }>
+	id?: number
+	email: string
+	is_active: boolean
+	is_superuser: boolean
+	is_verified: boolean
+	username: string | null
+	password?: string
+	group_ids_names: Array<[number, string]> | null
+	oauth_accounts: Array<{
+		id: number
+		account_email: string
+		oauth_name: string
+	}>
 }
 
 export type DatasetHistoryItem = {
-  workflowtask: WorkflowTask
-  status: string
-  parallelization: object
+	workflowtask: WorkflowTask
+	status: string
+	parallelization: object
 }
 
 export type ProjectV2 = {
@@ -234,3 +234,9 @@ export type TaskGroupActivityV2 = {
 	action: TaskGroupActivityActionV2;
 	log: string | null;
 };
+
+export type TypeFiltersFlow = {
+	dataset_filters: Array<{ [key: string]: bool }>
+	input_filters: Array<{ [key: string]: bool }>
+	output_filters: Array<{ [key: string]: bool }>
+}

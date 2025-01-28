@@ -20,6 +20,7 @@
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
+	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -76,6 +77,8 @@
 	let addWorkflowTaskModal;
 	/** @type {Modal} */
 	let editWorkflowModal;
+	/** @type {TypeFiltersFlowModal} */
+	let typeFiltersFlowModal;
 
 	/** @type {{ [id: string]: import('fractal-components/types/api').TaskV2[] }} */
 	let newVersionsMap = {};
@@ -594,7 +597,7 @@
 	</nav>
 </div>
 <div class="row mt-2">
-	<div class="col-lg-9">
+	<div class="col-lg-8">
 		<div class="row">
 			<div class="col-lg-4 col-md-6">
 				<div class="input-group mb-3">
@@ -645,8 +648,17 @@
 		</div>
 	</div>
 
-	<div class="col-lg-3 mb-2">
+	<div class="col-lg-4 mb-2">
 		<div class="float-end">
+			{#if $page.data.userInfo.is_superuser}
+				<button
+					class="btn btn-light"
+					on:click|preventDefault={() => typeFiltersFlowModal.open()}
+					disabled={workflow.task_list.length === 0}
+				>
+					Type filters flow
+				</button>
+			{/if}
 			<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
 				<i class="bi-journal-code" /> List jobs
 			</a>
@@ -669,6 +681,13 @@
 		</div>
 	</div>
 </div>
+
+<TypeFiltersFlowModal
+	{workflow}
+	{selectedDatasetId}
+	datasets={sortedDatasets}
+	bind:this={typeFiltersFlowModal}
+/>
 
 {#if workflow}
 	<StandardDismissableAlert message={workflowSuccessMessage} />
