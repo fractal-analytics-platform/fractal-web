@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Added type filters flow modal (\#701);
 * Pre-populated the image zarr_url (\#703);
 * Added validation for type filters and input types compatibility (\#703);
 * Displayed input/output task type in "Type" tab on workflow page (\#691);
