@@ -27,7 +27,10 @@
 	export function openForCreate() {
 		isNew = true;
 		saving = false;
-		zarr_url = '';
+		zarr_url = dataset.zarr_dir;
+		if (!zarr_url.endsWith('/')) {
+			zarr_url += '/';
+		}
 		attributesTypesForm.init({}, {});
 		formErrorHandler.clearErrors();
 		modal.show();

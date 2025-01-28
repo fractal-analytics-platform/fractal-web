@@ -66,17 +66,24 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await workflow.openWorkflowPage();
 	});
 
+	await test.step('Test type filters compatibility validation', async () => {
+		await workflow.addTask('MIP_compound');
+		await workflow.selectTask('MIP_compound');
+		await page.getByText('Types').click();
+		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
+		await page.getByPlaceholder('Key').fill('3D');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('Filter already present in task.input_types')).toBeVisible();
+		await workflow.removeCurrentTask();
+	});
+
 	await test.step('Add tasks to workflow', async () => {
 		await workflow.addTask(taskName1);
 		await workflow.addTask(taskName2);
 		await workflow.selectTask(taskName1);
 	});
 
-	await test.step('Open Input Filters tab', async () => {
-		await page.getByText('Types').click();
-	});
-
-	await test.step('Add empty attribute filter and trigger validation', async () => {
+	await test.step('Add empty attribute filter and trigger empty key validation', async () => {
 		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.getByText('Key is required').waitFor();

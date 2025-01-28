@@ -73,7 +73,11 @@
 		if (initialFilterValues === null) {
 			return null;
 		}
-		return initialFilterValues.attribute_filters[key];
+		const value = initialFilterValues.attribute_filters[key];
+		if (value === undefined) {
+			return null;
+		}
+		return value;
 	}
 
 	/**

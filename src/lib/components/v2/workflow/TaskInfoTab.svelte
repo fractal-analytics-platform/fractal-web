@@ -1,6 +1,5 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import("fractal-components/types/api").TaskV2} */
 	export let task;

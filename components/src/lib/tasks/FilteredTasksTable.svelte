@@ -56,6 +56,7 @@
 		if (!taskGroups) {
 			return;
 		}
+		genericSearch = '';
 		setFiltersValues(taskGroups);
 		allRows = buildWorkflowTaskTableRows(taskGroups, groupBy);
 		filterRows();

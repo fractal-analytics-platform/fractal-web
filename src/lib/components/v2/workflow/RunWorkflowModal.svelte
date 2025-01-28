@@ -265,7 +265,7 @@
 		}
 
 		datasetImagesLoading = true;
-		const task = workflow.task_list[firstTaskIndex];
+		const workflowTask = workflow.task_list[firstTaskIndex];
 
 		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
 			selectedDataset
@@ -279,7 +279,8 @@
 			},
 			type_filters: {
 				...dataset.type_filters,
-				...task.type_filters
+				...workflowTask.type_filters,
+				...workflowTask.task.input_types
 			}
 		};
 		let response = await fetch(
