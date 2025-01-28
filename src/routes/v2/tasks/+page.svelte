@@ -3,6 +3,7 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	let taskGroups = $page.data.taskGroups;
@@ -20,6 +21,13 @@
 		selectedTaskRow = taskRow;
 		modal.show();
 	}
+
+	onMount(() => {
+		const genericSearchInput = document.getElementById('taskGenericSearchInput');
+		if (genericSearchInput instanceof HTMLElement) {
+			genericSearchInput.focus();
+		}
+	});
 </script>
 
 {#if taskGroups.length > 0}

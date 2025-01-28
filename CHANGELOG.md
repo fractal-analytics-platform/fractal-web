@@ -1,6 +1,15 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
 # Unreleased
+
+* Added type filters flow modal (\#701);
+* Pre-populated the image zarr_url (\#703);
+* Added validation for type filters and input types compatibility (\#703);
+* Displayed input/output task type in "Type" tab on workflow page (\#691);
+* Removed dataset filters modal, implemented editing of dataset filters directly inside the image list table (\#691);
+* Refactored code to new filters format and sent selected filters in run workflow modal (\#686);
+* Displayed list of images that would be processed by the first task of a job (\#686);
+* Added environment variable `ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS`, to enable attribute filters on the "Run workflow" modal (\#686);
 * Fixed findings based on `zizmor 1.0.1` audit (\#687).
 
 # 1.14.0

@@ -25,19 +25,6 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
 	});
 
-	await test.step('Add attribute filter', async () => {
-		const addFilterBtn = page.getByRole('button', { name: 'Add attribute filter' });
-		await addFilterBtn.click();
-		await page.getByPlaceholder('Key').fill('key1');
-		await page.getByPlaceholder('Value').fill('value1');
-	});
-
-	await test.step('Add type filter', async () => {
-		const addFilterBtn = page.getByRole('button', { name: 'Add type filter' });
-		await addFilterBtn.click();
-		await page.getByPlaceholder('Key').nth(1).fill('key2');
-	});
-
 	await test.step('Save dataset', async () => {
 		const saveBtn = page.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
@@ -109,32 +96,6 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 
 	await test.step('Close info modal', async () => {
 		await page.locator('.modal.show').getByLabel('Close').click();
-		await waitModalClosed(page);
-	});
-
-	await test.step('Open filters modal', async () => {
-		await page.getByRole('button', { name: 'Filters' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		expect(await page.getByPlaceholder('Key').nth(0).inputValue()).toEqual('key1');
-		expect(await page.getByPlaceholder('Value').inputValue()).toEqual('value1');
-		expect(await page.getByPlaceholder('Key').nth(1).inputValue()).toEqual('key2');
-	});
-
-	await test.step('Edit filters', async () => {
-		await page.getByPlaceholder('Key').nth(0).fill('key1-renamed');
-		await page.getByPlaceholder('Value').fill('value1-renamed');
-		await page.locator('.modal.show').getByRole('button', { name: 'Save' }).click();
-	});
-
-	await test.step('Open filters modal again and verify the saved content', async () => {
-		await page.getByRole('button', { name: 'Filters' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		expect(await page.getByPlaceholder('Key').nth(0).inputValue()).toEqual('key1-renamed');
-		expect(await page.getByPlaceholder('Value').inputValue()).toEqual('value1-renamed');
-		expect(await page.getByPlaceholder('Key').nth(1).inputValue()).toEqual('key2');
-		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});
 

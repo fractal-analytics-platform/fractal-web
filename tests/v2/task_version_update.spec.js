@@ -148,12 +148,9 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add Input Filters', async () => {
-		await page.getByText('Input Filters').click();
-		await page.getByRole('button', { name: 'Add attribute filter', exact: true }).click();
-		await page.getByPlaceholder('Key').fill('key1');
-		await page.getByPlaceholder('Value').fill('value1');
+		await page.getByText('Types').click();
 		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
-		await page.getByPlaceholder('Key').nth(1).fill('key2');
+		await page.getByPlaceholder('Key').fill('key2');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
 	});
@@ -177,10 +174,8 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Verify that input filters have been preserved', async () => {
-		await page.getByText('Input Filters').click();
-		await expect(page.getByPlaceholder('Key').first()).toHaveValue('key1');
-		await expect(page.getByPlaceholder('Value')).toHaveValue('value1');
-		await expect(page.getByPlaceholder('Key').nth(1)).toHaveValue('key2');
+		await page.getByText('Types').click();
+		await expect(page.getByPlaceholder('Key')).toHaveValue('key2');
 	});
 
 	await test.step('Verify that task order is preserved', async () => {

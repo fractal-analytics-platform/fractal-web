@@ -3,7 +3,7 @@ import { waitModalClosed, waitPageLoading } from '../utils';
 
 test('Admin task-group activities page', async ({ page }) => {
 	await test.step('Open task-group activities page', async () => {
-		page.goto('/v2/admin/task-groups/activities');
+		await page.goto('/v2/admin/task-groups/activities');
 		await waitPageLoading(page);
 	});
 

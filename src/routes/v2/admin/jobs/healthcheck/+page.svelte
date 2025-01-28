@@ -65,8 +65,7 @@
 			headers,
 			body: JSON.stringify({
 				name: 'test',
-				zarr_dir: zarrDir,
-				filters: { attributes: {}, types: {} }
+				zarr_dir: zarrDir
 			})
 		});
 
@@ -175,7 +174,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify({ first_task_index: 0 })
+				body: JSON.stringify({ first_task_index: 0, attribute_filters: {} })
 			}
 		);
 		if (!response.ok) {

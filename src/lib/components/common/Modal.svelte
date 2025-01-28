@@ -1,6 +1,6 @@
 <script>
 	import { displayStandardErrorAlert } from '$lib/common/errors';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	export let id;
 	export let onOpen = () => {};
@@ -26,10 +26,11 @@
 				hideErrorAlert();
 				onOpen();
 			});
-			modal.addEventListener('shown.bs.modal', () => {
+			modal.addEventListener('shown.bs.modal', async () => {
+				await tick();
 				// Automatically set focus on first input element (if any)
 				if (inputAutofocus) {
-					const firstInput = document.querySelector(`#${id} input`);
+					const firstInput = document.querySelector(`#${id} input[type="text"]`);
 					if (firstInput instanceof HTMLElement) {
 						firstInput.focus();
 					}

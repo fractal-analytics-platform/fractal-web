@@ -20,6 +20,7 @@
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
+	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -28,6 +29,7 @@
 	$: project = workflow.project;
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	let datasets = $page.data.datasets;
+	let attributeFiltersEnabled = $page.data.attributeFiltersEnabled;
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
@@ -75,6 +77,8 @@
 	let addWorkflowTaskModal;
 	/** @type {Modal} */
 	let editWorkflowModal;
+	/** @type {TypeFiltersFlowModal} */
+	let typeFiltersFlowModal;
 
 	/** @type {{ [id: string]: import('fractal-components/types/api').TaskV2[] }} */
 	let newVersionsMap = {};
@@ -324,8 +328,9 @@
 		} else if (metaPropertiesForm?.hasUnsavedChanges()) {
 			toggleMetaPropertiesUnsavedChangesModal();
 		} else {
-			runWorkflowModal.open(action);
 			await reloadSelectedDataset();
+			await tick();
+			runWorkflowModal.open(action);
 		}
 	}
 
@@ -473,7 +478,9 @@
 			console.error('Error retrieving workflow jobs', await response.json());
 			return;
 		}
-		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (await response.json());
+		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (
+			await response.json()
+		);
 		const failedJobs = jobs
 			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
 			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
@@ -590,7 +597,7 @@
 	</nav>
 </div>
 <div class="row mt-2">
-	<div class="col-lg-9">
+	<div class="col-lg-8">
 		<div class="row">
 			<div class="col-lg-4 col-md-6">
 				<div class="input-group mb-3">
@@ -641,8 +648,17 @@
 		</div>
 	</div>
 
-	<div class="col-lg-3 mb-2">
+	<div class="col-lg-4 mb-2">
 		<div class="float-end">
+			{#if $page.data.userInfo.is_superuser}
+				<button
+					class="btn btn-light"
+					on:click|preventDefault={() => typeFiltersFlowModal.open()}
+					disabled={workflow.task_list.length === 0}
+				>
+					Type filters flow
+				</button>
+			{/if}
 			<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
 				<i class="bi-journal-code" /> List jobs
 			</a>
@@ -665,6 +681,13 @@
 		</div>
 	</div>
 </div>
+
+<TypeFiltersFlowModal
+	{workflow}
+	{selectedDatasetId}
+	datasets={sortedDatasets}
+	bind:this={typeFiltersFlowModal}
+/>
 
 {#if workflow}
 	<StandardDismissableAlert message={workflowSuccessMessage} />
@@ -790,7 +813,8 @@
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
 											on:click={() => setWorkflowTabContextId(3)}
 											aria-current={workflowTabContextId === 3}
-											>Input Filters
+										>
+											Types
 										</button>
 									</li>
 									<li class="nav-item">
@@ -949,6 +973,7 @@
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}
+	{attributeFiltersEnabled}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;

@@ -81,112 +81,12 @@ describe('CreateDatasetModal', () => {
 		await fireEvent.input(result.getByRole('textbox', { name: 'Zarr dir' }), {
 			target: { value: '/tmp' }
 		});
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'my-value' } });
 		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
 		expect(fetch).toHaveBeenLastCalledWith(
 			'/api/v2/project/1/dataset',
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'my dataset',
-					filters: {
-						attributes: { 'my-key': 'my-value' },
-						types: {}
-					},
-					zarr_dir: '/tmp'
-				})
-			})
-		);
-	});
-
-	it('create dataset with number filter', async () => {
-		mockFetch(null);
-		const createDatasetCallback = vi.fn();
-		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback }
-		});
-		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
-			target: { value: 'my dataset' }
-		});
-		await fireEvent.input(result.getByRole('textbox', { name: 'Zarr dir' }), {
-			target: { value: '/tmp' }
-		});
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute filter' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: '123' } });
-		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
-		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
-		expect(fetch).toHaveBeenLastCalledWith(
-			'/api/v2/project/1/dataset',
-			expect.objectContaining({
-				body: JSON.stringify({
-					name: 'my dataset',
-					filters: {
-						attributes: { 'my-key': 123 },
-						types: {}
-					},
-					zarr_dir: '/tmp'
-				})
-			})
-		);
-	});
-
-	it('create dataset with type filter set to false', async () => {
-		mockFetch(null);
-		const createDatasetCallback = vi.fn();
-		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback }
-		});
-		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
-			target: { value: 'my dataset' }
-		});
-		await fireEvent.input(result.getByRole('textbox', { name: 'Zarr dir' }), {
-			target: { value: '/tmp' }
-		});
-		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
-		expect(fetch).toHaveBeenLastCalledWith(
-			'/api/v2/project/1/dataset',
-			expect.objectContaining({
-				body: JSON.stringify({
-					name: 'my dataset',
-					filters: {
-						attributes: {},
-						types: { 'my-key': false }
-					},
-					zarr_dir: '/tmp'
-				})
-			})
-		);
-	});
-
-	it('create dataset with type filter set to true', async () => {
-		mockFetch(null);
-		const createDatasetCallback = vi.fn();
-		const result = render(CreateDatasetModal, {
-			props: { createDatasetCallback }
-		});
-		await fireEvent.input(result.getByRole('textbox', { name: 'Dataset Name' }), {
-			target: { value: 'my dataset' }
-		});
-		await fireEvent.input(result.getByRole('textbox', { name: 'Zarr dir' }), {
-			target: { value: '/tmp' }
-		});
-		await fireEvent.click(result.getByRole('button', { name: 'Add type filter' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.click(result.getByLabelText('Value for my-key'));
-		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
-		expect(fetch).toHaveBeenLastCalledWith(
-			'/api/v2/project/1/dataset',
-			expect.objectContaining({
-				body: JSON.stringify({
-					name: 'my dataset',
-					filters: {
-						attributes: {},
-						types: { 'my-key': true }
-					},
 					zarr_dir: '/tmp'
 				})
 			})
@@ -207,11 +107,7 @@ describe('CreateDatasetModal', () => {
 			'/api/v2/project/1/dataset',
 			expect.objectContaining({
 				body: JSON.stringify({
-					name: 'my dataset',
-					filters: {
-						attributes: {},
-						types: {}
-					}
+					name: 'my dataset'
 				})
 			})
 		);
@@ -262,10 +158,6 @@ describe('CreateDatasetModal', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'my dataset',
-					filters: {
-						attributes: {},
-						types: {}
-					},
 					zarr_dir: 'foo'
 				})
 			})

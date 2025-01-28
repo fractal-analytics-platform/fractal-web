@@ -69,7 +69,7 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 	await selector.click();
 	const items = await page.getByRole('option').all();
 	let selectedItem = null;
-	for (const item of items) {
+	for (const item of items.reverse()) {
 		const itemText = await item.innerText();
 		if (itemText === optionValue) {
 			selectedItem = item;
@@ -83,10 +83,36 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 	} else {
 		await expect(selector).toHaveText(optionValue);
 	}
-	await expect(page.getByRole('option', { name: optionValue, exact: true })).toHaveAttribute(
+	await expect(page.getByRole('option', { name: optionValue, exact: true }).last()).toHaveAttribute(
 		'aria-selected',
 		'true'
 	);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} selector
+ * @returns {Promise<string | string[] | null>}
+ */
+export async function getSlimSelectValues(page, selector) {
+	const dataId = await selector.getAttribute('data-id');
+	if (dataId === null) {
+		throw new Error(`Unable to retrieve slim select data-id`);
+	}
+	const dropdown = page.locator(`select[data-id="${dataId}"]`);
+	const id = await dropdown.getAttribute('id');
+	if (id === null) {
+		throw new Error(`Unable to retrieve slim select id`);
+	}
+
+	return await page.evaluate((id) => {
+		const element = document.getElementById(id);
+		if (element && 'slim' in element) {
+			const slimSelect = /** @type {any} */ (element.slim);
+			return slimSelect.getSelected();
+		}
+		return null;
+	}, id);
 }
 
 /**

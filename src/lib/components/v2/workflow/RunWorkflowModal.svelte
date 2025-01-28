@@ -7,7 +7,8 @@
 	} from '$lib/common/job_utilities';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
+	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets;
@@ -21,9 +22,13 @@
 	export let onDatasetsUpdated;
 	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
 	export let statuses;
+	export let attributeFiltersEnabled;
 
 	/** @type {Modal} */
 	let modal;
+
+	/** @type {DatasetImagesTable|undefined} */
+	let datasetImagesTable;
 
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
@@ -49,10 +54,16 @@
 		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
 		(mode === 'continue' && firstTaskIndex === undefined);
 
+	/** @type {import('fractal-components/types/api').ImagePage|null} */
+	let imagePage = null;
+	let hasImages = false;
+	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
+	let initialFilterValues = null;
+
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
-	export function open(action) {
+	export async function open(action) {
 		mode = action;
 		replaceExistingDataset = true;
 		applyingWorkflow = false;
@@ -64,6 +75,7 @@
 			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses);
 		}
 		lastTaskIndex = undefined;
+		await loadDatasetImages();
 		modal.show();
 	}
 
@@ -93,7 +105,8 @@
 		const requestBody = {
 			worker_init: workerInitControl,
 			first_task_index: firstTaskIndex,
-			last_task_index: lastTaskIndex
+			last_task_index: lastTaskIndex,
+			attribute_filters: appliedAttributeFilters
 		};
 		if (setSlurmAccount && slurmAccount !== '') {
 			requestBody.slurm_account = slurmAccount;
@@ -139,7 +152,9 @@
 	}
 
 	async function createNewDataset() {
-		const { zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
+		const { zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+			selectedDataset
+		);
 		const newDataset = await handleDatasetCreate(newDatasetName, zarr_dir);
 		onDatasetsUpdated([...datasets, newDataset], newDataset.id);
 	}
@@ -182,7 +197,9 @@
 		}
 	}
 
-	function resetLastTask() {
+	async function firstTaskIndexChanged() {
+		await loadDatasetImages();
+		// reset last task
 		if (
 			lastTaskIndex !== undefined &&
 			firstTaskIndex !== undefined &&
@@ -192,26 +209,37 @@
 		}
 	}
 
-	/** @type {{ [key: string]: string|number|boolean }} */
+	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
 	let appliedAttributeFilters = {};
 	/** @type {{ [key: string]: boolean }} */
 	let appliedTypeFilters = {};
 
-	function showConfirmRun() {
-		checkingConfiguration = true;
+	async function showConfirmRun() {
+		if (datasetImagesTable) {
+			await datasetImagesTable.applySearchFields();
+		}
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
-			appliedAttributeFilters = { ...wft.input_filters.attributes };
-			appliedTypeFilters = { ...wft.input_filters.types };
+			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };
+			appliedTypeFilters = { ...wft.type_filters };
 		} else {
-			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
-			appliedAttributeFilters = { ...dataset.filters.attributes, ...wft.input_filters.attributes };
-			appliedTypeFilters = { ...dataset.filters.types, ...wft.input_filters.types };
+			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+				selectedDataset
+			);
+			if (datasetImagesTable) {
+				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
+			} else {
+				appliedAttributeFilters = { ...dataset.attribute_filters };
+			}
+			appliedTypeFilters = getTypeFilterValues(dataset, wft);
 		}
+		checkingConfiguration = true;
 	}
 
 	function computeNewDatasetName() {
-		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (selectedDataset);
+		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+			selectedDataset
+		);
 		newDatasetName = generateNewUniqueDatasetName(datasets, dataset.name);
 	}
 
@@ -229,12 +257,94 @@
 		}
 	}
 
+	let datasetImagesLoading = false;
+
+	async function loadDatasetImages() {
+		if (firstTaskIndex === undefined) {
+			return;
+		}
+
+		datasetImagesLoading = true;
+		const workflowTask = workflow.task_list[firstTaskIndex];
+
+		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+			selectedDataset
+		);
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		initialFilterValues = {
+			attribute_filters: {
+				...dataset.attribute_filters
+			},
+			type_filters: getTypeFilterValues(dataset, workflowTask)
+		};
+		let response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
+			{
+				method: 'POST',
+				headers,
+				credentials: 'include',
+				body: JSON.stringify(initialFilterValues)
+			}
+		);
+		if (!response.ok) {
+			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			datasetImagesLoading = false;
+			return;
+		}
+		imagePage = await response.json();
+		hasImages =
+			/** @type {import('fractal-components/types/api').ImagePage} */ (imagePage).total_count > 0;
+		if (!hasImages) {
+			// Verify if dataset without filters has images
+			let response = await fetch(
+				`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
+				{
+					method: 'POST',
+					headers,
+					credentials: 'include',
+					body: JSON.stringify({})
+				}
+			);
+			if (!response.ok) {
+				modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+				datasetImagesLoading = false;
+				return;
+			}
+			/** @type {import('fractal-components/types/api').ImagePage} */
+			const result = await response.json();
+			hasImages = result.total_count > 0;
+		}
+		datasetImagesLoading = false;
+		await tick();
+		datasetImagesTable?.load();
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 */
+	function getTypeFilterValues(dataset, workflowTask) {
+		return {
+			...dataset.type_filters,
+			...workflowTask.type_filters,
+			...workflowTask.task.input_types
+		};
+	}
+
+	async function cancel() {
+		checkingConfiguration = false;
+		await tick();
+		datasetImagesTable?.load();
+	}
+
 	onMount(async () => {
 		await loadSlurmAccounts();
 	});
 </script>
 
-<Modal id="runWorkflowModal" centered={true} bind:this={modal}>
+<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">
 			{#if mode === 'run'}
@@ -323,7 +433,7 @@
 					class="form-select"
 					disabled={checkingConfiguration}
 					bind:value={firstTaskIndex}
-					on:change={resetLastTask}
+					on:change={firstTaskIndexChanged}
 					class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 				>
 					<option value={undefined}>Select first task</option>
@@ -350,7 +460,7 @@
 					{/each}
 				</select>
 			</div>
-			<div class="accordion" id="accordion-workflow-advanced-options">
+			<div class="accordion" id="accordion-run-workflow">
 				<div class="accordion-item">
 					<h2 class="accordion-header">
 						<button
@@ -361,13 +471,13 @@
 							aria-expanded="false"
 							aria-controls="collapse-workflow-advanced-options"
 						>
-							Advanced Options
+							Advanced options
 						</button>
 					</h2>
 					<div
 						id="collapse-workflow-advanced-options"
 						class="accordion-collapse collapse"
-						data-bs-parent="#accordion-workflow-advanced-options"
+						data-bs-parent="#accordion-run-workflow"
 					>
 						<div class="accordion-body">
 							<div class="mb-3">
@@ -415,6 +525,48 @@
 						</div>
 					</div>
 				</div>
+				{#if selectedDataset && imagePage && hasImages && firstTaskIndex !== undefined && mode !== 'restart'}
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapse-workflow-image-list"
+								aria-expanded="false"
+								aria-controls="collapse-workflow-image-list"
+							>
+								Image list
+							</button>
+						</h2>
+						<div
+							id="collapse-workflow-image-list"
+							class="accordion-collapse collapse"
+							data-bs-parent="#accordion-run-workflow"
+						>
+							<div class="accordion-body">
+								{#if checkingConfiguration}
+									This job will process {imagePage.total_count}
+									{imagePage.total_count === 1 ? 'image' : 'images'}.
+								{:else}
+									<DatasetImagesTable
+										bind:this={datasetImagesTable}
+										dataset={selectedDataset}
+										bind:imagePage
+										{initialFilterValues}
+										{attributeFiltersEnabled}
+										useDatasetFilters={false}
+										vizarrViewerUrl={null}
+										runWorkflowModal={true}
+									/>
+								{/if}
+							</div>
+						</div>
+					</div>
+				{/if}
+				{#if datasetImagesLoading}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				{/if}
 			</div>
 			{#if checkingConfiguration}
 				<hr />
@@ -442,9 +594,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		{#if checkingConfiguration}
-			<button class="btn btn-warning" on:click={() => (checkingConfiguration = false)}>
-				Cancel
-			</button>
+			<button class="btn btn-warning" on:click={cancel}> Cancel </button>
 			<button
 				class="btn btn-primary"
 				on:click|preventDefault={handleApplyWorkflow}

@@ -1,25 +1,25 @@
 import type { JSONSchemaObjectProperty } from './jschema';
 
 export type User = {
-  id?: number
-  email: string
-  is_active: boolean
-  is_superuser: boolean
-  is_verified: boolean
-  username: string | null
-  password?: string
-  group_ids_names : Array<[number, string]> | null
-  oauth_accounts: Array<{
-    id: number
-    account_email: string
-    oauth_name: string
-  }>
+	id?: number
+	email: string
+	is_active: boolean
+	is_superuser: boolean
+	is_verified: boolean
+	username: string | null
+	password?: string
+	group_ids_names: Array<[number, string]> | null
+	oauth_accounts: Array<{
+		id: number
+		account_email: string
+		oauth_name: string
+	}>
 }
 
 export type DatasetHistoryItem = {
-  workflowtask: WorkflowTask
-  status: string
-  parallelization: object
+	workflowtask: WorkflowTask
+	status: string
+	parallelization: object
 }
 
 export type ProjectV2 = {
@@ -35,10 +35,8 @@ export type DatasetV2 = {
 	project: ProjectV2;
 	history: Array<DatasetHistoryItemV2> | null;
 	zarr_dir: string;
-	filters: {
-		attributes: { [key: string]: string | number | boolean };
-		types: { [key: string]: boolean };
-	};
+	attribute_filters: { [key: string]: Array<string | number | boolean> | null };
+	type_filters: { [key: string]: boolean };
 	timestamp_created: string;
 };
 
@@ -117,6 +115,7 @@ export type ApplyWorkflowV2 = {
 	last_task_index: number | null;
 	user_email: string;
 	slurm_account: string | null;
+	attribute_filters: { [key: string]: string | number | boolean };
 };
 
 export type WorkflowV2 = {
@@ -137,10 +136,7 @@ export type WorkflowTaskV2 = {
 	order: number;
 	workflow_id: number;
 	task_type: TaskV2Type;
-	input_filters: {
-		attributes: { [key: string]: string | number | boolean };
-		types: { [key: string]: boolean };
-	};
+	type_filters: { [key: string]: boolean };
 	task_id: number;
 	task: TaskV2;
 	warning: string | null;
@@ -238,3 +234,9 @@ export type TaskGroupActivityV2 = {
 	action: TaskGroupActivityActionV2;
 	log: string | null;
 };
+
+export type TypeFiltersFlow = {
+	dataset_filters: Array<{ [key: string]: bool }>
+	input_filters: Array<{ [key: string]: bool }>
+	output_filters: Array<{ [key: string]: bool }>
+}

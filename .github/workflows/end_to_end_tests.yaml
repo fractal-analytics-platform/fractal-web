@@ -19,6 +19,7 @@ jobs:
       OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT: "http://127.0.0.1:5556/dex/.well-known/openid-configuration"
       PUBLIC_OAUTH_CLIENT_NAME: dexidp
       PUBLIC_FRACTAL_VIZARR_VIEWER_URL: http://localhost:3000/vizarr
+      ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS: true
 
     strategy:
       matrix:
@@ -75,6 +76,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-folder
+          name: test-results-folder-node-${{ matrix.node-version }}
           path: test-results
           overwrite: true

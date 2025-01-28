@@ -2,8 +2,6 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	export let filters = true;
-
 	/** @type {{ [key: string]: string | number | boolean }} */
 	let initialAttributeFields = {};
 	/** @type {{ [key: string]: boolean }} */
@@ -46,32 +44,6 @@
 	export function save() {
 		initialAttributeFields = getAttributes();
 		initialTypeFields = getTypes();
-	}
-
-	/**
-	 * @param {string} key
-	 * @param {string|number|boolean} value
-	 */
-	export function importAttribute(key, value) {
-		const newAttribute = { key, value: value.toString(), type: typeof value, error: '' };
-		if (attributeFields.filter((a) => a.key === key).length > 0) {
-			attributeFields = attributeFields.map((a) => (a.key === key ? newAttribute : a));
-		} else {
-			attributeFields = [...attributeFields, newAttribute];
-		}
-	}
-
-	/**
-	 * @param {string} key
-	 * @param {boolean} value
-	 */
-	export function importType(key, value) {
-		const newType = { key, value, error: '' };
-		if (typeFields.filter((t) => t.key === key).length > 0) {
-			typeFields = typeFields.map((t) => (t.key === key ? newType : t));
-		} else {
-			typeFields = [...typeFields, newType];
-		}
 	}
 
 	/**
@@ -220,13 +192,7 @@
 </script>
 
 {#if attributeFields.length > 0}
-	<h5>
-		{#if filters}
-			Attribute filters
-		{:else}
-			Attributes
-		{/if}
-	</h5>
+	<h5>Attributes</h5>
 {/if}
 {#each attributeFields as field, index}
 	<div class="input-group mb-3" class:has-validation={field.error}>
@@ -266,7 +232,7 @@
 			class="btn btn-outline-danger"
 			type="button"
 			on:click={() => removeAttribute(index)}
-			aria-label={filters ? 'Remove attribute filter' : 'Remove attribute'}
+			aria-label="Remove attribute"
 		>
 			<i class="bi bi-trash" />
 		</button>
@@ -277,13 +243,7 @@
 {/each}
 
 {#if typeFields.length > 0}
-	<h5>
-		{#if filters}
-			Type filters
-		{:else}
-			Types
-		{/if}
-	</h5>
+	<h5>Types</h5>
 {/if}
 {#each typeFields as field, index}
 	<div class="row">
@@ -312,7 +272,7 @@
 					class="btn btn-outline-danger"
 					type="button"
 					on:click={() => removeType(index)}
-					aria-label={filters ? 'Remove type filter' : 'Remove type'}
+					aria-label="Remove type"
 				>
 					<i class="bi bi-trash" />
 				</button>
@@ -327,18 +287,8 @@
 <div class="row mb-3">
 	<div class="col-12">
 		<button class="btn btn-outline-primary" type="button" on:click={addAttribute}>
-			{#if filters}
-				Add attribute filter
-			{:else}
-				Add attribute
-			{/if}
+			Add attribute
 		</button>
-		<button class="btn btn-outline-primary" type="button" on:click={addType}>
-			{#if filters}
-				Add type filter
-			{:else}
-				Add type
-			{/if}
-		</button>
+		<button class="btn btn-outline-primary" type="button" on:click={addType}> Add type </button>
 	</div>
 </div>
