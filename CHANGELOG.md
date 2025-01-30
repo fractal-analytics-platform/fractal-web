@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.15.0
 
 * Added type filters flow modal (\#701);
 * Pre-populated the image zarr_url (\#703);
