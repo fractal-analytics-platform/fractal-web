@@ -1,26 +1,26 @@
 import type { JSONSchemaObjectProperty } from './jschema';
 
 export type User = {
-	id?: number
-	email: string
-	is_active: boolean
-	is_superuser: boolean
-	is_verified: boolean
-	username: string | null
-	password?: string
-	group_ids_names: Array<[number, string]> | null
+	id?: number;
+	email: string;
+	is_active: boolean;
+	is_superuser: boolean;
+	is_verified: boolean;
+	username: string | null;
+	password?: string;
+	group_ids_names: Array<[number, string]> | null;
 	oauth_accounts: Array<{
-		id: number
-		account_email: string
-		oauth_name: string
-	}>
-}
+		id: number;
+		account_email: string;
+		oauth_name: string;
+	}>;
+};
 
 export type DatasetHistoryItem = {
-	workflowtask: WorkflowTask
-	status: string
-	parallelization: object
-}
+	workflowtask: WorkflowTask;
+	status: string;
+	parallelization: object;
+};
 
 export type ProjectV2 = {
 	id: number;
@@ -236,7 +236,20 @@ export type TaskGroupActivityV2 = {
 };
 
 export type TypeFiltersFlow = {
-	dataset_filters: Array<{ [key: string]: bool }>
-	input_filters: Array<{ [key: string]: bool }>
-	output_filters: Array<{ [key: string]: bool }>
-}
+	dataset_filters: Array<{ [key: string]: bool }>;
+	input_filters: Array<{ [key: string]: bool }>;
+	output_filters: Array<{ [key: string]: bool }>;
+};
+
+export type Accounting = {
+	total_count: number;
+	page_size: number;
+	current_page: number;
+	accountings: Array<{
+		id: number;
+		user_id: number;
+		timestamp: string;
+		num_tasks: number;
+		num_new_images: number;
+	}>;
+};
