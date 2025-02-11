@@ -63,3 +63,13 @@ export const sortUserToImportSettings = function (users, desiredGroups, allGroup
 	});
 	return users;
 };
+
+/**
+ * @param {import('$lib/types').User[]} users
+ * @param {number} currentUserId
+ */
+export function sortDropdownUsers(users, currentUserId) {
+	const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
+	sortUsers(usersCopy, currentUserId, false);
+	return usersCopy;
+}

@@ -42,5 +42,12 @@
 			<i class="bi bi-search" />
 			Search activities
 		</a>
+
+		<h2 class="fw-light mt-3">Accounting</h2>
+
+		<a href="/v2/admin/accounting" class="btn btn-primary me-2">
+			<i class="bi bi-search" />
+			Accounting
+		</a>
 	</div>
 </div>
