@@ -1,185 +1,55 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { page } from '$app/stores';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 
 	let inProgress = false;
-	let stepMessage = '';
-	let error = undefined;
+	let userId = $page.data.userInfo.id;
+
+	$: users = sortDropdownUsers($page.data.users, $page.data.userInfo.id);
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
 
 	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
-
-	async function startTest() {
-		error = undefined;
-		stepMessage = '';
-		inProgress = true;
-		try {
-			const projectId = await createProject();
-			const datasetId = await createDataset(projectId);
-			const workflowId = await createWorkflow(projectId);
-			const taskId = await createHealthCheckTaskIfNeeded();
-			await addTaskToWorkflow(projectId, workflowId, taskId);
-			await submitWorkflow(projectId, workflowId, datasetId);
-			await goto(`/v2/projects/${projectId}/workflows/${workflowId}`);
-		} catch (err) {
-			error = err;
-		} finally {
-			inProgress = false;
-		}
-	}
 
 	const headers = new Headers();
 	headers.set('Content-Type', 'application/json');
 
-	async function createProject() {
-		const randomPart = new Date().getTime();
-		const projectName = `test_${randomPart}`;
+	async function startTest() {
+		errorAlert?.hide();
+		inProgress = true;
 
-		stepMessage = `Creating project ${projectName}`;
-
-		const response = await fetch(`/api/v2/project`, {
-			method: 'POST',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				name: projectName
-			})
-		});
-
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
+		let url;
+		if ($page.data.userInfo.id == userId) {
+			url = `/api/v2/healthcheck`;
+		} else {
+			url = `/api/admin/v2/healthcheck/${userId}`;
 		}
-		const result = await response.json();
-		return result.id;
-	}
 
-	/**
-	 * @param {number} projectId
-	 */
-	async function createDataset(projectId) {
-		stepMessage = `Creating test dataset`;
-
-		const response = await fetch(`/api/v2/project/${projectId}/dataset`, {
+		const response = await fetch(url, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
 			body: JSON.stringify({
-				name: 'test',
 				zarr_dir: zarrDir
 			})
 		});
-
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
-		const result = await response.json();
-		return result.id;
-	}
-
-	/**
-	 * @param {number} projectId
-	 */
-	async function createWorkflow(projectId) {
-		stepMessage = `Creating test workflow`;
-
-		const response = await fetch(`/api/v2/project/${projectId}/workflow`, {
-			method: 'POST',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({ name: 'test' })
-		});
-
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
-		const result = await response.json();
-		return result.id;
-	}
-
-	async function createHealthCheckTaskIfNeeded() {
-		stepMessage = `Checking if health check test task exists`;
-		const taskId = await getHealthCheckTask();
-		if (taskId !== undefined) {
-			return taskId;
-		}
-
-		stepMessage = `Creating health check test task`;
-
-		const response = await fetch(`/api/v2/task?private=true`, {
-			method: 'POST',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				name: '__TEST_ECHO_TASK__',
-				command_non_parallel: 'echo',
-				version: '9.9.9',
-				input_types: {},
-				output_types: {}
-			})
-		});
-
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
-		const result = await response.json();
-		return result.id;
-	}
-
-	async function getHealthCheckTask() {
-		const response = await fetch(`/api/v2/task?args_schema=false`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
-		const result = await response.json();
-		const tasks = result.filter((t) => t.name === '__TEST_ECHO_TASK__');
-		return tasks.length > 0 ? tasks[0].id : undefined;
-	}
-
-	/**
-	 * @param {number} projectId
-	 * @param {number}  workflowId
-	 * @param {number}  taskId
-	 */
-	async function addTaskToWorkflow(projectId, workflowId, taskId) {
-		stepMessage = `Adding task to workflow`;
-
-		const response = await fetch(
-			`/api/v2/project/${projectId}/workflow/${workflowId}/wftask?task_id=${taskId}`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({})
+		if (response.ok) {
+			const job = await response.json();
+			if ($page.data.userInfo.id == userId) {
+				await goto(`/v2/projects/${job.project_id}/workflows/${job.workflow_id}`);
+			} else {
+				await goto(`/v2/admin/jobs?job_id=${job.workflow_id}`);
 			}
-		);
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
+		} else {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-healthcheck'
+			);
 		}
-	}
-
-	/**
-	 * @param {number} projectId
-	 * @param {number} workflowId
-	 * @param {number} datasetId
-	 */
-	async function submitWorkflow(projectId, workflowId, datasetId) {
-		stepMessage = `Submitting workflow`;
-
-		const response = await fetch(
-			`/api/v2/project/${projectId}/job/submit?workflow_id=${workflowId}&dataset_id=${datasetId}`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({ first_task_index: 0, attribute_filters: {} })
-			}
-		);
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
-		}
+		inProgress = false;
 	}
 </script>
 
@@ -204,18 +74,24 @@
 		</li>
 	</ul>
 
-	<StandardErrorAlert {error}>
-		<p>An error happened while executing the following step: <strong>{stepMessage}</strong></p>
-	</StandardErrorAlert>
+	<div id="errorAlert-healthcheck" />
 
-	<div class="row">
-		<div class="col">
-			<button class="btn btn-primary" disabled={inProgress} on:click={startTest}>
-				{#if inProgress}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Test
-			</button>
+	<div class="row row-cols-md-auto g-3 align-items-center mt-3">
+		<div class="col-12">
+			<div class="input-group mb-3">
+				<label class="input-group-text" for="user">Run as</label>
+				<select class="form-select" bind:value={userId} id="user">
+					{#each users as user}
+						<option value={user.id}>{user.email}</option>
+					{/each}
+				</select>
+				<button class="btn btn-primary" disabled={inProgress} on:click={startTest}>
+					{#if inProgress}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					{/if}
+					Test
+				</button>
+			</div>
 		</div>
 	</div>
 </div>

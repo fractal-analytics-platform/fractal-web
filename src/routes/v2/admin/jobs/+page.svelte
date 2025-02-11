@@ -2,9 +2,10 @@
 	import { page } from '$app/stores';
 	import { downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortUsers } from '$lib/components/admin/user_utilities';
+	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
+	import { onMount } from 'svelte';
 
 	let searched = false;
 	let searching = false;
@@ -215,7 +216,9 @@
 		statusModal.confirmAndHide(
 			async () => {
 				updatingStatus = true;
-				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (jobInEditing).id;
+				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (
+					jobInEditing
+				).id;
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
@@ -240,16 +243,15 @@
 		);
 	}
 
-	$: users = sortDropdownUsers($page.data.users);
+	$: users = sortDropdownUsers($page.data.users, $page.data.userInfo.id);
 
-	/**
-	 * @param {import('$lib/types').User[]} users
-	 */
-	function sortDropdownUsers(users) {
-		const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
-		sortUsers(usersCopy, $page.data.userInfo.id, false);
-		return usersCopy;
-	}
+	onMount(async () => {
+		const selectedJobId = $page.url.searchParams.get('job_id');
+		if (selectedJobId && !isNaN(Number(selectedJobId))) {
+			jobId = Number(selectedJobId);
+			await searchJobs();
+		}
+	});
 </script>
 
 <div>
