@@ -356,7 +356,7 @@
 							<BooleanIcon value={taskGroup.active} />
 						</td>
 						<td>{taskGroup.origin || '-'}</td>
-						<td> {taskGroup.task_list.length} </td>
+						<td>{taskGroup.task_list.length}</td>
 						<td>
 							<button class="btn btn-light" on:click={() => openInfoModal(taskGroup)}>
 								<i class="bi bi-info-circle" />
@@ -371,7 +371,7 @@
 								Manage
 							</button>
 							<ConfirmActionButton
-								modalId="confirmTaskGroupDeleteModal{taskGroup.pkg_name}"
+								modalId="confirmTaskGroupDeleteModal{taskGroup.id}"
 								style={'danger'}
 								btnStyle="danger"
 								buttonIcon="trash"
