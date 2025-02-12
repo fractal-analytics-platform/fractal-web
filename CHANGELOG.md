@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed bug in task-groups deletion in admin page (\#713);
+
 # 1.15.0
 
 * Added type filters flow modal (\#701);
