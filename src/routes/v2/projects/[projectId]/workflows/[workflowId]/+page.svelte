@@ -396,7 +396,7 @@
 		newVersionsCount = count;
 	}
 
-	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
+	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
 	let statuses = {};
 
 	$: hasAnyJobRun = Object.keys(statuses).length > 0;

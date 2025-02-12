@@ -20,7 +20,7 @@
 	export let onJobSubmitted;
 	/** @type {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} */
 	export let onDatasetsUpdated;
-	/** @type {{[key: number]: import('$lib/types').JobStatus}} */
+	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
 	export let statuses;
 	export let attributeFiltersEnabled;
 

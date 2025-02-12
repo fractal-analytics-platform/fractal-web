@@ -86,7 +86,7 @@ export async function handle({ event, resolve }) {
 
 	// Admin area check
 	if (event.url.pathname.startsWith('/v2/admin')) {
-		if (!(/** @type {import('$lib/types').User} */ (userInfo).is_superuser)) {
+		if (!(/** @type {import('fractal-components/types/api').User} */ (userInfo).is_superuser)) {
 			error(403, `Only superusers can access the admin area`);
 		}
 	}
@@ -113,7 +113,7 @@ export async function handleFetch({ event, request, fetch }) {
 
 /**
  * @param {typeof fetch} fetch
- * @returns {Promise<import('$lib/types').User|null>}
+ * @returns {Promise<import('fractal-components/types/api').User|null>}
  */
 async function getUserInfo(fetch) {
 	try {

@@ -7,7 +7,7 @@
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
 
 	// List of projects to be displayed
-	/** @type {import('$lib/types').Project[]} */
+	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	export let projects = [];
 
 	let projectSearch = '';

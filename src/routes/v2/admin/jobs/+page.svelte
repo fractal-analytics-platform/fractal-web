@@ -243,10 +243,10 @@
 	$: users = sortDropdownUsers($page.data.users);
 
 	/**
-	 * @param {import('$lib/types').User[]} users
+	 * @param {import('fractal-components/types/api').User[]} users
 	 */
 	function sortDropdownUsers(users) {
-		const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
+		const usersCopy = /** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
 		sortUsers(usersCopy, $page.data.userInfo.id, false);
 		return usersCopy;
 	}

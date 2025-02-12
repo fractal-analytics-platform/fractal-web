@@ -2,9 +2,9 @@
 	import { page } from '$app/stores';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 
-	/** @type {import('$lib/types').Group & {user_ids: number[]}} */
+	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
 	$: group = $page.data.group;
-	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	$: allUsers = $page.data.users;
 
 	$: groupUsers = allUsers

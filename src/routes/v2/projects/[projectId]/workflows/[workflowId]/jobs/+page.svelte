@@ -5,7 +5,7 @@
 
 	/** @type {import('fractal-components/types/api').ProjectV2} */
 	let project = $page.data.project;
-	/** @type {import('$lib/types').Workflow} */
+	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
 
 	/**

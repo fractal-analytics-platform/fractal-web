@@ -10,7 +10,7 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	/** @type {import('$lib/types').User} */
+	/** @type {import('fractal-components/types/api').User} */
 	export let user;
 	/**
 	 * @type {import('fractal-components/types/api').TaskGroupV2[]}

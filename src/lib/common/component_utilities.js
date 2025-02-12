@@ -52,83 +52,6 @@ function validateVersion(version) {
 	);
 }
 
-/**
- * @param {import('$lib/types').Task} t1
- * @param {import('$lib/types').Task} t2
- * @returns {-1|0|1}
- */
-export function compareTaskNameAscAndVersionAsc(t1, t2) {
-	if (t1.name.toLowerCase() < t2.name.toLowerCase()) return -1;
-	if (t1.name.toLowerCase() > t2.name.toLowerCase()) return 1;
-	// Names are equal, sort by version
-	return greatestVersionAsc(t1.version, t2.version);
-}
-
-/**
- * @param {import('$lib/types').Task} t1
- * @param {import('$lib/types').Task} t2
- * @returns {-1|0|1}
- */
-export function compareTaskNameAscAndVersionDesc(t1, t2) {
-	if (t1.name.toLowerCase() < t2.name.toLowerCase()) return -1;
-	if (t1.name.toLowerCase() > t2.name.toLowerCase()) return 1;
-	// Names are equal, sort by version
-	return greatestVersionDesc(t1.version, t2.version);
-}
-
-/**
- * @param {Array<import('$lib/types').Task>} tasks
- * @param {'asc'|'desc'} order
- * @returns {Array<import('$lib/types').Task>}
- */
-export function orderTasksByOwnerThenByNameThenByVersion(tasks, ownerName = null, order = 'asc') {
-	const sortingFunction = getVersionSortingFunction(order);
-	// Sort tasks by owner, by name and by version
-	return tasks.sort((t1, t2) => {
-		// If ownerName is not null, filter tasks by owner
-		if (ownerName !== null) {
-			// If t1 owner is same as ownerName, t1 should go before t2
-			if (t1.owner === ownerName) {
-				if (t2.owner !== ownerName) return -1;
-				// Both owners are same, sort by name and version
-				return sortingFunction(t1, t2);
-			} else {
-				// t1 owner is not same as ownerName, t2 should go before t1
-				if (t2.owner === ownerName) return 1;
-			}
-		}
-		if (t1.owner === null) {
-			// If t1 owner is null, t1 should go before t2 if t2 owner is null
-			// Should check if t2 owner is null too
-			if (t2.owner === null) {
-				// Both owners are null, sort by name
-				return sortingFunction(t1, t2);
-			} else {
-				// t1 owner is null, t2 owner is not null, t1 should go before t2
-				return -1;
-			}
-		} else {
-			// t1 owner is not null, t2 owner is null, t2 should go before t1
-			if (t2.owner === null) return 1;
-			// Both owners are not null, sort by owner
-			if (t1.owner.toLowerCase() < t2.owner.toLowerCase()) return -1;
-			if (t1.owner.toLowerCase() > t2.owner.toLowerCase()) return 1;
-			// Owners are equal, sort by name
-			return sortingFunction(t1, t2);
-		}
-	});
-}
-
-/**
- * @param {'asc'|'desc'} order
- */
-function getVersionSortingFunction(order) {
-	if (order === 'asc') {
-		return compareTaskNameAscAndVersionAsc;
-	}
-	return compareTaskNameAscAndVersionDesc;
-}
-
 export function fieldHasValue(event) {
 	const inputValue = event.target?.value || undefined;
 	return inputValue !== undefined && inputValue !== '';
@@ -226,7 +149,7 @@ export function removeDuplicatedItems(allItems) {
 }
 
 /**
- * @template {import('$lib/types').Project|import('fractal-components/types/api').ProjectV2} T
+ * @template {import('fractal-components/types/api').ProjectV2} T
  * @param {T[]} projects
  */
 export function sortProjectsByTimestampCreatedDesc(projects) {

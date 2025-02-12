@@ -9,9 +9,9 @@
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	/** @type {Array<import('$lib/types').User>} */
+	/** @type {Array<import('fractal-components/types/api').User>} */
 	const users = $page.data.users;
-	/** @type {Array<import('$lib/types').Group>} */
+	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $page.data.groups;
 
 	let user_id = '';

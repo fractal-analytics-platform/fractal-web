@@ -3,11 +3,11 @@
 	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $page.data.user;
-	/** @type {import('$lib/types').UserSettings} */
+	/** @type {import('fractal-components/types/api').UserSettings} */
 	const settings = $page.data.settings;
-	/** @type {Array<import('$lib/types').Group>} */
+	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $page.data.groups;
 	/** @type {string} */
 	const runnerBackend = $page.data.runnerBackend;

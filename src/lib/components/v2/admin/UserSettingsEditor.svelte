@@ -5,7 +5,7 @@
 
 	/** @type {string} */
 	export let runnerBackend;
-	/** @type {import('$lib/types').UserSettings} */
+	/** @type {import('fractal-components/types/api').UserSettings} */
 	export let settings;
 	/** @type {string} */
 	export let settingsApiEndpoint;
@@ -14,7 +14,7 @@
 
 	let settingsFormSubmitted = false;
 
-	/** @type {import('$lib/types').UserSettings} */
+	/** @type {import('fractal-components/types/api').UserSettings} */
 	let originalSettings;
 
 	export let pendingChanges = false;

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	$: user = $page.data.user;
 </script>
 
