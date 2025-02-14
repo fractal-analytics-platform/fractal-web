@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { waitPageLoading } from '../utils.js';
 
-test('Execute the admin job healthcheck', async ({ page }) => {
-	await test.step('Open the admin job healthcheck page', async () => {
-		await page.goto('/v2/admin/jobs/healthcheck');
+test('Execute the job healthcheck', async ({ page }) => {
+	await test.step('Open the job healthcheck page', async () => {
+		await page.goto('/healthcheck');
 		await waitPageLoading(page);
 	});
 
