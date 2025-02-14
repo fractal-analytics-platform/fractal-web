@@ -2,6 +2,8 @@
 
 # Unreleased
 
+* Used `FRACTAL_BACKEND_RUNNER=local` instead of `local_experimental` (\#713);
+* Moved job submission healthcheck page to user menu (\#713);
 * Fixed bug in task-groups deletion in admin page (\#713);
 
 # 1.15.0

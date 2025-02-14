@@ -70,7 +70,7 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          FRACTAL_RUNNER_BACKEND: local_experimental
+          FRACTAL_RUNNER_BACKEND: local
 
       - name: Archive test results
         if: always()

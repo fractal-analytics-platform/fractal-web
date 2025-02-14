@@ -204,7 +204,7 @@
 				</div>
 			</div>
 		{/if}
-		{#if runnerBackend !== 'local' && runnerBackend !== 'local_experimental'}
+		{#if runnerBackend !== 'local'}
 			<div class="row mb-3 has-validation">
 				<label for="slurmAccount-0" class="col-sm-3 col-form-label text-end">
 					<strong>SLURM accounts</strong>

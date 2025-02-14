@@ -92,7 +92,7 @@
 		{settings.project_dir || '-'}
 	</div>
 </div>
-{#if $page.data.runnerBackend !== 'local' && $page.data.runnerBackend !== 'local_experimental'}
+{#if $page.data.runnerBackend !== 'local'}
 	{#if $page.data.runnerBackend === 'slurm'}
 		<div class="row mb-4">
 			<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
