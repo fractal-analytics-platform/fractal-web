@@ -15,13 +15,13 @@
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
 	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	export let user;
-	/** @type {Array<import('$lib/types').Group>} */
+	/** @type {Array<import('fractal-components/types/api').Group>} */
 	export let groups = [];
-	/** @type {import('$lib/types').UserSettings|null} */
+	/** @type {import('fractal-components/types/api').UserSettings|null} */
 	export let settings = null;
-	/** @type {(user: import('$lib/types').User) => Promise<Response>} */
+	/** @type {(user: import('fractal-components/types/api').User) => Promise<Response>} */
 	export let saveUser;
 	/** @type {string} */
 	export let runnerBackend;
@@ -29,7 +29,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let originalUser;
 	let userPendingChanges = false;
 
@@ -40,7 +40,7 @@
 	/** @type {UserSettingsImportModal} */
 	let userSettingsImportModal;
 
-	/** @type {Array<import('$lib/types').Group>} */
+	/** @type {Array<import('fractal-components/types/api').Group>} */
 	let userGroups = [];
 
 	$: addedGroups = userGroups.filter(
@@ -306,7 +306,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').UserSettings} importedSettings
+	 * @param {import('fractal-components/types/api').UserSettings} importedSettings
 	 */
 	function onSettingsImported(importedSettings) {
 		settings = importedSettings;

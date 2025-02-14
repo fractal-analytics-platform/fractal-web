@@ -7,13 +7,13 @@
 
 	/** @type {number} */
 	export let currentUserId;
-	/** @type {(settings: import('$lib/types').UserSettings) => void} */
+	/** @type {(settings: import('fractal-components/types/api').UserSettings) => void} */
 	export let onSettingsImported;
 	let importingSettings = false;
 	/** @type {number[]} */
 	let desiredGroups = [];
 
-	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let users = [];
 	/** @type {number|null} */
 	let selectedUserId = null;
@@ -102,7 +102,7 @@
 	}
 
 	/**
-	 * @returns {Promise<Array<import('$lib/types').User & {id: number}>>}
+	 * @returns {Promise<Array<import('fractal-components/types/api').User & {id: number}>>}
 	 */
 	async function getUsers() {
 		const response = await fetch('/api/auth/users', {
@@ -118,7 +118,7 @@
 	}
 
 	/**
-	 * @returns {Promise<Array<import('$lib/types').Group & {user_ids: number[]}>>}
+	 * @returns {Promise<Array<import('fractal-components/types/api').Group & {user_ids: number[]}>>}
 	 */
 	async function getGroups() {
 		const response = await fetch('/api/auth/group?user_ids=true', {

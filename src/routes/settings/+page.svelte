@@ -10,7 +10,7 @@
 	import { onMount } from 'svelte';
 
 	/**
-	 * @type {import('$lib/types').UserSettings}
+	 * @type {import('fractal-components/types/api').UserSettings}
 	 */
 	const settings = $page.data.settings;
 
@@ -73,7 +73,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/types').UserSettings} settings
+	 * @param {import('fractal-components/types/api').UserSettings} settings
 	 */
 	function initFields(settings) {
 		slurmAccounts = settings.slurm_accounts;
@@ -92,7 +92,7 @@
 		{settings.project_dir || '-'}
 	</div>
 </div>
-{#if $page.data.runnerBackend !== 'local' && $page.data.runnerBackend !== 'local_experimental'}
+{#if $page.data.runnerBackend !== 'local'}
 	{#if $page.data.runnerBackend === 'slurm'}
 		<div class="row mb-4">
 			<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>

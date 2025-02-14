@@ -9,7 +9,13 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 	let taskName;
 	await test.step('Create test task group', async () => {
 		taskName = await createFakeTask(page, {
-			type: 'non_parallel'
+			type: 'non_parallel',
+			version: '0.0.1'
+		});
+		await createFakeTask(page, {
+			name: taskName,
+			type: 'non_parallel',
+			version: '0.0.2'
 		});
 	});
 
@@ -18,7 +24,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 	});
 
-	const taskRow = page.getByRole('row', { name: taskName });
+	const taskRow = page.getByRole('row', { name: new RegExp('.*' + taskName + '.*0.0.1.*') });
 
 	await test.step('Search without filters', async () => {
 		await page.getByRole('button', { name: 'Search task groups' }).click();
@@ -33,7 +39,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await page.getByRole('combobox', { name: 'Origin' }).selectOption('Other');
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await expect(taskRow).toBeVisible();
-		expect(page.getByRole('row')).toHaveCount(2);
+		expect(page.getByRole('row')).toHaveCount(3);
 	});
 
 	await test.step('Open info modal', async () => {
@@ -57,10 +63,18 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await expect(groupCell).toHaveText('-');
 	});
 
-	await test.step('Delete task group', async () => {
+	await test.step('Delete task groups', async () => {
 		await taskRow.getByRole('button', { name: 'Delete' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
+		await expect(modal).toContainText('0.0.1');
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+		await expect(page.getByText('The query returned 1 matching result')).toBeVisible();
+		const taskRow2 = page.getByRole('row', { name: taskName });
+		await taskRow2.getByRole('button', { name: 'Delete' }).click();
+		await modal.waitFor();
+		await expect(modal).toContainText('0.0.2');
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByText('The query returned 0 matching results')).toBeVisible();

@@ -9,7 +9,7 @@
 
 	/** @type {(task: import('fractal-components/types/api').TaskV2[]) => void} */
 	export let addNewTasks;
-	/** @type {import('$lib/types').User} */
+	/** @type {import('fractal-components/types/api').User} */
 	export let user;
 
 	let python_interpreter = '';

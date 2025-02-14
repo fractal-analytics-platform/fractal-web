@@ -25,7 +25,7 @@
 	/** @type {JobLogsModal} */
 	let jobLogsModal;
 
-	/** @type {import('$lib/types').Project[]} */
+	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	let projects = $page.data.projects;
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $page.data.workflows || [];

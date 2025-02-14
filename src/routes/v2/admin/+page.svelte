@@ -26,11 +26,6 @@
 			Search jobs
 		</a>
 
-		<a href="/v2/admin/jobs/healthcheck" class="btn btn-primary">
-			<i class="bi bi-heart-pulse-fill" />
-			Job submission healthcheck
-		</a>
-
 		<h2 class="fw-light mt-3">Tasks</h2>
 
 		<a href="/v2/admin/tasks" class="btn btn-primary me-2">

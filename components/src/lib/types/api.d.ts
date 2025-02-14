@@ -1,5 +1,7 @@
 import type { JSONSchemaObjectProperty } from './jschema';
 
+export type GetHeaders = (originalHeaders: Headers | undefined) => Headers
+
 export type User = {
 	id?: number
 	email: string
@@ -14,6 +16,27 @@ export type User = {
 		account_email: string
 		oauth_name: string
 	}>
+}
+
+export type UserSettings = {
+  slurm_accounts: string[]
+  project_dir: string | null
+  // Slurm
+  slurm_user: string | null
+  // Slurm SSH
+  ssh_host: string | null
+  ssh_username: string | null
+  ssh_private_key_path: string | null
+  ssh_tasks_dir: string | null
+  ssh_jobs_dir: string | null
+}
+
+export type Group = {
+  id: number
+  name: string
+  timestamp_created: string
+  user_ids?: number[]
+  viewer_paths: string[]
 }
 
 export type DatasetHistoryItem = {
@@ -117,6 +140,8 @@ export type ApplyWorkflowV2 = {
 	slurm_account: string | null;
 	attribute_filters: { [key: string]: string | number | boolean };
 };
+
+export type JobStatus = 'submitted' | 'done' | 'failed'
 
 export type WorkflowV2 = {
 	id: number;

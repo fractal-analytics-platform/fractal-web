@@ -3,17 +3,17 @@
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let user = $page.data.user;
 
-	/** @type {import('$lib/types').UserSettings} */
+	/** @type {import('fractal-components/types/api').UserSettings} */
 	let settings = $page.data.settings;
 
-	/** @type {Array<import('$lib/types').Group>} */
+	/** @type {Array<import('fractal-components/types/api').Group>} */
 	let groups = $page.data.groups;
 
 	/**
-	 * @param {import('$lib/types').User} user
+	 * @param {import('fractal-components/types/api').User} user
 	 * @returns {Promise<Response>}
 	 */
 	async function save(user) {

@@ -157,7 +157,7 @@
 		if (!response.ok) {
 			return;
 		}
-		/** @type {import('$lib/types').UserSettings} */
+		/** @type {import('fractal-components/types/api').UserSettings} */
 		const result = await response.json();
 		projectDir = result.project_dir;
 	}

@@ -5,7 +5,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {Array<import('$lib/types').Group & {user_ids: number[]}>} */
+	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
 	$: groups = $page.data.groups;
 
 	/** @type {Modal} */

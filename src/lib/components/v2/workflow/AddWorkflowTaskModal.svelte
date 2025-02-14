@@ -9,7 +9,7 @@
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	export let workflow;
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	export let user;
 	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} */
 	export let onWorkflowTaskAdded;

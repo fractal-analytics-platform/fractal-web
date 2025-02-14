@@ -52,7 +52,7 @@
 			return 'home';
 		}
 		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
-			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/$v2/${section}`)) {
+			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/v2/${section}`)) {
 				return section;
 			}
 		}
@@ -139,6 +139,7 @@
 							{#if env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}
+							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
 							<li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
 						</ul>
 					</li>

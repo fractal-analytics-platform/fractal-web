@@ -88,7 +88,7 @@ export function createDeleteProxy(path) {
 
 /**
  * Forward only selected headers, to avoid issues like content length mismatch
- * @type {import('$lib/types').GetHeaders}
+ * @type {import('fractal-components/types/api').GetHeaders}
  */
 function filterHeaders(originalHeaders) {
 	const headers = new Headers();

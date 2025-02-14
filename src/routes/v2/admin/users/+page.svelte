@@ -6,7 +6,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let users = [];
 
 	const deleteEnabled = false;

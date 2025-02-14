@@ -10,15 +10,15 @@
 	import UserSettingsEditor from '$lib/components/v2/admin/UserSettingsEditor.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('$lib/types').Group & {user_ids: number[]}} */
+	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
 	let group = $page.data.group;
-	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let users = $page.data.users;
 	let runnerBackend = $page.data.runnerBackend;
 
-	/** @type {import('$lib/types').User & {id: number}|null} */
+	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToAdd = null;
-	/** @type {import('$lib/types').User & {id: number}|null} */
+	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let addingUser = null;
 	let addUserHovering = false;
 	let userFilter = '';
@@ -28,10 +28,10 @@
 	let settingsPendingChanges = false;
 	let savingSettings = false;
 
-	/** @type {import('$lib/types').User & {id: number}|null} */
+	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToRemove = null;
 
-	/** @type {import('$lib/types').UserSettings} */
+	/** @type {import('fractal-components/types/api').UserSettings} */
 	let settings = createEmptySettings();
 
 	$: availableUsers = users
@@ -183,7 +183,7 @@
 	});
 
 	/**
-	 * @returns {import('$lib/types').UserSettings}
+	 * @returns {import('fractal-components/types/api').UserSettings}
 	 */
 	function createEmptySettings() {
 		return {

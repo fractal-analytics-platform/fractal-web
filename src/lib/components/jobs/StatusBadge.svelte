@@ -1,10 +1,10 @@
 <script>
-	/** @type {import('$lib/types').JobStatus|null} */
+	/** @type {import('fractal-components/types/api').JobStatus|null} */
 	export let status = null;
 	$: labelStyle = getLabelStyle(status);
 
 	/**
-	 * @param {import('$lib/types').JobStatus|null} status
+	 * @param {import('fractal-components/types/api').JobStatus|null} status
 	 */
 	function getLabelStyle(status) {
 		switch (status) {

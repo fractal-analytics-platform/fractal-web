@@ -3,7 +3,7 @@
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('$lib/types').User} */
+	/** @type {import('fractal-components/types/api').User} */
 	export let user;
 	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
 	let taskGroup;
