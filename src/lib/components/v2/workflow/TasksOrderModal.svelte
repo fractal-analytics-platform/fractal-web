@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {number} */
@@ -14,6 +15,9 @@
 
 	/** @type {{id: number, name: string}[]} */
 	let editableTasksList = [];
+
+	// used to hide drag and drop ghost image
+	let transparentImage;
 
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2[]} originalTasksList
@@ -103,9 +107,9 @@
 	function handleDragStart(workflowTaskId, index, event) {
 		draggedWftId = workflowTaskId;
 		draggedWftIndex = index;
-		// hide drag image
+		// set transparent drag image
 		if (event.dataTransfer && event.target instanceof Element) {
-			event.dataTransfer.setDragImage(event.target, window.outerWidth, window.outerHeight);
+			event.dataTransfer.setDragImage(transparentImage, 0, 0);
 		}
 	}
 
@@ -143,6 +147,24 @@
 	function handleDragEnd() {
 		draggedWftId = undefined;
 		draggedWftIndex = undefined;
+	}
+
+	onMount(() => {
+		transparentImage = getTransparentImage();
+	});
+
+	function getTransparentImage() {
+		const image = new Image();
+		const canvas = document.createElement('canvas');
+		canvas.width = 1;
+		canvas.height = 1;
+		const ctx = canvas.getContext('2d');
+		if (ctx != null) {
+			ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Fully transparent
+			ctx.fillRect(0, 0, 1, 1);
+		}
+		image.src = canvas.toDataURL();
+		return image;
 	}
 </script>
 
