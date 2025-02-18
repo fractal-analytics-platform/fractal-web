@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { downloadBlob, getTimestamp } from '$lib/common/component_utilities';
+	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -178,22 +178,6 @@
 		]);
 		const csv = arrayToCsv([header, ...rows]);
 		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
-	}
-
-	/**
-	 * @param {any[][]} data
-	 */
-	function arrayToCsv(data) {
-		return data
-			.map((row) =>
-				row
-					.map((v) => (v === null || v === undefined ? '' : v))
-					.map(String) // convert every value to String
-					.map((v) => v.replaceAll('"', '""')) // escape double quotes
-					.map((v) => `"${v}"`)
-					.join(',')
-			)
-			.join('\n');
 	}
 
 	/** @type {Modal} */

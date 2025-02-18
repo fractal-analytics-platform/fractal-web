@@ -1,5 +1,5 @@
 <script>
-	import { getTimestamp } from '$lib/common/component_utilities';
+	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Paginator from '$lib/components/common/Paginator.svelte';
@@ -10,6 +10,7 @@
 	export let currentUserId;
 
 	let searching = false;
+	let exportingCsv = false;
 
 	let dateMin = '';
 	let timeMin = '';
@@ -30,9 +31,43 @@
 	 * @param {number} newCurrentPage
 	 * @param {number} newPageSize
 	 */
-	async function accountingQuery(newCurrentPage = currentPage, newPageSize = pageSize) {
-		errorAlert?.hide();
+	async function search(newCurrentPage = currentPage, newPageSize = pageSize) {
 		searching = true;
+		accounting = await accountingQuery(newCurrentPage, newPageSize);
+		searching = false;
+		if (accounting) {
+			pageSize = accounting.page_size;
+			currentPage = accounting.current_page;
+		}
+	}
+
+	async function exportCsv() {
+		exportingCsv = true;
+		const accounting = await accountingQuery(1, 1000000);
+		exportingCsv = false;
+		if (!accounting) {
+			return;
+		}
+		const header = ['id', 'user_id', 'user_email', 'timestamp', 'num_tasks', 'num_new_images'];
+		const rows = accounting.records.map((record) => [
+			record.id,
+			record.user_id,
+			getUserById(record.user_id)?.email || '',
+			record.timestamp,
+			record.num_tasks,
+			record.num_new_images
+		]);
+		const csv = arrayToCsv([header, ...rows]);
+		downloadBlob(csv, 'accounting.csv', 'text/csv;charset=utf-8;');
+	}
+
+	/**
+	 * @param {number} newCurrentPage
+	 * @param {number} newPageSize
+	 * @returns {Promise<import('fractal-components/types/api').Accounting|undefined>}
+	 */
+	async function accountingQuery(newCurrentPage, newPageSize) {
+		errorAlert?.hide();
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const params = {};
@@ -57,18 +92,13 @@
 			}
 		);
 		if (response.ok) {
-			accounting = await response.json();
-			if (accounting) {
-				pageSize = accounting.page_size;
-				currentPage = accounting.current_page;
-			}
+			return await response.json();
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
 				'errorAlert-accounting'
 			);
 		}
-		searching = false;
 	}
 
 	function reset() {
@@ -130,13 +160,23 @@
 
 <div id="errorAlert-accounting" />
 
-<button class="btn btn-primary" on:click={() => accountingQuery()} disabled={searching}>
+<button class="btn btn-primary" on:click={() => search()} disabled={searching}>
 	{#if searching}
 		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 	{/if}
 	Search
 </button>
 <button class="btn btn-warning" on:click={reset}> Reset </button>
+
+{#if accounting}
+	<button class="btn btn-primary float-end" on:click={exportCsv} disabled={exportingCsv}>
+		{#if exportingCsv}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		{/if}
+		<i class="bi-download" />
+		Export to CSV
+	</button>
+{/if}
 
 {#if accounting}
 	<table class="table table-striped mt-3">
@@ -162,10 +202,5 @@
 		</tbody>
 	</table>
 
-	<Paginator
-		{currentPage}
-		{pageSize}
-		totalCount={accounting.total_count}
-		onPageChange={accountingQuery}
-	/>
+	<Paginator {currentPage} {pageSize} totalCount={accounting.total_count} onPageChange={search} />
 {/if}

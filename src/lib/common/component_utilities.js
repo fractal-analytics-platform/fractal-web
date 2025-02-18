@@ -219,3 +219,19 @@ export function getTimestamp(date, time) {
 	}
 	return new Date(`${date}T${time}:00`).toISOString();
 }
+
+/**
+ * @param {any[][]} data
+ */
+export function arrayToCsv(data) {
+	return data
+		.map((row) =>
+			row
+				.map((v) => (v === null || v === undefined ? '' : v))
+				.map(String) // convert every value to String
+				.map((v) => v.replaceAll('"', '""')) // escape double quotes
+				.map((v) => `"${v}"`)
+				.join(',')
+		)
+		.join('\n');
+}
