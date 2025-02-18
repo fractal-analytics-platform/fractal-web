@@ -33,7 +33,7 @@ test('OAuth2 account', async ({ page }) => {
 
 	await test.step('Logout', async () => {
 		await page.getByRole('button', { name: 'kilgore@kilgore.trout' }).click();
-		await page.getByRole('link', { name: 'Logout' }).click();
+		await page.getByRole('button', { name: 'Logout' }).click();
 		await page.waitForURL('/');
 
 		await expect(page.getByText('kilgore@kilgore.trout')).toHaveCount(0);

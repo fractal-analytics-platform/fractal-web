@@ -38,6 +38,6 @@
 	<Accounting users={$page.data.users} currentUserId={$page.data.userInfo.id} />
 {:else if selectedTab === 'slurmAccounting'}
 	{#if $page.data.runnerBackend === 'slurm'}
-		<SlurmAccounting users={$page.data.users} currentUserId={$page.data.userInfo.id} />
+		<SlurmAccounting users={$page.data.users} />
 	{/if}
 {/if}

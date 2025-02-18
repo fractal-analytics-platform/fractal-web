@@ -14,9 +14,14 @@
 			Manage users
 		</a>
 
-		<a href="/v2/admin/groups" class="btn btn-primary">
+		<a href="/v2/admin/groups" class="btn btn-primary me-2">
 			<i class="bi bi-people-fill" />
 			Manage groups
+		</a>
+
+		<a href="/v2/admin/impersonate" class="btn btn-primary">
+			<i class="bi bi-incognito" />
+			Impersonate users
 		</a>
 
 		<h2 class="fw-light mt-3">Jobs</h2>

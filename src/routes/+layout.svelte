@@ -1,7 +1,7 @@
 <script>
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
-	import { afterNavigate, invalidateAll } from '$app/navigation';
+	import { afterNavigate, goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
 	import { env } from '$env/dynamic/public';
@@ -72,6 +72,16 @@
 			await invalidateAll();
 		}
 	});
+
+	async function logout() {
+		sessionStorage.removeItem('userLoggedIn');
+		await fetch(`/auth/token/logout`, {
+			method: 'POST',
+			credentials: 'include'
+		});
+		await invalidateAll();
+		goto('/');
+	}
 </script>
 
 <main>
@@ -85,35 +95,21 @@
 				</li>
 				{#if userLoggedIn}
 					<li class="nav-item">
-						<a
-							href="/v2/projects"
-							class="nav-link"
-							class:active={selectedSection === 'projects'}
-						>
+						<a href="/v2/projects" class="nav-link" class:active={selectedSection === 'projects'}>
 							Projects
 						</a>
 					</li>
 					<li class="nav-item">
-						<a
-							href="/v2/tasks"
-							class="nav-link"
-							class:active={selectedSection === 'tasks'}
-						>
+						<a href="/v2/tasks" class="nav-link" class:active={selectedSection === 'tasks'}>
 							Tasks
 						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}>
-							Jobs
-						</a>
+						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}> Jobs </a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
-							<a
-								href="/v2/admin"
-								class="nav-link"
-								class:admin-active={selectedSection === 'admin'}
-							>
+							<a href="/v2/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
 								Admin area
 							</a>
 						</li>
@@ -140,7 +136,7 @@
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}
 							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
-							<li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+							<li><button class="dropdown-item" on:click={logout}>Logout</button></li>
 						</ul>
 					</li>
 				{:else}
