@@ -43,4 +43,9 @@ describe('AlertError class', () => {
 		);
 		expect(error.getSimpleValidationMessage('zarr_url')).eq('error message');
 	});
+
+	it('Extract field error', () => {
+		const error = new AlertError({ message: 'Payload Too Large' }, 413);
+		expect(error.getSimpleValidationMessage()).eq('Payload Too Large');
+	});
 });

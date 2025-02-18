@@ -228,7 +228,7 @@
 				{#if inProgress}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 				{/if}
-				Test
+				Run test
 			</button>
 		</div>
 	</div>

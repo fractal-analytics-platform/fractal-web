@@ -89,6 +89,9 @@ export function extractErrorDetail(errorResponse) {
  * @returns {null | { loc: string[], msg: string } | string}
  */
 function getSimpleValidationMessage(reason, statusCode) {
+	if (typeof reason === 'object' && 'message' in reason && typeof reason.message === 'string') {
+		return reason.message;
+	}
 	if (!isValidationError(reason, statusCode)) {
 		return null;
 	}

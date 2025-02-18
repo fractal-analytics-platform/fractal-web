@@ -19,8 +19,7 @@ export function createGetProxy(path, forbiddenPaths = []) {
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
@@ -44,8 +43,7 @@ export function createPostProxy(path, forbiddenPaths = []) {
 				duplex: 'half'
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
@@ -68,8 +66,7 @@ export function createPatchProxy(path, forbiddenPaths = []) {
 				duplex: 'half'
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
@@ -89,8 +86,7 @@ export function createDeleteProxy(path, forbiddenPaths = []) {
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
@@ -104,6 +100,21 @@ function checkForbiddenPaths(path, forbiddenPaths) {
 		if (path.startsWith(forbiddenPath)) {
 			error(403);
 		}
+	}
+}
+
+/**
+ * @param {unknown} err
+ */
+function handleError(err) {
+	if (err instanceof Error && err.cause instanceof Error) {
+		// Underlying cause might be a Svelte Kit error
+		error(500, err.cause.message);
+	} else if (err instanceof Error) {
+		error(500, err.message);
+	} else {
+		logger.debug(err);
+		throw err;
 	}
 }
 
