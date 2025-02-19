@@ -9,9 +9,9 @@
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	/** @type {Array<import('$lib/types').User>} */
+	/** @type {Array<import('fractal-components/types/api').User>} */
 	const users = $page.data.users;
-	/** @type {Array<import('$lib/types').Group>} */
+	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $page.data.groups;
 
 	let user_id = '';
@@ -356,7 +356,7 @@
 							<BooleanIcon value={taskGroup.active} />
 						</td>
 						<td>{taskGroup.origin || '-'}</td>
-						<td> {taskGroup.task_list.length} </td>
+						<td>{taskGroup.task_list.length}</td>
 						<td>
 							<button class="btn btn-light" on:click={() => openInfoModal(taskGroup)}>
 								<i class="bi bi-info-circle" />
@@ -371,7 +371,7 @@
 								Manage
 							</button>
 							<ConfirmActionButton
-								modalId="confirmTaskGroupDeleteModal{taskGroup.pkg_name}"
+								modalId="confirmTaskGroupDeleteModal{taskGroup.id}"
 								style={'danger'}
 								btnStyle="danger"
 								buttonIcon="trash"

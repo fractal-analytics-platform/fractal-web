@@ -136,7 +136,7 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 
 /**
  * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
- * @param {{[key: number]: import('$lib/types').JobStatus}} statuses
+ * @param {{[key: number]: import('fractal-components/types/api').JobStatus}} statuses
  * @returns {number|undefined}
  */
 export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses) {

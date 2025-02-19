@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { downloadBlob, getTimestamp } from '$lib/common/component_utilities';
+	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -180,22 +180,6 @@
 		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
 	}
 
-	/**
-	 * @param {any[][]} data
-	 */
-	function arrayToCsv(data) {
-		return data
-			.map((row) =>
-				row
-					.map((v) => (v === null || v === undefined ? '' : v))
-					.map(String) // convert every value to String
-					.map((v) => v.replaceAll('"', '""')) // escape double quotes
-					.map((v) => `"${v}"`)
-					.join(',')
-			)
-			.join('\n');
-	}
-
 	/** @type {Modal} */
 	let statusModal;
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
@@ -243,10 +227,10 @@
 	$: users = sortDropdownUsers($page.data.users);
 
 	/**
-	 * @param {import('$lib/types').User[]} users
+	 * @param {import('fractal-components/types/api').User[]} users
 	 */
 	function sortDropdownUsers(users) {
-		const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
+		const usersCopy = /** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
 		sortUsers(usersCopy, $page.data.userInfo.id, false);
 		return usersCopy;
 	}

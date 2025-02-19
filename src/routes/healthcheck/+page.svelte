@@ -2,12 +2,19 @@
 	import { goto } from '$app/navigation';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { onMount } from 'svelte';
 
 	let inProgress = false;
 	let stepMessage = '';
 	let error = undefined;
+	let randomProjectName = '';
 
 	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
+
+	onMount(() => {
+		const randomPart = new Date().getTime();
+		randomProjectName = `test_${randomPart}`;
+	});
 
 	async function startTest() {
 		error = undefined;
@@ -32,17 +39,15 @@
 	headers.set('Content-Type', 'application/json');
 
 	async function createProject() {
-		const randomPart = new Date().getTime();
-		const projectName = `test_${randomPart}`;
 
-		stepMessage = `Creating project ${projectName}`;
+		stepMessage = `Creating project ${randomProjectName}`;
 
 		const response = await fetch(`/api/v2/project`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
 			body: JSON.stringify({
-				name: projectName
+				name: randomProjectName
 			})
 		});
 
@@ -184,25 +189,34 @@
 </script>
 
 <div>
-	<h1 class="fw-light mb-3">Job submission healthcheck</h1>
+	<h1 class="fw-light mb-3">Job-submission test</h1>
 
-	<p>This page performs the following steps:</p>
+	<p>
+		This page lets you test that job execution works as expected, which is useful to verify that
+		your user settings are configured properly.
+	</p>
 
-	<ul>
-		<li>creates a project with name <code>test_&#123;random_integer&#125;</code>;</li>
-		<li>creates a dataset with <code>zarr_dir={zarrDir}</code></li>
-		<li>creates a workflow;</li>
+	<p>After you click the "Run test" button:</p>
+
+	<ol>
+		<li>A new project named <code>{randomProjectName}</code> is created.</li>
 		<li>
-			if not existing, creates a non-parallel task with <code>name=__TEST_ECHO_TASK__</code>,
-			<code>version=9.9.9</code> and <code>command_non_parallel="echo"</code>.
+			A new dataset (with <code>zarr_dir={zarrDir}</code>) and a new workflow (with a non-parallel
+			task named <code>__TEST_ECHO_TASK__</code>) are added to the project.
 		</li>
-		<li>adds the task to the workflow;</li>
-		<li>submits the workflow;</li>
-		<li>
-			if all up to here was successful, redirects to the workflow page; if anything failed, stops
-			the procedure and displays an error.
-		</li>
-	</ul>
+		<li>Submit the workflow for execution.</li>
+	</ol>
+
+	<p>
+		If anything fails before the job starts running, you will see an error in this page. Otherwise,
+		you'll be redirected to the workflow page, where you can monitor that the job completes
+		successfully.
+	</p>
+
+	<p>
+		Note: after running this test, you can safely delete the project
+		<code>{randomProjectName}</code>.
+	</p>
 
 	<StandardErrorAlert {error}>
 		<p>An error happened while executing the following step: <strong>{stepMessage}</strong></p>
@@ -214,7 +228,7 @@
 				{#if inProgress}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 				{/if}
-				Test
+				Run test
 			</button>
 		</div>
 	</div>

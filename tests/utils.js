@@ -137,7 +137,7 @@ export async function login(page, email, password) {
  */
 export async function logout(page, email) {
 	await page.getByRole('button', { name: email }).click();
-	await page.getByRole('link', { name: 'Logout' }).click();
+	await page.getByRole('button', { name: 'Logout' }).click();
 	await waitPageLoading(page);
 	await expect(page.getByRole('link', { name: 'Login' }).first()).toBeVisible();
 }

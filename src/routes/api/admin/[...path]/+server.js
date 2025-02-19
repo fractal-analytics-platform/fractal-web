@@ -3,7 +3,7 @@
  */
 import { createDeleteProxy, createGetProxy, createPatchProxy, createPostProxy } from '../../../proxy';
 
-export const GET = createGetProxy('admin');
+export const GET = createGetProxy('admin', ['v2/impersonate']);
 export const POST = createPostProxy('admin');
 export const PATCH = createPatchProxy('admin');
 export const DELETE = createDeleteProxy('admin');

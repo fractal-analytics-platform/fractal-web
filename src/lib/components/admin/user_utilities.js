@@ -1,5 +1,5 @@
 /**
- * @param {Array<import('$lib/types').User & {id: number}>} users
+ * @param {Array<import('fractal-components/types/api').User & {id: number}>} users
  * @param {number} currentAdminId
  * @param {boolean|true=} prioritizeSuperusers
  */
@@ -28,8 +28,8 @@ export function sortUsers(users, currentAdminId, prioritizeSuperusers = true) {
 
 /**
  * Sort groups by name, but keeping the All group first.
- * @param {import('$lib/types').Group} g1
- * @param {import('$lib/types').Group} g2
+ * @param {import('fractal-components/types/api').Group} g1
+ * @param {import('fractal-components/types/api').Group} g2
  */
 export const sortGroupByNameAllFirstComparator = function (g1, g2) {
 	return g1.name === 'All'
@@ -40,9 +40,9 @@ export const sortGroupByNameAllFirstComparator = function (g1, g2) {
 };
 
 /**
- * @param {Array<import('$lib/types').User & {id: number}>} users
+ * @param {Array<import('fractal-components/types/api').User & {id: number}>} users
  * @param {number[]} desiredGroups
- * @param {Array<import('$lib/types').Group & {user_ids: number[]}>} allGroups
+ * @param {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} allGroups
  * @returns
  */
 export const sortUserToImportSettings = function (users, desiredGroups, allGroups) {
@@ -63,3 +63,13 @@ export const sortUserToImportSettings = function (users, desiredGroups, allGroup
 	});
 	return users;
 };
+
+/**
+ * @param {import('$lib/types').User[]} users
+ * @param {number} currentUserId
+ */
+export function sortDropdownUsers(users, currentUserId) {
+	const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
+	sortUsers(usersCopy, currentUserId, false);
+	return usersCopy;
+}

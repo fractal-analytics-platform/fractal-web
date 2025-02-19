@@ -4,7 +4,7 @@
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('$lib/types').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let user = {
 		email: '',
 		is_active: true,
@@ -21,7 +21,7 @@
 	let verified = undefined;
 
 	/**
-	 * @param {import('$lib/types').User} user
+	 * @param {import('fractal-components/types/api').User} user
 	 * @returns {Promise<Response>}
 	 */
 	async function save(user) {

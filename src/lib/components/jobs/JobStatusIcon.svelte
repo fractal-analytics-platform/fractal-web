@@ -1,5 +1,5 @@
 <script>
-	/** @type {import('$lib/types').JobStatus|undefined} */
+	/** @type {import('fractal-components/types/api').JobStatus|undefined} */
 	export let status;
 </script>
 

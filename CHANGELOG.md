@@ -1,5 +1,15 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Used `FRACTAL_BACKEND_RUNNER=local` instead of `local_experimental` (\#713);
+* Moved job submission healthcheck page to user menu (\#713);
+* Fixed bug in task-groups deletion in admin page (\#713);
+* Fixed bug in task order modal drag and drop (\#713);
+* Added admin accounting page (\#713);
+* Implemented user impersonation (\#713);
+* Improved error handling in proxy functions and documented the usage of Svelte Kit `BODY_SIZE_LIMIT` environment variable (\#713);
+
 # 1.15.0
 
 * Added type filters flow modal (\#701);

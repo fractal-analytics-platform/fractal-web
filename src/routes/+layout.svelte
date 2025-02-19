@@ -1,7 +1,7 @@
 <script>
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
-	import { afterNavigate, invalidateAll } from '$app/navigation';
+	import { afterNavigate, goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { navigating } from '$app/stores';
 	import { env } from '$env/dynamic/public';
@@ -52,7 +52,7 @@
 			return 'home';
 		}
 		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
-			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/$v2/${section}`)) {
+			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/v2/${section}`)) {
 				return section;
 			}
 		}
@@ -72,6 +72,16 @@
 			await invalidateAll();
 		}
 	});
+
+	async function logout() {
+		sessionStorage.removeItem('userLoggedIn');
+		await fetch(`/auth/token/logout`, {
+			method: 'POST',
+			credentials: 'include'
+		});
+		await invalidateAll();
+		goto('/');
+	}
 </script>
 
 <main>
@@ -85,35 +95,21 @@
 				</li>
 				{#if userLoggedIn}
 					<li class="nav-item">
-						<a
-							href="/v2/projects"
-							class="nav-link"
-							class:active={selectedSection === 'projects'}
-						>
+						<a href="/v2/projects" class="nav-link" class:active={selectedSection === 'projects'}>
 							Projects
 						</a>
 					</li>
 					<li class="nav-item">
-						<a
-							href="/v2/tasks"
-							class="nav-link"
-							class:active={selectedSection === 'tasks'}
-						>
+						<a href="/v2/tasks" class="nav-link" class:active={selectedSection === 'tasks'}>
 							Tasks
 						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}>
-							Jobs
-						</a>
+						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}> Jobs </a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
-							<a
-								href="/v2/admin"
-								class="nav-link"
-								class:admin-active={selectedSection === 'admin'}
-							>
+							<a href="/v2/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
 								Admin area
 							</a>
 						</li>
@@ -139,7 +135,8 @@
 							{#if env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}
-							<li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
+							<li><button class="dropdown-item" on:click={logout}>Logout</button></li>
 						</ul>
 					</li>
 				{:else}

@@ -12,9 +12,9 @@
 
 	export let admin = false;
 
-	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	export let users = [];
-	/** @type {Array<import('$lib/types').User & {id: number}>} */
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let sortedUsers = [];
 	$: if (users) {
 		sortedUsers = [...users].sort(sortUserByEmailComparator);

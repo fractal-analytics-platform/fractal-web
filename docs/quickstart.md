@@ -49,6 +49,7 @@ export AUTH_COOKIE_DOMAIN=
 
 export ORIGIN=http://localhost:5173
 export PORT=5173
+export BODY_SIZE_LIMIT=5000000
 
 export LOG_FILE=fractal-web.log
 # default values for logging levels (uncomment if needed)

@@ -1,51 +1,8 @@
 import { it, expect } from 'vitest';
 import {
-	orderTasksByOwnerThenByNameThenByVersion,
 	removeDuplicatedItems,
 	sortProjectsByTimestampCreatedDesc
 } from '$lib/common/component_utilities.js';
-
-it('should order tasks by owner, then by name, then by version', () => {
-	const tasks = [
-		{ name: 'task1', owner: 'owner1', version: '0.0.1' },
-		{ name: 'task2', owner: 'owner1', version: '0.0.1' },
-		{ name: 'TASK3', owner: 'owner1', version: '0.0.2' },
-		{ name: 'task4', owner: 'OWNER2', version: '0.0.1' },
-		{ name: 'task5', owner: 'OWNER2', version: '0.0.2' },
-		{ name: 'TASK6', owner: 'OWNER2', version: '0.0.2' },
-		{ name: 'task7', owner: 'admin', version: '0.0.1' },
-		{ name: 'task8', owner: 'owner3', version: '0.0.2' },
-		{ name: 'TASK9', owner: 'owner3', version: '0.0.2' }
-	];
-
-	const sortedTasks = orderTasksByOwnerThenByNameThenByVersion(tasks);
-
-	expect(sortedTasks).toEqual([
-		{ name: 'task7', owner: 'admin', version: '0.0.1' },
-		{ name: 'task1', owner: 'owner1', version: '0.0.1' },
-		{ name: 'task2', owner: 'owner1', version: '0.0.1' },
-		{ name: 'TASK3', owner: 'owner1', version: '0.0.2' },
-		{ name: 'task4', owner: 'OWNER2', version: '0.0.1' },
-		{ name: 'task5', owner: 'OWNER2', version: '0.0.2' },
-		{ name: 'TASK6', owner: 'OWNER2', version: '0.0.2' },
-		{ name: 'task8', owner: 'owner3', version: '0.0.2' },
-		{ name: 'TASK9', owner: 'owner3', version: '0.0.2' }
-	]);
-
-	const sortedTasks2 = orderTasksByOwnerThenByNameThenByVersion(tasks, 'OWNER2');
-
-	expect(sortedTasks2).toEqual([
-		{ name: 'task4', owner: 'OWNER2', version: '0.0.1' },
-		{ name: 'task5', owner: 'OWNER2', version: '0.0.2' },
-		{ name: 'TASK6', owner: 'OWNER2', version: '0.0.2' },
-		{ name: 'task7', owner: 'admin', version: '0.0.1' },
-		{ name: 'task1', owner: 'owner1', version: '0.0.1' },
-		{ name: 'task2', owner: 'owner1', version: '0.0.1' },
-		{ name: 'TASK3', owner: 'owner1', version: '0.0.2' },
-		{ name: 'task8', owner: 'owner3', version: '0.0.2' },
-		{ name: 'TASK9', owner: 'owner3', version: '0.0.2' }
-	]);
-});
 
 it('removes duplicated datasets and sort by name', () => {
 	const allDatasets = [

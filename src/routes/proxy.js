@@ -1,13 +1,16 @@
 import { env } from '$env/dynamic/private';
 import { getLogger } from '$lib/server/logger.js';
+import { error } from '@sveltejs/kit';
 
 const logger = getLogger('proxy');
 
 /**
  * @param {string} path
+ * @param {string[]} forbiddenPaths
  */
-export function createGetProxy(path) {
+export function createGetProxy(path, forbiddenPaths = []) {
 	return async function GET({ params, url, request }) {
+		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[GET] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
@@ -16,17 +19,18 @@ export function createGetProxy(path) {
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
 
 /**
  * @param {string} path
+ * @param {string[]} forbiddenPaths
  */
-export function createPostProxy(path) {
+export function createPostProxy(path, forbiddenPaths = []) {
 	return async function POST({ params, url, request }) {
+		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[POST] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
@@ -39,17 +43,18 @@ export function createPostProxy(path) {
 				duplex: 'half'
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
 
 /**
  * @param {string} path
+ * @param {string[]} forbiddenPaths
  */
-export function createPatchProxy(path) {
+export function createPatchProxy(path, forbiddenPaths = []) {
 	return async function PATCH({ params, url, request }) {
+		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[PATCH] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
@@ -61,17 +66,18 @@ export function createPatchProxy(path) {
 				duplex: 'half'
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
 
 /**
  * @param {string} path
+ * @param {string[]} forbiddenPaths
  */
-export function createDeleteProxy(path) {
+export function createDeleteProxy(path, forbiddenPaths = []) {
 	return async function DELETE({ params, url, request }) {
+		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[DELETE] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
@@ -80,15 +86,41 @@ export function createDeleteProxy(path) {
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {
-			logger.debug(err);
-			throw err;
+			handleError(err);
 		}
 	};
 }
 
 /**
+ * @param {string} path
+ * @param {string[]} forbiddenPaths
+ */
+function checkForbiddenPaths(path, forbiddenPaths) {
+	for (const forbiddenPath of forbiddenPaths) {
+		if (path.startsWith(forbiddenPath)) {
+			error(403);
+		}
+	}
+}
+
+/**
+ * @param {unknown} err
+ */
+function handleError(err) {
+	if (err instanceof Error && err.cause instanceof Error) {
+		// Underlying cause might be a Svelte Kit error
+		error(500, err.cause.message);
+	} else if (err instanceof Error) {
+		error(500, err.message);
+	} else {
+		logger.debug(err);
+		throw err;
+	}
+}
+
+/**
  * Forward only selected headers, to avoid issues like content length mismatch
- * @type {import('$lib/types').GetHeaders}
+ * @type {import('fractal-components/types/api').GetHeaders}
  */
 function filterHeaders(originalHeaders) {
 	const headers = new Headers();

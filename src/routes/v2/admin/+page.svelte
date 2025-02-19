@@ -14,9 +14,14 @@
 			Manage users
 		</a>
 
-		<a href="/v2/admin/groups" class="btn btn-primary">
+		<a href="/v2/admin/groups" class="btn btn-primary me-2">
 			<i class="bi bi-people-fill" />
 			Manage groups
+		</a>
+
+		<a href="/v2/admin/impersonate" class="btn btn-primary">
+			<i class="bi bi-incognito" />
+			Impersonate users
 		</a>
 
 		<h2 class="fw-light mt-3">Jobs</h2>
@@ -24,11 +29,6 @@
 		<a href="/v2/admin/jobs" class="btn btn-primary me-2">
 			<i class="bi bi-search" />
 			Search jobs
-		</a>
-
-		<a href="/v2/admin/jobs/healthcheck" class="btn btn-primary">
-			<i class="bi bi-heart-pulse-fill" />
-			Job submission healthcheck
 		</a>
 
 		<h2 class="fw-light mt-3">Tasks</h2>
@@ -46,6 +46,13 @@
 		<a href="/v2/admin/task-groups/activities" class="btn btn-primary me-2">
 			<i class="bi bi-search" />
 			Search activities
+		</a>
+
+		<h2 class="fw-light mt-3">Accounting</h2>
+
+		<a href="/v2/admin/accounting" class="btn btn-primary me-2">
+			<i class="bi bi-search" />
+			Accounting
 		</a>
 	</div>
 </div>
