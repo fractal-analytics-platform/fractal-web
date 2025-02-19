@@ -1,6 +1,6 @@
 import type { JSONSchemaObjectProperty } from './jschema';
 
-export type GetHeaders = (originalHeaders: Headers | undefined) => Headers
+export type GetHeaders = (originalHeaders: Headers | undefined) => Headers;
 
 export type User = {
 	id?: number;
@@ -19,25 +19,25 @@ export type User = {
 };
 
 export type UserSettings = {
-  slurm_accounts: string[]
-  project_dir: string | null
-  // Slurm
-  slurm_user: string | null
-  // Slurm SSH
-  ssh_host: string | null
-  ssh_username: string | null
-  ssh_private_key_path: string | null
-  ssh_tasks_dir: string | null
-  ssh_jobs_dir: string | null
-}
+	slurm_accounts: string[];
+	project_dir: string | null;
+	// Slurm
+	slurm_user: string | null;
+	// Slurm SSH
+	ssh_host: string | null;
+	ssh_username: string | null;
+	ssh_private_key_path: string | null;
+	ssh_tasks_dir: string | null;
+	ssh_jobs_dir: string | null;
+};
 
 export type Group = {
-  id: number
-  name: string
-  timestamp_created: string
-  user_ids?: number[]
-  viewer_paths: string[]
-}
+	id: number;
+	name: string;
+	timestamp_created: string;
+	user_ids?: number[];
+	viewer_paths: string[];
+};
 
 export type DatasetHistoryItem = {
 	workflowtask: WorkflowTask;
@@ -141,7 +141,7 @@ export type ApplyWorkflowV2 = {
 	attribute_filters: { [key: string]: string | number | boolean };
 };
 
-export type JobStatus = 'submitted' | 'done' | 'failed'
+export type JobStatus = 'submitted' | 'done' | 'failed';
 
 export type WorkflowV2 = {
 	id: number;
@@ -277,4 +277,17 @@ export type Accounting = {
 		num_tasks: number;
 		num_new_images: number;
 	}>;
+};
+
+export type HistoryItemV2 = {
+	id: number;
+	dataset_id: number;
+	workflowtask_id: number;
+	timestamp_started: string;
+	parameters_hash: string;
+	num_available_images: number;
+	num_current_images: number;
+	images: { [key: string]: string };
+	worfklowtask_dump: WorkflowTaskV2;
+	task_group_dump: TaskGroupV2;
 };

@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
+	import DatasetHistoryOldModal from '$lib/components/v2/projects/datasets/DatasetHistoryOldModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
@@ -150,6 +151,9 @@
 		<button class="btn btn-light" data-bs-target="#datasetHistoryModal" data-bs-toggle="modal">
 			History
 		</button>
+		<button class="btn btn-light" data-bs-target="#datasetHistoryOldModal" data-bs-toggle="modal">
+			<del>History</del>
+		</button>
 		<button
 			class="btn btn-light"
 			on:click|preventDefault={handleExportDataset}
@@ -213,4 +217,5 @@
 />
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
+<DatasetHistoryOldModal {dataset} />
 <DatasetHistoryModal {dataset} />
