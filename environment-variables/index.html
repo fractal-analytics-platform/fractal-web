@@ -617,7 +617,7 @@
 <li><code>LOG_FILE</code>: the path of the file where logs will be written; by default is unset and no file will be created;</li>
 <li><code>LOG_LEVEL_FILE</code>: the log level of logs that will be written to the file; the default value is <code>info</code>;</li>
 <li><code>LOG_LEVEL_CONSOLE</code>: the log level of logs that will be written to the console; the default value is <code>warn</code>;</li>
-<li><code>FRACTAL_RUNNER_BACKEND</code>: specifies which runner backend is used; supported values are: <code>local</code>, <code>local_experimental</code>, <code>slurm</code>, <code>slurm_ssh</code>; setting this variable is mandatory;</li>
+<li><code>FRACTAL_RUNNER_BACKEND</code>: specifies which runner backend is used; supported values are: <code>local</code>, <code>slurm</code>, <code>slurm_ssh</code>; setting this variable is mandatory;</li>
 <li><code>PUBLIC_FRACTAL_VIZARR_VIEWER_URL</code>: URL to <a href="https://github.com/fractal-analytics-platform/fractal-vizarr-viewer">fractal-vizarr-viewer</a> service (e.g. <a href="http://localhost:3000/vizarr">http://localhost:3000/vizarr</a> for testing);</li>
 <li><code>WARNING_BANNER_PATH</code>: specifies the path to a text file containing the warning banner message displayed on the site; the banner is used to inform users about important issues, such as external resources downtime or maintenance alerts; if the variable is empty or unset no banner is displayed;</li>
 <li><code>ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS</code>: enable attribute filters interactive editing from the job-submission modal; supported values are <code>true</code> or <code>false</code>; default value is <code>false</code>.</li>
@@ -625,7 +625,8 @@
 <p>When running directly using <code>node</code> command these extra variables can also be configured:</p>
 <ul>
 <li><code>PORT</code>: specifies the port where Svelte server will run; the default value is 5173;</li>
-<li><code>ORIGIN</code> the URL where the app will be served (e.g. <a href="http://localhost:5173">http://localhost:5173</a>, or <a href="https://subdomain.example.org">https://subdomain.example.org</a>).</li>
+<li><code>ORIGIN</code> the URL where the app will be served (e.g. <a href="http://localhost:5173">http://localhost:5173</a>, or <a href="https://subdomain.example.org">https://subdomain.example.org</a>);</li>
+<li><code>BODY_SIZE_LIMIT</code>: the maximum request body size accepted in bytes; see <a href="https://svelte.dev/docs/kit/adapter-node#Environment-variables-BODY_SIZE_LIMIT">official SvelteKit documentation</a>.</li>
 </ul>
 <h2 id="common-issues-related-to-environment-variables">Common issues related to environment variables<a class="headerlink" href="#common-issues-related-to-environment-variables" title="Permanent link">&para;</a></h2>
 <p>The <code>node</code> command relies on some extra environment variables, and especially on <code>ORIGIN</code>:</p>
