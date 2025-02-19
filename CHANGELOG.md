@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.16.0
 
 * Used `FRACTAL_BACKEND_RUNNER=local` instead of `local_experimental` (\#713);
 * Moved job submission healthcheck page to user menu (\#713);
