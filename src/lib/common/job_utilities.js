@@ -136,13 +136,13 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 
 /**
  * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
- * @param {{[key: number]: import('fractal-components/types/api').JobStatus}} statuses
+ * @param {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
  * @returns {number|undefined}
  */
 export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses) {
-	if (workflowTasks.find((wft) => statuses[wft.id] === 'submitted')) {
+	if (workflowTasks.find((wft) => statuses[wft.id] && statuses[wft.id].num_submitted_images > 0)) {
 		// we can't re-submit while something is running
 		return undefined;
 	}
-	return workflowTasks.find((wft) => !(wft.id in statuses) || statuses[wft.id] === 'failed')?.order;
+	return workflowTasks.find((wft) => !(wft.id in statuses) || statuses[wft.id].num_failed_images > 0)?.order;
 }

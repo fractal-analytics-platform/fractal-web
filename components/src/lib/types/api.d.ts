@@ -143,6 +143,13 @@ export type ApplyWorkflowV2 = {
 
 export type JobStatus = 'submitted' | 'done' | 'failed';
 
+export type ImagesStatus = {
+	num_submitted_images: number;
+	num_done_images: number;
+	num_failed_images: number;
+	num_available_images: number;
+};
+
 export type WorkflowV2 = {
 	id: number;
 	name: string;

@@ -11,7 +11,7 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
 	import { getAllNewVersions } from '$lib/components/v2/workflow/version-checker';
-	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
+	import ImagesStatus from '$lib/components/jobs/ImagesStatus.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
@@ -396,7 +396,7 @@
 		newVersionsCount = count;
 	}
 
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
+	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = {};
 
 	$: hasAnyJobRun = Object.keys(statuses).length > 0;
@@ -421,7 +421,7 @@
 		}
 		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
 		const outputStatusResponse = await fetch(
-			`/api/v2/project/${project.id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
+			`/api/v2/history/latest-status/?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -429,11 +429,11 @@
 		);
 		const outputStatus = await outputStatusResponse.json();
 		if (!outputStatusResponse.ok) {
-			console.error('Error retrieving dataset status', outputStatus);
+			console.error('Error retrieving images status', outputStatus);
 			return;
 		}
-		statuses = outputStatus.status;
-		const submitted = Object.values(statuses).filter((s) => s === 'submitted');
+		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([_,v])=> v !== null));
+		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (submitted.length > 0) {
 			window.clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
@@ -463,7 +463,7 @@
 
 	async function loadJobError() {
 		if (Object.values(statuses).length > 0) {
-			const failedStatus = Object.values(statuses).find((s) => s === 'failed');
+			const failedStatus = Object.values(statuses).find((s) => s.num_failed_images > 0);
 			if (!failedStatus) {
 				jobError = '';
 				failedJob = undefined;
@@ -754,7 +754,7 @@
 								>
 									{workflowTask.task.name}
 									<span class="float-end ps-2">
-										<JobStatusIcon status={statuses[workflowTask.id]} />
+										<ImagesStatus status={statuses[workflowTask.id]} />
 									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-info" title="new version available">
