@@ -21,7 +21,7 @@ export function sortUsers(users, currentAdminId, prioritizeSuperusers = true) {
 			}
 		}
 		// then sort by email
-		return a.email < b.email ? -1 : 1;
+		return a.email.toLocaleLowerCase() < b.email.toLocaleLowerCase() ? -1 : 1;
 	});
 	return users;
 }
@@ -65,11 +65,11 @@ export const sortUserToImportSettings = function (users, desiredGroups, allGroup
 };
 
 /**
- * @param {import('$lib/types').User[]} users
+ * @param {import('fractal-components/types/api').User[]} users
  * @param {number} currentUserId
  */
 export function sortDropdownUsers(users, currentUserId) {
-	const usersCopy = /** @type {Array<import('$lib/types').User & {id: number}>} */ ([...users]);
+	const usersCopy = /** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
 	sortUsers(usersCopy, currentUserId, false);
 	return usersCopy;
 }
