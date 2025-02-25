@@ -75,10 +75,13 @@ export type Image = {
 	types: { [key: string]: boolean };
 };
 
-export type ImagePage = {
+export type Pagination = {
 	total_count: number;
 	page_size: number;
 	current_page: number;
+};
+
+export type ImagePage = Pagination & {
 	attributes: { [key: string]: Array<string | number | boolean> };
 	types: Array<string>;
 	images: Array<Image>;
@@ -273,10 +276,7 @@ export type TypeFiltersFlow = {
 	output_filters: Array<{ [key: string]: bool }>;
 };
 
-export type Accounting = {
-	total_count: number;
-	page_size: number;
-	current_page: number;
+export type Accounting = Pagination & {
 	records: Array<{
 		id: number;
 		user_id: number;
@@ -297,4 +297,10 @@ export type HistoryItemV2 = {
 	images: { [key: string]: string };
 	worfklowtask_dump: WorkflowTaskV2;
 	task_group_dump: TaskGroupV2;
+};
+
+export type SubsetStatus = {
+	workflowtask_dump: WorkflowTaskV2;
+	parameters_hash: string;
+	info: Omit<ImagesStatus, 'num_available_images'>;
 };

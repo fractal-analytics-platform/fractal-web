@@ -21,6 +21,8 @@
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
 	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
+	import { slide } from 'svelte/transition';
+	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -47,7 +49,14 @@
 	let workflowSuccessMessage = '';
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = undefined;
+	/** @type {number|undefined} */
+	let expandedWorkflowTaskId = undefined;
 	let preventedSelectedTaskChange = undefined;
+	/** @type {import('fractal-components/types/api').SubsetStatus[]} */
+	let subsetStatuses = [];
+	let loadingSubsetStatuses = false;
+	/** @type {ImagesStatusModal} */
+	let imagesStatusModal;
 
 	/** @type {ArgumentsSchema|undefined} */
 	let argsSchemaForm = undefined;
@@ -88,6 +97,8 @@
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
 
+	let mounted = false;
+
 	$: updatableWorkflowList = workflow.task_list || [];
 
 	$: sortedDatasets = datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
@@ -97,9 +108,11 @@
 		: 3000;
 
 	onMount(async () => {
+		mounted = false;
 		selectedDatasetId = getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId);
 		await loadJobsStatus();
 		await checkNewVersions();
+		mounted = true;
 	});
 
 	beforeNavigate((navigation) => {
@@ -299,10 +312,32 @@
 		}
 		if (wft) {
 			selectedWorkflowTask = wft;
+			if (expandedWorkflowTaskId !== wft.id) {
+				expandedWorkflowTaskId = undefined;
+			}
 		}
 		preventedSelectedTaskChange = undefined;
 		await tick();
 		await inputFiltersTab?.init();
+	}
+
+	/**
+	 * @param {number} workflowTaskId
+	 */
+	async function loadSubsetStatus(workflowTaskId) {
+		subsetStatuses = [];
+		expandedWorkflowTaskId = workflowTaskId;
+		loadingSubsetStatuses = true;
+		const response = await fetch(
+			`/api/v2/project/1/status/subsets?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
+		);
+		if (!response.ok) {
+			loadingSubsetStatuses = false;
+			return;
+		}
+		subsetStatuses = await response.json();
+		await tick(); // to trigger animation
+		loadingSubsetStatuses = false;
 	}
 
 	function toggleArgsUnsavedChangesModal() {
@@ -421,7 +456,7 @@
 		}
 		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
 		const outputStatusResponse = await fetch(
-			`/api/v2/history/latest-status/?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
+			`/api/v2/project/${workflow.project_id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -432,7 +467,7 @@
 			console.error('Error retrieving images status', outputStatus);
 			return;
 		}
-		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([_,v])=> v !== null));
+		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([_, v]) => v !== null));
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (submitted.length > 0) {
 			window.clearTimeout(statusWatcherTimer);
@@ -741,7 +776,7 @@
 
 					{#if workflow.task_list.length == 0}
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
-					{:else}
+					{:else if mounted}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
 							{#each workflow.task_list as workflowTask}
 								<button
@@ -752,9 +787,41 @@
 									data-fs-target={workflowTask.id}
 									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
 								>
+								{#if statuses[workflowTask.id]}
+									{#if expandedWorkflowTaskId === workflowTask.id && loadingSubsetStatuses}
+										<span
+											class="spinner-border spinner-border-sm p-0"
+											role="status"
+											aria-hidden="true"
+										/>
+									{:else if expandedWorkflowTaskId === workflowTask.id}
+										<button
+											class="btn btn-link p-0 text-white"
+											on:click={() => (expandedWorkflowTaskId = undefined)}
+										>
+											<i class="bi bi-caret-down-fill" />
+										</button>
+									{:else}
+										<button
+											class="btn btn-link p-0"
+											class:text-white={selectedWorkflowTask?.id === workflowTask.id}
+											on:click={() => loadSubsetStatus(workflowTask.id)}
+										>
+											<i class="bi bi-caret-right-fill" />
+										</button>
+									{/if}
+									{/if}
 									{workflowTask.task.name}
 									<span class="float-end ps-2">
-										<ImagesStatus status={statuses[workflowTask.id]} />
+										{#if selectedDatasetId}
+											<ImagesStatus
+												status={statuses[workflowTask.id]}
+												datasetId={selectedDatasetId}
+												projectId={project.id}
+												workflowTaskId={workflowTask.id}
+												{imagesStatusModal}
+											/>
+										{/if}
 									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-info" title="new version available">
@@ -767,6 +834,29 @@
 										</span>
 									{/if}
 								</button>
+								{#each subsetStatuses as status, index}
+									{#if !loadingSubsetStatuses && expandedWorkflowTaskId === workflowTask.id}
+										<button
+											transition:slide
+											class="list-group-item list-group-item-action"
+											style="padding-left: 38px"
+										>
+											Subset {index + 1}
+											<span class="float-end ps-2">
+												{#if selectedDatasetId}
+													<ImagesStatus
+														status={status.info}
+														datasetId={selectedDatasetId}
+														projectId={project.id}
+														workflowTaskId={workflowTask.id}
+														parametersHash={status.parameters_hash}
+														{imagesStatusModal}
+													/>
+												{/if}
+											</span>
+										</button>
+									{/if}
+								{/each}
 							{/each}
 						</div>
 					{/if}
@@ -797,7 +887,8 @@
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
 											on:click={() => setWorkflowTabContextId(1)}
 											aria-current={workflowTabContextId === 1}
-											>Meta
+										>
+											Meta
 										</button>
 									</li>
 									<li class="nav-item">
@@ -805,7 +896,8 @@
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
 											on:click={() => setWorkflowTabContextId(2)}
 											aria-current={workflowTabContextId === 2}
-											>Info
+										>
+											Info
 										</button>
 									</li>
 									<li class="nav-item">
@@ -928,6 +1020,8 @@
 	{workflow}
 	user={$page.data.user}
 />
+
+<ImagesStatusModal bind:this={imagesStatusModal} />
 
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	<svelte:fragment slot="header">
