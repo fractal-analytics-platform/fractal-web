@@ -493,6 +493,7 @@
 			console.error('Error retrieving images status', outputStatus);
 			return;
 		}
+		const jobHasError = selectedSubmittedJob?.status === 'failed';
 		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([, v]) => v !== null));
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
@@ -502,7 +503,7 @@
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 		}
-		await loadJobError();
+		await loadJobError(jobHasError);
 	}
 
 	async function reloadSelectedDataset() {
@@ -522,8 +523,11 @@
 		datasets = datasets.map((d) => (d.id === datasetId ? result : d));
 	}
 
-	async function loadJobError() {
-		if (Object.values(statuses).length > 0) {
+	/**
+	 * @param {boolean} jobHasError
+	 */
+	async function loadJobError(jobHasError) {
+		if (!jobHasError && Object.values(statuses).length > 0) {
 			const failedStatus = Object.values(statuses).find((s) => s.num_failed_images > 0);
 			if (!failedStatus) {
 				jobError = '';
