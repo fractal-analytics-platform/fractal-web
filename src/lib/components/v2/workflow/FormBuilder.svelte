@@ -236,7 +236,11 @@
 	{/each}
 
 	<div class="d-flex justify-content-center align-items-center mt-3">
-		<button class="btn btn-secondary" on:click={() => addProperty(editableArgs, true)}>
+		<button
+			class="btn btn-secondary"
+			on:click={() => addProperty(editableArgs, true)}
+			disabled={!editable}
+		>
 			Add property
 		</button>
 	</div>

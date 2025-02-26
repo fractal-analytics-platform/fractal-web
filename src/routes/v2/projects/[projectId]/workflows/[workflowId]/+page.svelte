@@ -495,7 +495,7 @@
 		}
 		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([, v]) => v !== null));
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
-		if (submitted.length > 0) {
+		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
 		} else {
@@ -566,7 +566,12 @@
 	 * @return {Promise<import('fractal-components/types/api').ApplyWorkflowV2|undefined>}
 	 */
 	async function getSelectedSubmittedJob(datasetId) {
-		if (selectedSubmittedJob && selectedSubmittedJob.dataset_id === datasetId) {
+		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
+		if (
+			submitted.length > 0 &&
+			selectedSubmittedJob &&
+			selectedSubmittedJob.dataset_id === datasetId
+		) {
 			return selectedSubmittedJob;
 		}
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
