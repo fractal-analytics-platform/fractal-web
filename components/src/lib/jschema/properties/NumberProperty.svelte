@@ -3,6 +3,7 @@
 
 	/** @type {import('../form_element.js').NumberFormElement} */
 	export let formElement;
+	export let editable = true;
 
 	/** @type {HTMLInputElement} */
 	let field;
@@ -58,6 +59,7 @@
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}
+			disabled={!editable}
 		/>
 		<span class="invalid-feedback">{validationError}</span>
 	</div>

@@ -5,6 +5,7 @@
 
 	/** @type {import("../form_element.js").TupleFormElement} */
 	export let formElement;
+	export let editable = true;
 
 	export let children = [];
 
@@ -32,9 +33,13 @@
 	<div class="d-flex justify-content-center p-2">
 		{#if !formElement.required}
 			{#if children.length > 0}
-				<button class="btn btn-primary" type="button" on:click={removeTuple}> Remove tuple </button>
+				<button class="btn btn-primary" type="button" on:click={removeTuple} disabled={!editable}>
+					Remove tuple
+				</button>
 			{:else}
-				<button class="btn btn-primary" type="button" on:click={addTuple}> Add tuple </button>
+				<button class="btn btn-primary" type="button" on:click={addTuple} disabled={!editable}>
+					Add tuple
+				</button>
 			{/if}
 		{/if}
 	</div>
@@ -42,7 +47,7 @@
 		{#each children as nestedProperty}
 			<div class="d-flex">
 				<div class="flex-fill">
-					<PropertyDiscriminator formElement={nestedProperty} />
+					<PropertyDiscriminator {editable} formElement={nestedProperty} />
 				</div>
 			</div>
 		{/each}

@@ -9,30 +9,31 @@
 	import TupleProperty from './TupleProperty.svelte';
 
 	export let formElement;
+	export let editable = true;
 
 	/**
 	 * Function passed by the parent that reset this element to its default value (used only on top-level objects)
 	 * @type {null|(() => void)}
 	 */
-	 export let reset = null;
+	export let reset = null;
 </script>
 
 {#if formElement.type === 'string'}
-	<StringProperty {formElement} />
+	<StringProperty {formElement} {editable} />
 {:else if formElement.type === 'number'}
-	<NumberProperty {formElement} />
+	<NumberProperty {formElement} {editable} />
 {:else if formElement.type === 'boolean'}
-	<BooleanProperty {formElement} />
+	<BooleanProperty {formElement} {editable} />
 {:else if formElement.type === 'enum'}
-	<EnumProperty {formElement} />
+	<EnumProperty {formElement} {editable} />
 {:else if formElement.type === 'object'}
 	<CollapsibleProperty {formElement} {reset}>
-		<ObjectProperty {formElement} />
+		<ObjectProperty {formElement} {editable} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
-	<ArrayProperty {formElement} {reset} />
+	<ArrayProperty {formElement} {editable} {reset} />
 {:else if formElement.type === 'tuple'}
-	<TupleProperty {formElement} {reset} />
+	<TupleProperty {formElement} {editable} {reset} />
 {:else}
 	<p>Unsupported property type {formElement.type}</p>
 {/if}

@@ -3,6 +3,7 @@
 
 	/** @type {import('../form_element.js').EnumFormElement} */
 	export let formElement;
+	export let editable = true;
 
 	/** @type {HTMLSelectElement} */
 	let field;
@@ -30,6 +31,7 @@
 			class="form-select"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}
+			disabled={!editable}
 		>
 			<option value="">Select...</option>
 			{#each formElement.options as optionValue}
