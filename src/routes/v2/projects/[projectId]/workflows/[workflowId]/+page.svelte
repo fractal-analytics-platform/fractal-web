@@ -355,7 +355,7 @@
 		expandedWorkflowTaskId = workflowTaskId;
 		loadingSubsetStatuses = true;
 		const response = await fetch(
-			`/api/v2/project/1/status/subsets?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
+			`/api/v2/project/${workflow.project_id}/status/subsets?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
 		);
 		if (!response.ok) {
 			loadingSubsetStatuses = false;
