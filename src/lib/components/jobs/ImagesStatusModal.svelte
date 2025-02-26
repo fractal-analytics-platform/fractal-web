@@ -72,9 +72,9 @@
 	}
 </script>
 
-<Modal id="imagesStatusModal" bind:this={modal} size="lg">
+<Modal id="imagesStatusModal" bind:this={modal} fullscreen={true}>
 	<svelte:fragment slot="header">
-		<h1 class="modal-title fs-5">Images status</h1>
+		<h1 class="modal-title fs-5">Images with status='{status}'</h1>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="errorAlert-imagesStatusModal" class="mb-2" />
@@ -82,7 +82,7 @@
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 		{:else if data}
 			{#if data.images.length > 0}
-				<table class="table">
+				<table class="table table-striped">
 					<tbody>
 						{#each data.images as image}
 							<tr><td>{image}</td></tr>
