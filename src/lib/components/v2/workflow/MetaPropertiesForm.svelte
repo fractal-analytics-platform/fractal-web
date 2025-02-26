@@ -14,6 +14,9 @@
 	export let workflowTask;
 	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
+	export let editable = true;
+	export let metaNonParallel = {};
+	export let metaParallel = {};
 
 	/** @type {FormBuilder|undefined} */
 	let nonParallelFormBuilderComponent;
@@ -27,8 +30,10 @@
 	let metaPropertiesParallel = {};
 
 	$: {
-		metaPropertiesNonParallel = workflowTask.meta_non_parallel || {};
-		metaPropertiesParallel = workflowTask.meta_parallel || {};
+		metaPropertiesNonParallel = editable
+			? workflowTask.meta_non_parallel || {}
+			: metaNonParallel || {};
+		metaPropertiesParallel = editable ? workflowTask.meta_parallel || {} : metaParallel || {};
 	}
 
 	$: unsavedChanges = unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel;
@@ -104,11 +109,14 @@
 	{#if workflowTask.task_type === 'compound'}
 		<h5 class="ms-2">Initialisation Meta</h5>
 	{/if}
-	<FormBuilder
-		args={metaPropertiesNonParallel}
-		bind:this={nonParallelFormBuilderComponent}
-		bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
-	/>
+	{#key editable}
+		<FormBuilder
+			{editable}
+			args={metaPropertiesNonParallel}
+			bind:this={nonParallelFormBuilderComponent}
+			bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
+		/>
+	{/key}
 {/if}
 {#if workflowTask.task_type === 'compound'}
 	<hr />
@@ -117,18 +125,22 @@
 	{#if workflowTask.task_type === 'compound'}
 		<h5 class="ms-2">Compute Meta</h5>
 	{/if}
-	<FormBuilder
-		args={metaPropertiesParallel}
-		bind:this={parallelFormBuilderComponent}
-		bind:unsavedChanges={unsavedChangesFormBuilderParallel}
-	/>
+	{#key editable}
+		<FormBuilder
+			{editable}
+			args={metaPropertiesParallel}
+			bind:this={parallelFormBuilderComponent}
+			bind:unsavedChanges={unsavedChangesFormBuilderParallel}
+		/>
+	{/key}
 {/if}
+
 <div class="p-3 clearfix metaproperties-controls-bar">
 	<div class="ms-1 float-end">
 		<button
 			class="btn btn-success"
 			type="button"
-			disabled={!unsavedChanges || savingChanges}
+			disabled={!editable || !unsavedChanges || savingChanges}
 			on:click={saveChanges}
 		>
 			{#if savingChanges}
@@ -140,7 +152,7 @@
 	<div class="float-end">
 		<button
 			class="btn btn-warning"
-			disabled={!unsavedChanges || savingChanges}
+			disabled={!editable || !unsavedChanges || savingChanges}
 			on:click={discardChanges}
 		>
 			Discard changes

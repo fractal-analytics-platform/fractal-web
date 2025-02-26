@@ -51,12 +51,17 @@
 	let selectedWorkflowTask = undefined;
 	/** @type {number|undefined} */
 	let expandedWorkflowTaskId = undefined;
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = undefined;
+	/** @type {import('fractal-components/types/api').SubsetStatus|undefined} */
+	let preventedSelectedSubsetChange = undefined;
 	/** @type {import('fractal-components/types/api').SubsetStatus[]} */
 	let subsetStatuses = [];
 	let loadingSubsetStatuses = false;
 	/** @type {ImagesStatusModal} */
 	let imagesStatusModal;
+	/** @type {import('fractal-components/types/api').SubsetStatus|undefined} */
+	let selectedSubset = undefined;
 
 	/** @type {ArgumentsSchema|undefined} */
 	let argsSchemaForm = undefined;
@@ -293,21 +298,12 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} wft
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2|undefined} wft
 	 */
 	async function setSelectedWorkflowTask(wft) {
 		await tick();
 		preventedSelectedTaskChange = wft;
-		if (argsSchemaForm?.hasUnsavedChanges()) {
-			toggleArgsUnsavedChangesModal();
-			return;
-		}
-		if (inputFiltersTab?.hasUnsavedChanges()) {
-			toggleFiltersUnsavedChangesModal();
-			return;
-		}
-		if (metaPropertiesForm?.hasUnsavedChanges()) {
-			toggleMetaPropertiesUnsavedChangesModal();
+		if (checkUnsavedChanges()) {
 			return;
 		}
 		if (wft) {
@@ -317,8 +313,38 @@
 			}
 		}
 		preventedSelectedTaskChange = undefined;
+		selectedSubset = undefined;
 		await tick();
 		await inputFiltersTab?.init();
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').SubsetStatus|undefined} subsetStatus
+	 */
+	async function selectSubset(subsetStatus) {
+		await tick();
+		preventedSelectedSubsetChange = subsetStatus;
+		if (checkUnsavedChanges()) {
+			return;
+		}
+		preventedSelectedSubsetChange = undefined;
+		selectedSubset = subsetStatus;
+	}
+
+	function checkUnsavedChanges() {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
+			toggleArgsUnsavedChangesModal();
+			return true;
+		}
+		if (inputFiltersTab?.hasUnsavedChanges()) {
+			toggleFiltersUnsavedChangesModal();
+			return true;
+		}
+		if (metaPropertiesForm?.hasUnsavedChanges()) {
+			toggleMetaPropertiesUnsavedChangesModal();
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -467,7 +493,7 @@
 			console.error('Error retrieving images status', outputStatus);
 			return;
 		}
-		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([_, v]) => v !== null));
+		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([, v]) => v !== null));
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (submitted.length > 0) {
 			window.clearTimeout(statusWatcherTimer);
@@ -787,29 +813,29 @@
 									data-fs-target={workflowTask.id}
 									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
 								>
-								{#if statuses[workflowTask.id]}
-									{#if expandedWorkflowTaskId === workflowTask.id && loadingSubsetStatuses}
-										<span
-											class="spinner-border spinner-border-sm p-0"
-											role="status"
-											aria-hidden="true"
-										/>
-									{:else if expandedWorkflowTaskId === workflowTask.id}
-										<button
-											class="btn btn-link p-0 text-white"
-											on:click={() => (expandedWorkflowTaskId = undefined)}
-										>
-											<i class="bi bi-caret-down-fill" />
-										</button>
-									{:else}
-										<button
-											class="btn btn-link p-0"
-											class:text-white={selectedWorkflowTask?.id === workflowTask.id}
-											on:click={() => loadSubsetStatus(workflowTask.id)}
-										>
-											<i class="bi bi-caret-right-fill" />
-										</button>
-									{/if}
+									{#if statuses[workflowTask.id]}
+										{#if expandedWorkflowTaskId === workflowTask.id && loadingSubsetStatuses}
+											<span
+												class="spinner-border spinner-border-sm p-0"
+												role="status"
+												aria-hidden="true"
+											/>
+										{:else if expandedWorkflowTaskId === workflowTask.id}
+											<button
+												class="btn btn-link p-0 text-white"
+												on:click={() => (expandedWorkflowTaskId = undefined)}
+											>
+												<i class="bi bi-caret-down-fill" />
+											</button>
+										{:else}
+											<button
+												class="btn btn-link p-0"
+												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
+												on:click={() => loadSubsetStatus(workflowTask.id)}
+											>
+												<i class="bi bi-caret-right-fill" />
+											</button>
+										{/if}
 									{/if}
 									{workflowTask.task.name}
 									<span class="float-end ps-2">
@@ -838,8 +864,11 @@
 									{#if !loadingSubsetStatuses && expandedWorkflowTaskId === workflowTask.id}
 										<button
 											transition:slide
-											class="list-group-item list-group-item-action"
+											class="subset-item list-group-item list-group-item-action"
+											class:active={selectedSubset &&
+												selectedSubset.parameters_hash === status.parameters_hash}
 											style="padding-left: 38px"
+											on:click={() => selectSubset(status)}
 										>
 											Subset {index + 1}
 											<span class="float-end ps-2">
@@ -949,7 +978,10 @@
 											<ArgumentsSchema
 												workflowTask={selectedWorkflowTask}
 												{onWorkflowTaskUpdated}
+												editable={!selectedSubset}
 												bind:this={argsSchemaForm}
+												argsNonParallel={selectedSubset?.workflowtask_dump.args_non_parallel}
+												argsParallel={selectedSubset?.workflowtask_dump.args_parallel}
 											/>
 										{/key}
 									{/if}
@@ -964,6 +996,9 @@
 												{onWorkflowTaskUpdated}
 												workflowTask={selectedWorkflowTask}
 												bind:this={metaPropertiesForm}
+												metaNonParallel={selectedSubset?.workflowtask_dump.meta_non_parallel}
+												metaParallel={selectedSubset?.workflowtask_dump.meta_parallel}
+												editable={!selectedSubset}
 											/>
 										{/key}
 									{/if}
@@ -1092,6 +1127,7 @@
 			on:click={() => {
 				argsSchemaForm?.discardChanges();
 				setSelectedWorkflowTask(preventedSelectedTaskChange);
+				selectSubset(preventedSelectedSubsetChange);
 			}}
 			data-bs-dismiss="modal"
 		>
@@ -1127,6 +1163,7 @@
 			on:click={() => {
 				inputFiltersTab?.discardChanges();
 				setSelectedWorkflowTask(preventedSelectedTaskChange);
+				selectSubset(preventedSelectedSubsetChange);
 			}}
 			data-bs-dismiss="modal"
 		>
@@ -1163,6 +1200,7 @@
 			on:click={() => {
 				metaPropertiesForm?.discardChanges();
 				setSelectedWorkflowTask(preventedSelectedTaskChange);
+				selectSubset(preventedSelectedSubsetChange);
 			}}
 			data-bs-dismiss="modal"
 		>
@@ -1182,3 +1220,12 @@
 </Modal>
 
 <JobLogsModal bind:this={jobLogsModal} />
+
+<style>
+	.subset-item {
+		padding-left: 38px;
+	}
+	.subset-item.active {
+		background-color: #4e95ff !important;
+	}
+</style>

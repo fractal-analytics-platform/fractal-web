@@ -26,6 +26,11 @@
 	export let workflowTask;
 	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
+	export let editable = true;
+	/** @type {object|undefined} */
+	export let argsNonParallel = undefined
+	/** @type {object|undefined} */
+	export let argsParallel = undefined;
 
 	/** @type {JSchema|undefined} */
 	let nonParallelSchemaComponent;
@@ -224,7 +229,8 @@
 				<JSchema
 					componentId="jschema-non-parallel"
 					schema={workflowTask.task.args_schema_non_parallel}
-					schemaData={workflowTask.args_non_parallel}
+					schemaData={editable ? workflowTask.args_non_parallel : argsNonParallel}
+					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
 					on:change={handleNonParallelChanged}
@@ -234,9 +240,10 @@
 		{:else}
 			<div>
 				<FormBuilder
-					args={workflowTask.args_non_parallel}
+					args={editable ? workflowTask.args_non_parallel : argsNonParallel}
 					bind:this={nonParallelFormBuilderComponent}
 					bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
+					{editable}
 				/>
 			</div>
 		{/if}
@@ -253,7 +260,8 @@
 				<JSchema
 					componentId="jschema-parallel"
 					schema={argsSchemaParallel}
-					schemaData={workflowTask.args_parallel}
+					schemaData={editable ? workflowTask.args_parallel : argsParallel}
+					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
 					on:change={handleParallelChanged}
@@ -263,9 +271,10 @@
 		{:else}
 			<div class="mb-3">
 				<FormBuilder
-					args={workflowTask.args_parallel}
+					args={editable ? workflowTask.args_parallel : argsParallel}
 					bind:this={parallelFormBuilderComponent}
 					bind:unsavedChanges={unsavedChangesFormBuilderParallel}
+					{editable}
 				/>
 			</div>
 		{/if}
@@ -277,13 +286,13 @@
 		<ImportExportArgs
 			{workflowTask}
 			onImport={handleImport}
-			exportDisabled={unsavedChanges || savingChanges}
+			exportDisabled={!editable || unsavedChanges || savingChanges}
 		/>
 		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}
 			<div>
 				<button
 					class="btn btn-warning"
-					disabled={!unsavedChanges || savingChanges}
+					disabled={!editable || !unsavedChanges || savingChanges}
 					on:click={discardChanges}
 				>
 					Discard changes
@@ -293,7 +302,7 @@
 				<button
 					class="btn btn-success"
 					type="button"
-					disabled={!unsavedChanges || savingChanges}
+					disabled={!editable || !unsavedChanges || savingChanges}
 					on:click={saveChanges}
 				>
 					{#if savingChanges}
