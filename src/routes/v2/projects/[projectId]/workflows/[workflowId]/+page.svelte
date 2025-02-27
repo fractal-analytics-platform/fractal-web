@@ -401,6 +401,8 @@
 	 */
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = job;
+		selectedSubset = undefined;
+		expandedWorkflowTaskId = undefined;
 		await loadJobsStatus();
 	}
 
