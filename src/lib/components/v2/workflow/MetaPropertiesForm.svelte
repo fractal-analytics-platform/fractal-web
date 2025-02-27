@@ -109,7 +109,7 @@
 	{#if workflowTask.task_type === 'compound'}
 		<h5 class="ms-2">Initialisation Meta</h5>
 	{/if}
-	{#key editable}
+	{#key editable || metaPropertiesNonParallel}
 		<FormBuilder
 			{editable}
 			args={metaPropertiesNonParallel}
@@ -125,7 +125,7 @@
 	{#if workflowTask.task_type === 'compound'}
 		<h5 class="ms-2">Compute Meta</h5>
 	{/if}
-	{#key editable}
+	{#key editable || metaPropertiesParallel}
 		<FormBuilder
 			{editable}
 			args={metaPropertiesParallel}
