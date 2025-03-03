@@ -6,9 +6,10 @@ const completeTracebackLine = 'Traceback (most recent call last):';
  *
  * @param {string|null} log
  * @param {boolean} ignoreUppercaseTraceback
+ * @param {boolean} imageError
  * @returns {Array<{text: string, highlight: boolean}>}
  */
-export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = false) {
+export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = false, imageError = false) {
 	if (!log) {
 		return [];
 	}
@@ -19,12 +20,13 @@ export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = fals
 	if (
 		log.startsWith('TASK ERROR') ||
 		log.startsWith('JOB ERROR') ||
-		log.startsWith('UNKNOWN ERROR')
+		log.startsWith('UNKNOWN ERROR') ||
+		imageError
 	) {
 		const lines = log.split('\n');
 		if (lines.length > 1) {
 			const [firstLine, ...nextLines] = lines;
-			return [{ text: firstLine, highlight: true }, ...extractTraceback(nextLines.join('\n'))];
+			return [{ text: firstLine, highlight: !imageError }, ...extractTraceback(nextLines.join('\n'))];
 		}
 	}
 	return [{ text: log, highlight: false }];
