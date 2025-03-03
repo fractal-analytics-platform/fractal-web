@@ -42,7 +42,7 @@
 			selectedPlate = '';
 			return;
 		}
-		let imageWithPlate = imagePage.images.find((i) => i.attributes['plate'] === selectedPlate);
+		let imageWithPlate = imagePage.items.find((i) => i.attributes['plate'] === selectedPlate);
 		if (!imageWithPlate) {
 			platePathLoading = true;
 			imageWithPlate = await loadImageForSelectedPlate();
@@ -82,13 +82,13 @@
 		}
 		/** @type {import('fractal-components/types/api').ImagePage}*/
 		const result = await response.json();
-		if (result.images.length === 0) {
+		if (result.items.length === 0) {
 			console.error(
 				`Unable to load image for plate ${selectedPlate}. Server replied with empty list`
 			);
 			return undefined;
 		}
-		return result.images[0];
+		return result.items[0];
 	}
 
 	async function handleExportDataset() {

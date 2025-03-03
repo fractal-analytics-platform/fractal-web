@@ -49,7 +49,7 @@
 			return;
 		}
 		const header = ['id', 'user_id', 'user_email', 'timestamp', 'num_tasks', 'num_new_images'];
-		const rows = accounting.records.map((record) => [
+		const rows = accounting.items.map((record) => [
 			record.id,
 			record.user_id,
 			getUserById(record.user_id)?.email || '',
@@ -190,7 +190,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each accounting.records as row}
+			{#each accounting.items as row}
 				<tr>
 					<td>{row.id}</td>
 					<td>{getUserById(row.user_id)?.email || row.user_id}</td>

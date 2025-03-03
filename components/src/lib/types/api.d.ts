@@ -75,16 +75,16 @@ export type Image = {
 	types: { [key: string]: boolean };
 };
 
-export type Pagination = {
+export type Pagination<T> = {
 	total_count: number;
 	page_size: number;
 	current_page: number;
+	items: Array<T>;
 };
 
-export type ImagePage = Pagination & {
+export type ImagePage = Pagination<Image> & {
 	attributes: { [key: string]: Array<string | number | boolean> };
 	types: Array<string>;
-	images: Array<Image>;
 };
 
 export type TaskV2Type = 'non_parallel' | 'parallel' | 'compound';
@@ -276,15 +276,13 @@ export type TypeFiltersFlow = {
 	output_filters: Array<{ [key: string]: bool }>;
 };
 
-export type Accounting = Pagination & {
-	records: Array<{
-		id: number;
-		user_id: number;
-		timestamp: string;
-		num_tasks: number;
-		num_new_images: number;
-	}>;
-};
+export type Accounting = Pagination<{
+	id: number;
+	user_id: number;
+	timestamp: string;
+	num_tasks: number;
+	num_new_images: number;
+}>;
 
 export type HistoryItemV2 = {
 	id: number;

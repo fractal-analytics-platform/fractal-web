@@ -24,7 +24,7 @@
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {(import('fractal-components/types/api').Pagination & {images: string[]})|undefined} */
+	/** @type {(import('fractal-components/types/api').Pagination<string>)|undefined} */
 	let data = undefined;
 
 	let loadingLogs = false;
@@ -105,7 +105,7 @@
 			loadingLogs = false;
 			return;
 		}
-		const { log } = await response.json();
+		const log = await response.json();
 		if (status === 'failed') {
 			logParts = extractJobErrorParts(log, false, true);
 		} else {
@@ -144,10 +144,10 @@
 				</div>
 			</div>
 		{:else if data}
-			{#if data.images.length > 0}
+			{#if data.items.length > 0}
 				<table class="table table-striped">
 					<tbody>
-						{#each data.images as image}
+						{#each data.items as image}
 							<tr>
 								<td>{image}</td>
 								<td>

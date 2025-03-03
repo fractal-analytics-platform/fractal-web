@@ -403,7 +403,7 @@
 			reloadTypeFilters(imagePage);
 			// Go to first page if the search returns no values and we are not in the first page
 			// This happens when we are in a given page and we restrict the search setting more filters
-			if (imagePage.images.length === 0 && imagePage.current_page > 1) {
+			if (imagePage.items.length === 0 && imagePage.current_page > 1) {
 				imagePage.current_page = 1;
 				await searchImages();
 			}
@@ -475,7 +475,7 @@
 		);
 		if (response.ok) {
 			// If we are deleting the last image of the current page go to previous page
-			if (imagePage.images.length === 1 && imagePage.current_page > 1) {
+			if (imagePage.items.length === 1 && imagePage.current_page > 1) {
 				imagePage.current_page--;
 			}
 			await searchImages();
@@ -691,7 +691,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each imagePage.images as image}
+					{#each imagePage.items as image}
 						<tr>
 							<td>{getRelativePath(image.zarr_url)}</td>
 							{#each Object.keys(imagePage.attributes) as attribute}
