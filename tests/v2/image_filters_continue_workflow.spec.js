@@ -34,11 +34,11 @@ test('Continue workflow displays image lists [#693]', async ({ page, workflow })
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait task success', async () => {
-		await waitTasksSuccess(page, 1);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Reload the page', async () => {

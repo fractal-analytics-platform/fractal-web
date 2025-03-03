@@ -28,7 +28,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		});
 		workflow1 = job.workflow;
 		dataset1 = job.dataset;
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 		await waitTaskFailure(page);
 		await workflow1.deleteProject();
 	});
@@ -46,7 +46,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		workflow2 = job.workflow;
 		dataset2 = job.dataset;
 		jobId2 = job.jobId;
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Open the admin jobs', async () => {

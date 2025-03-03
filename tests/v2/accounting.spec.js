@@ -28,11 +28,11 @@ test('Display accounting page', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait task success', async () => {
-		await waitTasksSuccess(page, 1);
+		await waitTasksSuccess(page);
 	});
 
 	/** @type {number} */

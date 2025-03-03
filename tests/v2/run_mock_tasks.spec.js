@@ -79,11 +79,11 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait task success', async () => {
-		await waitTasksSuccess(page, 1);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Open "Continue workflow" modal', async () => {
@@ -143,7 +143,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 2);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait job failure', async () => {
@@ -180,11 +180,11 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait tasks success', async () => {
-		await waitTasksSuccess(page, 2);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Cleanup zarr_dir', async () => {
@@ -206,11 +206,11 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 2);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait tasks success', async () => {
-		await waitTasksSuccess(page, 2);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Cleanup zarr_dir', async () => {
@@ -243,11 +243,11 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 2);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait tasks success', async () => {
-		await waitTasksSuccess(page, 2);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Open the workflow jobs page', async () => {

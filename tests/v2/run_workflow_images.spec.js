@@ -75,7 +75,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'k1v1');
 		// Await slim-select change events are propagated before clicking the Save button
-		//await new Promise((r) => setTimeout(r, 500));
+		await new Promise((r) => setTimeout(r, 500));
 		await page.getByRole('button', { name: 'Apply', exact: true }).click();
 		await page.getByRole('button', { name: 'Save' }).click();
 		await modal.waitFor();

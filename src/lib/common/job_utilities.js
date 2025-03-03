@@ -8,7 +8,7 @@ const completeTracebackLine = 'Traceback (most recent call last):';
  * @param {boolean} ignoreUppercaseTraceback
  * @returns {Array<{text: string, highlight: boolean}>}
  */
-export function extractJobErrorParts(log, ignoreUppercaseTraceback = false) {
+export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = false) {
 	if (!log) {
 		return [];
 	}
@@ -89,7 +89,7 @@ function extractUppercaseTraceback(error) {
  * @param {number|undefined} maxLines
  * @returns {string}
  */
-export function extractRelevantJobError(completeJobError, maxLines = undefined) {
+export function extractRelevantJobError(completeJobError = null, maxLines = undefined) {
 	if (!completeJobError) {
 		return '';
 	}

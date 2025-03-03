@@ -66,11 +66,11 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 	});
 
 	await test.step('Wait task submitted', async () => {
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait for job completion', async () => {
-		await waitTasksSuccess(page, 1);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Check SLURM account in workflow info modal', async () => {

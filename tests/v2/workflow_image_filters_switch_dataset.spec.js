@@ -91,11 +91,11 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	});
 
 	await test.step('Wait tasks submitted', async () => {
-		await waitTaskSubmitted(page, 1);
+		await waitTaskSubmitted(page);
 	});
 
 	await test.step('Wait task success', async () => {
-		await waitTasksSuccess(page, 1);
+		await waitTasksSuccess(page);
 	});
 
 	await test.step('Select the first dataset', async () => {
