@@ -1,4 +1,6 @@
 <script>
+	import { onDestroy, onMount } from 'svelte';
+
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	export let logParts = [];
 	export let highlight = false;
@@ -8,12 +10,26 @@
 
 	function expandDetails() {
 		showDetails = true;
-		// Restore focus on modal, otherwise it will not be possible to close it using the esc key
+		restoreModalFocus();
+	}
+
+	/**
+	 * Restore focus on modal, otherwise it will not be possible to close it using the esc key
+	 */
+	function restoreModalFocus() {
 		const modal = document.querySelector('.modal.show');
 		if (modal instanceof HTMLElement) {
 			modal.focus();
 		}
 	}
+
+	onMount(() => {
+		restoreModalFocus();
+	});
+
+	onDestroy(() => {
+		restoreModalFocus();
+	});
 </script>
 
 <div class="expandable-log">
