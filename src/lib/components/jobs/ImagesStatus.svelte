@@ -27,12 +27,13 @@
 	<span class="d-flex">
 		{#if status.num_submitted_images > 0}
 			<button
+				aria-label="Submitted images"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
 				on:click={() =>
 					imagesStatusModal.open(projectId, datasetId, workflowTaskId, parametersHash, 'submitted')}
 			>
 				<span class="d-flex">
-					<span class="pe-1 image-status text-primary" aria-label="Submitted images">
+					<span class="pe-1 image-status text-primary">
 						{status.num_submitted_images}
 					</span>
 					<div
@@ -46,12 +47,13 @@
 		{/if}
 		{#if showDone}
 			<button
+				aria-label="Done images"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
 				on:click={() =>
 					imagesStatusModal.open(projectId, datasetId, workflowTaskId, parametersHash, 'done')}
 			>
 				<span class="d-flex">
-					<span class="image-status text-success ps-1" aria-label="Done images">
+					<span class="image-status text-success ps-1">
 						{status.num_done_images}
 					</span>
 					<i class="image-status-icon bi bi-check text-success pe-1" />
@@ -63,12 +65,13 @@
 		{/if}
 		{#if showFailed}
 			<button
+				aria-label="Failed images"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
 				on:click={() =>
 					imagesStatusModal.open(projectId, datasetId, workflowTaskId, parametersHash, 'failed')}
 			>
 				<span class="d-flex">
-					<span class="image-status text-danger ps-1" aria-label="Failed images">
+					<span class="image-status text-danger ps-1">
 						{status.num_failed_images}
 					</span>
 					<i class="image-status-icon bi bi-x text-danger pe-1" />

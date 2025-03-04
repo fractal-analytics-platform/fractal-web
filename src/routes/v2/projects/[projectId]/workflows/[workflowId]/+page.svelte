@@ -500,7 +500,10 @@
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
-			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
+			statusWatcherTimer = window.setTimeout(
+				loadJobsStatus,
+				submitted.length > 0 ? updateJobsInterval : 0
+			);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
@@ -833,6 +836,7 @@
 											/>
 										{:else if expandedWorkflowTaskId === workflowTask.id}
 											<button
+												aria-label="Hide subsets"
 												class="btn btn-link p-0 text-white"
 												on:click={() => (expandedWorkflowTaskId = undefined)}
 											>
@@ -840,6 +844,7 @@
 											</button>
 										{:else}
 											<button
+												aria-label="Show subsets"
 												class="btn btn-link p-0"
 												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
 												on:click={() => loadSubsetStatus(workflowTask.id)}
@@ -1135,22 +1140,22 @@
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={() => {
+			on:click={async () => {
 				argsSchemaForm?.discardChanges();
-				setSelectedWorkflowTask(preventedSelectedTaskChange);
-				selectSubset(preventedSelectedSubsetChange);
+				await setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await selectSubset(preventedSelectedSubsetChange);
+				argsUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Discard changes
 		</button>
 		<button
 			type="button"
 			class="btn btn-success"
-			on:click={() => {
-				argsSchemaForm?.saveChanges();
+			on:click={async () => {
+				await argsSchemaForm?.saveChanges();
+				argsUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Save changes
 		</button>
@@ -1171,12 +1176,12 @@
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={() => {
+			on:click={async () => {
 				inputFiltersTab?.discardChanges();
-				setSelectedWorkflowTask(preventedSelectedTaskChange);
-				selectSubset(preventedSelectedSubsetChange);
+				await setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await selectSubset(preventedSelectedSubsetChange);
+				filtersUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Discard changes
 		</button>
@@ -1185,8 +1190,8 @@
 			class="btn btn-success"
 			on:click={async () => {
 				await inputFiltersTab?.save();
+				filtersUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Save changes
 		</button>
@@ -1208,12 +1213,12 @@
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={() => {
+			on:click={async () => {
 				metaPropertiesForm?.discardChanges();
-				setSelectedWorkflowTask(preventedSelectedTaskChange);
-				selectSubset(preventedSelectedSubsetChange);
+				await setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await selectSubset(preventedSelectedSubsetChange);
+				metaPropertiesUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Discard changes
 		</button>
@@ -1222,8 +1227,8 @@
 			class="btn btn-success"
 			on:click={async () => {
 				await metaPropertiesForm?.saveChanges();
+				metaPropertiesUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Save changes
 		</button>

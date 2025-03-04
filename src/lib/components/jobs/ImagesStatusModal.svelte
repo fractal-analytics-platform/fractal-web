@@ -56,6 +56,10 @@
 		await loadImages(page, pageSize);
 	}
 
+	function onClose() {
+		data = undefined;
+	}
+
 	/**
 	 * @param {number} currentPage
 	 * @param {number} selectedPageSize
@@ -116,7 +120,7 @@
 	}
 </script>
 
-<Modal id="imagesStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0">
+<Modal id="imagesStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
 	<svelte:fragment slot="header">
 		<h1 class="modal-title fs-5">
 			{#if selectedLogImage && !loadingLogs}
