@@ -25,11 +25,11 @@ import TaskGroupActivities from '../../src/lib/components/v2/tasks/TaskGroupActi
 
 describe('TaskGroupActivities', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('Update ongoing activity in background - standard user', async () => {
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
@@ -55,7 +55,7 @@ describe('TaskGroupActivities', () => {
 	});
 
 	it('Update ongoing activity in background - admin', async () => {
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
@@ -84,13 +84,14 @@ describe('TaskGroupActivities', () => {
 	});
 
 	it('Search activities - admin user', async () => {
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => []
 		});
 
 		render(TaskGroupActivities, {
+			// @ts-expect-error
 			props: { admin: true, users: [{ id: 1, email: 'admin@fractal.xy' }] }
 		});
 
@@ -114,9 +115,7 @@ describe('TaskGroupActivities', () => {
 		await user.click(screen.getByRole('button', { name: /Search activities/ }));
 
 		expect(fetch).toHaveBeenLastCalledWith(
-			new URL(
-				'http://localhost:3000/api/admin/v2/task-group/activity'
-			),
+			new URL('http://localhost:3000/api/admin/v2/task-group/activity'),
 			expect.anything()
 		);
 	});

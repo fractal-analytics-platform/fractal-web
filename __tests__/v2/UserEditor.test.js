@@ -2,6 +2,7 @@ import { describe, it, beforeEach, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { readable } from 'svelte/store';
+import { mockUser } from '../mock/mock-types';
 
 // Mocking fetch
 global.fetch = vi.fn();
@@ -28,6 +29,7 @@ class MockModal {
 }
 MockModal.getInstance = vi.fn();
 
+// @ts-expect-error
 global.window.bootstrap = {
 	Modal: MockModal
 };
@@ -37,18 +39,13 @@ import UserEditor from '../../src/lib/components/v2/admin/UserEditor.svelte';
 
 describe('UserEditor', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
-	const selectedUser = {
-		id: 1,
-		email: 'test@example.com',
-		is_superuser: false,
-		group_ids_names: []
-	};
+	const selectedUser = mockUser();
 
+	/** @type {import('fractal-components/types/api').UserSettings} */
 	const initialSettings = {
-		id: 1,
 		slurm_accounts: [],
 		project_dir: null,
 		slurm_user: null,
@@ -59,6 +56,11 @@ describe('UserEditor', () => {
 		ssh_jobs_dir: null
 	};
 
+	/**
+	 * @type {() => Promise<Response>}
+	 */
+	const mockSaveUser = vi.fn();
+
 	it('Update settings with slurm runner backend - success', async () => {
 		const user = userEvent.setup();
 
@@ -67,11 +69,11 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				saveUser: () => {}
+				saveUser: mockSaveUser
 			}
 		});
 
-		const mockRequest = fetch.mockResolvedValue({
+		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: () =>
@@ -79,7 +81,7 @@ describe('UserEditor', () => {
 					resolve({
 						...initialSettings,
 						slurm_user: 'user',
-						project_dir: '/path/to/project/dir',
+						project_dir: '/path/to/project/dir'
 					})
 				)
 		});
@@ -114,11 +116,11 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				saveUser: () => {}
+				saveUser: mockSaveUser
 			}
 		});
 
-		const mockRequest = fetch.mockResolvedValue({
+		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			status: 422,
 			json: () =>
@@ -164,11 +166,11 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm_ssh',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				saveUser: () => {}
+				saveUser: mockSaveUser
 			}
 		});
 
-		const mockRequest = fetch.mockResolvedValue({
+		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: () =>
@@ -217,11 +219,11 @@ describe('UserEditor', () => {
 				runnerBackend: 'slurm_ssh',
 				user: selectedUser,
 				settings: { ...initialSettings },
-				saveUser: () => {}
+				saveUser: mockSaveUser
 			}
 		});
 
-		const mockRequest = fetch.mockResolvedValue({
+		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			status: 422,
 			json: () =>

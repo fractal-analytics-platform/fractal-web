@@ -5,25 +5,26 @@ import userEvent from '@testing-library/user-event';
 // Mocking fetch
 global.fetch = vi.fn();
 
-const mockedUser = {
+const mockedUser = mockUser({
 	group_ids_names: [
 		[1, 'All'],
 		[2, 'Group2']
 	]
-};
+});
 
 // The component to be tested must be imported after the mock setup
 import AddSingleTask from '../../src/lib/components/v2/tasks/AddSingleTask.svelte';
+import { mockUser } from '../mock/mock-types';
 
 describe('AddSingleTask', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('Add single task associated with specific group', async () => {
 		const user = userEvent.setup();
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => ({})
@@ -57,7 +58,7 @@ describe('AddSingleTask', () => {
 	it('Add private task', async () => {
 		const user = userEvent.setup();
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => ({})

@@ -22,7 +22,9 @@ vi.mock('$env/dynamic/public', () => {
 global.fetch = vi.fn();
 
 // Mocking window location
+// @ts-expect-error
 delete window.location;
+// @ts-expect-error
 global.window.location = {
 	reload: vi.fn()
 };
@@ -33,9 +35,8 @@ import JobsList from '../../src/lib/components/v2/jobs/JobsList.svelte';
 describe('JobsList', () => {
 	it('display, filter and sort jobs', async () => {
 		const user = userEvent.setup();
-		const nop = function () {};
 		const result = render(JobsList, {
-			props: { jobUpdater: nop }
+			props: { jobUpdater: vi.fn() }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
@@ -88,7 +89,7 @@ describe('JobsList', () => {
 		);
 
 		// Sort by start date
-		const startDateSorter = table.querySelector('thead th:nth-child(4)');
+		const startDateSorter = /** @type {Element} */ (table.querySelector('thead th:nth-child(4)'));
 		await fireEvent.click(startDateSorter);
 		table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr:nth-child(1) td')[3].textContent).eq(
@@ -110,41 +111,39 @@ describe('JobsList', () => {
 	}
 
 	it('cancel job', async () => {
-		const nop = function () {};
 		const result = render(JobsList, {
-			props: { jobUpdater: nop }
+			props: { jobUpdater: vi.fn() }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
 
-		fetch.mockResolvedValue({ ok: true });
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({ ok: true });
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });
 		await fireEvent.click(cancelButton);
-		await new Promise(setTimeout);
+		await new Promise(resolve => setTimeout(resolve));
 
 		const message = result.getByText(/Job cancellation request received/);
 		expect(message).toBeDefined();
 	});
 
 	it('error while cancelling job', async () => {
-		const nop = function () {};
 		const result = render(JobsList, {
-			props: { jobUpdater: nop }
+			props: { jobUpdater: vi.fn() }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
 
 		expect(result.queryAllByRole('alert').length).eq(0);
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			json: () => new Promise((resolve) => resolve({ error: 'not implemented' }))
 		});
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });
 		await fireEvent.click(cancelButton);
-		await new Promise(setTimeout);
+		await new Promise(resolve => setTimeout(resolve));
 
 		expect(result.queryAllByRole('alert').length).eq(1);
 	});
@@ -152,7 +151,8 @@ describe('JobsList', () => {
 	it('updates jobs in background', async () => {
 		vi.useFakeTimers();
 		try {
-			const jobUpdater = function () {
+			/** @type {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} */
+			const jobUpdater = async function () {
 				return data.jobs.map((j) => (j.status === 'submitted' ? { ...j, status: 'done' } : j));
 			};
 			const result = render(JobsList, {
@@ -169,7 +169,7 @@ describe('JobsList', () => {
 			vi.advanceTimersByTime(3500);
 			vi.useRealTimers();
 			// trigger table update
-			await new Promise(setTimeout);
+			await new Promise(resolve => setTimeout(resolve));
 
 			table = result.getByRole('table');
 			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[1].textContent).contain('done');

@@ -25,6 +25,7 @@ class MockModal {
 }
 MockModal.getInstance = vi.fn();
 
+// @ts-expect-error
 global.window.bootstrap = {
 	Modal: MockModal
 };
@@ -39,7 +40,7 @@ const defaultProps = {
  * @param {string|null} project_dir
  */
 function mockFetch(project_dir) {
-	fetch.mockImplementation((url) => ({
+	/** @type {import('vitest').Mock} */ (fetch).mockImplementation((url) => ({
 		ok: true,
 		status: 200,
 		json: () =>
@@ -59,7 +60,7 @@ function mockFetch(project_dir) {
 
 describe('CreateDatasetModal', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('validate missing name and zarr dir', async () => {
@@ -122,7 +123,7 @@ describe('CreateDatasetModal', () => {
 	});
 
 	it('display invalid zarr dir error', async () => {
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,

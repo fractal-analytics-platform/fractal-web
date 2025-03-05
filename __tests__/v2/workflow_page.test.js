@@ -47,11 +47,11 @@ import page from '../../src/routes/v2/projects/[projectId]/workflows/[workflowId
 
 describe('Workflow page', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('Display error when submission failed before starting execution of tasks', async () => {
-		fetch.mockImplementation((url) => {
+		/** @type {import('vitest').Mock} */ (fetch).mockImplementation((url) => {
 			return Promise.resolve({
 				ok: true,
 				status: 200,

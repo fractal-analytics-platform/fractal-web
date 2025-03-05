@@ -10,8 +10,6 @@
 	let errorAlert = undefined;
 	/** @type {Modal} */
 	let modal;
-	/** Show/hide complete stack trace */
-	let showDetails = false;
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
 	let job;
 	let admin = false;
@@ -99,7 +97,6 @@
 	}
 
 	function onClose() {
-		showDetails = false;
 		clearTimeout(updateJobTimeout);
 	}
 

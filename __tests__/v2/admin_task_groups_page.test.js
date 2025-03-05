@@ -28,7 +28,7 @@ vi.mock('$app/stores', () => {
 import page from '../../src/routes/v2/admin/task-groups/+page.svelte';
 
 function mockTaskGroups() {
-	return fetch.mockResolvedValue({
+	return /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 		ok: true,
 		status: 200,
 		json: () =>
@@ -52,7 +52,7 @@ function mockTaskGroups() {
 
 describe('Admin task-groups page', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('Search without filters', async () => {

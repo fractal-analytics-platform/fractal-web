@@ -1,6 +1,7 @@
 import { describe, it, afterEach, beforeEach, expect, vi, beforeAll } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+import { mockUser } from '../mock/mock-types';
 
 // Mocking fetch
 global.fetch = vi.fn();
@@ -10,12 +11,12 @@ vi.mock('$env/dynamic/public', () => {
 	return { env: {} };
 });
 
-const mockedUser = {
-	group_ids_names: [
+const mockedUser = mockUser({
+	group_ids_names: /** @type {Array<[number, string]>} */ ([
 		[1, 'All'],
 		[2, 'Group2']
-	]
-};
+	])
+});
 
 // The component to be tested must be imported after the mock setup
 import TaskCollection from '../../src/lib/components/v2/tasks/TaskCollection.svelte';
@@ -36,7 +37,7 @@ describe('TaskCollection', () => {
 	});
 
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 		vi.useFakeTimers({ shouldAdvanceTime: true });
 	});
 
@@ -48,7 +49,7 @@ describe('TaskCollection', () => {
 	it('Add single task associated with specific group', async () => {
 		const user = userEvent.setup();
 
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
@@ -74,6 +75,7 @@ describe('TaskCollection', () => {
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=false&user_group_id=2',
 			expect.objectContaining({
+				// @ts-expect-error
 				body: expect.toBeFormDataWith({ package: 'test-task' })
 			})
 		);
@@ -82,7 +84,7 @@ describe('TaskCollection', () => {
 	it('Add private task', async () => {
 		const user = userEvent.setup();
 
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
@@ -108,13 +110,14 @@ describe('TaskCollection', () => {
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=true',
 			expect.objectContaining({
+				// @ts-expect-error
 				body: expect.toBeFormDataWith({ package: 'test-task' })
 			})
 		);
 	});
 
 	it('collect tasks with pinned package versions', async () => {
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
@@ -168,6 +171,7 @@ describe('TaskCollection', () => {
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=false&user_group_id=1',
 			expect.objectContaining({
+				// @ts-expect-error
 				body: expect.toBeFormDataWith({
 					package: 'main-package',
 					pinned_package_versions: JSON.stringify({
@@ -178,7 +182,7 @@ describe('TaskCollection', () => {
 			})
 		);
 
-		await new Promise(setTimeout);
+		await new Promise((resolve) => setTimeout(resolve));
 		expect(screen.getAllByRole('textbox').length).eq(3);
 	});
 });

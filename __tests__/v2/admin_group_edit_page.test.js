@@ -29,13 +29,13 @@ import page from '../../src/routes/v2/admin/groups/[groupId]/edit/+page.svelte';
 
 describe('Admin group edit page', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('User is added successfully', async () => {
 		const result = render(page);
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => ({ name: 'test', user_ids: [1, 2] })
@@ -50,7 +50,7 @@ describe('Admin group edit page', () => {
 	it('Error happens when user is dragged and dropped', async () => {
 		const result = render(page);
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			status: 422,
 			json: async () => ({ detail: 'An error happened' })

@@ -13,15 +13,17 @@ class MockModal {
 }
 MockModal.getInstance = vi.fn();
 
+// @ts-expect-error
 global.window.bootstrap = {
 	Modal: MockModal
 };
 
 import RunWorkflowModal from '../../src/lib/components/v2/workflow/RunWorkflowModal.svelte';
+import { mockDataset, mockTask, mockWorkflow, mockWorkflowTask } from '../mock/mock-types';
 
 describe('RunWorkflowModal', () => {
 	beforeEach(() => {
-		fetch
+		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
@@ -46,26 +48,25 @@ describe('RunWorkflowModal', () => {
 
 	it('Handles empty filters list', async () => {
 		const result = render(RunWorkflowModal, {
-			datasets: [
-				{
-					id: 1,
-					filters: { attributes: {}, types: {} }
-				}
-			],
+			datasets: [mockDataset()],
 			selectedDatasetId: 1,
-			workflow: {
-				id: 1,
+			workflow: mockWorkflow({
 				task_list: [
-					{
-						id: 1,
-						task: { name: 'task1' },
-						input_filters: { attributes: {}, types: {} }
-					}
+					mockWorkflowTask({
+						task: mockTask({ name: 'task1' })
+					})
 				]
-			},
+			}),
 			onJobSubmitted: vi.fn(),
 			onDatasetsUpdated: vi.fn(),
-			statuses: { 1: 'failed' },
+			statuses: {
+				1: {
+					num_submitted_images: 0,
+					num_done_images: 0,
+					num_failed_images: 5,
+					num_available_images: 5
+				}
+			},
 			attributeFiltersEnabled: false
 		});
 

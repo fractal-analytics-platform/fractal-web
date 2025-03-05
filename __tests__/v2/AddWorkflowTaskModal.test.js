@@ -13,27 +13,29 @@ class MockModal {
 }
 MockModal.getInstance = vi.fn();
 
+// @ts-expect-error
 global.window.bootstrap = {
 	Modal: MockModal
 };
 
-const mockedWorkflow = {
+const mockedWorkflow = mockWorkflow({
 	id: 20,
 	name: 'test',
 	project_id: 24,
 	task_list: []
-};
+});
 
 // The component to be tested must be imported after the mock setup
 import AddWorkflowTaskModal from '../../src/lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
+import { mockUser, mockWorkflow } from '../mock/mock-types';
 
 describe('AddWorkflowTaskModal', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('Display task with loosely valid version', async () => {
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => [
@@ -84,7 +86,7 @@ describe('AddWorkflowTaskModal', () => {
 
 		const result = render(AddWorkflowTaskModal, {
 			props: {
-				user: { id: 1 },
+				user: mockUser(),
 				workflow: mockedWorkflow,
 				onWorkflowTaskAdded: vi.fn()
 			}
@@ -100,14 +102,15 @@ describe('AddWorkflowTaskModal', () => {
 		await waitFor(() => screen.getAllByText(/test_task/));
 
 		const dropdown = screen.getByRole('combobox');
-		expect(dropdown.options.length).eq(2);
-		expect(dropdown.options[0].text).eq('0.7.10.dev4+g4c8ebe3');
-		expect(dropdown.options[1].text).eq('0.0.1');
-		expect(dropdown.value).eq('0.7.10.dev4+g4c8ebe3');
+		const options = /** @type {HTMLSelectElement} */ (dropdown).options;
+		expect(options.length).eq(2);
+		expect(options[0].text).eq('0.7.10.dev4+g4c8ebe3');
+		expect(options[1].text).eq('0.0.1');
+		expect(dropdown).toHaveValue('0.7.10.dev4+g4c8ebe3');
 	});
 
 	it('Display task with invalid version', async () => {
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => [
@@ -158,7 +161,7 @@ describe('AddWorkflowTaskModal', () => {
 
 		const result = render(AddWorkflowTaskModal, {
 			props: {
-				user: { id: 1 },
+				user: mockUser(),
 				workflow: mockedWorkflow,
 				onWorkflowTaskAdded: vi.fn()
 			}
@@ -174,9 +177,10 @@ describe('AddWorkflowTaskModal', () => {
 		await waitFor(() => screen.getAllByText(/test_task/));
 
 		const dropdown = await screen.findByRole('combobox');
-		expect(dropdown.options.length).eq(2);
-		expect(dropdown.options[0].text).eq('0.0.1');
-		expect(dropdown.options[1].text).eq('INVALID');
-		expect(dropdown.value).eq('0.0.1');
+		const options = /** @type {HTMLSelectElement} */ (dropdown).options;
+		expect(options.length).eq(2);
+		expect(options[0].text).eq('0.0.1');
+		expect(options[1].text).eq('INVALID');
+		expect(dropdown).toHaveValue('0.0.1');
 	});
 });
