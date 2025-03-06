@@ -177,7 +177,7 @@
 					onPageChange={(currentPage, pageSize) => loadImages(currentPage, pageSize)}
 				/>
 			{:else}
-				<p>No images</p>
+				<p class="ps-3">No images</p>
 			{/if}
 		{/if}
 	</svelte:fragment>

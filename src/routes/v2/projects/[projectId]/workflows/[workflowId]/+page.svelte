@@ -23,6 +23,7 @@
 	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 	import { slide } from 'svelte/transition';
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
+	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -35,6 +36,10 @@
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
+
+	let isLegacy = false;
+	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
+	let legacyStatuses = {};
 
 	let jobError = '';
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
@@ -482,21 +487,26 @@
 			selectedSubmittedJob = undefined;
 			return;
 		}
-		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
-		const outputStatusResponse = await fetch(
+		selectedSubmittedJob = await getSelectedJob(selectedDatasetId);
+		const statusResponse = await fetch(
 			`/api/v2/project/${workflow.project_id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
 			{
 				method: 'GET',
 				credentials: 'include'
 			}
 		);
-		const outputStatus = await outputStatusResponse.json();
-		if (!outputStatusResponse.ok) {
-			console.error('Error retrieving images status', outputStatus);
+		const receivedStatuses = await statusResponse.json();
+		if (!statusResponse.ok) {
+			console.error('Error retrieving images status', receivedStatuses);
 			return;
 		}
 		const jobHasError = selectedSubmittedJob?.status === 'failed';
-		statuses = Object.fromEntries(Object.entries(outputStatus).filter(([, v]) => v !== null));
+		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
+		if (selectedSubmittedJob && Object.keys(statuses).length === 0) {
+			await loadLegacyStatus();
+		} else {
+			isLegacy = false;
+		}
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
@@ -509,6 +519,22 @@
 			selectedSubmittedJob = undefined;
 		}
 		await loadJobError(jobHasError);
+	}
+
+	async function loadLegacyStatus() {
+		const response = await fetch(
+			`/api/v2/project/1/status-legacy?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`
+		);
+		if (!response.ok) {
+			console.log('Error loading legacy status');
+			return;
+		}
+		const result = await response.json();
+		if (Object.keys(result).length === 0) {
+			return;
+		}
+		legacyStatuses = result.status;
+		isLegacy = true;
 	}
 
 	async function reloadSelectedDataset() {
@@ -574,7 +600,7 @@
 	 * @param {number} datasetId
 	 * @return {Promise<import('fractal-components/types/api').ApplyWorkflowV2|undefined>}
 	 */
-	async function getSelectedSubmittedJob(datasetId) {
+	async function getSelectedJob(datasetId) {
 		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
 		if (
 			submitted.length > 0 &&
@@ -856,13 +882,17 @@
 									{workflowTask.task.name}
 									<span class="float-end ps-2">
 										{#if selectedDatasetId}
-											<ImagesStatus
-												status={statuses[workflowTask.id]}
-												datasetId={selectedDatasetId}
-												projectId={project.id}
-												workflowTaskId={workflowTask.id}
-												{imagesStatusModal}
-											/>
+											{#if isLegacy}
+												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
+											{:else}
+												<ImagesStatus
+													status={statuses[workflowTask.id]}
+													datasetId={selectedDatasetId}
+													projectId={project.id}
+													workflowTaskId={workflowTask.id}
+													{imagesStatusModal}
+												/>
+											{/if}
 										{/if}
 									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
