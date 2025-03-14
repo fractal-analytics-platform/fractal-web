@@ -263,9 +263,9 @@ function getMockedWorkflowTask() {
 
 describe('VersionUpdate', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
-	
+
 	it('update task without changing the arguments', async () => {
 		const task = getTask('My Task', '1.2.3');
 		const versions = /** @type {string[]} */ (
@@ -407,13 +407,15 @@ describe('VersionUpdate', () => {
 
 	it('update task with default parameters and no previous values', async () => {
 		const task = getTask('task_default_values', '0.0.1');
-		const versions = await checkVersions(task, 1);
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, getMockedWorkflowTask())
+		);
 		expect(versions[0]).toBe('0.0.2');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn.disabled).eq(false);
+		expect(btn).toBeEnabled();
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -424,7 +426,7 @@ describe('VersionUpdate', () => {
 					args_non_parallel: {
 						default_boolean1: false,
 						default_boolean2: true,
-						default_string: 'foo',
+						default_string: 'foo'
 					},
 					args_parallel: null
 				})
@@ -434,17 +436,22 @@ describe('VersionUpdate', () => {
 
 	it('update task with default parameters and previous values', async () => {
 		const task = getTask('task_default_values', '0.0.1');
-		const versions = await checkVersions(task, 1, {
-			args_non_parallel: {
-				default_boolean1: true,
-			}, args_parallel: null
-		});
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				...{
+					args_non_parallel: {
+						default_boolean1: true
+					}
+				}
+			})
+		);
 		expect(versions[0]).toBe('0.0.2');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn.disabled).eq(false);
+		expect(btn).toBeEnabled();
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -455,7 +462,7 @@ describe('VersionUpdate', () => {
 					args_non_parallel: {
 						default_boolean1: true,
 						default_boolean2: true,
-						default_string: 'foo',
+						default_string: 'foo'
 					},
 					args_parallel: null
 				})
