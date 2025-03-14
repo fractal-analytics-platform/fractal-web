@@ -1,4 +1,4 @@
-import { deepCopy, stripNullAndEmptyObjectsAndArrays, undefinedToNull } from '../utils';
+import { deepCopy, stripNullAndEmptyObjectsAndArrays, undefinedToNull } from '../common/utils';
 import {
 	ArrayFormElement,
 	EnumFormElement,

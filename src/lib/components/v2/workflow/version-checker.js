@@ -1,5 +1,5 @@
-import { greatestVersionAsc, greatestVersionDesc } from '$lib/common/component_utilities';
 import { getAlertErrorFromResponse } from '$lib/common/errors';
+import { greatestVersionAsc, greatestVersionDesc } from 'fractal-components/common/version';
 
 /**
  * @param {import('fractal-components/types/api').TaskV2} task
