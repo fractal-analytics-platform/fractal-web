@@ -1,7 +1,13 @@
 <script>
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
-	import { stripIgnoredProperties, getPropertiesToIgnore, SchemaValidator } from 'fractal-components';
+	import {
+		stripIgnoredProperties,
+		getPropertiesToIgnore,
+		SchemaValidator,
+		stripNullAndEmptyObjectsAndArrays
+	} from 'fractal-components';
+	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
@@ -53,34 +59,32 @@
 	export function checkArgumentsWithNewSchema() {
 		const oldArgs = (parallel ? workflowTask.args_parallel : workflowTask.args_non_parallel) || {};
 		originalArgs = JSON.stringify(oldArgs, null, 2);
-		validateArguments(oldArgs);
+		const newArgs = { ...getDefaultValues(), ...oldArgs };
+		validateArguments(newArgs);
 		return displayTextarea;
 	}
 
 	export function getNewArgs() {
-		argsToBeFixed !== ''
-			? JSON.parse(argsToBeFixed)
-			: (parallel ? workflowTask.args_parallel : workflowTask.args_non_parallel) || {};
+		if (argsToBeFixed !== '') {
+			return JSON.parse(argsToBeFixed);
+		}
+		const args = (parallel ? workflowTask.args_parallel : workflowTask.args_non_parallel) || {};
+		return { ...getDefaultValues(), ...args };
+	}
+
+	function getDefaultValues() {
+		const newSchema = getNewSchema();
+		const schemaDefaultData = getJsonSchemaData(newSchema, updateCandidate.args_schema_version);
+		return stripNullAndEmptyObjectsAndArrays(schemaDefaultData || {});
 	}
 
 	/**
 	 * @param {object} args
 	 */
 	function validateArguments(args) {
-		let newSchema =
-			/** @type {import('fractal-components/types/jschema').JSONSchemaObjectProperty} */ (
-				'args_schema' in updateCandidate
-					? updateCandidate.args_schema
-					: parallel
-					? updateCandidate.args_schema_parallel
-					: updateCandidate.args_schema_non_parallel
-			);
+		const newSchema = getNewSchema();
 		const validator = new SchemaValidator(updateCandidate.args_schema_version, true);
-		if ('properties' in newSchema) {
-			newSchema = stripIgnoredProperties(newSchema, getPropertiesToIgnore(false));
-		}
-		const parsedSchema = deepCopy(newSchema);
-		const isSchemaValid = validator.loadSchema(parsedSchema);
+		const isSchemaValid = validator.loadSchema(newSchema);
 		if (!isSchemaValid) {
 			throw new AlertError('Invalid JSON schema');
 		}
@@ -92,6 +96,21 @@
 			displayTextarea = true;
 			validationErrors = validator.getErrors();
 		}
+	}
+
+	function getNewSchema() {
+		let newSchema =
+			/** @type {import('fractal-components/types/jschema').JSONSchemaObjectProperty} */ (
+				'args_schema' in updateCandidate
+					? updateCandidate.args_schema
+					: parallel
+					? updateCandidate.args_schema_parallel
+					: updateCandidate.args_schema_non_parallel
+			);
+		if ('properties' in newSchema) {
+			newSchema = stripIgnoredProperties(newSchema, getPropertiesToIgnore(false));
+		}
+		return deepCopy(newSchema);
 	}
 
 	export function hasValidationErrors() {

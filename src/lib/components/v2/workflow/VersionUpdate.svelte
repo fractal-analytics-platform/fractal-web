@@ -159,7 +159,7 @@
 		headers.set('Content-Type', 'application/json');
 
 		const response = await fetch(
-			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/replace-task/?workflow_task_id=${workflowTask.id}&task_id=${newTaskId}`,
+			`/api/v2/project/${$page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/replace-task?workflow_task_id=${workflowTask.id}&task_id=${newTaskId}`,
 			{
 				method: 'POST',
 				credentials: 'include',

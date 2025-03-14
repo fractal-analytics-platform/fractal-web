@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { readable } from 'svelte/store';
 
@@ -169,6 +169,66 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			}
 		],
 		active: true
+	},
+	{
+		id: 9,
+		pkg_name: 'default_values',
+		version: '0.0.1',
+		task_list: [
+			{
+				id: 9,
+				name: 'task_default_values',
+				type: 'non_parallel',
+				args_schema_non_parallel: {
+					title: 'task_default_values',
+					type: 'object',
+					properties: {
+						default_boolean1: {
+							type: 'boolean',
+							default: false
+						}
+					},
+					additionalProperties: false
+				},
+				args_schema_parallel: null,
+				taskgroupv2_id: 9
+			}
+		],
+		active: true
+	},
+	{
+		id: 10,
+		pkg_name: 'default_values',
+		version: '0.0.2',
+		task_list: [
+			{
+				id: 10,
+				name: 'task_default_values',
+				type: 'non_parallel',
+				args_schema_non_parallel: {
+					title: 'task_default_values',
+					type: 'object',
+					properties: {
+						default_boolean1: {
+							type: 'boolean',
+							default: false
+						},
+						default_boolean2: {
+							type: 'boolean',
+							default: true
+						},
+						default_string: {
+							type: 'string',
+							default: 'foo'
+						}
+					},
+					additionalProperties: false
+				},
+				args_schema_parallel: null,
+				taskgroupv2_id: 10
+			}
+		],
+		active: true
 	}
 ]);
 
@@ -202,6 +262,10 @@ function getMockedWorkflowTask() {
 }
 
 describe('VersionUpdate', () => {
+	beforeEach(() => {
+		fetch.mockClear();
+	});
+	
 	it('update task without changing the arguments', async () => {
 		const task = getTask('My Task', '1.2.3');
 		const versions = /** @type {string[]} */ (
@@ -339,6 +403,64 @@ describe('VersionUpdate', () => {
 				'It is not possible to check for new versions because task has no args_schema.'
 			)
 		).toBeDefined();
+	});
+
+	it('update task with default parameters and no previous values', async () => {
+		const task = getTask('task_default_values', '0.0.1');
+		const versions = await checkVersions(task, 1);
+		expect(versions[0]).toBe('0.0.2');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
+
+		const btn = screen.getByRole('button', { name: 'Update' });
+		expect(btn.disabled).eq(false);
+		await fireEvent.click(btn);
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {
+						default_boolean1: false,
+						default_boolean2: true,
+						default_string: 'foo',
+					},
+					args_parallel: null
+				})
+			})
+		);
+	});
+
+	it('update task with default parameters and previous values', async () => {
+		const task = getTask('task_default_values', '0.0.1');
+		const versions = await checkVersions(task, 1, {
+			args_non_parallel: {
+				default_boolean1: true,
+			}, args_parallel: null
+		});
+		expect(versions[0]).toBe('0.0.2');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
+
+		const btn = screen.getByRole('button', { name: 'Update' });
+		expect(btn.disabled).eq(false);
+		await fireEvent.click(btn);
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {
+						default_boolean1: true,
+						default_boolean2: true,
+						default_string: 'foo',
+					},
+					args_parallel: null
+				})
+			})
+		);
 	});
 });
 
