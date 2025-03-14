@@ -1,4 +1,4 @@
-import { JsonSchemaDataError } from './jschema/form_manager';
+import { JsonSchemaDataError } from '../jschema/form_manager';
 
 /**
  * @param {any} value

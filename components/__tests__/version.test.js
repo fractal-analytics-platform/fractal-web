@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
 import valid from 'semver/functions/valid';
-import { greatestVersionAsc } from '../src/lib/common/component_utilities';
+import { greatestVersionAsc } from '../src/lib/common/version';
 
 it('should be able to loosely validate versions', () => {
 	const cases = [

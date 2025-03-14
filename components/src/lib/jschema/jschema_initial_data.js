@@ -1,4 +1,4 @@
-import { undefinedToNull } from '../utils.js';
+import { undefinedToNull } from '../common/utils.js';
 import { getAllObjectProperties, isTuple } from './property_utils.js';
 
 /**

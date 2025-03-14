@@ -1,4 +1,4 @@
-import { deepCopy, isObject } from '../utils.js';
+import { deepCopy, isObject } from '../common/utils.js';
 
 /**
  * Creates a simpler but still equivalent JSON Schema. Removes properties to ignore,
