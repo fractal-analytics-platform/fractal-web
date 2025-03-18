@@ -1,5 +1,5 @@
 <script>
-	/** @type {import('fractal-components/types/api').ImagesStatus|Omit<import('fractal-components/types/api').ImagesStatus, 'num_available_images'>|undefined} */
+	/** @type {import('fractal-components/types/api').ImagesStatus|undefined} */
 	export let status;
 	/** @type {number} */
 	export let projectId;
@@ -19,6 +19,9 @@
 		status &&
 		(status.num_failed_images > 0 ||
 			(status.num_done_images === 0 && status.num_failed_images === 0));
+	$: fullyDone = status && status.num_done_images === status.num_available_images;
+	$: fullyFailed = status && status.num_failed_images === status.num_available_images;
+	$: partial = status && !fullyDone && !fullyFailed;
 </script>
 
 {#if status}
@@ -90,7 +93,7 @@
 					</span>
 				</button>
 			{/if}
-			{#if 'num_available_images' in status}
+			{#if partial}
 				/
 				<span class="ps-1" aria-label="Available images">
 					{status.num_available_images === null ? '?' : status.num_available_images}
