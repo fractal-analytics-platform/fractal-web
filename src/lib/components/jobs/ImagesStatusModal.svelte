@@ -16,8 +16,6 @@
 	let datasetId;
 	/** @type {number} */
 	let workflowTaskId;
-	/** @type {string|undefined} */
-	let parametersHash = undefined;
 	/** @type {string} */
 	let status;
 
@@ -36,10 +34,9 @@
 	 * @param {number} _projectId
 	 * @param {number} _datasetId
 	 * @param {number} _workflowTaskId
-	 * @param {string|undefined} _parametersHash
 	 * @param {string} _status
 	 */
-	export async function open(_projectId, _datasetId, _workflowTaskId, _parametersHash, _status) {
+	export async function open(_projectId, _datasetId, _workflowTaskId, _status) {
 		loading = true;
 		data = undefined;
 		page = 1;
@@ -50,10 +47,9 @@
 		projectId = _projectId;
 		datasetId = _datasetId;
 		workflowTaskId = _workflowTaskId;
-		parametersHash = _parametersHash;
 		status = _status;
-		modal.show();
-		await loadImages(page, pageSize);
+		//modal.show();
+		//await loadImages(page, pageSize);
 	}
 
 	function onClose() {
@@ -67,9 +63,6 @@
 	async function loadImages(currentPage, selectedPageSize) {
 		loading = true;
 		let url = `/api/v2/project/${projectId}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&status=${status}&page=${currentPage}&page_size=${selectedPageSize}`;
-		if (parametersHash !== undefined) {
-			url += `&parameters_hash=${parametersHash}`;
-		}
 		const response = await fetch(url);
 		if (!response.ok) {
 			loading = false;

@@ -24,6 +24,7 @@
 	import { slide } from 'svelte/transition';
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
+	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -58,15 +59,15 @@
 	let expandedWorkflowTaskId = undefined;
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = undefined;
-	/** @type {import('fractal-components/types/api').SubsetStatus|undefined} */
-	let preventedSelectedSubsetChange = undefined;
-	/** @type {import('fractal-components/types/api').SubsetStatus[]} */
-	let subsetStatuses = [];
-	let loadingSubsetStatuses = false;
+	/** @type {import('fractal-components/types/api').HistoryRunRead|undefined} */
+	let preventedHistoryRunChange = undefined;
+	/** @type {import('fractal-components/types/api').HistoryRunRead[]} */
+	let historyRunStatuses = [];
+	let loadingHistoryRunStatuses = false;
 	/** @type {ImagesStatusModal} */
 	let imagesStatusModal;
-	/** @type {import('fractal-components/types/api').SubsetStatus|undefined} */
-	let selectedSubset = undefined;
+	/** @type {import('fractal-components/types/api').HistoryRunRead|undefined} */
+	let selectedHistoryRun = undefined;
 
 	/** @type {ArgumentsSchema|undefined} */
 	let argsSchemaForm = undefined;
@@ -318,22 +319,22 @@
 			}
 		}
 		preventedSelectedTaskChange = undefined;
-		selectedSubset = undefined;
+		selectedHistoryRun = undefined;
 		await tick();
 		await inputFiltersTab?.init();
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').SubsetStatus|undefined} subsetStatus
+	 * @param {import('fractal-components/types/api').HistoryRunRead|undefined} historyRun
 	 */
-	async function selectSubset(subsetStatus) {
+	async function selectHistoryRun(historyRun) {
 		await tick();
-		preventedSelectedSubsetChange = subsetStatus;
+		preventedHistoryRunChange = historyRun;
 		if (checkUnsavedChanges()) {
 			return;
 		}
-		preventedSelectedSubsetChange = undefined;
-		selectedSubset = subsetStatus;
+		preventedHistoryRunChange = undefined;
+		selectedHistoryRun = historyRun;
 	}
 
 	function checkUnsavedChanges() {
@@ -355,20 +356,20 @@
 	/**
 	 * @param {number} workflowTaskId
 	 */
-	async function loadSubsetStatus(workflowTaskId) {
-		subsetStatuses = [];
+	async function loadHistoryRunStatuses(workflowTaskId) {
+		historyRunStatuses = [];
 		expandedWorkflowTaskId = workflowTaskId;
-		loadingSubsetStatuses = true;
+		loadingHistoryRunStatuses = true;
 		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/status/subsets?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
+			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
 		);
 		if (!response.ok) {
-			loadingSubsetStatuses = false;
+			loadingHistoryRunStatuses = false;
 			return;
 		}
-		subsetStatuses = await response.json();
+		historyRunStatuses = await response.json();
 		await tick(); // to trigger animation
-		loadingSubsetStatuses = false;
+		loadingHistoryRunStatuses = false;
 	}
 
 	function toggleArgsUnsavedChangesModal() {
@@ -406,7 +407,7 @@
 	 */
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = job;
-		selectedSubset = undefined;
+		selectedHistoryRun = undefined;
 		expandedWorkflowTaskId = undefined;
 		await loadJobsStatus();
 	}
@@ -854,7 +855,7 @@
 									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
 								>
 									{#if statuses[workflowTask.id]}
-										{#if expandedWorkflowTaskId === workflowTask.id && loadingSubsetStatuses}
+										{#if expandedWorkflowTaskId === workflowTask.id && loadingHistoryRunStatuses}
 											<span
 												class="spinner-border spinner-border-sm p-0"
 												role="status"
@@ -862,7 +863,7 @@
 											/>
 										{:else if expandedWorkflowTaskId === workflowTask.id}
 											<button
-												aria-label="Hide subsets"
+												aria-label="Hide runs"
 												class="btn btn-link p-0 text-white"
 												on:click={() => (expandedWorkflowTaskId = undefined)}
 											>
@@ -870,10 +871,10 @@
 											</button>
 										{:else}
 											<button
-												aria-label="Show subsets"
+												aria-label="Show runs"
 												class="btn btn-link p-0"
 												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
-												on:click={() => loadSubsetStatus(workflowTask.id)}
+												on:click={() => loadHistoryRunStatuses(workflowTask.id)}
 											>
 												<i class="bi bi-caret-right-fill" />
 											</button>
@@ -889,7 +890,7 @@
 													status={statuses[workflowTask.id]}
 													datasetId={selectedDatasetId}
 													projectId={project.id}
-													workflowTaskId={workflowTask.id}
+													{workflowTask}
 													{imagesStatusModal}
 												/>
 											{/if}
@@ -906,27 +907,19 @@
 										</span>
 									{/if}
 								</button>
-								{#each subsetStatuses as status, index}
-									{#if !loadingSubsetStatuses && expandedWorkflowTaskId === workflowTask.id}
+								{#each historyRunStatuses as status, index}
+									{#if !loadingHistoryRunStatuses && expandedWorkflowTaskId === workflowTask.id}
 										<button
 											transition:slide
-											class="subset-item list-group-item list-group-item-action"
-											class:active={selectedSubset &&
-												selectedSubset.parameters_hash === status.parameters_hash}
+											class="run-item list-group-item list-group-item-action"
+											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
 											style="padding-left: 38px"
-											on:click={() => selectSubset(status)}
+											on:click={() => selectHistoryRun(status)}
 										>
-											Subset {index + 1}
+											Run {index + 1}
 											<span class="float-end ps-2">
 												{#if selectedDatasetId}
-													<ImagesStatus
-														status={status.info}
-														datasetId={selectedDatasetId}
-														projectId={project.id}
-														workflowTaskId={workflowTask.id}
-														parametersHash={status.parameters_hash}
-														{imagesStatusModal}
-													/>
+													<RunStatus run={status} />
 												{/if}
 											</span>
 										</button>
@@ -1024,10 +1017,10 @@
 											<ArgumentsSchema
 												workflowTask={selectedWorkflowTask}
 												{onWorkflowTaskUpdated}
-												editable={!selectedSubset}
+												editable={!selectedHistoryRun}
 												bind:this={argsSchemaForm}
-												argsNonParallel={selectedSubset?.workflowtask_dump.args_non_parallel}
-												argsParallel={selectedSubset?.workflowtask_dump.args_parallel}
+												argsNonParallel={selectedHistoryRun?.workflowtask_dump.args_non_parallel}
+												argsParallel={selectedHistoryRun?.workflowtask_dump.args_parallel}
 											/>
 										{/key}
 									{/if}
@@ -1042,9 +1035,9 @@
 												{onWorkflowTaskUpdated}
 												workflowTask={selectedWorkflowTask}
 												bind:this={metaPropertiesForm}
-												metaNonParallel={selectedSubset?.workflowtask_dump.meta_non_parallel}
-												metaParallel={selectedSubset?.workflowtask_dump.meta_parallel}
-												editable={!selectedSubset}
+												metaNonParallel={selectedHistoryRun?.workflowtask_dump.meta_non_parallel}
+												metaParallel={selectedHistoryRun?.workflowtask_dump.meta_parallel}
+												editable={!selectedHistoryRun}
 											/>
 										{/key}
 									{/if}
@@ -1173,7 +1166,7 @@
 			on:click={async () => {
 				argsSchemaForm?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
-				await selectSubset(preventedSelectedSubsetChange);
+				await selectHistoryRun(preventedHistoryRunChange);
 				argsUnsavedChangesModal.hide();
 			}}
 		>
@@ -1209,7 +1202,7 @@
 			on:click={async () => {
 				inputFiltersTab?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
-				await selectSubset(preventedSelectedSubsetChange);
+				await selectHistoryRun(preventedHistoryRunChange);
 				filtersUnsavedChangesModal.hide();
 			}}
 		>
@@ -1246,7 +1239,7 @@
 			on:click={async () => {
 				metaPropertiesForm?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
-				await selectSubset(preventedSelectedSubsetChange);
+				await selectHistoryRun(preventedHistoryRunChange);
 				metaPropertiesUnsavedChangesModal.hide();
 			}}
 		>
@@ -1268,10 +1261,10 @@
 <JobLogsModal bind:this={jobLogsModal} />
 
 <style>
-	.subset-item {
+	.run-item {
 		padding-left: 38px;
 	}
-	.subset-item.active {
+	.run-item.active {
 		background-color: #4e95ff !important;
 	}
 </style>

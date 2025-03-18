@@ -5,10 +5,8 @@
 	export let projectId;
 	/** @type {number} */
 	export let datasetId;
-	/** @type {number} */
-	export let workflowTaskId;
-	/** @type {string|undefined} */
-	export let parametersHash = undefined;
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
+	export let workflowTask;
 
 	/** @type {import('./ImagesStatusModal.svelte').default} */
 	export let imagesStatusModal;
@@ -24,65 +22,82 @@
 </script>
 
 {#if status}
-	<span class="d-flex">
-		{#if status.num_submitted_images > 0}
-			<button
-				aria-label="Submitted images"
-				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				on:click={() =>
-					imagesStatusModal.open(projectId, datasetId, workflowTaskId, parametersHash, 'submitted')}
-			>
-				<span class="d-flex">
-					<span class="pe-1 image-status text-primary">
-						{status.num_submitted_images}
+	{#if status.num_done_images === 0 && status.num_failed_images === 0 && status.num_submitted_images === 0}
+		<span class="d-flex">
+			{#if status.status === 'done'}
+				<i class="image-status-icon bi bi-check text-success pe-1" />
+			{:else if status.status === 'failed'}
+				<i class="image-status-icon bi bi-x text-danger pe-1" />
+			{:else if status.status === 'submitted'}
+				<div
+					class="mt-1 pe-1 spinner-border spinner-border-sm text-primary image-status"
+					role="status"
+				>
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			{/if}
+		</span>
+	{:else}
+		<span class="d-flex">
+			{#if status.num_submitted_images > 0}
+				<button
+					aria-label="Submitted images"
+					class="status-modal-btn btn btn-link text-decoration-none p-0"
+					on:click={() =>
+						imagesStatusModal.open(projectId, datasetId, workflowTask.id, 'submitted')}
+				>
+					<span class="d-flex">
+						<span class="pe-1 image-status text-primary">
+							{status.num_submitted_images}
+						</span>
+						<div
+							class="mt-1 pe-1 spinner-border spinner-border-sm text-primary image-status"
+							role="status"
+						>
+							<span class="visually-hidden">Loading...</span>
+						</div>
 					</span>
-					<div
-						class="mt-1 pe-1 spinner-border spinner-border-sm text-primary image-status"
-						role="status"
-					>
-						<span class="visually-hidden">Loading...</span>
-					</div>
-				</span>
-			</button>
-		{/if}
-		{#if showDone}
-			<button
-				aria-label="Done images"
-				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				on:click={() =>
-					imagesStatusModal.open(projectId, datasetId, workflowTaskId, parametersHash, 'done')}
-			>
-				<span class="d-flex">
-					<span class="image-status text-success ps-1">
-						{status.num_done_images}
+				</button>
+			{/if}
+			{#if showDone}
+				<button
+					aria-label="Done images"
+					class="status-modal-btn btn btn-link text-decoration-none p-0"
+					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id, 'done')}
+				>
+					<span class="d-flex">
+						<span class="image-status text-success ps-1">
+							{status.num_done_images}
+						</span>
+						<i class="image-status-icon bi bi-check text-success pe-1" />
 					</span>
-					<i class="image-status-icon bi bi-check text-success pe-1" />
-				</span>
-			</button>
-		{/if}
-		{#if showDone && showFailed}
-			/
-		{/if}
-		{#if showFailed}
-			<button
-				aria-label="Failed images"
-				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				on:click={() =>
-					imagesStatusModal.open(projectId, datasetId, workflowTaskId, parametersHash, 'failed')}
-			>
-				<span class="d-flex">
-					<span class="image-status text-danger ps-1">
-						{status.num_failed_images}
+				</button>
+			{/if}
+			{#if showDone && showFailed}
+				/
+			{/if}
+			{#if showFailed}
+				<button
+					aria-label="Failed images"
+					class="status-modal-btn btn btn-link text-decoration-none p-0"
+					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id, 'failed')}
+				>
+					<span class="d-flex">
+						<span class="image-status text-danger ps-1">
+							{status.num_failed_images}
+						</span>
+						<i class="image-status-icon bi bi-x text-danger pe-1" />
 					</span>
-					<i class="image-status-icon bi bi-x text-danger pe-1" />
+				</button>
+			{/if}
+			{#if 'num_available_images' in status}
+				/
+				<span class="ps-1" aria-label="Available images">
+					{status.num_available_images === null ? '?' : status.num_available_images}
 				</span>
-			</button>
-		{/if}
-		{#if 'num_available_images' in status}
-			/
-			<span class="ps-1" aria-label="Available images">{status.num_available_images}</span>
-		{/if}
-	</span>
+			{/if}
+		</span>
+	{/if}
 {/if}
 
 <style>

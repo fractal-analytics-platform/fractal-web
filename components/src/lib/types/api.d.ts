@@ -147,10 +147,11 @@ export type ApplyWorkflowV2 = {
 export type JobStatus = 'submitted' | 'done' | 'failed';
 
 export type ImagesStatus = {
+	status: JobStatus;
 	num_submitted_images: number;
 	num_done_images: number;
 	num_failed_images: number;
-	num_available_images: number;
+	num_available_images: number | null;
 };
 
 export type WorkflowV2 = {
@@ -297,8 +298,22 @@ export type HistoryItemV2 = {
 	task_group_dump: TaskGroupV2;
 };
 
-export type SubsetStatus = {
+export type HistoryUnit = {
+	id: number;
+	history_run_id: number;
+	logfile: string | null;
+	status: string;
+	zarr_urls: string[];
+};
+
+export type HistoryRunRead = {
+	id: number;
+	dataset_id: number;
+	workflowtask_id: number;
 	workflowtask_dump: WorkflowTaskV2;
-	parameters_hash: string;
-	info: Omit<ImagesStatus, 'num_available_images'>;
+	task_group_dump: TaskGroupV2;
+	timestamp_started: string;
+	status: JobStatus;
+	num_available_images: number;
+	units: Array<HistoryUnit>;
 };
