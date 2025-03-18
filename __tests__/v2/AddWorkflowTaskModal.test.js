@@ -179,8 +179,8 @@ describe('AddWorkflowTaskModal', () => {
 		const dropdown = await screen.findByRole('combobox');
 		const options = /** @type {HTMLSelectElement} */ (dropdown).options;
 		expect(options.length).eq(2);
-		expect(options[0].text).eq('0.0.1');
-		expect(options[1].text).eq('INVALID');
-		expect(dropdown).toHaveValue('0.0.1');
+		expect(options[0].text).eq('INVALID');
+		expect(options[1].text).eq('0.0.1');
+		expect(dropdown).toHaveValue('INVALID');
 	});
 });

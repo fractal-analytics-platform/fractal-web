@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stripNullAndEmptyObjectsAndArrays } from '../src/lib/utils';
+import { stripNullAndEmptyObjectsAndArrays } from '../src/lib/common/utils';
 
 describe('utils', () => {
 	it('should strip data objects correctly', () => {

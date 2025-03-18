@@ -1,4 +1,4 @@
-import compareLoose from 'semver/functions/compare-loose';
+import { greatestVersionAsc } from '../common/version';
 
 /**
  * @param {import('../types/api').TaskGroupV2[]} taskGroups
@@ -122,15 +122,7 @@ function sortTasksTableRows(rows) {
 export function sortVersions(versions) {
 	try {
 		versions
-			.sort((v1, v2) => {
-				if (!v1) {
-					return -1;
-				}
-				if (!v2) {
-					return 1;
-				}
-				return compareLoose(v1, v2);
-			})
+			.sort(greatestVersionAsc)
 			.reverse();
 	} catch (err) {
 		console.warn('Semver error:', err);
