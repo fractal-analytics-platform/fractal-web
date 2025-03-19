@@ -16,27 +16,25 @@
 	let datasetId;
 	/** @type {number} */
 	let workflowTaskId;
-	/** @type {string} */
-	let status;
 
 	/** @type {Modal} */
 	let modal;
 
-	/** @type {(import('fractal-components/types/api').Pagination<string>)|undefined} */
+	/** @type {(import('fractal-components/types/api').Pagination<{ zarr_url: string, status: string }>)|undefined} */
 	let data = undefined;
 
 	let loadingLogs = false;
 	let selectedLogImage = '';
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = [];
+	let loadedLogsStatus = '';
 
 	/**
 	 * @param {number} _projectId
 	 * @param {number} _datasetId
 	 * @param {number} _workflowTaskId
-	 * @param {string} _status
 	 */
-	export async function open(_projectId, _datasetId, _workflowTaskId, _status) {
+	export async function open(_projectId, _datasetId, _workflowTaskId) {
 		loading = true;
 		data = undefined;
 		page = 1;
@@ -47,7 +45,6 @@
 		projectId = _projectId;
 		datasetId = _datasetId;
 		workflowTaskId = _workflowTaskId;
-		status = _status;
 		modal.show();
 		await loadImages(page, pageSize);
 	}
@@ -62,7 +59,7 @@
 	 */
 	async function loadImages(currentPage, selectedPageSize) {
 		loading = true;
-		const url = `/api/v2/project/${projectId}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&status=${status}&page=${currentPage}&page_size=${selectedPageSize}`;
+		const url = `/api/v2/project/${projectId}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&page=${currentPage}&page_size=${selectedPageSize}`;
 		const response = await fetch(url);
 		if (!response.ok) {
 			loading = false;
@@ -80,29 +77,28 @@
 
 	/**
 	 * @param {string} zarrUrl
+	 * @param {string} status
 	 */
-	async function loadLogs(zarrUrl) {
+	async function loadLogs(zarrUrl, status) {
 		loadingLogs = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(
-			`/api/v2/project/${projectId}/status/image-logs?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&zarr_url=${zarrUrl}`,
-			{
-				method: 'POST',
-				headers,
-				body: JSON.stringify({
-					workflowtask_id: workflowTaskId,
-					dataset_id: datasetId,
-					zarr_url: zarrUrl
-				})
-			}
-		);
+		const response = await fetch(`/api/v2/project/${projectId}/status/image-log`, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				workflowtask_id: workflowTaskId,
+				dataset_id: datasetId,
+				zarr_url: zarrUrl
+			})
+		});
 		if (!response.ok) {
 			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
 			loadingLogs = false;
 			return;
 		}
 		const log = await response.json();
+		loadedLogsStatus = status;
 		if (status === 'failed') {
 			logParts = extractJobErrorParts(log, false, true);
 		} else {
@@ -119,7 +115,7 @@
 			{#if selectedLogImage && !loadingLogs}
 				Logs for {selectedLogImage}
 			{:else}
-				Images with status='{status}'
+				Images
 			{/if}
 		</h1>
 	</svelte:fragment>
@@ -130,7 +126,7 @@
 		{:else if selectedLogImage && !loadingLogs}
 			<div class="row">
 				<div class="col">
-					<ExpandableLog bind:logParts highlight={status === 'failed'} />
+					<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
 				</div>
 			</div>
 			<div class="row">
@@ -143,12 +139,23 @@
 		{:else if data}
 			{#if data.items.length > 0}
 				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Zarr URL</th>
+							<th>Status</th>
+							<th />
+						</tr>
+					</thead>
 					<tbody>
 						{#each data.items as image}
 							<tr>
-								<td>{image}</td>
+								<td>{image.zarr_url}</td>
+								<td>{image.status || '-'}</td>
 								<td>
-									<button class="btn btn-light" on:click={() => loadLogs(image)}>
+									<button
+										class="btn btn-light"
+										on:click={() => loadLogs(image.zarr_url, image.status)}
+									>
 										{#if loadingLogs}
 											<span
 												class="spinner-border spinner-border-sm"
