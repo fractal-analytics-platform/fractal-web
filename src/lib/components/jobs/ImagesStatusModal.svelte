@@ -48,8 +48,8 @@
 		datasetId = _datasetId;
 		workflowTaskId = _workflowTaskId;
 		status = _status;
-		//modal.show();
-		//await loadImages(page, pageSize);
+		modal.show();
+		await loadImages(page, pageSize);
 	}
 
 	function onClose() {
@@ -62,7 +62,7 @@
 	 */
 	async function loadImages(currentPage, selectedPageSize) {
 		loading = true;
-		let url = `/api/v2/project/${projectId}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&status=${status}&page=${currentPage}&page_size=${selectedPageSize}`;
+		const url = `/api/v2/project/${projectId}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&status=${status}&page=${currentPage}&page_size=${selectedPageSize}`;
 		const response = await fetch(url);
 		if (!response.ok) {
 			loading = false;

@@ -298,22 +298,10 @@ export type HistoryItemV2 = {
 	task_group_dump: TaskGroupV2;
 };
 
-export type HistoryUnit = {
+export type HistoryRunAggregated = {
 	id: number;
-	history_run_id: number;
-	logfile: string | null;
-	status: string;
-	zarr_urls: string[];
-};
-
-export type HistoryRunRead = {
-	id: number;
-	dataset_id: number;
-	workflowtask_id: number;
 	workflowtask_dump: WorkflowTaskV2;
-	task_group_dump: TaskGroupV2;
-	timestamp_started: string;
-	status: JobStatus;
-	num_available_images: number;
-	units: Array<HistoryUnit>;
+	num_submitted_units: number;
+	num_done_units: number;
+	num_failed_units: number;
 };

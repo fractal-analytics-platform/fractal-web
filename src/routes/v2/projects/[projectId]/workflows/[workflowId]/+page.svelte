@@ -59,14 +59,14 @@
 	let expandedWorkflowTaskId = undefined;
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = undefined;
-	/** @type {import('fractal-components/types/api').HistoryRunRead|undefined} */
+	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
 	let preventedHistoryRunChange = undefined;
-	/** @type {import('fractal-components/types/api').HistoryRunRead[]} */
+	/** @type {import('fractal-components/types/api').HistoryRunAggregated[]} */
 	let historyRunStatuses = [];
 	let loadingHistoryRunStatuses = false;
 	/** @type {ImagesStatusModal} */
 	let imagesStatusModal;
-	/** @type {import('fractal-components/types/api').HistoryRunRead|undefined} */
+	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
 	let selectedHistoryRun = undefined;
 
 	/** @type {ArgumentsSchema|undefined} */
@@ -325,7 +325,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').HistoryRunRead|undefined} historyRun
+	 * @param {import('fractal-components/types/api').HistoryRunAggregated|undefined} historyRun
 	 */
 	async function selectHistoryRun(historyRun) {
 		await tick();
