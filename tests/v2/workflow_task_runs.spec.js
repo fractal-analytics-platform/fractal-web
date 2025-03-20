@@ -3,7 +3,7 @@ import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js'
 import { createDataset } from './dataset_utils.js';
 import { waitTaskFailure, waitTasksSuccess } from './workflow_task_utils.js';
 
-test('Workflow subsets', async ({ page, workflow }) => {
+test('Workflow task runs', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
@@ -52,14 +52,14 @@ test('Workflow subsets', async ({ page, workflow }) => {
 	await test.step('Open logs modal', async () => {
 		await page.locator('[aria-label="Done images"]').last().click();
 		await modal.waitFor();
-		await expect(modal.getByText("Images with status='done'")).toBeVisible();
-		await expect(modal.getByText('Total results: 15')).toBeVisible();
+		await expect(modal.getByText('Images')).toBeVisible();
+		await expect(modal.getByText('Total results: 30')).toBeVisible();
 		await modal.getByRole('button', { name: '2' }).click();
-		await expect(modal.getByRole('row')).toHaveCount(5);
+		await expect(modal.getByRole('row')).toHaveCount(11);
 		await modal.getByRole('button', { name: 'Logs' }).last().click();
-		await expect(modal.getByText('START cellpose_segmentation task')).toBeVisible();
+		await expect(modal.getByText("Logs for task 'cellpose_segmentation'")).toBeVisible();
 		await modal.getByRole('button', { name: 'Back' }).click();
-		await expect(modal.getByRole('row')).toHaveCount(5);
+		await expect(modal.getByRole('row')).toHaveCount(11);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -87,42 +87,43 @@ test('Workflow subsets', async ({ page, workflow }) => {
 		await waitTasksSuccess(page);
 	});
 
-	await test.step('Open subsets of last task and check meta', async () => {
+	await test.step('Open runs of last task and check meta', async () => {
 		await page.getByRole('button', { name: 'Meta', exact: true }).click();
 		await expect(page.getByPlaceholder('Argument name')).toHaveValue('k2');
 		await expect(page.getByPlaceholder('Argument value')).toHaveValue('v2');
 		await expect(page.getByRole('button', { name: 'Add property' })).toBeEnabled();
-		await page.locator('[aria-label="Show subsets"]').last().click();
-		await page.getByRole('button', { name: 'Subset 1' }).click();
+		await page.locator('[aria-label="Show runs"]').last().click();
+		await page.getByRole('button', { name: 'Run 1' }).click();
 		await expect(page.getByPlaceholder('Argument name')).toHaveValue('k1');
 		await expect(page.getByPlaceholder('Argument value')).toHaveValue('v1');
 		await expect(page.getByRole('button', { name: 'Add property' })).not.toBeEnabled();
-		await page.getByRole('button', { name: 'Subset 2' }).click();
+		await page.getByRole('button', { name: 'Run 2' }).click();
 		await expect(page.getByPlaceholder('Argument name')).toHaveValue('k2');
 		await expect(page.getByPlaceholder('Argument value')).toHaveValue('v2');
 		await expect(page.getByRole('button', { name: 'Add property' })).not.toBeEnabled();
 	});
 
-	await test.step('Open subset logs modal', async () => {
+	await test.step('Open run logs modal', async () => {
 		await page.locator('[aria-label="Done images"]').last().click();
 		await modal.waitFor();
+		await expect(modal.getByText('Run 2')).toBeVisible();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
-		await expect(modal.getByRole('row')).toHaveCount(1);
+		await expect(modal.getByRole('row')).toHaveCount(2);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
 
-	await test.step('Open subsets of second task and check arguments', async () => {
+	await test.step('Open runs of second task and check arguments', async () => {
 		await workflow.selectTask('illumination_correction');
-		await expect(page.getByRole('button', { name: 'Subset 1' })).not.toBeVisible();
+		await expect(page.getByRole('button', { name: 'Run 1' })).not.toBeVisible();
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await expect(page.getByRole('switch')).toBeChecked();
-		await page.locator('[aria-label="Show subsets"]').nth(1).click();
-		await page.getByRole('button', { name: 'Subset 1' }).click();
-		await expect(page.getByRole('button', { name: 'Subset 2' })).not.toBeVisible();
+		await page.locator('[aria-label="Show runs"]').nth(1).click();
+		await page.getByRole('button', { name: 'Run 1' }).click();
+		await expect(page.getByRole('button', { name: 'Run 2' })).not.toBeVisible();
 		await expect(page.getByRole('switch')).not.toBeChecked();
 		await expect(page.getByRole('switch')).not.toBeEditable();
 	});
@@ -142,11 +143,15 @@ test('Workflow subsets', async ({ page, workflow }) => {
 	await test.step('Open failed logs modal', async () => {
 		await page.locator('[aria-label="Failed images"]').first().click();
 		await modal.waitFor();
-		await expect(modal.getByText("Images with status='failed'")).toBeVisible();
-		await expect(modal.getByText('Total results: 15')).toBeVisible();
-		await modal.getByRole('button', { name: 'Logs' }).first().click();
-		await modal.getByRole('button', { name: 'click here to expand' }).click();
-		await expect(page.getByText('Traceback')).toBeVisible();
+		await expect(modal.getByText('Images')).toBeVisible();
+		await expect(modal.getByText('Total results: 30')).toBeVisible();
+		await modal
+			.getByRole('row', { name: 'failed' })
+			.first()
+			.getByRole('button', { name: 'Logs' })
+			.click();
+		await expect(modal.locator('.expandable-log')).toBeVisible();
+		await expect(page.getByText("Logs for task 'create_ome_zarr_compound'")).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});

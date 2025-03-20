@@ -61,6 +61,7 @@ describe('RunWorkflowModal', () => {
 			onDatasetsUpdated: vi.fn(),
 			statuses: {
 				1: {
+					status: 'partial',
 					num_submitted_images: 0,
 					num_done_images: 0,
 					num_failed_images: 5,

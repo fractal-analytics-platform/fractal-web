@@ -239,9 +239,9 @@ it('generates new unique dataset name', () => {
 });
 
 it('get first task index for continuing workflow', () => {
-	const doneImages = createImageStatus(0, 2, 0);
-	const failedImages = createImageStatus(0, 0, 3);
-	const submittedImages = createImageStatus(5, 0, 0);
+	const doneImages = createImageStatus('done', 0, 2, 0);
+	const failedImages = createImageStatus('failed', 0, 0, 3);
+	const submittedImages = createImageStatus('submitted', 5, 0, 0);
 	expect(testGetFirstTaskIndexForContinuingWorkflow([null, null, null, null])).toEqual(0);
 	expect(testGetFirstTaskIndexForContinuingWorkflow([doneImages, doneImages, null, null])).toEqual(
 		2
@@ -278,8 +278,9 @@ function getMockedDatasets(names) {
  * @param {number} failed
  * @returns {import('fractal-components/types/api').ImagesStatus}
  */
-function createImageStatus(submitted, done, failed) {
+function createImageStatus(status, submitted, done, failed) {
 	return {
+		status,
 		num_submitted_images: submitted,
 		num_done_images: done,
 		num_failed_images: failed,
