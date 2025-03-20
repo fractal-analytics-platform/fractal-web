@@ -28,12 +28,12 @@
 	{#if status.num_done_images === 0 && status.num_failed_images === 0 && status.num_submitted_images === 0}
 		<span class="d-flex">
 			{#if status.status === 'done'}
-				<i class="image-status-icon bi bi-check text-success pe-1" />
+				<i class="status-icon bi bi-check text-success pe-1" />
 			{:else if status.status === 'failed'}
-				<i class="image-status-icon bi bi-x text-danger pe-1" />
+				<i class="status-icon bi bi-x text-danger pe-1" />
 			{:else if status.status === 'submitted'}
 				<div
-					class="mt-1 pe-1 spinner-border spinner-border-sm text-primary image-status"
+					class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
 					role="status"
 				>
 					<span class="visually-hidden">Loading...</span>
@@ -50,11 +50,11 @@
 						imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
 				>
 					<span class="d-flex">
-						<span class="pe-1 image-status text-primary">
+						<span class="pe-1 status-wrapper text-primary">
 							{status.num_submitted_images}
 						</span>
 						<div
-							class="mt-1 pe-1 spinner-border spinner-border-sm text-primary image-status"
+							class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
 							role="status"
 						>
 							<span class="visually-hidden">Loading...</span>
@@ -69,10 +69,10 @@
 					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
 				>
 					<span class="d-flex">
-						<span class="image-status text-success ps-1">
+						<span class="status-wrapper text-success ps-1">
 							{status.num_done_images}
 						</span>
-						<i class="image-status-icon bi bi-check text-success pe-1" />
+						<i class="status-icon bi bi-check text-success pe-1" />
 					</span>
 				</button>
 			{/if}
@@ -86,10 +86,10 @@
 					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
 				>
 					<span class="d-flex">
-						<span class="image-status text-danger ps-1">
+						<span class="status-wrapper text-danger ps-1">
 							{status.num_failed_images}
 						</span>
-						<i class="image-status-icon bi bi-x text-danger pe-1" />
+						<i class="status-icon bi bi-x text-danger pe-1" />
 					</span>
 				</button>
 			{/if}
@@ -103,21 +103,3 @@
 	{/if}
 {/if}
 
-<style>
-	:global(.image-status-icon) {
-		font-size: 160%;
-		font-weight: bold;
-		margin: 0 -5px -5px -5px;
-		line-height: 0;
-		display: block;
-	}
-
-	:global(.active .image-status),
-	:global(.active .image-status-icon) {
-		color: #fff !important;
-	}
-
-	.status-modal-btn:hover span {
-		text-decoration: underline;
-	}
-</style>

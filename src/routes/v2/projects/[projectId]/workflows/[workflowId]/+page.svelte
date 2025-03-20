@@ -25,6 +25,7 @@
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
+	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -66,6 +67,8 @@
 	let loadingHistoryRunStatuses = false;
 	/** @type {ImagesStatusModal} */
 	let imagesStatusModal;
+	/** @type {RunStatusModal} */
+	let runStatusModal;
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
 	let selectedHistoryRun = undefined;
 
@@ -474,6 +477,7 @@
 	let statusWatcherTimer;
 
 	async function selectedDatasetChanged() {
+		expandedWorkflowTaskId = undefined;
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
@@ -918,8 +922,15 @@
 										>
 											Run {index + 1}
 											<span class="float-end ps-2">
-												{#if selectedDatasetId}
-													<RunStatus run={status} />
+												{#if selectedDatasetId !== undefined}
+													<RunStatus
+														run={status}
+														index={index + 1}
+														{runStatusModal}
+														workflowTaskId={workflowTask.id}
+														projectId={workflow.project_id}
+														datasetId={selectedDatasetId}
+													/>
 												{/if}
 											</span>
 										</button>
@@ -1096,6 +1107,7 @@
 />
 
 <ImagesStatusModal bind:this={imagesStatusModal} />
+<RunStatusModal bind:this={runStatusModal} />
 
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	<svelte:fragment slot="header">
@@ -1266,5 +1278,22 @@
 	}
 	.run-item.active {
 		background-color: #4e95ff !important;
+	}
+
+	:global(.status-icon) {
+		font-size: 160%;
+		font-weight: bold;
+		margin: 0 -5px -5px -5px;
+		line-height: 0;
+		display: block;
+	}
+
+	:global(.active .status-wrapper),
+	:global(.active .status-icon) {
+		color: #fff !important;
+	}
+
+	:global(.status-modal-btn:hover span) {
+		text-decoration: underline;
 	}
 </style>
