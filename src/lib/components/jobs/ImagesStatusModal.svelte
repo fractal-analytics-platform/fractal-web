@@ -155,6 +155,7 @@
 									<button
 										class="btn btn-light"
 										on:click={() => loadLogs(image.zarr_url, image.status)}
+										disabled={image.status === null}
 									>
 										{#if loadingLogs}
 											<span
