@@ -1,4 +1,6 @@
 <script>
+	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
+
 	/** @type {import('fractal-components/types/api').ImagesStatus|undefined} */
 	export let status;
 	/** @type {number} */
@@ -11,21 +13,13 @@
 	/** @type {import('./ImagesStatusModal.svelte').default} */
 	export let imagesStatusModal;
 
-	$: showDone =
-		status &&
-		(status.num_done_images > 0 ||
-			(status.num_done_images === 0 && status.num_failed_images === 0));
-	$: showFailed =
-		status &&
-		(status.num_failed_images > 0 ||
-			(status.num_done_images === 0 && status.num_failed_images === 0));
 	$: fullyDone = status && status.num_done_images === status.num_available_images;
 	$: fullyFailed = status && status.num_failed_images === status.num_available_images;
 	$: partial = status && !fullyDone && !fullyFailed;
 </script>
 
 {#if status}
-	{#if status.num_done_images === 0 && status.num_failed_images === 0 && status.num_submitted_images === 0}
+	{#if isConverterType(workflowTask.task_type)}
 		<span class="d-flex">
 			{#if status.status === 'done'}
 				<i class="status-icon bi bi-check text-success pe-1" />
@@ -46,10 +40,9 @@
 				<button
 					aria-label="Submitted images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() =>
-						imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
 				>
-					<span class="d-flex">
+					<span class="d-flex pe-1">
 						<span class="pe-1 status-wrapper text-primary">
 							{status.num_submitted_images}
 						</span>
@@ -62,7 +55,7 @@
 					</span>
 				</button>
 			{/if}
-			{#if showDone}
+			{#if status.num_done_images > 0}
 				<button
 					aria-label="Done images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
@@ -76,10 +69,10 @@
 					</span>
 				</button>
 			{/if}
-			{#if showDone && showFailed}
+			{#if status.num_done_images > 0 && status.num_failed_images}
 				/
 			{/if}
-			{#if showFailed}
+			{#if status.num_failed_images > 0}
 				<button
 					aria-label="Failed images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
@@ -102,4 +95,3 @@
 		</span>
 	{/if}
 {/if}
-
