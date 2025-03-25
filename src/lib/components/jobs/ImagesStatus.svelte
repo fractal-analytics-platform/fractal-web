@@ -1,5 +1,5 @@
 <script>
-	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
+	import { isConverterType, isParallelType } from 'fractal-components/common/workflow_task_utils';
 
 	/** @type {import('fractal-components/types/api').ImagesStatus|undefined} */
 	export let status;
@@ -16,10 +16,30 @@
 	$: fullyDone = status && status.num_done_images === status.num_available_images;
 	$: fullyFailed = status && status.num_failed_images === status.num_available_images;
 	$: partial = status && !fullyDone && !fullyFailed;
+
+	/**
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @param {import('fractal-components/types/api').ImagesStatus} status
+	 * @returns {boolean}
+	 */
+	function handleAsConverter(workflowTask, status) {
+		if (isConverterType(workflowTask.task_type)) {
+			return true;
+		}
+		if (isParallelType(workflowTask.task_type)) {
+			return false;
+		}
+		return (
+			status.num_submitted_images === 0 &&
+			status.num_done_images === 0 &&
+			status.num_failed_images === 0 &&
+			status.num_available_images === 0
+		);
+	}
 </script>
 
 {#if status}
-	{#if isConverterType(workflowTask.task_type)}
+	{#if handleAsConverter(workflowTask, status)}
 		<span class="d-flex">
 			{#if status.status === 'done'}
 				<i class="status-icon bi bi-check text-success pe-1" />
