@@ -28,6 +28,7 @@
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = [];
 	let loadedLogsStatus = '';
+	let projectDir = '';
 
 	/**
 	 * @param {number} _projectId
@@ -46,11 +47,22 @@
 		datasetId = _datasetId;
 		workflowTaskId = _workflowTaskId;
 		modal.show();
+		await loadProjectDir();
 		await loadImages(page, pageSize);
 	}
 
 	function onClose() {
 		data = undefined;
+	}
+
+	async function loadProjectDir() {
+		const response = await fetch('/api/auth/current-user/settings');
+		if (!response.ok) {
+			return;
+		}
+		/** @type {import('fractal-components/types/api').UserSettings} */
+		const result = await response.json();
+		projectDir = result.project_dir || '';
 	}
 
 	/**
@@ -107,6 +119,18 @@
 		selectedLogImage = zarrUrl;
 		loadingLogs = false;
 	}
+
+	/**
+	 * @param {string} zarrUrl
+	 */
+	function trimProjectDir(zarrUrl) {
+		if (projectDir && zarrUrl.startsWith(projectDir)) {
+			return zarrUrl.substring(
+				projectDir.endsWith('/') ? projectDir.length : projectDir.length + 1
+			);
+		}
+		return zarrUrl;
+	}
 </script>
 
 <Modal id="imagesStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
@@ -149,7 +173,7 @@
 					<tbody>
 						{#each data.items as image}
 							<tr>
-								<td>{image.zarr_url}</td>
+								<td>{trimProjectDir(image.zarr_url)}</td>
 								<td>{image.status || '-'}</td>
 								<td>
 									<button
