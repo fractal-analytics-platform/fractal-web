@@ -927,7 +927,7 @@
 														run={status}
 														index={index + 1}
 														{runStatusModal}
-														workflowTaskId={workflowTask.id}
+														workflowTask={workflowTask}
 														projectId={workflow.project_id}
 														datasetId={selectedDatasetId}
 													/>
