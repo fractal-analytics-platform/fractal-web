@@ -108,7 +108,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await modal.waitFor();
 		await expect(modal.getByText('Run 2')).toBeVisible();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
-		await expect(modal.getByRole('row')).toHaveCount(2);
+		await expect(modal.getByRole('row')).toHaveCount(3);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
