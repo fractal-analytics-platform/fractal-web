@@ -277,9 +277,9 @@ export type TaskGroupActivityV2 = {
 };
 
 export type TypeFiltersFlow = {
-	dataset_filters: Array<{ [key: string]: bool }>;
-	input_filters: Array<{ [key: string]: bool }>;
-	output_filters: Array<{ [key: string]: bool }>;
+	current_type_filters: { [key: string]: bool };
+	input_type_filters: { [key: string]: bool };
+	output_type_filters: { [key: string]: bool };
 };
 
 export type Accounting = Pagination<{

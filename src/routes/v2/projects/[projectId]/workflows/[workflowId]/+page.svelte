@@ -782,12 +782,7 @@
 	</div>
 </div>
 
-<TypeFiltersFlowModal
-	{workflow}
-	{selectedDatasetId}
-	datasets={sortedDatasets}
-	bind:this={typeFiltersFlowModal}
-/>
+<TypeFiltersFlowModal {workflow} bind:this={typeFiltersFlowModal} />
 
 {#if workflow}
 	<StandardDismissableAlert message={workflowSuccessMessage} />

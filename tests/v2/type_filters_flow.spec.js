@@ -59,43 +59,14 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 		await expect(rows).toHaveCount(4);
 		// First row
 		await expect(rows.nth(1).getByRole('cell').nth(0)).toHaveText('cellpose_segmentation');
-		await expect(rows.nth(1).getByRole('cell').nth(1)).toContainText('t1');
-		await expect(rows.nth(1).getByRole('cell').nth(2)).toContainText('t1');
 		// Second row
 		await expect(rows.nth(2).getByRole('cell').nth(0)).toHaveText('MIP_compound');
-		await expect(rows.nth(2).getByRole('cell').nth(1)).toContainText('t1');
-		await expect(rows.nth(2).getByRole('cell').nth(2)).toContainText('t1');
 		await expect(rows.nth(2).getByRole('cell').nth(2)).toContainText('3D');
+		await expect(rows.nth(2).getByRole('cell').nth(3)).toContainText('3D');
 		// Third row
 		await expect(rows.nth(3).getByRole('cell').nth(0)).toHaveText('illumination_correction');
-		await expect(rows.nth(3).getByRole('cell').nth(1)).toContainText('t1');
 		await expect(rows.nth(3).getByRole('cell').nth(1)).toContainText('3D');
-		await expect(rows.nth(3).getByRole('cell').nth(2)).toContainText('t1');
-		await expect(rows.nth(3).getByRole('cell').nth(2)).toContainText('3D');
 		await expect(rows.nth(3).getByRole('cell').nth(2)).toContainText('illumination_correction');
-	});
-
-	await test.step('Deselect dataset', async () => {
-		await modal.getByRole('combobox', { name: 'Dataset' }).selectOption('Select...');
-		await expect(rows.nth(1).getByRole('cell').nth(0)).toHaveText('cellpose_segmentation');
-		await expect(rows.nth(1).getByRole('cell').nth(1)).not.toContainText('t1');
-	});
-
-	await test.step('Select first task', async () => {
-		await modal.getByRole('combobox', { name: 'First task' }).selectOption('MIP_compound');
-		await expect(rows).toHaveCount(3);
-		await expect(rows.nth(1).getByRole('cell').nth(0)).toHaveText('MIP_compound');
-		await expect(rows.nth(1).getByRole('cell').nth(1)).not.toContainText('t1');
-		await expect(rows.nth(1).getByRole('cell').nth(2)).not.toContainText('t1');
-		await expect(rows.nth(1).getByRole('cell').nth(2)).toContainText('3D');
-	});
-
-	await test.step('Select last task', async () => {
-		await modal.getByRole('combobox', { name: 'Last task' }).selectOption('MIP_compound');
-		await expect(rows).toHaveCount(2);
-		await expect(rows.nth(1).getByRole('cell').nth(0)).toHaveText('MIP_compound');
-		await expect(rows.nth(1).getByRole('cell').nth(1)).not.toContainText('t1');
-		await expect(rows.nth(1).getByRole('cell').nth(2)).not.toContainText('t1');
-		await expect(rows.nth(1).getByRole('cell').nth(2)).toContainText('3D');
+		await expect(rows.nth(3).getByRole('cell').nth(3)).toContainText('illumination_correction');
 	});
 });
