@@ -1,9 +1,11 @@
 <script>
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import { extractJobErrorParts } from '$lib/common/job_utilities';
+	import SlimSelect from 'slim-select';
 	import ExpandableLog from '../common/ExpandableLog.svelte';
 	import Modal from '../common/Modal.svelte';
 	import Paginator from '../common/Paginator.svelte';
+	import { tick } from 'svelte';
 
 	let loading = false;
 	let page = 1;
@@ -34,6 +36,10 @@
 	let logParts = [];
 	let loadedLogsStatus = '';
 
+	let statusFilter = '';
+	/** @type {SlimSelect|undefined} */
+	let statusFilterSelector = undefined;
+
 	/**
 	 * @param {number} _projectId
 	 * @param {number} _historyRunId
@@ -59,10 +65,14 @@
 		pageSize = 10;
 		modal.show();
 		await loadRun(page, pageSize);
+		await tick();
+		setStatusFilterSelector();
 	}
 
 	function onClose() {
 		data = undefined;
+		statusFilter = '';
+		unsetStatusFilterSelector();
 	}
 
 	/**
@@ -71,7 +81,10 @@
 	 */
 	async function loadRun(currentPage, selectedPageSize) {
 		loading = true;
-		const url = `/api/v2/project/${projectId}/status/run/${historyRunId}/units?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&page=${currentPage}&page_size=${selectedPageSize}`;
+		let url = `/api/v2/project/${projectId}/status/run/${historyRunId}/units?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&page=${currentPage}&page_size=${selectedPageSize}`;
+		if (statusFilter) {
+			url += `&unit_status=${statusFilter}`;
+		}
 		const response = await fetch(url);
 		if (!response.ok) {
 			loading = false;
@@ -92,6 +105,7 @@
 	 * @param {string} status
 	 */
 	async function loadLogs(unitId, status) {
+		unsetStatusFilterSelector();
 		loadingLogs = true;
 		const response = await fetch(
 			`/api/v2/project/${projectId}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unitId}&workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}`,
@@ -113,6 +127,59 @@
 		}
 		selectedLogUnit = unitId;
 		loadingLogs = false;
+	}
+
+	async function back() {
+		selectedLogUnit = undefined;
+		await tick();
+		setStatusFilterSelector();
+	}
+
+	function setStatusFilterSelector() {
+		const elementId = 'status-filter';
+		const placeholder = 'Select...';
+		const selectElement = document.getElementById(elementId);
+		selectElement?.classList.remove('invisible');
+		statusFilterSelector = new SlimSelect({
+			select: `#${elementId}`,
+			settings: {
+				maxValuesShown: 5,
+				showSearch: true,
+				allowDeselect: true,
+				ariaLabel: 'Select status'
+			},
+			events: {
+				afterChange: (selection) => {
+					if (selection.length === 0 || selection[0].value === placeholder) {
+						statusFilter = '';
+					} else {
+						statusFilter = selection[0].value;
+					}
+					statusFilterChanged();
+				}
+			}
+		});
+
+		const options = ['done', 'failed', 'submitted'];
+		statusFilterSelector.setData([
+			{ text: placeholder, placeholder: true },
+			...options.map((o) => ({ text: o, value: o }))
+		]);
+
+		if (statusFilter) {
+			statusFilterSelector.setSelected(statusFilter);
+		}
+	}
+
+	function unsetStatusFilterSelector() {
+		statusFilterSelector?.destroy();
+		const selectElement = document.getElementById('status-filter');
+		selectElement?.classList.add('invisible');
+	}
+
+	async function statusFilterChanged() {
+		page = 1;
+		await loadRun(page, pageSize);
 	}
 </script>
 
@@ -138,51 +205,57 @@
 			</div>
 			<div class="row">
 				<div class="col">
-					<button class="m-2 ms-3 btn btn-primary" on:click={() => (selectedLogUnit = undefined)}>
-						Back
-					</button>
+					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
 				</div>
 			</div>
 		{:else if data}
-			{#if data.items.length > 0}
-				<table class="table table-striped">
-					<thead>
+			<table class="table table-striped">
+				<colgroup>
+					<col width="30%" />
+					<col width="30%" />
+					<col width="40%" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Unit id</th>
+						<th>Status</th>
+						<th />
+					</tr>
+					<tr>
+						<th />
+						<th>
+							<select id="status-filter" class="invisible" />
+						</th>
+						<th />
+					</tr>
+				</thead>
+				<tbody>
+					{#each data.items as run}
 						<tr>
-							<th>Unit id</th>
-							<th>Status</th>
-							<th />
+							<td>{run.id}</td>
+							<td>{run.status || '-'}</td>
+							<td>
+								<button class="btn btn-light" on:click={() => loadLogs(run.id, run.status)}>
+									{#if loadingLogs}
+										<span
+											class="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										/>
+									{/if}
+									<i class="bi-list-columns-reverse" /> Logs
+								</button>
+							</td>
 						</tr>
-					</thead>
-					<tbody>
-						{#each data.items as run}
-							<tr>
-								<td>{run.id}</td>
-								<td>{run.status || '-'}</td>
-								<td>
-									<button class="btn btn-light" on:click={() => loadLogs(run.id, run.status)}>
-										{#if loadingLogs}
-											<span
-												class="spinner-border spinner-border-sm"
-												role="status"
-												aria-hidden="true"
-											/>
-										{/if}
-										<i class="bi-list-columns-reverse" /> Logs
-									</button>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-				<Paginator
-					currentPage={page}
-					{pageSize}
-					{totalCount}
-					onPageChange={(currentPage, pageSize) => loadRun(currentPage, pageSize)}
-				/>
-			{:else}
-				<p class="ps-3">No images</p>
-			{/if}
+					{/each}
+				</tbody>
+			</table>
+			<Paginator
+				currentPage={page}
+				{pageSize}
+				{totalCount}
+				onPageChange={(currentPage, pageSize) => loadRun(currentPage, pageSize)}
+			/>
 		{/if}
 	</svelte:fragment>
 </Modal>
