@@ -9,6 +9,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
+	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets;
@@ -53,6 +54,12 @@
 	$: runBtnDisabled =
 		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
 		(mode === 'continue' && firstTaskIndex === undefined);
+
+	$: showImageList =
+		hasImages &&
+		firstTaskIndex !== undefined &&
+		mode !== 'restart' &&
+		!isConverterType(workflow.task_list[firstTaskIndex].task_type);
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = null;
@@ -525,7 +532,7 @@
 						</div>
 					</div>
 				</div>
-				{#if selectedDataset && imagePage && hasImages && firstTaskIndex !== undefined && mode !== 'restart'}
+				{#if imagePage && selectedDataset && showImageList}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button
