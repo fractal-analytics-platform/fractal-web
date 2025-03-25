@@ -614,22 +614,16 @@
 		) {
 			return selectedSubmittedJob;
 		}
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(
+			`/api/v2/project/${project.id}/latest-job?workflow_id=${workflow.id}&dataset_id=${datasetId}`
+		);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-			const allJobs = await response.json();
-			const jobs = allJobs
-				.filter((j) => j.dataset_id === datasetId)
-				.sort((a, b) => (a.start_timestamp < b.start_timestamp ? 1 : -1));
-			if (jobs.length > 0) {
-				return jobs[0];
-			}
-		} else {
-			console.error('Unable to load workflow jobs', await response.json());
+			/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
+			return await response.json();
+		} else if (response.status !== 404) {
+			console.error('Unable to load latest job');
 		}
+		return undefined;
 	}
 
 	async function stopWorkflow() {
@@ -927,7 +921,7 @@
 														run={status}
 														index={index + 1}
 														{runStatusModal}
-														workflowTask={workflowTask}
+														{workflowTask}
 														projectId={workflow.project_id}
 														datasetId={selectedDatasetId}
 													/>
