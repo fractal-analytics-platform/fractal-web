@@ -144,7 +144,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.locator('[aria-label="Failed images"]').first().click();
 		await modal.waitFor();
 		await expect(modal.getByText('Images')).toBeVisible();
-		await expect(modal.getByText('Total results: 15')).toBeVisible();
+		await expect(modal.getByText('Total results: 30')).toBeVisible();
 		await modal
 			.getByRole('row', { name: 'failed' })
 			.first()

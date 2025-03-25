@@ -87,6 +87,15 @@ describe('Workflow page', () => {
 									log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
 								}
 							];
+						case '/api/v2/project/1/latest-job?workflow_id=1&dataset_id=1':
+							return {
+								id: 1,
+								project_id: 1,
+								workflow_id: 1,
+								dataset_id: 1,
+								status: 'failed',
+								log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
+							};
 						case '/api/auth/current-user/settings':
 							return { slurm_accounts: [] };
 						default:
