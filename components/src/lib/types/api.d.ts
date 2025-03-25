@@ -87,7 +87,12 @@ export type ImagePage = Pagination<Image> & {
 	types: Array<string>;
 };
 
-export type TaskV2Type = 'non_parallel' | 'parallel' | 'compound';
+export type TaskV2Type =
+	| 'non_parallel'
+	| 'parallel'
+	| 'compound'
+	| 'converter_non_parallel'
+	| 'converter_compound';
 
 export type TaskV2 = {
 	id: number;
@@ -147,7 +152,7 @@ export type ApplyWorkflowV2 = {
 export type JobStatus = 'submitted' | 'done' | 'failed';
 
 export type ImagesStatus = {
-	status: JobStatus;
+	status: JobStatus | 'partial';
 	num_submitted_images: number;
 	num_done_images: number;
 	num_failed_images: number;

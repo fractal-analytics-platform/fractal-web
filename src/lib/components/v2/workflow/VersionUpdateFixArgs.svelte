@@ -5,7 +5,8 @@
 		stripIgnoredProperties,
 		getPropertiesToIgnore,
 		SchemaValidator,
-		stripNullAndEmptyObjectsAndArrays
+		stripNullAndEmptyObjectsAndArrays,
+		isCompoundType
 	} from 'fractal-components';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 
@@ -159,7 +160,7 @@
 {#if originalArgs}
 	{#if !validationErrors}
 		<div class="alert alert-success mt-3">
-			{#if workflowTask.task_type === 'compound'}
+			{#if isCompoundType(workflowTask.task_type)}
 				The {parallel ? '' : ' non'} parallel arguments are valid
 			{:else}
 				The arguments are valid

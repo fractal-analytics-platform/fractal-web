@@ -53,13 +53,13 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.locator('[aria-label="Done images"]').last().click();
 		await modal.waitFor();
 		await expect(modal.getByText('Images')).toBeVisible();
-		await expect(modal.getByText('Total results: 30')).toBeVisible();
+		await expect(modal.getByText('Total results: 15')).toBeVisible();
 		await modal.getByRole('button', { name: '2' }).click();
 		await expect(modal.getByRole('row')).toHaveCount(11);
 		await modal.getByRole('button', { name: 'Logs' }).last().click();
 		await expect(modal.getByText("Logs for task 'cellpose_segmentation'")).toBeVisible();
 		await modal.getByRole('button', { name: 'Back' }).click();
-		await expect(modal.getByRole('row')).toHaveCount(11);
+		await expect(modal.getByRole('row')).toHaveCount(6);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -144,7 +144,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.locator('[aria-label="Failed images"]').first().click();
 		await modal.waitFor();
 		await expect(modal.getByText('Images')).toBeVisible();
-		await expect(modal.getByText('Total results: 30')).toBeVisible();
+		await expect(modal.getByText('Total results: 15')).toBeVisible();
 		await modal
 			.getByRole('row', { name: 'failed' })
 			.first()

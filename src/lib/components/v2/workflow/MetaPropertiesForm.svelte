@@ -9,6 +9,7 @@
 	import { page } from '$app/stores';
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
@@ -105,8 +106,8 @@
 <div class="mt-2">
 	<span id="metaPropertiesFormError" />
 </div>
-{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-	{#if workflowTask.task_type === 'compound'}
+{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
+	{#if isCompoundType(workflowTask.task_type)}
 		<h5 class="ms-2">Initialisation Meta</h5>
 	{/if}
 	{#key editable || metaPropertiesNonParallel}
@@ -118,11 +119,11 @@
 		/>
 	{/key}
 {/if}
-{#if workflowTask.task_type === 'compound'}
+{#if isCompoundType(workflowTask.task_type)}
 	<hr />
 {/if}
-{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-	{#if workflowTask.task_type === 'compound'}
+{#if isParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
+	{#if isCompoundType(workflowTask.task_type)}
 		<h5 class="ms-2">Compute Meta</h5>
 	{/if}
 	{#key editable || metaPropertiesParallel}
