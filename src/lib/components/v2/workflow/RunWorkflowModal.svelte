@@ -344,7 +344,7 @@
 	});
 </script>
 
-<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true}>
+<Modal id="runWorkflowModal" centered={true} bind:this={modal} fullscreen={true} scrollable={true}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">
 			{#if mode === 'run'}
