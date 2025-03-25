@@ -264,6 +264,7 @@
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: true,
 				allowDeselect: true,
 				isMultiple: true,
@@ -298,6 +299,7 @@
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: false,
 				allowDeselect: true,
 				ariaLabel: `Selector for type ${key}`

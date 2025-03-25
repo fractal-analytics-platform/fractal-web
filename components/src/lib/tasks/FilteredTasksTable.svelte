@@ -278,6 +278,7 @@
 		return new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: true,
 				allowDeselect: true,
 				ariaLabel

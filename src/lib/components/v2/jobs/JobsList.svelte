@@ -207,6 +207,7 @@
 		const select = new SlimSelect({
 			select: `#${id}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch,
 				allowDeselect: true
 			},
