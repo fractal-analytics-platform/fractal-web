@@ -34,7 +34,7 @@
 	$: project = workflow.project;
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	let datasets = $page.data.datasets;
-	let attributeFiltersEnabled = $page.data.attributeFiltersEnabled;
+	let filtersEnabled = $page.data.filtersEnabled;
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
@@ -1142,7 +1142,7 @@
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}
-	{attributeFiltersEnabled}
+	{filtersEnabled}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;

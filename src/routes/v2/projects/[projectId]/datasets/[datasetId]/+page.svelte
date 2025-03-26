@@ -16,7 +16,6 @@
 	let dataset = $page.data.dataset;
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	let imagePage = $page.data.imagePage;
-	let useDatasetFilters = false;
 
 	/** @type {DatasetImagesTable} */
 	let imagesTable;
@@ -206,7 +205,6 @@
 	{dataset}
 	bind:imagePage
 	{vizarrViewerUrl}
-	bind:useDatasetFilters
 	runWorkflowModal={false}
 	bind:this={imagesTable}
 	onDatasetsUpdated={(updated) => (dataset = updated)}

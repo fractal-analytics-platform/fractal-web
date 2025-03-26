@@ -68,7 +68,7 @@ describe('RunWorkflowModal', () => {
 					num_available_images: 5
 				}
 			},
-			attributeFiltersEnabled: false
+			filtersEnabled: false
 		});
 
 		result.component.open('continue');

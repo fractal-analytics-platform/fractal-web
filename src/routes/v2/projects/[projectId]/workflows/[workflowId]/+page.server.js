@@ -22,13 +22,13 @@ export async function load({ fetch, params }) {
 
 	const defaultDatasetId = getDefaultWorkflowDataset(datasets, jobs);
 
-	const attributeFiltersEnabled = env.ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS === 'true';
+	const filtersEnabled = env.ENABLE_INTERACTIVE_FILTERS === 'true';
 
 	return {
 		workflow,
 		datasets,
 		defaultDatasetId,
 		user,
-		attributeFiltersEnabled
+		filtersEnabled
 	};
 }

@@ -2,12 +2,10 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { deepCopy, objectChanged } from '$lib/common/component_utilities';
+	import { objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
-	import Tooltip from '$lib/components/common/Tooltip.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -15,27 +13,21 @@
 	export let imagePage;
 	/** @type {string|null} */
 	export let vizarrViewerUrl;
-	/** @type {boolean} */
-	export let useDatasetFilters;
 	/**
 	 * Set to true if the table is displayed inside the "Run workflow" modal.
 	 * Used to disable some buttons.
 	 * @type {boolean}
 	 */
 	export let runWorkflowModal;
-	export let attributeFiltersEnabled = true;
+	export let filtersEnabled = true;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 
-	let datasetFiltersChanged = false;
 	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
 	export let onDatasetsUpdated = () => {};
 
 	let showTable = false;
 	let firstLoad = true;
-
-	/** @type {Tooltip|undefined} */
-	let currentSelectionTooltip;
 
 	/** @type {CreateUpdateImageModal|undefined} */
 	let imageModal = undefined;
@@ -44,7 +36,6 @@
 	let resetting = false;
 	let savingDatasetFilters = false;
 
-	let loading = false;
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = {};
 
@@ -132,41 +123,29 @@
 
 	export async function applySearchFields() {
 		searching = true;
-		await searchImages();
+		const params = await searchImages();
 		resetBtnActive =
 			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
 			Object.values(typeFilters).filter((t) => t !== null).length > 0;
 		searching = false;
+		return params;
 	}
 
 	async function resetSearchFields() {
 		resetBtnActive = false;
 		resetting = true;
-		if (useDatasetFilters) {
-			attributeFilters = deepCopy(dataset.attribute_filters);
-			typeFilters = deepCopy(dataset.type_filters);
-		} else {
-			attributeFilters = getAttributeFilterBaseValues(imagePage);
-			typeFilters = getTypeFilterBaseValues(imagePage);
-		}
+		attributeFilters = getAttributeFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
 		await tick();
 		await searchImages();
 		resetting = false;
 	}
 
 	export async function load() {
-		loading = true;
-		currentSelectionTooltip?.setEnabled(!useDatasetFilters);
-		if (useDatasetFilters) {
-			attributeFilters = deepCopy(dataset.attribute_filters);
-			typeFilters = deepCopy(dataset.type_filters);
-		} else {
-			attributeFilters = getAttributeFilterBaseValues(imagePage);
-			typeFilters = getTypeFilterBaseValues(imagePage);
-		}
+		attributeFilters = getAttributeFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
 		await tick();
 		await searchImages();
-		loading = false;
 	}
 
 	onDestroy(() => {
@@ -233,12 +212,10 @@
 			])
 		);
 
-		if (runWorkflowModal) {
-			if (!attributeFiltersEnabled) {
-				// disable attribute filters selection
-				for (const attributeSelector of Object.values(attributesSelectors)) {
-					attributeSelector.disable();
-				}
+		if (runWorkflowModal && !filtersEnabled) {
+			// disable attribute filters selection
+			for (const attributeSelector of Object.values(attributesSelectors)) {
+				attributeSelector.disable();
 			}
 			// disable type filters selection
 			for (const typeSelector of Object.values(typesSelectors)) {
@@ -351,6 +328,7 @@
 	/**
 	 * @param {number|null} currentPage
 	 * @param {number|null} pageSize
+	 * @returns {Promise<{ attribute_filters: any, type_filters: any }>}
 	 */
 	async function searchImages(currentPage = null, pageSize = null) {
 		if (currentPage === null) {
@@ -417,6 +395,7 @@
 				'datasetImagesError'
 			);
 		}
+		return params;
 	}
 
 	/**
@@ -500,13 +479,6 @@
 		} else {
 			selector.setSelected(values.map((v) => v.toString()));
 		}
-	}
-
-	$: if (attributeFilters && typeFilters) {
-		datasetFiltersChanged =
-			!applyBtnActive &&
-			(attributesChanged(dataset.attribute_filters, removeNullValues(attributeFilters)) ||
-				objectChanged(dataset.type_filters, removeNullValues(typeFilters)));
 	}
 
 	$: if (dataset) {
@@ -678,12 +650,12 @@
 								{/if}
 								Reset
 							</button>
-							{#if !runWorkflowModal && useDatasetFilters}
+							{#if !runWorkflowModal}
 								<ConfirmActionButton
 									modalId="confirmSaveDatasetFilters"
 									label="Save"
 									message="Save dataset filters"
-									disabled={!datasetFiltersChanged || savingDatasetFilters}
+									disabled={savingDatasetFilters}
 									callbackAction={async () => {
 										await saveDatasetFilters();
 									}}
@@ -753,73 +725,16 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="pb-2" id="dataset-filters-wrapper" class:sticky-bottom={!runWorkflowModal}>
-			<div class="row">
-				<div class="col-lg-3 mb-3">
-					{#if !runWorkflowModal}
-						<input
-							type="radio"
-							class="btn-check"
-							name="filters-switch"
-							id="all-images"
-							autocomplete="off"
-							value={false}
-							bind:group={useDatasetFilters}
-							on:change={load}
-							disabled={loading || searching || resetting}
-						/>
-						<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
-						<Tooltip
-							id="current-selection-label"
-							title="These are default selection for images on which a workflow will be run"
-							placement="bottom"
-							bind:this={currentSelectionTooltip}
-						>
-							<input
-								type="radio"
-								class="btn-check"
-								name="filters-switch"
-								id="current-selection"
-								autocomplete="off"
-								value={true}
-								bind:group={useDatasetFilters}
-								on:change={load}
-								disabled={loading || searching || resetting}
-							/>
-							<label class="btn btn-white btn-outline-primary" for="current-selection">
-								Current selection
-							</label>
-						</Tooltip>
-						{#if loading}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-						{/if}
-					{/if}
-				</div>
-				<div class="col-lg-6">
-					<Paginator
-						currentPage={imagePage.current_page}
-						pageSize={imagePage.page_size}
-						totalCount={imagePage.total_count}
-						onPageChange={searchImages}
-					/>
-				</div>
-				{#if !runWorkflowModal}
-					<div class="col-lg-3">
-						<button
-							class="btn btn-outline-secondary float-end"
-							on:click={() => imageModal?.openForCreate()}
-						>
-							<i class="bi bi-plus-circle" />
-							Add an image list entry
-						</button>
-					</div>
-				{/if}
-			</div>
-		</div>
 	</div>
 {/if}
 
-<CreateUpdateImageModal {dataset} onImageSave={searchImages} bind:this={imageModal} />
+<CreateUpdateImageModal
+	{dataset}
+	onImageSave={async () => {
+		await searchImages();
+	}}
+	bind:this={imageModal}
+/>
 
 <style>
 	#dataset-images-table td:last-child,
@@ -829,15 +744,6 @@
 
 	#dataset-images-table thead tr:first-child th label {
 		word-break: break-all;
-	}
-
-	#dataset-filters-wrapper {
-		background-color: #fff;
-	}
-
-	.btn-check:not(:checked) + .btn-white {
-		color: #0d6efd;
-		background-color: #fff;
 	}
 
 	.wrap {

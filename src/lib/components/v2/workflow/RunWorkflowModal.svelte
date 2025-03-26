@@ -23,7 +23,7 @@
 	export let onDatasetsUpdated;
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	export let statuses;
-	export let attributeFiltersEnabled;
+	export let filtersEnabled;
 
 	/** @type {Modal} */
 	let modal;
@@ -33,6 +33,8 @@
 
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
+	/** @type {string[]} */
+	let preSubmissionCheckResults = [];
 	let setSlurmAccount = true;
 	/** @type {string[]} */
 	let slurmAccounts = [];
@@ -75,6 +77,7 @@
 		replaceExistingDataset = true;
 		applyingWorkflow = false;
 		checkingConfiguration = false;
+		preSubmissionCheckResults = [];
 		workerInitControl = '';
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
@@ -205,6 +208,7 @@
 	}
 
 	async function firstTaskIndexChanged() {
+		preSubmissionCheckResults = [];
 		await loadDatasetImages();
 		// reset last task
 		if (
@@ -223,24 +227,58 @@
 
 	async function showConfirmRun() {
 		if (datasetImagesTable) {
-			await datasetImagesTable.applySearchFields();
+			const params = await datasetImagesTable.applySearchFields();
+			const valid = await preSubmissionCheck(params);
+			if (!valid) {
+				return;
+			}
 		}
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
-			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };
 			appliedTypeFilters = { ...wft.type_filters };
 		} else {
-			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
-				selectedDataset
-			);
 			if (datasetImagesTable) {
 				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
-			} else {
-				appliedAttributeFilters = { ...dataset.attribute_filters };
 			}
-			appliedTypeFilters = getTypeFilterValues(dataset, wft);
+			appliedTypeFilters = await getTypeFilterValues(wft);
 		}
 		checkingConfiguration = true;
+	}
+
+	/**
+	 * @param {{ attribute_filters: any, type_filters: any }} params
+	 */
+	async function preSubmissionCheck(params) {
+		preSubmissionCheckResults = [];
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/verify-unique-types`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				body: JSON.stringify(params)
+			}
+		);
+		if (!response.ok) {
+			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			return false;
+		}
+		/** @type {string[]} */
+		preSubmissionCheckResults = await response.json();
+		const valid = preSubmissionCheckResults.length === 0;
+		if (!valid) {
+			await tick();
+			// scroll to error message
+			const modalBody = document.querySelector('.modal.show .modal-body');
+			const errorAlert = document.getElementById('pre-submission-check-error');
+			if (modalBody && errorAlert) {
+				const rect = errorAlert.getBoundingClientRect();
+				modalBody.scrollTo({
+					top: rect.y + rect.height,
+					behavior: 'smooth'
+				});
+			}
+		}
+		return valid;
 	}
 
 	function computeNewDatasetName() {
@@ -281,10 +319,8 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		initialFilterValues = {
-			attribute_filters: {
-				...dataset.attribute_filters
-			},
-			type_filters: getTypeFilterValues(dataset, workflowTask)
+			attribute_filters: {},
+			type_filters: await getTypeFilterValues(workflowTask)
 		};
 		let response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
@@ -329,12 +365,22 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} dataset
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 */
-	function getTypeFilterValues(dataset, workflowTask) {
+	async function getTypeFilterValues(workflowTask) {
+		let currentTypeFilters = {};
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/type-filters-flow`
+		);
+		if (response.ok) {
+			/** @type {{ [id: string]: import("fractal-components/types/api").TypeFiltersFlow }} */
+			const typeFiltersFlow = await response.json();
+			if (workflowTask.id in typeFiltersFlow) {
+				currentTypeFilters = typeFiltersFlow[workflowTask.id].current_type_filters;
+			}
+		}
 		return {
-			...dataset.type_filters,
+			...currentTypeFilters,
 			...workflowTask.type_filters,
 			...workflowTask.task.input_types
 		};
@@ -561,8 +607,7 @@
 										dataset={selectedDataset}
 										bind:imagePage
 										{initialFilterValues}
-										{attributeFiltersEnabled}
-										useDatasetFilters={false}
+										{filtersEnabled}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
 									/>
@@ -570,6 +615,17 @@
 							</div>
 						</div>
 					</div>
+					{#if preSubmissionCheckResults.length > 0}
+						<div class="alert alert-danger mt-3" id="pre-submission-check-error">
+							Image list includes multiple values for the following types:
+							<ul>
+								{#each preSubmissionCheckResults as item}
+									<li><code>{item}</code></li>
+								{/each}
+							</ul>
+							Please select one specific value from the dropdown menu.
+						</div>
+					{/if}
 				{/if}
 				{#if datasetImagesLoading}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />

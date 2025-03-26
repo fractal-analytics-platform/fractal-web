@@ -83,7 +83,18 @@
 	}
 
 	export function displayErrorAlert(/** @type {any} */ error) {
-		errorAlert = displayStandardErrorAlert(error, `errorAlert-${id}`);
+		const errorAlertId = `errorAlert-${id}`;
+		errorAlert = displayStandardErrorAlert(error, errorAlertId);
+		if (scrollable) {
+			const modalBody = document.querySelector('.modal.show .modal-body');
+			const errorAlert = document.getElementById(errorAlertId);
+			if (modalBody && errorAlert) {
+				modalBody.scrollTo({
+					top: errorAlert.getBoundingClientRect().y,
+					behavior: 'smooth'
+				});
+			}
+		}
 	}
 
 	function getBootstrapModal() {

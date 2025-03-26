@@ -58,8 +58,6 @@ export type DatasetV2 = {
 	project: ProjectV2;
 	history: Array<DatasetHistoryItemV2> | null;
 	zarr_dir: string;
-	attribute_filters: { [key: string]: Array<string | number | boolean> | null };
-	type_filters: { [key: string]: boolean };
 	timestamp_created: string;
 };
 
