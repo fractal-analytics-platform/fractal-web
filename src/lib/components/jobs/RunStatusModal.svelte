@@ -29,12 +29,16 @@
 	/** @type {(import('fractal-components/types/api').Pagination<import('fractal-components/types/api').HistoryUnit>)|undefined} */
 	let data = undefined;
 
+	/** @type {import('fractal-components/types/api').HistoryUnit|undefined} */
+	let selectedUnit = undefined;
+
 	let loadingLogs = false;
-	/** @type {number|undefined} */
-	let selectedLogUnit = undefined;
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = [];
 	let loadedLogsStatus = '';
+
+	let showLogs = false;
+	let showZarrUrls = false;
 
 	let statusFilter = '';
 	/** @type {SlimSelect|undefined} */
@@ -60,6 +64,9 @@
 		datasetId = _datasetId;
 		workflowTaskId = _workflowTaskId;
 		historyRunIndex = _historyRunIndex;
+		selectedUnit = undefined;
+		showLogs = false;
+		showZarrUrls = false;
 		data = undefined;
 		page = 1;
 		pageSize = 10;
@@ -101,14 +108,13 @@
 	}
 
 	/**
-	 * @param {number} unitId
-	 * @param {string} status
+	 * @param {import('fractal-components/types/api').HistoryUnit} unit
 	 */
-	async function loadLogs(unitId, status) {
+	async function loadLogs(unit) {
 		unsetStatusFilterSelector();
 		loadingLogs = true;
 		const response = await fetch(
-			`/api/v2/project/${projectId}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unitId}&workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}`,
+			`/api/v2/project/${projectId}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}`,
 			{
 				method: 'GET'
 			}
@@ -119,18 +125,32 @@
 			return;
 		}
 		const log = await response.json();
-		loadedLogsStatus = status;
-		if (status === 'failed') {
+		loadedLogsStatus = unit.status;
+		if (unit.status === 'failed') {
 			logParts = extractJobErrorParts(log, false, true);
 		} else {
 			logParts = [{ text: log, highlight: false }];
 		}
-		selectedLogUnit = unitId;
+		selectedUnit = unit;
 		loadingLogs = false;
+		showLogs = true;
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').HistoryUnit} unit
+	 */
+	async function displayZarrUrls(unit) {
+		unsetStatusFilterSelector();
+		showZarrUrls = true;
+		selectedUnit = unit;
+		await tick();
+		restoreModalFocus();
 	}
 
 	async function back() {
-		selectedLogUnit = undefined;
+		showZarrUrls = false;
+		showLogs = false;
+		selectedUnit = undefined;
 		await tick();
 		setStatusFilterSelector();
 	}
@@ -181,13 +201,25 @@
 		page = 1;
 		await loadRun(page, pageSize);
 	}
+
+	/**
+	 * Restore focus on modal, otherwise it will not be possible to close it using the esc key
+	 */
+	function restoreModalFocus() {
+		const modal = document.querySelector('.modal.show');
+		if (modal instanceof HTMLElement) {
+			modal.focus();
+		}
+	}
 </script>
 
 <Modal id="runStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
 	<svelte:fragment slot="header">
 		<h1 class="modal-title fs-5">
-			{#if selectedLogUnit && !loadingLogs}
-				Run {historyRunIndex} - Logs for unit #{selectedLogUnit}
+			{#if showLogs && !loadingLogs}
+				Run {historyRunIndex} - Logs for unit #{selectedUnit?.id}
+			{:else if showZarrUrls}
+				Run {historyRunIndex} - Zarr URLs for unit #{selectedUnit?.id}
 			{:else}
 				Run {historyRunIndex}
 			{/if}
@@ -197,10 +229,29 @@
 		<div id="errorAlert-runStatusModal" class="mb-2" />
 		{#if loading && !data}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-		{:else if selectedLogUnit && !loadingLogs}
+		{:else if showLogs && !loadingLogs}
 			<div class="row">
 				<div class="col">
 					<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
+				</div>
+			</div>
+		{:else if showZarrUrls && selectedUnit}
+			<div class="row">
+				<div class="col">
+					<table class="table table-striped">
+						<tbody>
+							{#each selectedUnit.zarr_urls as zarrUrl}
+								<tr>
+									<td>{zarrUrl}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
 				</div>
 			</div>
 			<div class="row">
@@ -230,12 +281,16 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.items as run}
+					{#each data.items as unit}
 						<tr>
-							<td>{run.id}</td>
-							<td>{run.status || '-'}</td>
+							<td>{unit.id}</td>
+							<td>{unit.status || '-'}</td>
 							<td>
-								<button class="btn btn-light" on:click={() => loadLogs(run.id, run.status)}>
+								<button
+									class="btn btn-light me-2"
+									on:click={() => loadLogs(unit)}
+									disabled={loadingLogs}
+								>
 									{#if loadingLogs}
 										<span
 											class="spinner-border spinner-border-sm"
@@ -244,6 +299,9 @@
 										/>
 									{/if}
 									<i class="bi-list-columns-reverse" /> Logs
+								</button>
+								<button class="btn btn-light" on:click={() => displayZarrUrls(unit)}>
+									<i class="bi bi-list-task" /> Zarr URLs
 								</button>
 							</td>
 						</tr>
