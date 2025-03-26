@@ -116,7 +116,8 @@
 			worker_init: workerInitControl,
 			first_task_index: firstTaskIndex,
 			last_task_index: lastTaskIndex,
-			attribute_filters: appliedAttributeFilters
+			attribute_filters: appliedAttributeFilters,
+			type_filters: appliedTypeFilters
 		};
 		if (setSlurmAccount && slurmAccount !== '') {
 			requestBody.slurm_account = slurmAccount;
