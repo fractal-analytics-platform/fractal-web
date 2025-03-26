@@ -251,9 +251,12 @@
 	 */
 	async function preSubmissionCheck(params) {
 		preSubmissionCheckResults = [];
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/verify-unique-types`,
 			{
+				headers,
 				method: 'POST',
 				credentials: 'include',
 				body: JSON.stringify(params)
