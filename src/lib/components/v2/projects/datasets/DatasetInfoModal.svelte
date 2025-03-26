@@ -212,9 +212,6 @@
 					</span>
 				{/if}
 			</li>
-			<li class="list-group-item text-bg-light">
-				<strong>Dataset filters</strong>
-			</li>
 		</ul>
 	</svelte:fragment>
 </Modal>

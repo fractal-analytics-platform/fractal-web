@@ -23,9 +23,6 @@
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 
-	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
-	export let onDatasetsUpdated = () => {};
-
 	let showTable = false;
 	let firstLoad = true;
 
@@ -34,7 +31,6 @@
 
 	let searching = false;
 	let resetting = false;
-	let savingDatasetFilters = false;
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = {};
@@ -520,33 +516,6 @@
 		}
 		return false;
 	}
-
-	async function saveDatasetFilters() {
-		errorAlert?.hide();
-		savingDatasetFilters = true;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				attribute_filters: getAttributeFilters(),
-				type_filters: getTypeFilters()
-			})
-		});
-		if (response.ok) {
-			const result = await response.json();
-			dataset = result;
-			onDatasetsUpdated(dataset);
-		} else {
-			errorAlert = displayStandardErrorAlert(
-				await getAlertErrorFromResponse(response),
-				'datasetImagesError'
-			);
-		}
-		savingDatasetFilters = false;
-	}
 </script>
 
 {#if !showTable}
@@ -650,17 +619,6 @@
 								{/if}
 								Reset
 							</button>
-							{#if !runWorkflowModal}
-								<ConfirmActionButton
-									modalId="confirmSaveDatasetFilters"
-									label="Save"
-									message="Save dataset filters"
-									disabled={savingDatasetFilters}
-									callbackAction={async () => {
-										await saveDatasetFilters();
-									}}
-								/>
-							{/if}
 						</th>
 					</tr>
 				</thead>

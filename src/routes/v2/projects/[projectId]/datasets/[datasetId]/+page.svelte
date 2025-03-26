@@ -207,7 +207,6 @@
 	{vizarrViewerUrl}
 	runWorkflowModal={false}
 	bind:this={imagesTable}
-	onDatasetsUpdated={(updated) => (dataset = updated)}
 />
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
