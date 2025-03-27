@@ -10,8 +10,8 @@
 	let modal;
 	let loading = false;
 
-	/** @type {{ [id: string]: import("fractal-components/types/api").TypeFiltersFlow }|undefined} */
-	let typeFiltersFlow;
+	/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
+	let typeFiltersFlow = [];
 
 	export async function open() {
 		modal.show();
@@ -36,14 +36,14 @@
 	}
 
 	/**
-	 * @param {number} taskId
+	 * @param {number} workflowTaskId
 	 */
-	function getTaskById(taskId) {
-		return workflow.task_list.filter((t) => t.id === taskId)[0].task;
+	function getTaskById(workflowTaskId) {
+		return workflow.task_list.filter((t) => t.id === workflowTaskId)[0].task;
 	}
 
 	function onClose() {
-		typeFiltersFlow = undefined;
+		typeFiltersFlow = [];
 	}
 </script>
 
@@ -70,10 +70,10 @@
 					<tbody>
 						{#if !loading}
 							<!-- eslint-disable-next-line no-unused-vars -->
-							{#each Object.entries(typeFiltersFlow) as [taskId, filters], index}
+							{#each typeFiltersFlow as filters}
 								<tr>
 									<td>
-										{getTaskById(Number(taskId)).name}
+										{getTaskById(Number(filters.workflowtask_id)).name}
 									</td>
 									<td>
 										<TypeFiltersCell filters={filters.current_type_filters} />

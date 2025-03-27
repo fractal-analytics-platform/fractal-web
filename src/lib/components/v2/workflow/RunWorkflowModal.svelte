@@ -376,11 +376,11 @@
 			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/type-filters-flow`
 		);
 		if (response.ok) {
-			/** @type {{ [id: string]: import("fractal-components/types/api").TypeFiltersFlow }} */
+			/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
 			const typeFiltersFlow = await response.json();
-			if (workflowTask.id in typeFiltersFlow) {
-				currentTypeFilters = typeFiltersFlow[workflowTask.id].current_type_filters;
-			}
+			currentTypeFilters =
+				typeFiltersFlow.find((t) => t.workflowtask_id === workflowTask.id)?.current_type_filters ||
+				{};
 		}
 		return {
 			...currentTypeFilters,

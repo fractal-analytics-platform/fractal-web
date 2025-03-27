@@ -275,6 +275,7 @@ export type TaskGroupActivityV2 = {
 };
 
 export type TypeFiltersFlow = {
+	workflowtask_id: number;
 	current_type_filters: { [key: string]: bool };
 	input_type_filters: { [key: string]: bool };
 	output_type_filters: { [key: string]: bool };
