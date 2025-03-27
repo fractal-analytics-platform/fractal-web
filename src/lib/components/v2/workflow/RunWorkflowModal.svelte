@@ -63,8 +63,8 @@
 		!isConverterType(workflow.task_list[firstTaskIndex].task_type);
 
 	$: disabledTypes = Object.keys({
-		...workflow.task_list[firstTaskIndex || 0].type_filters,
-		...workflow.task_list[firstTaskIndex || 0].task.input_types
+		...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
+		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {})
 	});
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
