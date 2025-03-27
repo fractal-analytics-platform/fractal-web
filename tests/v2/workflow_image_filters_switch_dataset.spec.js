@@ -1,10 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import {
-	getSlimSelectValues,
-	selectSlimSelect,
-	waitModalClosed,
-	waitPageLoading
-} from '../utils.js';
+import { getSlimSelectValues, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 import { createImage } from './image_utils.js';
 import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
@@ -28,19 +23,8 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	});
 
 	await test.step('Create test images for dataset1', async () => {
-		await createImage(page, `/tmp/playwright/datasets/${datasetName1}/img1`, { d1a1: 'd1v1' });
-		await createImage(page, `/tmp/playwright/datasets/${datasetName1}/img2`, { d1a1: 'd1v2' });
-	});
-
-	await test.step('Create filters for dataset1', async () => {
-		await page.getByText('Current selection').click();
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute d1a1'), 'd1v1');
-		await page.getByRole('button', { name: 'Apply' }).click();
-		await page.getByRole('button', { name: 'Save' }).click();
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
-		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
+		await createImage(page, `/tmp/playwright/datasets/${datasetName1}/img1`, {}, { d1t1: true });
+		await createImage(page, `/tmp/playwright/datasets/${datasetName1}/img2`, {}, { d1t1: true });
 	});
 
 	let datasetName2;
@@ -52,39 +36,38 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	});
 
 	await test.step('Create test image for dataset2', async () => {
-		await createImage(page, `/tmp/playwright/datasets/${datasetName2}/img3`, { d2a1: 'd2v1' });
-		await createImage(page, `/tmp/playwright/datasets/${datasetName2}/img4`, { d2a1: 'd2v2' });
+		await createImage(page, `/tmp/playwright/datasets/${datasetName2}/img3`, {}, { d2t1: true });
+		await createImage(page, `/tmp/playwright/datasets/${datasetName2}/img4`, {}, { d2t1: false });
 	});
 
-	await test.step('Create filters for dataset2', async () => {
-		await page.getByText('Current selection').click();
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute d2a1'), 'd2v2');
-		await page.getByRole('button', { name: 'Apply' }).click();
-		await page.getByRole('button', { name: 'Save' }).click();
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
-		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
-	});
-
-	await test.step('Run workflow', async () => {
+	await test.step('Prepare workflow', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
 		await workflow.addTask('generic_task');
+		await workflow.selectTask('generic_task');
+		await page.getByRole('button', { name: 'Types', exact: true }).click();
+		await page.getByRole('button', { name: 'Add type filter' }).click();
+		await page.getByPlaceholder('Key').fill('d2t1');
+		await page.getByRole('switch').check();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
+	});
+
+	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
 
 		// check images and selected filters
 		await modal.getByRole('button', { name: 'Image list' }).click();
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for attribute d2a1'));
+		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
 		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('d2v2');
+		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
 
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 
 		// Check filters on confimation page
 		await expect(modal.getByText('This job will process 1 image')).toBeVisible();
-		await expect(modal.getByRole('listitem')).toContainText('d2v2');
+		await expect(modal.getByRole('listitem')).toContainText('d2t1');
 
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -110,22 +93,13 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.waitFor();
 		await modal.getByRole('combobox', { name: 'First task' }).selectOption('generic_task');
 
-		// check images and selected filters
+		// check images
 		await modal.getByRole('button', { name: 'Image list' }).click();
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for attribute d1a1'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('d1v1');
-
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
-
-		// Check filters on confimation page
-		await expect(modal.getByText('This job will process 1 image')).toBeVisible();
-		await expect(modal.getByRole('listitem')).toContainText('d1v1');
-
-		await modal.getByRole('button', { name: 'Cancel' }).click();
-		const values2 = await getSlimSelectValues(page, page.getByLabel('Selector for attribute d1a1'));
-		expect(values2).toHaveLength(1);
-		expect(/** @type {string[]} */ (values2)[0]).toEqual('d1v1');
+		await expect(modal.getByText('This job will process 2 images')).toBeVisible();
+		await expect(
+			modal.locator('li').filter({ hasText: 'd2t1:' }).locator('[aria-checked="true"]')
+		).toBeVisible();
 
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
@@ -145,19 +119,21 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 		// check images and selected filters
 		await modal.getByRole('button', { name: 'Image list' }).click();
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for attribute d2a1'));
+		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
 		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('d2v2');
+		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
 
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 
 		// Check filters on confimation page
 		await expect(modal.getByText('This job will process 1 image')).toBeVisible();
-		await expect(modal.getByRole('listitem')).toContainText('d2v2');
+		await expect(
+			modal.locator('li').filter({ hasText: 'd2t1:' }).locator('[aria-checked="true"]')
+		).toBeVisible();
 
 		await modal.getByRole('button', { name: 'Cancel' }).click();
-		const values2 = await getSlimSelectValues(page, page.getByLabel('Selector for attribute d2a1'));
+		const values2 = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
 		expect(values2).toHaveLength(1);
-		expect(/** @type {string[]} */ (values2)[0]).toEqual('d2v2');
+		expect(/** @type {string[]} */ (values2)[0]).toEqual('True');
 	});
 });

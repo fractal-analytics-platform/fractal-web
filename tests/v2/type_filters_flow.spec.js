@@ -1,4 +1,4 @@
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { createImage } from './image_utils.js';
 import { expect, test } from './workflow_fixture.js';
 
@@ -27,20 +27,6 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 		await createImage(page, `${randomPath}/img1`, {}, { t1: true });
 		await createImage(page, `${randomPath}/img2`, {}, { t1: false });
-	});
-
-	await test.step('Add dataset filter', async () => {
-		await page.getByText('Current selection').click();
-		await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
-		await expect(page.getByText(/Total results: 2/)).toBeVisible();
-		await selectSlimSelect(page, page.getByLabel('Selector for type t1'), 'True');
-		await page.getByRole('button', { name: 'Apply' }).click();
-		await expect(page.getByRole('button', { name: 'Apply' })).toBeDisabled();
-		await expect(page.getByText(/Total results: 1/)).toBeVisible();
-		await page.getByRole('button', { name: 'Save' }).click();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
-		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
 	});
 
 	await test.step('Open workflow page', async () => {

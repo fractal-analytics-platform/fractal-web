@@ -1,7 +1,7 @@
-import { getSlimSelectValues, selectSlimSelect, waitPageLoading } from '../utils.js';
+import { getSlimSelectValues, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
-import { createImage } from './image_utils.js';
 import { expect, test } from './workflow_fixture.js';
+import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
 
 test('Type filters priority in run workflow modal', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
@@ -13,49 +13,72 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	const modal = page.locator('.modal.show');
 
 	let zarrDir;
-	let datasetName;
 
 	await test.step('Create test dataset', async () => {
 		const dataset = await createDataset(page, workflow.projectId);
 		zarrDir = dataset.zarrDir;
-		datasetName = dataset.name;
 	});
 
-	await test.step('Open test dataset', async () => {
-		await page.getByRole('link', { name: datasetName }).click();
-		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
-		await expect(page.getByText('No entries in the image list yet')).toBeVisible();
-	});
-
-	await test.step('Create test images', async () => {
-		await createImage(page, `${zarrDir}/img1`, {}, { '3D': true });
-		await createImage(page, `${zarrDir}/img2`, {}, { '3D': false });
-	});
-
-	await test.step('Set dataset filters', async () => {
-		await page.getByText('Current selection').click();
-		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
-		await expect(page.getByRole('row')).toHaveCount(4);
-		await selectSlimSelect(page, page.getByLabel('Selector for type 3D'), 'False');
-		await page.getByRole('button', { name: 'Apply', exact: true }).click();
-		await expect(page.getByRole('row')).toHaveCount(3);
-		await page.getByRole('button', { name: 'Save' }).click();
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-	});
-
-	await test.step('Open "Run workflow" modal', async () => {
+	await test.step('Prepare and run workflow', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
+		await workflow.addTask('create_ome_zarr_compound');
 		await workflow.addTask('MIP_compound'); // task having 3D: true
+		await workflow.addTask('illumination_correction'); // task having illumination_correction: false
+	});
+
+	await test.step('Fill create_ome_zarr_compound arguments', async () => {
+		await workflow.selectTask('create_ome_zarr_compound');
+		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByText('Arguments changes saved successfully').waitFor();
+	});
+
+	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
+		await modal.waitFor();
+		await page.getByRole('button', { name: 'Run', exact: true }).click();
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Wait tasks submitted', async () => {
+		await waitTaskSubmitted(page);
+	});
+
+	await test.step('Wait task success', async () => {
+		await waitTasksSuccess(page);
+	});
+
+	await test.step('Open "Continue workflow" modal', async () => {
+		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
 	});
 
-	await test.step('Check images and selected filters', async () => {
+	await test.step('Check selected filters for create_ome_zarr_compound', async () => {
+		await modal
+			.getByRole('combobox', { name: 'First task' })
+			.selectOption('create_ome_zarr_compound');
 		await modal.getByRole('button', { name: 'Image list' }).click();
-		await expect(page.getByRole('row')).toHaveCount(3);
-		await expect(page.getByRole('row').last()).toContainText('img1');
+		await expect(page.getByText('Total results: 6')).toBeVisible();
+		await expect(page.getByRole('row')).toHaveCount(8);
+	});
+
+	await test.step('Click Run and check error message', async () => {
+		await modal.getByRole('button', { name: 'Run' }).click();
+		await expect(
+			page.getByText('Image list includes multiple values for the following types:')
+		).toBeVisible();
+	});
+
+	await test.step('Check selected filters for MIP_compound', async () => {
+		await modal.getByRole('combobox', { name: 'First task' }).selectOption('MIP_compound');
+		await expect(
+			page.getByText('Image list includes multiple values for the following types:')
+		).not.toBeVisible();
+		await expect(modal.getByText('Total results: 2')).toBeVisible();
+		await expect(modal.getByRole('row')).toHaveCount(4);
+		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');
 		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type 3D'));
 		expect(values).toHaveLength(1);
 		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
@@ -65,5 +88,66 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
 		await expect(modal.getByRole('listitem').locator('[aria-checked="true"]')).toBeVisible();
+		await modal.getByRole('button', { name: 'Cancel' }).click();
+	});
+
+	await test.step('Check selected filters for illumination_correction', async () => {
+		await modal
+			.getByRole('combobox', { name: 'First task' })
+			.selectOption('illumination_correction');
+		await expect(modal.getByText('Total results: 2')).toBeVisible();
+		await expect(modal.getByRole('row')).toHaveCount(4);
+		await expect(modal.getByRole('row').last()).toContainText('my_plate_new.zarr/A/02/0');
+		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type 3D'));
+		expect(values).toHaveLength(1);
+		expect(/** @type {string[]} */ (values)[0]).toEqual('False');
+	});
+
+	await test.step('Click Run and verify confirmed values', async () => {
+		await modal.getByRole('button', { name: 'Run' }).click();
+		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
+		await expect(
+			modal.locator('li').filter({ hasText: '3D:' }).locator('[aria-checked="false"]')
+		).toBeVisible();
+		await modal.getByRole('button', { name: 'Cancel' }).click();
+		await modal.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Add 3D type filter to illumination_correction', async () => {
+		await workflow.selectTask('illumination_correction');
+		await page.getByRole('button', { name: 'Types', exact: true }).click();
+		await page.getByRole('button', { name: 'Add type filter' }).click();
+		await page.getByPlaceholder('Key').fill('3D');
+		await page.getByRole('switch').check();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
+	});
+
+	await test.step('Open "Continue workflow" modal', async () => {
+		await page.getByRole('button', { name: 'Continue workflow' }).click();
+		await modal.waitFor();
+	});
+
+	await test.step('Check selected filters for illumination_correction', async () => {
+		await modal
+			.getByRole('combobox', { name: 'First task' })
+			.selectOption('illumination_correction');
+		await modal.getByRole('button', { name: 'Image list' }).click();
+		await expect(modal.getByText('Total results: 2')).toBeVisible();
+		await expect(modal.getByRole('row')).toHaveCount(4);
+		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');
+		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type 3D'));
+		expect(values).toHaveLength(1);
+		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+	});
+
+	await test.step('Click Run and verify confirmed values', async () => {
+		await modal.getByRole('button', { name: 'Run' }).click();
+		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
+		await expect(
+			modal.locator('li').filter({ hasText: '3D:' }).locator('[aria-checked="true"]')
+		).toBeVisible();
+		await modal.getByRole('button', { name: 'Cancel' }).click();
 	});
 });

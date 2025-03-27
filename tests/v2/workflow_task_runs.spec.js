@@ -134,6 +134,15 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await modal
 			.getByRole('combobox', { name: 'First task' })
 			.selectOption('create_ome_zarr_compound');
+		await modal.getByRole('button', { name: 'Image list' }).click();
+		await expect(modal.getByText('Total results: 30')).toBeVisible();
+		await selectSlimSelect(
+			page,
+			modal.getByLabel('Selector for type illumination_correction'),
+			'True'
+		);
+		await modal.getByRole('button', { name: 'Apply' }).click();
+		await expect(modal.getByRole('button', { name: 'Apply' })).not.toBeEnabled();
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
