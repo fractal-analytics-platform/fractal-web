@@ -22,6 +22,8 @@
 	export let runWorkflowModal;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
+	/** @type {string[]} */
+	export let disabledTypes = [];
 
 	let showTable = false;
 	let firstLoad = true;
@@ -207,6 +209,16 @@
 				)
 			])
 		);
+
+		if (runWorkflowModal) {
+			for (const [key, typeSelector] of Object.entries(typesSelectors)) {
+				if (disabledTypes.includes(key)) {
+					typeSelector.disable();
+				} else {
+					typeSelector.enable();
+				}
+			}
+		}
 	}
 
 	/**
