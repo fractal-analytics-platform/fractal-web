@@ -618,13 +618,14 @@
 										{disabledTypes}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
+										beforeSelectionChanged={() => (preSubmissionCheckResults = [])}
 									/>
 								{/if}
 							</div>
 						</div>
 					</div>
 					{#if preSubmissionCheckResults.length > 0}
-						<div class="alert alert-danger mt-3" id="pre-submission-check-error">
+						<div class="alert alert-danger mt-3 alert-dismissible" id="pre-submission-check-error">
 							Image list includes multiple values for the following types:
 							<ul>
 								{#each preSubmissionCheckResults as item}
@@ -632,6 +633,7 @@
 								{/each}
 							</ul>
 							Please select one specific value from the dropdown menu.
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
 						</div>
 					{/if}
 				{/if}

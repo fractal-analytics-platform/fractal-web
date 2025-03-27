@@ -24,6 +24,7 @@
 	export let initialFilterValues = null;
 	/** @type {string[]} */
 	export let disabledTypes = [];
+	export let beforeSelectionChanged = () => {};
 
 	let showTable = false;
 	let firstLoad = true;
@@ -246,6 +247,10 @@
 				ariaLabel: `Selector for attribute ${key}`
 			},
 			events: {
+				beforeChange: () => {
+					beforeSelectionChanged();
+					return true;
+				},
 				afterChange: (selection) => {
 					const value = selection.map((s) => s.value);
 					setter(getTypedValues(key, value));
@@ -279,6 +284,10 @@
 				ariaLabel: `Selector for type ${key}`
 			},
 			events: {
+				beforeChange: () => {
+					beforeSelectionChanged();
+					return true;
+				},
 				afterChange: (selection) => {
 					const selectedOption = selection[0];
 					if (!selectedOption || selectedOption.placeholder) {
