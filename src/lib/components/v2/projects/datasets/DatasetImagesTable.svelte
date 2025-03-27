@@ -20,7 +20,6 @@
 	 * @type {boolean}
 	 */
 	export let runWorkflowModal;
-	export let filtersEnabled = true;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 
@@ -208,17 +207,6 @@
 				)
 			])
 		);
-
-		if (runWorkflowModal && !filtersEnabled) {
-			// disable attribute filters selection
-			for (const attributeSelector of Object.values(attributesSelectors)) {
-				attributeSelector.disable();
-			}
-			// disable type filters selection
-			for (const typeSelector of Object.values(typesSelectors)) {
-				typeSelector.disable();
-			}
-		}
 	}
 
 	/**

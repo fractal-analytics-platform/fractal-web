@@ -19,7 +19,6 @@ jobs:
       OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT: "http://127.0.0.1:5556/dex/.well-known/openid-configuration"
       PUBLIC_OAUTH_CLIENT_NAME: dexidp
       PUBLIC_FRACTAL_VIZARR_VIEWER_URL: http://localhost:3000/vizarr
-      ENABLE_INTERACTIVE_FILTERS: true
 
     strategy:
       matrix:

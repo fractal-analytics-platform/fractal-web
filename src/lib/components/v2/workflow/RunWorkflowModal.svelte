@@ -23,7 +23,6 @@
 	export let onDatasetsUpdated;
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	export let statuses;
-	export let filtersEnabled;
 
 	/** @type {Modal} */
 	let modal;
@@ -611,7 +610,6 @@
 										dataset={selectedDataset}
 										bind:imagePage
 										{initialFilterValues}
-										{filtersEnabled}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
 									/>
