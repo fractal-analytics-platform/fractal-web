@@ -679,8 +679,8 @@
 						currentPage={imagePage.current_page}
 						pageSize={imagePage.page_size}
 						totalCount={imagePage.total_count}
-						onPageChange={async () => {
-							await searchImages();
+						onPageChange={async (currentPage, pageSize) => {
+							await searchImages(currentPage, pageSize);
 						}}
 					/>
 				</div>
