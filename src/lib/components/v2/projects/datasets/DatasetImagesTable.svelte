@@ -6,6 +6,7 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
+	import Paginator from '$lib/components/common/Paginator.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -682,6 +683,31 @@
 					{/each}
 				</tbody>
 			</table>
+		</div>
+		<div class="pb-2 bg-white" class:sticky-bottom={!runWorkflowModal}>
+			<div class="row">
+				<div class="col-lg-6">
+					<Paginator
+						currentPage={imagePage.current_page}
+						pageSize={imagePage.page_size}
+						totalCount={imagePage.total_count}
+						onPageChange={async () => {
+							await searchImages();
+						}}
+					/>
+				</div>
+				{#if !runWorkflowModal}
+					<div class="col-lg-3">
+						<button
+							class="btn btn-outline-secondary float-end"
+							on:click={() => imageModal?.openForCreate()}
+						>
+							<i class="bi bi-plus-circle" />
+							Add an image list entry
+						</button>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 {/if}
