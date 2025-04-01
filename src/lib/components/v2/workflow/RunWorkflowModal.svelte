@@ -242,10 +242,11 @@
 		if (mode === 'restart') {
 			appliedTypeFilters = { ...wft.type_filters };
 		} else {
+			appliedTypeFilters = await getTypeFilterValues(wft);
 			if (datasetImagesTable) {
 				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
+				appliedTypeFilters = { ...appliedTypeFilters, ...datasetImagesTable.getTypeFilters() };
 			}
-			appliedTypeFilters = await getTypeFilterValues(wft);
 		}
 		checkingConfiguration = true;
 	}
