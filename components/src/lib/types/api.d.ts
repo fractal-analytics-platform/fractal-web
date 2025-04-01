@@ -71,6 +71,7 @@ export type Image = {
 	zarr_url: string;
 	attributes: { [key: string]: string | number | boolean };
 	types: { [key: string]: boolean };
+	status?: string;
 };
 
 export type Pagination<T> = {

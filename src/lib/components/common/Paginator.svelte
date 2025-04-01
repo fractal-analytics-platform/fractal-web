@@ -10,6 +10,7 @@
 	export let pageSize;
 	export let totalCount;
 	export let currentPage;
+	export let singleLine = false;
 
 	$: numberOfPages = Math.ceil(totalCount / pageSize);
 	$: pageNumbers = getPageNumbers(currentPage, numberOfPages);
@@ -77,74 +78,80 @@
 	}
 </script>
 
-<div class="row justify-content-center">
-	{#if numberOfPages > 1}
-		<div class="col">
-			<nav aria-label="Page navigation">
-				<ul class="pagination justify-content-center">
-					<li class="page-item">
-						<button
-							class="page-link"
-							type="button"
-							aria-label="Previous"
-							disabled={currentPage === 1}
-							on:click={() => setCurrentPage(currentPage - 1)}
-							class:disabled={currentPage === 1}
-						>
-							<span aria-hidden="true">&laquo;</span>
-						</button>
-					</li>
-					{#each pageNumbers as pageNumber}
-						{#if typeof pageNumber === 'number'}
-							<li class="page-item" class:active={pageNumber === currentPage}>
+<div class="row">
+	<div class={singleLine ? 'col-6' : 'col-12'}>
+		<div class="justify-content-center" class:row={!singleLine}>
+			{#if numberOfPages > 1}
+				<div class="col">
+					<nav aria-label="Page navigation">
+						<ul class="pagination justify-content-center">
+							<li class="page-item">
 								<button
-									type="button"
 									class="page-link"
-									on:click={() => setCurrentPage(/** @type {number} */ (pageNumber))}
+									type="button"
+									aria-label="Previous"
+									disabled={currentPage === 1}
+									on:click={() => setCurrentPage(currentPage - 1)}
+									class:disabled={currentPage === 1}
 								>
-									{pageNumber}
+									<span aria-hidden="true">&laquo;</span>
 								</button>
 							</li>
-						{:else}
+							{#each pageNumbers as pageNumber}
+								{#if typeof pageNumber === 'number'}
+									<li class="page-item" class:active={pageNumber === currentPage}>
+										<button
+											type="button"
+											class="page-link"
+											on:click={() => setCurrentPage(/** @type {number} */ (pageNumber))}
+										>
+											{pageNumber}
+										</button>
+									</li>
+								{:else}
+									<li class="page-item">
+										<span class="page-link disabled">{pageNumber}</span>
+									</li>
+								{/if}
+							{/each}
 							<li class="page-item">
-								<span class="page-link disabled">{pageNumber}</span>
+								<button
+									class="page-link"
+									type="button"
+									aria-label="Next"
+									disabled={currentPage === numberOfPages}
+									on:click={() => setCurrentPage(currentPage + 1)}
+									class:disabled={currentPage === numberOfPages}
+								>
+									<span aria-hidden="true">&raquo;</span>
+								</button>
 							</li>
-						{/if}
-					{/each}
-					<li class="page-item">
-						<button
-							class="page-link"
-							type="button"
-							aria-label="Next"
-							disabled={currentPage === numberOfPages}
-							on:click={() => setCurrentPage(currentPage + 1)}
-							class:disabled={currentPage === numberOfPages}
-						>
-							<span aria-hidden="true">&raquo;</span>
-						</button>
-					</li>
-				</ul>
-			</nav>
-		</div>
-	{/if}
-</div>
-<div class="row row-cols-lg-auto justify-content-center">
-	<div class="col-6">
-		<div class="input-group">
-			<label class="input-group-text" for="page_size">Page size</label>
-			<select
-				class="form-select"
-				id="page_size"
-				bind:value={pageSize}
-				on:change={() => setPageSize()}
-			>
-				{#each availablePageSizes as pageSize}
-					<option value={pageSize}>{pageSize}</option>
-				{/each}
-			</select>
+						</ul>
+					</nav>
+				</div>
+			{/if}
 		</div>
 	</div>
-	<div class="col-6 mt-2">
-		<p class="text-center">Total results: {totalCount}</p>
+	<div class={singleLine ? 'col-6' : 'col-12'}>
+		<div class="row row-cols-lg-auto justify-content-center">
+			<div class="col-6">
+				<div class="input-group">
+					<label class="input-group-text" for="page_size">Page size</label>
+					<select
+						class="form-select"
+						id="page_size"
+						bind:value={pageSize}
+						on:change={() => setPageSize()}
+					>
+						{#each availablePageSizes as pageSize}
+							<option value={pageSize}>{pageSize}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+			<div class="col-6 mt-2">
+				<p class="text-center">Total results: {totalCount}</p>
+			</div>
+		</div>
 	</div>
 </div>

@@ -7,6 +7,7 @@
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -19,12 +20,23 @@
 	 * Used to disable some buttons.
 	 * @type {boolean}
 	 */
-	export let runWorkflowModal;
+	export let runWorkflowModal = false;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
 	/** @type {string[]} */
 	export let disabledTypes = [];
 	export let beforeSelectionChanged = () => {};
+
+	/**
+	 * Set to true if the table is displayed inside the "Images status" modal.
+	 * @type {boolean}
+	 */
+	export let imagesStatusModal = false;
+	/**
+	 * @type {string|undefined}
+	 */
+	export let imagesStatusModalUrl = undefined;
+	let imagesStatusFilter = '';
 
 	let showTable = false;
 	let firstLoad = true;
@@ -51,6 +63,8 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
+	/** @type {SlimSelect|undefined} */
+	let statusSelector = undefined;
 	/** @type {{[key: string]: SlimSelect}} */
 	let attributesSelectors = {};
 	/** @type {{[key: string]: SlimSelect}} */
@@ -98,10 +112,12 @@
 	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
+	let lastAppliedImagesStatusFilter = '';
 
 	$: applyBtnActive =
 		attributesChanged(lastAppliedAttributeFilters, attributeFilters) ||
-		objectChanged(lastAppliedTypeFilters, typeFilters);
+		objectChanged(lastAppliedTypeFilters, typeFilters) ||
+		lastAppliedImagesStatusFilter !== imagesStatusFilter;
 
 	let resetBtnActive = false;
 
@@ -125,7 +141,8 @@
 		const params = await searchImages();
 		resetBtnActive =
 			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
-			Object.values(typeFilters).filter((t) => t !== null).length > 0;
+			Object.values(typeFilters).filter((t) => t !== null).length > 0 ||
+			!!imagesStatusFilter;
 		searching = false;
 		return params;
 	}
@@ -135,6 +152,7 @@
 		resetting = true;
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
+		imagesStatusFilter = '';
 		await tick();
 		await searchImages();
 		resetting = false;
@@ -154,6 +172,7 @@
 		for (const selector of Object.values(typesSelectors)) {
 			selector.destroy();
 		}
+		statusSelector?.destroy();
 		attributesSelectors = {};
 		typesSelectors = {};
 		attributeFilters = {};
@@ -185,7 +204,7 @@
 		);
 	}
 
-	function loadTypesSelector() {
+	function loadTypesSelectors() {
 		// Destroy previous selectors
 		for (const selector of Object.values(typesSelectors)) {
 			selector.destroy();
@@ -218,6 +237,12 @@
 				} else {
 					typeSelector.enable();
 				}
+			}
+		}
+
+		if (imagesStatusModal) {
+			for (const selector of Object.values(typesSelectors)) {
+				selector.disable();
 			}
 		}
 	}
@@ -303,6 +328,47 @@
 		return selector;
 	}
 
+	function loadStatusSelector() {
+		if (!imagesStatusModal) {
+			return;
+		}
+		const elementId = 'status-selector';
+		const selectElement = document.getElementById(elementId);
+		if (!selectElement) {
+			throw new Error(`Unable to find selector element with id ${elementId}`);
+		}
+		statusSelector?.destroy();
+		selectElement.classList.remove('invisible');
+		statusSelector = new SlimSelect({
+			select: `#${elementId}`,
+			settings: {
+				maxValuesShown: 5,
+				showSearch: false,
+				allowDeselect: true,
+				ariaLabel: `Status selector`,
+				isMultiple: false
+			},
+			events: {
+				beforeChange: () => {
+					beforeSelectionChanged();
+					return true;
+				},
+				afterChange: (selection) => {
+					const selectedOption = selection[0];
+					if (!selectedOption || selectedOption.placeholder) {
+						imagesStatusFilter = '';
+					} else {
+						imagesStatusFilter = selectedOption.value;
+					}
+				}
+			}
+		});
+		setSlimSelectOptions(statusSelector, ['done', 'submitted', 'failed']);
+		if (imagesStatusFilter) {
+			statusSelector.setSelected(imagesStatusFilter);
+		}
+	}
+
 	/**
 	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
 	 * @param {SlimSelect|undefined} select
@@ -336,7 +402,7 @@
 	 * @param {number|null} pageSize
 	 * @returns {Promise<{ attribute_filters: any, type_filters: any }>}
 	 */
-	async function searchImages(currentPage = null, pageSize = null) {
+	export async function searchImages(currentPage = null, pageSize = null) {
 		if (currentPage === null) {
 			currentPage = imagePage.current_page;
 		}
@@ -367,16 +433,33 @@
 		}
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
-			{
+		let response;
+		if (imagesStatusModal) {
+			let url = `${imagesStatusModalUrl}&page=${currentPage}&page_size=${pageSize}`;
+			if (imagesStatusFilter) {
+				url += `&unit_status=${imagesStatusFilter}`;
+			}
+			response = await fetch(url, {
 				method: 'POST',
 				headers,
-				credentials: 'include',
-				body: JSON.stringify(params)
-			}
-		);
-		if (firstLoad && !runWorkflowModal) {
+				body: JSON.stringify(
+					stripNullAndEmptyObjectsAndArrays({
+						attribute_filters: attributes
+					})
+				)
+			});
+		} else {
+			response = await fetch(
+				`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
+				{
+					method: 'POST',
+					headers,
+					credentials: 'include',
+					body: JSON.stringify(params)
+				}
+			);
+		}
+		if (firstLoad && !runWorkflowModal && !imagesStatusModal) {
 			showTable = imagePage.total_count > 0;
 			firstLoad = false;
 		} else {
@@ -387,6 +470,7 @@
 			await tick();
 			reloadAttributeFilters(imagePage);
 			reloadTypeFilters(imagePage);
+			loadStatusSelector();
 			// Go to first page if the search returns no values and we are not in the first page
 			// This happens when we are in a given page and we restrict the search setting more filters
 			if (imagePage.items.length === 0 && imagePage.current_page > 1) {
@@ -395,6 +479,7 @@
 			}
 			lastAppliedAttributeFilters = { ...attributeFilters };
 			lastAppliedTypeFilters = { ...typeFilters };
+			lastAppliedImagesStatusFilter = imagesStatusFilter;
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
@@ -435,7 +520,7 @@
 		typeFilters = Object.fromEntries(
 			imagePage.types.map((k) => [k, k in typeFilters ? typeFilters[k] : null])
 		);
-		loadTypesSelector();
+		loadTypesSelectors();
 	}
 
 	/**
@@ -529,8 +614,8 @@
 </script>
 
 {#if !showTable}
-	<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
-	{#if !runWorkflowModal}
+	{#if !runWorkflowModal && !imagesStatusModal}
+		<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
 		<button class="btn btn-outline-secondary ms-4" on:click={() => imageModal?.openForCreate()}>
 			<i class="bi bi-plus-circle" />
 			Add an image list entry
@@ -548,6 +633,9 @@
 			<table class="table" id="dataset-images-table">
 				<colgroup>
 					<col width="auto" />
+					{#if imagesStatusModal}
+						<col width="150" />
+					{/if}
 					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each Object.keys(imagePage.attributes) as _}
 						<col width="190" />
@@ -561,18 +649,23 @@
 				<thead>
 					<tr>
 						<th>Zarr URL</th>
+						{#if imagesStatusModal}
+							<th>Status</th>
+						{/if}
 						{#each Object.keys(imagePage.attributes) as attributeKey}
 							<th>
-								<label for="attribute-{getIdFromValue(attributeKey)}">
+								<label class="align-bottom" for="attribute-{getIdFromValue(attributeKey)}">
 									{attributeKey}
 								</label>
-								<button
-									class="ps-0 btn btn-link"
-									on:click|preventDefault={() => toggleAll(attributeKey)}
-									title="Toggle all"
-								>
-									<i class="bi bi-check-all" />
-								</button>
+								{#if !imagesStatusModal}
+									<button
+										class="ps-0 pb-0 btn btn-link"
+										on:click|preventDefault={() => toggleAll(attributeKey)}
+										title="Toggle all"
+									>
+										<i class="bi bi-check-all" />
+									</button>
+								{/if}
 							</th>
 						{/each}
 						{#each imagePage.types as typeKey}
@@ -586,6 +679,17 @@
 					</tr>
 					<tr>
 						<th />
+						{#if imagesStatusModal}
+							<th>
+								<div class="row">
+									<div class="col">
+										<div class="status-select-wrapper mb-1">
+											<select id="status-selector" class="invisible" />
+										</div>
+									</div>
+								</div>
+							</th>
+						{/if}
 						{#each Object.keys(imagePage.attributes) as attributeKey}
 							<th>
 								<div class="row">
@@ -636,6 +740,11 @@
 					{#each imagePage.items as image}
 						<tr>
 							<td>{getRelativePath(image.zarr_url)}</td>
+							{#if imagesStatusModal}
+								<td>
+									{image.status}
+								</td>
+							{/if}
 							{#each Object.keys(imagePage.attributes) as attribute}
 								<td>
 									{#if image.attributes[attribute] !== null && image.attributes[attribute] !== undefined}
@@ -657,7 +766,7 @@
 										View
 									</a>
 								{/if}
-								{#if !runWorkflowModal}
+								{#if !runWorkflowModal && !imagesStatusModal}
 									<button
 										class="btn btn-primary"
 										on:click={() => imageModal?.openForEditing(image)}
@@ -687,15 +796,18 @@
 										</svelte:fragment>
 									</ConfirmActionButton>
 								{/if}
+								{#if imagesStatusModal}
+									<slot name="extra-buttons" {image} />
+								{/if}
 							</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 		</div>
-		<div class="pb-2 bg-white" class:sticky-bottom={!runWorkflowModal}>
+		<div class="pb-2 bg-white" class:sticky-bottom={!runWorkflowModal && !imagesStatusModal}>
 			<div class="row">
-				<div class="col-lg-6">
+				<div class={!runWorkflowModal && !imagesStatusModal ? 'col-lg-6' : 'col'}>
 					<Paginator
 						currentPage={imagePage.current_page}
 						pageSize={imagePage.page_size}
@@ -703,9 +815,10 @@
 						onPageChange={async (currentPage, pageSize) => {
 							await searchImages(currentPage, pageSize);
 						}}
+						singleLine={runWorkflowModal || imagesStatusModal}
 					/>
 				</div>
-				{#if !runWorkflowModal}
+				{#if !runWorkflowModal && !imagesStatusModal}
 					<div class="col-lg-3">
 						<button
 							class="btn btn-outline-secondary float-end"

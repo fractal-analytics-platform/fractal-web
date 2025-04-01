@@ -37,6 +37,7 @@
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
+	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
 
 	let isLegacy = false;
 	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
@@ -874,14 +875,13 @@
 									{/if}
 									{workflowTask.task.name}
 									<span class="float-end ps-2">
-										{#if selectedDatasetId}
+										{#if selectedDataset}
 											{#if isLegacy}
 												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
 											{:else}
 												<ImagesStatus
 													status={statuses[workflowTask.id]}
-													datasetId={selectedDatasetId}
-													projectId={project.id}
+													dataset={selectedDataset}
 													{workflowTask}
 													{imagesStatusModal}
 												/>

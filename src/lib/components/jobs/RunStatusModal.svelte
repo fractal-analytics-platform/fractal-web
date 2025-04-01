@@ -232,7 +232,9 @@
 		{:else if showLogs && !loadingLogs}
 			<div class="row">
 				<div class="col">
-					<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+					<div class="ps-3 pe-3">
+						<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+					</div>
 				</div>
 			</div>
 			<div class="row">

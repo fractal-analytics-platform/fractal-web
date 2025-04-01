@@ -3,25 +3,25 @@
 	import { extractJobErrorParts } from '$lib/common/job_utilities';
 	import ExpandableLog from '../common/ExpandableLog.svelte';
 	import Modal from '../common/Modal.svelte';
-	import Paginator from '../common/Paginator.svelte';
+	import DatasetImagesTable from '../v2/projects/datasets/DatasetImagesTable.svelte';
+	import { env } from '$env/dynamic/public';
+	import { tick } from 'svelte';
 
+	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
+		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
+		: null;
+
+	/** @type {import('fractal-components/types/api').ImagePage|null} */
+	let imagePage = null;
 	let loading = false;
-	let page = 1;
-	let pageSize = 10;
-	let totalCount = 0;
 
-	/** @type {number} */
-	let projectId;
-	/** @type {number} */
-	let datasetId;
+	/** @type {import('fractal-components/types/api').DatasetV2} */
+	let dataset;
 	/** @type {number} */
 	let workflowTaskId;
 
 	/** @type {Modal} */
 	let modal;
-
-	/** @type {(import('fractal-components/types/api').Pagination<{ zarr_url: string, status: string }>)|undefined} */
-	let data = undefined;
 
 	let loadingLogs = false;
 	let selectedLogImage = '';
@@ -30,29 +30,30 @@
 	let loadedLogsStatus = '';
 	let projectDir = '';
 
+	/** @type {DatasetImagesTable} */
+	let datasetImagesTable;
+
 	/**
-	 * @param {number} _projectId
-	 * @param {number} _datasetId
+	 * @param {import('fractal-components/types/api').DatasetV2} _dataset
 	 * @param {number} _workflowTaskId
 	 */
-	export async function open(_projectId, _datasetId, _workflowTaskId) {
+	export async function open(_dataset, _workflowTaskId) {
 		loading = true;
-		data = undefined;
-		page = 1;
-		pageSize = 10;
+		imagePage = null;
 		loadingLogs = false;
 		logParts = [];
 		selectedLogImage = '';
-		projectId = _projectId;
-		datasetId = _datasetId;
+		dataset = _dataset;
 		workflowTaskId = _workflowTaskId;
 		modal.show();
 		await loadProjectDir();
-		await loadImages(page, pageSize);
+		await loadImages();
+		await tick();
+		await datasetImagesTable.load();
 	}
 
 	function onClose() {
-		data = undefined;
+		imagePage = null;
 	}
 
 	async function loadProjectDir() {
@@ -65,25 +66,24 @@
 		projectDir = result.project_dir || '';
 	}
 
-	/**
-	 * @param {number} currentPage
-	 * @param {number} selectedPageSize
-	 */
-	async function loadImages(currentPage, selectedPageSize) {
+	async function loadImages() {
 		loading = true;
-		const url = `/api/v2/project/${projectId}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&page=${currentPage}&page_size=${selectedPageSize}`;
-		const response = await fetch(url);
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const url = `/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${dataset.id}&page=1&page_size=10`;
+		const response = await fetch(url, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				attributes_query: {}
+			})
+		});
 		if (!response.ok) {
 			loading = false;
 			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
 			return;
 		}
-		data = await response.json();
-		if (data) {
-			page = data.current_page;
-			pageSize = data.page_size;
-			totalCount = data.total_count;
-		}
+		imagePage = await response.json();
 		loading = false;
 	}
 
@@ -95,12 +95,12 @@
 		loadingLogs = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v2/project/${projectId}/status/image-log`, {
+		const response = await fetch(`/api/v2/project/${dataset.project_id}/status/image-log`, {
 			method: 'POST',
 			headers,
 			body: JSON.stringify({
 				workflowtask_id: workflowTaskId,
-				dataset_id: datasetId,
+				dataset_id: dataset.id,
 				zarr_url: zarrUrl
 			})
 		});
@@ -120,16 +120,8 @@
 		loadingLogs = false;
 	}
 
-	/**
-	 * @param {string} zarrUrl
-	 */
-	function trimProjectDir(zarrUrl) {
-		if (projectDir && zarrUrl.startsWith(projectDir)) {
-			return zarrUrl.substring(
-				projectDir.endsWith('/') ? projectDir.length : projectDir.length + 1
-			);
-		}
-		return zarrUrl;
+	async function back() {
+		selectedLogImage = '';
 	}
 </script>
 
@@ -145,65 +137,46 @@
 	</svelte:fragment>
 	<svelte:fragment slot="body">
 		<div id="errorAlert-imagesStatusModal" class="mb-2" />
-		{#if loading && !data}
+		{#if loading && !imagePage}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 		{:else if selectedLogImage && !loadingLogs}
 			<div class="row">
 				<div class="col">
-					<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+					<div class="ps-3 pe-3">
+						<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+					</div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
-					<button class="m-2 ms-3 btn btn-primary" on:click={() => (selectedLogImage = '')}>
-						Back
-					</button>
+					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
 				</div>
 			</div>
-		{:else if data}
-			{#if data.items.length > 0}
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th>Zarr URL</th>
-							<th>Status</th>
-							<th />
-						</tr>
-					</thead>
-					<tbody>
-						{#each data.items as image}
-							<tr>
-								<td>{trimProjectDir(image.zarr_url)}</td>
-								<td>{image.status || '-'}</td>
-								<td>
-									<button
-										class="btn btn-light"
-										on:click={() => loadLogs(image.zarr_url, image.status)}
-										disabled={image.status === null}
-									>
-										{#if loadingLogs}
-											<span
-												class="spinner-border spinner-border-sm"
-												role="status"
-												aria-hidden="true"
-											/>
-										{/if}
-										<i class="bi-list-columns-reverse" /> Logs
-									</button>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-				<Paginator
-					currentPage={page}
-					{pageSize}
-					{totalCount}
-					onPageChange={(currentPage, pageSize) => loadImages(currentPage, pageSize)}
-				/>
-			{:else}
-				<p class="ps-3">No images</p>
-			{/if}
 		{/if}
+		<div class:d-none={selectedLogImage || loadingLogs}>
+			{#if imagePage}
+				<DatasetImagesTable
+					bind:this={datasetImagesTable}
+					{dataset}
+					bind:imagePage
+					{vizarrViewerUrl}
+					imagesStatusModal={true}
+					imagesStatusModalUrl={`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${dataset.id}`}
+				>
+					<svelte:fragment slot="extra-buttons" let:image>
+						<button
+							class="btn btn-light"
+							on:click={() => loadLogs(image.zarr_url, image.status || '')}
+							disabled={image.status === null}
+						>
+							{#if loadingLogs}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							{/if}
+							<i class="bi-list-columns-reverse" /> Logs
+						</button>
+					</svelte:fragment>
+				</DatasetImagesTable>
+			{/if}
+		</div>
 	</svelte:fragment>
 </Modal>

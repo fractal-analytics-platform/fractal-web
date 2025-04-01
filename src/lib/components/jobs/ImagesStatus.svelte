@@ -3,10 +3,8 @@
 
 	/** @type {import('fractal-components/types/api').ImagesStatus|undefined} */
 	export let status;
-	/** @type {number} */
-	export let projectId;
-	/** @type {number} */
-	export let datasetId;
+	/** @type {import('fractal-components/types/api').DatasetV2} */
+	export let dataset;
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
 
@@ -60,7 +58,7 @@
 				<button
 					aria-label="Submitted images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(dataset, workflowTask.id)}
 				>
 					<span class="d-flex pe-1">
 						<span class="pe-1 status-wrapper text-primary">
@@ -79,7 +77,7 @@
 				<button
 					aria-label="Done images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(dataset, workflowTask.id)}
 				>
 					<span class="d-flex">
 						<span class="status-wrapper text-success ps-1">
@@ -96,7 +94,7 @@
 				<button
 					aria-label="Failed images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(projectId, datasetId, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(dataset, workflowTask.id)}
 				>
 					<span class="d-flex">
 						<span class="status-wrapper text-danger ps-1">
