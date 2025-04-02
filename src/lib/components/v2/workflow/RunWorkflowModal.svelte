@@ -406,7 +406,7 @@
 	});
 </script>
 
-<Modal id="runWorkflowModal" centered={true} bind:this={modal} fullscreen={true} scrollable={true}>
+<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">
 			{#if mode === 'run'}
@@ -481,117 +481,49 @@
 					</span>
 				</div>
 			{/if}
-			<div class="mb-3 has-validation">
-				<label for="firstTaskIndex" class="form-label">
-					{#if mode === 'continue'}
-						First task (Required)
-					{:else}
-						First task (Optional)
-					{/if}
-				</label>
-				<select
-					name="firstTaskIndex"
-					id="firstTaskIndex"
-					class="form-select"
-					disabled={checkingConfiguration}
-					bind:value={firstTaskIndex}
-					on:change={firstTaskIndexChanged}
-					class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
-				>
-					<option value={undefined}>Select first task</option>
-					{#each workflow.task_list as wft}
-						<option value={wft.order}>{wft.task.name}</option>
-					{/each}
-				</select>
-				<span class="invalid-feedback"> The first task is required </span>
-			</div>
-			<div class="mb-3">
-				<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
-				<select
-					name="lastTaskIndex"
-					id="lastTaskIndex"
-					class="form-select"
-					disabled={checkingConfiguration}
-					bind:value={lastTaskIndex}
-				>
-					<option value={undefined}>Select last task</option>
-					{#each workflow.task_list as wft}
-						{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
-							<option value={wft.order}>{wft.task.name}</option>
-						{/if}
-					{/each}
-				</select>
-			</div>
-			<div class="accordion" id="accordion-run-workflow">
-				<div class="accordion-item">
-					<h2 class="accordion-header">
-						<button
-							class="accordion-button collapsed"
-							type="button"
-							data-bs-toggle="collapse"
-							data-bs-target="#collapse-workflow-advanced-options"
-							aria-expanded="false"
-							aria-controls="collapse-workflow-advanced-options"
-						>
-							Advanced options
-						</button>
-					</h2>
-					<div
-						id="collapse-workflow-advanced-options"
-						class="accordion-collapse collapse"
-						data-bs-parent="#accordion-run-workflow"
+			<div class="row mb-3">
+				<div class="col has-validation">
+					<label for="firstTaskIndex" class="form-label"> Start workflow at </label>
+					<select
+						name="firstTaskIndex"
+						id="firstTaskIndex"
+						class="form-select"
+						disabled={checkingConfiguration}
+						bind:value={firstTaskIndex}
+						on:change={firstTaskIndexChanged}
+						class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 					>
-						<div class="accordion-body">
-							<div class="mb-3">
-								<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-								<textarea
-									name="workerInit"
-									id="workerInit"
-									class="form-control font-monospace"
-									rows="5"
-									disabled={checkingConfiguration}
-									bind:value={workerInitControl}
-								/>
-							</div>
-							{#if slurmAccounts.length > 0}
-								<div class="mb-3">
-									<div class="form-check">
-										<input
-											class="form-check-input"
-											type="checkbox"
-											id="setSlurmAccount"
-											bind:checked={setSlurmAccount}
-										/>
-										<label class="form-check-label" for="setSlurmAccount">
-											Set SLURM account
-										</label>
-									</div>
-								</div>
-								{#if setSlurmAccount}
-									<div class="mb-3">
-										<label for="slurmAccount" class="form-label">SLURM account</label>
-										<select
-											name="slurmAccount"
-											id="slurmAccount"
-											class="form-select"
-											disabled={checkingConfiguration}
-											bind:value={slurmAccount}
-										>
-											{#each slurmAccounts as account}
-												<option>{account}</option>
-											{/each}
-										</select>
-									</div>
-								{/if}
-							{/if}
-						</div>
-					</div>
+						<option value={undefined}>Select first task</option>
+						{#each workflow.task_list as wft}
+							<option value={wft.order}>{wft.task.name}</option>
+						{/each}
+					</select>
+					<span class="invalid-feedback"> The first task is required </span>
 				</div>
+				<div class="col">
+					<label for="lastTaskIndex" class="form-label">(Optional) Stop workflow early</label>
+					<select
+						name="lastTaskIndex"
+						id="lastTaskIndex"
+						class="form-select"
+						disabled={checkingConfiguration}
+						bind:value={lastTaskIndex}
+					>
+						<option value={undefined}>Select last task</option>
+						{#each workflow.task_list as wft}
+							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
+								<option value={wft.order}>{wft.task.name}</option>
+							{/if}
+						{/each}
+					</select>
+				</div>
+			</div>
+			<div class="accordion mb-2" id="accordion-run-workflow">
 				{#if imagePage && selectedDataset && showImageList}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button
-								class="accordion-button collapsed"
+								class="accordion-button"
 								type="button"
 								data-bs-toggle="collapse"
 								data-bs-target="#collapse-workflow-image-list"
@@ -603,7 +535,7 @@
 						</h2>
 						<div
 							id="collapse-workflow-image-list"
-							class="accordion-collapse collapse"
+							class="accordion-collapse collapse show"
 							data-bs-parent="#accordion-run-workflow"
 						>
 							<div class="accordion-body">
@@ -641,6 +573,62 @@
 				{#if datasetImagesLoading}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 				{/if}
+			</div>
+			<div class="clearfix mb-1">
+				<button
+					class="btn btn-light float-end"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#collapseAdvancedOptions"
+					aria-expanded="false"
+					aria-controls="collapseAdvancedOptions"
+				>
+					Advanced options
+				</button>
+			</div>
+			<div class="collapse clearfix" id="collapseAdvancedOptions">
+				<div class="card card-body">
+					<div class="mb-3">
+						<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
+						<textarea
+							name="workerInit"
+							id="workerInit"
+							class="form-control font-monospace"
+							rows="5"
+							disabled={checkingConfiguration}
+							bind:value={workerInitControl}
+						/>
+					</div>
+					{#if slurmAccounts.length > 0}
+						<div class="mb-3">
+							<div class="form-check">
+								<input
+									class="form-check-input"
+									type="checkbox"
+									id="setSlurmAccount"
+									bind:checked={setSlurmAccount}
+								/>
+								<label class="form-check-label" for="setSlurmAccount"> Set SLURM account </label>
+							</div>
+						</div>
+						{#if setSlurmAccount}
+							<div class="mb-3">
+								<label for="slurmAccount" class="form-label">SLURM account</label>
+								<select
+									name="slurmAccount"
+									id="slurmAccount"
+									class="form-select"
+									disabled={checkingConfiguration}
+									bind:value={slurmAccount}
+								>
+									{#each slurmAccounts as account}
+										<option>{account}</option>
+									{/each}
+								</select>
+							</div>
+						{/if}
+					{/if}
+				</div>
 			</div>
 			{#if checkingConfiguration}
 				<hr />
