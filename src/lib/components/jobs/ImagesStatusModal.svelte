@@ -19,8 +19,8 @@
 	let dataset;
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	let workflowTask;
-	/** @type {string[]} */
-	let disabledTypes = [];
+	/** @type {{ [key: string]: boolean }} */
+	let frozenTypes = {};
 
 	/** @type {Modal} */
 	let modal;
@@ -46,10 +46,10 @@
 		selectedLogImage = '';
 		dataset = _dataset;
 		workflowTask = _workflowTask;
-		disabledTypes = Object.keys({
+		frozenTypes = {
 			...workflowTask.type_filters,
 			...workflowTask.task.input_types
-		});
+		};
 		modal.show();
 		await loadImages();
 		await tick();
@@ -154,7 +154,8 @@
 					{dataset}
 					bind:imagePage
 					{vizarrViewerUrl}
-					{disabledTypes}
+					disabledTypes={Object.keys(frozenTypes)}
+					initialFilterValues={{ attribute_filters: {}, type_filters: frozenTypes }}
 					imagesStatusModal={true}
 					imagesStatusModalUrl={`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}`}
 				>
