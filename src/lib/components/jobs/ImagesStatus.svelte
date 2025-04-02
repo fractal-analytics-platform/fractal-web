@@ -58,7 +58,7 @@
 				<button
 					aria-label="Submitted images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(dataset, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
 					<span class="d-flex pe-1">
 						<span class="pe-1 status-wrapper text-primary">
@@ -77,7 +77,7 @@
 				<button
 					aria-label="Done images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(dataset, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
 					<span class="d-flex">
 						<span class="status-wrapper text-success ps-1">
@@ -94,7 +94,7 @@
 				<button
 					aria-label="Failed images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(dataset, workflowTask.id)}
+					on:click={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
 					<span class="d-flex">
 						<span class="status-wrapper text-danger ps-1">

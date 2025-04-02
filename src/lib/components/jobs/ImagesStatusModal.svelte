@@ -17,8 +17,10 @@
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	let dataset;
-	/** @type {number} */
-	let workflowTaskId;
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
+	let workflowTask;
+	/** @type {string[]} */
+	let disabledTypes = [];
 
 	/** @type {Modal} */
 	let modal;
@@ -28,25 +30,27 @@
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = [];
 	let loadedLogsStatus = '';
-	let projectDir = '';
 
 	/** @type {DatasetImagesTable} */
 	let datasetImagesTable;
 
 	/**
 	 * @param {import('fractal-components/types/api').DatasetV2} _dataset
-	 * @param {number} _workflowTaskId
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} _workflowTask
 	 */
-	export async function open(_dataset, _workflowTaskId) {
+	export async function open(_dataset, _workflowTask) {
 		loading = true;
 		imagePage = null;
 		loadingLogs = false;
 		logParts = [];
 		selectedLogImage = '';
 		dataset = _dataset;
-		workflowTaskId = _workflowTaskId;
+		workflowTask = _workflowTask;
+		disabledTypes = Object.keys({
+			...workflowTask.type_filters,
+			...workflowTask.task.input_types
+		});
 		modal.show();
-		await loadProjectDir();
 		await loadImages();
 		await tick();
 		await datasetImagesTable.load();
@@ -56,21 +60,11 @@
 		imagePage = null;
 	}
 
-	async function loadProjectDir() {
-		const response = await fetch('/api/auth/current-user/settings');
-		if (!response.ok) {
-			return;
-		}
-		/** @type {import('fractal-components/types/api').UserSettings} */
-		const result = await response.json();
-		projectDir = result.project_dir || '';
-	}
-
 	async function loadImages() {
 		loading = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const url = `/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${dataset.id}&page=1&page_size=10`;
+		const url = `/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}&page=1&page_size=10`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
@@ -99,7 +93,7 @@
 			method: 'POST',
 			headers,
 			body: JSON.stringify({
-				workflowtask_id: workflowTaskId,
+				workflowtask_id: workflowTask.id,
 				dataset_id: dataset.id,
 				zarr_url: zarrUrl
 			})
@@ -160,8 +154,9 @@
 					{dataset}
 					bind:imagePage
 					{vizarrViewerUrl}
+					{disabledTypes}
 					imagesStatusModal={true}
-					imagesStatusModalUrl={`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTaskId}&dataset_id=${dataset.id}`}
+					imagesStatusModalUrl={`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}`}
 				>
 					<svelte:fragment slot="extra-buttons" let:image>
 						<button

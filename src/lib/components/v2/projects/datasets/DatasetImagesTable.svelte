@@ -230,19 +230,13 @@
 			])
 		);
 
-		if (runWorkflowModal) {
+		if (disabledTypes.length > 0) {
 			for (const [key, typeSelector] of Object.entries(typesSelectors)) {
 				if (disabledTypes.includes(key)) {
 					typeSelector.disable();
 				} else {
 					typeSelector.enable();
 				}
-			}
-		}
-
-		if (imagesStatusModal) {
-			for (const selector of Object.values(typesSelectors)) {
-				selector.disable();
 			}
 		}
 	}
@@ -363,7 +357,12 @@
 				}
 			}
 		});
-		setSlimSelectOptions(statusSelector, ['done', 'submitted', 'failed']);
+		setSlimSelectOptions(statusSelector, [
+			'done',
+			'submitted',
+			'failed',
+			{ text: 'not processed', value: 'unset' }
+		]);
 		if (imagesStatusFilter) {
 			statusSelector.setSelected(imagesStatusFilter);
 		}
@@ -372,13 +371,15 @@
 	/**
 	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
 	 * @param {SlimSelect|undefined} select
-	 * @param {Array<string>} values
+	 * @param {Array<string | { text: string, value: string }>} values
 	 */
 	function setSlimSelectOptions(select, values) {
 		if (!select) {
 			return;
 		}
-		const options = values.map((v) => ({ text: v.toString(), value: v.toString() }));
+		const options = values.map((v) =>
+			typeof v === 'string' ? { text: v.toString(), value: v.toString() } : v
+		);
 		select.setData([{ text: 'All', placeholder: true }, ...options]);
 	}
 
@@ -444,7 +445,8 @@
 				headers,
 				body: JSON.stringify(
 					stripNullAndEmptyObjectsAndArrays({
-						attribute_filters: attributes
+						attribute_filters: attributes,
+						type_filters: types
 					})
 				)
 			});
@@ -644,7 +646,7 @@
 				<colgroup>
 					<col width="auto" />
 					{#if imagesStatusModal}
-						<col width="150" />
+						<col width="190" />
 					{/if}
 					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each Object.keys(imagePage.attributes) as _}
@@ -752,7 +754,7 @@
 							<td>{getRelativePath(image.zarr_url)}</td>
 							{#if imagesStatusModal}
 								<td>
-									{image.status}
+									{image.status || '-'}
 								</td>
 							{/if}
 							{#each Object.keys(imagePage.attributes) as attribute}
