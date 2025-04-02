@@ -611,6 +611,16 @@
 		}
 		return false;
 	}
+
+	/**
+	 * @param {string} zarrUrl
+	 */
+	function encodePathForUrl(zarrUrl) {
+		let encodedPath = encodeURIComponent(zarrUrl);
+		// Replace encoded slashes back to slashes
+		encodedPath = encodedPath.replace(/%2F/g, '/');
+		return encodedPath;
+	}
 </script>
 
 {#if !showTable}
@@ -759,7 +769,9 @@
 								{#if vizarrViewerUrl}
 									<a
 										class="btn btn-info"
-										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{image.zarr_url}"
+										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{encodePathForUrl(
+											image.zarr_url
+										)}"
 										target="_blank"
 									>
 										<i class="bi bi-eye" />
