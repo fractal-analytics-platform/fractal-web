@@ -46,9 +46,7 @@
 			<p class="badge bg-{style} fs-6 wrap">{message}</p>
 			<p>Do you confirm?</p>
 		{/if}
-		<div class="container">
-			<div id="errorAlert-{modalId}" />
-		</div>
+		<div id="errorAlert-{modalId}" />
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

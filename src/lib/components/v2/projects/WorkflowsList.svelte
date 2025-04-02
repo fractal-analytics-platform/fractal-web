@@ -59,7 +59,7 @@
 
 <CreateWorkflowModal {handleWorkflowImported} bind:this={createWorkflowModal} />
 
-<div class="container p-0 mt-5">
+<div class="p-0 mt-5">
 	<div class="row">
 		<div class="col-sm-2">
 			<h3 class="fw-light">Workflows</h3>

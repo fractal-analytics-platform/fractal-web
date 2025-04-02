@@ -99,71 +99,69 @@
 	}
 </script>
 
-<div class="container">
-	<div class="row mt-3 mb-3">
-		<div class="col-sm-12">
-			<div class="row justify-content-end">
-				<div class="col-auto">
-					<div class="input-group">
-						<input
-							name="searchProject"
-							type="text"
-							class="form-control"
-							placeholder="Search"
-							bind:value={projectSearch}
-						/>
-					</div>
+<div class="row mt-3 mb-3">
+	<div class="col-sm-12">
+		<div class="row justify-content-end">
+			<div class="col-auto">
+				<div class="input-group">
+					<input
+						name="searchProject"
+						type="text"
+						class="form-control"
+						placeholder="Search"
+						bind:value={projectSearch}
+					/>
 				</div>
-				<div class="col-auto">
-					<button class="btn btn-primary" on:click={() => newProjectModal.show()}>
-						Create new project
-					</button>
-				</div>
+			</div>
+			<div class="col-auto">
+				<button class="btn btn-primary" on:click={() => newProjectModal.show()}>
+					Create new project
+				</button>
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<table class="table table-hover align-middle">
-			<thead class="table-light">
-				<tr>
-					<th class="col-7 col-lg-8">Name</th>
-					<th>Options</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#key projects}
-					{#each filteredProjects as { id, name }}
-						<tr>
-							<td>
-								<a href={'/v2/projects/' + id}>
-									{name}
-								</a>
-							</td>
-							<td>
-								<button
-									class="btn btn-light"
-									data-bs-toggle="modal"
-									data-bs-target="#projectInfoModal"
-									on:click={() => setProjectInfoModal(id)}
-								>
-									<i class="bi bi-info-circle" /> Info
-								</button>
-								<ConfirmActionButton
-									modalId={'confirmDeleteProject' + id}
-									style={'danger'}
-									btnStyle="danger"
-									message="Delete project {name}"
-									buttonIcon="trash"
-									label="Delete"
-									callbackAction={() => handleDeleteProject(id)}
-								/>
-							</td>
-						</tr>
-					{/each}
-				{/key}
-			</tbody>
-		</table>
-	</div>
+</div>
+<div class="row">
+	<table class="table table-hover align-middle">
+		<thead class="table-light">
+			<tr>
+				<th class="col-7 col-lg-8">Name</th>
+				<th>Options</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#key projects}
+				{#each filteredProjects as { id, name }}
+					<tr>
+						<td>
+							<a href={'/v2/projects/' + id}>
+								{name}
+							</a>
+						</td>
+						<td>
+							<button
+								class="btn btn-light"
+								data-bs-toggle="modal"
+								data-bs-target="#projectInfoModal"
+								on:click={() => setProjectInfoModal(id)}
+							>
+								<i class="bi bi-info-circle" /> Info
+							</button>
+							<ConfirmActionButton
+								modalId={'confirmDeleteProject' + id}
+								style={'danger'}
+								btnStyle="danger"
+								message="Delete project {name}"
+								buttonIcon="trash"
+								label="Delete"
+								callbackAction={() => handleDeleteProject(id)}
+							/>
+						</td>
+					</tr>
+				{/each}
+			{/key}
+		</tbody>
+	</table>
 </div>
 
 <Modal
