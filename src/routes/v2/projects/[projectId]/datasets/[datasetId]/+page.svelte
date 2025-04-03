@@ -5,6 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
+	import { encodePathForUrl } from '$lib/common/component_utilities';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -180,7 +181,7 @@
 			<div class="col-12">
 				{#if platePath}
 					<a
-						href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{platePath}"
+						href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{encodePathForUrl(platePath)}"
 						class="btn btn-info me-2"
 						target="_blank"
 						class:disabled={platePathLoading}

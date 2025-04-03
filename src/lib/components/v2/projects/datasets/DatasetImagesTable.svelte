@@ -3,11 +3,13 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { objectChanged } from '$lib/common/component_utilities';
+	import { encodePathForUrl, hideAllTooltips, objectChanged } from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
+	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
+	import { browser } from '$app/environment';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -411,6 +413,7 @@
 			pageSize = imagePage.page_size;
 		}
 		errorAlert?.hide();
+		hideAllTooltips();
 		const params = {};
 		let attributes = {};
 		for (const attributeKey of Object.keys(imagePage.attributes)) {
@@ -617,12 +620,15 @@
 	/**
 	 * @param {string} zarrUrl
 	 */
-	function encodePathForUrl(zarrUrl) {
-		let encodedPath = encodeURIComponent(zarrUrl);
-		// Replace encoded slashes back to slashes
-		encodedPath = encodedPath.replace(/%2F/g, '/');
-		return encodedPath;
+	function getUrl(zarrUrl) {
+		return `${vizarrViewerUrl}data${encodePathForUrl(zarrUrl)}`;
 	}
+
+	onDestroy(() => {
+		if (browser) {
+			hideAllTooltips();
+		}
+	});
 </script>
 
 {#if !showTable}
@@ -749,7 +755,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each imagePage.items as image}
+					{#each imagePage.items as image, index}
 						<tr>
 							<td>{getRelativePath(image.zarr_url)}</td>
 							{#if imagesStatusModal}
@@ -779,21 +785,31 @@
 										<i class="bi bi-eye" />
 										View
 									</a>
+									{#key imagePage.items}
+										<CopyToClipboardButton
+											btnClass="light"
+											clipboardText={getUrl(image.zarr_url)}
+											text="Get URL"
+											id="get-url{index}"
+										/>
+									{/key}
 								{/if}
 								{#if !runWorkflowModal && !imagesStatusModal}
 									<button
-										class="btn btn-primary"
+										class="btn btn-light"
 										on:click={() => imageModal?.openForEditing(image)}
+										aria-label="Edit"
 									>
-										<i class="bi bi-pencil" />
-										Edit
+										<span class="text-primary">
+											<i class="bi bi-pencil" />
+										</span>
 									</button>
 									<ConfirmActionButton
 										modalId={'deleteConfirmImageModal-' + getIdFromValue(image.zarr_url)}
-										style={'danger'}
-										btnStyle="danger"
+										style="danger"
+										btnStyle="light text-danger"
 										buttonIcon="trash"
-										label={'Delete'}
+										ariaLabel={'Delete'}
 										callbackAction={() => handleDeleteImage(image.zarr_url)}
 									>
 										<svelte:fragment slot="body">

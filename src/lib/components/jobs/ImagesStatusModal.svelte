@@ -6,6 +6,7 @@
 	import DatasetImagesTable from '../v2/projects/datasets/DatasetImagesTable.svelte';
 	import { env } from '$env/dynamic/public';
 	import { tick } from 'svelte';
+	import { hideAllTooltips } from '$lib/common/component_utilities';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -86,6 +87,7 @@
 	 * @param {string} status
 	 */
 	async function loadLogs(zarrUrl, status) {
+		hideAllTooltips();
 		loadingLogs = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
