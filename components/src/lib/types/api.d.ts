@@ -294,13 +294,11 @@ export type HistoryItemV2 = {
 	id: number;
 	dataset_id: number;
 	workflowtask_id: number;
-	timestamp_started: string;
-	parameters_hash: string;
-	num_available_images: number;
-	num_current_images: number;
-	images: { [key: string]: string };
-	worfklowtask_dump: WorkflowTaskV2;
+	workflowtask_dump: WorkflowTaskV2;
 	task_group_dump: TaskGroupV2;
+	timestamp_started: string;
+	status: ImagesStatus;
+	num_available_images: number;
 };
 
 export type HistoryUnit = {
