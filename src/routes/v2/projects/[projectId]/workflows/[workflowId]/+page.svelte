@@ -512,7 +512,7 @@
 		} else {
 			isLegacy = false;
 		}
-		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
+		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
 			statusWatcherTimer = window.setTimeout(

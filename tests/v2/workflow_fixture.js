@@ -145,7 +145,7 @@ const workflowTest = baseTest.extend({
 		await workflow.createProject();
 		await workflow.createWorkflow();
 		await use(workflow);
-		//await workflow.deleteProject();
+		await workflow.deleteProject();
 	}
 });
 
