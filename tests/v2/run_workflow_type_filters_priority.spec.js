@@ -1,4 +1,9 @@
-import { getSlimSelectValues, waitModalClosed, waitPageLoading } from '../utils.js';
+import {
+	getSlimSelectValues,
+	selectSlimSelect,
+	waitModalClosed,
+	waitPageLoading
+} from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
@@ -68,6 +73,19 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(
 			page.getByText('Image list includes multiple values for the following types:')
 		).toBeVisible();
+	});
+
+	await test.step('Select type and check confirm result', async () => {
+		await selectSlimSelect(page, modal.getByLabel('Selector for type 3D'), 'True');
+		await modal.getByRole('button', { name: 'Apply' }).click();
+		await expect(modal.getByText('Total results: 2')).toBeVisible();
+		await modal.getByRole('button', { name: 'Run' }).click();
+		await expect(modal.getByText('Applied filters')).toBeVisible();
+		await expect(
+			modal.locator('li').filter({ hasText: '3D:' }).locator('[aria-checked="true"]')
+		).toBeVisible();
+		await modal.getByRole('button', { name: 'Cancel' }).click();
+		await expect(modal.getByRole('button', { name: 'Run' })).toBeVisible();
 	});
 
 	await test.step('Check selected filters for MIP_compound', async () => {
