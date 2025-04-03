@@ -46,17 +46,17 @@
 			{
 				...historyItem,
 				worfklowtask_dump: {
-					...historyItem.worfklowtask_dump,
+					...historyItem.workflowtask_dump,
 					task: {
-						...historyItem.worfklowtask_dump.task,
-						args_schema_non_parallel: historyItem.worfklowtask_dump.task.args_schema_non_parallel
+						...historyItem.workflowtask_dump.task,
+						args_schema_non_parallel: historyItem.workflowtask_dump.task.args_schema_non_parallel
 							? '[HIDDEN]'
 							: undefined,
-						args_schema_parallel: historyItem.worfklowtask_dump.task.args_schema_parallel
+						args_schema_parallel: historyItem.workflowtask_dump.task.args_schema_parallel
 							? '[HIDDEN]'
 							: undefined,
-						docs_info: historyItem.worfklowtask_dump.task.docs_info ? '[HIDDEN]' : undefined,
-						docs_link: historyItem.worfklowtask_dump.task.docs_link ? '[HIDDEN]' : undefined
+						docs_info: historyItem.workflowtask_dump.task.docs_info ? '[HIDDEN]' : undefined,
+						docs_link: historyItem.workflowtask_dump.task.docs_link ? '[HIDDEN]' : undefined
 					}
 				}
 			},
@@ -82,7 +82,7 @@
 		<div id="errorAlert-datasetHistoryModal" />
 		{#if history && Object.keys(history).length > 0}
 			<div class="accordion" id="accordion-dataset-history">
-				{#each Object.entries(history) as [index, value]}
+				{#each history as value, index}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button
@@ -93,7 +93,7 @@
 								aria-expanded="false"
 								aria-controls="collapse-dataset-history-{index}"
 							>
-								Task "{value.worfklowtask_dump.task.name}" - {value.timestamp_started}
+								Task "{value.workflowtask_dump.task.name}" - {value.timestamp_started}
 							</button>
 						</h2>
 						<div
