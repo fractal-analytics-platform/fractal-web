@@ -57,9 +57,8 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 
 	await test.step('Check selected filters for create_ome_zarr_compound', async () => {
 		await modal
-			.getByRole('combobox', { name: 'First task' })
+			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('create_ome_zarr_compound');
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		await expect(page.getByText('Total results: 6')).toBeVisible();
 		await expect(page.getByRole('row')).toHaveCount(8);
 	});
@@ -72,7 +71,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	});
 
 	await test.step('Check selected filters for MIP_compound', async () => {
-		await modal.getByRole('combobox', { name: 'First task' }).selectOption('MIP_compound');
+		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('MIP_compound');
 		await expect(
 			page.getByText('Image list includes multiple values for the following types:')
 		).not.toBeVisible();
@@ -93,7 +92,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 
 	await test.step('Check selected filters for illumination_correction', async () => {
 		await modal
-			.getByRole('combobox', { name: 'First task' })
+			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('illumination_correction');
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
@@ -131,9 +130,8 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 
 	await test.step('Check selected filters for illumination_correction', async () => {
 		await modal
-			.getByRole('combobox', { name: 'First task' })
+			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('illumination_correction');
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');

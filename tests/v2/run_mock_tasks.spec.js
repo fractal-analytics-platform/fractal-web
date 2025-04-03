@@ -70,7 +70,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		).toHaveText(datasetName1);
 		await expect(
 			modal
-				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('combobox', { name: 'Start workflow at' })
 				.getByRole('option', { selected: true })
 		).toHaveText('create_ome_zarr_compound');
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
@@ -171,7 +171,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await modal.waitFor();
 		await expect(
 			modal
-				.getByRole('combobox', { name: 'First task (Required)' })
+				.getByRole('combobox', { name: 'Start workflow at' })
 				.getByRole('option', { selected: true })
 		).toHaveText('generic_task');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
@@ -197,7 +197,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await modal.waitFor();
 		await expect(
 			modal
-				.getByRole('combobox', { name: 'First task (Optional)' })
+				.getByRole('combobox', { name: 'Start workflow at' })
 				.getByRole('option', { selected: true })
 		).toHaveText('create_ome_zarr_compound');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();

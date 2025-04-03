@@ -58,7 +58,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.waitFor();
 
 		// check images and selected filters
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
 		expect(values).toHaveLength(1);
 		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
@@ -91,10 +90,9 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	await test.step('Check Run workflow modal', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
-		await modal.getByRole('combobox', { name: 'First task' }).selectOption('generic_task');
+		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 
 		// check images
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText('This job will process 2 images')).toBeVisible();
 		await expect(
@@ -115,10 +113,9 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 	await test.step('Check continue workflow modal', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
-		await modal.getByRole('combobox', { name: 'First task' }).selectOption('generic_task');
+		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 
 		// check images and selected filters
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
 		expect(values).toHaveLength(1);
 		expect(/** @type {string[]} */ (values)[0]).toEqual('True');

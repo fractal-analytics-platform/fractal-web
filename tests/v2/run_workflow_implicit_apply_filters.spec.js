@@ -52,7 +52,6 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
 		// check images and selected filters
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		let values = await getSlimSelectValues(page, page.getByLabel('Selector for attribute a1'));
 		expect(values).toHaveLength(0);
 		values = await getSlimSelectValues(page, page.getByLabel('Selector for type t1'));

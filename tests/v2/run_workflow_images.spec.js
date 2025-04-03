@@ -60,7 +60,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 	await test.step('Check images', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
@@ -80,7 +79,6 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Image list', exact: true }).click();
 		await expect(modal.getByRole('row')).toHaveCount(3);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);

@@ -49,7 +49,7 @@ test('Continue workflow displays image lists [#693]', async ({ page, workflow })
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await modal.getByRole('combobox', { name: 'First task' }).selectOption('generic_task');
+		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 		await expect(modal.getByRole('button', { name: 'Image list' })).toBeVisible();
 	});
 });

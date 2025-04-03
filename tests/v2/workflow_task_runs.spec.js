@@ -55,11 +55,11 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await expect(modal.getByText('Images')).toBeVisible();
 		await expect(modal.getByText('Total results: 15')).toBeVisible();
 		await modal.getByRole('button', { name: '2' }).click();
-		await expect(modal.getByRole('row')).toHaveCount(11);
+		await expect(modal.getByRole('row')).toHaveCount(7);
 		await modal.getByRole('button', { name: 'Logs' }).last().click();
-		await expect(modal.getByText("Logs for task 'cellpose_segmentation'")).toBeVisible();
+		await expect(modal.getByText('START cellpose_segmentation task')).toBeVisible();
 		await modal.getByRole('button', { name: 'Back' }).click();
-		await expect(modal.getByRole('row')).toHaveCount(6);
+		await expect(modal.getByRole('row')).toHaveCount(7);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -75,8 +75,9 @@ test('Workflow task runs', async ({ page, workflow }) => {
 	await test.step('Continue workflow', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
-		await modal.getByRole('combobox', { name: 'First task' }).selectOption('cellpose_segmentation');
-		await modal.getByRole('button', { name: 'Image list' }).click();
+		await modal
+			.getByRole('combobox', { name: 'Start workflow at' })
+			.selectOption('cellpose_segmentation');
 		await selectSlimSelect(page, page.getByLabel('Selector for attribute well'), 'A02');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
@@ -132,9 +133,8 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
 		await modal
-			.getByRole('combobox', { name: 'First task' })
+			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('create_ome_zarr_compound');
-		await modal.getByRole('button', { name: 'Image list' }).click();
 		await expect(modal.getByText('Total results: 30')).toBeVisible();
 		await selectSlimSelect(
 			page,
@@ -159,8 +159,8 @@ test('Workflow task runs', async ({ page, workflow }) => {
 			.first()
 			.getByRole('button', { name: 'Logs' })
 			.click();
-		await expect(modal.locator('.expandable-log')).toBeVisible();
-		await expect(page.getByText("Logs for task 'create_ome_zarr_compound'")).toBeVisible();
+		await expect(modal.getByText(/click here to expand/)).toBeVisible();
+		await expect(modal.getByText('Error in create_cellvoyager_ome_zarr')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
