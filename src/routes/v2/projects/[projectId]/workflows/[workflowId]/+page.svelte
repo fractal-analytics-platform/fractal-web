@@ -500,11 +500,11 @@
 				credentials: 'include'
 			}
 		);
-		const receivedStatuses = await statusResponse.json();
 		if (!statusResponse.ok) {
-			console.error('Error retrieving images status', receivedStatuses);
+			console.error('Error retrieving images status');
 			return;
 		}
+		const receivedStatuses = await statusResponse.json();
 		const jobHasError = selectedSubmittedJob?.status === 'failed';
 		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
 		if (selectedSubmittedJob && Object.keys(statuses).length === 0) {
@@ -515,7 +515,12 @@
 		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
-			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
+			// if there are no null statuses and no submitted statuses the job is completed,
+			// so we can reload the latest job immediately, otherwise wait default timeout
+			const allCompleted =
+				Object.entries(receivedStatuses).length === Object.values(statuses).length &&
+				submitted.length === 0;
+			statusWatcherTimer = window.setTimeout(loadJobsStatus, allCompleted ? 0 : updateJobsInterval);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
@@ -603,7 +608,7 @@
 	 * @return {Promise<import('fractal-components/types/api').ApplyWorkflowV2|undefined>}
 	 */
 	async function getSelectedJob(datasetId) {
-		const submitted = Object.values(statuses).filter((s) => s.num_submitted_images > 0);
+		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
 		if (
 			submitted.length > 0 &&
 			selectedSubmittedJob &&
