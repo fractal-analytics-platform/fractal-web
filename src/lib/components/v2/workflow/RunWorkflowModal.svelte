@@ -34,6 +34,7 @@
 	let checkingConfiguration = false;
 	/** @type {string[]} */
 	let preSubmissionCheckResults = [];
+	let ignorePreSubmissionCheck = false;
 	let setSlurmAccount = true;
 	/** @type {string[]} */
 	let slurmAccounts = [];
@@ -82,6 +83,7 @@
 		applyingWorkflow = false;
 		checkingConfiguration = false;
 		preSubmissionCheckResults = [];
+		ignorePreSubmissionCheck = false;
 		workerInitControl = '';
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
@@ -214,6 +216,7 @@
 
 	async function firstTaskIndexChanged() {
 		preSubmissionCheckResults = [];
+		ignorePreSubmissionCheck = false;
 		await loadDatasetImages();
 		// reset last task
 		if (
@@ -233,9 +236,14 @@
 	async function showConfirmRun() {
 		if (datasetImagesTable) {
 			const params = await datasetImagesTable.applySearchFields();
-			const valid = await preSubmissionCheck(params);
-			if (!valid) {
-				return;
+			if (ignorePreSubmissionCheck) {
+				preSubmissionCheckResults = [];
+				ignorePreSubmissionCheck = false;
+			} else {
+				const valid = await preSubmissionCheck(params);
+				if (!valid) {
+					return;
+				}
 			}
 		}
 		const wft = workflow.task_list[firstTaskIndex || 0];
@@ -276,13 +284,15 @@
 		const valid = preSubmissionCheckResults.length === 0;
 		if (!valid) {
 			await tick();
-			// scroll to error message
+			// scroll to warning message
 			const modalBody = document.querySelector('.modal.show .modal-body');
-			const errorAlert = document.getElementById('pre-submission-check-error');
-			if (modalBody && errorAlert) {
-				const rect = errorAlert.getBoundingClientRect();
+			const warningAlert = document.getElementById('pre-submission-check-warning');
+			if (modalBody && warningAlert) {
+				const bodyRect = modalBody.getBoundingClientRect();
+				const alertRect = warningAlert.getBoundingClientRect();
+				const alertRelativeY = alertRect.y - bodyRect.y;
 				modalBody.scrollTo({
-					top: rect.y + rect.height,
+					top: alertRelativeY + modalBody.scrollTop,
 					behavior: 'smooth'
 				});
 			}
@@ -539,6 +549,22 @@
 							data-bs-parent="#accordion-run-workflow"
 						>
 							<div class="accordion-body">
+								{#if preSubmissionCheckResults.length > 0}
+									<div class="alert alert-warning mb-0" id="pre-submission-check-warning">
+										You are trying to run a workflow without specifying what type of images should
+										be processed. Specify the relevant type filter to continue.
+										<button
+											type="button"
+											class="btn btn-warning mt-1"
+											on:click={() => {
+												ignorePreSubmissionCheck = true;
+												showConfirmRun();
+											}}
+										>
+											Continue anyway
+										</button>
+									</div>
+								{/if}
 								{#if checkingConfiguration}
 									This job will process {imagePage.total_count}
 									{imagePage.total_count === 1 ? 'image' : 'images'}.
@@ -549,26 +575,19 @@
 										bind:imagePage
 										{initialFilterValues}
 										{disabledTypes}
+										highlightedTypes={preSubmissionCheckResults}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
-										beforeSelectionChanged={() => (preSubmissionCheckResults = [])}
+										beforeTypeSelectionChanged={(key) => {
+											preSubmissionCheckResults = preSubmissionCheckResults.filter(
+												(k) => k !== key
+											);
+										}}
 									/>
 								{/if}
 							</div>
 						</div>
 					</div>
-					{#if preSubmissionCheckResults.length > 0}
-						<div class="alert alert-danger mt-3 alert-dismissible" id="pre-submission-check-error">
-							Image list includes multiple values for the following types:
-							<ul>
-								{#each preSubmissionCheckResults as item}
-									<li><code>{item}</code></li>
-								{/each}
-							</ul>
-							Please select one specific value from the dropdown menu.
-							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
-						</div>
-					{/if}
 				{/if}
 				{#if datasetImagesLoading}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />

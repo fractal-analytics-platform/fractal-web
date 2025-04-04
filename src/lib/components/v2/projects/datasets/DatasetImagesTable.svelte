@@ -3,7 +3,11 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { encodePathForUrl, hideAllTooltips, objectChanged } from '$lib/common/component_utilities';
+	import {
+		encodePathForUrl,
+		hideAllTooltips,
+		objectChanged
+	} from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
@@ -27,7 +31,10 @@
 	export let initialFilterValues = null;
 	/** @type {string[]} */
 	export let disabledTypes = [];
-	export let beforeSelectionChanged = () => {};
+	/** @type {(key: string) => void} */
+	export let beforeTypeSelectionChanged = () => {};
+	/** @type {string[]} */
+	export let highlightedTypes = [];
 
 	/**
 	 * Set to true if the table is displayed inside the "Images status" modal.
@@ -267,7 +274,6 @@
 			},
 			events: {
 				beforeChange: () => {
-					beforeSelectionChanged();
 					return true;
 				},
 				afterChange: (selection) => {
@@ -304,7 +310,7 @@
 			},
 			events: {
 				beforeChange: () => {
-					beforeSelectionChanged();
+					beforeTypeSelectionChanged(key);
 					return true;
 				},
 				afterChange: (selection) => {
@@ -343,10 +349,6 @@
 				isMultiple: false
 			},
 			events: {
-				beforeChange: () => {
-					beforeSelectionChanged();
-					return true;
-				},
 				afterChange: (selection) => {
 					const selectedOption = selection[0];
 					if (!selectedOption || selectedOption.placeholder) {
@@ -685,7 +687,7 @@
 							</th>
 						{/each}
 						{#each imagePage.types as typeKey}
-							<th>
+							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<label for="type-{getIdFromValue(typeKey)}">
 									{typeKey}
 								</label>
@@ -718,7 +720,7 @@
 							</th>
 						{/each}
 						{#each imagePage.types as typeKey}
-							<th>
+							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<div class="type-select-wrapper mb-1">
 									<select id="type-{getIdFromValue(typeKey)}" class="invisible" />
 								</div>
