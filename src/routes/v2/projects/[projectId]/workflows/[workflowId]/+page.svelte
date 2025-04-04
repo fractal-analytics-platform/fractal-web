@@ -528,7 +528,7 @@
 
 	async function loadLegacyStatus() {
 		const response = await fetch(
-			`/api/v2/project/1/status-legacy?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`
+			`/api/v2/project/${workflow.project_id}/status-legacy?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`
 		);
 		if (!response.ok) {
 			console.log('Error loading legacy status');
