@@ -232,13 +232,11 @@
 			])
 		);
 
-		if (disabledTypes.length > 0) {
-			for (const [key, typeSelector] of Object.entries(typesSelectors)) {
-				if (disabledTypes.includes(key)) {
-					typeSelector.disable();
-				} else {
-					typeSelector.enable();
-				}
+		for (const [key, typeSelector] of Object.entries(typesSelectors)) {
+			if (disabledTypes.includes(key)) {
+				typeSelector.disable();
+			} else {
+				typeSelector.enable();
 			}
 		}
 	}
