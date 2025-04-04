@@ -515,10 +515,7 @@
 		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
-			statusWatcherTimer = window.setTimeout(
-				loadJobsStatus,
-				submitted.length > 0 ? updateJobsInterval : 0
-			);
+			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
