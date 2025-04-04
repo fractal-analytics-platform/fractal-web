@@ -71,7 +71,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	await test.step('Click Run and check error message', async () => {
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(
-			page.getByText('Image list includes multiple values for the following types:')
+			page.getByText(/You are trying to run a workflow without specifying what type/)
 		).toBeVisible();
 	});
 
