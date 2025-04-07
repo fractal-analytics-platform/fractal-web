@@ -229,6 +229,70 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			}
 		],
 		active: true
+	},
+	{
+		id: 11,
+		pkg_name: 'test_converter_compound',
+		version: '1.4.2',
+		task_list: [
+			{
+				id: 11,
+				name: 'test_converter_compound',
+				type: 'compound',
+				args_schema_non_parallel: {},
+				args_schema_parallel: {},
+				taskgroupv2_id: 11
+			}
+		],
+		active: true
+	},
+	{
+		id: 12,
+		pkg_name: 'test_converter_compound',
+		version: '1.5.0',
+		task_list: [
+			{
+				id: 12,
+				name: 'test_converter_compound',
+				type: 'converter_compound',
+				args_schema_non_parallel: {},
+				args_schema_parallel: {},
+				taskgroupv2_id: 12
+			}
+		],
+		active: true
+	},
+	{
+		id: 13,
+		pkg_name: 'test_converter_non_parallel',
+		version: '1.4.2',
+		task_list: [
+			{
+				id: 13,
+				name: 'test_converter_non_parallel',
+				type: 'non_parallel',
+				args_schema_non_parallel: {},
+				args_schema_parallel: null,
+				taskgroupv2_id: 13
+			}
+		],
+		active: true
+	},
+	{
+		id: 14,
+		pkg_name: 'test_converter_non_parallel',
+		version: '1.5.0',
+		task_list: [
+			{
+				id: 14,
+				name: 'test_converter_non_parallel',
+				type: 'converter_non_parallel',
+				args_schema_non_parallel: {},
+				args_schema_parallel: null,
+				taskgroupv2_id: 14
+			}
+		],
+		active: true
 	}
 ]);
 
@@ -464,6 +528,67 @@ describe('VersionUpdate', () => {
 						default_boolean2: true,
 						default_string: 'foo'
 					},
+					args_parallel: null
+				})
+			})
+		);
+	});
+
+	it('update compound to converter_compound', async () => {
+		const task = getTask('test_converter_compound', '1.4.2');
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				...{
+					args_non_parallel: {},
+					args_parallel: {}
+				}
+			})
+		);
+		expect(versions[0]).toBe('1.5.0');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
+
+		const btn = screen.getByRole('button', { name: 'Update' });
+		expect(btn).toBeEnabled();
+		await fireEvent.click(btn);
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {},
+					args_parallel: {}
+				})
+			})
+		);
+	});
+
+	it('update non_parallel to converter_non_parallel', async () => {
+		const task = getTask('test_converter_non_parallel', '1.4.2');
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				...{
+					args_non_parallel: {}
+				}
+			})
+		);
+		expect(versions[0]).toBe('1.5.0');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
+
+		const btn = screen.getByRole('button', { name: 'Update' });
+		expect(btn).toBeEnabled();
+		await fireEvent.click(btn);
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {},
 					args_parallel: null
 				})
 			})
