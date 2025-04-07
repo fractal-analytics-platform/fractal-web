@@ -65,11 +65,14 @@
 
 	$: disabledTypes = Object.keys({
 		...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
-		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {})
+		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
+		...extraTypes
 	});
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = null;
+	/** @type {string[]} */
+	let extraTypes = [];
 	let hasImages = false;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	let initialFilterValues = null;
@@ -253,7 +256,7 @@
 			appliedTypeFilters = await getTypeFilterValues(wft);
 			if (datasetImagesTable) {
 				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
-				appliedTypeFilters = { ...appliedTypeFilters, ...datasetImagesTable.getTypeFilters() };
+				appliedTypeFilters = datasetImagesTable.getTypeFilters();
 			}
 		}
 		checkingConfiguration = true;
@@ -335,11 +338,13 @@
 			selectedDataset
 		);
 
+		const initialTypeFilters = await getTypeFilterValues(workflowTask);
+
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		initialFilterValues = {
 			attribute_filters: {},
-			type_filters: await getTypeFilterValues(workflowTask)
+			type_filters: initialTypeFilters
 		};
 		let response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
@@ -355,9 +360,12 @@
 			datasetImagesLoading = false;
 			return;
 		}
-		imagePage = await response.json();
-		hasImages =
-			/** @type {import('fractal-components/types/api').ImagePage} */ (imagePage).total_count > 0;
+		const result = /** @type {import('fractal-components/types/api').ImagePage} */ (
+			await response.json()
+		);
+		extraTypes = Object.keys(initialTypeFilters).filter((x) => !result.types.includes(x));
+		imagePage = result;
+		hasImages = imagePage.total_count > 0;
 		if (!hasImages) {
 			// Verify if dataset without filters has images
 			let response = await fetch(
@@ -388,20 +396,24 @@
 	 */
 	async function getTypeFilterValues(workflowTask) {
 		let currentTypeFilters = {};
+		let inputFilters = {};
 		const response = await fetch(
 			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/type-filters-flow`
 		);
 		if (response.ok) {
 			/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
 			const typeFiltersFlow = await response.json();
-			currentTypeFilters =
-				typeFiltersFlow.find((t) => t.workflowtask_id === workflowTask.id)?.current_type_filters ||
-				{};
+			const selectedTypeFiltersFlow = typeFiltersFlow.find(
+				(t) => t.workflowtask_id === workflowTask.id
+			);
+			if (selectedTypeFiltersFlow) {
+				currentTypeFilters = selectedTypeFiltersFlow.current_type_filters;
+				inputFilters = selectedTypeFiltersFlow.input_type_filters;
+			}
 		}
 		return {
 			...currentTypeFilters,
-			...workflowTask.type_filters,
-			...workflowTask.task.input_types
+			...inputFilters
 		};
 	}
 
@@ -575,6 +587,7 @@
 										bind:imagePage
 										{initialFilterValues}
 										{disabledTypes}
+										{extraTypes}
 										highlightedTypes={preSubmissionCheckResults}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}

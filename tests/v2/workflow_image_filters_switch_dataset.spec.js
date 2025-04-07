@@ -93,8 +93,9 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 
 		// check images
+		await expect(modal.getByText('Total results: 0')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
-		await expect(modal.getByText('This job will process 2 images')).toBeVisible();
+		await expect(modal.getByText('This job will process 0 images')).toBeVisible();
 		await expect(
 			modal.locator('li').filter({ hasText: 'd2t1:' }).locator('[aria-checked="true"]')
 		).toBeVisible();

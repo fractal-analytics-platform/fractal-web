@@ -19,6 +19,11 @@
 	export let dataset;
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	export let imagePage;
+	/**
+	 * Types not included in the the image page result
+	 * @type {string[]}
+	 */
+	export let extraTypes = [];
 	/** @type {string|null} */
 	export let vizarrViewerUrl;
 	/**
@@ -114,7 +119,12 @@
 
 	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
 	function getTypeFilterBaseValues(imagePage) {
-		return Object.fromEntries(imagePage.types.map((k) => [k, getInitialTypeFilterValue(k)]));
+		return Object.fromEntries(getTypeKeys(imagePage).map((k) => [k, getInitialTypeFilterValue(k)]));
+	}
+
+	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
+	function getTypeKeys(imagePage) {
+		return [...imagePage.types, ...extraTypes];
 	}
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
@@ -220,7 +230,7 @@
 		}
 		// Init new selectors
 		typesSelectors = Object.fromEntries(
-			imagePage.types.map((k) => [
+			getTypeKeys(imagePage).map((k) => [
 				k,
 				loadTypeSelector(
 					k,
@@ -426,7 +436,7 @@
 			params.attribute_filters = attributes;
 		}
 		let types = {};
-		for (const typeKey of imagePage.types) {
+		for (const typeKey of getTypeKeys(imagePage)) {
 			const typeValue = typeFilters[typeKey];
 			if (typeValue !== null) {
 				types[typeKey] = typeValue;
@@ -523,7 +533,7 @@
 	 */
 	function reloadTypeFilters(imagePage) {
 		typeFilters = Object.fromEntries(
-			imagePage.types.map((k) => [k, k in typeFilters ? typeFilters[k] : null])
+			getTypeKeys(imagePage).map((k) => [k, k in typeFilters ? typeFilters[k] : null])
 		);
 		loadTypesSelectors();
 	}
@@ -659,7 +669,7 @@
 						<col width="190" />
 					{/each}
 					<!-- eslint-disable-next-line no-unused-vars -->
-					{#each imagePage.types as _}
+					{#each getTypeKeys(imagePage) as _}
 						<col width="110" />
 					{/each}
 					<col width="auto" />
@@ -686,7 +696,7 @@
 								{/if}
 							</th>
 						{/each}
-						{#each imagePage.types as typeKey}
+						{#each getTypeKeys(imagePage) as typeKey}
 							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<label for="type-{getIdFromValue(typeKey)}">
 									{typeKey}
@@ -719,7 +729,7 @@
 								</div>
 							</th>
 						{/each}
-						{#each imagePage.types as typeKey}
+						{#each getTypeKeys(imagePage) as typeKey}
 							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<div class="type-select-wrapper mb-1">
 									<select id="type-{getIdFromValue(typeKey)}" class="invisible" />
@@ -770,7 +780,7 @@
 									{/if}
 								</td>
 							{/each}
-							{#each imagePage.types as typeKey}
+							{#each getTypeKeys(imagePage) as typeKey}
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">

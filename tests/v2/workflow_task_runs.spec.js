@@ -57,7 +57,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await modal.getByRole('button', { name: '2' }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
 		await modal.getByRole('button', { name: 'Logs' }).last().click();
-		await expect(modal.getByText("Logs for task 'cellpose_segmentation'")).toBeVisible();
+		await expect(modal.getByText('START cellpose_segmentation task')).toBeVisible();
 		await modal.getByRole('button', { name: 'Back' }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
 		await modal.getByRole('button', { name: 'Close' }).click();
@@ -159,8 +159,8 @@ test('Workflow task runs', async ({ page, workflow }) => {
 			.first()
 			.getByRole('button', { name: 'Logs' })
 			.click();
-		await expect(modal.locator('.expandable-log')).toBeVisible();
-		await expect(page.getByText("Logs for task 'create_ome_zarr_compound'")).toBeVisible();
+		await expect(modal.getByText(/click here to expand/)).toBeVisible();
+		await expect(modal.getByText('Error in create_cellvoyager_ome_zarr')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
