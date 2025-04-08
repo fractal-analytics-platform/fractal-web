@@ -72,6 +72,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Key').last().fill('t1');
 		await page.getByRole('switch').click();
 		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
 	});
 
 	await test.step('Check images with input filter', async () => {

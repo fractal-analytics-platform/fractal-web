@@ -505,7 +505,15 @@
 			return;
 		}
 		const receivedStatuses = await statusResponse.json();
-		const jobHasError = selectedSubmittedJob?.status === 'failed';
+
+		if (selectedSubmittedJob && selectedSubmittedJob.status === 'failed') {
+			failedJob = { ...selectedSubmittedJob };
+			jobError = extractRelevantJobError(selectedSubmittedJob.log || '', 5);
+		} else {
+			failedJob = undefined;
+			jobError = '';
+		}
+
 		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
 		if (selectedSubmittedJob && Object.keys(statuses).length === 0) {
 			await loadLegacyStatus();
@@ -525,7 +533,6 @@
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 		}
-		await loadJobError(jobHasError);
 	}
 
 	async function loadLegacyStatus() {
@@ -559,41 +566,6 @@
 			return;
 		}
 		datasets = datasets.map((d) => (d.id === datasetId ? result : d));
-	}
-
-	/**
-	 * @param {boolean} jobHasError
-	 */
-	async function loadJobError(jobHasError) {
-		if (!jobHasError && Object.values(statuses).length > 0) {
-			const failedStatus = Object.values(statuses).find((s) => s.num_failed_images > 0);
-			if (!failedStatus) {
-				jobError = '';
-				failedJob = undefined;
-				return;
-			}
-		}
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!response.ok) {
-			console.error('Error retrieving workflow jobs', await response.json());
-			return;
-		}
-		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (
-			await response.json()
-		);
-		const failedJobs = jobs
-			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
-			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
-		if (failedJobs.length === 0) {
-			jobError = '';
-			failedJob = undefined;
-			return;
-		}
-		failedJob = failedJobs[0];
-		jobError = extractRelevantJobError(failedJob.log || '', 5);
 	}
 
 	function showJobLogsModal() {
