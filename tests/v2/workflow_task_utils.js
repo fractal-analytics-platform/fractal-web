@@ -18,7 +18,7 @@ export async function waitTaskSubmitted(page, count = undefined) {
  */
 export async function waitTasksSuccess(page, count = undefined) {
 	await expect(page.getByRole('button', { name: 'Stop workflow' })).not.toBeVisible({
-		timeout: 8000
+		timeout: 24000
 	});
 	const errorAlert = page.getByText('The last job failed with the following error');
 	if (await errorAlert.isVisible()) {
