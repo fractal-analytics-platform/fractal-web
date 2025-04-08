@@ -1,5 +1,5 @@
 import {
-	getSlimSelectValues,
+	expectSlimSelectValue,
 	selectSlimSelect,
 	waitModalClosed,
 	waitPageLoading
@@ -96,9 +96,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type 3D'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+		await expectSlimSelectValue(page, 'Selector for type 3D', 'True');
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
@@ -115,9 +113,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate_new.zarr/A/02/0');
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type 3D'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('False');
+		await expectSlimSelectValue(page, 'Selector for type 3D', 'False');
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
@@ -153,9 +149,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type 3D'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+		await expectSlimSelectValue(page, 'Selector for type 3D', 'True');
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {

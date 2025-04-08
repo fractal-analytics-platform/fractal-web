@@ -1,5 +1,10 @@
 import { expect, test } from './workflow_fixture.js';
-import { getSlimSelectValues, selectSlimSelect, waitPageLoading } from '../utils.js';
+import {
+	expectSlimSelectNotSet,
+	expectSlimSelectValue,
+	selectSlimSelect,
+	waitPageLoading
+} from '../utils.js';
 import { createImage } from './image_utils.js';
 import { createDataset } from './dataset_utils.js';
 
@@ -52,11 +57,8 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
 		// check images and selected filters
-		let values = await getSlimSelectValues(page, page.getByLabel('Selector for attribute a1'));
-		expect(values).toHaveLength(0);
-		values = await getSlimSelectValues(page, page.getByLabel('Selector for type t1'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+		await expectSlimSelectNotSet(page, 'Selector for attribute a1');
+		await expectSlimSelectValue(page, 'Selector for type t1', 'True');
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
 		await expect(page.getByText('Total results: 2')).toBeVisible();
 	});
@@ -75,11 +77,8 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 
 	await test.step('Click cancel and check that filters have been reset', async () => {
 		await modal.getByRole('button', { name: 'Cancel' }).click();
-		let values = await getSlimSelectValues(page, page.getByLabel('Selector for attribute a1'));
-		expect(values).toHaveLength(0);
-		values = await getSlimSelectValues(page, page.getByLabel('Selector for type t1'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+		await expectSlimSelectNotSet(page, 'Selector for attribute a1');
+		await expectSlimSelectValue(page, 'Selector for type t1', 'True');
 		await expect(page.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
 	});

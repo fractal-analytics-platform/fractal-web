@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { getSlimSelectValues, waitModalClosed, waitPageLoading } from '../utils.js';
+import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 import { createImage } from './image_utils.js';
 import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
@@ -58,9 +58,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.waitFor();
 
 		// check images and selected filters
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
 
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 
@@ -94,6 +92,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 		// check images
 		await expect(modal.getByText('Total results: 0')).toBeVisible();
+		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText('This job will process 0 images')).toBeVisible();
 		await expect(
@@ -117,9 +116,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 
 		// check images and selected filters
-		const values = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
-		expect(values).toHaveLength(1);
-		expect(/** @type {string[]} */ (values)[0]).toEqual('True');
+		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
 
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 
@@ -130,8 +127,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		).toBeVisible();
 
 		await modal.getByRole('button', { name: 'Cancel' }).click();
-		const values2 = await getSlimSelectValues(page, page.getByLabel('Selector for type d2t1'));
-		expect(values2).toHaveLength(1);
-		expect(/** @type {string[]} */ (values2)[0]).toEqual('True');
+		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
 	});
 });

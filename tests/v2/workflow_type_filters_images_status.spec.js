@@ -1,6 +1,6 @@
 import { expect, test } from './workflow_fixture.js';
 import {
-	getSlimSelectValues,
+	expectSlimSelectValue,
 	selectSlimSelect,
 	waitModalClosed,
 	waitPageLoading
@@ -61,10 +61,6 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 		await modal.waitFor();
 		await expect(modal.getByLabel('Selector for type 3D')).toHaveClass(/ss-disabled/);
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
-		const selectedValues = await getSlimSelectValues(
-			page,
-			modal.getByLabel('Selector for type 3D')
-		);
-		expect(selectedValues).toEqual(['True']);
+		await expectSlimSelectValue(page, 'Selector for type 3D', 'True');
 	});
 });

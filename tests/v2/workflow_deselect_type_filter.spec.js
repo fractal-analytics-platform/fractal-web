@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { getSlimSelectValues, waitModalClosed, waitPageLoading } from '../utils.js';
+import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 import { waitTasksSuccess } from './workflow_task_utils.js';
 
@@ -47,11 +47,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 			.selectOption('cellpose_segmentation');
 		await expect(page.getByText('Total results: 2')).toBeVisible();
 		await expect(page.getByRole('row')).toHaveCount(4);
-		const selectedValues = await getSlimSelectValues(
-			page,
-			modal.getByLabel('Selector for type 3D')
-		);
-		expect(selectedValues).toEqual(['False']);
+		await expectSlimSelectValue(page, 'Selector for type 3D', 'False');
 	});
 
 	await test.step('Deselect 3D type', async () => {
