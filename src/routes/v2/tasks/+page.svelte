@@ -13,6 +13,7 @@
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = null;
+	let showDocLinksInTable = false;
 
 	/**
 	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
@@ -20,6 +21,13 @@
 	function showDocsInfoModal(taskRow) {
 		selectedTaskRow = taskRow;
 		modal.show();
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 */
+	function showInfoButton(taskRow) {
+		return taskRow.docs_info || (!showDocLinksInTable && taskRow.docs_link);
 	}
 
 	onMount(() => {
@@ -46,7 +54,7 @@
 {/if}
 
 <div class="container mt-2">
-	<FilteredTasksTable {taskGroups}>
+	<FilteredTasksTable {taskGroups} {showDocLinksInTable}>
 		<svelte:fragment slot="extra-columns-colgroup">
 			<col width="60" />
 		</svelte:fragment>
@@ -55,7 +63,7 @@
 		</svelte:fragment>
 		<svelte:fragment slot="extra-columns" let:task>
 			<td>
-				{#if task.docs_info}
+				{#if showInfoButton(task)}
 					<button class="btn btn-info" on:click={() => showDocsInfoModal(task)}>
 						<i class="bi bi-info-circle" />
 					</button>
@@ -70,7 +78,20 @@
 		<h5 class="modal-title">{selectedTaskRow?.task_name}</h5>
 	</svelte:fragment>
 	<svelte:fragment slot="body">
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html formatMarkdown(selectedTaskRow?.docs_info)}
+		{#if selectedTaskRow?.docs_info}
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			{@html formatMarkdown(selectedTaskRow?.docs_info)}
+		{/if}
+		{#if !showDocLinksInTable && selectedTaskRow?.docs_link}
+			{#if selectedTaskRow?.docs_info}
+				<hr />
+			{/if}
+			<div>
+				Docs link:
+				<a href={selectedTaskRow?.docs_link} target="_blank">
+					{selectedTaskRow?.docs_link}
+				</a>
+			</div>
+		{/if}
 	</svelte:fragment>
 </Modal>

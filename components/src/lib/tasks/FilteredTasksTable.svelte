@@ -7,6 +7,7 @@
 	/** @type {Array<import('../types/api').TaskGroupV2>} */
 	export let taskGroups;
 	export let showAuthorsInSeparateColumn = true;
+	export let showDocLinksInTable = false;
 
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
@@ -380,7 +381,7 @@
 							{#if task.taskVersions[task.selectedVersion]}
 								<tr>
 									<td class="task-name-col">
-										{#if task.taskVersions[task.selectedVersion].docs_link}
+										{#if showDocLinksInTable && task.taskVersions[task.selectedVersion].docs_link}
 											<a href={task.taskVersions[task.selectedVersion].docs_link} target="_blank">
 												{task.taskVersions[task.selectedVersion].task_name}
 											</a>
