@@ -52,9 +52,9 @@
 	});
 </script>
 
-<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
+<div class="container mt-2">
+	<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
 
-<div class="container mt-4">
 	<div class="col-sm-2">
 		<h3 class="fw-light">Datasets</h3>
 	</div>

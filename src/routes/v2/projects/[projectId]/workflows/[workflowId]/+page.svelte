@@ -758,7 +758,7 @@
 <TypeFiltersFlowModal {workflow} bind:this={typeFiltersFlowModal} />
 
 {#if workflow}
-	<div class="container">
+	<div class="container mt-2">
 		<StandardDismissableAlert message={workflowSuccessMessage} />
 
 		<div id="workflowErrorAlert" />
