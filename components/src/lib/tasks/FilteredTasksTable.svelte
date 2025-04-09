@@ -6,6 +6,7 @@
 
 	/** @type {Array<import('../types/api').TaskGroupV2>} */
 	export let taskGroups;
+	export let showAuthorsInSeparateColumn = true;
 
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
@@ -244,7 +245,7 @@
 		const values = [];
 		// authors, tags
 		values.push(...taskProperties.tags);
-		if (taskProperties.authors) {
+		if (taskProperties.authors && !showAuthorsInSeparateColumn) {
 			values.push(taskProperties.authors);
 		}
 		return values.join(', ');
@@ -351,6 +352,9 @@
 					<col />
 					<col />
 					<col />
+					{#if showAuthorsInSeparateColumn}
+						<col />
+					{/if}
 					<col width="120" />
 					<slot name="extra-columns-colgroup" />
 				</colgroup>
@@ -360,6 +364,9 @@
 						<th>Category</th>
 						<th>Modality</th>
 						<th>Metadata</th>
+						{#if showAuthorsInSeparateColumn}
+							<th>Author</th>
+						{/if}
 						<th>Version</th>
 						<slot name="extra-columns-header" />
 					</tr>
@@ -410,6 +417,11 @@
 									<td class="metadata-col">
 										{getMetadataCell(task.taskVersions[task.selectedVersion])}
 									</td>
+									{#if showAuthorsInSeparateColumn}
+										<td class="author-col">
+											{task.taskVersions[task.selectedVersion].authors || '-'}
+										</td>
+									{/if}
 									<td class="version-col">
 										{#if Object.keys(task.taskVersions).length > 1}
 											<select
@@ -454,7 +466,8 @@
 		padding-bottom: 12px;
 		background: transparent;
 	}
-	.metadata-col {
+	.metadata-col,
+	.author-col {
 		font-size: 85%;
 		max-width: 150px;
 	}

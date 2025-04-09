@@ -113,7 +113,7 @@
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 		{/if}
 		<div class:invisible={loading} class:collapse={loading}>
-			<FilteredTasksTable {taskGroups}>
+			<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
 				<svelte:fragment slot="extra-columns-colgroup">
 					<col width="40" />
 					<col width="120" />
