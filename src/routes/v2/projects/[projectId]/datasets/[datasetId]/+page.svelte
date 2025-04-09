@@ -130,7 +130,7 @@
 	});
 </script>
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="container mt-3 d-flex justify-content-between align-items-center">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
@@ -162,7 +162,7 @@
 </div>
 
 {#if vizarrViewerUrl && plates.length > 0}
-	<div class="border border-info rounded bg-light p-3 mt-2">
+	<div class="container border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
 				This dataset contains {plates.length}
@@ -202,13 +202,15 @@
 
 <div id="datasetUpdateError" />
 
-<DatasetImagesTable
-	{dataset}
-	bind:imagePage
-	{vizarrViewerUrl}
-	runWorkflowModal={false}
-	bind:this={imagesTable}
-/>
+<div class="container-fluid">
+	<DatasetImagesTable
+		{dataset}
+		bind:imagePage
+		{vizarrViewerUrl}
+		runWorkflowModal={false}
+		bind:this={imagesTable}
+	/>
+</div>
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
 <DatasetHistoryModal {dataset} />

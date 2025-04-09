@@ -188,7 +188,7 @@
 	}
 </script>
 
-<div>
+<div class="container mt-3">
 	<h1 class="fw-light mb-3">Job-submission test</h1>
 
 	<p>

@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div>
+<div class="container mt-3">
 	<div class="mb-2" id="errorSection" />
 
 	<h3 class="fw-light">Add tasks</h3>

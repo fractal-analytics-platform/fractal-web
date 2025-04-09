@@ -158,238 +158,238 @@
 	}
 </script>
 
-<div>
+<div class="container mt-3">
 	<div class="d-flex justify-content-between align-items-center mb-3">
 		<h1 class="fw-light">Task groups</h1>
 	</div>
-</div>
 
-<div class="row">
-	<div class="col-lg-12">
-		<div class="row">
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="pkg_name">Package name</label>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<input type="text" class="form-control" bind:value={pkg_name} id="pkg_name" />
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="user_id">User</label>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-select" bind:value={user_id} id="user_id">
-							<option value="">Select...</option>
-							{#each users as user}
-								<option value={user.id}>{user.email}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="user_group_id">Group</label>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-select" bind:value={user_group_id} id="user_group_id">
-							<option value="">Select...</option>
-							{#each groups as group}
-								<option value={group.id}>{group.name}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="row mt-lg-3">
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="private">Private</label>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-select" bind:value={privateGroup} id="private">
-							<option value={null}>Select...</option>
-							<option value={true}>True</option>
-							<option value={false}>False</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="active">Active</label>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-select" bind:value={active} id="active">
-							<option value={null}>Select...</option>
-							<option value={true}>True</option>
-							<option value={false}>False</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="origin">Origin</label>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<select class="form-select" bind:value={origin} id="origin">
-							<option value="">Select...</option>
-							<option value="pypi">PyPI</option>
-							<option value="wheel-file">Wheel file</option>
-							<option value="other">Other</option>
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="row mt-3">
-			<div class="col-md-3 col-lg-2 mt-2">Last used</div>
-			<div class="col-md-9 col-lg-10">
-				<div class="row row-cols-md-auto">
-					<div class="col-12 mt-1">
-						<div class="input-group">
-							<div class="input-group-text">Min</div>
-							<input
-								type="date"
-								class="form-control"
-								bind:value={lastUsedDateMin}
-								id="last_used_date_min"
-							/>
-							<input
-								type="time"
-								class="form-control"
-								bind:value={lastUsedTimeMin}
-								id="last_used_time_min"
-							/>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="row">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="pkg_name">Package name</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={pkg_name} id="pkg_name" />
 						</div>
 					</div>
-					<div class="col-12 mt-1">
-						<div class="input-group">
-							<div class="input-group-text">Max</div>
-							<input
-								type="date"
-								class="form-control"
-								bind:value={lastUsedDateMax}
-								id="last_used_date_max"
-							/>
-							<input
-								type="time"
-								class="form-control"
-								bind:value={lastUsedTimeMax}
-								id="last_used_time_max"
-							/>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="user_id">User</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={user_id} id="user_id">
+								<option value="">Select...</option>
+								{#each users as user}
+									<option value={user.id}>{user.email}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="user_group_id">Group</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={user_group_id} id="user_group_id">
+								<option value="">Select...</option>
+								{#each groups as group}
+									<option value={group.id}>{group.name}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="private">Private</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={privateGroup} id="private">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="active">Active</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={active} id="active">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="origin">Origin</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={origin} id="origin">
+								<option value="">Select...</option>
+								<option value="pypi">PyPI</option>
+								<option value="wheel-file">Wheel file</option>
+								<option value="other">Other</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-3">
+				<div class="col-md-3 col-lg-2 mt-2">Last used</div>
+				<div class="col-md-9 col-lg-10">
+					<div class="row row-cols-md-auto">
+						<div class="col-12 mt-1">
+							<div class="input-group">
+								<div class="input-group-text">Min</div>
+								<input
+									type="date"
+									class="form-control"
+									bind:value={lastUsedDateMin}
+									id="last_used_date_min"
+								/>
+								<input
+									type="time"
+									class="form-control"
+									bind:value={lastUsedTimeMin}
+									id="last_used_time_min"
+								/>
+							</div>
+						</div>
+						<div class="col-12 mt-1">
+							<div class="input-group">
+								<div class="input-group-text">Max</div>
+								<input
+									type="date"
+									class="form-control"
+									bind:value={lastUsedDateMax}
+									id="last_used_date_max"
+								/>
+								<input
+									type="time"
+									class="form-control"
+									bind:value={lastUsedTimeMax}
+									id="last_used_time_max"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<button class="btn btn-primary mt-4" on:click={searchTaskGroups} disabled={searching}>
-	{#if searching}
-		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-	{:else}
-		<i class="bi bi-search" />
-	{/if}
-	Search task groups
-</button>
-<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
-	Reset
-</button>
+	<button class="btn btn-primary mt-4" on:click={searchTaskGroups} disabled={searching}>
+		{#if searching}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		{:else}
+			<i class="bi bi-search" />
+		{/if}
+		Search task groups
+	</button>
+	<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
+		Reset
+	</button>
 
-<div id="searchError" class="mt-3 mb-3" />
+	<div id="searchError" class="mt-3 mb-3" />
 
-<div class:d-none={!searched}>
-	<p class="text-center">
-		The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
-	</p>
+	<div class:d-none={!searched}>
+		<p class="text-center">
+			The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
+		</p>
 
-	{#if results.length > 0}
-		<table class="table task-groups-table mt-4">
-			<colgroup>
-				<col width="60" />
-				<col width="auto" />
-				<col width="90" />
-				<col width="190" />
-				<col width="100" />
-				<col width="90" />
-				<col width="90" />
-				<col width="90" />
-				<col width="400" />
-			</colgroup>
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Package Name</th>
-					<th>Version</th>
-					<th>User</th>
-					<th>Group</th>
-					<th>Active</th>
-					<th>Origin</th>
-					<th># Tasks</th>
-					<th>Options</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each results as taskGroup, taskGroupIndex}
-					<tr class:row-grey={taskGroupIndex % 2 === 0}>
-						<td>{taskGroup.id}</td>
-						<td>{taskGroup.pkg_name}</td>
-						<td>{taskGroup.version || '-'}</td>
-						<td>{getUserEmail(taskGroup.user_id)}</td>
-						<td>{getGroupName(taskGroup.user_group_id)}</td>
-						<td>
-							<BooleanIcon value={taskGroup.active} />
-						</td>
-						<td>{taskGroup.origin || '-'}</td>
-						<td>{taskGroup.task_list.length}</td>
-						<td>
-							<button class="btn btn-light" on:click={() => openInfoModal(taskGroup)}>
-								<i class="bi bi-info-circle" />
-								Info
-							</button>
-							<button class="btn btn-primary" on:click={() => taskGroupEditModal.open(taskGroup)}>
-								<i class="bi bi-pencil" />
-								Edit
-							</button>
-							<button class="btn btn-info" on:click={() => taskGroupManageModal.open(taskGroup)}>
-								<i class="bi bi-gear" />
-								Manage
-							</button>
-							<ConfirmActionButton
-								modalId="confirmTaskGroupDeleteModal{taskGroup.id}"
-								style={'danger'}
-								btnStyle="danger"
-								buttonIcon="trash"
-								label={'Delete'}
-								message={`Delete task group ${
-									taskGroup.pkg_name +
-									(taskGroup.version ? ' (version ' + taskGroup.version + ')' : '')
-								}`}
-								callbackAction={async () => {
-									await handleDeleteTaskGroup(taskGroup.id);
-								}}
-							/>
-						</td>
+		{#if results.length > 0}
+			<table class="table task-groups-table mt-4">
+				<colgroup>
+					<col width="60" />
+					<col width="auto" />
+					<col width="90" />
+					<col width="190" />
+					<col width="100" />
+					<col width="90" />
+					<col width="90" />
+					<col width="90" />
+					<col width="400" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Package Name</th>
+						<th>Version</th>
+						<th>User</th>
+						<th>Group</th>
+						<th>Active</th>
+						<th>Origin</th>
+						<th># Tasks</th>
+						<th>Options</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{/if}
+				</thead>
+				<tbody>
+					{#each results as taskGroup, taskGroupIndex}
+						<tr class:row-grey={taskGroupIndex % 2 === 0}>
+							<td>{taskGroup.id}</td>
+							<td>{taskGroup.pkg_name}</td>
+							<td>{taskGroup.version || '-'}</td>
+							<td>{getUserEmail(taskGroup.user_id)}</td>
+							<td>{getGroupName(taskGroup.user_group_id)}</td>
+							<td>
+								<BooleanIcon value={taskGroup.active} />
+							</td>
+							<td>{taskGroup.origin || '-'}</td>
+							<td>{taskGroup.task_list.length}</td>
+							<td>
+								<button class="btn btn-light" on:click={() => openInfoModal(taskGroup)}>
+									<i class="bi bi-info-circle" />
+									Info
+								</button>
+								<button class="btn btn-primary" on:click={() => taskGroupEditModal.open(taskGroup)}>
+									<i class="bi bi-pencil" />
+									Edit
+								</button>
+								<button class="btn btn-info" on:click={() => taskGroupManageModal.open(taskGroup)}>
+									<i class="bi bi-gear" />
+									Manage
+								</button>
+								<ConfirmActionButton
+									modalId="confirmTaskGroupDeleteModal{taskGroup.id}"
+									style={'danger'}
+									btnStyle="danger"
+									buttonIcon="trash"
+									label={'Delete'}
+									message={`Delete task group ${
+										taskGroup.pkg_name +
+										(taskGroup.version ? ' (version ' + taskGroup.version + ')' : '')
+									}`}
+									callbackAction={async () => {
+										await handleDeleteTaskGroup(taskGroup.id);
+									}}
+								/>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</div>
 </div>
 
 <TaskGroupEditModal

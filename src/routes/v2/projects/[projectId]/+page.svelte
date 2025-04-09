@@ -62,8 +62,8 @@
 </script>
 
 {#if project}
-	<div class="d-flex justify-content-between align-items-center">
-		<div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+	<div class="container d-flex justify-content-between align-items-center">
+		<div class="d-flex justify-content-between align-items-center mt-3 mb-2">
 			<h1 class="fw-light">Project {project.name} #{project.id}</h1>
 		</div>
 		<div>

@@ -650,7 +650,7 @@
 	});
 </script>
 
-<div class="row">
+<div class="container mt-3">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
@@ -670,88 +670,91 @@
 		</ol>
 	</nav>
 </div>
-<div class="row mt-2">
-	<div class="col-lg-8">
-		<div class="row">
-			<div class="col-lg-4 col-md-6">
-				<div class="input-group mb-3">
-					<label for="dataset" class="input-group-text">Dataset</label>
-					<select
-						class="form-select"
-						id="dataset"
-						bind:value={selectedDatasetId}
-						on:change={selectedDatasetChanged}
-					>
-						<option value={undefined}>Select...</option>
-						{#each sortedDatasets as dataset}
-							<option value={dataset.id}>{dataset.name}</option>
-						{/each}
-					</select>
+
+<div class="container mt-2">
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="row">
+				<div class="col-lg-4 col-md-6">
+					<div class="input-group mb-3">
+						<label for="dataset" class="input-group-text">Dataset</label>
+						<select
+							class="form-select"
+							id="dataset"
+							bind:value={selectedDatasetId}
+							on:change={selectedDatasetChanged}
+						>
+							<option value={undefined}>Select...</option>
+							{#each sortedDatasets as dataset}
+								<option value={dataset.id}>{dataset.name}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+				<div class="col-lg-8 col-md-12">
+					{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
+						<button class="btn btn-danger" on:click={stopWorkflow}>
+							<i class="bi-stop-circle-fill" /> Stop workflow
+						</button>
+					{:else if !hasAnyJobRun}
+						<button
+							class="btn btn-success"
+							on:click|preventDefault={() => openRunWorkflowModal('run')}
+							disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
+						>
+							<i class="bi-play-fill" /> Run workflow
+						</button>
+					{:else}
+						<button
+							class="btn btn-success"
+							on:click|preventDefault={() => openRunWorkflowModal('continue')}
+							disabled={workflow.task_list.length === 0}
+						>
+							<i class="bi-play-fill" /> Continue workflow
+						</button>
+						<button
+							class="btn btn-primary"
+							on:click|preventDefault={() => openRunWorkflowModal('restart')}
+							disabled={workflow.task_list.length === 0}
+						>
+							<i class="bi bi-arrow-clockwise" /> Restart workflow
+						</button>
+					{/if}
 				</div>
 			</div>
-			<div class="col-lg-8 col-md-12">
-				{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
-					<button class="btn btn-danger" on:click={stopWorkflow}>
-						<i class="bi-stop-circle-fill" /> Stop workflow
-					</button>
-				{:else if !hasAnyJobRun}
+		</div>
+
+		<div class="col-lg-4 mb-2">
+			<div class="float-end">
+				{#if $page.data.userInfo.is_superuser}
 					<button
-						class="btn btn-success"
-						on:click|preventDefault={() => openRunWorkflowModal('run')}
-						disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
-					>
-						<i class="bi-play-fill" /> Run workflow
-					</button>
-				{:else}
-					<button
-						class="btn btn-success"
-						on:click|preventDefault={() => openRunWorkflowModal('continue')}
+						class="btn btn-light"
+						on:click|preventDefault={() => typeFiltersFlowModal.open()}
 						disabled={workflow.task_list.length === 0}
 					>
-						<i class="bi-play-fill" /> Continue workflow
-					</button>
-					<button
-						class="btn btn-primary"
-						on:click|preventDefault={() => openRunWorkflowModal('restart')}
-						disabled={workflow.task_list.length === 0}
-					>
-						<i class="bi bi-arrow-clockwise" /> Restart workflow
+						Type filters flow
 					</button>
 				{/if}
-			</div>
-		</div>
-	</div>
-
-	<div class="col-lg-4 mb-2">
-		<div class="float-end">
-			{#if $page.data.userInfo.is_superuser}
+				<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+					<i class="bi-journal-code" /> List jobs
+				</a>
 				<button
 					class="btn btn-light"
-					on:click|preventDefault={() => typeFiltersFlowModal.open()}
-					disabled={workflow.task_list.length === 0}
+					on:click|preventDefault={handleExportWorkflow}
+					aria-label="Export workflow"
 				>
-					Type filters flow
+					<i class="bi-download" />
 				</button>
-			{/if}
-			<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
-				<i class="bi-journal-code" /> List jobs
-			</a>
-			<button
-				class="btn btn-light"
-				on:click|preventDefault={handleExportWorkflow}
-				aria-label="Export workflow"
-			>
-				<i class="bi-download" />
-			</button>
-			<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-			<button
-				class="btn btn-light"
-				data-bs-toggle="modal"
-				data-bs-target="#editWorkflowModal"
-				on:click={resetWorkflowUpdateModal}
-			>
-				<i class="bi-pencil" />
-			</button>
+				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
+				<button
+					class="btn btn-light"
+					data-bs-toggle="modal"
+					data-bs-target="#editWorkflowModal"
+					on:click={resetWorkflowUpdateModal}
+				>
+					<i class="bi-pencil" />
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -779,7 +782,7 @@
 		</div>
 	{/if}
 
-	<div class="container mt-3 px-0">
+	<div class="container mt-2">
 		<div class="row">
 			<div class="col-4">
 				<div class="card">

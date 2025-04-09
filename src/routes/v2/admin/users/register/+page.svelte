@@ -75,23 +75,25 @@
 	});
 </script>
 
-<nav aria-label="breadcrumb">
-	<ol class="breadcrumb mb-4">
-		<li class="breadcrumb-item">
-			<a href="/v2/admin">Admin area</a>
-		</li>
-		<li class="breadcrumb-item">
-			<a href="/v2/admin/users">Manage users</a>
-		</li>
-		<li class="breadcrumb-item active" aria-current="page">Registering new user</li>
-	</ol>
-</nav>
+<div class="container mt-3">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb mb-4">
+			<li class="breadcrumb-item">
+				<a href="/v2/admin">Admin area</a>
+			</li>
+			<li class="breadcrumb-item">
+				<a href="/v2/admin/users">Manage users</a>
+			</li>
+			<li class="breadcrumb-item active" aria-current="page">Registering new user</li>
+		</ol>
+	</nav>
 
-{#if created === true && verified === false}
-	<div class="alert alert-warning">
-		<strong>Warning</strong>: The user was created but an error happened while setting the
-		<code>is_verified</code> flag on it.
-	</div>
-{/if}
+	{#if created === true && verified === false}
+		<div class="alert alert-warning">
+			<strong>Warning</strong>: The user was created but an error happened while setting the
+			<code>is_verified</code> flag on it.
+		</div>
+	{/if}
 
-<UserEditor {user} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+	<UserEditor {user} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+</div>

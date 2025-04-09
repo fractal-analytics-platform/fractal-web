@@ -17,26 +17,32 @@
 		.sort(sortGroupByNameAllFirstComparator);
 </script>
 
-<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item">
-			<a href="/v2/admin">Admin area</a>
-		</li>
-		<li class="breadcrumb-item">
-			<a href="/v2/admin/users">Manage users</a>
-		</li>
-		<li class="breadcrumb-item active" aria-current="page">
-			User #{user.id} ({user.email})
-		</li>
-	</ol>
-</nav>
+<div class="container mt-3">
+	<div class="row">
+		<div class="col">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a href="/v2/admin">Admin area</a>
+					</li>
+					<li class="breadcrumb-item">
+						<a href="/v2/admin/users">Manage users</a>
+					</li>
+					<li class="breadcrumb-item active" aria-current="page">
+						User #{user.id} ({user.email})
+					</li>
+				</ol>
+			</nav>
 
-<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary float-end">
-	<i class="bi bi-pencil" />
-	Edit
-</a>
+			<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary float-end">
+				<i class="bi bi-pencil" />
+				Edit
+			</a>
+		</div>
+	</div>
+</div>
 
-<div class="row mt-4">
+<div class="container">
 	<div class="col-md-10 col-lg-8">
 		<table class="table">
 			<tbody>

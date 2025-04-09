@@ -73,52 +73,54 @@
 	}
 </script>
 
-<button class="btn btn-primary float-end" on:click={openCreateGroupModal}>
-	Create new group
-</button>
+<div class="container mt-3">
+	<button class="btn btn-primary float-end" on:click={openCreateGroupModal}>
+		Create new group
+	</button>
 
-<h1 class="fw-light">Groups list</h1>
+	<h1 class="fw-light">Groups list</h1>
 
-<table class="table mt-3">
-	<thead>
-		<tr>
-			<th>Id</th>
-			<th>Name</th>
-			<th>Number of users</th>
-			<th>Number of viewer paths</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each groups as group}
+	<table class="table mt-3">
+		<thead>
 			<tr>
-				<td>{group.id}</td>
-				<td>{group.name}</td>
-				<td>{group.user_ids.length}</td>
-				<td>{group.viewer_paths.length}</td>
-				<td>
-					<a href="/v2/admin/groups/{group.id}" class="btn btn-light">
-						<i class="bi-info-circle" /> Info
-					</a>
-					<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary">
-						<i class="bi bi-pencil" /> Edit
-					</a>
-					{#if group.name !== 'All'}
-						<ConfirmActionButton
-							modalId="confirmGroupDeleteModal{group.id}"
-							style={'danger'}
-							btnStyle="danger"
-							buttonIcon="trash"
-							label={'Delete'}
-							message={`Delete group ${group.name}`}
-							callbackAction={() => handleGroupDelete(group.id)}
-						/>
-					{/if}
-				</td>
+				<th>Id</th>
+				<th>Name</th>
+				<th>Number of users</th>
+				<th>Number of viewer paths</th>
+				<th>Actions</th>
 			</tr>
-		{/each}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{#each groups as group}
+				<tr>
+					<td>{group.id}</td>
+					<td>{group.name}</td>
+					<td>{group.user_ids.length}</td>
+					<td>{group.viewer_paths.length}</td>
+					<td>
+						<a href="/v2/admin/groups/{group.id}" class="btn btn-light">
+							<i class="bi-info-circle" /> Info
+						</a>
+						<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary">
+							<i class="bi bi-pencil" /> Edit
+						</a>
+						{#if group.name !== 'All'}
+							<ConfirmActionButton
+								modalId="confirmGroupDeleteModal{group.id}"
+								style={'danger'}
+								btnStyle="danger"
+								buttonIcon="trash"
+								label={'Delete'}
+								message={`Delete group ${group.name}`}
+								callbackAction={() => handleGroupDelete(group.id)}
+							/>
+						{/if}
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+</div>
 
 <Modal id="createGroupModal" bind:this={createGroupModal} centered={true}>
 	<svelte:fragment slot="header">

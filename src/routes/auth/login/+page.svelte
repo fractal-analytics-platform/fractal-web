@@ -47,7 +47,7 @@
 	});
 </script>
 
-<div>
+<div class="container mt-3">
 	{#if userLoggedIn}
 		<div class="row mt-4">
 			<div class="col">

@@ -2,4 +2,6 @@
 	import TaskGroupActivities from '$lib/components/v2/tasks/TaskGroupActivities.svelte';
 </script>
 
-<TaskGroupActivities admin={false} />
+<div class="container mt-3">
+	<TaskGroupActivities admin={false} />
+</div>

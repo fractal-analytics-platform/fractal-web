@@ -152,35 +152,33 @@
 	{#if selectedSection === 'admin'}
 		<div class="admin-border" />
 	{/if}
-	<div class="container p-4">
-		{#if !server.alive}
-			<div class="alert alert-danger">
-				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
-			</div>
-		{/if}
-		{#if warningBanner}
-			<div class="alert alert-warning">
-				{#each warningBanner.split('\n') as line, index}
-					{#if index > 0}
-						<br />
-					{/if}
-					{line}
-				{/each}
-			</div>
-		{/if}
-		{#if userLoggedIn && !$page.data.userInfo.is_verified}
-			<div class="row">
-				<div class="col">
-					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle" />
-						<strong>Warning</strong>: as a non-verified user, you have limited access; please
-						contact an admin.
-					</div>
+	{#if !server.alive}
+		<div class="alert alert-danger">
+			Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
+		</div>
+	{/if}
+	{#if warningBanner}
+		<div class="alert alert-warning">
+			{#each warningBanner.split('\n') as line, index}
+				{#if index > 0}
+					<br />
+				{/if}
+				{line}
+			{/each}
+		</div>
+	{/if}
+	{#if userLoggedIn && !$page.data.userInfo.is_verified}
+		<div class="row">
+			<div class="col">
+				<div class="alert alert-warning">
+					<i class="bi bi-exclamation-triangle" />
+					<strong>Warning</strong>: as a non-verified user, you have limited access; please contact
+					an admin.
 				</div>
 			</div>
-		{/if}
-		<slot />
-	</div>
+		</div>
+	{/if}
+	<slot />
 	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:show={$navigating || loading}>
 		<div class="d-flex flex-grow-1 justify-content-center align-items-center">
 			<div class="spinner-border text-primary" role="status">

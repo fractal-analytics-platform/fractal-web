@@ -84,71 +84,73 @@
 	});
 </script>
 
-<h1 class="fw-light mb-4">My settings</h1>
+<div class="container mt-3">
+	<h1 class="fw-light mb-4">My settings</h1>
 
-<div class="row mb-4">
-	<div class="col-lg-2 col-sm-4 fw-bold">Project dir</div>
-	<div class="col-lg-6 col-sm-8">
-		{settings.project_dir || '-'}
-	</div>
-</div>
-{#if $page.data.runnerBackend !== 'local'}
-	{#if $page.data.runnerBackend === 'slurm'}
-		<div class="row mb-4">
-			<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
-			<div class="col-lg-6 col-sm-8">
-				{settings.slurm_user || '-'}
-			</div>
-		</div>
-	{/if}
-	{#if $page.data.runnerBackend === 'slurm_ssh'}
-		<div class="row mb-4">
-			<div class="col-lg-2 col-sm-4 fw-bold">SSH username</div>
-			<div class="col-lg-6 col-sm-8">
-				{settings.ssh_username || '-'}
-			</div>
-		</div>
-	{/if}
-	<div class="row mb-3">
-		<div class="col-lg-2 col-sm-4 fw-bold">SLURM accounts</div>
+	<div class="row mb-4">
+		<div class="col-lg-2 col-sm-4 fw-bold">Project dir</div>
 		<div class="col-lg-6 col-sm-8">
-			<div class="col-sm-9 has-validation">
-				{#each slurmAccounts as slurmAccount, i}
-					<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
-						<input
-							type="text"
-							class="form-control"
-							id={`slurmAccount-${i}`}
-							bind:value={slurmAccount}
-							class:is-invalid={slurmAccountsError}
-							aria-label="SLURM account {i + 1}"
-							required
-						/>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							id="slurm_account_remove_{i}"
-							aria-label="Remove SLURM account"
-							on:click={() => removeSlurmAccount(i)}
-						>
-							<i class="bi bi-trash" />
-						</button>
-					</div>
-				{/each}
-				<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
-				<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
-					<i class="bi bi-plus-circle" />
-					Add SLURM account
-				</button>
+			{settings.project_dir || '-'}
+		</div>
+	</div>
+	{#if $page.data.runnerBackend !== 'local'}
+		{#if $page.data.runnerBackend === 'slurm'}
+			<div class="row mb-4">
+				<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
+				<div class="col-lg-6 col-sm-8">
+					{settings.slurm_user || '-'}
+				</div>
+			</div>
+		{/if}
+		{#if $page.data.runnerBackend === 'slurm_ssh'}
+			<div class="row mb-4">
+				<div class="col-lg-2 col-sm-4 fw-bold">SSH username</div>
+				<div class="col-lg-6 col-sm-8">
+					{settings.ssh_username || '-'}
+				</div>
+			</div>
+		{/if}
+		<div class="row mb-3">
+			<div class="col-lg-2 col-sm-4 fw-bold">SLURM accounts</div>
+			<div class="col-lg-6 col-sm-8">
+				<div class="col-sm-9 has-validation">
+					{#each slurmAccounts as slurmAccount, i}
+						<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
+							<input
+								type="text"
+								class="form-control"
+								id={`slurmAccount-${i}`}
+								bind:value={slurmAccount}
+								class:is-invalid={slurmAccountsError}
+								aria-label="SLURM account {i + 1}"
+								required
+							/>
+							<button
+								class="btn btn-outline-secondary"
+								type="button"
+								id="slurm_account_remove_{i}"
+								aria-label="Remove SLURM account"
+								on:click={() => removeSlurmAccount(i)}
+							>
+								<i class="bi bi-trash" />
+							</button>
+						</div>
+					{/each}
+					<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
+					<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
+						<i class="bi bi-plus-circle" />
+						Add SLURM account
+					</button>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="row">
-		<div class="col">
-			<div id="settingsUpdate-error" />
-			<StandardDismissableAlert message={settingsUpdatedMessage} />
-			<button class="btn btn-primary" on:click={save}> Save </button>
+		<div class="row">
+			<div class="col">
+				<div id="settingsUpdate-error" />
+				<StandardDismissableAlert message={settingsUpdatedMessage} />
+				<button class="btn btn-primary" on:click={save}> Save </button>
+			</div>
 		</div>
-	</div>
-{/if}
+	{/if}
+</div>

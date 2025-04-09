@@ -108,161 +108,161 @@
 	}
 </script>
 
-<div>
+<div class="container mt-3">
 	<div class="d-flex justify-content-between align-items-center mb-3">
 		<h1 class="fw-light">Tasks</h1>
 	</div>
-</div>
 
-<div class="row">
-	<div class="col-lg-12">
-		<div class="row">
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="name">Name</label>
-						<PropertyDescription
-							description="Only include a task if its <code>name</code> contains this value (case insensitive)."
-							html={true}
-						/>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="row">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="name">Name</label>
+							<PropertyDescription
+								description="Only include a task if its <code>name</code> contains this value (case insensitive)."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={name} id="name" />
+						</div>
 					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<input type="text" class="form-control" bind:value={name} id="name" />
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="id">Id</label>
+							<PropertyDescription
+								description="Only include the task with this <code>id</code> (if any)."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="number" class="form-control" bind:value={id} id="id" />
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="version">Version</label>
+							<PropertyDescription
+								description="Only include a task if its <code>version</code> matches this value."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={version} id="version" />
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="id">Id</label>
-						<PropertyDescription
-							description="Only include the task with this <code>id</code> (if any)."
-							html={true}
-						/>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<input type="number" class="form-control" bind:value={id} id="id" />
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-4 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-						<label for="version">Version</label>
-						<PropertyDescription
-							description="Only include a task if its <code>version</code> matches this value."
-							html={true}
-						/>
-					</div>
-					<div class="col-xl-8 col-lg-7 col-9">
-						<input type="text" class="form-control" bind:value={version} id="version" />
-					</div>
-				</div>
-			</div>
-		</div>
 
-		<div class="row mt-lg-3">
-			<div class="col-xl-5 col-lg-6 pe-5">
-				<div class="row mt-1">
-					<div class="col-xl-7 col-lg-8 col-6 col-form-label">
-						<label for="max_number_of_results">Max number of results</label>
-						<PropertyDescription
-							description="Upper limit on the number of tasks in the response."
-							html={true}
-						/>
-					</div>
-					<div class="col-xl-4 col-lg-4 col-6">
-						<input
-							type="number"
-							class="form-control"
-							bind:value={max_number_of_results}
-							id="max_number_of_results"
-						/>
+			<div class="row mt-lg-3">
+				<div class="col-xl-5 col-lg-6 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-7 col-lg-8 col-6 col-form-label">
+							<label for="max_number_of_results">Max number of results</label>
+							<PropertyDescription
+								description="Upper limit on the number of tasks in the response."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-4 col-lg-4 col-6">
+							<input
+								type="number"
+								class="form-control"
+								bind:value={max_number_of_results}
+								id="max_number_of_results"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<button class="btn btn-primary mt-4" on:click={searchTasks} disabled={searching}>
-	{#if searching}
-		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-	{:else}
-		<i class="bi bi-search" />
-	{/if}
-	Search tasks
-</button>
-<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
-	Reset
-</button>
+	<button class="btn btn-primary mt-4" on:click={searchTasks} disabled={searching}>
+		{#if searching}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		{:else}
+			<i class="bi bi-search" />
+		{/if}
+		Search tasks
+	</button>
+	<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
+		Reset
+	</button>
 
-<div id="searchError" class="mt-3 mb-3" />
+	<div id="searchError" class="mt-3 mb-3" />
 
-<div class:d-none={!searched}>
-	<p class="text-center">
-		The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
-	</p>
+	<div class:d-none={!searched}>
+		<p class="text-center">
+			The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
+		</p>
 
-	{#if results.length > 0}
-		<table class="table tasks-table mt-4">
-			<colgroup>
-				<col width="60" />
-				<col width="auto" />
-				<col width="90" />
-				<col width="120" />
-				<col width="150" />
-				<col width="100" />
-			</colgroup>
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Name</th>
-					<th>Version</th>
-					<th># Workflows</th>
-					<th># Users</th>
-					<th>Options</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each results as taskInfo, taskInfoIndex}
-					<tr class:row-grey={taskInfoIndex % 2 === 0}>
-						<td>{taskInfo.task.id}</td>
-						<td>{taskInfo.task.name}</td>
-						<td>{taskInfo.task.version || '-'}</td>
-						<td>
-							{taskInfo.relationships.length || '-'}
-						</td>
-						<td>
-							{#if getUsers(taskInfo).length > 0}
-								{getUsers(taskInfo).length}
-								<button
-									class="btn btn-link"
-									id="users-list-toggler-{taskInfoIndex}"
-									on:click={() => toggleUsersList(taskInfoIndex)}
-								>
-									Show
-								</button>
-								<div class="d-none" id="users-list-{taskInfoIndex}">
-									{#each getUsers(taskInfo) as user}
-										{user}<br />
-									{/each}
-								</div>
-							{:else}
-								-
-							{/if}
-						</td>
-						<td>
-							<button class="btn btn-light" on:click={() => openInfoModal(taskInfo)}>
-								<i class="bi bi-info-circle" />
-								Info
-							</button>
-						</td>
+		{#if results.length > 0}
+			<table class="table tasks-table mt-4">
+				<colgroup>
+					<col width="60" />
+					<col width="auto" />
+					<col width="90" />
+					<col width="120" />
+					<col width="150" />
+					<col width="100" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Name</th>
+						<th>Version</th>
+						<th># Workflows</th>
+						<th># Users</th>
+						<th>Options</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{/if}
+				</thead>
+				<tbody>
+					{#each results as taskInfo, taskInfoIndex}
+						<tr class:row-grey={taskInfoIndex % 2 === 0}>
+							<td>{taskInfo.task.id}</td>
+							<td>{taskInfo.task.name}</td>
+							<td>{taskInfo.task.version || '-'}</td>
+							<td>
+								{taskInfo.relationships.length || '-'}
+							</td>
+							<td>
+								{#if getUsers(taskInfo).length > 0}
+									{getUsers(taskInfo).length}
+									<button
+										class="btn btn-link"
+										id="users-list-toggler-{taskInfoIndex}"
+										on:click={() => toggleUsersList(taskInfoIndex)}
+									>
+										Show
+									</button>
+									<div class="d-none" id="users-list-{taskInfoIndex}">
+										{#each getUsers(taskInfo) as user}
+											{user}<br />
+										{/each}
+									</div>
+								{:else}
+									-
+								{/if}
+							</td>
+							<td>
+								<button class="btn btn-light" on:click={() => openInfoModal(taskInfo)}>
+									<i class="bi bi-info-circle" />
+									Info
+								</button>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
+	</div>
 </div>
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>

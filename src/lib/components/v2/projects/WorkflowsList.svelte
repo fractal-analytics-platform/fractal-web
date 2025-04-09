@@ -59,35 +59,33 @@
 
 <CreateWorkflowModal {handleWorkflowImported} bind:this={createWorkflowModal} />
 
-<div class="container p-0 mt-5">
-	<div class="row">
-		<div class="col-sm-2">
-			<h3 class="fw-light">Workflows</h3>
-		</div>
-		<div class="col-sm-10 mb-2">
-			<div class="row justify-content-end">
-				<div class="col-auto">
-					<div class="input-group">
-						<input
-							name="searchWorkflow"
-							type="text"
-							class="form-control"
-							placeholder="Search workflow"
-							bind:value={workflowSearch}
-						/>
-					</div>
+<div class="container mt-5">
+	<div class="col-sm-2">
+		<h3 class="fw-light">Workflows</h3>
+	</div>
+	<div class="col-sm-10 mb-2">
+		<div class="row justify-content-end">
+			<div class="col-auto">
+				<div class="input-group">
+					<input
+						name="searchWorkflow"
+						type="text"
+						class="form-control"
+						placeholder="Search workflow"
+						bind:value={workflowSearch}
+					/>
 				</div>
-				<div class="col-auto">
-					<button
-						class="btn btn-primary float-end"
-						type="submit"
-						on:click={() => {
-							createWorkflowModal.show();
-						}}
-					>
-						Create new workflow
-					</button>
-				</div>
+			</div>
+			<div class="col-auto">
+				<button
+					class="btn btn-primary float-end"
+					type="submit"
+					on:click={() => {
+						createWorkflowModal.show();
+					}}
+				>
+					Create new workflow
+				</button>
 			</div>
 		</div>
 	</div>

@@ -40,18 +40,20 @@
 	}
 </script>
 
-<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item">
-			<a href="/v2/admin">Admin area</a>
-		</li>
-		<li class="breadcrumb-item">
-			<a href="/v2/admin/users">Manage users</a>
-		</li>
-		<li class="breadcrumb-item active" aria-current="page">
-			Editing user #{user.id} ({user.email})
-		</li>
-	</ol>
-</nav>
+<div class="container mt-3">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">
+				<a href="/v2/admin">Admin area</a>
+			</li>
+			<li class="breadcrumb-item">
+				<a href="/v2/admin/users">Manage users</a>
+			</li>
+			<li class="breadcrumb-item active" aria-current="page">
+				Editing user #{user.id} ({user.email})
+			</li>
+		</ol>
+	</nav>
 
-<UserEditor {user} {settings} {groups} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+	<UserEditor {user} {settings} {groups} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+</div>
