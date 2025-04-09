@@ -762,27 +762,29 @@
 <TypeFiltersFlowModal {workflow} bind:this={typeFiltersFlowModal} />
 
 {#if workflow}
-	<StandardDismissableAlert message={workflowSuccessMessage} />
+	<div class="container">
+		<StandardDismissableAlert message={workflowSuccessMessage} />
 
-	<div id="workflowErrorAlert" />
+		<div id="workflowErrorAlert" />
 
-	{#if jobError}
-		<div class="alert border border-danger bg-light">
-			<div class="row">
-				<div class="col-md-10 col-sm-9">
-					<div class="text-muted mb-2 fw-bolder">The last job failed with the following error:</div>
-					<pre class="text-danger mb-0">{jobError}</pre>
-				</div>
-				<div class="col-md-2 col-sm-3">
-					<button class="btn btn-outline-secondary float-end" on:click={showJobLogsModal}>
-						Show complete log
-					</button>
+		{#if jobError}
+			<div class="alert border border-danger bg-light">
+				<div class="row">
+					<div class="col-md-10 col-sm-9">
+						<div class="text-muted mb-2 fw-bolder">
+							The last job failed with the following error:
+						</div>
+						<pre class="text-danger mb-0">{jobError}</pre>
+					</div>
+					<div class="col-md-2 col-sm-3">
+						<button class="btn btn-outline-secondary float-end" on:click={showJobLogsModal}>
+							Show complete log
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
 
-	<div class="container mt-2">
 		<div class="row">
 			<div class="col-4">
 				<div class="card">

@@ -153,27 +153,33 @@
 		<div class="admin-border" />
 	{/if}
 	{#if !server.alive}
-		<div class="alert alert-danger">
-			Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
+		<div class="container mt-3">
+			<div class="alert alert-danger">
+				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
+			</div>
 		</div>
 	{/if}
 	{#if warningBanner}
-		<div class="alert alert-warning">
-			{#each warningBanner.split('\n') as line, index}
-				{#if index > 0}
-					<br />
-				{/if}
-				{line}
-			{/each}
+		<div class="container mt-3">
+			<div class="alert alert-warning">
+				{#each warningBanner.split('\n') as line, index}
+					{#if index > 0}
+						<br />
+					{/if}
+					{line}
+				{/each}
+			</div>
 		</div>
 	{/if}
 	{#if userLoggedIn && !$page.data.userInfo.is_verified}
-		<div class="row">
-			<div class="col">
-				<div class="alert alert-warning">
-					<i class="bi bi-exclamation-triangle" />
-					<strong>Warning</strong>: as a non-verified user, you have limited access; please contact
-					an admin.
+		<div class="container mt-3">
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-warning">
+						<i class="bi bi-exclamation-triangle" />
+						<strong>Warning</strong>: as a non-verified user, you have limited access; please
+						contact an admin.
+					</div>
 				</div>
 			</div>
 		</div>
