@@ -14,7 +14,6 @@
 * Added a "Get URL" button to image list (\#759);
 * Supported converter task types (\#759);
 * Made user sorting case insensitive (\#759);
-* Set the UI width to full window width (\#759);
 
 # 1.16.2
 

@@ -52,7 +52,7 @@
 
 <StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
 
-<div class="p-0 mt-4">
+<div class="container p-0 mt-4">
 	<div class="row">
 		<div class="col-sm-2">
 			<h3 class="fw-light">Datasets</h3>

@@ -779,7 +779,7 @@
 		</div>
 	{/if}
 
-	<div class="mt-3 px-0">
+	<div class="container mt-3 px-0">
 		<div class="row">
 			<div class="col-4">
 				<div class="card">

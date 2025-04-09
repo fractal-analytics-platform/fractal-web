@@ -86,7 +86,7 @@
 
 <main>
 	<nav class="bg-light border-bottom">
-		<div class="d-flex flex-wrap">
+		<div class="container d-flex flex-wrap">
 			<ul class="nav me-auto">
 				<li class="nav-item">
 					<a href="/" class="nav-link" id="home-link" class:active={selectedSection === 'home'}>
@@ -152,7 +152,7 @@
 	{#if selectedSection === 'admin'}
 		<div class="admin-border" />
 	{/if}
-	<div class="p-4">
+	<div class="container p-4">
 		{#if !server.alive}
 			<div class="alert alert-danger">
 				Sorry, we are performing some maintenance on fractal-server. It will be back online soon.
@@ -188,18 +188,22 @@
 			</div>
 		</div>
 	</div>
-	<footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-		<div class="col d-flex justify-content-center">
-			<div class="hstack gap-3">
-				<span class="font-monospace">
-					{#if server.version}
-						fractal-server {server.version},
-					{/if}
-					fractal-web {clientVersion}
-				</span>
+	<div class="container">
+		<footer
+			class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
+		>
+			<div class="col d-flex justify-content-center">
+				<div class="hstack gap-3">
+					<span class="font-monospace">
+						{#if server.version}
+							fractal-server {server.version},
+						{/if}
+						fractal-web {clientVersion}
+					</span>
+				</div>
 			</div>
-		</div>
-	</footer>
+		</footer>
+	</div>
 </main>
 
 <style>
