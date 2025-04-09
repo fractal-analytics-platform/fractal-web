@@ -111,8 +111,6 @@
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
 
-	let mounted = false;
-
 	$: updatableWorkflowList = workflow.task_list || [];
 
 	$: sortedDatasets = datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
@@ -122,11 +120,9 @@
 		: 3000;
 
 	onMount(async () => {
-		mounted = false;
 		selectedDatasetId = getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId);
 		await loadJobsStatus();
 		await checkNewVersions();
-		mounted = true;
 	});
 
 	beforeNavigate((navigation) => {
@@ -815,7 +811,7 @@
 
 					{#if workflow.task_list.length == 0}
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
-					{:else if mounted}
+					{:else}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
 							{#each workflow.task_list as workflowTask}
 								<button
