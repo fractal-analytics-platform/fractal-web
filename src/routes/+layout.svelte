@@ -82,6 +82,22 @@
 		await invalidateAll();
 		goto('/');
 	}
+
+	async function getToken() {
+		const response = await fetch(`/profile/token`);
+		if (response.ok) {
+			const { token } = await response.json();
+			await navigator.clipboard.writeText(token);
+			const toastElement = document.getElementById('tokenCopiedToast');
+			if (!toastElement) {
+				return;
+			}
+			// @ts-expect-error
+			// eslint-disable-next-line no-undef
+			const toast = new bootstrap.Toast(toastElement);
+			toast.show();
+		}
+	}
 </script>
 
 <main>
@@ -118,7 +134,7 @@
 			</ul>
 			<ul class="nav">
 				{#if userLoggedIn}
-					<li class="nav-item dropdown">
+					<li class="nav-item dropdown" id="user-menu">
 						<a
 							class="nav-link dropdown-toggle"
 							href="#user"
@@ -136,6 +152,9 @@
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}
 							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
+							<li>
+								<button class="dropdown-item" on:click={getToken}> Get token </button>
+							</li>
 							<li><button class="dropdown-item" on:click={logout}>Logout</button></li>
 						</ul>
 					</li>
@@ -207,6 +226,25 @@
 				</div>
 			</div>
 		</footer>
+	</div>
+	<div class="toast-container position-fixed bottom-0 end-0 p-3">
+		<div
+			id="tokenCopiedToast"
+			class="toast align-items-center text-bg-info border-0"
+			role="alert"
+			aria-live="assertive"
+			aria-atomic="true"
+		>
+			<div class="d-flex">
+				<div class="toast-body">Token copied to clipboard</div>
+				<button
+					type="button"
+					class="btn-close btn-close-white me-2 m-auto"
+					data-bs-dismiss="toast"
+					aria-label="Close"
+				/>
+			</div>
+		</div>
 	</div>
 </main>
 

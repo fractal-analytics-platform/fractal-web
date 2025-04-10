@@ -15,6 +15,7 @@
 * Supported converter task types (\#759);
 * Made user sorting case insensitive (\#759);
 * Moved tasks table links to the info modal (\#759);
+* Removed "Download token" button from profile page, added "Get token" button to main dropdown menu (\#759);
 
 # 1.16.2
 
