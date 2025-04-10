@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { waitPageLoading } from './utils.js';
 
+test.use({
+	permissions: ['clipboard-write']
+});
+
 test('Copy token test', async ({ page }) => {
 	await page.goto('/profile');
 	await waitPageLoading(page);
