@@ -1,10 +1,8 @@
 <script>
 	import { isParallelType } from 'fractal-components';
 
-	/** @type {number} */
-	export let projectId;
-	/** @type {number} */
-	export let datasetId;
+	/** @type {import('fractal-components/types/api').DatasetV2} */
+	export let dataset;
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated} */
@@ -17,7 +15,7 @@
 	$: showNumbers = isParallelType(workflowTask.task_type);
 
 	function openModal() {
-		runStatusModal.open(projectId, run.id, datasetId, workflowTask.id, index);
+		runStatusModal.open(run.id, dataset, workflowTask, index);
 	}
 </script>
 

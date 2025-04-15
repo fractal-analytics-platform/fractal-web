@@ -105,3 +105,19 @@ function getDatasetSelectionsFromLocalStorage() {
 	}
 	return [];
 }
+
+/**
+ * @param {import("fractal-components/types/api").DatasetV2} dataset
+ * @param {string} zarrUrl
+ * @returns {string}
+ */
+export function getRelativeZarrPath(dataset, zarrUrl) {
+	if (!zarrUrl.startsWith(dataset.zarr_dir)) {
+		return zarrUrl;
+	}
+	const relativePath = zarrUrl.substring(dataset.zarr_dir.length);
+	if (relativePath.startsWith('/')) {
+		return relativePath.substring(1);
+	}
+	return relativePath;
+}

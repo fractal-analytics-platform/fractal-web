@@ -6,6 +6,7 @@
 	import Modal from '../common/Modal.svelte';
 	import Paginator from '../common/Paginator.svelte';
 	import { tick } from 'svelte';
+	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
 	let loading = false;
 	let page = 1;
@@ -13,13 +14,11 @@
 	let totalCount = 0;
 
 	/** @type {number} */
-	let projectId;
-	/** @type {number} */
 	let historyRunId;
-	/** @type {number} */
-	let datasetId;
-	/** @type {number} */
-	let workflowTaskId;
+	/** @type {import('fractal-components/types/api').DatasetV2} */
+	let dataset;
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
+	let workflowTask;
 	/** @type {number} */
 	let historyRunIndex;
 
@@ -45,24 +44,16 @@
 	let statusFilterSelector = undefined;
 
 	/**
-	 * @param {number} _projectId
 	 * @param {number} _historyRunId
-	 * @param {number} _datasetId
-	 * @param {number} _workflowTaskId
+	 * @param {import('fractal-components/types/api').DatasetV2} _dataset
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} _workflowTask
 	 * @param {number} _historyRunIndex
 	 */
-	export async function open(
-		_projectId,
-		_historyRunId,
-		_datasetId,
-		_workflowTaskId,
-		_historyRunIndex
-	) {
+	export async function open(_historyRunId, _dataset, _workflowTask, _historyRunIndex) {
 		loading = true;
-		projectId = _projectId;
 		historyRunId = _historyRunId;
-		datasetId = _datasetId;
-		workflowTaskId = _workflowTaskId;
+		dataset = _dataset;
+		workflowTask = _workflowTask;
 		historyRunIndex = _historyRunIndex;
 		selectedUnit = undefined;
 		showLogs = false;
@@ -88,7 +79,7 @@
 	 */
 	async function loadRun(currentPage, selectedPageSize) {
 		loading = true;
-		let url = `/api/v2/project/${projectId}/status/run/${historyRunId}/units?workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}&page=${currentPage}&page_size=${selectedPageSize}`;
+		let url = `/api/v2/project/${dataset.project_id}/status/run/${historyRunId}/units?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}&page=${currentPage}&page_size=${selectedPageSize}`;
 		if (statusFilter) {
 			url += `&unit_status=${statusFilter}`;
 		}
@@ -114,7 +105,7 @@
 		unsetStatusFilterSelector();
 		loadingLogs = true;
 		const response = await fetch(
-			`/api/v2/project/${projectId}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTaskId}&dataset_id=${datasetId}`,
+			`/api/v2/project/${dataset.project_id}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}`,
 			{
 				method: 'GET'
 			}
@@ -153,6 +144,7 @@
 		selectedUnit = undefined;
 		await tick();
 		setStatusFilterSelector();
+		restoreModalFocus();
 	}
 
 	function setStatusFilterSelector() {
@@ -211,6 +203,9 @@
 			modal.focus();
 		}
 	}
+
+	$: hasZarrUrlsInTable =
+		data !== undefined && data.items.find((u) => u.zarr_urls.length === 1) !== undefined;
 </script>
 
 <Modal id="runStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
@@ -247,11 +242,15 @@
 				<div class="col">
 					<table class="table table-striped">
 						<tbody>
-							{#each selectedUnit.zarr_urls as zarrUrl}
-								<tr>
-									<td>{zarrUrl}</td>
-								</tr>
-							{/each}
+							{#if selectedUnit.zarr_urls.length === 0}
+								<p class="ms-3 mb-0 mt-2">No Zarr URLs</p>
+							{:else}
+								{#each selectedUnit.zarr_urls as zarrUrl}
+									<tr>
+										<td>{zarrUrl}</td>
+									</tr>
+								{/each}
+							{/if}
 						</tbody>
 					</table>
 				</div>
@@ -264,14 +263,23 @@
 		{:else if data}
 			<table class="table table-striped">
 				<colgroup>
-					<col width="30%" />
-					<col width="30%" />
-					<col width="40%" />
+					{#if hasZarrUrlsInTable}
+						<col width="10%" />
+						<col width="20%" />
+						<col width="60%" />
+						<col width="10%" />
+					{:else}
+						<col width="20%" />
+						<col width="30%" />
+						<col width="30%" />
+						<col width="20%" />
+					{/if}
 				</colgroup>
 				<thead>
 					<tr>
 						<th>Unit id</th>
 						<th>Status</th>
+						<th>Zarr URLs</th>
 						<th />
 					</tr>
 					<tr>
@@ -288,6 +296,17 @@
 							<td>{unit.id}</td>
 							<td>{unit.status || '-'}</td>
 							<td>
+								{#if unit.zarr_urls.length === 0}
+									-
+								{:else if unit.zarr_urls.length === 1}
+									{getRelativeZarrPath(dataset, unit.zarr_urls[0])}
+								{:else}
+									<button class="btn btn-light" on:click={() => displayZarrUrls(unit)}>
+										<i class="bi bi-list-task" /> Zarr URLs
+									</button>
+								{/if}
+							</td>
+							<td>
 								<button
 									class="btn btn-light me-2"
 									on:click={() => loadLogs(unit)}
@@ -301,9 +320,6 @@
 										/>
 									{/if}
 									<i class="bi-list-columns-reverse" /> Logs
-								</button>
-								<button class="btn btn-light" on:click={() => displayZarrUrls(unit)}>
-									<i class="bi bi-list-task" /> Zarr URLs
 								</button>
 							</td>
 						</tr>

@@ -885,14 +885,13 @@
 										>
 											Run {index + 1}
 											<span class="float-end ps-2">
-												{#if selectedDatasetId !== undefined}
+												{#if selectedDataset}
 													<RunStatus
 														run={status}
 														index={index + 1}
 														{runStatusModal}
 														{workflowTask}
-														projectId={workflow.project_id}
-														datasetId={selectedDatasetId}
+														dataset={selectedDataset}
 													/>
 												{/if}
 											</span>

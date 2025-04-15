@@ -14,6 +14,7 @@
 	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/environment';
+	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -139,21 +140,6 @@
 		lastAppliedImagesStatusFilter !== imagesStatusFilter;
 
 	let resetBtnActive = false;
-
-	/**
-	 * @param {string} zarrUrl
-	 * @returns {string}
-	 */
-	function getRelativePath(zarrUrl) {
-		if (!zarrUrl.startsWith(dataset.zarr_dir)) {
-			return zarrUrl;
-		}
-		const relativePath = zarrUrl.substring(dataset.zarr_dir.length);
-		if (relativePath.startsWith('/')) {
-			return relativePath.substring(1);
-		}
-		return relativePath;
-	}
 
 	export async function applySearchFields() {
 		searching = true;
@@ -767,7 +753,7 @@
 				<tbody>
 					{#each imagePage.items as image, index}
 						<tr>
-							<td>{getRelativePath(image.zarr_url)}</td>
+							<td>{getRelativeZarrPath(dataset, image.zarr_url)}</td>
 							{#if imagesStatusModal}
 								<td>
 									{image.status || '-'}
