@@ -45,7 +45,7 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	});
 
 	await test.step('Open cellpose_segmentation images modal', async () => {
-		await page.getByLabel('Done images').nth(1).click();
+		await page.getByLabel('Done images').nth(0).click();
 		await modal.waitFor();
 		await expect(modal.getByLabel('Selector for type 3D')).toBeEnabled();
 		await expect(modal.getByText('Total results: 4')).toBeVisible();
@@ -57,7 +57,7 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	});
 
 	await test.step('Open MIP_compound images modal', async () => {
-		await page.getByLabel('Done images').nth(2).click();
+		await page.getByLabel('Done images').nth(1).click();
 		await modal.waitFor();
 		await expect(modal.getByLabel('Selector for type 3D')).toHaveClass(/ss-disabled/);
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
