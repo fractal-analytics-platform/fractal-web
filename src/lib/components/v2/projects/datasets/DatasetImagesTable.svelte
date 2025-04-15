@@ -629,18 +629,18 @@
 
 {#if !showTable}
 	{#if !runWorkflowModal && !imagesStatusModal}
-		<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
-		<button class="btn btn-outline-secondary ms-4" on:click={() => imageModal?.openForCreate()}>
-			<i class="bi bi-plus-circle" />
-			Add an image list entry
-		</button>
+		<div class="container">
+			<p class="fw-bold mt-5">No entries in the image list yet</p>
+			<button class="btn btn-outline-secondary" on:click={() => imageModal?.openForCreate()}>
+				<i class="bi bi-plus-circle" />
+				Add an image list entry
+			</button>
+		</div>
 	{/if}
 {:else}
 	<div>
-		<div class="row">
-			<div class="col">
-				<div id="datasetImagesError" class="mt-2 mb-2" />
-			</div>
+		<div class="container">
+			<div id="datasetImagesError" class="mt-2 mb-2" />
 		</div>
 
 		<div class="table-responsive mt-2">
