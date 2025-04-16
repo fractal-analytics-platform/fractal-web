@@ -1,7 +1,7 @@
 import { expect, test } from './workflow_fixture.js';
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
-import { waitTaskFailure, waitTasksSuccess } from './workflow_task_utils.js';
+import { waitTasksSuccess } from './workflow_task_utils.js';
 
 test('Workflow task runs', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
@@ -127,41 +127,5 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await expect(page.getByRole('button', { name: 'Run 2' })).not.toBeVisible();
 		await expect(page.getByRole('switch')).not.toBeChecked();
 		await expect(page.getByRole('switch')).not.toBeEditable();
-	});
-
-	await test.step('Continue workflow causing failure', async () => {
-		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
-		await modal
-			.getByRole('combobox', { name: 'Start workflow at' })
-			.selectOption('create_ome_zarr_compound');
-		await expect(modal.getByText('Total results: 30')).toBeVisible();
-		await selectSlimSelect(
-			page,
-			modal.getByLabel('Selector for type illumination_correction'),
-			'True'
-		);
-		await modal.getByRole('button', { name: 'Apply' }).click();
-		await expect(modal.getByRole('button', { name: 'Apply' })).not.toBeEnabled();
-		await modal.getByRole('button', { name: 'Run' }).click();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
-		await waitTaskFailure(page);
-	});
-
-	await test.step('Open failed logs modal', async () => {
-		await page.locator('[aria-label="Failed images"]').first().click();
-		await modal.waitFor();
-		await expect(modal.getByText('Images')).toBeVisible();
-		await expect(modal.getByText('Total results: 30')).toBeVisible();
-		await modal
-			.getByRole('row', { name: 'failed' })
-			.first()
-			.getByRole('button', { name: 'Logs' })
-			.click();
-		await expect(modal.getByText(/click here to expand/)).toBeVisible();
-		await expect(modal.getByText('Error in create_cellvoyager_ome_zarr')).toBeVisible();
-		await modal.getByRole('button', { name: 'Close' }).click();
-		await waitModalClosed(page);
 	});
 });

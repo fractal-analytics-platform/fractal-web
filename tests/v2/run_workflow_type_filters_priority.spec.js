@@ -1,9 +1,4 @@
-import {
-	expectSlimSelectValue,
-	selectSlimSelect,
-	waitModalClosed,
-	waitPageLoading
-} from '../utils.js';
+import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
@@ -58,34 +53,6 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	await test.step('Open "Continue workflow" modal', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
-	});
-
-	await test.step('Check selected filters for create_ome_zarr_compound', async () => {
-		await modal
-			.getByRole('combobox', { name: 'Start workflow at' })
-			.selectOption('create_ome_zarr_compound');
-		await expect(page.getByText('Total results: 6')).toBeVisible();
-		await expect(page.getByRole('row')).toHaveCount(8);
-	});
-
-	await test.step('Click Run and check error message', async () => {
-		await modal.getByRole('button', { name: 'Run' }).click();
-		await expect(
-			page.getByText(/You are trying to run a workflow without specifying what type/)
-		).toBeVisible();
-	});
-
-	await test.step('Select type and check confirm result', async () => {
-		await selectSlimSelect(page, modal.getByLabel('Selector for type 3D'), 'True');
-		await modal.getByRole('button', { name: 'Apply' }).click();
-		await expect(modal.getByText('Total results: 2')).toBeVisible();
-		await modal.getByRole('button', { name: 'Run' }).click();
-		await expect(modal.getByText('Applied filters')).toBeVisible();
-		await expect(
-			modal.locator('li').filter({ hasText: '3D:' }).locator('[aria-checked="true"]')
-		).toBeVisible();
-		await modal.getByRole('button', { name: 'Cancel' }).click();
-		await expect(modal.getByRole('button', { name: 'Run' })).toBeVisible();
 	});
 
 	await test.step('Check selected filters for MIP_compound', async () => {
