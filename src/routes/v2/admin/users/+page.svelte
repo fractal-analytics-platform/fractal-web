@@ -33,56 +33,58 @@
 	});
 </script>
 
-<a href="/v2/admin/users/register" class="btn btn-primary float-end">
-	<i class="bi bi-person-fill-add" />
-	Register new user
-</a>
-
-<h1 class="fw-light">Users list</h1>
-
-<table class="table mt-3">
-	<thead>
-		<tr>
-			<th>Id</th>
-			<th>E-mail</th>
-			<th>Username</th>
-			<th>Active</th>
-			<th>Superuser</th>
-			<th>Verified</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#key users}
-			{#each users as user}
-				<tr class="align-middle">
-					<td>{user.id}</td>
-					<td>{user.email}</td>
-					<td>{user.username || '-'}</td>
-					<td><BooleanIcon value={user.is_active} /></td>
-					<td><BooleanIcon value={user.is_superuser} /></td>
-					<td><BooleanIcon value={user.is_verified} /></td>
-					<td>
-						<a href="/v2/admin/users/{user.id}" class="btn btn-light">
-							<i class="bi-info-circle" /> Info
-						</a>
-						<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary">
-							<i class="bi bi-pencil" /> Edit
-						</a>
-						{#if deleteEnabled && user.email !== $page.data.userInfo.email}
-							<ConfirmActionButton
-								modalId={'confirmDeleteProject' + user.id}
-								style={'danger'}
-								btnStyle="danger"
-								message="Delete user {user.email}"
-								buttonIcon="trash"
-								label="Delete"
-								callbackAction={() => handleDeleteUser(user.id)}
-							/>
-						{/if}
-					</td>
-				</tr>
-			{/each}
-		{/key}
-	</tbody>
-</table>
+<div class="container mt-3">
+	<a href="/v2/admin/users/register" class="btn btn-primary float-end">
+		<i class="bi bi-person-fill-add" />
+		Register new user
+	</a>
+	
+	<h1 class="fw-light">Users list</h1>
+	
+	<table class="table mt-3">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>E-mail</th>
+				<th>Username</th>
+				<th>Active</th>
+				<th>Superuser</th>
+				<th>Verified</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#key users}
+				{#each users as user}
+					<tr class="align-middle">
+						<td>{user.id}</td>
+						<td>{user.email}</td>
+						<td>{user.username || '-'}</td>
+						<td><BooleanIcon value={user.is_active} /></td>
+						<td><BooleanIcon value={user.is_superuser} /></td>
+						<td><BooleanIcon value={user.is_verified} /></td>
+						<td>
+							<a href="/v2/admin/users/{user.id}" class="btn btn-light">
+								<i class="bi-info-circle" /> Info
+							</a>
+							<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary">
+								<i class="bi bi-pencil" /> Edit
+							</a>
+							{#if deleteEnabled && user.email !== $page.data.userInfo.email}
+								<ConfirmActionButton
+									modalId={'confirmDeleteProject' + user.id}
+									style={'danger'}
+									btnStyle="danger"
+									message="Delete user {user.email}"
+									buttonIcon="trash"
+									label="Delete"
+									callbackAction={() => handleDeleteUser(user.id)}
+								/>
+							{/if}
+						</td>
+					</tr>
+				{/each}
+			{/key}
+		</tbody>
+	</table>
+</div>

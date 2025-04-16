@@ -38,7 +38,7 @@
 	}
 </script>
 
-<FilteredTasksTable taskGroups={tasks}>
+<FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true}>
 	<svelte:fragment slot="extra-columns-colgroup">
 		<col width="60" />
 		<col width="60" />

@@ -11,7 +11,7 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
 	import { getAllNewVersions } from '$lib/components/v2/workflow/version-checker';
-	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
+	import ImagesStatus from '$lib/components/jobs/ImagesStatus.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
@@ -21,6 +21,11 @@
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
 	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
 	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
+	import { slide } from 'svelte/transition';
+	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
+	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
+	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
+	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $page.data.workflow;
@@ -29,10 +34,14 @@
 	$: project = workflow.project;
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	let datasets = $page.data.datasets;
-	let attributeFiltersEnabled = $page.data.attributeFiltersEnabled;
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = undefined;
+	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
+
+	let isLegacy = false;
+	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
+	let legacyStatuses = {};
 
 	let jobError = '';
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
@@ -47,7 +56,21 @@
 	let workflowSuccessMessage = '';
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = undefined;
+	/** @type {number|undefined} */
+	let expandedWorkflowTaskId = undefined;
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = undefined;
+	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
+	let preventedHistoryRunChange = undefined;
+	/** @type {import('fractal-components/types/api').HistoryRunAggregated[]} */
+	let historyRunStatuses = [];
+	let loadingHistoryRunStatuses = false;
+	/** @type {ImagesStatusModal} */
+	let imagesStatusModal;
+	/** @type {RunStatusModal} */
+	let runStatusModal;
+	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
+	let selectedHistoryRun = undefined;
 
 	/** @type {ArgumentsSchema|undefined} */
 	let argsSchemaForm = undefined;
@@ -280,29 +303,72 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} wft
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2|undefined} wft
 	 */
 	async function setSelectedWorkflowTask(wft) {
 		await tick();
 		preventedSelectedTaskChange = wft;
-		if (argsSchemaForm?.hasUnsavedChanges()) {
-			toggleArgsUnsavedChangesModal();
-			return;
-		}
-		if (inputFiltersTab?.hasUnsavedChanges()) {
-			toggleFiltersUnsavedChangesModal();
-			return;
-		}
-		if (metaPropertiesForm?.hasUnsavedChanges()) {
-			toggleMetaPropertiesUnsavedChangesModal();
+		if (checkUnsavedChanges()) {
 			return;
 		}
 		if (wft) {
 			selectedWorkflowTask = wft;
+			if (expandedWorkflowTaskId !== wft.id) {
+				expandedWorkflowTaskId = undefined;
+			}
 		}
 		preventedSelectedTaskChange = undefined;
+		selectedHistoryRun = undefined;
 		await tick();
 		await inputFiltersTab?.init();
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').HistoryRunAggregated|undefined} historyRun
+	 */
+	async function selectHistoryRun(historyRun) {
+		await tick();
+		preventedHistoryRunChange = historyRun;
+		if (checkUnsavedChanges()) {
+			return;
+		}
+		preventedHistoryRunChange = undefined;
+		selectedHistoryRun = historyRun;
+	}
+
+	function checkUnsavedChanges() {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
+			toggleArgsUnsavedChangesModal();
+			return true;
+		}
+		if (inputFiltersTab?.hasUnsavedChanges()) {
+			toggleFiltersUnsavedChangesModal();
+			return true;
+		}
+		if (metaPropertiesForm?.hasUnsavedChanges()) {
+			toggleMetaPropertiesUnsavedChangesModal();
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @param {number} workflowTaskId
+	 */
+	async function loadHistoryRunStatuses(workflowTaskId) {
+		historyRunStatuses = [];
+		expandedWorkflowTaskId = workflowTaskId;
+		loadingHistoryRunStatuses = true;
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
+		);
+		if (!response.ok) {
+			loadingHistoryRunStatuses = false;
+			return;
+		}
+		historyRunStatuses = await response.json();
+		await tick(); // to trigger animation
+		loadingHistoryRunStatuses = false;
 	}
 
 	function toggleArgsUnsavedChangesModal() {
@@ -340,6 +406,8 @@
 	 */
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = job;
+		selectedHistoryRun = undefined;
+		expandedWorkflowTaskId = undefined;
 		await loadJobsStatus();
 	}
 
@@ -396,7 +464,7 @@
 		newVersionsCount = count;
 	}
 
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
+	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = {};
 
 	$: hasAnyJobRun = Object.keys(statuses).length > 0;
@@ -405,6 +473,7 @@
 	let statusWatcherTimer;
 
 	async function selectedDatasetChanged() {
+		expandedWorkflowTaskId = undefined;
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
@@ -419,29 +488,63 @@
 			selectedSubmittedJob = undefined;
 			return;
 		}
-		selectedSubmittedJob = await getSelectedSubmittedJob(selectedDatasetId);
-		const outputStatusResponse = await fetch(
-			`/api/v2/project/${project.id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
+		selectedSubmittedJob = await getSelectedJob(selectedDatasetId);
+		const statusResponse = await fetch(
+			`/api/v2/project/${workflow.project_id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
 			{
 				method: 'GET',
 				credentials: 'include'
 			}
 		);
-		const outputStatus = await outputStatusResponse.json();
-		if (!outputStatusResponse.ok) {
-			console.error('Error retrieving dataset status', outputStatus);
+		if (!statusResponse.ok) {
+			console.error('Error retrieving images status');
 			return;
 		}
-		statuses = outputStatus.status;
-		const submitted = Object.values(statuses).filter((s) => s === 'submitted');
-		if (submitted.length > 0) {
+		const receivedStatuses = await statusResponse.json();
+
+		if (selectedSubmittedJob && selectedSubmittedJob.status === 'failed') {
+			failedJob = { ...selectedSubmittedJob };
+			jobError = extractRelevantJobError(selectedSubmittedJob.log || '', 5);
+		} else {
+			failedJob = undefined;
+			jobError = '';
+		}
+
+		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
+		if (selectedSubmittedJob && Object.keys(statuses).length === 0) {
+			await loadLegacyStatus();
+		} else {
+			isLegacy = false;
+		}
+		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
+		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
-			statusWatcherTimer = window.setTimeout(loadJobsStatus, updateJobsInterval);
+			// if there are no null statuses and no submitted statuses the job is completed,
+			// so we can reload the latest job immediately, otherwise wait default timeout
+			const allCompleted =
+				Object.entries(receivedStatuses).length === Object.values(statuses).length &&
+				submitted.length === 0;
+			statusWatcherTimer = window.setTimeout(loadJobsStatus, allCompleted ? 0 : updateJobsInterval);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 		}
-		await loadJobError();
+	}
+
+	async function loadLegacyStatus() {
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/status-legacy?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`
+		);
+		if (!response.ok) {
+			console.log('Error loading legacy status');
+			return;
+		}
+		const result = await response.json();
+		if (Object.keys(result).length === 0) {
+			return;
+		}
+		legacyStatuses = result.status;
+		isLegacy = true;
 	}
 
 	async function reloadSelectedDataset() {
@@ -461,38 +564,6 @@
 		datasets = datasets.map((d) => (d.id === datasetId ? result : d));
 	}
 
-	async function loadJobError() {
-		if (Object.values(statuses).length > 0) {
-			const failedStatus = Object.values(statuses).find((s) => s === 'failed');
-			if (!failedStatus) {
-				jobError = '';
-				failedJob = undefined;
-				return;
-			}
-		}
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!response.ok) {
-			console.error('Error retrieving workflow jobs', await response.json());
-			return;
-		}
-		const jobs = /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ (
-			await response.json()
-		);
-		const failedJobs = jobs
-			.filter((j) => j.dataset_id === selectedDatasetId && j.status === 'failed')
-			.sort((j1, j2) => (j1.start_timestamp < j2.start_timestamp ? 1 : -1));
-		if (failedJobs.length === 0) {
-			jobError = '';
-			failedJob = undefined;
-			return;
-		}
-		failedJob = failedJobs[0];
-		jobError = extractRelevantJobError(failedJob.log || '', 5);
-	}
-
 	function showJobLogsModal() {
 		if (!failedJob) {
 			return;
@@ -504,26 +575,25 @@
 	 * @param {number} datasetId
 	 * @return {Promise<import('fractal-components/types/api').ApplyWorkflowV2|undefined>}
 	 */
-	async function getSelectedSubmittedJob(datasetId) {
-		if (selectedSubmittedJob && selectedSubmittedJob.dataset_id === datasetId) {
+	async function getSelectedJob(datasetId) {
+		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
+		if (
+			submitted.length > 0 &&
+			selectedSubmittedJob &&
+			selectedSubmittedJob.dataset_id === datasetId
+		) {
 			return selectedSubmittedJob;
 		}
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(
+			`/api/v2/project/${project.id}/latest-job?workflow_id=${workflow.id}&dataset_id=${datasetId}`
+		);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-			const allJobs = await response.json();
-			const jobs = allJobs
-				.filter((j) => j.dataset_id === datasetId)
-				.sort((a, b) => (a.start_timestamp < b.start_timestamp ? 1 : -1));
-			if (jobs.length > 0) {
-				return jobs[0];
-			}
-		} else {
-			console.error('Unable to load workflow jobs', await response.json());
+			/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
+			return await response.json();
+		} else if (response.status !== 404) {
+			console.error('Unable to load latest job');
 		}
+		return undefined;
 	}
 
 	async function stopWorkflow() {
@@ -576,7 +646,7 @@
 	});
 </script>
 
-<div class="row">
+<div class="container mt-3">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
@@ -596,121 +666,121 @@
 		</ol>
 	</nav>
 </div>
-<div class="row mt-2">
-	<div class="col-lg-8">
-		<div class="row">
-			<div class="col-lg-4 col-md-6">
-				<div class="input-group mb-3">
-					<label for="dataset" class="input-group-text">Dataset</label>
-					<select
-						class="form-select"
-						id="dataset"
-						bind:value={selectedDatasetId}
-						on:change={selectedDatasetChanged}
-					>
-						<option value={undefined}>Select...</option>
-						{#each sortedDatasets as dataset}
-							<option value={dataset.id}>{dataset.name}</option>
-						{/each}
-					</select>
+
+<div class="container mt-2">
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="row">
+				<div class="col-lg-4 col-md-6">
+					<div class="input-group mb-3">
+						<label for="dataset" class="input-group-text">Dataset</label>
+						<select
+							class="form-select"
+							id="dataset"
+							bind:value={selectedDatasetId}
+							on:change={selectedDatasetChanged}
+						>
+							<option value={undefined}>Select...</option>
+							{#each sortedDatasets as dataset}
+								<option value={dataset.id}>{dataset.name}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+				<div class="col-lg-8 col-md-12">
+					{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
+						<button class="btn btn-danger" on:click={stopWorkflow}>
+							<i class="bi-stop-circle-fill" /> Stop workflow
+						</button>
+					{:else if !hasAnyJobRun}
+						<button
+							class="btn btn-success"
+							on:click|preventDefault={() => openRunWorkflowModal('run')}
+							disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
+						>
+							<i class="bi-play-fill" /> Run workflow
+						</button>
+					{:else}
+						<button
+							class="btn btn-success"
+							on:click|preventDefault={() => openRunWorkflowModal('continue')}
+							disabled={workflow.task_list.length === 0}
+						>
+							<i class="bi-play-fill" /> Continue workflow
+						</button>
+						<button
+							class="btn btn-primary"
+							on:click|preventDefault={() => openRunWorkflowModal('restart')}
+							disabled={workflow.task_list.length === 0}
+						>
+							<i class="bi bi-arrow-clockwise" /> Restart workflow
+						</button>
+					{/if}
 				</div>
 			</div>
-			<div class="col-lg-8 col-md-12">
-				{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
-					<button class="btn btn-danger" on:click={stopWorkflow}>
-						<i class="bi-stop-circle-fill" /> Stop workflow
-					</button>
-				{:else if !hasAnyJobRun}
+		</div>
+
+		<div class="col-lg-4 mb-2">
+			<div class="float-end">
+				{#if $page.data.userInfo.is_superuser}
 					<button
-						class="btn btn-success"
-						on:click|preventDefault={() => openRunWorkflowModal('run')}
-						disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
-					>
-						<i class="bi-play-fill" /> Run workflow
-					</button>
-				{:else}
-					<button
-						class="btn btn-success"
-						on:click|preventDefault={() => openRunWorkflowModal('continue')}
+						class="btn btn-light"
+						on:click|preventDefault={() => typeFiltersFlowModal.open()}
 						disabled={workflow.task_list.length === 0}
 					>
-						<i class="bi-play-fill" /> Continue workflow
-					</button>
-					<button
-						class="btn btn-primary"
-						on:click|preventDefault={() => openRunWorkflowModal('restart')}
-						disabled={workflow.task_list.length === 0}
-					>
-						<i class="bi bi-arrow-clockwise" /> Restart workflow
+						Type filters flow
 					</button>
 				{/if}
-			</div>
-		</div>
-	</div>
-
-	<div class="col-lg-4 mb-2">
-		<div class="float-end">
-			{#if $page.data.userInfo.is_superuser}
+				<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+					<i class="bi-journal-code" /> List jobs
+				</a>
 				<button
 					class="btn btn-light"
-					on:click|preventDefault={() => typeFiltersFlowModal.open()}
-					disabled={workflow.task_list.length === 0}
+					on:click|preventDefault={handleExportWorkflow}
+					aria-label="Export workflow"
 				>
-					Type filters flow
+					<i class="bi-download" />
 				</button>
-			{/if}
-			<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
-				<i class="bi-journal-code" /> List jobs
-			</a>
-			<button
-				class="btn btn-light"
-				on:click|preventDefault={handleExportWorkflow}
-				aria-label="Export workflow"
-			>
-				<i class="bi-download" />
-			</button>
-			<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-			<button
-				class="btn btn-light"
-				data-bs-toggle="modal"
-				data-bs-target="#editWorkflowModal"
-				on:click={resetWorkflowUpdateModal}
-			>
-				<i class="bi-pencil" />
-			</button>
+				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
+				<button
+					class="btn btn-light"
+					data-bs-toggle="modal"
+					data-bs-target="#editWorkflowModal"
+					on:click={resetWorkflowUpdateModal}
+				>
+					<i class="bi-pencil" />
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
 
-<TypeFiltersFlowModal
-	{workflow}
-	{selectedDatasetId}
-	datasets={sortedDatasets}
-	bind:this={typeFiltersFlowModal}
-/>
+<TypeFiltersFlowModal {workflow} bind:this={typeFiltersFlowModal} />
 
 {#if workflow}
-	<StandardDismissableAlert message={workflowSuccessMessage} />
+	<div class="container mt-2">
+		<StandardDismissableAlert message={workflowSuccessMessage} />
 
-	<div id="workflowErrorAlert" />
+		<div id="workflowErrorAlert" />
 
-	{#if jobError}
-		<div class="alert border border-danger bg-light">
-			<div class="row">
-				<div class="col-md-10 col-sm-9">
-					<div class="text-muted mb-2 fw-bolder">The last job failed with the following error:</div>
-					<pre class="text-danger mb-0">{jobError}</pre>
-				</div>
-				<div class="col-md-2 col-sm-3">
-					<button class="btn btn-outline-secondary float-end" on:click={showJobLogsModal}>
-						Show complete log
-					</button>
+		{#if jobError}
+			<div class="alert border border-danger bg-light">
+				<div class="row">
+					<div class="col-md-10 col-sm-9">
+						<div class="text-muted mb-2 fw-bolder">
+							The last job failed with the following error:
+						</div>
+						<pre class="text-danger mb-0">{jobError}</pre>
+					</div>
+					<div class="col-md-2 col-sm-3">
+						<button class="btn btn-outline-secondary float-end" on:click={showJobLogsModal}>
+							Show complete log
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
 
-	<div class="container mt-3 px-0">
 		<div class="row">
 			<div class="col-4">
 				<div class="card">
@@ -752,9 +822,46 @@
 									data-fs-target={workflowTask.id}
 									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
 								>
+									{#if statuses[workflowTask.id]}
+										{#if expandedWorkflowTaskId === workflowTask.id && loadingHistoryRunStatuses}
+											<span
+												class="spinner-border spinner-border-sm p-0"
+												role="status"
+												aria-hidden="true"
+											/>
+										{:else if expandedWorkflowTaskId === workflowTask.id}
+											<button
+												aria-label="Hide runs"
+												class="btn btn-link p-0 text-white"
+												on:click={() => (expandedWorkflowTaskId = undefined)}
+											>
+												<i class="bi bi-caret-down-fill" />
+											</button>
+										{:else}
+											<button
+												aria-label="Show runs"
+												class="btn btn-link p-0"
+												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
+												on:click={() => loadHistoryRunStatuses(workflowTask.id)}
+											>
+												<i class="bi bi-caret-right-fill" />
+											</button>
+										{/if}
+									{/if}
 									{workflowTask.task.name}
 									<span class="float-end ps-2">
-										<JobStatusIcon status={statuses[workflowTask.id]} />
+										{#if selectedDataset}
+											{#if isLegacy}
+												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
+											{:else}
+												<ImagesStatus
+													status={statuses[workflowTask.id]}
+													dataset={selectedDataset}
+													{workflowTask}
+													{imagesStatusModal}
+												/>
+											{/if}
+										{/if}
 									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-info" title="new version available">
@@ -767,6 +874,30 @@
 										</span>
 									{/if}
 								</button>
+								{#each historyRunStatuses as status, index}
+									{#if !loadingHistoryRunStatuses && expandedWorkflowTaskId === workflowTask.id}
+										<button
+											transition:slide
+											class="run-item list-group-item list-group-item-action"
+											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
+											style="padding-left: 38px"
+											on:click={() => selectHistoryRun(status)}
+										>
+											Run {index + 1}
+											<span class="float-end ps-2">
+												{#if selectedDataset}
+													<RunStatus
+														run={status}
+														index={index + 1}
+														{runStatusModal}
+														{workflowTask}
+														dataset={selectedDataset}
+													/>
+												{/if}
+											</span>
+										</button>
+									{/if}
+								{/each}
 							{/each}
 						</div>
 					{/if}
@@ -797,7 +928,8 @@
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
 											on:click={() => setWorkflowTabContextId(1)}
 											aria-current={workflowTabContextId === 1}
-											>Meta
+										>
+											Meta
 										</button>
 									</li>
 									<li class="nav-item">
@@ -805,7 +937,8 @@
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
 											on:click={() => setWorkflowTabContextId(2)}
 											aria-current={workflowTabContextId === 2}
-											>Info
+										>
+											Info
 										</button>
 									</li>
 									<li class="nav-item">
@@ -857,7 +990,10 @@
 											<ArgumentsSchema
 												workflowTask={selectedWorkflowTask}
 												{onWorkflowTaskUpdated}
+												editable={!selectedHistoryRun}
 												bind:this={argsSchemaForm}
+												argsNonParallel={selectedHistoryRun?.workflowtask_dump.args_non_parallel}
+												argsParallel={selectedHistoryRun?.workflowtask_dump.args_parallel}
 											/>
 										{/key}
 									{/if}
@@ -872,6 +1008,9 @@
 												{onWorkflowTaskUpdated}
 												workflowTask={selectedWorkflowTask}
 												bind:this={metaPropertiesForm}
+												metaNonParallel={selectedHistoryRun?.workflowtask_dump.meta_non_parallel}
+												metaParallel={selectedHistoryRun?.workflowtask_dump.meta_parallel}
+												editable={!selectedHistoryRun}
 											/>
 										{/key}
 									{/if}
@@ -929,6 +1068,9 @@
 	user={$page.data.user}
 />
 
+<ImagesStatusModal bind:this={imagesStatusModal} />
+<RunStatusModal bind:this={runStatusModal} />
+
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	<svelte:fragment slot="header">
 		<h5 class="modal-title">Workflow properties</h5>
@@ -973,7 +1115,6 @@
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}
-	{attributeFiltersEnabled}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;
@@ -995,21 +1136,22 @@
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={() => {
+			on:click={async () => {
 				argsSchemaForm?.discardChanges();
-				setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await selectHistoryRun(preventedHistoryRunChange);
+				argsUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Discard changes
 		</button>
 		<button
 			type="button"
 			class="btn btn-success"
-			on:click={() => {
-				argsSchemaForm?.saveChanges();
+			on:click={async () => {
+				await argsSchemaForm?.saveChanges();
+				argsUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Save changes
 		</button>
@@ -1030,11 +1172,12 @@
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={() => {
+			on:click={async () => {
 				inputFiltersTab?.discardChanges();
-				setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await selectHistoryRun(preventedHistoryRunChange);
+				filtersUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Discard changes
 		</button>
@@ -1043,8 +1186,8 @@
 			class="btn btn-success"
 			on:click={async () => {
 				await inputFiltersTab?.save();
+				filtersUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Save changes
 		</button>
@@ -1066,11 +1209,12 @@
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={() => {
+			on:click={async () => {
 				metaPropertiesForm?.discardChanges();
-				setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await setSelectedWorkflowTask(preventedSelectedTaskChange);
+				await selectHistoryRun(preventedHistoryRunChange);
+				metaPropertiesUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Discard changes
 		</button>
@@ -1079,8 +1223,8 @@
 			class="btn btn-success"
 			on:click={async () => {
 				await metaPropertiesForm?.saveChanges();
+				metaPropertiesUnsavedChangesModal.hide();
 			}}
-			data-bs-dismiss="modal"
 		>
 			Save changes
 		</button>
@@ -1088,3 +1232,29 @@
 </Modal>
 
 <JobLogsModal bind:this={jobLogsModal} />
+
+<style>
+	.run-item {
+		padding-left: 38px;
+	}
+	.run-item.active {
+		background-color: #4e95ff !important;
+	}
+
+	:global(.status-icon) {
+		font-size: 160%;
+		font-weight: bold;
+		margin: 0 -5px -5px -5px;
+		line-height: 0;
+		display: block;
+	}
+
+	:global(.active .status-wrapper),
+	:global(.active .status-icon) {
+		color: #fff !important;
+	}
+
+	:global(.status-modal-btn:hover span) {
+		text-decoration: underline;
+	}
+</style>

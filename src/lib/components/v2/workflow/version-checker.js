@@ -63,7 +63,7 @@ export async function getAllNewVersions(tasks) {
 					task.version &&
 					t.version &&
 					t.name === task.name &&
-					t.type === task.type &&
+					isTaskTypeCompatible(t, task) &&
 					t.pkg_name === task.pkg_name &&
 					greatestVersionAsc(t.version, task.version) === 1 &&
 					t.active
@@ -77,4 +77,19 @@ export async function getAllNewVersions(tasks) {
 		updateCandidates,
 		enrichedTasks
 	};
+}
+
+/**
+ * @param {import('fractal-components/types/api').TaskV2} task1
+ * @param {import('fractal-components/types/api').TaskV2} task2
+ * @returns {boolean}
+ */
+function isTaskTypeCompatible(task1, task2) {
+	return (
+		task1.type === task2.type ||
+		(task1.type === 'compound' && task2.type === 'converter_compound') ||
+		(task1.type === 'converter_compound' && task2.type === 'compound') ||
+		(task1.type === 'non_parallel' && task2.type === 'converter_non_parallel') ||
+		(task1.type === 'converter_non_parallel' && task2.type === 'non_parallel')
+	);
 }

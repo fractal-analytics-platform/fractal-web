@@ -3,14 +3,13 @@
 	import { extractJobErrorParts } from '$lib/common/job_utilities';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
+	import ExpandableLog from '$lib/components/common/ExpandableLog.svelte';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = [];
 	let errorAlert = undefined;
 	/** @type {Modal} */
 	let modal;
-	/** Show/hide complete stack trace */
-	let showDetails = false;
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
 	let job;
 	let admin = false;
@@ -97,17 +96,7 @@
 		}
 	}
 
-	function expandDetails() {
-		showDetails = true;
-		// Restore focus on modal, otherwise it will not be possible to close it using the esc key
-		const modal = document.querySelector('.modal.show');
-		if (modal instanceof HTMLElement) {
-			modal.focus();
-		}
-	}
-
 	function onClose() {
-		showDetails = false;
 		clearTimeout(updateJobTimeout);
 	}
 
@@ -120,7 +109,7 @@
 	id="workflowJobLogsModal"
 	fullscreen={true}
 	bind:this={modal}
-	bodyCss="bg-tertiary text-secondary"
+	bodyCss="bg-tertiary text-secondary p-0 pt-2"
 	{onClose}
 >
 	<svelte:fragment slot="header">
@@ -136,36 +125,8 @@
 			</div>
 			Loading...
 		{:else}
-			<div class="row" id="workflow-job-logs">
-				<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
-				{#if logParts.length > 1}
-					<pre class="ps-0 pe-0">
-<!-- -->{#each logParts as part}{#if part.highlight}<div class="ps-3 pe-3 highlight">{part.text}
-<!-- --></div>{:else if showDetails}<div class="ps-3 pe-3">{part.text}</div>{:else}<button
-									class="btn btn-link text-decoration-none details-btn"
-									on:click={expandDetails}>... (details hidden, click here to expand)</button
-								>{/if}{/each}</pre>
-				{:else}
-					<pre class:highlight={job.status === 'failed'}>{logParts
-							.map((p) => p.text)
-							.join('\n')}</pre>
-				{/if}
-			</div>
+		<ExpandableLog bind:logParts highlight={job.status === 'failed'} />
 		{/if}
 	</svelte:fragment>
 </Modal>
 
-<style>
-	#workflow-job-logs pre {
-		/** avoid issues with overflow of inner divs */
-		display: table;
-	}
-	.highlight {
-		font-weight: bold;
-		background-color: #ffe5e5;
-	}
-
-	.details-btn {
-		font-family: revert;
-	}
-</style>

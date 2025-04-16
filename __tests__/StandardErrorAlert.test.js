@@ -6,33 +6,27 @@ import { AlertError } from '../src/lib/common/errors';
 
 describe('StandardErrorAlert', () => {
 	it('AlertError with string message', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new AlertError('error message')
-		});
+		const result = renderStandardErrorAlert(new AlertError('error message'));
 		expect(result.container.textContent).toContain('error message');
 	});
 
 	it('AlertError with string detail', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new AlertError({ detail: 'error message' })
-		});
+		const result = renderStandardErrorAlert(new AlertError({ detail: 'error message' }));
 		expect(result.container.textContent).toContain('error message');
 		expect(result.container.textContent).not.toContain('detail');
 		expect(result.container.textContent).not.toContain('There has been an error');
 	});
 
 	it('AlertError with array detail', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new AlertError({ detail: ['error message'] })
-		});
+		const result = renderStandardErrorAlert(new AlertError({ detail: ['error message'] }));
 		expect(result.container.textContent).toContain('error message');
 		expect(result.container.textContent).not.toContain('detail');
 		expect(result.container.textContent).not.toContain('There has been an error');
 	});
 
 	it('AlertError with object detail and __root__ loc', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new AlertError(
+		const result = renderStandardErrorAlert(
+			new AlertError(
 				{
 					detail: [
 						{
@@ -44,50 +38,47 @@ describe('StandardErrorAlert', () => {
 				},
 				422
 			)
-		});
+		);
 		expect(result.container.textContent).toContain('error message');
 		expect(result.container.textContent).not.toContain('detail');
 		expect(result.container.textContent).not.toContain('There has been an error');
 	});
 
 	it('AlertError with generic object message', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new AlertError({ foo: 'bar' })
-		});
+		const result = renderStandardErrorAlert(new AlertError({ foo: 'bar' }));
 		expect(result.container.textContent).toMatch(/{.*"foo".*:.*"bar".*}/s);
 		expect(result.container.textContent).toContain('There has been an error');
 	});
 
 	it('AlertError with generic object message', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new AlertError({ foo: 'bar' })
-		});
+		const result = renderStandardErrorAlert(new AlertError({ foo: 'bar' }));
 		expect(result.container.textContent).toMatch(/{.*"foo".*:.*"bar".*}/s);
 		expect(result.container.textContent).toContain('There has been an error');
 	});
 
 	it('Generic error with string message', async () => {
-		const result = render(StandardErrorAlert, {
-			error: new Error('error message')
-		});
+		const result = renderStandardErrorAlert(new Error('error message'));
 		expect(result.container.textContent).toContain('error message');
 		expect(result.container.textContent).not.toContain('There has been an error');
 	});
 
 	it('Generic object message with detail', async () => {
-		const result = render(StandardErrorAlert, {
-			error: { detail: 'error message' }
-		});
+		const result = renderStandardErrorAlert({ detail: 'error message' });
 		expect(result.container.textContent).toContain('error message');
 		expect(result.container.textContent).not.toContain('detail');
 		expect(result.container.textContent).not.toContain('There has been an error');
 	});
 
 	it('Generic object message without detail', async () => {
-		const result = render(StandardErrorAlert, {
-			error: { foo: 'bar' }
-		});
+		const result = renderStandardErrorAlert({ foo: 'bar' });
 		expect(result.container.textContent).toMatch(/{.*"foo".*:.*"bar".*}/s);
 		expect(result.container.textContent).toContain('There has been an error');
 	});
 });
+
+/**
+ * @param {any} error
+ */
+function renderStandardErrorAlert(error) {
+	return render(StandardErrorAlert, { error });
+}

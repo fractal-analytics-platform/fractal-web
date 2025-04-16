@@ -5,6 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
+	import { encodePathForUrl } from '$lib/common/component_utilities';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -16,7 +17,6 @@
 	let dataset = $page.data.dataset;
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	let imagePage = $page.data.imagePage;
-	let useDatasetFilters = false;
 
 	/** @type {DatasetImagesTable} */
 	let imagesTable;
@@ -42,7 +42,7 @@
 			selectedPlate = '';
 			return;
 		}
-		let imageWithPlate = imagePage.images.find((i) => i.attributes['plate'] === selectedPlate);
+		let imageWithPlate = imagePage.items.find((i) => i.attributes['plate'] === selectedPlate);
 		if (!imageWithPlate) {
 			platePathLoading = true;
 			imageWithPlate = await loadImageForSelectedPlate();
@@ -82,13 +82,13 @@
 		}
 		/** @type {import('fractal-components/types/api').ImagePage}*/
 		const result = await response.json();
-		if (result.images.length === 0) {
+		if (result.items.length === 0) {
 			console.error(
 				`Unable to load image for plate ${selectedPlate}. Server replied with empty list`
 			);
 			return undefined;
 		}
-		return result.images[0];
+		return result.items[0];
 	}
 
 	async function handleExportDataset() {
@@ -130,7 +130,7 @@
 	});
 </script>
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="container mt-3 d-flex justify-content-between align-items-center">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
@@ -162,7 +162,7 @@
 </div>
 
 {#if vizarrViewerUrl && plates.length > 0}
-	<div class="border border-info rounded bg-light p-3 mt-2">
+	<div class="container border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
 				This dataset contains {plates.length}
@@ -181,7 +181,7 @@
 			<div class="col-12">
 				{#if platePath}
 					<a
-						href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{platePath}"
+						href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{encodePathForUrl(platePath)}"
 						class="btn btn-info me-2"
 						target="_blank"
 						class:disabled={platePathLoading}
@@ -202,15 +202,15 @@
 
 <div id="datasetUpdateError" />
 
-<DatasetImagesTable
-	{dataset}
-	bind:imagePage
-	{vizarrViewerUrl}
-	bind:useDatasetFilters
-	runWorkflowModal={false}
-	bind:this={imagesTable}
-	onDatasetsUpdated={(updated) => (dataset = updated)}
-/>
+<div class="container-fluid">
+	<DatasetImagesTable
+		{dataset}
+		bind:imagePage
+		{vizarrViewerUrl}
+		runWorkflowModal={false}
+		bind:this={imagesTable}
+	/>
+</div>
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
 <DatasetHistoryModal {dataset} />

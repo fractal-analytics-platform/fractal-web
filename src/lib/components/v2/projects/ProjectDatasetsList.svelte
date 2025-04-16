@@ -15,7 +15,9 @@
 		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
 	);
 
-	function createDatasetCallback(/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset) {
+	function createDatasetCallback(
+		/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset
+	) {
 		datasetCreatedMessage = `Created new dataset with Zarr dir ${newDataset.zarr_dir}`;
 		datasets = [...datasets, newDataset].sort((a, b) =>
 			a.name < b.name ? -1 : a.name > b.name ? 1 : 0
@@ -50,37 +52,35 @@
 	});
 </script>
 
-<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
+<div class="container mt-2">
+	<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
 
-<div class="container p-0 mt-4">
-	<div class="row">
-		<div class="col-sm-2">
-			<h3 class="fw-light">Datasets</h3>
-		</div>
-		<div class="col-sm-10 mb-2">
-			<div class="row justify-content-end">
-				<div class="col-auto">
-					<div class="input-group">
-						<input
-							name="searchDataset"
-							type="text"
-							class="form-control"
-							placeholder="Search dataset"
-							bind:value={datasetSearch}
-						/>
-					</div>
+	<div class="col-sm-2">
+		<h3 class="fw-light">Datasets</h3>
+	</div>
+	<div class="col-sm-10 mb-2">
+		<div class="row justify-content-end">
+			<div class="col-auto">
+				<div class="input-group">
+					<input
+						name="searchDataset"
+						type="text"
+						class="form-control"
+						placeholder="Search dataset"
+						bind:value={datasetSearch}
+					/>
 				</div>
-				<div class="col-auto">
-					<button
-						class="btn btn-primary float-end"
-						type="button"
-						data-bs-target="#createDatasetModal"
-						data-bs-toggle="modal"
-						on:click={() => (datasetCreatedMessage = '')}
-					>
-						Create new dataset
-					</button>
-				</div>
+			</div>
+			<div class="col-auto">
+				<button
+					class="btn btn-primary float-end"
+					type="button"
+					data-bs-target="#createDatasetModal"
+					data-bs-toggle="modal"
+					on:click={() => (datasetCreatedMessage = '')}
+				>
+					Create new dataset
+				</button>
 			</div>
 		</div>
 	</div>

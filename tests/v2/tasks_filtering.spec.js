@@ -31,7 +31,7 @@ async function testFiltering(page) {
 	const rows = page.getByRole('row');
 
 	await selectSlimSelect(page, packageFilter, 'fractal-tasks-mock');
-	await expect(rows).toHaveCount(16);
+	await expect(rows).toHaveCount(17);
 	await selectSlimSelect(page, modalityFilter, 'HCS');
 	await expect(rows).toHaveCount(8);
 	await selectSlimSelect(page, categoryFilter, 'Conversion');
@@ -40,14 +40,14 @@ async function testFiltering(page) {
 
 	await deselect(modalityFilter);
 	await deselect(categoryFilter);
-	await expect(rows).toHaveCount(16);
+	await expect(rows).toHaveCount(17);
 
 	await selectSlimSelect(page, tagFilter, 'Deep Learning');
 	await expect(rows).toHaveCount(3);
 	await expect(page.getByRole('row', { name: 'cellpose_segmentation' })).toBeVisible();
 
 	await deselect(tagFilter);
-	await expect(rows).toHaveCount(16);
+	await expect(rows).toHaveCount(17);
 
 	await search(page, 'mip', 'MIP_compound'); // search by task_name
 	await search(page, 'deep', 'cellpose_segmentation'); // search by tag
@@ -74,5 +74,5 @@ async function search(page, query, expectedTaskName) {
 	await expect(page.getByRole('row')).toHaveCount(3);
 	await expect(page.getByRole('row', { name: expectedTaskName })).toBeVisible();
 	await page.getByPlaceholder('Search...').fill('');
-	await expect(page.getByRole('row')).toHaveCount(16);
+	await expect(page.getByRole('row')).toHaveCount(17);
 }

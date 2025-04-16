@@ -3,7 +3,6 @@ import { getProjectDatasets } from '$lib/server/api/v2/project_api';
 import { getDefaultWorkflowDataset } from '$lib/common/workflow_utilities';
 import { getLogger } from '$lib/server/logger.js';
 import { getCurrentUser } from '$lib/server/api/auth_api';
-import { env } from '$env/dynamic/private';
 
 const logger = getLogger('workflow page [v2]');
 
@@ -22,13 +21,10 @@ export async function load({ fetch, params }) {
 
 	const defaultDatasetId = getDefaultWorkflowDataset(datasets, jobs);
 
-	const attributeFiltersEnabled = env.ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS === 'true';
-
 	return {
 		workflow,
 		datasets,
 		defaultDatasetId,
-		user,
-		attributeFiltersEnabled
+		user
 	};
 }

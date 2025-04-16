@@ -5,6 +5,7 @@
 	/** @type {object} */
 	export let args;
 	export let unsavedChanges = false;
+	export let editable = true;
 
 	/**
 	 * @type {Array<import('./form-builder-types').FormBuilderEntry>}
@@ -224,6 +225,7 @@
 	{#each editableArgs as item, index}
 		<FormEntry
 			entry={item}
+			{editable}
 			{index}
 			parent={editableArgs}
 			{addProperty}
@@ -234,7 +236,11 @@
 	{/each}
 
 	<div class="d-flex justify-content-center align-items-center mt-3">
-		<button class="btn btn-secondary" on:click={() => addProperty(editableArgs, true)}>
+		<button
+			class="btn btn-secondary"
+			on:click={() => addProperty(editableArgs, true)}
+			disabled={!editable}
+		>
 			Add property
 		</button>
 	</div>

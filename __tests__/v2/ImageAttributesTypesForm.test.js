@@ -17,12 +17,16 @@ describe('AttributesTypesForm', () => {
 			}
 		);
 		await tick();
-		const keys = result.queryAllByPlaceholderText('Key').map((e) => e.value);
+		const keys = result
+			.queryAllByPlaceholderText('Key')
+			.map((e) => /** @type {HTMLInputElement} */ (e).value);
 		expect(keys.length).eq(3);
 		expect(keys[0]).eq('key1');
 		expect(keys[1]).eq('key2');
 		expect(keys[2]).eq('key3');
-		const values = result.queryAllByPlaceholderText('Value').map((e) => e.value);
+		const values = result
+			.queryAllByPlaceholderText('Value')
+			.map((e) => /** @type {HTMLInputElement} */ (e).value);
 		expect(values.length).eq(2);
 		expect(values[0]).eq('value1');
 		expect(values[1]).eq('42');
@@ -82,7 +86,7 @@ describe('AttributesTypesForm', () => {
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: '42' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
-		expect(result.getByPlaceholderText('Value').value).eq('42');
+		expect(result.getByPlaceholderText('Value')).toHaveValue('42');
 		expect(result.component.validateFields()).true;
 	});
 
@@ -92,7 +96,7 @@ describe('AttributesTypesForm', () => {
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
-		expect(result.getByPlaceholderText('Value').value).eq('');
+		expect(result.getByPlaceholderText('Value')).toHaveValue('');
 		expect(result.component.validateFields()).false;
 	});
 
@@ -101,7 +105,7 @@ describe('AttributesTypesForm', () => {
 		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
-		expect(result.getByLabelText('Value').value).eq('false');
+		expect(result.getByLabelText('Value')).toHaveValue('false');
 		expect(result.component.validateFields()).true;
 	});
 
@@ -111,7 +115,7 @@ describe('AttributesTypesForm', () => {
 		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
 		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'true' } });
 		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
-		expect(result.getByLabelText('Value').value).eq('true');
+		expect(result.getByLabelText('Value')).toHaveValue('true');
 		expect(result.component.validateFields()).true;
 	});
 

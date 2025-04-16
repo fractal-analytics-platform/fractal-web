@@ -6,6 +6,8 @@
 
 	/** @type {Array<import('../types/api').TaskGroupV2>} */
 	export let taskGroups;
+	export let showAuthorsInSeparateColumn = true;
+	export let showDocLinksInTable = false;
 
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
@@ -244,7 +246,7 @@
 		const values = [];
 		// authors, tags
 		values.push(...taskProperties.tags);
-		if (taskProperties.authors) {
+		if (taskProperties.authors && !showAuthorsInSeparateColumn) {
 			values.push(taskProperties.authors);
 		}
 		return values.join(', ');
@@ -278,6 +280,7 @@
 		return new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: true,
 				allowDeselect: true,
 				ariaLabel
@@ -350,6 +353,9 @@
 					<col />
 					<col />
 					<col />
+					{#if showAuthorsInSeparateColumn}
+						<col />
+					{/if}
 					<col width="120" />
 					<slot name="extra-columns-colgroup" />
 				</colgroup>
@@ -359,6 +365,9 @@
 						<th>Category</th>
 						<th>Modality</th>
 						<th>Metadata</th>
+						{#if showAuthorsInSeparateColumn}
+							<th>Author</th>
+						{/if}
 						<th>Version</th>
 						<slot name="extra-columns-header" />
 					</tr>
@@ -372,7 +381,7 @@
 							{#if task.taskVersions[task.selectedVersion]}
 								<tr>
 									<td class="task-name-col">
-										{#if task.taskVersions[task.selectedVersion].docs_link}
+										{#if showDocLinksInTable && task.taskVersions[task.selectedVersion].docs_link}
 											<a href={task.taskVersions[task.selectedVersion].docs_link} target="_blank">
 												{task.taskVersions[task.selectedVersion].task_name}
 											</a>
@@ -409,6 +418,11 @@
 									<td class="metadata-col">
 										{getMetadataCell(task.taskVersions[task.selectedVersion])}
 									</td>
+									{#if showAuthorsInSeparateColumn}
+										<td class="author-col">
+											{task.taskVersions[task.selectedVersion].authors || '-'}
+										</td>
+									{/if}
 									<td class="version-col">
 										{#if Object.keys(task.taskVersions).length > 1}
 											<select
@@ -453,7 +467,8 @@
 		padding-bottom: 12px;
 		background: transparent;
 	}
-	.metadata-col {
+	.metadata-col,
+	.author-col {
 		font-size: 85%;
 		max-width: 150px;
 	}

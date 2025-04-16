@@ -9,6 +9,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
+	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets;
@@ -20,9 +21,8 @@
 	export let onJobSubmitted;
 	/** @type {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} */
 	export let onDatasetsUpdated;
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
+	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	export let statuses;
-	export let attributeFiltersEnabled;
 
 	/** @type {Modal} */
 	let modal;
@@ -32,6 +32,9 @@
 
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
+	/** @type {string[]} */
+	let preSubmissionCheckResults = [];
+	let ignorePreSubmissionCheck = false;
 	let setSlurmAccount = true;
 	/** @type {string[]} */
 	let slurmAccounts = [];
@@ -54,8 +57,22 @@
 		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
 		(mode === 'continue' && firstTaskIndex === undefined);
 
+	$: showImageList =
+		hasImages &&
+		firstTaskIndex !== undefined &&
+		mode !== 'restart' &&
+		!isConverterType(workflow.task_list[firstTaskIndex].task_type);
+
+	$: disabledTypes = Object.keys({
+		...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
+		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
+		...extraTypes
+	});
+
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = null;
+	/** @type {string[]} */
+	let extraTypes = [];
 	let hasImages = false;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	let initialFilterValues = null;
@@ -68,6 +85,8 @@
 		replaceExistingDataset = true;
 		applyingWorkflow = false;
 		checkingConfiguration = false;
+		preSubmissionCheckResults = [];
+		ignorePreSubmissionCheck = false;
 		workerInitControl = '';
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
@@ -106,7 +125,8 @@
 			worker_init: workerInitControl,
 			first_task_index: firstTaskIndex,
 			last_task_index: lastTaskIndex,
-			attribute_filters: appliedAttributeFilters
+			attribute_filters: appliedAttributeFilters,
+			type_filters: appliedTypeFilters
 		};
 		if (setSlurmAccount && slurmAccount !== '') {
 			requestBody.slurm_account = slurmAccount;
@@ -198,6 +218,8 @@
 	}
 
 	async function firstTaskIndexChanged() {
+		preSubmissionCheckResults = [];
+		ignorePreSubmissionCheck = false;
 		await loadDatasetImages();
 		// reset last task
 		if (
@@ -216,24 +238,69 @@
 
 	async function showConfirmRun() {
 		if (datasetImagesTable) {
-			await datasetImagesTable.applySearchFields();
+			const params = await datasetImagesTable.applySearchFields();
+			if (ignorePreSubmissionCheck) {
+				preSubmissionCheckResults = [];
+				ignorePreSubmissionCheck = false;
+			} else {
+				const valid = await preSubmissionCheck(params);
+				if (!valid) {
+					return;
+				}
+			}
 		}
 		const wft = workflow.task_list[firstTaskIndex || 0];
 		if (mode === 'restart') {
-			appliedAttributeFilters = { ...selectedDataset?.attribute_filters };
 			appliedTypeFilters = { ...wft.type_filters };
 		} else {
-			const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
-				selectedDataset
-			);
+			appliedTypeFilters = await getTypeFilterValues(wft);
 			if (datasetImagesTable) {
 				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
-			} else {
-				appliedAttributeFilters = { ...dataset.attribute_filters };
+				appliedTypeFilters = datasetImagesTable.getTypeFilters();
 			}
-			appliedTypeFilters = getTypeFilterValues(dataset, wft);
 		}
 		checkingConfiguration = true;
+	}
+
+	/**
+	 * @param {{ attribute_filters: any, type_filters: any }} params
+	 */
+	async function preSubmissionCheck(params) {
+		preSubmissionCheckResults = [];
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/verify-unique-types`,
+			{
+				headers,
+				method: 'POST',
+				credentials: 'include',
+				body: JSON.stringify(params)
+			}
+		);
+		if (!response.ok) {
+			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			return false;
+		}
+		/** @type {string[]} */
+		preSubmissionCheckResults = await response.json();
+		const valid = preSubmissionCheckResults.length === 0;
+		if (!valid) {
+			await tick();
+			// scroll to warning message
+			const modalBody = document.querySelector('.modal.show .modal-body');
+			const warningAlert = document.getElementById('pre-submission-check-warning');
+			if (modalBody && warningAlert) {
+				const bodyRect = modalBody.getBoundingClientRect();
+				const alertRect = warningAlert.getBoundingClientRect();
+				const alertRelativeY = alertRect.y - bodyRect.y;
+				modalBody.scrollTo({
+					top: alertRelativeY + modalBody.scrollTop,
+					behavior: 'smooth'
+				});
+			}
+		}
+		return valid;
 	}
 
 	function computeNewDatasetName() {
@@ -271,13 +338,13 @@
 			selectedDataset
 		);
 
+		const initialTypeFilters = await getTypeFilterValues(workflowTask);
+
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		initialFilterValues = {
-			attribute_filters: {
-				...dataset.attribute_filters
-			},
-			type_filters: getTypeFilterValues(dataset, workflowTask)
+			attribute_filters: {},
+			type_filters: initialTypeFilters
 		};
 		let response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
@@ -293,9 +360,12 @@
 			datasetImagesLoading = false;
 			return;
 		}
-		imagePage = await response.json();
-		hasImages =
-			/** @type {import('fractal-components/types/api').ImagePage} */ (imagePage).total_count > 0;
+		const result = /** @type {import('fractal-components/types/api').ImagePage} */ (
+			await response.json()
+		);
+		extraTypes = Object.keys(initialTypeFilters).filter((x) => !result.types.includes(x));
+		imagePage = result;
+		hasImages = imagePage.total_count > 0;
 		if (!hasImages) {
 			// Verify if dataset without filters has images
 			let response = await fetch(
@@ -322,14 +392,28 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} dataset
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 */
-	function getTypeFilterValues(dataset, workflowTask) {
+	async function getTypeFilterValues(workflowTask) {
+		let currentTypeFilters = {};
+		let inputFilters = {};
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/type-filters-flow`
+		);
+		if (response.ok) {
+			/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
+			const typeFiltersFlow = await response.json();
+			const selectedTypeFiltersFlow = typeFiltersFlow.find(
+				(t) => t.workflowtask_id === workflowTask.id
+			);
+			if (selectedTypeFiltersFlow) {
+				currentTypeFilters = selectedTypeFiltersFlow.current_type_filters;
+				inputFilters = selectedTypeFiltersFlow.input_type_filters;
+			}
+		}
 		return {
-			...dataset.type_filters,
-			...workflowTask.type_filters,
-			...workflowTask.task.input_types
+			...currentTypeFilters,
+			...inputFilters
 		};
 	}
 
@@ -419,117 +503,49 @@
 					</span>
 				</div>
 			{/if}
-			<div class="mb-3 has-validation">
-				<label for="firstTaskIndex" class="form-label">
-					{#if mode === 'continue'}
-						First task (Required)
-					{:else}
-						First task (Optional)
-					{/if}
-				</label>
-				<select
-					name="firstTaskIndex"
-					id="firstTaskIndex"
-					class="form-select"
-					disabled={checkingConfiguration}
-					bind:value={firstTaskIndex}
-					on:change={firstTaskIndexChanged}
-					class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
-				>
-					<option value={undefined}>Select first task</option>
-					{#each workflow.task_list as wft}
-						<option value={wft.order}>{wft.task.name}</option>
-					{/each}
-				</select>
-				<span class="invalid-feedback"> The first task is required </span>
-			</div>
-			<div class="mb-3">
-				<label for="lastTaskIndex" class="form-label">Last task (Optional)</label>
-				<select
-					name="lastTaskIndex"
-					id="lastTaskIndex"
-					class="form-select"
-					disabled={checkingConfiguration}
-					bind:value={lastTaskIndex}
-				>
-					<option value={undefined}>Select last task</option>
-					{#each workflow.task_list as wft}
-						{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
-							<option value={wft.order}>{wft.task.name}</option>
-						{/if}
-					{/each}
-				</select>
-			</div>
-			<div class="accordion" id="accordion-run-workflow">
-				<div class="accordion-item">
-					<h2 class="accordion-header">
-						<button
-							class="accordion-button collapsed"
-							type="button"
-							data-bs-toggle="collapse"
-							data-bs-target="#collapse-workflow-advanced-options"
-							aria-expanded="false"
-							aria-controls="collapse-workflow-advanced-options"
-						>
-							Advanced options
-						</button>
-					</h2>
-					<div
-						id="collapse-workflow-advanced-options"
-						class="accordion-collapse collapse"
-						data-bs-parent="#accordion-run-workflow"
+			<div class="row mb-3">
+				<div class="col has-validation">
+					<label for="firstTaskIndex" class="form-label"> Start workflow at </label>
+					<select
+						name="firstTaskIndex"
+						id="firstTaskIndex"
+						class="form-select"
+						disabled={checkingConfiguration}
+						bind:value={firstTaskIndex}
+						on:change={firstTaskIndexChanged}
+						class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 					>
-						<div class="accordion-body">
-							<div class="mb-3">
-								<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-								<textarea
-									name="workerInit"
-									id="workerInit"
-									class="form-control font-monospace"
-									rows="5"
-									disabled={checkingConfiguration}
-									bind:value={workerInitControl}
-								/>
-							</div>
-							{#if slurmAccounts.length > 0}
-								<div class="mb-3">
-									<div class="form-check">
-										<input
-											class="form-check-input"
-											type="checkbox"
-											id="setSlurmAccount"
-											bind:checked={setSlurmAccount}
-										/>
-										<label class="form-check-label" for="setSlurmAccount">
-											Set SLURM account
-										</label>
-									</div>
-								</div>
-								{#if setSlurmAccount}
-									<div class="mb-3">
-										<label for="slurmAccount" class="form-label">SLURM account</label>
-										<select
-											name="slurmAccount"
-											id="slurmAccount"
-											class="form-select"
-											disabled={checkingConfiguration}
-											bind:value={slurmAccount}
-										>
-											{#each slurmAccounts as account}
-												<option>{account}</option>
-											{/each}
-										</select>
-									</div>
-								{/if}
-							{/if}
-						</div>
-					</div>
+						<option value={undefined}>Select first task</option>
+						{#each workflow.task_list as wft}
+							<option value={wft.order}>{wft.task.name}</option>
+						{/each}
+					</select>
+					<span class="invalid-feedback"> The first task is required </span>
 				</div>
-				{#if selectedDataset && imagePage && hasImages && firstTaskIndex !== undefined && mode !== 'restart'}
+				<div class="col">
+					<label for="lastTaskIndex" class="form-label">(Optional) Stop workflow early</label>
+					<select
+						name="lastTaskIndex"
+						id="lastTaskIndex"
+						class="form-select"
+						disabled={checkingConfiguration}
+						bind:value={lastTaskIndex}
+					>
+						<option value={undefined}>Select last task</option>
+						{#each workflow.task_list as wft}
+							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
+								<option value={wft.order}>{wft.task.name}</option>
+							{/if}
+						{/each}
+					</select>
+				</div>
+			</div>
+			<div class="accordion mb-2" id="accordion-run-workflow">
+				{#if imagePage && selectedDataset && showImageList}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button
-								class="accordion-button collapsed"
+								class="accordion-button"
 								type="button"
 								data-bs-toggle="collapse"
 								data-bs-target="#collapse-workflow-image-list"
@@ -541,10 +557,26 @@
 						</h2>
 						<div
 							id="collapse-workflow-image-list"
-							class="accordion-collapse collapse"
+							class="accordion-collapse collapse show"
 							data-bs-parent="#accordion-run-workflow"
 						>
 							<div class="accordion-body">
+								{#if preSubmissionCheckResults.length > 0}
+									<div class="alert alert-warning mb-0" id="pre-submission-check-warning">
+										You are trying to run a workflow without specifying what type of images should
+										be processed. Specify the relevant type filter to continue.
+										<button
+											type="button"
+											class="btn btn-warning mt-1"
+											on:click={() => {
+												ignorePreSubmissionCheck = true;
+												showConfirmRun();
+											}}
+										>
+											Continue anyway
+										</button>
+									</div>
+								{/if}
 								{#if checkingConfiguration}
 									This job will process {imagePage.total_count}
 									{imagePage.total_count === 1 ? 'image' : 'images'}.
@@ -554,10 +586,16 @@
 										dataset={selectedDataset}
 										bind:imagePage
 										{initialFilterValues}
-										{attributeFiltersEnabled}
-										useDatasetFilters={false}
+										{disabledTypes}
+										{extraTypes}
+										highlightedTypes={preSubmissionCheckResults}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
+										beforeTypeSelectionChanged={(key) => {
+											preSubmissionCheckResults = preSubmissionCheckResults.filter(
+												(k) => k !== key
+											);
+										}}
 									/>
 								{/if}
 							</div>
@@ -567,6 +605,62 @@
 				{#if datasetImagesLoading}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 				{/if}
+			</div>
+			<div class="clearfix mb-1">
+				<button
+					class="btn btn-light float-end"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#collapseAdvancedOptions"
+					aria-expanded="false"
+					aria-controls="collapseAdvancedOptions"
+				>
+					Advanced options
+				</button>
+			</div>
+			<div class="collapse clearfix" id="collapseAdvancedOptions">
+				<div class="card card-body">
+					<div class="mb-3">
+						<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
+						<textarea
+							name="workerInit"
+							id="workerInit"
+							class="form-control font-monospace"
+							rows="5"
+							disabled={checkingConfiguration}
+							bind:value={workerInitControl}
+						/>
+					</div>
+					{#if slurmAccounts.length > 0}
+						<div class="mb-3">
+							<div class="form-check">
+								<input
+									class="form-check-input"
+									type="checkbox"
+									id="setSlurmAccount"
+									bind:checked={setSlurmAccount}
+								/>
+								<label class="form-check-label" for="setSlurmAccount"> Set SLURM account </label>
+							</div>
+						</div>
+						{#if setSlurmAccount}
+							<div class="mb-3">
+								<label for="slurmAccount" class="form-label">SLURM account</label>
+								<select
+									name="slurmAccount"
+									id="slurmAccount"
+									class="form-select"
+									disabled={checkingConfiguration}
+									bind:value={slurmAccount}
+								>
+									{#each slurmAccounts as account}
+										<option>{account}</option>
+									{/each}
+								</select>
+							</div>
+						{/if}
+					{/if}
+				</div>
 			</div>
 			{#if checkingConfiguration}
 				<hr />

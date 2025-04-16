@@ -81,7 +81,7 @@ export class PageWithWorkflow extends PageWithProject {
 	 * @param {string} taskName
 	 */
 	async selectTask(taskName) {
-		await this.page.getByText(taskName).first().click();
+		await this.page.getByRole('button', { name: taskName }).first().click();
 	}
 
 	async openWorkflowPage() {

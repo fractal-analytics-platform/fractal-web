@@ -7,6 +7,15 @@ import {
 	stripNullAndEmptyObjectsAndArrays
 } from './common/utils';
 import { greatestVersionDesc, greatestVersionAsc } from './common/version';
+import {
+	isCompoundType,
+	isNonParallelType,
+	isParallelType,
+	hasComputeArguments,
+	hasInitialisationArguments,
+	hasNonParallelArguments,
+	hasParallelArguments
+} from './common/workflow_task_utils';
 import { getPropertiesToIgnore } from './jschema/property_utils';
 import { JsonSchemaDataError } from './jschema/form_manager';
 import { stripIgnoredProperties } from './jschema/jschema_adapter';
@@ -26,5 +35,12 @@ export {
 	detectSchemaVersion,
 	FilteredTasksTable,
 	greatestVersionDesc,
-	greatestVersionAsc
+	greatestVersionAsc,
+	isCompoundType,
+	isNonParallelType,
+	isParallelType,
+	hasComputeArguments,
+	hasInitialisationArguments,
+	hasNonParallelArguments,
+	hasParallelArguments
 };

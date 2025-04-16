@@ -3,6 +3,7 @@
 
 	/** @type {import('../form_element.js').ValueFormElement} */
 	export let formElement;
+	export let editable = true;
 
 	function handleValueChange() {
 		formElement.notifyChange();
@@ -22,6 +23,7 @@
 				bind:checked={formElement.value}
 				on:change={handleValueChange}
 				role="switch"
+				disabled={!editable}
 			/>
 		</div>
 	</div>

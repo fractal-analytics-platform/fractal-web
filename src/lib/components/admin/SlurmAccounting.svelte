@@ -1,7 +1,8 @@
 <script>
-	import { getTimestamp } from '$lib/common/component_utilities';
+	import { getTimestamp, hideAllTooltips } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy } from 'svelte';
+	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User>} */
 	export let users = [];
@@ -20,6 +21,9 @@
 
 	/** @type {number[]} */
 	let ids = [];
+
+	/** @type {CopyToClipboardButton|undefined} */
+	let copyToClipboardButton = undefined;
 
 	async function slurmAccountingQuery() {
 		errorAlert?.hide();
@@ -64,36 +68,11 @@
 		userId = '';
 		ids = [];
 		searched = false;
-		tooltip?.dispose();
-		tooltip = undefined;
-		copied = false;
-	}
-
-	let copied = false;
-	let tooltip;
-
-	async function copyTextToClipboard() {
-		await navigator.clipboard.writeText(ids.join(' '));
-		copied = true;
-
-		tooltip?.dispose();
-		// @ts-expect-error
-		// eslint-disable-next-line no-undef
-		tooltip = new bootstrap.Tooltip(document.getElementById('copy-text-btn'), {
-			title: 'Copied!',
-			trigger: 'manual'
-		});
-		tooltip.show();
-		setTimeout(() => {
-			copied = false;
-			tooltip?.dispose();
-			tooltip = undefined;
-		}, 2000);
+		copyToClipboardButton?.reset();
 	}
 
 	onDestroy(() => {
-		tooltip?.dispose();
-		tooltip = undefined;
+		hideAllTooltips();
 	});
 </script>
 
@@ -157,19 +136,13 @@
 					<span class="font-monospace me-2">{id}</span>
 				{/each}
 			</div>
-			<div class="copy-text-wrapper">
-				<button
-					class="btn btn-primary float-end mt-2"
-					on:click={copyTextToClipboard}
+			<div class="copy-text-wrapper float-end mt-2">
+				<CopyToClipboardButton
+					bind:this={copyToClipboardButton}
 					id="copy-text-btn"
-				>
-					{#if copied}
-						<i class="bi bi-clipboard-check" />
-					{:else}
-						<i class="bi bi-clipboard" />
-					{/if}
-					Copy text
-				</button>
+					clipboardText={ids.join(' ')}
+					text="Copy text"
+				/>
 			</div>
 		</div>
 	</div>

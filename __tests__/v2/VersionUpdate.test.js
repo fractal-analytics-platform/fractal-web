@@ -41,7 +41,7 @@ const newArgsSchema = {
 	additionalProperties: false
 };
 
-const taskGroups = [
+const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2[]} */ ([
 	{
 		id: 1,
 		pkg_name: 'group1',
@@ -229,33 +229,118 @@ const taskGroups = [
 			}
 		],
 		active: true
+	},
+	{
+		id: 11,
+		pkg_name: 'test_converter_compound',
+		version: '1.4.2',
+		task_list: [
+			{
+				id: 11,
+				name: 'test_converter_compound',
+				type: 'compound',
+				args_schema_non_parallel: {},
+				args_schema_parallel: {},
+				taskgroupv2_id: 11
+			}
+		],
+		active: true
+	},
+	{
+		id: 12,
+		pkg_name: 'test_converter_compound',
+		version: '1.5.0',
+		task_list: [
+			{
+				id: 12,
+				name: 'test_converter_compound',
+				type: 'converter_compound',
+				args_schema_non_parallel: {},
+				args_schema_parallel: {},
+				taskgroupv2_id: 12
+			}
+		],
+		active: true
+	},
+	{
+		id: 13,
+		pkg_name: 'test_converter_non_parallel',
+		version: '1.4.2',
+		task_list: [
+			{
+				id: 13,
+				name: 'test_converter_non_parallel',
+				type: 'non_parallel',
+				args_schema_non_parallel: {},
+				args_schema_parallel: null,
+				taskgroupv2_id: 13
+			}
+		],
+		active: true
+	},
+	{
+		id: 14,
+		pkg_name: 'test_converter_non_parallel',
+		version: '1.5.0',
+		task_list: [
+			{
+				id: 14,
+				name: 'test_converter_non_parallel',
+				type: 'converter_non_parallel',
+				args_schema_non_parallel: {},
+				args_schema_parallel: null,
+				taskgroupv2_id: 14
+			}
+		],
+		active: true
 	}
-];
+]);
 
 function mockTaskGroupsList() {
-	fetch.mockResolvedValue(createFetchResponse(taskGroups));
+	/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue(createFetchResponse(taskGroups));
 }
 
+/**
+ * @param {string} name
+ * @param {string|null} version
+ * @returns {import('fractal-components/types/api').TaskV2}
+ */
 function getTask(name, version) {
 	const taskGroup = taskGroups.find(
 		(tg) => tg.version === version && tg.task_list.find((t) => t.name === name)
 	);
-	return taskGroup.task_list.find((t) => t.name === name);
+	return /** @type {import('fractal-components/types/api').TaskV2} */ (
+		/** @type {import('fractal-components/types/api').TaskGroupV2} */ (taskGroup).task_list.find(
+			(t) => t.name === name
+		)
+	);
+}
+
+function getMockedWorkflowTask() {
+	/** @type {unknown} */
+	const wft = {
+		args_non_parallel: null,
+		args_parallel: null
+	};
+	return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ (wft);
 }
 
 describe('VersionUpdate', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
-	
+
 	it('update task without changing the arguments', async () => {
 		const task = getTask('My Task', '1.2.3');
-		const versions = await checkVersions(task, 2);
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 2, getMockedWorkflowTask())
+		);
 		expect(versions[0]).toBe('2.0.0');
 		expect(versions[1]).toBe('1.2.4');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.2.4' } });
 
+		/** @type {HTMLButtonElement} */
 		const btn = screen.getByRole('button', { name: 'Update' });
 		expect(btn.disabled).eq(false);
 		await fireEvent.click(btn);
@@ -263,14 +348,17 @@ describe('VersionUpdate', () => {
 
 	it('update task fixing the arguments', async () => {
 		const task = getTask('My Task', '1.2.4');
-		const versions = await checkVersions(task, 1, {
-			args_non_parallel: { extra_property: 1, changed_property: 'x' },
-			args_parallel: null
-		});
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				args_non_parallel: { extra_property: 1, changed_property: 'x' }
+			})
+		);
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
+		/** @type {HTMLButtonElement[]} */
 		const [moreLink1, moreLink2, moreLink3, checkBtn, cancelBtn, updateBtnDisabled] =
 			screen.getAllByRole('button');
 		expect(moreLink1.textContent).eq('more');
@@ -296,25 +384,28 @@ describe('VersionUpdate', () => {
 		});
 		await fireEvent.click(checkBtn);
 
-		const updateBtnEnabled = screen.getAllByRole('button')[2];
+		const updateBtnEnabled = /** @type {HTMLButtonElement} */ (screen.getAllByRole('button')[2]);
 		expect(updateBtnEnabled.textContent).eq('Update');
 		expect(updateBtnEnabled.disabled).eq(false);
 	});
 
 	it('use the cancel button when fixing the arguments', async () => {
 		const task = getTask('My Task', '1.2.4');
-		const versions = await checkVersions(task, 1, {
-			args_non_parallel: { changed_property: 'x' },
-			args_parallel: null
-		});
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				args_non_parallel: { changed_property: 'x' }
+			})
+		);
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		expect(screen.getByRole('textbox').value).eq(
+		expect(/** @type {HTMLInputElement} */ (screen.getByRole('textbox')).value).eq(
 			JSON.stringify({ changed_property: 'x' }, null, 2)
 		);
 
+		/** @type {HTMLButtonElement} */
 		const cancelBtnDisabled = screen.getByRole('button', { name: 'Cancel' });
 		expect(cancelBtnDisabled.disabled).eq(true);
 
@@ -322,23 +413,27 @@ describe('VersionUpdate', () => {
 			target: { value: '{"changed_property": "y"}' }
 		});
 
+		/** @type {HTMLButtonElement} */
 		const cancelBtnEnabled = screen.getByRole('button', { name: 'Cancel' });
 		expect(cancelBtnEnabled.disabled).eq(false);
 		await fireEvent.click(cancelBtnEnabled);
 
-		expect(screen.getByRole('textbox').value).eq(
+		expect(/** @type {HTMLInputElement} */ (screen.getByRole('textbox')).value).eq(
 			JSON.stringify({ changed_property: 'x' }, null, 2)
 		);
 	});
 
 	it('trying to fix the arguments with invalid JSON', async () => {
 		const task = getTask('My Task', '1.2.4');
-		const versions = await checkVersions(task, 1);
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, getMockedWorkflowTask())
+		);
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
 		const checkBtn = screen.getByRole('button', { name: 'Check' });
+		/** @type {HTMLButtonElement} */
 		const updateBtn = screen.getByRole('button', { name: 'Update' });
 		expect(updateBtn.disabled).eq(true);
 
@@ -353,11 +448,11 @@ describe('VersionUpdate', () => {
 
 	it('no new versions available', async () => {
 		const task = getTask('My Other Task', '1.3.0');
-		await checkVersions(task, 0);
+		await checkVersions(task, 0, getMockedWorkflowTask());
 	});
 
 	it('display warning if task has no version', () => {
-		renderVersionUpdate(getTask('null version task', null));
+		renderVersionUpdate(getTask('null version task', null), getMockedWorkflowTask());
 		expect(
 			screen.getByText(
 				'It is not possible to check for new versions because task version is not set.'
@@ -366,7 +461,7 @@ describe('VersionUpdate', () => {
 	});
 
 	it('display warning if task has no args_schema', () => {
-		renderVersionUpdate(getTask('no args schema task', '1.5.0'));
+		renderVersionUpdate(getTask('no args schema task', '1.5.0'), getMockedWorkflowTask());
 		expect(
 			screen.getByText(
 				'It is not possible to check for new versions because task has no args_schema.'
@@ -376,13 +471,15 @@ describe('VersionUpdate', () => {
 
 	it('update task with default parameters and no previous values', async () => {
 		const task = getTask('task_default_values', '0.0.1');
-		const versions = await checkVersions(task, 1);
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, getMockedWorkflowTask())
+		);
 		expect(versions[0]).toBe('0.0.2');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn.disabled).eq(false);
+		expect(btn).toBeEnabled();
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -393,7 +490,7 @@ describe('VersionUpdate', () => {
 					args_non_parallel: {
 						default_boolean1: false,
 						default_boolean2: true,
-						default_string: 'foo',
+						default_string: 'foo'
 					},
 					args_parallel: null
 				})
@@ -403,17 +500,22 @@ describe('VersionUpdate', () => {
 
 	it('update task with default parameters and previous values', async () => {
 		const task = getTask('task_default_values', '0.0.1');
-		const versions = await checkVersions(task, 1, {
-			args_non_parallel: {
-				default_boolean1: true,
-			}, args_parallel: null
-		});
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				...{
+					args_non_parallel: {
+						default_boolean1: true
+					}
+				}
+			})
+		);
 		expect(versions[0]).toBe('0.0.2');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn.disabled).eq(false);
+		expect(btn).toBeEnabled();
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -424,8 +526,69 @@ describe('VersionUpdate', () => {
 					args_non_parallel: {
 						default_boolean1: true,
 						default_boolean2: true,
-						default_string: 'foo',
+						default_string: 'foo'
 					},
+					args_parallel: null
+				})
+			})
+		);
+	});
+
+	it('update compound to converter_compound', async () => {
+		const task = getTask('test_converter_compound', '1.4.2');
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				...{
+					args_non_parallel: {},
+					args_parallel: {}
+				}
+			})
+		);
+		expect(versions[0]).toBe('1.5.0');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
+
+		const btn = screen.getByRole('button', { name: 'Update' });
+		expect(btn).toBeEnabled();
+		await fireEvent.click(btn);
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {},
+					args_parallel: {}
+				})
+			})
+		);
+	});
+
+	it('update non_parallel to converter_non_parallel', async () => {
+		const task = getTask('test_converter_non_parallel', '1.4.2');
+		const versions = /** @type {string[]} */ (
+			await checkVersions(task, 1, {
+				...getMockedWorkflowTask(),
+				...{
+					args_non_parallel: {}
+				}
+			})
+		);
+		expect(versions[0]).toBe('1.5.0');
+
+		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
+
+		const btn = screen.getByRole('button', { name: 'Update' });
+		expect(btn).toBeEnabled();
+		await fireEvent.click(btn);
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {},
 					args_parallel: null
 				})
 			})
@@ -433,15 +596,17 @@ describe('VersionUpdate', () => {
 	});
 });
 
-async function checkVersions(
-	task,
-	expectedCount,
-	workflowTask = { args_non_parallel: null, args_parallel: null }
-) {
+/**
+ * @param {import('fractal-components/types/api').TaskV2} task
+ * @param {number} expectedCount
+ * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @returns {Promise<string[]|undefined>}
+ */
+async function checkVersions(task, expectedCount, workflowTask) {
 	const result = renderVersionUpdate(task, workflowTask);
 
 	// triggers the updates
-	await new Promise(setTimeout);
+	await new Promise((resolve) => setTimeout(resolve));
 
 	if (expectedCount === 0) {
 		expect(result.getByText('No new versions available')).toBeDefined();
@@ -450,16 +615,18 @@ async function checkVersions(
 
 	const options = result.getAllByRole('option');
 	expect(options.length).toBe(expectedCount + 1);
-	expect(options[0].value).toBe('');
-	return options.filter((_, i) => i > 0).map((o) => o.value);
+	expect(/** @type {HTMLOptionElement} **/ (options[0]).value).toBe('');
+	return options.filter((_, i) => i > 0).map((o) => /** @type {HTMLOptionElement} **/ (o).value);
 }
 
-function renderVersionUpdate(
-	task,
-	workflowTask = { args_non_parallel: null, args_parallel: null }
-) {
+/**
+ * @param {import('fractal-components/types/api').TaskV2} task
+ * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @returns
+ */
+function renderVersionUpdate(task, workflowTask) {
 	workflowTask.task = task;
-	const nop = function () {};
+	const nop = async function () {};
 	mockTaskGroupsList();
 	return render(VersionUpdate, {
 		props: {

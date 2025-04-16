@@ -67,7 +67,8 @@ export async function uploadFile(page, selectorText, fileName, data, parentFolde
  */
 export async function selectSlimSelect(page, selector, optionValue, multiple = false) {
 	await selector.click();
-	const items = await page.getByRole('option').all();
+	const dataId = await selector.getAttribute('data-id');
+	const items = await page.locator(`.ss-content[data-id="${dataId}"]`).getByRole('option').all();
 	let selectedItem = null;
 	for (const item of items.reverse()) {
 		const itemText = await item.innerText();
@@ -77,42 +78,33 @@ export async function selectSlimSelect(page, selector, optionValue, multiple = f
 		}
 	}
 	expect(selectedItem).not.toBeNull();
-	await /** @type {import('@playwright/test').Locator} */ (selectedItem).click();
+	const item = /** @type {import('@playwright/test').Locator} */ (selectedItem);
+	await item.click();
 	if (multiple) {
 		await expect(selector).toHaveText(new RegExp(`(${optionValue}$)|(^\\d+ selected$)`));
 	} else {
 		await expect(selector).toHaveText(optionValue);
 	}
-	await expect(page.getByRole('option', { name: optionValue, exact: true }).last()).toHaveAttribute(
-		'aria-selected',
-		'true'
-	);
+	await expect(item).toHaveAttribute('aria-selected', 'true');
 }
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {import('@playwright/test').Locator} selector
- * @returns {Promise<string | string[] | null>}
+ * @param {string} label
+ * @param {string} value
+ * @returns {Promise<void>}
  */
-export async function getSlimSelectValues(page, selector) {
-	const dataId = await selector.getAttribute('data-id');
-	if (dataId === null) {
-		throw new Error(`Unable to retrieve slim select data-id`);
-	}
-	const dropdown = page.locator(`select[data-id="${dataId}"]`);
-	const id = await dropdown.getAttribute('id');
-	if (id === null) {
-		throw new Error(`Unable to retrieve slim select id`);
-	}
+export async function expectSlimSelectValue(page, label, value) {
+	await expect(page.getByLabel(label).locator('.ss-single')).toHaveText(value);
+}
 
-	return await page.evaluate((id) => {
-		const element = document.getElementById(id);
-		if (element && 'slim' in element) {
-			const slimSelect = /** @type {any} */ (element.slim);
-			return slimSelect.getSelected();
-		}
-		return null;
-	}, id);
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} label
+ * @returns {Promise<void>}
+ */
+export async function expectSlimSelectNotSet(page, label, placeholder = 'All') {
+	await expect(page.getByLabel(label).locator('.ss-placeholder')).toHaveText(placeholder);
 }
 
 /**

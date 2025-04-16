@@ -1,6 +1,6 @@
 import type { JSONSchemaObjectProperty } from './jschema';
 
-export type GetHeaders = (originalHeaders: Headers | undefined) => Headers
+export type GetHeaders = (originalHeaders: Headers | undefined) => Headers;
 
 export type User = {
 	id?: number;
@@ -19,25 +19,25 @@ export type User = {
 };
 
 export type UserSettings = {
-  slurm_accounts: string[]
-  project_dir: string | null
-  // Slurm
-  slurm_user: string | null
-  // Slurm SSH
-  ssh_host: string | null
-  ssh_username: string | null
-  ssh_private_key_path: string | null
-  ssh_tasks_dir: string | null
-  ssh_jobs_dir: string | null
-}
+	slurm_accounts: string[];
+	project_dir: string | null;
+	// Slurm
+	slurm_user: string | null;
+	// Slurm SSH
+	ssh_host: string | null;
+	ssh_username: string | null;
+	ssh_private_key_path: string | null;
+	ssh_tasks_dir: string | null;
+	ssh_jobs_dir: string | null;
+};
 
 export type Group = {
-  id: number
-  name: string
-  timestamp_created: string
-  user_ids?: number[]
-  viewer_paths: string[]
-}
+	id: number;
+	name: string;
+	timestamp_created: string;
+	user_ids?: number[];
+	viewer_paths: string[];
+};
 
 export type DatasetHistoryItem = {
 	workflowtask: WorkflowTask;
@@ -58,8 +58,6 @@ export type DatasetV2 = {
 	project: ProjectV2;
 	history: Array<DatasetHistoryItemV2> | null;
 	zarr_dir: string;
-	attribute_filters: { [key: string]: Array<string | number | boolean> | null };
-	type_filters: { [key: string]: boolean };
 	timestamp_created: string;
 };
 
@@ -73,18 +71,27 @@ export type Image = {
 	zarr_url: string;
 	attributes: { [key: string]: string | number | boolean };
 	types: { [key: string]: boolean };
+	status?: string;
 };
 
-export type ImagePage = {
+export type Pagination<T> = {
 	total_count: number;
 	page_size: number;
 	current_page: number;
-	attributes: { [key: string]: Array<string | number | boolean> };
-	types: Array<string>;
-	images: Array<Image>;
+	items: Array<T>;
 };
 
-export type TaskV2Type = 'non_parallel' | 'parallel' | 'compound';
+export type ImagePage = Pagination<Image> & {
+	attributes: { [key: string]: Array<string | number | boolean> };
+	types: Array<string>;
+};
+
+export type TaskV2Type =
+	| 'non_parallel'
+	| 'parallel'
+	| 'compound'
+	| 'converter_non_parallel'
+	| 'converter_compound';
 
 export type TaskV2 = {
 	id: number;
@@ -141,7 +148,15 @@ export type ApplyWorkflowV2 = {
 	attribute_filters: { [key: string]: string | number | boolean };
 };
 
-export type JobStatus = 'submitted' | 'done' | 'failed'
+export type JobStatus = 'submitted' | 'done' | 'failed';
+
+export type ImagesStatus = {
+	status: JobStatus | 'partial';
+	num_submitted_images: number;
+	num_done_images: number;
+	num_failed_images: number;
+	num_available_images: number | null;
+};
 
 export type WorkflowV2 = {
 	id: number;
@@ -261,20 +276,42 @@ export type TaskGroupActivityV2 = {
 };
 
 export type TypeFiltersFlow = {
-	dataset_filters: Array<{ [key: string]: bool }>;
-	input_filters: Array<{ [key: string]: bool }>;
-	output_filters: Array<{ [key: string]: bool }>;
+	workflowtask_id: number;
+	current_type_filters: { [key: string]: bool };
+	input_type_filters: { [key: string]: bool };
+	output_type_filters: { [key: string]: bool };
 };
 
-export type Accounting = {
-	total_count: number;
-	page_size: number;
-	current_page: number;
-	records: Array<{
-		id: number;
-		user_id: number;
-		timestamp: string;
-		num_tasks: number;
-		num_new_images: number;
-	}>;
+export type Accounting = Pagination<{
+	id: number;
+	user_id: number;
+	timestamp: string;
+	num_tasks: number;
+	num_new_images: number;
+}>;
+
+export type HistoryItemV2 = {
+	id: number;
+	dataset_id: number;
+	workflowtask_id: number;
+	workflowtask_dump: WorkflowTaskV2;
+	task_group_dump: TaskGroupV2;
+	timestamp_started: string;
+	status: ImagesStatus;
+	num_available_images: number;
+};
+
+export type HistoryUnit = {
+	id: number;
+	status: JobStatus;
+	zarr_urls: string[];
+	logfile: string | null;
+};
+
+export type HistoryRunAggregated = {
+	id: number;
+	workflowtask_dump: WorkflowTaskV2;
+	num_submitted_units: number;
+	num_done_units: number;
+	num_failed_units: number;
 };

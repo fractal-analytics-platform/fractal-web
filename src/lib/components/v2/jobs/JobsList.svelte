@@ -207,6 +207,7 @@
 		const select = new SlimSelect({
 			select: `#${id}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch,
 				allowDeselect: true
 			},
@@ -278,7 +279,7 @@
 <StandardDismissableAlert message={jobCancelledMessage} />
 
 {#if tableHandler}
-	<div class="d-flex justify-content-end align-items-center my-3">
+	<div class="d-flex justify-content-end align-items-center mb-3">
 		<div>
 			{#if !admin}
 				<button class="btn btn-warning" on:click={clearFilters}>

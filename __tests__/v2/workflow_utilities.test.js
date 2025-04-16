@@ -10,20 +10,22 @@ describe('Workflow Utilities', () => {
 	it('Default dataset is taken from most recent job', () => {
 		const id = getDefaultWorkflowDataset(
 			[],
-			[
+			/** @type {Array<import("fractal-components/types/api").ApplyWorkflowV2>} */
+			([
 				{ start_timestamp: '2024-04-24T10:18:37.868655+00:00', dataset_id: 1 },
 				{ start_timestamp: '2024-04-24T15:18:37.868655+00:00', dataset_id: 2 }
-			]
+			])
 		);
 		expect(id).toEqual(2);
 	});
 
 	it('Default dataset is taken from most recent dataset', () => {
 		const id = getDefaultWorkflowDataset(
-			[
+			/** @type {Array<import("fractal-components/types/api").DatasetV2>} */
+			([
 				{ id: 1, timestamp_created: '2024-04-24T10:18:37.868655+00:00' },
 				{ id: 2, timestamp_created: '2024-04-24T15:18:37.868655+00:00' }
-			],
+			]),
 			[]
 		);
 		expect(id).toEqual(2);
@@ -35,9 +37,19 @@ describe('Workflow Utilities', () => {
 	});
 
 	it('Store and retrieve selected dataset from localStorage', () => {
-		const workflow1 = { id: 1, project_id: 1 };
-		const workflow2 = { id: 2, project_id: 1 };
-		const datasets = [{ id: 1 }, { id: 2 }, { id: 3 }];
+		const workflow1 = /** @type {import("fractal-components/types/api").WorkflowV2} */ ({
+			id: 1,
+			project_id: 1
+		});
+		const workflow2 = /** @type {import("fractal-components/types/api").WorkflowV2} */ ({
+			id: 2,
+			project_id: 1
+		});
+		const datasets = /** @type {Array<import("fractal-components/types/api").DatasetV2>} */ ([
+			{ id: 1 },
+			{ id: 2 },
+			{ id: 3 }
+		]);
 		let datasetId = getSelectedWorkflowDataset(workflow1, datasets, 3);
 		// return default dataset if nothing is stored in localStorage
 		expect(datasetId).toEqual(3);
@@ -76,10 +88,11 @@ describe('Workflow Utilities', () => {
 	it('Handles jobs with deleted datasets', () => {
 		const id = getDefaultWorkflowDataset(
 			[],
-			[
+			/** @type {Array<import("fractal-components/types/api").ApplyWorkflowV2>} */
+			([
 				{ start_timestamp: '2024-04-24T15:18:37.868655+00:00', dataset_id: null },
 				{ start_timestamp: '2024-04-24T10:18:37.868655+00:00', dataset_id: 1 }
-			]
+			])
 		);
 		expect(id).toEqual(1);
 	});

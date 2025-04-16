@@ -6,25 +6,25 @@ import Paginator from '../src/lib/components/common/Paginator.svelte';
 describe('Paginator', () => {
 	it('display without ellipsis', () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 70, currentPage: 4, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 70, currentPage: 4, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '3', '4', '5', '6', '7', '»']);
 	});
 	it('display ellipsis at beginning', () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 1000, currentPage: 99, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 1000, currentPage: 99, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '...', '96', '97', '98', '99', '100', '»']);
 	});
 	it('display ellipsis at end', () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 1000, currentPage: 2, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 1000, currentPage: 2, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '3', '4', '5', '...', '100', '»']);
 	});
 	it('display ellipsis both at beginning and end', () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 1000, currentPage: 50, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 1000, currentPage: 50, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual([
 			'«',
@@ -44,13 +44,13 @@ describe('Paginator', () => {
 	});
 	it('omit ellipsis at end bewteen consecutive numbers', () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 70, currentPage: 3, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 70, currentPage: 3, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '3', '4', '5', '6', '7', '»']);
 	});
 	it('omit ellipsis at begninning bewteen consecutive numbers', () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 70, currentPage: 5, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 70, currentPage: 5, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '3', '4', '5', '6', '7', '»']);
 	});
@@ -81,29 +81,29 @@ describe('Paginator', () => {
 	});
 	it('hide pages if total results is zero', async () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 0, currentPage: 3, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 0, currentPage: 3, onPageChange: vi.fn() }
 		});
 		expect(result.queryByLabelText('Previous')).toBeNull();
 	});
 	it('previous is disabled on first page', async () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 13, currentPage: 1, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 13, currentPage: 1, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '»']);
-		expect(result.queryByLabelText('Previous').disabled).true;
+		expect(/** @type {HTMLLinkElement} */ (result.queryByLabelText('Previous')).disabled).true;
 	});
 	it('next is disabled on last page', async () => {
 		const result = render(Paginator, {
-			props: { pageSize: 10, totalCount: 13, currentPage: 2, onPageChange: () => {} }
+			props: { pageSize: 10, totalCount: 13, currentPage: 2, onPageChange: vi.fn() }
 		});
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '»']);
-		expect(result.queryByLabelText('Next').disabled).true;
+		expect(/** @type {HTMLLinkElement} */ (result.queryByLabelText('Next')).disabled).true;
 	});
 });
 
 /**
  *
- * @param {import('@testing-library/svelte').RenderResult} result
+ * @param {import('@testing-library/svelte').RenderResult<any>} result
  */
 function getPageItems(result) {
 	const itemElements = result.getByRole('list').querySelectorAll('.page-item');

@@ -32,7 +32,7 @@ export const data = {
 			name: 'workflow 2'
 		}
 	],
-	jobs: [
+	jobs: /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ ([
 		{
 			id: 1,
 			project_id: 1,
@@ -72,5 +72,5 @@ export const data = {
 			status: 'submitted',
 			user_email: 'admin@fractal.xy'
 		}
-	]
+	])
 };

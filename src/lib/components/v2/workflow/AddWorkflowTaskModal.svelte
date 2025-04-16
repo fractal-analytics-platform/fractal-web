@@ -19,6 +19,7 @@
 
 	let loading = false;
 	let addingTask = false;
+	let showDocLinksInTable = false;
 
 	/** @type {Array<import('fractal-components/types/api').TaskGroupV2>} */
 	let taskGroups = [];
@@ -94,6 +95,30 @@
 			}
 		);
 	}
+
+	/**
+	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 */
+	function showTaskInfoButton(taskRow) {
+		return taskRow.docs_info || (!showDocLinksInTable && taskRow.docs_link);
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 */
+	function getTaskInfo(taskRow) {
+		let info = '';
+		if (taskRow.docs_info) {
+			info += taskRow.docs_info;
+		}
+		if (!showDocLinksInTable && taskRow.docs_link) {
+			if (taskRow.docs_info) {
+				info += '\n\n---\n'; // markdown hr
+			}
+			info += taskRow.docs_link;
+		}
+		return formatMarkdown(info);
+	}
 </script>
 
 <Modal
@@ -113,7 +138,7 @@
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
 		{/if}
 		<div class:invisible={loading} class:collapse={loading}>
-			<FilteredTasksTable {taskGroups}>
+			<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
 				<svelte:fragment slot="extra-columns-colgroup">
 					<col width="40" />
 					<col width="120" />
@@ -124,8 +149,8 @@
 				</svelte:fragment>
 				<svelte:fragment slot="extra-columns" let:task>
 					<td>
-						{#if task.docs_info}
-							<PropertyDescription description={formatMarkdown(task.docs_info)} html={true} />
+						{#if showTaskInfoButton(task)}
+							<PropertyDescription description={getTaskInfo(task)} html={true} />
 						{/if}
 					</td>
 					<td>

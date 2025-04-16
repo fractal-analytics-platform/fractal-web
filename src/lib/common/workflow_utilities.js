@@ -4,9 +4,11 @@
  * @returns {number|undefined}
  */
 export function getDefaultWorkflowDataset(datasets, jobs) {
-	const jobsWithExistingDatasets = jobs.filter(j => j.dataset_id !== null);
+	const jobsWithExistingDatasets = jobs.filter((j) => j.dataset_id !== null);
 	if (jobsWithExistingDatasets.length > 0) {
-		return jobsWithExistingDatasets.sort((j1, j2) => (j1.start_timestamp > j2.start_timestamp ? -1 : 1))[0].dataset_id;
+		return jobsWithExistingDatasets.sort((j1, j2) =>
+			j1.start_timestamp > j2.start_timestamp ? -1 : 1
+		)[0].dataset_id;
 	}
 	if (datasets.length > 0) {
 		return datasets.sort((d1, d2) => (d1.timestamp_created > d2.timestamp_created ? -1 : 1))[0].id;
@@ -102,4 +104,20 @@ function getDatasetSelectionsFromLocalStorage() {
 		}
 	}
 	return [];
+}
+
+/**
+ * @param {import("fractal-components/types/api").DatasetV2} dataset
+ * @param {string} zarrUrl
+ * @returns {string}
+ */
+export function getRelativeZarrPath(dataset, zarrUrl) {
+	if (!zarrUrl.startsWith(dataset.zarr_dir)) {
+		return zarrUrl;
+	}
+	const relativePath = zarrUrl.substring(dataset.zarr_dir.length);
+	if (relativePath.startsWith('/')) {
+		return relativePath.substring(1);
+	}
+	return relativePath;
 }

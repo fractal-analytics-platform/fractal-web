@@ -184,3 +184,19 @@ export function arrayToCsv(data) {
 		)
 		.join('\n');
 }
+
+export function hideAllTooltips() {
+	for (const element of document.querySelectorAll('.tooltip')) {
+		element.remove();
+	}
+}
+
+/**
+ * @param {string} zarrUrl
+ */
+export function encodePathForUrl(zarrUrl) {
+	let encodedPath = encodeURIComponent(zarrUrl);
+	// Replace encoded slashes back to slashes
+	encodedPath = encodedPath.replace(/%2F/g, '/');
+	return encodedPath;
+}

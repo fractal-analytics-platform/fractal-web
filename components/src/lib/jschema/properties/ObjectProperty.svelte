@@ -6,6 +6,7 @@
 	export let formElement;
 
 	export let isRoot = false;
+	export let editable = true;
 
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
@@ -59,8 +60,9 @@
 						placeholder="Key"
 						class="form-control"
 						class:is-invalid={addPropertyError}
+						disabled={!editable}
 					/>
-					<button class="btn btn-primary" type="button" on:click={addProperty}>
+					<button class="btn btn-primary" type="button" on:click={addProperty} disabled={!editable}>
 						Add property
 					</button>
 					{#if addPropertyError}
@@ -79,6 +81,7 @@
 					class="btn btn-danger w-100"
 					type="button"
 					on:click={() => removeProperty(/**@type {string}*/ (child.key))}
+					disabled={!editable}
 				>
 					Remove Property Block
 				</button>
@@ -86,6 +89,7 @@
 			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
 				<PropertyDiscriminator
 					formElement={child}
+					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
 				/>
 			</div>

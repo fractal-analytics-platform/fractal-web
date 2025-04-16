@@ -58,6 +58,8 @@
 						<li class="list-group-item">{task.name}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Version</li>
 						<li class="list-group-item">{taskVersion || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Type</li>
+						<li class="list-group-item">{task.type}</li>
 						{#if task.command_non_parallel !== null}
 							<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
 							<li class="list-group-item"><code>{task.command_non_parallel}</code></li>

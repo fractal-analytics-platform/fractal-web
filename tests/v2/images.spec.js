@@ -108,30 +108,6 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await searchImages(page, 1);
 	});
 
-	await test.step('Set dataset filters', async () => {
-		await expect(page.getByRole('row')).toHaveCount(7);
-		const datasetFiltersBtn = page.getByText('Current selection').first();
-		await expect(datasetFiltersBtn).toBeEnabled();
-		await datasetFiltersBtn.click();
-		await expect(datasetFiltersBtn).toBeEnabled();
-		await expect(page.getByRole('row')).toHaveCount(7);
-		await page.getByText('Current selection').click();
-		await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled();
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'v1');
-		await page.getByRole('button', { name: 'Apply', exact: true }).click();
-		await page.getByRole('button', { name: 'Save' }).click();
-		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await waitModalClosed(page);
-		await expect(page.getByRole('button', { name: 'Apply', exact: true })).toBeDisabled();
-		await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeDisabled();
-		await expect(page.getByRole('row')).toHaveCount(3);
-		const allImagesBtn = page.getByText('All images');
-		await allImagesBtn.click();
-		await expect(allImagesBtn).toBeEnabled();
-		await expect(page.getByRole('row')).toHaveCount(7);
-	});
-
 	await test.step('Edit image', async () => {
 		await page.getByRole('row', { name: 'img2' }).getByRole('button', { name: 'Edit' }).click();
 		await modal.waitFor();
@@ -157,6 +133,20 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByRole('row')).toHaveCount(6);
 	});
+
+	await test.step('Add more images and test pagination', async () => {
+		await createImage(page, `${randomPath}/img6`);
+		await createImage(page, `${randomPath}/img7`);
+		await createImage(page, `${randomPath}/img8`);
+		await createImage(page, `${randomPath}/img9`);
+		await createImage(page, `${randomPath}/img10`);
+		await createImage(page, `${randomPath}/img11`);
+		await createImage(page, `${randomPath}/img12`);
+		await expect(page.getByText('Total results: 11')).toBeVisible();
+		await expect(page.getByRole('row')).toHaveCount(12);
+		await page.getByRole('button', { name: '2', exact: true }).click();
+		await expect(page.getByRole('row')).toHaveCount(3);
+	});
 });
 
 /**
@@ -164,7 +154,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
  * @param {string} zarr_url
  * @param {(modal: import('@playwright/test').Locator) => Promise<void>} filtersFunction
  */
-async function createImage(page, zarr_url, filtersFunction) {
+async function createImage(page, zarr_url, filtersFunction = async () => {}) {
 	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
 	await newImageBtn.waitFor();
 	await newImageBtn.click();

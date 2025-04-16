@@ -8,6 +8,7 @@
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
 	import { getNewVersions } from './version-checker';
+	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
@@ -63,9 +64,9 @@
 	$: canBeUpdated =
 		selectedUpdateVersion &&
 		updateCandidate &&
-		(((updateCandidateType === 'non_parallel' || updateCandidateType === 'compound') &&
+		(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
 			nonParallelCanBeUpdated) ||
-			((updateCandidateType === 'parallel' || updateCandidateType === 'compound') &&
+			((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
 				parallelCanBeUpdated));
 
 	async function checkNewVersions() {
@@ -217,7 +218,7 @@
 				</div>
 			{/if}
 			{#if updateCandidate}
-				{#if updateCandidateType === 'non_parallel' || updateCandidateType === 'compound'}
+				{#if isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)}
 					<VersionUpdateFixArgs
 						{workflowTask}
 						{updateCandidate}
@@ -227,7 +228,7 @@
 						bind:this={fixArgsComponentNonParallel}
 					/>
 				{/if}
-				{#if updateCandidateType === 'parallel' || updateCandidateType === 'compound'}
+				{#if isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)}
 					<VersionUpdateFixArgs
 						{workflowTask}
 						{updateCandidate}

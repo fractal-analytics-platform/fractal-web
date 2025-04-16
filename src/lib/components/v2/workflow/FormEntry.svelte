@@ -15,6 +15,7 @@
 	export let removeProperty;
 	/** @type {() => void} */
 	export let triggerChanges;
+	export let editable = true;
 </script>
 
 {#if entry.type === 'object' || entry.type === 'array'}
@@ -40,6 +41,7 @@
 								data-bs-toggle="collapse"
 								data-bs-target=""
 								on:input={triggerChanges}
+								disabled={!editable}
 							/>
 						{/if}
 						<button
@@ -49,6 +51,7 @@
 							aria-label="Remove property"
 							data-bs-toggle="collapse"
 							data-bs-target=""
+							disabled={!editable}
 						>
 							<i class="bi bi-trash" />
 						</button>
@@ -74,6 +77,7 @@
 							{#if child.type === 'object' || child.type === 'array'}
 								<svelte:self
 									entry={child}
+									{editable}
 									parent={entry.children}
 									index={childIndex}
 									{changeType}
@@ -84,6 +88,7 @@
 							{:else}
 								<FormBaseEntry
 									entry={child}
+									{editable}
 									{triggerChanges}
 									changeType={() => {
 										if ('children' in entry) {
@@ -106,6 +111,7 @@
 										addProperty(entry.children, entry.type === 'object');
 									}
 								}}
+								disabled={!editable}
 							>
 								Add property
 							</button>
@@ -118,6 +124,7 @@
 {:else}
 	<FormBaseEntry
 		{entry}
+		{editable}
 		{triggerChanges}
 		changeType={() => changeType(parent, index, entry.type)}
 		removeProperty={() => removeProperty(parent, index)}

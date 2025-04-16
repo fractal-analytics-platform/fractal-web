@@ -2,49 +2,66 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { deepCopy, objectChanged } from '$lib/common/component_utilities';
+	import {
+		encodePathForUrl,
+		hideAllTooltips,
+		objectChanged
+	} from '$lib/common/component_utilities';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
-	import Tooltip from '$lib/components/common/Tooltip.svelte';
+	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
+	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
+	import { browser } from '$app/environment';
+	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	export let imagePage;
+	/**
+	 * Types not included in the the image page result
+	 * @type {string[]}
+	 */
+	export let extraTypes = [];
 	/** @type {string|null} */
 	export let vizarrViewerUrl;
-	/** @type {boolean} */
-	export let useDatasetFilters;
 	/**
 	 * Set to true if the table is displayed inside the "Run workflow" modal.
 	 * Used to disable some buttons.
 	 * @type {boolean}
 	 */
-	export let runWorkflowModal;
-	export let attributeFiltersEnabled = true;
+	export let runWorkflowModal = false;
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	export let initialFilterValues = null;
+	/** @type {string[]} */
+	export let disabledTypes = [];
+	/** @type {(key: string) => void} */
+	export let beforeTypeSelectionChanged = () => {};
+	/** @type {string[]} */
+	export let highlightedTypes = [];
 
-	let datasetFiltersChanged = false;
-	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
-	export let onDatasetsUpdated = () => {};
+	/**
+	 * Set to true if the table is displayed inside the "Images status" modal.
+	 * @type {boolean}
+	 */
+	export let imagesStatusModal = false;
+	/**
+	 * @type {string|undefined}
+	 */
+	export let imagesStatusModalUrl = undefined;
+	let imagesStatusFilter = '';
 
 	let showTable = false;
 	let firstLoad = true;
-
-	/** @type {Tooltip|undefined} */
-	let currentSelectionTooltip;
 
 	/** @type {CreateUpdateImageModal|undefined} */
 	let imageModal = undefined;
 
 	let searching = false;
 	let resetting = false;
-	let savingDatasetFilters = false;
 
-	let loading = false;
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = {};
 
@@ -61,6 +78,8 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
+	/** @type {SlimSelect|undefined} */
+	let statusSelector = undefined;
 	/** @type {{[key: string]: SlimSelect}} */
 	let attributesSelectors = {};
 	/** @type {{[key: string]: SlimSelect}} */
@@ -101,72 +120,54 @@
 
 	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
 	function getTypeFilterBaseValues(imagePage) {
-		return Object.fromEntries(imagePage.types.map((k) => [k, getInitialTypeFilterValue(k)]));
+		return Object.fromEntries(getTypeKeys(imagePage).map((k) => [k, getInitialTypeFilterValue(k)]));
+	}
+
+	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
+	function getTypeKeys(imagePage) {
+		return [...imagePage.types, ...extraTypes];
 	}
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
 	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
+	let lastAppliedImagesStatusFilter = '';
 
 	$: applyBtnActive =
 		attributesChanged(lastAppliedAttributeFilters, attributeFilters) ||
-		objectChanged(lastAppliedTypeFilters, typeFilters);
+		objectChanged(lastAppliedTypeFilters, typeFilters) ||
+		lastAppliedImagesStatusFilter !== imagesStatusFilter;
 
 	let resetBtnActive = false;
 
-	/**
-	 * @param {string} zarrUrl
-	 * @returns {string}
-	 */
-	function getRelativePath(zarrUrl) {
-		if (!zarrUrl.startsWith(dataset.zarr_dir)) {
-			return zarrUrl;
-		}
-		const relativePath = zarrUrl.substring(dataset.zarr_dir.length);
-		if (relativePath.startsWith('/')) {
-			return relativePath.substring(1);
-		}
-		return relativePath;
-	}
-
 	export async function applySearchFields() {
 		searching = true;
-		await searchImages();
+		const params = await searchImages();
 		resetBtnActive =
 			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
-			Object.values(typeFilters).filter((t) => t !== null).length > 0;
+			Object.values(typeFilters).filter((t) => t !== null).length > 0 ||
+			!!imagesStatusFilter;
 		searching = false;
+		return params;
 	}
 
 	async function resetSearchFields() {
 		resetBtnActive = false;
 		resetting = true;
-		if (useDatasetFilters) {
-			attributeFilters = deepCopy(dataset.attribute_filters);
-			typeFilters = deepCopy(dataset.type_filters);
-		} else {
-			attributeFilters = getAttributeFilterBaseValues(imagePage);
-			typeFilters = getTypeFilterBaseValues(imagePage);
-		}
+		attributeFilters = getAttributeFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
+		imagesStatusFilter = '';
 		await tick();
 		await searchImages();
 		resetting = false;
 	}
 
 	export async function load() {
-		loading = true;
-		currentSelectionTooltip?.setEnabled(!useDatasetFilters);
-		if (useDatasetFilters) {
-			attributeFilters = deepCopy(dataset.attribute_filters);
-			typeFilters = deepCopy(dataset.type_filters);
-		} else {
-			attributeFilters = getAttributeFilterBaseValues(imagePage);
-			typeFilters = getTypeFilterBaseValues(imagePage);
-		}
+		attributeFilters = getAttributeFilterBaseValues(imagePage);
+		typeFilters = getTypeFilterBaseValues(imagePage);
 		await tick();
 		await searchImages();
-		loading = false;
 	}
 
 	onDestroy(() => {
@@ -176,6 +177,7 @@
 		for (const selector of Object.values(typesSelectors)) {
 			selector.destroy();
 		}
+		statusSelector?.destroy();
 		attributesSelectors = {};
 		typesSelectors = {};
 		attributeFilters = {};
@@ -207,14 +209,14 @@
 		);
 	}
 
-	function loadTypesSelector() {
+	function loadTypesSelectors() {
 		// Destroy previous selectors
 		for (const selector of Object.values(typesSelectors)) {
 			selector.destroy();
 		}
 		// Init new selectors
 		typesSelectors = Object.fromEntries(
-			imagePage.types.map((k) => [
+			getTypeKeys(imagePage).map((k) => [
 				k,
 				loadTypeSelector(
 					k,
@@ -233,16 +235,11 @@
 			])
 		);
 
-		if (runWorkflowModal) {
-			if (!attributeFiltersEnabled) {
-				// disable attribute filters selection
-				for (const attributeSelector of Object.values(attributesSelectors)) {
-					attributeSelector.disable();
-				}
-			}
-			// disable type filters selection
-			for (const typeSelector of Object.values(typesSelectors)) {
+		for (const [key, typeSelector] of Object.entries(typesSelectors)) {
+			if (disabledTypes.includes(key)) {
 				typeSelector.disable();
+			} else {
+				typeSelector.enable();
 			}
 		}
 	}
@@ -264,6 +261,7 @@
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: true,
 				allowDeselect: true,
 				isMultiple: true,
@@ -271,6 +269,9 @@
 				ariaLabel: `Selector for attribute ${key}`
 			},
 			events: {
+				beforeChange: () => {
+					return true;
+				},
 				afterChange: (selection) => {
 					const value = selection.map((s) => s.value);
 					setter(getTypedValues(key, value));
@@ -298,11 +299,16 @@
 		const selector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: false,
 				allowDeselect: true,
 				ariaLabel: `Selector for type ${key}`
 			},
 			events: {
+				beforeChange: () => {
+					beforeTypeSelectionChanged(key);
+					return true;
+				},
 				afterChange: (selection) => {
 					const selectedOption = selection[0];
 					if (!selectedOption || selectedOption.placeholder) {
@@ -318,16 +324,60 @@
 		return selector;
 	}
 
+	function loadStatusSelector() {
+		if (!imagesStatusModal) {
+			return;
+		}
+		const elementId = 'status-selector';
+		const selectElement = document.getElementById(elementId);
+		if (!selectElement) {
+			throw new Error(`Unable to find selector element with id ${elementId}`);
+		}
+		statusSelector?.destroy();
+		selectElement.classList.remove('invisible');
+		statusSelector = new SlimSelect({
+			select: `#${elementId}`,
+			settings: {
+				maxValuesShown: 5,
+				showSearch: false,
+				allowDeselect: true,
+				ariaLabel: `Status selector`,
+				isMultiple: false
+			},
+			events: {
+				afterChange: (selection) => {
+					const selectedOption = selection[0];
+					if (!selectedOption || selectedOption.placeholder) {
+						imagesStatusFilter = '';
+					} else {
+						imagesStatusFilter = selectedOption.value;
+					}
+				}
+			}
+		});
+		setSlimSelectOptions(statusSelector, [
+			'done',
+			'submitted',
+			'failed',
+			{ text: 'not processed', value: 'unset' }
+		]);
+		if (imagesStatusFilter) {
+			statusSelector.setSelected(imagesStatusFilter);
+		}
+	}
+
 	/**
 	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
 	 * @param {SlimSelect|undefined} select
-	 * @param {Array<string>} values
+	 * @param {Array<string | { text: string, value: string }>} values
 	 */
 	function setSlimSelectOptions(select, values) {
 		if (!select) {
 			return;
 		}
-		const options = values.map((v) => ({ text: v.toString(), value: v.toString() }));
+		const options = values.map((v) =>
+			typeof v === 'string' ? { text: v.toString(), value: v.toString() } : v
+		);
 		select.setData([{ text: 'All', placeholder: true }, ...options]);
 	}
 
@@ -349,8 +399,9 @@
 	/**
 	 * @param {number|null} currentPage
 	 * @param {number|null} pageSize
+	 * @returns {Promise<{ attribute_filters: any, type_filters: any }>}
 	 */
-	async function searchImages(currentPage = null, pageSize = null) {
+	export async function searchImages(currentPage = null, pageSize = null) {
 		if (currentPage === null) {
 			currentPage = imagePage.current_page;
 		}
@@ -358,6 +409,7 @@
 			pageSize = imagePage.page_size;
 		}
 		errorAlert?.hide();
+		hideAllTooltips();
 		const params = {};
 		let attributes = {};
 		for (const attributeKey of Object.keys(imagePage.attributes)) {
@@ -370,7 +422,7 @@
 			params.attribute_filters = attributes;
 		}
 		let types = {};
-		for (const typeKey of imagePage.types) {
+		for (const typeKey of getTypeKeys(imagePage)) {
 			const typeValue = typeFilters[typeKey];
 			if (typeValue !== null) {
 				types[typeKey] = typeValue;
@@ -381,16 +433,34 @@
 		}
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
-			{
+		let response;
+		if (imagesStatusModal) {
+			let url = `${imagesStatusModalUrl}&page=${currentPage}&page_size=${pageSize}`;
+			if (imagesStatusFilter) {
+				url += `&unit_status=${imagesStatusFilter}`;
+			}
+			response = await fetch(url, {
 				method: 'POST',
 				headers,
-				credentials: 'include',
-				body: JSON.stringify(params)
-			}
-		);
-		if (firstLoad && !runWorkflowModal) {
+				body: JSON.stringify(
+					stripNullAndEmptyObjectsAndArrays({
+						attribute_filters: attributes,
+						type_filters: types
+					})
+				)
+			});
+		} else {
+			response = await fetch(
+				`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=${currentPage}&page_size=${pageSize}`,
+				{
+					method: 'POST',
+					headers,
+					credentials: 'include',
+					body: JSON.stringify(params)
+				}
+			);
+		}
+		if (firstLoad && !runWorkflowModal && !imagesStatusModal) {
 			showTable = imagePage.total_count > 0;
 			firstLoad = false;
 		} else {
@@ -401,20 +471,23 @@
 			await tick();
 			reloadAttributeFilters(imagePage);
 			reloadTypeFilters(imagePage);
+			loadStatusSelector();
 			// Go to first page if the search returns no values and we are not in the first page
 			// This happens when we are in a given page and we restrict the search setting more filters
-			if (imagePage.images.length === 0 && imagePage.current_page > 1) {
+			if (imagePage.items.length === 0 && imagePage.current_page > 1) {
 				imagePage.current_page = 1;
 				await searchImages();
 			}
 			lastAppliedAttributeFilters = { ...attributeFilters };
 			lastAppliedTypeFilters = { ...typeFilters };
+			lastAppliedImagesStatusFilter = imagesStatusFilter;
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
 				'datasetImagesError'
 			);
 		}
+		return params;
 	}
 
 	/**
@@ -446,9 +519,9 @@
 	 */
 	function reloadTypeFilters(imagePage) {
 		typeFilters = Object.fromEntries(
-			imagePage.types.map((k) => [k, k in typeFilters ? typeFilters[k] : null])
+			getTypeKeys(imagePage).map((k) => [k, k in typeFilters ? typeFilters[k] : null])
 		);
-		loadTypesSelector();
+		loadTypesSelectors();
 	}
 
 	/**
@@ -475,7 +548,7 @@
 		);
 		if (response.ok) {
 			// If we are deleting the last image of the current page go to previous page
-			if (imagePage.images.length === 1 && imagePage.current_page > 1) {
+			if (imagePage.items.length === 1 && imagePage.current_page > 1) {
 				imagePage.current_page--;
 			}
 			await searchImages();
@@ -498,13 +571,6 @@
 		} else {
 			selector.setSelected(values.map((v) => v.toString()));
 		}
-	}
-
-	$: if (attributeFilters && typeFilters) {
-		datasetFiltersChanged =
-			!applyBtnActive &&
-			(attributesChanged(dataset.attribute_filters, removeNullValues(attributeFilters)) ||
-				objectChanged(dataset.type_filters, removeNullValues(typeFilters)));
 	}
 
 	$: if (dataset) {
@@ -547,60 +613,49 @@
 		return false;
 	}
 
-	async function saveDatasetFilters() {
-		errorAlert?.hide();
-		savingDatasetFilters = true;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: JSON.stringify({
-				attribute_filters: getAttributeFilters(),
-				type_filters: getTypeFilters()
-			})
-		});
-		if (response.ok) {
-			const result = await response.json();
-			dataset = result;
-			onDatasetsUpdated(dataset);
-		} else {
-			errorAlert = displayStandardErrorAlert(
-				await getAlertErrorFromResponse(response),
-				'datasetImagesError'
-			);
-		}
-		savingDatasetFilters = false;
+	/**
+	 * @param {string} zarrUrl
+	 */
+	function getUrl(zarrUrl) {
+		return `${vizarrViewerUrl}data${encodePathForUrl(zarrUrl)}`;
 	}
+
+	onDestroy(() => {
+		if (browser) {
+			hideAllTooltips();
+		}
+	});
 </script>
 
 {#if !showTable}
-	<p class="fw-bold ms-4 mt-5">No entries in the image list yet</p>
-	{#if !runWorkflowModal}
-		<button class="btn btn-outline-secondary ms-4" on:click={() => imageModal?.openForCreate()}>
-			<i class="bi bi-plus-circle" />
-			Add an image list entry
-		</button>
+	{#if !runWorkflowModal && !imagesStatusModal}
+		<div class="container">
+			<p class="fw-bold mt-5">No entries in the image list yet</p>
+			<button class="btn btn-outline-secondary" on:click={() => imageModal?.openForCreate()}>
+				<i class="bi bi-plus-circle" />
+				Add an image list entry
+			</button>
+		</div>
 	{/if}
 {:else}
 	<div>
-		<div class="row">
-			<div class="col">
-				<div id="datasetImagesError" class="mt-2 mb-2" />
-			</div>
+		<div class="container">
+			<div id="datasetImagesError" class="mt-2 mb-2" />
 		</div>
 
 		<div class="table-responsive mt-2">
 			<table class="table" id="dataset-images-table">
 				<colgroup>
 					<col width="auto" />
+					{#if imagesStatusModal}
+						<col width="190" />
+					{/if}
 					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each Object.keys(imagePage.attributes) as _}
 						<col width="190" />
 					{/each}
 					<!-- eslint-disable-next-line no-unused-vars -->
-					{#each imagePage.types as _}
+					{#each getTypeKeys(imagePage) as _}
 						<col width="110" />
 					{/each}
 					<col width="auto" />
@@ -608,22 +663,27 @@
 				<thead>
 					<tr>
 						<th>Zarr URL</th>
+						{#if imagesStatusModal}
+							<th>Status</th>
+						{/if}
 						{#each Object.keys(imagePage.attributes) as attributeKey}
 							<th>
-								<label for="attribute-{getIdFromValue(attributeKey)}">
+								<label class="align-bottom" for="attribute-{getIdFromValue(attributeKey)}">
 									{attributeKey}
 								</label>
-								<button
-									class="ps-0 btn btn-link"
-									on:click|preventDefault={() => toggleAll(attributeKey)}
-									title="Toggle all"
-								>
-									<i class="bi bi-check-all" />
-								</button>
+								{#if !imagesStatusModal}
+									<button
+										class="ps-0 pb-0 btn btn-link"
+										on:click|preventDefault={() => toggleAll(attributeKey)}
+										title="Toggle all"
+									>
+										<i class="bi bi-check-all" />
+									</button>
+								{/if}
 							</th>
 						{/each}
-						{#each imagePage.types as typeKey}
-							<th>
+						{#each getTypeKeys(imagePage) as typeKey}
+							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<label for="type-{getIdFromValue(typeKey)}">
 									{typeKey}
 								</label>
@@ -633,6 +693,17 @@
 					</tr>
 					<tr>
 						<th />
+						{#if imagesStatusModal}
+							<th>
+								<div class="row">
+									<div class="col">
+										<div class="status-select-wrapper mb-1">
+											<select id="status-selector" class="invisible" />
+										</div>
+									</div>
+								</div>
+							</th>
+						{/if}
 						{#each Object.keys(imagePage.attributes) as attributeKey}
 							<th>
 								<div class="row">
@@ -644,8 +715,8 @@
 								</div>
 							</th>
 						{/each}
-						{#each imagePage.types as typeKey}
-							<th>
+						{#each getTypeKeys(imagePage) as typeKey}
+							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<div class="type-select-wrapper mb-1">
 									<select id="type-{getIdFromValue(typeKey)}" class="invisible" />
 								</div>
@@ -676,24 +747,18 @@
 								{/if}
 								Reset
 							</button>
-							{#if !runWorkflowModal && useDatasetFilters}
-								<ConfirmActionButton
-									modalId="confirmSaveDatasetFilters"
-									label="Save"
-									message="Save dataset filters"
-									disabled={!datasetFiltersChanged || savingDatasetFilters}
-									callbackAction={async () => {
-										await saveDatasetFilters();
-									}}
-								/>
-							{/if}
 						</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each imagePage.images as image}
+					{#each imagePage.items as image, index}
 						<tr>
-							<td>{getRelativePath(image.zarr_url)}</td>
+							<td>{getRelativeZarrPath(dataset, image.zarr_url)}</td>
+							{#if imagesStatusModal}
+								<td>
+									{image.status || '-'}
+								</td>
+							{/if}
 							{#each Object.keys(imagePage.attributes) as attribute}
 								<td>
 									{#if image.attributes[attribute] !== null && image.attributes[attribute] !== undefined}
@@ -701,34 +766,46 @@
 									{/if}
 								</td>
 							{/each}
-							{#each imagePage.types as typeKey}
+							{#each getTypeKeys(imagePage) as typeKey}
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
 								{#if vizarrViewerUrl}
 									<a
 										class="btn btn-info"
-										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{image.zarr_url}"
+										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{encodePathForUrl(
+											image.zarr_url
+										)}"
 										target="_blank"
 									>
 										<i class="bi bi-eye" />
 										View
 									</a>
+									{#key imagePage.items}
+										<CopyToClipboardButton
+											btnClass="light"
+											clipboardText={getUrl(image.zarr_url)}
+											text="Get URL"
+											id="get-url{index}"
+										/>
+									{/key}
 								{/if}
-								{#if !runWorkflowModal}
+								{#if !runWorkflowModal && !imagesStatusModal}
 									<button
-										class="btn btn-primary"
+										class="btn btn-light"
 										on:click={() => imageModal?.openForEditing(image)}
+										aria-label="Edit"
 									>
-										<i class="bi bi-pencil" />
-										Edit
+										<span class="text-primary">
+											<i class="bi bi-pencil" />
+										</span>
 									</button>
 									<ConfirmActionButton
 										modalId={'deleteConfirmImageModal-' + getIdFromValue(image.zarr_url)}
-										style={'danger'}
-										btnStyle="danger"
+										style="danger"
+										btnStyle="light text-danger"
 										buttonIcon="trash"
-										label={'Delete'}
+										ariaLabel={'Delete'}
 										callbackAction={() => handleDeleteImage(image.zarr_url)}
 									>
 										<svelte:fragment slot="body">
@@ -745,63 +822,29 @@
 										</svelte:fragment>
 									</ConfirmActionButton>
 								{/if}
+								{#if imagesStatusModal}
+									<slot name="extra-buttons" {image} />
+								{/if}
 							</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 		</div>
-		<div class="pb-2" id="dataset-filters-wrapper" class:sticky-bottom={!runWorkflowModal}>
+		<div class="pb-2 bg-white" class:sticky-bottom={!runWorkflowModal && !imagesStatusModal}>
 			<div class="row">
-				<div class="col-lg-3 mb-3">
-					{#if !runWorkflowModal}
-						<input
-							type="radio"
-							class="btn-check"
-							name="filters-switch"
-							id="all-images"
-							autocomplete="off"
-							value={false}
-							bind:group={useDatasetFilters}
-							on:change={load}
-							disabled={loading || searching || resetting}
-						/>
-						<label class="btn btn-white btn-outline-primary" for="all-images">All images</label>
-						<Tooltip
-							id="current-selection-label"
-							title="These are default selection for images on which a workflow will be run"
-							placement="bottom"
-							bind:this={currentSelectionTooltip}
-						>
-							<input
-								type="radio"
-								class="btn-check"
-								name="filters-switch"
-								id="current-selection"
-								autocomplete="off"
-								value={true}
-								bind:group={useDatasetFilters}
-								on:change={load}
-								disabled={loading || searching || resetting}
-							/>
-							<label class="btn btn-white btn-outline-primary" for="current-selection">
-								Current selection
-							</label>
-						</Tooltip>
-						{#if loading}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-						{/if}
-					{/if}
-				</div>
-				<div class="col-lg-6">
+				<div class={!runWorkflowModal && !imagesStatusModal ? 'col-lg-6' : 'col'}>
 					<Paginator
 						currentPage={imagePage.current_page}
 						pageSize={imagePage.page_size}
 						totalCount={imagePage.total_count}
-						onPageChange={searchImages}
+						onPageChange={async (currentPage, pageSize) => {
+							await searchImages(currentPage, pageSize);
+						}}
+						singleLine={runWorkflowModal || imagesStatusModal}
 					/>
 				</div>
-				{#if !runWorkflowModal}
+				{#if !runWorkflowModal && !imagesStatusModal}
 					<div class="col-lg-3">
 						<button
 							class="btn btn-outline-secondary float-end"
@@ -817,7 +860,13 @@
 	</div>
 {/if}
 
-<CreateUpdateImageModal {dataset} onImageSave={searchImages} bind:this={imageModal} />
+<CreateUpdateImageModal
+	{dataset}
+	onImageSave={async () => {
+		await searchImages();
+	}}
+	bind:this={imageModal}
+/>
 
 <style>
 	#dataset-images-table td:last-child,
@@ -827,15 +876,6 @@
 
 	#dataset-images-table thead tr:first-child th label {
 		word-break: break-all;
-	}
-
-	#dataset-filters-wrapper {
-		background-color: #fff;
-	}
-
-	.btn-check:not(:checked) + .btn-white {
-		color: #0d6efd;
-		background-color: #fff;
 	}
 
 	.wrap {

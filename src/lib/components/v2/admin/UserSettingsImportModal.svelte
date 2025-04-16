@@ -68,6 +68,7 @@
 		userSelector = new SlimSelect({
 			select: `#${elementId}`,
 			settings: {
+				maxValuesShown: 5,
 				showSearch: true,
 				ariaLabel: 'Select user'
 			},

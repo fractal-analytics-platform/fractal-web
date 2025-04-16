@@ -47,11 +47,11 @@ import page from '../../src/routes/v2/projects/[projectId]/workflows/[workflowId
 
 describe('Workflow page', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('Display error when submission failed before starting execution of tasks', async () => {
-		fetch.mockImplementation((url) => {
+		/** @type {import('vitest').Mock} */ (fetch).mockImplementation((url) => {
 			return Promise.resolve({
 				ok: true,
 				status: 200,
@@ -87,6 +87,15 @@ describe('Workflow page', () => {
 									log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
 								}
 							];
+						case '/api/v2/project/1/latest-job?workflow_id=1&dataset_id=1':
+							return {
+								id: 1,
+								project_id: 1,
+								workflow_id: 1,
+								dataset_id: 1,
+								status: 'failed',
+								log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
+							};
 						case '/api/auth/current-user/settings':
 							return { slurm_accounts: [] };
 						default:

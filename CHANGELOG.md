@@ -1,5 +1,22 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Workflow task flexibility (\#759):
+    * Added image list modal in workflow page;
+    * Displayed workflow runs in expansible subsections, with frozen arguments;
+    * Supported both new and legacy workflow statuses;
+    * Displayed per-image logs in workflow image list;
+    * Displayed run logs in workflow page;
+    * Exposed type filters in workflow submission modals;
+    * Added job-submission warning when there are images with different values for some types;
+* Dropped support for dataset type/attribute filters and removed environment variable `ENABLE_INTERACTIVE_ATTRIBUTE_FILTERS` (\#759);
+* Added a "Get URL" button to image list (\#759);
+* Supported converter task types (\#759);
+* Made user sorting case insensitive (\#759);
+* Moved tasks table links to the info modal (\#759);
+* Removed "Download token" button from profile page, added "Get token" button to main dropdown menu (\#759);
+
 # 1.16.2
 
 * Fixed task version sorting issue (\#733);

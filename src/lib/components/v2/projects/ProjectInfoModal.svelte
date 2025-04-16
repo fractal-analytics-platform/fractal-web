@@ -82,24 +82,13 @@
 					<div id="errorAlert-projectInfoModal" />
 					{#if datasets}
 						<p class="lead">Datasets</p>
-						<table class="table">
-							<thead class="table-light">
-								<tr>
-									<th>Name</th>
-									<th># Attribute Filters</th>
-									<th># Type Filters</th>
-								</tr>
-							</thead>
-							<tbody>
-								{#each datasets as { name, attribute_filters, type_filters }}
-									<tr>
-										<td>{name}</td>
-										<td>{Object.entries(attribute_filters).length}</td>
-										<td>{Object.entries(type_filters).length}</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
+						<ul>
+							{#each datasets as { name }}
+								<li>
+									{name}
+								</li>
+							{/each}
+						</ul>
 					{/if}
 				</div>
 			</div>

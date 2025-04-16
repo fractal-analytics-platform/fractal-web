@@ -9,11 +9,15 @@
 	import { page } from '$app/stores';
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	export let workflowTask;
 	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
+	export let editable = true;
+	export let metaNonParallel = {};
+	export let metaParallel = {};
 
 	/** @type {FormBuilder|undefined} */
 	let nonParallelFormBuilderComponent;
@@ -27,8 +31,10 @@
 	let metaPropertiesParallel = {};
 
 	$: {
-		metaPropertiesNonParallel = workflowTask.meta_non_parallel || {};
-		metaPropertiesParallel = workflowTask.meta_parallel || {};
+		metaPropertiesNonParallel = editable
+			? workflowTask.meta_non_parallel || {}
+			: metaNonParallel || {};
+		metaPropertiesParallel = editable ? workflowTask.meta_parallel || {} : metaParallel || {};
 	}
 
 	$: unsavedChanges = unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel;
@@ -100,35 +106,42 @@
 <div class="mt-2">
 	<span id="metaPropertiesFormError" />
 </div>
-{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-	{#if workflowTask.task_type === 'compound'}
+{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
+	{#if isCompoundType(workflowTask.task_type)}
 		<h5 class="ms-2">Initialisation Meta</h5>
 	{/if}
-	<FormBuilder
-		args={metaPropertiesNonParallel}
-		bind:this={nonParallelFormBuilderComponent}
-		bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
-	/>
+	{#key editable || metaPropertiesNonParallel}
+		<FormBuilder
+			{editable}
+			args={metaPropertiesNonParallel}
+			bind:this={nonParallelFormBuilderComponent}
+			bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
+		/>
+	{/key}
 {/if}
-{#if workflowTask.task_type === 'compound'}
+{#if isCompoundType(workflowTask.task_type)}
 	<hr />
 {/if}
-{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-	{#if workflowTask.task_type === 'compound'}
+{#if isParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
+	{#if isCompoundType(workflowTask.task_type)}
 		<h5 class="ms-2">Compute Meta</h5>
 	{/if}
-	<FormBuilder
-		args={metaPropertiesParallel}
-		bind:this={parallelFormBuilderComponent}
-		bind:unsavedChanges={unsavedChangesFormBuilderParallel}
-	/>
+	{#key editable || metaPropertiesParallel}
+		<FormBuilder
+			{editable}
+			args={metaPropertiesParallel}
+			bind:this={parallelFormBuilderComponent}
+			bind:unsavedChanges={unsavedChangesFormBuilderParallel}
+		/>
+	{/key}
 {/if}
+
 <div class="p-3 clearfix metaproperties-controls-bar">
 	<div class="ms-1 float-end">
 		<button
 			class="btn btn-success"
 			type="button"
-			disabled={!unsavedChanges || savingChanges}
+			disabled={!editable || !unsavedChanges || savingChanges}
 			on:click={saveChanges}
 		>
 			{#if savingChanges}
@@ -140,7 +153,7 @@
 	<div class="float-end">
 		<button
 			class="btn btn-warning"
-			disabled={!unsavedChanges || savingChanges}
+			disabled={!editable || !unsavedChanges || savingChanges}
 			on:click={discardChanges}
 		>
 			Discard changes

@@ -25,7 +25,7 @@
 </script>
 
 {#if project && workflow}
-	<div class="d-flex justify-content-between align-items-center">
+	<div class="container mt-3 d-flex justify-content-between align-items-center">
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item" aria-current="page">
@@ -44,5 +44,7 @@
 		<div />
 	</div>
 
-	<JobsList columnsToHide={['project', 'workflow', 'user_email', 'id']} {jobUpdater} />
+	<div class="container">
+		<JobsList columnsToHide={['project', 'workflow', 'user_email', 'id']} {jobUpdater} />
+	</div>
 {/if}

@@ -239,16 +239,25 @@ it('generates new unique dataset name', () => {
 });
 
 it('get first task index for continuing workflow', () => {
+	const doneImages = createImageStatus('done', 0, 2, 0);
+	const failedImages = createImageStatus('failed', 0, 0, 3);
+	const submittedImages = createImageStatus('submitted', 5, 0, 0);
 	expect(testGetFirstTaskIndexForContinuingWorkflow([null, null, null, null])).toEqual(0);
-	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', 'done', null, null])).toEqual(2);
-	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', 'failed', 'done', null])).toEqual(1);
-	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', null, 'done', null])).toEqual(1);
-	expect(testGetFirstTaskIndexForContinuingWorkflow(['done', 'done', 'done', 'done'])).toEqual(
-		undefined
+	expect(testGetFirstTaskIndexForContinuingWorkflow([doneImages, doneImages, null, null])).toEqual(
+		2
 	);
-	expect(testGetFirstTaskIndexForContinuingWorkflow(['submitted', 'failed', null, null])).toEqual(
-		undefined
+	expect(
+		testGetFirstTaskIndexForContinuingWorkflow([doneImages, failedImages, doneImages, null])
+	).toEqual(1);
+	expect(testGetFirstTaskIndexForContinuingWorkflow([doneImages, null, doneImages, null])).toEqual(
+		1
 	);
+	expect(
+		testGetFirstTaskIndexForContinuingWorkflow([doneImages, doneImages, doneImages, doneImages])
+	).toEqual(undefined);
+	expect(
+		testGetFirstTaskIndexForContinuingWorkflow([submittedImages, failedImages, null, null])
+	).toEqual(undefined);
 });
 
 /**
@@ -256,20 +265,39 @@ it('get first task index for continuing workflow', () => {
  */
 function getMockedDatasets(names) {
 	return names.map((name, index) => {
-		return { id: index + 1, name };
+		return /** @type {import('fractal-components/types/api').DatasetV2} */ ({
+			id: index + 1,
+			name
+		});
 	});
 }
 
 /**
- * @param {Array<string|null>} values
+ * @param {number} submitted
+ * @param {number} done
+ * @param {number} failed
+ * @returns {import('fractal-components/types/api').ImagesStatus}
+ */
+function createImageStatus(status, submitted, done, failed) {
+	return {
+		status,
+		num_submitted_images: submitted,
+		num_done_images: done,
+		num_failed_images: failed,
+		num_available_images: 10
+	};
+}
+
+/**
+ * @param {Array<import('fractal-components/types/api').ImagesStatus|null>} values
  * @returns {number|undefined}
  */
 function testGetFirstTaskIndexForContinuingWorkflow(values) {
 	const workflowTasks = values.map((_, i) => {
-		return {
+		return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ ({
 			id: i + 1,
 			order: i
-		};
+		});
 	});
 	const statuses = Object.fromEntries(
 		values.map((v, i) => [i + 1, v]).filter((e) => e[1] !== null)

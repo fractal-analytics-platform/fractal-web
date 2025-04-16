@@ -9,13 +9,21 @@
 	import {
 		JSchema,
 		stripNullAndEmptyObjectsAndArrays,
-		stripIgnoredProperties,
 		getPropertiesToIgnore
 	} from 'fractal-components';
 	import FormBuilder from './FormBuilder.svelte';
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
+	import {
+		isCompoundType,
+		hasComputeArguments,
+		hasInitialisationArguments,
+		hasNonParallelArguments,
+		isNonParallelType,
+		hasParallelArguments,
+		isParallelType
+	} from 'fractal-components';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
@@ -26,6 +34,11 @@
 	export let workflowTask;
 	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
 	export let onWorkflowTaskUpdated;
+	export let editable = true;
+	/** @type {object|undefined} */
+	export let argsNonParallel = undefined;
+	/** @type {object|undefined} */
+	export let argsParallel = undefined;
 
 	/** @type {JSchema|undefined} */
 	let nonParallelSchemaComponent;
@@ -50,10 +63,6 @@
 		unsavedChangesFormBuilderNonParallel;
 
 	$: isSchemaValid = argsSchemaVersionValid(workflowTask.task.args_schema_version);
-
-	$: hasNonParallel =
-		workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound';
-	$: hasParallel = workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound';
 
 	$: argsSchemaNonParallel = workflowTask.task.args_schema_non_parallel;
 
@@ -85,14 +94,14 @@
 			return;
 		}
 		const payload = {};
-		if (hasNonParallel) {
+		if (isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)) {
 			if (nonParallelSchemaComponent) {
 				payload.args_non_parallel = nonParallelSchemaComponent.getArguments();
 			} else if (nonParallelFormBuilderComponent) {
 				payload.args_non_parallel = nonParallelFormBuilderComponent.getArguments();
 			}
 		}
-		if (hasParallel) {
+		if (isParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)) {
 			if (parallelSchemaComponent) {
 				payload.args_parallel = parallelSchemaComponent.getArguments();
 			} else if (parallelFormBuilderComponent) {
@@ -196,35 +205,22 @@
 		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
 	}
 
-	$: hasNonParallelArgs =
-		workflowTask.task.args_schema_non_parallel &&
-		Object.keys(
-			stripIgnoredProperties(
-				workflowTask.task.args_schema_non_parallel,
-				getPropertiesToIgnore(false)
-			).properties
-		).length;
-
-	$: hasParallelArgs =
-		argsSchemaParallel &&
-		Object.keys(stripIgnoredProperties(argsSchemaParallel, getPropertiesToIgnore(false)).properties)
-			.length;
-
 	$: propertiesToIgnore = getPropertiesToIgnore(false);
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="task-args-validation-errors" />
-	{#if workflowTask.task_type === 'non_parallel' || workflowTask.task_type === 'compound'}
-		{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !workflowTask.task.args_schema_non_parallel)}
+	{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
+		{#if hasInitialisationArguments(workflowTask)}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
-		{#if workflowTask.task.args_schema_non_parallel && isSchemaValid}
+		{#if argsSchemaNonParallel && isSchemaValid}
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-non-parallel"
-					schema={workflowTask.task.args_schema_non_parallel}
-					schemaData={workflowTask.args_non_parallel}
+					schema={argsSchemaNonParallel}
+					schemaData={editable ? workflowTask.args_non_parallel : argsNonParallel}
+					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
 					on:change={handleNonParallelChanged}
@@ -234,18 +230,19 @@
 		{:else}
 			<div>
 				<FormBuilder
-					args={workflowTask.args_non_parallel}
+					args={editable ? workflowTask.args_non_parallel : argsNonParallel}
 					bind:this={nonParallelFormBuilderComponent}
 					bind:unsavedChanges={unsavedChangesFormBuilderNonParallel}
+					{editable}
 				/>
 			</div>
 		{/if}
 	{/if}
-	{#if (hasNonParallelArgs && hasParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel && !workflowTask.task.args_schema_non_parallel)}
+	{#if hasInitialisationArguments(workflowTask) && hasComputeArguments(workflowTask)}
 		<hr />
 	{/if}
-	{#if workflowTask.task_type === 'parallel' || workflowTask.task_type === 'compound'}
-		{#if (hasParallelArgs && hasNonParallelArgs) || (workflowTask.task_type === 'compound' && !argsSchemaParallel)}
+	{#if isParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
+		{#if hasComputeArguments(workflowTask)}
 			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
@@ -253,7 +250,8 @@
 				<JSchema
 					componentId="jschema-parallel"
 					schema={argsSchemaParallel}
-					schemaData={workflowTask.args_parallel}
+					schemaData={editable ? workflowTask.args_parallel : argsParallel}
+					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
 					on:change={handleParallelChanged}
@@ -263,27 +261,28 @@
 		{:else}
 			<div class="mb-3">
 				<FormBuilder
-					args={workflowTask.args_parallel}
+					args={editable ? workflowTask.args_parallel : argsParallel}
 					bind:this={parallelFormBuilderComponent}
 					bind:unsavedChanges={unsavedChangesFormBuilderParallel}
+					{editable}
 				/>
 			</div>
 		{/if}
 	{/if}
-	{#if !hasNonParallelArgs && !hasParallelArgs && (argsSchemaParallel || argsSchemaNonParallel)}
+	{#if !hasNonParallelArguments(workflowTask) && !hasParallelArguments(workflowTask) && (argsSchemaParallel || argsSchemaNonParallel)}
 		<p class="mt-3 ps-3">No arguments</p>
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
 		<ImportExportArgs
 			{workflowTask}
 			onImport={handleImport}
-			exportDisabled={unsavedChanges || savingChanges}
+			exportDisabled={!editable || unsavedChanges || savingChanges}
 		/>
 		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}
 			<div>
 				<button
 					class="btn btn-warning"
-					disabled={!unsavedChanges || savingChanges}
+					disabled={!editable || !unsavedChanges || savingChanges}
 					on:click={discardChanges}
 				>
 					Discard changes
@@ -293,7 +292,7 @@
 				<button
 					class="btn btn-success"
 					type="button"
-					disabled={!unsavedChanges || savingChanges}
+					disabled={!editable || !unsavedChanges || savingChanges}
 					on:click={saveChanges}
 				>
 					{#if savingChanges}

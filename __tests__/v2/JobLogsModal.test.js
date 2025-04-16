@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
+import { mockApplyWorkflow } from '../mock/mock-types';
 
 // Mocking public variables
 vi.mock('$env/dynamic/public', () => {
@@ -14,6 +15,7 @@ class MockModal {
 }
 MockModal.getInstance = vi.fn();
 
+// @ts-expect-error
 global.window.bootstrap = {
 	Modal: MockModal
 };
@@ -30,8 +32,8 @@ describe('JobLogsModal', async () => {
 TRACEBACK:
 Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.`;
 		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
-		await result.component.show({ id: 1, status: 'failed', log: null }, false);
-		const pre = result.container.querySelector('pre');
+		await result.component.show(mockApplyWorkflow({ id: 1, status: 'failed', log: null }), false);
+		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		expect(pre.classList.contains('highlight')).eq(true);
 		expect(pre.innerHTML).eq(error);
 	});
@@ -52,8 +54,8 @@ pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
   field required (type=value_error.missing)`;
 		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
-		await result.component.show({ id: 1, status: 'failed', log: null }, true);
-		const pre = result.container.querySelector('pre');
+		await result.component.show(mockApplyWorkflow({ id: 1, status: 'failed', log: null }), true);
+		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		let divs = pre.querySelectorAll('div');
 		expect(divs.length).eq(2);
 		expect(divs[0].classList.contains('highlight')).eq(true);
@@ -80,35 +82,35 @@ allowed_channels
 		const result = render(JobLogsModal);
 		const log = 'Successful log...';
 		mockSuccesfulJobFetch({ id: 1, status: 'done', log });
-		await result.component.show({ id: 1, status: 'done', log: null }, false);
-		const pre = result.container.querySelector('pre');
+		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), false);
+		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		expect(pre.classList.contains('highlight')).eq(false);
 		expect(pre.innerHTML).eq(log);
 	});
 
 	it('error while loading job for user', async () => {
 		const result = render(JobLogsModal);
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			json: () => new Promise((resolve) => resolve({ error: 'Something happened' }))
 		});
-		await result.component.show({ id: 1, status: 'done', log: null }, false);
+		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), false);
 		expect(result.queryByText(/Unable to fetch job/)).not.null;
 	});
 
 	it('error while loading job for admin', async () => {
 		const result = render(JobLogsModal);
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			json: () => new Promise((resolve) => resolve({ error: 'Something happened' }))
 		});
-		await result.component.show({ id: 1, status: 'done', log: null }, true);
+		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), true);
 		expect(result.queryByText(/Unable to fetch job/)).not.null;
 	});
 });
 
 function mockSuccesfulJobFetch(job) {
-	fetch.mockResolvedValue({
+	/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 		ok: true,
 		json: () => new Promise((resolve) => resolve(job))
 	});

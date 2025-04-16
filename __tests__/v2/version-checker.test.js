@@ -6,11 +6,11 @@ global.fetch = vi.fn();
 
 describe('Version checker', () => {
 	beforeEach(() => {
-		fetch.mockClear();
+		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
 	it('getAllNewVersions checks pkg_name', async () => {
-		const workflowTasks = [
+		const workflowTasks = /** @type {import('fractal-components/types/api').TaskV2[]} */ ([
 			{
 				id: 1,
 				name: 'task1',
@@ -32,7 +32,7 @@ describe('Version checker', () => {
 				type: 'non_parallel',
 				taskgroupv2_id: 3
 			}
-		];
+		]);
 
 		const taksGroups = [
 			{
@@ -82,7 +82,7 @@ describe('Version checker', () => {
 			}
 		];
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => taksGroups
@@ -97,7 +97,7 @@ describe('Version checker', () => {
 	});
 
 	it('getAllNewVersions checks task type', async () => {
-		const workflowTasks = [
+		const workflowTasks = /** @type {import('fractal-components/types/api').TaskV2[]} */ ([
 			{
 				id: 1,
 				name: 'task1',
@@ -108,6 +108,7 @@ describe('Version checker', () => {
 			{
 				id: 2,
 				name: 'task1',
+				args_schema_non_parallel: null,
 				args_schema_parallel: {},
 				type: 'parallel',
 				taskgroupv2_id: 2
@@ -119,7 +120,7 @@ describe('Version checker', () => {
 				type: 'non_parallel',
 				taskgroupv2_id: 3
 			}
-		];
+		]);
 
 		const taksGroups = [
 			{
@@ -169,7 +170,7 @@ describe('Version checker', () => {
 			}
 		];
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => taksGroups
@@ -184,7 +185,7 @@ describe('Version checker', () => {
 	});
 
 	it('getAllNewVersions ignore tasks without version', async () => {
-		const workflowTasks = [
+		const workflowTasks = /** @type {import('fractal-components/types/api').TaskV2[]} */ ([
 			{
 				id: 1,
 				name: 'task1',
@@ -199,7 +200,7 @@ describe('Version checker', () => {
 				type: 'non_parallel',
 				taskgroupv2_id: 2
 			}
-		];
+		]);
 
 		const taksGroups = [
 			{
@@ -234,7 +235,7 @@ describe('Version checker', () => {
 			}
 		];
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => taksGroups
@@ -247,7 +248,7 @@ describe('Version checker', () => {
 	});
 
 	it('getAllNewVersions ignore tasks without schema', async () => {
-		const workflowTasks = [
+		const workflowTasks = /** @type {import('fractal-components/types/api').TaskV2[]} */ ([
 			{
 				id: 1,
 				name: 'task1',
@@ -272,7 +273,7 @@ describe('Version checker', () => {
 				type: 'non_parallel',
 				taskgroupv2_id: 3
 			}
-		];
+		]);
 
 		const taksGroups = [
 			{
@@ -325,7 +326,7 @@ describe('Version checker', () => {
 			}
 		];
 
-		fetch.mockResolvedValue({
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
 			status: 200,
 			json: async () => taksGroups

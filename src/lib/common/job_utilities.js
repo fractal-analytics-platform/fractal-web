@@ -6,9 +6,10 @@ const completeTracebackLine = 'Traceback (most recent call last):';
  *
  * @param {string|null} log
  * @param {boolean} ignoreUppercaseTraceback
+ * @param {boolean} imageError
  * @returns {Array<{text: string, highlight: boolean}>}
  */
-export function extractJobErrorParts(log, ignoreUppercaseTraceback = false) {
+export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = false, imageError = false) {
 	if (!log) {
 		return [];
 	}
@@ -19,12 +20,13 @@ export function extractJobErrorParts(log, ignoreUppercaseTraceback = false) {
 	if (
 		log.startsWith('TASK ERROR') ||
 		log.startsWith('JOB ERROR') ||
-		log.startsWith('UNKNOWN ERROR')
+		log.startsWith('UNKNOWN ERROR') ||
+		imageError
 	) {
 		const lines = log.split('\n');
 		if (lines.length > 1) {
 			const [firstLine, ...nextLines] = lines;
-			return [{ text: firstLine, highlight: true }, ...extractTraceback(nextLines.join('\n'))];
+			return [{ text: firstLine, highlight: !imageError }, ...extractTraceback(nextLines.join('\n'))];
 		}
 	}
 	return [{ text: log, highlight: false }];
@@ -89,7 +91,7 @@ function extractUppercaseTraceback(error) {
  * @param {number|undefined} maxLines
  * @returns {string}
  */
-export function extractRelevantJobError(completeJobError, maxLines = undefined) {
+export function extractRelevantJobError(completeJobError = null, maxLines = undefined) {
 	if (!completeJobError) {
 		return '';
 	}
@@ -136,13 +138,13 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 
 /**
  * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
- * @param {{[key: number]: import('fractal-components/types/api').JobStatus}} statuses
+ * @param {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
  * @returns {number|undefined}
  */
 export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses) {
-	if (workflowTasks.find((wft) => statuses[wft.id] === 'submitted')) {
+	if (workflowTasks.find((wft) => statuses[wft.id] && statuses[wft.id].num_submitted_images > 0)) {
 		// we can't re-submit while something is running
 		return undefined;
 	}
-	return workflowTasks.find((wft) => !(wft.id in statuses) || statuses[wft.id] === 'failed')?.order;
+	return workflowTasks.find((wft) => !(wft.id in statuses) || statuses[wft.id].num_failed_images > 0)?.order;
 }

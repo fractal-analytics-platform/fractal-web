@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
 	export let dataset;
@@ -212,35 +211,6 @@
 						<pre>{dataset.zarr_dir}</pre>
 					</span>
 				{/if}
-			</li>
-			<li class="list-group-item text-bg-light">
-				<strong>Dataset filters</strong>
-			</li>
-			<li class="list-group-item">
-				<div>
-					<p class="fw-medium">Attribute filters:</p>
-					{#if Object.entries(dataset.attribute_filters).length > 0}
-						<ul>
-							{#each Object.entries(dataset.attribute_filters) as [k, v]}
-								<li>{k}: <code>{v}</code></li>
-							{/each}
-						</ul>
-					{:else}
-						<p class="ms-3">No attribute filters</p>
-					{/if}
-				</div>
-				<div class="mt-3">
-					<p class="fw-medium">Type filters:</p>
-					{#if Object.entries(dataset.type_filters).length > 0}
-						<ul>
-							{#each Object.entries(dataset.type_filters) as [k, v]}
-								<li>{k}: <BooleanIcon value={v} /></li>
-							{/each}
-						</ul>
-					{:else}
-						<p class="ms-3">No type filters</p>
-					{/if}
-				</div>
 			</li>
 		</ul>
 	</svelte:fragment>

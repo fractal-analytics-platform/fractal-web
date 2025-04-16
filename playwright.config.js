@@ -13,7 +13,10 @@ const commonTests = [
 		testIgnore: /v2\/.*\.spec\.js/,
 		use: {
 			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json'
+			storageState: 'tests/.auth/user.json',
+			contextOptions: {
+				permissions: ['clipboard-write']
+			}
 		},
 		dependencies: ['auth']
 	},

@@ -16,6 +16,7 @@
 	export let propertiesToIgnore = [];
 	/** @type {string} */
 	export let componentId;
+	export let editable = true;
 
 	/** @type {FormManager|undefined} */
 	let formManager;
@@ -46,7 +47,13 @@
 	function initFormManager() {
 		if (schema) {
 			try {
-				formManager = new FormManager(schema, dispatch, schemaVersion, propertiesToIgnore, schemaData);
+				formManager = new FormManager(
+					schema,
+					dispatch,
+					schemaVersion,
+					propertiesToIgnore,
+					schemaData
+				);
 			} catch (err) {
 				console.error(err);
 				formManager = undefined;
@@ -60,7 +67,7 @@
 {#if formManager}
 	{#key formManager}
 		<div id={componentId}>
-			<ObjectProperty formElement={formManager.root} isRoot={true} />
+			<ObjectProperty formElement={formManager.root} isRoot={true} {editable} />
 		</div>
 	{/key}
 {/if}

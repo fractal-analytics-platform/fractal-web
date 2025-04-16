@@ -7,6 +7,7 @@
 	export let removeProperty;
 	/** @type {() => void} */
 	export let triggerChanges;
+	export let editable = true;
 </script>
 
 <div class="input-group mb-2" class:has-validation={entry.error}>
@@ -18,6 +19,7 @@
 			class:is-invalid={entry.error}
 			bind:value={entry.key}
 			on:input={triggerChanges}
+			disabled={!editable}
 		/>
 	{/if}
 	{#if entry.type === 'string'}
@@ -28,6 +30,7 @@
 			class:is-invalid={entry.error}
 			bind:value={entry.value}
 			on:input={triggerChanges}
+			disabled={!editable}
 		/>
 	{:else if entry.type === 'number'}
 		<input
@@ -37,14 +40,20 @@
 			class:is-invalid={entry.error}
 			bind:value={entry.value}
 			on:input={triggerChanges}
+			disabled={!editable}
 		/>
 	{:else if entry.type === 'boolean'}
-		<select class="form-select" bind:value={entry.value} on:change={triggerChanges}>
+		<select
+			class="form-select"
+			bind:value={entry.value}
+			on:change={triggerChanges}
+			disabled={!editable}
+		>
 			<option value={true}>True</option>
 			<option value={false}>False</option>
 		</select>
 	{/if}
-	<select class="form-select" bind:value={entry.type} on:change={changeType}>
+	<select class="form-select" bind:value={entry.type} on:change={changeType} disabled={!editable}>
 		<option value="string">String</option>
 		<option value="number">Number</option>
 		<option value="boolean">Boolean</option>
@@ -56,6 +65,7 @@
 		type="button"
 		on:click={removeProperty}
 		aria-label="Remove property"
+		disabled={!editable}
 	>
 		<i class="bi bi-trash" />
 	</button>
