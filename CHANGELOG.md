@@ -16,6 +16,7 @@
 * Made user sorting case insensitive (\#759);
 * Moved tasks table links to the info modal (\#759);
 * Removed "Download token" button from profile page, added "Get token" button to main dropdown menu (\#759);
+* Added job cancellation received message to the workflow page (\#767);
 
 # 1.16.2
 
