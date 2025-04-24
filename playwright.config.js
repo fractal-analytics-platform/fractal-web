@@ -71,7 +71,7 @@ const v2Tests = [
 
 export default defineConfig({
 	testDir: 'tests',
-	//retries: 3,
+	retries: 3,
 
 	projects: [...commonTests, ...v2Tests],
 
