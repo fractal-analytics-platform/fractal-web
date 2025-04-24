@@ -110,6 +110,7 @@
 
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob;
+	let jobCancelledMessage = '';
 
 	$: updatableWorkflowList = workflow.task_list || [];
 
@@ -597,6 +598,7 @@
 	}
 
 	async function stopWorkflow() {
+		jobCancelledMessage = '';
 		if (!selectedSubmittedJob) {
 			return;
 		}
@@ -611,6 +613,7 @@
 			}
 		);
 		if (response.ok) {
+			jobCancelledMessage = 'Job cancellation request received. The job will stop in a few seconds';
 			await loadJobsStatus();
 		} else {
 			console.error('Error stopping job');
@@ -759,6 +762,7 @@
 
 {#if workflow}
 	<div class="container mt-2">
+		<StandardDismissableAlert message={jobCancelledMessage} />
 		<StandardDismissableAlert message={workflowSuccessMessage} />
 
 		<div id="workflowErrorAlert" />
