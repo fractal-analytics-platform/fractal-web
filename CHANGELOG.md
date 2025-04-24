@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.17.0
 
 * Workflow task flexibility (\#759):
     * Added image list modal in workflow page;
