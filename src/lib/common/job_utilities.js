@@ -9,7 +9,11 @@ const completeTracebackLine = 'Traceback (most recent call last):';
  * @param {boolean} imageError
  * @returns {Array<{text: string, highlight: boolean}>}
  */
-export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = false, imageError = false) {
+export function extractJobErrorParts(
+	log = null,
+	ignoreUppercaseTraceback = false,
+	imageError = false
+) {
 	if (!log) {
 		return [];
 	}
@@ -26,7 +30,10 @@ export function extractJobErrorParts(log = null, ignoreUppercaseTraceback = fals
 		const lines = log.split('\n');
 		if (lines.length > 1) {
 			const [firstLine, ...nextLines] = lines;
-			return [{ text: firstLine, highlight: !imageError }, ...extractTraceback(nextLines.join('\n'))];
+			return [
+				{ text: firstLine, highlight: !imageError },
+				...extractTraceback(nextLines.join('\n'))
+			];
 		}
 	}
 	return [{ text: log, highlight: false }];
@@ -139,12 +146,21 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 /**
  * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
  * @param {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
+ * @param {{[key: number]: import('fractal-components/types/api').JobStatus}} legacyStatuses
  * @returns {number|undefined}
  */
-export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses) {
+export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses, legacyStatuses) {
+	if (Object.keys(legacyStatuses).length > 0 && Object.keys(statuses).length === 0) {
+		return workflowTasks.find(
+			(wft) => !(wft.id in legacyStatuses) || legacyStatuses[wft.id] === 'failed'
+		)?.order;
+	}
+
 	if (workflowTasks.find((wft) => statuses[wft.id] && statuses[wft.id].num_submitted_images > 0)) {
 		// we can't re-submit while something is running
 		return undefined;
 	}
-	return workflowTasks.find((wft) => !(wft.id in statuses) || statuses[wft.id].num_failed_images > 0)?.order;
+	return workflowTasks.find(
+		(wft) => !(wft.id in statuses) || statuses[wft.id].num_failed_images > 0
+	)?.order;
 }

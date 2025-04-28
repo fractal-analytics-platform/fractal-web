@@ -23,6 +23,8 @@
 	export let onDatasetsUpdated;
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	export let statuses;
+	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
+	export let legacyStatuses;
 
 	/** @type {Modal} */
 	let modal;
@@ -91,7 +93,7 @@
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
 		} else {
-			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses);
+			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses, legacyStatuses);
 		}
 		lastTaskIndex = undefined;
 		await loadDatasetImages();

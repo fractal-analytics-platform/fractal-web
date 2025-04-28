@@ -1119,6 +1119,7 @@
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}
+	{legacyStatuses}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;
