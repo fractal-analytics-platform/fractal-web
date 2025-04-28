@@ -249,15 +249,15 @@ it('get first task index for continuing workflow', () => {
 	expect(
 		testGetFirstTaskIndexForContinuingWorkflow([doneImages, failedImages, doneImages, null])
 	).toEqual(1);
-	expect(testGetFirstTaskIndexForContinuingWorkflow([doneImages, null, doneImages, null])).toEqual(
-		1
-	);
+	expect(
+		testGetFirstTaskIndexForContinuingWorkflow([doneImages, null, doneImages, null])
+	).toBeUndefined();
 	expect(
 		testGetFirstTaskIndexForContinuingWorkflow([doneImages, doneImages, doneImages, doneImages])
-	).toEqual(undefined);
+	).toBeUndefined();
 	expect(
 		testGetFirstTaskIndexForContinuingWorkflow([submittedImages, failedImages, null, null])
-	).toEqual(undefined);
+	).toBeUndefined();
 });
 
 /**
@@ -302,5 +302,5 @@ function testGetFirstTaskIndexForContinuingWorkflow(values) {
 	const statuses = Object.fromEntries(
 		values.map((v, i) => [i + 1, v]).filter((e) => e[1] !== null)
 	);
-	return getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses);
+	return getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses, {});
 }

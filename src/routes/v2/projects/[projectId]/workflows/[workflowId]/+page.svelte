@@ -468,7 +468,7 @@
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = {};
 
-	$: hasAnyJobRun = Object.keys(statuses).length > 0;
+	$: hasAnyJobRun = Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0;
 
 	/** @type {number|undefined} */
 	let statusWatcherTimer;
@@ -1119,6 +1119,7 @@
 	{selectedDatasetId}
 	{onJobSubmitted}
 	{statuses}
+	{legacyStatuses}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;
