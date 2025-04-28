@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.17.1
 
 * Fixed "Continue workflow" for legacy workflows (\#772);
 
