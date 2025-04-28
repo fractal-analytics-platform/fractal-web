@@ -160,6 +160,21 @@ export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses, 
 		// we can't re-submit while something is running
 		return undefined;
 	}
+
+	// check for "holes" (e.g. tasks without status preceding tasks with status)
+	for (let i = 0; i < workflowTasks.length - 1; i++) {
+		const wft = workflowTasks[i];		
+		if (!(wft.id in statuses)) {
+			for (let j = i + 1; j < workflowTasks.length; j++) {
+				const nextWft = workflowTasks[j];
+				if (nextWft.id in statuses) {
+					// hole found
+					return undefined;
+				}
+			}
+		}
+	}
+
 	return workflowTasks.find(
 		(wft) => !(wft.id in statuses) || statuses[wft.id].num_failed_images > 0
 	)?.order;

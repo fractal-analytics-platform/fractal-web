@@ -63,6 +63,7 @@
 		hasImages &&
 		firstTaskIndex !== undefined &&
 		mode !== 'restart' &&
+		workflow.task_list[firstTaskIndex] &&
 		!isConverterType(workflow.task_list[firstTaskIndex].task_type);
 
 	$: disabledTypes = Object.keys({
@@ -93,7 +94,11 @@
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
 		} else {
-			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(workflow.task_list, statuses, legacyStatuses);
+			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(
+				workflow.task_list,
+				statuses,
+				legacyStatuses
+			);
 		}
 		lastTaskIndex = undefined;
 		await loadDatasetImages();
