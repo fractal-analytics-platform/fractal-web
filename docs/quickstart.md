@@ -60,6 +60,7 @@ export FRACTAL_RUNNER_BACKEND=local
 
 #export PUBLIC_FRACTAL_VIZARR_VIEWER_URL=
 #export WARNING_BANNER_PATH=
+#export NEWS_INFO_PATH=
 
 # default values are usually fine for the following variables; remove comments if needed
 #export AUTH_COOKIE_NAME=fastapiusersauth
