@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.17.2
 
 * Added `NEWS_INFO_PATH` variable to display news in home page (\#773);
 * Displayed SLURM accounting also for slurm_ssh backend (\#773);
