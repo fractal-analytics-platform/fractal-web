@@ -45,6 +45,6 @@ jobs:
         run: tar -C package -czf "node-${{ matrix.node-version }}-fractal-web-${GITHUB_REF_NAME}.tar.gz" build package.json node_modules LICENSE  
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.2.1
         with:
           files: node-${{ matrix.node-version }}-fractal-web-*.tar.gz

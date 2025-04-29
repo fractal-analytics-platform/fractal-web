@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added `NEWS_INFO_PATH` variable to display news in home page (\#773);
+* Displayed SLURM accounting also for slurm_ssh backend (\#773);
+
 # 1.17.1
 
 * Fixed "Continue workflow" for legacy workflows (\#772);

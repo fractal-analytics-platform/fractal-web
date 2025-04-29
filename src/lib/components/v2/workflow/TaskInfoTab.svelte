@@ -10,6 +10,8 @@
 <ul class="list-group">
 	<li class="list-group-item list-group-item-light fw-bold">Name</li>
 	<li class="list-group-item">{task.name}</li>
+	<li class="list-group-item list-group-item-light fw-bold">Type</li>
+	<li class="list-group-item">{task.type}</li>
 	<li class="list-group-item list-group-item-light fw-bold">Version</li>
 	<li class="list-group-item">{taskVersion || '–'}</li>
 	<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>

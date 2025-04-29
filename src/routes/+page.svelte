@@ -2,13 +2,22 @@
 	import { env } from '$env/dynamic/public';
 	import { page } from '$app/stores';
 	import logoMedium from '$lib/assets/fractal-logo-medium.png';
+	import { formatMarkdown } from '$lib/common/component_utilities';
+	import { onMount } from 'svelte';
 
 	$: userLoggedIn = !!$page.data.userInfo;
+	$: news = $page.data.news;
+
+	let mounted = false;
+
+	onMount(() => {
+		mounted = true;
+	});
 </script>
 
 <div class="container mt-3">
 	<img alt="Fractal logo" src={logoMedium} class="float-end" id="fractal-logo-home" />
-	
+
 	<h1 class="fw-light">Welcome to Fractal web client.</h1>
 
 	<div>
@@ -43,6 +52,12 @@
 					{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 				</a>
 			</p>
+		{/if}
+
+		{#if news && mounted}
+			<h3 class="fw-light">News</h3>
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			{@html formatMarkdown(news)}
 		{/if}
 
 		<h3 class="fw-light">Links</h3>
