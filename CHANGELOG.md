@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Displayed warning when attempting to continue a workflow on unprocessed images (\#774);
+
 # 1.17.2
 
 * Added `NEWS_INFO_PATH` variable to display news in home page (\#773);
