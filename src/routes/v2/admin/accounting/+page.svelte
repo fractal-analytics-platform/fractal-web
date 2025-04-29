@@ -5,12 +5,14 @@
 
 	/** @type {'accounting'|'slurmAccounting'} */
 	let selectedTab = 'accounting';
+
+	$: useSlurm = $page.data.runnerBackend === 'slurm' || $page.data.runnerBackend === 'slurm_ssh';
 </script>
 
 <div class="container mt-3">
 	<h1 class="fw-light mb-3">Accounting</h1>
 
-	{#if $page.data.runnerBackend === 'slurm'}
+	{#if useSlurm}
 		<ul class="nav nav-tabs">
 			<li class="nav-item">
 				<button
@@ -38,7 +40,7 @@
 	{#if selectedTab === 'accounting'}
 		<Accounting users={$page.data.users} currentUserId={$page.data.userInfo.id} />
 	{:else if selectedTab === 'slurmAccounting'}
-		{#if $page.data.runnerBackend === 'slurm'}
+		{#if useSlurm}
 			<SlurmAccounting users={$page.data.users} />
 		{/if}
 	{/if}
