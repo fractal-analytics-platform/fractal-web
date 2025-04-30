@@ -76,7 +76,7 @@ test('Display not processed images warning', async ({ page, workflow }) => {
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(
 			modal.getByText(
-				'You are trying to run the generic_task_parallel on images that were not run on the prior generic_task task.'
+				'You are trying to run the generic_task_parallel task on images that were not run on the prior generic_task task.'
 			)
 		).toBeVisible();
 		await modal.getByRole('button', { name: 'Continue anyway' }).click();

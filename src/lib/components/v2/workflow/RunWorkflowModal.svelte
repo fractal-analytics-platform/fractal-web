@@ -675,9 +675,10 @@
 										class="alert alert-warning mb-0"
 										id="pre-submission-check-not-processed-warning"
 									>
-										You are trying to run the {workflow.task_list[firstTaskIndex || 0].task.name} on
-										images that were not run on the prior {getPreviousTaskName(firstTaskIndex || 0)}
-										task. {getNotProcessedImagesLabel(preSubmissionCheckNotProcessedResults)}
+										You are trying to run the {workflow.task_list[firstTaskIndex || 0].task.name} task
+										on images that were not run on the prior
+										{getPreviousTaskName(firstTaskIndex || 0)} task.
+										{getNotProcessedImagesLabel(preSubmissionCheckNotProcessedResults)}
 										not run on the prior task.
 										<button
 											type="button"
