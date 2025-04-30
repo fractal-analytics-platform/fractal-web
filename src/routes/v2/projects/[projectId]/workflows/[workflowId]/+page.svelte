@@ -482,6 +482,7 @@
 	}
 
 	async function loadJobsStatus() {
+		legacyStatuses = {};
 		if (selectedDatasetId === undefined) {
 			statuses = {};
 			jobError = '';
