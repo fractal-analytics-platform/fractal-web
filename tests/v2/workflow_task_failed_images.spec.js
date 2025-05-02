@@ -44,6 +44,8 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('button', { name: 'Apply' })).not.toBeEnabled();
 		await modal.getByRole('button', { name: 'Run' }).click();
+		await expect(modal.getByText('You are trying to run the MIP_compound task')).toBeVisible();
+		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await waitTaskFailure(page);
