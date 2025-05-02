@@ -6,6 +6,7 @@
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
 	import { encodePathForUrl } from '$lib/common/component_utilities';
+	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -189,6 +190,12 @@
 						<i class="bi bi-eye" />
 						View plate
 					</a>
+					<CopyToClipboardButton
+						btnClass="light btn-outline-secondary"
+						clipboardText="{vizarrViewerUrl}data{encodePathForUrl(platePath)}"
+						text="Get URL"
+						id="get-plate-url"
+					/>
 				{:else if platePathError}
 					<span class="text-danger">{platePathError}</span>
 				{/if}

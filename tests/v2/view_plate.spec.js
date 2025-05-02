@@ -41,10 +41,16 @@ test('View plate', async ({ page, project }) => {
 	await test.step('Select plates', async () => {
 		for (let i = 1; i <= 3; i++) {
 			await page.getByRole('combobox', { name: 'Select plate' }).selectOption(`plate${i}`);
+			const plateUrlRegExp = new RegExp(`\\/plate${i}\\.zarr$`);
 			await expect(page.getByRole('link', { name: 'View plate' })).toHaveAttribute(
 				'href',
-				new RegExp(`\\/plate${i}\\.zarr$`)
+				plateUrlRegExp
 			);
+			await page.getByRole('button', { name: 'Get URL' }).first().click();
+			const clipboardContent = await page.evaluate(async () => {
+				return await navigator.clipboard.readText();
+			});
+			expect(clipboardContent).toMatch(plateUrlRegExp);
 			await expect(page.getByRole('combobox', { name: 'Select plate' })).toHaveValue(`plate${i}`);
 		}
 	});
@@ -117,7 +123,9 @@ async function createImageWithPlate(page, zarrUrl, plate) {
  * @param  {...string} expectedOptions
  */
 async function checkPlateSelector(page, ...expectedOptions) {
-	await expect(page.getByText(`This dataset contains ${expectedOptions.length} plate`)).toBeVisible();
+	await expect(
+		page.getByText(`This dataset contains ${expectedOptions.length} plate`)
+	).toBeVisible();
 	const options = await page
 		.getByRole('combobox', { name: 'Select plate' })
 		.getByRole('option')
