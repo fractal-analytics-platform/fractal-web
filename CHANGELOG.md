@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.17.3
 
 * Displayed warning when attempting to continue a workflow on unprocessed images (\#774);
 * Added "Get URL" button for plates on dataset page (\#774);
