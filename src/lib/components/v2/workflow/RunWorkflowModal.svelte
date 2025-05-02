@@ -259,6 +259,8 @@
 			} else {
 				const valid = await preSubmissionCheckUniqueTypes(params);
 				if (!valid) {
+					preSubmissionCheckNotProcessedResults = [];
+					ignorePreSubmissionCheckNotProcessed = false;
 					return;
 				}
 			}
