@@ -356,10 +356,10 @@
 	/**
 	 * @param {number} workflowTaskId
 	 */
-	async function loadHistoryRunStatuses(workflowTaskId) {
+	async function loadHistoryRunStatuses(workflowTaskId, animate = true) {
 		historyRunStatuses = [];
 		expandedWorkflowTaskId = workflowTaskId;
-		loadingHistoryRunStatuses = true;
+		loadingHistoryRunStatuses = animate;
 		const response = await fetch(
 			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
 		);
@@ -368,7 +368,9 @@
 			return;
 		}
 		historyRunStatuses = await response.json();
-		await tick(); // to trigger animation
+		if (animate) {
+			await tick(); // to trigger animation
+		}
 		loadingHistoryRunStatuses = false;
 	}
 
@@ -482,6 +484,7 @@
 	}
 
 	async function loadJobsStatus() {
+		legacyStatuses = {};
 		if (selectedDatasetId === undefined) {
 			statuses = {};
 			jobError = '';
@@ -529,6 +532,10 @@
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
+			// reload run statuses, if one task is expanded
+			if (expandedWorkflowTaskId !== undefined) {
+				loadHistoryRunStatuses(expandedWorkflowTaskId, false);
+			}
 		}
 	}
 

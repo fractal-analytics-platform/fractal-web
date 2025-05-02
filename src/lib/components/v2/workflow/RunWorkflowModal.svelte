@@ -10,6 +10,7 @@
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
+	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	export let datasets;
@@ -34,9 +35,6 @@
 
 	let applyingWorkflow = false;
 	let checkingConfiguration = false;
-	/** @type {string[]} */
-	let preSubmissionCheckResults = [];
-	let ignorePreSubmissionCheck = false;
 	let setSlurmAccount = true;
 	/** @type {string[]} */
 	let slurmAccounts = [];
@@ -46,6 +44,13 @@
 	let firstTaskIndex = undefined;
 	/** @type {number|undefined} */
 	let lastTaskIndex = undefined;
+
+	/** @type {string[]} */
+	let preSubmissionCheckUniqueTypesResults = [];
+	let ignorePreSubmissionCheckUniqueTypes = false;
+	/** @type {string[]} */
+	let preSubmissionCheckNotProcessedResults = [];
+	let ignorePreSubmissionCheckNotProcessed = false;
 
 	/** @type {'run'|'restart'|'continue'} */
 	let mode = 'run';
@@ -88,8 +93,10 @@
 		replaceExistingDataset = true;
 		applyingWorkflow = false;
 		checkingConfiguration = false;
-		preSubmissionCheckResults = [];
-		ignorePreSubmissionCheck = false;
+		preSubmissionCheckUniqueTypesResults = [];
+		ignorePreSubmissionCheckUniqueTypes = false;
+		preSubmissionCheckNotProcessedResults = [];
+		ignorePreSubmissionCheckNotProcessed = false;
 		workerInitControl = '';
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
@@ -225,8 +232,8 @@
 	}
 
 	async function firstTaskIndexChanged() {
-		preSubmissionCheckResults = [];
-		ignorePreSubmissionCheck = false;
+		preSubmissionCheckUniqueTypesResults = [];
+		ignorePreSubmissionCheckUniqueTypes = false;
 		await loadDatasetImages();
 		// reset last task
 		if (
@@ -246,11 +253,22 @@
 	async function showConfirmRun() {
 		if (datasetImagesTable) {
 			const params = await datasetImagesTable.applySearchFields();
-			if (ignorePreSubmissionCheck) {
-				preSubmissionCheckResults = [];
-				ignorePreSubmissionCheck = false;
+			if (ignorePreSubmissionCheckUniqueTypes) {
+				preSubmissionCheckUniqueTypesResults = [];
+				ignorePreSubmissionCheckUniqueTypes = false;
 			} else {
-				const valid = await preSubmissionCheck(params);
+				const valid = await preSubmissionCheckUniqueTypes(params);
+				if (!valid) {
+					preSubmissionCheckNotProcessedResults = [];
+					ignorePreSubmissionCheckNotProcessed = false;
+					return;
+				}
+			}
+			if (ignorePreSubmissionCheckNotProcessed) {
+				preSubmissionCheckNotProcessedResults = [];
+				ignorePreSubmissionCheckNotProcessed = false;
+			} else {
+				const valid = await preSubmissionCheckNotProcessed(params);
 				if (!valid) {
 					return;
 				}
@@ -272,8 +290,8 @@
 	/**
 	 * @param {{ attribute_filters: any, type_filters: any }} params
 	 */
-	async function preSubmissionCheck(params) {
-		preSubmissionCheckResults = [];
+	async function preSubmissionCheckUniqueTypes(params) {
+		preSubmissionCheckUniqueTypesResults = [];
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
@@ -290,24 +308,61 @@
 			return false;
 		}
 		/** @type {string[]} */
-		preSubmissionCheckResults = await response.json();
-		const valid = preSubmissionCheckResults.length === 0;
+		preSubmissionCheckUniqueTypesResults = await response.json();
+		const valid = preSubmissionCheckUniqueTypesResults.length === 0;
 		if (!valid) {
-			await tick();
-			// scroll to warning message
-			const modalBody = document.querySelector('.modal.show .modal-body');
-			const warningAlert = document.getElementById('pre-submission-check-warning');
-			if (modalBody && warningAlert) {
-				const bodyRect = modalBody.getBoundingClientRect();
-				const alertRect = warningAlert.getBoundingClientRect();
-				const alertRelativeY = alertRect.y - bodyRect.y;
-				modalBody.scrollTo({
-					top: alertRelativeY + modalBody.scrollTop,
-					behavior: 'smooth'
-				});
-			}
+			await scrollToWarningMessage('pre-submission-check-unique-types-warning');
 		}
 		return valid;
+	}
+
+	/**
+	 * @param {{ attribute_filters: any, type_filters: any }} params
+	 * @returns {Promise<boolean>}
+	 */
+	async function preSubmissionCheckNotProcessed(params) {
+		preSubmissionCheckNotProcessedResults = [];
+		const wft = workflow.task_list[firstTaskIndex || 0];
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/non-processed?workflow_id=${workflow.id}&workflowtask_id=${wft.id}`,
+			{
+				headers,
+				method: 'POST',
+				credentials: 'include',
+				body: JSON.stringify(params)
+			}
+		);
+		if (!response.ok) {
+			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			return false;
+		}
+		/** @type {string[]} */
+		preSubmissionCheckNotProcessedResults = await response.json();
+		const valid = preSubmissionCheckNotProcessedResults.length === 0;
+		if (!valid) {
+			await scrollToWarningMessage('pre-submission-check-not-processed-warning');
+		}
+		return valid;
+	}
+
+	/**
+	 * @param {string} elementId
+	 */
+	async function scrollToWarningMessage(elementId) {
+		await tick();
+		const modalBody = document.querySelector('.modal.show .modal-body');
+		const warningAlert = document.getElementById(elementId);
+		if (modalBody && warningAlert) {
+			const bodyRect = modalBody.getBoundingClientRect();
+			const alertRect = warningAlert.getBoundingClientRect();
+			const alertRelativeY = alertRect.y - bodyRect.y;
+			modalBody.scrollTo({
+				top: alertRelativeY + modalBody.scrollTop,
+				behavior: 'smooth'
+			});
+		}
 	}
 
 	function computeNewDatasetName() {
@@ -422,6 +477,36 @@
 			...currentTypeFilters,
 			...inputFilters
 		};
+	}
+
+	/**
+	 * @param {number} selectedIndex
+	 * @returns {string|undefined}
+	 */
+	function getPreviousTaskName(selectedIndex) {
+		if (selectedIndex === 0) {
+			return undefined;
+		}
+		return workflow.task_list[selectedIndex - 1].task.name;
+	}
+
+	/**
+	 * @param {string[]} paths
+	 * @returns {string}
+	 */
+	function getNotProcessedImagesLabel(paths) {
+		if (!selectedDataset) {
+			return '';
+		}
+		paths = paths.map((p) => getRelativeZarrPath(selectedDataset, p));
+		if (paths.length === 1) {
+			return `Image ${paths[0]} was`;
+		}
+		if (paths.length <= 3) {
+			return `Images ${paths.join(', ')} were`;
+		}
+		const firstThree = paths.slice(0, 3);
+		return `Images ${firstThree.join(', ')} and ${paths.length - 3} others were`;
 	}
 
 	async function cancel() {
@@ -568,15 +653,41 @@
 							data-bs-parent="#accordion-run-workflow"
 						>
 							<div class="accordion-body">
-								{#if preSubmissionCheckResults.length > 0}
-									<div class="alert alert-warning mb-0" id="pre-submission-check-warning">
+								{#if preSubmissionCheckUniqueTypesResults.length > 0}
+									<div
+										class="alert alert-warning mb-0"
+										id="pre-submission-check-unique-types-warning"
+									>
 										You are trying to run a workflow without specifying what type of images should
 										be processed. Specify the relevant type filter to continue.
 										<button
 											type="button"
 											class="btn btn-warning mt-1"
 											on:click={() => {
-												ignorePreSubmissionCheck = true;
+												ignorePreSubmissionCheckUniqueTypes = true;
+												showConfirmRun();
+											}}
+										>
+											Continue anyway
+										</button>
+									</div>
+								{/if}
+								{#if preSubmissionCheckNotProcessedResults.length > 0}
+									<div
+										class="alert alert-warning mb-0"
+										id="pre-submission-check-not-processed-warning"
+									>
+										You are trying to run the {workflow.task_list[firstTaskIndex || 0].task.name} task
+										on images that were not run on the prior
+										{getPreviousTaskName(firstTaskIndex || 0)} task.
+										{getNotProcessedImagesLabel(preSubmissionCheckNotProcessedResults)}
+										not run on the prior task.
+										<button
+											type="button"
+											class="btn btn-warning mt-1"
+											on:click={() => {
+												ignorePreSubmissionCheckUniqueTypes = true;
+												ignorePreSubmissionCheckNotProcessed = true;
 												showConfirmRun();
 											}}
 										>
@@ -595,13 +706,12 @@
 										{initialFilterValues}
 										{disabledTypes}
 										{extraTypes}
-										highlightedTypes={preSubmissionCheckResults}
+										highlightedTypes={preSubmissionCheckUniqueTypesResults}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
 										beforeTypeSelectionChanged={(key) => {
-											preSubmissionCheckResults = preSubmissionCheckResults.filter(
-												(k) => k !== key
-											);
+											preSubmissionCheckUniqueTypesResults =
+												preSubmissionCheckUniqueTypesResults.filter((k) => k !== key);
 										}}
 									/>
 								{/if}

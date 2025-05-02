@@ -15,7 +15,7 @@ const commonTests = [
 			...devices['Desktop Chrome'],
 			storageState: 'tests/.auth/user.json',
 			contextOptions: {
-				permissions: ['clipboard-write']
+				permissions: ['clipboard-read', 'clipboard-write']
 			}
 		},
 		dependencies: ['auth']
@@ -54,7 +54,10 @@ const v2Tests = [
 		testMatch: /v2\/.*\.spec\.js/,
 		use: {
 			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json'
+			storageState: 'tests/.auth/user.json',
+			contextOptions: {
+				permissions: ['clipboard-read', 'clipboard-write']
+			}
 		},
 		dependencies: ['collect_mock_tasks', 'create_fake_task']
 	},
