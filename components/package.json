@@ -55,7 +55,8 @@
 		"dompurify": "^3.2.3",
 		"marked": "^7.0.4",
 		"semver": "^7.6.3",
-		"slim-select": "^2.8.1"
+		"slim-select": "^2.8.1",
+		"svelte-preprocess": "^6.0.3"
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
