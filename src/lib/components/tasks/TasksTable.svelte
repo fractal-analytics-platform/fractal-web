@@ -1,9 +1,19 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script>
 	/**
-	 * @type {any[]}
+	 * @typedef {Object} Props
+	 * @property {any[]} tasks
+	 * @property {import('svelte').Snippet} thead
+	 * @property {import('svelte').Snippet} [customColumnsLeft]
+	 * @property {import('svelte').Snippet} [customColumnsRight]
 	 */
-	export let tasks;
+
+	/** @type {Props} */
+	let {
+		tasks,
+		thead,
+		customColumnsLeft,
+		customColumnsRight
+	} = $props();
 
 	/**
 	 * @param {number} index
@@ -93,7 +103,7 @@
 </script>
 
 <table class="table align-middle">
-	<slot name="thead" />
+	{@render thead?.()}
 	<tbody>
 		{#key tasks}
 			{#each tasks as task, i}
@@ -103,7 +113,7 @@
 					class:is-main-version={isMainVersion(i)}
 					class:collapsed={isOldVersion(i)}
 				>
-					<slot name="custom-columns-left" {task} />
+				  {@render customColumnsLeft?.()}
 					<td>{isOldVersion(i) ? '' : task.name}</td>
 					<td>
 						{task.version || '–'}
@@ -113,7 +123,7 @@
 							</button>
 						{/if}
 					</td>
-					<slot name="custom-columns-right" {task} />
+					{@render customColumnsRight?.()}
 				</tr>
 			{/each}
 		{/key}

@@ -164,8 +164,7 @@
 						imagesStatusModal={true}
 						imagesStatusModalUrl={`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}`}
 					>
-						<!-- @migration-task: migrate this slot by hand, `extra-buttons` is an invalid identifier -->
-	<svelte:fragment slot="extra-buttons" let:image>
+						{#snippet extraButtons(image)}
 							<button
 								class="btn btn-light"
 								onclick={() => loadLogs(image.zarr_url, image.status || '')}
@@ -176,7 +175,7 @@
 								{/if}
 								<i class="bi-list-columns-reverse"></i> Logs
 							</button>
-						</svelte:fragment>
+						{/snippet}
 					</DatasetImagesTable>
 				{/if}
 			</div>

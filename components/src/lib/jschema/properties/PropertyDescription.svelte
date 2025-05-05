@@ -3,12 +3,15 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {any} [description]
+	 * @property {string} [description]
 	 * @property {boolean} [html]
 	 */
 
 	/** @type {Props} */
-	let { description = undefined, html = false } = $props();
+	let {
+		description,
+		html = false
+	} = $props();
 
 	/** @type {HTMLElement|undefined} */
 	let element = $state();

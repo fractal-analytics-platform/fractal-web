@@ -372,21 +372,18 @@
 		</p>
 		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
 			{#snippet buttons()}
-					
-					<button class="btn btn-outline-secondary" onclick={downloadCSV}>
-						<i class="bi-download"></i> Download CSV
-					</button>
-				
-					{/snippet}
-			<!-- @migration-task: migrate this slot by hand, `edit-status` is an invalid identifier -->
-	<svelte:fragment slot="edit-status" let:row>
+				<button class="btn btn-outline-secondary" onclick={downloadCSV}>
+					<i class="bi-download"></i> Download CSV
+				</button>
+			{/snippet}
+			{#snippet editStatus(row)}
 				{#if row.status === 'submitted'}
 					&nbsp;
 					<button class="btn btn-link p-0" onclick={() => openEditStatusModal(row)}>
 						<i class="bi bi-pencil"></i>
 					</button>
 				{/if}
-			</svelte:fragment>
+			{/snippet}
 		</JobsList>
 	</div>
 </div>

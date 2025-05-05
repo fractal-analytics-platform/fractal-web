@@ -39,18 +39,15 @@
 </script>
 
 <FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true}>
-	<!-- @migration-task: migrate this slot by hand, `extra-columns-colgroup` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns-colgroup">
+	{#snippet extraColumnsColgroup()}
 		<col width="60" />
 		<col width="60" />
-	</svelte:fragment>
-	<!-- @migration-task: migrate this slot by hand, `extra-columns-header` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns-header">
+	{/snippet}
+	{#snippet extraColumnsHeader()}
 		<th></th>
 		<th></th>
-	</svelte:fragment>
-	<!-- @migration-task: migrate this slot by hand, `extra-columns` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns" let:task>
+	{/snippet}
+	{#snippet extraColumns(task)}
 		<td>
 			{#if task.docs_info}
 				<button class="btn btn-info" onclick={() => showSelectedTaskModal(task, task.docs_info)}>
@@ -68,7 +65,7 @@
 				</button>
 			{/if}
 		</td>
-	</svelte:fragment>
+	{/snippet}
 </FilteredTasksTable>
 
 <div class="modal modal-xl" id="task-info-modal" tabindex="-1">

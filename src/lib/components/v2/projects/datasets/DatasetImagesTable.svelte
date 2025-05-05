@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script>
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
@@ -17,41 +16,38 @@
 	import { browser } from '$app/environment';
 	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
-	/** @type {import('fractal-components/types/api').ImagePage} */
-	export let imagePage;
 	/**
-	 * Types not included in the the image page result
-	 * @type {string[]}
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('fractal-components/types/api').ImagePage} imagePage
+	 * @property {Array<string>} [extraTypes] Types not included in the the image page result
+	 * @property {string|null} [vizarrViewerUrl]
+	 * @property {boolean} [runWorkflowModal] Set to true if the table is displayed inside the "Run workflow" modal. Used to disable some buttons.
+	 * @property {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} [initialFilterValues]
+	 * @property {Array<string>} [disabledTypes]
+	 * @property {(key: string) => void} [beforeTypeSelectionChanged]
+	 * @property {Array<string>} [highlightedTypes]
+	 * @property {boolean} [imagesStatusModal] Set to true if the table is displayed inside the "Images status" modal.
+	 * @property {string} [imagesStatusModalUrl]
+	 * @property {import('svelte').Snippet} [extraButtons]
 	 */
-	export let extraTypes = [];
-	/** @type {string|null} */
-	export let vizarrViewerUrl;
-	/**
-	 * Set to true if the table is displayed inside the "Run workflow" modal.
-	 * Used to disable some buttons.
-	 * @type {boolean}
-	 */
-	export let runWorkflowModal = false;
-	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
-	export let initialFilterValues = null;
-	/** @type {string[]} */
-	export let disabledTypes = [];
-	/** @type {(key: string) => void} */
-	export let beforeTypeSelectionChanged = () => {};
-	/** @type {string[]} */
-	export let highlightedTypes = [];
 
-	/**
-	 * Set to true if the table is displayed inside the "Images status" modal.
-	 * @type {boolean}
-	 */
-	export let imagesStatusModal = false;
-	/**
-	 * @type {string|undefined}
-	 */
-	export let imagesStatusModalUrl = undefined;
+	/** @type {Props} */
+	let {
+		dataset,
+		imagePage,
+		extraTypes = [],
+		vizarrViewerUrl = null,
+		runWorkflowModal = false,
+		initialFilterValues = null,
+		disabledTypes = [],
+		beforeTypeSelectionChanged = () => {},
+		highlightedTypes = [],
+		imagesStatusModal = false,
+		imagesStatusModalUrl,
+		extraButtons
+	} = $props();
+
 	let imagesStatusFilter = '';
 
 	let showTable = false;
@@ -824,7 +820,7 @@
 									</ConfirmActionButton>
 								{/if}
 								{#if imagesStatusModal}
-									<slot name="extra-buttons" {image} />
+									{@render extraButtons?.(image)}
 								{/if}
 							</td>
 						</tr>

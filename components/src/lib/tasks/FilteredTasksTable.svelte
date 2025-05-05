@@ -1,14 +1,28 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script>
 	import { onMount } from 'svelte';
 	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
 	import ColouredBadge from '../common/ColouredBadge.svelte';
 
-	/** @type {Array<import('../types/api').TaskGroupV2>} */
-	export let taskGroups;
-	export let showAuthorsInSeparateColumn = true;
-	export let showDocLinksInTable = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<import('../types/api').TaskGroupV2>} taskGroups
+	 * @property {boolean} [showAuthorsInSeparateColumn]
+	 * @property {boolean} [showDocLinksInTable]
+	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
+	 * @property {import('svelte').Snippet} [extraColumnsHeader]
+	 * @property {import('svelte').Snippet} [extraColumns]
+	 */
+
+	/** @type {Props} */
+	let {
+		taskGroups,
+		showAuthorsInSeparateColumn = true,
+		showDocLinksInTable = false,
+		extraColumnsColgroup,
+		extraColumnsHeader,
+		extraColumns
+	} = $props();
 
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	let allRows = [];
@@ -358,7 +372,7 @@
 						<col />
 					{/if}
 					<col width="120" />
-					<slot name="extra-columns-colgroup" />
+					{@render extraColumnsColgroup?.()}
 				</colgroup>
 				<thead>
 					<tr>
@@ -370,7 +384,7 @@
 							<th>Author</th>
 						{/if}
 						<th>Version</th>
-						<slot name="extra-columns-header" />
+						{@render extraColumnsHeader?.()}
 					</tr>
 				</thead>
 				<tbody>
@@ -440,7 +454,7 @@
 											{task.taskVersions[task.selectedVersion].version}
 										{/if}
 									</td>
-									<slot name="extra-columns" task={task.taskVersions[task.selectedVersion]} />
+									{@render extraColumns?.(task.taskVersions[task.selectedVersion])}
 								</tr>
 							{/if}
 						{/each}

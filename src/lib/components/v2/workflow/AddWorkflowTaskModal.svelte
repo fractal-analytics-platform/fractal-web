@@ -7,9 +7,6 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
@@ -137,29 +134,23 @@
 	inputAutofocus={false}
 >
 	{#snippet header()}
-	
-			<h5 class="modal-title">Add new workflow task</h5>
-		
+		<h5 class="modal-title">Add new workflow task</h5>
 	{/snippet}
 	{#snippet body()}
-	
 			{#if loading}
 				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			<div class:invisible={loading} class:collapse={loading}>
 				<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
-					<!-- @migration-task: migrate this slot by hand, `extra-columns-colgroup` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns-colgroup">
+					{#snippet extraColumnsColgroup()}
 						<col width="40" />
 						<col width="120" />
-					</svelte:fragment>
-					<!-- @migration-task: migrate this slot by hand, `extra-columns-header` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns-header">
+					{/snippet}
+					{#snippet extraColumnsHeader()}
 						<th></th>
 						<th></th>
-					</svelte:fragment>
-					<!-- @migration-task: migrate this slot by hand, `extra-columns` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns" let:task>
+					{/snippet}
+					{#snippet extraColumns(task)}
 						<td>
 							{#if showTaskInfoButton(task)}
 								<PropertyDescription description={getTaskInfo(task)} html={true} />
@@ -174,14 +165,11 @@
 								Add task
 							</button>
 						</td>
-					</svelte:fragment>
+					{/snippet}
 				</FilteredTasksTable>
 			</div>
-		
 	{/snippet}
 	{#snippet footer()}
-	
-			<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill"></div>
-		
+		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill"></div>
 	{/snippet}
 </Modal>

@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script>
 	import { env } from '$env/dynamic/public';
 	import { page } from '$app/stores';
@@ -14,12 +13,23 @@
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
 	import SlimSelect from 'slim-select';
 
-	/** @type {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} */
-	export let jobUpdater;
-	/** @type {('project'|'workflow'|'user_email'|'id')[]} */
-	export let columnsToHide = [];
-	/** @type {boolean} */
-	export let admin = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} jobUpdater
+	 * @property {Array<('project'|'workflow'|'user_email'|'id')>} [columnsToHide]
+	 * @property {boolean} [admin]
+	 * @property {import('svelte').Snippet} [buttons]
+	 * @property {import('svelte').Snippet} [editStatus]
+	 */
+
+	/** @type {Props} */
+	let {
+		jobUpdater,
+		columnsToHide = [],
+		admin = false,
+		buttons,
+		editStatus
+	} = $props();
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
@@ -288,7 +298,7 @@
 					Clear filters
 				</button>
 			{/if}
-			<slot name="buttons" />
+			{@render buttons?.()}
 		</div>
 	</div>
 	<div id="jobUpdatesError" />
@@ -378,7 +388,7 @@
 							<span>
 								<StatusBadge status={row.status} />
 								{#if admin}
-									<slot name="edit-status" {row} />
+									{@render editStatus?.()}
 								{/if}
 							</span>
 						</td>

@@ -55,16 +55,13 @@
 
 <div class="container mt-2">
 	<FilteredTasksTable {taskGroups} {showDocLinksInTable}>
-		<!-- @migration-task: migrate this slot by hand, `extra-columns-colgroup` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns-colgroup">
+		{#snippet extraColumnsColgroup()}
 			<col width="60" />
-		</svelte:fragment>
-		<!-- @migration-task: migrate this slot by hand, `extra-columns-header` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns-header">
+		{/snippet}
+		{#snippet extraColumnsHeader()}
 			<th></th>
-		</svelte:fragment>
-		<!-- @migration-task: migrate this slot by hand, `extra-columns` is an invalid identifier -->
-	<svelte:fragment slot="extra-columns" let:task>
+		{/snippet}
+		{#snippet extraColumns(task)}
 			<td>
 				{#if showInfoButton(task)}
 					<button class="btn btn-info" onclick={() => showDocsInfoModal(task)}>
@@ -72,7 +69,7 @@
 					</button>
 				{/if}
 			</td>
-		</svelte:fragment>
+		{/snippet}
 	</FilteredTasksTable>
 </div>
 
