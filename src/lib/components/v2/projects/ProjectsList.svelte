@@ -1,4 +1,6 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { projectInfoModalV2 } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
@@ -7,20 +9,26 @@
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
 
 	// List of projects to be displayed
-	/** @type {import('fractal-components/types/api').ProjectV2[]} */
-	export let projects = [];
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').ProjectV2[]} [projects]
+	 */
 
-	let projectSearch = '';
+	/** @type {Props} */
+	let { projects = $bindable([]) } = $props();
 
-	$: filteredProjects = projects.filter((p) =>
+	let projectSearch = $state('');
+
+	let filteredProjects = $derived(projects.filter((p) =>
 		p.name.toLowerCase().includes(projectSearch.toLowerCase())
-	);
+	));
 
 	/** @type {Modal} */
-	let newProjectModal;
+	let newProjectModal = $state();
 
-	let newProjectName = '';
-	let newProjectNameError = '';
+	let newProjectName = $state('');
+	let newProjectNameError = $state('');
 
 	function onNewProjectModalOpen() {
 		newProjectName = '';
@@ -37,7 +45,7 @@
 		projectInfoModalV2.set(project);
 	}
 
-	let creating = false;
+	let creating = $state(false);
 
 	async function handleCreateProject() {
 		newProjectModal.hideErrorAlert();
@@ -115,7 +123,7 @@
 					</div>
 				</div>
 				<div class="col-auto">
-					<button class="btn btn-primary" on:click={() => newProjectModal.show()}>
+					<button class="btn btn-primary" onclick={() => newProjectModal.show()}>
 						Create new project
 					</button>
 				</div>
@@ -145,9 +153,9 @@
 										class="btn btn-light"
 										data-bs-toggle="modal"
 										data-bs-target="#projectInfoModal"
-										on:click={() => setProjectInfoModal(id)}
+										onclick={() => setProjectInfoModal(id)}
 									>
-										<i class="bi bi-info-circle" /> Info
+										<i class="bi bi-info-circle"></i> Info
 									</button>
 									<ConfirmActionButton
 										modalId={'confirmDeleteProject' + id}
@@ -175,39 +183,45 @@
 	size="md"
 	centered={true}
 >
-	<svelte:fragment slot="header">
-		<h1 class="modal-title fs-5">Create new project</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-crateNewProjectModal" />
-		<form class="row" on:submit|preventDefault={handleCreateProject} id="create-project-form">
-			<div class="col">
-				<div class="row mb-3">
-					<label for="projectName" class="col-md-3 col-form-label">Project name</label>
-					<div class="col-md-9">
-						<input
-							id="projectName"
-							type="text"
-							bind:value={newProjectName}
-							class="form-control"
-							class:is-invalid={newProjectNameError}
-							required
-						/>
-						{#if newProjectNameError}
-							<div class="invalid-feedback">{newProjectNameError}</div>
-						{/if}
+	{#snippet header()}
+	
+			<h1 class="modal-title fs-5">Create new project</h1>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-crateNewProjectModal"></div>
+			<form class="row" onsubmit={preventDefault(handleCreateProject)} id="create-project-form">
+				<div class="col">
+					<div class="row mb-3">
+						<label for="projectName" class="col-md-3 col-form-label">Project name</label>
+						<div class="col-md-9">
+							<input
+								id="projectName"
+								type="text"
+								bind:value={newProjectName}
+								class="form-control"
+								class:is-invalid={newProjectNameError}
+								required
+							/>
+							{#if newProjectNameError}
+								<div class="invalid-feedback">{newProjectNameError}</div>
+							{/if}
+						</div>
 					</div>
 				</div>
-			</div>
-		</form>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary" form="create-project-form" disabled={creating}>
-			{#if creating}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-			{/if}
-			Create
-		</button>
-	</svelte:fragment>
+			</form>
+		
+	{/snippet}
+	{#snippet footer()}
+	
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" form="create-project-form" disabled={creating}>
+				{#if creating}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Create
+			</button>
+		
+	{/snippet}
 </Modal>

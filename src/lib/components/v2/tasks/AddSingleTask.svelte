@@ -1,4 +1,6 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
@@ -6,29 +8,35 @@
 	import TypesEditor from './TypesEditor.svelte';
 	import { detectSchemaVersion, SchemaValidator } from 'fractal-components';
 
-	/** @type {(task: import('fractal-components/types/api').TaskV2[]) => void} */
-	export let addNewTasks;
-	/** @type {import('fractal-components/types/api').User} */
-	export let user;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
+	 * @property {import('fractal-components/types/api').User} user
+	 */
 
-	let taskSuccessMessage = '';
+	/** @type {Props} */
+	let { addNewTasks, user } = $props();
+
+	let taskSuccessMessage = $state('');
 
 	// Add a single task fields
-	let name = '';
-	let command_non_parallel = '';
-	let command_parallel = '';
-	let version = '';
-	let docs_info = '';
-	let docs_link = '';
+	let name = $state('');
+	let command_non_parallel = $state('');
+	let command_parallel = $state('');
+	let version = $state('');
+	let docs_info = $state('');
+	let docs_link = $state('');
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let args_schema_version = 'pydantic_v2';
+	let args_schema_version = $state('pydantic_v2');
 	/** @type {import('fractal-components/types/api').TaskV2Type} */
-	let taskType = 'non_parallel';
-	let privateTask = false;
-	let selectedGroup = null;
+	let taskType = $state('non_parallel');
+	let privateTask = $state(false);
+	let selectedGroup = $state(null);
 
 	/** @type {TypesEditor} */
-	let typesEditor;
+	let typesEditor = $state();
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-createTask', [
 		'name',
@@ -147,22 +155,22 @@
 	}
 
 	/** @type {FileList|null} */
-	let argsSchemaNonParallelFiles = null;
+	let argsSchemaNonParallelFiles = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let argsSchemaNonParallelFileInput = undefined;
+	let argsSchemaNonParallelFileInput = $state(undefined);
 	/** @type {FileList|null} */
-	let argsSchemaParallelFiles = null;
+	let argsSchemaParallelFiles = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let argsSchemaParallelFileInput = undefined;
+	let argsSchemaParallelFileInput = $state(undefined);
 
 	/** @type {FileList|null} */
-	let metaFilesNonParallel = null;
+	let metaFilesNonParallel = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let metaFileInputNonParallel = undefined;
+	let metaFileInputNonParallel = $state(undefined);
 	/** @type {FileList|null} */
-	let metaFilesParallel = null;
+	let metaFilesParallel = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let metaFileInputParallel = undefined;
+	let metaFileInputParallel = $state(undefined);
 
 	/**
 	 * @param {boolean} autodetectVersion
@@ -339,7 +347,7 @@
 
 <StandardDismissableAlert message={taskSuccessMessage} />
 
-<form on:submit|preventDefault={handleCreateTask}>
+<form onsubmit={preventDefault(handleCreateTask)}>
 	<div class="row mb-1">
 		<div class="col-xl-1 col-lg-2 col-3">Task type</div>
 		<div class="col-xl-11 col-lg-8 col-9">
@@ -464,7 +472,7 @@
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="metaFileNonParallel" class="input-group-text">
-						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload non parallel meta file
+						<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Upload non parallel meta file
 					</label>
 					<input
 						class="form-control schemaFile"
@@ -477,7 +485,7 @@
 						class:is-invalid={$validationErrors['meta_non_parallel']}
 					/>
 					{#if metaFilesNonParallel && metaFilesNonParallel.length > 0}
-						<button class="btn btn-outline-secondary" on:click={clearMetaNonParallelFileUpload}>
+						<button class="btn btn-outline-secondary" onclick={clearMetaNonParallelFileUpload}>
 							Clear
 						</button>
 					{/if}
@@ -490,7 +498,7 @@
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="argsSchemaNonParallelFile" class="input-group-text">
-						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload non parallel args schema
+						<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Upload non parallel args schema
 					</label>
 					<input
 						class="form-control schemaFile"
@@ -500,13 +508,13 @@
 						id="argsSchemaNonParallelFile"
 						bind:this={argsSchemaNonParallelFileInput}
 						bind:files={argsSchemaNonParallelFiles}
-						on:change={handleNonParallelSchemaChanged}
+						onchange={handleNonParallelSchemaChanged}
 						class:is-invalid={$validationErrors['args_schema_non_parallel']}
 					/>
 					{#if argsSchemaNonParallelFiles && argsSchemaNonParallelFiles.length > 0}
 						<button
 							class="btn btn-outline-secondary"
-							on:click={clearArgsSchemaNonParallelFileUpload}
+							onclick={clearArgsSchemaNonParallelFileUpload}
 						>
 							Clear
 						</button>
@@ -522,7 +530,7 @@
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="metaFileParallel" class="input-group-text">
-						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload parallel meta file
+						<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Upload parallel meta file
 					</label>
 					<input
 						class="form-control schemaFile"
@@ -535,7 +543,7 @@
 						class:is-invalid={$validationErrors['meta_parallel']}
 					/>
 					{#if metaFilesParallel && metaFilesParallel.length > 0}
-						<button class="btn btn-outline-secondary" on:click={clearMetaParallelFileUpload}>
+						<button class="btn btn-outline-secondary" onclick={clearMetaParallelFileUpload}>
 							Clear
 						</button>
 					{/if}
@@ -548,7 +556,7 @@
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
 					<label for="argsSchemaParallelFile" class="input-group-text">
-						<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload parallel args schema
+						<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Upload parallel args schema
 					</label>
 					<input
 						class="form-control schemaFile"
@@ -558,11 +566,11 @@
 						id="argsSchemaParallelFile"
 						bind:this={argsSchemaParallelFileInput}
 						bind:files={argsSchemaParallelFiles}
-						on:change={handleParallelSchemaChanged}
+						onchange={handleParallelSchemaChanged}
 						class:is-invalid={$validationErrors['args_schema_parallel']}
 					/>
 					{#if argsSchemaParallelFiles && argsSchemaParallelFiles.length > 0}
-						<button class="btn btn-outline-secondary" on:click={clearArgsSchemaParallelFileUpload}>
+						<button class="btn btn-outline-secondary" onclick={clearArgsSchemaParallelFileUpload}>
 							Clear
 						</button>
 					{/if}
@@ -621,7 +629,7 @@
 								bind:value={docs_info}
 								class:is-invalid={$validationErrors['docs_info']}
 								rows="10"
-							/>
+							></textarea>
 						</div>
 					</div>
 					<div class="row">
@@ -654,7 +662,7 @@
 	/>
 
 	<div class="row">
-		<div id="errorAlert-createTask" />
+		<div id="errorAlert-createTask"></div>
 		<div class="col-auto">
 			<button type="submit" class="btn btn-primary mt-1 mb-3">Create</button>
 		</div>

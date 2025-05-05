@@ -1,20 +1,28 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {number} */
-	export let projectId;
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
+	
+	
 
-	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => void} */
-	export let workflowUpdater;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} projectId
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} workflowUpdater
+	 */
+
+	/** @type {Props} */
+	let { projectId, workflow, workflowUpdater } = $props();
 
 	/** @type {Modal} */
-	let editWorkflowTasksOrderModal;
+	let editWorkflowTasksOrderModal = $state();
 
 	/** @type {{id: number, name: string}[]} */
-	let editableTasksList = [];
+	let editableTasksList = $state([]);
 
 	// used to hide drag and drop ghost image
 	let transparentImage;
@@ -56,7 +64,7 @@
 		}
 	}
 
-	let workflowTaskSorting = false;
+	let workflowTaskSorting = $state(false);
 
 	/**
 	 * Reorders a project's workflow in the server
@@ -95,9 +103,9 @@
 	}
 
 	/** @type {number|undefined} */
-	let draggedWftId = undefined;
+	let draggedWftId = $state(undefined);
 	/** @type {number|undefined} */
-	let draggedWftIndex = undefined;
+	let draggedWftIndex = $state(undefined);
 
 	/**
 	 * @param {number} workflowTaskId
@@ -169,52 +177,58 @@
 </script>
 
 <Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">Edit workflow tasks order</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editWorkflowTasksOrderModal" />
-		{#if workflow !== undefined && editableTasksList.length == 0}
-			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
-		{:else if workflow !== undefined}
-			<div class="fw-light mb-3">Sort the elements by dragging them to the desired position.</div>
-			<div
-				id="workflow-tasks-order"
-				role="region"
-				tabindex="-1"
-				on:dragover={handleDragOver}
-				on:drop={handleDragEnd}
-			>
-				{#each editableTasksList as workflowTask, i}
-					<div
-						class="btn w-100 mt-2 border border-secondary btn-draggable"
-						data-fs-target={workflowTask.id}
-						draggable={true}
-						role="button"
-						tabindex="0"
-						class:active={draggedWftIndex === i}
-						class:dragged={workflowTask.id === draggedWftId}
-						on:dragstart={(event) => handleDragStart(workflowTask.id, i, event)}
-						on:dragend={handleDragEnd}
-					>
-						{workflowTask.name}
-					</div>
-				{/each}
-			</div>
-		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button
-			class="btn btn-primary"
-			on:click|preventDefault={handleWorkflowOrderUpdate}
-			disabled={workflowTaskSorting}
-		>
-			{#if workflowTaskSorting}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+	{#snippet header()}
+	
+			<h5 class="modal-title">Edit workflow tasks order</h5>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-editWorkflowTasksOrderModal"></div>
+			{#if workflow !== undefined && editableTasksList.length == 0}
+				<p class="text-center mt-3">No workflow tasks yet, add one.</p>
+			{:else if workflow !== undefined}
+				<div class="fw-light mb-3">Sort the elements by dragging them to the desired position.</div>
+				<div
+					id="workflow-tasks-order"
+					role="region"
+					tabindex="-1"
+					ondragover={handleDragOver}
+					ondrop={handleDragEnd}
+				>
+					{#each editableTasksList as workflowTask, i}
+						<div
+							class="btn w-100 mt-2 border border-secondary btn-draggable"
+							data-fs-target={workflowTask.id}
+							draggable={true}
+							role="button"
+							tabindex="0"
+							class:active={draggedWftIndex === i}
+							class:dragged={workflowTask.id === draggedWftId}
+							ondragstart={(event) => handleDragStart(workflowTask.id, i, event)}
+							ondragend={handleDragEnd}
+						>
+							{workflowTask.name}
+						</div>
+					{/each}
+				</div>
 			{/if}
-			Save
-		</button>
-	</svelte:fragment>
+		
+	{/snippet}
+	{#snippet footer()}
+	
+			<button
+				class="btn btn-primary"
+				onclick={preventDefault(handleWorkflowOrderUpdate)}
+				disabled={workflowTaskSorting}
+			>
+				{#if workflowTaskSorting}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Save
+			</button>
+		
+	{/snippet}
 </Modal>
 
 <style>

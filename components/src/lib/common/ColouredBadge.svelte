@@ -1,8 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
 
-	/** @type {string | null} */
-	export let value;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {string | null} value
+	 */
+
+	/** @type {Props} */
+	let { value } = $props();
 
 	let ColorHash;
 
@@ -14,7 +20,7 @@
 		return colorHash.hex(stringInput);
 	}
 
-	let mounted = false;
+	let mounted = $state(false);
 
 	onMount(async () => {
 		// Force rendering of coloured badge after SSR, to avoid issue with

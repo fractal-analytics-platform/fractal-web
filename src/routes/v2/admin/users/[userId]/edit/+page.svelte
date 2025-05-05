@@ -1,16 +1,16 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	let user = $page.data.user;
+	let user = page.data.user;
 
 	/** @type {import('fractal-components/types/api').UserSettings} */
-	let settings = $page.data.settings;
+	let settings = page.data.settings;
 
 	/** @type {Array<import('fractal-components/types/api').Group>} */
-	let groups = $page.data.groups;
+	let groups = page.data.groups;
 
 	/**
 	 * @param {import('fractal-components/types/api').User} user
@@ -55,5 +55,5 @@
 		</ol>
 	</nav>
 
-	<UserEditor {user} {settings} {groups} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+	<UserEditor {user} {settings} {groups} saveUser={save} runnerBackend={page.data.runnerBackend} />
 </div>

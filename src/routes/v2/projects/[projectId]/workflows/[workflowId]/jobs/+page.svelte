@@ -1,12 +1,12 @@
 <script>
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	/** @type {import('fractal-components/types/api').ProjectV2} */
-	let project = $page.data.project;
+	let project = page.data.project;
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	let workflow = $page.data.workflow;
+	let workflow = page.data.workflow;
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
@@ -41,7 +41,7 @@
 				<li class="breadcrumb-item active" aria-current="page">Jobs</li>
 			</ol>
 		</nav>
-		<div />
+		<div></div>
 	</div>
 
 	<div class="container">

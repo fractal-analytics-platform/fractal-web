@@ -1,8 +1,14 @@
 <script>
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {{ [key: string]: boolean }} */
-	export let filters;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {{ [key: string]: boolean }} filters
+	 */
+
+	/** @type {Props} */
+	let { filters } = $props();
 </script>
 
 {#each Object.entries(filters) as [key, value]}

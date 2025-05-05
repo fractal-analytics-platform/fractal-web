@@ -1,4 +1,6 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
 	import { SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
@@ -7,20 +9,26 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	/** @type {(task: import('fractal-components/types/api').TaskV2[]) => void} */
-	export let addNewTasks;
-	/** @type {import('fractal-components/types/api').User} */
-	export let user;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
+	 * @property {import('fractal-components/types/api').User} user
+	 */
 
-	let python_interpreter = '';
-	let label = '';
-	let version = '';
-	let package_name = '';
-	let package_root = '';
+	/** @type {Props} */
+	let { addNewTasks, user } = $props();
+
+	let python_interpreter = $state('');
+	let label = $state('');
+	let version = $state('');
+	let package_name = $state('');
+	let package_root = $state('');
 	let manifestData = null;
-	let privateTask = false;
-	let selectedGroup = null;
-	let successMessage = '';
+	let privateTask = $state(false);
+	let selectedGroup = $state(null);
+	let successMessage = $state('');
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-customEnvTask', [
 		'python_interpreter',
@@ -32,7 +40,7 @@
 
 	const validationErrors = formErrorHandler.getValidationErrorStore();
 
-	let dragAndDropUploader;
+	let dragAndDropUploader = $state();
 
 	/**
 	 * @param {string} content
@@ -75,7 +83,7 @@
 		}
 	}
 
-	let collecting = false;
+	let collecting = $state(false);
 
 	async function handleCollect() {
 		if (!manifestData) {
@@ -131,7 +139,7 @@
 </script>
 
 <div class="alert alert-warning">
-	<i class="bi bi-exclamation-triangle" />
+	<i class="bi bi-exclamation-triangle"></i>
 	Collecting tasks with a custom Python environment will use that environment for running the tasks.
 	Be careful about changing this environment, as that may break existing workflows. It is recommended
 	to use custom Python environments only during task development or when something needed for your environment
@@ -141,7 +149,7 @@
 
 <StandardDismissableAlert message={successMessage} />
 
-<form on:submit|preventDefault={handleCollect} class="mb-5">
+<form onsubmit={preventDefault(handleCollect)} class="mb-5">
 	<div class="row mb-2 pb-1">
 		<div class="col">
 			<div class="input-group has-validation">
@@ -264,7 +272,7 @@
 	</div>
 	<div class="row">
 		<div class="col">
-			<div id="errorAlert-customEnvTask" />
+			<div id="errorAlert-customEnvTask"></div>
 		</div>
 	</div>
 
@@ -277,7 +285,7 @@
 
 	<button type="submit" class="btn btn-primary" disabled={collecting}>
 		{#if collecting}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{/if}
 		Collect
 	</button>

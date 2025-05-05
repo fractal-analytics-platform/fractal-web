@@ -1,10 +1,16 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
 
-	/** @type {import("fractal-components/types/api").TaskV2} */
-	export let task;
-	/** @type {string | null} */
-	export let taskVersion;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("fractal-components/types/api").TaskV2} task
+	 * @property {string | null} taskVersion
+	 */
+
+	/** @type {Props} */
+	let { task, taskVersion } = $props();
 </script>
 
 <ul class="list-group">

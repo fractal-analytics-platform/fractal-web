@@ -1,13 +1,19 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
 
-	/** @type {import('../form_element.js').EnumFormElement} */
-	export let formElement;
-	export let editable = true;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').EnumFormElement} formElement
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let { formElement = $bindable(), editable = true } = $props();
 
 	/** @type {HTMLSelectElement} */
-	let field;
-	let validationError = '';
+	let field = $state();
+	let validationError = $state('');
 
 	function handleValueChange() {
 		formElement.notifyChange();
@@ -26,8 +32,8 @@
 		<select
 			bind:this={field}
 			bind:value={formElement.value}
-			on:change={handleValueChange}
-			on:input={handleValueChange}
+			onchange={handleValueChange}
+			oninput={handleValueChange}
 			class="form-select"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}

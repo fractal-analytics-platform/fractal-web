@@ -5,14 +5,14 @@
 	import { onMount } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 
-	export let form;
-	let loginError = false;
+	let { form } = $props();
+	let loginError = $state(false);
 
 	if (form?.invalid) {
 		loginError = true;
 	}
 
-	$: userLoggedIn = !!$page.data.userInfo;
+	let userLoggedIn = $derived(!!$page.data.userInfo);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;
@@ -35,7 +35,7 @@
 		window.location.replace(result.authorization_url);
 	}
 
-	let showSessionExpiredMessage = false;
+	let showSessionExpiredMessage = $state(false);
 	onMount(async () => {
 		if (location.href.includes('invalidate=true')) {
 			await invalidateAll();
@@ -69,8 +69,8 @@
 			<div class="row">
 				<div class="col mb-4 pb-3">
 					<h3 class="fw-light">Institutional login</h3>
-					<div id="externalLoginError" />
-					<button type="button" on:click={oauth2Login} class="btn btn-primary">
+					<div id="externalLoginError"></div>
+					<button type="button" onclick={oauth2Login} class="btn btn-primary">
 						{#if oauth2Provider === 'github'}
 							Log in with GitHub
 						{:else if oauth2Provider === 'google'}

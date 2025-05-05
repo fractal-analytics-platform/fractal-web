@@ -1,18 +1,24 @@
 <script>
 	import PropertyDescription from './PropertyDescription.svelte';
 
-	/** @type {import('../form_element.js').BaseFormElement} */
-	export let formElement;
-	/** @type {'label'|'span'} */
-	export let tag = 'label';
-	export let defaultTitle = '';
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').BaseFormElement} formElement
+	 * @property {'label'|'span'} [tag]
+	 * @property {string} [defaultTitle]
+	 */
 
-	$: classValue = formElement.required
+	/** @type {Props} */
+	let { formElement, tag = 'label', defaultTitle = '' } = $props();
+
+	let classValue = $derived(formElement.required
 		? 'fw-bold'
 		: !('value' in formElement) ||
 		  (formElement.value !== null && formElement.value !== undefined && formElement.value !== '')
 		? ''
-		: 'text-secondary fw-light';
+		: 'text-secondary fw-light');
 </script>
 
 {#if tag === 'label'}

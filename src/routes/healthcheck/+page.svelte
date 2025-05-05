@@ -4,10 +4,10 @@
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { onMount } from 'svelte';
 
-	let inProgress = false;
-	let stepMessage = '';
-	let error = undefined;
-	let randomProjectName = '';
+	let inProgress = $state(false);
+	let stepMessage = $state('');
+	let error = $state(undefined);
+	let randomProjectName = $state('');
 
 	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
 
@@ -224,9 +224,9 @@
 
 	<div class="row">
 		<div class="col">
-			<button class="btn btn-primary" disabled={inProgress} on:click={startTest}>
+			<button class="btn btn-primary" disabled={inProgress} onclick={startTest}>
 				{#if inProgress}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 				Run test
 			</button>

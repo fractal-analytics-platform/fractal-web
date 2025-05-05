@@ -5,8 +5,8 @@
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
-	let selectedTaskRow = null;
-	let modalText = '';
+	let selectedTaskRow = $state(null);
+	let modalText = $state('');
 
 	/**
 	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
@@ -39,19 +39,22 @@
 </script>
 
 <FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true}>
+	<!-- @migration-task: migrate this slot by hand, `extra-columns-colgroup` is an invalid identifier -->
 	<svelte:fragment slot="extra-columns-colgroup">
 		<col width="60" />
 		<col width="60" />
 	</svelte:fragment>
+	<!-- @migration-task: migrate this slot by hand, `extra-columns-header` is an invalid identifier -->
 	<svelte:fragment slot="extra-columns-header">
-		<th />
-		<th />
+		<th></th>
+		<th></th>
 	</svelte:fragment>
+	<!-- @migration-task: migrate this slot by hand, `extra-columns` is an invalid identifier -->
 	<svelte:fragment slot="extra-columns" let:task>
 		<td>
 			{#if task.docs_info}
-				<button class="btn btn-info" on:click={() => showSelectedTaskModal(task, task.docs_info)}>
-					<i class="bi bi-info-circle" />
+				<button class="btn btn-info" onclick={() => showSelectedTaskModal(task, task.docs_info)}>
+					<i class="bi bi-info-circle"></i>
 				</button>
 			{/if}
 		</td>
@@ -59,9 +62,9 @@
 			{#if task.install_instructions}
 				<button
 					class="btn btn-primary me-2"
-					on:click={() => showSelectedTaskModal(task, task.install_instructions)}
+					onclick={() => showSelectedTaskModal(task, task.install_instructions)}
 				>
-					<i class="bi bi-plus-circle" />
+					<i class="bi bi-plus-circle"></i>
 				</button>
 			{/if}
 		</td>
@@ -73,7 +76,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title">{selectedTaskRow?.task_name}</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->

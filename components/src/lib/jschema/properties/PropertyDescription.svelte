@@ -1,11 +1,17 @@
 <script>
 	import { onMount } from 'svelte';
 
-	export let description = undefined;
-	export let html = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} [description]
+	 * @property {boolean} [html]
+	 */
+
+	/** @type {Props} */
+	let { description = undefined, html = false } = $props();
 
 	/** @type {HTMLElement|undefined} */
-	let element;
+	let element = $state();
 
 	let popover;
 	let windowEventListener;
@@ -53,6 +59,6 @@
 			data-bs-target
 			data-bs-html={html}
 			data-bs-content={description}
-		/>
+		></span>
 	{/if}
 </span>

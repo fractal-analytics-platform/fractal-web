@@ -10,34 +10,41 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	/** @type {import('fractal-components/types/api').User} */
-	export let user;
+	
+	
+	
+	
 	/**
-	 * @type {import('fractal-components/types/api').TaskGroupV2[]}
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').User} user
+	 * @property {import('fractal-components/types/api').TaskGroupV2[]} taskGroups
+	 * @property {string|undefined} expandedTaskGroupRow
+	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupV2[]) => void} updateTaskGroups
 	 */
-	export let taskGroups;
-	/** @type {string|undefined} */
-	export let expandedTaskGroupRow;
-	/**
-	 * @type {(updatedGroups: import('fractal-components/types/api').TaskGroupV2[]) => void}
-	 */
-	export let updateTaskGroups;
+
+	/** @type {Props} */
+	let {
+		user,
+		taskGroups,
+		expandedTaskGroupRow = $bindable(),
+		updateTaskGroups
+	} = $props();
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default} */
-	let taskGroupInfoModal;
+	let taskGroupInfoModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
-	let taskGroupEditModal;
+	let taskGroupEditModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
-	let taskGroupManageModal;
+	let taskGroupManageModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default} */
-	let taskInfoModal;
+	let taskInfoModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default} */
-	let taskEditModal;
+	let taskEditModal = $state();
 
 	/**
 	 * @type {import('fractal-components/types/api').TasksTableRowGroup[]}
 	 */
-	let taskGroupRows = [];
+	let taskGroupRows = $state([]);
 
 	onMount(() => {
 		buildRows();
@@ -159,7 +166,7 @@
 							class="form-select"
 							aria-label="Version for {taskGroupRow.groupTitle}"
 							bind:value={taskGroupRow.selectedVersion}
-							on:change={() => handleSwitchVersion(i)}
+							onchange={() => handleSwitchVersion(i)}
 						>
 							{#each sortVersions(Object.keys(taskGroupRow.groups)) as version}
 								<option value={version}>{version || 'None'}</option>
@@ -173,41 +180,41 @@
 					{taskGroupRow.groups[taskGroupRow.selectedVersion].task_list.length}
 					<button
 						class="btn btn-link"
-						on:click={() => handleToggleTasks(i)}
+						onclick={() => handleToggleTasks(i)}
 						aria-label={expandedTaskGroupRow === taskGroupRow.groupTitle
 							? 'Collapse tasks'
 							: 'Expand tasks'}
 					>
 						{#if expandedTaskGroupRow === taskGroupRow.groupTitle}
-							<i class="bi bi-dash-circle" />
+							<i class="bi bi-dash-circle"></i>
 						{:else}
-							<i class="bi bi-plus-circle" />
+							<i class="bi bi-plus-circle"></i>
 						{/if}
 					</button>
 				</td>
 				<td>
 					<button
 						class="btn btn-light"
-						on:click={() =>
+						onclick={() =>
 							taskGroupInfoModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
-						<i class="bi bi-info-circle" />
+						<i class="bi bi-info-circle"></i>
 						Info
 					</button>
 					<button
 						class="btn btn-primary"
-						on:click={() =>
+						onclick={() =>
 							taskGroupEditModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
-						<i class="bi bi-pencil" />
+						<i class="bi bi-pencil"></i>
 						Edit
 					</button>
 					<button
 						class="btn btn-info"
-						on:click={() =>
+						onclick={() =>
 							taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
-						<i class="bi bi-gear" />
+						<i class="bi bi-gear"></i>
 						Manage
 					</button>
 					<ConfirmActionButton
@@ -238,20 +245,20 @@
 						<td>
 							<button
 								class="btn btn-light"
-								on:click={() => {
+								onclick={() => {
 									taskInfoModal.open(task, taskGroupRow.selectedVersion);
 								}}
 							>
-								<i class="bi bi-info-circle" />
+								<i class="bi bi-info-circle"></i>
 								Info
 							</button>
 							<button
 								class="btn btn-primary"
-								on:click={() => {
+								onclick={() => {
 									taskEditModal.open(task);
 								}}
 							>
-								<i class="bi bi-pencil" />
+								<i class="bi bi-pencil"></i>
 								Edit
 							</button>
 						</td>

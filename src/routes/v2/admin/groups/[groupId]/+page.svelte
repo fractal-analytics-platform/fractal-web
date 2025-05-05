@@ -3,13 +3,13 @@
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
-	$: group = $page.data.group;
+	let group = $derived($page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	$: allUsers = $page.data.users;
+	let allUsers = $derived($page.data.users);
 
-	$: groupUsers = allUsers
+	let groupUsers = $derived(allUsers
 		.filter((u) => group.user_ids.includes(u.id))
-		.sort(sortUserByEmailComparator);
+		.sort(sortUserByEmailComparator));
 </script>
 
 <div class="container mt-3">
@@ -28,7 +28,7 @@
 	</nav>
 
 	<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary float-end">
-		<i class="bi bi-pencil" />
+		<i class="bi bi-pencil"></i>
 		Edit
 	</a>
 

@@ -1,6 +1,12 @@
 <script>
-	/** @type {import('fractal-components/types/api').JobStatus|undefined} */
-	export let status;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').JobStatus|undefined} status
+	 */
+
+	/** @type {Props} */
+	let { status } = $props();
 </script>
 
 {#if status}
@@ -10,9 +16,9 @@
       <span class="visually-hidden">Loading...</span>
     </div>
 		{:else if status === 'done'}
-			<i class="job-status-icon bi bi-check text-success" />
+			<i class="job-status-icon bi bi-check text-success"></i>
 		{:else if status === 'failed'}
-			<i class="job-status-icon bi bi-x text-danger" />
+			<i class="job-status-icon bi bi-x text-danger"></i>
 		{/if}
 	</span>
 {/if}

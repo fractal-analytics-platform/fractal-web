@@ -5,10 +5,10 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { onMount } from 'svelte';
 
-	$: userLoggedIn = !!$page.data.userInfo;
-	$: news = $page.data.news;
+	let userLoggedIn = $derived(!!$page.data.userInfo);
+	let news = $derived($page.data.news);
 
-	let mounted = false;
+	let mounted = $state(false);
 
 	onMount(() => {
 		mounted = true;

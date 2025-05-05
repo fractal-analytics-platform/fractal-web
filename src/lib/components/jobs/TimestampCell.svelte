@@ -1,11 +1,19 @@
 <script>
-	/** @type {string|null} */
-	export let timestamp;
+	import { run } from 'svelte/legacy';
 
-	let date = '';
-	let time = '';
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {string|null} timestamp
+	 */
 
-	$: {
+	/** @type {Props} */
+	let { timestamp } = $props();
+
+	let date = $state('');
+	let time = $state('');
+
+	run(() => {
 		if (timestamp) {
 			const dateObj = new Date(timestamp);
 			date = dateObj.toLocaleString([], {
@@ -23,7 +31,7 @@
 			date = '';
 			time = '';
 		}
-	}
+	});
 </script>
 
 {#if date === ''}

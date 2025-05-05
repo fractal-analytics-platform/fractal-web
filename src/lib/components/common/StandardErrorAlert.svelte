@@ -1,14 +1,13 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { AlertError, extractErrorDetail } from '$lib/common/errors';
 
-	export let error = undefined;
+	let { error = undefined, children } = $props();
 
-	let errorString = '';
-	let formatAsPre = false;
+	let errorString = $state('');
+	let formatAsPre = $state(false);
 
-	$: if (error) {
-		updateErrorMessage();
-	}
 
 	function updateErrorMessage() {
 		if (error instanceof AlertError) {
@@ -42,11 +41,16 @@
 	export function hide() {
 		errorString = '';
 	}
+	run(() => {
+		if (error) {
+			updateErrorMessage();
+		}
+	});
 </script>
 
 {#if errorString}
 	<div class="alert alert-danger alert-dismissible" role="alert">
-		<slot />
+		{@render children?.()}
 		{#if formatAsPre}
 			<p>There has been an error, reason:</p>
 			<pre>{errorString}</pre>
@@ -58,6 +62,6 @@
 				{line}
 			{/each}
 		{/if}
-		<button class="btn-close" data-bs-dismiss="alert" on:click={hide} />
+		<button class="btn-close" data-bs-dismiss="alert" onclick={hide}></button>
 	</div>
 {/if}

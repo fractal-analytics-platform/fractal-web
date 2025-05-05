@@ -1,7 +1,12 @@
 <script>
-	/** @type {import('fractal-components/types/api').JobStatus|null} */
-	export let status = null;
-	$: labelStyle = getLabelStyle(status);
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').JobStatus|null} [status]
+	 */
+
+	/** @type {Props} */
+	let { status = null } = $props();
 
 	/**
 	 * @param {import('fractal-components/types/api').JobStatus|null} status
@@ -16,6 +21,7 @@
 				return 'badge text-bg-danger';
 		}
 	}
+	let labelStyle = $derived(getLabelStyle(status));
 </script>
 
 <span class={labelStyle}>

@@ -1,15 +1,23 @@
 <script>
-	/** @type {import('@vincjo/datatables').DataHandler} */
-	export let handler;
-	/** @type {string} */
-	export let key;
-	/** @type {string} */
-	export let label;
-	let filterLabel = label;
+	import { run } from 'svelte/legacy';
+
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('@vincjo/datatables').DataHandler} handler
+	 * @property {string} key
+	 * @property {string} label
+	 */
+
+	/** @type {Props} */
+	let { handler, key, label } = $props();
+	let filterLabel = $state(label);
 
 	/** @type {import('svelte/store').Writable<{ identifier?: string, direction?: 'asc' | 'desc' }>} */
-	let sorted;
-	$: {
+	let sorted = $state();
+	run(() => {
 		sorted = handler.getSort();
 		if ($sorted.identifier === key) {
 			if ($sorted.direction === 'asc') {
@@ -20,10 +28,10 @@
 		} else {
 			filterLabel = label + '&nbsp;⇅';
 		}
-	}
+	});
 </script>
 
-<th on:click={() => handler.sort(key)} style="cursor: pointer">
+<th onclick={() => handler.sort(key)} style="cursor: pointer">
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html filterLabel}
 </th>

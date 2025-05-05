@@ -1,12 +1,18 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 
-	/** @type {Array<{text: string, highlight: boolean}>} */
-	export let logParts = [];
-	export let highlight = false;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<{text: string, highlight: boolean}>} [logParts]
+	 * @property {boolean} [highlight]
+	 */
+
+	/** @type {Props} */
+	let { logParts = [], highlight = false } = $props();
 
 	/** Show/hide complete stack trace */
-	let showDetails = false;
+	let showDetails = $state(false);
 
 	function expandDetails() {
 		showDetails = true;
@@ -40,7 +46,7 @@
 <!-- --></div>{:else if showDetails || (i + 1 < logParts.length && !logParts[i + 1].highlight)}<div
 						class="ps-3 pe-3">{part.text}</div>{:else}<button
 						class="btn btn-link text-decoration-none details-btn"
-						on:click={expandDetails}>... (details hidden, click here to expand)</button
+						onclick={expandDetails}>... (details hidden, click here to expand)</button
 					>{/if}{/each}</pre>
 	{:else}
 		<pre class:highlight>{logParts.map((p) => p.text).join('\n')}</pre>

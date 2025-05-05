@@ -3,7 +3,7 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	$: user = $page.data.user;
+	let user = $derived($page.data.user);
 </script>
 
 <div class="container mt-3">

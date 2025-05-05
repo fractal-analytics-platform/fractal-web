@@ -8,36 +8,36 @@
 	import { tick } from 'svelte';
 	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
-	let loading = false;
-	let page = 1;
-	let pageSize = 10;
-	let totalCount = 0;
+	let loading = $state(false);
+	let page = $state(1);
+	let pageSize = $state(10);
+	let totalCount = $state(0);
 
 	/** @type {number} */
 	let historyRunId;
 	/** @type {import('fractal-components/types/api').DatasetV2} */
-	let dataset;
+	let dataset = $state();
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
 	let workflowTask;
 	/** @type {number} */
-	let historyRunIndex;
+	let historyRunIndex = $state();
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
 	/** @type {(import('fractal-components/types/api').Pagination<import('fractal-components/types/api').HistoryUnit>)|undefined} */
-	let data = undefined;
+	let data = $state(undefined);
 
 	/** @type {import('fractal-components/types/api').HistoryUnit|undefined} */
-	let selectedUnit = undefined;
+	let selectedUnit = $state(undefined);
 
-	let loadingLogs = false;
+	let loadingLogs = $state(false);
 	/** @type {Array<{text: string, highlight: boolean}>} */
-	let logParts = [];
-	let loadedLogsStatus = '';
+	let logParts = $state([]);
+	let loadedLogsStatus = $state('');
 
-	let showLogs = false;
-	let showZarrUrls = false;
+	let showLogs = $state(false);
+	let showZarrUrls = $state(false);
 
 	let statusFilter = '';
 	/** @type {SlimSelect|undefined} */
@@ -204,134 +204,138 @@
 		}
 	}
 
-	$: hasZarrUrlsInTable =
-		data !== undefined && data.items.find((u) => u.zarr_urls.length === 1) !== undefined;
+	let hasZarrUrlsInTable =
+		$derived(data !== undefined && data.items.find((u) => u.zarr_urls.length === 1) !== undefined);
 </script>
 
 <Modal id="runStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
-	<svelte:fragment slot="header">
-		<h1 class="modal-title fs-5">
-			{#if showLogs && !loadingLogs}
-				Run {historyRunIndex} - Logs for unit #{selectedUnit?.id}
-			{:else if showZarrUrls}
-				Run {historyRunIndex} - Zarr URLs for unit #{selectedUnit?.id}
-			{:else}
-				Run {historyRunIndex}
-			{/if}
-		</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-runStatusModal" class="mb-2" />
-		{#if loading && !data}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-		{:else if showLogs && !loadingLogs}
-			<div class="row">
-				<div class="col">
-					<div class="ps-3 pe-3">
-						<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+	{#snippet header()}
+	
+			<h1 class="modal-title fs-5">
+				{#if showLogs && !loadingLogs}
+					Run {historyRunIndex} - Logs for unit #{selectedUnit?.id}
+				{:else if showZarrUrls}
+					Run {historyRunIndex} - Zarr URLs for unit #{selectedUnit?.id}
+				{:else}
+					Run {historyRunIndex}
+				{/if}
+			</h1>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-runStatusModal" class="mb-2"></div>
+			{#if loading && !data}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{:else if showLogs && !loadingLogs}
+				<div class="row">
+					<div class="col">
+						<div class="ps-3 pe-3">
+							<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
+				<div class="row">
+					<div class="col">
+						<button class="m-2 ms-3 btn btn-primary" onclick={back}> Back </button>
+					</div>
 				</div>
-			</div>
-		{:else if showZarrUrls && selectedUnit}
-			<div class="row">
-				<div class="col">
-					<table class="table table-striped">
-						<tbody>
-							{#if selectedUnit.zarr_urls.length === 0}
-								<p class="ms-3 mb-0 mt-2">No Zarr URLs</p>
-							{:else}
-								{#each selectedUnit.zarr_urls as zarrUrl}
-									<tr>
-										<td>{zarrUrl}</td>
-									</tr>
-								{/each}
-							{/if}
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
-				</div>
-			</div>
-		{:else if data}
-			<table class="table table-striped">
-				<colgroup>
-					{#if hasZarrUrlsInTable}
-						<col width="10%" />
-						<col width="20%" />
-						<col width="60%" />
-						<col width="10%" />
-					{:else}
-						<col width="20%" />
-						<col width="30%" />
-						<col width="30%" />
-						<col width="20%" />
-					{/if}
-				</colgroup>
-				<thead>
-					<tr>
-						<th>Unit id</th>
-						<th>Status</th>
-						<th>Zarr URLs</th>
-						<th />
-					</tr>
-					<tr>
-						<th />
-						<th>
-							<select id="status-filter" class="invisible" />
-						</th>
-						<th />
-					</tr>
-				</thead>
-				<tbody>
-					{#each data.items as unit}
-						<tr>
-							<td>{unit.id}</td>
-							<td>{unit.status || '-'}</td>
-							<td>
-								{#if unit.zarr_urls.length === 0}
-									-
-								{:else if unit.zarr_urls.length === 1}
-									{getRelativeZarrPath(dataset, unit.zarr_urls[0])}
+			{:else if showZarrUrls && selectedUnit}
+				<div class="row">
+					<div class="col">
+						<table class="table table-striped">
+							<tbody>
+								{#if selectedUnit.zarr_urls.length === 0}
+									<p class="ms-3 mb-0 mt-2">No Zarr URLs</p>
 								{:else}
-									<button class="btn btn-light" on:click={() => displayZarrUrls(unit)}>
-										<i class="bi bi-list-task" /> Zarr URLs
-									</button>
+									{#each selectedUnit.zarr_urls as zarrUrl}
+										<tr>
+											<td>{zarrUrl}</td>
+										</tr>
+									{/each}
 								{/if}
-							</td>
-							<td>
-								<button
-									class="btn btn-light me-2"
-									on:click={() => loadLogs(unit)}
-									disabled={loadingLogs}
-								>
-									{#if loadingLogs}
-										<span
-											class="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										/>
-									{/if}
-									<i class="bi-list-columns-reverse" /> Logs
-								</button>
-							</td>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<button class="m-2 ms-3 btn btn-primary" onclick={back}> Back </button>
+					</div>
+				</div>
+			{:else if data}
+				<table class="table table-striped">
+					<colgroup>
+						{#if hasZarrUrlsInTable}
+							<col width="10%" />
+							<col width="20%" />
+							<col width="60%" />
+							<col width="10%" />
+						{:else}
+							<col width="20%" />
+							<col width="30%" />
+							<col width="30%" />
+							<col width="20%" />
+						{/if}
+					</colgroup>
+					<thead>
+						<tr>
+							<th>Unit id</th>
+							<th>Status</th>
+							<th>Zarr URLs</th>
+							<th></th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
-			<Paginator
-				currentPage={page}
-				{pageSize}
-				{totalCount}
-				onPageChange={(currentPage, pageSize) => loadRun(currentPage, pageSize)}
-			/>
-		{/if}
-	</svelte:fragment>
+						<tr>
+							<th></th>
+							<th>
+								<select id="status-filter" class="invisible"></select>
+							</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each data.items as unit}
+							<tr>
+								<td>{unit.id}</td>
+								<td>{unit.status || '-'}</td>
+								<td>
+									{#if unit.zarr_urls.length === 0}
+										-
+									{:else if unit.zarr_urls.length === 1}
+										{getRelativeZarrPath(dataset, unit.zarr_urls[0])}
+									{:else}
+										<button class="btn btn-light" onclick={() => displayZarrUrls(unit)}>
+											<i class="bi bi-list-task"></i> Zarr URLs
+										</button>
+									{/if}
+								</td>
+								<td>
+									<button
+										class="btn btn-light me-2"
+										onclick={() => loadLogs(unit)}
+										disabled={loadingLogs}
+									>
+										{#if loadingLogs}
+											<span
+												class="spinner-border spinner-border-sm"
+												role="status"
+												aria-hidden="true"
+											></span>
+										{/if}
+										<i class="bi-list-columns-reverse"></i> Logs
+									</button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+				<Paginator
+					currentPage={page}
+					{pageSize}
+					{totalCount}
+					onPageChange={(currentPage, pageSize) => loadRun(currentPage, pageSize)}
+				/>
+			{/if}
+		
+	{/snippet}
 </Modal>

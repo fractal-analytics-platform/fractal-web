@@ -1,4 +1,6 @@
 <script>
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import { page } from '$app/stores';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
@@ -15,27 +17,18 @@
 	let projectId = $page.params.projectId;
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
-	let dataset = $page.data.dataset;
+	let dataset = $state($page.data.dataset);
 	/** @type {import('fractal-components/types/api').ImagePage} */
-	let imagePage = $page.data.imagePage;
+	let imagePage = $state($page.data.imagePage);
 
 	/** @type {DatasetImagesTable} */
-	let imagesTable;
+	let imagesTable = $state();
 
-	$: plates = Array.isArray(imagePage.attributes['plate'])
-		? imagePage.attributes['plate'].sort()
-		: [];
-	let selectedPlate = '';
-	let platePath = '';
-	let platePathLoading = false;
-	let platePathError = '';
+	let selectedPlate = $state('');
+	let platePath = $state('');
+	let platePathLoading = $state(false);
+	let platePathError = $state('');
 
-	$: if (plates.length > 0 && selectedPlate !== '') {
-		computePlatePath();
-	} else {
-		platePath = '';
-		platePathError = '';
-	}
 
 	async function computePlatePath() {
 		platePathError = '';
@@ -129,6 +122,17 @@
 	onMount(() => {
 		imagesTable.load();
 	});
+	let plates = $derived(Array.isArray(imagePage.attributes['plate'])
+		? imagePage.attributes['plate'].sort()
+		: []);
+	run(() => {
+		if (plates.length > 0 && selectedPlate !== '') {
+			computePlatePath();
+		} else {
+			platePath = '';
+			platePathError = '';
+		}
+	});
 </script>
 
 <div class="container mt-3 d-flex justify-content-between align-items-center">
@@ -153,10 +157,10 @@
 		</button>
 		<button
 			class="btn btn-light"
-			on:click|preventDefault={handleExportDataset}
+			onclick={preventDefault(handleExportDataset)}
 			aria-label="Export dataset"
 		>
-			<i class="bi-download" />
+			<i class="bi-download"></i>
 		</button>
 		<a id="downloadDatasetButton" class="d-none">Download dataset link</a>
 	</div>
@@ -187,7 +191,7 @@
 						target="_blank"
 						class:disabled={platePathLoading}
 					>
-						<i class="bi bi-eye" />
+						<i class="bi bi-eye"></i>
 						View plate
 					</a>
 					<CopyToClipboardButton
@@ -200,14 +204,14 @@
 					<span class="text-danger">{platePathError}</span>
 				{/if}
 				{#if platePathLoading}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 			</div>
 		</div>
 	</div>
 {/if}
 
-<div id="datasetUpdateError" />
+<div id="datasetUpdateError"></div>
 
 <div class="container-fluid">
 	<DatasetImagesTable

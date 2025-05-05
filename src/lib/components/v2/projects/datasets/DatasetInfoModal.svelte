@@ -3,18 +3,24 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
-	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
-	export let updateDatasetCallback;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} updateDatasetCallback
+	 */
+
+	/** @type {Props} */
+	let { dataset, updateDatasetCallback } = $props();
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
-	let editName = false;
-	let name = '';
-	let editZarrDir = false;
-	let zarrDir = '';
+	let editName = $state(false);
+	let name = $state('');
+	let editZarrDir = $state(false);
+	let zarrDir = $state('');
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-datasetInfoModal', [
 		'name',
@@ -30,7 +36,7 @@
 		formErrorHandler.clearErrors();
 	}
 
-	let savingName = false;
+	let savingName = $state(false);
 
 	async function saveName() {
 		if (!name) {
@@ -49,7 +55,7 @@
 		name = dataset.name;
 	}
 
-	let savingZarrDir = false;
+	let savingZarrDir = $state(false);
 
 	async function saveZarrDir() {
 		if (!zarrDir) {
@@ -96,122 +102,126 @@
 </script>
 
 <Modal id="datasetInfoModal" centered={true} scrollable={true} {onOpen} bind:this={modal} size="lg">
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">Dataset properties</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-datasetInfoModal" />
-		<ul class="list-group">
-			<li class="list-group-item text-bg-light">
-				<strong>Id</strong>
-			</li>
-			<li class="list-group-item">
-				<span>{dataset.id}</span>
-			</li>
-			<li class="list-group-item text-bg-light">
-				<strong>Name</strong>
-			</li>
-			<li class="list-group-item">
-				{#if editName}
-					<div class="input-group has-validation">
-						<input
-							type="text"
-							bind:value={name}
-							class="form-control"
-							class:is-invalid={$validationErrors['name']}
-							on:keydown={(e) => {
+	{#snippet header()}
+	
+			<h5 class="modal-title">Dataset properties</h5>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-datasetInfoModal"></div>
+			<ul class="list-group">
+				<li class="list-group-item text-bg-light">
+					<strong>Id</strong>
+				</li>
+				<li class="list-group-item">
+					<span>{dataset.id}</span>
+				</li>
+				<li class="list-group-item text-bg-light">
+					<strong>Name</strong>
+				</li>
+				<li class="list-group-item">
+					{#if editName}
+						<div class="input-group has-validation">
+							<input
+								type="text"
+								bind:value={name}
+								class="form-control"
+								class:is-invalid={$validationErrors['name']}
+								onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									saveName();
 								}
 							}}
-						/>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							on:click={undoEditName}
-							aria-label="Undo edit name"
-						>
-							<i class="bi bi-arrow-counterclockwise" />
-						</button>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							on:click={saveName}
-							disabled={!name || savingName}
-						>
-							{#if savingName}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-							{/if}
-							Save
-						</button>
-						<span class="invalid-feedback">{$validationErrors['name']}</span>
-					</div>
-				{:else}
-					<span>
-						{dataset.name}
-						<button
-							class="btn btn-primary float-end pt-0 pb-0"
-							on:click={() => (editName = true)}
-							aria-label="Edit dataset name"
-						>
-							<i class="bi bi-pencil" />
-							Edit
-						</button>
-					</span>
-				{/if}
-			</li>
-			<li class="list-group-item text-bg-light">
-				<strong>Zarr dir</strong>
-			</li>
-			<li class="list-group-item">
-				{#if editZarrDir}
-					<div class="input-group has-validation">
-						<input
-							type="text"
-							bind:value={zarrDir}
-							class="form-control"
-							class:is-invalid={$validationErrors['zarr_dir']}
-							on:keydown={(e) => {
+							/>
+							<button
+								class="btn btn-outline-secondary"
+								type="button"
+								onclick={undoEditName}
+								aria-label="Undo edit name"
+							>
+								<i class="bi bi-arrow-counterclockwise"></i>
+							</button>
+							<button
+								class="btn btn-outline-secondary"
+								type="button"
+								onclick={saveName}
+								disabled={!name || savingName}
+							>
+								{#if savingName}
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+								{/if}
+								Save
+							</button>
+							<span class="invalid-feedback">{$validationErrors['name']}</span>
+						</div>
+					{:else}
+						<span>
+							{dataset.name}
+							<button
+								class="btn btn-primary float-end pt-0 pb-0"
+								onclick={() => (editName = true)}
+								aria-label="Edit dataset name"
+							>
+								<i class="bi bi-pencil"></i>
+								Edit
+							</button>
+						</span>
+					{/if}
+				</li>
+				<li class="list-group-item text-bg-light">
+					<strong>Zarr dir</strong>
+				</li>
+				<li class="list-group-item">
+					{#if editZarrDir}
+						<div class="input-group has-validation">
+							<input
+								type="text"
+								bind:value={zarrDir}
+								class="form-control"
+								class:is-invalid={$validationErrors['zarr_dir']}
+								onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									saveZarrDir();
 								}
 							}}
-						/>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							on:click={undoEditZarrDir}
-							aria-label="Undo edit zarr dir"
-						>
-							<i class="bi bi-arrow-counterclockwise" />
-						</button>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							on:click={saveZarrDir}
-							disabled={!zarrDir || savingZarrDir}
-						>
-							{#if savingZarrDir}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-							{/if}
-							Save
-						</button>
-						<span class="invalid-feedback">{$validationErrors['zarr_dir']}</span>
-					</div>
-				{:else}
-					<span>
-						<button
-							class="btn btn-primary float-end pt-0 pb-0"
-							on:click={() => (editZarrDir = true)}
-							aria-label="Edit Zarr dir"
-						>
-							<i class="bi bi-pencil" />
-							Edit
-						</button>
-						<pre>{dataset.zarr_dir}</pre>
-					</span>
-				{/if}
-			</li>
-		</ul>
-	</svelte:fragment>
+							/>
+							<button
+								class="btn btn-outline-secondary"
+								type="button"
+								onclick={undoEditZarrDir}
+								aria-label="Undo edit zarr dir"
+							>
+								<i class="bi bi-arrow-counterclockwise"></i>
+							</button>
+							<button
+								class="btn btn-outline-secondary"
+								type="button"
+								onclick={saveZarrDir}
+								disabled={!zarrDir || savingZarrDir}
+							>
+								{#if savingZarrDir}
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+								{/if}
+								Save
+							</button>
+							<span class="invalid-feedback">{$validationErrors['zarr_dir']}</span>
+						</div>
+					{:else}
+						<span>
+							<button
+								class="btn btn-primary float-end pt-0 pb-0"
+								onclick={() => (editZarrDir = true)}
+								aria-label="Edit Zarr dir"
+							>
+								<i class="bi bi-pencil"></i>
+								Edit
+							</button>
+							<pre>{dataset.zarr_dir}</pre>
+						</span>
+					{/if}
+				</li>
+			</ul>
+		
+	{/snippet}
 </Modal>

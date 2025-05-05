@@ -1,17 +1,25 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { onMount } from 'svelte';
 	import FormEntry from './FormEntry.svelte';
 
-	/** @type {object} */
-	export let args;
-	export let unsavedChanges = false;
-	export let editable = true;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {object} args
+	 * @property {boolean} [unsavedChanges]
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let { args, unsavedChanges = $bindable(false), editable = true } = $props();
 
 	/**
 	 * @type {Array<import('./form-builder-types').FormBuilderEntry>}
 	 */
-	let editableArgs = [];
-	let savedEditableArgs = '';
+	let editableArgs = $state([]);
+	let savedEditableArgs = $state('');
 	/**
 	 * Used to generate unique id in the form (needed for accordions).
 	 */
@@ -32,9 +40,9 @@
 		savedEditableArgs = JSON.stringify(editableArgs);
 	}
 
-	$: {
+	run(() => {
 		unsavedChanges = savedEditableArgs !== JSON.stringify(editableArgs);
-	}
+	});
 
 	/**
 	 * @param {any} value
@@ -238,7 +246,7 @@
 	<div class="d-flex justify-content-center align-items-center mt-3">
 		<button
 			class="btn btn-secondary"
-			on:click={() => addProperty(editableArgs, true)}
+			onclick={() => addProperty(editableArgs, true)}
 			disabled={!editable}
 		>
 			Add property

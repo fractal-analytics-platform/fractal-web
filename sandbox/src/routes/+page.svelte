@@ -6,7 +6,7 @@
 
 	const pages = ['jschema', 'version-update', 'task-manifest'];
 
-	let currentPage = 'jschema';
+	let currentPage = $state('jschema');
 
 	onMount(() => {
 		for (const page of pages) {
@@ -29,7 +29,7 @@
 					class="nav-link"
 					class:active={currentPage === 'jschema'}
 					href="#jschema"
-					on:click={() => (currentPage = 'jschema')}
+					onclick={() => (currentPage = 'jschema')}
 				>
 					JSON Schema
 				</a>
@@ -38,7 +38,7 @@
 				<a
 					class="nav-link"
 					class:active={currentPage === 'version-update'}
-					on:click={() => (currentPage = 'version-update')}
+					onclick={() => (currentPage = 'version-update')}
 					href="#version-update"
 				>
 					Version update
@@ -48,7 +48,7 @@
 				<a
 					class="nav-link"
 					class:active={currentPage === 'task-manifest'}
-					on:click={() => (currentPage = 'task-manifest')}
+					onclick={() => (currentPage = 'task-manifest')}
 					href="#task-manifest"
 				>
 					Task manifest

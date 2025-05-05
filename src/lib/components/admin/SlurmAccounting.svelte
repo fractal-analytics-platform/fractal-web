@@ -4,26 +4,32 @@
 	import { onDestroy } from 'svelte';
 	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
 
-	/** @type {Array<import('fractal-components/types/api').User>} */
-	export let users = [];
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<import('fractal-components/types/api').User>} [users]
+	 */
 
-	let searching = false;
-	let searched = false;
+	/** @type {Props} */
+	let { users = [] } = $props();
 
-	let dateMin = '';
-	let timeMin = '';
-	let dateMax = '';
-	let timeMax = '';
-	let userId = '';
+	let searching = $state(false);
+	let searched = $state(false);
+
+	let dateMin = $state('');
+	let timeMin = $state('');
+	let dateMax = $state('');
+	let timeMax = $state('');
+	let userId = $state('');
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/** @type {number[]} */
-	let ids = [];
+	let ids = $state([]);
 
 	/** @type {CopyToClipboardButton|undefined} */
-	let copyToClipboardButton = undefined;
+	let copyToClipboardButton = $state(undefined);
 
 	async function slurmAccountingQuery() {
 		errorAlert?.hide();
@@ -114,15 +120,15 @@
 	</div>
 </div>
 
-<div id="errorAlert-accounting" />
+<div id="errorAlert-accounting"></div>
 
-<button class="btn btn-primary" on:click={slurmAccountingQuery} disabled={searching}>
+<button class="btn btn-primary" onclick={slurmAccountingQuery} disabled={searching}>
 	{#if searching}
-		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 	{/if}
 	Search
 </button>
-<button class="btn btn-warning" on:click={reset}> Reset </button>
+<button class="btn btn-warning" onclick={reset}> Reset </button>
 
 {#if searched}
 	<p class="text-center">

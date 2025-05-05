@@ -1,13 +1,19 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
 
-	/** @type {import('../form_element.js').NumberFormElement} */
-	export let formElement;
-	export let editable = true;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').NumberFormElement} formElement
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let { formElement = $bindable(), editable = true } = $props();
 
 	/** @type {HTMLInputElement} */
-	let field;
-	let validationError = '';
+	let field = $state();
+	let validationError = $state('');
 
 	function handleValueChange() {
 		validate();
@@ -53,7 +59,7 @@
 			type="number"
 			bind:this={field}
 			bind:value={formElement.value}
-			on:input={handleValueChange}
+			oninput={handleValueChange}
 			min={formElement.min}
 			max={formElement.max}
 			class="form-control"

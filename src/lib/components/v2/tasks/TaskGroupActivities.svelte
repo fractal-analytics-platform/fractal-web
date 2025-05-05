@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { env } from '$env/dynamic/public';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
@@ -10,41 +12,49 @@
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
 
-	export let admin = false;
 
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {boolean} [admin]
+	 * @property {Array<import('fractal-components/types/api').User & {id: number}>} [users]
+	 */
+
+	/** @type {Props} */
+	let { admin = false, users = [] } = $props();
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	export let users = [];
-	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	let sortedUsers = [];
-	$: if (users) {
-		sortedUsers = [...users].sort(sortUserByEmailComparator);
-	}
+	let sortedUsers = $state([]);
+	run(() => {
+		if (users) {
+			sortedUsers = [...users].sort(sortUserByEmailComparator);
+		}
+	});
 
 	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
-	let results = [];
+	let results = $state([]);
 
-	let pkg_name = '';
-	let status = '';
-	let action = '';
+	let pkg_name = $state('');
+	let status = $state('');
+	let action = $state('');
 	/** @type {number|null} */
-	let taskgroupv2_id = null;
+	let taskgroupv2_id = $state(null);
 	/** @type {string|undefined} */
-	let startDateMin = undefined;
+	let startDateMin = $state(undefined);
 	/** @type {string|undefined} */
-	let startTimeMin = undefined;
+	let startTimeMin = $state(undefined);
 	/** @type {number|null} */
-	let user_id = null;
+	let user_id = $state(null);
 	/** @type {number|null} */
 	let task_group_activity_id = null;
 
-	let searched = false;
-	let searching = false;
+	let searched = $state(false);
+	let searching = $state(false);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	/** @type {TaskGroupActivityLogsModal} */
-	let taskGroupActivityLogsModal;
+	let taskGroupActivityLogsModal = $state();
 	/** @type {number|null} */
 	let openedTaskCollectionLogId = null;
 
@@ -246,19 +256,19 @@
 	{/if}
 </div>
 
-<button class="btn btn-primary mt-2" on:click={searchActivities} disabled={searching}>
+<button class="btn btn-primary mt-2" onclick={searchActivities} disabled={searching}>
 	{#if searching}
-		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 	{:else}
-		<i class="bi bi-search" />
+		<i class="bi bi-search"></i>
 	{/if}
 	Search activities
 </button>
-<button class="btn btn-warning mt-2" on:click={resetSearchFields} disabled={searching}>
+<button class="btn btn-warning mt-2" onclick={resetSearchFields} disabled={searching}>
 	Reset
 </button>
 
-<div id="searchError" class="mt-3 mb-3" />
+<div id="searchError" class="mt-3 mb-3"></div>
 
 <div class:d-none={!searched}>
 	<p class="text-center">
@@ -309,9 +319,9 @@
 							<button
 								class="btn btn-info"
 								aria-label="Show activity log"
-								on:click={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
+								onclick={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
 							>
-								<i class="bi bi-info-circle" />
+								<i class="bi bi-info-circle"></i>
 							</button>
 						{/if}
 					</td>

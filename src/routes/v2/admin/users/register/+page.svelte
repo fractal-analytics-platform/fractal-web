@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
@@ -17,8 +17,8 @@
 	};
 
 	/** @type {undefined|boolean} */
-	let created = undefined;
-	let verified = undefined;
+	let created = $state(undefined);
+	let verified = $state(undefined);
 
 	/**
 	 * @param {import('fractal-components/types/api').User} user
@@ -95,5 +95,5 @@
 		</div>
 	{/if}
 
-	<UserEditor {user} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+	<UserEditor {user} saveUser={save} runnerBackend={page.data.runnerBackend} />
 </div>

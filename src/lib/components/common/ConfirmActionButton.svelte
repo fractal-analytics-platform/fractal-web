@@ -1,19 +1,37 @@
 <script>
 	import Modal from './Modal.svelte';
 
-	export let callbackAction = async () => {}; // A default empty function
-	export let style = 'primary';
-	export let btnStyle = 'primary';
-	export let label = '';
-	/** @type {string|undefined} */
-	export let ariaLabel = undefined;
-	export let buttonIcon = undefined;
-	export let modalId = undefined;
-	export let message = '';
-	export let disabled = false;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} [callbackAction] - A default empty function
+	 * @property {string} [style]
+	 * @property {string} [btnStyle]
+	 * @property {string} [label]
+	 * @property {string|undefined} [ariaLabel]
+	 * @property {any} [buttonIcon]
+	 * @property {any} [modalId]
+	 * @property {string} [message]
+	 * @property {boolean} [disabled]
+	 * @property {import('svelte').Snippet} [body]
+	 */
+
+	/** @type {Props} */
+	let {
+		callbackAction = async () => {},
+		style = 'primary',
+		btnStyle = 'primary',
+		label = '',
+		ariaLabel = undefined,
+		buttonIcon = undefined,
+		modalId = undefined,
+		message = '',
+		disabled = false,
+		body
+	} = $props();
 	/** @type {Modal} */
-	let modal;
-	let loading = false;
+	let modal = $state();
+	let loading = $state(false);
 
 	const onOpen = () => {
 		// Remove old errors
@@ -32,31 +50,39 @@
 			loading = false;
 		});
 	};
+
+	const body_render = $derived(body);
 </script>
 
 <Modal id={modalId} {onOpen} bind:this={modal} size="lg">
-	<svelte:fragment slot="header">
-		<h1 class="modal-title fs-5">Confirm action</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		{#if !!$$slots.body}
-			<slot name="body" />
-		{:else}
-			<p>You're about to:</p>
-			<p class="badge bg-{style} fs-6 wrap">{message}</p>
-			<p>Do you confirm?</p>
-		{/if}
-		<div id="errorAlert-{modalId}" />
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary" on:click={handleCallbackAction}>
-			{#if loading}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+	{#snippet header()}
+	
+			<h1 class="modal-title fs-5">Confirm action</h1>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			{#if !!body}
+				{@render body_render?.()}
+			{:else}
+				<p>You're about to:</p>
+				<p class="badge bg-{style} fs-6 wrap">{message}</p>
+				<p>Do you confirm?</p>
 			{/if}
-			Confirm
-		</button>
-	</svelte:fragment>
+			<div id="errorAlert-{modalId}"></div>
+		
+	{/snippet}
+	{#snippet footer()}
+	
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" onclick={handleCallbackAction}>
+				{#if loading}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Confirm
+			</button>
+		
+	{/snippet}
 </Modal>
 
 <button
@@ -67,7 +93,7 @@
 	{disabled}
 >
 	{#if buttonIcon}
-		<i class="bi bi-{buttonIcon}" />
+		<i class="bi bi-{buttonIcon}"></i>
 	{/if}
 	{label}
 </button>

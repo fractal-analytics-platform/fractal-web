@@ -1,28 +1,36 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import Modal from '../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 
-	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => void} */
-	export let handleWorkflowImported;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} handleWorkflowImported
+	 */
+
+	/** @type {Props} */
+	let { handleWorkflowImported } = $props();
 
 	// Component properties
-	let creating = false;
-	let importSuccess = undefined;
-	let workflowName = '';
+	let creating = $state(false);
+	let importSuccess = $state(undefined);
+	let workflowName = $state('');
 
 	/** @type {FileList|null} */
-	let files = null;
+	let files = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let fileInput = undefined;
+	let fileInput = $state(undefined);
 
-	$: workflowFileSelected = files !== null && files.length > 0;
-	$: projectId = $page.params.projectId;
+	let workflowFileSelected = $derived(files !== null && files.length > 0);
+	let projectId = $derived($page.params.projectId);
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
 	export function show() {
 		modal.show();
@@ -144,54 +152,58 @@
 	onOpen={reset}
 	bind:this={modal}
 >
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">Create new workflow</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<form on:submit|preventDefault={handleImportOrCreateWorkflow}>
-			<div class="mb-2">
-				<label for="workflowName" class="form-label">Workflow name</label>
-				<input
-					id="workflowName"
-					name="workflowName"
-					type="text"
-					bind:value={workflowName}
-					class="form-control"
-				/>
-			</div>
+	{#snippet header()}
+	
+			<h5 class="modal-title">Create new workflow</h5>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<form onsubmit={preventDefault(handleImportOrCreateWorkflow)}>
+				<div class="mb-2">
+					<label for="workflowName" class="form-label">Workflow name</label>
+					<input
+						id="workflowName"
+						name="workflowName"
+						type="text"
+						bind:value={workflowName}
+						class="form-control"
+					/>
+				</div>
 
-			<div class="mb-3">
-				<label for="workflowFile" class="form-label">Import workflow from file</label>
-				<input
-					class="form-control"
-					accept="application/json"
-					type="file"
-					name="workflowFile"
-					id="workflowFile"
-					bind:this={fileInput}
-					bind:files
-				/>
-			</div>
+				<div class="mb-3">
+					<label for="workflowFile" class="form-label">Import workflow from file</label>
+					<input
+						class="form-control"
+						accept="application/json"
+						type="file"
+						name="workflowFile"
+						id="workflowFile"
+						bind:this={fileInput}
+						bind:files
+					/>
+				</div>
 
-			<div id="errorAlert-createWorkflowModal" />
+				<div id="errorAlert-createWorkflowModal"></div>
 
-			<button
-				class="btn btn-primary mt-2"
-				disabled={(!workflowName && !workflowFileSelected) || creating}
-			>
-				{#if creating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				{#if workflowFileSelected}
-					Import workflow
-				{:else}
-					Create empty workflow
-				{/if}
-			</button>
-		</form>
+				<button
+					class="btn btn-primary mt-2"
+					disabled={(!workflowName && !workflowFileSelected) || creating}
+				>
+					{#if creating}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{/if}
+					{#if workflowFileSelected}
+						Import workflow
+					{:else}
+						Create empty workflow
+					{/if}
+				</button>
+			</form>
 
-		{#if importSuccess}
-			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
-		{/if}
-	</svelte:fragment>
+			{#if importSuccess}
+				<p class="alert alert-primary mt-3">Workflow imported successfully</p>
+			{/if}
+		
+	{/snippet}
 </Modal>

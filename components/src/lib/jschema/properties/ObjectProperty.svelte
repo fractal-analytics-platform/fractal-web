@@ -2,24 +2,30 @@
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 
-	/** @type {import("../form_element.js").ObjectFormElement} */
-	export let formElement;
+	
 
-	export let isRoot = false;
-	export let editable = true;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("../form_element.js").ObjectFormElement} formElement
+	 * @property {boolean} [isRoot]
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let { formElement, isRoot = false, editable = true } = $props();
 
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
 	 * @type {Array<import("../../types/form").FormElement>}
 	 */
-	let children = [];
+	let children = $state([]);
 
 	onMount(() => {
 		children = formElement.children;
 	});
 
-	let newPropertyKey = '';
-	let addPropertyError = '';
+	let newPropertyKey = $state('');
+	let addPropertyError = $state('');
 
 	function addProperty() {
 		try {
@@ -62,7 +68,7 @@
 						class:is-invalid={addPropertyError}
 						disabled={!editable}
 					/>
-					<button class="btn btn-primary" type="button" on:click={addProperty} disabled={!editable}>
+					<button class="btn btn-primary" type="button" onclick={addProperty} disabled={!editable}>
 						Add property
 					</button>
 					{#if addPropertyError}
@@ -80,7 +86,7 @@
 				<button
 					class="btn btn-danger w-100"
 					type="button"
-					on:click={() => removeProperty(/**@type {string}*/ (child.key))}
+					onclick={() => removeProperty(/**@type {string}*/ (child.key))}
 					disabled={!editable}
 				>
 					Remove Property Block

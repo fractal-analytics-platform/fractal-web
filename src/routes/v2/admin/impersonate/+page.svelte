@@ -2,10 +2,10 @@
 	import { page } from '$app/stores';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 
-	export let form;
-	let userId = '';
+	let { form } = $props();
+	let userId = $state('');
 
-	$: users = sortDropdownUsers($page.data.users, $page.data.userInfo.id);
+	let users = $derived(sortDropdownUsers($page.data.users, $page.data.userInfo.id));
 </script>
 
 <div class="container mt-3">

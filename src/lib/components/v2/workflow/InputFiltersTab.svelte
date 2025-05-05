@@ -5,26 +5,37 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {import("fractal-components/types/api").WorkflowV2} */
-	export let workflow;
-	/** @type {import("fractal-components/types/api").WorkflowTaskV2} */
-	export let workflowTask;
-	/** @type {number|undefined} */
-	export let selectedDatasetId;
-	/** @type {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} */
-	export let updateWorkflowTaskCallback;
+	
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
+	 * @property {import("fractal-components/types/api").WorkflowTaskV2} workflowTask
+	 * @property {number|undefined} selectedDatasetId
+	 * @property {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} updateWorkflowTaskCallback
+	 */
+
+	/** @type {Props} */
+	let {
+		workflow,
+		workflowTask,
+		selectedDatasetId,
+		updateWorkflowTaskCallback
+	} = $props();
 
 	/** @type {InputFiltersTypesForm} */
-	let form;
+	let form = $state();
 
-	let saving = false;
-	let successfullySaved = false;
+	let saving = $state(false);
+	let successfullySaved = $state(false);
 
-	let loadingDatasetFilters = false;
+	let loadingDatasetFilters = $state(false);
 	/** @type {string[]} */
-	let datasetTypes = [];
-	let selectedDatasetTypeKey = '';
-	let selectedDatasetTypeValue = true;
+	let datasetTypes = $state([]);
+	let selectedDatasetTypeKey = $state('');
+	let selectedDatasetTypeValue = $state(true);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
@@ -134,7 +145,7 @@
 	<InputFiltersTypesForm task={workflowTask.task} bind:this={form} />
 
 	{#if loadingDatasetFilters}
-		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true" />
+		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true"></span>
 	{:else if datasetTypes.length > 0}
 		<button
 			class="btn btn-outline-primary mb-3"
@@ -146,13 +157,13 @@
 		</button>
 	{/if}
 
-	<div id="errorAlert-inputFilters" />
+	<div id="errorAlert-inputFilters"></div>
 
 	{#if successfullySaved}
 		<div class="alert alert-success">Input filters successfully updated</div>
 	{/if}
 
-	<button type="button" class="btn btn-primary" on:click={save} disabled={saving}>
+	<button type="button" class="btn btn-primary" onclick={save} disabled={saving}>
 		{#if saving}
 			<div class="spinner-border spinner-border-sm" role="status">
 				<span class="visually-hidden">Loading...</span>
@@ -162,36 +173,42 @@
 	</button>
 
 	<Modal id="add-type-filter-from-dataset-modal" onOpen={onOpenAddDatasetTypeModal} centered={true}>
-		<svelte:fragment slot="header">
-			<h1 class="modal-title fs-5">Add type filter from dataset</h1>
-		</svelte:fragment>
-		<svelte:fragment slot="body">
-			<label class="form-label" for="datasetTypeKey"> Type Key </label>
-			<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
-				<option value="">Select...</option>
-				{#each datasetTypes as t}
-					<option>{t}</option>
-				{/each}
-			</select>
-			{#if selectedDatasetTypeKey !== ''}
-				<label class="form-label mt-2" for="datasetTypeValue"> Type Value </label>
-				<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-select">
-					<option value={true}>True</option>
-					<option value={false}>False</option>
+		{#snippet header()}
+			
+				<h1 class="modal-title fs-5">Add type filter from dataset</h1>
+			
+			{/snippet}
+		{#snippet body()}
+			
+				<label class="form-label" for="datasetTypeKey"> Type Key </label>
+				<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
+					<option value="">Select...</option>
+					{#each datasetTypes as t}
+						<option>{t}</option>
+					{/each}
 				</select>
-			{/if}
-		</svelte:fragment>
-		<svelte:fragment slot="footer">
-			<button
-				class="btn btn-primary"
-				on:click={addDatasetType}
-				data-bs-dismiss="modal"
-				disabled={selectedDatasetTypeKey === ''}
-			>
-				Add
-			</button>
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		</svelte:fragment>
+				{#if selectedDatasetTypeKey !== ''}
+					<label class="form-label mt-2" for="datasetTypeValue"> Type Value </label>
+					<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-select">
+						<option value={true}>True</option>
+						<option value={false}>False</option>
+					</select>
+				{/if}
+			
+			{/snippet}
+		{#snippet footer()}
+			
+				<button
+					class="btn btn-primary"
+					onclick={addDatasetType}
+					data-bs-dismiss="modal"
+					disabled={selectedDatasetTypeKey === ''}
+				>
+					Add
+				</button>
+				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			
+			{/snippet}
 	</Modal>
 </div>
 

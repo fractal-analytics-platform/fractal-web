@@ -1,4 +1,6 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
@@ -6,14 +8,14 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
-	$: groups = $page.data.groups;
+	let groups = $derived($page.data.groups);
 
 	/** @type {Modal} */
-	let createGroupModal;
+	let createGroupModal = $state();
 
-	let newGroupName = '';
-	let newGroupNameError = '';
-	let creatingGroup = false;
+	let newGroupName = $state('');
+	let newGroupNameError = $state('');
+	let creatingGroup = $state(false);
 
 	function openCreateGroupModal() {
 		newGroupName = '';
@@ -74,7 +76,7 @@
 </script>
 
 <div class="container mt-3">
-	<button class="btn btn-primary float-end" on:click={openCreateGroupModal}>
+	<button class="btn btn-primary float-end" onclick={openCreateGroupModal}>
 		Create new group
 	</button>
 
@@ -99,10 +101,10 @@
 					<td>{group.viewer_paths.length}</td>
 					<td>
 						<a href="/v2/admin/groups/{group.id}" class="btn btn-light">
-							<i class="bi-info-circle" /> Info
+							<i class="bi-info-circle"></i> Info
 						</a>
 						<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary">
-							<i class="bi bi-pencil" /> Edit
+							<i class="bi bi-pencil"></i> Edit
 						</a>
 						{#if group.name !== 'All'}
 							<ConfirmActionButton
@@ -123,37 +125,43 @@
 </div>
 
 <Modal id="createGroupModal" bind:this={createGroupModal} centered={true}>
-	<svelte:fragment slot="header">
-		<h1 class="modal-title fs-5">Create new group</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-createGroupModal" />
-		<form class="row" on:submit|preventDefault={handleCreateGroup} id="create-group-form">
-			<div class="row mb-3">
-				<label for="groupName" class="col-md-3 col-form-label">Group name</label>
-				<div class="col-md-9">
-					<input
-						id="groupName"
-						type="text"
-						bind:value={newGroupName}
-						class="form-control"
-						class:is-invalid={newGroupNameError}
-						required
-					/>
-					{#if newGroupNameError}
-						<div class="invalid-feedback">{newGroupNameError}</div>
-					{/if}
+	{#snippet header()}
+	
+			<h1 class="modal-title fs-5">Create new group</h1>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-createGroupModal"></div>
+			<form class="row" onsubmit={preventDefault(handleCreateGroup)} id="create-group-form">
+				<div class="row mb-3">
+					<label for="groupName" class="col-md-3 col-form-label">Group name</label>
+					<div class="col-md-9">
+						<input
+							id="groupName"
+							type="text"
+							bind:value={newGroupName}
+							class="form-control"
+							class:is-invalid={newGroupNameError}
+							required
+						/>
+						{#if newGroupNameError}
+							<div class="invalid-feedback">{newGroupNameError}</div>
+						{/if}
+					</div>
 				</div>
-			</div>
-		</form>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary" form="create-group-form" disabled={creatingGroup}>
-			{#if creatingGroup}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-			{/if}
-			Create
-		</button>
-	</svelte:fragment>
+			</form>
+		
+	{/snippet}
+	{#snippet footer()}
+	
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" form="create-group-form" disabled={creatingGroup}>
+				{#if creatingGroup}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Create
+			</button>
+		
+	{/snippet}
 </Modal>

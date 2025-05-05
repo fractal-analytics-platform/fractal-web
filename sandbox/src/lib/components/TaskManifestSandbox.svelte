@@ -14,23 +14,23 @@
 
 	let manifest = null;
 	/** @type {string[]} */
-	let tasks = [];
-	let selectedTaskName = '';
-	let selectedSchema;
+	let tasks = $state([]);
+	let selectedTaskName = $state('');
+	let selectedSchema = $state();
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let schemaVersion = 'pydantic_v2';
+	let schemaVersion = $state('pydantic_v2');
 	/** @type {'parallel'|'non_parallel'} */
-	let selectedSchemaType = 'non_parallel';
-	let selectedTask;
-	let schemaData = undefined;
-	let jsonDataString = '';
-	let dataError = '';
+	let selectedSchemaType = $state('non_parallel');
+	let selectedTask = $state();
+	let schemaData = $state(undefined);
+	let jsonDataString = $state('');
+	let dataError = $state('');
 
-	let hasNonParallelArgsSchema = false;
-	let hasParallelArgsSchema = false;
+	let hasNonParallelArgsSchema = $state(false);
+	let hasParallelArgsSchema = $state(false);
 
-	let validationError = '';
-	let valid = false;
+	let validationError = $state('');
+	let valid = $state(false);
 
 	function clearFields() {
 		manifest = null;
@@ -55,7 +55,7 @@
 	}
 
 	/** @type {JSchema|undefined} */
-	let jschemaComponent = undefined;
+	let jschemaComponent = $state(undefined);
 
 	/**
 	 * @param {string} content
@@ -186,7 +186,7 @@
 		}
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(false);
+	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 </script>
 
 <h1 class="fw-light">Sandbox page for task package manifest</h1>
@@ -213,7 +213,7 @@
 					name="selectedTask"
 					id="selectedTask"
 					bind:value={selectedTaskName}
-					on:change={() => loadTaskSchema()}
+					onchange={() => loadTaskSchema()}
 				>
 					<option value="">Select...</option>
 					{#each tasks as task}
@@ -237,7 +237,7 @@
 					value="non_parallel"
 					bind:group={selectedSchemaType}
 					disabled={!hasNonParallelArgsSchema}
-					on:change={() => loadTaskSchema('non_parallel')}
+					onchange={() => loadTaskSchema('non_parallel')}
 				/>
 				<label class="form-check-label" for="schemaNonParallelSelector">non parallel</label>
 			</div>
@@ -250,7 +250,7 @@
 					value="parallel"
 					bind:group={selectedSchemaType}
 					disabled={!hasParallelArgsSchema}
-					on:change={() => loadTaskSchema('parallel')}
+					onchange={() => loadTaskSchema('parallel')}
 				/>
 				<label class="form-check-label" for="schemaParallelSelector">parallel</label>
 			</div>
@@ -268,7 +268,7 @@
 						value={JSON.stringify(selectedSchema, null, 2)}
 						rows="10"
 						disabled
-					/>
+					></textarea>
 				</div>
 			</div>
 			<div class="row has-validation mt-3 mb-2">
@@ -278,10 +278,10 @@
 						id="jdata"
 						class="form-control"
 						bind:value={jsonDataString}
-						on:input={handleDataStringChanged}
+						oninput={handleDataStringChanged}
 						class:is-invalid={dataError}
 						rows="10"
-					/>
+					></textarea>
 					<span class="invalid-feedback">{dataError}</span>
 				</div>
 			</div>
@@ -295,7 +295,7 @@
 					{#if valid}
 						<div class="alert alert-success">Data is valid</div>
 					{/if}
-					<button class="btn btn-primary" on:click={validate}>Validate</button>
+					<button class="btn btn-primary" onclick={validate}>Validate</button>
 				</div>
 			</div>
 		</div>

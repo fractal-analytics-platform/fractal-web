@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
@@ -15,65 +17,58 @@
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
 	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	export let user;
-	/** @type {Array<import('fractal-components/types/api').Group>} */
-	export let groups = [];
-	/** @type {import('fractal-components/types/api').UserSettings|null} */
-	export let settings = null;
-	/** @type {(user: import('fractal-components/types/api').User) => Promise<Response>} */
-	export let saveUser;
-	/** @type {string} */
-	export let runnerBackend;
+	
+	
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
+	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
+	 * @property {import('fractal-components/types/api').UserSettings|null} [settings]
+	 * @property {(user: import('fractal-components/types/api').User) => Promise<Response>} saveUser
+	 * @property {string} runnerBackend
+	 */
+
+	/** @type {Props} */
+	let {
+		user = $bindable(),
+		groups = [],
+		settings = $bindable(null),
+		saveUser,
+		runnerBackend
+	} = $props();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	let originalUser;
-	let userPendingChanges = false;
+	let originalUser = $state();
+	let userPendingChanges = $state(false);
 
 	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
-	let userSettingsEditor;
-	let settingsPendingChanges;
+	let userSettingsEditor = $state();
+	let settingsPendingChanges = $state();
 
 	/** @type {UserSettingsImportModal} */
-	let userSettingsImportModal;
+	let userSettingsImportModal = $state();
 
 	/** @type {Array<import('fractal-components/types/api').Group>} */
-	let userGroups = [];
+	let userGroups = $state([]);
 
-	$: addedGroups = userGroups.filter(
-		(g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id)
-	);
 
-	$: removedGroups = user.group_ids_names
-		.map((ni) => ni[0])
-		.filter((gi) => !userGroups.map((ug) => ug.id).includes(gi));
 
-	$: availableGroups = groups
-		.filter((g) => !userGroups.map((ug) => ug.id).includes(g.id))
-		.sort(sortGroupByNameAllFirstComparator);
 
-	$: if (user) {
-		userPendingChanges = JSON.stringify(originalUser) !== JSON.stringify(nullifyEmptyStrings(user));
-	}
 
-	$: enableSave =
-		!saving &&
-		(userPendingChanges ||
-			settingsPendingChanges ||
-			addedGroups.length > 0 ||
-			removedGroups.length > 0 ||
-			password);
 
-	let password = '';
-	let confirmPassword = '';
+	let password = $state('');
+	let confirmPassword = $state('');
 
-	let saving = false;
-	let userFormSubmitted = false;
+	let saving = $state(false);
+	let userFormSubmitted = $state(false);
 
-	let userUpdatedMessage = '';
+	let userUpdatedMessage = $state('');
 
 	const userFormErrorHandler = new FormErrorHandler('genericUserError', [
 		'email',
@@ -84,7 +79,7 @@
 	const userValidationErrors = userFormErrorHandler.getValidationErrorStore();
 
 	/** @type {Modal} */
-	let confirmSuperuserChange;
+	let confirmSuperuserChange = $state();
 
 	async function handleSave() {
 		saving = true;
@@ -170,10 +165,10 @@
 	}
 
 	/** @type {Modal} */
-	let addGroupModal;
+	let addGroupModal = $state();
 	/** @type {SlimSelect|undefined} */
 	let groupsSelector;
-	let addGroupError = '';
+	let addGroupError = $state('');
 	/** @type {number[]} */
 	let selectedGroupIdsToAdd = [];
 
@@ -312,6 +307,27 @@
 	function onSettingsImported(importedSettings) {
 		settings = importedSettings;
 	}
+	let addedGroups = $derived(userGroups.filter(
+		(g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id)
+	));
+	let removedGroups = $derived(user.group_ids_names
+		.map((ni) => ni[0])
+		.filter((gi) => !userGroups.map((ug) => ug.id).includes(gi)));
+	let availableGroups = $derived(groups
+		.filter((g) => !userGroups.map((ug) => ug.id).includes(g.id))
+		.sort(sortGroupByNameAllFirstComparator));
+	run(() => {
+		if (user) {
+			userPendingChanges = JSON.stringify(originalUser) !== JSON.stringify(nullifyEmptyStrings(user));
+		}
+	});
+	let enableSave =
+		$derived(!saving &&
+		(userPendingChanges ||
+			settingsPendingChanges ||
+			addedGroups.length > 0 ||
+			removedGroups.length > 0 ||
+			password));
 </script>
 
 <div class="row">
@@ -449,7 +465,7 @@
 										class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
 										type="button"
 										aria-label="Remove group {group.name}"
-										on:click={() => removeGroup(group.id)}
+										onclick={() => removeGroup(group.id)}
 									>
 										&times;
 									</button>
@@ -457,8 +473,8 @@
 							</span>
 						{/each}
 						{#if availableGroups.length > 0}
-							<button class="btn btn-light" type="button" on:click={openAddGroupModal}>
-								<i class="bi bi-plus-circle" />
+							<button class="btn btn-light" type="button" onclick={openAddGroupModal}>
+								<i class="bi bi-plus-circle"></i>
 								Add group
 							</button>
 						{/if}
@@ -481,7 +497,7 @@
 					<div class="col offset-sm-3">
 						<button
 							class="btn btn-primary float-end mb-2"
-							on:click={() =>
+							onclick={() =>
 								userSettingsImportModal.open(
 									userGroups.filter((g) => g.name !== 'All').map((g) => g.id)
 								)}
@@ -508,15 +524,15 @@
 			<div class="row mb-3 mt-2">
 				<div class="col-sm-9 offset-sm-3">
 					<StandardDismissableAlert message={userUpdatedMessage} />
-					<div id="genericUserError" />
+					<div id="genericUserError"></div>
 					<button
 						type="button"
-						on:click={handleSave}
+						onclick={handleSave}
 						class="btn btn-primary"
 						disabled={!enableSave}
 					>
 						{#if saving}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 						{/if}
 						Save
 					</button>
@@ -531,37 +547,49 @@
 		size="md"
 		centered={true}
 	>
-		<svelte:fragment slot="header">
-			<h1 class="modal-title fs-5">Confirm action</h1>
-		</svelte:fragment>
-		<svelte:fragment slot="body">
-			<p>
-				Do you really want to
-				<strong>{user.is_superuser ? 'grant' : 'revoke'}</strong>
-				superuser privilege to this user?
-			</p>
-		</svelte:fragment>
-		<svelte:fragment slot="footer">
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" on:click={confirmSave}>Confirm</button>
-		</svelte:fragment>
+		{#snippet header()}
+			
+				<h1 class="modal-title fs-5">Confirm action</h1>
+			
+			{/snippet}
+		{#snippet body()}
+			
+				<p>
+					Do you really want to
+					<strong>{user.is_superuser ? 'grant' : 'revoke'}</strong>
+					superuser privilege to this user?
+				</p>
+			
+			{/snippet}
+		{#snippet footer()}
+			
+				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button class="btn btn-primary" onclick={confirmSave}>Confirm</button>
+			
+			{/snippet}
 	</Modal>
 
 	<Modal id="addGroupModal" centered={true} bind:this={addGroupModal} focus={false}>
-		<svelte:fragment slot="header">
-			<h1 class="modal-title fs-5">Add group</h1>
-		</svelte:fragment>
-		<svelte:fragment slot="body">
-			<select id="group-select" class="invisible" class:border-danger={addGroupError} multiple />
-			{#if addGroupError}
-				<span class="text-danger">{addGroupError}</span>
-			{/if}
-			<div id="errorAlert-addGroupModal" class="mt-3" />
-		</svelte:fragment>
-		<svelte:fragment slot="footer">
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" on:click={addGroupToUser}> Add </button>
-		</svelte:fragment>
+		{#snippet header()}
+			
+				<h1 class="modal-title fs-5">Add group</h1>
+			
+			{/snippet}
+		{#snippet body()}
+			
+				<select id="group-select" class="invisible" class:border-danger={addGroupError} multiple></select>
+				{#if addGroupError}
+					<span class="text-danger">{addGroupError}</span>
+				{/if}
+				<div id="errorAlert-addGroupModal" class="mt-3"></div>
+			
+			{/snippet}
+		{#snippet footer()}
+			
+				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button class="btn btn-primary" onclick={addGroupToUser}> Add </button>
+			
+			{/snippet}
 	</Modal>
 
 	<UserSettingsImportModal

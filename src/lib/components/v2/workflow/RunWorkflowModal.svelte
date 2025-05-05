@@ -1,4 +1,6 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import {
@@ -12,78 +14,77 @@
 	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
 	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
-	export let datasets;
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
-	/** @type {number|undefined} */
-	export let selectedDatasetId;
-	/** @type {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} */
-	export let onJobSubmitted;
-	/** @type {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} */
-	export let onDatasetsUpdated;
-	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
-	export let statuses;
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
-	export let legacyStatuses;
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2[]} datasets
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {number|undefined} selectedDatasetId
+	 * @property {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} onJobSubmitted
+	 * @property {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
+	 * @property {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
+	 * @property {{[key: number]: import('fractal-components/types/api').JobStatus}} legacyStatuses
+	 */
+
+	/** @type {Props} */
+	let {
+		datasets,
+		workflow,
+		selectedDatasetId = $bindable(),
+		onJobSubmitted,
+		onDatasetsUpdated,
+		statuses,
+		legacyStatuses
+	} = $props();
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
 	/** @type {DatasetImagesTable|undefined} */
-	let datasetImagesTable;
+	let datasetImagesTable = $state();
 
-	let applyingWorkflow = false;
-	let checkingConfiguration = false;
-	let setSlurmAccount = true;
+	let applyingWorkflow = $state(false);
+	let checkingConfiguration = $state(false);
+	let setSlurmAccount = $state(true);
 	/** @type {string[]} */
-	let slurmAccounts = [];
-	let slurmAccount = '';
-	let workerInitControl = '';
+	let slurmAccounts = $state([]);
+	let slurmAccount = $state('');
+	let workerInitControl = $state('');
 	/** @type {number|undefined} */
-	let firstTaskIndex = undefined;
+	let firstTaskIndex = $state(undefined);
 	/** @type {number|undefined} */
-	let lastTaskIndex = undefined;
+	let lastTaskIndex = $state(undefined);
 
 	/** @type {string[]} */
-	let preSubmissionCheckUniqueTypesResults = [];
-	let ignorePreSubmissionCheckUniqueTypes = false;
+	let preSubmissionCheckUniqueTypesResults = $state([]);
+	let ignorePreSubmissionCheckUniqueTypes = $state(false);
 	/** @type {string[]} */
-	let preSubmissionCheckNotProcessedResults = [];
-	let ignorePreSubmissionCheckNotProcessed = false;
+	let preSubmissionCheckNotProcessedResults = $state([]);
+	let ignorePreSubmissionCheckNotProcessed = $state(false);
 
 	/** @type {'run'|'restart'|'continue'} */
-	let mode = 'run';
-	let replaceExistingDataset = true;
+	let mode = $state('run');
+	let replaceExistingDataset = $state(true);
 
-	let newDatasetName = '';
+	let newDatasetName = $state('');
 
-	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
 
-	$: runBtnDisabled =
-		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
-		(mode === 'continue' && firstTaskIndex === undefined);
 
-	$: showImageList =
-		hasImages &&
-		firstTaskIndex !== undefined &&
-		mode !== 'restart' &&
-		workflow.task_list[firstTaskIndex] &&
-		!isConverterType(workflow.task_list[firstTaskIndex].task_type);
 
-	$: disabledTypes = Object.keys({
-		...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
-		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
-		...extraTypes
-	});
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
-	let imagePage = null;
+	let imagePage = $state(null);
 	/** @type {string[]} */
-	let extraTypes = [];
-	let hasImages = false;
+	let extraTypes = $state([]);
+	let hasImages = $state(false);
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
-	let initialFilterValues = null;
+	let initialFilterValues = $state(null);
 
 	/**
 	 * @param {'run'|'restart'|'continue'} action
@@ -246,9 +247,9 @@
 	}
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
-	let appliedAttributeFilters = {};
+	let appliedAttributeFilters = $state({});
 	/** @type {{ [key: string]: boolean }} */
-	let appliedTypeFilters = {};
+	let appliedTypeFilters = $state({});
 
 	async function showConfirmRun() {
 		if (datasetImagesTable) {
@@ -386,7 +387,7 @@
 		}
 	}
 
-	let datasetImagesLoading = false;
+	let datasetImagesLoading = $state(false);
 
 	async function loadDatasetImages() {
 		if (firstTaskIndex === undefined) {
@@ -518,310 +519,331 @@
 	onMount(async () => {
 		await loadSlurmAccounts();
 	});
+	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
+	let runBtnDisabled =
+		$derived((mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
+		(mode === 'continue' && firstTaskIndex === undefined));
+	let showImageList =
+		$derived(hasImages &&
+		firstTaskIndex !== undefined &&
+		mode !== 'restart' &&
+		workflow.task_list[firstTaskIndex] &&
+		!isConverterType(workflow.task_list[firstTaskIndex].task_type));
+	let disabledTypes = $derived(Object.keys({
+		...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
+		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
+		...extraTypes
+	}));
 </script>
 
 <Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true}>
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">
-			{#if mode === 'run'}
-				Run workflow
-			{:else if mode === 'continue'}
-				Continue workflow
-			{:else}
-				Restart workflow
-			{/if}
-		</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-runWorkflowModal" />
-		<form id="runWorkflowForm">
-			{#if mode === 'restart'}
-				<div class="alert alert-warning">
-					<strong>WARNING</strong>: Restarting a workflow will create a new dataset and optionally
-					delete the old dataset with its image list, filters & history. It does not remove the
-					existing Zarr data though. Either remove it yourself before rerunning or set the overwrite
-					option to True in the corresponding tasks.
-				</div>
-			{/if}
-			{#if mode === 'restart'}
+	{#snippet header()}
+	
+			<h5 class="modal-title">
+				{#if mode === 'run'}
+					Run workflow
+				{:else if mode === 'continue'}
+					Continue workflow
+				{:else}
+					Restart workflow
+				{/if}
+			</h5>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-runWorkflowModal"></div>
+			<form id="runWorkflowForm">
+				{#if mode === 'restart'}
+					<div class="alert alert-warning">
+						<strong>WARNING</strong>: Restarting a workflow will create a new dataset and optionally
+						delete the old dataset with its image list, filters & history. It does not remove the
+						existing Zarr data though. Either remove it yourself before rerunning or set the overwrite
+						option to True in the corresponding tasks.
+					</div>
+				{/if}
+				{#if mode === 'restart'}
+					<div class="mb-3">
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="replaceExistingDataset"
+								bind:checked={replaceExistingDataset}
+								onchange={computeNewDatasetName}
+							/>
+							<label class="form-check-label" for="replaceExistingDataset">
+								Replace existing dataset
+							</label>
+						</div>
+					</div>
+				{/if}
 				<div class="mb-3">
-					<div class="form-check">
+					<label for="run-workflow-dataset" class="form-label">
+						{#if mode === 'restart'}
+							Original dataset
+						{:else}
+							Dataset
+						{/if}
+					</label>
+					<select
+						id="run-workflow-dataset"
+						class="form-select"
+						disabled
+						bind:value={selectedDatasetId}
+					>
+						<option value={undefined}>Select a dataset</option>
+						{#each datasets as dataset}
+							<option value={dataset.id}>{dataset.name}</option>
+						{/each}
+					</select>
+				</div>
+				{#if mode === 'restart' && !replaceExistingDataset}
+					<div class="mb-3 has-validation">
+						<label for="newDatasetName" class="form-label">New dataset name</label>
 						<input
-							class="form-check-input"
-							type="checkbox"
-							id="replaceExistingDataset"
-							bind:checked={replaceExistingDataset}
-							on:change={computeNewDatasetName}
+							id="newDatasetName"
+							class="form-control"
+							type="text"
+							bind:value={newDatasetName}
+							disabled={checkingConfiguration}
+							class:is-invalid={newDatasetName === selectedDataset?.name}
 						/>
-						<label class="form-check-label" for="replaceExistingDataset">
-							Replace existing dataset
-						</label>
+						<span class="invalid-feedback">
+							The new dataset name must be different from the original dataset name
+						</span>
+					</div>
+				{/if}
+				<div class="row mb-3">
+					<div class="col has-validation">
+						<label for="firstTaskIndex" class="form-label"> Start workflow at </label>
+						<select
+							name="firstTaskIndex"
+							id="firstTaskIndex"
+							class="form-select"
+							disabled={checkingConfiguration}
+							bind:value={firstTaskIndex}
+							onchange={firstTaskIndexChanged}
+							class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
+						>
+							<option value={undefined}>Select first task</option>
+							{#each workflow.task_list as wft}
+								<option value={wft.order}>{wft.task.name}</option>
+							{/each}
+						</select>
+						<span class="invalid-feedback"> The first task is required </span>
+					</div>
+					<div class="col">
+						<label for="lastTaskIndex" class="form-label">(Optional) Stop workflow early</label>
+						<select
+							name="lastTaskIndex"
+							id="lastTaskIndex"
+							class="form-select"
+							disabled={checkingConfiguration}
+							bind:value={lastTaskIndex}
+						>
+							<option value={undefined}>Select last task</option>
+							{#each workflow.task_list as wft}
+								{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
+									<option value={wft.order}>{wft.task.name}</option>
+								{/if}
+							{/each}
+						</select>
 					</div>
 				</div>
-			{/if}
-			<div class="mb-3">
-				<label for="run-workflow-dataset" class="form-label">
-					{#if mode === 'restart'}
-						Original dataset
-					{:else}
-						Dataset
-					{/if}
-				</label>
-				<select
-					id="run-workflow-dataset"
-					class="form-select"
-					disabled
-					bind:value={selectedDatasetId}
-				>
-					<option value={undefined}>Select a dataset</option>
-					{#each datasets as dataset}
-						<option value={dataset.id}>{dataset.name}</option>
-					{/each}
-				</select>
-			</div>
-			{#if mode === 'restart' && !replaceExistingDataset}
-				<div class="mb-3 has-validation">
-					<label for="newDatasetName" class="form-label">New dataset name</label>
-					<input
-						id="newDatasetName"
-						class="form-control"
-						type="text"
-						bind:value={newDatasetName}
-						disabled={checkingConfiguration}
-						class:is-invalid={newDatasetName === selectedDataset?.name}
-					/>
-					<span class="invalid-feedback">
-						The new dataset name must be different from the original dataset name
-					</span>
-				</div>
-			{/if}
-			<div class="row mb-3">
-				<div class="col has-validation">
-					<label for="firstTaskIndex" class="form-label"> Start workflow at </label>
-					<select
-						name="firstTaskIndex"
-						id="firstTaskIndex"
-						class="form-select"
-						disabled={checkingConfiguration}
-						bind:value={firstTaskIndex}
-						on:change={firstTaskIndexChanged}
-						class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
-					>
-						<option value={undefined}>Select first task</option>
-						{#each workflow.task_list as wft}
-							<option value={wft.order}>{wft.task.name}</option>
-						{/each}
-					</select>
-					<span class="invalid-feedback"> The first task is required </span>
-				</div>
-				<div class="col">
-					<label for="lastTaskIndex" class="form-label">(Optional) Stop workflow early</label>
-					<select
-						name="lastTaskIndex"
-						id="lastTaskIndex"
-						class="form-select"
-						disabled={checkingConfiguration}
-						bind:value={lastTaskIndex}
-					>
-						<option value={undefined}>Select last task</option>
-						{#each workflow.task_list as wft}
-							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
-								<option value={wft.order}>{wft.task.name}</option>
-							{/if}
-						{/each}
-					</select>
-				</div>
-			</div>
-			<div class="accordion mb-2" id="accordion-run-workflow">
-				{#if imagePage && selectedDataset && showImageList}
-					<div class="accordion-item">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button"
-								type="button"
-								data-bs-toggle="collapse"
-								data-bs-target="#collapse-workflow-image-list"
-								aria-expanded="false"
-								aria-controls="collapse-workflow-image-list"
+				<div class="accordion mb-2" id="accordion-run-workflow">
+					{#if imagePage && selectedDataset && showImageList}
+						<div class="accordion-item">
+							<h2 class="accordion-header">
+								<button
+									class="accordion-button"
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target="#collapse-workflow-image-list"
+									aria-expanded="false"
+									aria-controls="collapse-workflow-image-list"
+								>
+									Image list
+								</button>
+							</h2>
+							<div
+								id="collapse-workflow-image-list"
+								class="accordion-collapse collapse show"
+								data-bs-parent="#accordion-run-workflow"
 							>
-								Image list
-							</button>
-						</h2>
-						<div
-							id="collapse-workflow-image-list"
-							class="accordion-collapse collapse show"
-							data-bs-parent="#accordion-run-workflow"
-						>
-							<div class="accordion-body">
-								{#if preSubmissionCheckUniqueTypesResults.length > 0}
-									<div
-										class="alert alert-warning mb-0"
-										id="pre-submission-check-unique-types-warning"
-									>
-										You are trying to run a workflow without specifying what type of images should
-										be processed. Specify the relevant type filter to continue.
-										<button
-											type="button"
-											class="btn btn-warning mt-1"
-											on:click={() => {
+								<div class="accordion-body">
+									{#if preSubmissionCheckUniqueTypesResults.length > 0}
+										<div
+											class="alert alert-warning mb-0"
+											id="pre-submission-check-unique-types-warning"
+										>
+											You are trying to run a workflow without specifying what type of images should
+											be processed. Specify the relevant type filter to continue.
+											<button
+												type="button"
+												class="btn btn-warning mt-1"
+												onclick={() => {
 												ignorePreSubmissionCheckUniqueTypes = true;
 												showConfirmRun();
 											}}
+											>
+												Continue anyway
+											</button>
+										</div>
+									{/if}
+									{#if preSubmissionCheckNotProcessedResults.length > 0}
+										<div
+											class="alert alert-warning mb-0"
+											id="pre-submission-check-not-processed-warning"
 										>
-											Continue anyway
-										</button>
-									</div>
-								{/if}
-								{#if preSubmissionCheckNotProcessedResults.length > 0}
-									<div
-										class="alert alert-warning mb-0"
-										id="pre-submission-check-not-processed-warning"
-									>
-										You are trying to run the {workflow.task_list[firstTaskIndex || 0].task.name} task
-										on images that were not run on the prior
-										{getPreviousTaskName(firstTaskIndex || 0)} task.
-										{getNotProcessedImagesLabel(preSubmissionCheckNotProcessedResults)}
-										not run on the prior task.
-										<button
-											type="button"
-											class="btn btn-warning mt-1"
-											on:click={() => {
+											You are trying to run the {workflow.task_list[firstTaskIndex || 0].task.name} task
+											on images that were not run on the prior
+											{getPreviousTaskName(firstTaskIndex || 0)} task.
+											{getNotProcessedImagesLabel(preSubmissionCheckNotProcessedResults)}
+											not run on the prior task.
+											<button
+												type="button"
+												class="btn btn-warning mt-1"
+												onclick={() => {
 												ignorePreSubmissionCheckUniqueTypes = true;
 												ignorePreSubmissionCheckNotProcessed = true;
 												showConfirmRun();
 											}}
-										>
-											Continue anyway
-										</button>
-									</div>
-								{/if}
-								{#if checkingConfiguration}
-									This job will process {imagePage.total_count}
-									{imagePage.total_count === 1 ? 'image' : 'images'}.
-								{:else}
-									<DatasetImagesTable
-										bind:this={datasetImagesTable}
-										dataset={selectedDataset}
-										bind:imagePage
-										{initialFilterValues}
-										{disabledTypes}
-										{extraTypes}
-										highlightedTypes={preSubmissionCheckUniqueTypesResults}
-										vizarrViewerUrl={null}
-										runWorkflowModal={true}
-										beforeTypeSelectionChanged={(key) => {
-											preSubmissionCheckUniqueTypesResults =
-												preSubmissionCheckUniqueTypesResults.filter((k) => k !== key);
-										}}
-									/>
-								{/if}
+											>
+												Continue anyway
+											</button>
+										</div>
+									{/if}
+									{#if checkingConfiguration}
+										This job will process {imagePage.total_count}
+										{imagePage.total_count === 1 ? 'image' : 'images'}.
+									{:else}
+										<DatasetImagesTable
+											bind:this={datasetImagesTable}
+											dataset={selectedDataset}
+											bind:imagePage
+											{initialFilterValues}
+											{disabledTypes}
+											{extraTypes}
+											highlightedTypes={preSubmissionCheckUniqueTypesResults}
+											vizarrViewerUrl={null}
+											runWorkflowModal={true}
+											beforeTypeSelectionChanged={(key) => {
+												preSubmissionCheckUniqueTypesResults =
+													preSubmissionCheckUniqueTypesResults.filter((k) => k !== key);
+											}}
+										/>
+									{/if}
+								</div>
 							</div>
 						</div>
-					</div>
-				{/if}
-				{#if datasetImagesLoading}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-			</div>
-			<div class="clearfix mb-1">
-				<button
-					class="btn btn-light float-end"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseAdvancedOptions"
-					aria-expanded="false"
-					aria-controls="collapseAdvancedOptions"
-				>
-					Advanced options
-				</button>
-			</div>
-			<div class="collapse clearfix" id="collapseAdvancedOptions">
-				<div class="card card-body">
-					<div class="mb-3">
-						<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
-						<textarea
-							name="workerInit"
-							id="workerInit"
-							class="form-control font-monospace"
-							rows="5"
-							disabled={checkingConfiguration}
-							bind:value={workerInitControl}
-						/>
-					</div>
-					{#if slurmAccounts.length > 0}
-						<div class="mb-3">
-							<div class="form-check">
-								<input
-									class="form-check-input"
-									type="checkbox"
-									id="setSlurmAccount"
-									bind:checked={setSlurmAccount}
-								/>
-								<label class="form-check-label" for="setSlurmAccount"> Set SLURM account </label>
-							</div>
-						</div>
-						{#if setSlurmAccount}
-							<div class="mb-3">
-								<label for="slurmAccount" class="form-label">SLURM account</label>
-								<select
-									name="slurmAccount"
-									id="slurmAccount"
-									class="form-select"
-									disabled={checkingConfiguration}
-									bind:value={slurmAccount}
-								>
-									{#each slurmAccounts as account}
-										<option>{account}</option>
-									{/each}
-								</select>
-							</div>
-						{/if}
+					{/if}
+					{#if datasetImagesLoading}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 					{/if}
 				</div>
-			</div>
+				<div class="clearfix mb-1">
+					<button
+						class="btn btn-light float-end"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseAdvancedOptions"
+						aria-expanded="false"
+						aria-controls="collapseAdvancedOptions"
+					>
+						Advanced options
+					</button>
+				</div>
+				<div class="collapse clearfix" id="collapseAdvancedOptions">
+					<div class="card card-body">
+						<div class="mb-3">
+							<label for="workerInit" class="form-label">Worker initialization (Optional)</label>
+							<textarea
+								name="workerInit"
+								id="workerInit"
+								class="form-control font-monospace"
+								rows="5"
+								disabled={checkingConfiguration}
+								bind:value={workerInitControl}
+							></textarea>
+						</div>
+						{#if slurmAccounts.length > 0}
+							<div class="mb-3">
+								<div class="form-check">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										id="setSlurmAccount"
+										bind:checked={setSlurmAccount}
+									/>
+									<label class="form-check-label" for="setSlurmAccount"> Set SLURM account </label>
+								</div>
+							</div>
+							{#if setSlurmAccount}
+								<div class="mb-3">
+									<label for="slurmAccount" class="form-label">SLURM account</label>
+									<select
+										name="slurmAccount"
+										id="slurmAccount"
+										class="form-select"
+										disabled={checkingConfiguration}
+										bind:value={slurmAccount}
+									>
+										{#each slurmAccounts as account}
+											<option>{account}</option>
+										{/each}
+									</select>
+								</div>
+							{/if}
+						{/if}
+					</div>
+				</div>
+				{#if checkingConfiguration}
+					<hr />
+					<h6 class="mt-3">Applied filters</h6>
+					{#if Object.entries(appliedAttributeFilters).length > 0 || Object.entries(appliedTypeFilters).length > 0}
+						<p>
+							Currently, the following filters are applied to the image list before it is passed to
+							the first task:
+						</p>
+						<ul class="mb-0">
+							{#each Object.entries(appliedAttributeFilters) as [key, value]}
+								<li>{key}: <code>{value}</code></li>
+							{/each}
+						</ul>
+						<ul class="mt-0 mb-1">
+							{#each Object.entries(appliedTypeFilters) as [key, value]}
+								<li>{key}: <BooleanIcon {value} /></li>
+							{/each}
+						</ul>
+					{:else}
+						<p class="mb-0">No filters</p>
+					{/if}
+				{/if}
+			</form>
+		
+	{/snippet}
+	{#snippet footer()}
+	
 			{#if checkingConfiguration}
-				<hr />
-				<h6 class="mt-3">Applied filters</h6>
-				{#if Object.entries(appliedAttributeFilters).length > 0 || Object.entries(appliedTypeFilters).length > 0}
-					<p>
-						Currently, the following filters are applied to the image list before it is passed to
-						the first task:
-					</p>
-					<ul class="mb-0">
-						{#each Object.entries(appliedAttributeFilters) as [key, value]}
-							<li>{key}: <code>{value}</code></li>
-						{/each}
-					</ul>
-					<ul class="mt-0 mb-1">
-						{#each Object.entries(appliedTypeFilters) as [key, value]}
-							<li>{key}: <BooleanIcon {value} /></li>
-						{/each}
-					</ul>
-				{:else}
-					<p class="mb-0">No filters</p>
-				{/if}
+				<button class="btn btn-warning" onclick={cancel}> Cancel </button>
+				<button
+					class="btn btn-primary"
+					onclick={preventDefault(handleApplyWorkflow)}
+					disabled={applyingWorkflow}
+				>
+					{#if applyingWorkflow}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{/if}
+					Confirm
+				</button>
+			{:else}
+				<button class="btn btn-primary" onclick={showConfirmRun} disabled={runBtnDisabled}>
+					Run
+				</button>
 			{/if}
-		</form>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		{#if checkingConfiguration}
-			<button class="btn btn-warning" on:click={cancel}> Cancel </button>
-			<button
-				class="btn btn-primary"
-				on:click|preventDefault={handleApplyWorkflow}
-				disabled={applyingWorkflow}
-			>
-				{#if applyingWorkflow}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Confirm
-			</button>
-		{:else}
-			<button class="btn btn-primary" on:click={showConfirmRun} disabled={runBtnDisabled}>
-				Run
-			</button>
-		{/if}
-	</svelte:fragment>
+		
+	{/snippet}
 </Modal>
 
 <style>

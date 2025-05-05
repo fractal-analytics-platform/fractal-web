@@ -11,41 +11,32 @@
 	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
-	let group = $page.data.group;
+	let group = $state($page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let users = $page.data.users;
 	let runnerBackend = $page.data.runnerBackend;
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
-	let draggedUserToAdd = null;
+	let draggedUserToAdd = $state(null);
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
-	let addingUser = null;
-	let addUserHovering = false;
-	let userFilter = '';
+	let addingUser = $state(null);
+	let addUserHovering = $state(false);
+	let userFilter = $state('');
 	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default} */
-	let userSettingsEditor;
-	let settingsUpdatedMessage = '';
-	let settingsPendingChanges = false;
-	let savingSettings = false;
+	let userSettingsEditor = $state();
+	let settingsUpdatedMessage = $state('');
+	let settingsPendingChanges = $state(false);
+	let savingSettings = $state(false);
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
-	let draggedUserToRemove = null;
+	let draggedUserToRemove = $state(null);
 
 	/** @type {import('fractal-components/types/api').UserSettings} */
-	let settings = createEmptySettings();
+	let settings = $state(createEmptySettings());
 
-	$: availableUsers = users
-		.filter((u) => !group.user_ids.includes(u.id))
-		.sort(sortUserByEmailComparator);
 
-	$: filteredAvailableUsers = availableUsers.filter((u) =>
-		u.email.toLowerCase().includes(userFilter.toLowerCase())
-	);
 
-	$: members = users.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator);
 
-	$: saveViewerPathsEnabled =
-		JSON.stringify(originalViewPaths) !== JSON.stringify(editableViewPaths);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -136,10 +127,10 @@
 	}
 
 	/** @type {string[]} */
-	let editableViewPaths = [];
+	let editableViewPaths = $state([]);
 	/** @type {string[]} */
-	let originalViewPaths = [];
-	let viewerPathsUpdatedMessage = '';
+	let originalViewPaths = $state([]);
+	let viewerPathsUpdatedMessage = $state('');
 	const viewerPathsErrorHandler = new FormErrorHandler('viewerPathGenericError', ['viewer_paths']);
 	const viewerPathsValidationErrors = viewerPathsErrorHandler.getValidationErrorStore();
 
@@ -212,6 +203,15 @@
 			savingSettings = false;
 		}
 	}
+	let availableUsers = $derived(users
+		.filter((u) => !group.user_ids.includes(u.id))
+		.sort(sortUserByEmailComparator));
+	let filteredAvailableUsers = $derived(availableUsers.filter((u) =>
+		u.email.toLowerCase().includes(userFilter.toLowerCase())
+	));
+	let members = $derived(users.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator));
+	let saveViewerPathsEnabled =
+		$derived(JSON.stringify(originalViewPaths) !== JSON.stringify(editableViewPaths));
 </script>
 
 <div class="container mt-3">
@@ -229,7 +229,7 @@
 		</ol>
 	</nav>
 
-	<div id="editGroupError" />
+	<div id="editGroupError"></div>
 
 	<div class="row mt-4">
 		<div class="col-6">
@@ -239,10 +239,10 @@
 				id="members-container"
 				role="region"
 				class:addUserHovering
-				on:dragenter={() => (addUserHovering = true)}
-				on:dragleave={() => (addUserHovering = false)}
-				on:drop={(event) => handleDrop(event)}
-				on:dragover={(event) => {
+				ondragenter={() => (addUserHovering = true)}
+				ondragleave={() => (addUserHovering = false)}
+				ondrop={(event) => handleDrop(event)}
+				ondragover={(event) => {
 					event.preventDefault();
 				}}
 			>
@@ -252,15 +252,15 @@
 							<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 								{user.email}
 								{#if addingUser && addingUser.id === user.id}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 								{/if}
 							</span>
 						{:else}
 							<button
 								class="btn btn-secondary ps-1 pe-0 pt-0 pb-0 me-2 mb-2 user-badge"
 								draggable={true}
-								on:dragstart={() => (draggedUserToRemove = user)}
-								on:dragend={(event) => handleDroppedUserToRemove(event)}
+								ondragstart={() => (draggedUserToRemove = user)}
+								ondragend={(event) => handleDroppedUserToRemove(event)}
 							>
 								<span class="user-text">
 									{user.email}
@@ -270,14 +270,14 @@
 										class="spinner-border spinner-border-sm me-2"
 										role="status"
 										aria-hidden="true"
-									/>
+									></span>
 								{:else}
 									<button
 										class="text-danger remove-user-btn btn ms-1 ps-1 pe-1"
 										aria-label="Remove user {user.email}"
-										on:click={() => removeUser(user.id)}
+										onclick={() => removeUser(user.id)}
 									>
-										<i class="bi bi-x" />
+										<i class="bi bi-x"></i>
 									</button>
 								{/if}
 							</button>
@@ -303,8 +303,8 @@
 						<button
 							class="btn btn-outline-secondary ps-1 pe-2 pt-0 pb-0 me-2 mb-2"
 							draggable={true}
-							on:dragstart={() => (draggedUserToAdd = user)}
-							on:dragend={() => {
+							ondragstart={() => (draggedUserToAdd = user)}
+							ondragend={() => {
 								draggedUserToAdd = null;
 								addUserHovering = false;
 							}}
@@ -338,21 +338,21 @@
 						type="button"
 						id="viewer_path_remove_{i}"
 						aria-label={`Remove viewer path #${i + 1}`}
-						on:click={() => removeViewerPath(i)}
+						onclick={() => removeViewerPath(i)}
 					>
-						<i class="bi bi-trash" />
+						<i class="bi bi-trash"></i>
 					</button>
 				</div>
 			{/each}
-			<button class="btn btn-secondary mb-2" on:click={addViewerPath}>Add viewer path</button>
-			<div id="viewerPathGenericError" />
+			<button class="btn btn-secondary mb-2" onclick={addViewerPath}>Add viewer path</button>
+			<div id="viewerPathGenericError"></div>
 			{#if $viewerPathsValidationErrors['viewer_paths']}
 				<div class="alert alert-danger mb-2">
 					{$viewerPathsValidationErrors['viewer_paths']}
 				</div>
 			{/if}
 			<StandardDismissableAlert message={viewerPathsUpdatedMessage} />
-			<button class="btn btn-primary" on:click={saveViewerPaths} disabled={!saveViewerPathsEnabled}>
+			<button class="btn btn-primary" onclick={saveViewerPaths} disabled={!saveViewerPathsEnabled}>
 				Save
 			</button>
 		</div>
@@ -369,7 +369,7 @@
 			<div class="row">
 				<div class="offset-sm-3 col-10">
 					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle" />
+						<i class="bi bi-exclamation-triangle"></i>
 						<strong>Warning</strong>: this PATCH will be applied to all the {group.user_ids.length} users
 						of this user group.
 					</div>
@@ -392,12 +392,12 @@
 					<StandardDismissableAlert message={settingsUpdatedMessage} />
 					<button
 						type="button"
-						on:click={handleSaveSettings}
+						onclick={handleSaveSettings}
 						class="btn btn-primary"
 						disabled={savingSettings || !settingsPendingChanges}
 					>
 						{#if savingSettings}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 						{/if}
 						Save
 					</button>

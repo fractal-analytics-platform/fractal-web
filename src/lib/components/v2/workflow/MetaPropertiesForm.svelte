@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	// This component handles the meta properties of a workflow task.
 	// Every time the workflow task meta properties are updated within the form, this component should update the server
 	// If the server successfully stores the updated meta properties
@@ -11,33 +13,45 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
-	export let workflowTask;
-	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
-	export let onWorkflowTaskUpdated;
-	export let editable = true;
-	export let metaNonParallel = {};
-	export let metaParallel = {};
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
+	 * @property {boolean} [editable]
+	 * @property {any} [metaNonParallel]
+	 * @property {any} [metaParallel]
+	 */
+
+	/** @type {Props} */
+	let {
+		workflowTask,
+		onWorkflowTaskUpdated,
+		editable = true,
+		metaNonParallel = {},
+		metaParallel = {}
+	} = $props();
 
 	/** @type {FormBuilder|undefined} */
-	let nonParallelFormBuilderComponent;
+	let nonParallelFormBuilderComponent = $state();
 	/** @type {FormBuilder|undefined} */
-	let parallelFormBuilderComponent;
-	let unsavedChangesFormBuilderParallel = false;
-	let unsavedChangesFormBuilderNonParallel = false;
-	let savingChanges = false;
+	let parallelFormBuilderComponent = $state();
+	let unsavedChangesFormBuilderParallel = $state(false);
+	let unsavedChangesFormBuilderNonParallel = $state(false);
+	let savingChanges = $state(false);
 
-	let metaPropertiesNonParallel = {};
-	let metaPropertiesParallel = {};
+	let metaPropertiesNonParallel = $state({});
+	let metaPropertiesParallel = $state({});
 
-	$: {
+	run(() => {
 		metaPropertiesNonParallel = editable
 			? workflowTask.meta_non_parallel || {}
 			: metaNonParallel || {};
 		metaPropertiesParallel = editable ? workflowTask.meta_parallel || {} : metaParallel || {};
-	}
+	});
 
-	$: unsavedChanges = unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel;
+	let unsavedChanges = $derived(unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel);
 
 	export async function saveChanges() {
 		const invalidNonParallel =
@@ -104,7 +118,7 @@
 </script>
 
 <div class="mt-2">
-	<span id="metaPropertiesFormError" />
+	<span id="metaPropertiesFormError"></span>
 </div>
 {#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
 	{#if isCompoundType(workflowTask.task_type)}
@@ -142,10 +156,10 @@
 			class="btn btn-success"
 			type="button"
 			disabled={!editable || !unsavedChanges || savingChanges}
-			on:click={saveChanges}
+			onclick={saveChanges}
 		>
 			{#if savingChanges}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Save changes
 		</button>
@@ -154,7 +168,7 @@
 		<button
 			class="btn btn-warning"
 			disabled={!editable || !unsavedChanges || savingChanges}
-			on:click={discardChanges}
+			onclick={discardChanges}
 		>
 			Discard changes
 		</button>

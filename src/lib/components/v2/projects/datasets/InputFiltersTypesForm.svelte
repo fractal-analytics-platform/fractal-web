@@ -2,14 +2,20 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	/** @type {import("fractal-components/types/api").TaskV2} */
-	export let task;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("fractal-components/types/api").TaskV2} task
+	 */
+
+	/** @type {Props} */
+	let { task } = $props();
 
 	/** @type {{ [key: string]: boolean }} */
 	let initialTypeFields = {};
 
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let typeFields = [];
+	let typeFields = $state([]);
 
 	/**
 	 * @param {{ [key: string]: boolean }} types
@@ -152,10 +158,10 @@
 				<button
 					class="btn btn-outline-danger"
 					type="button"
-					on:click={() => removeType(index)}
+					onclick={() => removeType(index)}
 					aria-label="Remove type filter"
 				>
-					<i class="bi bi-trash" />
+					<i class="bi bi-trash"></i>
 				</button>
 				{#if field.error}
 					<div class="invalid-feedback">{field.error}</div>
@@ -167,7 +173,7 @@
 
 <div class="row mb-3">
 	<div class="col-12">
-		<button class="btn btn-outline-primary" type="button" on:click={addTypeFilter}>
+		<button class="btn btn-outline-primary" type="button" onclick={addTypeFilter}>
 			Add type filter
 		</button>
 	</div>

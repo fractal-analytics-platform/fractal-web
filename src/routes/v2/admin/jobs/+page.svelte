@@ -6,33 +6,33 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 
-	let searched = false;
-	let searching = false;
+	let searched = $state(false);
+	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {JobsList} */
-	let jobsListComponent;
+	let jobsListComponent = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-	let jobs = [];
+	let jobs = $state([]);
 
-	let status;
-	let userId;
-	let jobId;
+	let status = $state();
+	let userId = $state();
+	let jobId = $state();
 
-	let startDateMin;
-	let startTimeMin;
-	let startDateMax;
-	let startTimeMax;
+	let startDateMin = $state();
+	let startTimeMin = $state();
+	let startDateMax = $state();
+	let startTimeMax = $state();
 
-	let endDateMin;
-	let endTimeMin;
-	let endDateMax;
-	let endTimeMax;
+	let endDateMin = $state();
+	let endTimeMin = $state();
+	let endDateMax = $state();
+	let endTimeMax = $state();
 
-	let projectId;
-	let workflowId;
-	let datasetId;
+	let projectId = $state();
+	let workflowId = $state();
+	let datasetId = $state();
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
@@ -181,9 +181,9 @@
 	}
 
 	/** @type {Modal} */
-	let statusModal;
+	let statusModal = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
-	let jobInEditing;
+	let jobInEditing = $state();
 
 	/**
 	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} row
@@ -193,7 +193,7 @@
 		statusModal.show();
 	}
 
-	let updatingStatus = false;
+	let updatingStatus = $state(false);
 
 	async function updateJobStatus() {
 		statusModal.confirmAndHide(
@@ -224,7 +224,6 @@
 		);
 	}
 
-	$: users = sortDropdownUsers($page.data.users);
 
 	/**
 	 * @param {import('fractal-components/types/api').User[]} users
@@ -234,6 +233,7 @@
 		sortUsers(usersCopy, $page.data.userInfo.id, false);
 		return usersCopy;
 	}
+	let users = $derived(sortDropdownUsers($page.data.users));
 </script>
 
 <div class="container mt-3">
@@ -352,35 +352,38 @@
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" on:click={searchJobs} disabled={searching}>
+	<button class="btn btn-primary mt-4" onclick={searchJobs} disabled={searching}>
 		{#if searching}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
-			<i class="bi bi-search" />
+			<i class="bi bi-search"></i>
 		{/if}
 		Search jobs
 	</button>
-	<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
+	<button class="btn btn-warning mt-4" onclick={resetSearchFields} disabled={searching}>
 		Reset
 	</button>
 
-	<div id="searchError" class="mt-3" />
+	<div id="searchError" class="mt-3"></div>
 
 	<div class:d-none={!searched}>
 		<p class="text-center">
 			The query returned {jobs.length} matching {jobs.length !== 1 ? 'jobs' : 'job'}
 		</p>
 		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
-			<svelte:fragment slot="buttons">
-				<button class="btn btn-outline-secondary" on:click={downloadCSV}>
-					<i class="bi-download" /> Download CSV
-				</button>
-			</svelte:fragment>
-			<svelte:fragment slot="edit-status" let:row>
+			{#snippet buttons()}
+					
+					<button class="btn btn-outline-secondary" onclick={downloadCSV}>
+						<i class="bi-download"></i> Download CSV
+					</button>
+				
+					{/snippet}
+			<!-- @migration-task: migrate this slot by hand, `edit-status` is an invalid identifier -->
+	<svelte:fragment slot="edit-status" let:row>
 				{#if row.status === 'submitted'}
 					&nbsp;
-					<button class="btn btn-link p-0" on:click={() => openEditStatusModal(row)}>
-						<i class="bi bi-pencil" />
+					<button class="btn btn-link p-0" onclick={() => openEditStatusModal(row)}>
+						<i class="bi bi-pencil"></i>
 					</button>
 				{/if}
 			</svelte:fragment>
@@ -389,29 +392,33 @@
 </div>
 
 <Modal id="editJobStatusModal" bind:this={statusModal} centered={true} size="md">
-	<svelte:fragment slot="header">
-		{#if jobInEditing}
-			<h1 class="h5 modal-title flex-grow-1">Editing job #{jobInEditing.id}</h1>
-		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editJobStatusModal" />
-		<div class="alert alert-warning">
-			<i class="bi bi-exclamation-triangle" />
-			<strong>Warning</strong>: this operation will not cancel job execution but only modify its
-			status in the database
-		</div>
-		<div class="d-flex justify-content-center">
-			<button class="btn btn-danger" on:click={updateJobStatus} disabled={updatingStatus}>
-				{#if updatingStatus}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-				{/if}
-				Set status to failed
-			</button>
-			&nbsp;
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		</div>
-	</svelte:fragment>
+	{#snippet header()}
+	
+			{#if jobInEditing}
+				<h1 class="h5 modal-title flex-grow-1">Editing job #{jobInEditing.id}</h1>
+			{/if}
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-editJobStatusModal"></div>
+			<div class="alert alert-warning">
+				<i class="bi bi-exclamation-triangle"></i>
+				<strong>Warning</strong>: this operation will not cancel job execution but only modify its
+				status in the database
+			</div>
+			<div class="d-flex justify-content-center">
+				<button class="btn btn-danger" onclick={updateJobStatus} disabled={updatingStatus}>
+					{#if updatingStatus}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{/if}
+					Set status to failed
+				</button>
+				&nbsp;
+				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			</div>
+		
+	{/snippet}
 </Modal>
 
 <style>

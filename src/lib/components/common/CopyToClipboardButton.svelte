@@ -2,15 +2,26 @@
 	import { hideAllTooltips } from '$lib/common/component_utilities';
 	import { onDestroy } from 'svelte';
 
-	/** @type {string} */
-	export let clipboardText;
-	/** @type {string} */
-	export let text;
-	/** @type {string} */
-	export let id;
-	export let btnClass = 'primary';
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} clipboardText
+	 * @property {string} text
+	 * @property {string} id
+	 * @property {string} [btnClass]
+	 */
 
-	let copied = false;
+	/** @type {Props} */
+	let {
+		clipboardText,
+		text,
+		id,
+		btnClass = 'primary'
+	} = $props();
+
+	let copied = $state(false);
 	let tooltip;
 
 	let timeout = undefined;
@@ -46,11 +57,11 @@
 	});
 </script>
 
-<button class="btn btn-{btnClass} copy-to-clipboard-btn" on:click={copyTextToClipboard} {id}>
+<button class="btn btn-{btnClass} copy-to-clipboard-btn" onclick={copyTextToClipboard} {id}>
 	{#if copied}
-		<i class="bi bi-clipboard-check" />
+		<i class="bi bi-clipboard-check"></i>
 	{:else}
-		<i class="bi bi-clipboard" />
+		<i class="bi bi-clipboard"></i>
 	{/if}
 	{text}
 </button>

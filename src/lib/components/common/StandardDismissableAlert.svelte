@@ -1,32 +1,42 @@
 <script>
-	export let message;
-	export let autoDismiss = true;
-	/** @type {'success'|'warning'} */
-	export let alertType = 'success';
+	import { run } from 'svelte/legacy';
 
-	let timeout;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} message
+	 * @property {boolean} [autoDismiss]
+	 * @property {'success'|'warning'} [alertType]
+	 */
 
-	$: if (autoDismiss && message) {
-		if (timeout) {
-			clearTimeout(timeout);
-		}
-		timeout = setTimeout(function () {
-			hide();
-			timeout = null;
-		}, 3000);
-	}
+	/** @type {Props} */
+	let { message = $bindable(), autoDismiss = true, alertType = 'success' } = $props();
+
+	let timeout = $state();
+
 
 	export function hide() {
 		message = '';
 	}
+	run(() => {
+		if (autoDismiss && message) {
+			if (timeout) {
+				clearTimeout(timeout);
+			}
+			timeout = setTimeout(function () {
+				hide();
+				timeout = null;
+			}, 3000);
+		}
+	});
 </script>
 
 {#if message}
 	<div class="alert alert-{alertType} alert-dismissible fade show" role="alert">
 		{#if alertType === 'warning'}
-			<i class="bi bi-exclamation-triangle" />
+			<i class="bi bi-exclamation-triangle"></i>
 		{/if}
 		{message}
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	</div>
 {/if}

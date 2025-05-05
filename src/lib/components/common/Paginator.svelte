@@ -5,15 +5,25 @@
 	const maxPagesPerSide = 3;
 	const availablePageSizes = [10, 20, 50, 100, 500];
 
-	/** @type {(currentPage: number, pageSize: number) => Promise<void>} */
-	export let onPageChange;
-	export let pageSize;
-	export let totalCount;
-	export let currentPage;
-	export let singleLine = false;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {(currentPage: number, pageSize: number) => Promise<void>} onPageChange
+	 * @property {any} pageSize
+	 * @property {any} totalCount
+	 * @property {any} currentPage
+	 * @property {boolean} [singleLine]
+	 */
 
-	$: numberOfPages = Math.ceil(totalCount / pageSize);
-	$: pageNumbers = getPageNumbers(currentPage, numberOfPages);
+	/** @type {Props} */
+	let {
+		onPageChange,
+		pageSize = $bindable(),
+		totalCount,
+		currentPage = $bindable(),
+		singleLine = false
+	} = $props();
+
 
 	/**
 	 * @param {number} newCurrentPage
@@ -76,6 +86,8 @@
 		}
 		return pageNumbers;
 	}
+	let numberOfPages = $derived(Math.ceil(totalCount / pageSize));
+	let pageNumbers = $derived(getPageNumbers(currentPage, numberOfPages));
 </script>
 
 <div class="row">
@@ -91,7 +103,7 @@
 									type="button"
 									aria-label="Previous"
 									disabled={currentPage === 1}
-									on:click={() => setCurrentPage(currentPage - 1)}
+									onclick={() => setCurrentPage(currentPage - 1)}
 									class:disabled={currentPage === 1}
 								>
 									<span aria-hidden="true">&laquo;</span>
@@ -103,7 +115,7 @@
 										<button
 											type="button"
 											class="page-link"
-											on:click={() => setCurrentPage(/** @type {number} */ (pageNumber))}
+											onclick={() => setCurrentPage(/** @type {number} */ (pageNumber))}
 										>
 											{pageNumber}
 										</button>
@@ -120,7 +132,7 @@
 									type="button"
 									aria-label="Next"
 									disabled={currentPage === numberOfPages}
-									on:click={() => setCurrentPage(currentPage + 1)}
+									onclick={() => setCurrentPage(currentPage + 1)}
 									class:disabled={currentPage === numberOfPages}
 								>
 									<span aria-hidden="true">&raquo;</span>
@@ -141,7 +153,7 @@
 						class="form-select"
 						id="page_size"
 						bind:value={pageSize}
-						on:change={() => setPageSize()}
+						onchange={() => setPageSize()}
 					>
 						{#each availablePageSizes as pageSize}
 							<option value={pageSize}>{pageSize}</option>

@@ -7,22 +7,28 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	export let user;
-	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} */
-	export let onWorkflowTaskAdded;
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
+	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
+	 */
+
+	/** @type {Props} */
+	let { workflow, user, onWorkflowTaskAdded } = $props();
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
-	let loading = false;
-	let addingTask = false;
+	let loading = $state(false);
+	let addingTask = $state(false);
 	let showDocLinksInTable = false;
 
 	/** @type {Array<import('fractal-components/types/api').TaskGroupV2>} */
-	let taskGroups = [];
+	let taskGroups = $state([]);
 
 	export async function show() {
 		loading = true;
@@ -130,43 +136,52 @@
 	focus={false}
 	inputAutofocus={false}
 >
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">Add new workflow task</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		{#if loading}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-		{/if}
-		<div class:invisible={loading} class:collapse={loading}>
-			<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
-				<svelte:fragment slot="extra-columns-colgroup">
-					<col width="40" />
-					<col width="120" />
-				</svelte:fragment>
-				<svelte:fragment slot="extra-columns-header">
-					<th />
-					<th />
-				</svelte:fragment>
-				<svelte:fragment slot="extra-columns" let:task>
-					<td>
-						{#if showTaskInfoButton(task)}
-							<PropertyDescription description={getTaskInfo(task)} html={true} />
-						{/if}
-					</td>
-					<td>
-						<button
-							class="btn btn-primary"
-							disabled={addingTask}
-							on:click={() => addTaskToWorkflow(task.task_id)}
-						>
-							Add task
-						</button>
-					</td>
-				</svelte:fragment>
-			</FilteredTasksTable>
-		</div>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill" />
-	</svelte:fragment>
+	{#snippet header()}
+	
+			<h5 class="modal-title">Add new workflow task</h5>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			{#if loading}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			<div class:invisible={loading} class:collapse={loading}>
+				<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
+					<!-- @migration-task: migrate this slot by hand, `extra-columns-colgroup` is an invalid identifier -->
+	<svelte:fragment slot="extra-columns-colgroup">
+						<col width="40" />
+						<col width="120" />
+					</svelte:fragment>
+					<!-- @migration-task: migrate this slot by hand, `extra-columns-header` is an invalid identifier -->
+	<svelte:fragment slot="extra-columns-header">
+						<th></th>
+						<th></th>
+					</svelte:fragment>
+					<!-- @migration-task: migrate this slot by hand, `extra-columns` is an invalid identifier -->
+	<svelte:fragment slot="extra-columns" let:task>
+						<td>
+							{#if showTaskInfoButton(task)}
+								<PropertyDescription description={getTaskInfo(task)} html={true} />
+							{/if}
+						</td>
+						<td>
+							<button
+								class="btn btn-primary"
+								disabled={addingTask}
+								onclick={() => addTaskToWorkflow(task.task_id)}
+							>
+								Add task
+							</button>
+						</td>
+					</svelte:fragment>
+				</FilteredTasksTable>
+			</div>
+		
+	{/snippet}
+	{#snippet footer()}
+	
+			<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill"></div>
+		
+	{/snippet}
 </Modal>

@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
@@ -7,7 +7,7 @@
 	import { onMount } from 'svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	let users = [];
+	let users = $state([]);
 
 	const deleteEnabled = false;
 
@@ -24,18 +24,18 @@
 		}
 		users = sortUsers(
 			users.filter((u) => u.id !== userId),
-			$page.data.userInfo.id
+			page.data.userInfo.id
 		);
 	}
 
 	onMount(() => {
-		users = sortUsers($page.data.users, $page.data.userInfo.id);
+		users = sortUsers(page.data.users, page.data.userInfo.id);
 	});
 </script>
 
 <div class="container mt-3">
 	<a href="/v2/admin/users/register" class="btn btn-primary float-end">
-		<i class="bi bi-person-fill-add" />
+		<i class="bi bi-person-fill-add"></i>
 		Register new user
 	</a>
 	
@@ -65,12 +65,12 @@
 						<td><BooleanIcon value={user.is_verified} /></td>
 						<td>
 							<a href="/v2/admin/users/{user.id}" class="btn btn-light">
-								<i class="bi-info-circle" /> Info
+								<i class="bi-info-circle"></i> Info
 							</a>
 							<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary">
-								<i class="bi bi-pencil" /> Edit
+								<i class="bi bi-pencil"></i> Edit
 							</a>
-							{#if deleteEnabled && user.email !== $page.data.userInfo.email}
+							{#if deleteEnabled && user.email !== page.data.userInfo.email}
 								<ConfirmActionButton
 									modalId={'confirmDeleteProject' + user.id}
 									style={'danger'}

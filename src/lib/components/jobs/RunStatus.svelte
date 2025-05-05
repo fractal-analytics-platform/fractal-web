@@ -1,18 +1,30 @@
 <script>
 	import { isParallelType } from 'fractal-components';
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
-	export let workflowTask;
-	/** @type {import('fractal-components/types/api').HistoryRunAggregated} */
-	export let run;
-	/** @type {number} */
-	export let index;
-	/** @type {import('./RunStatusModal.svelte').default} */
-	export let runStatusModal;
+	
+	
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('fractal-components/types/api').HistoryRunAggregated} run
+	 * @property {number} index
+	 * @property {import('./RunStatusModal.svelte').default} runStatusModal
+	 */
 
-	$: showNumbers = isParallelType(workflowTask.task_type);
+	/** @type {Props} */
+	let {
+		dataset,
+		workflowTask,
+		run,
+		index,
+		runStatusModal
+	} = $props();
+
+	let showNumbers = $derived(isParallelType(workflowTask.task_type));
 
 	function openModal() {
 		runStatusModal.open(run.id, dataset, workflowTask, index);
@@ -25,7 +37,7 @@
 			<button
 				aria-label="Submitted images"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				on:click={openModal}
+				onclick={openModal}
 			>
 				<span class="d-flex">
 					{#if showNumbers}
@@ -46,7 +58,7 @@
 			<button
 				aria-label="Done images"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				on:click={openModal}
+				onclick={openModal}
 			>
 				<span class="d-flex">
 					{#if showNumbers}
@@ -54,7 +66,7 @@
 							{run.num_done_units}
 						</span>
 					{/if}
-					<i class="status-icon bi bi-check text-success pe-1" />
+					<i class="status-icon bi bi-check text-success pe-1"></i>
 				</span>
 			</button>
 		{/if}
@@ -65,7 +77,7 @@
 			<button
 				aria-label="Failed images"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				on:click={openModal}
+				onclick={openModal}
 			>
 				<span class="d-flex">
 					{#if showNumbers}
@@ -73,7 +85,7 @@
 							{run.num_failed_units}
 						</span>
 					{/if}
-					<i class="status-icon bi bi-x text-danger pe-1" />
+					<i class="status-icon bi bi-x text-danger pe-1"></i>
 				</span>
 			</button>
 		{/if}

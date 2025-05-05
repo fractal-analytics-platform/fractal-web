@@ -1,15 +1,27 @@
 <script>
 	import { onMount } from 'svelte';
 
-	/** @type {Array<[number, string]>} */
-	export let groupIdsNames;
-	/** @type {string} */
-	export let id;
+	
+	
 
-	export let privateTask = false;
-	export let selectedGroup = null;
 
-	export let wrapperClass = 'mt-3 mb-3';
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<[number, string]>} groupIdsNames
+	 * @property {string} id
+	 * @property {boolean} [privateTask]
+	 * @property {any} [selectedGroup]
+	 * @property {string} [wrapperClass]
+	 */
+
+	/** @type {Props} */
+	let {
+		groupIdsNames,
+		id,
+		privateTask = $bindable(false),
+		selectedGroup = $bindable(null),
+		wrapperClass = 'mt-3 mb-3'
+	} = $props();
 
 	onMount(() => {
 		selectAllGroup();
@@ -36,7 +48,7 @@
 					id="taskSelectorShared-{id}"
 					value={false}
 					bind:group={privateTask}
-					on:change={selectAllGroup}
+					onchange={selectAllGroup}
 				/>
 				<label class="form-check-label" for="taskSelectorShared-{id}">Shared task</label>
 			</div>

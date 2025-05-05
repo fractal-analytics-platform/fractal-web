@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import {
@@ -10,27 +12,35 @@
 	} from 'fractal-components';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
-	export let workflowTask;
-	/** @type {import('fractal-components/types/api').TaskV2} */
-	export let updateCandidate;
-	/** @type {boolean} */
-	export let parallel;
+	
+	
+	
 
-	export let canBeUpdated = false;
-	export let argsChanged = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('fractal-components/types/api').TaskV2} updateCandidate
+	 * @property {boolean} parallel
+	 * @property {boolean} [canBeUpdated]
+	 * @property {boolean} [argsChanged]
+	 */
 
-	$: {
-		canBeUpdated = validationErrors === null || validationErrors.length === 0;
-		argsChanged = argsToBeFixed !== originalArgs;
-	}
+	/** @type {Props} */
+	let {
+		workflowTask,
+		updateCandidate,
+		parallel,
+		canBeUpdated = $bindable(false),
+		argsChanged = $bindable(false)
+	} = $props();
 
-	let originalArgs = '';
-	let displayTextarea = false;
-	let argsToBeFixed = '';
-	let argsToBeFixedValidJson = true;
+
+	let originalArgs = $state('');
+	let displayTextarea = $state(false);
+	let argsToBeFixed = $state('');
+	let argsToBeFixedValidJson = $state(true);
 	/** @type {import('ajv').ErrorObject[] | null} */
-	let validationErrors = null;
+	let validationErrors = $state(null);
 
 	export function reset() {
 		argsToBeFixed = '';
@@ -117,6 +127,10 @@
 	export function hasValidationErrors() {
 		return (validationErrors?.length || 0) > 0;
 	}
+	run(() => {
+		canBeUpdated = validationErrors === null || validationErrors.length === 0;
+		argsChanged = argsToBeFixed !== originalArgs;
+	});
 </script>
 
 {#if validationErrors}
@@ -177,7 +191,7 @@
 			class:is-invalid={!argsToBeFixedValidJson}
 			bind:value={argsToBeFixed}
 			rows="20"
-		/>
+		></textarea>
 	{/if}
 	{#if !argsToBeFixedValidJson}
 		<div class="invalid-feedback">Invalid JSON</div>

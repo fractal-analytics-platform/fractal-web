@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
 	import { afterNavigate, goto, invalidateAll } from '$app/navigation';
@@ -6,19 +8,19 @@
 	import { navigating } from '$app/stores';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('svelte').Snippet} [children]
+	 */
 
-	$: userLoggedIn = !!$page.data.userInfo;
-	$: isAdmin = userLoggedIn && $page.data.userInfo.is_superuser;
-	$: server = $page.data.serverInfo || {};
-	$: warningBanner = $page.data.warningBanner;
+	/** @type {Props} */
+	let { children } = $props();
+
 	// @ts-ignore
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
 
-	// Detects page change
-	$: if ($navigating) cleanupModalBackdrop();
 
-	$: selectedSection = getSelectedSection($page.url.pathname);
 
 	/**
 	 * Removes the modal backdrop that remains stuck at page change.
@@ -58,7 +60,7 @@
 		}
 	}
 
-	let loading = true;
+	let loading = $state(true);
 
 	onMount(() => {
 		loading = false;
@@ -98,6 +100,15 @@
 			toast.show();
 		}
 	}
+	let userLoggedIn = $derived(!!$page.data.userInfo);
+	let isAdmin = $derived(userLoggedIn && $page.data.userInfo.is_superuser);
+	let server = $derived($page.data.serverInfo || {});
+	let warningBanner = $derived($page.data.warningBanner);
+	// Detects page change
+	run(() => {
+		if ($navigating) cleanupModalBackdrop();
+	});
+	let selectedSection = $derived(getSelectedSection($page.url.pathname));
 </script>
 
 <main>
@@ -142,7 +153,7 @@
 							data-bs-toggle="dropdown"
 							aria-expanded="false"
 						>
-							<i class="bi bi-person-circle" />
+							<i class="bi bi-person-circle"></i>
 							{$page.data.userInfo.email}
 						</a>
 						<ul class="dropdown-menu">
@@ -153,9 +164,9 @@
 							{/if}
 							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
 							<li>
-								<button class="dropdown-item" on:click={getToken}> Get token </button>
+								<button class="dropdown-item" onclick={getToken}> Get token </button>
 							</li>
-							<li><button class="dropdown-item" on:click={logout}>Logout</button></li>
+							<li><button class="dropdown-item" onclick={logout}>Logout</button></li>
 						</ul>
 					</li>
 				{:else}
@@ -169,7 +180,7 @@
 		</div>
 	</nav>
 	{#if selectedSection === 'admin'}
-		<div class="admin-border" />
+		<div class="admin-border"></div>
 	{/if}
 	{#if !server.alive}
 		<div class="container mt-3">
@@ -195,7 +206,7 @@
 			<div class="row">
 				<div class="col">
 					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle" />
+						<i class="bi bi-exclamation-triangle"></i>
 						<strong>Warning</strong>: as a non-verified user, you have limited access; please
 						contact an admin.
 					</div>
@@ -203,7 +214,7 @@
 			</div>
 		</div>
 	{/if}
-	<slot />
+	{@render children?.()}
 	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:show={$navigating || loading}>
 		<div class="d-flex flex-grow-1 justify-content-center align-items-center">
 			<div class="spinner-border text-primary" role="status">
@@ -242,7 +253,7 @@
 					class="btn-close btn-close-white me-2 m-auto"
 					data-bs-dismiss="toast"
 					aria-label="Close"
-				/>
+				></button>
 			</div>
 		</div>
 	</div>

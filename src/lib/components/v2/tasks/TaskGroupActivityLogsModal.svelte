@@ -7,13 +7,13 @@
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	export let admin;
+	let { admin } = $props();
 
-	let log = '';
+	let log = $state('');
 	let errorAlert = undefined;
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
 	/**
 	 * @param {number} taskGroupActivityId
@@ -77,11 +77,15 @@
 	bind:this={modal}
 	bodyCss="bg-tertiary text-secondary"
 >
-	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title">Task-group activity logs</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="collectionTaskLogsError" />
-		<pre>{log}</pre>
-	</svelte:fragment>
+	{#snippet header()}
+	
+			<h1 class="h5 modal-title">Task-group activity logs</h1>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="collectionTaskLogsError"></div>
+			<pre>{log}</pre>
+		
+	{/snippet}
 </Modal>

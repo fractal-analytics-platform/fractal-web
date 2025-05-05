@@ -1,9 +1,15 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
 
-	/** @type {import('../form_element.js').ValueFormElement} */
-	export let formElement;
-	export let editable = true;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').ValueFormElement} formElement
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let { formElement = $bindable(), editable = true } = $props();
 
 	function handleValueChange() {
 		formElement.notifyChange();
@@ -21,7 +27,7 @@
 				class="form-check-input"
 				type="checkbox"
 				bind:checked={formElement.value}
-				on:change={handleValueChange}
+				onchange={handleValueChange}
 				role="switch"
 				disabled={!editable}
 			/>

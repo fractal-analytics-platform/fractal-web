@@ -9,10 +9,10 @@
 	let taskGroups = $page.data.taskGroups;
 
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
-	let selectedTaskRow = null;
+	let selectedTaskRow = $state(null);
 	let showDocLinksInTable = false;
 
 	/**
@@ -45,7 +45,7 @@
 				Here is the list of currently available tasks. You can add new tasks or edit the current
 				ones at the <a href="/v2/tasks/management">Tasks management</a> page.
 				<a href="/v2/tasks/management" class="btn btn-primary float-end">
-					<i class="bi bi-gear-fill" />
+					<i class="bi bi-gear-fill"></i>
 					Manage tasks
 				</a>
 			</div>
@@ -55,17 +55,20 @@
 
 <div class="container mt-2">
 	<FilteredTasksTable {taskGroups} {showDocLinksInTable}>
-		<svelte:fragment slot="extra-columns-colgroup">
+		<!-- @migration-task: migrate this slot by hand, `extra-columns-colgroup` is an invalid identifier -->
+	<svelte:fragment slot="extra-columns-colgroup">
 			<col width="60" />
 		</svelte:fragment>
-		<svelte:fragment slot="extra-columns-header">
-			<th />
+		<!-- @migration-task: migrate this slot by hand, `extra-columns-header` is an invalid identifier -->
+	<svelte:fragment slot="extra-columns-header">
+			<th></th>
 		</svelte:fragment>
-		<svelte:fragment slot="extra-columns" let:task>
+		<!-- @migration-task: migrate this slot by hand, `extra-columns` is an invalid identifier -->
+	<svelte:fragment slot="extra-columns" let:task>
 			<td>
 				{#if showInfoButton(task)}
-					<button class="btn btn-info" on:click={() => showDocsInfoModal(task)}>
-						<i class="bi bi-info-circle" />
+					<button class="btn btn-info" onclick={() => showDocsInfoModal(task)}>
+						<i class="bi bi-info-circle"></i>
 					</button>
 				{/if}
 			</td>
@@ -74,24 +77,28 @@
 </div>
 
 <Modal id="task-docs-info-modal" size="xl" scrollable={true} bind:this={modal}>
-	<svelte:fragment slot="header">
-		<h5 class="modal-title">{selectedTaskRow?.task_name}</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		{#if selectedTaskRow?.docs_info}
-			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html formatMarkdown(selectedTaskRow?.docs_info)}
-		{/if}
-		{#if !showDocLinksInTable && selectedTaskRow?.docs_link}
+	{#snippet header()}
+	
+			<h5 class="modal-title">{selectedTaskRow?.task_name}</h5>
+		
+	{/snippet}
+	{#snippet body()}
+	
 			{#if selectedTaskRow?.docs_info}
-				<hr />
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html formatMarkdown(selectedTaskRow?.docs_info)}
 			{/if}
-			<div>
-				Docs link:
-				<a href={selectedTaskRow?.docs_link} target="_blank">
-					{selectedTaskRow?.docs_link}
-				</a>
-			</div>
-		{/if}
-	</svelte:fragment>
+			{#if !showDocLinksInTable && selectedTaskRow?.docs_link}
+				{#if selectedTaskRow?.docs_info}
+					<hr />
+				{/if}
+				<div>
+					Docs link:
+					<a href={selectedTaskRow?.docs_link} target="_blank">
+						{selectedTaskRow?.docs_link}
+					</a>
+				</div>
+			{/if}
+		
+	{/snippet}
 </Modal>

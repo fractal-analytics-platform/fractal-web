@@ -12,9 +12,9 @@
 	/** @type {string} */
 	const runnerBackend = $page.data.runnerBackend;
 
-	$: userGroups = user.group_ids_names
+	let userGroups = $derived(user.group_ids_names
 		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-		.sort(sortGroupByNameAllFirstComparator);
+		.sort(sortGroupByNameAllFirstComparator));
 </script>
 
 <div class="container mt-3">
@@ -35,7 +35,7 @@
 			</nav>
 
 			<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary float-end">
-				<i class="bi bi-pencil" />
+				<i class="bi bi-pencil"></i>
 				Edit
 			</a>
 		</div>

@@ -8,14 +8,17 @@
 	import EnumProperty from './EnumProperty.svelte';
 	import TupleProperty from './TupleProperty.svelte';
 
-	export let formElement;
-	export let editable = true;
 
+	
 	/**
-	 * Function passed by the parent that reset this element to its default value (used only on top-level objects)
-	 * @type {null|(() => void)}
+	 * @typedef {Object} Props
+	 * @property {any} formElement
+	 * @property {boolean} [editable]
+	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
 	 */
-	export let reset = null;
+
+	/** @type {Props} */
+	let { formElement, editable = true, reset = null } = $props();
 </script>
 
 {#if formElement.type === 'string'}

@@ -5,15 +5,21 @@
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
-	export let datasets = [];
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2[]} [datasets]
+	 */
 
-	let datasetSearch = '';
-	let datasetCreatedMessage = '';
+	/** @type {Props} */
+	let { datasets = $bindable([]) } = $props();
 
-	$: filteredDatasets = datasets.filter((p) =>
+	let datasetSearch = $state('');
+	let datasetCreatedMessage = $state('');
+
+	let filteredDatasets = $derived(datasets.filter((p) =>
 		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
-	);
+	));
 
 	function createDatasetCallback(
 		/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset
@@ -77,14 +83,14 @@
 					type="button"
 					data-bs-target="#createDatasetModal"
 					data-bs-toggle="modal"
-					on:click={() => (datasetCreatedMessage = '')}
+					onclick={() => (datasetCreatedMessage = '')}
 				>
 					Create new dataset
 				</button>
 			</div>
 		</div>
 	</div>
-	<div id="datasetCreateErrorAlert" />
+	<div id="datasetCreateErrorAlert"></div>
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>

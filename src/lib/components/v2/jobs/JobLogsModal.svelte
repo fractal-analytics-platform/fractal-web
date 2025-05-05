@@ -6,15 +6,15 @@
 	import ExpandableLog from '$lib/components/common/ExpandableLog.svelte';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
-	let logParts = [];
+	let logParts = $state([]);
 	let errorAlert = undefined;
 	/** @type {Modal} */
-	let modal;
+	let modal = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
-	let job;
+	let job = $state();
 	let admin = false;
 	let log = '';
-	let loading = true;
+	let loading = $state(true);
 
 	const updateJobInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
@@ -112,21 +112,25 @@
 	bodyCss="bg-tertiary text-secondary p-0 pt-2"
 	{onClose}
 >
-	<svelte:fragment slot="header">
-		<div class="flex-fill">
-			<h1 class="h5 modal-title float-start mt-1">Workflow Job logs</h1>
-		</div>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-workflowJobLogsModal" />
-		{#if loading}
-			<div class="spinner-border spinner-border-sm" role="status">
-				<span class="visually-hidden">Loading...</span>
+	{#snippet header()}
+	
+			<div class="flex-fill">
+				<h1 class="h5 modal-title float-start mt-1">Workflow Job logs</h1>
 			</div>
-			Loading...
-		{:else}
-		<ExpandableLog bind:logParts highlight={job.status === 'failed'} />
-		{/if}
-	</svelte:fragment>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			<div id="errorAlert-workflowJobLogsModal"></div>
+			{#if loading}
+				<div class="spinner-border spinner-border-sm" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				Loading...
+			{:else}
+			<ExpandableLog bind:logParts highlight={job.status === 'failed'} />
+			{/if}
+		
+	{/snippet}
 </Modal>
 

@@ -1,28 +1,36 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 
-	/** @type {Array<import('fractal-components/types/api').User>} */
-	export let users = [];
-	/** @type {number} */
-	export let currentUserId;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<import('fractal-components/types/api').User>} [users]
+	 * @property {number} currentUserId
+	 */
 
-	let searching = false;
-	let exportingCsv = false;
+	/** @type {Props} */
+	let { users = $bindable([]), currentUserId } = $props();
 
-	let dateMin = '';
-	let timeMin = '';
-	let dateMax = '';
-	let timeMax = '';
-	let userId = '';
+	let searching = $state(false);
+	let exportingCsv = $state(false);
 
-	let currentPage = 1;
-	let pageSize = 10;
+	let dateMin = $state('');
+	let timeMin = $state('');
+	let dateMax = $state('');
+	let timeMax = $state('');
+	let userId = $state('');
+
+	let currentPage = $state(1);
+	let pageSize = $state(10);
 
 	/** @type {import('fractal-components/types/api').Accounting|undefined} */
-	let accounting = undefined;
+	let accounting = $state(undefined);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -117,7 +125,9 @@
 		return users.find((u) => u.id === userId);
 	}
 
-	$: users = sortDropdownUsers(users, currentUserId);
+	run(() => {
+		users = sortDropdownUsers(users, currentUserId);
+	});
 </script>
 
 <div class="row mt-3 mb-3">
@@ -158,22 +168,22 @@
 	</div>
 </div>
 
-<div id="errorAlert-accounting" />
+<div id="errorAlert-accounting"></div>
 
-<button class="btn btn-primary" on:click={() => search()} disabled={searching}>
+<button class="btn btn-primary" onclick={() => search()} disabled={searching}>
 	{#if searching}
-		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 	{/if}
 	Search
 </button>
-<button class="btn btn-warning" on:click={reset}> Reset </button>
+<button class="btn btn-warning" onclick={reset}> Reset </button>
 
 {#if accounting}
-	<button class="btn btn-primary float-end" on:click={exportCsv} disabled={exportingCsv}>
+	<button class="btn btn-primary float-end" onclick={exportCsv} disabled={exportingCsv}>
 		{#if exportingCsv}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{/if}
-		<i class="bi-download" />
+		<i class="bi-download"></i>
 		Export to CSV
 	</button>
 {/if}

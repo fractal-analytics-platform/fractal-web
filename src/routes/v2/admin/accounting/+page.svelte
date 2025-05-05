@@ -4,9 +4,9 @@
 	import SlurmAccounting from '$lib/components/admin/SlurmAccounting.svelte';
 
 	/** @type {'accounting'|'slurmAccounting'} */
-	let selectedTab = 'accounting';
+	let selectedTab = $state('accounting');
 
-	$: useSlurm = $page.data.runnerBackend === 'slurm' || $page.data.runnerBackend === 'slurm_ssh';
+	let useSlurm = $derived($page.data.runnerBackend === 'slurm' || $page.data.runnerBackend === 'slurm_ssh');
 </script>
 
 <div class="container mt-3">
@@ -18,7 +18,7 @@
 				<button
 					class="nav-link"
 					class:active={selectedTab === 'accounting'}
-					on:click={() => (selectedTab = 'accounting')}
+					onclick={() => (selectedTab = 'accounting')}
 					aria-current={selectedTab === 'accounting' ? 'page' : undefined}
 				>
 					Accounting
@@ -28,7 +28,7 @@
 				<button
 					class="nav-link"
 					class:active={selectedTab === 'slurmAccounting'}
-					on:click={() => (selectedTab = 'slurmAccounting')}
+					onclick={() => (selectedTab = 'slurmAccounting')}
 					aria-current={selectedTab === 'slurmAccounting' ? 'page' : undefined}
 				>
 					SLURM Accounting

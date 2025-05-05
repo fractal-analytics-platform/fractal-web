@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
@@ -10,40 +10,40 @@
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User>} */
-	const users = $page.data.users;
+	const users = page.data.users;
 	/** @type {Array<import('fractal-components/types/api').Group>} */
-	const groups = $page.data.groups;
+	const groups = page.data.groups;
 
-	let user_id = '';
-	let user_group_id = '';
-	let pkg_name = '';
-	let origin = '';
+	let user_id = $state('');
+	let user_group_id = $state('');
+	let pkg_name = $state('');
+	let origin = $state('');
 	/** @type {boolean|null} */
-	let privateGroup = null;
+	let privateGroup = $state(null);
 	/** @type {boolean|null} */
-	let active = null;
-	let lastUsedDateMin;
-	let lastUsedTimeMin = '';
-	let lastUsedDateMax = '';
-	let lastUsedTimeMax = '';
+	let active = $state(null);
+	let lastUsedDateMin = $state();
+	let lastUsedTimeMin = $state('');
+	let lastUsedDateMax = $state('');
+	let lastUsedTimeMax = $state('');
 
-	let searched = false;
-	let searching = false;
+	let searched = $state(false);
+	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
-	let results = [];
+	let results = $state([]);
 
 	/** @type {Modal} */
-	let infoModal;
+	let infoModal = $state();
 	/** @type {import('fractal-components/types/api').TaskGroupV2|null} */
-	let selectedTaskGroup = null;
+	let selectedTaskGroup = $state(null);
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
-	let taskGroupEditModal;
+	let taskGroupEditModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
-	let taskGroupManageModal;
+	let taskGroupManageModal = $state();
 
 	async function searchTaskGroups() {
 		searching = true;
@@ -298,19 +298,19 @@
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" on:click={searchTaskGroups} disabled={searching}>
+	<button class="btn btn-primary mt-4" onclick={searchTaskGroups} disabled={searching}>
 		{#if searching}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
-			<i class="bi bi-search" />
+			<i class="bi bi-search"></i>
 		{/if}
 		Search task groups
 	</button>
-	<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
+	<button class="btn btn-warning mt-4" onclick={resetSearchFields} disabled={searching}>
 		Reset
 	</button>
 
-	<div id="searchError" class="mt-3 mb-3" />
+	<div id="searchError" class="mt-3 mb-3"></div>
 
 	<div class:d-none={!searched}>
 		<p class="text-center">
@@ -357,16 +357,16 @@
 							<td>{taskGroup.origin || '-'}</td>
 							<td>{taskGroup.task_list.length}</td>
 							<td>
-								<button class="btn btn-light" on:click={() => openInfoModal(taskGroup)}>
-									<i class="bi bi-info-circle" />
+								<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
+									<i class="bi bi-info-circle"></i>
 									Info
 								</button>
-								<button class="btn btn-primary" on:click={() => taskGroupEditModal.open(taskGroup)}>
-									<i class="bi bi-pencil" />
+								<button class="btn btn-primary" onclick={() => taskGroupEditModal.open(taskGroup)}>
+									<i class="bi bi-pencil"></i>
 									Edit
 								</button>
-								<button class="btn btn-info" on:click={() => taskGroupManageModal.open(taskGroup)}>
-									<i class="bi bi-gear" />
+								<button class="btn btn-info" onclick={() => taskGroupManageModal.open(taskGroup)}>
+									<i class="bi bi-gear"></i>
 									Manage
 								</button>
 								<ConfirmActionButton
@@ -400,51 +400,55 @@
 <TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} />
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
-	<svelte:fragment slot="header">
-		<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		{#if selectedTaskGroup}
-			<ul class="list-group">
-				<li class="list-group-item list-group-item-light fw-bold">Id</li>
-				<li class="list-group-item">{selectedTaskGroup.id}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Package name</li>
-				<li class="list-group-item">{selectedTaskGroup.pkg_name}</li>
-				<li class="list-group-item list-group-item-light fw-bold">User</li>
-				<li class="list-group-item">{getUserEmail(selectedTaskGroup.user_id)}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Group</li>
-				<li class="list-group-item">{getGroupName(selectedTaskGroup.user_group_id)}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Active</li>
-				<li class="list-group-item">
-					<BooleanIcon value={selectedTaskGroup.active} />
-				</li>
-				<li class="list-group-item list-group-item-light fw-bold">Origin</li>
-				<li class="list-group-item">{selectedTaskGroup.origin || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Version</li>
-				<li class="list-group-item">{selectedTaskGroup.version || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Python version</li>
-				<li class="list-group-item">{selectedTaskGroup.python_version || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Path</li>
-				<li class="list-group-item">{selectedTaskGroup.path || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
-				<li class="list-group-item">{selectedTaskGroup.venv_path || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
-				<li class="list-group-item">{selectedTaskGroup.venv_file_number || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
-				<li class="list-group-item">
-					{selectedTaskGroup.venv_size_in_kB
-						? (selectedTaskGroup.venv_size_in_kB / 1000).toFixed(2)
-						: '-'}
-				</li>
-				<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
-				<li class="list-group-item">{selectedTaskGroup.pip_extras || '-'}</li>
-				<li class="list-group-item list-group-item-light fw-bold">Last used</li>
-				<li class="list-group-item">
-					<TimestampCell timestamp={selectedTaskGroup.timestamp_last_used} />
-				</li>
-			</ul>
-		{/if}
-	</svelte:fragment>
+	{#snippet header()}
+	
+			<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
+		
+	{/snippet}
+	{#snippet body()}
+	
+			{#if selectedTaskGroup}
+				<ul class="list-group">
+					<li class="list-group-item list-group-item-light fw-bold">Id</li>
+					<li class="list-group-item">{selectedTaskGroup.id}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Package name</li>
+					<li class="list-group-item">{selectedTaskGroup.pkg_name}</li>
+					<li class="list-group-item list-group-item-light fw-bold">User</li>
+					<li class="list-group-item">{getUserEmail(selectedTaskGroup.user_id)}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Group</li>
+					<li class="list-group-item">{getGroupName(selectedTaskGroup.user_group_id)}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Active</li>
+					<li class="list-group-item">
+						<BooleanIcon value={selectedTaskGroup.active} />
+					</li>
+					<li class="list-group-item list-group-item-light fw-bold">Origin</li>
+					<li class="list-group-item">{selectedTaskGroup.origin || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Version</li>
+					<li class="list-group-item">{selectedTaskGroup.version || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Python version</li>
+					<li class="list-group-item">{selectedTaskGroup.python_version || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Path</li>
+					<li class="list-group-item">{selectedTaskGroup.path || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
+					<li class="list-group-item">{selectedTaskGroup.venv_path || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
+					<li class="list-group-item">{selectedTaskGroup.venv_file_number || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
+					<li class="list-group-item">
+						{selectedTaskGroup.venv_size_in_kB
+							? (selectedTaskGroup.venv_size_in_kB / 1000).toFixed(2)
+							: '-'}
+					</li>
+					<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
+					<li class="list-group-item">{selectedTaskGroup.pip_extras || '-'}</li>
+					<li class="list-group-item list-group-item-light fw-bold">Last used</li>
+					<li class="list-group-item">
+						<TimestampCell timestamp={selectedTaskGroup.timestamp_last_used} />
+					</li>
+				</ul>
+			{/if}
+		
+	{/snippet}
 </Modal>
 
 <style>

@@ -1,25 +1,37 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 
-	/** @type {string} */
-	export let id;
-	/** @type {string} */
-	export let description;
-	/** @type {string} */
-	export let accept;
-	export let required = false;
+	
+	
+	
 
-	/** @type {(content: string) => any} */
-	export let validateFile;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} id
+	 * @property {string} description
+	 * @property {string} accept
+	 * @property {boolean} [required]
+	 * @property {(content: string) => any} validateFile
+	 */
+
+	/** @type {Props} */
+	let {
+		id,
+		description,
+		accept,
+		required = false,
+		validateFile
+	} = $props();
 
 	/** @type {(type: string, detail?: any) => boolean} */
 	const dispatch = createEventDispatcher();
 
 	/** @type {FileList|null} */
-	let files = null;
+	let files = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let fileInput = undefined;
-	let fileError = '';
+	let fileInput = $state(undefined);
+	let fileError = $state('');
 
 	async function onFileSelected() {
 		fileError = '';
@@ -73,7 +85,7 @@
 		}
 	}
 
-	let dragOver = false;
+	let dragOver = $state(false);
 
 	/**
 	 * @param {DragEvent} ev
@@ -91,9 +103,9 @@
 
 <div
 	class="droparea bg-light"
-	on:drop={handleDrop}
-	on:dragover={handleDragOver}
-	on:dragleave={handleDragLeave}
+	ondrop={handleDrop}
+	ondragover={handleDragOver}
+	ondragleave={handleDragLeave}
 	class:active={dragOver}
 	role="region"
 >
@@ -111,16 +123,16 @@
 				bind:this={fileInput}
 				bind:files
 				class:is-invalid={fileError}
-				on:change={onFileSelected}
+				onchange={onFileSelected}
 				{required}
 			/>
 			{#if files && files.length > 0}
-				<button class="btn btn-outline-secondary" on:click={clearSelectedFile}> Clear </button>
+				<button class="btn btn-outline-secondary" onclick={clearSelectedFile}> Clear </button>
 			{/if}
 			<span class="invalid-feedback">{fileError}</span>
 		</div>
 	</div>
 	<p class="text-center mt-1 mb-1">
-		<i class="bi bi-file-earmark-arrow-up" /> or drag file here
+		<i class="bi bi-file-earmark-arrow-up"></i> or drag file here
 	</p>
 </div>

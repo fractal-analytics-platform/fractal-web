@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 import { writable } from 'svelte/store';
+import { mount } from "svelte";
 
 /**
  * Propagates an error response.
@@ -206,12 +207,12 @@ function hasValidationErrorPayload(err) {
 export function displayStandardErrorAlert(error, targetElementId) {
 	const errorAlert = document.getElementById(targetElementId);
 	if (errorAlert) {
-		return new StandardErrorAlert({
-			target: errorAlert,
-			props: {
-				error
-			}
-		});
+		return mount(StandardErrorAlert, {
+        			target: errorAlert,
+        			props: {
+        				error
+        			}
+        		});
 	} else {
 		console.warn(`Unable to display the error: element ${targetElementId} not found`);
 	}

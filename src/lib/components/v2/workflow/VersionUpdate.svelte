@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import {
 		AlertError,
 		displayStandardErrorAlert,
@@ -10,64 +12,47 @@
 	import { getNewVersions } from './version-checker';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
-	export let workflowTask;
+	
 
-	/** @type {(workflowTask: import('fractal-components/types/api').WorkflowTaskV2) => void} */
-	export let updateWorkflowCallback;
-	/** @type {(count: number) => Promise<void>} */
-	export let updateNewVersionsCount;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {(workflowTask: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowCallback
+	 * @property {(count: number) => Promise<void>} updateNewVersionsCount
+	 */
+
+	/** @type {Props} */
+	let { workflowTask, updateWorkflowCallback, updateNewVersionsCount } = $props();
 
 	/** @type {VersionUpdateFixArgs|undefined} */
-	let fixArgsComponentNonParallel;
+	let fixArgsComponentNonParallel = $state();
 	/** @type {VersionUpdateFixArgs|undefined} */
-	let fixArgsComponentParallel;
+	let fixArgsComponentParallel = $state();
 
-	let nonParallelCanBeUpdated = false;
-	let parallelCanBeUpdated = false;
+	let nonParallelCanBeUpdated = $state(false);
+	let parallelCanBeUpdated = $state(false);
 
-	let nonParallelArgsChanged = false;
-	let parallelArgsChanged = false;
+	let nonParallelArgsChanged = $state(false);
+	let parallelArgsChanged = $state(false);
 
-	let displayCheckAndCancelBtn = true;
+	let displayCheckAndCancelBtn = $state(true);
 
-	$: task = workflowTask.task;
-	let taskVersion = '';
+	let taskVersion = $state('');
 
 	/** @type {Array<import('fractal-components/types/api').TaskV2 & { version: string }>} */
-	let updateCandidates = [];
-	let selectedUpdateVersion = '';
+	let updateCandidates = $state([]);
+	let selectedUpdateVersion = $state('');
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	$: {
-		if (task) {
-			checkNewVersions();
-		}
-	}
 
-	$: updateCandidate =
-		selectedUpdateVersion === ''
-			? null
-			: updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0];
 
-	$: cancelEnabled = nonParallelArgsChanged || parallelArgsChanged;
 
-	$: taskHasArgsSchema = !!(
-		workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel
-	);
 
-	$: updateCandidateType =
-		updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel';
 
-	$: canBeUpdated =
-		selectedUpdateVersion &&
-		updateCandidate &&
-		(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
-			nonParallelCanBeUpdated) ||
-			((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
-				parallelCanBeUpdated));
 
 	async function checkNewVersions() {
 		if (errorAlert) {
@@ -186,10 +171,33 @@
 		}
 		return null;
 	}
+	let task = $derived(workflowTask.task);
+	run(() => {
+		if (task) {
+			checkNewVersions();
+		}
+	});
+	let updateCandidate =
+		$derived(selectedUpdateVersion === ''
+			? null
+			: updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0]);
+	let cancelEnabled = $derived(nonParallelArgsChanged || parallelArgsChanged);
+	let taskHasArgsSchema = $derived(!!(
+		workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel
+	));
+	let updateCandidateType =
+		$derived(updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel');
+	let canBeUpdated =
+		$derived(selectedUpdateVersion &&
+		updateCandidate &&
+		(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
+			nonParallelCanBeUpdated) ||
+			((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
+				parallelCanBeUpdated)));
 </script>
 
 <div>
-	<div id="versionUpdateError" />
+	<div id="versionUpdateError"></div>
 	{#if taskHasArgsSchema && taskVersion}
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection">
@@ -199,7 +207,7 @@
 				class="form-select"
 				bind:value={selectedUpdateVersion}
 				id="updateSelection"
-				on:change={checkArgumentsWithNewSchema}
+				onchange={checkArgumentsWithNewSchema}
 			>
 				<option value="">Select...</option>
 				{#each updateCandidates as update}
@@ -241,12 +249,12 @@
 			{/if}
 			{#if updateCandidate}
 				{#if displayCheckAndCancelBtn}
-					<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
+					<button type="button" class="btn btn-warning mt-3" onclick={check}> Check </button>
 					&nbsp;
 					<button
 						type="button"
 						class="btn btn-secondary mt-3"
-						on:click={cancel}
+						onclick={cancel}
 						disabled={!cancelEnabled}
 					>
 						Cancel
@@ -254,7 +262,7 @@
 					&nbsp;
 				{/if}
 			{/if}
-			<button type="button" class="btn btn-primary mt-3" on:click={update} disabled={!canBeUpdated}>
+			<button type="button" class="btn btn-primary mt-3" onclick={update} disabled={!canBeUpdated}>
 				Update
 			</button>
 		{:else}

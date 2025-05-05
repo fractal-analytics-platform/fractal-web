@@ -7,19 +7,25 @@
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	// The list of workflows
-	/** @type {import('fractal-components/types/api').WorkflowV2[]} */
-	export let workflows = [];
-	// Set the projectId prop to reference a specific project for each workflow
-	export let projectId = undefined;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
+	 * @property {any} [projectId] - Set the projectId prop to reference a specific project for each workflow
+	 */
 
-	let workflowSearch = '';
+	/** @type {Props} */
+	let { workflows = $bindable([]), projectId = undefined } = $props();
 
-	$: filteredWorkflows = workflows.filter((p) =>
+	let workflowSearch = $state('');
+
+	let filteredWorkflows = $derived(workflows.filter((p) =>
 		p.name.toLowerCase().includes(workflowSearch.toLowerCase())
-	);
+	));
 
 	/** @type {CreateWorkflowModal} */
-	let createWorkflowModal;
+	let createWorkflowModal = $state();
 
 	/**
 	 * Deletes a project's workflow from the server
@@ -80,7 +86,7 @@
 				<button
 					class="btn btn-primary float-end"
 					type="submit"
-					on:click={() => {
+					onclick={() => {
 						createWorkflowModal.show();
 					}}
 				>
@@ -108,7 +114,7 @@
 						</td>
 						<td>
 							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
-								<i class="bi-journal-code" /> List jobs
+								<i class="bi-journal-code"></i> List jobs
 							</a>
 							<ConfirmActionButton
 								modalId={'deleteConfirmModal' + id}

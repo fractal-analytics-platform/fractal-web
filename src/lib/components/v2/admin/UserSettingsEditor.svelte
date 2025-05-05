@@ -1,28 +1,44 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 
-	/** @type {string} */
-	export let runnerBackend;
-	/** @type {import('fractal-components/types/api').UserSettings} */
-	export let settings;
-	/** @type {string} */
-	export let settingsApiEndpoint;
-	/** @type {(response: Response) => Promise<void>} */
-	export let onSettingsUpdated = async () => {};
+	
+	
+	
+	
 
-	let settingsFormSubmitted = false;
+	let settingsFormSubmitted = $state(false);
 
 	/** @type {import('fractal-components/types/api').UserSettings} */
-	let originalSettings;
+	let originalSettings = $state();
 
-	export let pendingChanges = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} runnerBackend
+	 * @property {import('fractal-components/types/api').UserSettings} settings
+	 * @property {string} settingsApiEndpoint
+	 * @property {(response: Response) => Promise<void>} [onSettingsUpdated]
+	 * @property {boolean} [pendingChanges]
+	 */
 
-	$: if (settings) {
-		pendingChanges =
-			JSON.stringify(originalSettings) !== JSON.stringify(nullifyEmptyStrings(settings));
-	}
+	/** @type {Props} */
+	let {
+		runnerBackend,
+		settings = $bindable(),
+		settingsApiEndpoint,
+		onSettingsUpdated = async () => {},
+		pendingChanges = $bindable(false)
+	} = $props();
+
+	run(() => {
+		if (settings) {
+			pendingChanges =
+				JSON.stringify(originalSettings) !== JSON.stringify(nullifyEmptyStrings(settings));
+		}
+	});
 
 	onMount(() => {
 		originalSettings = deepCopy(nullifyEmptyStrings(settings));
@@ -231,15 +247,15 @@
 								type="button"
 								id="slurm_account_remove_{i}"
 								aria-label={`Remove SLURM account #${i + 1}`}
-								on:click={() => removeSlurmAccount(i)}
+								onclick={() => removeSlurmAccount(i)}
 							>
-								<i class="bi bi-trash" />
+								<i class="bi bi-trash"></i>
 							</button>
 						</div>
 					{/each}
 					<span class="invalid-feedback mb-2">{$settingsValidationErrors['slurm_accounts']}</span>
-					<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
-						<i class="bi bi-plus-circle" />
+					<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
+						<i class="bi bi-plus-circle"></i>
 						Add SLURM account
 					</button>
 					<div class="form-text">
@@ -250,7 +266,7 @@
 		{/if}
 		<div class="row">
 			<div class="col-sm-9 offset-sm-3">
-				<div id="genericSettingsError" />
+				<div id="genericSettingsError"></div>
 			</div>
 		</div>
 	</div>
