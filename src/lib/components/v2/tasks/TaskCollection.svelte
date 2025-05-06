@@ -16,11 +16,10 @@
 	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
 	let recentActivities = $state([]);
 
-	let sortedRecentActivities = $derived([...recentActivities].sort(sortActivitiesByTimestampStarted));
+	let sortedRecentActivities = $derived(
+		[...recentActivities].sort(sortActivitiesByTimestampStarted)
+	);
 
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {'pypi'|'local'} [packageType]
@@ -45,7 +44,7 @@
 	/** @type {HTMLInputElement|undefined} */
 	let wheelFileInput = $state(undefined);
 
-	/** @type {TaskGroupActivityLogsModal} */
+	/** @type {TaskGroupActivityLogsModal|undefined} */
 	let taskGroupActivitiesLogsModal = $state();
 	/** @type {number|null} */
 	let openedTaskCollectionLogId = null;
@@ -199,7 +198,7 @@
 			(u) => u.id === openedTaskCollectionLogId
 		)?.log;
 		if (openedTaskCollectionLogToUpdate) {
-			await taskGroupActivitiesLogsModal.updateLog(openedTaskCollectionLogToUpdate);
+			await taskGroupActivitiesLogsModal?.updateLog(openedTaskCollectionLogToUpdate);
 		}
 	}
 
@@ -208,7 +207,7 @@
 	 */
 	async function openTaskGroupActivityLogsModal(taskGroupActivityId) {
 		openedTaskCollectionLogId = taskGroupActivityId;
-		await taskGroupActivitiesLogsModal.open(taskGroupActivityId);
+		await taskGroupActivitiesLogsModal?.open(taskGroupActivityId);
 	}
 
 	function addPackageVersion() {
@@ -486,6 +485,7 @@
 									<button
 										class="btn btn-info"
 										onclick={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
+										aria-label="Info"
 									>
 										<i class="bi bi-info-circle"></i>
 									</button>

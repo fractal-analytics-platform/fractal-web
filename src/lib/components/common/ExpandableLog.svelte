@@ -1,7 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<{text: string, highlight: boolean}>} [logParts]
@@ -9,7 +8,7 @@
 	 */
 
 	/** @type {Props} */
-	let { logParts = [], highlight = false } = $props();
+	let { logParts = $bindable([]), highlight = false } = $props();
 
 	/** Show/hide complete stack trace */
 	let showDetails = $state(false);

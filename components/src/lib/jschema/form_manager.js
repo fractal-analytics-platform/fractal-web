@@ -27,12 +27,12 @@ import { SchemaValidator } from './jschema_validation.js';
 export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
-	 * @param {(type: string, detail?: any) => boolean} dispatch
+	 * @param {(data: any) => void} onchange
 	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
 	 */
-	constructor(originalJsonSchema, dispatch, schemaVersion, propertiesToIgnore = [], initialValue = undefined) {
+	constructor(originalJsonSchema, onchange, schemaVersion, propertiesToIgnore = [], initialValue = undefined) {
 		/** @type {'pydantic_v1'|'pydantic_v2'} */
 		this.schemaVersion = schemaVersion;
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
@@ -50,10 +50,10 @@ export class FormManager {
 		this.ids = [];
 
 		const data = getJsonSchemaData(this.jsonSchema, schemaVersion, initialValue);
-		this.dispatch = dispatch;
+		this.onchange = onchange;
 		this.notifyChange = () => {
 			const data = this.getFormData();
-			this.dispatch('change', { value: data });
+			this.onchange(data);
 		};
 
 		/**

@@ -12,7 +12,7 @@
 	let log = $state('');
 	let errorAlert = undefined;
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/**
@@ -25,7 +25,7 @@
 		}
 		log = '';
 
-		modal.show();
+		modal?.show();
 
 		const response = await fetch(
 			admin

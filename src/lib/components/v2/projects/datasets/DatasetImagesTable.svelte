@@ -29,13 +29,13 @@
 	 * @property {Array<string>} [highlightedTypes]
 	 * @property {boolean} [imagesStatusModal] Set to true if the table is displayed inside the "Images status" modal.
 	 * @property {string} [imagesStatusModalUrl]
-	 * @property {import('svelte').Snippet} [extraButtons]
+	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').Image]>} [extraButtons]
 	 */
 
 	/** @type {Props} */
 	let {
 		dataset,
-		imagePage,
+		imagePage = $bindable(),
 		extraTypes = [],
 		vizarrViewerUrl = null,
 		runWorkflowModal = false,
@@ -50,14 +50,14 @@
 
 	let imagesStatusFilter = '';
 
-	let showTable = false;
+	let showTable = $state(false);
 	let firstLoad = true;
 
 	/** @type {CreateUpdateImageModal|undefined} */
 	let imageModal = undefined;
 
-	let searching = false;
-	let resetting = false;
+	let searching = $state(false);
+	let resetting = $state(false);
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
 	let attributeFilters = {};
@@ -131,12 +131,13 @@
 	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
 	let lastAppliedImagesStatusFilter = '';
 
-	$: applyBtnActive =
+	const applyBtnActive = $derived(
 		attributesChanged(lastAppliedAttributeFilters, attributeFilters) ||
-		objectChanged(lastAppliedTypeFilters, typeFilters) ||
-		lastAppliedImagesStatusFilter !== imagesStatusFilter;
+			objectChanged(lastAppliedTypeFilters, typeFilters) ||
+			lastAppliedImagesStatusFilter !== imagesStatusFilter
+	);
 
-	let resetBtnActive = false;
+	let resetBtnActive = $state(false);
 
 	export async function applySearchFields() {
 		searching = true;
@@ -570,9 +571,11 @@
 		}
 	}
 
-	$: if (dataset) {
-		resetBtnActive = false;
-	}
+	$effect(() => {
+		if (dataset) {
+			resetBtnActive = false;
+		}
+	});
 
 	/**
 	 * @param {{ [key: string]: any }} map
@@ -628,8 +631,8 @@
 	{#if !runWorkflowModal && !imagesStatusModal}
 		<div class="container">
 			<p class="fw-bold mt-5">No entries in the image list yet</p>
-			<button class="btn btn-outline-secondary" on:click={() => imageModal?.openForCreate()}>
-				<i class="bi bi-plus-circle" />
+			<button class="btn btn-outline-secondary" onclick={() => imageModal?.openForCreate()}>
+				<i class="bi bi-plus-circle"></i>
 				Add an image list entry
 			</button>
 		</div>
@@ -637,7 +640,7 @@
 {:else}
 	<div>
 		<div class="container">
-			<div id="datasetImagesError" class="mt-2 mb-2" />
+			<div id="datasetImagesError" class="mt-2 mb-2"></div>
 		</div>
 
 		<div class="table-responsive mt-2">
@@ -671,10 +674,14 @@
 								{#if !imagesStatusModal}
 									<button
 										class="ps-0 pb-0 btn btn-link"
-										on:click|preventDefault={() => toggleAll(attributeKey)}
+										onclick={(event) => {
+											event.preventDefault();
+											toggleAll(attributeKey);
+										}}
 										title="Toggle all"
+										aria-label="Toggle all"
 									>
-										<i class="bi bi-check-all" />
+										<i class="bi bi-check-all"></i>
 									</button>
 								{/if}
 							</th>
@@ -689,13 +696,13 @@
 						<th>Options</th>
 					</tr>
 					<tr>
-						<th />
+						<th></th>
 						{#if imagesStatusModal}
 							<th>
 								<div class="row">
 									<div class="col">
 										<div class="status-select-wrapper mb-1">
-											<select id="status-selector" class="invisible" />
+											<select id="status-selector" class="invisible"></select>
 										</div>
 									</div>
 								</div>
@@ -706,7 +713,8 @@
 								<div class="row">
 									<div class="col">
 										<div class="attribute-select-wrapper mb-1">
-											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible" />
+											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible"
+											></select>
 										</div>
 									</div>
 								</div>
@@ -715,32 +723,34 @@
 						{#each getTypeKeys(imagePage) as typeKey}
 							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<div class="type-select-wrapper mb-1">
-									<select id="type-{getIdFromValue(typeKey)}" class="invisible" />
+									<select id="type-{getIdFromValue(typeKey)}" class="invisible"></select>
 								</div>
 							</th>
 						{/each}
 						<th>
 							<button
 								class="btn"
-								on:click={applySearchFields}
+								onclick={applySearchFields}
 								disabled={searching || resetting || !applyBtnActive}
 								class:btn-primary={applyBtnActive}
 								class:btn-secondary={!applyBtnActive}
 							>
 								{#if searching}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+									></span>
 								{/if}
 								Apply
 							</button>
 							<button
 								class="btn"
-								on:click={resetSearchFields}
+								onclick={resetSearchFields}
 								disabled={resetting || searching || !resetBtnActive}
 								class:btn-warning={resetBtnActive}
 								class:btn-secondary={!resetBtnActive}
 							>
 								{#if resetting}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+									></span>
 								{/if}
 								Reset
 							</button>
@@ -775,7 +785,7 @@
 										)}"
 										target="_blank"
 									>
-										<i class="bi bi-eye" />
+										<i class="bi bi-eye"></i>
 										View
 									</a>
 									{#key imagePage.items}
@@ -790,11 +800,11 @@
 								{#if !runWorkflowModal && !imagesStatusModal}
 									<button
 										class="btn btn-light"
-										on:click={() => imageModal?.openForEditing(image)}
+										onclick={() => imageModal?.openForEditing(image)}
 										aria-label="Edit"
 									>
 										<span class="text-primary">
-											<i class="bi bi-pencil" />
+											<i class="bi bi-pencil"></i>
 										</span>
 									</button>
 									<ConfirmActionButton
@@ -805,7 +815,7 @@
 										ariaLabel={'Delete'}
 										callbackAction={() => handleDeleteImage(image.zarr_url)}
 									>
-										<svelte:fragment slot="body">
+										{#snippet body()}
 											<div class="alert alert-danger fw-semibold wrap">
 												The following image is about to be removed from the Fractal image list:<br
 												/>
@@ -816,7 +826,7 @@
 												from the Fractal database
 											</p>
 											<p>Do you confirm?</p>
-										</svelte:fragment>
+										{/snippet}
 									</ConfirmActionButton>
 								{/if}
 								{#if imagesStatusModal}
@@ -845,9 +855,9 @@
 					<div class="col-lg-3">
 						<button
 							class="btn btn-outline-secondary float-end"
-							on:click={() => imageModal?.openForCreate()}
+							onclick={() => imageModal?.openForCreate()}
 						>
-							<i class="bi bi-plus-circle" />
+							<i class="bi bi-plus-circle"></i>
 							Add an image list entry
 						</button>
 					</div>

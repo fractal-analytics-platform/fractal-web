@@ -3,8 +3,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import ImageAttributesTypesForm from './ImageAttributesTypesForm.svelte';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').DatasetV2} dataset
@@ -14,14 +12,14 @@
 	/** @type {Props} */
 	let { dataset, onImageSave } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	let zarr_url = $state('');
 	let saving = $state(false);
 	let isNew = $state(false);
 
-	/** @type {ImageAttributesTypesForm} */
+	/** @type {ImageAttributesTypesForm|undefined} */
 	let attributesTypesForm = $state();
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-datasetCreateUpdateImageModal', [
@@ -37,9 +35,9 @@
 		if (!zarr_url.endsWith('/')) {
 			zarr_url += '/';
 		}
-		attributesTypesForm.init({}, {});
+		attributesTypesForm?.init({}, {});
 		formErrorHandler.clearErrors();
-		modal.show();
+		modal?.show();
 	}
 
 	/**
@@ -49,9 +47,9 @@
 		isNew = false;
 		saving = false;
 		zarr_url = image.zarr_url;
-		attributesTypesForm.init(image.attributes, image.types);
+		attributesTypesForm?.init(image.attributes, image.types);
 		formErrorHandler.clearErrors();
-		modal.show();
+		modal?.show();
 	}
 
 	async function saveImage() {
@@ -74,14 +72,14 @@
 				headers,
 				body: JSON.stringify({
 					zarr_url,
-					attributes: attributesTypesForm.getAttributes(),
-					types: attributesTypesForm.getTypes()
+					attributes: attributesTypesForm?.getAttributes(),
+					types: attributesTypesForm?.getTypes()
 				})
 			}
 		);
 		if (response.ok) {
 			await onImageSave();
-			modal.hide();
+			modal?.hide();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
@@ -99,14 +97,14 @@
 				headers,
 				body: JSON.stringify({
 					zarr_url,
-					attributes: attributesTypesForm.getAttributes(),
-					types: attributesTypesForm.getTypes()
+					attributes: attributesTypesForm?.getAttributes(),
+					types: attributesTypesForm?.getTypes()
 				})
 			}
 		);
 		if (response.ok) {
 			await onImageSave();
-			modal.hide();
+			modal?.hide();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
@@ -122,45 +120,39 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-	
-			<h5 class="modal-title">
-				{#if isNew}
-					Add an image list entry
-				{:else}
-					Edit an image list entry
-				{/if}
-			</h5>
-		
+		<h5 class="modal-title">
+			{#if isNew}
+				Add an image list entry
+			{:else}
+				Edit an image list entry
+			{/if}
+		</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<div class="row mb-3 has-validation">
-				<label class="col-3 col-lg-2 col-form-label" for="image-zarr-url"> Zarr URL </label>
-				<div class="col col-lg-10">
-					<input
-						type="text"
-						class="form-control"
-						bind:value={zarr_url}
-						class:is-invalid={$validationErrors['zarr_url']}
-						disabled={!isNew}
-						id="image-zarr-url"
-					/>
-					<span class="invalid-feedback">{$validationErrors['zarr_url']}</span>
-				</div>
+		<div class="row mb-3 has-validation">
+			<label class="col-3 col-lg-2 col-form-label" for="image-zarr-url"> Zarr URL </label>
+			<div class="col col-lg-10">
+				<input
+					type="text"
+					class="form-control"
+					bind:value={zarr_url}
+					class:is-invalid={$validationErrors['zarr_url']}
+					disabled={!isNew}
+					id="image-zarr-url"
+				/>
+				<span class="invalid-feedback">{$validationErrors['zarr_url']}</span>
 			</div>
-			<ImageAttributesTypesForm bind:this={attributesTypesForm} />
-			<div id="errorAlert-datasetCreateUpdateImageModal" class="mt-3"></div>
-		
+		</div>
+		<ImageAttributesTypesForm bind:this={attributesTypesForm} />
+		<div id="errorAlert-datasetCreateUpdateImageModal" class="mt-3"></div>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-primary" onclick={saveImage} disabled={saving}>
-				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Save
-			</button>
-			<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
-		
+		<button class="btn btn-primary" onclick={saveImage} disabled={saving}>
+			{#if saving}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Save
+		</button>
+		<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
 	{/snippet}
 </Modal>

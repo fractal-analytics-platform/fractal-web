@@ -3,11 +3,17 @@
 
 	import { AlertError, extractErrorDetail } from '$lib/common/errors';
 
-	let { error = undefined, children } = $props();
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} [error]
+	 * @property {import('svelte').Snippet} [children]
+	 */
+
+	/** @type {Props} */
+	let { error, children } = $props();
 
 	let errorString = $state('');
 	let formatAsPre = $state(false);
-
 
 	function updateErrorMessage() {
 		if (error instanceof AlertError) {
@@ -62,6 +68,6 @@
 				{line}
 			{/each}
 		{/if}
-		<button class="btn-close" data-bs-dismiss="alert" onclick={hide}></button>
+		<button class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick={hide}></button>
 	</div>
 {/if}

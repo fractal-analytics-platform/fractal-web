@@ -1,7 +1,6 @@
 <script>
 	import Modal from './Modal.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {any} [callbackAction] - A default empty function
@@ -29,7 +28,7 @@
 		disabled = false,
 		body
 	} = $props();
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 	let loading = $state(false);
 
@@ -46,7 +45,7 @@
 	 */
 	const handleCallbackAction = async () => {
 		loading = true;
-		modal.confirmAndHide(callbackAction, function () {
+		modal?.confirmAndHide(callbackAction, function () {
 			loading = false;
 		});
 	};
@@ -56,32 +55,26 @@
 
 <Modal id={modalId} {onOpen} bind:this={modal} size="lg">
 	{#snippet header()}
-	
-			<h1 class="modal-title fs-5">Confirm action</h1>
-		
+		<h1 class="modal-title fs-5">Confirm action</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			{#if !!body}
-				{@render body_render?.()}
-			{:else}
-				<p>You're about to:</p>
-				<p class="badge bg-{style} fs-6 wrap">{message}</p>
-				<p>Do you confirm?</p>
-			{/if}
-			<div id="errorAlert-{modalId}"></div>
-		
+		{#if !!body}
+			{@render body_render?.()}
+		{:else}
+			<p>You're about to:</p>
+			<p class="badge bg-{style} fs-6 wrap">{message}</p>
+			<p>Do you confirm?</p>
+		{/if}
+		<div id="errorAlert-{modalId}"></div>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" onclick={handleCallbackAction}>
-				{#if loading}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Confirm
-			</button>
-		
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button class="btn btn-primary" onclick={handleCallbackAction}>
+			{#if loading}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Confirm
+		</button>
 	{/snippet}
 </Modal>
 

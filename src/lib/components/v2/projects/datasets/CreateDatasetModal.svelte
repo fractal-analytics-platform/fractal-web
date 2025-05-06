@@ -6,7 +6,6 @@
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} createDatasetCallback
@@ -15,7 +14,7 @@
 	/** @type {Props} */
 	let { createDatasetCallback } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/** @type {'new'|'import'} */
@@ -55,7 +54,7 @@
 
 	async function handleSave() {
 		submitted = true;
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		if (!fieldsAreValid()) {
 			return;
 		}
@@ -67,11 +66,11 @@
 			return;
 		}
 		createDatasetCallback(newDataset);
-		modal.hide();
+		modal?.hide();
 	}
 
 	async function handleImport() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 
 		if (files === null || files.length === 0) {
 			fileError = 'A file is required';
@@ -117,12 +116,12 @@
 		const result = await response.json();
 		saving = false;
 		if (!response.ok) {
-			modal.displayErrorAlert(result);
+			modal?.displayErrorAlert(result);
 			return;
 		}
 
 		createDatasetCallback(result);
-		modal.hide();
+		modal?.hide();
 	}
 
 	/**
@@ -173,195 +172,189 @@
 
 <Modal id="createDatasetModal" bind:this={modal} size="lg" centered={true} {onOpen}>
 	{#snippet header()}
-	
-			<h4 class="modal-title">Create new dataset</h4>
-		
+		<h4 class="modal-title">Create new dataset</h4>
 	{/snippet}
 	{#snippet body()}
-	
-			<span id="errorAlert-createDatasetModal"></span>
-			<div class="row">
-				<div class="col-10">
-					<div class="form-check form-check-inline mb-3">
-						<input
-							class="form-check-input"
-							type="radio"
-							name="createDatasetMode"
-							id="createDatasetModeNew"
-							value="new"
-							bind:group={mode}
-						/>
-						<label class="form-check-label" for="createDatasetModeNew">Create new</label>
-					</div>
-					<div class="form-check form-check-inline mb-3">
-						<input
-							class="form-check-input"
-							type="radio"
-							name="createDatasetMode"
-							id="createDatasetModeImport"
-							value="import"
-							bind:group={mode}
-						/>
-						<label class="form-check-label" for="createDatasetModeImport">Import from file</label>
-					</div>
+		<span id="errorAlert-createDatasetModal"></span>
+		<div class="row">
+			<div class="col-10">
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createDatasetMode"
+						id="createDatasetModeNew"
+						value="new"
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createDatasetModeNew">Create new</label>
+				</div>
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createDatasetMode"
+						id="createDatasetModeImport"
+						value="import"
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createDatasetModeImport">Import from file</label>
 				</div>
 			</div>
-			{#if mode === 'new'}
-				<form
-					class="row needs-validation"
-					novalidate
-					onsubmit={preventDefault(handleSave)}
-					id="create-new-dataset-form"
-				>
-					<div class="col">
+		</div>
+		{#if mode === 'new'}
+			<form
+				class="row needs-validation"
+				novalidate
+				onsubmit={preventDefault(handleSave)}
+				id="create-new-dataset-form"
+			>
+				<div class="col">
+					<div class="row mb-3">
+						<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
+						<div class="col-10">
+							<input
+								id="datasetName"
+								type="text"
+								bind:value={datasetName}
+								class="form-control"
+								class:is-invalid={submitted && (!datasetName.trim() || $validationErrors['name'])}
+							/>
+							{#if submitted && !datasetName.trim()}
+								<div class="invalid-feedback">
+									{#if !datasetName.trim()}
+										Required field
+									{:else}
+										{$validationErrors['name']}
+									{/if}
+								</div>
+							{/if}
+						</div>
+					</div>
+					{#if projectDir === null}
 						<div class="row mb-3">
-							<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
+							<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
 							<div class="col-10">
 								<input
-									id="datasetName"
+									id="zarrDir"
 									type="text"
-									bind:value={datasetName}
+									bind:value={zarrDir}
 									class="form-control"
-									class:is-invalid={submitted && (!datasetName.trim() || $validationErrors['name'])}
+									class:is-invalid={submitted && (!zarrDir || $validationErrors['zarr_dir'])}
 								/>
-								{#if submitted && !datasetName.trim()}
+								<div class="form-text">The main folder for OME-Zarrs of this dataset.</div>
+								{#if submitted && (!zarrDir || $validationErrors['zarr_dir'])}
 									<div class="invalid-feedback">
-										{#if !datasetName.trim()}
+										{#if !zarrDir}
 											Required field
 										{:else}
-											{$validationErrors['name']}
+											{$validationErrors['zarr_dir']}
 										{/if}
 									</div>
 								{/if}
 							</div>
 						</div>
-						{#if projectDir === null}
-							<div class="row mb-3">
-								<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
-								<div class="col-10">
-									<input
-										id="zarrDir"
-										type="text"
-										bind:value={zarrDir}
-										class="form-control"
-										class:is-invalid={submitted && (!zarrDir || $validationErrors['zarr_dir'])}
-									/>
-									<div class="form-text">The main folder for OME-Zarrs of this dataset.</div>
-									{#if submitted && (!zarrDir || $validationErrors['zarr_dir'])}
-										<div class="invalid-feedback">
-											{#if !zarrDir}
-												Required field
-											{:else}
-												{$validationErrors['zarr_dir']}
-											{/if}
-										</div>
-									{/if}
-								</div>
-							</div>
-						{:else}
-							<div class="row mb-3">
-								<div class="accordion" id="zarrDirAccordion">
-									<div class="accordion-item">
-										<h2 class="accordion-header">
-											<button
-												class="accordion-button collapsed"
-												type="button"
-												data-bs-toggle="collapse"
-												data-bs-target="#zarrDirCollapse"
-												aria-expanded="false"
-												aria-controls="zarrDirCollapse"
-											>
-												Advanced options
-											</button>
-										</h2>
-										<div
-											id="zarrDirCollapse"
-											class="accordion-collapse collapse"
-											data-bs-parent="#zarrDirAccordion"
+					{:else}
+						<div class="row mb-3">
+							<div class="accordion" id="zarrDirAccordion">
+								<div class="accordion-item">
+									<h2 class="accordion-header">
+										<button
+											class="accordion-button collapsed"
+											type="button"
+											data-bs-toggle="collapse"
+											data-bs-target="#zarrDirCollapse"
+											aria-expanded="false"
+											aria-controls="zarrDirCollapse"
 										>
-											<div class="accordion-body">
-												<div class="row">
-													<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
-													<div class="col-10">
-														<input
-															id="zarrDir"
-															type="text"
-															bind:value={zarrDir}
-															class="form-control"
-															class:is-invalid={submitted && $validationErrors['zarr_dir']}
-														/>
-														<div class="form-text">
-															The main folder for OME-Zarrs of this dataset. If not set, a default
-															subfolder of <code>{projectDir}</code> will be used.
-														</div>
-														{#if submitted && $validationErrors['zarr_dir']}
-															<div class="invalid-feedback">
-																{$validationErrors['zarr_dir']}
-															</div>
-														{/if}
+											Advanced options
+										</button>
+									</h2>
+									<div
+										id="zarrDirCollapse"
+										class="accordion-collapse collapse"
+										data-bs-parent="#zarrDirAccordion"
+									>
+										<div class="accordion-body">
+											<div class="row">
+												<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
+												<div class="col-10">
+													<input
+														id="zarrDir"
+														type="text"
+														bind:value={zarrDir}
+														class="form-control"
+														class:is-invalid={submitted && $validationErrors['zarr_dir']}
+													/>
+													<div class="form-text">
+														The main folder for OME-Zarrs of this dataset. If not set, a default
+														subfolder of <code>{projectDir}</code> will be used.
 													</div>
+													{#if submitted && $validationErrors['zarr_dir']}
+														<div class="invalid-feedback">
+															{$validationErrors['zarr_dir']}
+														</div>
+													{/if}
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						{/if}
-					</div>
-				</form>
-			{:else}
-				<form
-					onsubmit={preventDefault(handleImport)}
-					class="row needs-validation"
-					id="import-dataset-form"
-					novalidate
-				>
-					<div class="col">
-						<div class="row mb-3">
-							<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
-							<div class="col-10">
-								<input id="datasetName" type="text" bind:value={datasetName} class="form-control" />
-							</div>
+						</div>
+					{/if}
+				</div>
+			</form>
+		{:else}
+			<form
+				onsubmit={preventDefault(handleImport)}
+				class="row needs-validation"
+				id="import-dataset-form"
+				novalidate
+			>
+				<div class="col">
+					<div class="row mb-3">
+						<label for="datasetName" class="col-2 col-form-label text-end">Dataset Name</label>
+						<div class="col-10">
+							<input id="datasetName" type="text" bind:value={datasetName} class="form-control" />
 						</div>
 					</div>
-					<div class="mb-3">
-						<label for="datasetFile" class="form-label">Select dataset file</label>
-						<input
-							class="form-control"
-							accept="application/json"
-							type="file"
-							name="datasetFile"
-							id="datasetFile"
-							bind:this={fileInput}
-							bind:files
-							class:is-invalid={fileError}
-						/>
-						{#if fileError}
-							<div class="invalid-feedback">{fileError}</div>
-						{/if}
-					</div>
-				</form>
-			{/if}
-		
+				</div>
+				<div class="mb-3">
+					<label for="datasetFile" class="form-label">Select dataset file</label>
+					<input
+						class="form-control"
+						accept="application/json"
+						type="file"
+						name="datasetFile"
+						id="datasetFile"
+						bind:this={fileInput}
+						bind:files
+						class:is-invalid={fileError}
+					/>
+					{#if fileError}
+						<div class="invalid-feedback">{fileError}</div>
+					{/if}
+				</div>
+			</form>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
-	
-			{#if mode === 'new'}
-				<button class="btn btn-primary" form="create-new-dataset-form" disabled={saving}>
-					{#if saving}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-					{/if}
-					Save
-				</button>
-			{:else}
-				<button class="btn btn-primary" form="import-dataset-form" disabled={saving}>
-					{#if saving}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-					{/if}
-					Import
-				</button>
-			{/if}
-			<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
-		
+		{#if mode === 'new'}
+			<button class="btn btn-primary" form="create-new-dataset-form" disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Save
+			</button>
+		{:else}
+			<button class="btn btn-primary" form="import-dataset-form" disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Import
+			</button>
+		{/if}
+		<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
 	{/snippet}
 </Modal>

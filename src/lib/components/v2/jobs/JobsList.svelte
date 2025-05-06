@@ -23,13 +23,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		jobUpdater,
-		columnsToHide = [],
-		admin = false,
-		buttons,
-		editStatus
-	} = $props();
+	let { jobUpdater, columnsToHide = [], admin = false, buttons, editStatus } = $props();
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
@@ -39,11 +33,11 @@
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	let projects = $page.data.projects;
 	/** @type {{id: number, name: string}[]} */
-	let workflows = $page.data.workflows || [];
+	let workflows = $state([]);
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 	let jobs = $page.data.jobs || [];
 	/** @type {{ id: number, name: string }[]} */
-	let datasets = $page.data.datasets || [];
+	let datasets = $state([]);
 
 	/** @type {DataHandler} */
 	let tableHandler = new DataHandler(jobs);
@@ -71,12 +65,20 @@
 	let datasetFilter = '';
 
 	// Filters
-	$: tableHandler.filter(statusFilter, 'status', check.isEqualTo);
-	$: tableHandler.filter(projectFilter, (row) => row.project_dump.id.toString(), check.isEqualTo);
-	$: tableHandler.filter(workflowFilter, (row) => row.workflow_dump.id.toString(), check.isEqualTo);
-	$: tableHandler.filter(datasetFilter, (row) => row.dataset_dump.id.toString(), check.isEqualTo);
-
-	$: rebuildSlimSelectOptions($rows);
+	$effect(() => {
+		console.log('EFFECT 1')
+		tableHandler.filter(statusFilter, 'status', check.isEqualTo)
+	});
+	$effect(() =>
+		tableHandler.filter(projectFilter, (row) => row.project_dump.id.toString(), check.isEqualTo)
+	);
+	$effect(() =>
+		tableHandler.filter(workflowFilter, (row) => row.workflow_dump.id.toString(), check.isEqualTo)
+	);
+	$effect(() =>
+		tableHandler.filter(datasetFilter, (row) => row.dataset_dump.id.toString(), check.isEqualTo)
+	);
+	$effect(() => rebuildSlimSelectOptions($rows));
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -98,8 +100,8 @@
 		tableHandler.setRows(jobs);
 	}
 
-	let cancellingJobs = [];
-	let jobCancelledMessage = '';
+	let cancellingJobs = $state([]);
+	let jobCancelledMessage = $state('');
 
 	/**
 	 * Requests the server to stop a job execution
@@ -173,6 +175,9 @@
 	}
 
 	onMount(() => {
+		workflows = $page.data.workflows;
+		datasets = $page.data.datasets;
+
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
 
 		statusSelect = setSlimSelect(
@@ -293,15 +298,15 @@
 	<div class="d-flex justify-content-end align-items-center mb-3">
 		<div>
 			{#if !admin}
-				<button class="btn btn-warning" on:click={clearFilters}>
-					<i class="bi-x-square" />
+				<button class="btn btn-warning" onclick={clearFilters}>
+					<i class="bi-x-square"></i>
 					Clear filters
 				</button>
 			{/if}
 			{@render buttons?.()}
 		</div>
 	</div>
-	<div id="jobUpdatesError" />
+	<div id="jobUpdatesError"></div>
 	<table class="table jobs-table">
 		<colgroup>
 			{#if !columnsToHide.includes('id')}
@@ -345,33 +350,33 @@
 			{#if !admin}
 				<tr>
 					{#if !columnsToHide.includes('id')}
-						<th />
+						<th></th>
 					{/if}
 					<th>
-						<select id="status-select" class="invisible" />
+						<select id="status-select" class="invisible"></select>
 					</th>
-					<th />
-					<th />
-					<th />
+					<th></th>
+					<th></th>
+					<th></th>
 					{#if !columnsToHide.includes('project')}
 						<th>
 							{#if projects}
-								<select id="project-select" class="invisible" />
+								<select id="project-select" class="invisible"></select>
 							{/if}
 						</th>
 					{/if}
 					{#if !columnsToHide.includes('workflow')}
 						<th>
 							{#if workflows}
-								<select id="workflow-select" class="invisible" />
+								<select id="workflow-select" class="invisible"></select>
 							{/if}
 						</th>
 					{/if}
 					<th>
-						<select id="dataset-select" class="invisible" />
+						<select id="dataset-select" class="invisible"></select>
 					</th>
 					{#if !columnsToHide.includes('user_email')}
-						<th />
+						<th></th>
 					{/if}
 				</tr>
 			{/if}
@@ -393,36 +398,47 @@
 							</span>
 						</td>
 						<td>
-							<button class="btn btn-info" on:click|preventDefault={() => jobInfoModal.show(row)}>
-								<i class="bi-info-circle" />
+							<button
+								class="btn btn-info"
+								onclick={(event) => {
+									event.preventDefault();
+									jobInfoModal.show(row);
+								}}
+							>
+								<i class="bi-info-circle"></i>
 								Info
 							</button>
 							<button
 								class="btn btn-light"
-								on:click|preventDefault={() => jobLogsModal.show(row, admin)}
+								onclick={(event) => {
+									event.preventDefault();
+									jobLogsModal.show(row, admin);
+								}}
 							>
-								<i class="bi-list-columns-reverse" />
+								<i class="bi-list-columns-reverse"></i>
 								Logs
 							</button>
 							{#if (admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email)}
-								<a class="btn btn-light" href={getDownloadUrl(row)} download={`${row.id}_logs.zip`}>
-									<i class="bi-arrow-down-circle" />
+								<a
+									class="btn btn-light"
+									href={getDownloadUrl(row)}
+									download={`${row.id}_logs.zip`}
+									aria-label="Download logs"
+								>
+									<i class="bi-arrow-down-circle"></i>
 								</a>
 							{/if}
 							{#if row.status === 'submitted'}
 								<button
 									class="btn btn-danger"
-									on:click={() => handleJobCancel(row)}
+									onclick={() => handleJobCancel(row)}
 									disabled={cancellingJobs.includes(row.id)}
 								>
 									{#if cancellingJobs.includes(row.id)}
-										<span
-											class="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										/>
+										<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+										</span>
 									{:else}
-										<i class="bi-x-circle" />
+										<i class="bi-x-circle"></i>
 									{/if}
 									Cancel
 								</button>

@@ -3,7 +3,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TypeFiltersCell from './TypeFiltersCell.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
@@ -12,7 +11,7 @@
 	/** @type {Props} */
 	let { workflow } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 	let loading = $state(false);
 
@@ -20,12 +19,12 @@
 	let typeFiltersFlow = $state([]);
 
 	export async function open() {
-		modal.show();
+		modal?.show();
 		await loadData();
 	}
 
 	async function loadData() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		loading = true;
 
 		const response = await fetch(
@@ -35,7 +34,7 @@
 		if (response.ok) {
 			typeFiltersFlow = await response.json();
 		} else {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 
 		loading = false;
@@ -55,51 +54,47 @@
 
 <Modal id="typeFiltersFlowModal" size="xl" bind:this={modal} {onClose}>
 	{#snippet header()}
-	
-			<h5 class="modal-title">Type filters</h5>
-		
+		<h5 class="modal-title">Type filters</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-typeFiltersFlowModal"></div>
-			{#if loading && !typeFiltersFlow}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-			{/if}
-			{#if typeFiltersFlow}
-				<div class="table-responsive">
-					<table class="table table-striped table-bordered">
-						<thead>
-							<tr>
-								<th>Task</th>
-								<th>Current</th>
-								<th>Input</th>
-								<th>Output</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#if !loading}
-								<!-- eslint-disable-next-line no-unused-vars -->
-								{#each typeFiltersFlow as filters}
-									<tr>
-										<td>
-											{getTaskById(Number(filters.workflowtask_id)).name}
-										</td>
-										<td>
-											<TypeFiltersCell filters={filters.current_type_filters} />
-										</td>
-										<td>
-											<TypeFiltersCell filters={filters.input_type_filters} />
-										</td>
-										<td>
-											<TypeFiltersCell filters={filters.output_type_filters} />
-										</td>
-									</tr>
-								{/each}
-							{/if}
-						</tbody>
-					</table>
-				</div>
-			{/if}
-		
+		<div id="errorAlert-typeFiltersFlowModal"></div>
+		{#if loading && !typeFiltersFlow}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+		{/if}
+		{#if typeFiltersFlow}
+			<div class="table-responsive">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>Task</th>
+							<th>Current</th>
+							<th>Input</th>
+							<th>Output</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#if !loading}
+							<!-- eslint-disable-next-line no-unused-vars -->
+							{#each typeFiltersFlow as filters}
+								<tr>
+									<td>
+										{getTaskById(Number(filters.workflowtask_id)).name}
+									</td>
+									<td>
+										<TypeFiltersCell filters={filters.current_type_filters} />
+									</td>
+									<td>
+										<TypeFiltersCell filters={filters.input_type_filters} />
+									</td>
+									<td>
+										<TypeFiltersCell filters={filters.output_type_filters} />
+									</td>
+								</tr>
+							{/each}
+						{/if}
+					</tbody>
+				</table>
+			</div>
+		{/if}
 	{/snippet}
 </Modal>

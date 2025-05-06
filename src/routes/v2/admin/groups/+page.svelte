@@ -10,7 +10,7 @@
 	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
 	let groups = $derived($page.data.groups);
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let createGroupModal = $state();
 
 	let newGroupName = $state('');
@@ -20,12 +20,12 @@
 	function openCreateGroupModal() {
 		newGroupName = '';
 		newGroupNameError = '';
-		createGroupModal.hideErrorAlert();
-		createGroupModal.show();
+		createGroupModal?.hideErrorAlert();
+		createGroupModal?.show();
 	}
 
 	async function handleCreateGroup() {
-		createGroupModal.hideErrorAlert();
+		createGroupModal?.hideErrorAlert();
 		newGroupNameError = '';
 		creatingGroup = true;
 
@@ -46,14 +46,14 @@
 		if (response.ok) {
 			newGroupName = '';
 			groups = [...groups, result];
-			createGroupModal.hide();
+			createGroupModal?.hide();
 			goto(`/v2/admin/groups/${result.id}/edit`);
 		} else {
 			const error = getFieldValidationError(result, response.status);
 			if (error) {
 				newGroupNameError = error;
 			} else {
-				createGroupModal.displayErrorAlert(result);
+				createGroupModal?.displayErrorAlert(result);
 			}
 		}
 	}
@@ -126,42 +126,36 @@
 
 <Modal id="createGroupModal" bind:this={createGroupModal} centered={true}>
 	{#snippet header()}
-	
-			<h1 class="modal-title fs-5">Create new group</h1>
-		
+		<h1 class="modal-title fs-5">Create new group</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-createGroupModal"></div>
-			<form class="row" onsubmit={preventDefault(handleCreateGroup)} id="create-group-form">
-				<div class="row mb-3">
-					<label for="groupName" class="col-md-3 col-form-label">Group name</label>
-					<div class="col-md-9">
-						<input
-							id="groupName"
-							type="text"
-							bind:value={newGroupName}
-							class="form-control"
-							class:is-invalid={newGroupNameError}
-							required
-						/>
-						{#if newGroupNameError}
-							<div class="invalid-feedback">{newGroupNameError}</div>
-						{/if}
-					</div>
+		<div id="errorAlert-createGroupModal"></div>
+		<form class="row" onsubmit={preventDefault(handleCreateGroup)} id="create-group-form">
+			<div class="row mb-3">
+				<label for="groupName" class="col-md-3 col-form-label">Group name</label>
+				<div class="col-md-9">
+					<input
+						id="groupName"
+						type="text"
+						bind:value={newGroupName}
+						class="form-control"
+						class:is-invalid={newGroupNameError}
+						required
+					/>
+					{#if newGroupNameError}
+						<div class="invalid-feedback">{newGroupNameError}</div>
+					{/if}
 				</div>
-			</form>
-		
+			</div>
+		</form>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" form="create-group-form" disabled={creatingGroup}>
-				{#if creatingGroup}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Create
-			</button>
-		
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button class="btn btn-primary" form="create-group-form" disabled={creatingGroup}>
+			{#if creatingGroup}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Create
+		</button>
 	{/snippet}
 </Modal>

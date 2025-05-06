@@ -2,7 +2,6 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').DatasetV2} dataset
@@ -11,7 +10,7 @@
 	/** @type {Props} */
 	let { dataset } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/** @type {Array<import('fractal-components/types/api').HistoryItemV2>} */
@@ -19,7 +18,7 @@
 	let loading = $state(false);
 
 	async function onOpen() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		loading = true;
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/history`,
@@ -31,13 +30,13 @@
 		if (response.ok) {
 			history = await response.json();
 		} else {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 		loading = false;
 	}
 
 	function onClose() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		history = [];
 	}
 
@@ -82,46 +81,42 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-	
-			<h5 class="modal-title">Dataset history</h5>
-		
+		<h5 class="modal-title">Dataset history</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-datasetHistoryModal"></div>
-			{#if history && Object.keys(history).length > 0}
-				<div class="accordion" id="accordion-dataset-history">
-					{#each history as value, index}
-						<div class="accordion-item">
-							<h2 class="accordion-header">
-								<button
-									class="accordion-button collapsed"
-									type="button"
-									data-bs-toggle="collapse"
-									data-bs-target="#collapse-dataset-history-{index}"
-									aria-expanded="false"
-									aria-controls="collapse-dataset-history-{index}"
-								>
-									Task "{value.workflowtask_dump.task.name}" - {value.timestamp_started}
-								</button>
-							</h2>
-							<div
-								id="collapse-dataset-history-{index}"
-								class="accordion-collapse collapse"
-								data-bs-parent="#accordion-dataset-history"
+		<div id="errorAlert-datasetHistoryModal"></div>
+		{#if history && Object.keys(history).length > 0}
+			<div class="accordion" id="accordion-dataset-history">
+				{#each history as value, index}
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapse-dataset-history-{index}"
+								aria-expanded="false"
+								aria-controls="collapse-dataset-history-{index}"
 							>
-								<div class="accordion-body">
-									<code><pre>{formatDatasetHistory(value)}</pre></code>
-								</div>
+								Task "{value.workflowtask_dump.task.name}" - {value.timestamp_started}
+							</button>
+						</h2>
+						<div
+							id="collapse-dataset-history-{index}"
+							class="accordion-collapse collapse"
+							data-bs-parent="#accordion-dataset-history"
+						>
+							<div class="accordion-body">
+								<code><pre>{formatDatasetHistory(value)}</pre></code>
 							</div>
 						</div>
-					{/each}
-				</div>
-			{:else if !loading}
-				<p>No history</p>
-			{:else}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-			{/if}
-		
+					</div>
+				{/each}
+			</div>
+		{:else if !loading}
+			<p>No history</p>
+		{:else}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+		{/if}
 	{/snippet}
 </Modal>

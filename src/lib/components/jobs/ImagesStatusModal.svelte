@@ -16,14 +16,14 @@
 	let imagePage = $state(null);
 	let loading = $state(false);
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
+	/** @type {import('fractal-components/types/api').DatasetV2|undefined} */
 	let dataset = $state();
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let workflowTask = $state();
 	/** @type {{ [key: string]: boolean }} */
 	let frozenTypes = $state({});
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	let loadingLogs = $state(false);
@@ -32,7 +32,7 @@
 	let logParts = $state([]);
 	let loadedLogsStatus = $state('');
 
-	/** @type {DatasetImagesTable} */
+	/** @type {DatasetImagesTable|undefined} */
 	let datasetImagesTable = $state();
 
 	/**
@@ -51,10 +51,10 @@
 			...workflowTask.type_filters,
 			...workflowTask.task.input_types
 		};
-		modal.show();
+		modal?.show();
 		await loadImages();
 		await tick();
-		await datasetImagesTable.load();
+		await datasetImagesTable?.load();
 	}
 
 	function onClose() {
@@ -65,7 +65,7 @@
 		loading = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const url = `/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}&page=1&page_size=10`;
+		const url = `/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}&page=1&page_size=10`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
@@ -75,7 +75,7 @@
 		});
 		if (!response.ok) {
 			loading = false;
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			return;
 		}
 		imagePage = await response.json();
@@ -91,17 +91,17 @@
 		loadingLogs = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/v2/project/${dataset.project_id}/status/image-log`, {
+		const response = await fetch(`/api/v2/project/${dataset?.project_id}/status/image-log`, {
 			method: 'POST',
 			headers,
 			body: JSON.stringify({
-				workflowtask_id: workflowTask.id,
-				dataset_id: dataset.id,
+				workflowtask_id: workflowTask?.id,
+				dataset_id: dataset?.id,
 				zarr_url: zarrUrl
 			})
 		});
 		if (!response.ok) {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			loadingLogs = false;
 			return;
 		}
@@ -123,62 +123,59 @@
 
 <Modal id="imagesStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
 	{#snippet header()}
-	
-			<h1 class="modal-title fs-5">
-				{#if selectedLogImage && !loadingLogs}
-					Logs for {selectedLogImage}
-				{:else}
-					Images
-				{/if}
-			</h1>
-		
+		<h1 class="modal-title fs-5">
+			{#if selectedLogImage && !loadingLogs}
+				Logs for {selectedLogImage}
+			{:else}
+				Images
+			{/if}
+		</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-imagesStatusModal" class="mb-2"></div>
-			{#if loading && !imagePage}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-			{:else if selectedLogImage && !loadingLogs}
-				<div class="row">
-					<div class="col">
-						<div class="ps-3 pe-3">
-							<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
-						</div>
+		<div id="errorAlert-imagesStatusModal" class="mb-2"></div>
+		{#if loading && !imagePage}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+		{:else if selectedLogImage && !loadingLogs}
+			<div class="row">
+				<div class="col">
+					<div class="ps-3 pe-3">
+						<ExpandableLog bind:logParts highlight={loadedLogsStatus === 'failed'} />
 					</div>
 				</div>
-				<div class="row">
-					<div class="col">
-						<button class="m-2 ms-3 btn btn-primary" onclick={back}> Back </button>
-					</div>
-				</div>
-			{/if}
-			<div class:d-none={selectedLogImage || loadingLogs}>
-				{#if imagePage}
-					<DatasetImagesTable
-						bind:this={datasetImagesTable}
-						{dataset}
-						bind:imagePage
-						{vizarrViewerUrl}
-						disabledTypes={Object.keys(frozenTypes)}
-						initialFilterValues={{ attribute_filters: {}, type_filters: frozenTypes }}
-						imagesStatusModal={true}
-						imagesStatusModalUrl={`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}`}
-					>
-						{#snippet extraButtons(image)}
-							<button
-								class="btn btn-light"
-								onclick={() => loadLogs(image.zarr_url, image.status || '')}
-								disabled={image.status === null}
-							>
-								{#if loadingLogs}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-								{/if}
-								<i class="bi-list-columns-reverse"></i> Logs
-							</button>
-						{/snippet}
-					</DatasetImagesTable>
-				{/if}
 			</div>
-		
+			<div class="row">
+				<div class="col">
+					<button class="m-2 ms-3 btn btn-primary" onclick={back}> Back </button>
+				</div>
+			</div>
+		{/if}
+		<div class:d-none={selectedLogImage || loadingLogs}>
+			{#if imagePage && dataset}
+				<DatasetImagesTable
+					bind:this={datasetImagesTable}
+					{dataset}
+					bind:imagePage
+					{vizarrViewerUrl}
+					disabledTypes={Object.keys(frozenTypes)}
+					initialFilterValues={{ attribute_filters: {}, type_filters: frozenTypes }}
+					imagesStatusModal={true}
+					imagesStatusModalUrl={`/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
+				>
+					{#snippet extraButtons(image)}
+						<button
+							class="btn btn-light"
+							onclick={() => loadLogs(image.zarr_url, image.status || '')}
+							disabled={image.status === null}
+						>
+							{#if loadingLogs}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+								></span>
+							{/if}
+							<i class="bi-list-columns-reverse"></i> Logs
+						</button>
+					{/snippet}
+				</DatasetImagesTable>
+			{/if}
+		</div>
 	{/snippet}
 </Modal>

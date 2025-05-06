@@ -17,11 +17,11 @@
 	let updatedProjectName = $state('');
 	let updating = $state(false);
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let editProjectModal = $state();
 
 	async function handleProjectPropertiesUpdate() {
-		editProjectModal.confirmAndHide(
+		editProjectModal?.confirmAndHide(
 			async () => {
 				updating = true;
 				projectUpdatesSuccessMessage = '';
@@ -74,6 +74,7 @@
 				data-bs-toggle="modal"
 				data-bs-target="#editProjectModal"
 				onclick={() => (updatedProjectName = project.name)}
+				aria-label="Edit project"
 			>
 				<i class="bi-pencil"></i>
 			</button>
@@ -92,38 +93,32 @@
 	onOpen={onEditProjectModalOpen}
 >
 	{#snippet header()}
-	
-			<h5 class="modal-title">Project properties</h5>
-		
+		<h5 class="modal-title">Project properties</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-editProjectModal"></div>
-			{#if project}
-				<form id="updateProject" onsubmit={preventDefault(handleProjectPropertiesUpdate)}>
-					<div class="mb-3">
-						<label for="projectName" class="form-label">Project name</label>
-						<input
-							type="text"
-							class="form-control"
-							name="projectName"
-							id="projectName"
-							bind:value={updatedProjectName}
-							required
-						/>
-					</div>
-				</form>
-			{/if}
-		
+		<div id="errorAlert-editProjectModal"></div>
+		{#if project}
+			<form id="updateProject" onsubmit={preventDefault(handleProjectPropertiesUpdate)}>
+				<div class="mb-3">
+					<label for="projectName" class="form-label">Project name</label>
+					<input
+						type="text"
+						class="form-control"
+						name="projectName"
+						id="projectName"
+						bind:value={updatedProjectName}
+						required
+					/>
+				</div>
+			</form>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-primary" form="updateProject" disabled={updating}>
-				{#if updating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Save
-			</button>
-		
+		<button class="btn btn-primary" form="updateProject" disabled={updating}>
+			{#if updating}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Save
+		</button>
 	{/snippet}
 </Modal>

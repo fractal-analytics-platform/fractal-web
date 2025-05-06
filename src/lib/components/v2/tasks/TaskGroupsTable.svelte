@@ -10,10 +10,6 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User} user
@@ -23,22 +19,17 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		user,
-		taskGroups,
-		expandedTaskGroupRow = $bindable(),
-		updateTaskGroups
-	} = $props();
+	let { user, taskGroups, expandedTaskGroupRow = $bindable(), updateTaskGroups } = $props();
 
-	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default|undefined} */
 	let taskGroupInfoModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
 	let taskGroupEditModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default|undefined} */
 	let taskInfoModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default|undefined} */
 	let taskEditModal = $state();
 
 	/**
@@ -196,7 +187,7 @@
 					<button
 						class="btn btn-light"
 						onclick={() =>
-							taskGroupInfoModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+							taskGroupInfoModal?.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
 						<i class="bi bi-info-circle"></i>
 						Info
@@ -204,7 +195,7 @@
 					<button
 						class="btn btn-primary"
 						onclick={() =>
-							taskGroupEditModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+							taskGroupEditModal?.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
 						<i class="bi bi-pencil"></i>
 						Edit
@@ -212,7 +203,7 @@
 					<button
 						class="btn btn-info"
 						onclick={() =>
-							taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+							taskGroupManageModal?.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
 						<i class="bi bi-gear"></i>
 						Manage
@@ -246,7 +237,7 @@
 							<button
 								class="btn btn-light"
 								onclick={() => {
-									taskInfoModal.open(task, taskGroupRow.selectedVersion);
+									taskInfoModal?.open(task, taskGroupRow.selectedVersion);
 								}}
 							>
 								<i class="bi bi-info-circle"></i>
@@ -255,7 +246,7 @@
 							<button
 								class="btn btn-primary"
 								onclick={() => {
-									taskEditModal.open(task);
+									taskEditModal?.open(task);
 								}}
 							>
 								<i class="bi bi-pencil"></i>

@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `<button>` cannot be a descendant of `<button>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
-https://svelte.dev/e/node_invalid_placement -->
 <script>
 	import FormBaseEntry from './FormBaseEntry.svelte';
 
@@ -24,9 +22,8 @@ https://svelte.dev/e/node_invalid_placement -->
 	<div class="accordion mb-2" id="accordion-{entry.id}">
 		<div class="accordion-item">
 			<h2 class="accordion-header">
-				<button
+				<div
 					class="accordion-button collapsed ps-1 pt-1 pb-1"
-					type="button"
 					data-bs-toggle="collapse"
 					data-bs-target="#collapse-{entry.id}"
 					aria-expanded="false"
@@ -42,20 +39,20 @@ https://svelte.dev/e/node_invalid_placement -->
 								bind:value={entry.key}
 								data-bs-toggle="collapse"
 								data-bs-target=""
-								on:input={triggerChanges}
+								oninput={triggerChanges}
 								disabled={!editable}
 							/>
 						{/if}
 						<button
 							class="btn btn-outline-danger"
 							type="button"
-							on:click={() => removeProperty(parent, index)}
+							onclick={() => removeProperty(parent, index)}
 							aria-label="Remove property"
 							data-bs-toggle="collapse"
 							data-bs-target=""
 							disabled={!editable}
 						>
-							<i class="bi bi-trash" />
+							<i class="bi bi-trash"></i>
 						</button>
 						{#if entry.error}
 							<div class="invalid-feedback">{entry.error}</div>
@@ -66,7 +63,7 @@ https://svelte.dev/e/node_invalid_placement -->
 					{:else}
 						(list)
 					{/if}
-				</button>
+				</div>
 			</h2>
 			<div
 				id="collapse-{entry.id}"
@@ -108,7 +105,7 @@ https://svelte.dev/e/node_invalid_placement -->
 						<div class="d-flex justify-content-center align-items-center mt-3">
 							<button
 								class="btn btn-secondary"
-								on:click={() => {
+								onclick={() => {
 									if ('children' in entry) {
 										addProperty(entry.children, entry.type === 'object');
 									}

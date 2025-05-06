@@ -11,7 +11,7 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), editable = true } = $props();
 
-	/** @type {HTMLInputElement} */
+	/** @type {HTMLInputElement|undefined} */
 	let field = $state();
 	let validationError = $state('');
 
@@ -22,6 +22,9 @@
 
 	function validate() {
 		validationError = '';
+		if (!field) {
+			return;
+		}
 		formElement.badInput = field.validity.badInput;
 		if (formElement.badInput) {
 			validationError = 'Should be a number';

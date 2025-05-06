@@ -7,8 +7,7 @@
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
 
 	// The list of workflows
-	
-	
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
@@ -20,11 +19,11 @@
 
 	let workflowSearch = $state('');
 
-	let filteredWorkflows = $derived(workflows.filter((p) =>
-		p.name.toLowerCase().includes(workflowSearch.toLowerCase())
-	));
+	let filteredWorkflows = $derived(
+		workflows.filter((p) => p.name.toLowerCase().includes(workflowSearch.toLowerCase()))
+	);
 
-	/** @type {CreateWorkflowModal} */
+	/** @type {CreateWorkflowModal|undefined} */
 	let createWorkflowModal = $state();
 
 	/**
@@ -87,7 +86,7 @@
 					class="btn btn-primary float-end"
 					type="submit"
 					onclick={() => {
-						createWorkflowModal.show();
+						createWorkflowModal?.show();
 					}}
 				>
 					Create new workflow

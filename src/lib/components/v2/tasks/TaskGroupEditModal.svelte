@@ -4,8 +4,6 @@
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
@@ -15,14 +13,15 @@
 	/** @type {Props} */
 	let { groupIdsNames, updateEditedTaskGroup } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
-	let taskGroup = $state(undefined);
+	let taskGroup = $state();
 
 	let privateTask = $state(false);
-	let selectedGroup = $state(null);
+	/** @type {number|undefined} */
+	let selectedGroup = $state();
 
 	let saving = $state(false);
 
@@ -38,11 +37,11 @@
 		privateTask = taskGroupToEdit.user_group_id === null;
 		selectedGroup = taskGroupToEdit.user_group_id;
 		formErrorHandler.clearErrors();
-		modal.show();
+		modal?.show();
 	}
 
 	async function handleUpdate() {
-		modal.confirmAndHide(
+		modal?.confirmAndHide(
 			async () => {
 				saving = true;
 
@@ -75,45 +74,39 @@
 
 <Modal id="taskGroupEditModal" bind:this={modal} size="lg">
 	{#snippet header()}
-	
-			{#if taskGroup}
-				<h1 class="h5 modal-title">
-					Task group {taskGroup.pkg_name}
-					(version {taskGroup.version ? taskGroup.version : 'None'})
-				</h1>
-			{/if}
-		
+		{#if taskGroup}
+			<h1 class="h5 modal-title">
+				Task group {taskGroup.pkg_name}
+				(version {taskGroup.version ? taskGroup.version : 'None'})
+			</h1>
+		{/if}
 	{/snippet}
 	{#snippet body()}
-	
-			{#if taskGroup}
-				<div class="mb-2 row">
-					<div class="col">
-						{#key taskGroup}
-							<TaskGroupSelector
-								id="edit-{taskGroup.id}"
-								{groupIdsNames}
-								bind:privateTask
-								bind:selectedGroup
-								wrapperClass="mb-1"
-							/>
-						{/key}
-						<span class="invalid-feedback">{$validationErrors['user_group_id']}</span>
-					</div>
+		{#if taskGroup}
+			<div class="mb-2 row">
+				<div class="col">
+					{#key taskGroup}
+						<TaskGroupSelector
+							id="edit-{taskGroup.id}"
+							{groupIdsNames}
+							bind:privateTask
+							bind:selectedGroup
+							wrapperClass="mb-1"
+						/>
+					{/key}
+					<span class="invalid-feedback">{$validationErrors['user_group_id']}</span>
 				</div>
-				<span id="taskGroupUpdateError"></span>
-			{/if}
-		
+			</div>
+			<span id="taskGroupUpdateError"></span>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-primary" onclick={handleUpdate} disabled={saving}>
-				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Update
-			</button>
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		
+		<button class="btn btn-primary" onclick={handleUpdate} disabled={saving}>
+			{#if saving}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Update
+		</button>
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	{/snippet}
 </Modal>

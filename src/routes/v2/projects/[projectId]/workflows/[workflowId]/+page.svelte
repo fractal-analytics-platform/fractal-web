@@ -48,7 +48,7 @@
 	let jobError = $state('');
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let failedJob;
-	/** @type {JobLogsModal} */
+	/** @type {JobLogsModal|undefined} */
 	let jobLogsModal = $state();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -67,9 +67,9 @@
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated[]} */
 	let historyRunStatuses = $state([]);
 	let loadingHistoryRunStatuses = $state(false);
-	/** @type {ImagesStatusModal} */
+	/** @type {ImagesStatusModal|undefined} */
 	let imagesStatusModal = $state();
-	/** @type {RunStatusModal} */
+	/** @type {RunStatusModal|undefined} */
 	let runStatusModal = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
 	let selectedHistoryRun = $state(undefined);
@@ -88,21 +88,21 @@
 	let updatedWorkflowName = $state('');
 
 	// Modals
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let argsUnsavedChangesModal = $state();
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let filtersUnsavedChangesModal = $state();
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let metaPropertiesUnsavedChangesModal = $state();
-	/** @type {RunWorkflowModal} */
+	/** @type {RunWorkflowModal|undefined} */
 	let runWorkflowModal = $state();
-	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
+	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default|undefined} */
 	let editTasksOrderModal = $state();
-	/** @type {AddWorkflowTaskModal} */
+	/** @type {AddWorkflowTaskModal|undefined} */
 	let addWorkflowTaskModal = $state();
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let editWorkflowModal = $state();
-	/** @type {TypeFiltersFlowModal} */
+	/** @type {TypeFiltersFlowModal|undefined} */
 	let typeFiltersFlowModal = $state();
 
 	/** @type {{ [id: string]: import('fractal-components/types/api').TaskV2[] }} */
@@ -116,7 +116,9 @@
 
 	let updatableWorkflowList = $derived(workflow.task_list || []);
 
-	let sortedDatasets = $derived(datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)));
+	let sortedDatasets = $derived(
+		datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+	);
 
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
@@ -220,7 +222,7 @@
 	 * @returns {Promise<void>}
 	 */
 	async function handleWorkflowUpdate() {
-		editWorkflowModal.confirmAndHide(
+		editWorkflowModal?.confirmAndHide(
 			async () => {
 				workflowSuccessMessage = '';
 				if (!workflow) {
@@ -377,15 +379,15 @@
 	}
 
 	function toggleArgsUnsavedChangesModal() {
-		argsUnsavedChangesModal.toggle();
+		argsUnsavedChangesModal?.toggle();
 	}
 
 	function toggleFiltersUnsavedChangesModal() {
-		filtersUnsavedChangesModal.toggle();
+		filtersUnsavedChangesModal?.toggle();
 	}
 
 	function toggleMetaPropertiesUnsavedChangesModal() {
-		metaPropertiesUnsavedChangesModal.toggle();
+		metaPropertiesUnsavedChangesModal?.toggle();
 	}
 
 	/**
@@ -401,7 +403,7 @@
 		} else {
 			await reloadSelectedDataset();
 			await tick();
-			runWorkflowModal.open(action);
+			runWorkflowModal?.open(action);
 		}
 	}
 
@@ -472,7 +474,9 @@
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = $state({});
 
-	let hasAnyJobRun = $derived(Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0);
+	let hasAnyJobRun = $derived(
+		Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0
+	);
 
 	/** @type {number|undefined} */
 	let statusWatcherTimer;
@@ -578,7 +582,7 @@
 		if (!failedJob) {
 			return;
 		}
-		jobLogsModal.show(failedJob, false);
+		jobLogsModal?.show(failedJob, false);
 	}
 
 	/**
@@ -737,7 +741,7 @@
 				{#if $page.data.userInfo.is_superuser}
 					<button
 						class="btn btn-light"
-						onclick={preventDefault(() => typeFiltersFlowModal.open())}
+						onclick={preventDefault(() => typeFiltersFlowModal?.open())}
 						disabled={workflow.task_list.length === 0}
 					>
 						Type filters flow
@@ -759,6 +763,7 @@
 					data-bs-toggle="modal"
 					data-bs-target="#editWorkflowModal"
 					onclick={resetWorkflowUpdateModal}
+					aria-label="Edit workflow"
 				>
 					<i class="bi-pencil"></i>
 				</button>
@@ -806,7 +811,7 @@
 									aria-label="Add task to workflow"
 									onclick={() => {
 										workflowSuccessMessage = '';
-										addWorkflowTaskModal.show();
+										addWorkflowTaskModal?.show();
 									}}
 								>
 									<i class="bi-plus-lg"></i>
@@ -814,7 +819,7 @@
 								<button
 									class="btn btn-light"
 									aria-label="Edit tasks order"
-									onclick={() => editTasksOrderModal.show(updatableWorkflowList)}
+									onclick={() => editTasksOrderModal?.show(updatableWorkflowList)}
 								>
 									<i class="bi-arrow-down-up"></i>
 								</button>
@@ -866,7 +871,7 @@
 										{#if selectedDataset}
 											{#if isLegacy}
 												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
-											{:else}
+											{:else if imagesStatusModal}
 												<ImagesStatus
 													status={statuses[workflowTask.id]}
 													dataset={selectedDataset}
@@ -898,7 +903,7 @@
 										>
 											Run {index + 1}
 											<span class="float-end ps-2">
-												{#if selectedDataset}
+												{#if selectedDataset && runStatusModal}
 													<RunStatus
 														run={status}
 														index={index + 1}
@@ -1086,38 +1091,32 @@
 
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
 	{#snippet header()}
-	
-			<h5 class="modal-title">Workflow properties</h5>
-		
+		<h5 class="modal-title">Workflow properties</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-editWorkflowModal"></div>
-			{#if workflow}
-				<form id="updateWorkflow" onsubmit={preventDefault(handleWorkflowUpdate)}>
-					<div class="mb-3">
-						<label for="workflowName" class="form-label">Workflow name</label>
-						<input
-							type="text"
-							class="form-control"
-							name="workflowName"
-							id="workflowName"
-							bind:value={updatedWorkflowName}
-						/>
-					</div>
-				</form>
-			{/if}
-		
+		<div id="errorAlert-editWorkflowModal"></div>
+		{#if workflow}
+			<form id="updateWorkflow" onsubmit={preventDefault(handleWorkflowUpdate)}>
+				<div class="mb-3">
+					<label for="workflowName" class="form-label">Workflow name</label>
+					<input
+						type="text"
+						class="form-control"
+						name="workflowName"
+						id="workflowName"
+						bind:value={updatedWorkflowName}
+					/>
+				</div>
+			</form>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-primary" form="updateWorkflow" disabled={workflowUpdating}>
-				{#if workflowUpdating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Save
-			</button>
-		
+		<button class="btn btn-primary" form="updateWorkflow" disabled={workflowUpdating}>
+			{#if workflowUpdating}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Save
+		</button>
 	{/snippet}
 </Modal>
 
@@ -1144,128 +1143,110 @@
 
 <Modal id="args-changes-unsaved-dialog" bind:this={argsUnsavedChangesModal}>
 	{#snippet header()}
-	
-			<h5 class="modal-title">There are argument changes unsaved</h5>
-		
+		<h5 class="modal-title">There are argument changes unsaved</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<p>
-				Do you want to save the changes made to the arguments of the current selected workflow task?
-			</p>
-		
+		<p>
+			Do you want to save the changes made to the arguments of the current selected workflow task?
+		</p>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button
-				type="button"
-				class="btn btn-warning"
-				onclick={async () => {
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-warning"
+			onclick={async () => {
 				argsSchemaForm?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
 				await selectHistoryRun(preventedHistoryRunChange);
-				argsUnsavedChangesModal.hide();
+				argsUnsavedChangesModal?.hide();
 			}}
-			>
-				Discard changes
-			</button>
-			<button
-				type="button"
-				class="btn btn-success"
-				onclick={async () => {
+		>
+			Discard changes
+		</button>
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick={async () => {
 				await argsSchemaForm?.saveChanges();
-				argsUnsavedChangesModal.hide();
+				argsUnsavedChangesModal?.hide();
 			}}
-			>
-				Save changes
-			</button>
-		
+		>
+			Save changes
+		</button>
 	{/snippet}
 </Modal>
 
 <Modal id="filters-changes-unsaved-dialog" bind:this={filtersUnsavedChangesModal}>
 	{#snippet header()}
-	
-			<h5 class="modal-title">There are filter changes unsaved</h5>
-		
+		<h5 class="modal-title">There are filter changes unsaved</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<p>
-				Do you want to save the changes made to the filters of the current selected workflow task?
-			</p>
-		
+		<p>
+			Do you want to save the changes made to the filters of the current selected workflow task?
+		</p>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button
-				type="button"
-				class="btn btn-warning"
-				onclick={async () => {
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-warning"
+			onclick={async () => {
 				inputFiltersTab?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
 				await selectHistoryRun(preventedHistoryRunChange);
-				filtersUnsavedChangesModal.hide();
+				filtersUnsavedChangesModal?.hide();
 			}}
-			>
-				Discard changes
-			</button>
-			<button
-				type="button"
-				class="btn btn-success"
-				onclick={async () => {
+		>
+			Discard changes
+		</button>
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick={async () => {
 				await inputFiltersTab?.save();
-				filtersUnsavedChangesModal.hide();
+				filtersUnsavedChangesModal?.hide();
 			}}
-			>
-				Save changes
-			</button>
-		
+		>
+			Save changes
+		</button>
 	{/snippet}
 </Modal>
 
 <Modal id="meta-properties-changes-unsaved-dialog" bind:this={metaPropertiesUnsavedChangesModal}>
 	{#snippet header()}
-	
-			<h5 class="modal-title">There are meta properties changes unsaved</h5>
-		
+		<h5 class="modal-title">There are meta properties changes unsaved</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<p>
-				Do you want to save the changes made to the meta properties of the current selected workflow
-				task?
-			</p>
-		
+		<p>
+			Do you want to save the changes made to the meta properties of the current selected workflow
+			task?
+		</p>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button
-				type="button"
-				class="btn btn-warning"
-				onclick={async () => {
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			type="button"
+			class="btn btn-warning"
+			onclick={async () => {
 				metaPropertiesForm?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
 				await selectHistoryRun(preventedHistoryRunChange);
-				metaPropertiesUnsavedChangesModal.hide();
+				metaPropertiesUnsavedChangesModal?.hide();
 			}}
-			>
-				Discard changes
-			</button>
-			<button
-				type="button"
-				class="btn btn-success"
-				onclick={async () => {
+		>
+			Discard changes
+		</button>
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick={async () => {
 				await metaPropertiesForm?.saveChanges();
-				metaPropertiesUnsavedChangesModal.hide();
+				metaPropertiesUnsavedChangesModal?.hide();
 			}}
-			>
-				Save changes
-			</button>
-		
+		>
+			Save changes
+		</button>
 	{/snippet}
 </Modal>
 

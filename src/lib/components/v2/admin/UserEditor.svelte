@@ -17,11 +17,6 @@
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
 	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 
-	
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
@@ -43,7 +38,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	let originalUser = $state();
 	let userPendingChanges = $state(false);
 
@@ -51,16 +46,11 @@
 	let userSettingsEditor = $state();
 	let settingsPendingChanges = $state();
 
-	/** @type {UserSettingsImportModal} */
+	/** @type {UserSettingsImportModal|undefined} */
 	let userSettingsImportModal = $state();
 
 	/** @type {Array<import('fractal-components/types/api').Group>} */
 	let userGroups = $state([]);
-
-
-
-
-
 
 	let password = $state('');
 	let confirmPassword = $state('');
@@ -78,7 +68,7 @@
 
 	const userValidationErrors = userFormErrorHandler.getValidationErrorStore();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let confirmSuperuserChange = $state();
 
 	async function handleSave() {
@@ -91,10 +81,10 @@
 			if (Object.keys($userValidationErrors).length > 0) {
 				return;
 			}
-			if (user.is_superuser === originalUser.is_superuser) {
+			if (user.is_superuser === originalUser?.is_superuser) {
 				await confirmSave();
 			} else {
-				confirmSuperuserChange.show();
+				confirmSuperuserChange?.show();
 			}
 		} finally {
 			saving = false;
@@ -103,7 +93,7 @@
 
 	async function confirmSave() {
 		saving = true;
-		confirmSuperuserChange.hide();
+		confirmSuperuserChange?.hide();
 		try {
 			let existing = !!user.id;
 			const groupsSuccess = await setGroups();
@@ -164,7 +154,7 @@
 		}
 	}
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let addGroupModal = $state();
 	/** @type {SlimSelect|undefined} */
 	let groupsSelector;
@@ -176,7 +166,7 @@
 		selectedGroupIdsToAdd = [];
 		addGroupError = '';
 		setSlimSelectOptions(groupsSelector, getGroupSlimSelectOptions());
-		addGroupModal.show();
+		addGroupModal?.show();
 	}
 
 	function getGroupSlimSelectOptions() {
@@ -199,7 +189,7 @@
 
 		userGroups = newUserGroups;
 		selectedGroupIdsToAdd = [];
-		addGroupModal.hide();
+		addGroupModal?.hide();
 	}
 
 	/**
@@ -307,27 +297,33 @@
 	function onSettingsImported(importedSettings) {
 		settings = importedSettings;
 	}
-	let addedGroups = $derived(userGroups.filter(
-		(g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id)
-	));
-	let removedGroups = $derived(user.group_ids_names
-		.map((ni) => ni[0])
-		.filter((gi) => !userGroups.map((ug) => ug.id).includes(gi)));
-	let availableGroups = $derived(groups
-		.filter((g) => !userGroups.map((ug) => ug.id).includes(g.id))
-		.sort(sortGroupByNameAllFirstComparator));
+	let addedGroups = $derived(
+		userGroups.filter((g) => !user.group_ids_names.map((ni) => ni[0]).includes(g.id))
+	);
+	let removedGroups = $derived(
+		user.group_ids_names
+			.map((ni) => ni[0])
+			.filter((gi) => !userGroups.map((ug) => ug.id).includes(gi))
+	);
+	let availableGroups = $derived(
+		groups
+			.filter((g) => !userGroups.map((ug) => ug.id).includes(g.id))
+			.sort(sortGroupByNameAllFirstComparator)
+	);
 	run(() => {
 		if (user) {
-			userPendingChanges = JSON.stringify(originalUser) !== JSON.stringify(nullifyEmptyStrings(user));
+			userPendingChanges =
+				JSON.stringify(originalUser) !== JSON.stringify(nullifyEmptyStrings(user));
 		}
 	});
-	let enableSave =
-		$derived(!saving &&
-		(userPendingChanges ||
-			settingsPendingChanges ||
-			addedGroups.length > 0 ||
-			removedGroups.length > 0 ||
-			password));
+	let enableSave = $derived(
+		!saving &&
+			(userPendingChanges ||
+				settingsPendingChanges ||
+				addedGroups.length > 0 ||
+				removedGroups.length > 0 ||
+				password)
+	);
 </script>
 
 <div class="row">
@@ -446,9 +442,7 @@
 					class:is-invalid={userFormSubmitted && $userValidationErrors['username']}
 					bind:value={user.username}
 				/>
-				<span class="form-text">
-					Optional property
-				</span>
+				<span class="form-text"> Optional property </span>
 				<span class="invalid-feedback">{$userValidationErrors['username']}</span>
 			</div>
 		</div>
@@ -498,7 +492,7 @@
 						<button
 							class="btn btn-primary float-end mb-2"
 							onclick={() =>
-								userSettingsImportModal.open(
+								userSettingsImportModal?.open(
 									userGroups.filter((g) => g.name !== 'All').map((g) => g.id)
 								)}
 						>
@@ -525,14 +519,10 @@
 				<div class="col-sm-9 offset-sm-3">
 					<StandardDismissableAlert message={userUpdatedMessage} />
 					<div id="genericUserError"></div>
-					<button
-						type="button"
-						onclick={handleSave}
-						class="btn btn-primary"
-						disabled={!enableSave}
-					>
+					<button type="button" onclick={handleSave} class="btn btn-primary" disabled={!enableSave}>
 						{#if saving}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+							></span>
 						{/if}
 						Save
 					</button>
@@ -548,48 +538,37 @@
 		centered={true}
 	>
 		{#snippet header()}
-			
-				<h1 class="modal-title fs-5">Confirm action</h1>
-			
-			{/snippet}
+			<h1 class="modal-title fs-5">Confirm action</h1>
+		{/snippet}
 		{#snippet body()}
-			
-				<p>
-					Do you really want to
-					<strong>{user.is_superuser ? 'grant' : 'revoke'}</strong>
-					superuser privilege to this user?
-				</p>
-			
-			{/snippet}
+			<p>
+				Do you really want to
+				<strong>{user.is_superuser ? 'grant' : 'revoke'}</strong>
+				superuser privilege to this user?
+			</p>
+		{/snippet}
 		{#snippet footer()}
-			
-				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-				<button class="btn btn-primary" onclick={confirmSave}>Confirm</button>
-			
-			{/snippet}
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" onclick={confirmSave}>Confirm</button>
+		{/snippet}
 	</Modal>
 
 	<Modal id="addGroupModal" centered={true} bind:this={addGroupModal} focus={false}>
 		{#snippet header()}
-			
-				<h1 class="modal-title fs-5">Add group</h1>
-			
-			{/snippet}
+			<h1 class="modal-title fs-5">Add group</h1>
+		{/snippet}
 		{#snippet body()}
-			
-				<select id="group-select" class="invisible" class:border-danger={addGroupError} multiple></select>
-				{#if addGroupError}
-					<span class="text-danger">{addGroupError}</span>
-				{/if}
-				<div id="errorAlert-addGroupModal" class="mt-3"></div>
-			
-			{/snippet}
+			<select id="group-select" class="invisible" class:border-danger={addGroupError} multiple
+			></select>
+			{#if addGroupError}
+				<span class="text-danger">{addGroupError}</span>
+			{/if}
+			<div id="errorAlert-addGroupModal" class="mt-3"></div>
+		{/snippet}
 		{#snippet footer()}
-			
-				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-				<button class="btn btn-primary" onclick={addGroupToUser}> Add </button>
-			
-			{/snippet}
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			<button class="btn btn-primary" onclick={addGroupToUser}> Add </button>
+		{/snippet}
 	</Modal>
 
 	<UserSettingsImportModal

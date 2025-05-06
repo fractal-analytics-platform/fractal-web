@@ -12,7 +12,7 @@
 	/** @type {'pypi'|'local'|'single'|'custom_env'} */
 	let packageType = $state('pypi');
 
-	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default|undefined} */
 	let taskCollectionComponent = $state();
 
 	/** @type {string|undefined} */

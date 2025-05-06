@@ -7,7 +7,6 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} handleWorkflowImported
@@ -18,39 +17,40 @@
 
 	// Component properties
 	let creating = $state(false);
-	let importSuccess = $state(undefined);
+	/** @type {boolean|undefined} */
+	let importSuccess = $state();
 	let workflowName = $state('');
 
-	/** @type {FileList|null} */
-	let files = $state(null);
+	/** @type {FileList|undefined} */
+	let files = $state();
 	/** @type {HTMLInputElement|undefined} */
 	let fileInput = $state(undefined);
 
-	let workflowFileSelected = $derived(files !== null && files.length > 0);
+	let workflowFileSelected = $derived(files && files.length > 0);
 	let projectId = $derived($page.params.projectId);
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	export function show() {
-		modal.show();
+		modal?.show();
 	}
 
 	/**
 	 * Reset the form fields.
 	 */
 	export function reset() {
-		files = null;
+		files = undefined;
 		if (fileInput) {
 			fileInput.value = '';
 		}
 		workflowName = '';
 		creating = false;
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 	}
 
 	function handleImportOrCreateWorkflow() {
-		modal.confirmAndHide(
+		modal?.confirmAndHide(
 			async () => {
 				creating = true;
 				if (workflowFileSelected) {
@@ -153,57 +153,53 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-	
-			<h5 class="modal-title">Create new workflow</h5>
-		
+		<h5 class="modal-title">Create new workflow</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<form onsubmit={preventDefault(handleImportOrCreateWorkflow)}>
-				<div class="mb-2">
-					<label for="workflowName" class="form-label">Workflow name</label>
-					<input
-						id="workflowName"
-						name="workflowName"
-						type="text"
-						bind:value={workflowName}
-						class="form-control"
-					/>
-				</div>
+		<form onsubmit={preventDefault(handleImportOrCreateWorkflow)}>
+			<div class="mb-2">
+				<label for="workflowName" class="form-label">Workflow name</label>
+				<input
+					id="workflowName"
+					name="workflowName"
+					type="text"
+					bind:value={workflowName}
+					class="form-control"
+				/>
+			</div>
 
-				<div class="mb-3">
-					<label for="workflowFile" class="form-label">Import workflow from file</label>
-					<input
-						class="form-control"
-						accept="application/json"
-						type="file"
-						name="workflowFile"
-						id="workflowFile"
-						bind:this={fileInput}
-						bind:files
-					/>
-				</div>
+			<div class="mb-3">
+				<label for="workflowFile" class="form-label">Import workflow from file</label>
+				<input
+					class="form-control"
+					accept="application/json"
+					type="file"
+					name="workflowFile"
+					id="workflowFile"
+					bind:this={fileInput}
+					bind:files
+				/>
+			</div>
 
-				<div id="errorAlert-createWorkflowModal"></div>
+			<div id="errorAlert-createWorkflowModal"></div>
 
-				<button
-					class="btn btn-primary mt-2"
-					disabled={(!workflowName && !workflowFileSelected) || creating}
-				>
-					{#if creating}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-					{/if}
-					{#if workflowFileSelected}
-						Import workflow
-					{:else}
-						Create empty workflow
-					{/if}
-				</button>
-			</form>
+			<button
+				class="btn btn-primary mt-2"
+				disabled={(!workflowName && !workflowFileSelected) || creating}
+			>
+				{#if creating}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				{#if workflowFileSelected}
+					Import workflow
+				{:else}
+					Create empty workflow
+				{/if}
+			</button>
+		</form>
 
-			{#if importSuccess}
-				<p class="alert alert-primary mt-3">Workflow imported successfully</p>
-			{/if}
-		
+		{#if importSuccess}
+			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
+		{/if}
 	{/snippet}
 </Modal>

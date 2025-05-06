@@ -8,8 +8,6 @@
 	import TypesEditor from './TypesEditor.svelte';
 	import { detectSchemaVersion, SchemaValidator } from 'fractal-components';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
@@ -35,7 +33,7 @@
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
 
-	/** @type {TypesEditor} */
+	/** @type {TypesEditor|undefined} */
 	let typesEditor = $state();
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-createTask', [
@@ -87,7 +85,7 @@
 			formErrorHandler.addValidationError('meta_parallel', metaParallel.message);
 		}
 
-		const typesValid = typesEditor.validate();
+		const typesValid = typesEditor?.validate();
 
 		if (Object.keys($validationErrors).length > 0 || !typesValid) {
 			return;
@@ -101,8 +99,8 @@
 			command_non_parallel,
 			command_parallel,
 			version,
-			input_types: typesEditor.getInputTypes(),
-			output_types: typesEditor.getOutputTypes(),
+			input_types: typesEditor?.getInputTypes(),
+			output_types: typesEditor?.getOutputTypes(),
 			docs_info,
 			docs_link
 		};
@@ -323,7 +321,7 @@
 		command_non_parallel = '';
 		command_parallel = '';
 		version = '';
-		typesEditor.init({}, {});
+		typesEditor?.init({}, {});
 		docs_info = '';
 		docs_link = '';
 		args_schema_version = 'pydantic_v2';

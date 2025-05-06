@@ -35,14 +35,14 @@
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	let results = $state([]);
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let infoModal = $state();
 	/** @type {import('fractal-components/types/api').TaskGroupV2|null} */
 	let selectedTaskGroup = $state(null);
 
-	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
 	let taskGroupEditModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
 
 	async function searchTaskGroups() {
@@ -117,7 +117,7 @@
 	 */
 	function openInfoModal(taskGroup) {
 		selectedTaskGroup = taskGroup;
-		infoModal.show();
+		infoModal?.show();
 	}
 
 	function onInfoModalClose() {
@@ -361,11 +361,11 @@
 									<i class="bi bi-info-circle"></i>
 									Info
 								</button>
-								<button class="btn btn-primary" onclick={() => taskGroupEditModal.open(taskGroup)}>
+								<button class="btn btn-primary" onclick={() => taskGroupEditModal?.open(taskGroup)}>
 									<i class="bi bi-pencil"></i>
 									Edit
 								</button>
-								<button class="btn btn-info" onclick={() => taskGroupManageModal.open(taskGroup)}>
+								<button class="btn btn-info" onclick={() => taskGroupManageModal?.open(taskGroup)}>
 									<i class="bi bi-gear"></i>
 									Manage
 								</button>

@@ -1,9 +1,6 @@
 <script>
 	import { run } from 'svelte/legacy';
 
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('@vincjo/datatables').DataHandler} handler
@@ -15,10 +12,14 @@
 	let { handler, key, label } = $props();
 	let filterLabel = $state(label);
 
-	/** @type {import('svelte/store').Writable<{ identifier?: string, direction?: 'asc' | 'desc' }>} */
+	/** @type {import('svelte/store').Writable<{ identifier?: string, direction?: 'asc' | 'desc' }> | undefined} */
 	let sorted = $state();
+
 	run(() => {
 		sorted = handler.getSort();
+		if (!$sorted) {
+			return;
+		}
 		if ($sorted.identifier === key) {
 			if ($sorted.direction === 'asc') {
 				filterLabel = label + '&nbsp;↑';

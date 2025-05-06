@@ -4,10 +4,6 @@
 	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	
-	
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {number} projectId
@@ -18,7 +14,7 @@
 	/** @type {Props} */
 	let { projectId, workflow, workflowUpdater } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let editWorkflowTasksOrderModal = $state();
 
 	/** @type {{id: number, name: string}[]} */
@@ -35,7 +31,7 @@
 			id: wt.id,
 			name: wt.task.name
 		}));
-		editWorkflowTasksOrderModal.show();
+		editWorkflowTasksOrderModal?.show();
 	}
 
 	/**
@@ -95,10 +91,10 @@
 		if (response.ok) {
 			console.log('Workflow task order updated');
 			workflowUpdater(result);
-			editWorkflowTasksOrderModal.toggle();
+			editWorkflowTasksOrderModal?.toggle();
 		} else {
 			console.error('Workflow task order not updated', result);
-			editWorkflowTasksOrderModal.displayErrorAlert(result);
+			editWorkflowTasksOrderModal?.displayErrorAlert(result);
 		}
 	}
 
@@ -178,56 +174,50 @@
 
 <Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
 	{#snippet header()}
-	
-			<h5 class="modal-title">Edit workflow tasks order</h5>
-		
+		<h5 class="modal-title">Edit workflow tasks order</h5>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-editWorkflowTasksOrderModal"></div>
-			{#if workflow !== undefined && editableTasksList.length == 0}
-				<p class="text-center mt-3">No workflow tasks yet, add one.</p>
-			{:else if workflow !== undefined}
-				<div class="fw-light mb-3">Sort the elements by dragging them to the desired position.</div>
-				<div
-					id="workflow-tasks-order"
-					role="region"
-					tabindex="-1"
-					ondragover={handleDragOver}
-					ondrop={handleDragEnd}
-				>
-					{#each editableTasksList as workflowTask, i}
-						<div
-							class="btn w-100 mt-2 border border-secondary btn-draggable"
-							data-fs-target={workflowTask.id}
-							draggable={true}
-							role="button"
-							tabindex="0"
-							class:active={draggedWftIndex === i}
-							class:dragged={workflowTask.id === draggedWftId}
-							ondragstart={(event) => handleDragStart(workflowTask.id, i, event)}
-							ondragend={handleDragEnd}
-						>
-							{workflowTask.name}
-						</div>
-					{/each}
-				</div>
-			{/if}
-		
+		<div id="errorAlert-editWorkflowTasksOrderModal"></div>
+		{#if workflow !== undefined && editableTasksList.length == 0}
+			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
+		{:else if workflow !== undefined}
+			<div class="fw-light mb-3">Sort the elements by dragging them to the desired position.</div>
+			<div
+				id="workflow-tasks-order"
+				role="region"
+				tabindex="-1"
+				ondragover={handleDragOver}
+				ondrop={handleDragEnd}
+			>
+				{#each editableTasksList as workflowTask, i}
+					<div
+						class="btn w-100 mt-2 border border-secondary btn-draggable"
+						data-fs-target={workflowTask.id}
+						draggable={true}
+						role="button"
+						tabindex="0"
+						class:active={draggedWftIndex === i}
+						class:dragged={workflowTask.id === draggedWftId}
+						ondragstart={(event) => handleDragStart(workflowTask.id, i, event)}
+						ondragend={handleDragEnd}
+					>
+						{workflowTask.name}
+					</div>
+				{/each}
+			</div>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
-	
-			<button
-				class="btn btn-primary"
-				onclick={preventDefault(handleWorkflowOrderUpdate)}
-				disabled={workflowTaskSorting}
-			>
-				{#if workflowTaskSorting}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Save
-			</button>
-		
+		<button
+			class="btn btn-primary"
+			onclick={preventDefault(handleWorkflowOrderUpdate)}
+			disabled={workflowTaskSorting}
+		>
+			{#if workflowTaskSorting}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Save
+		</button>
 	{/snippet}
 </Modal>
 

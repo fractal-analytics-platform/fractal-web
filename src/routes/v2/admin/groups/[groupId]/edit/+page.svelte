@@ -22,7 +22,7 @@
 	let addingUser = $state(null);
 	let addUserHovering = $state(false);
 	let userFilter = $state('');
-	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default} */
+	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
 	let userSettingsEditor = $state();
 	let settingsUpdatedMessage = $state('');
 	let settingsPendingChanges = $state(false);
@@ -33,10 +33,6 @@
 
 	/** @type {import('fractal-components/types/api').UserSettings} */
 	let settings = $state(createEmptySettings());
-
-
-
-
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -198,20 +194,23 @@
 		settingsUpdatedMessage = '';
 		savingSettings = true;
 		try {
-			await userSettingsEditor.handleSaveSettings();
+			await userSettingsEditor?.handleSaveSettings();
 		} finally {
 			savingSettings = false;
 		}
 	}
-	let availableUsers = $derived(users
-		.filter((u) => !group.user_ids.includes(u.id))
-		.sort(sortUserByEmailComparator));
-	let filteredAvailableUsers = $derived(availableUsers.filter((u) =>
-		u.email.toLowerCase().includes(userFilter.toLowerCase())
-	));
-	let members = $derived(users.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator));
-	let saveViewerPathsEnabled =
-		$derived(JSON.stringify(originalViewPaths) !== JSON.stringify(editableViewPaths));
+	let availableUsers = $derived(
+		users.filter((u) => !group.user_ids.includes(u.id)).sort(sortUserByEmailComparator)
+	);
+	let filteredAvailableUsers = $derived(
+		availableUsers.filter((u) => u.email.toLowerCase().includes(userFilter.toLowerCase()))
+	);
+	let members = $derived(
+		users.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator)
+	);
+	let saveViewerPathsEnabled = $derived(
+		JSON.stringify(originalViewPaths) !== JSON.stringify(editableViewPaths)
+	);
 </script>
 
 <div class="container mt-3">
@@ -252,7 +251,8 @@
 							<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 								{user.email}
 								{#if addingUser && addingUser.id === user.id}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+									></span>
 								{/if}
 							</span>
 						{:else}
@@ -323,13 +323,13 @@
 	<div class="row mt-4 mb-4">
 		<div class="col-lg-9">
 			<h4 class="fw-light">Viewer paths</h4>
-			{#each editableViewPaths as viewerPath, i}
+			{#each editableViewPaths as _, i}
 				<div class="input-group mb-2">
 					<input
 						type="text"
 						class="form-control"
 						id={`viewerPath-${i}`}
-						bind:value={viewerPath}
+						bind:value={editableViewPaths[i]}
 						aria-label={`Viewer path #${i + 1}`}
 						required
 					/>
@@ -397,7 +397,8 @@
 						disabled={savingSettings || !settingsPendingChanges}
 					>
 						{#if savingSettings}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+							></span>
 						{/if}
 						Save
 					</button>

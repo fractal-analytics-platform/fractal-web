@@ -16,9 +16,10 @@
 		oauth_accounts: []
 	};
 
-	/** @type {undefined|boolean} */
-	let created = $state(undefined);
-	let verified = $state(undefined);
+	/** @type {boolean|undefined} */
+	let created = $state();
+	/** @type {boolean|undefined} */
+	let verified = $state();
 
 	/**
 	 * @param {import('fractal-components/types/api').User} user

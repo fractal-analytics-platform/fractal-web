@@ -2,7 +2,7 @@
 	
 	/**
 	 * @typedef {Object} Props
-	 * @property {boolean|null|undefined} value
+	 * @property {boolean|null} [value]
 	 */
 
 	/** @type {Props} */

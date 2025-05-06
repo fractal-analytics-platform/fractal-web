@@ -11,7 +11,7 @@
 	 * @property {boolean} [showDocLinksInTable]
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
 	 * @property {import('svelte').Snippet} [extraColumnsHeader]
-	 * @property {import('svelte').Snippet} [extraColumns]
+	 * @property {import('svelte').Snippet<[import('../types/api').TasksTableRow]>} [extraColumns]
 	 */
 
 	/** @type {Props} */
@@ -25,12 +25,12 @@
 	} = $props();
 
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
-	let allRows = [];
+	let allRows = $state([]);
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
-	let filteredRows = [];
+	let filteredRows = $state([]);
 	let groupBy = 'pkg_name';
 
-	let genericSearch = '';
+	let genericSearch = $state('');
 	/** @type {SlimSelect|undefined} */
 	let categorySelector = undefined;
 	let categoryFilter = '';
@@ -49,25 +49,36 @@
 		pkg_name: 'Task'
 	};
 
-	$: if (taskGroups) {
-		setup();
-	}
+	/**
+	 * Needed to prevent infinite loop in $effect
+	 * @type {Array<import('../types/api').TaskGroupV2>|undefined}
+	 */
+	let storedTaskGroups = undefined;
 
-	$: selectedTasksCount = filteredRows.reduce((acc, row) => acc + row.tasks.length, 0);
-	$: tasksCount = allRows.reduce((acc, row) => acc + row.tasks.length, 0);
+	$effect(() => {
+		if (storedTaskGroups !== taskGroups) {
+			storedTaskGroups = taskGroups;
+			setup();
+		}
+	});
 
-	$: if (
-		genericSearch ||
-		categoryFilter ||
-		modalityFilter ||
-		packageFilter ||
-		tagFilter ||
-		inputTypeFilter
-	) {
-		filterRows();
-	} else {
-		filteredRows = allRows;
-	}
+	const selectedTasksCount = $derived(filteredRows.reduce((acc, row) => acc + row.tasks.length, 0));
+	const tasksCount = $derived(allRows.reduce((acc, row) => acc + row.tasks.length, 0));
+
+	$effect(() => {
+		if (
+			genericSearch ||
+			categoryFilter ||
+			modalityFilter ||
+			packageFilter ||
+			tagFilter ||
+			inputTypeFilter
+		) {
+			filterRows();
+		} else {
+			filteredRows = allRows;
+		}
+	});
 
 	function setup() {
 		if (!taskGroups) {
@@ -331,7 +342,7 @@
 						</div>
 					</div>
 					<div>
-						<button class="btn btn-outline-secondary btn-sm ms-3" on:click={resetFilters}>
+						<button class="btn btn-outline-secondary btn-sm ms-3" onclick={resetFilters}>
 							Reset
 						</button>
 					</div>
@@ -340,16 +351,16 @@
 		</div>
 		<div class="row">
 			<div class="col">
-				<select id="package-filter" class="invisible" />
+				<select id="package-filter" class="invisible"></select>
 			</div>
 			<div class="col">
-				<select id="category-filter" class="invisible" />
+				<select id="category-filter" class="invisible"></select>
 			</div>
 			<div class="col">
-				<select id="modality-filter" class="invisible" />
+				<select id="modality-filter" class="invisible"></select>
 			</div>
 			<div class="col">
-				<select id="tag-filter" class="invisible" />
+				<select id="tag-filter" class="invisible"></select>
 			</div>
 		</div>
 	</div>
@@ -407,7 +418,7 @@
 									<td>
 										{#if task.taskVersions[task.selectedVersion].category}
 											<button
-												on:click={() =>
+												onclick={() =>
 													categorySelector?.setSelected(
 														/** @type {string} */ (task.taskVersions[task.selectedVersion].category)
 													)}
@@ -420,7 +431,7 @@
 									<td>
 										{#if task.taskVersions[task.selectedVersion].modality}
 											<button
-												on:click={() =>
+												onclick={() =>
 													modalitySelector?.setSelected(
 														/** @type {string} */ (task.taskVersions[task.selectedVersion].modality)
 													)}

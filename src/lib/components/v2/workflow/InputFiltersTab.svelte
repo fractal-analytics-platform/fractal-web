@@ -5,10 +5,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
@@ -18,14 +14,9 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		workflow,
-		workflowTask,
-		selectedDatasetId,
-		updateWorkflowTaskCallback
-	} = $props();
+	let { workflow, workflowTask, selectedDatasetId, updateWorkflowTaskCallback } = $props();
 
-	/** @type {InputFiltersTypesForm} */
+	/** @type {InputFiltersTypesForm|undefined} */
 	let form = $state();
 
 	let saving = $state(false);
@@ -45,8 +36,8 @@
 	});
 
 	export async function init() {
-		if (!form.hasUnsavedChanges()) {
-			form.init(workflowTask.type_filters);
+		if (!form?.hasUnsavedChanges()) {
+			form?.init(workflowTask.type_filters);
 		}
 
 		if (selectedDatasetId === undefined) {
@@ -84,7 +75,7 @@
 		}
 		successfullySaved = false;
 
-		const valid = form.validateFields();
+		const valid = form?.validateFields();
 		if (!valid) {
 			return;
 		}
@@ -99,7 +90,7 @@
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					type_filters: form.getTypes()
+					type_filters: form?.getTypes()
 				})
 			}
 		);
@@ -108,7 +99,7 @@
 			setTimeout(() => {
 				successfullySaved = false;
 			}, 3000);
-			form.save();
+			form?.save();
 			const result = await response.json();
 			updateWorkflowTaskCallback(result);
 		} else {
@@ -124,11 +115,11 @@
 	 * @returns {boolean}
 	 */
 	export function hasUnsavedChanges() {
-		return form.hasUnsavedChanges();
+		return form?.hasUnsavedChanges() || false;
 	}
 
 	export function discardChanges() {
-		form.discardChanges();
+		form?.discardChanges();
 	}
 
 	function onOpenAddDatasetTypeModal() {
@@ -137,7 +128,7 @@
 	}
 
 	function addDatasetType() {
-		form.importType(selectedDatasetTypeKey, selectedDatasetTypeValue);
+		form?.importType(selectedDatasetTypeKey, selectedDatasetTypeValue);
 	}
 </script>
 
@@ -174,41 +165,35 @@
 
 	<Modal id="add-type-filter-from-dataset-modal" onOpen={onOpenAddDatasetTypeModal} centered={true}>
 		{#snippet header()}
-			
-				<h1 class="modal-title fs-5">Add type filter from dataset</h1>
-			
-			{/snippet}
+			<h1 class="modal-title fs-5">Add type filter from dataset</h1>
+		{/snippet}
 		{#snippet body()}
-			
-				<label class="form-label" for="datasetTypeKey"> Type Key </label>
-				<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
-					<option value="">Select...</option>
-					{#each datasetTypes as t}
-						<option>{t}</option>
-					{/each}
+			<label class="form-label" for="datasetTypeKey"> Type Key </label>
+			<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
+				<option value="">Select...</option>
+				{#each datasetTypes as t}
+					<option>{t}</option>
+				{/each}
+			</select>
+			{#if selectedDatasetTypeKey !== ''}
+				<label class="form-label mt-2" for="datasetTypeValue"> Type Value </label>
+				<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-select">
+					<option value={true}>True</option>
+					<option value={false}>False</option>
 				</select>
-				{#if selectedDatasetTypeKey !== ''}
-					<label class="form-label mt-2" for="datasetTypeValue"> Type Value </label>
-					<select bind:value={selectedDatasetTypeValue} id="datasetTypeValue" class="form-select">
-						<option value={true}>True</option>
-						<option value={false}>False</option>
-					</select>
-				{/if}
-			
-			{/snippet}
+			{/if}
+		{/snippet}
 		{#snippet footer()}
-			
-				<button
-					class="btn btn-primary"
-					onclick={addDatasetType}
-					data-bs-dismiss="modal"
-					disabled={selectedDatasetTypeKey === ''}
-				>
-					Add
-				</button>
-				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			
-			{/snippet}
+			<button
+				class="btn btn-primary"
+				onclick={addDatasetType}
+				data-bs-dismiss="modal"
+				disabled={selectedDatasetTypeKey === ''}
+			>
+				Add
+			</button>
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		{/snippet}
 	</Modal>
 </div>
 

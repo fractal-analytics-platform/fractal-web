@@ -1,18 +1,10 @@
 <script>
 	import { run } from 'svelte/legacy';
 
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { FormManager } from './form_manager.js';
 	import ObjectProperty from './properties/ObjectProperty.svelte';
 
-	/** @type {(type: string, detail?: any) => boolean} */
-	const dispatch = createEventDispatcher();
-
-	
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {object} schema
@@ -21,6 +13,7 @@
 	 * @property {string[]} [propertiesToIgnore]
 	 * @property {string} componentId
 	 * @property {boolean} [editable]
+	 * @property {() => void} onchange
 	 */
 
 	/** @type {Props} */
@@ -30,7 +23,8 @@
 		schemaVersion,
 		propertiesToIgnore = [],
 		componentId,
-		editable = true
+		editable = true,
+		onchange
 	} = $props();
 
 	/** @type {FormManager|undefined} */
@@ -53,13 +47,12 @@
 		formManager?.validate();
 	}
 
-
 	function initFormManager() {
 		if (schema) {
 			try {
 				formManager = new FormManager(
 					schema,
-					dispatch,
+					onchange,
 					schemaVersion,
 					propertiesToIgnore,
 					schemaData

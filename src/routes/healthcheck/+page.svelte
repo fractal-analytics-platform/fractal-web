@@ -6,7 +6,7 @@
 
 	let inProgress = $state(false);
 	let stepMessage = $state('');
-	let error = $state(undefined);
+	let error = $state();
 	let randomProjectName = $state('');
 
 	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
@@ -39,7 +39,6 @@
 	headers.set('Content-Type', 'application/json');
 
 	async function createProject() {
-
 		stepMessage = `Creating project ${randomProjectName}`;
 
 		const response = await fetch(`/api/v2/project`, {

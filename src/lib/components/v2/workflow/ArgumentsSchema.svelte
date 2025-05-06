@@ -30,10 +30,6 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
@@ -67,11 +63,6 @@
 	let unsavedChangesFormBuilderNonParallel = $state(false);
 
 	let savingChanges = $state(false);
-
-
-
-
-
 
 	function handleNonParallelChanged() {
 		unsavedChangesNonParallel = true;
@@ -208,11 +199,12 @@
 		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
 	}
 
-	let unsavedChanges =
-		$derived(unsavedChangesParallel ||
-		unsavedChangesNonParallel ||
-		unsavedChangesFormBuilderParallel ||
-		unsavedChangesFormBuilderNonParallel);
+	let unsavedChanges = $derived(
+		unsavedChangesParallel ||
+			unsavedChangesNonParallel ||
+			unsavedChangesFormBuilderParallel ||
+			unsavedChangesFormBuilderNonParallel
+	);
 	let isSchemaValid = $derived(argsSchemaVersionValid(workflowTask.task.args_schema_version));
 	let argsSchemaNonParallel = $derived(workflowTask.task.args_schema_non_parallel);
 	let argsSchemaParallel = $derived(workflowTask.task.args_schema_parallel);
@@ -235,7 +227,7 @@
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
-					on:change={handleNonParallelChanged}
+					onchange={handleNonParallelChanged}
 					bind:this={nonParallelSchemaComponent}
 				/>
 			</div>
@@ -266,7 +258,7 @@
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
-					on:change={handleParallelChanged}
+					onchange={handleParallelChanged}
 					bind:this={parallelSchemaComponent}
 				/>
 			</div>

@@ -11,7 +11,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {JobsList} */
+	/** @type {JobsList|undefined} */
 	let jobsListComponent = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 	let jobs = $state([]);
@@ -114,7 +114,7 @@
 			}
 			searched = true;
 			jobs = await response.json();
-			jobsListComponent.setJobs(jobs);
+			jobsListComponent?.setJobs(jobs);
 		} finally {
 			searching = false;
 		}
@@ -140,7 +140,7 @@
 		datasetId = '';
 		searched = false;
 		jobs = [];
-		jobsListComponent.setJobs([]);
+		jobsListComponent?.setJobs([]);
 	}
 
 	async function downloadCSV() {
@@ -180,7 +180,7 @@
 		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
 	}
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let statusModal = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let jobInEditing = $state();
@@ -190,16 +190,18 @@
 	 */
 	function openEditStatusModal(row) {
 		jobInEditing = row;
-		statusModal.show();
+		statusModal?.show();
 	}
 
 	let updatingStatus = $state(false);
 
 	async function updateJobStatus() {
-		statusModal.confirmAndHide(
+		statusModal?.confirmAndHide(
 			async () => {
 				updatingStatus = true;
-				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (jobInEditing).id;
+				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (
+					jobInEditing
+				).id;
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
@@ -216,7 +218,7 @@
 				}
 
 				jobs = jobs.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));
-				jobsListComponent.setJobs(jobs);
+				jobsListComponent?.setJobs(jobs);
 			},
 			() => {
 				updatingStatus = false;
@@ -224,12 +226,12 @@
 		);
 	}
 
-
 	/**
 	 * @param {import('fractal-components/types/api').User[]} users
 	 */
 	function sortDropdownUsers(users) {
-		const usersCopy = /** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
+		const usersCopy =
+			/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
 		sortUsers(usersCopy, $page.data.userInfo.id, false);
 		return usersCopy;
 	}
@@ -379,7 +381,11 @@
 			{#snippet editStatus(row)}
 				{#if row.status === 'submitted'}
 					&nbsp;
-					<button class="btn btn-link p-0" onclick={() => openEditStatusModal(row)}>
+					<button
+						class="btn btn-link p-0"
+						onclick={() => openEditStatusModal(row)}
+						aria-label="Edit status"
+					>
 						<i class="bi bi-pencil"></i>
 					</button>
 				{/if}
@@ -390,31 +396,27 @@
 
 <Modal id="editJobStatusModal" bind:this={statusModal} centered={true} size="md">
 	{#snippet header()}
-	
-			{#if jobInEditing}
-				<h1 class="h5 modal-title flex-grow-1">Editing job #{jobInEditing.id}</h1>
-			{/if}
-		
+		{#if jobInEditing}
+			<h1 class="h5 modal-title flex-grow-1">Editing job #{jobInEditing.id}</h1>
+		{/if}
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-editJobStatusModal"></div>
-			<div class="alert alert-warning">
-				<i class="bi bi-exclamation-triangle"></i>
-				<strong>Warning</strong>: this operation will not cancel job execution but only modify its
-				status in the database
-			</div>
-			<div class="d-flex justify-content-center">
-				<button class="btn btn-danger" onclick={updateJobStatus} disabled={updatingStatus}>
-					{#if updatingStatus}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-					{/if}
-					Set status to failed
-				</button>
-				&nbsp;
-				<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			</div>
-		
+		<div id="errorAlert-editJobStatusModal"></div>
+		<div class="alert alert-warning">
+			<i class="bi bi-exclamation-triangle"></i>
+			<strong>Warning</strong>: this operation will not cancel job execution but only modify its
+			status in the database
+		</div>
+		<div class="d-flex justify-content-center">
+			<button class="btn btn-danger" onclick={updateJobStatus} disabled={updatingStatus}>
+				{#if updatingStatus}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				{/if}
+				Set status to failed
+			</button>
+			&nbsp;
+			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		</div>
 	{/snippet}
 </Modal>
 

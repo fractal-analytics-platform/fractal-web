@@ -9,7 +9,7 @@
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
 
 	// List of projects to be displayed
-	
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').ProjectV2[]} [projects]
@@ -20,11 +20,11 @@
 
 	let projectSearch = $state('');
 
-	let filteredProjects = $derived(projects.filter((p) =>
-		p.name.toLowerCase().includes(projectSearch.toLowerCase())
-	));
+	let filteredProjects = $derived(
+		projects.filter((p) => p.name.toLowerCase().includes(projectSearch.toLowerCase()))
+	);
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let newProjectModal = $state();
 
 	let newProjectName = $state('');
@@ -33,7 +33,7 @@
 	function onNewProjectModalOpen() {
 		newProjectName = '';
 		newProjectNameError = '';
-		newProjectModal.hideErrorAlert();
+		newProjectModal?.hideErrorAlert();
 	}
 
 	/**
@@ -48,7 +48,7 @@
 	let creating = $state(false);
 
 	async function handleCreateProject() {
-		newProjectModal.hideErrorAlert();
+		newProjectModal?.hideErrorAlert();
 		newProjectNameError = '';
 		creating = true;
 
@@ -70,14 +70,14 @@
 		if (response.ok) {
 			newProjectName = '';
 			projects = [...projects, result];
-			newProjectModal.hide();
+			newProjectModal?.hide();
 			goto(`/v2/projects/${result.id}`);
 		} else {
 			const error = getFieldValidationError(result, response.status);
 			if (error) {
 				newProjectNameError = error;
 			} else {
-				newProjectModal.displayErrorAlert(result);
+				newProjectModal?.displayErrorAlert(result);
 			}
 		}
 	}
@@ -123,7 +123,7 @@
 					</div>
 				</div>
 				<div class="col-auto">
-					<button class="btn btn-primary" onclick={() => newProjectModal.show()}>
+					<button class="btn btn-primary" onclick={() => newProjectModal?.show()}>
 						Create new project
 					</button>
 				</div>
@@ -184,44 +184,38 @@
 	centered={true}
 >
 	{#snippet header()}
-	
-			<h1 class="modal-title fs-5">Create new project</h1>
-		
+		<h1 class="modal-title fs-5">Create new project</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			<div id="errorAlert-crateNewProjectModal"></div>
-			<form class="row" onsubmit={preventDefault(handleCreateProject)} id="create-project-form">
-				<div class="col">
-					<div class="row mb-3">
-						<label for="projectName" class="col-md-3 col-form-label">Project name</label>
-						<div class="col-md-9">
-							<input
-								id="projectName"
-								type="text"
-								bind:value={newProjectName}
-								class="form-control"
-								class:is-invalid={newProjectNameError}
-								required
-							/>
-							{#if newProjectNameError}
-								<div class="invalid-feedback">{newProjectNameError}</div>
-							{/if}
-						</div>
+		<div id="errorAlert-crateNewProjectModal"></div>
+		<form class="row" onsubmit={preventDefault(handleCreateProject)} id="create-project-form">
+			<div class="col">
+				<div class="row mb-3">
+					<label for="projectName" class="col-md-3 col-form-label">Project name</label>
+					<div class="col-md-9">
+						<input
+							id="projectName"
+							type="text"
+							bind:value={newProjectName}
+							class="form-control"
+							class:is-invalid={newProjectNameError}
+							required
+						/>
+						{#if newProjectNameError}
+							<div class="invalid-feedback">{newProjectNameError}</div>
+						{/if}
 					</div>
 				</div>
-			</form>
-		
+			</div>
+		</form>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button class="btn btn-primary" form="create-project-form" disabled={creating}>
-				{#if creating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Create
-			</button>
-		
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button class="btn btn-primary" form="create-project-form" disabled={creating}>
+			{#if creating}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Create
+		</button>
 	{/snippet}
 </Modal>

@@ -5,14 +5,9 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 
-	
-	
-	
-	
-
 	let settingsFormSubmitted = $state(false);
 
-	/** @type {import('fractal-components/types/api').UserSettings} */
+	/** @type {import('fractal-components/types/api').UserSettings|undefined} */
 	let originalSettings = $state();
 
 	/**
@@ -226,7 +221,7 @@
 					<strong>SLURM accounts</strong>
 				</label>
 				<div class="col-sm-9 has-validation">
-					{#each settings.slurm_accounts as slurmAccount, i}
+					{#each settings.slurm_accounts as _, i}
 						<div
 							class="input-group mb-2"
 							class:is-invalid={settingsFormSubmitted &&
@@ -236,7 +231,7 @@
 								type="text"
 								class="form-control"
 								id={`slurmAccount-${i}`}
-								bind:value={slurmAccount}
+								bind:value={settings.slurm_accounts[i]}
 								aria-label={`SLURM account #${i + 1}`}
 								class:is-invalid={settingsFormSubmitted &&
 									$settingsValidationErrors['slurm_accounts']}

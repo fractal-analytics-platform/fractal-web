@@ -57,12 +57,14 @@
 								-
 							{:else}
 								<table class="table mb-0">
-									{#each user.oauth_accounts as account}
-										<tr>
-											<th>{account.oauth_name}</th>
-											<td>{account.account_email}</td>
-										</tr>
-									{/each}
+									<tbody>
+										{#each user.oauth_accounts as account}
+											<tr>
+												<th>{account.oauth_name}</th>
+												<td>{account.account_email}</td>
+											</tr>
+										{/each}
+									</tbody>
 								</table>
 							{/if}
 						</td>

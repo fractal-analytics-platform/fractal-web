@@ -12,8 +12,6 @@
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
 
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {boolean} [admin]
@@ -53,7 +51,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
-	/** @type {TaskGroupActivityLogsModal} */
+	/** @type {TaskGroupActivityLogsModal|undefined} */
 	let taskGroupActivityLogsModal = $state();
 	/** @type {number|null} */
 	let openedTaskCollectionLogId = null;
@@ -63,7 +61,7 @@
 	 */
 	async function openTaskGroupActivityLogsModal(taskCollectionId) {
 		openedTaskCollectionLogId = taskCollectionId;
-		await taskGroupActivityLogsModal.open(taskCollectionId);
+		await taskGroupActivityLogsModal?.open(taskCollectionId);
 	}
 
 	async function searchActivities() {
@@ -151,7 +149,7 @@
 			(u) => u.id === openedTaskCollectionLogId
 		)?.log;
 		if (openedTaskCollectionLogToUpdate) {
-			await taskGroupActivityLogsModal.updateLog(openedTaskCollectionLogToUpdate);
+			await taskGroupActivityLogsModal?.updateLog(openedTaskCollectionLogToUpdate);
 		}
 	}
 

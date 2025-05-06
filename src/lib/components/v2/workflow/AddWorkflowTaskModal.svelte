@@ -17,7 +17,7 @@
 	/** @type {Props} */
 	let { workflow, user, onWorkflowTaskAdded } = $props();
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	let loading = $state(false);
@@ -29,15 +29,15 @@
 
 	export async function show() {
 		loading = true;
-		modal.hideErrorAlert();
-		modal.show();
+		modal?.hideErrorAlert();
+		modal?.show();
 		const response = await fetch(`/api/v2/task-group?only_active=true&args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
 		loading = false;
 		if (!response.ok) {
-			modal.displayErrorAlert(await response.json());
+			modal?.displayErrorAlert(await response.json());
 			return;
 		}
 		const allTaskGroups = await response.json();
@@ -53,7 +53,7 @@
 	 * @param {number} taskId
 	 */
 	async function addTaskToWorkflow(taskId) {
-		modal.confirmAndHide(
+		modal?.confirmAndHide(
 			async () => {
 				addingTask = true;
 
@@ -137,37 +137,37 @@
 		<h5 class="modal-title">Add new workflow task</h5>
 	{/snippet}
 	{#snippet body()}
-			{#if loading}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-			{/if}
-			<div class:invisible={loading} class:collapse={loading}>
-				<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
-					{#snippet extraColumnsColgroup()}
-						<col width="40" />
-						<col width="120" />
-					{/snippet}
-					{#snippet extraColumnsHeader()}
-						<th></th>
-						<th></th>
-					{/snippet}
-					{#snippet extraColumns(task)}
-						<td>
-							{#if showTaskInfoButton(task)}
-								<PropertyDescription description={getTaskInfo(task)} html={true} />
-							{/if}
-						</td>
-						<td>
-							<button
-								class="btn btn-primary"
-								disabled={addingTask}
-								onclick={() => addTaskToWorkflow(task.task_id)}
-							>
-								Add task
-							</button>
-						</td>
-					{/snippet}
-				</FilteredTasksTable>
-			</div>
+		{#if loading}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+		{/if}
+		<div class:invisible={loading} class:collapse={loading}>
+			<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
+				{#snippet extraColumnsColgroup()}
+					<col width="40" />
+					<col width="120" />
+				{/snippet}
+				{#snippet extraColumnsHeader()}
+					<th></th>
+					<th></th>
+				{/snippet}
+				{#snippet extraColumns(task)}
+					<td>
+						{#if showTaskInfoButton(task)}
+							<PropertyDescription description={getTaskInfo(task)} html={true} />
+						{/if}
+					</td>
+					<td>
+						<button
+							class="btn btn-primary"
+							disabled={addingTask}
+							onclick={() => addTaskToWorkflow(task.task_id)}
+						>
+							Add task
+						</button>
+					</td>
+				{/snippet}
+			</FilteredTasksTable>
+		</div>
 	{/snippet}
 	{#snippet footer()}
 		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill"></div>

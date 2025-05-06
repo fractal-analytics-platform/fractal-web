@@ -1,6 +1,5 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
-
 	
 	/**
 	 * @typedef {Object} Props
@@ -11,14 +10,14 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), editable = true } = $props();
 
-	/** @type {HTMLSelectElement} */
+	/** @type {HTMLSelectElement|undefined} */
 	let field = $state();
 	let validationError = $state('');
 
 	function handleValueChange() {
 		formElement.notifyChange();
 		validationError = '';
-		if (formElement.required && field.value === '') {
+		if (formElement.required && field?.value === '') {
 			validationError = 'Field is required';
 		}
 	}

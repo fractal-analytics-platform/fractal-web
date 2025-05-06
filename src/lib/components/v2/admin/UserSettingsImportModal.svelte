@@ -5,8 +5,6 @@
 	import SlimSelect from 'slim-select';
 	import { onMount } from 'svelte';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {number} currentUserId
@@ -25,7 +23,7 @@
 	let selectedUserId = null;
 	let userError = $state('');
 
-	/** @type {Modal}*/
+	/** @type {Modal|undefined}*/
 	let modal = $state();
 	/** @type {SlimSelect|undefined} */
 	let userSelector;
@@ -40,9 +38,9 @@
 	export async function open(selectedGroups) {
 		userError = '';
 		selectedUserId = null;
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		desiredGroups = selectedGroups;
-		modal.show();
+		modal?.show();
 		await setUsersSlimSelectOptions();
 	}
 
@@ -59,10 +57,10 @@
 		if (response.ok) {
 			onSettingsImported(await response.json());
 			importingSettings = false;
-			modal.hide();
+			modal?.hide();
 		} else {
 			const error = await getAlertErrorFromResponse(response);
-			modal.displayErrorAlert(error);
+			modal?.displayErrorAlert(error);
 			importingSettings = false;
 		}
 	}
@@ -100,7 +98,7 @@
 				allGroups
 			);
 		} catch (err) {
-			modal.displayErrorAlert(err);
+			modal?.displayErrorAlert(err);
 			return;
 		}
 
@@ -143,32 +141,27 @@
 
 <Modal id="selectUserToImportSettingsModal" centered={true} bind:this={modal} focus={false}>
 	{#snippet header()}
-	
-			<h1 class="modal-title fs-5">Select user to import settings</h1>
-		
+		<h1 class="modal-title fs-5">Select user to import settings</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			<select id="user-to-import-settings-select" class="invisible" class:border-danger={userError}></select>
-			{#if userError}
-				<span class="text-danger">{userError}</span>
-			{/if}
-			<div id="errorAlert-selectUserToImportSettingsModal" class="mt-3"></div>
-		
+		<select id="user-to-import-settings-select" class="invisible" class:border-danger={userError}
+		></select>
+		{#if userError}
+			<span class="text-danger">{userError}</span>
+		{/if}
+		<div id="errorAlert-selectUserToImportSettingsModal" class="mt-3"></div>
 	{/snippet}
 	{#snippet footer()}
-	
-			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-			<button
-				class="btn btn-primary"
-				onclick={importSettingsFromSelectedUser}
-				disabled={importingSettings}
-			>
-				{#if importingSettings}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Import settings
-			</button>
-		
+		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+		<button
+			class="btn btn-primary"
+			onclick={importSettingsFromSelectedUser}
+			disabled={importingSettings}
+		>
+			{#if importingSettings}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Import settings
+		</button>
 	{/snippet}
 </Modal>

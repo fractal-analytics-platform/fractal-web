@@ -21,14 +21,13 @@
 	/** @type {import('fractal-components/types/api').ImagePage} */
 	let imagePage = $state($page.data.imagePage);
 
-	/** @type {DatasetImagesTable} */
+	/** @type {DatasetImagesTable|undefined} */
 	let imagesTable = $state();
 
 	let selectedPlate = $state('');
 	let platePath = $state('');
 	let platePathLoading = $state(false);
 	let platePathError = $state('');
-
 
 	async function computePlatePath() {
 		platePathError = '';
@@ -120,11 +119,11 @@
 	}
 
 	onMount(() => {
-		imagesTable.load();
+		imagesTable?.load();
 	});
-	let plates = $derived(Array.isArray(imagePage.attributes['plate'])
-		? imagePage.attributes['plate'].sort()
-		: []);
+	let plates = $derived(
+		Array.isArray(imagePage.attributes['plate']) ? imagePage.attributes['plate'].sort() : []
+	);
 	run(() => {
 		if (plates.length > 0 && selectedPlate !== '') {
 			computePlatePath();

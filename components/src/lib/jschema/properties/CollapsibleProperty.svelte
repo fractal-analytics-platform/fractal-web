@@ -1,8 +1,5 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
-
-	
-
 	
 	/**
 	 * @typedef {Object} Props
@@ -42,11 +39,11 @@
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item">
 				<div class="accordion-header">
-					<button
+					<a
 						class="accordion-button"
 						class:collapsed={formElement.collapsed}
-						type="button"
 						onclick={(event) => toggleCollapse(event)}
+						role="button"
 					>
 						<div class="flex-fill">
 							<PropertyLabel {formElement} tag="span" />
@@ -56,7 +53,7 @@
 								<button class="btn btn-warning me-3" onclick={handleReset}> Reset </button>
 							{/if}
 						</div>
-					</button>
+					</a>
 				</div>
 				<div
 					id="collapse-{formElement.id}"
