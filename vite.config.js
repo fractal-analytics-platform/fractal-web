@@ -50,13 +50,13 @@ const config = defineConfig({
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection
 		include: [
+			'clsx',
 			'slim-select',
 			'marked',
 			'dompurify',
 			'ajv/dist/ajv',
 			'ajv/dist/2020',
 			'ajv-formats',
-			'@vincjo/datatables',
 			'semver/functions/coerce',
 			'semver/functions/gte',
 			'semver/functions/lte',
