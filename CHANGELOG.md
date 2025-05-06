@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed search box not working in workflow submission modal (\#787);
+* Fixed "Get token" button not working in Safari (\#787);
+
 # 1.17.3
 
 * Displayed warning when attempting to continue a workflow on unprocessed images (\#774);
