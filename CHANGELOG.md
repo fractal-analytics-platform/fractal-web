@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.17.4
 
 * Fixed search box not working in workflow submission modal (\#787);
 * Fixed "Get token" button not working in Safari (\#787);
