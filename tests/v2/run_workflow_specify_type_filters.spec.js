@@ -59,10 +59,6 @@ test('Warning message "You are trying to run a workflow without specifying what 
 
 	await test.step('Continue anyway and back', async () => {
 		await modal.getByRole('button', { name: 'Continue anyway' }).click();
-		await expect(
-			modal.getByText('You are trying to run the cellpose_segmentation task')
-		).toBeVisible();
-		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await expect(modal.getByText('This job will process 4 images.')).toBeVisible();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await expect(modal.getByText('Total results: 4')).toBeVisible();
@@ -77,10 +73,6 @@ test('Warning message "You are trying to run a workflow without specifying what 
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
-		await expect(
-			modal.getByText('You are trying to run the cellpose_segmentation task')
-		).toBeVisible();
-		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await expect(modal.getByText(/the following filters are applied/)).toBeVisible();
 		await expect(
 			modal.locator('li').filter({ hasText: '3D:' }).locator('[aria-checked="true"]')

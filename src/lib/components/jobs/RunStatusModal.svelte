@@ -135,7 +135,7 @@
 		showZarrUrls = true;
 		selectedUnit = unit;
 		await tick();
-		restoreModalFocus();
+		modal.restoreModalFocus();
 	}
 
 	async function back() {
@@ -144,7 +144,7 @@
 		selectedUnit = undefined;
 		await tick();
 		setStatusFilterSelector();
-		restoreModalFocus();
+		modal.restoreModalFocus();
 	}
 
 	function setStatusFilterSelector() {
@@ -192,16 +192,6 @@
 	async function statusFilterChanged() {
 		page = 1;
 		await loadRun(page, pageSize);
-	}
-
-	/**
-	 * Restore focus on modal, otherwise it will not be possible to close it using the esc key
-	 */
-	function restoreModalFocus() {
-		const modal = document.querySelector('.modal.show');
-		if (modal instanceof HTMLElement) {
-			modal.focus();
-		}
 	}
 
 	$: hasZarrUrlsInTable =
