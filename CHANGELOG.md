@@ -4,6 +4,7 @@
 
 * Fixed search box not working in workflow submission modal (\#787);
 * Fixed "Get token" button not working in Safari (\#787);
+* Added a disclaimer to non-processed-images warning (\#787);
 
 # 1.17.3
 

@@ -694,6 +694,9 @@
 										>
 											Continue anyway
 										</button>
+										<div class="mt-2">
+											<em><strong>Note</strong>: if the prior task was a converter, this warning may be a false positive.</em>
+										</div>
 									</div>
 								{/if}
 								{#if checkingConfiguration}
