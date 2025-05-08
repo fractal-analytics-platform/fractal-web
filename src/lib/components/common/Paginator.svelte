@@ -5,7 +5,6 @@
 	const maxPagesPerSide = 3;
 	const availablePageSizes = [10, 20, 50, 100, 500];
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {(currentPage: number, pageSize: number) => Promise<void>} onPageChange
@@ -23,7 +22,6 @@
 		currentPage = $bindable(),
 		singleLine = false
 	} = $props();
-
 
 	/**
 	 * @param {number} newCurrentPage

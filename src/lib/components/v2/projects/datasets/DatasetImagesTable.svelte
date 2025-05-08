@@ -60,7 +60,7 @@
 	let resetting = $state(false);
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null}} */
-	let attributeFilters = {};
+	let attributeFilters = $state({});
 
 	export function getAttributeFilters() {
 		return removeNullValues(attributeFilters);
@@ -71,7 +71,7 @@
 	}
 
 	/** @type {{ [key: string]: boolean | null }}} */
-	let typeFilters = {};
+	let typeFilters = $state({});
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 

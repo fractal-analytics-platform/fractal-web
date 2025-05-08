@@ -1,6 +1,4 @@
 <script>
-	import { run, preventDefault } from 'svelte/legacy';
-
 	import { page } from '$app/stores';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
@@ -118,19 +116,21 @@
 		}
 	}
 
-	onMount(() => {
-		imagesTable?.load();
-	});
-	let plates = $derived(
-		Array.isArray(imagePage.attributes['plate']) ? imagePage.attributes['plate'].sort() : []
+	const plates = $derived(
+		Array.isArray(imagePage.attributes['plate']) ? [...imagePage.attributes['plate']].sort() : []
 	);
-	run(() => {
+
+	$effect(() => {
 		if (plates.length > 0 && selectedPlate !== '') {
 			computePlatePath();
 		} else {
 			platePath = '';
 			platePathError = '';
 		}
+	});
+
+	onMount(() => {
+		imagesTable?.load();
 	});
 </script>
 
@@ -156,7 +156,10 @@
 		</button>
 		<button
 			class="btn btn-light"
-			onclick={preventDefault(handleExportDataset)}
+			onclick={(event) => {
+				event.preventDefault();
+				handleExportDataset();
+			}}
 			aria-label="Export dataset"
 		>
 			<i class="bi-download"></i>

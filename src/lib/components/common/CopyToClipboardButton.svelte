@@ -2,9 +2,6 @@
 	import { hideAllTooltips } from '$lib/common/component_utilities';
 	import { onDestroy } from 'svelte';
 
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {string} clipboardText
@@ -14,12 +11,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		clipboardText,
-		text,
-		id,
-		btnClass = 'primary'
-	} = $props();
+	let { clipboardText, text, id, btnClass = 'primary' } = $props();
 
 	let copied = $state(false);
 	let tooltip;
