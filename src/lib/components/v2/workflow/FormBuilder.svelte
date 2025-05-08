@@ -1,10 +1,7 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import { onMount } from 'svelte';
 	import FormEntry from './FormEntry.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {object} args
@@ -40,8 +37,8 @@
 		savedEditableArgs = JSON.stringify(editableArgs);
 	}
 
-	run(() => {
-		unsavedChanges = savedEditableArgs !== JSON.stringify(editableArgs);
+	$effect(() => {
+		unsavedChanges = savedEditableArgs !== JSON.stringify($state.snapshot(editableArgs));
 	});
 
 	/**
@@ -230,9 +227,9 @@
 </script>
 
 <div class="mt-2 p-2">
-	{#each editableArgs as item, index}
+	{#each editableArgs as _, index}
 		<FormEntry
-			entry={item}
+			bind:entry={editableArgs[index]}
 			{editable}
 			{index}
 			parent={editableArgs}

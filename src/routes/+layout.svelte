@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
 	import { afterNavigate, goto, invalidateAll } from '$app/navigation';
@@ -105,7 +103,7 @@
 	let server = $derived($page.data.serverInfo || {});
 	let warningBanner = $derived($page.data.warningBanner);
 	// Detects page change
-	run(() => {
+	$effect(() => {
 		if ($navigating) cleanupModalBackdrop();
 	});
 	let selectedSection = $derived(getSelectedSection($page.url.pathname));

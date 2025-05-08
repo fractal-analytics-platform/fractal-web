@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
@@ -210,7 +208,10 @@
 	{#snippet footer()}
 		<button
 			class="btn btn-primary"
-			onclick={preventDefault(handleWorkflowOrderUpdate)}
+			onclick={(e) => {
+				e.preventDefault();
+				handleWorkflowOrderUpdate();
+			}}
 			disabled={workflowTaskSorting}
 		>
 			{#if workflowTaskSorting}

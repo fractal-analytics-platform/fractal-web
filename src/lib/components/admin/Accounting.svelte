@@ -1,13 +1,9 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<import('fractal-components/types/api').User>} [users]
@@ -125,9 +121,7 @@
 		return users.find((u) => u.id === userId);
 	}
 
-	run(() => {
-		users = sortDropdownUsers(users, currentUserId);
-	});
+	const sortedUsers = $derived(sortDropdownUsers([...users], currentUserId));
 </script>
 
 <div class="row mt-3 mb-3">
@@ -137,7 +131,7 @@
 			<div class="col-12 mt-1">
 				<select class="form-select" bind:value={userId} id="user">
 					<option value="">All</option>
-					{#each users as user}
+					{#each sortedUsers as user}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>

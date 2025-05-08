@@ -33,17 +33,17 @@
 	let genericSearch = $state('');
 	/** @type {SlimSelect|undefined} */
 	let categorySelector = undefined;
-	let categoryFilter = '';
+	let categoryFilter = $state('');
 	/** @type {SlimSelect|undefined} */
 	let modalitySelector = undefined;
-	let modalityFilter = '';
+	let modalityFilter = $state('');
 	/** @type {SlimSelect|undefined} */
 	let packageSelector = undefined;
-	let packageFilter = '';
+	let packageFilter = $state('');
 	/** @type {SlimSelect|undefined} */
 	let tagSelector = undefined;
-	let tagFilter = '';
-	let inputTypeFilter = '';
+	let tagFilter = $state('');
+	let inputTypeFilter = $state('');
 
 	let groupByLabels = {
 		pkg_name: 'Task'

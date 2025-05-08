@@ -22,7 +22,7 @@
 	/** @type {'parallel'|'non_parallel'} */
 	let selectedSchemaType = $state('non_parallel');
 	let selectedTask = $state();
-	let schemaData = $state(undefined);
+	let schemaData = $state();
 	let jsonDataString = $state('');
 	let dataError = $state('');
 

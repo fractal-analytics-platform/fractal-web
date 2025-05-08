@@ -1,21 +1,30 @@
 <script>
 	import FormBaseEntry from './FormBaseEntry.svelte';
+	import FormEntry from './FormEntry.svelte';
 
-	/** @type {import('./form-builder-types').FormBuilderEntry} */
-	export let entry;
-	/** @type {Array<import('./form-builder-types').FormBuilderEntry>} */
-	export let parent;
-	/** @type {number} */
-	export let index;
-	/** @type {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number, type: string) => void} */
-	export let changeType;
-	/** @type {(parent: Array<import('./form-builder-types').FormBuilderEntry>, hasKey: boolean) => void} */
-	export let addProperty;
-	/** @type {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number) => void} */
-	export let removeProperty;
-	/** @type {() => void} */
-	export let triggerChanges;
-	export let editable = true;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('./form-builder-types').FormBuilderEntry} entry
+	 * @property {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @property {number} index
+	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number, type: string) => void} changeType
+	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, hasKey: boolean) => void} addProperty
+	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number) => void} removeProperty
+	 * @property {() => void} triggerChanges
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let {
+		entry = $bindable(),
+		parent,
+		index,
+		changeType,
+		addProperty,
+		removeProperty,
+		triggerChanges,
+		editable = true
+	} = $props();
 </script>
 
 {#if entry.type === 'object' || entry.type === 'array'}
@@ -74,8 +83,8 @@
 					{#if entry.children}
 						{#each entry.children as child, childIndex}
 							{#if child.type === 'object' || child.type === 'array'}
-								<svelte:self
-									entry={child}
+								<FormEntry
+									bind:entry={entry.children[childIndex]}
 									{editable}
 									parent={entry.children}
 									index={childIndex}
@@ -86,7 +95,7 @@
 								/>
 							{:else}
 								<FormBaseEntry
-									entry={child}
+									bind:entry={entry.children[childIndex]}
 									{editable}
 									{triggerChanges}
 									changeType={() => {
@@ -122,7 +131,7 @@
 	</div>
 {:else}
 	<FormBaseEntry
-		{entry}
+		bind:entry
 		{editable}
 		{triggerChanges}
 		changeType={() => changeType(parent, index, entry.type)}

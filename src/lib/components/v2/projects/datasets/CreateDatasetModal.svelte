@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { page } from '$app/stores';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
@@ -206,7 +204,10 @@
 			<form
 				class="row needs-validation"
 				novalidate
-				onsubmit={preventDefault(handleSave)}
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleSave();
+				}}
 				id="create-new-dataset-form"
 			>
 				<div class="col">
@@ -307,7 +308,10 @@
 			</form>
 		{:else}
 			<form
-				onsubmit={preventDefault(handleImport)}
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleImport();
+				}}
 				class="row needs-validation"
 				id="import-dataset-form"
 				novalidate

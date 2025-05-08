@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import {
@@ -61,8 +59,8 @@
 	let preSubmissionCheckNotProcessedResults = $state([]);
 	let ignorePreSubmissionCheckNotProcessed = $state(false);
 
-	/** @type {'run'|'restart'|'continue'} */
-	let mode = $state('run');
+	/** @type {'run'|'restart'|'continue'|undefined} */
+	let mode = $state();
 	let replaceExistingDataset = $state(true);
 
 	let newDatasetName = $state('');
@@ -506,6 +504,7 @@
 	}
 
 	onMount(async () => {
+		mode = 'run';
 		await loadSlurmAccounts();
 	});
 	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
@@ -817,7 +816,10 @@
 			<button class="btn btn-warning" onclick={cancel}> Cancel </button>
 			<button
 				class="btn btn-primary"
-				onclick={preventDefault(handleApplyWorkflow)}
+				onclick={(e) => {
+					e.preventDefault();
+					handleApplyWorkflow();
+				}}
 				disabled={applyingWorkflow}
 			>
 				{#if applyingWorkflow}

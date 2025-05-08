@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
 	import { SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
@@ -9,8 +7,6 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
@@ -149,7 +145,13 @@
 
 <StandardDismissableAlert message={successMessage} />
 
-<form onsubmit={preventDefault(handleCollect)} class="mb-5">
+<form
+	onsubmit={(e) => {
+		e.preventDefault();
+		handleCollect();
+	}}
+	class="mb-5"
+>
 	<div class="row mb-2 pb-1">
 		<div class="col">
 			<div class="input-group has-validation">

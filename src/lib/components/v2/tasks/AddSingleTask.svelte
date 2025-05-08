@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
@@ -345,7 +343,12 @@
 
 <StandardDismissableAlert message={taskSuccessMessage} />
 
-<form onsubmit={preventDefault(handleCreateTask)}>
+<form
+	onsubmit={(e) => {
+		e.preventDefault();
+		handleCreateTask();
+	}}
+>
 	<div class="row mb-1">
 		<div class="col-xl-1 col-lg-2 col-3">Task type</div>
 		<div class="col-xl-11 col-lg-8 col-9">

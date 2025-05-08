@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { page } from '$app/state';
 	import ProjectDatasetsList from '$lib/components/v2/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/v2/projects/WorkflowsList.svelte';
@@ -98,7 +96,13 @@
 	{#snippet body()}
 		<div id="errorAlert-editProjectModal"></div>
 		{#if project}
-			<form id="updateProject" onsubmit={preventDefault(handleProjectPropertiesUpdate)}>
+			<form
+				id="updateProject"
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleProjectPropertiesUpdate();
+				}}
+			>
 				<div class="mb-3">
 					<label for="projectName" class="form-label">Project name</label>
 					<input

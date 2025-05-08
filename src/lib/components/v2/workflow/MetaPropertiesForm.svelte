@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	// This component handles the meta properties of a workflow task.
 	// Every time the workflow task meta properties are updated within the form, this component should update the server
 	// If the server successfully stores the updated meta properties
@@ -13,8 +11,6 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
@@ -41,17 +37,17 @@
 	let unsavedChangesFormBuilderNonParallel = $state(false);
 	let savingChanges = $state(false);
 
-	let metaPropertiesNonParallel = $state({});
-	let metaPropertiesParallel = $state({});
+	const metaPropertiesNonParallel = $derived(
+		editable ? workflowTask.meta_non_parallel || {} : metaNonParallel || {}
+	);
 
-	run(() => {
-		metaPropertiesNonParallel = editable
-			? workflowTask.meta_non_parallel || {}
-			: metaNonParallel || {};
-		metaPropertiesParallel = editable ? workflowTask.meta_parallel || {} : metaParallel || {};
-	});
+	const metaPropertiesParallel = $derived(
+		editable ? workflowTask.meta_parallel || {} : metaParallel || {}
+	);
 
-	let unsavedChanges = $derived(unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel);
+	let unsavedChanges = $derived(
+		unsavedChangesFormBuilderParallel || unsavedChangesFormBuilderNonParallel
+	);
 
 	export async function saveChanges() {
 		const invalidNonParallel =

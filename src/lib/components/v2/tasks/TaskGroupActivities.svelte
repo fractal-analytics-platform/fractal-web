@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import { env } from '$env/dynamic/public';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
@@ -21,12 +19,7 @@
 	/** @type {Props} */
 	let { admin = false, users = [] } = $props();
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	let sortedUsers = $state([]);
-	run(() => {
-		if (users) {
-			sortedUsers = [...users].sort(sortUserByEmailComparator);
-		}
-	});
+	const sortedUsers = $derived([...users].sort(sortUserByEmailComparator));
 
 	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
 	let results = $state([]);

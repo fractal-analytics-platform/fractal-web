@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount } from 'svelte';
 	import TaskGroupActivityLogsModal from '$lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
@@ -255,7 +253,12 @@
 <TaskGroupActivityLogsModal bind:this={taskGroupActivitiesLogsModal} admin={false} />
 
 <div>
-	<form onsubmit={preventDefault(handleTaskCollection)}>
+	<form
+		onsubmit={(e) => {
+			e.preventDefault();
+			handleTaskCollection();
+		}}
+	>
 		<div class="row">
 			{#if packageType === 'pypi'}
 				<div class="mb-2 col-md-6">
@@ -396,7 +399,10 @@
 							type="button"
 							id="ppv_remove_{i}"
 							aria-label="Remove pinned package version"
-							onclick={preventDefault(() => removePackageVersion(i))}
+							onclick={(e) => {
+								e.preventDefault();
+								removePackageVersion(i);
+							}}
 						>
 							<i class="bi bi-trash"></i>
 						</button>
@@ -406,7 +412,13 @@
 		{/each}
 		<div class="row">
 			<div class="col-12 mb-1">
-				<button class="btn btn-light" onclick={preventDefault(addPackageVersion)}>
+				<button
+					class="btn btn-light"
+					onclick={(e) => {
+						e.preventDefault();
+						addPackageVersion();
+					}}
+				>
 					<i class="bi bi-plus-circle"></i> Add pinned package version
 				</button>
 			</div>

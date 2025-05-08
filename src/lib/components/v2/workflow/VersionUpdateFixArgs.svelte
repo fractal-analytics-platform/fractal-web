@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import {
@@ -11,10 +9,6 @@
 		isCompoundType
 	} from 'fractal-components';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
-
-	
-	
-	
 
 	/**
 	 * @typedef {Object} Props
@@ -34,17 +28,16 @@
 		argsChanged = $bindable(false)
 	} = $props();
 
-
 	let originalArgs = $state('');
 	let displayTextarea = $state(false);
 	let argsToBeFixed = $state('');
 	let argsToBeFixedValidJson = $state(true);
-	/** @type {import('ajv').ErrorObject[] | null} */
-	let validationErrors = $state(null);
+	/** @type {import('ajv').ErrorObject[] | undefined} */
+	let validationErrors = $state();
 
 	export function reset() {
 		argsToBeFixed = '';
-		validationErrors = null;
+		validationErrors = undefined;
 	}
 
 	export function cancel() {
@@ -101,11 +94,11 @@
 		}
 		const valid = validator.isValid(args);
 		if (valid) {
-			validationErrors = null;
+			validationErrors = undefined;
 		} else {
 			argsToBeFixed = JSON.stringify(args, null, 2);
 			displayTextarea = true;
-			validationErrors = validator.getErrors();
+			validationErrors = validator.getErrors() || undefined;
 		}
 	}
 
@@ -115,8 +108,8 @@
 				'args_schema' in updateCandidate
 					? updateCandidate.args_schema
 					: parallel
-					? updateCandidate.args_schema_parallel
-					: updateCandidate.args_schema_non_parallel
+						? updateCandidate.args_schema_parallel
+						: updateCandidate.args_schema_non_parallel
 			);
 		if ('properties' in newSchema) {
 			newSchema = stripIgnoredProperties(newSchema, getPropertiesToIgnore(false));
@@ -127,8 +120,12 @@
 	export function hasValidationErrors() {
 		return (validationErrors?.length || 0) > 0;
 	}
-	run(() => {
-		canBeUpdated = validationErrors === null || validationErrors.length === 0;
+
+	$effect(() => {
+		canBeUpdated = validationErrors === undefined || validationErrors.length === 0;
+	});
+
+	$effect(() => {
 		argsChanged = argsToBeFixed !== originalArgs;
 	});
 </script>

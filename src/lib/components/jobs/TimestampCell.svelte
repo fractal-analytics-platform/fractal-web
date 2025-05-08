@@ -1,7 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {string|null} timestamp
@@ -10,28 +7,43 @@
 	/** @type {Props} */
 	let { timestamp } = $props();
 
-	let date = $state('');
-	let time = $state('');
+	const date = $derived(getDate(timestamp));
+	const time = $derived(getTime(timestamp));
 
-	run(() => {
+	/**
+	 * @param {string|null} timestamp
+	 * @returns {string}
+	 */
+	function getDate(timestamp) {
 		if (timestamp) {
 			const dateObj = new Date(timestamp);
-			date = dateObj.toLocaleString([], {
+			return dateObj.toLocaleString([], {
 				day: 'numeric',
 				month: 'numeric',
 				year: 'numeric'
 			});
-			time = dateObj.toLocaleString([], {
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * @param {string|null} timestamp
+	 * @returns {string}
+	 */
+	function getTime(timestamp) {
+		if (timestamp) {
+			const dateObj = new Date(timestamp);
+			return dateObj.toLocaleString([], {
 				hour: 'numeric',
 				minute: 'numeric',
 				second: 'numeric',
 				hour12: false
 			});
 		} else {
-			date = '';
-			time = '';
+			return '';
 		}
-	});
+	}
 </script>
 
 {#if date === ''}

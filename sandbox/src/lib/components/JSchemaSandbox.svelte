@@ -11,8 +11,8 @@
 	import { tick } from 'svelte';
 	import example from './example.json';
 
-	let schema = $state(undefined);
-	let schemaData = $state(undefined);
+	let schema = $state();
+	let schemaData = $state();
 
 	let jsonSchemaString = $state('');
 	let jsonDataString = $state('');
@@ -24,7 +24,7 @@
 	let schemaVersion = $state('pydantic_v2');
 
 	/** @type {JSchema|undefined} */
-	let jschemaComponent = $state(undefined);
+	let jschemaComponent = $state();
 
 	function handleJsonSchemaStringChanged() {
 		validationError = '';
@@ -96,10 +96,6 @@
 			return;
 		}
 		updateData(jschemaComponent.getArguments());
-	}
-
-	function detectChange({ detail }) {
-		updateData(detail.value);
 	}
 
 	/**
@@ -199,7 +195,7 @@
 		{#if schema && !jsonSchemaError}
 			<JSchema
 				componentId="json-schema-sandbox"
-				on:change={detectChange}
+				onchange={updateData}
 				{schema}
 				{schemaVersion}
 				{schemaData}

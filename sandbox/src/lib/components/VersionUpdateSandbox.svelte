@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import {
 		JSchema,
 		SchemaValidator,
@@ -187,7 +185,6 @@
 	let canBeUpdated = $state(false);
 	let argsChanged = $state(false);
 
-
 	let originalArgs = $state('');
 	let displayTextarea = $state(false);
 	let argsToBeFixed = $state('');
@@ -257,10 +254,11 @@
 		return (validationErrors?.length || 0) > 0;
 	}
 
-	run(() => {
+	$effect(() => {
 		canBeUpdated = validationErrors === null || validationErrors.length === 0;
 		argsChanged = argsToBeFixed !== originalArgs;
 	});
+
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 </script>
 

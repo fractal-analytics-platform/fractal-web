@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { page } from '$app/stores';
 	import Modal from '../../common/Modal.svelte';
@@ -156,7 +154,12 @@
 		<h5 class="modal-title">Create new workflow</h5>
 	{/snippet}
 	{#snippet body()}
-		<form onsubmit={preventDefault(handleImportOrCreateWorkflow)}>
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleImportOrCreateWorkflow();
+			}}
+		>
 			<div class="mb-2">
 				<label for="workflowName" class="form-label">Workflow name</label>
 				<input

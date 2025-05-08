@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
@@ -130,7 +128,14 @@
 	{/snippet}
 	{#snippet body()}
 		<div id="errorAlert-createGroupModal"></div>
-		<form class="row" onsubmit={preventDefault(handleCreateGroup)} id="create-group-form">
+		<form
+			class="row"
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleCreateGroup();
+			}}
+			id="create-group-form"
+		>
 			<div class="row mb-3">
 				<label for="groupName" class="col-md-3 col-form-label">Group name</label>
 				<div class="col-md-9">

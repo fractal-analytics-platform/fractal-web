@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { projectInfoModalV2 } from '$lib/stores/projectStores.js';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
@@ -188,7 +186,14 @@
 	{/snippet}
 	{#snippet body()}
 		<div id="errorAlert-crateNewProjectModal"></div>
-		<form class="row" onsubmit={preventDefault(handleCreateProject)} id="create-project-form">
+		<form
+			class="row"
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleCreateProject();
+			}}
+			id="create-project-form"
+		>
 			<div class="col">
 				<div class="row mb-3">
 					<label for="projectName" class="col-md-3 col-form-label">Project name</label>

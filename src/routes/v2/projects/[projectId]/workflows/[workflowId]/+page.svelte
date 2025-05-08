@@ -1,6 +1,4 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
@@ -711,7 +709,10 @@
 					{:else if !hasAnyJobRun}
 						<button
 							class="btn btn-success"
-							onclick={preventDefault(() => openRunWorkflowModal('run'))}
+							onclick={(e) => {
+								e.preventDefault();
+								() => openRunWorkflowModal('run');
+							}}
 							disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
 						>
 							<i class="bi-play-fill"></i> Run workflow
@@ -719,14 +720,20 @@
 					{:else}
 						<button
 							class="btn btn-success"
-							onclick={preventDefault(() => openRunWorkflowModal('continue'))}
+							onclick={(e) => {
+								e.preventDefault();
+								openRunWorkflowModal('continue');
+							}}
 							disabled={workflow.task_list.length === 0}
 						>
 							<i class="bi-play-fill"></i> Continue workflow
 						</button>
 						<button
 							class="btn btn-primary"
-							onclick={preventDefault(() => openRunWorkflowModal('restart'))}
+							onclick={(e) => {
+								e.preventDefault();
+								openRunWorkflowModal('restart');
+							}}
 							disabled={workflow.task_list.length === 0}
 						>
 							<i class="bi bi-arrow-clockwise"></i> Restart workflow
@@ -741,7 +748,10 @@
 				{#if $page.data.userInfo.is_superuser}
 					<button
 						class="btn btn-light"
-						onclick={preventDefault(() => typeFiltersFlowModal?.open())}
+						onclick={(e) => {
+							e.preventDefault();
+							typeFiltersFlowModal?.open();
+						}}
 						disabled={workflow.task_list.length === 0}
 					>
 						Type filters flow
@@ -752,7 +762,10 @@
 				</a>
 				<button
 					class="btn btn-light"
-					onclick={preventDefault(handleExportWorkflow)}
+					onclick={(e) => {
+						e.preventDefault();
+						handleExportWorkflow();
+					}}
 					aria-label="Export workflow"
 				>
 					<i class="bi-download"></i>
@@ -838,7 +851,10 @@
 									class:active={selectedWorkflowTask !== undefined &&
 										selectedWorkflowTask.id === workflowTask.id}
 									data-fs-target={workflowTask.id}
-									onclick={preventDefault(() => setSelectedWorkflowTask(workflowTask))}
+									onclick={(e) => {
+										e.preventDefault();
+										setSelectedWorkflowTask(workflowTask);
+									}}
 								>
 									{#if statuses[workflowTask.id]}
 										{#if expandedWorkflowTaskId === workflowTask.id && loadingHistoryRunStatuses}
@@ -1096,7 +1112,13 @@
 	{#snippet body()}
 		<div id="errorAlert-editWorkflowModal"></div>
 		{#if workflow}
-			<form id="updateWorkflow" onsubmit={preventDefault(handleWorkflowUpdate)}>
+			<form
+				id="updateWorkflow"
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleWorkflowUpdate();
+				}}
+			>
 				<div class="mb-3">
 					<label for="workflowName" class="form-label">Workflow name</label>
 					<input
