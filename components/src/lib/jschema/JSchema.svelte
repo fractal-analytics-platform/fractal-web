@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import { onMount } from 'svelte';
 	import { FormManager } from './form_manager.js';
 	import ObjectProperty from './properties/ObjectProperty.svelte';
@@ -65,7 +63,8 @@
 			formManager = undefined;
 		}
 	}
-	run(() => {
+
+	$effect(() => {
 		if (schema || schemaData || propertiesToIgnore) {
 			initFormManager();
 		}

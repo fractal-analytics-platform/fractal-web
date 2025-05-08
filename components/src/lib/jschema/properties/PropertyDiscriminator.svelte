@@ -7,8 +7,6 @@
 	import NumberProperty from './NumberProperty.svelte';
 	import EnumProperty from './EnumProperty.svelte';
 	import TupleProperty from './TupleProperty.svelte';
-
-
 	
 	/**
 	 * @typedef {Object} Props

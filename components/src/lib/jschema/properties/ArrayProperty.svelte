@@ -1,29 +1,20 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
-
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 	import CollapsibleProperty from './CollapsibleProperty.svelte';
 
-	
-
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").ArrayFormElement} formElement
 	 * @property {boolean} [editable]
-	 * @property {any} [children]
 	 * @property {null|(() => void)} [reset]
 	 */
 
 	/** @type {Props} */
-	let {
-		formElement,
-		editable = true,
-		children = $bindable([]),
-		reset = null
-	} = $props();
+	let { formElement, editable = true, reset = null } = $props();
+
+	/** @type {any[]} */
+	let children = $state([]);
 
 	onMount(() => {
 		children = formElement.children;
@@ -58,17 +49,18 @@
 		children = formElement.children;
 	}
 
-	let canAddChildren =
-		$derived(editable &&
-		(typeof formElement.maxItems !== 'number' || children.length < formElement.maxItems));
+	let canAddChildren = $derived(
+		editable && (typeof formElement.maxItems !== 'number' || children.length < formElement.maxItems)
+	);
 
-	let canRemoveChildren =
-		$derived(editable &&
-		!(
-			formElement.required &&
-			typeof formElement.minItems === 'number' &&
-			children.length <= formElement.minItems
-		));
+	let canRemoveChildren = $derived(
+		editable &&
+			!(
+				formElement.required &&
+				typeof formElement.minItems === 'number' &&
+				children.length <= formElement.minItems
+			)
+	);
 </script>
 
 <CollapsibleProperty {formElement} {reset}>
@@ -93,13 +85,16 @@
 					{/if}
 				</div>
 				<div class="flex-fill">
-					<PropertyDiscriminator {editable} formElement={nestedProperty} />
+					<PropertyDiscriminator {editable} formElement={children[index]} />
 				</div>
 				<div class="align-self-right mt-2 me-2">
 					{#if children.length > 1}
 						<button
 							class="btn btn-light"
-							onclick={preventDefault(() => moveChildUp(index))}
+							onclick={(e) => {
+								e.preventDefault();
+								moveChildUp(index);
+							}}
 							aria-label="Move item up"
 							disabled={!editable && index === 0}
 						>
@@ -107,7 +102,10 @@
 						</button>
 						<button
 							class="btn btn-light"
-							onclick={preventDefault(() => moveChildDown(index))}
+							onclick={(e) => {
+								e.preventDefault();
+								moveChildDown(index);
+							}}
 							aria-label="Move item down"
 							disabled={!editable && index === children.length - 1}
 						>

@@ -1,6 +1,6 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
-	
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../../types/form").CollapsibleFormElement} formElement
@@ -11,6 +11,13 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), reset = null, children } = $props();
 
+	/** @type {boolean} */
+	let collapsed = $state(false);
+
+	$effect(() => {
+		collapsed = formElement.collapsed;
+	});
+
 	/**
 	 * @param {MouseEvent} event
 	 */
@@ -19,7 +26,7 @@
 			// prevent collapse when we are clicking on a property description
 			return;
 		}
-		formElement.collapsed = !formElement.collapsed;
+		collapsed = !collapsed;
 	}
 
 	/**
@@ -39,27 +46,30 @@
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item">
 				<div class="accordion-header">
-					<a
+					<button
 						class="accordion-button"
-						class:collapsed={formElement.collapsed}
+						class:collapsed
 						onclick={(event) => toggleCollapse(event)}
-						role="button"
+						type="button"
 					>
 						<div class="flex-fill">
 							<PropertyLabel {formElement} tag="span" />
 						</div>
 						<div>
 							{#if reset !== null && formElement.property.default !== undefined}
-								<button class="btn btn-warning me-3" onclick={handleReset}> Reset </button>
+								<!-- svelte-ignore a11y_interactive_supports_focus -->
+								<!-- svelte-ignore a11y_click_events_have_key_events -->
+								<!-- svelte-ignore a11y_missing_attribute -->
+								<a class="btn btn-warning me-3" role="button" onclick={handleReset}>Reset</a>
 							{/if}
 						</div>
-					</a>
+					</button>
 				</div>
 				<div
 					id="collapse-{formElement.id}"
 					class="accordion-collapse jschema-collapsing"
-					class:collapse={formElement.collapsed}
-					class:show={!formElement.collapsed}
+					class:collapse={collapsed}
+					class:show={!collapsed}
 				>
 					<div class="accordion-body p-1">
 						{@render children?.()}

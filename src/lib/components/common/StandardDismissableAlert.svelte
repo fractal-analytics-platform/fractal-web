@@ -1,7 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {any} message
@@ -14,21 +11,32 @@
 
 	let timeout = $state();
 
-
 	export function hide() {
 		message = '';
 	}
-	run(() => {
-		if (autoDismiss && message) {
-			if (timeout) {
-				clearTimeout(timeout);
-			}
-			timeout = setTimeout(function () {
-				hide();
-				timeout = null;
-			}, 3000);
+
+	/** @type {string|undefined} */
+	let previousMessage = $state('');
+
+	$effect(() => {
+		if (message !== previousMessage) {
+			previousMessage = message;
+			setupTimeout();
 		}
 	});
+
+	function setupTimeout() {
+		if (!autoDismiss) {
+			return;
+		}
+		if (timeout) {
+			clearTimeout(timeout);
+		}
+		timeout = setTimeout(function () {
+			hide();
+			timeout = null;
+		}, 3000);
+	}
 </script>
 
 {#if message}

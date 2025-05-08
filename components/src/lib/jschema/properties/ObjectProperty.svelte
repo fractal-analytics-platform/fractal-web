@@ -94,7 +94,7 @@
 			{/if}
 			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
 				<PropertyDiscriminator
-					formElement={child}
+					formElement={children[index]}
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
 				/>

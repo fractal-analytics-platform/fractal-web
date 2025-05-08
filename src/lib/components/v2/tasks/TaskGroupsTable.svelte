@@ -209,7 +209,9 @@
 						Manage
 					</button>
 					<ConfirmActionButton
-						modalId="confirmTaskGroupDeleteModal{taskGroupRow.groupTitle}"
+						modalId="confirmTaskGroupDeleteModal{Object.values(taskGroupRow.groups)
+							.map((t) => t.id)
+							.join('-')}"
 						style={'danger'}
 						btnStyle="danger"
 						buttonIcon="trash"
