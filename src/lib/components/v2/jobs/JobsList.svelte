@@ -33,7 +33,7 @@
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $state([]);
 	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
-	let jobs = $page.data.jobs || [];
+	let jobs = [];
 	/** @type {{ id: number, name: string }[]} */
 	let datasets = $state([]);
 
@@ -66,14 +66,14 @@
 	 * @type {Array<SortField>}
 	 */
 	let columns = $state([
-		{ key: 'id', label: 'Id', field: (j) => j.id },
+		{ key: 'id', label: 'Id', direction: 'desc', priority: 1, field: (j) => j.id },
 		{ key: 'status', label: 'Status', field: (j) => j.status },
 		{ key: 'options', label: 'Options' },
 		{ key: 'start_timestamp', label: 'Start', field: (j) => j.start_timestamp },
 		{ key: 'end_timestamp', label: 'End', field: (j) => j.end_timestamp },
-		{ key: 'project_id', label: 'Project', field: (j) => j.project_dump.id },
-		{ key: 'workflow_id', label: 'Workflow', field: (j) => j.workflow_dump.id },
-		{ key: 'dataset_id', label: 'Dataset', field: (j) => j.dataset_dump.id },
+		{ key: 'project', label: 'Project', field: (j) => j.project_dump.id },
+		{ key: 'workflow', label: 'Workflow', field: (j) => j.workflow_dump.id },
+		{ key: 'dataset', label: 'Dataset', field: (j) => j.dataset_dump.id },
 		{ key: 'user_email', label: 'User', field: (j) => j.user_email }
 	]);
 
@@ -215,7 +215,11 @@
 	}
 
 	function clearFilters() {
-		columns = columns.map((c) => ({ ...c, direction: undefined, priority: undefined }));
+		columns = columns.map((c) =>
+			c.key === 'id'
+				? { ...c, direction: 'desc', priority: 1 }
+				: { ...c, direction: undefined, priority: undefined }
+		);
 		updateRows();
 		statusSelect?.setSelected('');
 		projectSelect?.setSelected('');
@@ -227,6 +231,7 @@
 	onMount(() => {
 		workflows = $page.data.workflows;
 		datasets = $page.data.datasets;
+		setJobs($page.data.jobs || []);
 
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
 

@@ -117,7 +117,7 @@
 	let updatableWorkflowList = $derived(workflow.task_list || []);
 
 	let sortedDatasets = $derived(
-		datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+		[...datasets].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
 	);
 
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL

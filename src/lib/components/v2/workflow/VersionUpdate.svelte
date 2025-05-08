@@ -1,6 +1,4 @@
 <script>
-	import { run } from 'svelte/legacy';
-
 	import {
 		AlertError,
 		displayStandardErrorAlert,
@@ -12,10 +10,6 @@
 	import { getNewVersions } from './version-checker';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
-	
-
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
@@ -47,12 +41,6 @@
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
-
-
-
-
-
-
 
 	async function checkNewVersions() {
 		if (errorAlert) {
@@ -171,29 +159,38 @@
 		}
 		return null;
 	}
-	let task = $derived(workflowTask.task);
-	run(() => {
-		if (task) {
+
+	/** @type {number|undefined} */
+	let previousTaskId = $state();
+	const task = $derived(workflowTask.task);
+
+	$effect(() => {
+		if (task.id !== previousTaskId) {
+			previousTaskId = task.id;
 			checkNewVersions();
 		}
 	});
-	let updateCandidate =
-		$derived(selectedUpdateVersion === ''
+
+	let updateCandidate = $derived(
+		selectedUpdateVersion === ''
 			? null
-			: updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0]);
+			: updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0]
+	);
 	let cancelEnabled = $derived(nonParallelArgsChanged || parallelArgsChanged);
-	let taskHasArgsSchema = $derived(!!(
-		workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel
-	));
-	let updateCandidateType =
-		$derived(updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel');
-	let canBeUpdated =
-		$derived(selectedUpdateVersion &&
-		updateCandidate &&
-		(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
-			nonParallelCanBeUpdated) ||
-			((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
-				parallelCanBeUpdated)));
+	let taskHasArgsSchema = $derived(
+		!!(workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel)
+	);
+	let updateCandidateType = $derived(
+		updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel'
+	);
+	let canBeUpdated = $derived(
+		selectedUpdateVersion &&
+			updateCandidate &&
+			(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
+				nonParallelCanBeUpdated) ||
+				((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
+					parallelCanBeUpdated))
+	);
 </script>
 
 <div>
