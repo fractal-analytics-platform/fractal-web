@@ -44,7 +44,7 @@
 
 	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
 	let userSettingsEditor = $state();
-	let settingsPendingChanges = $state();
+	let settingsPendingChanges = $state(false);
 
 	/** @type {UserSettingsImportModal|undefined} */
 	let userSettingsImportModal = $state();
