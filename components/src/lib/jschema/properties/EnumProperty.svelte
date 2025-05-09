@@ -1,6 +1,7 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
-	
+	import { get } from 'svelte/store';
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').EnumFormElement} formElement
@@ -10,11 +11,23 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), editable = true } = $props();
 
+	let value = $state();
+	formElement.value.subscribe((v) => (value = v));
+	$effect(() => handleValueChange(value));
+
 	/** @type {HTMLSelectElement|undefined} */
 	let field = $state();
 	let validationError = $state('');
 
-	function handleValueChange() {
+	/**
+	 * @param {any} value
+	 */
+	function handleValueChange(value) {
+		const previousValue = get(formElement.value);
+		if (previousValue === value) {
+			return;
+		}
+		formElement.value.set(value);
 		formElement.notifyChange();
 		validationError = '';
 		if (formElement.required && field?.value === '') {
@@ -30,9 +43,7 @@
 	<div class="property-input ms-auto w-50 has-validation">
 		<select
 			bind:this={field}
-			bind:value={formElement.value}
-			onchange={handleValueChange}
-			oninput={handleValueChange}
+			bind:value
 			class="form-select"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}

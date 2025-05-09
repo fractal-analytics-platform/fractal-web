@@ -1,5 +1,6 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
+	import { get } from 'svelte/store';
 
 	/**
 	 * @typedef {Object} Props
@@ -10,11 +11,23 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), editable = true } = $props();
 
+	let value = $state();
+	formElement.value.subscribe((v) => (value = v));
+	$effect(() => handleValueChange(value));
+
 	/** @type {HTMLInputElement|undefined} */
 	let field = $state();
 	let validationError = $state('');
 
-	function handleValueChange() {
+	/**
+	 * @param {any} value
+	 */
+	function handleValueChange(value) {
+		const previousValue = get(formElement.value);
+		if (previousValue === value) {
+			return;
+		}
+		formElement.value.set(value);
 		formElement.notifyChange();
 		validationError = '';
 		if (formElement.required && field?.value === '') {
@@ -31,8 +44,7 @@
 		<input
 			type="text"
 			bind:this={field}
-			bind:value={formElement.value}
-			oninput={handleValueChange}
+			bind:value
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}

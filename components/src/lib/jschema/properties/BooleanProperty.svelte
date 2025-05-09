@@ -1,7 +1,7 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
+	import { get } from 'svelte/store';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').ValueFormElement} formElement
@@ -11,7 +11,19 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), editable = true } = $props();
 
-	function handleValueChange() {
+	let value = $state();
+	formElement.value.subscribe((v) => (value = v));
+
+	/**
+	 * @param {any} event
+	 */
+	function handleValueChange(event) {
+		const value = event.target.checked;
+		const previousValue = get(formElement.value);
+		if (previousValue === value) {
+			return;
+		}
+		formElement.value.set(value);
 		formElement.notifyChange();
 	}
 </script>
@@ -26,8 +38,8 @@
 				id="property-{formElement.id}"
 				class="form-check-input"
 				type="checkbox"
-				bind:checked={formElement.value}
-				onchange={handleValueChange}
+				onchange={(event) => handleValueChange(event)}
+				checked={value === true}
 				role="switch"
 				disabled={!editable}
 			/>

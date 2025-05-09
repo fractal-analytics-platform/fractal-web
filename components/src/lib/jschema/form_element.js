@@ -1,4 +1,5 @@
 import { getPropertyData } from './jschema_initial_data';
+import { writable } from "svelte/store"
 
 /**
  * Base class for representing data associated with a form element.
@@ -47,7 +48,7 @@ export class ValueFormElement extends BaseFormElement {
 	 */
 	constructor(fields) {
 		super(fields);
-		this.value = fields.value;
+		this.value = writable(fields.value);
 	}
 }
 
