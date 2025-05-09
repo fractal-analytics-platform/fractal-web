@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { svelteTesting } from '@testing-library/svelte/vite';
 
 /** @type {import('vite').UserConfigExport} */
 const config = defineConfig({
-	plugins: [svelte()],
+	plugins: [svelte(), svelteTesting()],
 	build: {
 		outDir: './build',
 		emptyOutDir: true,
@@ -13,13 +14,9 @@ const config = defineConfig({
 		}
 	},
 	test: {
-		globals: true,
 		environment: 'jsdom',
+		clearMocks: true,
 		include: ['**/__tests__/**/*\\.test\\.js'],
-		alias: [
-			// See https://github.com/vitest-dev/vitest/issues/2834#issuecomment-1439576110
-			{ find: /^svelte$/, replacement: 'svelte/internal' }
-		],
 		setupFiles: ['vitest.setup.js']
 	}
 });
