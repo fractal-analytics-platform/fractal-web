@@ -26,7 +26,7 @@
 
 	<table class="table table-striped">
 		<tbody>
-			{#each Object.entries(settings) as [key, value]}
+			{#each Object.entries(settings) as [key, value] (key)}
 				{#if showObfuscated || value !== '**********'}
 					<tr>
 						<th>{key}</th>

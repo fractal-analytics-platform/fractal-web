@@ -1,10 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
 
-	
-	
-
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
@@ -70,7 +66,7 @@
 					<label class="input-group-text" for="task-group-selector">Group</label>
 					<select class="form-select" id="task-group-selector" bind:value={selectedGroup}>
 						{#if groupIdsNames}
-							{#each groupIdsNames as [groupId, groupName]}
+							{#each groupIdsNames as [groupId, groupName] (groupId)}
 								<option value={groupId}>{groupName}</option>
 							{/each}
 						{/if}

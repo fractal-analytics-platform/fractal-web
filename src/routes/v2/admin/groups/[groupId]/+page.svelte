@@ -38,7 +38,7 @@
 		<p>This group has no users.</p>
 	{:else}
 		<div class="col-6 bg-light p-2 rounded">
-			{#each groupUsers as user}
+			{#each groupUsers as user (user.id)}
 				<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 					<a href="/v2/admin/users/{user.id}" class="text-light">{user.email}</a>
 				</span>
@@ -51,7 +51,7 @@
 			<h4 class="fw-light mb-3">Viewer paths</h4>
 			{#if group.viewer_paths.length > 0}
 				<ul>
-					{#each group.viewer_paths as viewerPath}
+					{#each group.viewer_paths as viewerPath (viewerPath)}
 						<li><code>{viewerPath}</code></li>
 					{/each}
 				</ul>

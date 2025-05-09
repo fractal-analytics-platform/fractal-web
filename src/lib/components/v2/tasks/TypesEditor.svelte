@@ -107,7 +107,7 @@
 	<span class="col-2 col-form-label text-end"> Input Types </span>
 	{#if inputTypesArray.length > 0}
 		<div class="col-7">
-			{#each inputTypesArray as inputType, index}
+			{#each inputTypesArray as inputType, index (index)}
 				<div class="row">
 					<div class="col">
 						<div class="input-group mb-1" class:has-validation={inputType.error}>
@@ -157,7 +157,7 @@
 	<span class="col-2 col-form-label text-end"> Output Types </span>
 	{#if outputTypesArray.length > 0}
 		<div class="col-7">
-			{#each outputTypesArray as outputType, index}
+			{#each outputTypesArray as outputType, index (index)}
 				<div class="row">
 					<div class="col">
 						<div class="input-group mb-1" class:has-validation={outputType.error}>

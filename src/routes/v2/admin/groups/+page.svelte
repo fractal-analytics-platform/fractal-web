@@ -91,7 +91,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each groups as group}
+			{#each groups as group (group.id)}
 				<tr>
 					<td>{group.id}</td>
 					<td>{group.name}</td>
@@ -107,10 +107,10 @@
 						{#if group.name !== 'All'}
 							<ConfirmActionButton
 								modalId="confirmGroupDeleteModal{group.id}"
-								style={'danger'}
+								style="danger"
 								btnStyle="danger"
 								buttonIcon="trash"
-								label={'Delete'}
+								label="Delete"
 								message={`Delete group ${group.name}`}
 								callbackAction={() => handleGroupDelete(group.id)}
 							/>

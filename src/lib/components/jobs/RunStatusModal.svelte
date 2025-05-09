@@ -246,7 +246,7 @@
 					{:else}
 						<table class="table table-striped">
 							<tbody>
-								{#each selectedUnit.zarr_urls as zarrUrl}
+								{#each selectedUnit.zarr_urls as zarrUrl (zarrUrl)}
 									<tr>
 										<td>{zarrUrl}</td>
 									</tr>
@@ -292,7 +292,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.items as unit}
+					{#each data.items as unit (unit.id)}
 						<tr>
 							<td>{unit.id}</td>
 							<td>{unit.status || '-'}</td>

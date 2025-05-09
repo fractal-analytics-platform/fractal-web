@@ -227,7 +227,8 @@
 </script>
 
 <div class="mt-2 p-2">
-	{#each editableArgs as _, index}
+	<!-- eslint-disable-next-line no-unused-vars -->
+	{#each editableArgs as _, index (index)}
 		<FormEntry
 			bind:entry={editableArgs[index]}
 			{editable}

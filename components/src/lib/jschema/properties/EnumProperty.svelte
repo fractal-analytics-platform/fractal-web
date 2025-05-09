@@ -39,7 +39,7 @@
 			disabled={!editable}
 		>
 			<option value="">Select...</option>
-			{#each formElement.options as optionValue}
+			{#each formElement.options as optionValue, index (index)}
 				<option>{optionValue}</option>
 			{/each}
 		</select>

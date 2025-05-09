@@ -4,7 +4,6 @@
 	import { onDestroy } from 'svelte';
 	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<import('fractal-components/types/api').User>} [users]
@@ -89,7 +88,7 @@
 			<div class="col-12 mt-1">
 				<select class="form-select" bind:value={userId} id="user">
 					<option value="">All</option>
-					{#each users as user}
+					{#each users as user (user.id)}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>
@@ -138,7 +137,7 @@
 	<div class="card" class:d-none={ids.length === 0}>
 		<div class="card-body d-flex flex-row">
 			<div class="text-break flex-fill">
-				{#each ids as id}
+				{#each ids as id (id)}
 					<span class="font-monospace me-2">{id}</span>
 				{/each}
 			</div>

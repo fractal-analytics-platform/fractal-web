@@ -190,7 +190,7 @@
 	{#if warningBanner}
 		<div class="container mt-3">
 			<div class="alert alert-warning">
-				{#each warningBanner.split('\n') as line, index}
+				{#each warningBanner.split('\n') as line, index (index)}
 					{#if index > 0}
 						<br />
 					{/if}

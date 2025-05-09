@@ -81,7 +81,7 @@
 			>
 				<div class="accordion-body">
 					{#if entry.children}
-						{#each entry.children as child, childIndex}
+						{#each entry.children as child, childIndex (childIndex)}
 							{#if child.type === 'object' || child.type === 'array'}
 								<FormEntry
 									bind:entry={entry.children[childIndex]}

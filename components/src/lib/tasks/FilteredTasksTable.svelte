@@ -399,11 +399,11 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each filteredRows as row}
+					{#each filteredRows as row, index (index)}
 						<tr class="border-top">
 							<th colspan="3">{row.groupTitle}</th>
 						</tr>
-						{#each row.tasks as task}
+						{#each row.tasks as task, index (index)}
 							{#if task.taskVersions[task.selectedVersion]}
 								<tr>
 									<td class="task-name-col">
@@ -457,7 +457,7 @@
 													.task_name}"
 												bind:value={task.selectedVersion}
 											>
-												{#each sortVersions(Object.keys(task.taskVersions)) as version}
+												{#each sortVersions(Object.keys(task.taskVersions)) as version (version)}
 													<option value={version}>{version || 'None'}</option>
 												{/each}
 											</select>

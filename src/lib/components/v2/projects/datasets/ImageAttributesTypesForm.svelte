@@ -194,7 +194,7 @@
 {#if attributeFields.length > 0}
 	<h5>Attributes</h5>
 {/if}
-{#each attributeFields as field, index}
+{#each attributeFields as field, index (index)}
 	<div class="input-group mb-3" class:has-validation={field.error}>
 		<input
 			type="text"
@@ -245,7 +245,7 @@
 {#if typeFields.length > 0}
 	<h5>Types</h5>
 {/if}
-{#each typeFields as field, index}
+{#each typeFields as field, index (index)}
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="input-group mb-3" class:has-validation={field.error}>

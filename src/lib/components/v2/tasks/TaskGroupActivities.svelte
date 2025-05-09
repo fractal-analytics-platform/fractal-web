@@ -238,7 +238,7 @@
 				<label class="input-group-text" for="user"> User </label>
 				<select class="form-select" id="user" bind:value={user_id}>
 					<option value={null}>Select...</option>
-					{#each sortedUsers as user}
+					{#each sortedUsers as user (user.id)}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>
@@ -282,7 +282,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each results as taskGroupActivity}
+			{#each results as taskGroupActivity (taskGroupActivity.id)}
 				<tr>
 					<td>{taskGroupActivity.pkg_name}</td>
 					<td>

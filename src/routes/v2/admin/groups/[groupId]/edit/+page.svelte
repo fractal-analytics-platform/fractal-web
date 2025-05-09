@@ -246,7 +246,7 @@
 				}}
 			>
 				<div class="p-2">
-					{#each members as user}
+					{#each members as user (user.id)}
 						{#if group.name === 'All'}
 							<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 								{user.email}
@@ -299,7 +299,7 @@
 					/>
 				</div>
 				<div>
-					{#each filteredAvailableUsers as user}
+					{#each filteredAvailableUsers as user (user.id)}
 						<button
 							class="btn btn-outline-secondary ps-1 pe-2 pt-0 pb-0 me-2 mb-2"
 							draggable={true}
@@ -323,7 +323,8 @@
 	<div class="row mt-4 mb-4">
 		<div class="col-lg-9">
 			<h4 class="fw-light">Viewer paths</h4>
-			{#each editableViewPaths as _, i}
+			<!-- eslint-disable-next-line no-unused-vars -->
+			{#each editableViewPaths as _, i (i)}
 				<div class="input-group mb-2">
 					<input
 						type="text"

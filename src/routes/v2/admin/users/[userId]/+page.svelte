@@ -73,7 +73,7 @@
 				<tr>
 					<th>Groups</th>
 					<td>
-						{#each userGroups as group}
+						{#each userGroups as group (group.id)}
 							<a href="/v2/admin/groups/{group.id}" class="me-2">{group.name}</a>
 						{/each}
 					</td>
@@ -121,7 +121,7 @@
 						<th>SLURM accounts</th>
 						<td>
 							{#if settings.slurm_accounts.length > 0}
-								{#each settings.slurm_accounts as account}
+								{#each settings.slurm_accounts as account (account)}
 									<span class="badge text-bg-light fw-normal fs-6">{account}</span>
 									&nbsp;
 								{/each}

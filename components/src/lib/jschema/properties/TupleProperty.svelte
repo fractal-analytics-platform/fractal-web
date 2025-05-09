@@ -3,10 +3,6 @@
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 	import CollapsibleProperty from './CollapsibleProperty.svelte';
 
-	
-
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").TupleFormElement} formElement
@@ -16,12 +12,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		formElement,
-		editable = true,
-		children = $bindable([]),
-		reset = null
-	} = $props();
+	let { formElement, editable = true, children = $bindable([]), reset = null } = $props();
 
 	onMount(() => {
 		children = formElement.children;
@@ -53,7 +44,7 @@
 		{/if}
 	</div>
 	<div>
-		{#each children as nestedProperty}
+		{#each children as nestedProperty, index (index)}
 			<div class="d-flex">
 				<div class="flex-fill">
 					<PropertyDiscriminator {editable} formElement={nestedProperty} />

@@ -184,7 +184,7 @@
 						<div class="col-xl-8 col-lg-7 col-9">
 							<select class="form-select" bind:value={user_id} id="user_id">
 								<option value="">Select...</option>
-								{#each users as user}
+								{#each users as user (user.id)}
 									<option value={user.id}>{user.email}</option>
 								{/each}
 							</select>
@@ -199,7 +199,7 @@
 						<div class="col-xl-8 col-lg-7 col-9">
 							<select class="form-select" bind:value={user_group_id} id="user_group_id">
 								<option value="">Select...</option>
-								{#each groups as group}
+								{#each groups as group (group.id)}
 									<option value={group.id}>{group.name}</option>
 								{/each}
 							</select>
@@ -344,7 +344,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each results as taskGroup, taskGroupIndex}
+					{#each results as taskGroup, taskGroupIndex (taskGroup.id)}
 						<tr class:row-grey={taskGroupIndex % 2 === 0}>
 							<td>{taskGroup.id}</td>
 							<td>{taskGroup.pkg_name}</td>
@@ -371,10 +371,10 @@
 								</button>
 								<ConfirmActionButton
 									modalId="confirmTaskGroupDeleteModal{taskGroup.id}"
-									style={'danger'}
+									style="danger"
 									btnStyle="danger"
 									buttonIcon="trash"
-									label={'Delete'}
+									label="Delete"
 									message={`Delete task group ${
 										taskGroup.pkg_name +
 										(taskGroup.version ? ' (version ' + taskGroup.version + ')' : '')

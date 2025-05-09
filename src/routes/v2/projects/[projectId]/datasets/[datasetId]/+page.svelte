@@ -180,7 +180,7 @@
 			<div class="col-12">
 				<select class="form-select" aria-label="Select plate" bind:value={selectedPlate}>
 					<option value="">Select...</option>
-					{#each plates as plate}
+					{#each plates as plate, index (index)}
 						<option>{plate}</option>
 					{/each}
 				</select>

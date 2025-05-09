@@ -100,7 +100,7 @@
 		</thead>
 		<tbody>
 			{#key datasets}
-				{#each filteredDatasets as dataset}
+				{#each filteredDatasets as dataset (dataset.id)}
 					<tr>
 						<td>
 							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
@@ -110,10 +110,10 @@
 						<td>
 							<ConfirmActionButton
 								modalId="confirmDatasetDeleteModal{dataset.id}"
-								style={'danger'}
+								style="danger"
 								btnStyle="danger"
 								buttonIcon="trash"
-								label={'Delete'}
+								label="Delete"
 								message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
 								callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
 							/>

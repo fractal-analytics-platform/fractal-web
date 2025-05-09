@@ -77,7 +77,7 @@
 			<p>There has been an error, reason:</p>
 			<pre>{errorData.errorString}</pre>
 		{:else}
-			{#each errorData.errorString.split('\n') as line, index}
+			{#each errorData.errorString.split('\n') as line, index (index)}
 				{#if index > 0}
 					<br />
 				{/if}

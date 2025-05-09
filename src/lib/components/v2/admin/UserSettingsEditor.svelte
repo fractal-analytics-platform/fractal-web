@@ -228,7 +228,8 @@
 						<strong>SLURM accounts</strong>
 					</label>
 					<div class="col-sm-9 has-validation">
-						{#each editableSettings.slurm_accounts as _, i}
+						<!-- eslint-disable-next-line no-unused-vars -->
+						{#each editableSettings.slurm_accounts as _, i (i)}
 							<div
 								class="input-group mb-2"
 								class:is-invalid={settingsFormSubmitted &&

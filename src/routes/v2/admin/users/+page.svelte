@@ -55,7 +55,7 @@
 		</thead>
 		<tbody>
 			{#key users}
-				{#each users as user}
+				{#each users as user (user.id)}
 					<tr class="align-middle">
 						<td>{user.id}</td>
 						<td>{user.email}</td>
@@ -73,7 +73,7 @@
 							{#if deleteEnabled && user.email !== page.data.userInfo.email}
 								<ConfirmActionButton
 									modalId={'confirmDeleteProject' + user.id}
-									style={'danger'}
+									style="danger"
 									btnStyle="danger"
 									message="Delete user {user.email}"
 									buttonIcon="trash"

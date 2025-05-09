@@ -25,7 +25,7 @@
 	</p>
 
 	<ul>
-		{#each viewerPaths as viewerPath}
+		{#each viewerPaths as viewerPath (viewerPath)}
 			<li><code>{viewerPath}</code></li>
 		{/each}
 	</ul>

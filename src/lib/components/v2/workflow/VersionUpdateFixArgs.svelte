@@ -134,7 +134,7 @@
 	<div class="alert alert-danger mt-3">
 		<p>Following errors must be fixed before performing the update:</p>
 		<ul id="validation-errors">
-			{#each validationErrors as error, index}
+			{#each validationErrors as error, index (index)}
 				<li>
 					{#if error.instancePath !== ''}
 						{error.instancePath}:

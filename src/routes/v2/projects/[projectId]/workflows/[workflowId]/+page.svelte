@@ -695,7 +695,7 @@
 							onchange={selectedDatasetChanged}
 						>
 							<option value={undefined}>Select...</option>
-							{#each sortedDatasets as dataset}
+							{#each sortedDatasets as dataset (dataset.id)}
 								<option value={dataset.id}>{dataset.name}</option>
 							{/each}
 						</select>
@@ -844,7 +844,7 @@
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 					{:else}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
-							{#each workflow.task_list as workflowTask}
+							{#each workflow.task_list as workflowTask (workflowTask.id)}
 								<button
 									style="cursor: pointer"
 									class="list-group-item list-group-item-action"
@@ -864,6 +864,7 @@
 												aria-hidden="true"
 											></span>
 										{:else if expandedWorkflowTaskId === workflowTask.id}
+											<!-- svelte-ignore node_invalid_placement_ssr -->
 											<button
 												aria-label="Hide runs"
 												class="btn btn-link p-0 text-white"
@@ -872,6 +873,7 @@
 												<i class="bi bi-caret-down-fill"></i>
 											</button>
 										{:else}
+											<!-- svelte-ignore node_invalid_placement_ssr -->
 											<button
 												aria-label="Show runs"
 												class="btn btn-link p-0"
@@ -908,7 +910,7 @@
 										</span>
 									{/if}
 								</button>
-								{#each historyRunStatuses as status, index}
+								{#each historyRunStatuses as status, index (status.id)}
 									{#if !loadingHistoryRunStatuses && expandedWorkflowTaskId === workflowTask.id}
 										<button
 											transition:slide

@@ -75,7 +75,7 @@
 					<tbody>
 						{#if !loading}
 							<!-- eslint-disable-next-line no-unused-vars -->
-							{#each typeFiltersFlow as filters}
+							{#each typeFiltersFlow as filters, index (index)}
 								<tr>
 									<td>
 										{getTaskById(Number(filters.workflowtask_id)).name}

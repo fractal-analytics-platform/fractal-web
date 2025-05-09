@@ -582,7 +582,7 @@
 					bind:value={selectedDatasetId}
 				>
 					<option value={undefined}>Select a dataset</option>
-					{#each datasets as dataset}
+					{#each datasets as dataset (dataset.id)}
 						<option value={dataset.id}>{dataset.name}</option>
 					{/each}
 				</select>
@@ -616,7 +616,7 @@
 						class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 					>
 						<option value={undefined}>Select first task</option>
-						{#each workflow.task_list as wft}
+						{#each workflow.task_list as wft (wft.id)}
 							<option value={wft.order}>{wft.task.name}</option>
 						{/each}
 					</select>
@@ -632,7 +632,7 @@
 						bind:value={lastTaskIndex}
 					>
 						<option value={undefined}>Select last task</option>
-						{#each workflow.task_list as wft}
+						{#each workflow.task_list as wft (wft.id)}
 							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
 								<option value={wft.order}>{wft.task.name}</option>
 							{/if}
@@ -778,7 +778,7 @@
 									disabled={checkingConfiguration}
 									bind:value={slurmAccount}
 								>
-									{#each slurmAccounts as account}
+									{#each slurmAccounts as account (account)}
 										<option>{account}</option>
 									{/each}
 								</select>
@@ -796,12 +796,12 @@
 						the first task:
 					</p>
 					<ul class="mb-0">
-						{#each Object.entries(appliedAttributeFilters) as [key, value]}
+						{#each Object.entries(appliedAttributeFilters) as [key, value] (key)}
 							<li>{key}: <code>{value}</code></li>
 						{/each}
 					</ul>
 					<ul class="mt-0 mb-1">
-						{#each Object.entries(appliedTypeFilters) as [key, value]}
+						{#each Object.entries(appliedTypeFilters) as [key, value] (key)}
 							<li>{key}: <BooleanIcon {value} /></li>
 						{/each}
 					</ul>

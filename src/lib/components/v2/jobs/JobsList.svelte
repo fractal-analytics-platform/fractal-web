@@ -400,7 +400,7 @@
 	<thead class="table-light">
 		<tr>
 			{#key columns}
-				{#each columns as column}
+				{#each columns as column (column.key)}
 					{#if !columnsToHide.includes(column.key)}
 						{#if column.field}
 							<th onclick={() => updateSortField(column)} style="cursor: pointer">
@@ -456,7 +456,7 @@
 	</thead>
 
 	<tbody>
-		{#each rows as row}
+		{#each rows as row (row.id)}
 			<tr class="align-middle">
 				{#if !columnsToHide.includes('id')}
 					<td> {row.id} </td>

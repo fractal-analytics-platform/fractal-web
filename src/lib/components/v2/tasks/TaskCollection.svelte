@@ -374,7 +374,7 @@
 		{#if pinnedPackageVersions.length > 0}
 			<p class="mt-2">Pinned packages versions:</p>
 		{/if}
-		{#each pinnedPackageVersions as ppv, i}
+		{#each pinnedPackageVersions as ppv, i (i)}
 			<div class="row">
 				<div class="col-xl-6 col-lg-8 col-md-12 mb-2">
 					<div class="input-group">
@@ -475,7 +475,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each sortedRecentActivities as taskGroupActivity}
+					{#each sortedRecentActivities as taskGroupActivity (taskGroupActivity.id)}
 						<tr>
 							<td>{taskGroupActivity.pkg_name}</td>
 							<td>

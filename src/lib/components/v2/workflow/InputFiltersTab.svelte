@@ -171,7 +171,7 @@
 			<label class="form-label" for="datasetTypeKey"> Type Key </label>
 			<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
 				<option value="">Select...</option>
-				{#each datasetTypes as t}
+				{#each datasetTypes as t (t)}
 					<option>{t}</option>
 				{/each}
 			</select>
@@ -205,7 +205,7 @@
 		{:else}
 			<table class="table table-borderless mb-0">
 				<tbody>
-					{#each Object.keys(workflowTask.task.input_types) as key}
+					{#each Object.keys(workflowTask.task.input_types) as key (key)}
 						<tr class="d-flex">
 							<td><code>{key}</code></td>
 							<td class="flex-grow"><BooleanIcon value={workflowTask.task.input_types[key]} /></td>
@@ -222,7 +222,7 @@
 		{:else}
 			<table class="table table-borderless mb-0">
 				<tbody>
-					{#each Object.keys(workflowTask.task.output_types) as key}
+					{#each Object.keys(workflowTask.task.output_types) as key (key)}
 						<tr class="d-flex">
 							<td><code>{key}</code></td>
 							<td class="flex-grow"><BooleanIcon value={workflowTask.task.output_types[key]} /></td>

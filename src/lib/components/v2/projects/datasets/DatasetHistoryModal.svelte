@@ -87,7 +87,7 @@
 		<div id="errorAlert-datasetHistoryModal"></div>
 		{#if history && Object.keys(history).length > 0}
 			<div class="accordion" id="accordion-dataset-history">
-				{#each history as value, index}
+				{#each history as value, index (value.id)}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button

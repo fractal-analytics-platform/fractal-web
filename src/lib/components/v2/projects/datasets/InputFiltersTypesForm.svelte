@@ -132,7 +132,7 @@
 {#if typeFields.length > 0}
 	<h5>Type filters</h5>
 {/if}
-{#each typeFields as field, index}
+{#each typeFields as field, index (index)}
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="input-group mb-3" class:has-validation={field.error}>

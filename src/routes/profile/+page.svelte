@@ -44,8 +44,7 @@
 					<tr>
 						<th>Groups</th>
 						<td>
-							<!-- eslint-disable-next-line no-unused-vars -->
-							{#each user.group_ids_names as [_, group_name]}
+							{#each user.group_ids_names as [id, group_name] (id)}
 								<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group_name}</span>
 							{/each}
 						</td>
@@ -58,7 +57,7 @@
 							{:else}
 								<table class="table mb-0">
 									<tbody>
-										{#each user.oauth_accounts as account}
+										{#each user.oauth_accounts as account (account.id)}
 											<tr>
 												<th>{account.oauth_name}</th>
 												<td>{account.account_email}</td>

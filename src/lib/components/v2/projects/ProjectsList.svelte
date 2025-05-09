@@ -139,7 +139,7 @@
 				</thead>
 				<tbody>
 					{#key projects}
-						{#each filteredProjects as { id, name }}
+						{#each filteredProjects as { id, name } (id)}
 							<tr>
 								<td>
 									<a href={'/v2/projects/' + id}>
@@ -157,7 +157,7 @@
 									</button>
 									<ConfirmActionButton
 										modalId={'confirmDeleteProject' + id}
-										style={'danger'}
+										style="danger"
 										btnStyle="danger"
 										message="Delete project {name}"
 										buttonIcon="trash"

@@ -11,7 +11,7 @@
 	let { filters } = $props();
 </script>
 
-{#each Object.entries(filters) as [key, value]}
+{#each Object.entries(filters) as [key, value] (key)}
 	<div class="d-flex m-1">
 		<div class="flex-fill pe-3">
 			<code>{key}</code>

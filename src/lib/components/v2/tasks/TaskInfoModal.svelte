@@ -72,7 +72,7 @@
 						<li class="list-group-item">
 							<table class="table table-borderless mb-0">
 								<tbody>
-									{#each Object.keys(task.input_types) as key}
+									{#each Object.keys(task.input_types) as key (key)}
 										<tr class="d-flex">
 											<td><code>{key}</code></td>
 											<td class="flex-grow"><BooleanIcon value={task.input_types[key]} /></td>
@@ -85,7 +85,7 @@
 						<li class="list-group-item">
 							<table class="table table-borderless mb-0">
 								<tbody>
-									{#each Object.keys(task.output_types) as key}
+									{#each Object.keys(task.output_types) as key (key)}
 										<tr class="d-flex">
 											<td><code>{key}</code></td>
 											<td class="flex-grow"><BooleanIcon value={task.output_types[key]} /></td>

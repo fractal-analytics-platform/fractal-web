@@ -104,7 +104,7 @@
 		</thead>
 		<tbody>
 			{#key workflows}
-				{#each filteredWorkflows as { id, name }}
+				{#each filteredWorkflows as { id, name } (id)}
 					<tr>
 						<td>
 							<a href="/v2/projects/{projectId}/workflows/{id}">
@@ -117,10 +117,10 @@
 							</a>
 							<ConfirmActionButton
 								modalId={'deleteConfirmModal' + id}
-								style={'danger'}
+								style="danger"
 								btnStyle="danger"
 								buttonIcon="trash"
-								label={'Delete'}
+								label="Delete"
 								message="Delete workflow {name}"
 								callbackAction={() => handleDeleteWorkflow(id)}
 							/>

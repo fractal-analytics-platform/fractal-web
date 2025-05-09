@@ -187,7 +187,7 @@
 				ondragover={handleDragOver}
 				ondrop={handleDragEnd}
 			>
-				{#each editableTasksList as workflowTask, i}
+				{#each editableTasksList as workflowTask, i (workflowTask.id)}
 					<div
 						class="btn w-100 mt-2 border border-secondary btn-draggable"
 						data-fs-target={workflowTask.id}

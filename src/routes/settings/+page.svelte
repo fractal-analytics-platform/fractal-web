@@ -114,7 +114,8 @@
 			<div class="col-lg-2 col-sm-4 fw-bold">SLURM accounts</div>
 			<div class="col-lg-6 col-sm-8">
 				<div class="col-sm-9 has-validation">
-					{#each slurmAccounts as _, i}
+					<!-- eslint-disable-next-line no-unused-vars -->
+					{#each slurmAccounts as _, i (i)}
 						<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
 							<input
 								type="text"

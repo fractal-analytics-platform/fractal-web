@@ -2,8 +2,6 @@
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 
-	
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").ObjectFormElement} formElement
@@ -80,7 +78,7 @@
 	</div>
 {/if}
 {#key children}
-	{#each children as child, index}
+	{#each children as child, index (index)}
 		<div class="property-block">
 			{#if child.removable}
 				<button

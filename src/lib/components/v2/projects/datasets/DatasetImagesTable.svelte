@@ -650,12 +650,10 @@
 					{#if imagesStatusModal}
 						<col width="190" />
 					{/if}
-					<!-- eslint-disable-next-line no-unused-vars -->
-					{#each Object.keys(imagePage.attributes) as _}
+					{#each Object.keys(imagePage.attributes) as key (key)}
 						<col width="190" />
 					{/each}
-					<!-- eslint-disable-next-line no-unused-vars -->
-					{#each getTypeKeys(imagePage) as _}
+					{#each getTypeKeys(imagePage) as key (key)}
 						<col width="110" />
 					{/each}
 					<col width="auto" />
@@ -666,7 +664,7 @@
 						{#if imagesStatusModal}
 							<th>Status</th>
 						{/if}
-						{#each Object.keys(imagePage.attributes) as attributeKey}
+						{#each Object.keys(imagePage.attributes) as attributeKey (attributeKey)}
 							<th>
 								<label class="align-bottom" for="attribute-{getIdFromValue(attributeKey)}">
 									{attributeKey}
@@ -686,7 +684,7 @@
 								{/if}
 							</th>
 						{/each}
-						{#each getTypeKeys(imagePage) as typeKey}
+						{#each getTypeKeys(imagePage) as typeKey (typeKey)}
 							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<label for="type-{getIdFromValue(typeKey)}">
 									{typeKey}
@@ -708,7 +706,7 @@
 								</div>
 							</th>
 						{/if}
-						{#each Object.keys(imagePage.attributes) as attributeKey}
+						{#each Object.keys(imagePage.attributes) as attributeKey (attributeKey)}
 							<th>
 								<div class="row">
 									<div class="col">
@@ -720,7 +718,7 @@
 								</div>
 							</th>
 						{/each}
-						{#each getTypeKeys(imagePage) as typeKey}
+						{#each getTypeKeys(imagePage) as typeKey (typeKey)}
 							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
 								<div class="type-select-wrapper mb-1">
 									<select id="type-{getIdFromValue(typeKey)}" class="invisible"></select>
@@ -758,7 +756,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each imagePage.items as image, index}
+					{#each imagePage.items as image, index (index)}
 						<tr>
 							<td>{getRelativeZarrPath(dataset, image.zarr_url)}</td>
 							{#if imagesStatusModal}
@@ -766,14 +764,14 @@
 									{image.status || '-'}
 								</td>
 							{/if}
-							{#each Object.keys(imagePage.attributes) as attribute}
+							{#each Object.keys(imagePage.attributes) as attribute (attribute)}
 								<td>
 									{#if image.attributes[attribute] !== null && image.attributes[attribute] !== undefined}
 										{image.attributes[attribute]}
 									{/if}
 								</td>
 							{/each}
-							{#each getTypeKeys(imagePage) as typeKey}
+							{#each getTypeKeys(imagePage) as typeKey (typeKey)}
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
@@ -812,7 +810,7 @@
 										style="danger"
 										btnStyle="light text-danger"
 										buttonIcon="trash"
-										ariaLabel={'Delete'}
+										ariaLabel="Delete"
 										callbackAction={() => handleDeleteImage(image.zarr_url)}
 									>
 										{#snippet body()}

@@ -142,7 +142,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each taskGroupRows as taskGroupRow, i}
+		{#each taskGroupRows as taskGroupRow, i (i)}
 			<tr>
 				<td>{taskGroupRow.groupTitle}</td>
 				<td>
@@ -159,7 +159,7 @@
 							bind:value={taskGroupRow.selectedVersion}
 							onchange={() => handleSwitchVersion(i)}
 						>
-							{#each sortVersions(Object.keys(taskGroupRow.groups)) as version}
+							{#each sortVersions(Object.keys(taskGroupRow.groups)) as version (version)}
 								<option value={version}>{version || 'None'}</option>
 							{/each}
 						</select>
@@ -212,10 +212,10 @@
 						modalId="confirmTaskGroupDeleteModal{Object.values(taskGroupRow.groups)
 							.map((t) => t.id)
 							.join('-')}"
-						style={'danger'}
+						style="danger"
 						btnStyle="danger"
 						buttonIcon="trash"
-						label={'Delete'}
+						label="Delete"
 						message={`Delete task group ${
 							taskGroupRow.groupTitle +
 							(taskGroupRow.selectedVersion
@@ -229,7 +229,7 @@
 				</td>
 			</tr>
 
-			{#each taskGroupRow.groups[taskGroupRow.selectedVersion].task_list as task}
+			{#each taskGroupRow.groups[taskGroupRow.selectedVersion].task_list as task (task.id)}
 				{#if task}
 					<tr class:collapsed={taskGroupRow.groupTitle !== expandedTaskGroupRow} class="task-row">
 						<td colspan="5" class="text-end">

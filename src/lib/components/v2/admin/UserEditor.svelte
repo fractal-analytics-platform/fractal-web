@@ -470,7 +470,7 @@
 					<span class="col-sm-3 col-form-label text-end fw-bold">Groups</span>
 					<div class="col-sm-9">
 						<div>
-							{#each userGroups as group}
+							{#each userGroups as group (group.id)}
 								<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">
 									{group.name}
 									{#if group.name !== 'All'}

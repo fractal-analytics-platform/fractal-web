@@ -41,7 +41,8 @@
 	<!-- IMPORTANT: do not reindent the pre block, as it will affect the aspect of the log message -->
 	{#if logParts.length > 1}
 		<pre class="ps-0 pe-0">
-<!-- -->{#each logParts as part, i}{#if part.highlight}<div class="ps-3 pe-3 highlight">{part.text}
+<!-- -->{#each logParts as part, i (i)}{#if part.highlight}<div
+						class="ps-3 pe-3 highlight">{part.text}
 <!-- --></div>{:else if showDetails || (i + 1 < logParts.length && !logParts[i + 1].highlight)}<div
 						class="ps-3 pe-3">{part.text}</div>{:else}<button
 						class="btn btn-link text-decoration-none details-btn"

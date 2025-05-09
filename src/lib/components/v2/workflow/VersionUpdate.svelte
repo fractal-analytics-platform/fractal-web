@@ -207,7 +207,7 @@
 				onchange={checkArgumentsWithNewSchema}
 			>
 				<option value="">Select...</option>
-				{#each updateCandidates as update}
+				{#each updateCandidates as update (update.id)}
 					<option>{update.version}</option>
 				{/each}
 			</select>

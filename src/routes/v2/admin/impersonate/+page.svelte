@@ -17,7 +17,7 @@
 				<label class="input-group-text" for="user">User</label>
 				<select class="form-select" bind:value={userId} id="user" name="user_id">
 					<option value="">Select</option>
-					{#each users as user}
+					{#each users as user (user.id)}
 						{#if user.id !== $page.data.userInfo.id}
 							<option value={user.id}>{user.email}</option>
 						{/if}

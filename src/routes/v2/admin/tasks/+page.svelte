@@ -16,7 +16,7 @@
 	/** @type {import('fractal-components/types/api').TaskV2Info[]} */
 	let results = $state([]);
 
-	/** @type {Modal} */
+	/** @type {Modal|undefined} */
 	let infoModal = $state();
 	/** @type {import('fractal-components/types/api').TaskV2Info|null} */
 	let selectedTaskInfo = $state(null);
@@ -73,7 +73,7 @@
 	 */
 	function openInfoModal(taskInfo) {
 		selectedTaskInfo = taskInfo;
-		infoModal.show();
+		infoModal?.show();
 	}
 
 	function onInfoModalClose() {
@@ -224,7 +224,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each results as taskInfo, taskInfoIndex}
+					{#each results as taskInfo, taskInfoIndex (taskInfoIndex)}
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
 							<td>{taskInfo.task.id}</td>
 							<td>{taskInfo.task.name}</td>
@@ -243,7 +243,7 @@
 										Show
 									</button>
 									<div class="d-none" id="users-list-{taskInfoIndex}">
-										{#each getUsers(taskInfo) as user}
+										{#each getUsers(taskInfo) as user (user)}
 											{user}<br />
 										{/each}
 									</div>
@@ -267,116 +267,112 @@
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>
 	{#snippet header()}
-	
-			<h1 class="h5 modal-title flex-grow-1">Task info</h1>
-		
+		<h1 class="h5 modal-title flex-grow-1">Task info</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			{#if selectedTaskInfo}
-				<div class="accordion mb-3" id="accordion-task-properties">
-					<div class="accordion-item">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button collapsed"
-								type="button"
-								data-bs-toggle="collapse"
-								data-bs-target="#collapse-task-properties"
-								aria-expanded="false"
-								aria-controls="collapse-task-properties"
-							>
-								Task properties
-							</button>
-						</h2>
-						<div
-							id="collapse-task-properties"
-							class="accordion-collapse collapse"
-							data-bs-parent="#accordion-task-properties"
+		{#if selectedTaskInfo}
+			<div class="accordion mb-3" id="accordion-task-properties">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button
+							class="accordion-button collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapse-task-properties"
+							aria-expanded="false"
+							aria-controls="collapse-task-properties"
 						>
-							<div class="accordion-body p-0">
-								<ul class="list-group noborders">
-									<li class="list-group-item list-group-item-light fw-bold">Task id</li>
-									<li class="list-group-item">{selectedTaskInfo.task.id}</li>
-									<li class="list-group-item list-group-item-light fw-bold">Task name</li>
-									<li class="list-group-item">{selectedTaskInfo.task.name}</li>
-									<li class="list-group-item list-group-item-light fw-bold">Task type</li>
-									<li class="list-group-item">{selectedTaskInfo.task.type}</li>
-									<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
-									<li class="list-group-item">{selectedTaskInfo.task.command_non_parallel || '-'}</li>
-									<li class="list-group-item list-group-item-light fw-bold">Command parallel</li>
-									<li class="list-group-item">{selectedTaskInfo.task.command_parallel || '-'}</li>
-								</ul>
-							</div>
+							Task properties
+						</button>
+					</h2>
+					<div
+						id="collapse-task-properties"
+						class="accordion-collapse collapse"
+						data-bs-parent="#accordion-task-properties"
+					>
+						<div class="accordion-body p-0">
+							<ul class="list-group noborders">
+								<li class="list-group-item list-group-item-light fw-bold">Task id</li>
+								<li class="list-group-item">{selectedTaskInfo.task.id}</li>
+								<li class="list-group-item list-group-item-light fw-bold">Task name</li>
+								<li class="list-group-item">{selectedTaskInfo.task.name}</li>
+								<li class="list-group-item list-group-item-light fw-bold">Task type</li>
+								<li class="list-group-item">{selectedTaskInfo.task.type}</li>
+								<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
+								<li class="list-group-item">{selectedTaskInfo.task.command_non_parallel || '-'}</li>
+								<li class="list-group-item list-group-item-light fw-bold">Command parallel</li>
+								<li class="list-group-item">{selectedTaskInfo.task.command_parallel || '-'}</li>
+							</ul>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				<p class="lead">Relationships</p>
-				{#if selectedTaskInfo.relationships.length === 0}
-					<p class="mb-3">No relationships</p>
-				{:else}
-					<div class="accordion" id="accordion-relationships">
-						{#each selectedTaskInfo.relationships as relationship, index}
-							<div class="accordion-item">
-								<h2 class="accordion-header">
-									<button
-										class="accordion-button collapsed"
-										type="button"
-										data-bs-toggle="collapse"
-										data-bs-target="#collapse-{index}"
-										aria-expanded="false"
-										aria-controls="collapse-{index}"
-									>
-										{relationship.project_name} - {relationship.workflow_name}
-									</button>
-								</h2>
-								<div
-									id="collapse-{index}"
-									class="accordion-collapse collapse"
-									data-bs-parent="#accordion-relationships"
+			<p class="lead">Relationships</p>
+			{#if selectedTaskInfo.relationships.length === 0}
+				<p class="mb-3">No relationships</p>
+			{:else}
+				<div class="accordion" id="accordion-relationships">
+					{#each selectedTaskInfo.relationships as relationship, index (index)}
+						<div class="accordion-item">
+							<h2 class="accordion-header">
+								<button
+									class="accordion-button collapsed"
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target="#collapse-{index}"
+									aria-expanded="false"
+									aria-controls="collapse-{index}"
 								>
-									<div class="accordion-body p-0">
-										<ul class="list-group noborders">
-											<li class="list-group-item list-group-item-light fw-bold">Project id</li>
-											<li class="list-group-item">{relationship.project_id}</li>
-											<li class="list-group-item list-group-item-light fw-bold">Project name</li>
-											<li class="list-group-item">{relationship.project_name}</li>
-											<li class="list-group-item list-group-item-light fw-bold">Workflow id</li>
-											<li class="list-group-item">{relationship.workflow_id}</li>
-											<li class="list-group-item list-group-item-light fw-bold">Workflow name</li>
-											<li class="list-group-item">{relationship.workflow_name}</li>
-											<li class="list-group-item list-group-item-light fw-bold">Project users</li>
-											<li class="list-group-item p-0">
-												{#if relationship.project_users}
-													<table class="table table-borderless mb-0">
-														<thead>
+									{relationship.project_name} - {relationship.workflow_name}
+								</button>
+							</h2>
+							<div
+								id="collapse-{index}"
+								class="accordion-collapse collapse"
+								data-bs-parent="#accordion-relationships"
+							>
+								<div class="accordion-body p-0">
+									<ul class="list-group noborders">
+										<li class="list-group-item list-group-item-light fw-bold">Project id</li>
+										<li class="list-group-item">{relationship.project_id}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Project name</li>
+										<li class="list-group-item">{relationship.project_name}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Workflow id</li>
+										<li class="list-group-item">{relationship.workflow_id}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Workflow name</li>
+										<li class="list-group-item">{relationship.workflow_name}</li>
+										<li class="list-group-item list-group-item-light fw-bold">Project users</li>
+										<li class="list-group-item p-0">
+											{#if relationship.project_users}
+												<table class="table table-borderless mb-0">
+													<thead>
+														<tr>
+															<th>User Id</th>
+															<th>User E-mail</th>
+														</tr>
+													</thead>
+													<tbody>
+														{#each relationship.project_users as user (user.id)}
 															<tr>
-																<th>User Id</th>
-																<th>User E-mail</th>
+																<td>{user.id}</td>
+																<td>{user.email}</td>
 															</tr>
-														</thead>
-														<tbody>
-															{#each relationship.project_users as user}
-																<tr>
-																	<td>{user.id}</td>
-																	<td>{user.email}</td>
-																</tr>
-															{/each}
-														</tbody>
-													</table>
-												{:else}
-													-
-												{/if}
-											</li>
-										</ul>
-									</div>
+														{/each}
+													</tbody>
+												</table>
+											{:else}
+												-
+											{/if}
+										</li>
+									</ul>
 								</div>
 							</div>
-						{/each}
-					</div>
-				{/if}
+						</div>
+					{/each}
+				</div>
 			{/if}
-		
+		{/if}
 	{/snippet}
 </Modal>
 

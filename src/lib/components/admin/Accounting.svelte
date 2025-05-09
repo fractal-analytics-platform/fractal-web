@@ -131,7 +131,7 @@
 			<div class="col-12 mt-1">
 				<select class="form-select" bind:value={userId} id="user">
 					<option value="">All</option>
-					{#each sortedUsers as user}
+					{#each sortedUsers as user (user.id)}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>
@@ -194,7 +194,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each accounting.items as row}
+			{#each accounting.items as row (row.id)}
 				<tr>
 					<td>{row.id}</td>
 					<td>{getUserById(row.user_id)?.email || row.user_id}</td>
