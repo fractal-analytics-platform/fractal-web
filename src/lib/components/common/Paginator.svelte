@@ -107,7 +107,7 @@
 									<span aria-hidden="true">&laquo;</span>
 								</button>
 							</li>
-							{#each pageNumbers as pageNumber (pageNumber)}
+							{#each pageNumbers as pageNumber, index (index)}
 								{#if typeof pageNumber === 'number'}
 									<li class="page-item" class:active={pageNumber === currentPage}>
 										<button
@@ -153,7 +153,7 @@
 						bind:value={pageSize}
 						onchange={() => setPageSize()}
 					>
-						{#each availablePageSizes as pageSize (pageSize)}
+						{#each availablePageSizes as pageSize}
 							<option value={pageSize}>{pageSize}</option>
 						{/each}
 					</select>

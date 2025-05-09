@@ -1,6 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
 	import JobInfoModal from '$lib/components/v2/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
@@ -21,7 +21,13 @@
 	 */
 
 	/** @type {Props} */
-	let { jobUpdater, columnsToHide = [], admin = false, buttons, editStatus } = $props();
+	let {
+		jobUpdater,
+		columnsToHide = [],
+		admin = false,
+		buttons = undefined,
+		editStatus = undefined
+	} = $props();
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
@@ -29,7 +35,7 @@
 	let jobLogsModal;
 
 	/** @type {Array<import('fractal-components/types/api').ProjectV2>} */
-	let projects = $page.data.projects;
+	let projects = page.data.projects;
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $state([]);
 	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
@@ -229,9 +235,9 @@
 	}
 
 	onMount(() => {
-		workflows = $page.data.workflows;
-		datasets = $page.data.datasets;
-		setJobs($page.data.jobs || []);
+		workflows = page.data.workflows;
+		datasets = page.data.datasets;
+		setJobs(page.data.jobs || []);
 
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
 
@@ -490,7 +496,7 @@
 						<i class="bi-list-columns-reverse"></i>
 						Logs
 					</button>
-					{#if (admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email)}
+					{#if (admin && row.id) || (row.project_id !== null && row.user_email === page.data.userInfo.email)}
 						<a
 							class="btn btn-light"
 							href={getDownloadUrl(row)}
@@ -524,7 +530,7 @@
 				</td>
 				{#if !columnsToHide.includes('project')}
 					<td>
-						{#if projects && row.project_id !== null && row.user_email === $page.data.userInfo.email}
+						{#if projects && row.project_id !== null && row.user_email === page.data.userInfo.email}
 							<a href={`/v2/projects/${row.project_id}`}>
 								{row.project_dump.name}
 							</a>
@@ -535,7 +541,7 @@
 				{/if}
 				{#if !columnsToHide.includes('workflow')}
 					<td>
-						{#if workflows && row.workflow_id !== null && row.user_email === $page.data.userInfo.email}
+						{#if workflows && row.workflow_id !== null && row.user_email === page.data.userInfo.email}
 							<a href={`/v2/projects/${row.project_id}/workflows/${row.workflow_id}`}>
 								{row.workflow_dump.name}
 							</a>
@@ -545,7 +551,7 @@
 					</td>
 				{/if}
 				<td>
-					{#if datasets && row.dataset_id !== null && row.user_email === $page.data.userInfo.email}
+					{#if datasets && row.dataset_id !== null && row.user_email === page.data.userInfo.email}
 						<a href={`/v2/projects/${row.project_id}/datasets/${row.dataset_id}`}>
 							{row.dataset_dump.name}
 						</a>

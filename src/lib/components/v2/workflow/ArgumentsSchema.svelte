@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import {
 		AlertError,
 		displayStandardErrorAlert,
@@ -163,7 +163,7 @@
 	 */
 	async function patchWorkflow(payload) {
 		savingChanges = true;
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');

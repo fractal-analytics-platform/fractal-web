@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors.js';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
@@ -12,7 +12,7 @@
 		loginError = true;
 	}
 
-	let userLoggedIn = $derived(!!$page.data.userInfo);
+	let userLoggedIn = $derived(!!page.data.userInfo);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;

@@ -2,7 +2,7 @@
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
@@ -28,12 +28,12 @@
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	let workflow = $state($page.data.workflow);
+	let workflow = $state(page.data.workflow);
 	/** @type {number|undefined} */
-	let defaultDatasetId = $page.data.defaultDatasetId;
+	let defaultDatasetId = page.data.defaultDatasetId;
 	let project = $derived(workflow.project);
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
-	let datasets = $state($page.data.datasets);
+	let datasets = $state(page.data.datasets);
 
 	/** @type {number|undefined} */
 	let selectedDatasetId = $state(undefined);
@@ -666,9 +666,9 @@
 			<li class="breadcrumb-item" aria-current="page">
 				<a href="/v2/projects">Projects</a>
 			</li>
-			{#if $page.params.projectId}
+			{#if page.params.projectId}
 				<li class="breadcrumb-item" aria-current="page">
-					<a href="/v2/projects/{$page.params.projectId}">{project?.name}</a>
+					<a href="/v2/projects/{page.params.projectId}">{project?.name}</a>
 				</li>
 			{/if}
 			<li class="breadcrumb-item">Workflows</li>
@@ -745,7 +745,7 @@
 
 		<div class="col-lg-4 mb-2">
 			<div class="float-end">
-				{#if $page.data.userInfo.is_superuser}
+				{#if page.data.userInfo.is_superuser}
 					<button
 						class="btn btn-light"
 						onclick={(e) => {
@@ -1101,7 +1101,7 @@
 	bind:this={addWorkflowTaskModal}
 	{onWorkflowTaskAdded}
 	{workflow}
-	user={$page.data.user}
+	user={page.data.user}
 />
 
 <ImagesStatusModal bind:this={imagesStatusModal} />

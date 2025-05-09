@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
@@ -79,7 +79,7 @@
 	 * @returns {Promise<boolean>} true if the update was successful, false otherwise
 	 */
 	async function updateDataset(body) {
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/dataset/${dataset.id}`, {

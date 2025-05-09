@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
 	import DatasetHistoryModal from '$lib/components/v2/projects/datasets/DatasetHistoryModal.svelte';
 	import { env } from '$env/dynamic/public';
@@ -12,12 +12,12 @@
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
 		: null;
 
-	let projectId = $page.params.projectId;
+	let projectId = page.params.projectId;
 
 	/** @type {import('fractal-components/types/api').DatasetV2} */
-	let dataset = $state($page.data.dataset);
+	let dataset = $state(page.data.dataset);
 	/** @type {import('fractal-components/types/api').ImagePage} */
-	let imagePage = $state($page.data.imagePage);
+	let imagePage = $state(page.data.imagePage);
 
 	/** @type {DatasetImagesTable|undefined} */
 	let imagesTable = $state();

@@ -1,12 +1,12 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import logoMedium from '$lib/assets/fractal-logo-medium.png';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { onMount } from 'svelte';
 
-	let userLoggedIn = $derived(!!$page.data.userInfo);
-	let news = $derived($page.data.news);
+	let userLoggedIn = $derived(!!page.data.userInfo);
+	let news = $derived(page.data.news);
 
 	let mounted = $state(false);
 

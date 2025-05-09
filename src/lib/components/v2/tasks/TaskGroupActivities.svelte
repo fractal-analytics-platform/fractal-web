@@ -6,7 +6,7 @@
 	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
 	import TaskGroupActivityLogsModal from './TaskGroupActivityLogsModal.svelte';
 	import { getTimestamp } from '$lib/common/component_utilities';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
 
@@ -166,7 +166,7 @@
 	}
 
 	onMount(async () => {
-		const activityId = $page.url.searchParams.get('activity_id');
+		const activityId = page.url.searchParams.get('activity_id');
 		if (activityId && !isNaN(Number(activityId))) {
 			task_group_activity_id = Number(activityId);
 		}

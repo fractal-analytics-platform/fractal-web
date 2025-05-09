@@ -1,11 +1,11 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
-	let group = $derived($page.data.group);
+	let group = $derived(page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	let allUsers = $derived($page.data.users);
+	let allUsers = $derived(page.data.users);
 
 	let groupUsers = $derived(allUsers
 		.filter((u) => group.user_ids.includes(u.id))

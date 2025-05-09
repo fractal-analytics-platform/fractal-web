@@ -1,6 +1,6 @@
 <script>
 	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Modal from '../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
@@ -25,7 +25,7 @@
 	let fileInput = $state(undefined);
 
 	let workflowFileSelected = $derived(files && files.length > 0);
-	let projectId = $derived($page.params.projectId);
+	let projectId = $derived(page.params.projectId);
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -83,7 +83,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v2/project/${$page.params.projectId}/workflow/import`, {
+		const response = await fetch(`/api/v2/project/${page.params.projectId}/workflow/import`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,

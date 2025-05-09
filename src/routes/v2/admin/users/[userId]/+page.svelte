@@ -1,20 +1,22 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	const user = $page.data.user;
+	const user = page.data.user;
 	/** @type {import('fractal-components/types/api').UserSettings} */
-	const settings = $page.data.settings;
+	const settings = page.data.settings;
 	/** @type {Array<import('fractal-components/types/api').Group>} */
-	const groups = $page.data.groups;
+	const groups = page.data.groups;
 	/** @type {string} */
-	const runnerBackend = $page.data.runnerBackend;
+	const runnerBackend = page.data.runnerBackend;
 
-	let userGroups = $derived(user.group_ids_names
-		.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-		.sort(sortGroupByNameAllFirstComparator));
+	let userGroups = $derived(
+		user.group_ids_names
+			.map((ni) => groups.filter((g) => g.id === ni[0])[0])
+			.sort(sortGroupByNameAllFirstComparator)
+	);
 </script>
 
 <div class="container mt-3">

@@ -1,12 +1,12 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
-	let groups = $derived($page.data.groups);
+	let groups = $derived(page.data.groups);
 
 	/** @type {Modal|undefined} */
 	let createGroupModal = $state();

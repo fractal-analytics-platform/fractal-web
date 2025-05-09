@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import {
 		displayStandardErrorAlert,
 		FormErrorHandler,
@@ -11,10 +11,10 @@
 	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
-	let group = $state($page.data.group);
+	let group = $state(page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	let users = $page.data.users;
-	let runnerBackend = $page.data.runnerBackend;
+	let users = page.data.users;
+	let runnerBackend = page.data.runnerBackend;
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToAdd = $state(null);

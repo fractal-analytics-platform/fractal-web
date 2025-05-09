@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
@@ -232,10 +232,10 @@
 	function sortDropdownUsers(users) {
 		const usersCopy =
 			/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
-		sortUsers(usersCopy, $page.data.userInfo.id, false);
+		sortUsers(usersCopy, page.data.userInfo.id, false);
 		return usersCopy;
 	}
-	let users = $derived(sortDropdownUsers($page.data.users));
+	let users = $derived(sortDropdownUsers(page.data.users));
 </script>
 
 <div class="container mt-3">

@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
@@ -104,7 +104,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v2/project/${$page.params.projectId}/dataset/import`, {
+		const response = await fetch(`/api/v2/project/${page.params.projectId}/dataset/import`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -126,7 +126,7 @@
 	 * @returns {Promise<import('fractal-components/types/api').DatasetV2|null>}
 	 */
 	async function callCreateDataset() {
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const body = {

@@ -6,7 +6,7 @@
 	//
 	// This component also manages the overall form structure of meta properties.
 	// The form should be structured in multiple levels of depth, and support complex structure.
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
@@ -71,7 +71,7 @@
 	 * @param {object} payload
 	 */
 	async function handleEntryUpdate(payload) {
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');

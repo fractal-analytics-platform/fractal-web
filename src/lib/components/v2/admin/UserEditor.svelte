@@ -1,6 +1,6 @@
 <script>
 	import { invalidateAll, goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		displayStandardErrorAlert,
@@ -122,7 +122,7 @@
 					return;
 				}
 				const result = await response.json();
-				if (result.id === $page.data.userInfo.id) {
+				if (result.id === page.data.userInfo.id) {
 					// If the user modifies their own account the userInfo cached in the store has to be reloaded
 					await invalidateAll();
 				}
@@ -374,7 +374,7 @@
 					<span class="invalid-feedback">{$userValidationErrors['email']}</span>
 				</div>
 			</div>
-			{#if editableUser.id && editableUser.id !== $page.data.userInfo.id}
+			{#if editableUser.id && editableUser.id !== page.data.userInfo.id}
 				<div class="row mb-3">
 					<div class="col-sm-9 offset-sm-3">
 						<div class="form-check">

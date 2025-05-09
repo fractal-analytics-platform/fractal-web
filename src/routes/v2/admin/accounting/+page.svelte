@@ -1,12 +1,12 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Accounting from '$lib/components/admin/Accounting.svelte';
 	import SlurmAccounting from '$lib/components/admin/SlurmAccounting.svelte';
 
 	/** @type {'accounting'|'slurmAccounting'} */
 	let selectedTab = $state('accounting');
 
-	let useSlurm = $derived($page.data.runnerBackend === 'slurm' || $page.data.runnerBackend === 'slurm_ssh');
+	let useSlurm = $derived(page.data.runnerBackend === 'slurm' || page.data.runnerBackend === 'slurm_ssh');
 </script>
 
 <div class="container mt-3">
@@ -38,10 +38,10 @@
 	{/if}
 
 	{#if selectedTab === 'accounting'}
-		<Accounting users={$page.data.users} currentUserId={$page.data.userInfo.id} />
+		<Accounting users={page.data.users} currentUserId={page.data.userInfo.id} />
 	{:else if selectedTab === 'slurmAccounting'}
 		{#if useSlurm}
-			<SlurmAccounting users={$page.data.users} />
+			<SlurmAccounting users={page.data.users} />
 		{/if}
 	{/if}
 </div>
