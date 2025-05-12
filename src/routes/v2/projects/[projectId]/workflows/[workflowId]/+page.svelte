@@ -26,11 +26,13 @@
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
+	import { navigating, navigationCancelled } from '$lib/stores';
+
+	/** @type {number|undefined} */
+	const defaultDatasetId = $derived(page.data.defaultDatasetId);
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $state(page.data.workflow);
-	/** @type {number|undefined} */
-	let defaultDatasetId = page.data.defaultDatasetId;
 	let project = $derived(workflow.project);
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	let datasets = $state(page.data.datasets);
@@ -128,25 +130,32 @@
 		await checkNewVersions();
 	});
 
-	beforeNavigate((navigation) => {
+	beforeNavigate(async (navigation) => {
 		if (argsSchemaForm?.hasUnsavedChanges()) {
-			// Prevent navigation
-			navigation.cancel();
+			preventNavigation(navigation);
 			toggleArgsUnsavedChangesModal();
 		}
 
 		if (inputFiltersTab?.hasUnsavedChanges()) {
-			// Prevent navigation
-			navigation.cancel();
+			preventNavigation(navigation);
 			toggleFiltersUnsavedChangesModal();
 		}
 
 		if (metaPropertiesForm?.hasUnsavedChanges()) {
-			// Prevent navigation
-			navigation.cancel();
+			preventNavigation(navigation);
 			toggleMetaPropertiesUnsavedChangesModal();
 		}
 	});
+
+	/**
+	 *
+	 * @param {import('@sveltejs/kit').BeforeNavigate} navigation
+	 */
+	function preventNavigation(navigation) {
+		navigation.cancel();
+		navigationCancelled.set(true);
+		navigating.set(false);
+	}
 
 	/**
 	 * @param {number} id
@@ -709,10 +718,8 @@
 					{:else if !hasAnyJobRun}
 						<button
 							class="btn btn-success"
-							onclick={(e) => {
-								e.preventDefault();
-								() => openRunWorkflowModal('run');
-							}}
+							onclick={() => openRunWorkflowModal('run')}
+							type="button"
 							disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
 						>
 							<i class="bi-play-fill"></i> Run workflow
@@ -720,20 +727,16 @@
 					{:else}
 						<button
 							class="btn btn-success"
-							onclick={(e) => {
-								e.preventDefault();
-								openRunWorkflowModal('continue');
-							}}
+							onclick={() => openRunWorkflowModal('continue')}
+							type="button"
 							disabled={workflow.task_list.length === 0}
 						>
 							<i class="bi-play-fill"></i> Continue workflow
 						</button>
 						<button
 							class="btn btn-primary"
-							onclick={(e) => {
-								e.preventDefault();
-								openRunWorkflowModal('restart');
-							}}
+							onclick={() => openRunWorkflowModal('restart')}
+							type="button"
 							disabled={workflow.task_list.length === 0}
 						>
 							<i class="bi bi-arrow-clockwise"></i> Restart workflow

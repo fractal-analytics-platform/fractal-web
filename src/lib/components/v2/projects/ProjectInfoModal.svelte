@@ -2,17 +2,17 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 
 	// ProjectInfoModal component
-	import { projectInfoModalV2 } from '$lib/stores/projectStores';
+	import { projectInfoModalV2 } from '$lib/stores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	// Project to be displayed
 	/** @type {import('fractal-components/types/api').ProjectV2|undefined} */
-	let project = $state(undefined);
+	let project = $state();
 
 	let loadingDatasets = $state(true);
 	/** @type {import('fractal-components/types/api').DatasetV2[]|undefined} */
-	let datasets = $state(undefined);
+	let datasets = $state();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let datasetErrorAlert;

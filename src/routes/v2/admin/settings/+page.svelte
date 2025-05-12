@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
 
-	const settings = page.data.settings;
+	const settings = $derived(page.data.settings);
 
 	let showObfuscated = $state(false);
 </script>

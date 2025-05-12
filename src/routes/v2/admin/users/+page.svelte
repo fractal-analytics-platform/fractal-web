@@ -6,6 +6,9 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
+	const currentUserId = $derived(page.data.userInfo?.id);
+	const currentUserEmail = $derived(page.data.userInfo?.email);
+
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let users = $state([]);
 
@@ -24,12 +27,12 @@
 		}
 		users = sortUsers(
 			users.filter((u) => u.id !== userId),
-			page.data.userInfo.id
+			currentUserId
 		);
 	}
 
 	onMount(() => {
-		users = sortUsers(page.data.users, page.data.userInfo.id);
+		users = sortUsers(page.data.users, currentUserId);
 	});
 </script>
 
@@ -38,9 +41,9 @@
 		<i class="bi bi-person-fill-add"></i>
 		Register new user
 	</a>
-	
+
 	<h1 class="fw-light">Users list</h1>
-	
+
 	<table class="table mt-3">
 		<thead>
 			<tr>
@@ -70,7 +73,7 @@
 							<a href="/v2/admin/users/{user.id}/edit" class="btn btn-primary">
 								<i class="bi bi-pencil"></i> Edit
 							</a>
-							{#if deleteEnabled && user.email !== page.data.userInfo.email}
+							{#if deleteEnabled && user.email !== currentUserEmail}
 								<ConfirmActionButton
 									modalId={'confirmDeleteProject' + user.id}
 									style="danger"

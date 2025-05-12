@@ -6,6 +6,8 @@
 	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
 	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
 
+	const user = $derived(page.data.user);
+
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
 	let taskGroups = $state(page.data.taskGroups);
 
@@ -16,7 +18,7 @@
 	let taskCollectionComponent = $state();
 
 	/** @type {string|undefined} */
-	let expandedTaskGroupRow = $state(undefined);
+	let expandedTaskGroupRow = $state();
 
 	async function reloadTaskGroupsList() {
 		const response = await fetch(`/api/v2/task-group?args_schema=false`, {
@@ -94,12 +96,12 @@
 				{packageType}
 				{reloadTaskGroupsList}
 				bind:this={taskCollectionComponent}
-				user={page.data.user}
+				{user}
 			/>
 		{:else if packageType === 'single'}
-			<AddSingleTask addNewTasks={reloadTaskGroupsList} user={page.data.user} />
+			<AddSingleTask addNewTasks={reloadTaskGroupsList} {user} />
 		{:else if packageType === 'custom_env'}
-			<CustomEnvTask addNewTasks={reloadTaskGroupsList} user={page.data.user} />
+			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {user} />
 		{/if}
 	</div>
 
@@ -107,12 +109,7 @@
 		<h3 class="fw-light">Task List</h3>
 		<div class="col-12">
 			{#key taskGroups}
-				<TaskGroupsTable
-					{taskGroups}
-					{updateTaskGroups}
-					user={page.data.user}
-					bind:expandedTaskGroupRow
-				/>
+				<TaskGroupsTable {taskGroups} {updateTaskGroups} {user} bind:expandedTaskGroupRow />
 			{/key}
 		</div>
 	</div>

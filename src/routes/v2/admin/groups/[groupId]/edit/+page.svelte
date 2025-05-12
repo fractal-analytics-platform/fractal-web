@@ -13,8 +13,8 @@
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
 	let group = $state(page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	let users = page.data.users;
-	let runnerBackend = page.data.runnerBackend;
+	const users = $derived(page.data.users);
+	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToAdd = $state(null);
@@ -272,6 +272,7 @@
 										aria-hidden="true"
 									></span>
 								{:else}
+									<!-- svelte-ignore node_invalid_placement_ssr -->
 									<button
 										class="text-danger remove-user-btn btn ms-1 ps-1 pe-1"
 										aria-label="Remove user {user.email}"

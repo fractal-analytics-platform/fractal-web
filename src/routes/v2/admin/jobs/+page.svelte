@@ -6,6 +6,9 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(sortDropdownUsers(page.data.users));
+
 	let searched = $state(false);
 	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -232,10 +235,9 @@
 	function sortDropdownUsers(users) {
 		const usersCopy =
 			/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
-		sortUsers(usersCopy, page.data.userInfo.id, false);
+		sortUsers(usersCopy, currentUserId, false);
 		return usersCopy;
 	}
-	let users = $derived(sortDropdownUsers(page.data.users));
 </script>
 
 <div class="container mt-3">

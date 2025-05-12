@@ -7,9 +7,10 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	// Component properties
-	let project = $state(page.data.project);
-	let datasets = page.data.datasets;
-	let workflows = page.data.workflows;
+	const project = $derived(page.data.project);
+	const datasets = $derived(page.data.datasets);
+	const workflows = $derived(page.data.workflows);
+
 	let projectUpdatesSuccessMessage = $state('');
 
 	let updatedProjectName = $state('');

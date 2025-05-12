@@ -4,9 +4,9 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	/** @type {import('fractal-components/types/api').ProjectV2} */
-	let project = page.data.project;
+	const project = $derived(page.data.project);
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	let workflow = page.data.workflow;
+	const workflow = $derived(page.data.workflow);
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}

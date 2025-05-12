@@ -6,7 +6,11 @@
 	/** @type {'accounting'|'slurmAccounting'} */
 	let selectedTab = $state('accounting');
 
-	let useSlurm = $derived(page.data.runnerBackend === 'slurm' || page.data.runnerBackend === 'slurm_ssh');
+	const useSlurm = $derived(
+		page.data.runnerBackend === 'slurm' || page.data.runnerBackend === 'slurm_ssh'
+	);
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(page.data.users);
 </script>
 
 <div class="container mt-3">
@@ -38,10 +42,10 @@
 	{/if}
 
 	{#if selectedTab === 'accounting'}
-		<Accounting users={page.data.users} currentUserId={page.data.userInfo.id} />
+		<Accounting {users} {currentUserId} />
 	{:else if selectedTab === 'slurmAccounting'}
 		{#if useSlurm}
-			<SlurmAccounting users={page.data.users} />
+			<SlurmAccounting {users} />
 		{/if}
 	{/if}
 </div>

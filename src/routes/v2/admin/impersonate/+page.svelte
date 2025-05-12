@@ -5,7 +5,8 @@
 	let { form } = $props();
 	let userId = $state('');
 
-	let users = $derived(sortDropdownUsers(page.data.users, page.data.userInfo.id));
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(sortDropdownUsers(page.data.users, page.data.userInfo.id));
 </script>
 
 <div class="container mt-3">
@@ -18,7 +19,7 @@
 				<select class="form-select" bind:value={userId} id="user" name="user_id">
 					<option value="">Select</option>
 					{#each users as user (user.id)}
-						{#if user.id !== page.data.userInfo.id}
+						{#if user.id !== currentUserId}
 							<option value={user.id}>{user.email}</option>
 						{/if}
 					{/each}

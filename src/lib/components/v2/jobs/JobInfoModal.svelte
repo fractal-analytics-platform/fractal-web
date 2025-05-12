@@ -5,11 +5,13 @@
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
-	let job = $state(undefined);
+	let job = $state();
 
 	let errorAlert = undefined;
 	/** @type {Modal|undefined} */
 	let modal = $state();
+
+	const currentUserEmail = $derived(page.data.userInfo?.email);
 
 	/**
 	 * @param jobToDisplay {import('fractal-components/types/api').ApplyWorkflowV2}
@@ -47,7 +49,7 @@
 <Modal id="workflowJobInfoModal" bind:this={modal} size="lg">
 	{#snippet header()}
 		<h1 class="h5 modal-title flex-grow-1">Workflow Job #{job?.id}</h1>
-		{#if job && job.user_email === page.data.userInfo.email && job.project_id !== null}
+		{#if job && job.user_email === currentUserEmail && job.project_id !== null}
 			<button class="btn btn-light me-3" onclick={fetchJob} aria-label="Load">
 				<i class="bi-arrow-clockwise"></i>
 			</button>

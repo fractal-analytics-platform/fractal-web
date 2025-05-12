@@ -34,8 +34,10 @@
 	/** @type {JobLogsModal} */
 	let jobLogsModal;
 
+	const currentUserEmail = $derived(page.data.userInfo?.email);
+
 	/** @type {Array<import('fractal-components/types/api').ProjectV2>} */
-	let projects = page.data.projects;
+	const projects = $derived(page.data.projects || []);
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $state([]);
 	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
@@ -496,7 +498,7 @@
 						<i class="bi-list-columns-reverse"></i>
 						Logs
 					</button>
-					{#if (admin && row.id) || (row.project_id !== null && row.user_email === page.data.userInfo.email)}
+					{#if (admin && row.id) || (row.project_id !== null && row.user_email === currentUserEmail)}
 						<a
 							class="btn btn-light"
 							href={getDownloadUrl(row)}
@@ -530,7 +532,7 @@
 				</td>
 				{#if !columnsToHide.includes('project')}
 					<td>
-						{#if projects && row.project_id !== null && row.user_email === page.data.userInfo.email}
+						{#if projects && row.project_id !== null && row.user_email === currentUserEmail}
 							<a href={`/v2/projects/${row.project_id}`}>
 								{row.project_dump.name}
 							</a>
@@ -541,7 +543,7 @@
 				{/if}
 				{#if !columnsToHide.includes('workflow')}
 					<td>
-						{#if workflows && row.workflow_id !== null && row.user_email === page.data.userInfo.email}
+						{#if workflows && row.workflow_id !== null && row.user_email === currentUserEmail}
 							<a href={`/v2/projects/${row.project_id}/workflows/${row.workflow_id}`}>
 								{row.workflow_dump.name}
 							</a>
@@ -551,7 +553,7 @@
 					</td>
 				{/if}
 				<td>
-					{#if datasets && row.dataset_id !== null && row.user_email === page.data.userInfo.email}
+					{#if datasets && row.dataset_id !== null && row.user_email === currentUserEmail}
 						<a href={`/v2/projects/${row.project_id}/datasets/${row.dataset_id}`}>
 							{row.dataset_dump.name}
 						</a>

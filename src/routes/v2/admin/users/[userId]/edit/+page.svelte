@@ -4,13 +4,15 @@
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	let user = page.data.user;
+	const user = $derived(page.data.user);
 
 	/** @type {import('fractal-components/types/api').UserSettings} */
-	let settings = page.data.settings;
+	const settings = $derived(page.data.settings);
 
 	/** @type {Array<import('fractal-components/types/api').Group>} */
-	let groups = page.data.groups;
+	const groups = $derived(page.data.groups);
+
+	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/**
 	 * @param {import('fractal-components/types/api').User} user
@@ -55,5 +57,5 @@
 		</ol>
 	</nav>
 
-	<UserEditor {user} {settings} {groups} saveUser={save} runnerBackend={page.data.runnerBackend} />
+	<UserEditor {user} {settings} {groups} saveUser={save} {runnerBackend} />
 </div>

@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 
 	/** @type {string[]} */
-	const viewerPaths = page.data.viewerPaths;
+	const viewerPaths = $derived(page.data.viewerPaths);
 </script>
 
 <div class="container mt-3">

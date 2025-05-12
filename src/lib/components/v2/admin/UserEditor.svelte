@@ -40,6 +40,8 @@
 		editableUser = deepCopy(user);
 	});
 
+	const currentUserId = $derived(page.data.userInfo?.id);
+
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
@@ -122,7 +124,7 @@
 					return;
 				}
 				const result = await response.json();
-				if (result.id === page.data.userInfo.id) {
+				if (result.id === currentUserId) {
 					// If the user modifies their own account the userInfo cached in the store has to be reloaded
 					await invalidateAll();
 				}
@@ -177,12 +179,12 @@
 	function openAddGroupModal() {
 		selectedGroupIdsToAdd = [];
 		addGroupError = '';
-		setSlimSelectOptions(groupsSelector, getGroupSlimSelectOptions());
+		if (!groupsSelector) {
+			setGroupsSlimSelect();
+		}
+		const options = availableGroups.map((g) => ({ id: g.id, name: g.name }));
+		setSlimSelectOptions(groupsSelector, options);
 		addGroupModal?.show();
-	}
-
-	function getGroupSlimSelectOptions() {
-		return availableGroups.map((g) => ({ id: g.id, name: g.name }));
 	}
 
 	async function addGroupToUser() {
@@ -261,7 +263,6 @@
 	onMount(() => {
 		originalUser = deepCopy(nullifyEmptyStrings($state.snapshot(editableUser)));
 		loadUserGroups();
-		setGroupsSlimSelect();
 	});
 
 	function loadUserGroups() {
@@ -374,7 +375,7 @@
 					<span class="invalid-feedback">{$userValidationErrors['email']}</span>
 				</div>
 			</div>
-			{#if editableUser.id && editableUser.id !== page.data.userInfo.id}
+			{#if editableUser.id && editableUser.id !== currentUserId}
 				<div class="row mb-3">
 					<div class="col-sm-9 offset-sm-3">
 						<div class="form-check">

@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
-	let taskGroups = page.data.taskGroups;
+	const taskGroups = $derived(page.data.taskGroups || []);
 
 	/** @type {Modal|undefined} */
 	let modal = $state();

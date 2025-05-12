@@ -1,5 +1,5 @@
 <script>
-	import { projectInfoModalV2 } from '$lib/stores/projectStores.js';
+	import { projectInfoModalV2 } from '$lib/stores';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
 	import { goto } from '$app/navigation';

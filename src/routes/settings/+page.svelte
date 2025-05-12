@@ -12,7 +12,8 @@
 	/**
 	 * @type {import('fractal-components/types/api').UserSettings}
 	 */
-	const settings = page.data.settings;
+	const settings = $derived(page.data.settings);
+	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -93,8 +94,8 @@
 			{settings.project_dir || '-'}
 		</div>
 	</div>
-	{#if page.data.runnerBackend !== 'local'}
-		{#if page.data.runnerBackend === 'slurm'}
+	{#if runnerBackend !== 'local'}
+		{#if runnerBackend === 'slurm'}
 			<div class="row mb-4">
 				<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
 				<div class="col-lg-6 col-sm-8">
@@ -102,7 +103,7 @@
 				</div>
 			</div>
 		{/if}
-		{#if page.data.runnerBackend === 'slurm_ssh'}
+		{#if runnerBackend === 'slurm_ssh'}
 			<div class="row mb-4">
 				<div class="col-lg-2 col-sm-4 fw-bold">SSH username</div>
 				<div class="col-lg-6 col-sm-8">

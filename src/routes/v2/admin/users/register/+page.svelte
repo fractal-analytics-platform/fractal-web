@@ -4,6 +4,8 @@
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
 
+	const runnerBackend = $derived(page.data.runnerBackend);
+
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let user = {
 		email: '',
@@ -96,5 +98,5 @@
 		</div>
 	{/if}
 
-	<UserEditor {user} saveUser={save} runnerBackend={page.data.runnerBackend} />
+	<UserEditor {user} saveUser={save} {runnerBackend} />
 </div>

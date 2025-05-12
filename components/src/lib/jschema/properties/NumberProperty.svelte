@@ -23,11 +23,11 @@
 	 * @param {any} value
 	 */
 	function handleValueChange(value) {
-		validate();
 		const previousValue = get(formElement.value);
 		if (previousValue === value) {
 			return;
 		}
+		validate();
 		formElement.value.set(value);
 		formElement.notifyChange();
 	}
@@ -76,6 +76,7 @@
 			bind:value
 			min={formElement.min}
 			max={formElement.max}
+			oninput={() => validate()}
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}

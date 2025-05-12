@@ -1,11 +1,12 @@
 <script>
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
-	import { afterNavigate, goto, invalidateAll } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import { navigating } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
+	import { navigating, navigationCancelled } from '$lib/stores';
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('svelte').Snippet} [children]
@@ -65,10 +66,19 @@
 		}
 	});
 
+	beforeNavigate(async () => {
+		if (!$navigationCancelled) {
+			navigating.set(true);
+		}
+		navigationCancelled.set(false);
+	});
+
 	afterNavigate(async () => {
+		navigating.set(false);
 		if (location.href.includes('invalidate=true')) {
 			await invalidateAll();
 		}
+		cleanupModalBackdrop();
 	});
 
 	async function logout() {
@@ -96,17 +106,14 @@
 			toast.show();
 		}
 	}
-	let userLoggedIn = $derived(!!page.data.userInfo);
-	let isAdmin = $derived(userLoggedIn && page.data.userInfo.is_superuser);
-	let server = $derived(page.data.serverInfo || {});
-	let warningBanner = $derived(page.data.warningBanner);
-	// Detects page change
-	$effect(() => {
-		if (navigating) {
-			cleanupModalBackdrop();
-		}
-	});
-	let selectedSection = $derived(getSelectedSection(page.url.pathname));
+
+	const selectedSection = $derived(getSelectedSection(page.url.pathname));
+	const userLoggedIn = $derived(!!page.data.userInfo);
+	const isAdmin = $derived(userLoggedIn && page.data.userInfo.is_superuser);
+	const server = $derived(page.data.serverInfo || {});
+	const warningBanner = $derived(page.data.warningBanner);
+	const userEmail = $derived(userLoggedIn ? page.data.userInfo.email : undefined);
+	const isVerified = $derived(userLoggedIn && page.data.userInfo.is_verified);
 </script>
 
 <main>
@@ -152,7 +159,7 @@
 							aria-expanded="false"
 						>
 							<i class="bi bi-person-circle"></i>
-							{page.data.userInfo.email}
+							{userEmail}
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/profile">My profile</a></li>
@@ -199,7 +206,7 @@
 			</div>
 		</div>
 	{/if}
-	{#if userLoggedIn && !page.data.userInfo.is_verified}
+	{#if userLoggedIn && !isVerified}
 		<div class="container mt-3">
 			<div class="row">
 				<div class="col">
@@ -213,7 +220,7 @@
 		</div>
 	{/if}
 	{@render children?.()}
-	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:show={navigating || loading}>
+	<div class="d-flex flex-column min-vh-100 min-vw-100 loading" class:show={$navigating || loading}>
 		<div class="d-flex flex-grow-1 justify-content-center align-items-center">
 			<div class="spinner-border text-primary" role="status">
 				<span class="visually-hidden">Loading...</span>

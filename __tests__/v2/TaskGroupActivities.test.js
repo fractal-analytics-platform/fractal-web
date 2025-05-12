@@ -90,7 +90,21 @@ describe('TaskGroupActivities', () => {
 		});
 
 		render(TaskGroupActivities, {
-			props: { admin: true, users: [{ id: 1, email: 'admin@fractal.xy' }] }
+			props: {
+				admin: true,
+				users: [
+					{
+						id: 1,
+						email: 'admin@fractal.xy',
+						username: 'admin',
+						is_active: true,
+						is_superuser: true,
+						is_verified: true,
+						group_ids_names: [],
+						oauth_accounts: []
+					}
+				]
+			}
 		});
 
 		const user = userEvent.setup();

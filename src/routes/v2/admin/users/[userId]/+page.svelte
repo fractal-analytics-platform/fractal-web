@@ -4,13 +4,13 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	const user = page.data.user;
+	const user = $derived(page.data.user || []);
 	/** @type {import('fractal-components/types/api').UserSettings} */
-	const settings = page.data.settings;
+	const settings = $derived(page.data.settings);
 	/** @type {Array<import('fractal-components/types/api').Group>} */
-	const groups = page.data.groups;
+	const groups = $derived(page.data.groups || []);
 	/** @type {string} */
-	const runnerBackend = page.data.runnerBackend;
+	const runnerBackend = $derived(page.data.runnerBackend);
 
 	let userGroups = $derived(
 		user.group_ids_names

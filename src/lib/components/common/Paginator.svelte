@@ -153,7 +153,7 @@
 						bind:value={pageSize}
 						onchange={() => setPageSize()}
 					>
-						{#each availablePageSizes as pageSize}
+						{#each availablePageSizes as pageSize (pageSize)}
 							<option value={pageSize}>{pageSize}</option>
 						{/each}
 					</select>
