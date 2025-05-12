@@ -125,7 +125,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		const addBtn = form.getByRole('button', { name: 'Add argument to list' }).first();
 		await addBtn.click();
 		await addBtn.click();
-		await expect( addBtn).toBeDisabled();
+		await expect(addBtn).toBeDisabled();
 		const block = form.locator('.property-block', {
 			has: page.getByText('requiredArrayWithMinMaxItems')
 		});
@@ -145,7 +145,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await checkFirstArray(block, ['a', 'b', 'd', 'c']);
 		// Remove items
 		await form.getByRole('button', { name: 'Remove' }).nth(3).click();
-		await expect( addBtn).not.toBeDisabled();
+		await expect(addBtn).not.toBeDisabled();
 		await form.getByRole('button', { name: 'Remove' }).nth(2).click();
 		await checkFirstArray(block, ['a', 'b']);
 	});
@@ -221,7 +221,12 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('Should be a number')).toHaveCount(1);
+	});
+
+	await test.step('Must be integer is validated', async () => {
+		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
+		await input.fill('5.12');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByText('must be integer').waitFor();
 		await page.getByRole('button', { name: 'Discard changes' }).click();
