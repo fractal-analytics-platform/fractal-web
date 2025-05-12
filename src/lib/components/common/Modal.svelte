@@ -58,6 +58,9 @@
 						firstInput.focus();
 					}
 				}
+				if (!focus) {
+					restoreModalFocus();
+				}
 			});
 			modal.addEventListener('hidden.bs.modal', onClose);
 		}
@@ -131,6 +134,16 @@
 		// @ts-ignore
 		// eslint-disable-next-line no-undef
 		return new bootstrap.Modal(modalElement);
+	}
+
+	/**
+	 * Restore focus on modal, otherwise it will not be possible to close it using the esc key
+	 */
+	export function restoreModalFocus() {
+		const modal = document.querySelector('.modal.show');
+		if (modal instanceof HTMLElement) {
+			modal.focus();
+		}
 	}
 </script>
 

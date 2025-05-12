@@ -175,7 +175,6 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 				.getByRole('option', { selected: true })
 		).toHaveText('generic_task');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
-		await modal.getByRole('button', { name: 'Continue anyway', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 	});

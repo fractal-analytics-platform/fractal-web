@@ -273,6 +273,7 @@
 			}
 		}
 		checkingConfiguration = true;
+		modal?.restoreModalFocus();
 	}
 
 	/**
@@ -528,7 +529,7 @@
 	);
 </script>
 
-<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true}>
+<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true} focus={false}>
 	{#snippet header()}
 		<h5 class="modal-title">
 			{#if mode === 'run'}

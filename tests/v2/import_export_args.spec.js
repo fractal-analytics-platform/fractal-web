@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { closeModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';

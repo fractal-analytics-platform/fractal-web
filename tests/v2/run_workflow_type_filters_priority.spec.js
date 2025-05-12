@@ -68,8 +68,6 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 
 	await test.step('Click Run and verify confirmed values', async () => {
 		await modal.getByRole('button', { name: 'Run' }).click();
-		await expect(modal.getByText('You are trying to run the MIP_compound task')).toBeVisible();
-		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
 		await expect(modal.getByRole('listitem').locator('[aria-checked="true"]')).toBeVisible();
 		await modal.getByRole('button', { name: 'Cancel' }).click();

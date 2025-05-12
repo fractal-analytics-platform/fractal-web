@@ -92,19 +92,30 @@
 	}
 
 	async function getToken() {
+		const promise = getTokenPromise();
+		await navigator.clipboard.write([new ClipboardItem({ 'text/plain': promise })]);
+		const toastElement = document.getElementById('tokenCopiedToast');
+		if (!toastElement) {
+			return;
+		}
+		// @ts-expect-error
+		// eslint-disable-next-line no-undef
+		const toast = new bootstrap.Toast(toastElement);
+		toast.show();
+	}
+
+	/**
+	 * Safari doesn't allow to run asynchronous code between the click event and the
+	 * clipboard write, so we need to pass the promise to the ClipboardItem constructor.
+	 */
+	async function getTokenPromise() {
 		const response = await fetch(`/profile/token`);
 		if (response.ok) {
 			const { token } = await response.json();
-			await navigator.clipboard.writeText(token);
-			const toastElement = document.getElementById('tokenCopiedToast');
-			if (!toastElement) {
-				return;
-			}
-			// @ts-expect-error
-			// eslint-disable-next-line no-undef
-			const toast = new bootstrap.Toast(toastElement);
-			toast.show();
+			// Chrome only accept a promise returning Blob type, with proper content type.
+			return new Blob([token], { type: 'text/plain' });
 		}
+		throw new Error('Unable to retrieve token');
 	}
 
 	const selectedSection = $derived(getSelectedSection(page.url.pathname));
