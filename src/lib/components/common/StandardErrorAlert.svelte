@@ -8,7 +8,7 @@
 	 */
 
 	/** @type {Props} */
-	let { error, children } = $props();
+	let { error, children = undefined } = $props();
 
 	const errorData = $derived(getErrorData(error));
 

@@ -93,18 +93,9 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Test project dir validation error', async () => {
 		await page.getByLabel('Project dir').fill('foo');
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.waitForFunction(() => {
-			const invalidFeeback = document
-				.querySelector('#projectDir')
-				?.closest('div')
-				?.querySelector('.invalid-feedback');
-			if (invalidFeeback instanceof HTMLElement) {
-				return invalidFeeback.innerText.includes(
-					"String attribute 'project_dir' must be an absolute path (given 'foo')"
-				);
-			}
-			return false;
-		});
+		await expect(
+			page.getByText("Value error, String must be an absolute path (given 'foo')")
+		).toBeVisible();
 		await page.getByLabel('Project dir').fill('/tmp/test/project-dir');
 	});
 
@@ -118,7 +109,7 @@ test('Create and update a user', async ({ page }) => {
 			.getByRole('textbox', { name: /^SLURM account #2/ })
 			.fill(randomUserName + '-slurm-account');
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
+		await expect(page.getByText('Value error, List has repetitions')).toBeVisible();
 		await page.getByLabel('Remove SLURM account').first().click();
 	});
 
