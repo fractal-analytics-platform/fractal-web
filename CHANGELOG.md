@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Upgrade to Svelte 5 (\#789);
+
 # 1.17.4
 
 * Fixed search box not working in workflow submission modal (\#787);
