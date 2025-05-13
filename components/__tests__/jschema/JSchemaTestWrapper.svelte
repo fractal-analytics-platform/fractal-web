@@ -24,7 +24,7 @@
 	 */
 	function innerOnChange(data) {
 		unsavedChanges = true;
-		onChange(data.detail.value);
+		onChange(data);
 	}
 </script>
 
@@ -34,5 +34,5 @@
 	{schema}
 	{schemaData}
 	{schemaVersion}
-	on:change={innerOnChange}
+	onchange={innerOnChange}
 />

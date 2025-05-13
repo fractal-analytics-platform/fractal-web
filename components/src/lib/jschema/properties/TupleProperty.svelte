@@ -3,16 +3,16 @@
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 	import CollapsibleProperty from './CollapsibleProperty.svelte';
 
-	/** @type {import("../form_element.js").TupleFormElement} */
-	export let formElement;
-	export let editable = true;
-
-	export let children = [];
-
 	/**
-	 * @type {null|(() => void)}
+	 * @typedef {Object} Props
+	 * @property {import("../form_element.js").TupleFormElement} formElement
+	 * @property {boolean} [editable]
+	 * @property {any} [children]
+	 * @property {null|(() => void)} [reset]
 	 */
-	export let reset = null;
+
+	/** @type {Props} */
+	let { formElement, editable = true, children = $bindable([]), reset = null } = $props();
 
 	onMount(() => {
 		children = formElement.children;
@@ -33,18 +33,18 @@
 	<div class="d-flex justify-content-center p-2">
 		{#if !formElement.required}
 			{#if children.length > 0}
-				<button class="btn btn-primary" type="button" on:click={removeTuple} disabled={!editable}>
+				<button class="btn btn-primary" type="button" onclick={removeTuple} disabled={!editable}>
 					Remove tuple
 				</button>
 			{:else}
-				<button class="btn btn-primary" type="button" on:click={addTuple} disabled={!editable}>
+				<button class="btn btn-primary" type="button" onclick={addTuple} disabled={!editable}>
 					Add tuple
 				</button>
 			{/if}
 		{/if}
 	</div>
 	<div>
-		{#each children as nestedProperty}
+		{#each children as nestedProperty, index (index)}
 			<div class="d-flex">
 				<div class="flex-fill">
 					<PropertyDiscriminator {editable} formElement={nestedProperty} />

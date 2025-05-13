@@ -2,6 +2,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
+import { svelteTesting } from '@testing-library/svelte/vite';
 
 const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
@@ -9,9 +10,7 @@ const pkg = JSON.parse(packageJsonData.toString());
 
 /** @type {import('vite').UserConfigExport} */
 const config = defineConfig({
-	plugins: [
-		sveltekit(),
-	],
+	plugins: [sveltekit(), svelteTesting()],
 	define: {
 		__APP_VERSION__: JSON.stringify(pkg.version)
 	},
@@ -21,7 +20,7 @@ const config = defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		setupFiles: ['./setupTests.js'],
+		setupFiles: ['./vitest.setup.js'],
 		include: ['**/__tests__/**/*\\.test\\.js'],
 		exclude: ['components/**', 'node_modules', 'build', '.idea', '.git', '.cache'],
 		coverage: {
@@ -30,11 +29,7 @@ const config = defineConfig({
 			reportsDirectory: './coverage-unit',
 			include: ['src'],
 			all: true
-		},
-		alias: [
-			// See https://github.com/vitest-dev/vitest/issues/2834#issuecomment-1439576110
-			{ find: /^svelte$/, replacement: 'svelte/internal' }
-		]
+		}
 	},
 	resolve: {
 		alias: {
@@ -50,13 +45,13 @@ const config = defineConfig({
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection
 		include: [
+			'clsx',
 			'slim-select',
 			'marked',
 			'dompurify',
 			'ajv/dist/ajv',
 			'ajv/dist/2020',
 			'ajv-formats',
-			'@vincjo/datatables',
 			'semver/functions/coerce',
 			'semver/functions/gte',
 			'semver/functions/lte',

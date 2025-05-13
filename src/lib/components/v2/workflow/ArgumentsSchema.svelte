@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import {
 		AlertError,
 		displayStandardErrorAlert,
@@ -30,45 +30,39 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2}  */
-	export let workflowTask;
-	/** @type {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} */
-	export let onWorkflowTaskUpdated;
-	export let editable = true;
-	/** @type {object|undefined} */
-	export let argsNonParallel = undefined;
-	/** @type {object|undefined} */
-	export let argsParallel = undefined;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
+	 * @property {boolean} [editable]
+	 * @property {object|undefined} [argsNonParallel]
+	 * @property {object|undefined} [argsParallel]
+	 */
+
+	/** @type {Props} */
+	let {
+		workflowTask = $bindable(),
+		onWorkflowTaskUpdated,
+		editable = true,
+		argsNonParallel = undefined,
+		argsParallel = undefined
+	} = $props();
 
 	/** @type {JSchema|undefined} */
-	let nonParallelSchemaComponent;
+	let nonParallelSchemaComponent = $state();
 	/** @type {JSchema|undefined} */
-	let parallelSchemaComponent;
-	let unsavedChangesParallel = false;
-	let unsavedChangesNonParallel = false;
+	let parallelSchemaComponent = $state();
+	let unsavedChangesParallel = $state(false);
+	let unsavedChangesNonParallel = $state(false);
 
 	/** @type {FormBuilder|undefined} */
-	let nonParallelFormBuilderComponent;
+	let nonParallelFormBuilderComponent = $state();
 	/** @type {FormBuilder|undefined} */
-	let parallelFormBuilderComponent;
-	let unsavedChangesFormBuilderParallel = false;
-	let unsavedChangesFormBuilderNonParallel = false;
+	let parallelFormBuilderComponent = $state();
+	let unsavedChangesFormBuilderParallel = $state(false);
+	let unsavedChangesFormBuilderNonParallel = $state(false);
 
-	let savingChanges = false;
-
-	$: unsavedChanges =
-		unsavedChangesParallel ||
-		unsavedChangesNonParallel ||
-		unsavedChangesFormBuilderParallel ||
-		unsavedChangesFormBuilderNonParallel;
-
-	$: isSchemaValid = argsSchemaVersionValid(workflowTask.task.args_schema_version);
-
-	$: argsSchemaNonParallel = workflowTask.task.args_schema_non_parallel;
-
-	$: argsSchemaParallel = workflowTask.task.args_schema_parallel;
-
-	$: schemaVersion = workflowTask.task.args_schema_version;
+	let savingChanges = $state(false);
 
 	function handleNonParallelChanged() {
 		unsavedChangesNonParallel = true;
@@ -169,7 +163,7 @@
 	 */
 	async function patchWorkflow(payload) {
 		savingChanges = true;
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -205,11 +199,21 @@
 		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(false);
+	let unsavedChanges = $derived(
+		unsavedChangesParallel ||
+			unsavedChangesNonParallel ||
+			unsavedChangesFormBuilderParallel ||
+			unsavedChangesFormBuilderNonParallel
+	);
+	let isSchemaValid = $derived(argsSchemaVersionValid(workflowTask.task.args_schema_version));
+	let argsSchemaNonParallel = $derived(workflowTask.task.args_schema_non_parallel);
+	let argsSchemaParallel = $derived(workflowTask.task.args_schema_parallel);
+	let schemaVersion = $derived(workflowTask.task.args_schema_version);
+	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 </script>
 
 <div id="workflow-arguments-schema-panel">
-	<div id="task-args-validation-errors" />
+	<div id="task-args-validation-errors"></div>
 	{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
 		{#if hasInitialisationArguments(workflowTask)}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
@@ -223,7 +227,7 @@
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
-					on:change={handleNonParallelChanged}
+					onchange={handleNonParallelChanged}
 					bind:this={nonParallelSchemaComponent}
 				/>
 			</div>
@@ -254,7 +258,7 @@
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
-					on:change={handleParallelChanged}
+					onchange={handleParallelChanged}
 					bind:this={parallelSchemaComponent}
 				/>
 			</div>
@@ -283,7 +287,7 @@
 				<button
 					class="btn btn-warning"
 					disabled={!editable || !unsavedChanges || savingChanges}
-					on:click={discardChanges}
+					onclick={discardChanges}
 				>
 					Discard changes
 				</button>
@@ -293,10 +297,10 @@
 					class="btn btn-success"
 					type="button"
 					disabled={!editable || !unsavedChanges || savingChanges}
-					on:click={saveChanges}
+					onclick={saveChanges}
 				>
 					{#if savingChanges}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 					{/if}
 					Save changes
 				</button>

@@ -1,29 +1,34 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
 
-	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
-	export let createDatasetCallback;
+	/**
+	 * @typedef {Object} Props
+	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} createDatasetCallback
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { createDatasetCallback } = $props();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {'new'|'import'} */
-	let mode = 'new';
-	let datasetName = '';
+	let mode = $state('new');
+	let datasetName = $state('');
 	/** @type {string|null} */
-	let projectDir = null;
-	let zarrDir = '';
-	let submitted = false;
-	let saving = false;
+	let projectDir = $state(null);
+	let zarrDir = $state('');
+	let submitted = $state(false);
+	let saving = $state(false);
 
 	/** @type {FileList|null} */
-	let files = null;
+	let files = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let fileInput;
-	let fileError = '';
+	let fileInput = $state();
+	let fileError = $state('');
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-createDatasetModal', [
 		'name',
@@ -47,7 +52,7 @@
 
 	async function handleSave() {
 		submitted = true;
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		if (!fieldsAreValid()) {
 			return;
 		}
@@ -59,11 +64,11 @@
 			return;
 		}
 		createDatasetCallback(newDataset);
-		modal.hide();
+		modal?.hide();
 	}
 
 	async function handleImport() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 
 		if (files === null || files.length === 0) {
 			fileError = 'A file is required';
@@ -99,7 +104,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v2/project/${$page.params.projectId}/dataset/import`, {
+		const response = await fetch(`/api/v2/project/${page.params.projectId}/dataset/import`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -109,19 +114,19 @@
 		const result = await response.json();
 		saving = false;
 		if (!response.ok) {
-			modal.displayErrorAlert(result);
+			modal?.displayErrorAlert(result);
 			return;
 		}
 
 		createDatasetCallback(result);
-		modal.hide();
+		modal?.hide();
 	}
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').DatasetV2|null>}
 	 */
 	async function callCreateDataset() {
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const body = {
@@ -164,11 +169,11 @@
 </script>
 
 <Modal id="createDatasetModal" bind:this={modal} size="lg" centered={true} {onOpen}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h4 class="modal-title">Create new dataset</h4>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<span id="errorAlert-createDatasetModal" />
+	{/snippet}
+	{#snippet body()}
+		<span id="errorAlert-createDatasetModal"></span>
 		<div class="row">
 			<div class="col-10">
 				<div class="form-check form-check-inline mb-3">
@@ -199,7 +204,10 @@
 			<form
 				class="row needs-validation"
 				novalidate
-				on:submit|preventDefault={handleSave}
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleSave();
+				}}
 				id="create-new-dataset-form"
 			>
 				<div class="col">
@@ -300,7 +308,10 @@
 			</form>
 		{:else}
 			<form
-				on:submit|preventDefault={handleImport}
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleImport();
+				}}
 				class="row needs-validation"
 				id="import-dataset-form"
 				novalidate
@@ -331,23 +342,23 @@
 				</div>
 			</form>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		{#if mode === 'new'}
 			<button class="btn btn-primary" form="create-new-dataset-form" disabled={saving}>
 				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 				Save
 			</button>
 		{:else}
 			<button class="btn btn-primary" form="import-dataset-form" disabled={saving}>
 				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 				Import
 			</button>
 		{/if}
 		<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

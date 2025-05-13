@@ -1,14 +1,13 @@
 import { describe, it, beforeEach, expect, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
-import { readable } from 'svelte/store';
 
 // Mocking fetch
 global.fetch = vi.fn();
 
 // Mocking the page store
-vi.mock('$app/stores', () => {
+vi.mock('$app/state', () => {
 	return {
-		page: readable({
+		page: {
 			data: {
 				workflow: {
 					id: 1,
@@ -33,7 +32,7 @@ vi.mock('$app/stores', () => {
 				userInfo: { id: 1, slurm_accounts: [] }
 			},
 			params: { projectId: 1 }
-		})
+		}
 	};
 });
 

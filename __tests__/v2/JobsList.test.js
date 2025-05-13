@@ -2,15 +2,14 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { within, waitFor } from '@testing-library/dom';
-import { readable } from 'svelte/store';
 import { data } from '../mock/jobs-list';
 
 // Mocking the page store
-vi.mock('$app/stores', () => {
+vi.mock('$app/state', () => {
 	return {
-		page: readable({
+		page: {
 			data
-		})
+		}
 	};
 });
 // Mocking public variables
@@ -42,7 +41,7 @@ describe('JobsList', () => {
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
 
 		const filters = result.getAllByRole('listbox', { hidden: false });
-		expect(filters.length).eq(3);
+		expect(filters.length).eq(4);
 
 		const statusFilter = filters[0];
 		verifyOptions(statusFilter, ['Submitted', 'Done', 'Failed']);
@@ -121,7 +120,7 @@ describe('JobsList', () => {
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });
 		await fireEvent.click(cancelButton);
-		await new Promise(resolve => setTimeout(resolve));
+		await new Promise((resolve) => setTimeout(resolve));
 
 		const message = result.getByText(/Job cancellation request received/);
 		expect(message).toBeDefined();
@@ -143,7 +142,7 @@ describe('JobsList', () => {
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });
 		await fireEvent.click(cancelButton);
-		await new Promise(resolve => setTimeout(resolve));
+		await new Promise((resolve) => setTimeout(resolve));
 
 		expect(result.queryAllByRole('alert').length).eq(1);
 	});
@@ -169,7 +168,7 @@ describe('JobsList', () => {
 			vi.advanceTimersByTime(3500);
 			vi.useRealTimers();
 			// trigger table update
-			await new Promise(resolve => setTimeout(resolve));
+			await new Promise((resolve) => setTimeout(resolve));
 
 			table = result.getByRole('table');
 			expect(table.querySelectorAll('tbody tr:nth-child(1) td')[1].textContent).contain('done');

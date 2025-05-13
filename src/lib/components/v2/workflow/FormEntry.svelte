@@ -1,30 +1,38 @@
 <script>
 	import FormBaseEntry from './FormBaseEntry.svelte';
+	import FormEntry from './FormEntry.svelte';
 
-	/** @type {import('./form-builder-types').FormBuilderEntry} */
-	export let entry;
-	/** @type {Array<import('./form-builder-types').FormBuilderEntry>} */
-	export let parent;
-	/** @type {number} */
-	export let index;
-	/** @type {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number, type: string) => void} */
-	export let changeType;
-	/** @type {(parent: Array<import('./form-builder-types').FormBuilderEntry>, hasKey: boolean) => void} */
-	export let addProperty;
-	/** @type {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number) => void} */
-	export let removeProperty;
-	/** @type {() => void} */
-	export let triggerChanges;
-	export let editable = true;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('./form-builder-types').FormBuilderEntry} entry
+	 * @property {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @property {number} index
+	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number, type: string) => void} changeType
+	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, hasKey: boolean) => void} addProperty
+	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number) => void} removeProperty
+	 * @property {() => void} triggerChanges
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let {
+		entry = $bindable(),
+		parent,
+		index,
+		changeType,
+		addProperty,
+		removeProperty,
+		triggerChanges,
+		editable = true
+	} = $props();
 </script>
 
 {#if entry.type === 'object' || entry.type === 'array'}
 	<div class="accordion mb-2" id="accordion-{entry.id}">
 		<div class="accordion-item">
 			<h2 class="accordion-header">
-				<button
+				<div
 					class="accordion-button collapsed ps-1 pt-1 pb-1"
-					type="button"
 					data-bs-toggle="collapse"
 					data-bs-target="#collapse-{entry.id}"
 					aria-expanded="false"
@@ -40,20 +48,20 @@
 								bind:value={entry.key}
 								data-bs-toggle="collapse"
 								data-bs-target=""
-								on:input={triggerChanges}
+								oninput={triggerChanges}
 								disabled={!editable}
 							/>
 						{/if}
 						<button
 							class="btn btn-outline-danger"
 							type="button"
-							on:click={() => removeProperty(parent, index)}
+							onclick={() => removeProperty(parent, index)}
 							aria-label="Remove property"
 							data-bs-toggle="collapse"
 							data-bs-target=""
 							disabled={!editable}
 						>
-							<i class="bi bi-trash" />
+							<i class="bi bi-trash"></i>
 						</button>
 						{#if entry.error}
 							<div class="invalid-feedback">{entry.error}</div>
@@ -64,7 +72,7 @@
 					{:else}
 						(list)
 					{/if}
-				</button>
+				</div>
 			</h2>
 			<div
 				id="collapse-{entry.id}"
@@ -73,10 +81,10 @@
 			>
 				<div class="accordion-body">
 					{#if entry.children}
-						{#each entry.children as child, childIndex}
+						{#each entry.children as child, childIndex (childIndex)}
 							{#if child.type === 'object' || child.type === 'array'}
-								<svelte:self
-									entry={child}
+								<FormEntry
+									bind:entry={entry.children[childIndex]}
 									{editable}
 									parent={entry.children}
 									index={childIndex}
@@ -87,7 +95,7 @@
 								/>
 							{:else}
 								<FormBaseEntry
-									entry={child}
+									bind:entry={entry.children[childIndex]}
 									{editable}
 									{triggerChanges}
 									changeType={() => {
@@ -106,7 +114,7 @@
 						<div class="d-flex justify-content-center align-items-center mt-3">
 							<button
 								class="btn btn-secondary"
-								on:click={() => {
+								onclick={() => {
 									if ('children' in entry) {
 										addProperty(entry.children, entry.type === 'object');
 									}
@@ -123,7 +131,7 @@
 	</div>
 {:else}
 	<FormBaseEntry
-		{entry}
+		bind:entry
 		{editable}
 		{triggerChanges}
 		changeType={() => changeType(parent, index, entry.type)}

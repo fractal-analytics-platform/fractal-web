@@ -1,8 +1,10 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
 	import { onMount } from 'svelte';
+
+	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let user = {
@@ -16,9 +18,10 @@
 		oauth_accounts: []
 	};
 
-	/** @type {undefined|boolean} */
-	let created = undefined;
-	let verified = undefined;
+	/** @type {boolean|undefined} */
+	let created = $state();
+	/** @type {boolean|undefined} */
+	let verified = $state();
 
 	/**
 	 * @param {import('fractal-components/types/api').User} user
@@ -95,5 +98,5 @@
 		</div>
 	{/if}
 
-	<UserEditor {user} saveUser={save} runnerBackend={$page.data.runnerBackend} />
+	<UserEditor {user} saveUser={save} {runnerBackend} />
 </div>

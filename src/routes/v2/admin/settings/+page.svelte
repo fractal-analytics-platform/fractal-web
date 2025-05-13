@@ -1,9 +1,9 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
-	const settings = $page.data.settings;
+	const settings = $derived(page.data.settings);
 
-	let showObfuscated = false;
+	let showObfuscated = $state(false);
 </script>
 
 <div class="container mt-3">
@@ -26,7 +26,7 @@
 
 	<table class="table table-striped">
 		<tbody>
-			{#each Object.entries(settings) as [key, value]}
+			{#each Object.entries(settings) as [key, value] (key)}
 				{#if showObfuscated || value !== '**********'}
 					<tr>
 						<th>{key}</th>

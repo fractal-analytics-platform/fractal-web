@@ -1,22 +1,21 @@
 import { describe, it, beforeEach, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import { readable } from 'svelte/store';
 import { mockUser } from '../mock/mock-types';
 
 // Mocking fetch
 global.fetch = vi.fn();
 
 // Mocking the page store
-vi.mock('$app/stores', () => {
+vi.mock('$app/state', () => {
 	return {
-		page: readable({
+		page: {
 			data: {
 				userInfo: {
 					id: 2
 				}
 			}
-		})
+		}
 	};
 });
 

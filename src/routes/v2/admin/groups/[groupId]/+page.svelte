@@ -1,15 +1,15 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
-	$: group = $page.data.group;
+	let group = $derived(page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
-	$: allUsers = $page.data.users;
+	let allUsers = $derived(page.data.users);
 
-	$: groupUsers = allUsers
+	let groupUsers = $derived(allUsers
 		.filter((u) => group.user_ids.includes(u.id))
-		.sort(sortUserByEmailComparator);
+		.sort(sortUserByEmailComparator));
 </script>
 
 <div class="container mt-3">
@@ -28,7 +28,7 @@
 	</nav>
 
 	<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary float-end">
-		<i class="bi bi-pencil" />
+		<i class="bi bi-pencil"></i>
 		Edit
 	</a>
 
@@ -38,7 +38,7 @@
 		<p>This group has no users.</p>
 	{:else}
 		<div class="col-6 bg-light p-2 rounded">
-			{#each groupUsers as user}
+			{#each groupUsers as user (user.id)}
 				<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 					<a href="/v2/admin/users/{user.id}" class="text-light">{user.email}</a>
 				</span>
@@ -51,7 +51,7 @@
 			<h4 class="fw-light mb-3">Viewer paths</h4>
 			{#if group.viewer_paths.length > 0}
 				<ul>
-					{#each group.viewer_paths as viewerPath}
+					{#each group.viewer_paths as viewerPath (viewerPath)}
 						<li><code>{viewerPath}</code></li>
 					{/each}
 				</ul>

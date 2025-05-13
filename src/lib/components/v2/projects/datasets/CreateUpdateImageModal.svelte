@@ -3,20 +3,24 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import ImageAttributesTypesForm from './ImageAttributesTypesForm.svelte';
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
-	/** @type {() => Promise<void>} */
-	export let onImageSave;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {() => Promise<void>} onImageSave
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { dataset, onImageSave } = $props();
 
-	let zarr_url = '';
-	let saving = false;
-	let isNew = false;
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
-	/** @type {ImageAttributesTypesForm} */
-	let attributesTypesForm;
+	let zarr_url = $state('');
+	let saving = $state(false);
+	let isNew = $state(false);
+
+	/** @type {ImageAttributesTypesForm|undefined} */
+	let attributesTypesForm = $state();
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-datasetCreateUpdateImageModal', [
 		'zarr_url'
@@ -31,9 +35,9 @@
 		if (!zarr_url.endsWith('/')) {
 			zarr_url += '/';
 		}
-		attributesTypesForm.init({}, {});
+		attributesTypesForm?.init({}, {});
 		formErrorHandler.clearErrors();
-		modal.show();
+		modal?.show();
 	}
 
 	/**
@@ -43,9 +47,9 @@
 		isNew = false;
 		saving = false;
 		zarr_url = image.zarr_url;
-		attributesTypesForm.init(image.attributes, image.types);
+		attributesTypesForm?.init(image.attributes, image.types);
 		formErrorHandler.clearErrors();
-		modal.show();
+		modal?.show();
 	}
 
 	async function saveImage() {
@@ -68,14 +72,14 @@
 				headers,
 				body: JSON.stringify({
 					zarr_url,
-					attributes: attributesTypesForm.getAttributes(),
-					types: attributesTypesForm.getTypes()
+					attributes: attributesTypesForm?.getAttributes(),
+					types: attributesTypesForm?.getTypes()
 				})
 			}
 		);
 		if (response.ok) {
 			await onImageSave();
-			modal.hide();
+			modal?.hide();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
@@ -93,14 +97,14 @@
 				headers,
 				body: JSON.stringify({
 					zarr_url,
-					attributes: attributesTypesForm.getAttributes(),
-					types: attributesTypesForm.getTypes()
+					attributes: attributesTypesForm?.getAttributes(),
+					types: attributesTypesForm?.getTypes()
 				})
 			}
 		);
 		if (response.ok) {
 			await onImageSave();
-			modal.hide();
+			modal?.hide();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
@@ -115,7 +119,7 @@
 	scrollable={true}
 	bind:this={modal}
 >
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">
 			{#if isNew}
 				Add an image list entry
@@ -123,8 +127,8 @@
 				Edit an image list entry
 			{/if}
 		</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		<div class="row mb-3 has-validation">
 			<label class="col-3 col-lg-2 col-form-label" for="image-zarr-url"> Zarr URL </label>
 			<div class="col col-lg-10">
@@ -140,15 +144,15 @@
 			</div>
 		</div>
 		<ImageAttributesTypesForm bind:this={attributesTypesForm} />
-		<div id="errorAlert-datasetCreateUpdateImageModal" class="mt-3" />
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click={saveImage} disabled={saving}>
+		<div id="errorAlert-datasetCreateUpdateImageModal" class="mt-3"></div>
+	{/snippet}
+	{#snippet footer()}
+		<button class="btn btn-primary" onclick={saveImage} disabled={saving}>
 			{#if saving}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Save
 		</button>
 		<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

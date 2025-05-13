@@ -5,24 +5,23 @@
 	import Modal from '../../common/Modal.svelte';
 	import TypesEditor from './TypesEditor.svelte';
 
-	export let updateEditedTask;
+	let { updateEditedTask } = $props();
 
 	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
-	let task;
+	let task = $state();
 
-	$: updateEnabled = !loading && !saving && task && task.name;
-	/** @type {Modal} */
-	let modal;
-	let loading = false;
-	let saving = false;
+	/** @type {Modal|undefined} */
+	let modal = $state();
+	let loading = $state(false);
+	let saving = $state(false);
 
 	/** @type {string|null} */
-	let command_parallel = null;
+	let command_parallel = $state(null);
 	/** @type {string|null} */
-	let command_non_parallel = null;
+	let command_non_parallel = $state(null);
 
-	/** @type {TypesEditor} */
-	let typesEditor;
+	/** @type {TypesEditor|undefined} */
+	let typesEditor = $state();
 
 	const formErrorHandler = new FormErrorHandler('taskEditModalError', [
 		'command_parallel',
@@ -36,7 +35,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleEditTask() {
-		if (!typesEditor.validate()) {
+		if (!typesEditor?.validate()) {
 			return;
 		}
 
@@ -66,7 +65,7 @@
 		if (response.ok) {
 			console.log('Task updated successfully');
 			updateEditedTask(await response.json());
-			modal.hide();
+			modal?.hide();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
@@ -78,7 +77,7 @@
 	 */
 	export async function open(taskToEdit) {
 		loading = true;
-		modal.show();
+		modal?.show();
 
 		// Retrieving the args_schema field
 		const response = await fetch(`/api/v2/task/${taskToEdit.id}`, {
@@ -95,22 +94,23 @@
 			command_non_parallel = task.command_non_parallel;
 			// wait the typesEditor element rendering, that happens after task is defined
 			await tick();
-			typesEditor.init(task.input_types, task.output_types);
+			typesEditor?.init(task.input_types, task.output_types);
 		} else {
-			modal.displayErrorAlert('Unable to load task');
+			modal?.displayErrorAlert('Unable to load task');
 			task = undefined;
-			typesEditor.init({}, {});
+			typesEditor?.init({}, {});
 		}
 	}
+	let updateEnabled = $derived(!loading && !saving && task && task.name);
 </script>
 
 <Modal id="taskEditModal" bind:this={modal} size="xl">
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if loading}
 			<div class="spinner-border spinner-border-sm" role="status">
 				<span class="visually-hidden">Loading...</span>
@@ -120,7 +120,7 @@
 				<div class="col-12">
 					<p class="lead">Task properties</p>
 
-					<span id="taskEditModalError" />
+					<span id="taskEditModalError"></span>
 
 					<div class="mb-2 row">
 						<label for="taskName" class="col-2 col-form-label text-end">Name</label>
@@ -202,7 +202,7 @@
 									disabled
 									class="form-control"
 									rows="10"
-								/>
+								></textarea>
 							</div>
 						</div>
 					{/if}
@@ -221,7 +221,7 @@
 									disabled
 									class="form-control"
 									rows="10"
-								/>
+								></textarea>
 							</div>
 						</div>
 					{/if}
@@ -248,20 +248,20 @@
 								disabled
 								class="form-control"
 								rows="5"
-							/>
+							></textarea>
 						</div>
 					</div>
 				</div>
 			</div>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click={handleEditTask} disabled={!updateEnabled}>
+	{/snippet}
+	{#snippet footer()}
+		<button class="btn btn-primary" onclick={handleEditTask} disabled={!updateEnabled}>
 			{#if saving}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Update
 		</button>
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

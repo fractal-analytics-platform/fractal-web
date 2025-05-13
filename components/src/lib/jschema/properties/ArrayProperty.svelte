@@ -3,16 +3,18 @@
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 	import CollapsibleProperty from './CollapsibleProperty.svelte';
 
-	/** @type {import("../form_element.js").ArrayFormElement} */
-	export let formElement;
-	export let editable = true;
-
-	export let children = [];
-
 	/**
-	 * @type {null|(() => void)}
+	 * @typedef {Object} Props
+	 * @property {import("../form_element.js").ArrayFormElement} formElement
+	 * @property {boolean} [editable]
+	 * @property {null|(() => void)} [reset]
 	 */
-	export let reset = null;
+
+	/** @type {Props} */
+	let { formElement, editable = true, reset = null } = $props();
+
+	/** @type {any[]} */
+	let children = $state([]);
 
 	onMount(() => {
 		children = formElement.children;
@@ -47,17 +49,18 @@
 		children = formElement.children;
 	}
 
-	$: canAddChildren =
-		editable &&
-		(typeof formElement.maxItems !== 'number' || children.length < formElement.maxItems);
+	let canAddChildren = $derived(
+		editable && (typeof formElement.maxItems !== 'number' || children.length < formElement.maxItems)
+	);
 
-	$: canRemoveChildren =
+	let canRemoveChildren = $derived(
 		editable &&
-		!(
-			formElement.required &&
-			typeof formElement.minItems === 'number' &&
-			children.length <= formElement.minItems
-		);
+			!(
+				formElement.required &&
+				typeof formElement.minItems === 'number' &&
+				children.length <= formElement.minItems
+			)
+	);
 </script>
 
 <CollapsibleProperty {formElement} {reset}>
@@ -65,7 +68,7 @@
 		<button
 			class="btn btn-primary"
 			type="button"
-			on:click={() => addChild()}
+			onclick={() => addChild()}
 			disabled={!canAddChildren}
 		>
 			Add argument to list
@@ -76,31 +79,37 @@
 			<div class="d-flex">
 				<div class="align-self-center m-2">
 					{#if canRemoveChildren}
-						<button class="btn btn-warning" type="button" on:click={() => removeChild(index)}>
+						<button class="btn btn-warning" type="button" onclick={() => removeChild(index)}>
 							Remove
 						</button>
 					{/if}
 				</div>
 				<div class="flex-fill">
-					<PropertyDiscriminator {editable} formElement={nestedProperty} />
+					<PropertyDiscriminator {editable} formElement={children[index]} />
 				</div>
 				<div class="align-self-right mt-2 me-2">
 					{#if children.length > 1}
 						<button
 							class="btn btn-light"
-							on:click|preventDefault={() => moveChildUp(index)}
+							onclick={(e) => {
+								e.preventDefault();
+								moveChildUp(index);
+							}}
 							aria-label="Move item up"
 							disabled={!editable && index === 0}
 						>
-							<i class="bi-arrow-up" />
+							<i class="bi-arrow-up"></i>
 						</button>
 						<button
 							class="btn btn-light"
-							on:click|preventDefault={() => moveChildDown(index)}
+							onclick={(e) => {
+								e.preventDefault();
+								moveChildDown(index);
+							}}
 							aria-label="Move item down"
 							disabled={!editable && index === children.length - 1}
 						>
-							<i class="bi-arrow-down" />
+							<i class="bi-arrow-down"></i>
 						</button>
 					{/if}
 				</div>

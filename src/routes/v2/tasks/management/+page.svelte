@@ -1,22 +1,24 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import TaskCollection from '$lib/components/v2/tasks/TaskCollection.svelte';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import AddSingleTask from '$lib/components/v2/tasks/AddSingleTask.svelte';
 	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
 	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
 
+	const user = $derived(page.data.user);
+
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
-	let taskGroups = $page.data.taskGroups;
+	let taskGroups = $state(page.data.taskGroups);
 
 	/** @type {'pypi'|'local'|'single'|'custom_env'} */
-	let packageType = 'pypi';
+	let packageType = $state('pypi');
 
-	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default} */
-	let taskCollectionComponent;
+	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default|undefined} */
+	let taskCollectionComponent = $state();
 
 	/** @type {string|undefined} */
-	let expandedTaskGroupRow = undefined;
+	let expandedTaskGroupRow = $state();
 
 	async function reloadTaskGroupsList() {
 		const response = await fetch(`/api/v2/task-group?args_schema=false`, {
@@ -40,7 +42,7 @@
 </script>
 
 <div class="container mt-3">
-	<div class="mb-2" id="errorSection" />
+	<div class="mb-2" id="errorSection"></div>
 
 	<h3 class="fw-light">Add tasks</h3>
 
@@ -53,7 +55,7 @@
 		id="pypi"
 		value="pypi"
 		bind:group={packageType}
-		on:click={() => taskCollectionComponent?.clearForm()}
+		onclick={() => taskCollectionComponent?.clearForm()}
 	/>
 	<label class="btn btn-outline-secondary" for="pypi"> PyPI </label>
 
@@ -64,7 +66,7 @@
 		id="local"
 		value="local"
 		bind:group={packageType}
-		on:click={() => taskCollectionComponent?.clearForm()}
+		onclick={() => taskCollectionComponent?.clearForm()}
 	/>
 	<label class="btn btn-outline-secondary" for="local"> Local </label>
 
@@ -94,12 +96,12 @@
 				{packageType}
 				{reloadTaskGroupsList}
 				bind:this={taskCollectionComponent}
-				user={$page.data.user}
+				{user}
 			/>
 		{:else if packageType === 'single'}
-			<AddSingleTask addNewTasks={reloadTaskGroupsList} user={$page.data.user} />
+			<AddSingleTask addNewTasks={reloadTaskGroupsList} {user} />
 		{:else if packageType === 'custom_env'}
-			<CustomEnvTask addNewTasks={reloadTaskGroupsList} user={$page.data.user} />
+			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {user} />
 		{/if}
 	</div>
 
@@ -107,12 +109,7 @@
 		<h3 class="fw-light">Task List</h3>
 		<div class="col-12">
 			{#key taskGroups}
-				<TaskGroupsTable
-					{taskGroups}
-					{updateTaskGroups}
-					user={$page.data.user}
-					bind:expandedTaskGroupRow
-				/>
+				<TaskGroupsTable {taskGroups} {updateTaskGroups} {user} bind:expandedTaskGroupRow />
 			{/key}
 		</div>
 	</div>

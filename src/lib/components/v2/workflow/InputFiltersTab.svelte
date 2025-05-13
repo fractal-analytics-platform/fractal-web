@@ -5,26 +5,28 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {import("fractal-components/types/api").WorkflowV2} */
-	export let workflow;
-	/** @type {import("fractal-components/types/api").WorkflowTaskV2} */
-	export let workflowTask;
-	/** @type {number|undefined} */
-	export let selectedDatasetId;
-	/** @type {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} */
-	export let updateWorkflowTaskCallback;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
+	 * @property {import("fractal-components/types/api").WorkflowTaskV2} workflowTask
+	 * @property {number|undefined} selectedDatasetId
+	 * @property {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} updateWorkflowTaskCallback
+	 */
 
-	/** @type {InputFiltersTypesForm} */
-	let form;
+	/** @type {Props} */
+	let { workflow, workflowTask, selectedDatasetId, updateWorkflowTaskCallback } = $props();
 
-	let saving = false;
-	let successfullySaved = false;
+	/** @type {InputFiltersTypesForm|undefined} */
+	let form = $state();
 
-	let loadingDatasetFilters = false;
+	let saving = $state(false);
+	let successfullySaved = $state(false);
+
+	let loadingDatasetFilters = $state(false);
 	/** @type {string[]} */
-	let datasetTypes = [];
-	let selectedDatasetTypeKey = '';
-	let selectedDatasetTypeValue = true;
+	let datasetTypes = $state([]);
+	let selectedDatasetTypeKey = $state('');
+	let selectedDatasetTypeValue = $state(true);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
@@ -34,8 +36,8 @@
 	});
 
 	export async function init() {
-		if (!form.hasUnsavedChanges()) {
-			form.init(workflowTask.type_filters);
+		if (!form?.hasUnsavedChanges()) {
+			form?.init(workflowTask.type_filters);
 		}
 
 		if (selectedDatasetId === undefined) {
@@ -73,7 +75,7 @@
 		}
 		successfullySaved = false;
 
-		const valid = form.validateFields();
+		const valid = form?.validateFields();
 		if (!valid) {
 			return;
 		}
@@ -88,7 +90,7 @@
 				credentials: 'include',
 				headers,
 				body: JSON.stringify({
-					type_filters: form.getTypes()
+					type_filters: form?.getTypes()
 				})
 			}
 		);
@@ -97,7 +99,7 @@
 			setTimeout(() => {
 				successfullySaved = false;
 			}, 3000);
-			form.save();
+			form?.save();
 			const result = await response.json();
 			updateWorkflowTaskCallback(result);
 		} else {
@@ -113,11 +115,11 @@
 	 * @returns {boolean}
 	 */
 	export function hasUnsavedChanges() {
-		return form.hasUnsavedChanges();
+		return form?.hasUnsavedChanges() || false;
 	}
 
 	export function discardChanges() {
-		form.discardChanges();
+		form?.discardChanges();
 	}
 
 	function onOpenAddDatasetTypeModal() {
@@ -126,7 +128,7 @@
 	}
 
 	function addDatasetType() {
-		form.importType(selectedDatasetTypeKey, selectedDatasetTypeValue);
+		form?.importType(selectedDatasetTypeKey, selectedDatasetTypeValue);
 	}
 </script>
 
@@ -134,7 +136,7 @@
 	<InputFiltersTypesForm task={workflowTask.task} bind:this={form} />
 
 	{#if loadingDatasetFilters}
-		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true" />
+		<span class="spinner-border spinner-border-sm mb-3" role="status" aria-hidden="true"></span>
 	{:else if datasetTypes.length > 0}
 		<button
 			class="btn btn-outline-primary mb-3"
@@ -146,13 +148,13 @@
 		</button>
 	{/if}
 
-	<div id="errorAlert-inputFilters" />
+	<div id="errorAlert-inputFilters"></div>
 
 	{#if successfullySaved}
 		<div class="alert alert-success">Input filters successfully updated</div>
 	{/if}
 
-	<button type="button" class="btn btn-primary" on:click={save} disabled={saving}>
+	<button type="button" class="btn btn-primary" onclick={save} disabled={saving}>
 		{#if saving}
 			<div class="spinner-border spinner-border-sm" role="status">
 				<span class="visually-hidden">Loading...</span>
@@ -162,14 +164,14 @@
 	</button>
 
 	<Modal id="add-type-filter-from-dataset-modal" onOpen={onOpenAddDatasetTypeModal} centered={true}>
-		<svelte:fragment slot="header">
+		{#snippet header()}
 			<h1 class="modal-title fs-5">Add type filter from dataset</h1>
-		</svelte:fragment>
-		<svelte:fragment slot="body">
+		{/snippet}
+		{#snippet body()}
 			<label class="form-label" for="datasetTypeKey"> Type Key </label>
 			<select bind:value={selectedDatasetTypeKey} id="datasetTypeKey" class="form-select">
 				<option value="">Select...</option>
-				{#each datasetTypes as t}
+				{#each datasetTypes as t (t)}
 					<option>{t}</option>
 				{/each}
 			</select>
@@ -180,18 +182,18 @@
 					<option value={false}>False</option>
 				</select>
 			{/if}
-		</svelte:fragment>
-		<svelte:fragment slot="footer">
+		{/snippet}
+		{#snippet footer()}
 			<button
 				class="btn btn-primary"
-				on:click={addDatasetType}
+				onclick={addDatasetType}
 				data-bs-dismiss="modal"
 				disabled={selectedDatasetTypeKey === ''}
 			>
 				Add
 			</button>
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		</svelte:fragment>
+		{/snippet}
 	</Modal>
 </div>
 
@@ -203,7 +205,7 @@
 		{:else}
 			<table class="table table-borderless mb-0">
 				<tbody>
-					{#each Object.keys(workflowTask.task.input_types) as key}
+					{#each Object.keys(workflowTask.task.input_types) as key (key)}
 						<tr class="d-flex">
 							<td><code>{key}</code></td>
 							<td class="flex-grow"><BooleanIcon value={workflowTask.task.input_types[key]} /></td>
@@ -220,7 +222,7 @@
 		{:else}
 			<table class="table table-borderless mb-0">
 				<tbody>
-					{#each Object.keys(workflowTask.task.output_types) as key}
+					{#each Object.keys(workflowTask.task.output_types) as key (key)}
 						<tr class="d-flex">
 							<td><code>{key}</code></td>
 							<td class="flex-grow"><BooleanIcon value={workflowTask.task.output_types[key]} /></td>

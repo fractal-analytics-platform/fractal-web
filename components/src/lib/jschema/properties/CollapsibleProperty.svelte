@@ -1,14 +1,22 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
 
-	/** @type {import("../../types/form").CollapsibleFormElement} */
-	export let formElement;
-
 	/**
-	 * Function passed by the parent that reset this element to its default value (used only on top-level objects)
-	 * @type {null|(() => void)}
+	 * @typedef {Object} Props
+	 * @property {import("../../types/form").CollapsibleFormElement} formElement
+	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @property {import('svelte').Snippet} [children]
 	 */
-	export let reset = null;
+
+	/** @type {Props} */
+	let { formElement = $bindable(), reset = null, children } = $props();
+
+	/** @type {boolean} */
+	let collapsed = $state(false);
+
+	$effect(() => {
+		collapsed = formElement.collapsed;
+	});
 
 	/**
 	 * @param {MouseEvent} event
@@ -18,7 +26,7 @@
 			// prevent collapse when we are clicking on a property description
 			return;
 		}
-		formElement.collapsed = !formElement.collapsed;
+		collapsed = !collapsed;
 	}
 
 	/**
@@ -40,16 +48,19 @@
 				<div class="accordion-header">
 					<button
 						class="accordion-button"
-						class:collapsed={formElement.collapsed}
+						class:collapsed
+						onclick={(event) => toggleCollapse(event)}
 						type="button"
-						on:click={(event) => toggleCollapse(event)}
 					>
 						<div class="flex-fill">
 							<PropertyLabel {formElement} tag="span" />
 						</div>
 						<div>
 							{#if reset !== null && formElement.property.default !== undefined}
-								<button class="btn btn-warning me-3" on:click={handleReset}> Reset </button>
+								<!-- svelte-ignore a11y_interactive_supports_focus -->
+								<!-- svelte-ignore a11y_click_events_have_key_events -->
+								<!-- svelte-ignore a11y_missing_attribute -->
+								<a class="btn btn-warning me-3" role="button" onclick={handleReset}>Reset</a>
 							{/if}
 						</div>
 					</button>
@@ -57,11 +68,11 @@
 				<div
 					id="collapse-{formElement.id}"
 					class="accordion-collapse jschema-collapsing"
-					class:collapse={formElement.collapsed}
-					class:show={!formElement.collapsed}
+					class:collapse={collapsed}
+					class:show={!collapsed}
 				>
 					<div class="accordion-body p-1">
-						<slot />
+						{@render children?.()}
 					</div>
 				</div>
 			</div>

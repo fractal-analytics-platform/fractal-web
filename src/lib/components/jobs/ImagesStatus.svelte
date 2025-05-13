@@ -1,19 +1,30 @@
 <script>
 	import { isConverterType, isParallelType } from 'fractal-components/common/workflow_task_utils';
 
-	/** @type {import('fractal-components/types/api').ImagesStatus|undefined} */
-	export let status;
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
-	export let workflowTask;
+	
+	
+	
 
-	/** @type {import('./ImagesStatusModal.svelte').default} */
-	export let imagesStatusModal;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').ImagesStatus|undefined} status
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('./ImagesStatusModal.svelte').default} imagesStatusModal
+	 */
 
-	$: fullyDone = status && status.num_done_images === status.num_available_images;
-	$: fullyFailed = status && status.num_failed_images === status.num_available_images;
-	$: partial = status && !fullyDone && !fullyFailed;
+	/** @type {Props} */
+	let {
+		status,
+		dataset,
+		workflowTask,
+		imagesStatusModal
+	} = $props();
+
+	let fullyDone = $derived(status && status.num_done_images === status.num_available_images);
+	let fullyFailed = $derived(status && status.num_failed_images === status.num_available_images);
+	let partial = $derived(status && !fullyDone && !fullyFailed);
 
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
@@ -40,9 +51,9 @@
 	{#if handleAsConverter(workflowTask, status)}
 		<span class="d-flex">
 			{#if status.status === 'done'}
-				<i class="status-icon bi bi-check text-success pe-1" />
+				<i class="status-icon bi bi-check text-success pe-1"></i>
 			{:else if status.status === 'failed'}
-				<i class="status-icon bi bi-x text-danger pe-1" />
+				<i class="status-icon bi bi-x text-danger pe-1"></i>
 			{:else if status.status === 'submitted'}
 				<div
 					class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
@@ -58,7 +69,7 @@
 				<button
 					aria-label="Submitted images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(dataset, workflowTask)}
+					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
 					<span class="d-flex pe-1">
 						<span class="pe-1 status-wrapper text-primary">
@@ -77,13 +88,13 @@
 				<button
 					aria-label="Done images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(dataset, workflowTask)}
+					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
 					<span class="d-flex">
 						<span class="status-wrapper text-success ps-1">
 							{status.num_done_images}
 						</span>
-						<i class="status-icon bi bi-check text-success pe-1" />
+						<i class="status-icon bi bi-check text-success pe-1"></i>
 					</span>
 				</button>
 			{/if}
@@ -94,13 +105,13 @@
 				<button
 					aria-label="Failed images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
-					on:click={() => imagesStatusModal.open(dataset, workflowTask)}
+					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
 					<span class="d-flex">
 						<span class="status-wrapper text-danger ps-1">
 							{status.num_failed_images}
 						</span>
-						<i class="status-icon bi bi-x text-danger pe-1" />
+						<i class="status-icon bi bi-x text-danger pe-1"></i>
 					</span>
 				</button>
 			{/if}

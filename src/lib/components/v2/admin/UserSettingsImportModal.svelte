@@ -5,11 +5,15 @@
 	import SlimSelect from 'slim-select';
 	import { onMount } from 'svelte';
 
-	/** @type {number} */
-	export let currentUserId;
-	/** @type {(settings: import('fractal-components/types/api').UserSettings) => void} */
-	export let onSettingsImported;
-	let importingSettings = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} currentUserId
+	 * @property {(settings: import('fractal-components/types/api').UserSettings) => void} onSettingsImported
+	 */
+
+	/** @type {Props} */
+	let { currentUserId, onSettingsImported } = $props();
+	let importingSettings = $state(false);
 	/** @type {number[]} */
 	let desiredGroups = [];
 
@@ -17,10 +21,10 @@
 	let users = [];
 	/** @type {number|null} */
 	let selectedUserId = null;
-	let userError = '';
+	let userError = $state('');
 
-	/** @type {Modal}*/
-	let modal;
+	/** @type {Modal|undefined}*/
+	let modal = $state();
 	/** @type {SlimSelect|undefined} */
 	let userSelector;
 
@@ -34,9 +38,9 @@
 	export async function open(selectedGroups) {
 		userError = '';
 		selectedUserId = null;
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		desiredGroups = selectedGroups;
-		modal.show();
+		modal?.show();
 		await setUsersSlimSelectOptions();
 	}
 
@@ -53,10 +57,10 @@
 		if (response.ok) {
 			onSettingsImported(await response.json());
 			importingSettings = false;
-			modal.hide();
+			modal?.hide();
 		} else {
 			const error = await getAlertErrorFromResponse(response);
-			modal.displayErrorAlert(error);
+			modal?.displayErrorAlert(error);
 			importingSettings = false;
 		}
 	}
@@ -94,7 +98,7 @@
 				allGroups
 			);
 		} catch (err) {
-			modal.displayErrorAlert(err);
+			modal?.displayErrorAlert(err);
 			return;
 		}
 
@@ -136,27 +140,28 @@
 </script>
 
 <Modal id="selectUserToImportSettingsModal" centered={true} bind:this={modal} focus={false}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h1 class="modal-title fs-5">Select user to import settings</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<select id="user-to-import-settings-select" class="invisible" class:border-danger={userError} />
+	{/snippet}
+	{#snippet body()}
+		<select id="user-to-import-settings-select" class="invisible" class:border-danger={userError}
+		></select>
 		{#if userError}
 			<span class="text-danger">{userError}</span>
 		{/if}
-		<div id="errorAlert-selectUserToImportSettingsModal" class="mt-3" />
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+		<div id="errorAlert-selectUserToImportSettingsModal" class="mt-3"></div>
+	{/snippet}
+	{#snippet footer()}
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		<button
 			class="btn btn-primary"
-			on:click={importSettingsFromSelectedUser}
+			onclick={importSettingsFromSelectedUser}
 			disabled={importingSettings}
 		>
 			{#if importingSettings}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Import settings
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

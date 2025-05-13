@@ -4,21 +4,21 @@
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
-	let task;
-	/** @type {string | null} */
-	let taskVersion;
+	let task = $state();
+	/** @type {string|undefined} */
+	let taskVersion = $state();
 
-	/** @type {Modal} */
-	let modal;
-	let loading = false;
+	/** @type {Modal|undefined} */
+	let modal = $state();
+	let loading = $state(false);
 
 	/**
 	 *
 	 * @param {import('fractal-components/types/api').TaskV2} taskToLoad
-	 * @param {string | null} taskGroupVersion
+	 * @param {string|undefined} taskGroupVersion
 	 */
 	export async function open(taskToLoad, taskGroupVersion) {
-		modal.show();
+		modal?.show();
 		task = taskToLoad;
 		taskVersion = taskGroupVersion;
 
@@ -34,7 +34,7 @@
 		if (response.ok) {
 			task = result;
 		} else {
-			modal.displayErrorAlert('Unable to load task');
+			modal?.displayErrorAlert('Unable to load task');
 			task = undefined;
 		}
 		loading = false;
@@ -42,13 +42,13 @@
 </script>
 
 <Modal id="taskInfoModal" size="xl" bind:this={modal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if task}
 			<h1 class="h5 modal-title">Task {task.name}</h1>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<span id="errorAlert-taskInfoModal" />
+	{/snippet}
+	{#snippet body()}
+		<span id="errorAlert-taskInfoModal"></span>
 		{#if task}
 			<div class="row mb-3">
 				<div class="col-12">
@@ -72,7 +72,7 @@
 						<li class="list-group-item">
 							<table class="table table-borderless mb-0">
 								<tbody>
-									{#each Object.keys(task.input_types) as key}
+									{#each Object.keys(task.input_types) as key (key)}
 										<tr class="d-flex">
 											<td><code>{key}</code></td>
 											<td class="flex-grow"><BooleanIcon value={task.input_types[key]} /></td>
@@ -85,7 +85,7 @@
 						<li class="list-group-item">
 							<table class="table table-borderless mb-0">
 								<tbody>
-									{#each Object.keys(task.output_types) as key}
+									{#each Object.keys(task.output_types) as key (key)}
 										<tr class="d-flex">
 											<td><code>{key}</code></td>
 											<td class="flex-grow"><BooleanIcon value={task.output_types[key]} /></td>
@@ -118,10 +118,7 @@
 									<span class="visually-hidden">Loading...</span>
 								</div>
 							{:else if Object.keys(task.meta_non_parallel).length > 0}
-								<div
-									class="accordion"
-									id="accordion-meta-non-parallel"
-								>
+								<div class="accordion" id="accordion-meta-non-parallel">
 									<div class="accordion-item rounded-0">
 										<h2 class="accordion-header">
 											<button
@@ -149,9 +146,7 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">
-									Initialisation Meta
-								</li>
+								<li class="list-group-item list-group-item-light fw-bold">Initialisation Meta</li>
 								<li class="list-group-item">-</li>
 							{/if}
 						{/if}
@@ -161,10 +156,7 @@
 									<span class="visually-hidden">Loading...</span>
 								</div>
 							{:else if Object.keys(task.meta_parallel).length > 0}
-								<div
-									class="accordion"
-									id="accordion-meta-parallel"
-								>
+								<div class="accordion" id="accordion-meta-parallel">
 									<div class="accordion-item rounded-0">
 										<h2 class="accordion-header">
 											<button
@@ -192,9 +184,7 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">
-									Compute Meta
-								</li>
+								<li class="list-group-item list-group-item-light fw-bold">Compute Meta</li>
 								<li class="list-group-item">-</li>
 							{/if}
 						{/if}
@@ -206,10 +196,7 @@
 									<span class="visually-hidden">Loading...</span>
 								</div>
 							{:else if task.args_schema_non_parallel}
-								<div
-									class="accordion"
-									id="accordion-args-schema-non-parallel"
-								>
+								<div class="accordion" id="accordion-args-schema-non-parallel">
 									<div class="accordion-item rounded-0">
 										<h2 class="accordion-header">
 											<button
@@ -249,10 +236,7 @@
 									<span class="visually-hidden">Loading...</span>
 								</div>
 							{:else if task.args_schema_parallel}
-								<div
-									class="accordion"
-									id="accordion-args-schema-parallel"
-								>
+								<div class="accordion" id="accordion-args-schema-parallel">
 									<div class="accordion-item rounded-0">
 										<h2 class="accordion-header">
 											<button
@@ -280,9 +264,7 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">
-									Args Schema parallel
-								</li>
+								<li class="list-group-item list-group-item-light fw-bold">Args Schema parallel</li>
 								<li class="list-group-item">-</li>
 							{/if}
 						{/if}
@@ -290,8 +272,8 @@
 				</div>
 			</div>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

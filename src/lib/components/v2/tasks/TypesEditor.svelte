@@ -1,8 +1,8 @@
 <script>
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let inputTypesArray = [];
+	let inputTypesArray = $state([]);
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let outputTypesArray = [];
+	let outputTypesArray = $state([]);
 
 	/**
 	 * @returns {boolean}
@@ -107,7 +107,7 @@
 	<span class="col-2 col-form-label text-end"> Input Types </span>
 	{#if inputTypesArray.length > 0}
 		<div class="col-7">
-			{#each inputTypesArray as inputType, index}
+			{#each inputTypesArray as inputType, index (index)}
 				<div class="row">
 					<div class="col">
 						<div class="input-group mb-1" class:has-validation={inputType.error}>
@@ -132,10 +132,10 @@
 							<button
 								class="btn btn-outline-danger"
 								type="button"
-								on:click={() => removeInputType(index)}
+								onclick={() => removeInputType(index)}
 								aria-label="Remove input type"
 							>
-								<i class="bi bi-trash" />
+								<i class="bi bi-trash"></i>
 							</button>
 							{#if inputType.error}
 								<div class="invalid-feedback">{inputType.error}</div>
@@ -147,7 +147,7 @@
 		</div>
 	{/if}
 	<div class="col-3">
-		<button class="btn btn-outline-primary" on:click={addInputType} type="button">
+		<button class="btn btn-outline-primary" onclick={addInputType} type="button">
 			Add input type
 		</button>
 	</div>
@@ -157,7 +157,7 @@
 	<span class="col-2 col-form-label text-end"> Output Types </span>
 	{#if outputTypesArray.length > 0}
 		<div class="col-7">
-			{#each outputTypesArray as outputType, index}
+			{#each outputTypesArray as outputType, index (index)}
 				<div class="row">
 					<div class="col">
 						<div class="input-group mb-1" class:has-validation={outputType.error}>
@@ -182,10 +182,10 @@
 							<button
 								class="btn btn-outline-danger"
 								type="button"
-								on:click={() => removeOutputType(index)}
+								onclick={() => removeOutputType(index)}
 								aria-label="Remove output type"
 							>
-								<i class="bi bi-trash" />
+								<i class="bi bi-trash"></i>
 							</button>
 							{#if outputType.error}
 								<div class="invalid-feedback">{outputType.error}</div>
@@ -197,7 +197,7 @@
 		</div>
 	{/if}
 	<div class="col-3">
-		<button class="btn btn-outline-primary" on:click={addOutputType} type="button">
+		<button class="btn btn-outline-primary" onclick={addOutputType} type="button">
 			Add output type
 		</button>
 	</div>

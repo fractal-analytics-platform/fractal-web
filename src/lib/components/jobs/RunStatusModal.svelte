@@ -8,36 +8,36 @@
 	import { tick } from 'svelte';
 	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
-	let loading = false;
-	let page = 1;
-	let pageSize = 10;
-	let totalCount = 0;
+	let loading = $state(false);
+	let page = $state(1);
+	let pageSize = $state(10);
+	let totalCount = $state(0);
 
 	/** @type {number} */
 	let historyRunId;
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	let dataset;
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
+	/** @type {import('fractal-components/types/api').DatasetV2|undefined} */
+	let dataset = $state();
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let workflowTask;
-	/** @type {number} */
-	let historyRunIndex;
+	/** @type {number|undefined} */
+	let historyRunIndex = $state();
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {(import('fractal-components/types/api').Pagination<import('fractal-components/types/api').HistoryUnit>)|undefined} */
-	let data = undefined;
+	let data = $state();
 
 	/** @type {import('fractal-components/types/api').HistoryUnit|undefined} */
-	let selectedUnit = undefined;
+	let selectedUnit = $state(undefined);
 
-	let loadingLogs = false;
+	let loadingLogs = $state(false);
 	/** @type {Array<{text: string, highlight: boolean}>} */
-	let logParts = [];
-	let loadedLogsStatus = '';
+	let logParts = $state([]);
+	let loadedLogsStatus = $state('');
 
-	let showLogs = false;
-	let showZarrUrls = false;
+	let showLogs = $state(false);
+	let showZarrUrls = $state(false);
 
 	let statusFilter = '';
 	/** @type {SlimSelect|undefined} */
@@ -61,7 +61,7 @@
 		data = undefined;
 		page = 1;
 		pageSize = 10;
-		modal.show();
+		modal?.show();
 		await loadRun(page, pageSize);
 		await tick();
 		setStatusFilterSelector();
@@ -79,14 +79,14 @@
 	 */
 	async function loadRun(currentPage, selectedPageSize) {
 		loading = true;
-		let url = `/api/v2/project/${dataset.project_id}/status/run/${historyRunId}/units?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}&page=${currentPage}&page_size=${selectedPageSize}`;
+		let url = `/api/v2/project/${dataset?.project_id}/status/run/${historyRunId}/units?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}&page=${currentPage}&page_size=${selectedPageSize}`;
 		if (statusFilter) {
 			url += `&unit_status=${statusFilter}`;
 		}
 		const response = await fetch(url);
 		if (!response.ok) {
 			loading = false;
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			return;
 		}
 		data = await response.json();
@@ -105,13 +105,13 @@
 		unsetStatusFilterSelector();
 		loadingLogs = true;
 		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}`,
+			`/api/v2/project/${dataset?.project_id}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}`,
 			{
 				method: 'GET'
 			}
 		);
 		if (!response.ok) {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			loadingLogs = false;
 			return;
 		}
@@ -135,7 +135,7 @@
 		showZarrUrls = true;
 		selectedUnit = unit;
 		await tick();
-		modal.restoreModalFocus();
+		modal?.restoreModalFocus();
 	}
 
 	async function back() {
@@ -144,7 +144,7 @@
 		selectedUnit = undefined;
 		await tick();
 		setStatusFilterSelector();
-		modal.restoreModalFocus();
+		modal?.restoreModalFocus();
 	}
 
 	function setStatusFilterSelector() {
@@ -194,12 +194,13 @@
 		await loadRun(page, pageSize);
 	}
 
-	$: hasZarrUrlsInTable =
-		data !== undefined && data.items.find((u) => u.zarr_urls.length === 1) !== undefined;
+	let hasZarrUrlsInTable = $derived(
+		data !== undefined && data.items.find((u) => u.zarr_urls.length === 1) !== undefined
+	);
 </script>
 
 <Modal id="runStatusModal" bind:this={modal} fullscreen={true} bodyCss="p-0" {onClose}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h1 class="modal-title fs-5">
 			{#if showLogs && !loadingLogs}
 				Run {historyRunIndex} - Logs for unit #{selectedUnit?.id}
@@ -209,11 +210,11 @@
 				Run {historyRunIndex}
 			{/if}
 		</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-runStatusModal" class="mb-2" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-runStatusModal" class="mb-2"></div>
 		{#if loading && !data}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else if showLogs && !loadingLogs}
 			<div class="row">
 				<div class="col">
@@ -224,30 +225,30 @@
 			</div>
 			<div class="row">
 				<div class="col">
-					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
+					<button class="m-2 ms-3 btn btn-primary" onclick={back}> Back </button>
 				</div>
 			</div>
 		{:else if showZarrUrls && selectedUnit}
 			<div class="row">
 				<div class="col">
-					<table class="table table-striped">
-						<tbody>
-							{#if selectedUnit.zarr_urls.length === 0}
-								<p class="ms-3 mb-0 mt-2">No Zarr URLs</p>
-							{:else}
-								{#each selectedUnit.zarr_urls as zarrUrl}
+					{#if selectedUnit.zarr_urls.length === 0}
+						<p class="ms-3 mb-0 mt-2">No Zarr URLs</p>
+					{:else}
+						<table class="table table-striped">
+							<tbody>
+								{#each selectedUnit.zarr_urls as zarrUrl (zarrUrl)}
 									<tr>
 										<td>{zarrUrl}</td>
 									</tr>
 								{/each}
-							{/if}
-						</tbody>
-					</table>
+							</tbody>
+						</table>
+					{/if}
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
-					<button class="m-2 ms-3 btn btn-primary" on:click={back}> Back </button>
+					<button class="m-2 ms-3 btn btn-primary" onclick={back}> Back </button>
 				</div>
 			</div>
 		{:else if data}
@@ -270,46 +271,43 @@
 						<th>Unit id</th>
 						<th>Status</th>
 						<th>Zarr URLs</th>
-						<th />
+						<th></th>
 					</tr>
 					<tr>
-						<th />
+						<th></th>
 						<th>
-							<select id="status-filter" class="invisible" />
+							<select id="status-filter" class="invisible"></select>
 						</th>
-						<th />
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.items as unit}
+					{#each data.items as unit (unit.id)}
 						<tr>
 							<td>{unit.id}</td>
 							<td>{unit.status || '-'}</td>
 							<td>
 								{#if unit.zarr_urls.length === 0}
 									-
-								{:else if unit.zarr_urls.length === 1}
+								{:else if unit.zarr_urls.length === 1 && dataset}
 									{getRelativeZarrPath(dataset, unit.zarr_urls[0])}
 								{:else}
-									<button class="btn btn-light" on:click={() => displayZarrUrls(unit)}>
-										<i class="bi bi-list-task" /> Zarr URLs
+									<button class="btn btn-light" onclick={() => displayZarrUrls(unit)}>
+										<i class="bi bi-list-task"></i> Zarr URLs
 									</button>
 								{/if}
 							</td>
 							<td>
 								<button
 									class="btn btn-light me-2"
-									on:click={() => loadLogs(unit)}
+									onclick={() => loadLogs(unit)}
 									disabled={loadingLogs}
 								>
 									{#if loadingLogs}
-										<span
-											class="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										/>
+										<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+										></span>
 									{/if}
-									<i class="bi-list-columns-reverse" /> Logs
+									<i class="bi-list-columns-reverse"></i> Logs
 								</button>
 							</td>
 						</tr>
@@ -323,5 +321,5 @@
 				onPageChange={(currentPage, pageSize) => loadRun(currentPage, pageSize)}
 			/>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>

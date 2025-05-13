@@ -3,20 +3,25 @@
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').User} */
-	export let user;
-	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
-	let taskGroup;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').User} user
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { user } = $props();
+	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
+	let taskGroup = $state();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/**
 	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToLoad
 	 */
 	export async function open(taskGroupToLoad) {
 		taskGroup = taskGroupToLoad;
-		modal.show();
+		modal?.show();
 	}
 
 	/**
@@ -32,13 +37,13 @@
 </script>
 
 <Modal id="taskGroupInfoModal" size="xl" bind:this={modal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if taskGroup}
 			<h1 class="h5 modal-title">Task group {taskGroup.pkg_name}</h1>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<span id="errorAlert-taskGroupInfoModal" />
+	{/snippet}
+	{#snippet body()}
+		<span id="errorAlert-taskGroupInfoModal"></span>
 		{#if taskGroup}
 			<div class="row mb-3">
 				<div class="col-12">
@@ -75,8 +80,8 @@
 				</div>
 			</div>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

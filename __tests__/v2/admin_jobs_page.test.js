@@ -1,11 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
-import { readable } from 'svelte/store';
 
 // Mocking the page store
-vi.mock('$app/stores', () => {
+vi.mock('$app/state', () => {
 	return {
-		page: readable({
+		page: {
 			data: {
 				users: [
 					{ id: 1, email: 'admin@fractal.xy' },
@@ -17,7 +16,7 @@ vi.mock('$app/stores', () => {
 					id: 2
 				}
 			}
-		})
+		}
 	};
 });
 

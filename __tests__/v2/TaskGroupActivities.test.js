@@ -1,7 +1,6 @@
 import { describe, it, beforeEach, expect, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import { readable } from 'svelte/store';
 
 // Mocking fetch
 global.fetch = vi.fn();
@@ -12,11 +11,11 @@ vi.mock('$env/dynamic/public', () => {
 });
 
 // Mocking the page store
-vi.mock('$app/stores', () => {
+vi.mock('$app/state', () => {
 	return {
-		page: readable({
+		page: {
 			url: new URL('http://localhost:5173/v2/tasks/activities')
-		})
+		}
 	};
 });
 
@@ -91,8 +90,21 @@ describe('TaskGroupActivities', () => {
 		});
 
 		render(TaskGroupActivities, {
-			// @ts-expect-error
-			props: { admin: true, users: [{ id: 1, email: 'admin@fractal.xy' }] }
+			props: {
+				admin: true,
+				users: [
+					{
+						id: 1,
+						email: 'admin@fractal.xy',
+						username: 'admin',
+						is_active: true,
+						is_superuser: true,
+						is_verified: true,
+						group_ids_names: [],
+						oauth_accounts: []
+					}
+				]
+			}
 		});
 
 		const user = userEvent.setup();

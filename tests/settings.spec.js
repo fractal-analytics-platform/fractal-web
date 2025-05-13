@@ -35,7 +35,7 @@ test('User settings', async ({ page }) => {
 		await page.getByLabel('SLURM account 1').fill(randomSlurmAccount);
 		await page.getByLabel('SLURM account 2').fill(randomSlurmAccount);
 		await page.getByRole('button', { name: 'Save' }).click();
-		await page.getByText('`slurm_accounts` list has repetitions').waitFor();
+		await page.getByText('List has repetitions').waitFor();
 	});
 
 	await test.step('Add SLURM account (success)', async () => {

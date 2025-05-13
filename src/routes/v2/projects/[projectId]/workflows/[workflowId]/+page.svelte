@@ -2,7 +2,7 @@
 	import { env } from '$env/dynamic/public';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
@@ -26,95 +26,99 @@
 	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
+	import { navigating, navigationCancelled } from '$lib/stores';
+
+	/** @type {number|undefined} */
+	const defaultDatasetId = $derived(page.data.defaultDatasetId);
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	let workflow = $page.data.workflow;
-	/** @type {number|undefined} */
-	let defaultDatasetId = $page.data.defaultDatasetId;
-	$: project = workflow.project;
+	let workflow = $state(page.data.workflow);
+	let project = $derived(workflow.project);
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
-	let datasets = $page.data.datasets;
+	let datasets = $state(page.data.datasets);
 
 	/** @type {number|undefined} */
-	let selectedDatasetId = undefined;
-	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
+	let selectedDatasetId = $state(undefined);
+	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
 
-	let isLegacy = false;
+	let isLegacy = $state(false);
 	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
-	let legacyStatuses = {};
+	let legacyStatuses = $state({});
 
-	let jobError = '';
+	let jobError = $state('');
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let failedJob;
-	/** @type {JobLogsModal} */
-	let jobLogsModal;
+	/** @type {JobLogsModal|undefined} */
+	let jobLogsModal = $state();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let workflowErrorAlert = undefined;
 
-	let workflowTabContextId = 0;
-	let workflowSuccessMessage = '';
+	let workflowTabContextId = $state(0);
+	let workflowSuccessMessage = $state('');
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
-	let selectedWorkflowTask = undefined;
+	let selectedWorkflowTask = $state(undefined);
 	/** @type {number|undefined} */
-	let expandedWorkflowTaskId = undefined;
+	let expandedWorkflowTaskId = $state(undefined);
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
-	let preventedSelectedTaskChange = undefined;
+	let preventedSelectedTaskChange = $state(undefined);
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
-	let preventedHistoryRunChange = undefined;
+	let preventedHistoryRunChange = $state(undefined);
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated[]} */
-	let historyRunStatuses = [];
-	let loadingHistoryRunStatuses = false;
-	/** @type {ImagesStatusModal} */
-	let imagesStatusModal;
-	/** @type {RunStatusModal} */
-	let runStatusModal;
+	let historyRunStatuses = $state([]);
+	let loadingHistoryRunStatuses = $state(false);
+	/** @type {ImagesStatusModal|undefined} */
+	let imagesStatusModal = $state();
+	/** @type {RunStatusModal|undefined} */
+	let runStatusModal = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
-	let selectedHistoryRun = undefined;
+	let selectedHistoryRun = $state(undefined);
 
 	/** @type {ArgumentsSchema|undefined} */
-	let argsSchemaForm = undefined;
+	let argsSchemaForm = $state(undefined);
 	/** @type {MetaPropertiesForm|undefined} */
-	let metaPropertiesForm = undefined;
+	let metaPropertiesForm = $state(undefined);
 
-	let argsChangesSaved = false;
+	let argsChangesSaved = $state(false);
 
 	/** @type {InputFiltersTab|undefined} */
-	let inputFiltersTab = undefined;
+	let inputFiltersTab = $state(undefined);
 
 	// Update workflow modal
-	let updatedWorkflowName = '';
+	let updatedWorkflowName = $state('');
 
 	// Modals
-	/** @type {Modal} */
-	let argsUnsavedChangesModal;
-	/** @type {Modal} */
-	let filtersUnsavedChangesModal;
-	/** @type {Modal} */
-	let metaPropertiesUnsavedChangesModal;
-	/** @type {RunWorkflowModal} */
-	let runWorkflowModal;
-	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default} */
-	let editTasksOrderModal;
-	/** @type {AddWorkflowTaskModal} */
-	let addWorkflowTaskModal;
-	/** @type {Modal} */
-	let editWorkflowModal;
-	/** @type {TypeFiltersFlowModal} */
-	let typeFiltersFlowModal;
+	/** @type {Modal|undefined} */
+	let argsUnsavedChangesModal = $state();
+	/** @type {Modal|undefined} */
+	let filtersUnsavedChangesModal = $state();
+	/** @type {Modal|undefined} */
+	let metaPropertiesUnsavedChangesModal = $state();
+	/** @type {RunWorkflowModal|undefined} */
+	let runWorkflowModal = $state();
+	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default|undefined} */
+	let editTasksOrderModal = $state();
+	/** @type {AddWorkflowTaskModal|undefined} */
+	let addWorkflowTaskModal = $state();
+	/** @type {Modal|undefined} */
+	let editWorkflowModal = $state();
+	/** @type {TypeFiltersFlowModal|undefined} */
+	let typeFiltersFlowModal = $state();
 
 	/** @type {{ [id: string]: import('fractal-components/types/api').TaskV2[] }} */
-	let newVersionsMap = {};
+	let newVersionsMap = $state({});
 	/** @type {{ [id: string]: string | null }} */
-	let tasksVersions = {};
+	let tasksVersions = $state({});
 
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
-	let selectedSubmittedJob;
-	let jobCancelledMessage = '';
+	let selectedSubmittedJob = $state();
+	let jobCancelledMessage = $state('');
 
-	$: updatableWorkflowList = workflow.task_list || [];
+	let updatableWorkflowList = $derived(workflow.task_list || []);
 
-	$: sortedDatasets = datasets.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+	let sortedDatasets = $derived(
+		[...datasets].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+	);
 
 	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
@@ -126,25 +130,32 @@
 		await checkNewVersions();
 	});
 
-	beforeNavigate((navigation) => {
+	beforeNavigate(async (navigation) => {
 		if (argsSchemaForm?.hasUnsavedChanges()) {
-			// Prevent navigation
-			navigation.cancel();
+			preventNavigation(navigation);
 			toggleArgsUnsavedChangesModal();
 		}
 
 		if (inputFiltersTab?.hasUnsavedChanges()) {
-			// Prevent navigation
-			navigation.cancel();
+			preventNavigation(navigation);
 			toggleFiltersUnsavedChangesModal();
 		}
 
 		if (metaPropertiesForm?.hasUnsavedChanges()) {
-			// Prevent navigation
-			navigation.cancel();
+			preventNavigation(navigation);
 			toggleMetaPropertiesUnsavedChangesModal();
 		}
 	});
+
+	/**
+	 *
+	 * @param {import('@sveltejs/kit').BeforeNavigate} navigation
+	 */
+	function preventNavigation(navigation) {
+		navigation.cancel();
+		navigationCancelled.set(true);
+		navigating.set(false);
+	}
 
 	/**
 	 * @param {number} id
@@ -211,14 +222,14 @@
 		updatedWorkflowName = workflow.name;
 	}
 
-	let workflowUpdating = false;
+	let workflowUpdating = $state(false);
 
 	/**
 	 * Updates a project's workflow in the server
 	 * @returns {Promise<void>}
 	 */
 	async function handleWorkflowUpdate() {
-		editWorkflowModal.confirmAndHide(
+		editWorkflowModal?.confirmAndHide(
 			async () => {
 				workflowSuccessMessage = '';
 				if (!workflow) {
@@ -375,15 +386,15 @@
 	}
 
 	function toggleArgsUnsavedChangesModal() {
-		argsUnsavedChangesModal.toggle();
+		argsUnsavedChangesModal?.toggle();
 	}
 
 	function toggleFiltersUnsavedChangesModal() {
-		filtersUnsavedChangesModal.toggle();
+		filtersUnsavedChangesModal?.toggle();
 	}
 
 	function toggleMetaPropertiesUnsavedChangesModal() {
-		metaPropertiesUnsavedChangesModal.toggle();
+		metaPropertiesUnsavedChangesModal?.toggle();
 	}
 
 	/**
@@ -399,7 +410,7 @@
 		} else {
 			await reloadSelectedDataset();
 			await tick();
-			runWorkflowModal.open(action);
+			runWorkflowModal?.open(action);
 		}
 	}
 
@@ -458,7 +469,7 @@
 		}
 	}
 
-	let newVersionsCount = 0;
+	let newVersionsCount = $state(0);
 	/**
 	 * Used to receive new version count from VersionUpdate component.
 	 * @param count {number}
@@ -468,9 +479,11 @@
 	}
 
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
-	let statuses = {};
+	let statuses = $state({});
 
-	$: hasAnyJobRun = Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0;
+	let hasAnyJobRun = $derived(
+		Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0
+	);
 
 	/** @type {number|undefined} */
 	let statusWatcherTimer;
@@ -576,7 +589,7 @@
 		if (!failedJob) {
 			return;
 		}
-		jobLogsModal.show(failedJob, false);
+		jobLogsModal?.show(failedJob, false);
 	}
 
 	/**
@@ -662,9 +675,9 @@
 			<li class="breadcrumb-item" aria-current="page">
 				<a href="/v2/projects">Projects</a>
 			</li>
-			{#if $page.params.projectId}
+			{#if page.params.projectId}
 				<li class="breadcrumb-item" aria-current="page">
-					<a href="/v2/projects/{$page.params.projectId}">{project?.name}</a>
+					<a href="/v2/projects/{page.params.projectId}">{project?.name}</a>
 				</li>
 			{/if}
 			<li class="breadcrumb-item">Workflows</li>
@@ -688,10 +701,10 @@
 							class="form-select"
 							id="dataset"
 							bind:value={selectedDatasetId}
-							on:change={selectedDatasetChanged}
+							onchange={selectedDatasetChanged}
 						>
 							<option value={undefined}>Select...</option>
-							{#each sortedDatasets as dataset}
+							{#each sortedDatasets as dataset (dataset.id)}
 								<option value={dataset.id}>{dataset.name}</option>
 							{/each}
 						</select>
@@ -699,31 +712,34 @@
 				</div>
 				<div class="col-lg-8 col-md-12">
 					{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
-						<button class="btn btn-danger" on:click={stopWorkflow}>
-							<i class="bi-stop-circle-fill" /> Stop workflow
+						<button class="btn btn-danger" onclick={stopWorkflow}>
+							<i class="bi-stop-circle-fill"></i> Stop workflow
 						</button>
 					{:else if !hasAnyJobRun}
 						<button
 							class="btn btn-success"
-							on:click|preventDefault={() => openRunWorkflowModal('run')}
+							onclick={() => openRunWorkflowModal('run')}
+							type="button"
 							disabled={selectedDatasetId === undefined || workflow.task_list.length === 0}
 						>
-							<i class="bi-play-fill" /> Run workflow
+							<i class="bi-play-fill"></i> Run workflow
 						</button>
 					{:else}
 						<button
 							class="btn btn-success"
-							on:click|preventDefault={() => openRunWorkflowModal('continue')}
+							onclick={() => openRunWorkflowModal('continue')}
+							type="button"
 							disabled={workflow.task_list.length === 0}
 						>
-							<i class="bi-play-fill" /> Continue workflow
+							<i class="bi-play-fill"></i> Continue workflow
 						</button>
 						<button
 							class="btn btn-primary"
-							on:click|preventDefault={() => openRunWorkflowModal('restart')}
+							onclick={() => openRunWorkflowModal('restart')}
+							type="button"
 							disabled={workflow.task_list.length === 0}
 						>
-							<i class="bi bi-arrow-clockwise" /> Restart workflow
+							<i class="bi bi-arrow-clockwise"></i> Restart workflow
 						</button>
 					{/if}
 				</div>
@@ -732,33 +748,40 @@
 
 		<div class="col-lg-4 mb-2">
 			<div class="float-end">
-				{#if $page.data.userInfo.is_superuser}
+				{#if page.data.userInfo.is_superuser}
 					<button
 						class="btn btn-light"
-						on:click|preventDefault={() => typeFiltersFlowModal.open()}
+						onclick={(e) => {
+							e.preventDefault();
+							typeFiltersFlowModal?.open();
+						}}
 						disabled={workflow.task_list.length === 0}
 					>
 						Type filters flow
 					</button>
 				{/if}
 				<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
-					<i class="bi-journal-code" /> List jobs
+					<i class="bi-journal-code"></i> List jobs
 				</a>
 				<button
 					class="btn btn-light"
-					on:click|preventDefault={handleExportWorkflow}
+					onclick={(e) => {
+						e.preventDefault();
+						handleExportWorkflow();
+					}}
 					aria-label="Export workflow"
 				>
-					<i class="bi-download" />
+					<i class="bi-download"></i>
 				</button>
 				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 				<button
 					class="btn btn-light"
 					data-bs-toggle="modal"
 					data-bs-target="#editWorkflowModal"
-					on:click={resetWorkflowUpdateModal}
+					onclick={resetWorkflowUpdateModal}
+					aria-label="Edit workflow"
 				>
-					<i class="bi-pencil" />
+					<i class="bi-pencil"></i>
 				</button>
 			</div>
 		</div>
@@ -772,7 +795,7 @@
 		<StandardDismissableAlert message={jobCancelledMessage} />
 		<StandardDismissableAlert message={workflowSuccessMessage} />
 
-		<div id="workflowErrorAlert" />
+		<div id="workflowErrorAlert"></div>
 
 		{#if jobError}
 			<div class="alert border border-danger bg-light">
@@ -784,7 +807,7 @@
 						<pre class="text-danger mb-0">{jobError}</pre>
 					</div>
 					<div class="col-md-2 col-sm-3">
-						<button class="btn btn-outline-secondary float-end" on:click={showJobLogsModal}>
+						<button class="btn btn-outline-secondary float-end" onclick={showJobLogsModal}>
 							Show complete log
 						</button>
 					</div>
@@ -802,19 +825,19 @@
 								<button
 									class="btn btn-light"
 									aria-label="Add task to workflow"
-									on:click={() => {
+									onclick={() => {
 										workflowSuccessMessage = '';
-										addWorkflowTaskModal.show();
+										addWorkflowTaskModal?.show();
 									}}
 								>
-									<i class="bi-plus-lg" />
+									<i class="bi-plus-lg"></i>
 								</button>
 								<button
 									class="btn btn-light"
 									aria-label="Edit tasks order"
-									on:click={() => editTasksOrderModal.show(updatableWorkflowList)}
+									onclick={() => editTasksOrderModal?.show(updatableWorkflowList)}
 								>
-									<i class="bi-arrow-down-up" />
+									<i class="bi-arrow-down-up"></i>
 								</button>
 							</div>
 						</div>
@@ -824,14 +847,17 @@
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 					{:else}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
-							{#each workflow.task_list as workflowTask}
+							{#each workflow.task_list as workflowTask (workflowTask.id)}
 								<button
 									style="cursor: pointer"
 									class="list-group-item list-group-item-action"
 									class:active={selectedWorkflowTask !== undefined &&
 										selectedWorkflowTask.id === workflowTask.id}
 									data-fs-target={workflowTask.id}
-									on:click|preventDefault={() => setSelectedWorkflowTask(workflowTask)}
+									onclick={(e) => {
+										e.preventDefault();
+										setSelectedWorkflowTask(workflowTask);
+									}}
 								>
 									{#if statuses[workflowTask.id]}
 										{#if expandedWorkflowTaskId === workflowTask.id && loadingHistoryRunStatuses}
@@ -839,23 +865,25 @@
 												class="spinner-border spinner-border-sm p-0"
 												role="status"
 												aria-hidden="true"
-											/>
+											></span>
 										{:else if expandedWorkflowTaskId === workflowTask.id}
+											<!-- svelte-ignore node_invalid_placement_ssr -->
 											<button
 												aria-label="Hide runs"
 												class="btn btn-link p-0 text-white"
-												on:click={() => (expandedWorkflowTaskId = undefined)}
+												onclick={() => (expandedWorkflowTaskId = undefined)}
 											>
-												<i class="bi bi-caret-down-fill" />
+												<i class="bi bi-caret-down-fill"></i>
 											</button>
 										{:else}
+											<!-- svelte-ignore node_invalid_placement_ssr -->
 											<button
 												aria-label="Show runs"
 												class="btn btn-link p-0"
 												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
-												on:click={() => loadHistoryRunStatuses(workflowTask.id)}
+												onclick={() => loadHistoryRunStatuses(workflowTask.id)}
 											>
-												<i class="bi bi-caret-right-fill" />
+												<i class="bi bi-caret-right-fill"></i>
 											</button>
 										{/if}
 									{/if}
@@ -864,7 +892,7 @@
 										{#if selectedDataset}
 											{#if isLegacy}
 												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
-											{:else}
+											{:else if imagesStatusModal}
 												<ImagesStatus
 													status={statuses[workflowTask.id]}
 													dataset={selectedDataset}
@@ -876,27 +904,27 @@
 									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
 										<span class="float-end text-info" title="new version available">
-											<i class="bi bi-arrow-up-circle-fill" />
+											<i class="bi bi-arrow-up-circle-fill"></i>
 										</span>
 									{/if}
 									{#if workflowTask.warning}
 										<span class="float-end text-warning" title={workflowTask.warning}>
-											<i class="bi bi-exclamation-triangle-fill" />
+											<i class="bi bi-exclamation-triangle-fill"></i>
 										</span>
 									{/if}
 								</button>
-								{#each historyRunStatuses as status, index}
+								{#each historyRunStatuses as status, index (status.id)}
 									{#if !loadingHistoryRunStatuses && expandedWorkflowTaskId === workflowTask.id}
 										<button
 											transition:slide
 											class="run-item list-group-item list-group-item-action"
 											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
 											style="padding-left: 38px"
-											on:click={() => selectHistoryRun(status)}
+											onclick={() => selectHistoryRun(status)}
 										>
 											Run {index + 1}
 											<span class="float-end ps-2">
-												{#if selectedDataset}
+												{#if selectedDataset && runStatusModal}
 													<RunStatus
 														run={status}
 														index={index + 1}
@@ -917,7 +945,7 @@
 			<div class="col-8">
 				{#if selectedWorkflowTask?.warning}
 					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle-fill" />
+						<i class="bi bi-exclamation-triangle-fill"></i>
 						{selectedWorkflowTask.warning}
 					</div>
 				{/if}
@@ -929,7 +957,7 @@
 									<li class="nav-item">
 										<button
 											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
-											on:click={() => setWorkflowTabContextId(0)}
+											onclick={() => setWorkflowTabContextId(0)}
 											aria-current={workflowTabContextId === 0}
 											>Arguments
 										</button>
@@ -937,7 +965,7 @@
 									<li class="nav-item">
 										<button
 											class="nav-link {workflowTabContextId === 1 ? 'active' : ''}"
-											on:click={() => setWorkflowTabContextId(1)}
+											onclick={() => setWorkflowTabContextId(1)}
 											aria-current={workflowTabContextId === 1}
 										>
 											Meta
@@ -946,7 +974,7 @@
 									<li class="nav-item">
 										<button
 											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
-											on:click={() => setWorkflowTabContextId(2)}
+											onclick={() => setWorkflowTabContextId(2)}
 											aria-current={workflowTabContextId === 2}
 										>
 											Info
@@ -955,7 +983,7 @@
 									<li class="nav-item">
 										<button
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
-											on:click={() => setWorkflowTabContextId(3)}
+											onclick={() => setWorkflowTabContextId(3)}
 											aria-current={workflowTabContextId === 3}
 										>
 											Types
@@ -964,7 +992,7 @@
 									<li class="nav-item">
 										<button
 											class="nav-link {workflowTabContextId === 4 ? 'active' : ''}"
-											on:click={() => setWorkflowTabContextId(4)}
+											onclick={() => setWorkflowTabContextId(4)}
 											aria-current={workflowTabContextId === 4}
 										>
 											Version
@@ -1076,20 +1104,26 @@
 	bind:this={addWorkflowTaskModal}
 	{onWorkflowTaskAdded}
 	{workflow}
-	user={$page.data.user}
+	user={page.data.user}
 />
 
 <ImagesStatusModal bind:this={imagesStatusModal} />
 <RunStatusModal bind:this={runStatusModal} />
 
 <Modal id="editWorkflowModal" centered={true} bind:this={editWorkflowModal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Workflow properties</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editWorkflowModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-editWorkflowModal"></div>
 		{#if workflow}
-			<form id="updateWorkflow" on:submit|preventDefault={handleWorkflowUpdate}>
+			<form
+				id="updateWorkflow"
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleWorkflowUpdate();
+				}}
+			>
 				<div class="mb-3">
 					<label for="workflowName" class="form-label">Workflow name</label>
 					<input
@@ -1102,15 +1136,15 @@
 				</div>
 			</form>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button class="btn btn-primary" form="updateWorkflow" disabled={workflowUpdating}>
 			{#if workflowUpdating}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Save
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <TasksOrderModal
@@ -1135,24 +1169,24 @@
 />
 
 <Modal id="args-changes-unsaved-dialog" bind:this={argsUnsavedChangesModal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">There are argument changes unsaved</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		<p>
 			Do you want to save the changes made to the arguments of the current selected workflow task?
 		</p>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={async () => {
+			onclick={async () => {
 				argsSchemaForm?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
 				await selectHistoryRun(preventedHistoryRunChange);
-				argsUnsavedChangesModal.hide();
+				argsUnsavedChangesModal?.hide();
 			}}
 		>
 			Discard changes
@@ -1160,35 +1194,35 @@
 		<button
 			type="button"
 			class="btn btn-success"
-			on:click={async () => {
+			onclick={async () => {
 				await argsSchemaForm?.saveChanges();
-				argsUnsavedChangesModal.hide();
+				argsUnsavedChangesModal?.hide();
 			}}
 		>
 			Save changes
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <Modal id="filters-changes-unsaved-dialog" bind:this={filtersUnsavedChangesModal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">There are filter changes unsaved</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		<p>
 			Do you want to save the changes made to the filters of the current selected workflow task?
 		</p>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={async () => {
+			onclick={async () => {
 				inputFiltersTab?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
 				await selectHistoryRun(preventedHistoryRunChange);
-				filtersUnsavedChangesModal.hide();
+				filtersUnsavedChangesModal?.hide();
 			}}
 		>
 			Discard changes
@@ -1196,36 +1230,36 @@
 		<button
 			type="button"
 			class="btn btn-success"
-			on:click={async () => {
+			onclick={async () => {
 				await inputFiltersTab?.save();
-				filtersUnsavedChangesModal.hide();
+				filtersUnsavedChangesModal?.hide();
 			}}
 		>
 			Save changes
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <Modal id="meta-properties-changes-unsaved-dialog" bind:this={metaPropertiesUnsavedChangesModal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">There are meta properties changes unsaved</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		<p>
 			Do you want to save the changes made to the meta properties of the current selected workflow
 			task?
 		</p>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		<button
 			type="button"
 			class="btn btn-warning"
-			on:click={async () => {
+			onclick={async () => {
 				metaPropertiesForm?.discardChanges();
 				await setSelectedWorkflowTask(preventedSelectedTaskChange);
 				await selectHistoryRun(preventedHistoryRunChange);
-				metaPropertiesUnsavedChangesModal.hide();
+				metaPropertiesUnsavedChangesModal?.hide();
 			}}
 		>
 			Discard changes
@@ -1233,14 +1267,14 @@
 		<button
 			type="button"
 			class="btn btn-success"
-			on:click={async () => {
+			onclick={async () => {
 				await metaPropertiesForm?.saveChanges();
-				metaPropertiesUnsavedChangesModal.hide();
+				metaPropertiesUnsavedChangesModal?.hide();
 			}}
 		>
 			Save changes
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <JobLogsModal bind:this={jobLogsModal} />

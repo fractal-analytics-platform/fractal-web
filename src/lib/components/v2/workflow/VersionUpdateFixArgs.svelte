@@ -10,31 +10,34 @@
 	} from 'fractal-components';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2} */
-	export let workflowTask;
-	/** @type {import('fractal-components/types/api').TaskV2} */
-	export let updateCandidate;
-	/** @type {boolean} */
-	export let parallel;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('fractal-components/types/api').TaskV2} updateCandidate
+	 * @property {boolean} parallel
+	 * @property {boolean} [canBeUpdated]
+	 * @property {boolean} [argsChanged]
+	 */
 
-	export let canBeUpdated = false;
-	export let argsChanged = false;
+	/** @type {Props} */
+	let {
+		workflowTask,
+		updateCandidate,
+		parallel,
+		canBeUpdated = $bindable(false),
+		argsChanged = $bindable(false)
+	} = $props();
 
-	$: {
-		canBeUpdated = validationErrors === null || validationErrors.length === 0;
-		argsChanged = argsToBeFixed !== originalArgs;
-	}
-
-	let originalArgs = '';
-	let displayTextarea = false;
-	let argsToBeFixed = '';
-	let argsToBeFixedValidJson = true;
-	/** @type {import('ajv').ErrorObject[] | null} */
-	let validationErrors = null;
+	let originalArgs = $state('');
+	let displayTextarea = $state(false);
+	let argsToBeFixed = $state('');
+	let argsToBeFixedValidJson = $state(true);
+	/** @type {import('ajv').ErrorObject[] | undefined} */
+	let validationErrors = $state();
 
 	export function reset() {
 		argsToBeFixed = '';
-		validationErrors = null;
+		validationErrors = undefined;
 	}
 
 	export function cancel() {
@@ -91,11 +94,11 @@
 		}
 		const valid = validator.isValid(args);
 		if (valid) {
-			validationErrors = null;
+			validationErrors = undefined;
 		} else {
 			argsToBeFixed = JSON.stringify(args, null, 2);
 			displayTextarea = true;
-			validationErrors = validator.getErrors();
+			validationErrors = validator.getErrors() || undefined;
 		}
 	}
 
@@ -105,8 +108,8 @@
 				'args_schema' in updateCandidate
 					? updateCandidate.args_schema
 					: parallel
-					? updateCandidate.args_schema_parallel
-					: updateCandidate.args_schema_non_parallel
+						? updateCandidate.args_schema_parallel
+						: updateCandidate.args_schema_non_parallel
 			);
 		if ('properties' in newSchema) {
 			newSchema = stripIgnoredProperties(newSchema, getPropertiesToIgnore(false));
@@ -117,13 +120,21 @@
 	export function hasValidationErrors() {
 		return (validationErrors?.length || 0) > 0;
 	}
+
+	$effect(() => {
+		canBeUpdated = validationErrors === undefined || validationErrors.length === 0;
+	});
+
+	$effect(() => {
+		argsChanged = argsToBeFixed !== originalArgs;
+	});
 </script>
 
 {#if validationErrors}
 	<div class="alert alert-danger mt-3">
 		<p>Following errors must be fixed before performing the update:</p>
 		<ul id="validation-errors">
-			{#each validationErrors as error, index}
+			{#each validationErrors as error, index (index)}
 				<li>
 					{#if error.instancePath !== ''}
 						{error.instancePath}:
@@ -177,7 +188,7 @@
 			class:is-invalid={!argsToBeFixedValidJson}
 			bind:value={argsToBeFixed}
 			rows="20"
-		/>
+		></textarea>
 	{/if}
 	{#if !argsToBeFixedValidJson}
 		<div class="invalid-feedback">Invalid JSON</div>

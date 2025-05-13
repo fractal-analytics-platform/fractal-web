@@ -5,15 +5,21 @@
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
-	export let datasets = [];
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2[]} [datasets]
+	 */
 
-	let datasetSearch = '';
-	let datasetCreatedMessage = '';
+	/** @type {Props} */
+	let { datasets = $bindable([]) } = $props();
 
-	$: filteredDatasets = datasets.filter((p) =>
+	let datasetSearch = $state('');
+	let datasetCreatedMessage = $state('');
+
+	let filteredDatasets = $derived(datasets.filter((p) =>
 		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
-	);
+	));
 
 	function createDatasetCallback(
 		/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset
@@ -77,14 +83,14 @@
 					type="button"
 					data-bs-target="#createDatasetModal"
 					data-bs-toggle="modal"
-					on:click={() => (datasetCreatedMessage = '')}
+					onclick={() => (datasetCreatedMessage = '')}
 				>
 					Create new dataset
 				</button>
 			</div>
 		</div>
 	</div>
-	<div id="datasetCreateErrorAlert" />
+	<div id="datasetCreateErrorAlert"></div>
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
@@ -94,7 +100,7 @@
 		</thead>
 		<tbody>
 			{#key datasets}
-				{#each filteredDatasets as dataset}
+				{#each filteredDatasets as dataset (dataset.id)}
 					<tr>
 						<td>
 							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
@@ -104,10 +110,10 @@
 						<td>
 							<ConfirmActionButton
 								modalId="confirmDatasetDeleteModal{dataset.id}"
-								style={'danger'}
+								style="danger"
 								btnStyle="danger"
 								buttonIcon="trash"
-								label={'Delete'}
+								label="Delete"
 								message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
 								callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
 							/>

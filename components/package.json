@@ -24,29 +24,29 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"@sveltejs/package": "^2.0.0",
-		"@testing-library/jest-dom": "^6.4.6",
-		"@testing-library/svelte": "^4.0.4",
-		"@testing-library/user-event": "^14.5.2",
+		"@sveltejs/kit": "^2.20.8",
+		"@sveltejs/package": "^2.3.7",
+		"@sveltejs/vite-plugin-svelte": "^4.0.0",
+		"@testing-library/jest-dom": "^6.0.0",
+		"@testing-library/svelte": "^5.0.0",
+		"@testing-library/user-event": "^14.0.0",
 		"@types/color-hash": "^2.0.0",
 		"eslint": "^9.0.0",
-		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-svelte": "^2.0.0",
+		"eslint-config-prettier": "^10.0.0",
+		"eslint-plugin-svelte": "^3.0.0",
 		"jsdom": "^22.1.0",
-		"prettier": "^2.0.0",
-		"prettier-plugin-svelte": "^2.10.1",
-		"svelte": "^4.0.0",
-		"svelte-check": "^3.4.3",
+		"prettier": "^3.0.0",
+		"prettier-plugin-svelte": "^3.0.0",
+		"svelte": "^5.0.0",
+		"svelte-check": "^4.0.0",
 		"tslib": "^2.7.0",
-		"typescript": "^5.0.0",
+		"typescript": "^5.5.0",
 		"vite": "^5.0.0",
-		"vitest": "^1.0.0"
+		"vitest": "^3.0.0"
 	},
 	"dependencies": {
 		"ajv": "^8.12.0",
@@ -55,7 +55,8 @@
 		"dompurify": "^3.2.3",
 		"marked": "^7.0.4",
 		"semver": "^7.6.3",
-		"slim-select": "^2.8.1"
+		"slim-select": "^2.8.1",
+		"svelte-preprocess": "^6.0.3"
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",

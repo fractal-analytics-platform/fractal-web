@@ -1,11 +1,9 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { page } from '$app/stores';
-	import { DataHandler, check } from '@vincjo/datatables';
+	import { page } from '$app/state';
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
 	import JobInfoModal from '$lib/components/v2/jobs/JobInfoModal.svelte';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import Th from '$lib/components/common/filterable/Th.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy, onMount } from 'svelte';
 	import { removeDuplicatedItems } from '$lib/common/component_utilities';
@@ -13,33 +11,42 @@
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
 	import SlimSelect from 'slim-select';
 
-	/** @type {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} */
-	export let jobUpdater;
-	/** @type {('project'|'workflow'|'user_email'|'id')[]} */
-	export let columnsToHide = [];
-	/** @type {boolean} */
-	export let admin = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} jobUpdater
+	 * @property {Array<string>} [columnsToHide]
+	 * @property {boolean} [admin]
+	 * @property {import('svelte').Snippet} [buttons]
+	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').ApplyWorkflowV2]>} [editStatus]
+	 */
+
+	/** @type {Props} */
+	let {
+		jobUpdater,
+		columnsToHide = [],
+		admin = false,
+		buttons = undefined,
+		editStatus = undefined
+	} = $props();
 
 	/** @type {JobInfoModal} */
 	let jobInfoModal;
 	/** @type {JobLogsModal} */
 	let jobLogsModal;
 
-	/** @type {import('fractal-components/types/api').ProjectV2[]} */
-	let projects = $page.data.projects;
+	const currentUserEmail = $derived(page.data.userInfo?.email);
+
+	/** @type {Array<import('fractal-components/types/api').ProjectV2>} */
+	const projects = $derived(page.data.projects || []);
 	/** @type {{id: number, name: string}[]} */
-	let workflows = $page.data.workflows || [];
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-	let jobs = $page.data.jobs || [];
+	let workflows = $state([]);
+	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
+	let jobs = [];
 	/** @type {{ id: number, name: string }[]} */
-	let datasets = $page.data.datasets || [];
+	let datasets = $state([]);
 
-	/** @type {DataHandler} */
-	let tableHandler = new DataHandler(jobs);
-	tableHandler.sortDesc('id');
-
-	/** @type {import('svelte/store').Readable<import('fractal-components/types/api').ApplyWorkflowV2[]>} */
-	let rows = tableHandler.getRows();
+	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
+	let rows = $state(jobs);
 
 	// Selectors
 	/** @type {SlimSelect|undefined} */
@@ -59,13 +66,37 @@
 	let workflowFilter = '';
 	let datasetFilter = '';
 
-	// Filters
-	$: tableHandler.filter(statusFilter, 'status', check.isEqualTo);
-	$: tableHandler.filter(projectFilter, (row) => row.project_dump.id.toString(), check.isEqualTo);
-	$: tableHandler.filter(workflowFilter, (row) => row.workflow_dump.id.toString(), check.isEqualTo);
-	$: tableHandler.filter(datasetFilter, (row) => row.dataset_dump.id.toString(), check.isEqualTo);
+	/**
+	 * @typedef {{ key: string, label: string, direction?: 'asc'|'desc', priority?: number, field?: (j: import('fractal-components/types/api').ApplyWorkflowV2) => number | string | null}} SortField
+	 */
 
-	$: rebuildSlimSelectOptions($rows);
+	/**
+	 * @type {Array<SortField>}
+	 */
+	let columns = $state([
+		{ key: 'id', label: 'Id', direction: 'desc', priority: 1, field: (j) => j.id },
+		{ key: 'status', label: 'Status', field: (j) => j.status },
+		{ key: 'options', label: 'Options' },
+		{ key: 'start_timestamp', label: 'Start', field: (j) => j.start_timestamp },
+		{ key: 'end_timestamp', label: 'End', field: (j) => j.end_timestamp },
+		{ key: 'project', label: 'Project', field: (j) => j.project_dump.id },
+		{ key: 'workflow', label: 'Workflow', field: (j) => j.workflow_dump.id },
+		{ key: 'dataset', label: 'Dataset', field: (j) => j.dataset_dump.id },
+		{ key: 'user_email', label: 'User', field: (j) => j.user_email }
+	]);
+
+	/**
+	 * @param {SortField} sortField
+	 */
+	function updateSortField(sortField) {
+		const priorities = columns.map((c) => c.priority).filter((p) => p !== undefined);
+		const maxPriority = priorities.length > 0 ? Math.max(...priorities) : 0;
+		const direction = sortField.direction === 'asc' ? 'desc' : 'asc';
+		/** @type {SortField} */
+		const updatedSortField = { ...sortField, direction, priority: maxPriority + 1 };
+		columns = columns.map((s) => (s.key === sortField.key ? updatedSortField : s));
+		updateRows();
+	}
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -84,11 +115,51 @@
 			/** @type {{id: number, name: string}[]} */
 			(jobs.filter((j) => j.dataset_dump).map((j) => j.dataset_dump))
 		);
-		tableHandler.setRows(jobs);
+		updateRows();
 	}
 
-	let cancellingJobs = [];
-	let jobCancelledMessage = '';
+	function updateRows() {
+		if (admin) {
+			rows = getSortedJobs(jobs);
+			return;
+		}
+
+		rows = getSortedJobs(
+			jobs
+				.filter((j) => (statusFilter ? j.status === statusFilter : j))
+				.filter((j) => (projectFilter ? j.project_dump.id.toString() === projectFilter : j))
+				.filter((j) => (workflowFilter ? j.workflow_dump.id.toString() === workflowFilter : j))
+				.filter((j) => (datasetFilter ? j.dataset_dump.id.toString() === datasetFilter : j))
+		);
+
+		rebuildSlimSelectOptions(rows);
+	}
+
+	/**
+	 * @param {Array<import('fractal-components/types/api').ApplyWorkflowV2>} jobs
+	 */
+	function getSortedJobs(jobs) {
+		const sortedRows = [...jobs];
+		const sortColumns = columns.filter(
+			(c) => c.direction !== undefined && c.priority !== undefined && c.field
+		);
+		sortColumns.sort((c1, c2) => (Number(c1.priority) > Number(c2.priority) ? 1 : -1));
+		for (const sortField of sortColumns) {
+			sortedRows.sort((a, b) => {
+				const field = sortField.field;
+				if (!field) {
+					return -1;
+				}
+				const [field1, field2] = [field(a), field(b)];
+				const result = field1 === null ? -1 : field2 === null ? 1 : field1 < field2 ? -1 : 1;
+				return sortField.direction === 'desc' ? -1 * result : result;
+			});
+		}
+		return sortedRows;
+	}
+
+	let cancellingJobs = $state([]);
+	let jobCancelledMessage = $state('');
 
 	/**
 	 * Requests the server to stop a job execution
@@ -134,8 +205,7 @@
 	async function updateJobsInBackground() {
 		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
 		if (jobsToCheck.length > 0) {
-			jobs = await jobUpdater();
-			tableHandler.setRows(jobs);
+			setJobs(await jobUpdater());
 		}
 		clearTimeout(updateJobsTimeout);
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
@@ -153,7 +223,12 @@
 	}
 
 	function clearFilters() {
-		tableHandler.clearFilters();
+		columns = columns.map((c) =>
+			c.key === 'id'
+				? { ...c, direction: 'desc', priority: 1 }
+				: { ...c, direction: undefined, priority: undefined }
+		);
+		updateRows();
 		statusSelect?.setSelected('');
 		projectSelect?.setSelected('');
 		workflowSelect?.setSelected('');
@@ -162,7 +237,15 @@
 	}
 
 	onMount(() => {
+		workflows = page.data.workflows;
+		datasets = page.data.datasets;
+		setJobs(page.data.jobs || []);
+
 		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+
+		if (admin) {
+			return;
+		}
 
 		statusSelect = setSlimSelect(
 			'status-select',
@@ -171,20 +254,32 @@
 				{ id: 'done', name: 'Done' },
 				{ id: 'failed', name: 'Failed' }
 			],
-			(value) => (statusFilter = value),
+			(value) => {
+				if (statusFilter !== value) {
+					statusFilter = value;
+					updateRows();
+				}
+			},
 			false
 		);
-		projectSelect = setSlimSelect('project-select', projects, (value) => (projectFilter = value));
-		workflowSelect = setSlimSelect(
-			'workflow-select',
-			workflows,
-			(value) => (workflowFilter = value)
-		);
-		datasetSelect = setSlimSelect(
-			'input-dataset-select',
-			datasets,
-			(value) => (datasetFilter = value)
-		);
+		projectSelect = setSlimSelect('project-select', projects, (value) => {
+			if (projectFilter !== value) {
+				projectFilter = value;
+				updateRows();
+			}
+		});
+		workflowSelect = setSlimSelect('workflow-select', workflows, (value) => {
+			if (workflowFilter !== value) {
+				workflowFilter = value;
+				updateRows();
+			}
+		});
+		datasetSelect = setSlimSelect('dataset-select', datasets, (value) => {
+			if (datasetFilter !== value) {
+				datasetFilter = value;
+				updateRows();
+			}
+		});
 	});
 
 	/**
@@ -278,191 +373,201 @@
 
 <StandardDismissableAlert message={jobCancelledMessage} />
 
-{#if tableHandler}
-	<div class="d-flex justify-content-end align-items-center mb-3">
-		<div>
-			{#if !admin}
-				<button class="btn btn-warning" on:click={clearFilters}>
-					<i class="bi-x-square" />
-					Clear filters
-				</button>
-			{/if}
-			<slot name="buttons" />
-		</div>
+<div class="d-flex justify-content-end align-items-center mb-3">
+	<div>
+		{#if !admin}
+			<button class="btn btn-warning" onclick={clearFilters}>
+				<i class="bi-x-square"></i>
+				Clear filters
+			</button>
+		{/if}
+		{@render buttons?.()}
 	</div>
-	<div id="jobUpdatesError" />
-	<table class="table jobs-table">
-		<colgroup>
-			{#if !columnsToHide.includes('id')}
-				<col width="60" />
-			{/if}
-			<col width="100" />
+</div>
+<div id="jobUpdatesError"></div>
+<table class="table jobs-table">
+	<colgroup>
+		{#if !columnsToHide.includes('id')}
+			<col width="60" />
+		{/if}
+		<col width="100" />
+		<col width="110" />
+		<col width="100" />
+		<col width="100" />
+		{#if !columnsToHide.includes('project')}
 			<col width="110" />
-			<col width="100" />
-			<col width="100" />
-			{#if !columnsToHide.includes('project')}
-				<col width="110" />
-			{/if}
-			{#if !columnsToHide.includes('workflow')}
-				<col width="110" />
-			{/if}
+		{/if}
+		{#if !columnsToHide.includes('workflow')}
 			<col width="110" />
-			{#if !columnsToHide.includes('user_email')}
-				<col width="120" />
-			{/if}
-		</colgroup>
-		<thead class="table-light">
+		{/if}
+		<col width="110" />
+		{#if !columnsToHide.includes('user_email')}
+			<col width="120" />
+		{/if}
+	</colgroup>
+	<thead class="table-light">
+		<tr>
+			{#key columns}
+				{#each columns as column (column.key)}
+					{#if !columnsToHide.includes(column.key)}
+						{#if column.field}
+							<th onclick={() => updateSortField(column)} style="cursor: pointer">
+								{column.label}
+								{#if column.direction === 'asc'}
+									↑
+								{:else if column.direction === 'desc'}
+									↓
+								{:else}
+									⇅
+								{/if}
+							</th>
+						{:else}
+							<th>{column.label}</th>
+						{/if}
+					{/if}
+				{/each}
+			{/key}
+		</tr>
+		{#if !admin}
 			<tr>
 				{#if !columnsToHide.includes('id')}
-					<Th handler={tableHandler} key="id" label="Id" />
+					<th></th>
 				{/if}
-				<Th handler={tableHandler} key="status" label="Status" />
-				<th>Options</th>
-				<Th handler={tableHandler} key="start_timestamp" label="Start" />
-				<Th handler={tableHandler} key="end_timestamp" label="End" />
+				<th>
+					<select id="status-select" class="invisible"></select>
+				</th>
+				<th></th>
+				<th></th>
+				<th></th>
 				{#if !columnsToHide.includes('project')}
-					<Th handler={tableHandler} key="project_id" label="Project" />
+					<th>
+						{#if projects}
+							<select id="project-select" class="invisible"></select>
+						{/if}
+					</th>
 				{/if}
 				{#if !columnsToHide.includes('workflow')}
-					<Th handler={tableHandler} key="workflow_id" label="Workflow" />
+					<th>
+						{#if workflows}
+							<select id="workflow-select" class="invisible"></select>
+						{/if}
+					</th>
 				{/if}
-				<Th handler={tableHandler} key="dataset_id" label="Dataset" />
+				<th>
+					<select id="dataset-select" class="invisible"></select>
+				</th>
 				{#if !columnsToHide.includes('user_email')}
-					<Th handler={tableHandler} key="user_email" label="User" />
+					<th></th>
 				{/if}
 			</tr>
-			{#if !admin}
-				<tr>
-					{#if !columnsToHide.includes('id')}
-						<th />
-					{/if}
-					<th>
-						<select id="status-select" class="invisible" />
-					</th>
-					<th />
-					<th />
-					<th />
-					{#if !columnsToHide.includes('project')}
-						<th>
-							{#if projects}
-								<select id="project-select" class="invisible" />
-							{/if}
-						</th>
-					{/if}
-					{#if !columnsToHide.includes('workflow')}
-						<th>
-							{#if workflows}
-								<select id="workflow-select" class="invisible" />
-							{/if}
-						</th>
-					{/if}
-					<th>
-						<select id="dataset-select" class="invisible" />
-					</th>
-					{#if !columnsToHide.includes('user_email')}
-						<th />
-					{/if}
-				</tr>
-			{/if}
-		</thead>
+		{/if}
+	</thead>
 
-		<tbody>
-			{#if rows}
-				{#each $rows as row}
-					<tr class="align-middle">
-						{#if !columnsToHide.includes('id')}
-							<td> {row.id} </td>
+	<tbody>
+		{#each rows as row (row.id)}
+			<tr class="align-middle">
+				{#if !columnsToHide.includes('id')}
+					<td> {row.id} </td>
+				{/if}
+				<td>
+					<span>
+						<StatusBadge status={row.status} />
+						{#if admin}
+							{@render editStatus?.(row)}
 						{/if}
-						<td>
-							<span>
-								<StatusBadge status={row.status} />
-								{#if admin}
-									<slot name="edit-status" {row} />
-								{/if}
-							</span>
-						</td>
-						<td>
-							<button class="btn btn-info" on:click|preventDefault={() => jobInfoModal.show(row)}>
-								<i class="bi-info-circle" />
-								Info
-							</button>
-							<button
-								class="btn btn-light"
-								on:click|preventDefault={() => jobLogsModal.show(row, admin)}
-							>
-								<i class="bi-list-columns-reverse" />
-								Logs
-							</button>
-							{#if (admin && row.id) || (row.project_id !== null && row.user_email === $page.data.userInfo.email)}
-								<a class="btn btn-light" href={getDownloadUrl(row)} download={`${row.id}_logs.zip`}>
-									<i class="bi-arrow-down-circle" />
-								</a>
-							{/if}
-							{#if row.status === 'submitted'}
-								<button
-									class="btn btn-danger"
-									on:click={() => handleJobCancel(row)}
-									disabled={cancellingJobs.includes(row.id)}
-								>
-									{#if cancellingJobs.includes(row.id)}
-										<span
-											class="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										/>
-									{:else}
-										<i class="bi-x-circle" />
-									{/if}
-									Cancel
-								</button>
-							{/if}
-						</td>
-						<td>
-							<TimestampCell timestamp={row.start_timestamp} />
-						</td>
-						<td>
-							<TimestampCell timestamp={row.end_timestamp} />
-						</td>
-						{#if !columnsToHide.includes('project')}
-							<td>
-								{#if projects && row.project_id !== null && row.user_email === $page.data.userInfo.email}
-									<a href={`/v2/projects/${row.project_id}`}>
-										{row.project_dump.name}
-									</a>
-								{:else}
-									{row.project_dump.name || '-'}
-								{/if}
-							</td>
-						{/if}
-						{#if !columnsToHide.includes('workflow')}
-							<td>
-								{#if workflows && row.workflow_id !== null && row.user_email === $page.data.userInfo.email}
-									<a href={`/v2/projects/${row.project_id}/workflows/${row.workflow_id}`}>
-										{row.workflow_dump.name}
-									</a>
-								{:else}
-									{row.workflow_dump.name}
-								{/if}
-							</td>
-						{/if}
-						<td>
-							{#if datasets && row.dataset_id !== null && row.user_email === $page.data.userInfo.email}
-								<a href={`/v2/projects/${row.project_id}/datasets/${row.dataset_id}`}>
-									{row.dataset_dump.name}
-								</a>
+					</span>
+				</td>
+				<td>
+					<button
+						class="btn btn-info"
+						onclick={(event) => {
+							event.preventDefault();
+							jobInfoModal.show(row);
+						}}
+					>
+						<i class="bi-info-circle"></i>
+						Info
+					</button>
+					<button
+						class="btn btn-light"
+						onclick={(event) => {
+							event.preventDefault();
+							jobLogsModal.show(row, admin);
+						}}
+					>
+						<i class="bi-list-columns-reverse"></i>
+						Logs
+					</button>
+					{#if (admin && row.id) || (row.project_id !== null && row.user_email === currentUserEmail)}
+						<a
+							class="btn btn-light"
+							href={getDownloadUrl(row)}
+							download={`${row.id}_logs.zip`}
+							aria-label="Download logs"
+						>
+							<i class="bi-arrow-down-circle"></i>
+						</a>
+					{/if}
+					{#if row.status === 'submitted'}
+						<button
+							class="btn btn-danger"
+							onclick={() => handleJobCancel(row)}
+							disabled={cancellingJobs.includes(row.id)}
+						>
+							{#if cancellingJobs.includes(row.id)}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+								</span>
 							{:else}
-								{row.dataset_dump.name}
+								<i class="bi-x-circle"></i>
 							{/if}
-						</td>
-						{#if !columnsToHide.includes('user_email')}
-							<td>{row.user_email}</td>
+							Cancel
+						</button>
+					{/if}
+				</td>
+				<td>
+					<TimestampCell timestamp={row.start_timestamp} />
+				</td>
+				<td>
+					<TimestampCell timestamp={row.end_timestamp} />
+				</td>
+				{#if !columnsToHide.includes('project')}
+					<td>
+						{#if projects && row.project_id !== null && row.user_email === currentUserEmail}
+							<a href={`/v2/projects/${row.project_id}`}>
+								{row.project_dump.name}
+							</a>
+						{:else}
+							{row.project_dump.name || '-'}
 						{/if}
-					</tr>
-				{/each}
-			{/if}
-		</tbody>
-	</table>
-{/if}
+					</td>
+				{/if}
+				{#if !columnsToHide.includes('workflow')}
+					<td>
+						{#if workflows && row.workflow_id !== null && row.user_email === currentUserEmail}
+							<a href={`/v2/projects/${row.project_id}/workflows/${row.workflow_id}`}>
+								{row.workflow_dump.name}
+							</a>
+						{:else}
+							{row.workflow_dump.name}
+						{/if}
+					</td>
+				{/if}
+				<td>
+					{#if datasets && row.dataset_id !== null && row.user_email === currentUserEmail}
+						<a href={`/v2/projects/${row.project_id}/datasets/${row.dataset_id}`}>
+							{row.dataset_dump.name}
+						</a>
+					{:else}
+						{row.dataset_dump.name}
+					{/if}
+				</td>
+				{#if !columnsToHide.includes('user_email')}
+					<td>{row.user_email}</td>
+				{/if}
+			</tr>
+		{/each}
+	</tbody>
+</table>
 
 <JobInfoModal bind:this={jobInfoModal} />
 <JobLogsModal bind:this={jobLogsModal} />

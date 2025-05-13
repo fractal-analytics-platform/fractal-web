@@ -6,15 +6,15 @@
 	import ExpandableLog from '$lib/components/common/ExpandableLog.svelte';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
-	let logParts = [];
+	let logParts = $state([]);
 	let errorAlert = undefined;
-	/** @type {Modal} */
-	let modal;
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
-	let job;
+	/** @type {Modal|undefined} */
+	let modal = $state();
+	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
+	let job = $state();
 	let admin = false;
 	let log = '';
-	let loading = true;
+	let loading = $state(true);
 
 	const updateJobInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
@@ -35,7 +35,7 @@
 		admin = isAdminPage;
 		log = '';
 		loading = true;
-		modal.show();
+		modal?.show();
 		try {
 			await loadJobLog();
 			if (job.status === 'failed') {
@@ -53,11 +53,11 @@
 
 	async function updateJobLogInBackground() {
 		clearTimeout(updateJobTimeout);
-		if (job.status === 'submitted') {
+		if (job?.status === 'submitted') {
 			await loadJobLog();
 			logParts = [{ text: log, highlight: false }];
 			updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
-		} else if (job.status === 'failed') {
+		} else if (job?.status === 'failed') {
 			logParts = extractJobErrorParts(log, true);
 		} else {
 			logParts = [{ text: log, highlight: false }];
@@ -73,17 +73,23 @@
 	}
 
 	async function loadAdminJobLog() {
+		if (!job) {
+			return;
+		}
 		const response = await fetch(`/api/admin/v2/job/${job.id}?show_tmp_logs=true`);
 		if (response.ok) {
 			const result = await response.json();
 			log = result.log || '';
 			job.status = result.status;
 		} else {
-			modal.displayErrorAlert('Unable to fetch job');
+			modal?.displayErrorAlert('Unable to fetch job');
 		}
 	}
 
 	async function loadUserJobLog() {
+		if (!job) {
+			return;
+		}
 		const response = await fetch(
 			`/api/v2/project/${job.project_id}/job/${job.id}?show_tmp_logs=true`
 		);
@@ -92,7 +98,7 @@
 			log = result.log || '';
 			job.status = result.status;
 		} else {
-			modal.displayErrorAlert('Unable to fetch job');
+			modal?.displayErrorAlert('Unable to fetch job');
 		}
 	}
 
@@ -112,21 +118,20 @@
 	bodyCss="bg-tertiary text-secondary p-0 pt-2"
 	{onClose}
 >
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<div class="flex-fill">
 			<h1 class="h5 modal-title float-start mt-1">Workflow Job logs</h1>
 		</div>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-workflowJobLogsModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-workflowJobLogsModal"></div>
 		{#if loading}
 			<div class="spinner-border spinner-border-sm" role="status">
 				<span class="visually-hidden">Loading...</span>
 			</div>
 			Loading...
 		{:else}
-		<ExpandableLog bind:logParts highlight={job.status === 'failed'} />
+			<ExpandableLog bind:logParts highlight={job?.status === 'failed'} />
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>
-

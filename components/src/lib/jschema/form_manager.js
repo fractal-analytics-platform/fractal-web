@@ -19,6 +19,7 @@ import {
 	isTuple
 } from './property_utils.js';
 import { SchemaValidator } from './jschema_validation.js';
+import { get } from 'svelte/store';
 
 /**
  * Creates the object used to draw the JSON Schema form, provides the functions to initialize new form elements,
@@ -27,12 +28,18 @@ import { SchemaValidator } from './jschema_validation.js';
 export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
-	 * @param {(type: string, detail?: any) => boolean} dispatch
+	 * @param {(data: any) => void} onchange
 	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
 	 */
-	constructor(originalJsonSchema, dispatch, schemaVersion, propertiesToIgnore = [], initialValue = undefined) {
+	constructor(
+		originalJsonSchema,
+		onchange,
+		schemaVersion,
+		propertiesToIgnore = [],
+		initialValue = undefined
+	) {
 		/** @type {'pydantic_v1'|'pydantic_v2'} */
 		this.schemaVersion = schemaVersion;
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
@@ -50,10 +57,10 @@ export class FormManager {
 		this.ids = [];
 
 		const data = getJsonSchemaData(this.jsonSchema, schemaVersion, initialValue);
-		this.dispatch = dispatch;
+		this.onchange = onchange;
 		this.notifyChange = () => {
 			const data = this.getFormData();
-			this.dispatch('change', { value: data });
+			this.onchange(data);
 		};
 
 		/**
@@ -369,7 +376,15 @@ export class FormManager {
 		const data = {};
 		for (const child of objectElement.children) {
 			let childData = this.getDataFromElement(child);
-			data[child.key] = childData;
+			const value =
+				childData == null
+					? null
+					: typeof childData === 'object' &&
+						  'subscribe' in childData &&
+						  typeof childData === 'function'
+						? get(childData)
+						: childData;
+			data[child.key] = value;
 		}
 		return data;
 	}
@@ -400,7 +415,7 @@ export class FormManager {
 					if (element instanceof NumberFormElement && element.badInput) {
 						return 'invalid';
 					}
-					return element.value;
+					return get(element.value);
 				}
 				throw new Error(`Unsupported type ${element.type}`);
 		}

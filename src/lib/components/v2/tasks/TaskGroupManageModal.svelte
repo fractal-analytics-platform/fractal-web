@@ -3,18 +3,23 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {boolean} */
-	export let admin;
+	/**
+	 * @typedef {Object} Props
+	 * @property {boolean} admin
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { admin } = $props();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
-	let taskGroup = undefined;
-	let originalActive = true;
+	let taskGroup = $state(undefined);
+	let originalActive = $state(true);
 
-	let saving = false;
-	let askConfirm = false;
+	let saving = $state(false);
+	let askConfirm = $state(false);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -27,7 +32,7 @@
 		originalActive = taskGroupToEdit.active;
 		askConfirm = false;
 		errorAlert?.hide();
-		modal.show();
+		modal?.show();
 	}
 
 	/**
@@ -55,7 +60,7 @@
 			const result = await response.json();
 			const page = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
 			goto(`${page}?activity_id=${result.id}`);
-			modal.hide();
+			modal?.hide();
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
@@ -66,20 +71,20 @@
 </script>
 
 <Modal id="taskGroupManageModal" bind:this={modal} size="lg">
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if taskGroup}
 			<h1 class="h5 modal-title">
 				Task group {taskGroup.pkg_name}
 				(version {taskGroup.version ? taskGroup.version : 'None'})
 			</h1>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if askConfirm}
 			<div class="row">
 				<div class="col">
 					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle" />
+						<i class="bi bi-exclamation-triangle"></i>
 						Warning: after a task-group is marked as non-active, jobs that include its tasks cannot be
 						submitted any more. Do you want to proceed?
 					</div>
@@ -89,11 +94,12 @@
 				<div class="col">
 					<button
 						class="btn btn-primary"
-						on:click={() => handleEditTaskGroup(false)}
+						onclick={() => handleEditTaskGroup(false)}
 						disabled={saving}
 					>
 						{#if saving}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+							></span>
 						{/if}
 						Confirm
 					</button>
@@ -108,20 +114,20 @@
 			<div class="row">
 				<div class="col">
 					{#if originalActive}
-						<button class="btn btn-primary" on:click={() => (askConfirm = true)}>
+						<button class="btn btn-primary" onclick={() => (askConfirm = true)}>
 							Deactivate task group
 						</button>
 					{:else}
-						<button class="btn btn-primary" on:click={() => handleEditTaskGroup(true)}>
+						<button class="btn btn-primary" onclick={() => handleEditTaskGroup(true)}>
 							Reactivate task group
 						</button>
 					{/if}
 				</div>
 			</div>
 		{/if}
-		<span id="taskGroupManageError" />
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+		<span id="taskGroupManageError"></span>
+	{/snippet}
+	{#snippet footer()}
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

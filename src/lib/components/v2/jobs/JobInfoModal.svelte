@@ -1,22 +1,24 @@
 <script>
 	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
-	let job = undefined;
+	let job = $state();
 
 	let errorAlert = undefined;
-	/** @type {Modal} */
-	let modal;
+	/** @type {Modal|undefined} */
+	let modal = $state();
+
+	const currentUserEmail = $derived(page.data.userInfo?.email);
 
 	/**
 	 * @param jobToDisplay {import('fractal-components/types/api').ApplyWorkflowV2}
 	 */
 	export async function show(jobToDisplay) {
 		job = jobToDisplay;
-		modal.show();
+		modal?.show();
 	}
 
 	async function fetchJob() {
@@ -45,18 +47,18 @@
 </script>
 
 <Modal id="workflowJobInfoModal" bind:this={modal} size="lg">
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h1 class="h5 modal-title flex-grow-1">Workflow Job #{job?.id}</h1>
-		{#if job && job.user_email === $page.data.userInfo.email && job.project_id !== null}
-			<button class="btn btn-light me-3" on:click={fetchJob}>
-				<i class="bi-arrow-clockwise" />
+		{#if job && job.user_email === currentUserEmail && job.project_id !== null}
+			<button class="btn btn-light me-3" onclick={fetchJob} aria-label="Load">
+				<i class="bi-arrow-clockwise"></i>
 			</button>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		<div class="row mb-3">
 			<div class="col-12">
-				<div id="workflowJobError" />
+				<div id="workflowJobError"></div>
 				<p class="lead">Workflow job properties</p>
 				{#if job}
 					<ul class="list-group">
@@ -83,7 +85,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-12" />
+			<div class="col-12"></div>
 		</div>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

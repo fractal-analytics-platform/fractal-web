@@ -11,20 +11,20 @@
 	import { tick } from 'svelte';
 	import example from './example.json';
 
-	let schema = undefined;
-	let schemaData = undefined;
+	let schema = $state();
+	let schemaData = $state();
 
-	let jsonSchemaString = '';
-	let jsonDataString = '';
+	let jsonSchemaString = $state('');
+	let jsonDataString = $state('');
 
-	let jsonSchemaError = '';
-	let dataError = '';
+	let jsonSchemaError = $state('');
+	let dataError = $state('');
 
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let schemaVersion = 'pydantic_v2';
+	let schemaVersion = $state('pydantic_v2');
 
 	/** @type {JSchema|undefined} */
-	let jschemaComponent = undefined;
+	let jschemaComponent = $state();
 
 	function handleJsonSchemaStringChanged() {
 		validationError = '';
@@ -70,8 +70,8 @@
 		}
 	}
 
-	let validationError = '';
-	let valid = false;
+	let validationError = $state('');
+	let valid = $state(false);
 
 	function validate() {
 		try {
@@ -98,10 +98,6 @@
 		updateData(jschemaComponent.getArguments());
 	}
 
-	function detectChange({ detail }) {
-		updateData(detail.value);
-	}
-
 	/**
 	 * @param {object} newData
 	 */
@@ -114,7 +110,7 @@
 		}
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(false);
+	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 </script>
 
 <h1 class="fw-light">Sandbox page for JSON Schema</h1>
@@ -132,7 +128,7 @@
 						id="pydantic_v1"
 						value="pydantic_v1"
 						bind:group={schemaVersion}
-						on:change={handleJsonSchemaStringChanged}
+						onchange={handleJsonSchemaStringChanged}
 					/>
 					<label class="form-check-label" for="pydantic_v1">pydantic_v1</label>
 				</div>
@@ -144,11 +140,11 @@
 						id="pydantic_v2"
 						value="pydantic_v2"
 						bind:group={schemaVersion}
-						on:change={handleJsonSchemaStringChanged}
+						onchange={handleJsonSchemaStringChanged}
 					/>
 					<label class="form-check-label" for="pydantic_v2">pydantic_v2</label>
 				</div>
-				<button class="btn btn-outline-primary float-end" on:click={loadExample}>
+				<button class="btn btn-outline-primary float-end" onclick={loadExample}>
 					Load example
 				</button>
 			</div>
@@ -160,10 +156,10 @@
 					id="json-schema"
 					class="form-control"
 					bind:value={jsonSchemaString}
-					on:input={handleJsonSchemaStringChanged}
+					oninput={handleJsonSchemaStringChanged}
 					class:is-invalid={jsonSchemaError}
 					rows="10"
-				/>
+				></textarea>
 				<span class="invalid-feedback">{jsonSchemaError}</span>
 			</div>
 		</div>
@@ -174,10 +170,10 @@
 					id="jdata"
 					class="form-control"
 					bind:value={jsonDataString}
-					on:input={handleDataStringChanged}
+					oninput={handleDataStringChanged}
 					class:is-invalid={dataError}
 					rows="10"
-				/>
+				></textarea>
 				<span class="invalid-feedback">{dataError}</span>
 			</div>
 		</div>
@@ -191,7 +187,7 @@
 				{#if valid}
 					<div class="alert alert-success">Data is valid</div>
 				{/if}
-				<button class="btn btn-primary" on:click={validate}>Validate</button>
+				<button class="btn btn-primary" onclick={validate}>Validate</button>
 			</div>
 		</div>
 	</div>
@@ -199,7 +195,7 @@
 		{#if schema && !jsonSchemaError}
 			<JSchema
 				componentId="json-schema-sandbox"
-				on:change={detectChange}
+				onchange={updateData}
 				{schema}
 				{schemaVersion}
 				{schemaData}

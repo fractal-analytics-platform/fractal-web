@@ -1,15 +1,23 @@
 <script>
 	import { onMount } from 'svelte';
 
-	/** @type {Array<[number, string]>} */
-	export let groupIdsNames;
-	/** @type {string} */
-	export let id;
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<[number, string]>} groupIdsNames
+	 * @property {string} id
+	 * @property {boolean} [privateTask]
+	 * @property {any} [selectedGroup]
+	 * @property {string} [wrapperClass]
+	 */
 
-	export let privateTask = false;
-	export let selectedGroup = null;
-
-	export let wrapperClass = 'mt-3 mb-3';
+	/** @type {Props} */
+	let {
+		groupIdsNames,
+		id,
+		privateTask = $bindable(false),
+		selectedGroup = $bindable(null),
+		wrapperClass = 'mt-3 mb-3'
+	} = $props();
 
 	onMount(() => {
 		selectAllGroup();
@@ -36,7 +44,7 @@
 					id="taskSelectorShared-{id}"
 					value={false}
 					bind:group={privateTask}
-					on:change={selectAllGroup}
+					onchange={selectAllGroup}
 				/>
 				<label class="form-check-label" for="taskSelectorShared-{id}">Shared task</label>
 			</div>
@@ -58,7 +66,7 @@
 					<label class="input-group-text" for="task-group-selector">Group</label>
 					<select class="form-select" id="task-group-selector" bind:value={selectedGroup}>
 						{#if groupIdsNames}
-							{#each groupIdsNames as [groupId, groupName]}
+							{#each groupIdsNames as [groupId, groupName] (groupId)}
 								<option value={groupId}>{groupName}</option>
 							{/each}
 						{/if}

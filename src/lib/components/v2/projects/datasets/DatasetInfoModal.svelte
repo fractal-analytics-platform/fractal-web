@@ -1,20 +1,24 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
-	/** @type {(dataset: import('fractal-components/types/api').DatasetV2) => void} */
-	export let updateDatasetCallback;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} updateDatasetCallback
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { dataset, updateDatasetCallback } = $props();
 
-	let editName = false;
-	let name = '';
-	let editZarrDir = false;
-	let zarrDir = '';
+	/** @type {Modal|undefined} */
+	let modal = $state();
+
+	let editName = $state(false);
+	let name = $state('');
+	let editZarrDir = $state(false);
+	let zarrDir = $state('');
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-datasetInfoModal', [
 		'name',
@@ -30,7 +34,7 @@
 		formErrorHandler.clearErrors();
 	}
 
-	let savingName = false;
+	let savingName = $state(false);
 
 	async function saveName() {
 		if (!name) {
@@ -49,7 +53,7 @@
 		name = dataset.name;
 	}
 
-	let savingZarrDir = false;
+	let savingZarrDir = $state(false);
 
 	async function saveZarrDir() {
 		if (!zarrDir) {
@@ -75,7 +79,7 @@
 	 * @returns {Promise<boolean>} true if the update was successful, false otherwise
 	 */
 	async function updateDataset(body) {
-		const projectId = $page.params.projectId;
+		const projectId = page.params.projectId;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/dataset/${dataset.id}`, {
@@ -96,11 +100,11 @@
 </script>
 
 <Modal id="datasetInfoModal" centered={true} scrollable={true} {onOpen} bind:this={modal} size="lg">
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Dataset properties</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-datasetInfoModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-datasetInfoModal"></div>
 		<ul class="list-group">
 			<li class="list-group-item text-bg-light">
 				<strong>Id</strong>
@@ -119,7 +123,7 @@
 							bind:value={name}
 							class="form-control"
 							class:is-invalid={$validationErrors['name']}
-							on:keydown={(e) => {
+							onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									saveName();
 								}
@@ -128,19 +132,20 @@
 						<button
 							class="btn btn-outline-secondary"
 							type="button"
-							on:click={undoEditName}
+							onclick={undoEditName}
 							aria-label="Undo edit name"
 						>
-							<i class="bi bi-arrow-counterclockwise" />
+							<i class="bi bi-arrow-counterclockwise"></i>
 						</button>
 						<button
 							class="btn btn-outline-secondary"
 							type="button"
-							on:click={saveName}
+							onclick={saveName}
 							disabled={!name || savingName}
 						>
 							{#if savingName}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+								></span>
 							{/if}
 							Save
 						</button>
@@ -151,10 +156,10 @@
 						{dataset.name}
 						<button
 							class="btn btn-primary float-end pt-0 pb-0"
-							on:click={() => (editName = true)}
+							onclick={() => (editName = true)}
 							aria-label="Edit dataset name"
 						>
-							<i class="bi bi-pencil" />
+							<i class="bi bi-pencil"></i>
 							Edit
 						</button>
 					</span>
@@ -171,7 +176,7 @@
 							bind:value={zarrDir}
 							class="form-control"
 							class:is-invalid={$validationErrors['zarr_dir']}
-							on:keydown={(e) => {
+							onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									saveZarrDir();
 								}
@@ -180,19 +185,20 @@
 						<button
 							class="btn btn-outline-secondary"
 							type="button"
-							on:click={undoEditZarrDir}
+							onclick={undoEditZarrDir}
 							aria-label="Undo edit zarr dir"
 						>
-							<i class="bi bi-arrow-counterclockwise" />
+							<i class="bi bi-arrow-counterclockwise"></i>
 						</button>
 						<button
 							class="btn btn-outline-secondary"
 							type="button"
-							on:click={saveZarrDir}
+							onclick={saveZarrDir}
 							disabled={!zarrDir || savingZarrDir}
 						>
 							{#if savingZarrDir}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+								></span>
 							{/if}
 							Save
 						</button>
@@ -202,10 +208,10 @@
 					<span>
 						<button
 							class="btn btn-primary float-end pt-0 pb-0"
-							on:click={() => (editZarrDir = true)}
+							onclick={() => (editZarrDir = true)}
 							aria-label="Edit Zarr dir"
 						>
-							<i class="bi bi-pencil" />
+							<i class="bi bi-pencil"></i>
 							Edit
 						</button>
 						<pre>{dataset.zarr_dir}</pre>
@@ -213,5 +219,5 @@
 				{/if}
 			</li>
 		</ul>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

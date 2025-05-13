@@ -1,18 +1,18 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
-	let taskGroups = $page.data.taskGroups;
+	const taskGroups = $derived(page.data.taskGroups || []);
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
-	let selectedTaskRow = null;
+	let selectedTaskRow = $state(null);
 	let showDocLinksInTable = false;
 
 	/**
@@ -20,7 +20,7 @@
 	 */
 	function showDocsInfoModal(taskRow) {
 		selectedTaskRow = taskRow;
-		modal.show();
+		modal?.show();
 	}
 
 	/**
@@ -45,7 +45,7 @@
 				Here is the list of currently available tasks. You can add new tasks or edit the current
 				ones at the <a href="/v2/tasks/management">Tasks management</a> page.
 				<a href="/v2/tasks/management" class="btn btn-primary float-end">
-					<i class="bi bi-gear-fill" />
+					<i class="bi bi-gear-fill"></i>
 					Manage tasks
 				</a>
 			</div>
@@ -55,29 +55,33 @@
 
 <div class="container mt-2">
 	<FilteredTasksTable {taskGroups} {showDocLinksInTable}>
-		<svelte:fragment slot="extra-columns-colgroup">
+		{#snippet extraColumnsColgroup()}
 			<col width="60" />
-		</svelte:fragment>
-		<svelte:fragment slot="extra-columns-header">
-			<th />
-		</svelte:fragment>
-		<svelte:fragment slot="extra-columns" let:task>
+		{/snippet}
+		{#snippet extraColumnsHeader()}
+			<th></th>
+		{/snippet}
+		{#snippet extraColumns(task)}
 			<td>
 				{#if showInfoButton(task)}
-					<button class="btn btn-info" on:click={() => showDocsInfoModal(task)}>
-						<i class="bi bi-info-circle" />
+					<button
+						class="btn btn-info"
+						onclick={() => showDocsInfoModal(task)}
+						aria-label="Show info"
+					>
+						<i class="bi bi-info-circle"></i>
 					</button>
 				{/if}
 			</td>
-		</svelte:fragment>
+		{/snippet}
 	</FilteredTasksTable>
 </div>
 
 <Modal id="task-docs-info-modal" size="xl" scrollable={true} bind:this={modal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">{selectedTaskRow?.task_name}</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if selectedTaskRow?.docs_info}
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html formatMarkdown(selectedTaskRow?.docs_info)}
@@ -93,5 +97,5 @@
 				</a>
 			</div>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>

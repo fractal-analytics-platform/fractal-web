@@ -46,7 +46,9 @@ test('Custom Python env task [v2]', async ({ page }) => {
 
 		await page.getByRole('button', { name: 'Collect' }).click();
 
-		await expect(page.getByText('Python interpreter path must be absolute')).toBeVisible();
+		await expect(
+			page.getByText("Value error, String must be an absolute path (given 'foo')")
+		).toBeVisible();
 	});
 
 	await test.step("Test \"One and only one must be set between 'package_root' and 'package_name'\" error", async () => {

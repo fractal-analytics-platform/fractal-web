@@ -1,18 +1,36 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
+	import { get } from 'svelte/store';
 
-	/** @type {import('../form_element.js').ValueFormElement} */
-	export let formElement;
-	export let editable = true;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').ValueFormElement} formElement
+	 * @property {boolean} [editable]
+	 */
 
-	/** @type {HTMLInputElement} */
-	let field;
-	let validationError = '';
+	/** @type {Props} */
+	let { formElement = $bindable(), editable = true } = $props();
 
-	function handleValueChange() {
+	let value = $state();
+	formElement.value.subscribe((v) => (value = v));
+	$effect(() => handleValueChange(value));
+
+	/** @type {HTMLInputElement|undefined} */
+	let field = $state();
+	let validationError = $state('');
+
+	/**
+	 * @param {any} value
+	 */
+	function handleValueChange(value) {
+		const previousValue = get(formElement.value);
+		if (previousValue === value) {
+			return;
+		}
+		formElement.value.set(value);
 		formElement.notifyChange();
 		validationError = '';
-		if (formElement.required && field.value === '') {
+		if (formElement.required && field?.value === '') {
 			validationError = 'Field is required';
 		}
 	}
@@ -26,8 +44,7 @@
 		<input
 			type="text"
 			bind:this={field}
-			bind:value={formElement.value}
-			on:input={handleValueChange}
+			bind:value
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}

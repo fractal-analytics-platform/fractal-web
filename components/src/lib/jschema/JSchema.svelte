@@ -1,25 +1,32 @@
 <script>
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { FormManager } from './form_manager.js';
 	import ObjectProperty from './properties/ObjectProperty.svelte';
 
-	/** @type {(type: string, detail?: any) => boolean} */
-	const dispatch = createEventDispatcher();
+	/**
+	 * @typedef {Object} Props
+	 * @property {object} schema
+	 * @property {object} schemaData
+	 * @property {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @property {string[]} [propertiesToIgnore]
+	 * @property {string} componentId
+	 * @property {boolean} [editable]
+	 * @property {() => void} onchange
+	 */
 
-	/** @type {object} */
-	export let schema;
-	/** @type {object} */
-	export let schemaData;
-	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	export let schemaVersion;
-	/** @type {string[]} */
-	export let propertiesToIgnore = [];
-	/** @type {string} */
-	export let componentId;
-	export let editable = true;
+	/** @type {Props} */
+	let {
+		schema,
+		schemaData,
+		schemaVersion,
+		propertiesToIgnore = [],
+		componentId,
+		editable = true,
+		onchange
+	} = $props();
 
 	/** @type {FormManager|undefined} */
-	let formManager;
+	let formManager = $state();
 	onMount(() => {
 		initFormManager();
 	});
@@ -38,18 +45,12 @@
 		formManager?.validate();
 	}
 
-	$: {
-		if (schema || schemaData || propertiesToIgnore) {
-			initFormManager();
-		}
-	}
-
 	function initFormManager() {
 		if (schema) {
 			try {
 				formManager = new FormManager(
 					schema,
-					dispatch,
+					onchange,
 					schemaVersion,
 					propertiesToIgnore,
 					schemaData
@@ -62,6 +63,12 @@
 			formManager = undefined;
 		}
 	}
+
+	$effect(() => {
+		if (schema || schemaData || propertiesToIgnore) {
+			initFormManager();
+		}
+	});
 </script>
 
 {#if formManager}

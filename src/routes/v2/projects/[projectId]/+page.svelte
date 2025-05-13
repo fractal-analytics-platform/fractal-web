@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import ProjectDatasetsList from '$lib/components/v2/projects/ProjectDatasetsList.svelte';
 	import WorkflowsList from '$lib/components/v2/projects/WorkflowsList.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -7,19 +7,20 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	// Component properties
-	let project = $page.data.project;
-	let datasets = $page.data.datasets;
-	let workflows = $page.data.workflows;
-	let projectUpdatesSuccessMessage = '';
+	const project = $derived(page.data.project);
+	const datasets = $derived(page.data.datasets);
+	const workflows = $derived(page.data.workflows);
 
-	let updatedProjectName = '';
-	let updating = false;
+	let projectUpdatesSuccessMessage = $state('');
 
-	/** @type {Modal} */
-	let editProjectModal;
+	let updatedProjectName = $state('');
+	let updating = $state(false);
+
+	/** @type {Modal|undefined} */
+	let editProjectModal = $state();
 
 	async function handleProjectPropertiesUpdate() {
-		editProjectModal.confirmAndHide(
+		editProjectModal?.confirmAndHide(
 			async () => {
 				updating = true;
 				projectUpdatesSuccessMessage = '';
@@ -71,9 +72,10 @@
 				class="btn btn-light"
 				data-bs-toggle="modal"
 				data-bs-target="#editProjectModal"
-				on:click={() => (updatedProjectName = project.name)}
+				onclick={() => (updatedProjectName = project.name)}
+				aria-label="Edit project"
 			>
-				<i class="bi-pencil" />
+				<i class="bi-pencil"></i>
 			</button>
 		</div>
 	</div>
@@ -89,13 +91,19 @@
 	bind:this={editProjectModal}
 	onOpen={onEditProjectModalOpen}
 >
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Project properties</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editProjectModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-editProjectModal"></div>
 		{#if project}
-			<form id="updateProject" on:submit|preventDefault={handleProjectPropertiesUpdate}>
+			<form
+				id="updateProject"
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleProjectPropertiesUpdate();
+				}}
+			>
 				<div class="mb-3">
 					<label for="projectName" class="form-label">Project name</label>
 					<input
@@ -109,13 +117,13 @@
 				</div>
 			</form>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button class="btn btn-primary" form="updateProject" disabled={updating}>
 			{#if updating}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Save
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

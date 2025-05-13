@@ -1,8 +1,8 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	/** @type {string[]} */
-	const viewerPaths = $page.data.viewerPaths;
+	const viewerPaths = $derived(page.data.viewerPaths);
 </script>
 
 <div class="container mt-3">
@@ -25,7 +25,7 @@
 	</p>
 
 	<ul>
-		{#each viewerPaths as viewerPath}
+		{#each viewerPaths as viewerPath (viewerPath)}
 			<li><code>{viewerPath}</code></li>
 		{/each}
 	</ul>

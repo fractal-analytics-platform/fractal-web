@@ -1,12 +1,24 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 
-	/** @type {string} */
-	export let id;
-	/** @type {string} */
-	export let title;
+	
+	
 
-	export let placement = 'top';
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} id
+	 * @property {string} title
+	 * @property {string} [placement]
+	 * @property {import('svelte').Snippet} [children]
+	 */
+
+	/** @type {Props} */
+	let {
+		id,
+		title,
+		placement = 'top',
+		children
+	} = $props();
 
 	let tooltip;
 
@@ -42,5 +54,5 @@
 </script>
 
 <span {id} data-bs-placement={placement} style="display: inline-block;">
-	<slot />
+	{@render children?.()}
 </span>

@@ -12,78 +12,66 @@
 	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
 	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
 
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
-	export let datasets;
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
-	/** @type {number|undefined} */
-	export let selectedDatasetId;
-	/** @type {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} */
-	export let onJobSubmitted;
-	/** @type {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} */
-	export let onDatasetsUpdated;
-	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
-	export let statuses;
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
-	export let legacyStatuses;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2[]} datasets
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {number|undefined} selectedDatasetId
+	 * @property {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} onJobSubmitted
+	 * @property {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
+	 * @property {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
+	 * @property {{[key: number]: import('fractal-components/types/api').JobStatus}} legacyStatuses
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let {
+		datasets,
+		workflow,
+		selectedDatasetId = $bindable(),
+		onJobSubmitted,
+		onDatasetsUpdated,
+		statuses,
+		legacyStatuses
+	} = $props();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {DatasetImagesTable|undefined} */
-	let datasetImagesTable;
+	let datasetImagesTable = $state();
 
-	let applyingWorkflow = false;
-	let checkingConfiguration = false;
-	let setSlurmAccount = true;
+	let applyingWorkflow = $state(false);
+	let checkingConfiguration = $state(false);
+	let setSlurmAccount = $state(true);
 	/** @type {string[]} */
-	let slurmAccounts = [];
-	let slurmAccount = '';
-	let workerInitControl = '';
+	let slurmAccounts = $state([]);
+	let slurmAccount = $state('');
+	let workerInitControl = $state('');
 	/** @type {number|undefined} */
-	let firstTaskIndex = undefined;
+	let firstTaskIndex = $state(undefined);
 	/** @type {number|undefined} */
-	let lastTaskIndex = undefined;
+	let lastTaskIndex = $state(undefined);
 
 	/** @type {string[]} */
-	let preSubmissionCheckUniqueTypesResults = [];
-	let ignorePreSubmissionCheckUniqueTypes = false;
+	let preSubmissionCheckUniqueTypesResults = $state([]);
+	let ignorePreSubmissionCheckUniqueTypes = $state(false);
 	/** @type {string[]} */
-	let preSubmissionCheckNotProcessedResults = [];
-	let ignorePreSubmissionCheckNotProcessed = false;
+	let preSubmissionCheckNotProcessedResults = $state([]);
+	let ignorePreSubmissionCheckNotProcessed = $state(false);
 
-	/** @type {'run'|'restart'|'continue'} */
-	let mode = 'run';
-	let replaceExistingDataset = true;
+	/** @type {'run'|'restart'|'continue'|undefined} */
+	let mode = $state();
+	let replaceExistingDataset = $state(true);
 
-	let newDatasetName = '';
-
-	$: selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
-
-	$: runBtnDisabled =
-		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
-		(mode === 'continue' && firstTaskIndex === undefined);
-
-	$: showImageList =
-		hasImages &&
-		firstTaskIndex !== undefined &&
-		mode !== 'restart' &&
-		workflow.task_list[firstTaskIndex] &&
-		!isConverterType(workflow.task_list[firstTaskIndex].task_type);
-
-	$: disabledTypes = Object.keys({
-		...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
-		...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
-		...extraTypes
-	});
+	let newDatasetName = $state('');
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
-	let imagePage = null;
+	let imagePage = $state(null);
 	/** @type {string[]} */
-	let extraTypes = [];
-	let hasImages = false;
+	let extraTypes = $state([]);
+	let hasImages = $state(false);
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
-	let initialFilterValues = null;
+	let initialFilterValues = $state(null);
 
 	/**
 	 * @param {'run'|'restart'|'continue'} action
@@ -109,7 +97,7 @@
 		}
 		lastTaskIndex = undefined;
 		await loadDatasetImages();
-		modal.show();
+		modal?.show();
 	}
 
 	/**
@@ -118,7 +106,7 @@
 	 */
 	async function handleApplyWorkflow() {
 		// reset previous errors
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 
 		applyingWorkflow = true;
 		if (mode === 'restart') {
@@ -129,7 +117,7 @@
 					await createNewDataset();
 				}
 			} catch (err) {
-				modal.displayErrorAlert(err);
+				modal?.displayErrorAlert(err);
 				applyingWorkflow = false;
 				return;
 			}
@@ -164,13 +152,13 @@
 		// Handle API response
 		if (response.ok) {
 			// Successfully applied workflow
-			modal.toggle();
+			modal?.toggle();
 			const job = await response.json();
 			await onJobSubmitted(job);
 		} else {
 			console.error(response);
 			// Set an error message on the component
-			modal.displayErrorAlert(await response.json());
+			modal?.displayErrorAlert(await response.json());
 		}
 	}
 
@@ -246,9 +234,9 @@
 	}
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
-	let appliedAttributeFilters = {};
+	let appliedAttributeFilters = $state({});
 	/** @type {{ [key: string]: boolean }} */
-	let appliedTypeFilters = {};
+	let appliedTypeFilters = $state({});
 
 	async function showConfirmRun() {
 		if (datasetImagesTable) {
@@ -285,7 +273,7 @@
 			}
 		}
 		checkingConfiguration = true;
-		modal.restoreModalFocus();
+		modal?.restoreModalFocus();
 	}
 
 	/**
@@ -305,7 +293,7 @@
 			}
 		);
 		if (!response.ok) {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			return false;
 		}
 		/** @type {string[]} */
@@ -336,7 +324,7 @@
 			}
 		);
 		if (!response.ok) {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			return false;
 		}
 		/** @type {string[]} */
@@ -387,7 +375,7 @@
 		}
 	}
 
-	let datasetImagesLoading = false;
+	let datasetImagesLoading = $state(false);
 
 	async function loadDatasetImages() {
 		if (firstTaskIndex === undefined) {
@@ -419,7 +407,7 @@
 			}
 		);
 		if (!response.ok) {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 			datasetImagesLoading = false;
 			return;
 		}
@@ -441,7 +429,7 @@
 				}
 			);
 			if (!response.ok) {
-				modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+				modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 				datasetImagesLoading = false;
 				return;
 			}
@@ -517,12 +505,32 @@
 	}
 
 	onMount(async () => {
+		mode = 'run';
 		await loadSlurmAccounts();
 	});
+	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
+	let runBtnDisabled = $derived(
+		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
+			(mode === 'continue' && firstTaskIndex === undefined)
+	);
+	let showImageList = $derived(
+		hasImages &&
+			firstTaskIndex !== undefined &&
+			mode !== 'restart' &&
+			workflow.task_list[firstTaskIndex] &&
+			!isConverterType(workflow.task_list[firstTaskIndex].task_type)
+	);
+	let disabledTypes = $derived(
+		Object.keys({
+			...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
+			...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
+			...extraTypes
+		})
+	);
 </script>
 
 <Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true} focus={false}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">
 			{#if mode === 'run'}
 				Run workflow
@@ -532,9 +540,9 @@
 				Restart workflow
 			{/if}
 		</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-runWorkflowModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-runWorkflowModal"></div>
 		<form id="runWorkflowForm">
 			{#if mode === 'restart'}
 				<div class="alert alert-warning">
@@ -552,7 +560,7 @@
 							type="checkbox"
 							id="replaceExistingDataset"
 							bind:checked={replaceExistingDataset}
-							on:change={computeNewDatasetName}
+							onchange={computeNewDatasetName}
 						/>
 						<label class="form-check-label" for="replaceExistingDataset">
 							Replace existing dataset
@@ -575,7 +583,7 @@
 					bind:value={selectedDatasetId}
 				>
 					<option value={undefined}>Select a dataset</option>
-					{#each datasets as dataset}
+					{#each datasets as dataset (dataset.id)}
 						<option value={dataset.id}>{dataset.name}</option>
 					{/each}
 				</select>
@@ -605,11 +613,11 @@
 						class="form-select"
 						disabled={checkingConfiguration}
 						bind:value={firstTaskIndex}
-						on:change={firstTaskIndexChanged}
+						onchange={firstTaskIndexChanged}
 						class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
 					>
 						<option value={undefined}>Select first task</option>
-						{#each workflow.task_list as wft}
+						{#each workflow.task_list as wft (wft.id)}
 							<option value={wft.order}>{wft.task.name}</option>
 						{/each}
 					</select>
@@ -625,7 +633,7 @@
 						bind:value={lastTaskIndex}
 					>
 						<option value={undefined}>Select last task</option>
-						{#each workflow.task_list as wft}
+						{#each workflow.task_list as wft (wft.id)}
 							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
 								<option value={wft.order}>{wft.task.name}</option>
 							{/if}
@@ -664,7 +672,7 @@
 										<button
 											type="button"
 											class="btn btn-warning mt-1"
-											on:click={() => {
+											onclick={() => {
 												ignorePreSubmissionCheckUniqueTypes = true;
 												showConfirmRun();
 											}}
@@ -686,7 +694,7 @@
 										<button
 											type="button"
 											class="btn btn-warning mt-1"
-											on:click={() => {
+											onclick={() => {
 												ignorePreSubmissionCheckUniqueTypes = true;
 												ignorePreSubmissionCheckNotProcessed = true;
 												showConfirmRun();
@@ -694,9 +702,6 @@
 										>
 											Continue anyway
 										</button>
-										<div class="mt-2">
-											<em><strong>Note</strong>: if the prior task was a converter, this warning may be a false positive.</em>
-										</div>
 									</div>
 								{/if}
 								{#if checkingConfiguration}
@@ -724,7 +729,7 @@
 					</div>
 				{/if}
 				{#if datasetImagesLoading}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 			</div>
 			<div class="clearfix mb-1">
@@ -750,7 +755,7 @@
 							rows="5"
 							disabled={checkingConfiguration}
 							bind:value={workerInitControl}
-						/>
+						></textarea>
 					</div>
 					{#if slurmAccounts.length > 0}
 						<div class="mb-3">
@@ -774,7 +779,7 @@
 									disabled={checkingConfiguration}
 									bind:value={slurmAccount}
 								>
-									{#each slurmAccounts as account}
+									{#each slurmAccounts as account (account)}
 										<option>{account}</option>
 									{/each}
 								</select>
@@ -792,12 +797,12 @@
 						the first task:
 					</p>
 					<ul class="mb-0">
-						{#each Object.entries(appliedAttributeFilters) as [key, value]}
+						{#each Object.entries(appliedAttributeFilters) as [key, value] (key)}
 							<li>{key}: <code>{value}</code></li>
 						{/each}
 					</ul>
 					<ul class="mt-0 mb-1">
-						{#each Object.entries(appliedTypeFilters) as [key, value]}
+						{#each Object.entries(appliedTypeFilters) as [key, value] (key)}
 							<li>{key}: <BooleanIcon {value} /></li>
 						{/each}
 					</ul>
@@ -806,26 +811,29 @@
 				{/if}
 			{/if}
 		</form>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		{#if checkingConfiguration}
-			<button class="btn btn-warning" on:click={cancel}> Cancel </button>
+			<button class="btn btn-warning" onclick={cancel}> Cancel </button>
 			<button
 				class="btn btn-primary"
-				on:click|preventDefault={handleApplyWorkflow}
+				onclick={(e) => {
+					e.preventDefault();
+					handleApplyWorkflow();
+				}}
 				disabled={applyingWorkflow}
 			>
 				{#if applyingWorkflow}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 				Confirm
 			</button>
 		{:else}
-			<button class="btn btn-primary" on:click={showConfirmRun} disabled={runBtnDisabled}>
+			<button class="btn btn-primary" onclick={showConfirmRun} disabled={runBtnDisabled}>
 				Run
 			</button>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <style>

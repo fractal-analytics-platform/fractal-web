@@ -12,33 +12,38 @@
 	// in pending and ongoing status
 
 	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
-	let recentActivities = [];
+	let recentActivities = $state([]);
 
-	$: sortedRecentActivities = [...recentActivities].sort(sortActivitiesByTimestampStarted);
+	let sortedRecentActivities = $derived(
+		[...recentActivities].sort(sortActivitiesByTimestampStarted)
+	);
 
-	/** @type {'pypi'|'local'} */
-	export let packageType = 'pypi';
-	/** @type {() => Promise<void>} */
-	export let reloadTaskGroupsList;
-	/** @type {import('fractal-components/types/api').User} */
-	export let user;
+	/**
+	 * @typedef {Object} Props
+	 * @property {'pypi'|'local'} [packageType]
+	 * @property {() => Promise<void>} reloadTaskGroupsList
+	 * @property {import('fractal-components/types/api').User} user
+	 */
 
-	let python_package = '';
-	let package_version = '';
-	let python_version = '';
-	let package_extras = '';
+	/** @type {Props} */
+	let { packageType = 'pypi', reloadTaskGroupsList, user } = $props();
+
+	let python_package = $state('');
+	let package_version = $state('');
+	let python_version = $state('');
+	let package_extras = $state('');
 	/** @type {{key: string, value: string}[]} */
-	let pinnedPackageVersions = [];
-	let privateTask = false;
-	let selectedGroup = null;
+	let pinnedPackageVersions = $state([]);
+	let privateTask = $state(false);
+	let selectedGroup = $state(null);
 
 	/** @type {FileList|null} */
-	let wheelFiles = null;
+	let wheelFiles = $state(null);
 	/** @type {HTMLInputElement|undefined} */
-	let wheelFileInput = undefined;
+	let wheelFileInput = $state(undefined);
 
-	/** @type {TaskGroupActivityLogsModal} */
-	let taskGroupActivitiesLogsModal;
+	/** @type {TaskGroupActivityLogsModal|undefined} */
+	let taskGroupActivitiesLogsModal = $state();
 	/** @type {number|null} */
 	let openedTaskCollectionLogId = null;
 
@@ -92,7 +97,7 @@
 		return [];
 	}
 
-	let taskCollectionInProgress = false;
+	let taskCollectionInProgress = $state(false);
 
 	/**
 	 * Requests a task collection to the server
@@ -191,7 +196,7 @@
 			(u) => u.id === openedTaskCollectionLogId
 		)?.log;
 		if (openedTaskCollectionLogToUpdate) {
-			await taskGroupActivitiesLogsModal.updateLog(openedTaskCollectionLogToUpdate);
+			await taskGroupActivitiesLogsModal?.updateLog(openedTaskCollectionLogToUpdate);
 		}
 	}
 
@@ -200,7 +205,7 @@
 	 */
 	async function openTaskGroupActivityLogsModal(taskGroupActivityId) {
 		openedTaskCollectionLogId = taskGroupActivityId;
-		await taskGroupActivitiesLogsModal.open(taskGroupActivityId);
+		await taskGroupActivitiesLogsModal?.open(taskGroupActivityId);
 	}
 
 	function addPackageVersion() {
@@ -248,7 +253,12 @@
 <TaskGroupActivityLogsModal bind:this={taskGroupActivitiesLogsModal} admin={false} />
 
 <div>
-	<form on:submit|preventDefault={handleTaskCollection}>
+	<form
+		onsubmit={(e) => {
+			e.preventDefault();
+			handleTaskCollection();
+		}}
+	>
 		<div class="row">
 			{#if packageType === 'pypi'}
 				<div class="mb-2 col-md-6">
@@ -273,7 +283,7 @@
 				<div class="mb-2 col-md-6">
 					<div class="input-group has-validation">
 						<label for="wheelFile" class="input-group-text">
-							<i class="bi bi-file-earmark-arrow-up" /> &nbsp; Upload a wheel file
+							<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Upload a wheel file
 						</label>
 						<input
 							class="form-control"
@@ -286,7 +296,7 @@
 							class:is-invalid={$validationErrors['file']}
 						/>
 						{#if wheelFiles && wheelFiles.length > 0}
-							<button class="btn btn-outline-secondary" on:click={clearWheelFileUpload}>
+							<button class="btn btn-outline-secondary" onclick={clearWheelFileUpload}>
 								Clear
 							</button>
 						{/if}
@@ -364,7 +374,7 @@
 		{#if pinnedPackageVersions.length > 0}
 			<p class="mt-2">Pinned packages versions:</p>
 		{/if}
-		{#each pinnedPackageVersions as ppv, i}
+		{#each pinnedPackageVersions as ppv, i (i)}
 			<div class="row">
 				<div class="col-xl-6 col-lg-8 col-md-12 mb-2">
 					<div class="input-group">
@@ -389,9 +399,12 @@
 							type="button"
 							id="ppv_remove_{i}"
 							aria-label="Remove pinned package version"
-							on:click|preventDefault={() => removePackageVersion(i)}
+							onclick={(e) => {
+								e.preventDefault();
+								removePackageVersion(i);
+							}}
 						>
-							<i class="bi bi-trash" />
+							<i class="bi bi-trash"></i>
 						</button>
 					</div>
 				</div>
@@ -399,8 +412,14 @@
 		{/each}
 		<div class="row">
 			<div class="col-12 mb-1">
-				<button class="btn btn-light" on:click|preventDefault={addPackageVersion}>
-					<i class="bi bi-plus-circle" /> Add pinned package version
+				<button
+					class="btn btn-light"
+					onclick={(e) => {
+						e.preventDefault();
+						addPackageVersion();
+					}}
+				>
+					<i class="bi bi-plus-circle"></i> Add pinned package version
 				</button>
 			</div>
 		</div>
@@ -412,7 +431,7 @@
 			bind:selectedGroup
 		/>
 
-		<div id="taskCollectionError" class="mt-3" />
+		<div id="taskCollectionError" class="mt-3"></div>
 
 		<div class="row">
 			<div class="col-auto">
@@ -429,7 +448,7 @@
 	</form>
 	{#if recentActivities.length > 0}
 		<a href="/v2/tasks/activities" class="btn btn-light float-end">
-			<i class="bi bi-info-circle" />
+			<i class="bi bi-info-circle"></i>
 			Show all activities
 		</a>
 	{/if}
@@ -438,7 +457,7 @@
 		<p class="mb-5">
 			No recent activities
 			<a href="/v2/tasks/activities" class="btn btn-light ms-3">
-				<i class="bi bi-info-circle" />
+				<i class="bi bi-info-circle"></i>
 				Show all activities
 			</a>
 		</p>
@@ -456,7 +475,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each sortedRecentActivities as taskGroupActivity}
+					{#each sortedRecentActivities as taskGroupActivity (taskGroupActivity.id)}
 						<tr>
 							<td>{taskGroupActivity.pkg_name}</td>
 							<td>
@@ -477,9 +496,10 @@
 								{#if taskGroupActivity.status !== 'pending' && taskGroupActivity.log}
 									<button
 										class="btn btn-info"
-										on:click={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
+										onclick={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
+										aria-label="Info"
 									>
-										<i class="bi bi-info-circle" />
+										<i class="bi bi-info-circle"></i>
 									</button>
 								{/if}
 							</td>

@@ -1,12 +1,16 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Accounting from '$lib/components/admin/Accounting.svelte';
 	import SlurmAccounting from '$lib/components/admin/SlurmAccounting.svelte';
 
 	/** @type {'accounting'|'slurmAccounting'} */
-	let selectedTab = 'accounting';
+	let selectedTab = $state('accounting');
 
-	$: useSlurm = $page.data.runnerBackend === 'slurm' || $page.data.runnerBackend === 'slurm_ssh';
+	const useSlurm = $derived(
+		page.data.runnerBackend === 'slurm' || page.data.runnerBackend === 'slurm_ssh'
+	);
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(page.data.users);
 </script>
 
 <div class="container mt-3">
@@ -18,7 +22,7 @@
 				<button
 					class="nav-link"
 					class:active={selectedTab === 'accounting'}
-					on:click={() => (selectedTab = 'accounting')}
+					onclick={() => (selectedTab = 'accounting')}
 					aria-current={selectedTab === 'accounting' ? 'page' : undefined}
 				>
 					Accounting
@@ -28,7 +32,7 @@
 				<button
 					class="nav-link"
 					class:active={selectedTab === 'slurmAccounting'}
-					on:click={() => (selectedTab = 'slurmAccounting')}
+					onclick={() => (selectedTab = 'slurmAccounting')}
 					aria-current={selectedTab === 'slurmAccounting' ? 'page' : undefined}
 				>
 					SLURM Accounting
@@ -38,10 +42,10 @@
 	{/if}
 
 	{#if selectedTab === 'accounting'}
-		<Accounting users={$page.data.users} currentUserId={$page.data.userInfo.id} />
+		<Accounting {users} {currentUserId} />
 	{:else if selectedTab === 'slurmAccounting'}
 		{#if useSlurm}
-			<SlurmAccounting users={$page.data.users} />
+			<SlurmAccounting {users} />
 		{/if}
 	{/if}
 </div>

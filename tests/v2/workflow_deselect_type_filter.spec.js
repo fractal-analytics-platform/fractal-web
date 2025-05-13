@@ -61,7 +61,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 	await test.step('Click on "Run" and ignore warning. Verify that no filter is applied', async () => {
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Continue anyway' }).click();
-		await expect(modal.getByText(/This job will process 4 images/)).toBeVisible();
+		await expect(modal.getByText('This job will process 4 images.')).toBeVisible();
 		await expect(modal.getByText('Applied filters')).toBeVisible();
 		await expect(modal.getByText('No filters')).toBeVisible();
 	});

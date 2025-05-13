@@ -10,34 +10,32 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	/** @type {import('fractal-components/types/api').User} */
-	export let user;
 	/**
-	 * @type {import('fractal-components/types/api').TaskGroupV2[]}
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').User} user
+	 * @property {import('fractal-components/types/api').TaskGroupV2[]} taskGroups
+	 * @property {string|undefined} expandedTaskGroupRow
+	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupV2[]) => void} updateTaskGroups
 	 */
-	export let taskGroups;
-	/** @type {string|undefined} */
-	export let expandedTaskGroupRow;
-	/**
-	 * @type {(updatedGroups: import('fractal-components/types/api').TaskGroupV2[]) => void}
-	 */
-	export let updateTaskGroups;
 
-	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default} */
-	let taskGroupInfoModal;
-	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default} */
-	let taskGroupEditModal;
-	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default} */
-	let taskGroupManageModal;
-	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default} */
-	let taskInfoModal;
-	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default} */
-	let taskEditModal;
+	/** @type {Props} */
+	let { user, taskGroups, expandedTaskGroupRow = $bindable(), updateTaskGroups } = $props();
+
+	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default|undefined} */
+	let taskGroupInfoModal = $state();
+	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
+	let taskGroupEditModal = $state();
+	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
+	let taskGroupManageModal = $state();
+	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default|undefined} */
+	let taskInfoModal = $state();
+	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default|undefined} */
+	let taskEditModal = $state();
 
 	/**
 	 * @type {import('fractal-components/types/api').TasksTableRowGroup[]}
 	 */
-	let taskGroupRows = [];
+	let taskGroupRows = $state([]);
 
 	onMount(() => {
 		buildRows();
@@ -144,7 +142,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each taskGroupRows as taskGroupRow, i}
+		{#each taskGroupRows as taskGroupRow, i (i)}
 			<tr>
 				<td>{taskGroupRow.groupTitle}</td>
 				<td>
@@ -159,9 +157,9 @@
 							class="form-select"
 							aria-label="Version for {taskGroupRow.groupTitle}"
 							bind:value={taskGroupRow.selectedVersion}
-							on:change={() => handleSwitchVersion(i)}
+							onchange={() => handleSwitchVersion(i)}
 						>
-							{#each sortVersions(Object.keys(taskGroupRow.groups)) as version}
+							{#each sortVersions(Object.keys(taskGroupRow.groups)) as version (version)}
 								<option value={version}>{version || 'None'}</option>
 							{/each}
 						</select>
@@ -173,49 +171,51 @@
 					{taskGroupRow.groups[taskGroupRow.selectedVersion].task_list.length}
 					<button
 						class="btn btn-link"
-						on:click={() => handleToggleTasks(i)}
+						onclick={() => handleToggleTasks(i)}
 						aria-label={expandedTaskGroupRow === taskGroupRow.groupTitle
 							? 'Collapse tasks'
 							: 'Expand tasks'}
 					>
 						{#if expandedTaskGroupRow === taskGroupRow.groupTitle}
-							<i class="bi bi-dash-circle" />
+							<i class="bi bi-dash-circle"></i>
 						{:else}
-							<i class="bi bi-plus-circle" />
+							<i class="bi bi-plus-circle"></i>
 						{/if}
 					</button>
 				</td>
 				<td>
 					<button
 						class="btn btn-light"
-						on:click={() =>
-							taskGroupInfoModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+						onclick={() =>
+							taskGroupInfoModal?.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
-						<i class="bi bi-info-circle" />
+						<i class="bi bi-info-circle"></i>
 						Info
 					</button>
 					<button
 						class="btn btn-primary"
-						on:click={() =>
-							taskGroupEditModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+						onclick={() =>
+							taskGroupEditModal?.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
-						<i class="bi bi-pencil" />
+						<i class="bi bi-pencil"></i>
 						Edit
 					</button>
 					<button
 						class="btn btn-info"
-						on:click={() =>
-							taskGroupManageModal.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
+						onclick={() =>
+							taskGroupManageModal?.open(taskGroupRow.groups[taskGroupRow.selectedVersion])}
 					>
-						<i class="bi bi-gear" />
+						<i class="bi bi-gear"></i>
 						Manage
 					</button>
 					<ConfirmActionButton
-						modalId="confirmTaskGroupDeleteModal{taskGroupRow.groupTitle}"
-						style={'danger'}
+						modalId="confirmTaskGroupDeleteModal{Object.values(taskGroupRow.groups)
+							.map((t) => t.id)
+							.join('-')}"
+						style="danger"
 						btnStyle="danger"
 						buttonIcon="trash"
-						label={'Delete'}
+						label="Delete"
 						message={`Delete task group ${
 							taskGroupRow.groupTitle +
 							(taskGroupRow.selectedVersion
@@ -229,7 +229,7 @@
 				</td>
 			</tr>
 
-			{#each taskGroupRow.groups[taskGroupRow.selectedVersion].task_list as task}
+			{#each taskGroupRow.groups[taskGroupRow.selectedVersion].task_list as task (task.id)}
 				{#if task}
 					<tr class:collapsed={taskGroupRow.groupTitle !== expandedTaskGroupRow} class="task-row">
 						<td colspan="5" class="text-end">
@@ -238,20 +238,20 @@
 						<td>
 							<button
 								class="btn btn-light"
-								on:click={() => {
-									taskInfoModal.open(task, taskGroupRow.selectedVersion);
+								onclick={() => {
+									taskInfoModal?.open(task, taskGroupRow.selectedVersion);
 								}}
 							>
-								<i class="bi bi-info-circle" />
+								<i class="bi bi-info-circle"></i>
 								Info
 							</button>
 							<button
 								class="btn btn-primary"
-								on:click={() => {
-									taskEditModal.open(task);
+								onclick={() => {
+									taskEditModal?.open(task);
 								}}
 							>
-								<i class="bi bi-pencil" />
+								<i class="bi bi-pencil"></i>
 								Edit
 							</button>
 						</td>

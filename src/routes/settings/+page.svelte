@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		AlertError,
@@ -12,15 +12,16 @@
 	/**
 	 * @type {import('fractal-components/types/api').UserSettings}
 	 */
-	const settings = $page.data.settings;
+	const settings = $derived(page.data.settings);
+	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	let slurmAccounts = [];
-	let slurmAccountsError = '';
+	let slurmAccounts = $state([]);
+	let slurmAccountsError = $state('');
 
-	let settingsUpdatedMessage = '';
+	let settingsUpdatedMessage = $state('');
 
 	function addSlurmAccount() {
 		slurmAccounts = [...slurmAccounts, ''];
@@ -80,7 +81,7 @@
 	}
 
 	onMount(() => {
-		initFields($page.data.settings);
+		initFields(page.data.settings);
 	});
 </script>
 
@@ -93,8 +94,8 @@
 			{settings.project_dir || '-'}
 		</div>
 	</div>
-	{#if $page.data.runnerBackend !== 'local'}
-		{#if $page.data.runnerBackend === 'slurm'}
+	{#if runnerBackend !== 'local'}
+		{#if runnerBackend === 'slurm'}
 			<div class="row mb-4">
 				<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
 				<div class="col-lg-6 col-sm-8">
@@ -102,7 +103,7 @@
 				</div>
 			</div>
 		{/if}
-		{#if $page.data.runnerBackend === 'slurm_ssh'}
+		{#if runnerBackend === 'slurm_ssh'}
 			<div class="row mb-4">
 				<div class="col-lg-2 col-sm-4 fw-bold">SSH username</div>
 				<div class="col-lg-6 col-sm-8">
@@ -114,13 +115,14 @@
 			<div class="col-lg-2 col-sm-4 fw-bold">SLURM accounts</div>
 			<div class="col-lg-6 col-sm-8">
 				<div class="col-sm-9 has-validation">
-					{#each slurmAccounts as slurmAccount, i}
+					<!-- eslint-disable-next-line no-unused-vars -->
+					{#each slurmAccounts as _, i (i)}
 						<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
 							<input
 								type="text"
 								class="form-control"
 								id={`slurmAccount-${i}`}
-								bind:value={slurmAccount}
+								bind:value={slurmAccounts[i]}
 								class:is-invalid={slurmAccountsError}
 								aria-label="SLURM account {i + 1}"
 								required
@@ -130,15 +132,15 @@
 								type="button"
 								id="slurm_account_remove_{i}"
 								aria-label="Remove SLURM account"
-								on:click={() => removeSlurmAccount(i)}
+								onclick={() => removeSlurmAccount(i)}
 							>
-								<i class="bi bi-trash" />
+								<i class="bi bi-trash"></i>
 							</button>
 						</div>
 					{/each}
 					<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
-					<button class="btn btn-light" type="button" on:click={addSlurmAccount}>
-						<i class="bi bi-plus-circle" />
+					<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
+						<i class="bi bi-plus-circle"></i>
 						Add SLURM account
 					</button>
 				</div>
@@ -147,9 +149,9 @@
 
 		<div class="row">
 			<div class="col">
-				<div id="settingsUpdate-error" />
+				<div id="settingsUpdate-error"></div>
 				<StandardDismissableAlert message={settingsUpdatedMessage} />
-				<button class="btn btn-primary" on:click={save}> Save </button>
+				<button class="btn btn-primary" onclick={save}> Save </button>
 			</div>
 		</div>
 	{/if}

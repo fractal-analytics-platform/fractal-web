@@ -8,9 +8,9 @@
 	let initialTypeFields = {};
 
 	/** @type {Array<{ key: string, value: string, type: string, error: string }>} */
-	let attributeFields = [];
+	let attributeFields = $state([]);
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
-	let typeFields = [];
+	let typeFields = $state([]);
 
 	/**
 	 * @param {{ [key: string]: string | number | boolean }} attributes
@@ -194,7 +194,7 @@
 {#if attributeFields.length > 0}
 	<h5>Attributes</h5>
 {/if}
-{#each attributeFields as field, index}
+{#each attributeFields as field, index (index)}
 	<div class="input-group mb-3" class:has-validation={field.error}>
 		<input
 			type="text"
@@ -222,7 +222,7 @@
 			bind:value={field.type}
 			class:is-invalid={field.error}
 			aria-label="Type"
-			on:change={() => fieldTypeChanged(field, index)}
+			onchange={() => fieldTypeChanged(field, index)}
 		>
 			<option value="string">String</option>
 			<option value="number">Number</option>
@@ -231,10 +231,10 @@
 		<button
 			class="btn btn-outline-danger"
 			type="button"
-			on:click={() => removeAttribute(index)}
+			onclick={() => removeAttribute(index)}
 			aria-label="Remove attribute"
 		>
-			<i class="bi bi-trash" />
+			<i class="bi bi-trash"></i>
 		</button>
 		{#if field.error}
 			<div class="invalid-feedback">{field.error}</div>
@@ -245,7 +245,7 @@
 {#if typeFields.length > 0}
 	<h5>Types</h5>
 {/if}
-{#each typeFields as field, index}
+{#each typeFields as field, index (index)}
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="input-group mb-3" class:has-validation={field.error}>
@@ -271,10 +271,10 @@
 				<button
 					class="btn btn-outline-danger"
 					type="button"
-					on:click={() => removeType(index)}
+					onclick={() => removeType(index)}
 					aria-label="Remove type"
 				>
-					<i class="bi bi-trash" />
+					<i class="bi bi-trash"></i>
 				</button>
 				{#if field.error}
 					<div class="invalid-feedback">{field.error}</div>
@@ -286,9 +286,9 @@
 
 <div class="row mb-3">
 	<div class="col-12">
-		<button class="btn btn-outline-primary" type="button" on:click={addAttribute}>
+		<button class="btn btn-outline-primary" type="button" onclick={addAttribute}>
 			Add attribute
 		</button>
-		<button class="btn btn-outline-primary" type="button" on:click={addType}> Add type </button>
+		<button class="btn btn-outline-primary" type="button" onclick={addType}> Add type </button>
 	</div>
 </div>

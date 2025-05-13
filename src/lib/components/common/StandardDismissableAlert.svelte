@@ -1,12 +1,34 @@
 <script>
-	export let message;
-	export let autoDismiss = true;
-	/** @type {'success'|'warning'} */
-	export let alertType = 'success';
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} message
+	 * @property {boolean} [autoDismiss]
+	 * @property {'success'|'warning'} [alertType]
+	 */
 
-	let timeout;
+	/** @type {Props} */
+	let { message = $bindable(), autoDismiss = true, alertType = 'success' } = $props();
 
-	$: if (autoDismiss && message) {
+	let timeout = $state();
+
+	export function hide() {
+		message = '';
+	}
+
+	/** @type {string|undefined} */
+	let previousMessage = $state('');
+
+	$effect(() => {
+		if (message !== previousMessage) {
+			previousMessage = message;
+			setupTimeout();
+		}
+	});
+
+	function setupTimeout() {
+		if (!autoDismiss) {
+			return;
+		}
 		if (timeout) {
 			clearTimeout(timeout);
 		}
@@ -15,18 +37,14 @@
 			timeout = null;
 		}, 3000);
 	}
-
-	export function hide() {
-		message = '';
-	}
 </script>
 
 {#if message}
 	<div class="alert alert-{alertType} alert-dismissible fade show" role="alert">
 		{#if alertType === 'warning'}
-			<i class="bi bi-exclamation-triangle" />
+			<i class="bi bi-exclamation-triangle"></i>
 		{/if}
 		{message}
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	</div>
 {/if}

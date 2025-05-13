@@ -1,15 +1,21 @@
 <script>
-	/** @type {boolean|null|undefined} */
-	export let value;
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {boolean|null} [value]
+	 */
+
+	/** @type {Props} */
+	let { value } = $props();
 </script>
 
 {#if value === true}
 	<span class="text-success boolean-icon" aria-checked="true">
-		<i class="bi bi-check" />
+		<i class="bi bi-check"></i>
 	</span>
 {:else if value === false}
 	<span class="text-danger boolean-icon" aria-checked="false">
-		<i class="bi bi-x" />
+		<i class="bi bi-x"></i>
 	</span>
 {/if}
 

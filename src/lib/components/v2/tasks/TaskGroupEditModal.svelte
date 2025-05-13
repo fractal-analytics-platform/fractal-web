@@ -4,23 +4,26 @@
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
-	/** @type {Array<[number, string]>} */
-	export let groupIdsNames;
 	/**
-	 * @type {(updatedGroups: import('fractal-components/types/api').TaskGroupV2) => void}
+	 * @typedef {Object} Props
+	 * @property {Array<[number, string]>} groupIdsNames
+	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupV2) => void} updateEditedTaskGroup
 	 */
-	export let updateEditedTaskGroup;
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { groupIdsNames, updateEditedTaskGroup } = $props();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
-	let taskGroup = undefined;
+	let taskGroup = $state();
 
-	let privateTask = false;
-	let selectedGroup = null;
+	let privateTask = $state(false);
+	/** @type {number|undefined} */
+	let selectedGroup = $state();
 
-	let saving = false;
+	let saving = $state(false);
 
 	const formErrorHandler = new FormErrorHandler('taskGroupUpdateError', ['user_group_id']);
 
@@ -34,11 +37,11 @@
 		privateTask = taskGroupToEdit.user_group_id === null;
 		selectedGroup = taskGroupToEdit.user_group_id;
 		formErrorHandler.clearErrors();
-		modal.show();
+		modal?.show();
 	}
 
 	async function handleUpdate() {
-		modal.confirmAndHide(
+		modal?.confirmAndHide(
 			async () => {
 				saving = true;
 
@@ -70,15 +73,15 @@
 </script>
 
 <Modal id="taskGroupEditModal" bind:this={modal} size="lg">
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if taskGroup}
 			<h1 class="h5 modal-title">
 				Task group {taskGroup.pkg_name}
 				(version {taskGroup.version ? taskGroup.version : 'None'})
 			</h1>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if taskGroup}
 			<div class="mb-2 row">
 				<div class="col">
@@ -94,16 +97,16 @@
 					<span class="invalid-feedback">{$validationErrors['user_group_id']}</span>
 				</div>
 			</div>
-			<span id="taskGroupUpdateError" />
+			<span id="taskGroupUpdateError"></span>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<button class="btn btn-primary" on:click={handleUpdate} disabled={saving}>
+	{/snippet}
+	{#snippet footer()}
+		<button class="btn btn-primary" onclick={handleUpdate} disabled={saving}>
 			{#if saving}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Update
 		</button>
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>

@@ -7,34 +7,37 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	export let user;
-	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} */
-	export let onWorkflowTaskAdded;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
+	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { workflow, user, onWorkflowTaskAdded } = $props();
 
-	let loading = false;
-	let addingTask = false;
+	/** @type {Modal|undefined} */
+	let modal = $state();
+
+	let loading = $state(false);
+	let addingTask = $state(false);
 	let showDocLinksInTable = false;
 
 	/** @type {Array<import('fractal-components/types/api').TaskGroupV2>} */
-	let taskGroups = [];
+	let taskGroups = $state([]);
 
 	export async function show() {
 		loading = true;
-		modal.hideErrorAlert();
-		modal.show();
+		modal?.hideErrorAlert();
+		modal?.show();
 		const response = await fetch(`/api/v2/task-group?only_active=true&args_schema=false`, {
 			method: 'GET',
 			credentials: 'include'
 		});
 		loading = false;
 		if (!response.ok) {
-			modal.displayErrorAlert(await response.json());
+			modal?.displayErrorAlert(await response.json());
 			return;
 		}
 		const allTaskGroups = await response.json();
@@ -50,7 +53,7 @@
 	 * @param {number} taskId
 	 */
 	async function addTaskToWorkflow(taskId) {
-		modal.confirmAndHide(
+		modal?.confirmAndHide(
 			async () => {
 				addingTask = true;
 
@@ -130,24 +133,24 @@
 	focus={false}
 	inputAutofocus={false}
 >
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Add new workflow task</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if loading}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{/if}
 		<div class:invisible={loading} class:collapse={loading}>
 			<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
-				<svelte:fragment slot="extra-columns-colgroup">
+				{#snippet extraColumnsColgroup()}
 					<col width="40" />
 					<col width="120" />
-				</svelte:fragment>
-				<svelte:fragment slot="extra-columns-header">
-					<th />
-					<th />
-				</svelte:fragment>
-				<svelte:fragment slot="extra-columns" let:task>
+				{/snippet}
+				{#snippet extraColumnsHeader()}
+					<th></th>
+					<th></th>
+				{/snippet}
+				{#snippet extraColumns(task)}
 					<td>
 						{#if showTaskInfoButton(task)}
 							<PropertyDescription description={getTaskInfo(task)} html={true} />
@@ -157,16 +160,16 @@
 						<button
 							class="btn btn-primary"
 							disabled={addingTask}
-							on:click={() => addTaskToWorkflow(task.task_id)}
+							onclick={() => addTaskToWorkflow(task.task_id)}
 						>
 							Add task
 						</button>
 					</td>
-				</svelte:fragment>
+				{/snippet}
 			</FilteredTasksTable>
 		</div>
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
-		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill" />
-	</svelte:fragment>
+	{/snippet}
+	{#snippet footer()}
+		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill"></div>
+	{/snippet}
 </Modal>

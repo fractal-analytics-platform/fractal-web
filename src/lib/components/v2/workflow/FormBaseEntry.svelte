@@ -1,13 +1,25 @@
 <script>
-	/** @type {import('./form-builder-types').FormBuilderEntry} */
-	export let entry;
-	/** @type {() => void} */
-	export let changeType;
-	/** @type {() => void} */
-	export let removeProperty;
-	/** @type {() => void} */
-	export let triggerChanges;
-	export let editable = true;
+	
+	
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('./form-builder-types').FormBuilderEntry} entry
+	 * @property {() => void} changeType
+	 * @property {() => void} removeProperty
+	 * @property {() => void} triggerChanges
+	 * @property {boolean} [editable]
+	 */
+
+	/** @type {Props} */
+	let {
+		entry = $bindable(),
+		changeType,
+		removeProperty,
+		triggerChanges,
+		editable = true
+	} = $props();
 </script>
 
 <div class="input-group mb-2" class:has-validation={entry.error}>
@@ -18,7 +30,7 @@
 			placeholder="Argument name"
 			class:is-invalid={entry.error}
 			bind:value={entry.key}
-			on:input={triggerChanges}
+			oninput={triggerChanges}
 			disabled={!editable}
 		/>
 	{/if}
@@ -29,7 +41,7 @@
 			placeholder="Argument value"
 			class:is-invalid={entry.error}
 			bind:value={entry.value}
-			on:input={triggerChanges}
+			oninput={triggerChanges}
 			disabled={!editable}
 		/>
 	{:else if entry.type === 'number'}
@@ -39,21 +51,21 @@
 			placeholder="Argument value"
 			class:is-invalid={entry.error}
 			bind:value={entry.value}
-			on:input={triggerChanges}
+			oninput={triggerChanges}
 			disabled={!editable}
 		/>
 	{:else if entry.type === 'boolean'}
 		<select
 			class="form-select"
 			bind:value={entry.value}
-			on:change={triggerChanges}
+			onchange={triggerChanges}
 			disabled={!editable}
 		>
 			<option value={true}>True</option>
 			<option value={false}>False</option>
 		</select>
 	{/if}
-	<select class="form-select" bind:value={entry.type} on:change={changeType} disabled={!editable}>
+	<select class="form-select" bind:value={entry.type} onchange={changeType} disabled={!editable}>
 		<option value="string">String</option>
 		<option value="number">Number</option>
 		<option value="boolean">Boolean</option>
@@ -63,11 +75,11 @@
 	<button
 		class="btn btn-outline-danger"
 		type="button"
-		on:click={removeProperty}
+		onclick={removeProperty}
 		aria-label="Remove property"
 		disabled={!editable}
 	>
-		<i class="bi bi-trash" />
+		<i class="bi bi-trash"></i>
 	</button>
 	{#if entry.error}
 		<div class="invalid-feedback">{entry.error}</div>

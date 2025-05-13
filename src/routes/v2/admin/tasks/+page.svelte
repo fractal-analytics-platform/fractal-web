@@ -3,23 +3,23 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { PropertyDescription } from 'fractal-components';
 
-	let name = '';
-	let id = '';
-	let version = '';
-	let max_number_of_results = '25';
+	let name = $state('');
+	let id = $state('');
+	let version = $state('');
+	let max_number_of_results = $state('25');
 
-	let searched = false;
-	let searching = false;
+	let searched = $state(false);
+	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {import('fractal-components/types/api').TaskV2Info[]} */
-	let results = [];
+	let results = $state([]);
 
-	/** @type {Modal} */
-	let infoModal;
+	/** @type {Modal|undefined} */
+	let infoModal = $state();
 	/** @type {import('fractal-components/types/api').TaskV2Info|null} */
-	let selectedTaskInfo = null;
+	let selectedTaskInfo = $state(null);
 
 	async function searchTasks() {
 		searching = true;
@@ -73,7 +73,7 @@
 	 */
 	function openInfoModal(taskInfo) {
 		selectedTaskInfo = taskInfo;
-		infoModal.show();
+		infoModal?.show();
 	}
 
 	function onInfoModalClose() {
@@ -184,19 +184,19 @@
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" on:click={searchTasks} disabled={searching}>
+	<button class="btn btn-primary mt-4" onclick={searchTasks} disabled={searching}>
 		{#if searching}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
-			<i class="bi bi-search" />
+			<i class="bi bi-search"></i>
 		{/if}
 		Search tasks
 	</button>
-	<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
+	<button class="btn btn-warning mt-4" onclick={resetSearchFields} disabled={searching}>
 		Reset
 	</button>
 
-	<div id="searchError" class="mt-3 mb-3" />
+	<div id="searchError" class="mt-3 mb-3"></div>
 
 	<div class:d-none={!searched}>
 		<p class="text-center">
@@ -224,7 +224,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each results as taskInfo, taskInfoIndex}
+					{#each results as taskInfo, taskInfoIndex (taskInfoIndex)}
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
 							<td>{taskInfo.task.id}</td>
 							<td>{taskInfo.task.name}</td>
@@ -238,12 +238,12 @@
 									<button
 										class="btn btn-link"
 										id="users-list-toggler-{taskInfoIndex}"
-										on:click={() => toggleUsersList(taskInfoIndex)}
+										onclick={() => toggleUsersList(taskInfoIndex)}
 									>
 										Show
 									</button>
 									<div class="d-none" id="users-list-{taskInfoIndex}">
-										{#each getUsers(taskInfo) as user}
+										{#each getUsers(taskInfo) as user (user)}
 											{user}<br />
 										{/each}
 									</div>
@@ -252,8 +252,8 @@
 								{/if}
 							</td>
 							<td>
-								<button class="btn btn-light" on:click={() => openInfoModal(taskInfo)}>
-									<i class="bi bi-info-circle" />
+								<button class="btn btn-light" onclick={() => openInfoModal(taskInfo)}>
+									<i class="bi bi-info-circle"></i>
 									Info
 								</button>
 							</td>
@@ -266,10 +266,10 @@
 </div>
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="lg" onClose={onInfoModalClose}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h1 class="h5 modal-title flex-grow-1">Task info</h1>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if selectedTaskInfo}
 			<div class="accordion mb-3" id="accordion-task-properties">
 				<div class="accordion-item">
@@ -313,7 +313,7 @@
 				<p class="mb-3">No relationships</p>
 			{:else}
 				<div class="accordion" id="accordion-relationships">
-					{#each selectedTaskInfo.relationships as relationship, index}
+					{#each selectedTaskInfo.relationships as relationship, index (index)}
 						<div class="accordion-item">
 							<h2 class="accordion-header">
 								<button
@@ -353,7 +353,7 @@
 														</tr>
 													</thead>
 													<tbody>
-														{#each relationship.project_users as user}
+														{#each relationship.project_users as user (user.id)}
 															<tr>
 																<td>{user.id}</td>
 																<td>{user.email}</td>
@@ -373,7 +373,7 @@
 				</div>
 			{/if}
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <style>

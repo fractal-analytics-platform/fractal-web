@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 import { writable } from 'svelte/store';
+import { mount } from 'svelte';
 
 /**
  * Propagates an error response.
@@ -206,7 +207,7 @@ function hasValidationErrorPayload(err) {
 export function displayStandardErrorAlert(error, targetElementId) {
 	const errorAlert = document.getElementById(targetElementId);
 	if (errorAlert) {
-		return new StandardErrorAlert({
+		return mount(StandardErrorAlert, {
 			target: errorAlert,
 			props: {
 				error

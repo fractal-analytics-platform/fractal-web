@@ -1,11 +1,12 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 
-	export let form;
-	let userId = '';
+	let { form } = $props();
+	let userId = $state('');
 
-	$: users = sortDropdownUsers($page.data.users, $page.data.userInfo.id);
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(sortDropdownUsers(page.data.users, page.data.userInfo.id));
 </script>
 
 <div class="container mt-3">
@@ -17,8 +18,8 @@
 				<label class="input-group-text" for="user">User</label>
 				<select class="form-select" bind:value={userId} id="user" name="user_id">
 					<option value="">Select</option>
-					{#each users as user}
-						{#if user.id !== $page.data.userInfo.id}
+					{#each users as user (user.id)}
+						{#if user.id !== currentUserId}
 							<option value={user.id}>{user.email}</option>
 						{/if}
 					{/each}

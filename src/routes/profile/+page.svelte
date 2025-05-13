@@ -1,9 +1,9 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	$: user = $page.data.user;
+	let user = $derived(page.data.user);
 </script>
 
 <div class="container mt-3">
@@ -44,8 +44,7 @@
 					<tr>
 						<th>Groups</th>
 						<td>
-							<!-- eslint-disable-next-line no-unused-vars -->
-							{#each user.group_ids_names as [_, group_name]}
+							{#each user.group_ids_names as [id, group_name] (id)}
 								<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">{group_name}</span>
 							{/each}
 						</td>
@@ -57,12 +56,14 @@
 								-
 							{:else}
 								<table class="table mb-0">
-									{#each user.oauth_accounts as account}
-										<tr>
-											<th>{account.oauth_name}</th>
-											<td>{account.account_email}</td>
-										</tr>
-									{/each}
+									<tbody>
+										{#each user.oauth_accounts as account (account.id)}
+											<tr>
+												<th>{account.oauth_name}</th>
+												<td>{account.account_email}</td>
+											</tr>
+										{/each}
+									</tbody>
 								</table>
 							{/if}
 						</td>

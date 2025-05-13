@@ -11,31 +11,31 @@
 	} from 'fractal-components';
 	import { tick } from 'svelte';
 
-	let oldSchema = undefined;
-	let oldSchemaData = undefined;
+	let oldSchema = $state(undefined);
+	let oldSchemaData = $state(undefined);
 
-	let oldJsonSchemaString = '';
-	let oldJsonDataString = '';
+	let oldJsonSchemaString = $state('');
+	let oldJsonDataString = $state('');
 
-	let oldJsonSchemaError = '';
-	let oldDataError = '';
+	let oldJsonSchemaError = $state('');
+	let oldDataError = $state('');
 
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let oldSchemaVersion = 'pydantic_v2';
+	let oldSchemaVersion = $state('pydantic_v2');
 
 	/** @type {JSchema|undefined} */
-	let oldJschemaComponent = undefined;
+	let oldJschemaComponent = $state(undefined);
 
-	let newSchema = undefined;
+	let newSchema = $state(undefined);
 
 	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	let newSchemaVersion = 'pydantic_v2';
+	let newSchemaVersion = $state('pydantic_v2');
 
-	let newJsonSchemaString = '';
-	let newJsonSchemaError = '';
+	let newJsonSchemaString = $state('');
+	let newJsonSchemaError = $state('');
 
-	let dummyWorkflowTask = undefined;
-	let dummyUpdateCandidate = undefined;
+	let dummyWorkflowTask = $state(undefined);
+	let dummyUpdateCandidate = $state(undefined);
 
 	async function handleOldJsonSchemaStringChanged() {
 		oldJsonSchemaError = '';
@@ -106,8 +106,8 @@
 	}
 
 	/** @type {string} */
-	let errorOld;
-	let oldValid = false;
+	let errorOld = $state();
+	let oldValid = $state(false);
 
 	async function validate() {
 		try {
@@ -182,19 +182,14 @@
 		handleNewJsonSchemaStringChanged();
 	}
 
-	let canBeUpdated = false;
-	let argsChanged = false;
+	let canBeUpdated = $state(false);
+	let argsChanged = $state(false);
 
-	$: {
-		canBeUpdated = validationErrors === null || validationErrors.length === 0;
-		argsChanged = argsToBeFixed !== originalArgs;
-	}
-
-	let originalArgs = '';
-	let displayTextarea = false;
-	let argsToBeFixed = '';
-	let argsToBeFixedValidJson = true;
-	let validationErrors = null;
+	let originalArgs = $state('');
+	let displayTextarea = $state(false);
+	let argsToBeFixed = $state('');
+	let argsToBeFixedValidJson = $state(true);
+	let validationErrors = $state(null);
 
 	export function reset() {
 		argsToBeFixed = '';
@@ -259,7 +254,12 @@
 		return (validationErrors?.length || 0) > 0;
 	}
 
-	$: propertiesToIgnore = getPropertiesToIgnore(false);
+	$effect(() => {
+		canBeUpdated = validationErrors === null || validationErrors.length === 0;
+		argsChanged = argsToBeFixed !== originalArgs;
+	});
+
+	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 </script>
 
 <h1 class="fw-light">Sandbox page for task version update</h1>
@@ -276,7 +276,7 @@
 				id="old_pydantic_v1"
 				value="pydantic_v1"
 				bind:group={oldSchemaVersion}
-				on:change={handleOldJsonSchemaStringChanged}
+				onchange={handleOldJsonSchemaStringChanged}
 			/>
 			<label class="form-check-label" for="old_pydantic_v1">pydantic_v1</label>
 		</div>
@@ -288,13 +288,13 @@
 				id="old_pydantic_v2"
 				value="pydantic_v2"
 				bind:group={oldSchemaVersion}
-				on:change={handleOldJsonSchemaStringChanged}
+				onchange={handleOldJsonSchemaStringChanged}
 			/>
 			<label class="form-check-label" for="old_pydantic_v2">pydantic_v2</label>
 		</div>
 	</div>
 	<div class="col-lg-6 mt-5">
-		<button class="btn btn-outline-primary" on:click={loadExample}> Load example </button>
+		<button class="btn btn-outline-primary" onclick={loadExample}> Load example </button>
 	</div>
 </div>
 
@@ -307,10 +307,10 @@
 					id="jschema-old"
 					class="form-control"
 					bind:value={oldJsonSchemaString}
-					on:input={handleOldJsonSchemaStringChanged}
+					oninput={handleOldJsonSchemaStringChanged}
 					class:is-invalid={oldJsonSchemaError}
 					rows="10"
-				/>
+				></textarea>
 				<span class="invalid-feedback">{oldJsonSchemaError}</span>
 			</div>
 		</div>
@@ -321,10 +321,10 @@
 					id="jdata-old"
 					class="form-control"
 					bind:value={oldJsonDataString}
-					on:input={handleOldDataStringChanged}
+					oninput={handleOldDataStringChanged}
 					class:is-invalid={oldDataError}
 					rows="10"
-				/>
+				></textarea>
 				<span class="invalid-feedback">{oldDataError}</span>
 			</div>
 		</div>
@@ -338,7 +338,7 @@
 				{#if oldValid}
 					<div class="alert alert-success">Data is valid</div>
 				{/if}
-				<button class="btn btn-primary" on:click={validate}>Validate</button>
+				<button class="btn btn-primary" onclick={validate}>Validate</button>
 			</div>
 		</div>
 	</div>
@@ -370,7 +370,7 @@
 				id="new_pydantic_v1"
 				value="pydantic_v1"
 				bind:group={newSchemaVersion}
-				on:change={handleNewJsonSchemaStringChanged}
+				onchange={handleNewJsonSchemaStringChanged}
 			/>
 			<label class="form-check-label" for="new_pydantic_v1">pydantic_v1</label>
 		</div>
@@ -382,7 +382,7 @@
 				id="new_pydantic_v2"
 				value="pydantic_v2"
 				bind:group={newSchemaVersion}
-				on:change={handleNewJsonSchemaStringChanged}
+				onchange={handleNewJsonSchemaStringChanged}
 			/>
 			<label class="form-check-label" for="new_pydantic_v2">pydantic_v2</label>
 		</div>
@@ -398,17 +398,17 @@
 					id="jschema-new"
 					class="form-control"
 					bind:value={newJsonSchemaString}
-					on:input={handleNewJsonSchemaStringChanged}
+					oninput={handleNewJsonSchemaStringChanged}
 					class:is-invalid={newJsonSchemaError}
 					rows="10"
-				/>
+				></textarea>
 				<span class="invalid-feedback">{newJsonSchemaError}</span>
 			</div>
 		</div>
 	</div>
 	<div class="col-lg-6">
 		{#if newSchema}
-			<button class="btn btn-primary mt-4 mb-2" on:click={tryVersionUpdate}>
+			<button class="btn btn-primary mt-4 mb-2" onclick={tryVersionUpdate}>
 				Try version update
 			</button>
 			{#if dummyWorkflowTask && dummyUpdateCandidate}
@@ -462,14 +462,14 @@
 							class:is-invalid={!argsToBeFixedValidJson}
 							bind:value={argsToBeFixed}
 							rows="20"
-						/>
+						></textarea>
 					{/if}
 					{#if !argsToBeFixedValidJson}
 						<div class="invalid-feedback">Invalid JSON</div>
 					{/if}
 				{/if}
 				{#if displayTextarea}
-					<button type="button" class="btn btn-warning mt-3" on:click={check}> Check </button>
+					<button type="button" class="btn btn-warning mt-3" onclick={check}> Check </button>
 				{/if}
 			{/if}
 		{/if}

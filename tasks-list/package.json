@@ -19,22 +19,22 @@
 		"build"
 	],
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"@sveltejs/package": "^2.0.0",
+		"@sveltejs/kit": "^2.20.8",
+		"@sveltejs/package": "^2.3.7",
+		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"eslint": "^9.0.0",
-		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-svelte": "^2.0.0",
-		"prettier": "^2.0.0",
-		"prettier-plugin-svelte": "^2.10.1",
-		"svelte": "^4.0.0",
-		"svelte-check": "^3.4.3",
+		"eslint-config-prettier": "^10.0.0",
+		"eslint-plugin-svelte": "^3.0.0",
+		"prettier": "^3.0.0",
+		"prettier-plugin-svelte": "^3.0.0",
+		"svelte": "^5.0.0",
+		"svelte-check": "^4.0.0",
 		"tslib": "^2.7.0",
-		"typescript": "^5.0.0",
+		"typescript": "^5.5.0",
 		"vite": "^5.0.0"
 	},
 	"svelte": "./build/index.js",
@@ -45,5 +45,8 @@
 		"slim-select",
 		"dompurify",
 		"marked"
-	]
+	],
+	"dependencies": {
+		"svelte-preprocess": "^6.0.3"
+	}
 }

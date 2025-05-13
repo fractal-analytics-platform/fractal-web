@@ -1,18 +1,36 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
+	import { get } from 'svelte/store';
 
-	/** @type {import('../form_element.js').EnumFormElement} */
-	export let formElement;
-	export let editable = true;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').EnumFormElement} formElement
+	 * @property {boolean} [editable]
+	 */
 
-	/** @type {HTMLSelectElement} */
-	let field;
-	let validationError = '';
+	/** @type {Props} */
+	let { formElement = $bindable(), editable = true } = $props();
 
-	function handleValueChange() {
+	let value = $state();
+	formElement.value.subscribe((v) => (value = v));
+	$effect(() => handleValueChange(value));
+
+	/** @type {HTMLSelectElement|undefined} */
+	let field = $state();
+	let validationError = $state('');
+
+	/**
+	 * @param {any} value
+	 */
+	function handleValueChange(value) {
+		const previousValue = get(formElement.value);
+		if (previousValue === value) {
+			return;
+		}
+		formElement.value.set(value);
 		formElement.notifyChange();
 		validationError = '';
-		if (formElement.required && field.value === '') {
+		if (formElement.required && field?.value === '') {
 			validationError = 'Field is required';
 		}
 	}
@@ -25,16 +43,14 @@
 	<div class="property-input ms-auto w-50 has-validation">
 		<select
 			bind:this={field}
-			bind:value={formElement.value}
-			on:change={handleValueChange}
-			on:input={handleValueChange}
+			bind:value
 			class="form-select"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}
 			disabled={!editable}
 		>
 			<option value="">Select...</option>
-			{#each formElement.options as optionValue}
+			{#each formElement.options as optionValue, index (index)}
 				<option>{optionValue}</option>
 			{/each}
 		</select>

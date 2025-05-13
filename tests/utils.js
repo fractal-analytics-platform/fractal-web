@@ -17,6 +17,16 @@ export async function waitPageLoading(page) {
 }
 
 /**
+ * Close the currently opened modal
+ * @param {import('@playwright/test').Page} page
+ */
+export async function closeModal(page) {
+	const modal = page.locator('.modal.show');
+	await modal.locator('.modal-header').getByRole('button', { name: 'Close' }).click();
+	await expect(modal).not.toBeVisible();
+}
+
+/**
  * Wait until modal is closed
  * @param {import('@playwright/test').Page} page
  */

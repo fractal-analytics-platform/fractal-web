@@ -2,17 +2,17 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 
 	// ProjectInfoModal component
-	import { projectInfoModalV2 } from '$lib/stores/projectStores';
+	import { projectInfoModalV2 } from '$lib/stores';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	// Project to be displayed
 	/** @type {import('fractal-components/types/api').ProjectV2|undefined} */
-	let project = undefined;
+	let project = $state();
 
-	let loadingDatasets = true;
+	let loadingDatasets = $state(true);
 	/** @type {import('fractal-components/types/api').DatasetV2[]|undefined} */
-	let datasets = undefined;
+	let datasets = $state();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let datasetErrorAlert;
@@ -55,15 +55,15 @@
 </script>
 
 <Modal id="projectInfoModal" size="lg" {onClose}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if project}
 			<h1 class="h5 modal-title flex-grow-1">Project {project.name}</h1>
 			<a href={'/v2/projects/' + project.id} class="btn btn-light me-3">
-				Open <i class="bi bi-arrow-up-right-square" />
+				Open <i class="bi bi-arrow-up-right-square"></i>
 			</a>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
+	{/snippet}
+	{#snippet body()}
 		{#if project}
 			<div class="row mb-3">
 				<div class="col-12">
@@ -79,13 +79,13 @@
 					{#if loadingDatasets}
 						Loading...
 					{/if}
-					<div id="errorAlert-projectInfoModal" />
+					<div id="errorAlert-projectInfoModal"></div>
 					{#if datasets}
 						<p class="lead">Datasets</p>
 						<ul>
-							{#each datasets as { name }}
+							{#each datasets as dataset (dataset.id)}
 								<li>
-									{name}
+									{dataset.name}
 								</li>
 							{/each}
 						</ul>
@@ -93,5 +93,5 @@
 				</div>
 			</div>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>

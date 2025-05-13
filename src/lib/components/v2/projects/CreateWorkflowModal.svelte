@@ -1,48 +1,54 @@
 <script>
 	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Modal from '../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 
-	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => void} */
-	export let handleWorkflowImported;
+	/**
+	 * @typedef {Object} Props
+	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} handleWorkflowImported
+	 */
+
+	/** @type {Props} */
+	let { handleWorkflowImported } = $props();
 
 	// Component properties
-	let creating = false;
-	let importSuccess = undefined;
-	let workflowName = '';
+	let creating = $state(false);
+	/** @type {boolean|undefined} */
+	let importSuccess = $state();
+	let workflowName = $state('');
 
-	/** @type {FileList|null} */
-	let files = null;
+	/** @type {FileList|undefined} */
+	let files = $state();
 	/** @type {HTMLInputElement|undefined} */
-	let fileInput = undefined;
+	let fileInput = $state(undefined);
 
-	$: workflowFileSelected = files !== null && files.length > 0;
-	$: projectId = $page.params.projectId;
+	let workflowFileSelected = $derived(files && files.length > 0);
+	let projectId = $derived(page.params.projectId);
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	export function show() {
-		modal.show();
+		modal?.show();
 	}
 
 	/**
 	 * Reset the form fields.
 	 */
 	export function reset() {
-		files = null;
+		files = undefined;
 		if (fileInput) {
 			fileInput.value = '';
 		}
 		workflowName = '';
 		creating = false;
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 	}
 
 	function handleImportOrCreateWorkflow() {
-		modal.confirmAndHide(
+		modal?.confirmAndHide(
 			async () => {
 				creating = true;
 				if (workflowFileSelected) {
@@ -77,7 +83,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v2/project/${$page.params.projectId}/workflow/import`, {
+		const response = await fetch(`/api/v2/project/${page.params.projectId}/workflow/import`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -144,11 +150,16 @@
 	onOpen={reset}
 	bind:this={modal}
 >
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Create new workflow</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<form on:submit|preventDefault={handleImportOrCreateWorkflow}>
+	{/snippet}
+	{#snippet body()}
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleImportOrCreateWorkflow();
+			}}
+		>
 			<div class="mb-2">
 				<label for="workflowName" class="form-label">Workflow name</label>
 				<input
@@ -173,14 +184,14 @@
 				/>
 			</div>
 
-			<div id="errorAlert-createWorkflowModal" />
+			<div id="errorAlert-createWorkflowModal"></div>
 
 			<button
 				class="btn btn-primary mt-2"
 				disabled={(!workflowName && !workflowFileSelected) || creating}
 			>
 				{#if creating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 				{#if workflowFileSelected}
 					Import workflow
@@ -193,5 +204,5 @@
 		{#if importSuccess}
 			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>

@@ -3,23 +3,28 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TypeFiltersCell from './TypeFiltersCell.svelte';
 
-	/** @type {import("fractal-components/types/api").WorkflowV2} */
-	export let workflow;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
+	 */
 
-	/** @type {Modal} */
-	let modal;
-	let loading = false;
+	/** @type {Props} */
+	let { workflow } = $props();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
+	let loading = $state(false);
 
 	/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
-	let typeFiltersFlow = [];
+	let typeFiltersFlow = $state([]);
 
 	export async function open() {
-		modal.show();
+		modal?.show();
 		await loadData();
 	}
 
 	async function loadData() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		loading = true;
 
 		const response = await fetch(
@@ -29,7 +34,7 @@
 		if (response.ok) {
 			typeFiltersFlow = await response.json();
 		} else {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 
 		loading = false;
@@ -48,13 +53,13 @@
 </script>
 
 <Modal id="typeFiltersFlowModal" size="xl" bind:this={modal} {onClose}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Type filters</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-typeFiltersFlowModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-typeFiltersFlowModal"></div>
 		{#if loading && !typeFiltersFlow}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{/if}
 		{#if typeFiltersFlow}
 			<div class="table-responsive">
@@ -70,7 +75,7 @@
 					<tbody>
 						{#if !loading}
 							<!-- eslint-disable-next-line no-unused-vars -->
-							{#each typeFiltersFlow as filters}
+							{#each typeFiltersFlow as filters, index (index)}
 								<tr>
 									<td>
 										{getTaskById(Number(filters.workflowtask_id)).name}
@@ -91,5 +96,5 @@
 				</table>
 			</div>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>

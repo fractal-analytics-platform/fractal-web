@@ -2,18 +2,23 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
-	export let dataset;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 */
 
-	/** @type {Modal} */
-	let modal;
+	/** @type {Props} */
+	let { dataset } = $props();
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	/** @type {Array<import('fractal-components/types/api').HistoryItemV2>} */
-	let history = [];
-	let loading = false;
+	let history = $state([]);
+	let loading = $state(false);
 
 	async function onOpen() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		loading = true;
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/history`,
@@ -25,13 +30,13 @@
 		if (response.ok) {
 			history = await response.json();
 		} else {
-			modal.displayErrorAlert(await getAlertErrorFromResponse(response));
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 		loading = false;
 	}
 
 	function onClose() {
-		modal.hideErrorAlert();
+		modal?.hideErrorAlert();
 		history = [];
 	}
 
@@ -75,14 +80,14 @@
 	{onClose}
 	bind:this={modal}
 >
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Dataset history</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-datasetHistoryModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-datasetHistoryModal"></div>
 		{#if history && Object.keys(history).length > 0}
 			<div class="accordion" id="accordion-dataset-history">
-				{#each history as value, index}
+				{#each history as value, index (value.id)}
 					<div class="accordion-item">
 						<h2 class="accordion-header">
 							<button
@@ -111,7 +116,7 @@
 		{:else if !loading}
 			<p>No history</p>
 		{:else}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{/if}
-	</svelte:fragment>
+	{/snippet}
 </Modal>

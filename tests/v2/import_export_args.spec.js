@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { closeModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -224,8 +224,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await fileChooser.setFiles(file);
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByText('must have required property')).toBeVisible();
-		await modal.getByRole('button', { name: 'Close' }).click();
-		await waitModalClosed(page);
+		await closeModal(page);
 		fs.rmSync(file);
 		await workflow.removeCurrentTask();
 	});

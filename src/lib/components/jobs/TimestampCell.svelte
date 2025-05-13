@@ -1,27 +1,47 @@
 <script>
-	/** @type {string|null} */
-	export let timestamp;
+	/**
+	 * @typedef {Object} Props
+	 * @property {string|null} timestamp
+	 */
 
-	let date = '';
-	let time = '';
+	/** @type {Props} */
+	let { timestamp } = $props();
 
-	$: {
+	const date = $derived(getDate(timestamp));
+	const time = $derived(getTime(timestamp));
+
+	/**
+	 * @param {string|null} timestamp
+	 * @returns {string}
+	 */
+	function getDate(timestamp) {
 		if (timestamp) {
 			const dateObj = new Date(timestamp);
-			date = dateObj.toLocaleString([], {
+			return dateObj.toLocaleString([], {
 				day: 'numeric',
 				month: 'numeric',
 				year: 'numeric'
 			});
-			time = dateObj.toLocaleString([], {
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * @param {string|null} timestamp
+	 * @returns {string}
+	 */
+	function getTime(timestamp) {
+		if (timestamp) {
+			const dateObj = new Date(timestamp);
+			return dateObj.toLocaleString([], {
 				hour: 'numeric',
 				minute: 'numeric',
 				second: 'numeric',
 				hour12: false
 			});
 		} else {
-			date = '';
-			time = '';
+			return '';
 		}
 	}
 </script>

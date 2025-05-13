@@ -1,21 +1,42 @@
 <script>
 	import PropertyLabel from './PropertyLabel.svelte';
+	import { get } from 'svelte/store';
 
-	/** @type {import('../form_element.js').NumberFormElement} */
-	export let formElement;
-	export let editable = true;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('../form_element.js').NumberFormElement} formElement
+	 * @property {boolean} [editable]
+	 */
 
-	/** @type {HTMLInputElement} */
-	let field;
-	let validationError = '';
+	/** @type {Props} */
+	let { formElement = $bindable(), editable = true } = $props();
 
-	function handleValueChange() {
+	let value = $state();
+	formElement.value.subscribe((v) => (value = v));
+	$effect(() => handleValueChange(value));
+
+	/** @type {HTMLInputElement|undefined} */
+	let field = $state();
+	let validationError = $state('');
+
+	/**
+	 * @param {any} value
+	 */
+	function handleValueChange(value) {
+		const previousValue = get(formElement.value);
+		if (previousValue === value) {
+			return;
+		}
 		validate();
+		formElement.value.set(value);
 		formElement.notifyChange();
 	}
 
 	function validate() {
 		validationError = '';
+		if (!field) {
+			return;
+		}
 		formElement.badInput = field.validity.badInput;
 		if (formElement.badInput) {
 			validationError = 'Should be a number';
@@ -52,10 +73,10 @@
 		<input
 			type="number"
 			bind:this={field}
-			bind:value={formElement.value}
-			on:input={handleValueChange}
+			bind:value
 			min={formElement.min}
 			max={formElement.max}
+			oninput={() => validate()}
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}

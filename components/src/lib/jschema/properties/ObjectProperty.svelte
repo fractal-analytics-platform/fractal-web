@@ -2,24 +2,28 @@
 	import { onMount } from 'svelte';
 	import PropertyDiscriminator from './PropertyDiscriminator.svelte';
 
-	/** @type {import("../form_element.js").ObjectFormElement} */
-	export let formElement;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import("../form_element.js").ObjectFormElement} formElement
+	 * @property {boolean} [isRoot]
+	 * @property {boolean} [editable]
+	 */
 
-	export let isRoot = false;
-	export let editable = true;
+	/** @type {Props} */
+	let { formElement, isRoot = false, editable = true } = $props();
 
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
 	 * @type {Array<import("../../types/form").FormElement>}
 	 */
-	let children = [];
+	let children = $state([]);
 
 	onMount(() => {
 		children = formElement.children;
 	});
 
-	let newPropertyKey = '';
-	let addPropertyError = '';
+	let newPropertyKey = $state('');
+	let addPropertyError = $state('');
 
 	function addProperty() {
 		try {
@@ -62,7 +66,7 @@
 						class:is-invalid={addPropertyError}
 						disabled={!editable}
 					/>
-					<button class="btn btn-primary" type="button" on:click={addProperty} disabled={!editable}>
+					<button class="btn btn-primary" type="button" onclick={addProperty} disabled={!editable}>
 						Add property
 					</button>
 					{#if addPropertyError}
@@ -74,13 +78,13 @@
 	</div>
 {/if}
 {#key children}
-	{#each children as child, index}
+	{#each children as child, index (index)}
 		<div class="property-block">
 			{#if child.removable}
 				<button
 					class="btn btn-danger w-100"
 					type="button"
-					on:click={() => removeProperty(/**@type {string}*/ (child.key))}
+					onclick={() => removeProperty(/**@type {string}*/ (child.key))}
 					disabled={!editable}
 				>
 					Remove Property Block
@@ -88,7 +92,7 @@
 			{/if}
 			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
 				<PropertyDiscriminator
-					formElement={child}
+					formElement={children[index]}
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
 				/>

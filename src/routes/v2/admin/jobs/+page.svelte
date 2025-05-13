@@ -1,38 +1,41 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 
-	let searched = false;
-	let searching = false;
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(sortDropdownUsers(page.data.users));
+
+	let searched = $state(false);
+	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {JobsList} */
-	let jobsListComponent;
+	/** @type {JobsList|undefined} */
+	let jobsListComponent = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-	let jobs = [];
+	let jobs = $state([]);
 
-	let status;
-	let userId;
-	let jobId;
+	let status = $state();
+	let userId = $state();
+	let jobId = $state();
 
-	let startDateMin;
-	let startTimeMin;
-	let startDateMax;
-	let startTimeMax;
+	let startDateMin = $state();
+	let startTimeMin = $state();
+	let startDateMax = $state();
+	let startTimeMax = $state();
 
-	let endDateMin;
-	let endTimeMin;
-	let endDateMax;
-	let endTimeMax;
+	let endDateMin = $state();
+	let endTimeMin = $state();
+	let endDateMax = $state();
+	let endTimeMax = $state();
 
-	let projectId;
-	let workflowId;
-	let datasetId;
+	let projectId = $state();
+	let workflowId = $state();
+	let datasetId = $state();
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
@@ -114,7 +117,7 @@
 			}
 			searched = true;
 			jobs = await response.json();
-			jobsListComponent.setJobs(jobs);
+			jobsListComponent?.setJobs(jobs);
 		} finally {
 			searching = false;
 		}
@@ -140,7 +143,7 @@
 		datasetId = '';
 		searched = false;
 		jobs = [];
-		jobsListComponent.setJobs([]);
+		jobsListComponent?.setJobs([]);
 	}
 
 	async function downloadCSV() {
@@ -180,26 +183,28 @@
 		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
 	}
 
-	/** @type {Modal} */
-	let statusModal;
+	/** @type {Modal|undefined} */
+	let statusModal = $state();
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
-	let jobInEditing;
+	let jobInEditing = $state();
 
 	/**
 	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} row
 	 */
 	function openEditStatusModal(row) {
 		jobInEditing = row;
-		statusModal.show();
+		statusModal?.show();
 	}
 
-	let updatingStatus = false;
+	let updatingStatus = $state(false);
 
 	async function updateJobStatus() {
-		statusModal.confirmAndHide(
+		statusModal?.confirmAndHide(
 			async () => {
 				updatingStatus = true;
-				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (jobInEditing).id;
+				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (
+					jobInEditing
+				).id;
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
@@ -216,7 +221,7 @@
 				}
 
 				jobs = jobs.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));
-				jobsListComponent.setJobs(jobs);
+				jobsListComponent?.setJobs(jobs);
 			},
 			() => {
 				updatingStatus = false;
@@ -224,14 +229,13 @@
 		);
 	}
 
-	$: users = sortDropdownUsers($page.data.users);
-
 	/**
 	 * @param {import('fractal-components/types/api').User[]} users
 	 */
 	function sortDropdownUsers(users) {
-		const usersCopy = /** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
-		sortUsers(usersCopy, $page.data.userInfo.id, false);
+		const usersCopy =
+			/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
+		sortUsers(usersCopy, currentUserId, false);
 		return usersCopy;
 	}
 </script>
@@ -261,7 +265,7 @@
 				<div class="col-9">
 					<select class="form-select" bind:value={userId} id="user">
 						<option value="">All</option>
-						{#each users as user}
+						{#each users as user (user.id)}
 							<option value={user.id}>{user.email}</option>
 						{/each}
 					</select>
@@ -352,66 +356,70 @@
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" on:click={searchJobs} disabled={searching}>
+	<button class="btn btn-primary mt-4" onclick={searchJobs} disabled={searching}>
 		{#if searching}
-			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
-			<i class="bi bi-search" />
+			<i class="bi bi-search"></i>
 		{/if}
 		Search jobs
 	</button>
-	<button class="btn btn-warning mt-4" on:click={resetSearchFields} disabled={searching}>
+	<button class="btn btn-warning mt-4" onclick={resetSearchFields} disabled={searching}>
 		Reset
 	</button>
 
-	<div id="searchError" class="mt-3" />
+	<div id="searchError" class="mt-3"></div>
 
 	<div class:d-none={!searched}>
 		<p class="text-center">
 			The query returned {jobs.length} matching {jobs.length !== 1 ? 'jobs' : 'job'}
 		</p>
 		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
-			<svelte:fragment slot="buttons">
-				<button class="btn btn-outline-secondary" on:click={downloadCSV}>
-					<i class="bi-download" /> Download CSV
+			{#snippet buttons()}
+				<button class="btn btn-outline-secondary" onclick={downloadCSV}>
+					<i class="bi-download"></i> Download CSV
 				</button>
-			</svelte:fragment>
-			<svelte:fragment slot="edit-status" let:row>
+			{/snippet}
+			{#snippet editStatus(row)}
 				{#if row.status === 'submitted'}
 					&nbsp;
-					<button class="btn btn-link p-0" on:click={() => openEditStatusModal(row)}>
-						<i class="bi bi-pencil" />
+					<button
+						class="btn btn-link p-0"
+						onclick={() => openEditStatusModal(row)}
+						aria-label="Edit status"
+					>
+						<i class="bi bi-pencil"></i>
 					</button>
 				{/if}
-			</svelte:fragment>
+			{/snippet}
 		</JobsList>
 	</div>
 </div>
 
 <Modal id="editJobStatusModal" bind:this={statusModal} centered={true} size="md">
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		{#if jobInEditing}
 			<h1 class="h5 modal-title flex-grow-1">Editing job #{jobInEditing.id}</h1>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editJobStatusModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-editJobStatusModal"></div>
 		<div class="alert alert-warning">
-			<i class="bi bi-exclamation-triangle" />
+			<i class="bi bi-exclamation-triangle"></i>
 			<strong>Warning</strong>: this operation will not cancel job execution but only modify its
 			status in the database
 		</div>
 		<div class="d-flex justify-content-center">
-			<button class="btn btn-danger" on:click={updateJobStatus} disabled={updatingStatus}>
+			<button class="btn btn-danger" onclick={updateJobStatus} disabled={updatingStatus}>
 				{#if updatingStatus}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
 				Set status to failed
 			</button>
 			&nbsp;
 			<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 		</div>
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <style>

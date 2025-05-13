@@ -2,20 +2,43 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onMount, tick } from 'svelte';
 
-	export let id;
-	export let onOpen = () => {};
-	export let onClose = () => {};
-	/** @type {'sm'|'md'|'lg'|'xl'|undefined} */
-	export let size = undefined;
-	export let fullscreen = false;
-	export let centered = false;
-	export let scrollable = false;
-	export let bodyCss = '';
+	
 	// Set to false to avoid issues in modals containing slim-select dropdowns
-	// As a side effect, it prevents closing the modal with the esc key, unless the user has clicked inside the modal before
-	export let focus = true;
-	// Automatically set the focus on the first input element inside the modal when the modal is shown
-	export let inputAutofocus = true;
+	
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} id
+	 * @property {any} [onOpen]
+	 * @property {any} [onClose]
+	 * @property {'sm'|'md'|'lg'|'xl'|undefined} [size]
+	 * @property {boolean} [fullscreen]
+	 * @property {boolean} [centered]
+	 * @property {boolean} [scrollable]
+	 * @property {string} [bodyCss]
+	 * @property {boolean} [focus] - As a side effect, it prevents closing the modal with the esc key, unless the user has clicked inside the modal before
+	 * @property {boolean} [inputAutofocus] - Automatically set the focus on the first input element inside the modal when the modal is shown
+	 * @property {import('svelte').Snippet} [header]
+	 * @property {import('svelte').Snippet} [body]
+	 * @property {import('svelte').Snippet} [footer]
+	 */
+
+	/** @type {Props} */
+	let {
+		id,
+		onOpen = () => {},
+		onClose = () => {},
+		size = undefined,
+		fullscreen = false,
+		centered = false,
+		scrollable = false,
+		bodyCss = '',
+		focus = true,
+		inputAutofocus = true,
+		header,
+		body,
+		footer
+	} = $props();
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
@@ -137,15 +160,15 @@
 	>
 		<div class="modal-content">
 			<div class="modal-header">
-				<slot name="header" />
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+				{@render header?.()}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body {bodyCss}">
-				<slot name="body" />
+				{@render body?.()}
 			</div>
-			{#if !!$$slots.footer}
+			{#if !!footer}
 				<div class="modal-footer">
-					<slot name="footer" />
+					{@render footer?.()}
 				</div>
 			{/if}
 		</div>

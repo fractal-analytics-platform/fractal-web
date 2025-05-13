@@ -2,19 +2,21 @@
 	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {number} */
-	export let projectId;
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
-	export let workflow;
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} projectId
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} workflowUpdater
+	 */
 
-	/** @type {(workflow: import('fractal-components/types/api').WorkflowV2) => void} */
-	export let workflowUpdater;
+	/** @type {Props} */
+	let { projectId, workflow, workflowUpdater } = $props();
 
-	/** @type {Modal} */
-	let editWorkflowTasksOrderModal;
+	/** @type {Modal|undefined} */
+	let editWorkflowTasksOrderModal = $state();
 
 	/** @type {{id: number, name: string}[]} */
-	let editableTasksList = [];
+	let editableTasksList = $state([]);
 
 	// used to hide drag and drop ghost image
 	let transparentImage;
@@ -27,7 +29,7 @@
 			id: wt.id,
 			name: wt.task.name
 		}));
-		editWorkflowTasksOrderModal.show();
+		editWorkflowTasksOrderModal?.show();
 	}
 
 	/**
@@ -56,7 +58,7 @@
 		}
 	}
 
-	let workflowTaskSorting = false;
+	let workflowTaskSorting = $state(false);
 
 	/**
 	 * Reorders a project's workflow in the server
@@ -87,17 +89,17 @@
 		if (response.ok) {
 			console.log('Workflow task order updated');
 			workflowUpdater(result);
-			editWorkflowTasksOrderModal.toggle();
+			editWorkflowTasksOrderModal?.toggle();
 		} else {
 			console.error('Workflow task order not updated', result);
-			editWorkflowTasksOrderModal.displayErrorAlert(result);
+			editWorkflowTasksOrderModal?.displayErrorAlert(result);
 		}
 	}
 
 	/** @type {number|undefined} */
-	let draggedWftId = undefined;
+	let draggedWftId = $state(undefined);
 	/** @type {number|undefined} */
-	let draggedWftIndex = undefined;
+	let draggedWftIndex = $state(undefined);
 
 	/**
 	 * @param {number} workflowTaskId
@@ -169,11 +171,11 @@
 </script>
 
 <Modal id="editWorkflowTasksOrderModal" centered={true} bind:this={editWorkflowTasksOrderModal}>
-	<svelte:fragment slot="header">
+	{#snippet header()}
 		<h5 class="modal-title">Edit workflow tasks order</h5>
-	</svelte:fragment>
-	<svelte:fragment slot="body">
-		<div id="errorAlert-editWorkflowTasksOrderModal" />
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-editWorkflowTasksOrderModal"></div>
 		{#if workflow !== undefined && editableTasksList.length == 0}
 			<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 		{:else if workflow !== undefined}
@@ -182,10 +184,10 @@
 				id="workflow-tasks-order"
 				role="region"
 				tabindex="-1"
-				on:dragover={handleDragOver}
-				on:drop={handleDragEnd}
+				ondragover={handleDragOver}
+				ondrop={handleDragEnd}
 			>
-				{#each editableTasksList as workflowTask, i}
+				{#each editableTasksList as workflowTask, i (workflowTask.id)}
 					<div
 						class="btn w-100 mt-2 border border-secondary btn-draggable"
 						data-fs-target={workflowTask.id}
@@ -194,27 +196,30 @@
 						tabindex="0"
 						class:active={draggedWftIndex === i}
 						class:dragged={workflowTask.id === draggedWftId}
-						on:dragstart={(event) => handleDragStart(workflowTask.id, i, event)}
-						on:dragend={handleDragEnd}
+						ondragstart={(event) => handleDragStart(workflowTask.id, i, event)}
+						ondragend={handleDragEnd}
 					>
 						{workflowTask.name}
 					</div>
 				{/each}
 			</div>
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="footer">
+	{/snippet}
+	{#snippet footer()}
 		<button
 			class="btn btn-primary"
-			on:click|preventDefault={handleWorkflowOrderUpdate}
+			onclick={(e) => {
+				e.preventDefault();
+				handleWorkflowOrderUpdate();
+			}}
 			disabled={workflowTaskSorting}
 		>
 			{#if workflowTaskSorting}
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 			{/if}
 			Save
 		</button>
-	</svelte:fragment>
+	{/snippet}
 </Modal>
 
 <style>
