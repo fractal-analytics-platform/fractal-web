@@ -26,6 +26,7 @@
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
+	import { writable } from 'svelte/store';
 
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
@@ -486,14 +487,7 @@
 		return updateCandidates;
 	}
 
-	let newVersionsCount = $state(0);
-	/**
-	 * Used to receive new version count from VersionUpdate component.
-	 * @param count {number}
-	 */
-	async function updateNewVersionsCount(count) {
-		newVersionsCount = count;
-	}
+	const newVersionsCount = writable(0);
 
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = $state({});
@@ -1013,8 +1007,8 @@
 											aria-current={workflowTabContextId === 4}
 										>
 											Version
-											{#if newVersionsCount}
-												<span class="badge bg-primary rounded-pill">{newVersionsCount}</span>
+											{#if $newVersionsCount}
+												<span class="badge bg-primary rounded-pill">{$newVersionsCount}</span>
 											{/if}
 										</button>
 									</li>
@@ -1103,7 +1097,7 @@
 										workflowTask={selectedWorkflowTask}
 										updateWorkflowCallback={taskUpdated}
 										updateCandidates={newVersionsMap[selectedWorkflowTask.task_id] || []}
-										{updateNewVersionsCount}
+										{newVersionsCount}
 									/>
 								{/if}
 							</div>

@@ -24,6 +24,7 @@ function createFetchResponse(data) {
 
 // The component to be tested must be imported after the mock setup
 import VersionUpdate from '../../src/lib/components/v2/workflow/VersionUpdate.svelte';
+import { writable } from 'svelte/store';
 
 const newArgsSchema = {
 	title: 'MyTask',
@@ -700,7 +701,7 @@ function renderVersionUpdate(task, workflowTask, updateCandidates) {
 			workflowTask,
 			updateCandidates,
 			updateWorkflowCallback: nop,
-			updateNewVersionsCount: nop
+			newVersionsCount: writable(0)
 		}
 	});
 }

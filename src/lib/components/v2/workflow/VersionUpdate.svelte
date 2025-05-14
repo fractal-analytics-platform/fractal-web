@@ -14,11 +14,11 @@
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {Array<{ task_id: number, version: string }>} updateCandidates
 	 * @property {(workflowTask: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowCallback
-	 * @property {(count: number) => Promise<void>} updateNewVersionsCount
+	 * @property {import('svelte/store').Writable<number>} newVersionsCount
 	 */
 
 	/** @type {Props} */
-	let { workflowTask, updateCandidates, updateWorkflowCallback, updateNewVersionsCount } = $props();
+	let { workflowTask, updateCandidates, updateWorkflowCallback, newVersionsCount } = $props();
 
 	/** @type {VersionUpdateFixArgs|undefined} */
 	let fixArgsComponentNonParallel = $state();
@@ -40,20 +40,13 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	async function setup() {
+	function setup() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
 		selectedUpdateVersion = '';
 		fixArgsComponentNonParallel?.reset();
 		fixArgsComponentParallel?.reset();
-
-		await tick(); // wait taskHasArgsSchema is set
-		if (!taskHasArgsSchema) {
-			return;
-		}
-
-		await updateNewVersionsCount(updateCandidates.length);
 	}
 
 	/**
@@ -195,6 +188,10 @@
 
 	$effect(() => {
 		loadSelectedTask(selectedUpdateVersion);
+	});
+
+	$effect(() => {
+		newVersionsCount.set(updateCandidates.length);
 	});
 </script>
 
