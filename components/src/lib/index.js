@@ -6,7 +6,6 @@ import {
 	getValidationErrorMessage,
 	stripNullAndEmptyObjectsAndArrays
 } from './common/utils';
-import { greatestVersionDesc, greatestVersionAsc } from './common/version';
 import {
 	isCompoundType,
 	isNonParallelType,
@@ -34,8 +33,6 @@ export {
 	PropertyDescription,
 	detectSchemaVersion,
 	FilteredTasksTable,
-	greatestVersionDesc,
-	greatestVersionAsc,
 	isCompoundType,
 	isNonParallelType,
 	isParallelType,

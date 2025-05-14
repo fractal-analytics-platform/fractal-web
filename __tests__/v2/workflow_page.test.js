@@ -56,21 +56,6 @@ describe('Workflow page', () => {
 				status: 200,
 				json: async () => {
 					switch (url) {
-						case '/api/v2/task-group?only_active=false':
-							return [
-								{
-									id: 1,
-									pkg_name: 'group1',
-									version: null,
-									task_list: [
-										{
-											id: 1,
-											name: 'test',
-											taskgroupv2_id: 1
-										}
-									]
-								}
-							];
 						case '/api/v2/project/1/dataset/1':
 							return { id: 1, name: 'test' };
 						case '/api/v2/project/1/status?dataset_id=1&workflow_id=1':
@@ -97,6 +82,8 @@ describe('Workflow page', () => {
 							};
 						case '/api/auth/current-user/settings':
 							return { slurm_accounts: [] };
+						case '/api/v2/project/1/workflow/1/version-update-candidates':
+							return [];
 						default:
 							throw Error(`Unexpected API call: ${url}`);
 					}

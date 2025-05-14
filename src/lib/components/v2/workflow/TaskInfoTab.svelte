@@ -1,16 +1,13 @@
 <script>
 	import { formatMarkdown } from '$lib/common/component_utilities';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("fractal-components/types/api").TaskV2} task
-	 * @property {string | null} taskVersion
 	 */
 
 	/** @type {Props} */
-	let { task, taskVersion } = $props();
+	let { task } = $props();
 </script>
 
 <ul class="list-group">
@@ -19,7 +16,7 @@
 	<li class="list-group-item list-group-item-light fw-bold">Type</li>
 	<li class="list-group-item">{task.type}</li>
 	<li class="list-group-item list-group-item-light fw-bold">Version</li>
-	<li class="list-group-item">{taskVersion || '–'}</li>
+	<li class="list-group-item">{task.version || '–'}</li>
 	<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
 	<li class="list-group-item">
 		{#if task.docs_link}
