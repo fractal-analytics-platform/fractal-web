@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 
 // Mocking the page store
 vi.mock('$app/state', () => {
@@ -24,6 +24,7 @@ function createFetchResponse(data) {
 
 // The component to be tested must be imported after the mock setup
 import VersionUpdate from '../../src/lib/components/v2/workflow/VersionUpdate.svelte';
+import { writable } from 'svelte/store';
 
 const newArgsSchema = {
 	title: 'MyTask',
@@ -49,6 +50,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 1,
 				name: 'My Task',
+				version: '1.2.3',
 				type: 'non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
@@ -65,6 +67,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 2,
 				name: 'My Task',
+				version: '1.2.4',
 				type: 'non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
@@ -81,6 +84,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 3,
 				name: 'My Task',
+				version: '2.0.0',
 				type: 'non_parallel',
 				args_schema_non_parallel: newArgsSchema,
 				args_schema_parallel: null,
@@ -97,6 +101,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 3,
 				name: 'My Task',
+				version: '2.5.0',
 				type: 'compound',
 				args_schema_non_parallel: {},
 				args_schema_parallel: {},
@@ -113,6 +118,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 5,
 				name: 'My Other Task',
+				version: '1.2.3',
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: {},
@@ -129,6 +135,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 6,
 				name: 'My Other Task',
+				version: '1.3.0',
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: {},
@@ -145,6 +152,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 7,
 				name: 'null version task',
+				version: null,
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: {},
@@ -161,6 +169,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 8,
 				name: 'no args schema task',
+				version: '1.5.0',
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: null,
@@ -177,6 +186,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 9,
 				name: 'task_default_values',
+				version: '0.0.1',
 				type: 'non_parallel',
 				args_schema_non_parallel: {
 					title: 'task_default_values',
@@ -203,6 +213,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 10,
 				name: 'task_default_values',
+				version: '0.0.2',
 				type: 'non_parallel',
 				args_schema_non_parallel: {
 					title: 'task_default_values',
@@ -237,6 +248,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 11,
 				name: 'test_converter_compound',
+				version: '1.4.2',
 				type: 'compound',
 				args_schema_non_parallel: {},
 				args_schema_parallel: {},
@@ -253,6 +265,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 12,
 				name: 'test_converter_compound',
+				version: '1.5.0',
 				type: 'converter_compound',
 				args_schema_non_parallel: {},
 				args_schema_parallel: {},
@@ -269,6 +282,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 13,
 				name: 'test_converter_non_parallel',
+				version: '1.4.2',
 				type: 'non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
@@ -285,6 +299,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 			{
 				id: 14,
 				name: 'test_converter_non_parallel',
+				version: '1.5.0',
 				type: 'converter_non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
@@ -295,8 +310,11 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 	}
 ]);
 
-function mockTaskGroupsList() {
-	/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue(createFetchResponse(taskGroups));
+/**
+ * @param {import('fractal-components/types/api').TaskV2} task
+ */
+function mockTaskRequest(task) {
+	/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue(createFetchResponse(task));
 }
 
 /**
@@ -331,8 +349,13 @@ describe('VersionUpdate', () => {
 
 	it('update task without changing the arguments', async () => {
 		const task = getTask('My Task', '1.2.3');
+		const newTask = getTask('My Task', '1.2.4');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 2, getMockedWorkflowTask())
+			await checkVersions(task, 2, getMockedWorkflowTask(), [
+				{ task_id: 3, version: '2.0.0' },
+				{ task_id: newTask.id, version: newTask.version }
+			])
 		);
 		expect(versions[0]).toBe('2.0.0');
 		expect(versions[1]).toBe('1.2.4');
@@ -341,21 +364,30 @@ describe('VersionUpdate', () => {
 
 		/** @type {HTMLButtonElement} */
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn.disabled).eq(false);
+		await waitFor(() => expect(btn).toBeEnabled());
 		await fireEvent.click(btn);
 	});
 
 	it('update task fixing the arguments', async () => {
 		const task = getTask('My Task', '1.2.4');
+		const newTask = getTask('My Task', '2.0.0');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, {
-				...getMockedWorkflowTask(),
-				args_non_parallel: { extra_property: 1, changed_property: 'x' }
-			})
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					args_non_parallel: { extra_property: 1, changed_property: 'x' }
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
 		);
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
+
+		await screen.findAllByRole('button', { name: 'more' });
 
 		/** @type {HTMLButtonElement[]} */
 		const [moreLink1, moreLink2, moreLink3, checkBtn, cancelBtn, updateBtnDisabled] =
@@ -390,19 +422,26 @@ describe('VersionUpdate', () => {
 
 	it('use the cancel button when fixing the arguments', async () => {
 		const task = getTask('My Task', '1.2.4');
+		const newTask = getTask('My Task', '2.0.0');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, {
-				...getMockedWorkflowTask(),
-				args_non_parallel: { changed_property: 'x' }
-			})
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					args_non_parallel: { changed_property: 'x' }
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
 		);
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		expect(/** @type {HTMLInputElement} */ (screen.getByRole('textbox')).value).eq(
-			JSON.stringify({ changed_property: 'x' }, null, 2)
-		);
+		const textbox = await screen.findByRole('textbox');
+
+		expect(textbox).toHaveValue(JSON.stringify({ changed_property: 'x' }, null, 2));
 
 		/** @type {HTMLButtonElement} */
 		const cancelBtnDisabled = screen.getByRole('button', { name: 'Cancel' });
@@ -424,17 +463,21 @@ describe('VersionUpdate', () => {
 
 	it('trying to fix the arguments with invalid JSON', async () => {
 		const task = getTask('My Task', '1.2.4');
+		const newTask = getTask('My Task', '2.0.0');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, getMockedWorkflowTask())
+			await checkVersions(task, 1, getMockedWorkflowTask(), [
+				{ task_id: newTask.id, version: newTask.version }
+			])
 		);
 		expect(versions[0]).toBe('2.0.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
 
-		const checkBtn = screen.getByRole('button', { name: 'Check' });
+		const checkBtn = await screen.findByRole('button', { name: 'Check' });
 		/** @type {HTMLButtonElement} */
 		const updateBtn = screen.getByRole('button', { name: 'Update' });
-		expect(updateBtn.disabled).eq(true);
+		await waitFor(() => expect(updateBtn).toBeEnabled());
 
 		await fireEvent.input(screen.getByRole('textbox'), {
 			target: { value: '}{' }
@@ -447,11 +490,11 @@ describe('VersionUpdate', () => {
 
 	it('no new versions available', async () => {
 		const task = getTask('My Other Task', '1.3.0');
-		await checkVersions(task, 0, getMockedWorkflowTask());
+		await checkVersions(task, 0, getMockedWorkflowTask(), []);
 	});
 
 	it('display warning if task has no version', () => {
-		renderVersionUpdate(getTask('null version task', null), getMockedWorkflowTask());
+		renderVersionUpdate(getTask('null version task', null), getMockedWorkflowTask(), []);
 		expect(
 			screen.getByText(
 				'It is not possible to check for new versions because task version is not set.'
@@ -460,7 +503,7 @@ describe('VersionUpdate', () => {
 	});
 
 	it('display warning if task has no args_schema', () => {
-		renderVersionUpdate(getTask('no args schema task', '1.5.0'), getMockedWorkflowTask());
+		renderVersionUpdate(getTask('no args schema task', '1.5.0'), getMockedWorkflowTask(), []);
 		expect(
 			screen.getByText(
 				'It is not possible to check for new versions because task has no args_schema.'
@@ -470,15 +513,19 @@ describe('VersionUpdate', () => {
 
 	it('update task with default parameters and no previous values', async () => {
 		const task = getTask('task_default_values', '0.0.1');
+		const newTask = getTask('task_default_values', '0.0.2');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, getMockedWorkflowTask())
+			await checkVersions(task, 1, getMockedWorkflowTask(), [
+				{ task_id: newTask.id, version: newTask.version }
+			])
 		);
 		expect(versions[0]).toBe('0.0.2');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn).toBeEnabled();
+		await waitFor(() => expect(btn).toBeEnabled());
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -499,22 +546,29 @@ describe('VersionUpdate', () => {
 
 	it('update task with default parameters and previous values', async () => {
 		const task = getTask('task_default_values', '0.0.1');
+		const newTask = getTask('task_default_values', '0.0.2');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, {
-				...getMockedWorkflowTask(),
-				...{
-					args_non_parallel: {
-						default_boolean1: true
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					...{
+						args_non_parallel: {
+							default_boolean1: true
+						}
 					}
-				}
-			})
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
 		);
 		expect(versions[0]).toBe('0.0.2');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn).toBeEnabled();
+		await waitFor(() => expect(btn).toBeEnabled());
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -535,21 +589,28 @@ describe('VersionUpdate', () => {
 
 	it('update compound to converter_compound', async () => {
 		const task = getTask('test_converter_compound', '1.4.2');
+		const newTask = getTask('test_converter_compound', '1.5.0');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, {
-				...getMockedWorkflowTask(),
-				...{
-					args_non_parallel: {},
-					args_parallel: {}
-				}
-			})
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					...{
+						args_non_parallel: {},
+						args_parallel: {}
+					}
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
 		);
 		expect(versions[0]).toBe('1.5.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn).toBeEnabled();
+		await waitFor(() => expect(btn).toBeEnabled());
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -566,20 +627,27 @@ describe('VersionUpdate', () => {
 
 	it('update non_parallel to converter_non_parallel', async () => {
 		const task = getTask('test_converter_non_parallel', '1.4.2');
+		const newTask = getTask('test_converter_non_parallel', '1.5.0');
+		mockTaskRequest(newTask);
 		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, {
-				...getMockedWorkflowTask(),
-				...{
-					args_non_parallel: {}
-				}
-			})
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					...{
+						args_non_parallel: {}
+					}
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
 		);
 		expect(versions[0]).toBe('1.5.0');
 
 		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
 
 		const btn = screen.getByRole('button', { name: 'Update' });
-		expect(btn).toBeEnabled();
+		await waitFor(() => expect(btn).toBeEnabled());
 		await fireEvent.click(btn);
 
 		expect(fetch).toHaveBeenNthCalledWith(
@@ -599,10 +667,11 @@ describe('VersionUpdate', () => {
  * @param {import('fractal-components/types/api').TaskV2} task
  * @param {number} expectedCount
  * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @param {Array<{ task_id: number, version: string }>} updateCandidates
  * @returns {Promise<string[]|undefined>}
  */
-async function checkVersions(task, expectedCount, workflowTask) {
-	const result = renderVersionUpdate(task, workflowTask);
+async function checkVersions(task, expectedCount, workflowTask, updateCandidates) {
+	const result = renderVersionUpdate(task, workflowTask, updateCandidates);
 
 	// triggers the updates
 	await new Promise((resolve) => setTimeout(resolve));
@@ -621,17 +690,18 @@ async function checkVersions(task, expectedCount, workflowTask) {
 /**
  * @param {import('fractal-components/types/api').TaskV2} task
  * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @param {Array<{ task_id: number, version: string }>} updateCandidates
  * @returns
  */
-function renderVersionUpdate(task, workflowTask) {
+function renderVersionUpdate(task, workflowTask, updateCandidates) {
 	workflowTask.task = task;
 	const nop = async function () {};
-	mockTaskGroupsList();
 	return render(VersionUpdate, {
 		props: {
 			workflowTask,
+			updateCandidates,
 			updateWorkflowCallback: nop,
-			updateNewVersionsCount: nop
+			newVersionsCount: writable(0)
 		}
 	});
 }

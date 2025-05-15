@@ -10,7 +10,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
-	import { getAllNewVersions } from '$lib/components/v2/workflow/version-checker';
 	import ImagesStatus from '$lib/components/jobs/ImagesStatus.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError } from '$lib/common/job_utilities';
@@ -27,6 +26,7 @@
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
+	import { writable } from 'svelte/store';
 
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
@@ -105,10 +105,8 @@
 	/** @type {TypeFiltersFlowModal|undefined} */
 	let typeFiltersFlowModal = $state();
 
-	/** @type {{ [id: string]: import('fractal-components/types/api').TaskV2[] }} */
+	/** @type {{ [id: string]: Array<{ task_id: number, version: string }> }} */
 	let newVersionsMap = $state({});
-	/** @type {{ [id: string]: string | null }} */
-	let tasksVersions = $state({});
 
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob = $state();
@@ -460,23 +458,36 @@
 	}
 
 	async function checkNewVersions() {
-		if (workflow) {
-			const { updateCandidates, enrichedTasks } = await getAllNewVersions(
-				workflow.task_list.map((wt) => wt.task)
-			);
-			newVersionsMap = updateCandidates;
-			tasksVersions = Object.fromEntries(enrichedTasks.map((t) => [t.id, t.version]));
+		if (!workflow) {
+			return;
 		}
+		newVersionsMap = await getNewVersionsForWorkflow(workflow);
 	}
 
-	let newVersionsCount = $state(0);
 	/**
-	 * Used to receive new version count from VersionUpdate component.
-	 * @param count {number}
+	 * @param {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @returns {Promise<{ [id: string]: Array<{ task_id: number, version: string }> }>}
 	 */
-	async function updateNewVersionsCount(count) {
-		newVersionsCount = count;
+	async function getNewVersionsForWorkflow(workflow) {
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/version-update-candidates`
+		);
+
+		/** @type {Array<Array<{ task_id: number, version: string }>>} */
+		const updates = await response.json();
+
+		/** @type {{ [id: string]: Array<{ task_id: number, version: string }> }} */
+		const updateCandidates = {};
+
+		for (let i = 0; i < updates.length; i++) {
+			const task = workflow.task_list[i].task;
+			updateCandidates[task.id] = updates[i];
+		}
+
+		return updateCandidates;
 	}
+
+	const newVersionsCount = writable(0);
 
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = $state({});
@@ -996,8 +1007,8 @@
 											aria-current={workflowTabContextId === 4}
 										>
 											Version
-											{#if newVersionsCount}
-												<span class="badge bg-primary rounded-pill">{newVersionsCount}</span>
+											{#if $newVersionsCount}
+												<span class="badge bg-primary rounded-pill">{$newVersionsCount}</span>
 											{/if}
 										</button>
 									</li>
@@ -1059,10 +1070,7 @@
 							<div id="info-tab" class="tab-pane show active">
 								<div class="card-body">
 									{#if selectedWorkflowTask}
-										<TaskInfoTab
-											task={selectedWorkflowTask.task}
-											taskVersion={tasksVersions[selectedWorkflowTask.task.id]}
-										/>
+										<TaskInfoTab task={selectedWorkflowTask.task} />
 									{/if}
 								</div>
 							</div>
@@ -1088,7 +1096,8 @@
 									<VersionUpdate
 										workflowTask={selectedWorkflowTask}
 										updateWorkflowCallback={taskUpdated}
-										{updateNewVersionsCount}
+										updateCandidates={newVersionsMap[selectedWorkflowTask.task_id] || []}
+										{newVersionsCount}
 									/>
 								{/if}
 							</div>

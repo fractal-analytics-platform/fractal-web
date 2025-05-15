@@ -7,18 +7,18 @@
 	import { page } from '$app/state';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
-	import { getNewVersions } from './version-checker';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {Array<{ task_id: number, version: string }>} updateCandidates
 	 * @property {(workflowTask: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowCallback
-	 * @property {(count: number) => Promise<void>} updateNewVersionsCount
+	 * @property {import('svelte/store').Writable<number>} newVersionsCount
 	 */
 
 	/** @type {Props} */
-	let { workflowTask, updateWorkflowCallback, updateNewVersionsCount } = $props();
+	let { workflowTask, updateCandidates, updateWorkflowCallback, newVersionsCount } = $props();
 
 	/** @type {VersionUpdateFixArgs|undefined} */
 	let fixArgsComponentNonParallel = $state();
@@ -33,39 +33,42 @@
 
 	let displayCheckAndCancelBtn = $state(true);
 
-	let taskVersion = $state('');
-
-	/** @type {Array<import('fractal-components/types/api').TaskV2 & { version: string }>} */
-	let updateCandidates = $state([]);
 	let selectedUpdateVersion = $state('');
+	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
+	let updateCandidate = $state();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	async function checkNewVersions() {
+	function setup() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		updateCandidates = [];
 		selectedUpdateVersion = '';
 		fixArgsComponentNonParallel?.reset();
 		fixArgsComponentParallel?.reset();
+	}
 
-		await tick(); // wait taskHasArgsSchema is set
-		if (!taskHasArgsSchema) {
+	/**
+	 * @param {string} selectedVersion
+	 */
+	async function loadSelectedTask(selectedVersion) {
+		const taskId = updateCandidates.find((u) => u.version === selectedVersion)?.task_id;
+
+		if (taskId === undefined) {
 			return;
 		}
 
-		try {
-			const newVersionsResult = await getNewVersions(workflowTask.task);
-			updateCandidates = newVersionsResult.updateCandidates;
-			taskVersion = newVersionsResult.enrichedTask.version || '';
-		} catch (error) {
-			errorAlert = displayStandardErrorAlert(error, 'versionUpdateError');
-			return;
+		const response = await fetch(`/api/v2/task/${taskId}`);
+		if (response.ok) {
+			updateCandidate = await response.json();
+			await checkArgumentsWithNewSchema();
+		} else {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'versionUpdateError'
+			);
 		}
-
-		await updateNewVersionsCount(updateCandidates.length);
 	}
 
 	async function checkArgumentsWithNewSchema() {
@@ -127,7 +130,11 @@
 	}
 
 	async function replaceWorkflowTask() {
-		const newTaskId = updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0].id;
+		if (!updateCandidate) {
+			return;
+		}
+
+		const newTaskId = updateCandidate.id;
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -152,14 +159,6 @@
 		return await response.json();
 	}
 
-	function getSelectedUpdateCandidate() {
-		const selectedCandidate = updateCandidates.filter((t) => t.version === selectedUpdateVersion);
-		if (selectedCandidate.length === 1) {
-			return selectedCandidate[0];
-		}
-		return null;
-	}
-
 	/** @type {number|undefined} */
 	let previousTaskId = $state();
 	const task = $derived(workflowTask.task);
@@ -167,23 +166,18 @@
 	$effect(() => {
 		if (task.id !== previousTaskId) {
 			previousTaskId = task.id;
-			checkNewVersions();
+			setup();
 		}
 	});
 
-	let updateCandidate = $derived(
-		selectedUpdateVersion === ''
-			? null
-			: updateCandidates.filter((t) => t.version === selectedUpdateVersion)[0]
-	);
-	let cancelEnabled = $derived(nonParallelArgsChanged || parallelArgsChanged);
-	let taskHasArgsSchema = $derived(
+	const cancelEnabled = $derived(nonParallelArgsChanged || parallelArgsChanged);
+	const taskHasArgsSchema = $derived(
 		!!(workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel)
 	);
-	let updateCandidateType = $derived(
+	const updateCandidateType = $derived(
 		updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel'
 	);
-	let canBeUpdated = $derived(
+	const canBeUpdated = $derived(
 		selectedUpdateVersion &&
 			updateCandidate &&
 			(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
@@ -191,38 +185,37 @@
 				((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
 					parallelCanBeUpdated))
 	);
+
+	$effect(() => {
+		loadSelectedTask(selectedUpdateVersion);
+	});
+
+	$effect(() => {
+		newVersionsCount.set(updateCandidates.length);
+	});
 </script>
 
 <div>
 	<div id="versionUpdateError"></div>
-	{#if taskHasArgsSchema && taskVersion}
+	{#if taskHasArgsSchema && task.version}
 		{#if updateCandidates.length > 0}
 			<label class="form-label" for="updateSelection">
-				New versions of this task exist (current version is {taskVersion}):
+				New versions of this task exist (current version is {task.version}):
 			</label>
-			<select
-				class="form-select"
-				bind:value={selectedUpdateVersion}
-				id="updateSelection"
-				onchange={checkArgumentsWithNewSchema}
-			>
+			<select class="form-select" bind:value={selectedUpdateVersion} id="updateSelection">
 				<option value="">Select...</option>
-				{#each updateCandidates as update (update.id)}
+				{#each updateCandidates as update (update.task_id)}
 					<option>{update.version}</option>
 				{/each}
 			</select>
-			{#if selectedUpdateVersion}
+			{#if selectedUpdateVersion && updateCandidate}
 				<div class="alert alert-warning mt-3">
-					You are updating version from {taskVersion} to {selectedUpdateVersion}<br />
-					{#if getSelectedUpdateCandidate()?.docs_link}
+					You are updating version from {task.version} to {selectedUpdateVersion}<br />
+					{#if updateCandidate.docs_link}
 						Information on different version may be found on
-						<a href={getSelectedUpdateCandidate()?.docs_link} target="_blank">
-							task documentation
-						</a>
+						<a href={updateCandidate.docs_link} target="_blank"> task documentation </a>
 					{/if}
 				</div>
-			{/if}
-			{#if updateCandidate}
 				{#if isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)}
 					<VersionUpdateFixArgs
 						{workflowTask}
@@ -243,8 +236,6 @@
 						bind:this={fixArgsComponentParallel}
 					/>
 				{/if}
-			{/if}
-			{#if updateCandidate}
 				{#if displayCheckAndCancelBtn}
 					<button type="button" class="btn btn-warning mt-3" onclick={check}> Check </button>
 					&nbsp;
@@ -269,7 +260,7 @@
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task has no args_schema.
 		</div>
-	{:else if !taskVersion}
+	{:else if !task.version}
 		<div class="alert alert-warning">
 			It is not possible to check for new versions because task version is not set.
 		</div>

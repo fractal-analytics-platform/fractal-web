@@ -96,6 +96,7 @@ export type TaskV2Type =
 export type TaskV2 = {
 	id: number;
 	name: string;
+	version: string;
 	type: TaskV2Type;
 	command_non_parallel: string | null;
 	command_parallel: string | null;
