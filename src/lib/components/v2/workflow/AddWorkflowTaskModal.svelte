@@ -6,6 +6,7 @@
 	import { removeIdenticalTaskGroups } from 'fractal-components/tasks/task_group_utilities';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
+	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 
 	/**
 	 * @typedef {Object} Props
@@ -57,17 +58,32 @@
 			async () => {
 				addingTask = true;
 
+				const task = await getTask(taskId);
+
 				const headers = new Headers();
 				headers.set('Content-Type', 'application/json');
 
 				// Creating workflow task
+				const defaultData = {};
+
+				if (task.args_schema_parallel) {
+					defaultData.args_parallel = getJsonSchemaData(task.args_schema_parallel, 'pydantic_v2');
+				}
+
+				if (task.args_schema_non_parallel) {
+					defaultData.args_non_parallel = getJsonSchemaData(
+						task.args_schema_non_parallel,
+						'pydantic_v2'
+					);
+				}
+
 				const workflowTaskResponse = await fetch(
-					`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask?task_id=${taskId}`,
+					`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask?task_id=${task.id}`,
 					{
 						method: 'POST',
 						credentials: 'include',
 						headers,
-						body: JSON.stringify({})
+						body: JSON.stringify(defaultData)
 					}
 				);
 
@@ -97,6 +113,23 @@
 				addingTask = false;
 			}
 		);
+	}
+
+	/**
+	 * @param {number} taskId
+	 * @returns {Promise<import('fractal-components/types/api').TaskV2>}
+	 */
+	async function getTask(taskId) {
+		const response = await fetch(`/api/v2/task/${taskId}`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		if (!response.ok) {
+			throw await getAlertErrorFromResponse(response);
+		}
+
+		return await response.json();
 	}
 
 	/**
