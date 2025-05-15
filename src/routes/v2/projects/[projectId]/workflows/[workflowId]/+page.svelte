@@ -1037,14 +1037,27 @@
 									{/if}
 									{#if selectedWorkflowTask}
 										{#key selectedWorkflowTask}
-											<ArgumentsSchema
-												workflowTask={selectedWorkflowTask}
-												{onWorkflowTaskUpdated}
-												editable={!selectedHistoryRun}
-												bind:this={argsSchemaForm}
-												argsNonParallel={selectedHistoryRun?.workflowtask_dump.args_non_parallel}
-												argsParallel={selectedHistoryRun?.workflowtask_dump.args_parallel}
-											/>
+											{#if selectedHistoryRun}
+												<ArgumentsSchema
+													workflowTask={selectedWorkflowTask}
+													{onWorkflowTaskUpdated}
+													editable={false}
+													bind:this={argsSchemaForm}
+													argsSchemaNonParallel={selectedHistoryRun.args_schema_non_parallel}
+													argsSchemaParallel={selectedHistoryRun.args_schema_parallel}
+													argsNonParallel={selectedHistoryRun.workflowtask_dump.args_non_parallel}
+													argsParallel={selectedHistoryRun.workflowtask_dump.args_parallel}
+												/>
+											{:else}
+												<ArgumentsSchema
+													workflowTask={selectedWorkflowTask}
+													{onWorkflowTaskUpdated}
+													editable={!selectedHistoryRun}
+													bind:this={argsSchemaForm}
+													argsSchemaNonParallel={selectedWorkflowTask.task.args_schema_non_parallel}
+													argsSchemaParallel={selectedWorkflowTask.task.args_schema_parallel}
+												/>
+											{/if}
 										{/key}
 									{/if}
 								</div>

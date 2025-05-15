@@ -80,7 +80,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 2496-task-updating-should-inherit-history-status-from-old-task',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

@@ -35,6 +35,8 @@
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
 	 * @property {boolean} [editable]
+	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaNonParallel
+	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaParallel
 	 * @property {object|undefined} [argsNonParallel]
 	 * @property {object|undefined} [argsParallel]
 	 */
@@ -44,6 +46,8 @@
 		workflowTask = $bindable(),
 		onWorkflowTaskUpdated,
 		editable = true,
+		argsSchemaNonParallel = null,
+		argsSchemaParallel = null,
 		argsNonParallel = undefined,
 		argsParallel = undefined
 	} = $props();
@@ -206,8 +210,6 @@
 			unsavedChangesFormBuilderNonParallel
 	);
 	let isSchemaValid = $derived(argsSchemaVersionValid(workflowTask.task.args_schema_version));
-	let argsSchemaNonParallel = $derived(workflowTask.task.args_schema_non_parallel);
-	let argsSchemaParallel = $derived(workflowTask.task.args_schema_parallel);
 	let schemaVersion = $derived(workflowTask.task.args_schema_version);
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 </script>
