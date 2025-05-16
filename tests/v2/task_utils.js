@@ -32,10 +32,14 @@ export async function createFakeTask(page, task) {
 
 		const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
 		if (task.type === 'non_parallel' || task.type === 'compound') {
-			await page.getByRole('textbox', { name: 'Command non parallel' }).fill(command);
+			await page
+				.getByRole('textbox', { name: 'Command non parallel' })
+				.fill(task.command_non_parallel || command);
 		}
 		if (task.type === 'parallel' || task.type === 'compound') {
-			await page.getByRole('textbox', { name: 'Command parallel' }).fill(command);
+			await page
+				.getByRole('textbox', { name: 'Command parallel' })
+				.fill(task.command_parallel || command);
 		}
 
 		if (task.version) {

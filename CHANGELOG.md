@@ -3,6 +3,7 @@
 # Unreleased
 
 * Used new API endpoint to detect task version upgrade (\#792);
+* Handled arguments schema changes in workflow task runs (\#796);
 
 # 1.18.0
 
