@@ -7,6 +7,7 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
+	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -67,13 +68,14 @@
 				const defaultData = {};
 
 				if (task.args_schema_parallel) {
-					defaultData.args_parallel = getJsonSchemaData(task.args_schema_parallel, 'pydantic_v2');
+					defaultData.args_parallel = stripNullAndEmptyObjectsAndArrays(
+						getJsonSchemaData(task.args_schema_parallel, 'pydantic_v2')
+					);
 				}
 
 				if (task.args_schema_non_parallel) {
-					defaultData.args_non_parallel = getJsonSchemaData(
-						task.args_schema_non_parallel,
-						'pydantic_v2'
+					defaultData.args_non_parallel = stripNullAndEmptyObjectsAndArrays(
+						getJsonSchemaData(task.args_schema_non_parallel, 'pydantic_v2')
 					);
 				}
 
