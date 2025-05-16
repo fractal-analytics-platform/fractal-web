@@ -27,6 +27,7 @@
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
 	import { writable } from 'svelte/store';
+	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
@@ -970,7 +971,8 @@
 											class="nav-link {workflowTabContextId === 0 ? 'active' : ''}"
 											onclick={() => setWorkflowTabContextId(0)}
 											aria-current={workflowTabContextId === 0}
-											>Arguments
+										>
+											Arguments
 										</button>
 									</li>
 									<li class="nav-item">
@@ -982,22 +984,24 @@
 											Meta
 										</button>
 									</li>
-									<li class="nav-item">
-										<button
-											class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
-											onclick={() => setWorkflowTabContextId(2)}
-											aria-current={workflowTabContextId === 2}
-										>
-											Info
-										</button>
-									</li>
+									{#if selectedHistoryRun}
+										<li>
+											<button
+												class="nav-link {workflowTabContextId === 2 ? 'active' : ''}"
+												onclick={() => setWorkflowTabContextId(2)}
+												aria-current={workflowTabContextId === 2}
+											>
+												Run
+											</button>
+										</li>
+									{/if}
 									<li class="nav-item">
 										<button
 											class="nav-link {workflowTabContextId === 3 ? 'active' : ''}"
 											onclick={() => setWorkflowTabContextId(3)}
 											aria-current={workflowTabContextId === 3}
 										>
-											Types
+											Info
 										</button>
 									</li>
 									<li class="nav-item">
@@ -1005,6 +1009,15 @@
 											class="nav-link {workflowTabContextId === 4 ? 'active' : ''}"
 											onclick={() => setWorkflowTabContextId(4)}
 											aria-current={workflowTabContextId === 4}
+										>
+											Types
+										</button>
+									</li>
+									<li class="nav-item">
+										<button
+											class="nav-link {workflowTabContextId === 5 ? 'active' : ''}"
+											onclick={() => setWorkflowTabContextId(5)}
+											aria-current={workflowTabContextId === 5}
 										>
 											Version
 											{#if $newVersionsCount}
@@ -1080,6 +1093,21 @@
 								</div>
 							</div>
 						{:else if workflowTabContextId === 2}
+							<div id="run-tab" class="tab-pane show active">
+								<div class="card-body">
+									{#if selectedHistoryRun}
+										<ul class="list-group">
+											<li class="list-group-item list-group-item-light fw-bold">Started</li>
+											<li class="list-group-item">
+												<TimestampCell timestamp={selectedHistoryRun.timestamp_started} />
+											</li>
+											<li class="list-group-item list-group-item-light fw-bold">Version</li>
+											<li class="list-group-item">{selectedHistoryRun.version || '-'}</li>
+										</ul>
+									{/if}
+								</div>
+							</div>
+						{:else if workflowTabContextId === 3}
 							<div id="info-tab" class="tab-pane show active">
 								<div class="card-body">
 									{#if selectedWorkflowTask}
@@ -1087,7 +1115,7 @@
 									{/if}
 								</div>
 							</div>
-						{:else if workflowTabContextId === 3}
+						{:else if workflowTabContextId === 4}
 							{#if selectedWorkflowTask}
 								<InputFiltersTab
 									{workflow}
@@ -1101,8 +1129,8 @@
 						<div
 							id="version-tab"
 							class="tab-pane"
-							class:show={workflowTabContextId === 4}
-							class:active={workflowTabContextId === 4}
+							class:show={workflowTabContextId === 5}
+							class:active={workflowTabContextId === 5}
 						>
 							<div class="card-body">
 								{#if selectedWorkflowTask}

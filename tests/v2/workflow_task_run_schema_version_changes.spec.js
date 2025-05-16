@@ -104,6 +104,13 @@ test('Workflow task runs display different versions of arguments schema', async 
 		await expect(page.getByRole('spinbutton')).toBeDisabled();
 	});
 
+	await test.step('Check runs tab', async () => {
+		await page.getByRole('button', { name: 'Run', exact: true }).click();
+		await expect(page.locator('#run-tab').getByText('0.0.2')).toBeVisible();
+		await page.getByRole('button', { name: 'Run 1' }).click();
+		await expect(page.locator('#run-tab').getByText('0.0.1')).toBeVisible();
+	});
+
 	await test.step('Delete older task version', async () => {
 		await page.goto('/v2/tasks/management');
 		const taskRow = page.getByRole('row', { name: taskName });
