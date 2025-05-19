@@ -1051,21 +1051,23 @@
 									{#if selectedWorkflowTask}
 										{#key selectedWorkflowTask}
 											{#if selectedHistoryRun}
-												<ArgumentsSchema
-													workflowTask={selectedWorkflowTask}
-													{onWorkflowTaskUpdated}
-													editable={false}
-													bind:this={argsSchemaForm}
-													argsSchemaNonParallel={selectedHistoryRun.args_schema_non_parallel}
-													argsSchemaParallel={selectedHistoryRun.args_schema_parallel}
-													argsNonParallel={selectedHistoryRun.workflowtask_dump.args_non_parallel}
-													argsParallel={selectedHistoryRun.workflowtask_dump.args_parallel}
-												/>
+												{#key selectedHistoryRun}
+													<ArgumentsSchema
+														workflowTask={selectedWorkflowTask}
+														{onWorkflowTaskUpdated}
+														editable={false}
+														bind:this={argsSchemaForm}
+														argsSchemaNonParallel={selectedHistoryRun.args_schema_non_parallel}
+														argsSchemaParallel={selectedHistoryRun.args_schema_parallel}
+														argsNonParallel={selectedHistoryRun.workflowtask_dump.args_non_parallel}
+														argsParallel={selectedHistoryRun.workflowtask_dump.args_parallel}
+													/>
+												{/key}
 											{:else}
 												<ArgumentsSchema
 													workflowTask={selectedWorkflowTask}
 													{onWorkflowTaskUpdated}
-													editable={!selectedHistoryRun}
+													editable={true}
 													bind:this={argsSchemaForm}
 													argsSchemaNonParallel={selectedWorkflowTask.task.args_schema_non_parallel}
 													argsSchemaParallel={selectedWorkflowTask.task.args_schema_parallel}
