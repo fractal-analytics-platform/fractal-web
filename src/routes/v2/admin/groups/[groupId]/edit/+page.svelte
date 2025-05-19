@@ -138,6 +138,11 @@
 	 * @param {number} index
 	 */
 	function removeViewerPath(index) {
+		if ($viewerPathsValidationErrors['viewer_paths']) {
+			$viewerPathsValidationErrors['viewer_paths'] = $viewerPathsValidationErrors[
+				'viewer_paths'
+			].filter((_, i) => i !== index);
+		}
 		editableViewPaths = editableViewPaths.filter((_, i) => i !== index);
 	}
 

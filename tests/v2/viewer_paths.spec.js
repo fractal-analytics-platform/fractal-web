@@ -54,7 +54,7 @@ test('Viewer paths', async ({ page }) => {
 		await addViewerPathBtn.click();
 		const saveBtn = page.getByRole('button', { name: 'Save' }).first();
 		await saveBtn.click();
-		await expect(page.getByText('String should have at least 1 character')).toBeVisible();
+		await expect(page.getByText('String should have at least 1 character').first()).toBeVisible();
 		await page.getByLabel('Viewer path #1', { exact: true }).fill('/path/to/1');
 		await page.getByLabel('Viewer path #2', { exact: true }).fill('/path/to/2');
 		await saveBtn.click();
