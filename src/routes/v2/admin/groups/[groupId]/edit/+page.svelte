@@ -326,13 +326,19 @@
 			<h4 class="fw-light">Viewer paths</h4>
 			<!-- eslint-disable-next-line no-unused-vars -->
 			{#each editableViewPaths as _, i (i)}
-				<div class="input-group mb-2">
+				<div
+					class="input-group mb-2"
+					class:has-validation={$viewerPathsValidationErrors['viewer_paths'] &&
+						$viewerPathsValidationErrors['viewer_paths'][i]}
+				>
 					<input
 						type="text"
 						class="form-control"
 						id={`viewerPath-${i}`}
 						bind:value={editableViewPaths[i]}
 						aria-label={`Viewer path #${i + 1}`}
+						class:is-invalid={$viewerPathsValidationErrors['viewer_paths'] &&
+							$viewerPathsValidationErrors['viewer_paths'][i]}
 						required
 					/>
 					<button
@@ -344,11 +350,16 @@
 					>
 						<i class="bi bi-trash"></i>
 					</button>
+					{#if $viewerPathsValidationErrors['viewer_paths'] && $viewerPathsValidationErrors['viewer_paths'][i]}
+						<div class="invalid-feedback">
+							{$viewerPathsValidationErrors['viewer_paths'][i]}
+						</div>
+					{/if}
 				</div>
 			{/each}
 			<button class="btn btn-secondary mb-2" onclick={addViewerPath}>Add viewer path</button>
 			<div id="viewerPathGenericError"></div>
-			{#if $viewerPathsValidationErrors['viewer_paths']}
+			{#if $viewerPathsValidationErrors['viewer_paths'] && !Array.isArray($viewerPathsValidationErrors['viewer_paths'])}
 				<div class="alert alert-danger mb-2">
 					{$viewerPathsValidationErrors['viewer_paths']}
 				</div>
