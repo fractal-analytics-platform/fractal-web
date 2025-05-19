@@ -47,6 +47,7 @@ describe('AddSingleTask', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'test-task',
+					type: 'non_parallel',
 					command_non_parallel: 'command',
 					input_types: {},
 					output_types: {}
@@ -81,6 +82,7 @@ describe('AddSingleTask', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					name: 'test-task',
+					type: 'non_parallel',
 					command_non_parallel: 'command',
 					input_types: {},
 					output_types: {}

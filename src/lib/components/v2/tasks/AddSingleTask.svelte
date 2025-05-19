@@ -4,7 +4,13 @@
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import TypesEditor from './TypesEditor.svelte';
-	import { detectSchemaVersion, SchemaValidator } from 'fractal-components';
+	import {
+		detectSchemaVersion,
+		isCompoundType,
+		isNonParallelType,
+		isParallelType,
+		SchemaValidator
+	} from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -36,6 +42,7 @@
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-createTask', [
 		'name',
+		'type',
 		'command_non_parallel',
 		'command_parallel',
 		'version',
@@ -94,6 +101,7 @@
 
 		const bodyData = {
 			name,
+			type: taskType,
 			command_non_parallel,
 			command_parallel,
 			version,
@@ -350,40 +358,22 @@
 	}}
 >
 	<div class="row mb-1">
-		<div class="col-xl-1 col-lg-2 col-3">Task type</div>
-		<div class="col-xl-11 col-lg-8 col-9">
-			<div class="form-check form-check-inline">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="taskType"
-					id="non_parallel"
-					value="non_parallel"
-					bind:group={taskType}
-				/>
-				<label class="form-check-label" for="non_parallel"> Non parallel </label>
-			</div>
-			<div class="form-check form-check-inline">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="taskType"
-					id="parallel"
-					value="parallel"
-					bind:group={taskType}
-				/>
-				<label class="form-check-label" for="parallel">Parallel</label>
-			</div>
-			<div class="form-check form-check-inline">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="taskType"
-					id="compound"
-					value="compound"
-					bind:group={taskType}
-				/>
-				<label class="form-check-label" for="compound">Compound</label>
+		<div class="col-md-6 mb-2">
+			<div class="input-group has-validation">
+				<label for="task_type" class="input-group-text">Task type</label>
+				<select
+					class="form-select"
+					bind:value={taskType}
+					class:is-invalid={$validationErrors['type']}
+					id="task_type"
+				>
+					<option value="non_parallel">Non parallel</option>
+					<option value="parallel">Parallel</option>
+					<option value="compound">Compound</option>
+					<option value="converter_non_parallel">Converter Non Parallel</option>
+					<option value="converter_compound">Converter Compound</option>
+				</select>
+				<span class="invalid-feedback">{$validationErrors['type']}</span>
 			</div>
 		</div>
 	</div>
@@ -404,7 +394,7 @@
 			</div>
 		</div>
 	</div>
-	{#if taskType === 'non_parallel' || taskType === 'compound'}
+	{#if isNonParallelType(taskType) || isCompoundType(taskType)}
 		<div class="row">
 			<div class="col-12 mb-2">
 				<div class="input-group has-validation">
@@ -423,7 +413,7 @@
 			</div>
 		</div>
 	{/if}
-	{#if taskType === 'parallel' || taskType === 'compound'}
+	{#if isParallelType(taskType) || isCompoundType(taskType)}
 		<div class="row">
 			<div class="col-12 mb-2">
 				<div class="input-group has-validation">
@@ -468,7 +458,7 @@
 			</div>
 		</div>
 	</div>
-	{#if taskType === 'non_parallel' || taskType === 'compound'}
+	{#if isNonParallelType(taskType) || isCompoundType(taskType)}
 		<div class="row">
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
@@ -526,7 +516,7 @@
 			</div>
 		</div>
 	{/if}
-	{#if taskType === 'parallel' || taskType === 'compound'}
+	{#if isParallelType(taskType) || isCompoundType(taskType)}
 		<div class="row">
 			<div class="col-lg-6 mb-2">
 				<div class="input-group has-validation">
