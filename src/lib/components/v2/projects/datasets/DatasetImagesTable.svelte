@@ -48,7 +48,7 @@
 		extraButtons
 	} = $props();
 
-	let imagesStatusFilter = '';
+	let imagesStatusFilter = $state('');
 
 	let showTable = $state(false);
 	let firstLoad = true;
@@ -711,8 +711,8 @@
 								<div class="row">
 									<div class="col">
 										<div class="attribute-select-wrapper mb-1">
-											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible"
-											></select>
+											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible">
+											</select>
 										</div>
 									</div>
 								</div>
@@ -734,8 +734,8 @@
 								class:btn-secondary={!applyBtnActive}
 							>
 								{#if searching}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-									></span>
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+									</span>
 								{/if}
 								Apply
 							</button>
@@ -747,8 +747,8 @@
 								class:btn-secondary={!resetBtnActive}
 							>
 								{#if resetting}
-									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-									></span>
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+									</span>
 								{/if}
 								Reset
 							</button>
