@@ -60,7 +60,7 @@
 			let errorShown = false;
 			if (errorMap) {
 				if ('slurm_accounts' in errorMap) {
-					slurmAccountsError = errorMap['slurm_accounts'];
+					slurmAccountsError = /** @type {string} */ (errorMap['slurm_accounts']);
 					errorShown = true;
 				}
 			}

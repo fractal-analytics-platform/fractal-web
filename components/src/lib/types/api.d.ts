@@ -311,8 +311,12 @@ export type HistoryUnit = {
 
 export type HistoryRunAggregated = {
 	id: number;
+	timestamp_started: string;
+	version: string | null;
 	workflowtask_dump: WorkflowTaskV2;
 	num_submitted_units: number;
 	num_done_units: number;
 	num_failed_units: number;
+	args_schema_parallel: JSONSchemaObjectProperty | null;
+	args_schema_non_parallel: JSONSchemaObjectProperty | null;
 };

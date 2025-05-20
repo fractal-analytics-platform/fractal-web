@@ -23,19 +23,23 @@ export async function createFakeTask(page, task) {
 		await page.getByText('Single task').click();
 
 		if (task.type === 'parallel') {
-			await page.getByText('Parallel', { exact: true }).click();
+			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Parallel');
 		} else if (task.type === 'compound') {
-			await page.getByText('Compound', { exact: true }).click();
+			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Compound');
 		}
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);
 
 		const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
 		if (task.type === 'non_parallel' || task.type === 'compound') {
-			await page.getByRole('textbox', { name: 'Command non parallel' }).fill(command);
+			await page
+				.getByRole('textbox', { name: 'Command non parallel' })
+				.fill(task.command_non_parallel || command);
 		}
 		if (task.type === 'parallel' || task.type === 'compound') {
-			await page.getByRole('textbox', { name: 'Command parallel' }).fill(command);
+			await page
+				.getByRole('textbox', { name: 'Command parallel' })
+				.fill(task.command_parallel || command);
 		}
 
 		if (task.version) {

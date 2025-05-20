@@ -154,7 +154,7 @@ function extractFieldValidationError(simpleValidationMessage, loc) {
 /**
  * @param {any} reason
  * @param {number | null} statusCode
- * @returns {null | { [key: string]: string }}
+ * @returns {null | { [key: string]: string | string[] }}
  */
 export function getValidationMessagesMap(reason, statusCode) {
 	if (!isValidationError(reason, statusCode)) {
@@ -163,16 +163,25 @@ export function getValidationMessagesMap(reason, statusCode) {
 	if (!Array.isArray(reason.detail) || reason.detail.length === 0) {
 		return null;
 	}
-	/** @type {{[key: string]: string}} */
+	/** @type {{[key: string]: string | string[]}} */
 	const map = {};
 	for (const error of reason.detail) {
 		if (!hasValidationErrorPayload(error)) {
 			return null;
 		}
-		if (error.loc.length !== 2 || error.loc[0] !== 'body') {
+		if (error.loc[0] !== 'body') {
 			return null;
 		}
-		map[error.loc[1]] = error.msg;
+		if (error.loc.length === 2) {
+			map[error.loc[1]] = error.msg;
+		} else if (error.loc.length === 3 && typeof error.loc[2] === 'number') {
+			if (!(error.loc[1] in map)) {
+				map[error.loc[1]] = [];
+			}
+			/** @type {string[]} */ (map[error.loc[1]])[error.loc[2]] = error.msg;
+		} else {
+			return null;
+		}
 	}
 	return map;
 }
@@ -294,7 +303,7 @@ export class FormErrorHandler {
 	 * Returns true if all the keys of the error map are handled by the current page or component.
 	 * Used to decide if it possible to show user friendly validation messages
 	 * or if it is necessary to display a generic error message.
-	 * @param {{[key:string]: string}} errorsMap
+	 * @param {{[key:string]: string | string[] }} errorsMap
 	 * @return {boolean}
 	 */
 	validateErrorMapKeys(errorsMap) {

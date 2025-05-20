@@ -58,7 +58,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 	const randomTaskName2 = Math.random().toString(36).substring(7);
 
 	await test.step('Create parallel task', async () => {
-		await page.getByText('Parallel', { exact: true }).click();
+		await page.getByRole('combobox', { name: 'Task type' }).selectOption('Parallel');
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName2);
 		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test');
@@ -89,7 +89,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 	const randomTaskName3 = Math.random().toString(36).substring(7);
 
 	await test.step('Create compound task', async () => {
-		await page.getByText('Compound', { exact: true }).click();
+		await page.getByRole('combobox', { name: 'Task type' }).selectOption('Compound');
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName3);
 		await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
@@ -208,7 +208,7 @@ test('Add single tasks [v2]', async ({ page }) => {
 	});
 
 	await test.step('Create different version of parallel task', async () => {
-		await page.getByText('Parallel', { exact: true }).click();
+		await page.getByRole('combobox', { name: 'Task type' }).selectOption('Parallel');
 		await page.getByRole('textbox', { name: 'Task name' }).fill(randomTaskName2);
 		await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test2');
 		await page.getByRole('textbox', { name: 'Version' }).fill('0.0.2');
