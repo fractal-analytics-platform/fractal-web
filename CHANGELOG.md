@@ -1,9 +1,12 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.18.1
 
 * Used new API endpoint to detect task version upgrade (\#792);
 * Handled arguments schema changes in workflow task runs (\#796);
+* Added Run tab in workflow page (\#796);
+* Improved handling of viewer paths errors (\#796);
+* Added converter non parallel and converter compound to task creation form (\#796);
 
 # 1.18.0
 
