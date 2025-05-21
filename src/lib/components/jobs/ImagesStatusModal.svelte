@@ -7,6 +7,7 @@
 	import { env } from '$env/dynamic/public';
 	import { tick } from 'svelte';
 	import { hideAllTooltips } from '$lib/common/component_utilities';
+	import { getTypeFilterValues, STATUS_KEY } from '$lib/common/workflow_utilities';
 
 	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
 		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
@@ -35,6 +36,9 @@
 	/** @type {DatasetImagesTable|undefined} */
 	let datasetImagesTable = $state();
 
+	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
+	let initialFilterValues = $state(null);
+
 	/**
 	 * @param {import('fractal-components/types/api').DatasetV2} _dataset
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} _workflowTask
@@ -51,10 +55,15 @@
 			...workflowTask.type_filters,
 			...workflowTask.task.input_types
 		};
+		const initialTypeFilters = await getTypeFilterValues(_dataset.project_id, workflowTask);
+		initialFilterValues = {
+			attribute_filters: {},
+			type_filters: initialTypeFilters
+		};
 		modal?.show();
 		await loadImages();
 		await tick();
-		await datasetImagesTable?.load();
+		await datasetImagesTable?.load(false);
 	}
 
 	function onClose() {
@@ -69,9 +78,7 @@
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify({
-				attributes_query: {}
-			})
+			body: JSON.stringify(initialFilterValues)
 		});
 		if (!response.ok) {
 			loading = false;
@@ -83,10 +90,9 @@
 	}
 
 	/**
-	 * @param {string} zarrUrl
-	 * @param {string} status
+	 * @param {import('fractal-components/types/api').Image} image
 	 */
-	async function loadLogs(zarrUrl, status) {
+	async function loadLogs(image) {
 		hideAllTooltips();
 		loadingLogs = true;
 		const headers = new Headers();
@@ -97,7 +103,7 @@
 			body: JSON.stringify({
 				workflowtask_id: workflowTask?.id,
 				dataset_id: dataset?.id,
-				zarr_url: zarrUrl
+				zarr_url: image.zarr_url
 			})
 		});
 		if (!response.ok) {
@@ -106,18 +112,26 @@
 			return;
 		}
 		const log = await response.json();
-		loadedLogsStatus = status;
-		if (status === 'failed') {
+		loadedLogsStatus = getImageStatus(image);
+		if (loadedLogsStatus === 'failed') {
 			logParts = extractJobErrorParts(log, false, true);
 		} else {
 			logParts = [{ text: log, highlight: false }];
 		}
-		selectedLogImage = zarrUrl;
+		selectedLogImage = image.zarr_url;
 		loadingLogs = false;
 	}
 
 	async function back() {
 		selectedLogImage = '';
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').Image} image
+	 * @returns {string}
+	 */
+	function getImageStatus(image) {
+		return /** @type {string} */ (image.attributes[STATUS_KEY]);
 	}
 </script>
 
@@ -157,15 +171,15 @@
 					bind:imagePage
 					{vizarrViewerUrl}
 					disabledTypes={Object.keys(frozenTypes)}
-					initialFilterValues={{ attribute_filters: {}, type_filters: frozenTypes }}
+					{initialFilterValues}
 					imagesStatusModal={true}
-					imagesStatusModalUrl={`/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
+					queryUrl={`/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
 				>
 					{#snippet extraButtons(image)}
 						<button
 							class="btn btn-light"
-							onclick={() => loadLogs(image.zarr_url, image.status || '')}
-							disabled={image.status === null}
+							onclick={() => loadLogs(image)}
+							disabled={getImageStatus(image) === null}
 						>
 							{#if loadingLogs}
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"

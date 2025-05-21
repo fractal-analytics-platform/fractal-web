@@ -10,7 +10,7 @@
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
-	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
+	import { getRelativeZarrPath, getTypeFilterValues } from '$lib/common/workflow_utilities';
 
 	/**
 	 * @typedef {Object} Props
@@ -266,7 +266,7 @@
 		if (mode === 'restart') {
 			appliedTypeFilters = { ...wft.type_filters };
 		} else {
-			appliedTypeFilters = await getTypeFilterValues(wft);
+			appliedTypeFilters = await getTypeFilterValues(workflow.project_id, wft);
 			if (datasetImagesTable) {
 				appliedAttributeFilters = datasetImagesTable.getAttributeFilters();
 				appliedTypeFilters = datasetImagesTable.getTypeFilters();
@@ -389,7 +389,7 @@
 			selectedDataset
 		);
 
-		const initialTypeFilters = await getTypeFilterValues(workflowTask);
+		const initialTypeFilters = await getTypeFilterValues(workflow.project_id, workflowTask);
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -397,8 +397,8 @@
 			attribute_filters: {},
 			type_filters: initialTypeFilters
 		};
-		let response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}&page=1&page_size=10`,
 			{
 				method: 'POST',
 				headers,
@@ -419,8 +419,8 @@
 		hasImages = imagePage.total_count > 0;
 		if (!hasImages) {
 			// Verify if dataset without filters has images
-			let response = await fetch(
-				`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/images/query?page=1&page_size=10`,
+			const response = await fetch(
+				`/api/v2/project/${dataset.project_id}/status/images?workflowtask_id=${workflowTask.id}&dataset_id=${dataset.id}&page=1&page_size=10`,
 				{
 					method: 'POST',
 					headers,
@@ -439,33 +439,7 @@
 		}
 		datasetImagesLoading = false;
 		await tick();
-		datasetImagesTable?.load();
-	}
-
-	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
-	 */
-	async function getTypeFilterValues(workflowTask) {
-		let currentTypeFilters = {};
-		let inputFilters = {};
-		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/type-filters-flow`
-		);
-		if (response.ok) {
-			/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
-			const typeFiltersFlow = await response.json();
-			const selectedTypeFiltersFlow = typeFiltersFlow.find(
-				(t) => t.workflowtask_id === workflowTask.id
-			);
-			if (selectedTypeFiltersFlow) {
-				currentTypeFilters = selectedTypeFiltersFlow.current_type_filters;
-				inputFilters = selectedTypeFiltersFlow.input_type_filters;
-			}
-		}
-		return {
-			...currentTypeFilters,
-			...inputFilters
-		};
+		datasetImagesTable?.load(false);
 	}
 
 	/**
@@ -508,19 +482,20 @@
 		mode = 'run';
 		await loadSlurmAccounts();
 	});
-	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
-	let runBtnDisabled = $derived(
+
+	const selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
+	const runBtnDisabled = $derived(
 		(mode === 'restart' && !replaceExistingDataset && newDatasetName === selectedDataset?.name) ||
 			(mode === 'continue' && firstTaskIndex === undefined)
 	);
-	let showImageList = $derived(
+	const showImageList = $derived(
 		hasImages &&
 			firstTaskIndex !== undefined &&
 			mode !== 'restart' &&
 			workflow.task_list[firstTaskIndex] &&
 			!isConverterType(workflow.task_list[firstTaskIndex].task_type)
 	);
-	let disabledTypes = $derived(
+	const disabledTypes = $derived(
 		Object.keys({
 			...(workflow.task_list[firstTaskIndex || 0]?.type_filters || {}),
 			...(workflow.task_list[firstTaskIndex || 0]?.task.input_types || {}),
@@ -529,7 +504,14 @@
 	);
 </script>
 
-<Modal id="runWorkflowModal" centered={true} bind:this={modal} size="xl" scrollable={true} focus={false}>
+<Modal
+	id="runWorkflowModal"
+	centered={true}
+	bind:this={modal}
+	size="xl"
+	scrollable={true}
+	focus={false}
+>
 	{#snippet header()}
 		<h5 class="modal-title">
 			{#if mode === 'run'}
@@ -718,6 +700,7 @@
 										highlightedTypes={preSubmissionCheckUniqueTypesResults}
 										vizarrViewerUrl={null}
 										runWorkflowModal={true}
+										queryUrl={`/api/v2/project/${selectedDataset.project_id}/status/images?workflowtask_id=${workflow.task_list[firstTaskIndex || 0].id}&dataset_id=${selectedDataset.id}`}
 										beforeTypeSelectionChanged={(key) => {
 											preSubmissionCheckUniqueTypesResults =
 												preSubmissionCheckUniqueTypesResults.filter((k) => k !== key);
