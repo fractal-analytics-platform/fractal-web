@@ -10,7 +10,11 @@
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
-	import { getRelativeZarrPath, getTypeFilterValues } from '$lib/common/workflow_utilities';
+	import {
+		getRelativeZarrPath,
+		getTypeFilterValues,
+		STATUS_KEY
+	} from '$lib/common/workflow_utilities';
 
 	/**
 	 * @typedef {Object} Props
@@ -781,7 +785,7 @@
 					</p>
 					<ul class="mb-0">
 						{#each Object.entries(appliedAttributeFilters) as [key, value] (key)}
-							<li>{key}: <code>{value}</code></li>
+							<li>{key === STATUS_KEY ? 'Status' : key}: <code>{value}</code></li>
 						{/each}
 					</ul>
 					<ul class="mt-0 mb-1">
