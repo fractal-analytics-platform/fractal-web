@@ -1,133 +1,35 @@
-import { greatestVersionAsc } from '../common/version';
-
 /**
- * @param {import('../types/api').TaskGroupV2[]} taskGroups
- * @param {string} groupBy
+ * @param {Array<[string, Array<import('../types/api').TaskGroupV2>]>} taskGroups
  * @returns {import('../types/api').WorkflowTasksTableRowGroup[]}
  */
-export function buildWorkflowTaskTableRows(taskGroups, groupBy) {
+export function buildWorkflowTaskTableRows(taskGroups) {
 	/** @type {import('../types/api').WorkflowTasksTableRowGroup[]} */
 	const rows = [];
-	for (const taskGroup of taskGroups) {
-		for (const task of taskGroup.task_list) {
-			const groupValue = taskGroup[groupBy];
-			let groupRow = rows.find((r) => r.groupTitle === groupValue);
-			const taskProperties = getTaskTableProperties(taskGroup, task);
-			const taskVersion = taskGroup.version || '';
-			if (groupRow) {
-				let groupTask = groupRow.tasks.find((t) =>
-					Object.values(t.taskVersions).find((r) => r.task_name === task.name)
-				);
-				if (groupTask) {
-					groupTask.taskVersions[taskVersion] = taskProperties;
-				} else {
-					groupTask = {
-						selectedVersion: taskVersion,
-						taskVersions: { [taskVersion]: taskProperties }
-					};
-					groupRow.tasks.push(groupTask);
+	for (const [pkg_name, groups] of taskGroups) {
+		/** @type {Array<{ selectedVersion: string, taskVersions: Array<import('../types/api').TasksTableRow> }>} */
+		const tasksRows = [];
+		for (const taskGroup of groups) {
+			for (const task of taskGroup.task_list) {
+				const taskProperties = getTaskTableProperties(taskGroup, task);
+				let found = false;
+				for (const row of tasksRows) {
+					if (row.taskVersions.find((tv) => tv.task_name === task.name)) {
+						row.taskVersions.push(taskProperties);
+						found = true;
+						break;
+					}
 				}
-			} else {
-				groupRow = {
-					groupTitle: taskGroup[groupBy],
-					tasks: [
-						{
-							selectedVersion: taskVersion,
-							taskVersions: { [taskVersion]: taskProperties }
-						}
-					]
-				};
-				rows.push(groupRow);
+				if (!found) {
+					tasksRows.push({
+						selectedVersion: taskGroup.version || '',
+						taskVersions: [taskProperties]
+					});
+				}
 			}
 		}
+		rows.push({ pkg_name, tasks: tasksRows });
 	}
-	sortWorkflowTasksTableRows(rows);
 	return rows;
-}
-
-/**
- * @param {import('../types/api').WorkflowTasksTableRowGroup[]} rows
- */
-function sortWorkflowTasksTableRows(rows) {
-	for (const row of rows) {
-		for (const task of row.tasks) {
-			const validVersions = Object.keys(task.taskVersions).filter((v) => v !== '');
-			if (validVersions.length > 0) {
-				sortVersions(validVersions);
-				task.selectedVersion = validVersions[0];
-			}
-		}
-		row.tasks.sort((t1, t2) =>
-			t1.taskVersions[t1.selectedVersion].task_id < t2.taskVersions[t2.selectedVersion].task_id
-				? -1
-				: 1
-		);
-	}
-	rows.sort((r1, r2) =>
-		r1.groupTitle.localeCompare(r2.groupTitle, undefined, { sensitivity: 'base' })
-	);
-}
-
-/**
- * @param {import('../types/api').TaskGroupV2[]} taskGroups
- * @param {string} groupBy
- * @returns {import('../types/api').TasksTableRowGroup[]}
- */
-export function buildTaskTableRows(taskGroups, groupBy) {
-	/** @type {import('../types/api').TasksTableRowGroup[]} */
-	const rows = [];
-	for (const taskGroup of taskGroups) {
-		if (taskGroup.task_list.length > 0) {
-			const groupValue = taskGroup[groupBy];
-			let groupRow = rows.find((r) => r.groupTitle === groupValue);
-			const version = taskGroup.version || '';
-			if (groupRow) {
-				groupRow.groups[version] = taskGroup;
-			} else {
-				groupRow = {
-					groupTitle: groupValue,
-					selectedVersion: version,
-					groups: { [version]: taskGroup }
-				};
-				rows.push(groupRow);
-			}
-		}
-	}
-	sortTasksTableRows(rows);
-	return rows;
-}
-
-/**
- * @param {import('../types/api').TasksTableRowGroup[]} rows
- */
-function sortTasksTableRows(rows) {
-	for (const row of rows) {
-		const validVersions = Object.keys(row.groups).filter((v) => v !== '');
-		if (validVersions.length > 0) {
-			sortVersions(validVersions);
-			row.selectedVersion = validVersions[0];
-		}
-		for (const taskGroup of Object.values(row.groups)) {
-			taskGroup.task_list.sort((t1, t2) => (t1.id < t2.id ? -1 : 1));
-		}
-	}
-	rows.sort((r1, r2) =>
-		r1.groupTitle.localeCompare(r2.groupTitle, undefined, { sensitivity: 'base' })
-	);
-}
-
-/**
- * @param {string[]} versions
- */
-export function sortVersions(versions) {
-	try {
-		versions
-			.sort(greatestVersionAsc)
-			.reverse();
-	} catch (err) {
-		console.warn('Semver error:', err);
-	}
-	return versions;
 }
 
 /**
@@ -153,63 +55,15 @@ function getTaskTableProperties(taskGroup, task) {
 }
 
 /**
- * @param {import('../types/api').TaskGroupV2[]} taskGroups
- * @param {import('../types/api').User & {group_ids_names: Array<[number, string]>}} user
- * @returns {import('../types/api').TaskGroupV2[]}
+ * @param {Array<[string, Array<import('../types/api').TaskGroupV2>]>} taskGroups
+ * @returns {import('../types/api').TasksTableRowGroup[]}
  */
-export function removeIdenticalTaskGroups(taskGroups, user) {
-	/** @type {Map<string, Map<string|null, import('../types/api').TaskGroupV2>>}  */
-	const taskGroupsMap = new Map();
-	for (const taskGroup of taskGroups) {
-		let versionsMap = taskGroupsMap.get(taskGroup.pkg_name);
-		if (!versionsMap) {
-			/** @type {Map<string|null, import('../types/api').TaskGroupV2>}  */
-			versionsMap = new Map();
-			taskGroupsMap.set(taskGroup.pkg_name, versionsMap);
-		}
-		const duplicate = versionsMap.get(taskGroup.version);
-		if (duplicate) {
-			const preferredTaskGroup = selectTaskGroupToKeep(taskGroup, duplicate, user);
-			versionsMap.set(taskGroup.version, preferredTaskGroup);
-		} else {
-			versionsMap.set(taskGroup.version, taskGroup);
-		}
-	}
-	/** @type {import('../types/api').TaskGroupV2[]} */
-	const filteredTaskGroups = [];
-	for (const [, versionsMap] of taskGroupsMap) {
-		for (const [, taskGroup] of versionsMap) {
-			filteredTaskGroups.push(taskGroup);
-		}
-	}
-	return filteredTaskGroups;
-}
-
-/**
- * @param {import('../types/api').TaskGroupV2} taskGroup1
- * @param {import('../types/api').TaskGroupV2} taskGroup2
- * @param {import('../types/api').User & {group_ids_names: Array<[number, string]>}} user
- * @returns {import('../types/api').TaskGroupV2}
- */
-function selectTaskGroupToKeep(taskGroup1, taskGroup2, user) {
-	if (taskGroup1.user_id === user.id) {
-		return taskGroup1;
-	}
-	for (const [userGroupId] of user.group_ids_names) {
-		if (taskGroup1.user_group_id === userGroupId) {
-			return taskGroup1;
-		}
-		if (taskGroup2.user_group_id === userGroupId) {
-			return taskGroup2;
-		}
-	}
-	console.warn(
-		'Unable to find a user group matching task groups',
-		taskGroup1,
-		taskGroup2,
-		user.group_ids_names
-	);
-	return taskGroup1;
+export function buildTaskTableRows(taskGroups) {
+	return taskGroups.map((tg) => ({
+		pkg_name: tg[0],
+		selectedVersion: tg[1][0].version || '',
+		groups: tg[1].map((g) => ({ ...g, version: g.version === null ? '' : g.version }))
+	}));
 }
 
 /**

@@ -3,7 +3,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
-	import { removeIdenticalTaskGroups } from 'fractal-components/tasks/task_group_utilities';
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
@@ -12,12 +11,11 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
-	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
 	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
 	 */
 
 	/** @type {Props} */
-	let { workflow, user, onWorkflowTaskAdded } = $props();
+	let { workflow, onWorkflowTaskAdded } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -26,7 +24,7 @@
 	let addingTask = $state(false);
 	let showDocLinksInTable = false;
 
-	/** @type {Array<import('fractal-components/types/api').TaskGroupV2>} */
+	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
 	let taskGroups = $state([]);
 
 	export async function show() {
@@ -42,8 +40,7 @@
 			modal?.displayErrorAlert(await response.json());
 			return;
 		}
-		const allTaskGroups = await response.json();
-		taskGroups = removeIdenticalTaskGroups(allTaskGroups, user);
+		taskGroups = await response.json();
 		await tick();
 		const searchInput = document.querySelector('#addWorkflowTaskModal input');
 		if (searchInput instanceof HTMLElement) {

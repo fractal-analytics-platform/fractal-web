@@ -1156,7 +1156,6 @@
 	bind:this={addWorkflowTaskModal}
 	{onWorkflowTaskAdded}
 	{workflow}
-	user={page.data.user}
 />
 
 <ImagesStatusModal bind:this={imagesStatusModal} />
