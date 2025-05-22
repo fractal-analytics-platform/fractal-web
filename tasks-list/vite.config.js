@@ -13,6 +13,6 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection
-		include: ['semver', 'slim-select', 'dompurify', 'marked']
+		include: ['slim-select', 'dompurify', 'marked']
 	}
 });

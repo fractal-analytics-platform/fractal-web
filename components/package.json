@@ -54,7 +54,6 @@
 		"color-hash": "^2.0.2",
 		"dompurify": "^3.2.3",
 		"marked": "^7.0.4",
-		"semver": "^7.6.3",
 		"slim-select": "^2.8.1",
 		"svelte-preprocess": "^6.0.3"
 	},
@@ -65,7 +64,6 @@
 		"ajv/dist/ajv",
 		"ajv/dist/2020",
 		"ajv-formats",
-		"semver",
 		"slim-select",
 		"dompurify",
 		"marked"

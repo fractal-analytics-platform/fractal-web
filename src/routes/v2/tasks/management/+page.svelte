@@ -8,8 +8,8 @@
 
 	const user = $derived(page.data.user);
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
-	let taskGroups = $state(page.data.taskGroups);
+	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
+	let taskGroups = $state(page.data.taskGroups || []);
 
 	/** @type {'pypi'|'local'|'single'|'custom_env'} */
 	let packageType = $state('pypi');
@@ -34,7 +34,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2[]} updatedGroups
+	 * @param {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} updatedGroups
 	 */
 	function updateTaskGroups(updatedGroups) {
 		taskGroups = updatedGroups;

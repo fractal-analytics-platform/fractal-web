@@ -41,7 +41,6 @@
 	"types": "./build/index.d.ts",
 	"type": "module",
 	"bundleDependencies": [
-		"semver",
 		"slim-select",
 		"dompurify",
 		"marked"

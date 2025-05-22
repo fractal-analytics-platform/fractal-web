@@ -51,11 +51,7 @@ const config = defineConfig({
 			'dompurify',
 			'ajv/dist/ajv',
 			'ajv/dist/2020',
-			'ajv-formats',
-			'semver/functions/coerce',
-			'semver/functions/gte',
-			'semver/functions/lte',
-			'semver/functions/valid'
+			'ajv-formats'
 		]
 	}
 });

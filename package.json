@@ -50,7 +50,6 @@
 		"jose": "^4.14.4",
 		"log4js": "^6.9.1",
 		"marked": "^7.0.4",
-		"semver": "^7.6.3",
 		"slim-select": "^2.8.1"
 	},
 	"files": [
@@ -64,7 +63,6 @@
 		"jose",
 		"log4js",
 		"marked",
-		"semver",
 		"slim-select"
 	]
 }
