@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.18.2
 
 * Retrieved image status from `__wftask_dataset_image_status__` attribute (\#801);
 
