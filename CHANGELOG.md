@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Retrieved image status from `__wftask_dataset_image_status__` attribute (\#801);
+
 # 1.18.1
 
 * Used new API endpoint to detect task version upgrade (\#792);

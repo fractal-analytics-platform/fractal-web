@@ -14,7 +14,7 @@
 	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/environment';
-	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
+	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
 
 	/**
 	 * @typedef {Object} Props
@@ -28,7 +28,7 @@
 	 * @property {(key: string) => void} [beforeTypeSelectionChanged]
 	 * @property {Array<string>} [highlightedTypes]
 	 * @property {boolean} [imagesStatusModal] Set to true if the table is displayed inside the "Images status" modal.
-	 * @property {string} [imagesStatusModalUrl]
+	 * @property {string} [queryUrl]
 	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').Image]>} [extraButtons]
 	 */
 
@@ -44,11 +44,9 @@
 		beforeTypeSelectionChanged = () => {},
 		highlightedTypes = [],
 		imagesStatusModal = false,
-		imagesStatusModalUrl,
+		queryUrl,
 		extraButtons
 	} = $props();
-
-	let imagesStatusFilter = $state('');
 
 	let showTable = $state(false);
 	let firstLoad = true;
@@ -75,8 +73,6 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
-	/** @type {SlimSelect|undefined} */
-	let statusSelector = undefined;
 	/** @type {{[key: string]: SlimSelect}} */
 	let attributesSelectors = {};
 	/** @type {{[key: string]: SlimSelect}} */
@@ -129,12 +125,10 @@
 	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
 	/** @type {{ [key: string]: boolean | null }}} */
 	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
-	let lastAppliedImagesStatusFilter = '';
 
 	const applyBtnActive = $derived(
 		attributesChanged(lastAppliedAttributeFilters, attributeFilters) ||
-			objectChanged(lastAppliedTypeFilters, typeFilters) ||
-			lastAppliedImagesStatusFilter !== imagesStatusFilter
+			objectChanged(lastAppliedTypeFilters, typeFilters)
 	);
 
 	let resetBtnActive = $state(false);
@@ -142,10 +136,15 @@
 	export async function applySearchFields() {
 		searching = true;
 		const params = await searchImages();
-		resetBtnActive =
-			Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
-			Object.values(typeFilters).filter((t) => t !== null).length > 0 ||
-			!!imagesStatusFilter;
+		if (initialFilterValues) {
+			resetBtnActive =
+				attributesChanged(initialFilterValues.attribute_filters, attributeFilters) ||
+				objectChanged(initialFilterValues.type_filters, typeFilters);
+		} else {
+			resetBtnActive =
+				Object.values(attributeFilters).filter((a) => a !== null).length > 0 ||
+				Object.values(typeFilters).filter((t) => t !== null).length > 0;
+		}
 		searching = false;
 		return params;
 	}
@@ -155,17 +154,27 @@
 		resetting = true;
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
-		imagesStatusFilter = '';
 		await tick();
 		await searchImages();
 		resetting = false;
 	}
 
-	export async function load() {
+	/**
+	 * @param {boolean} search
+	 */
+	export async function load(search = true) {
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
+		if (!search) {
+			showTable = true;
+		}
 		await tick();
-		await searchImages();
+		if (search) {
+			await searchImages();
+		} else {
+			reloadAttributeFilters(imagePage);
+			reloadTypeFilters(imagePage);
+		}
 	}
 
 	onDestroy(() => {
@@ -175,7 +184,6 @@
 		for (const selector of Object.values(typesSelectors)) {
 			selector.destroy();
 		}
-		statusSelector?.destroy();
 		attributesSelectors = {};
 		typesSelectors = {};
 		attributeFilters = {};
@@ -322,48 +330,6 @@
 		return selector;
 	}
 
-	function loadStatusSelector() {
-		if (!imagesStatusModal) {
-			return;
-		}
-		const elementId = 'status-selector';
-		const selectElement = document.getElementById(elementId);
-		if (!selectElement) {
-			throw new Error(`Unable to find selector element with id ${elementId}`);
-		}
-		statusSelector?.destroy();
-		selectElement.classList.remove('invisible');
-		statusSelector = new SlimSelect({
-			select: `#${elementId}`,
-			settings: {
-				maxValuesShown: 5,
-				showSearch: false,
-				allowDeselect: true,
-				ariaLabel: `Status selector`,
-				isMultiple: false
-			},
-			events: {
-				afterChange: (selection) => {
-					const selectedOption = selection[0];
-					if (!selectedOption || selectedOption.placeholder) {
-						imagesStatusFilter = '';
-					} else {
-						imagesStatusFilter = selectedOption.value;
-					}
-				}
-			}
-		});
-		setSlimSelectOptions(statusSelector, [
-			'done',
-			'submitted',
-			'failed',
-			{ text: 'not processed', value: 'unset' }
-		]);
-		if (imagesStatusFilter) {
-			statusSelector.setSelected(imagesStatusFilter);
-		}
-	}
-
 	/**
 	 * Updates SlimSelect options. This rebuilds the HTML elements and unset the selected value.
 	 * @param {SlimSelect|undefined} select
@@ -432,11 +398,8 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		let response;
-		if (imagesStatusModal) {
-			let url = `${imagesStatusModalUrl}&page=${currentPage}&page_size=${pageSize}`;
-			if (imagesStatusFilter) {
-				url += `&unit_status=${imagesStatusFilter}`;
-			}
+		if (imagesStatusModal || runWorkflowModal) {
+			let url = `${queryUrl}&page=${currentPage}&page_size=${pageSize}`;
 			response = await fetch(url, {
 				method: 'POST',
 				headers,
@@ -469,7 +432,6 @@
 			await tick();
 			reloadAttributeFilters(imagePage);
 			reloadTypeFilters(imagePage);
-			loadStatusSelector();
 			// Go to first page if the search returns no values and we are not in the first page
 			// This happens when we are in a given page and we restrict the search setting more filters
 			if (imagePage.items.length === 0 && imagePage.current_page > 1) {
@@ -478,7 +440,6 @@
 			}
 			lastAppliedAttributeFilters = { ...attributeFilters };
 			lastAppliedTypeFilters = { ...typeFilters };
-			lastAppliedImagesStatusFilter = imagesStatusFilter;
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
@@ -613,6 +574,13 @@
 		return false;
 	}
 
+	/** @type {string[]} */
+	const sortedAttributesKeys = $derived(
+		runWorkflowModal || imagesStatusModal
+			? [STATUS_KEY, ...Object.keys(imagePage.attributes).filter((a) => a !== STATUS_KEY)]
+			: Object.keys(imagePage.attributes)
+	);
+
 	/**
 	 * @param {string} zarrUrl
 	 */
@@ -647,9 +615,6 @@
 			<table class="table" id="dataset-images-table">
 				<colgroup>
 					<col width="auto" />
-					{#if imagesStatusModal}
-						<col width="190" />
-					{/if}
 					{#each Object.keys(imagePage.attributes) as key (key)}
 						<col width="190" />
 					{/each}
@@ -661,13 +626,10 @@
 				<thead>
 					<tr>
 						<th>Zarr URL</th>
-						{#if imagesStatusModal}
-							<th>Status</th>
-						{/if}
-						{#each Object.keys(imagePage.attributes) as attributeKey (attributeKey)}
+						{#each sortedAttributesKeys as attributeKey (attributeKey)}
 							<th>
 								<label class="align-bottom" for="attribute-{getIdFromValue(attributeKey)}">
-									{attributeKey}
+									{attributeKey === STATUS_KEY ? 'Status' : attributeKey}
 								</label>
 								{#if !imagesStatusModal}
 									<button
@@ -695,18 +657,7 @@
 					</tr>
 					<tr>
 						<th></th>
-						{#if imagesStatusModal}
-							<th>
-								<div class="row">
-									<div class="col">
-										<div class="status-select-wrapper mb-1">
-											<select id="status-selector" class="invisible"></select>
-										</div>
-									</div>
-								</div>
-							</th>
-						{/if}
-						{#each Object.keys(imagePage.attributes) as attributeKey (attributeKey)}
+						{#each sortedAttributesKeys as attributeKey (attributeKey)}
 							<th>
 								<div class="row">
 									<div class="col">
@@ -759,12 +710,7 @@
 					{#each imagePage.items as image, index (index)}
 						<tr>
 							<td>{getRelativeZarrPath(dataset, image.zarr_url)}</td>
-							{#if imagesStatusModal}
-								<td>
-									{image.status || '-'}
-								</td>
-							{/if}
-							{#each Object.keys(imagePage.attributes) as attribute (attribute)}
+							{#each sortedAttributesKeys as attribute (attribute)}
 								<td>
 									{#if image.attributes[attribute] !== null && image.attributes[attribute] !== undefined}
 										{image.attributes[attribute]}

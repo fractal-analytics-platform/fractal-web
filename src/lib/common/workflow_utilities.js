@@ -1,3 +1,5 @@
+export const STATUS_KEY = '__wftask_dataset_image_status__';
+
 /**
  * @param {Array<import("fractal-components/types/api").DatasetV2>} datasets
  * @param {Array<import("fractal-components/types/api").ApplyWorkflowV2>} jobs
@@ -120,4 +122,32 @@ export function getRelativeZarrPath(dataset, zarrUrl) {
 		return relativePath.substring(1);
 	}
 	return relativePath;
+}
+
+/**
+ * @param {number} projectId
+ * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @returns {Promise<{ [key: string]: boolean }>}
+ */
+export async function getTypeFilterValues(projectId, workflowTask) {
+	let currentTypeFilters = {};
+	let inputFilters = {};
+	const response = await fetch(
+		`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/type-filters-flow`
+	);
+	if (response.ok) {
+		/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
+		const typeFiltersFlow = await response.json();
+		const selectedTypeFiltersFlow = typeFiltersFlow.find(
+			(t) => t.workflowtask_id === workflowTask.id
+		);
+		if (selectedTypeFiltersFlow) {
+			currentTypeFilters = selectedTypeFiltersFlow.current_type_filters;
+			inputFilters = selectedTypeFiltersFlow.input_type_filters;
+		}
+	}
+	return {
+		...currentTypeFilters,
+		...inputFilters
+	};
 }
