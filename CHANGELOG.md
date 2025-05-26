@@ -3,6 +3,7 @@
 # Unreleased
 
 * Dropped semver and used API task-groups ordering (\#803);
+* Parsed timestamps in `admin/accounting` (\#803);
 
 # 1.18.2
 
