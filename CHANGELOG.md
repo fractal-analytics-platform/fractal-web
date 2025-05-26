@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.18.3
 
 * Dropped semver and used API task-groups ordering (\#803);
 * Parsed timestamps in `admin/accounting` (\#803);
