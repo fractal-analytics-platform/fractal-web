@@ -3,6 +3,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Paginator from '$lib/components/common/Paginator.svelte';
+	import TimestampCell from '../jobs/TimestampCell.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -198,7 +199,7 @@
 				<tr>
 					<td>{row.id}</td>
 					<td>{getUserById(row.user_id)?.email || row.user_id}</td>
-					<td>{row.timestamp}</td>
+					<td><TimestampCell timestamp={row.timestamp} /></td>
 					<td>{row.num_tasks}</td>
 					<td>{row.num_new_images}</td>
 				</tr>

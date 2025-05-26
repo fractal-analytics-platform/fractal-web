@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Dropped semver and used API task-groups ordering (\#803);
+* Parsed timestamps in `admin/accounting` (\#803);
+
 # 1.18.2
 
 * Retrieved image status from `__wftask_dataset_image_status__` attribute (\#801);

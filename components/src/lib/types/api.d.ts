@@ -228,19 +228,17 @@ export type TaskGroupV2 = {
 };
 
 export type WorkflowTasksTableRowGroup = {
-	groupTitle: string;
+	pkg_name: string;
 	tasks: Array<{
 		selectedVersion: string;
-		taskVersions: {
-			[version: string]: TasksTableRow;
-		};
+		taskVersions: Array<TasksTableRow>;
 	}>;
 };
 
 export type TasksTableRowGroup = {
-	groupTitle: string;
+	pkg_name: string;
 	selectedVersion: string;
-	groups: { [version: string]: TaskGroupV2 };
+	groups: Array<TaskGroupV2>;
 };
 
 export type TasksTableRow = {

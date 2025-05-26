@@ -1,12 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
-	import { buildWorkflowTaskTableRows, sortVersions } from '../tasks/task_group_utilities';
+	import { buildWorkflowTaskTableRows } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
 	import ColouredBadge from '../common/ColouredBadge.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Array<import('../types/api').TaskGroupV2>} taskGroups
+	 * @property {Array<[ string, Array<import('../types/api').TaskGroupV2> ]>} taskGroups
 	 * @property {boolean} [showAuthorsInSeparateColumn]
 	 * @property {boolean} [showDocLinksInTable]
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
@@ -51,7 +51,7 @@
 
 	/**
 	 * Needed to prevent infinite loop in $effect
-	 * @type {Array<import('../types/api').TaskGroupV2>|undefined}
+	 * @type {Array<[ string, Array<import('../types/api').TaskGroupV2> ]>|undefined}
 	 */
 	let storedTaskGroups = undefined;
 
@@ -85,15 +85,15 @@
 			return;
 		}
 		genericSearch = '';
-		setFiltersValues(taskGroups);
-		allRows = buildWorkflowTaskTableRows(taskGroups, groupBy);
+		setFiltersValues(taskGroups.map((tg) => tg[1]).flatMap((t) => t));
+		allRows = buildWorkflowTaskTableRows(taskGroups);
 		filterRows();
 	}
 
 	function filterRows() {
 		filteredRows = allRows
 			.map((row) => {
-				const filteredTasks = row.tasks.filter((t) => filterRow(t.taskVersions[t.selectedVersion]));
+				const filteredTasks = row.tasks.filter((t) => filterRow(getSelectedTask(t)));
 				return {
 					...row,
 					tasks: filteredTasks
@@ -322,6 +322,16 @@
 			}
 		});
 	}
+
+	/**
+	 * @param {{ selectedVersion: string, taskVersions: Array<import('../types/api').TasksTableRow> }} taskRow
+	 * @returns {import('../types/api').TasksTableRow}
+	 */
+	function getSelectedTask(taskRow) {
+		return /** @type {import('../types/api').TasksTableRow} */ (
+			taskRow.taskVersions.find((t) => t.version === taskRow.selectedVersion)
+		);
+	}
 </script>
 
 <div class="card mb-2" class:invisible={allRows.length === 0} class:collapse={allRows.length === 0}>
@@ -401,71 +411,66 @@
 				<tbody>
 					{#each filteredRows as row, index (index)}
 						<tr class="border-top">
-							<th colspan="3">{row.groupTitle}</th>
+							<th colspan="3">{row.pkg_name}</th>
 						</tr>
-						{#each row.tasks as task, index (index)}
-							{#if task.taskVersions[task.selectedVersion]}
+						{#each row.tasks.map((tr) => getSelectedTask(tr)) as task, index (index)}
+							{#if task}
 								<tr>
 									<td class="task-name-col">
-										{#if showDocLinksInTable && task.taskVersions[task.selectedVersion].docs_link}
-											<a href={task.taskVersions[task.selectedVersion].docs_link} target="_blank">
-												{task.taskVersions[task.selectedVersion].task_name}
+										{#if showDocLinksInTable && task.docs_link}
+											<a href={task.docs_link} target="_blank">
+												{task.task_name}
 											</a>
 										{:else}
-											{task.taskVersions[task.selectedVersion].task_name}
+											{task.task_name}
 										{/if}
 									</td>
 									<td>
-										{#if task.taskVersions[task.selectedVersion].category}
+										{#if task.category}
 											<button
 												onclick={() =>
-													categorySelector?.setSelected(
-														/** @type {string} */ (task.taskVersions[task.selectedVersion].category)
-													)}
+													categorySelector?.setSelected(/** @type {string} */ (task.category))}
 												class="btn btn-link p-0"
 											>
-												<ColouredBadge value={task.taskVersions[task.selectedVersion].category} />
+												<ColouredBadge value={task.category} />
 											</button>
 										{/if}
 									</td>
 									<td>
-										{#if task.taskVersions[task.selectedVersion].modality}
+										{#if task.modality}
 											<button
 												onclick={() =>
-													modalitySelector?.setSelected(
-														/** @type {string} */ (task.taskVersions[task.selectedVersion].modality)
-													)}
+													modalitySelector?.setSelected(/** @type {string} */ (task.modality))}
 												class="btn btn-link p-0"
 											>
-												<ColouredBadge value={task.taskVersions[task.selectedVersion].modality} />
+												<ColouredBadge value={task.modality} />
 											</button>
 										{/if}
 									</td>
 									<td class="metadata-col">
-										{getMetadataCell(task.taskVersions[task.selectedVersion])}
+										{getMetadataCell(task)}
 									</td>
 									{#if showAuthorsInSeparateColumn}
 										<td class="author-col">
-											{task.taskVersions[task.selectedVersion].authors || '-'}
+											{task.authors || '-'}
 										</td>
 									{/if}
 									<td class="version-col">
-										{#if Object.keys(task.taskVersions).length > 1}
+										{#if row.tasks[index].taskVersions.length > 1}
 											<select
 												class="form-select"
-												aria-label="Version for task {task.taskVersions[task.selectedVersion]
-													.task_name}"
-												bind:value={task.selectedVersion}
+												aria-label="Version for task {task.task_name}"
+												bind:value={row.tasks[index].selectedVersion}
 											>
-												{#each sortVersions(Object.keys(task.taskVersions)) as version (version)}
+												{#each row.tasks[index].taskVersions.map((t) => t.version) as version (version)}
 													<option value={version}>{version || 'None'}</option>
 												{/each}
 											</select>
 										{:else}
-											{task.taskVersions[task.selectedVersion].version}
+											{task.version}
 										{/if}
 									</td>
-									{@render extraColumns?.(task.taskVersions[task.selectedVersion])}
+									{@render extraColumns?.(task)}
 								</tr>
 							{/if}
 						{/each}

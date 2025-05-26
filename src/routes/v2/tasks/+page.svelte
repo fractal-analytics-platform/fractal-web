@@ -5,7 +5,7 @@
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
+	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
 	const taskGroups = $derived(page.data.taskGroups || []);
 
 	/** @type {Modal|undefined} */

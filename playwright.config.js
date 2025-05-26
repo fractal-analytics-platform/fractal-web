@@ -80,7 +80,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 2572-expose-grouped-response-from-get-apiv2task-group',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
