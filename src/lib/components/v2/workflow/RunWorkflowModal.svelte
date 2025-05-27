@@ -444,7 +444,7 @@
 		}
 		datasetImagesLoading = false;
 		await tick();
-		datasetImagesTable?.load(false);
+		await datasetImagesTable?.load(false);
 	}
 
 	/**
