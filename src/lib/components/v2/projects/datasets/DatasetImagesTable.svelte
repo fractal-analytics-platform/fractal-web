@@ -11,7 +11,7 @@
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
+	import { deepCopy, stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/environment';
 	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
@@ -122,9 +122,9 @@
 	}
 
 	/** @type {{ [key: string]: Array<string | number | boolean> | null }} */
-	let lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
+	let lastAppliedAttributeFilters = $state({});
 	/** @type {{ [key: string]: boolean | null }}} */
-	let lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
+	let lastAppliedTypeFilters = $state({});
 
 	const applyBtnActive = $derived(
 		attributesChanged(lastAppliedAttributeFilters, attributeFilters) ||
@@ -163,8 +163,10 @@
 	 * @param {boolean} search
 	 */
 	export async function load(search = true) {
-		attributeFilters = getAttributeFilterBaseValues(imagePage);
-		typeFilters = getTypeFilterBaseValues(imagePage);
+		lastAppliedAttributeFilters = getAttributeFilterBaseValues(imagePage);
+		lastAppliedTypeFilters = getTypeFilterBaseValues(imagePage);
+		attributeFilters = deepCopy(lastAppliedAttributeFilters);
+		typeFilters = deepCopy(lastAppliedTypeFilters);
 		if (!search) {
 			showTable = true;
 		}
@@ -272,7 +274,7 @@
 				allowDeselect: true,
 				isMultiple: true,
 				closeOnSelect: false,
-				ariaLabel: `Selector for attribute ${key}`
+				ariaLabel: `Selector for attribute ${key === '__wftask_dataset_image_status__' ? 'Status' : key}`
 			},
 			events: {
 				beforeChange: () => {

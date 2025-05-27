@@ -418,6 +418,7 @@
 						e.preventDefault();
 						addPackageVersion();
 					}}
+					type="button"
 				>
 					<i class="bi bi-plus-circle"></i> Add pinned package version
 				</button>

@@ -285,10 +285,11 @@
 	 */
 	async function preSubmissionCheckUniqueTypes(params) {
 		preSubmissionCheckUniqueTypesResults = [];
+		const wft = workflow.task_list[firstTaskIndex || 0];
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/verify-unique-types`,
+			`/api/v2/project/${workflow.project_id}/dataset/${selectedDatasetId}/images/verify-unique-types?workflowtask_id=${wft.id}`,
 			{
 				headers,
 				method: 'POST',
@@ -443,7 +444,7 @@
 		}
 		datasetImagesLoading = false;
 		await tick();
-		datasetImagesTable?.load(false);
+		await datasetImagesTable?.load(false);
 	}
 
 	/**
