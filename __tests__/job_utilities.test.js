@@ -290,7 +290,7 @@ describe('get first task index for continuing workflow', () => {
 
 	it('should return the task order if previous task has been run successfully on at least one image (partial)', () => {
 		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
-		const statuses = { 1: createImageStatus('partial', 2, 1, 1) };
+		const statuses = { 1: createImageStatus('failed', 2, 1, 1) };
 		const selectedWorkflowTask = dummyTasks[1];
 
 		const result = getFirstTaskIndexForContinuingWorkflow(
@@ -336,6 +336,7 @@ function getMockedDatasets(names) {
 }
 
 /**
+ * @param {import('fractal-components/types/api').JobStatus} status
  * @param {number} submitted
  * @param {number} done
  * @param {number} failed

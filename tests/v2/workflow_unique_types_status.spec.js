@@ -42,11 +42,9 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await workflow.selectTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
-		await expect(
-			modal
-				.getByRole('combobox', { name: 'Start workflow at' })
-				.getByRole('option', { selected: true })
-		).toHaveText('cellpose_segmentation');
+		await modal
+			.getByRole('combobox', { name: 'Start workflow at' })
+			.selectOption('cellpose_segmentation');
 		await selectSlimSelect(page, modal.getByLabel('Selector for attribute well'), 'A01');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
