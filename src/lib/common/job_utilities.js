@@ -145,37 +145,42 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 
 /**
  * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
+ * @param {import('fractal-components/types/api').WorkflowTaskV2|undefined} selectedWorkflowTask
  * @param {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
  * @param {{[key: number]: import('fractal-components/types/api').JobStatus}} legacyStatuses
  * @returns {number|undefined}
  */
-export function getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses, legacyStatuses) {
+export function getFirstTaskIndexForContinuingWorkflow(
+	workflowTasks,
+	selectedWorkflowTask,
+	statuses,
+	legacyStatuses
+) {
+	// legacy status logic
 	if (Object.keys(legacyStatuses).length > 0 && Object.keys(statuses).length === 0) {
-		return workflowTasks.find(
-			(wft) => !(wft.id in legacyStatuses) || legacyStatuses[wft.id] === 'failed'
-		)?.order;
-	}
-
-	if (workflowTasks.find((wft) => statuses[wft.id] && statuses[wft.id].num_submitted_images > 0)) {
-		// we can't re-submit while something is running
 		return undefined;
 	}
 
-	// check for "holes" (e.g. tasks without status preceding tasks with status)
+	if (!selectedWorkflowTask) {
+		return undefined;
+	}
+
+	// check if the currently selected task has been run
+	if (selectedWorkflowTask.id in statuses) {
+		return selectedWorkflowTask.order;
+	}
+
+	// check if the previous task has been run successfully on at least 1 image
 	for (let i = 0; i < workflowTasks.length - 1; i++) {
-		const wft = workflowTasks[i];		
-		if (!(wft.id in statuses)) {
-			for (let j = i + 1; j < workflowTasks.length; j++) {
-				const nextWft = workflowTasks[j];
-				if (nextWft.id in statuses) {
-					// hole found
-					return undefined;
+		if (workflowTasks[i + 1].id === selectedWorkflowTask.id) {
+			const previousTask = workflowTasks[i];
+			if (previousTask.id in statuses) {
+				if (statuses[previousTask.id].num_done_images > 0) {
+					return selectedWorkflowTask.order;
 				}
 			}
 		}
 	}
 
-	return workflowTasks.find(
-		(wft) => !(wft.id in statuses) || statuses[wft.id].num_failed_images > 0
-	)?.order;
+	return undefined;
 }

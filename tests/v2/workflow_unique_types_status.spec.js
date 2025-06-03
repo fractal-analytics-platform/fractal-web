@@ -39,13 +39,12 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 
 	await test.step('Add second task and run it only on one well', async () => {
 		await workflow.addTask('cellpose_segmentation');
+		await workflow.selectTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
-		await expect(
-			modal
-				.getByRole('combobox', { name: 'Start workflow at' })
-				.getByRole('option', { selected: true })
-		).toHaveText('cellpose_segmentation');
+		await modal
+			.getByRole('combobox', { name: 'Start workflow at' })
+			.selectOption('cellpose_segmentation');
 		await selectSlimSelect(page, modal.getByLabel('Selector for attribute well'), 'A01');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
@@ -58,6 +57,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 
 	await test.step('Add third task and run it only on one well', async () => {
 		await workflow.addTask('MIP_compound');
+		await workflow.selectTask('MIP_compound');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
 		await expect(
@@ -77,11 +77,14 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 	});
 
 	await test.step('Try to continue running from the second task and verify warning', async () => {
+		await workflow.selectTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await modal.waitFor();
-		await modal
-			.getByRole('combobox', { name: 'Start workflow at' })
-			.selectOption('cellpose_segmentation');
+		await expect(
+			modal
+				.getByRole('combobox', { name: 'Start workflow at' })
+				.getByRole('option', { selected: true })
+		).toHaveText('cellpose_segmentation');
 		await selectSlimSelect(page, modal.getByLabel('Selector for attribute Status'), 'unset');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();

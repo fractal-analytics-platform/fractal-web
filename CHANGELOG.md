@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Changed default first task selection logic (\#810);
+
 # 1.18.4
 
 * Added `workflowtask_id` query parameter to `verify-unique-types` API call (\#809);
