@@ -24,6 +24,7 @@ test('Continue workflow displays image lists [#693]', async ({ page, workflow })
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
 		await workflow.addTask('generic_task');
+		await workflow.selectTask('generic_task');
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();

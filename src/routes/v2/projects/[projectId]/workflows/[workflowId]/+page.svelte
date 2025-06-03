@@ -39,7 +39,7 @@
 	let datasets = $state(page.data.datasets);
 
 	/** @type {number|undefined} */
-	let selectedDatasetId = $state(undefined);
+	let selectedDatasetId = $state();
 	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
 
 	let isLegacy = $state(false);
@@ -58,13 +58,13 @@
 	let workflowTabContextId = $state(0);
 	let workflowSuccessMessage = $state('');
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
-	let selectedWorkflowTask = $state(undefined);
+	let selectedWorkflowTask = $state();
 	/** @type {number|undefined} */
-	let expandedWorkflowTaskId = $state(undefined);
+	let expandedWorkflowTaskId = $state();
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
-	let preventedSelectedTaskChange = $state(undefined);
+	let preventedSelectedTaskChange = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
-	let preventedHistoryRunChange = $state(undefined);
+	let preventedHistoryRunChange = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated[]} */
 	let historyRunStatuses = $state([]);
 	let loadingHistoryRunStatuses = $state(false);
@@ -73,17 +73,17 @@
 	/** @type {RunStatusModal|undefined} */
 	let runStatusModal = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
-	let selectedHistoryRun = $state(undefined);
+	let selectedHistoryRun = $state();
 
 	/** @type {ArgumentsSchema|undefined} */
-	let argsSchemaForm = $state(undefined);
+	let argsSchemaForm = $state();
 	/** @type {MetaPropertiesForm|undefined} */
-	let metaPropertiesForm = $state(undefined);
+	let metaPropertiesForm = $state();
 
 	let argsChangesSaved = $state(false);
 
 	/** @type {InputFiltersTab|undefined} */
-	let inputFiltersTab = $state(undefined);
+	let inputFiltersTab = $state();
 
 	// Update workflow modal
 	let updatedWorkflowName = $state('');
@@ -1152,11 +1152,7 @@
 	</div>
 {/if}
 
-<AddWorkflowTaskModal
-	bind:this={addWorkflowTaskModal}
-	{onWorkflowTaskAdded}
-	{workflow}
-/>
+<AddWorkflowTaskModal bind:this={addWorkflowTaskModal} {onWorkflowTaskAdded} {workflow} />
 
 <ImagesStatusModal bind:this={imagesStatusModal} />
 <RunStatusModal bind:this={runStatusModal} />
@@ -1209,6 +1205,7 @@
 	{workflow}
 	datasets={sortedDatasets}
 	{selectedDatasetId}
+	{selectedWorkflowTask}
 	{onJobSubmitted}
 	{statuses}
 	{legacyStatuses}

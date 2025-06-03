@@ -1,4 +1,4 @@
-import { it, expect } from 'vitest';
+import { it, describe, expect } from 'vitest';
 import {
 	extractJobErrorParts,
 	extractRelevantJobError,
@@ -238,26 +238,89 @@ it('generates new unique dataset name', () => {
 	);
 });
 
-it('get first task index for continuing workflow', () => {
-	const doneImages = createImageStatus('done', 0, 2, 0);
-	const failedImages = createImageStatus('failed', 0, 0, 3);
-	const submittedImages = createImageStatus('submitted', 5, 0, 0);
-	expect(testGetFirstTaskIndexForContinuingWorkflow([null, null, null, null])).toEqual(0);
-	expect(testGetFirstTaskIndexForContinuingWorkflow([doneImages, doneImages, null, null])).toEqual(
-		2
-	);
-	expect(
-		testGetFirstTaskIndexForContinuingWorkflow([doneImages, failedImages, doneImages, null])
-	).toEqual(1);
-	expect(
-		testGetFirstTaskIndexForContinuingWorkflow([doneImages, null, doneImages, null])
-	).toBeUndefined();
-	expect(
-		testGetFirstTaskIndexForContinuingWorkflow([doneImages, doneImages, doneImages, doneImages])
-	).toBeUndefined();
-	expect(
-		testGetFirstTaskIndexForContinuingWorkflow([submittedImages, failedImages, null, null])
-	).toBeUndefined();
+describe('get first task index for continuing workflow', () => {
+	const dummyTasks = [getDummyTask(0), getDummyTask(1)];
+
+	it('should return undefined if legacy statuses are present', () => {
+		/** @type {{ [key: number]: import('fractal-components/types/api').JobStatus }} */
+		const legacyStatuses = { 1: 'done' };
+		const selectedWorkflowTask = dummyTasks[0];
+
+		const result = getFirstTaskIndexForContinuingWorkflow(
+			dummyTasks,
+			selectedWorkflowTask,
+			{},
+			legacyStatuses
+		);
+		expect(result).toBeUndefined();
+	});
+
+	it('should return undefined if no selectedWorkflowTask is provided', () => {
+		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, undefined, {}, {});
+		expect(result).toBeUndefined();
+	});
+
+	it('should return the selected task order if selected task has a status', () => {
+		const selectedWorkflowTask = dummyTasks[0];
+		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		const statuses = { 1: createImageStatus('failed', 2, 0, 2) };
+
+		const result = getFirstTaskIndexForContinuingWorkflow(
+			dummyTasks,
+			selectedWorkflowTask,
+			statuses,
+			{}
+		);
+		expect(result).toEqual(selectedWorkflowTask.order);
+	});
+
+	it('should return the task order if previous task has been run successfully on at least one image (done)', () => {
+		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		const statuses = { 1: createImageStatus('done', 2, 2, 0) };
+		const selectedWorkflowTask = dummyTasks[1];
+
+		const result = getFirstTaskIndexForContinuingWorkflow(
+			dummyTasks,
+			selectedWorkflowTask,
+			statuses,
+			{}
+		);
+		expect(result).toEqual(selectedWorkflowTask.order);
+	});
+
+	it('should return the task order if previous task has been run successfully on at least one image (partial)', () => {
+		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		const statuses = { 1: createImageStatus('partial', 2, 1, 1) };
+		const selectedWorkflowTask = dummyTasks[1];
+
+		const result = getFirstTaskIndexForContinuingWorkflow(
+			dummyTasks,
+			selectedWorkflowTask,
+			statuses,
+			{}
+		);
+		expect(result).toEqual(selectedWorkflowTask.order);
+	});
+
+	it('should return undefined if selected workflow task is not in statuses and previous task status is not done/partial', () => {
+		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		const statuses = { 1: createImageStatus('failed', 2, 0, 2) };
+		const selectedWorkflowTask = dummyTasks[1];
+
+		const result = getFirstTaskIndexForContinuingWorkflow(
+			dummyTasks,
+			selectedWorkflowTask,
+			statuses,
+			{}
+		);
+		expect(result).toBeUndefined();
+	});
+
+	it('should return undefined if selected task is not in statuses and there is no previous task with status', () => {
+		const selectedWorkflowTask = dummyTasks[1];
+		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, selectedWorkflowTask, {}, {});
+		expect(result).toBeUndefined();
+	});
 });
 
 /**
@@ -289,18 +352,12 @@ function createImageStatus(status, submitted, done, failed) {
 }
 
 /**
- * @param {Array<import('fractal-components/types/api').ImagesStatus|null>} values
- * @returns {number|undefined}
+ * @param {number} order
+ * @returns {import('fractal-components/types/api').WorkflowTaskV2}
  */
-function testGetFirstTaskIndexForContinuingWorkflow(values) {
-	const workflowTasks = values.map((_, i) => {
-		return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ ({
-			id: i + 1,
-			order: i
-		});
+function getDummyTask(order) {
+	return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ ({
+		id: order + 1,
+		order: order
 	});
-	const statuses = Object.fromEntries(
-		values.map((v, i) => [i + 1, v]).filter((e) => e[1] !== null)
-	);
-	return getFirstTaskIndexForContinuingWorkflow(workflowTasks, statuses, {});
 }
