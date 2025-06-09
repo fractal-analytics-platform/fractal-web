@@ -80,7 +80,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch pixi',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

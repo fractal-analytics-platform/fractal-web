@@ -5,13 +5,15 @@
 	import AddSingleTask from '$lib/components/v2/tasks/AddSingleTask.svelte';
 	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
 	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
+	import PixiTask from '$lib/components/v2/tasks/PixiTask.svelte';
+	import TaskCollectionTable from '$lib/components/v2/tasks/TaskCollectionTable.svelte';
 
 	const user = $derived(page.data.user);
 
 	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
 	let taskGroups = $state(page.data.taskGroups || []);
 
-	/** @type {'pypi'|'local'|'single'|'custom_env'} */
+	/** @type {'pypi'|'local'|'single'|'custom_env'|'pixi'} */
 	let packageType = $state('pypi');
 
 	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default|undefined} */
@@ -90,20 +92,31 @@
 	/>
 	<label class="btn btn-outline-secondary" for="custom_env"> Custom Python env </label>
 
+	<input
+		class="btn-check"
+		type="radio"
+		name="pixi"
+		id="pixi"
+		value="pixi"
+		bind:group={packageType}
+	/>
+	<label class="btn btn-outline-secondary" for="pixi"> Pixi </label>
+
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
-			<TaskCollection
-				{packageType}
-				{reloadTaskGroupsList}
-				bind:this={taskCollectionComponent}
-				{user}
-			/>
+			<TaskCollection {packageType} bind:this={taskCollectionComponent} {user} />
 		{:else if packageType === 'single'}
 			<AddSingleTask addNewTasks={reloadTaskGroupsList} {user} />
 		{:else if packageType === 'custom_env'}
 			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {user} />
+		{:else if packageType === 'pixi'}
+			<PixiTask {user} />
 		{/if}
 	</div>
+
+	{#if packageType === 'pypi' || packageType === 'local' || packageType === 'pixi'}
+		<TaskCollectionTable {reloadTaskGroupsList} />
+	{/if}
 
 	<div class="row mt-4">
 		<h3 class="fw-light">Task List</h3>

@@ -401,53 +401,54 @@
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
 	{#snippet header()}
-	
-			<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
-		
+		<h1 class="h5 modal-title flex-grow-1">Task-group info</h1>
 	{/snippet}
 	{#snippet body()}
-	
-			{#if selectedTaskGroup}
-				<ul class="list-group">
-					<li class="list-group-item list-group-item-light fw-bold">Id</li>
-					<li class="list-group-item">{selectedTaskGroup.id}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Package name</li>
-					<li class="list-group-item">{selectedTaskGroup.pkg_name}</li>
-					<li class="list-group-item list-group-item-light fw-bold">User</li>
-					<li class="list-group-item">{getUserEmail(selectedTaskGroup.user_id)}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Group</li>
-					<li class="list-group-item">{getGroupName(selectedTaskGroup.user_group_id)}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Active</li>
-					<li class="list-group-item">
-						<BooleanIcon value={selectedTaskGroup.active} />
-					</li>
-					<li class="list-group-item list-group-item-light fw-bold">Origin</li>
-					<li class="list-group-item">{selectedTaskGroup.origin || '-'}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Version</li>
-					<li class="list-group-item">{selectedTaskGroup.version || '-'}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Python version</li>
-					<li class="list-group-item">{selectedTaskGroup.python_version || '-'}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Path</li>
-					<li class="list-group-item">{selectedTaskGroup.path || '-'}</li>
+		{#if selectedTaskGroup}
+			<ul class="list-group">
+				<li class="list-group-item list-group-item-light fw-bold">Id</li>
+				<li class="list-group-item">{selectedTaskGroup.id}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Package name</li>
+				<li class="list-group-item">{selectedTaskGroup.pkg_name}</li>
+				<li class="list-group-item list-group-item-light fw-bold">User</li>
+				<li class="list-group-item">{getUserEmail(selectedTaskGroup.user_id)}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Group</li>
+				<li class="list-group-item">{getGroupName(selectedTaskGroup.user_group_id)}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Active</li>
+				<li class="list-group-item">
+					<BooleanIcon value={selectedTaskGroup.active} />
+				</li>
+				<li class="list-group-item list-group-item-light fw-bold">Origin</li>
+				<li class="list-group-item">{selectedTaskGroup.origin || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Version</li>
+				<li class="list-group-item">{selectedTaskGroup.version || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Python version</li>
+				<li class="list-group-item">{selectedTaskGroup.python_version || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Path</li>
+				<li class="list-group-item">{selectedTaskGroup.path || '-'}</li>
+				{#if selectedTaskGroup.origin === 'pixi'}
+					<li class="list-group-item list-group-item-light fw-bold">Pixi version</li>
+					<li class="list-group-item">{selectedTaskGroup.pixi_version || '-'}</li>
+				{:else}
 					<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
 					<li class="list-group-item">{selectedTaskGroup.venv_path || '-'}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
-					<li class="list-group-item">{selectedTaskGroup.venv_file_number || '-'}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
-					<li class="list-group-item">
-						{selectedTaskGroup.venv_size_in_kB
-							? (selectedTaskGroup.venv_size_in_kB / 1000).toFixed(2)
-							: '-'}
-					</li>
-					<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
-					<li class="list-group-item">{selectedTaskGroup.pip_extras || '-'}</li>
-					<li class="list-group-item list-group-item-light fw-bold">Last used</li>
-					<li class="list-group-item">
-						<TimestampCell timestamp={selectedTaskGroup.timestamp_last_used} />
-					</li>
-				</ul>
-			{/if}
-		
+				{/if}
+				<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
+				<li class="list-group-item">{selectedTaskGroup.venv_file_number || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
+				<li class="list-group-item">
+					{selectedTaskGroup.venv_size_in_kB
+						? (selectedTaskGroup.venv_size_in_kB / 1000).toFixed(2)
+						: '-'}
+				</li>
+				<li class="list-group-item list-group-item-light fw-bold">Pip extras</li>
+				<li class="list-group-item">{selectedTaskGroup.pip_extras || '-'}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Last used</li>
+				<li class="list-group-item">
+					<TimestampCell timestamp={selectedTaskGroup.timestamp_last_used} />
+				</li>
+			</ul>
+		{/if}
 	{/snippet}
 </Modal>
 
