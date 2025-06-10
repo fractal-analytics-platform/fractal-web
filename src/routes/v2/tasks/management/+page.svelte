@@ -70,17 +70,17 @@
 		bind:group={packageType}
 		onclick={() => taskCollectionComponent?.clearForm()}
 	/>
-	<label class="btn btn-outline-secondary" for="local"> Local </label>
+	<label class="btn btn-outline-secondary" for="local"> Local whl </label>
 
 	<input
 		class="btn-check"
 		type="radio"
-		name="single"
-		id="single"
-		value="single"
+		name="pixi"
+		id="pixi"
+		value="pixi"
 		bind:group={packageType}
 	/>
-	<label class="btn btn-outline-secondary" for="single"> Single task </label>
+	<label class="btn btn-outline-secondary" for="pixi"> Pixi </label>
 
 	<input
 		class="btn-check"
@@ -95,12 +95,12 @@
 	<input
 		class="btn-check"
 		type="radio"
-		name="pixi"
-		id="pixi"
-		value="pixi"
+		name="single"
+		id="single"
+		value="single"
 		bind:group={packageType}
 	/>
-	<label class="btn btn-outline-secondary" for="pixi"> Pixi </label>
+	<label class="btn btn-outline-secondary" for="single"> Single task </label>
 
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
