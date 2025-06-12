@@ -218,7 +218,8 @@ export type TaskGroupV2 = {
 	version: string | null;
 	python_version: string;
 	path: string;
-	venv_path: string;
+	venv_path: string | null;
+	pixi_version: string | null;
 	venv_file_number: number;
 	venv_size_in_kB: number;
 	pip_extras: string;

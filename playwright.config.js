@@ -50,6 +50,14 @@ const v2Tests = [
 		dependencies: ['auth']
 	},
 	{
+		name: 'pixi',
+		testMatch: /v2\/pixi\.setup\.js/,
+		use: {
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	},
+	{
 		name: 'chromium',
 		testMatch: /v2\/.*\.spec\.js/,
 		use: {

@@ -39,7 +39,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 	});
 
 	await test.step('Collect mock tasks', async () => {
-		await page.getByText('Local', { exact: true }).click();
+		await page.getByText('Local whl', { exact: true }).click();
 
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Upload a wheel file', { exact: true }).click();

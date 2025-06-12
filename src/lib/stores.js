@@ -8,3 +8,6 @@ export const projectInfoModalV2 = writable(undefined);
 
 export const navigating = writable(false);
 export const navigationCancelled = writable(false);
+
+/** @type {import('svelte/store').Writable<Array<import('fractal-components/types/api').TaskGroupActivityV2>>} */
+export const recentActivities = writable([]);
