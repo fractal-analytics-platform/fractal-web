@@ -86,4 +86,13 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByRole('button', { name: 'Collect', exact: true }).click();
 		await expect(page.getByText('Field required')).toBeVisible();
 	});
+
+	await test.step('Check pixi origin in /v2/admin/task-groups page', async () => {
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await page.getByRole('combobox', { name: 'Origin' }).selectOption('Pixi');
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await expect(page.getByText('The query returned 1 matching result')).toBeVisible();
+		await expect(page.getByRole('cell', { name: 'mock-pixi-tasks' })).toBeVisible();
+	});
 });

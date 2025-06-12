@@ -247,6 +247,7 @@
 								<option value="">Select...</option>
 								<option value="pypi">PyPI</option>
 								<option value="wheel-file">Wheel file</option>
+								<option value="pixi">Pixi</option>
 								<option value="other">Other</option>
 							</select>
 						</div>
