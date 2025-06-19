@@ -3,14 +3,16 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { onDestroy } from 'svelte';
 	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
+	import { sortDropdownUsers } from './user_utilities';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<import('fractal-components/types/api').User>} [users]
+	 * @property {number} currentUserId
 	 */
 
 	/** @type {Props} */
-	let { users = [] } = $props();
+	let { users = [], currentUserId } = $props();
 
 	let searching = $state(false);
 	let searched = $state(false);
@@ -76,6 +78,8 @@
 		copyToClipboardButton?.reset();
 	}
 
+	const sortedUsers = $derived(sortDropdownUsers([...users], currentUserId));
+
 	onDestroy(() => {
 		hideAllTooltips();
 	});
@@ -88,7 +92,7 @@
 			<div class="col-12 mt-1">
 				<select class="form-select" bind:value={userId} id="user">
 					<option value="">All</option>
-					{#each users as user (user.id)}
+					{#each sortedUsers as user (user.id)}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>

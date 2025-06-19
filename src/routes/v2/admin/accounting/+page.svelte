@@ -45,7 +45,7 @@
 		<Accounting {users} {currentUserId} />
 	{:else if selectedTab === 'slurmAccounting'}
 		{#if useSlurm}
-			<SlurmAccounting {users} />
+			<SlurmAccounting {users} {currentUserId} />
 		{/if}
 	{/if}
 </div>
