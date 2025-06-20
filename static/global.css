@@ -29,3 +29,11 @@ pre {
 .droparea.active {
     background-color: #c8e5ff !important;
 }
+
+.form-control[type='date'] {
+    min-width: 170px;
+}
+
+.form-control[type='time'] {
+    min-width: 115px;
+}

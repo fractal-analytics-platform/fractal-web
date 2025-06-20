@@ -20,6 +20,8 @@ OAuth2 test requires a running instance of dexidp test image and a fractal-serve
 
 To skip OAuth2 test set the environment variable `SKIP_OAUTH_TEST` to `true`.
 
+To skip Pixi test set the environment variable `SKIP_PIXI_TEST` to `true`.
+
 To run the OAuth2 test locally add the following configuration to `.fractal_server.env`:
 
 ```

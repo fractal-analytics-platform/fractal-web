@@ -62,8 +62,13 @@
 						<li class="list-group-item">{taskGroup.python_version || '-'}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Path</li>
 						<li class="list-group-item">{taskGroup.path || '-'}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
-						<li class="list-group-item">{taskGroup.venv_path || '-'}</li>
+						{#if taskGroup.origin === 'pixi'}
+							<li class="list-group-item list-group-item-light fw-bold">Pixi version</li>
+							<li class="list-group-item">{taskGroup.pixi_version || '-'}</li>
+						{:else}
+							<li class="list-group-item list-group-item-light fw-bold">Venv path</li>
+							<li class="list-group-item">{taskGroup.venv_path || '-'}</li>
+						{/if}
 						<li class="list-group-item list-group-item-light fw-bold">Number of files</li>
 						<li class="list-group-item">{taskGroup.venv_file_number || '-'}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Size (MB)</li>
