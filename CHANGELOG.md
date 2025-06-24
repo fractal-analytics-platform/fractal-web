@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Used separated environment variabled (`PUBLIC_FRACTAL_VIZARR_VIEWER_URL` and `PUBLIC_FRACTAL_DATA_URL`) to configure fractal-data URL and vizarr viewer URL (\#816);
+* Used separate environment variables (`PUBLIC_FRACTAL_VIZARR_VIEWER_URL` and `PUBLIC_FRACTAL_DATA_URL`) to configure fractal-data URL and vizarr viewer URL (\#816);
 
 # 1.19.0
 
