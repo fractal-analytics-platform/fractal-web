@@ -5,12 +5,11 @@
 	import { env } from '$env/dynamic/public';
 	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
-	import { encodePathForUrl } from '$lib/common/component_utilities';
+	import { addFinalSlash, encodePathForUrl } from '$lib/common/component_utilities';
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 
-	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
-		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
-		: null;
+	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
+	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
 
 	let projectId = page.params.projectId;
 
@@ -168,7 +167,7 @@
 	</div>
 </div>
 
-{#if vizarrViewerUrl && plates.length > 0}
+{#if fractalDataUrl && vizarrViewerUrl && plates.length > 0}
 	<div class="container border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
@@ -188,7 +187,7 @@
 			<div class="col-12">
 				{#if platePath}
 					<a
-						href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{encodePathForUrl(platePath)}"
+						href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(platePath)}"
 						class="btn btn-info me-2"
 						target="_blank"
 						class:disabled={platePathLoading}
@@ -198,7 +197,7 @@
 					</a>
 					<CopyToClipboardButton
 						btnClass="light btn-outline-secondary"
-						clipboardText="{vizarrViewerUrl}data{encodePathForUrl(platePath)}"
+						clipboardText="{fractalDataUrl}files{encodePathForUrl(platePath)}"
 						text="Get URL"
 						id="get-plate-url"
 					/>
@@ -219,7 +218,6 @@
 	<DatasetImagesTable
 		{dataset}
 		bind:imagePage
-		{vizarrViewerUrl}
 		runWorkflowModal={false}
 		bind:this={imagesTable}
 	/>

@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Used separate environment variables (`PUBLIC_FRACTAL_VIZARR_VIEWER_URL` and `PUBLIC_FRACTAL_DATA_URL`) to configure fractal-data URL and vizarr viewer URL (\#816);
+
 # 1.19.0
 
 * Implemented Pixi task collection (\#812);
