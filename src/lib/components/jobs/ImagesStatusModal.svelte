@@ -4,14 +4,9 @@
 	import ExpandableLog from '../common/ExpandableLog.svelte';
 	import Modal from '../common/Modal.svelte';
 	import DatasetImagesTable from '../v2/projects/datasets/DatasetImagesTable.svelte';
-	import { env } from '$env/dynamic/public';
 	import { tick } from 'svelte';
 	import { hideAllTooltips } from '$lib/common/component_utilities';
 	import { getTypeFilterValues, STATUS_KEY } from '$lib/common/workflow_utilities';
-
-	const vizarrViewerUrl = env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL
-		? env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL.replace(/\/$|$/, '/')
-		: null;
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = $state(null);
@@ -169,7 +164,6 @@
 					bind:this={datasetImagesTable}
 					{dataset}
 					bind:imagePage
-					{vizarrViewerUrl}
 					disabledTypes={Object.keys(frozenTypes)}
 					{initialFilterValues}
 					imagesStatusModal={true}

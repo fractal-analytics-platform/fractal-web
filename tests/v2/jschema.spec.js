@@ -122,13 +122,13 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	});
 
 	await test.step('Required array with minItems and maxItems', async () => {
-		const addBtn = form.getByRole('button', { name: 'Add argument to list' }).first();
-		await addBtn.click();
-		await addBtn.click();
-		await expect(addBtn).toBeDisabled();
 		const block = form.locator('.property-block', {
 			has: page.getByText('requiredArrayWithMinMaxItems')
 		});
+		const addBtn = block.getByRole('button', { name: 'Add argument to list' });
+		await addBtn.click();
+		await addBtn.click();
+		await expect(addBtn).toBeDisabled();
 		// Fill items
 		await block.getByRole('textbox').nth(0).fill('a');
 		await block.getByRole('textbox').nth(1).fill('b');
@@ -162,14 +162,14 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Optional array with minItems and maxItems', async () => {
 		await form.getByText('optionalArrayWithMinMaxItems').first().click();
-		const addBtn = form.getByRole('button', { name: 'Add argument to list' }).nth(1);
+		const block = form.locator('.property-block', {
+			has: page.getByText('optionalArrayWithMinMaxItems')
+		});
+		const addBtn = block.getByRole('button', { name: 'Add argument to list' });
 		await addBtn.click();
 		await addBtn.click();
 		await addBtn.click();
 		await expect(addBtn).toBeDisabled();
-		const block = form.locator('.property-block', {
-			has: page.getByText('optionalArrayWithMinMaxItems')
-		});
 		await block.getByRole('textbox').nth(0).fill('a');
 		await block.getByRole('textbox').nth(1).fill('b');
 		await block.getByRole('textbox').nth(2).fill('c');

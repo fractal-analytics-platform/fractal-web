@@ -18,7 +18,8 @@ jobs:
       OAUTH_DEXIDP_REDIRECT_URL: "http://localhost:5173/auth/login/oauth2/"
       OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT: "http://127.0.0.1:5556/dex/.well-known/openid-configuration"
       PUBLIC_OAUTH_CLIENT_NAME: dexidp
-      PUBLIC_FRACTAL_VIZARR_VIEWER_URL: http://localhost:3000/vizarr
+      PUBLIC_FRACTAL_DATA_URL: http://localhost:3000/data
+      PUBLIC_FRACTAL_VIZARR_VIEWER_URL: http://localhost:3000/data/vizarr
 
     strategy:
       matrix:

@@ -1,9 +1,11 @@
 <script>
+	import { env } from '$env/dynamic/public';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import {
+		addFinalSlash,
 		encodePathForUrl,
 		hideAllTooltips,
 		objectChanged
@@ -16,12 +18,14 @@
 	import { browser } from '$app/environment';
 	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
 
+	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
+	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').DatasetV2} dataset
 	 * @property {import('fractal-components/types/api').ImagePage} imagePage
 	 * @property {Array<string>} [extraTypes] Types not included in the the image page result
-	 * @property {string|null} [vizarrViewerUrl]
 	 * @property {boolean} [runWorkflowModal] Set to true if the table is displayed inside the "Run workflow" modal. Used to disable some buttons.
 	 * @property {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} [initialFilterValues]
 	 * @property {Array<string>} [disabledTypes]
@@ -37,7 +41,6 @@
 		dataset,
 		imagePage = $bindable(),
 		extraTypes = [],
-		vizarrViewerUrl = null,
 		runWorkflowModal = false,
 		initialFilterValues = null,
 		disabledTypes = [],
@@ -587,7 +590,7 @@
 	 * @param {string} zarrUrl
 	 */
 	function getUrl(zarrUrl) {
-		return `${vizarrViewerUrl}data${encodePathForUrl(zarrUrl)}`;
+		return `${fractalDataUrl}files${encodePathForUrl(zarrUrl)}`;
 	}
 
 	onDestroy(() => {
@@ -723,10 +726,10 @@
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
-								{#if vizarrViewerUrl}
+								{#if fractalDataUrl && vizarrViewerUrl}
 									<a
 										class="btn btn-info"
-										href="{vizarrViewerUrl}?source={vizarrViewerUrl}data{encodePathForUrl(
+										href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
 											image.zarr_url
 										)}"
 										target="_blank"

@@ -92,8 +92,8 @@ export function removeDuplicatedItems(allItems) {
 		a.name.toLowerCase() < b.name.toLowerCase()
 			? -1
 			: a.name.toLowerCase() === b.name.toLowerCase()
-			? 0
-			: 1
+				? 0
+				: 1
 	);
 }
 
@@ -106,8 +106,8 @@ export function sortProjectsByTimestampCreatedDesc(projects) {
 		p1.timestamp_created < p2.timestamp_created
 			? 1
 			: p1.timestamp_created > p2.timestamp_created
-			? -1
-			: 0
+				? -1
+				: 0
 	);
 }
 
@@ -199,4 +199,15 @@ export function encodePathForUrl(zarrUrl) {
 	// Replace encoded slashes back to slashes
 	encodedPath = encodedPath.replace(/%2F/g, '/');
 	return encodedPath;
+}
+
+/**
+ * Add a slash to the end of the URL, if needed.
+ * @param {string|undefined} url
+ */
+export function addFinalSlash(url) {
+	if (!url) {
+		return undefined;
+	}
+	return url.replace(/\/$|$/, '/');
 }
