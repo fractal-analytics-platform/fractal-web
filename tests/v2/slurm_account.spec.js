@@ -81,7 +81,7 @@ test('Add SLURM accounts for the admin and execute workflow using a specific acc
 		await modalTitle.waitFor();
 		await expect(modalTitle).toContainText(`Workflow Job #`);
 		const items = await page.locator('.modal.show').getByRole('listitem').allInnerTexts();
-		expect(items[items.length - 2]).toEqual('SLURM account');
-		expect(items[items.length - 1]).toEqual(randomSlurmAccount);
+		expect(items[items.length - 6]).toEqual('SLURM account');
+		expect(items[items.length - 5]).toEqual(randomSlurmAccount);
 	});
 });

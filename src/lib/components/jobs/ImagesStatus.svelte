@@ -1,29 +1,26 @@
 <script>
 	import { isConverterType, isParallelType } from 'fractal-components/common/workflow_task_utils';
 
-	
-	
-	
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').ImagesStatus|undefined} status
+	 * @property {boolean} running
 	 * @property {import('fractal-components/types/api').DatasetV2} dataset
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {import('./ImagesStatusModal.svelte').default} imagesStatusModal
 	 */
 
 	/** @type {Props} */
-	let {
-		status,
-		dataset,
-		workflowTask,
-		imagesStatusModal
-	} = $props();
+	let { status, running, dataset, workflowTask, imagesStatusModal } = $props();
 
-	let fullyDone = $derived(status && status.num_done_images === status.num_available_images);
-	let fullyFailed = $derived(status && status.num_failed_images === status.num_available_images);
+	let fullyDone = $derived(
+		status && 'num_done_images' in status && status.num_done_images === status.num_available_images
+	);
+	let fullyFailed = $derived(
+		status &&
+			'num_failed_images' in status &&
+			status.num_failed_images === status.num_available_images
+	);
 	let partial = $derived(status && !fullyDone && !fullyFailed);
 
 	/**
@@ -39,6 +36,7 @@
 			return false;
 		}
 		return (
+			'num_available_images' in status &&
 			status.num_submitted_images === 0 &&
 			status.num_done_images === 0 &&
 			status.num_failed_images === 0 &&
@@ -55,17 +53,21 @@
 			{:else if status.status === 'failed'}
 				<i class="status-icon bi bi-x text-danger pe-1"></i>
 			{:else if status.status === 'submitted'}
-				<div
-					class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
-					role="status"
-				>
-					<span class="visually-hidden">Loading...</span>
-				</div>
+				{#if running}
+					<div
+						class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
+						role="status"
+					>
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				{:else}
+					<i class="bi bi-hourglass"></i>
+				{/if}
 			{/if}
 		</span>
 	{:else}
 		<span class="d-flex">
-			{#if status.num_submitted_images > 0}
+			{#if 'num_submitted_images' in status && status.num_submitted_images > 0}
 				<button
 					aria-label="Submitted images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
@@ -83,8 +85,10 @@
 						</div>
 					</span>
 				</button>
+			{:else if status.status === 'submitted' && !running}
+				<i class="bi bi-hourglass"></i>
 			{/if}
-			{#if status.num_done_images > 0}
+			{#if 'num_done_images' in status && status.num_done_images > 0}
 				<button
 					aria-label="Done images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
@@ -98,10 +102,10 @@
 					</span>
 				</button>
 			{/if}
-			{#if status.num_done_images > 0 && status.num_failed_images}
+			{#if 'num_done_images' in status && status.num_done_images > 0 && status.num_failed_images}
 				/
 			{/if}
-			{#if status.num_failed_images > 0}
+			{#if 'num_failed_images' in status && status.num_failed_images > 0}
 				<button
 					aria-label="Failed images"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
@@ -115,7 +119,7 @@
 					</span>
 				</button>
 			{/if}
-			{#if partial}
+			{#if partial && 'num_available_images' in status}
 				/
 				<span class="ps-1" aria-label="Available images">
 					{status.num_available_images === null ? '?' : status.num_available_images}

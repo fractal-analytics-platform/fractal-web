@@ -80,6 +80,10 @@
 						<li class="list-group-item"><code>{job.working_dir_user}</code></li>
 						<li class="list-group-item list-group-item-light fw-bold">SLURM account</li>
 						<li class="list-group-item">{job.slurm_account || '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">First task index</li>
+						<li class="list-group-item">{job.first_task_index !== null ? job.first_task_index : '-'}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Last task index</li>
+						<li class="list-group-item">{job.last_task_index !== null ? job.last_task_index : '-'}</li>
 					</ul>
 				{/if}
 			</div>

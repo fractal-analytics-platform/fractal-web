@@ -706,7 +706,6 @@
 										{disabledTypes}
 										{extraTypes}
 										highlightedTypes={preSubmissionCheckUniqueTypesResults}
-										vizarrViewerUrl={null}
 										runWorkflowModal={true}
 										queryUrl={`/api/v2/project/${selectedDataset.project_id}/status/images?workflowtask_id=${workflow.task_list[firstTaskIndex || 0].id}&dataset_id=${selectedDataset.id}`}
 										beforeTypeSelectionChanged={(key) => {
