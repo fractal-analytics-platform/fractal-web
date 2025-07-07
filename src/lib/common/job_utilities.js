@@ -175,7 +175,8 @@ export function getFirstTaskIndexForContinuingWorkflow(
 		if (workflowTasks[i + 1].id === selectedWorkflowTask.id) {
 			const previousTask = workflowTasks[i];
 			if (previousTask.id in statuses) {
-				if (statuses[previousTask.id].num_done_images > 0) {
+				const status = statuses[previousTask.id];
+				if ('num_done_images' in status && status.num_done_images > 0) {
 					return selectedWorkflowTask.order;
 				}
 			}

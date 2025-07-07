@@ -497,6 +497,10 @@
 		Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0
 	);
 
+	let runningTaskId = $derived(
+		workflow.task_list.find((t) => statuses[t.id]?.status === 'submitted')?.id
+	);
+
 	/** @type {number|undefined} */
 	let statusWatcherTimer;
 
@@ -910,6 +914,7 @@
 													dataset={selectedDataset}
 													{workflowTask}
 													{imagesStatusModal}
+													running={workflowTask.id === runningTaskId}
 												/>
 											{/if}
 										{/if}

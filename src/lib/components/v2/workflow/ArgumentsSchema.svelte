@@ -110,7 +110,7 @@
 	}
 
 	export function discardChanges() {
-		workflowTask = workflowTask;
+		workflowTask = deepCopy(workflowTask);
 		unsavedChangesNonParallel = false;
 		unsavedChangesParallel = false;
 		unsavedChangesFormBuilderParallel = false;
