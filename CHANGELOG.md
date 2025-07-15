@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added "Open in Feature Explorer" link and `PUBLIC_FRACTAL_FEATURE_EXPLORER_URL` environment variable (\#820);
+
 # 1.19.2
 
 * Added first and last task index to job info modal (\#818);

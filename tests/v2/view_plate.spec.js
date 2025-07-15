@@ -1,7 +1,7 @@
 import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { expect, test } from './project_fixture.js';
 
-test('View plate', async ({ page, project }) => {
+test('View plate and feature explorer link', async ({ page, project }) => {
 	await page.waitForURL(project.url);
 	await waitPageLoading(page);
 
@@ -45,6 +45,10 @@ test('View plate', async ({ page, project }) => {
 			await expect(page.getByRole('link', { name: 'View plate' })).toHaveAttribute(
 				'href',
 				plateUrlRegExp
+			);
+			await expect(page.getByRole('link', { name: 'Open in Feature Explorer' })).toHaveAttribute(
+				'href',
+				new RegExp(`\\/plate${i}\\.zarr\\&setup_mode=Plates$`)
 			);
 			await page.getByRole('button', { name: 'Get URL' }).first().click();
 			const clipboardContent = await page.evaluate(async () => {
