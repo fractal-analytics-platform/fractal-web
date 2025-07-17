@@ -10,6 +10,7 @@
 
 	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
 	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
+	const featureExplorerUrl = addFinalSlash(env.PUBLIC_FRACTAL_FEATURE_EXPLORER_URL);
 
 	let projectId = page.params.projectId;
 
@@ -167,7 +168,7 @@
 	</div>
 </div>
 
-{#if fractalDataUrl && vizarrViewerUrl && plates.length > 0}
+{#if fractalDataUrl && (vizarrViewerUrl || featureExplorerUrl) && plates.length > 0}
 	<div class="container border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
@@ -186,21 +187,38 @@
 			</div>
 			<div class="col-12">
 				{#if platePath}
-					<a
-						href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(platePath)}"
-						class="btn btn-info me-2"
-						target="_blank"
-						class:disabled={platePathLoading}
-					>
-						<i class="bi bi-eye"></i>
-						View plate
-					</a>
-					<CopyToClipboardButton
-						btnClass="light btn-outline-secondary"
-						clipboardText="{fractalDataUrl}files{encodePathForUrl(platePath)}"
-						text="Get URL"
-						id="get-plate-url"
-					/>
+					{#if vizarrViewerUrl}
+						<a
+							href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(platePath)}"
+							class="btn btn-info me-2"
+							target="_blank"
+							class:disabled={platePathLoading}
+						>
+							<i class="bi bi-eye"></i>
+							View plate
+						</a>
+					{/if}
+					{#if featureExplorerUrl}
+						<a
+							href="{featureExplorerUrl}?zarr_url={fractalDataUrl}files{encodePathForUrl(
+								platePath
+							)}&setup_mode=Plates"
+							class="btn btn-info me-2"
+							target="_blank"
+							class:disabled={platePathLoading}
+						>
+							<i class="bi bi-eye"></i>
+							Open in Feature Explorer
+						</a>
+					{/if}
+					{#if vizarrViewerUrl}
+						<CopyToClipboardButton
+							btnClass="light btn-outline-secondary"
+							clipboardText="{fractalDataUrl}files{encodePathForUrl(platePath)}"
+							text="Get URL"
+							id="get-plate-url"
+						/>
+					{/if}
 				{:else if platePathError}
 					<span class="text-danger">{platePathError}</span>
 				{/if}
@@ -215,12 +233,7 @@
 <div id="datasetUpdateError"></div>
 
 <div class="container-fluid">
-	<DatasetImagesTable
-		{dataset}
-		bind:imagePage
-		runWorkflowModal={false}
-		bind:this={imagesTable}
-	/>
+	<DatasetImagesTable {dataset} bind:imagePage runWorkflowModal={false} bind:this={imagesTable} />
 </div>
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />

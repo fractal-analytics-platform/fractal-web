@@ -19,6 +19,7 @@ The following environment variables can be used to configure fractal-web.
 * `FRACTAL_RUNNER_BACKEND`: specifies which runner backend is used; supported values are: `local`, `slurm`, `slurm_ssh`; setting this variable is mandatory;
 * `PUBLIC_FRACTAL_DATA_URL`: URL to [fractal-data](https://github.com/fractal-analytics-platform/fractal-data) service (e.g. http://localhost:3000/data for testing);
 * `PUBLIC_FRACTAL_VIZARR_VIEWER_URL`: URL to vizarr viewer (e.g. http://localhost:3000/data/vizarr for testing);
+* `PUBLIC_FRACTAL_FEATURE_EXPLORER_URL`: URL to Fractal Feature Explorer (e.g. http://localhost:8501 for testing);
 * `WARNING_BANNER_PATH`: specifies the path to a text file containing the warning banner message displayed on the site; the banner is used to inform users about important issues, such as external resources downtime or maintenance alerts; if the variable is empty or unset no banner is displayed;
 * `NEWS_INFO_PATH`: specifies the path to a Markdown file containing the news section of the home page; the title of the section is automatically added; if the variable is empty or unset the news section is not displayed;
 

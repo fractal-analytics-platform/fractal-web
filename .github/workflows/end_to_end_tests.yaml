@@ -20,6 +20,7 @@ jobs:
       PUBLIC_OAUTH_CLIENT_NAME: dexidp
       PUBLIC_FRACTAL_DATA_URL: http://localhost:3000/data
       PUBLIC_FRACTAL_VIZARR_VIEWER_URL: http://localhost:3000/data/vizarr
+      PUBLIC_FRACTAL_FEATURE_EXPLORER_URL: http://localhost:8501
 
     strategy:
       matrix:
