@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added body request normalizer (\#825);
+
 # 1.19.3
 
 * Added "Open in Feature Explorer" link and `PUBLIC_FRACTAL_FEATURE_EXPLORER_URL` environment variable (\#820);
