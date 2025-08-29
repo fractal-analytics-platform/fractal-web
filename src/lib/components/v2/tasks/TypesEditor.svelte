@@ -80,11 +80,19 @@
 		return Object.fromEntries(items.map((i) => [i.key, i.value]));
 	}
 
-	function addInputType() {
+	/**
+	 * @param {Event} event
+	 */
+	 function addInputType(event) {
+		event.stopPropagation();
 		inputTypesArray = [...inputTypesArray, { key: '', value: false, error: '' }];
 	}
 
-	function addOutputType() {
+	/**
+	 * @param {Event} event
+	 */
+	function addOutputType(event) {
+		event.stopPropagation();
 		outputTypesArray = [...outputTypesArray, { key: '', value: false, error: '' }];
 	}
 
