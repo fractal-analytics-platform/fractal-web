@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import { addFinalSlash, encodePathForUrl } from '$lib/common/component_utilities';
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
 	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
@@ -64,7 +65,7 @@
 				method: 'POST',
 				headers,
 				credentials: 'include',
-				body: JSON.stringify(params)
+				body: normalizePayload(params)
 			}
 		);
 		if (!response.ok) {

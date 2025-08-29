@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors';
 import { getLogger } from '$lib/server/logger.js';
+import { normalizePayload } from 'fractal-components';
 
 const logger = getLogger('dataset API [v2]');
 
@@ -28,7 +29,7 @@ export async function getDatasetImages(fetch, projectId, datasetId, page, pageSi
 			method: 'POST',
 			headers,
 			credentials: 'include',
-			body: JSON.stringify(params)
+			body: normalizePayload(params)
 		}
 	);
 

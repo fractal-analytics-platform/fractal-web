@@ -1,6 +1,7 @@
 <script>
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { normalizePayload } from 'fractal-components';
 	import ImageAttributesTypesForm from './ImageAttributesTypesForm.svelte';
 
 	/**
@@ -70,7 +71,7 @@
 			{
 				method: 'POST',
 				headers,
-				body: JSON.stringify({
+				body: normalizePayload({
 					zarr_url,
 					attributes: attributesTypesForm?.getAttributes(),
 					types: attributesTypesForm?.getTypes()
@@ -95,7 +96,7 @@
 			{
 				method: 'PATCH',
 				headers,
-				body: JSON.stringify({
+				body: normalizePayload({
 					zarr_url,
 					attributes: attributesTypesForm?.getAttributes(),
 					types: attributesTypesForm?.getTypes()

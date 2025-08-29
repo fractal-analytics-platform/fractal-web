@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import Modal from '../../common/Modal.svelte';
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
+	import { normalizePayload } from 'fractal-components';
 
 	// List of projects to be displayed
 
@@ -58,7 +59,7 @@
 			credentials: 'include',
 			mode: 'cors',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: newProjectName
 			})
 		});

@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -81,7 +82,7 @@
 			credentials: 'include',
 			mode: 'cors',
 			headers,
-			body: JSON.stringify(patchData)
+			body: normalizePayload(patchData)
 		});
 		workflowTaskSorting = false;
 

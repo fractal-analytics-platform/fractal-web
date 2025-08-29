@@ -5,6 +5,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { normalizePayload } from 'fractal-components';
 
 	// Component properties
 	const project = $derived(page.data.project);
@@ -36,7 +37,7 @@
 					credentials: 'include',
 					mode: 'cors',
 					headers,
-					body: JSON.stringify({
+					body: normalizePayload({
 						name: updatedProjectName
 					})
 				});

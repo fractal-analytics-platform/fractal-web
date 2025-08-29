@@ -1,6 +1,7 @@
 <script>
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { recentActivities } from '$lib/stores';
+	import { normalizePayload } from 'fractal-components';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	/**

@@ -1,9 +1,9 @@
 <script>
-	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 	import TypesEditor from './TypesEditor.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	let { updateEditedTask } = $props();
 
@@ -59,7 +59,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(nullifyEmptyStrings(taskProperties))
+			body: normalizePayload(taskProperties, { nullifyEmptyStrings: true })
 		});
 
 		if (response.ok) {

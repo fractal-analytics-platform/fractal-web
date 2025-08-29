@@ -4,6 +4,7 @@
 	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
 	let groups = $derived(page.data.groups);
@@ -34,7 +35,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: newGroupName
 			})
 		});

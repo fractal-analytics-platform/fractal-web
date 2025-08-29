@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
 	let inProgress = $state(false);
@@ -45,7 +46,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: randomProjectName
 			})
 		});
@@ -67,7 +68,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: 'test',
 				zarr_dir: zarrDir
 			})
@@ -90,7 +91,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({ name: 'test' })
+			body: normalizePayload({ name: 'test' })
 		});
 
 		if (!response.ok) {
@@ -113,7 +114,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: '__TEST_ECHO_TASK__',
 				command_non_parallel: 'echo',
 				version: '9.9.9',
@@ -178,7 +179,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify({ first_task_index: 0, attribute_filters: {} })
+				body: normalizePayload({ first_task_index: 0, attribute_filters: {} })
 			}
 		);
 		if (!response.ok) {

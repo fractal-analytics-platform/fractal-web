@@ -17,29 +17,6 @@ export function getOnlyModifiedProperties(oldProperties, newProperties) {
 }
 
 /**
- * Transform an object setting to null all the keys having empty string as value
- * @param {object} inputValues
- * @returns {object}
- */
-export function nullifyEmptyStrings(inputValues) {
-	const clearedValues = {};
-	for (let key in inputValues) {
-		if (typeof inputValues[key] === 'string' && inputValues[key].trim() === '') {
-			clearedValues[key] = null;
-		} else if (
-			inputValues[key] !== null &&
-			typeof inputValues[key] === 'object' &&
-			!Array.isArray(inputValues[key])
-		) {
-			clearedValues[key] = nullifyEmptyStrings(inputValues[key]);
-		} else {
-			clearedValues[key] = inputValues[key];
-		}
-	}
-	return clearedValues;
-}
-
-/**
  * Removes null values from an object
  * @param {object} inputValues
  * @returns {object}
@@ -52,21 +29,6 @@ export function removeNullValues(inputValues) {
 		}
 	}
 	return clearedValues;
-}
-
-/**
- * Replacer function to ignore empty strings when using JSON.stringify().
- * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description}
- * @param {string} _key
- * @param {any} value
- * @returns {any}
- */
-export function replaceEmptyStrings(_key, value) {
-	if (typeof value === 'string' && value.trim() === '') {
-		return undefined;
-	} else {
-		return value;
-	}
 }
 
 export function formatMarkdown(markdownValue) {
@@ -145,13 +107,6 @@ export function objectChanged(oldObject, newObject) {
 		}
 	}
 	return false;
-}
-
-/**
- * @param {any} value
- */
-export function deepCopy(value) {
-	return JSON.parse(JSON.stringify(value));
 }
 
 /**

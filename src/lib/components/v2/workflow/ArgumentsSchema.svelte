@@ -6,13 +6,8 @@
 		getAlertErrorFromResponse
 	} from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
-	import {
-		JSchema,
-		stripNullAndEmptyObjectsAndArrays,
-		getPropertiesToIgnore
-	} from 'fractal-components';
+	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
 	import FormBuilder from './FormBuilder.svelte';
-	import { deepCopy } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
 	import {
@@ -24,6 +19,7 @@
 		hasParallelArguments,
 		isParallelType
 	} from 'fractal-components';
+	import { deepCopy, normalizePayload } from 'fractal-components/common/utils';
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
@@ -178,7 +174,7 @@
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(stripNullAndEmptyObjectsAndArrays(deepCopy(payload)))
+				body: normalizePayload(payload, { deepCopy: true, stripEmptyElements: true })
 			}
 		);
 

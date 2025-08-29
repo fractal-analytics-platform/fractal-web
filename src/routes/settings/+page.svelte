@@ -1,12 +1,12 @@
 <script>
 	import { page } from '$app/state';
-	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		AlertError,
 		displayStandardErrorAlert,
 		getValidationMessagesMap
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
 	/**
@@ -49,7 +49,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(nullifyEmptyStrings(payload))
+			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});
 		const result = await response.json();
 		if (response.ok) {

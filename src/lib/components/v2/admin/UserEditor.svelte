@@ -1,7 +1,6 @@
 <script>
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import {
 		displayStandardErrorAlert,
 		FormErrorHandler,
@@ -14,6 +13,7 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
 	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
+	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -232,7 +232,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				group_ids: userGroups.map((g) => g.id)
 			})
 		});

@@ -1,6 +1,6 @@
 <script>
-	import { nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
+	import { normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
@@ -56,7 +56,7 @@
 					method: 'PATCH',
 					credentials: 'include',
 					headers,
-					body: JSON.stringify(taskGroupProperties)
+					body: normalizePayload(taskGroupProperties)
 				});
 
 				if (!response.ok) {

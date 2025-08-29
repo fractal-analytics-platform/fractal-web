@@ -7,7 +7,12 @@
 	import { page } from '$app/state';
 	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
 	import { tick } from 'svelte';
-	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
+	import {
+		isCompoundType,
+		isNonParallelType,
+		isParallelType,
+		normalizePayload
+	} from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -145,7 +150,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify({
+				body: normalizePayload({
 					args_non_parallel:
 						fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
 					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel

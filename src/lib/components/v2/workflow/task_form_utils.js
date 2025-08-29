@@ -1,4 +1,5 @@
 import { AlertError, getAlertErrorFromResponse } from "$lib/common/errors";
+import { normalizePayload } from "fractal-components";
 
 /**
  * Updates the workflow task properties.
@@ -66,7 +67,7 @@ async function updateWorkflowTaskArguments(
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(requestBody)
+			body: normalizePayload(requestBody)
 		}
 	);
 
@@ -105,7 +106,7 @@ async function updateWorkflowTaskMetadata(
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(requestBody)
+			body: normalizePayload(requestBody)
 		}
 	);
 

@@ -3,6 +3,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { normalizePayload } from 'fractal-components/common/utils';
 	import TimestampCell from '../jobs/TimestampCell.svelte';
 
 	/**
@@ -93,7 +94,7 @@
 				method: 'POST',
 				headers,
 				credentials: 'include',
-				body: JSON.stringify(params)
+				body: normalizePayload(params)
 			}
 		);
 		if (response.ok) {

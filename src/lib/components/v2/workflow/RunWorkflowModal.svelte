@@ -1,5 +1,4 @@
 <script>
-	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import {
 		generateNewUniqueDatasetName,
@@ -15,6 +14,7 @@
 		getTypeFilterValues,
 		STATUS_KEY
 	} from '$lib/common/workflow_utilities';
+	import { normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -150,7 +150,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(requestBody, replaceEmptyStrings)
+				body: normalizePayload(requestBody, { stripEmptyStrings: true })
 			}
 		);
 		applyingWorkflow = false;
@@ -200,7 +200,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: datasetName,
 				zarr_dir: zarrDir
 			})
@@ -297,7 +297,7 @@
 				headers,
 				method: 'POST',
 				credentials: 'include',
-				body: JSON.stringify(params)
+				body: normalizePayload(params)
 			}
 		);
 		if (!response.ok) {
@@ -328,7 +328,7 @@
 				headers,
 				method: 'POST',
 				credentials: 'include',
-				body: JSON.stringify(params)
+				body: normalizePayload(params)
 			}
 		);
 		if (!response.ok) {
@@ -411,7 +411,7 @@
 				method: 'POST',
 				headers,
 				credentials: 'include',
-				body: JSON.stringify(initialFilterValues)
+				body: normalizePayload(initialFilterValues)
 			}
 		);
 		if (!response.ok) {
