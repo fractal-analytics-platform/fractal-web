@@ -16,21 +16,6 @@ export function getOnlyModifiedProperties(oldProperties, newProperties) {
 	return modifiedProperties;
 }
 
-/**
- * Removes null values from an object
- * @param {object} inputValues
- * @returns {object}
- */
-export function removeNullValues(inputValues) {
-	const clearedValues = {};
-	for (let key in inputValues) {
-		if (inputValues[key] !== null) {
-			clearedValues[key] = inputValues[key];
-		}
-	}
-	return clearedValues;
-}
-
 export function formatMarkdown(markdownValue) {
 	if (!markdownValue) {
 		return '';

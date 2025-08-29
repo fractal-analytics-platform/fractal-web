@@ -76,7 +76,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: normalizePayload({ ...editableSettings, id: undefined }, { stripEmptyStrings: true })
+			body: normalizePayload({ ...editableSettings, id: undefined }, { nullifyEmptyStrings: true })
 		});
 		if (!response.ok) {
 			await settingsFormErrorHandler.handleErrorResponse(response);

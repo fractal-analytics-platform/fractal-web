@@ -1,6 +1,6 @@
 <script>
 	import { FormErrorHandler } from '$lib/common/errors';
-	import { normalizePayload, nullifyEmptyStrings } from 'fractal-components';
+	import { normalizePayload } from 'fractal-components';
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
@@ -45,10 +45,6 @@
 			async () => {
 				saving = true;
 
-				const taskGroupProperties = nullifyEmptyStrings({
-					user_group_id: privateTask ? null : selectedGroup
-				});
-
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');
 
@@ -56,7 +52,12 @@
 					method: 'PATCH',
 					credentials: 'include',
 					headers,
-					body: normalizePayload(taskGroupProperties)
+					body: normalizePayload(
+						{
+							user_group_id: privateTask ? null : selectedGroup
+						},
+						{ nullifyEmptyStrings: true }
+					)
 				});
 
 				if (!response.ok) {
