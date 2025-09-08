@@ -219,11 +219,16 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Select arguments file').click();
+		await modal.getByText('Select arguments file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(file);
-		await page.getByRole('button', { name: 'Confirm' }).click();
-		await expect(page.getByText('must have required property')).toBeVisible();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await expect(modal.getByText('Invalid JSON Schema data')).toBeVisible();
+		await expect(modal.getByText('Invalid arguments')).toBeVisible();
+		await modal.getByRole('button', { name: 'more' }).click();
+		await expect(
+			modal.getByText(/must have required property 'test_parallel'/).first()
+		).toBeVisible();
 		await closeModal(page);
 		fs.rmSync(file);
 		await workflow.removeCurrentTask();

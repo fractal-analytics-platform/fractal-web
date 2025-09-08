@@ -3,6 +3,7 @@
 # Unreleased
 
 * Added body request normalizer (\#825);
+* Fixed JSON schema validation during arguments import (\#827);
 
 # 1.19.3
 
