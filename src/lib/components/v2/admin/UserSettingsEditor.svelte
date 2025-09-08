@@ -1,6 +1,6 @@
 <script>
-	import { deepCopy, nullifyEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
+	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 	import { onMount } from 'svelte';
 
 	let settingsFormSubmitted = $state(false);
@@ -76,7 +76,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(nullifyEmptyStrings({ ...editableSettings, id: undefined }))
+			body: normalizePayload({ ...editableSettings, id: undefined }, { nullifyEmptyStrings: true })
 		});
 		if (!response.ok) {
 			await settingsFormErrorHandler.handleErrorResponse(response);

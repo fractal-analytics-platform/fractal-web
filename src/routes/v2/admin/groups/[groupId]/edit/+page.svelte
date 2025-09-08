@@ -8,6 +8,7 @@
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import UserSettingsEditor from '$lib/components/v2/admin/UserSettingsEditor.svelte';
+	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
@@ -155,7 +156,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				viewer_paths: [...editableViewPaths]
 			})
 		});

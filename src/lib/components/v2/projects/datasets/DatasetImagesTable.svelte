@@ -13,7 +13,7 @@
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { deepCopy, stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
+	import { deepCopy, normalizePayload } from 'fractal-components';
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/environment';
 	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
@@ -408,11 +408,12 @@
 			response = await fetch(url, {
 				method: 'POST',
 				headers,
-				body: JSON.stringify(
-					stripNullAndEmptyObjectsAndArrays({
+				body: normalizePayload(
+					{
 						attribute_filters: attributes,
 						type_filters: types
-					})
+					},
+					{ stripEmptyElements: true }
 				)
 			});
 		} else {
@@ -422,7 +423,7 @@
 					method: 'POST',
 					headers,
 					credentials: 'include',
-					body: JSON.stringify(params)
+					body: normalizePayload(params)
 				}
 			);
 		}

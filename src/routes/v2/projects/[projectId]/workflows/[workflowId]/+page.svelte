@@ -28,6 +28,7 @@
 	import { navigating, navigationCancelled } from '$lib/stores';
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
@@ -243,7 +244,7 @@
 					method: 'PATCH',
 					credentials: 'include',
 					headers,
-					body: JSON.stringify({
+					body: normalizePayload({
 						name: updatedWorkflowName
 					})
 				});

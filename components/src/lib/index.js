@@ -4,7 +4,9 @@ import { SchemaValidator, detectSchemaVersion } from './jschema/jschema_validati
 import {
 	deepCopy,
 	getValidationErrorMessage,
-	stripNullAndEmptyObjectsAndArrays
+	stripNullAndEmptyObjectsAndArrays,
+	normalizePayload,
+	nullifyEmptyStrings
 } from './common/utils';
 import {
 	isCompoundType,
@@ -39,5 +41,7 @@ export {
 	hasComputeArguments,
 	hasInitialisationArguments,
 	hasNonParallelArguments,
-	hasParallelArguments
+	hasParallelArguments,
+	normalizePayload,
+	nullifyEmptyStrings
 };

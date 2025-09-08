@@ -1,8 +1,7 @@
 <script>
 	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
-	import { SchemaValidator } from 'fractal-components';
+	import { normalizePayload, SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
-	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
@@ -111,7 +110,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(body, replaceEmptyStrings)
+				body: normalizePayload(body, { stripEmptyStrings: true })
 			});
 
 			if (response.ok) {

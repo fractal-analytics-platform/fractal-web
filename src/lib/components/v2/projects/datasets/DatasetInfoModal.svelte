@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -86,7 +87,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(body)
+			body: normalizePayload(body)
 		});
 		if (response.ok) {
 			const result = await response.json();

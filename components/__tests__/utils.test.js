@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stripNullAndEmptyObjectsAndArrays } from '../src/lib/common/utils';
+import { stripNullAndEmptyObjectsAndArrays, _normalize } from '../src/lib/common/utils';
 
 describe('utils', () => {
 	it('should strip data objects correctly', () => {
@@ -38,5 +38,45 @@ describe('utils', () => {
 				list_property: [0]
 			}
 		});
+	});
+
+	it('should normalize a complex nested object and track paths', () => {
+		const payload = {
+			foo: {
+				bar: [{ baz: '  Value 1\u200B ' }, { baz: '  Value 2  ' }, null, { baz: undefined }],
+				qux: '  Some text\u200B '
+			},
+			quux: {
+				corge: '  Another value  ',
+				grault: [{ garply: '  Nested value  ' }, { garply: null }],
+				'key_with_space ': true
+			},
+			'key_with_space ': true
+		};
+
+		const normalizedPaths = _normalize(payload);
+
+		expect(payload).toEqual({
+			foo: {
+				bar: [{ baz: 'Value 1' }, { baz: 'Value 2' }, null, { baz: undefined }],
+				qux: 'Some text'
+			},
+			quux: {
+				corge: 'Another value',
+				grault: [{ garply: 'Nested value' }, { garply: null }],
+				key_with_space: true
+			},
+			key_with_space: true
+		});
+
+		expect(normalizedPaths).toEqual([
+			'foo.bar[0].baz',
+			'foo.bar[1].baz',
+			'foo.qux',
+			'quux.corge',
+			'quux.grault[0].garply',
+			'quux',
+			'root'
+		]);
 	});
 });

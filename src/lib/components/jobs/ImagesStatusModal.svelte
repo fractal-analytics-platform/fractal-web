@@ -7,6 +7,7 @@
 	import { tick } from 'svelte';
 	import { hideAllTooltips } from '$lib/common/component_utilities';
 	import { getTypeFilterValues, STATUS_KEY } from '$lib/common/workflow_utilities';
+	import { normalizePayload } from 'fractal-components/common/utils';
 
 	/** @type {import('fractal-components/types/api').ImagePage|null} */
 	let imagePage = $state(null);
@@ -73,7 +74,7 @@
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify(initialFilterValues)
+			body: normalizePayload(initialFilterValues)
 		});
 		if (!response.ok) {
 			loading = false;
@@ -95,7 +96,7 @@
 		const response = await fetch(`/api/v2/project/${dataset?.project_id}/status/image-log`, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				workflowtask_id: workflowTask?.id,
 				dataset_id: dataset?.id,
 				zarr_url: image.zarr_url

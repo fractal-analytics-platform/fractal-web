@@ -5,6 +5,7 @@
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users));
@@ -213,7 +214,7 @@
 					method: 'PATCH',
 					credentials: 'include',
 					headers,
-					body: JSON.stringify({ status: 'failed' })
+					body: normalizePayload({ status: 'failed' })
 				});
 
 				if (!response.ok) {

@@ -79,3 +79,169 @@ export function getValidationErrorMessage(err) {
 		return /** @type {Error}*/ (err).message;
 	}
 }
+
+/**
+ * Transform an object setting to null all the keys having empty string as value
+ * @param {object} inputValues
+ * @returns {object}
+ */
+export function nullifyEmptyStrings(inputValues) {
+	const clearedValues = {};
+	for (let key in inputValues) {
+		if (typeof inputValues[key] === 'string' && inputValues[key].trim() === '') {
+			clearedValues[key] = null;
+		} else if (
+			inputValues[key] !== null &&
+			typeof inputValues[key] === 'object' &&
+			!Array.isArray(inputValues[key])
+		) {
+			clearedValues[key] = nullifyEmptyStrings(inputValues[key]);
+		} else {
+			clearedValues[key] = inputValues[key];
+		}
+	}
+	return clearedValues;
+}
+
+/**
+ * Replacer function to ignore empty strings when using JSON.stringify().
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description}
+ * @param {string} _key
+ * @param {any} value
+ * @returns {any}
+ */
+function stripEmptyStrings(_key, value) {
+	if (typeof value === 'string' && value.trim() === '') {
+		return undefined;
+	} else {
+		return value;
+	}
+}
+
+/**
+ * @typedef {Object} NormalizerOptions
+ * @property {boolean} stripEmptyStrings - Indicates whether to remove empty strings from the input. Not needed if `stripEmptyElements` is used.
+ * @property {boolean} stripEmptyElements - Removes both empty strings and empty, null and undefined objects from the input
+ * @property {boolean} nullifyEmptyStrings - Convert empty strings to null
+ * @property {boolean} deepCopy - Indicates whether to create a deep copy of the input.
+ * @property {boolean} showWarning - Indicates whether to show a warning when normalization has been applied.
+ */
+
+/** @type {NormalizerOptions} */
+const defaultNormalizerOptions = {
+	stripEmptyStrings: false,
+	stripEmptyElements: false,
+	nullifyEmptyStrings: false,
+	deepCopy: false,
+	showWarning: true
+};
+
+/**
+ * @param {object} payload
+ * @param {Partial<NormalizerOptions>} options
+ * @returns {string}
+ */
+export function normalizePayload(payload, options = {}) {
+	options = {
+		...defaultNormalizerOptions,
+		...options
+	};
+	payload = options.deepCopy ? deepCopy(payload) : payload;
+	const normalizedPaths = _normalize(payload);
+	if (options.nullifyEmptyStrings) {
+		payload = nullifyEmptyStrings(payload);
+	}
+	if (options.stripEmptyElements) {
+		payload = stripNullAndEmptyObjectsAndArrays(payload);
+	}
+	if (options.showWarning) {
+		showNormalizationWarning(normalizedPaths);
+	}
+	if (options.stripEmptyStrings) {
+		return JSON.stringify(payload, stripEmptyStrings);
+	}
+	return JSON.stringify(payload);
+}
+
+/**
+ * Note: export for testing only.
+ * @param {object} payload
+ * @param {string[]} normalizedPaths
+ * @param {string} parentPath
+ * @returns {string[]}
+ */
+export function _normalize(payload, normalizedPaths = [], parentPath = '') {
+	for (const [key, value] of Object.entries(payload)) {
+		// normalize key
+		const normalizedKey = normalizeString(key);
+		if (normalizedKey !== key) {
+			payload[normalizedKey] = value;
+			delete payload[key];
+			normalizedPaths.push(parentPath === '' ? 'root' : parentPath);
+		}
+
+		const path = Array.isArray(payload)
+			? `${parentPath}[${normalizedKey}]`
+			: parentPath === ''
+				? normalizedKey
+				: `${parentPath}.${normalizedKey}`;
+
+		// normalize value
+		if (value === null || value === undefined) {
+			payload[normalizedKey] = value;
+		} else if (typeof value === 'string') {
+			const normalizedValue = normalizeString(value);
+			if (value !== normalizedValue) {
+				normalizedPaths.push(path);
+			}
+			payload[normalizedKey] = normalizedValue;
+		} else if (typeof value === 'object') {
+			if (Array.isArray(payload)) {
+				_normalize(value, normalizedPaths, path);
+			} else {
+				_normalize(value, normalizedPaths, path);
+			}
+		} else {
+			payload[normalizedKey] = value;
+		}
+	}
+	return normalizedPaths;
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function normalizeString(value) {
+	return value
+		.normalize('NFC')
+		.trim()
+		.replace(/[\u200B-\u200D\uFEFF]/g, '');
+}
+
+/**
+ * @param {string[]} normalizedPaths
+ */
+function showNormalizationWarning(normalizedPaths) {
+	if (typeof document === 'undefined' || normalizedPaths.length === 0) {
+		return;
+	}
+	const ul = document.getElementById('normalized-parameters');
+	if (ul) {
+		ul.innerHTML = '';
+		for (const path of [...new Set(normalizedPaths)]) {
+			const li = document.createElement('li');
+			const code = document.createElement('code');
+			code.textContent = path;
+			li.appendChild(code);
+			ul.appendChild(li);
+		}
+	}
+	const toastElement = document.getElementById('normalization-toast');
+	if (toastElement) {
+		// @ts-expect-error
+		// eslint-disable-next-line no-undef
+		const toast = new bootstrap.Toast(toastElement);
+		toast.show();
+	}
+}

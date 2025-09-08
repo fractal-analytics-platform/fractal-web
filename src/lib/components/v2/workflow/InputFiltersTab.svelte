@@ -4,6 +4,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -89,7 +90,7 @@
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify({
+				body: normalizePayload({
 					type_filters: form?.getTypes()
 				})
 			}

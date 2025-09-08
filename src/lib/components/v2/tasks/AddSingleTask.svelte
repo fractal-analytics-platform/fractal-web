@@ -1,5 +1,4 @@
 <script>
-	import { replaceEmptyStrings } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
@@ -9,6 +8,7 @@
 		isCompoundType,
 		isNonParallelType,
 		isParallelType,
+		normalizePayload,
 		SchemaValidator
 	} from 'fractal-components';
 
@@ -142,7 +142,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(bodyData, replaceEmptyStrings)
+			body: normalizePayload(bodyData, { stripEmptyStrings: true })
 		});
 
 		if (response.ok) {

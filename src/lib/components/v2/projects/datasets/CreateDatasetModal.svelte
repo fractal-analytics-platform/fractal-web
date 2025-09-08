@@ -3,6 +3,7 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -108,7 +109,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(datasetData)
+			body: normalizePayload(datasetData)
 		});
 
 		const result = await response.json();
@@ -139,7 +140,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(body)
+			body: normalizePayload(body)
 		});
 		if (!response.ok) {
 			console.log('Dataset creation failed');

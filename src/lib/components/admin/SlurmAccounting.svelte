@@ -4,6 +4,7 @@
 	import { onDestroy } from 'svelte';
 	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
 	import { sortDropdownUsers } from './user_utilities';
+	import { normalizePayload } from 'fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props
@@ -53,7 +54,7 @@
 			method: 'POST',
 			headers,
 			credentials: 'include',
-			body: JSON.stringify(params)
+			body: normalizePayload(params)
 		});
 		if (response.ok) {
 			ids = await response.json();

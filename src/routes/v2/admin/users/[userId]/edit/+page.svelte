@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
-	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user);
@@ -26,17 +26,16 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(
-				removeNullValues(
-					nullifyEmptyStrings({
-						email: user.email,
-						password: user.password,
-						username: user.username,
-						is_active: user.is_active,
-						is_superuser: user.is_superuser,
-						is_verified: user.is_verified
-					})
-				)
+			body: normalizePayload(
+				{
+					email: user.email,
+					password: user.password,
+					username: user.username,
+					is_active: user.is_active,
+					is_superuser: user.is_superuser,
+					is_verified: user.is_verified
+				},
+				{ stripEmptyElements: true }
 			)
 		});
 	}

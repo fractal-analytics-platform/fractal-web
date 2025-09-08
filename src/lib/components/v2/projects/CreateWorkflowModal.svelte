@@ -4,6 +4,7 @@
 	import Modal from '../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
+	import { normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -87,7 +88,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(workflowMetadata)
+			body: normalizePayload(workflowMetadata)
 		});
 
 		if (response.ok) {
@@ -127,7 +128,7 @@
 			credentials: 'include',
 			mode: 'cors',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				name: workflowName
 			})
 		});

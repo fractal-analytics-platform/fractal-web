@@ -6,7 +6,7 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
-	import { stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
+	import { normalizePayload, stripNullAndEmptyObjectsAndArrays } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -82,7 +82,7 @@
 						method: 'POST',
 						credentials: 'include',
 						headers,
-						body: JSON.stringify(defaultData)
+						body: normalizePayload(defaultData)
 					}
 				);
 

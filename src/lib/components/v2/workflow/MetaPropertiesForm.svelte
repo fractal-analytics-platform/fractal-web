@@ -9,7 +9,7 @@
 	import { page } from '$app/state';
 	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
+	import { isCompoundType, isNonParallelType, isParallelType, normalizePayload } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -83,7 +83,7 @@
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(payload)
+				body: normalizePayload(payload)
 			}
 		);
 		savingChanges = false;

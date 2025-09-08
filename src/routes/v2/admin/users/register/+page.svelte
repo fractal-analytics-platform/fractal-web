@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
-	import { nullifyEmptyStrings, removeNullValues } from '$lib/common/component_utilities';
 	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
+	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
 	const runnerBackend = $derived(page.data.runnerBackend);
@@ -38,14 +38,13 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify(
-				removeNullValues(
-					nullifyEmptyStrings({
-						email: user.email,
-						password: user.password,
-						username: user.username
-					})
-				)
+			body: normalizePayload(
+				{
+					email: user.email,
+					password: user.password,
+					username: user.username
+				},
+				{ stripEmptyElements: true }
 			)
 		});
 
@@ -60,7 +59,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: JSON.stringify({
+			body: normalizePayload({
 				is_verified: true
 			})
 		});

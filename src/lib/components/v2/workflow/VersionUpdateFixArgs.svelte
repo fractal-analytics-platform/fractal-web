@@ -1,12 +1,12 @@
 <script>
-	import { deepCopy } from '$lib/common/component_utilities';
 	import { AlertError } from '$lib/common/errors';
 	import {
 		stripIgnoredProperties,
 		getPropertiesToIgnore,
 		SchemaValidator,
 		stripNullAndEmptyObjectsAndArrays,
-		isCompoundType
+		isCompoundType,
+		deepCopy
 	} from 'fractal-components';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 
