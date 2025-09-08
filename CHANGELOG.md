@@ -4,6 +4,7 @@
 
 * Added body request normalizer (\#825);
 * Fixed JSON schema validation during arguments import (\#827);
+* Updated slim-select version to support range selection (\#827);
 
 # 1.19.3
 
