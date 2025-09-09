@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
 import { svelteTesting } from '@testing-library/svelte/vite';
+import coverageOptions from './mcr.config.unit.js';
 
 const packageJsonFile = fileURLToPath(new URL('package.json', import.meta.url));
 const packageJsonData = readFileSync(packageJsonFile);
@@ -22,13 +23,14 @@ const config = defineConfig({
 		environment: 'jsdom',
 		setupFiles: ['./vitest.setup.js'],
 		include: ['**/__tests__/**/*\\.test\\.js'],
-		exclude: ['components/**', 'node_modules', 'build', '.idea', '.git', '.cache'],
+		exclude: ['node_modules', 'build', '.idea', '.git', '.cache'],
 		coverage: {
-			provider: 'istanbul',
-			reporter: ['text', 'json', 'html'],
-			reportsDirectory: './coverage-unit',
-			include: ['src'],
-			all: true
+			provider: 'custom',
+			customProviderModule: 'vitest-monocart-coverage',
+
+			// or a config path for coverage options
+			// coverageReportOptions: "mcr.config.js"
+			coverageReportOptions: coverageOptions
 		}
 	},
 	resolve: {
