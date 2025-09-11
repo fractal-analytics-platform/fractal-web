@@ -376,7 +376,7 @@
 	</div>
 </div>
 {#if allRows.length === 0}
-	<p>
+	<p class="mt-4">
 		There are no available tasks. You can add new tasks on the
 		<a href="/v2/tasks/management">Tasks management</a> page.
 	</p>

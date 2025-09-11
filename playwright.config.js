@@ -88,7 +88,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 2760-support-both-pre-pinning-and-post-pinning-for-task-collection',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

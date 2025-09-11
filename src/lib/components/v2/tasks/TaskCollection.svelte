@@ -2,6 +2,7 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import { recentActivities } from '$lib/stores';
+	import { PropertyDescription } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -16,7 +17,7 @@
 	let package_version = $state('');
 	let python_version = $state('');
 	let package_extras = $state('');
-	/** @type {{key: string, value: string}[]} */
+	/** @type {Array<{key: string, value: string, type: 'pre' | 'post'}>} */
 	let pinnedPackageVersions = $state([]);
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
@@ -78,9 +79,13 @@
 			formData.append('package_version', package_version);
 		}
 
-		const ppv = getPinnedPackageVersionsMap();
-		if (ppv) {
-			formData.append('pinned_package_versions', JSON.stringify(ppv));
+		const ppvPre = getPinnedPackageVersionsMap('pre');
+		if (ppvPre) {
+			formData.append('pinned_package_versions_pre', JSON.stringify(ppvPre));
+		}
+		const ppvPost = getPinnedPackageVersionsMap('post');
+		if (ppvPost) {
+			formData.append('pinned_package_versions_post', JSON.stringify(ppvPost));
 		}
 
 		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
@@ -115,13 +120,14 @@
 	}
 
 	/**
+	 * @param {'pre'|'post'} type
 	 * @returns {{[key: string]: string}|undefined}
 	 */
-	function getPinnedPackageVersionsMap() {
+	function getPinnedPackageVersionsMap(type) {
 		/** @type {{[key: string]: string}} */
 		const map = {};
 		for (const ppv of pinnedPackageVersions) {
-			if (ppv.key && ppv.value) {
+			if (ppv.key && ppv.value && ppv.type === type) {
 				map[ppv.key] = ppv.value;
 			}
 		}
@@ -132,7 +138,7 @@
 	}
 
 	function addPackageVersion() {
-		pinnedPackageVersions = [...pinnedPackageVersions, { key: '', value: '' }];
+		pinnedPackageVersions = [...pinnedPackageVersions, { key: '', value: '', type: 'post' }];
 	}
 
 	/**
@@ -275,12 +281,12 @@
 		{/if}
 		{#each pinnedPackageVersions as ppv, i (i)}
 			<div class="row">
-				<div class="col-xl-6 col-lg-8 col-md-12 mb-2">
+				<div class="col-xl-8 col-lg-10 col-md-12 mb-2">
 					<div class="input-group">
 						<label class="input-group-text" for="ppv_key_{i}">Name</label>
 						<input
 							type="text"
-							class="form-control"
+							class="form-control ppv-input"
 							id="ppv_key_{i}"
 							bind:value={ppv.key}
 							required
@@ -288,11 +294,38 @@
 						<label class="input-group-text" for="ppv_value_{i}">Version</label>
 						<input
 							type="text"
-							class="form-control"
+							class="form-control ppv-input"
 							id="ppv_value_{i}"
 							bind:value={ppv.value}
 							required
 						/>
+						<span class="input-group-text">
+							<div class="form-check form-check-inline">
+								<input
+									class="form-check-input"
+									type="radio"
+									name="ppv-type-{i}"
+									id="ppv-pre-{i}"
+									value="pre"
+									bind:group={ppv.type}
+								/>
+								<label class="form-check-label" for="ppv-pre-{i}">Pre</label>
+							</div>
+							<div class="form-check form-check-inline me-1">
+								<input
+									class="form-check-input"
+									type="radio"
+									name="ppv-type-{i}"
+									id="ppv-post-{i}"
+									value="post"
+									bind:group={ppv.type}
+								/>
+								<label class="form-check-label" for="ppv-post-{i}">Post</label>
+							</div>
+							<PropertyDescription
+								description="Whether the pinned dependency should be installed before or after the main package"
+							/>
+						</span>
 						<button
 							class="btn btn-outline-secondary"
 							type="button"
@@ -347,3 +380,9 @@
 		</div>
 	</form>
 </div>
+
+<style>
+	.ppv-input {
+		min-width: 100px;
+	}
+</style>
