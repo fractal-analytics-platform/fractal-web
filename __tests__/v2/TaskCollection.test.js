@@ -147,11 +147,13 @@ describe('TaskCollection', () => {
 
 		const [key1, key2] = screen.getAllByRole('textbox', { name: 'Name' });
 		const [value1, value2] = screen.getAllByRole('textbox', { name: 'Version' });
+		const [pre1] = screen.getAllByRole('radio', { name: 'Pre' });
 
 		await fireEvent.input(key1, { target: { value: 'package1' } });
 		await fireEvent.input(value1, { target: { value: '1.2.3' } });
 		await fireEvent.input(key2, { target: { value: 'package2' } });
 		await fireEvent.input(value2, { target: { value: '0.0.8' } });
+		await fireEvent.click(pre1);
 
 		const packageInput = screen.getByRole('textbox', { name: 'Package' });
 		await fireEvent.input(packageInput, { target: { value: 'main-package' } });
@@ -165,8 +167,10 @@ describe('TaskCollection', () => {
 				// @ts-expect-error
 				body: expect.toBeFormDataWith({
 					package: 'main-package',
-					pinned_package_versions: JSON.stringify({
-						package1: '1.2.3',
+					pinned_package_versions_pre: JSON.stringify({
+						package1: '1.2.3'
+					}),
+					pinned_package_versions_post: JSON.stringify({
 						package2: '0.0.8'
 					})
 				})
