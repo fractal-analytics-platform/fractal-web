@@ -9,6 +9,7 @@
 		deepCopy
 	} from 'fractal-components';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
+	import JsonSchemaValidationErrors from './JsonSchemaValidationErrors.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -130,44 +131,12 @@
 	});
 </script>
 
-{#if validationErrors}
-	<div class="alert alert-danger mt-3">
-		<p>Following errors must be fixed before performing the update:</p>
-		<ul id="validation-errors">
-			{#each validationErrors as error, index (index)}
-				<li>
-					{#if error.instancePath !== ''}
-						{error.instancePath}:
-					{/if}
-					{#if error.keyword === 'additionalProperties'}
-						must NOT have additional property '{error.params.additionalProperty}'
-					{:else}
-						{error.message}
-					{/if}
-					<small
-						data-bs-toggle="collapse"
-						data-bs-target="#collapse-{index}"
-						aria-expanded="true"
-						aria-controls="collapse-{index}"
-						class="text-primary"
-						role="button"
-					>
-						more
-					</small>
-					<div
-						id="collapse-{index}"
-						class="accordion-collapse collapse"
-						data-bs-parent="#validation-errors"
-					>
-						<div class="accordion-body">
-							<pre class="alert alert-warning mt-1">{JSON.stringify(error, null, 2)}</pre>
-						</div>
-					</div>
-				</li>
-			{/each}
-		</ul>
-	</div>
-{/if}
+<div class="mt-3">
+	<JsonSchemaValidationErrors
+		title="Following errors must be fixed before performing the update:"
+		{validationErrors}
+	/>
+</div>
 {#if originalArgs}
 	{#if !validationErrors}
 		<div class="alert alert-success mt-3">

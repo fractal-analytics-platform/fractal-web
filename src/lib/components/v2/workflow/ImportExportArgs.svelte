@@ -1,6 +1,14 @@
 <script>
 	import { downloadBlob } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import {
+		getPropertiesToIgnore,
+		JsonSchemaDataError,
+		SchemaValidator,
+		stripNullAndEmptyObjectsAndArrays
+	} from 'fractal-components';
+	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
+	import JsonSchemaValidationErrors from './JsonSchemaValidationErrors.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -20,6 +28,8 @@
 	/** @type {HTMLInputElement|undefined} */
 	let importArgsFileInput = $state(undefined);
 	let importArgsError = $state('');
+	/** @type {import('ajv').ErrorObject[] | undefined} */
+	let validationErrors = $state();
 
 	function onImportArgsModalOpen() {
 		importArgsFiles = null;
@@ -27,10 +37,12 @@
 			importArgsFileInput.value = '';
 		}
 		importArgsError = '';
+		validationErrors = undefined;
 	}
 
 	async function importArgs() {
 		importArgsError = '';
+		validationErrors = undefined;
 		if (importArgsFiles === null || importArgsFiles.length === 0) {
 			return;
 		}
@@ -43,9 +55,51 @@
 			importArgsError = "File doesn't contain valid JSON";
 			return;
 		}
+		try {
+			if (json.args_parallel) {
+				validateArgumentsForImport(
+					workflowTask.task.args_schema_parallel,
+					workflowTask.task.args_schema_version,
+					json.args_parallel
+				);
+			}
+			if (json.args_non_parallel) {
+				validateArgumentsForImport(
+					workflowTask.task.args_schema_non_parallel,
+					workflowTask.task.args_schema_version,
+					json.args_non_parallel
+				);
+			}
+		} catch (err) {
+			if (err instanceof Error) {
+				importArgsError = err.message;
+			}
+			return;
+		}
 		importArgsModal?.confirmAndHide(async function () {
 			await onImport(json);
 		});
+	}
+
+	/**
+	 * @param {object} schema
+	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @param {object} data
+	 */
+	function validateArgumentsForImport(schema, schemaVersion, data) {
+		if (!schema) {
+			return;
+		}
+		const jsonSchema = adaptJsonSchema(schema, getPropertiesToIgnore(false));
+		const validator = new SchemaValidator(schemaVersion);
+		const isSchemaValid = validator.loadSchema(jsonSchema);
+		if (!isSchemaValid) {
+			throw new Error('Invalid JSON Schema');
+		}
+		if (!validator.isValid(stripNullAndEmptyObjectsAndArrays(data))) {
+			validationErrors = validator.getErrors() || undefined;
+			throw new JsonSchemaDataError(validator.getErrors());
+		}
 	}
 
 	function exportArgs() {
@@ -118,6 +172,11 @@
 		<div class="row">
 			<div class="col">
 				<div id="errorAlert-importArgumentsModal"></div>
+			</div>
+		</div>
+		<div class="row mt-0">
+			<div class="col">
+				<JsonSchemaValidationErrors title="Invalid arguments:" {validationErrors} />
 			</div>
 		</div>
 	{/snippet}

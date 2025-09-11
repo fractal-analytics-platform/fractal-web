@@ -1059,7 +1059,7 @@
 											{#if selectedHistoryRun}
 												{#key selectedHistoryRun}
 													<ArgumentsSchema
-														workflowTask={selectedWorkflowTask}
+														bind:workflowTask={selectedWorkflowTask}
 														{onWorkflowTaskUpdated}
 														editable={false}
 														bind:this={argsSchemaForm}
@@ -1071,7 +1071,7 @@
 												{/key}
 											{:else}
 												<ArgumentsSchema
-													workflowTask={selectedWorkflowTask}
+													bind:workflowTask={selectedWorkflowTask}
 													{onWorkflowTaskUpdated}
 													editable={true}
 													bind:this={argsSchemaForm}
