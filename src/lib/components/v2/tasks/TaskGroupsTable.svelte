@@ -78,8 +78,8 @@
 	 * @param {number} groupId
 	 */
 	async function handleDeleteTaskGroup(groupId) {
-		const response = await fetch(`/api/v2/task-group/${groupId}`, {
-			method: 'DELETE',
+		const response = await fetch(`/api/v2/task-group/${groupId}/delete/`, {
+			method: 'POST',
 			credentials: 'include'
 		});
 		if (response.ok) {
