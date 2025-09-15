@@ -35,7 +35,7 @@ Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/pytho
 		await result.component.show(mockApplyWorkflow({ id: 1, status: 'failed', log: null }), false);
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		expect(pre.classList.contains('highlight')).eq(true);
-		expect(pre.innerHTML).eq(error);
+		expect(pre.querySelector('div')?.innerHTML).eq(error);
 	});
 
 	it('display log with highlighting and hidden details', async () => {
@@ -85,7 +85,7 @@ allowed_channels
 		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), false);
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		expect(pre.classList.contains('highlight')).eq(false);
-		expect(pre.innerHTML).eq(log);
+		expect(pre.querySelector('div')?.innerHTML).eq(log);
 	});
 
 	it('error while loading job for user', async () => {

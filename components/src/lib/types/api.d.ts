@@ -146,6 +146,7 @@ export type ApplyWorkflowV2 = {
 	user_email: string;
 	slurm_account: string | null;
 	attribute_filters: { [key: string]: string | number | boolean };
+	executor_error_log: string | null;
 };
 
 export type JobStatus = 'submitted' | 'done' | 'failed';
@@ -261,7 +262,7 @@ export type TasksTableRow = {
 
 export type TaskGroupActivityStatusV2 = 'pending' | 'ongoing' | 'failed' | 'OK';
 
-export type TaskGroupActivityActionV2 = 'collect' | 'deactivate' | 'reactivate';
+export type TaskGroupActivityActionV2 = 'collect' | 'deactivate' | 'reactivate' | 'delete';
 
 export type TaskGroupActivityV2 = {
 	id: number;

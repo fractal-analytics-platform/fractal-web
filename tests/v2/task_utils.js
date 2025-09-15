@@ -89,11 +89,15 @@ export async function deleteTask(page, taskName) {
 		await waitPageLoading(page);
 	}
 	const row = await getTaskGroupRow(page, taskName);
-	await row.getByRole('button', { name: 'Delete' }).click();
+	await row.getByRole('button', { name: 'Manage' }).click();
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
-	await modal.getByRole('button', { name: 'Confirm' }).click();
+	await modal.getByRole('button', { name: 'Delete task group' }).click();
+	await modal.getByRole('button', { name: 'Confirm delete' }).click();
 	await waitModalClosed(page);
+	await page.waitForURL(/\/v2\/tasks\/activities\?activity_id=\d+/);
+	await waitPageLoading(page);
+	await expect(page.getByRole('row', { name: taskName })).toContainText('delete');
 }
 
 /**

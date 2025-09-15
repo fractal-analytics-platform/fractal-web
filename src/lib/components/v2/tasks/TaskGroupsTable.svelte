@@ -1,8 +1,6 @@
 <script>
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 	import { buildTaskTableRows } from 'fractal-components/tasks/task_group_utilities';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import TaskInfoModal from './TaskInfoModal.svelte';
 	import TaskEditModal from './TaskEditModal.svelte';
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
@@ -72,30 +70,6 @@
 				return r;
 			}
 		});
-	}
-
-	/**
-	 * @param {number} groupId
-	 */
-	async function handleDeleteTaskGroup(groupId) {
-		const response = await fetch(`/api/v2/task-group/${groupId}`, {
-			method: 'DELETE',
-			credentials: 'include'
-		});
-		if (response.ok) {
-			console.log('Task group deleted successfully');
-			updateTaskGroups(
-				/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
-				(
-					taskGroups
-						.map((tg) => [tg[0], tg[1].filter((g) => g.id !== groupId)])
-						.filter((tg) => tg[1].length > 0)
-				)
-			);
-		} else {
-			console.error('Error deleting the task group');
-			throw await getAlertErrorFromResponse(response);
-		}
 	}
 
 	/**
@@ -221,22 +195,6 @@
 							<i class="bi bi-gear"></i>
 							Manage
 						</button>
-						<ConfirmActionButton
-							modalId="confirmTaskGroupDeleteModal{Object.values(taskGroupRows[i].groups)
-								.map((t) => t.id)
-								.join('-')}"
-							style="danger"
-							btnStyle="danger"
-							buttonIcon="trash"
-							label="Delete"
-							message={`Delete task group ${
-								selectedGroup.pkg_name +
-								(selectedGroup.version ? ' (version ' + selectedGroup.version + ')' : '')
-							}`}
-							callbackAction={async () => {
-								await handleDeleteTaskGroup(selectedGroup.id);
-							}}
-						/>
 					</td>
 				</tr>
 

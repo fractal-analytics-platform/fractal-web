@@ -185,3 +185,20 @@ export function getFirstTaskIndexForContinuingWorkflow(
 
 	return undefined;
 }
+
+/**
+ * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
+ */
+export function showExecutorErrorLog(job) {
+	if (job.status !== 'failed' || !job.executor_error_log) {
+		return false;
+	}
+	const log = job.executor_error_log.toLowerCase();
+	const errorKeywords = ['oom', 'killed', 'srun: error', 'out of memory', 'due to time limit'];
+	for (const keyword of errorKeywords) {
+		if (log.includes(keyword)) {
+			return true;
+		}
+	}
+	return false;
+}

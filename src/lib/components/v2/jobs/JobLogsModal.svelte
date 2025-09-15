@@ -1,6 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
-	import { extractJobErrorParts } from '$lib/common/job_utilities';
+	import { extractJobErrorParts, showExecutorErrorLog } from '$lib/common/job_utilities';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 	import ExpandableLog from '$lib/components/common/ExpandableLog.svelte';
@@ -15,6 +15,8 @@
 	let admin = false;
 	let log = '';
 	let loading = $state(true);
+	/** @type {'main'|'slurm'} */
+	let selectedTab = $state('main');
 
 	const updateJobInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
@@ -31,6 +33,7 @@
 		if (errorAlert) {
 			errorAlert.hide();
 		}
+		selectedTab = showExecutorErrorLog(selectedJob) ? 'slurm' : 'main';
 		job = selectedJob;
 		admin = isAdminPage;
 		log = '';
@@ -124,14 +127,42 @@
 		</div>
 	{/snippet}
 	{#snippet body()}
-		<div id="errorAlert-workflowJobLogsModal"></div>
-		{#if loading}
-			<div class="spinner-border spinner-border-sm" role="status">
-				<span class="visually-hidden">Loading...</span>
-			</div>
-			Loading...
+		{#if job && showExecutorErrorLog(job)}
+			<ul class="nav nav-tabs mb-3">
+				<li class="nav-item">
+					<button
+						class="nav-link"
+						class:active={selectedTab === 'main'}
+						onclick={() => (selectedTab = 'main')}
+						aria-current={selectedTab === 'main' ? 'page' : undefined}
+					>
+						Main Log
+					</button>
+				</li>
+				<li class="nav-item">
+					<button
+						class="nav-link"
+						class:active={selectedTab === 'slurm'}
+						onclick={() => (selectedTab = 'slurm')}
+						aria-current={selectedTab === 'slurm' ? 'page' : undefined}
+					>
+						SLURM Error Log
+					</button>
+				</li>
+			</ul>
+		{/if}
+		{#if selectedTab === 'main'}
+			<div id="errorAlert-workflowJobLogsModal"></div>
+			{#if loading}
+				<div class="spinner-border spinner-border-sm" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				Loading...
+			{:else}
+				<ExpandableLog bind:logParts highlight={job?.status === 'failed'} />
+			{/if}
 		{:else}
-			<ExpandableLog bind:logParts highlight={job?.status === 'failed'} />
+			<pre><div class="ps-3 pe-3">{job?.executor_error_log}</div></pre>
 		{/if}
 	{/snippet}
 </Modal>

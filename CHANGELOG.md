@@ -6,6 +6,8 @@
 * Fixed JSON schema validation during arguments import (\#827);
 * Updated slim-select version to support range selection (\#827);
 * Supported pre/post `pinned_package_versions` in task-collection (\#827);
+* Adapted frontend to new task-group deletion endpoint (\#833);
+* Displayed executor errors (\#833);
 
 # 1.19.3
 

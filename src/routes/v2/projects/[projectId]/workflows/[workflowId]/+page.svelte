@@ -12,7 +12,7 @@
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
 	import ImagesStatus from '$lib/components/jobs/ImagesStatus.svelte';
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
-	import { extractRelevantJobError } from '$lib/common/job_utilities';
+	import { extractRelevantJobError, showExecutorErrorLog } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
 	import TaskInfoTab from '$lib/components/v2/workflow/TaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
@@ -49,7 +49,7 @@
 
 	let jobError = $state('');
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
-	let failedJob;
+	let failedJob = $state();
 	/** @type {JobLogsModal|undefined} */
 	let jobLogsModal = $state();
 
@@ -821,7 +821,11 @@
 						<div class="text-muted mb-2 fw-bolder">
 							The last job failed with the following error:
 						</div>
-						<pre class="text-danger mb-0">{jobError}</pre>
+						{#if failedJob && showExecutorErrorLog(failedJob)}
+							<pre class="text-danger mb-0">{failedJob.executor_error_log}</pre>
+						{:else}
+							<pre class="text-danger mb-0">{jobError}</pre>
+						{/if}
 					</div>
 					<div class="col-md-2 col-sm-3">
 						<button class="btn btn-outline-secondary float-end" onclick={showJobLogsModal}>

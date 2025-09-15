@@ -3,7 +3,6 @@
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
@@ -138,23 +137,6 @@
 	 */
 	function getGroupName(userGroupId) {
 		return groups.find((g) => g.id === userGroupId)?.name || '-';
-	}
-
-	/**
-	 * @param {number} groupId
-	 */
-	async function handleDeleteTaskGroup(groupId) {
-		const response = await fetch(`/api/admin/v2/task-group/${groupId}`, {
-			method: 'DELETE',
-			credentials: 'include'
-		});
-		if (response.ok) {
-			console.log('Task group deleted successfully');
-			await searchTaskGroups();
-		} else {
-			console.error('Error deleting the task group');
-			throw await getAlertErrorFromResponse(response);
-		}
 	}
 </script>
 
@@ -370,20 +352,6 @@
 									<i class="bi bi-gear"></i>
 									Manage
 								</button>
-								<ConfirmActionButton
-									modalId="confirmTaskGroupDeleteModal{taskGroup.id}"
-									style="danger"
-									btnStyle="danger"
-									buttonIcon="trash"
-									label="Delete"
-									message={`Delete task group ${
-										taskGroup.pkg_name +
-										(taskGroup.version ? ' (version ' + taskGroup.version + ')' : '')
-									}`}
-									callbackAction={async () => {
-										await handleDeleteTaskGroup(taskGroup.id);
-									}}
-								/>
 							</td>
 						</tr>
 					{/each}
