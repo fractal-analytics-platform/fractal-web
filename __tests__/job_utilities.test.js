@@ -3,7 +3,8 @@ import {
 	extractJobErrorParts,
 	extractRelevantJobError,
 	generateNewUniqueDatasetName,
-	getFirstTaskIndexForContinuingWorkflow
+	getFirstTaskIndexForContinuingWorkflow,
+	showExecutorErrorLog
 } from '$lib/common/job_utilities.js';
 
 const completeTracebackError = `TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0
@@ -321,6 +322,27 @@ describe('get first task index for continuing workflow', () => {
 		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, selectedWorkflowTask, {}, {});
 		expect(result).toBeUndefined();
 	});
+});
+
+it('should handle executor_error_log', () => {
+	const job = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ ({});
+	expect(showExecutorErrorLog({ ...job, status: 'done', executor_error_log: null })).toBeFalsy();
+	expect(showExecutorErrorLog({ ...job, status: 'failed', executor_error_log: null })).toBeFalsy();
+	expect(
+		showExecutorErrorLog({
+			...job,
+			status: 'failed',
+			executor_error_log: `slurmstepd: error: Detected 1 oom_kill event in StepId=111.0. Some of the step tasks have been OOM Killed.
+		srun: error: u20-cva0000-113: task 0: Out Of Memory`
+		})
+	).toBeTruthy();
+	expect(
+		showExecutorErrorLog({
+			...job,
+			status: 'failed',
+			executor_error_log: `foobar`
+		})
+	).toBeFalsy();
 });
 
 /**

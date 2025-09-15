@@ -146,6 +146,7 @@ export type ApplyWorkflowV2 = {
 	user_email: string;
 	slurm_account: string | null;
 	attribute_filters: { [key: string]: string | number | boolean };
+	executor_error_log: string | null;
 };
 
 export type JobStatus = 'submitted' | 'done' | 'failed';

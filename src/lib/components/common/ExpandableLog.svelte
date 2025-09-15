@@ -49,7 +49,7 @@
 						onclick={expandDetails}>... (details hidden, click here to expand)</button
 					>{/if}{/each}</pre>
 	{:else}
-		<pre class:highlight>{logParts.map((p) => p.text).join('\n')}</pre>
+		<pre class:highlight><div class="ps-3 pe-3">{logParts.map((p) => p.text).join('\n')}</div></pre>
 	{/if}
 </div>
 
