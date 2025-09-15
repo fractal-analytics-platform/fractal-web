@@ -148,7 +148,6 @@
 		if (response.ok) {
 			const result = await response.json();
 			// Add created task to the list
-			console.log('Task created', result);
 			addNewTasks([result]);
 			taskSuccessMessage = 'Task created successfully';
 			resetFields();

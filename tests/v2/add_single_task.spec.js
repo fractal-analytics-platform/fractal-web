@@ -386,7 +386,7 @@ async function getExpandedTaskRow(page) {
 	const table = page.getByRole('table').last();
 	const rows = await table.getByRole('row', { name: 'Info' }).all();
 	for (const row of rows) {
-		if (!(await row.getByRole('button', { name: 'Delete' }).isVisible())) {
+		if (!(await row.getByRole('button', { name: 'Manage' }).isVisible())) {
 			return row;
 		}
 	}

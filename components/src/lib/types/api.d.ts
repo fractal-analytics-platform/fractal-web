@@ -261,7 +261,7 @@ export type TasksTableRow = {
 
 export type TaskGroupActivityStatusV2 = 'pending' | 'ongoing' | 'failed' | 'OK';
 
-export type TaskGroupActivityActionV2 = 'collect' | 'deactivate' | 'reactivate';
+export type TaskGroupActivityActionV2 = 'collect' | 'deactivate' | 'reactivate' | 'delete';
 
 export type TaskGroupActivityV2 = {
 	id: number;

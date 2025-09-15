@@ -88,7 +88,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 2743-delete-task-group-path-on-disk-during-task-group-deletion',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

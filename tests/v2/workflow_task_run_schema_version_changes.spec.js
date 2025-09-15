@@ -115,10 +115,15 @@ test('Workflow task runs display different versions of arguments schema', async 
 		await page.goto('/v2/tasks/management');
 		const taskRow = page.getByRole('row', { name: taskName });
 		await taskRow.getByRole('combobox').selectOption('0.0.1');
-		await taskRow.getByRole('button', { name: 'Delete' }).click();
+		await taskRow.getByRole('button', { name: 'Manage' }).click();
+		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await modal.getByRole('button', { name: 'Delete task group' }).click();
+		await modal.getByRole('button', { name: 'Confirm delete' }).click();
 		await waitModalClosed(page);
+		await page.waitForURL(/\/v2\/tasks\/activities\?activity_id=\d+/);
+		await waitPageLoading(page);
+		await expect(page.getByRole('row', { name: taskName })).toContainText('delete');
 	});
 
 	await test.step('Check runs again', async () => {

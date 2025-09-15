@@ -33,13 +33,9 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Filter test task', async () => {
-		await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
-		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
-		await page.getByRole('combobox', { name: 'Origin' }).selectOption('Other');
-		await page.getByRole('combobox', { name: 'Origin' }).selectOption('Other');
-		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await filterTestTasks(page, taskName);
 		await expect(taskRow).toBeVisible();
-		expect(page.getByRole('row')).toHaveCount(3);
+		await expect(page.getByRole('row')).toHaveCount(3);
 	});
 
 	await test.step('Open info modal', async () => {
@@ -63,20 +59,46 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await expect(groupCell).toHaveText('-');
 	});
 
-	await test.step('Delete task groups', async () => {
-		await taskRow.getByRole('button', { name: 'Delete' }).click();
+	await test.step('Delete task group 0.0.1', async () => {
+		await taskRow.getByRole('button', { name: 'Manage' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await expect(modal).toContainText('0.0.1');
-		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await modal.getByRole('button', { name: 'Delete task group' }).click();
+		await modal.getByRole('button', { name: 'Confirm delete' }).click();
 		await waitModalClosed(page);
+		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);
+		await waitPageLoading(page);
+		await expect(page.getByRole('row', { name: taskName })).toContainText('delete');
+	});
+
+	await test.step('Go back to tasks management page', async () => {
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await filterTestTasks(page, taskName);
+		await expect(page.getByRole('row')).toHaveCount(2);
 		await expect(page.getByText('The query returned 1 matching result')).toBeVisible();
+	});
+
+	await test.step('Delete task group 0.0.2', async () => {
 		const taskRow2 = page.getByRole('row', { name: taskName });
-		await taskRow2.getByRole('button', { name: 'Delete' }).click();
+		await taskRow2.getByRole('button', { name: 'Manage' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
 		await modal.waitFor();
 		await expect(modal).toContainText('0.0.2');
-		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await modal.getByRole('button', { name: 'Delete task group' }).click();
+		await modal.getByRole('button', { name: 'Confirm delete' }).click();
 		await waitModalClosed(page);
+		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);
+		await waitPageLoading(page);
+		await expect(page.getByRole('row', { name: taskName })).toContainText('delete');
+	});
+
+	await test.step('Go back to tasks management page', async () => {
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await filterTestTasks(page, taskName);
 		await expect(page.getByText('The query returned 0 matching results')).toBeVisible();
 	});
 
@@ -96,3 +118,15 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await expect(page.locator('#last_used_time_max')).toHaveValue('');
 	});
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} taskName
+ */
+async function filterTestTasks(page, taskName) {
+	await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
+	await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
+	await page.getByRole('combobox', { name: 'Origin' }).selectOption('Other');
+	await page.getByRole('combobox', { name: 'Origin' }).selectOption('Other');
+	await page.getByRole('button', { name: 'Search task groups' }).click();
+}
