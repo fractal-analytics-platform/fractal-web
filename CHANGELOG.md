@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.20.0
 
 * Added body request normalizer (\#825);
 * Fixed JSON schema validation during arguments import (\#827);
