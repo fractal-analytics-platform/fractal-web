@@ -48,7 +48,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 
 		await page.getByRole('button', { name: 'Collect', exact: true }).click();
 
-		// Wait for Task collections table
+		// Wait for Task activities table
 		await page.waitForFunction(
 			(expectedCount) => document.querySelectorAll('table').length === expectedCount,
 			2
@@ -56,7 +56,7 @@ test('Collect mock tasks [v2]', async ({ page, request }) => {
 		await expect(page.getByRole('row', { name: /pending|ongoing/ })).toBeVisible();
 	});
 
-	await test.step('Wait tasks collection', async () => {
+	await test.step('Wait tasks activities', async () => {
 		await expect(page.getByRole('row', { name: /pending|ongoing/ })).not.toBeVisible({
 			timeout: 30000
 		});

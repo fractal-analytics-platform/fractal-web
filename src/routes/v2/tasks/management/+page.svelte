@@ -6,7 +6,7 @@
 	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
 	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
 	import PixiTask from '$lib/components/v2/tasks/PixiTask.svelte';
-	import TaskCollectionTable from '$lib/components/v2/tasks/TaskCollectionTable.svelte';
+	import TaskActivitiesTable from '$lib/components/v2/tasks/TaskActivitiesTable.svelte';
 
 	const user = $derived(page.data.user);
 
@@ -114,9 +114,7 @@
 		{/if}
 	</div>
 
-	{#if packageType === 'pypi' || packageType === 'local' || packageType === 'pixi'}
-		<TaskCollectionTable {reloadTaskGroupsList} />
-	{/if}
+	<TaskActivitiesTable {reloadTaskGroupsList} />
 
 	<div class="row mt-4">
 		<h3 class="fw-light">Task List</h3>
