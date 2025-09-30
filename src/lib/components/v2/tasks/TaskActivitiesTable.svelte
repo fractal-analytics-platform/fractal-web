@@ -7,7 +7,7 @@
 	import TaskGroupActivityLogsModal from '$lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
 	import { recentActivities } from '$lib/stores';
 
-	// This component automatically fecthes updates for task collections activities
+	// This component automatically fecthes updates for task recent activities
 	// in pending and ongoing status
 
 	/**
@@ -23,7 +23,7 @@
 	);
 
 	/** @type {number|null} */
-	let openedTaskCollectionLogId = null;
+	let openedTaskActivityLogId = null;
 
 	/** @type {TaskGroupActivityLogsModal|undefined} */
 	let taskGroupActivitiesLogsModal = $state();
@@ -31,18 +31,18 @@
 	/**
 	 * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
-	async function updateTaskCollectionsState(activitiesToUpdate) {
+	async function updateTaskActivitiesState(activitiesToUpdate) {
 		recentActivities.set(
 			$recentActivities.map((a) => {
 				const updatedActivity = activitiesToUpdate.find((u) => u.id === a.id);
 				return updatedActivity ?? a;
 			})
 		);
-		const openedTaskCollectionLogToUpdate = activitiesToUpdate.find(
-			(u) => u.id === openedTaskCollectionLogId
+		const openedTaskActivityLogToUpdate = activitiesToUpdate.find(
+			(u) => u.id === openedTaskActivityLogId
 		)?.log;
-		if (openedTaskCollectionLogToUpdate) {
-			await taskGroupActivitiesLogsModal?.updateLog(openedTaskCollectionLogToUpdate);
+		if (openedTaskActivityLogToUpdate) {
+			await taskGroupActivitiesLogsModal?.updateLog(openedTaskActivityLogToUpdate);
 		}
 	}
 
@@ -50,14 +50,14 @@
 	 * @param {number} taskGroupActivityId
 	 */
 	async function openTaskGroupActivityLogsModal(taskGroupActivityId) {
-		openedTaskCollectionLogId = taskGroupActivityId;
+		openedTaskActivityLogId = taskGroupActivityId;
 		await taskGroupActivitiesLogsModal?.open(taskGroupActivityId);
 	}
 
-	async function updateTasksCollectionInBackground() {
+	async function updateTasksActivitiesInBackground() {
 		const activitiesToUpdate = await getTaskGroupActivitiesToUpdate($recentActivities, false);
 		if (activitiesToUpdate.length > 0) {
-			await updateTaskCollectionsState(activitiesToUpdate);
+			await updateTaskActivitiesState(activitiesToUpdate);
 			const newOkTasks = $recentActivities.filter(
 				(a) => activitiesToUpdate.map((u) => u.id).includes(a.id) && a.status === 'OK'
 			).length;
@@ -65,18 +65,18 @@
 				await reloadTaskGroupsList();
 			}
 		}
-		clearTimeout(updateTasksCollectionTimeout);
-		updateTasksCollectionTimeout = setTimeout(
-			updateTasksCollectionInBackground,
-			updateTasksCollectionInterval
+		clearTimeout(updateTasksActivitiesTimeout);
+		updateTasksActivitiesTimeout = setTimeout(
+			updateTasksActivitiesInBackground,
+			updateTasksActivitiesInterval
 		);
 	}
 
-	async function loadRecentTaskCollections() {
+	async function loadRecentTaskActivities() {
 		const date = new Date();
 		date.setTime(date.getTime() - 24 * 3600 * 1000); // yesterday
 		const response = await fetch(
-			`/api/v2/task-group/activity?timestamp_started_min=${date.toISOString()}&action=collect`,
+			`/api/v2/task-group/activity?timestamp_started_min=${date.toISOString()}`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -86,25 +86,25 @@
 		if (response.ok) {
 			return result;
 		}
-		console.error('Unable to load recent task collections', result);
+		console.error('Unable to load recent task activities', result);
 		return [];
 	}
 
-	const updateTasksCollectionInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
+	const updateTasksActivitiesInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
 		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
-	let updateTasksCollectionTimeout = undefined;
+	let updateTasksActivitiesTimeout = undefined;
 
 	onMount(async () => {
-		recentActivities.set(await loadRecentTaskCollections());
-		updateTasksCollectionTimeout = setTimeout(
-			updateTasksCollectionInBackground,
-			updateTasksCollectionInterval
+		recentActivities.set(await loadRecentTaskActivities());
+		updateTasksActivitiesTimeout = setTimeout(
+			updateTasksActivitiesInBackground,
+			updateTasksActivitiesInterval
 		);
 	});
 
 	onDestroy(() => {
-		clearTimeout(updateTasksCollectionTimeout);
+		clearTimeout(updateTasksActivitiesTimeout);
 	});
 </script>
 
@@ -114,7 +114,7 @@
 		Show all activities
 	</a>
 {/if}
-<h4 class="fw-light mt-3">Task collections</h4>
+<h4 class="fw-light mt-3">Recent task activities</h4>
 {#if $recentActivities.length === 0}
 	<p class="mb-5">
 		No recent activities

@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Displayed all kinds of recent task activities in tasks management page. (\#835);
+
 # 1.20.0
 
 * Added body request normalizer (\#825);
