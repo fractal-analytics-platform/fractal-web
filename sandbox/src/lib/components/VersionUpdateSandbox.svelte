@@ -349,7 +349,7 @@
 				schema={oldSchema}
 				schemaData={oldSchemaData}
 				schemaVersion={oldSchemaVersion}
-				on:change={handleOldDataChanged}
+				onchange={handleOldDataChanged}
 				{propertiesToIgnore}
 				bind:this={oldJschemaComponent}
 			/>

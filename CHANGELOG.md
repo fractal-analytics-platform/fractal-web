@@ -2,6 +2,7 @@
 
 # Unreleased
 
+* Fixed bug in sandbox pages (\#839);
 * Displayed all kinds of recent task activities in tasks management page. (\#835);
 
 # 1.20.0

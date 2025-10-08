@@ -170,8 +170,8 @@
 		updateData(jschemaComponent.getArguments());
 	}
 
-	function detectChange({ detail }) {
-		updateData(detail.value);
+	function detectChange(value) {
+		updateData(value);
 	}
 
 	/**
@@ -302,7 +302,7 @@
 		<div class="col-lg-6">
 			<JSchema
 				componentId="json-schema-task-manifest-sandbox"
-				on:change={detectChange}
+				onchange={detectChange}
 				schema={selectedSchema}
 				{schemaVersion}
 				{schemaData}
