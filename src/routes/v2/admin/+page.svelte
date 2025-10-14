@@ -55,6 +55,13 @@
 				<i class="bi bi-search"></i>
 				Accounting
 			</a>
+
+			<h2 class="fw-light mt-3">Computational Area</h2>
+
+			<a href="/v2/admin/resources" class="btn btn-primary me-2">
+				<i class="bi bi-search"></i>
+				Resources
+			</a>
 		</div>
 	</div>
 </div>

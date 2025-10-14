@@ -151,15 +151,17 @@ export type ApplyWorkflowV2 = {
 
 export type JobStatus = 'submitted' | 'done' | 'failed';
 
-export type ImagesStatus = {
-	status: JobStatus;
-} | {
-	status: JobStatus;
-	num_submitted_images: number;
-	num_done_images: number;
-	num_failed_images: number;
-	num_available_images: number | null;
-};
+export type ImagesStatus =
+	| {
+			status: JobStatus;
+	  }
+	| {
+			status: JobStatus;
+			num_submitted_images: number;
+			num_done_images: number;
+			num_failed_images: number;
+			num_available_images: number | null;
+	  };
 
 export type WorkflowV2 = {
 	id: number;
@@ -320,4 +322,20 @@ export type HistoryRunAggregated = {
 	num_failed_units: number;
 	args_schema_parallel: JSONSchemaObjectProperty | null;
 	args_schema_non_parallel: JSONSchemaObjectProperty | null;
+};
+
+export type Resource = {
+	id: number;
+	type: string;
+	name: string;
+	timestamp_created: string;
+	host: string | null;
+	jobs_local_dir: string;
+	jobs_runner_config: Record<string, any>;
+	jobs_slurm_python_worker: string;
+	jobs_poll_interval: number;
+	tasks_local_dir: string;
+	tasks_python_config: Record<string, any>;
+	tasks_pixi_config: Record<string, any>;
+	tasks_pip_cache_dir: string | null;
 };
