@@ -78,6 +78,9 @@
 							<a href="/v2/admin/resources/{resource.id}" class="btn btn-light">
 								<i class="bi-info-circle"></i> Info
 							</a>
+							<a href="/v2/admin/resources/{resource.id}/profiles" class="btn btn-info">
+								<i class="bi bi-sliders"></i> Profiles
+							</a>
 							<a href="/v2/admin/resources/{resource.id}/edit" class="btn btn-primary">
 								<i class="bi bi-pencil"></i> Edit
 							</a>

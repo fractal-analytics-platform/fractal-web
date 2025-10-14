@@ -22,6 +22,10 @@
 				</ol>
 			</nav>
 
+			<a href="/v2/admin/resources/{resource.id}/profiles" class="btn btn-info float-end ms-2">
+				<i class="bi bi-sliders"></i>
+				Profiles
+			</a>
 			<a href="/v2/admin/resources/{resource.id}/edit" class="btn btn-primary float-end">
 				<i class="bi bi-pencil"></i>
 				Edit

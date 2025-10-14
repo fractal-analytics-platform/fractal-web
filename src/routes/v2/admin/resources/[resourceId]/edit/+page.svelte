@@ -87,5 +87,10 @@
 
 	<StandardDismissableAlert message={resourceUpdatedMessage} autoDismiss={true} />
 
-	<button class="btn btn-primary" onclick={saveResource} disabled={saving}> Save </button>
+	<button class="btn btn-primary" onclick={saveResource} disabled={saving}>
+		{#if saving}
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"> </span>
+		{/if}
+		Save
+	</button>
 </div>

@@ -120,6 +120,9 @@
 	<div class="row">
 		<div class="col">
 			<button class="btn btn-primary" onclick={createResource} disabled={saving}>
+				{#if saving}
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"> </span>
+				{/if}
 				Create resource
 			</button>
 		</div>

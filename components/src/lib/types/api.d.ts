@@ -339,3 +339,12 @@ export type Resource = {
 	tasks_pixi_config: Record<string, any>;
 	tasks_pip_cache_dir: string | null;
 };
+
+export type Profile = {
+	id: number;
+	resource_id: number;
+	username: string | null;
+	ssh_key_path: string | null;
+	jobs_remote_dir: string | null;
+	tasks_remote_dir: string | null;
+};
