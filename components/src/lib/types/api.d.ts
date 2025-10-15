@@ -8,6 +8,7 @@ export type User = {
 	is_active: boolean;
 	is_superuser: boolean;
 	is_verified: boolean;
+	profile_id: number | null;
 	username: string | null;
 	password?: string;
 	group_ids_names: Array<[number, string]> | null;

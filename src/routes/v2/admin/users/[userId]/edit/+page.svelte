@@ -33,7 +33,8 @@
 					username: user.username,
 					is_active: user.is_active,
 					is_superuser: user.is_superuser,
-					is_verified: user.is_verified
+					is_verified: user.is_verified,
+					profile_id: user.profile_id
 				},
 				{ stripEmptyElements: true }
 			)

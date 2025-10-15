@@ -15,7 +15,8 @@
 		username: '',
 		password: '',
 		group_ids_names: [],
-		oauth_accounts: []
+		oauth_accounts: [],
+		profile_id: null
 	};
 
 	/** @type {boolean|undefined} */
@@ -42,7 +43,8 @@
 				{
 					email: user.email,
 					password: user.password,
-					username: user.username
+					username: user.username,
+					profile_id: user.profile_id
 				},
 				{ stripEmptyElements: true }
 			)

@@ -80,6 +80,10 @@
 						{/each}
 					</td>
 				</tr>
+				<tr>
+					<th>Profile</th>
+					<td>{user.profile_id || '-'}</td>
+				</tr>
 			</tbody>
 		</table>
 

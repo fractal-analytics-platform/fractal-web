@@ -44,6 +44,8 @@
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let profilesErrorAlert = undefined;
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	let originalUser = $state();
@@ -65,6 +67,13 @@
 
 	let password = $state('');
 	let confirmPassword = $state('');
+
+	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	let resources = $state([]);
+	/** @type {number|undefined} */
+	let selectedResourceId = $state();
+	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	let profiles = $state([]);
 
 	let saving = $state(false);
 	let userFormSubmitted = $state(false);
@@ -260,9 +269,14 @@
 		settings = { ...result };
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		originalUser = deepCopy(nullifyEmptyStrings($state.snapshot(editableUser)));
 		loadUserGroups();
+		await initProfile();
+		await loadResources(false);
+		if (selectedResourceId) {
+			await loadProfiles(false);
+		}
 	});
 
 	function loadUserGroups() {
@@ -270,6 +284,64 @@
 			editableUser?.group_ids_names
 				.map((ni) => groups.filter((g) => g.id === ni[0])[0])
 				.sort(sortGroupByNameAllFirstComparator) || [];
+	}
+
+	async function initProfile() {
+		if (!editableUser || editableUser.profile_id === null) {
+			return;
+		}
+		const response = await fetch(`/api/admin/v2/resource-of-profile/${editableUser.profile_id}`);
+		if (response.ok) {
+			/** @type {import('fractal-components/types/api').Resource} */
+			const resource = await response.json();
+			selectedResourceId = resource.id;
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
+	}
+
+	async function loadResources(hideOldError = true) {
+		profiles = [];
+		if (hideOldError) {
+			profilesErrorAlert?.hide();
+		}
+		const response = await fetch(`/api/admin/v2/resource`);
+		if (response.ok) {
+			resources = await response.json();
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
+	}
+
+	async function resourceChanged() {
+		if (editableUser) {
+			editableUser.profile_id = null;
+		}
+		await loadProfiles();
+	}
+
+	async function loadProfiles(hideOldError = true) {
+		if (selectedResourceId === undefined) {
+			return;
+		}
+		if (hideOldError) {
+			profilesErrorAlert?.hide();
+		}
+		const response = await fetch(`/api/admin/v2/resource/${selectedResourceId}/profile`);
+		if (response.ok) {
+			profiles = await response.json();
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
 	}
 
 	function setGroupsSlimSelect() {
@@ -464,6 +536,42 @@
 					/>
 					<span class="form-text"> Optional property </span>
 					<span class="invalid-feedback">{$userValidationErrors['username']}</span>
+				</div>
+			</div>
+			<div class="row mb-3 has-validation">
+				<label for="profile" class="col-sm-3 col-form-label text-end">
+					<strong>Profile</strong>
+				</label>
+				<div class="col-sm-9">
+					<div class="row">
+						<div class="col-lg-6">
+							<select
+								class="form-select"
+								bind:value={selectedResourceId}
+								onchange={resourceChanged}
+							>
+								<option value={undefined}>Select resource...</option>
+								{#each resources as resource}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
+						</div>
+						<div class="col-lg-6">
+							<select
+								class="form-select"
+								bind:value={editableUser.profile_id}
+								class:is-invalid={userFormSubmitted && $userValidationErrors['profile_id']}
+								disabled={selectedResourceId === undefined}
+							>
+								<option value={null}>Select profile...</option>
+								{#each profiles as profile}
+									<option value={profile.id}>{profile.id}</option>
+								{/each}
+							</select>
+							<span class="invalid-feedback">{$userValidationErrors['profile_id']}</span>
+						</div>
+					</div>
+					<div id="errorAlert-profiles" class="mt-2 mb-0"></div>
 				</div>
 			</div>
 			{#if editableUser.id}
