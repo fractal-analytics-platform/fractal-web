@@ -11,6 +11,37 @@
 	let data = $state('');
 	let resourceUpdatedMessage = $state('');
 
+	/** @type {FileList|null} */
+	let files = $state(null);
+	/** @type {HTMLInputElement|undefined} */
+	let fileInput = $state(undefined);
+
+	let fileError = $state('');
+
+	async function loadFromFile() {
+		fileError = '';
+
+		if (!files) {
+			return;
+		}
+
+		let content = '';
+		try {
+			const file = files[0];
+			content = await file.text();
+		} catch {
+			fileError = 'Unable to read file';
+			return;
+		}
+
+		try {
+			const value = JSON.parse(content);
+			data = JSON.stringify(removeUnmodifiableFields(value), null, 2);
+		} catch {
+			fileError = "File doesn't contain valid JSON";
+		}
+	}
+
 	onMount(() => {
 		data = JSON.stringify(removeUnmodifiableFields(resource), null, 2);
 	});
@@ -78,6 +109,28 @@
 					</li>
 				</ol>
 			</nav>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col mb-3">
+			<div class="input-group has-validation">
+				<label for="resourceFile" class="input-group-text">
+					<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Load from file
+				</label>
+				<input
+					class="form-control schemaFile"
+					accept="application/json"
+					type="file"
+					name="resourceFile"
+					id="resourceFile"
+					bind:this={fileInput}
+					bind:files
+					onchange={loadFromFile}
+					class:is-invalid={fileError}
+				/>
+				<span class="invalid-feedback">{fileError}</span>
+			</div>
 		</div>
 	</div>
 

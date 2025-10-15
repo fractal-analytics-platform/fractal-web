@@ -327,7 +327,7 @@ export type HistoryRunAggregated = {
 
 export type Resource = {
 	id: number;
-	type: string;
+	type: 'local' | 'slurm_sudo' | 'slurm_ssh';
 	name: string;
 	timestamp_created: string;
 	host: string | null;
