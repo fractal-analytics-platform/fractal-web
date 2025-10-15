@@ -53,7 +53,7 @@
 	<div class="row mt-4">
 		<div class="col">
 			{#if profile}
-				<ProfileEditor {profile} {saveProfile} />
+				<ProfileEditor {profile} {resource} {saveProfile} />
 			{/if}
 		</div>
 	</div>

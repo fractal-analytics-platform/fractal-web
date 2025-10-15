@@ -7,11 +7,12 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {Omit<import('fractal-components/types/api').Profile, 'id'>} profile
+	 * @property {import('fractal-components/types/api').Resource} resource
 	 * @property {(user: import('fractal-components/types/api').Profile & { id: number | undefined }) => Promise<Response>} saveProfile
 	 */
 
 	/** @type {Props} */
-	let { profile = $bindable(), saveProfile } = $props();
+	let { profile = $bindable(), resource, saveProfile } = $props();
 
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
 	let editableProfile = $state();
@@ -78,74 +79,90 @@
 					</div>
 				</div>
 			{/if}
-			<div class="row mb-3 has-validation">
-				<label for="username" class="col-sm-3 col-form-label text-end">
-					<strong>Username</strong>
-				</label>
-				<div class="col-sm-9">
-					<input
-						autocomplete="off"
-						type="text"
-						class="form-control"
-						id="username"
-						bind:value={editableProfile.username}
-						class:is-invalid={profileFormSubmitted && $profileValidationErrors['username']}
-						required
-					/>
-					<span class="invalid-feedback">{$profileValidationErrors['username']}</span>
+			{#if resource.type === 'local'}
+				<div class="row">
+					<div class="col-sm-9 offset-sm-3">
+						<div class="alert alert-info">Profiles of local resources have no fields</div>
+					</div>
 				</div>
-			</div>
-			<div class="row mb-3 has-validation">
-				<label for="ssh_key_path" class="col-sm-3 col-form-label text-end">
-					<strong>SSH key path</strong>
-				</label>
-				<div class="col-sm-9">
-					<input
-						autocomplete="off"
-						type="text"
-						class="form-control"
-						id="ssh_key_path"
-						bind:value={editableProfile.ssh_key_path}
-						class:is-invalid={profileFormSubmitted && $profileValidationErrors['ssh_key_path']}
-						required
-					/>
-					<span class="invalid-feedback">{$profileValidationErrors['ssh_key_path']}</span>
+			{/if}
+			{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
+				<div class="row mb-3 has-validation">
+					<label for="username" class="col-sm-3 col-form-label text-end">
+						<strong>Username</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							autocomplete="off"
+							type="text"
+							class="form-control"
+							id="username"
+							bind:value={editableProfile.username}
+							class:is-invalid={profileFormSubmitted && $profileValidationErrors['username']}
+							required
+						/>
+						<span class="invalid-feedback">{$profileValidationErrors['username']}</span>
+					</div>
 				</div>
-			</div>
-			<div class="row mb-3 has-validation">
-				<label for="jobs_remote_dir" class="col-sm-3 col-form-label text-end">
-					<strong>Jobs remote dir</strong>
-				</label>
-				<div class="col-sm-9">
-					<input
-						autocomplete="off"
-						type="text"
-						class="form-control"
-						id="jobs_remote_dir"
-						bind:value={editableProfile.jobs_remote_dir}
-						class:is-invalid={profileFormSubmitted && $profileValidationErrors['jobs_remote_dir']}
-						required
-					/>
-					<span class="invalid-feedback">{$profileValidationErrors['jobs_remote_dir']}</span>
+			{/if}
+			{#if resource.type === 'slurm_ssh'}
+				<div class="row mb-3 has-validation">
+					<label for="ssh_key_path" class="col-sm-3 col-form-label text-end">
+						<strong>SSH key path</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							autocomplete="off"
+							type="text"
+							class="form-control"
+							id="ssh_key_path"
+							bind:value={editableProfile.ssh_key_path}
+							class:is-invalid={profileFormSubmitted && $profileValidationErrors['ssh_key_path']}
+							required
+						/>
+						<span class="invalid-feedback">{$profileValidationErrors['ssh_key_path']}</span>
+					</div>
 				</div>
-			</div>
-			<div class="row mb-3 has-validation">
-				<label for="tasks_remote_dir" class="col-sm-3 col-form-label text-end">
-					<strong>Tasks remote dir</strong>
-				</label>
-				<div class="col-sm-9">
-					<input
-						autocomplete="off"
-						type="text"
-						class="form-control"
-						id="tasks_remote_dir"
-						bind:value={editableProfile.tasks_remote_dir}
-						class:is-invalid={profileFormSubmitted && $profileValidationErrors['tasks_remote_dir']}
-						required
-					/>
-					<span class="invalid-feedback">{$profileValidationErrors['tasks_remote_dir']}</span>
+			{/if}
+			{#if resource.type === 'slurm_ssh'}
+				<div class="row mb-3 has-validation">
+					<label for="jobs_remote_dir" class="col-sm-3 col-form-label text-end">
+						<strong>Jobs remote dir</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							autocomplete="off"
+							type="text"
+							class="form-control"
+							id="jobs_remote_dir"
+							bind:value={editableProfile.jobs_remote_dir}
+							class:is-invalid={profileFormSubmitted && $profileValidationErrors['jobs_remote_dir']}
+							required
+						/>
+						<span class="invalid-feedback">{$profileValidationErrors['jobs_remote_dir']}</span>
+					</div>
 				</div>
-			</div>
+			{/if}
+			{#if resource.type === 'slurm_ssh'}
+				<div class="row mb-3 has-validation">
+					<label for="tasks_remote_dir" class="col-sm-3 col-form-label text-end">
+						<strong>Tasks remote dir</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							autocomplete="off"
+							type="text"
+							class="form-control"
+							id="tasks_remote_dir"
+							bind:value={editableProfile.tasks_remote_dir}
+							class:is-invalid={profileFormSubmitted &&
+								$profileValidationErrors['tasks_remote_dir']}
+							required
+						/>
+						<span class="invalid-feedback">{$profileValidationErrors['tasks_remote_dir']}</span>
+					</div>
+				</div>
+			{/if}
 		</div>
 		<div class="row">
 			<div class="col-lg-7">

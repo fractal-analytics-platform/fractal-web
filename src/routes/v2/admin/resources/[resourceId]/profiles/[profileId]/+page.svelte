@@ -47,22 +47,30 @@
 					<th>Resource ID</th>
 					<td>{profile.resource_id}</td>
 				</tr>
-				<tr>
-					<th>Username</th>
-					<td>{profile.username || '-'}</td>
-				</tr>
-				<tr>
-					<th>SSH key path</th>
-					<td>{profile.ssh_key_path || '-'}</td>
-				</tr>
-				<tr>
-					<th>Jobs remote dir</th>
-					<td>{profile.jobs_remote_dir || '-'}</td>
-				</tr>
-				<tr>
-					<th>Tasks remote dir</th>
-					<td>{profile.tasks_remote_dir || '-'}</td>
-				</tr>
+				{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
+					<tr>
+						<th>Username</th>
+						<td>{profile.username || '-'}</td>
+					</tr>
+				{/if}
+				{#if resource.type === 'slurm_ssh'}
+					<tr>
+						<th>SSH key path</th>
+						<td>{profile.ssh_key_path || '-'}</td>
+					</tr>
+				{/if}
+				{#if resource.type === 'slurm_ssh'}
+					<tr>
+						<th>Jobs remote dir</th>
+						<td>{profile.jobs_remote_dir || '-'}</td>
+					</tr>
+				{/if}
+				{#if resource.type === 'slurm_ssh'}
+					<tr>
+						<th>Tasks remote dir</th>
+						<td>{profile.tasks_remote_dir || '-'}</td>
+					</tr>
+				{/if}
 			</tbody>
 		</table>
 	</div>
