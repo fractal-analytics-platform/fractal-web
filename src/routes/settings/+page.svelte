@@ -95,7 +95,7 @@
 		</div>
 	</div>
 	{#if runnerBackend !== 'local'}
-		{#if runnerBackend === 'slurm'}
+		{#if runnerBackend === 'slurm_sudo'}
 			<div class="row mb-4">
 				<div class="col-lg-2 col-sm-4 fw-bold">SLURM user</div>
 				<div class="col-lg-6 col-sm-8">

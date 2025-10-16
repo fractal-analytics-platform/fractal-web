@@ -109,7 +109,7 @@
 					<span class="invalid-feedback">{$settingsValidationErrors['project_dir']}</span>
 				</div>
 			</div>
-			{#if runnerBackend === 'slurm'}
+			{#if runnerBackend === 'slurm_sudo'}
 				<div class="row mb-3 has-validation">
 					<label for="slurmUser" class="col-sm-3 col-form-label text-end">
 						<strong>SLURM user</strong>

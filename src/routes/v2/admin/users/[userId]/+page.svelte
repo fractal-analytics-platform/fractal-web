@@ -90,7 +90,7 @@
 					<th>Project dir</th>
 					<td>{settings.project_dir || '-'}</td>
 				</tr>
-				{#if runnerBackend === 'slurm'}
+				{#if runnerBackend === 'slurm_sudo'}
 					<tr>
 						<th>SLURM user</th>
 						<td>{settings.slurm_user || '-'}</td>
@@ -118,7 +118,7 @@
 						<td>{settings.ssh_jobs_dir || '-'}</td>
 					</tr>
 				{/if}
-				{#if runnerBackend === 'slurm' || runnerBackend === 'slurm_ssh'}
+				{#if runnerBackend === 'slurm_sudo' || runnerBackend === 'slurm_ssh'}
 					<tr>
 						<th>SLURM accounts</th>
 						<td>
