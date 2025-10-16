@@ -31,7 +31,7 @@
 		</div>
 	</div>
 
-	{#each settings as [title, s]}
+	{#each settings as [title, s] (title)}
 		<h3 class="fw-light mt-4">{title}</h3>
 		<table class="table table-striped">
 			<tbody>

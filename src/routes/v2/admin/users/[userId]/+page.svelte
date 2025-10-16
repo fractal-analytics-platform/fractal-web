@@ -57,10 +57,6 @@
 					<td>{user.email}</td>
 				</tr>
 				<tr>
-					<th>Username</th>
-					<td>{user.username || '-'}</td>
-				</tr>
-				<tr>
 					<th>Active</th>
 					<td><BooleanIcon value={user.is_active} /></td>
 				</tr>

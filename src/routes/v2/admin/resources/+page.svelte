@@ -3,29 +3,23 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
-	let searching = $state(false);
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	let resources = $state([]);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	async function loadResources() {
-		try {
-			searching = true;
-			searchErrorAlert?.hide();
-			const url = new URL('/api/admin/v2/resource', window.location.origin);
-			const response = await fetch(url);
-			if (!response.ok) {
-				searchErrorAlert = displayStandardErrorAlert(
-					await getAlertErrorFromResponse(response),
-					'searchError'
-				);
-				return;
-			}
-			resources = await response.json();
-		} finally {
-			searching = false;
+		searchErrorAlert?.hide();
+		const url = new URL('/api/admin/v2/resource', window.location.origin);
+		const response = await fetch(url);
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			return;
 		}
+		resources = await response.json();
 	}
 
 	/**
@@ -69,7 +63,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each resources as resource}
+				{#each resources as resource (resource.id)}
 					<tr>
 						<td>{resource.id}</td>
 						<td>{resource.name}</td>

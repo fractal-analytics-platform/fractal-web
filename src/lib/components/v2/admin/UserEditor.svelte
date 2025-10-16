@@ -80,11 +80,7 @@
 
 	let userUpdatedMessage = $state('');
 
-	const userFormErrorHandler = new FormErrorHandler('genericUserError', [
-		'email',
-		'username',
-		'password'
-	]);
+	const userFormErrorHandler = new FormErrorHandler('genericUserError', ['email', 'password']);
 
 	const userValidationErrors = userFormErrorHandler.getValidationErrorStore();
 
@@ -521,24 +517,6 @@
 				</div>
 			</div>
 			<div class="row mb-3 has-validation">
-				<label for="username" class="col-sm-3 col-form-label text-end">
-					<strong>Username</strong>
-				</label>
-				<div class="col-sm-9">
-					<input
-						autocomplete="off"
-						aria-autocomplete="none"
-						type="text"
-						class="form-control"
-						id="username"
-						class:is-invalid={userFormSubmitted && $userValidationErrors['username']}
-						bind:value={editableUser.username}
-					/>
-					<span class="form-text"> Optional property </span>
-					<span class="invalid-feedback">{$userValidationErrors['username']}</span>
-				</div>
-			</div>
-			<div class="row mb-3 has-validation">
 				<label for="profile" class="col-sm-3 col-form-label text-end">
 					<strong>Profile</strong>
 				</label>
@@ -551,7 +529,7 @@
 								onchange={resourceChanged}
 							>
 								<option value={undefined}>Select resource...</option>
-								{#each resources as resource}
+								{#each resources as resource (resource.id)}
 									<option value={resource.id}>{resource.name}</option>
 								{/each}
 							</select>
@@ -564,7 +542,7 @@
 								disabled={selectedResourceId === undefined}
 							>
 								<option value={null}>Select profile...</option>
-								{#each profiles as profile}
+								{#each profiles as profile (profile.id)}
 									<option value={profile.id}>{profile.name}</option>
 								{/each}
 							</select>

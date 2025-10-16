@@ -96,12 +96,12 @@ describe('TaskGroupActivities', () => {
 					{
 						id: 1,
 						email: 'admin@fractal.xy',
-						username: 'admin',
 						is_active: true,
 						is_superuser: true,
 						is_verified: true,
 						group_ids_names: [],
-						oauth_accounts: []
+						oauth_accounts: [],
+						profile_id: 1,
 					}
 				]
 			}

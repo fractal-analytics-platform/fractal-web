@@ -7,29 +7,23 @@
 	/** @type {import('fractal-components/types/api').Resource} */
 	const resource = $derived(page.data.resource);
 
-	let searching = $state(false);
 	/** @type {Array<import('fractal-components/types/api').Profile>} */
 	let profiles = $state([]);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	async function loadProfiles() {
-		try {
-			searching = true;
-			searchErrorAlert?.hide();
-			const url = new URL(`/api/admin/v2/resource/${resource.id}/profile`, window.location.origin);
-			const response = await fetch(url);
-			if (!response.ok) {
-				searchErrorAlert = displayStandardErrorAlert(
-					await getAlertErrorFromResponse(response),
-					'searchError'
-				);
-				return;
-			}
-			profiles = await response.json();
-		} finally {
-			searching = false;
+		searchErrorAlert?.hide();
+		const url = new URL(`/api/admin/v2/resource/${resource.id}/profile`, window.location.origin);
+		const response = await fetch(url);
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			return;
 		}
+		profiles = await response.json();
 	}
 
 	/**
@@ -99,7 +93,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each profiles as profile}
+				{#each profiles as profile (profile.id)}
 					<tr>
 						<td>{profile.id}</td>
 						<td>{profile.name}</td>

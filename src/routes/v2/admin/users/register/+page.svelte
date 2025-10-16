@@ -12,7 +12,6 @@
 		is_active: true,
 		is_superuser: false,
 		is_verified: false,
-		username: '',
 		password: '',
 		group_ids_names: [],
 		oauth_accounts: [],
@@ -43,7 +42,6 @@
 				{
 					email: user.email,
 					password: user.password,
-					username: user.username,
 					profile_id: user.profile_id
 				},
 				{ stripEmptyElements: true }
