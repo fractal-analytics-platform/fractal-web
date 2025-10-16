@@ -60,7 +60,39 @@ describe('UserEditor', () => {
 	 */
 	const mockSaveUser = vi.fn();
 
-	it('Update settings with slurm runner backend - success', async () => {
+	it('Update settings with slurm_sudo runner backend - success', async () => {
+		const mockRequest = /** @type {import('vitest').Mock} */ (fetch)
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				// mock profile
+				json: () => new Promise((resolve) => resolve({ id: 1, resource_id: 1 }))
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				// mock resources
+				json: () => new Promise((resolve) => resolve([{ id: 1 }]))
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				// mock profiles
+				json: () => new Promise((resolve) => resolve([{ id: 1 }]))
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				json: () =>
+					new Promise((resolve) =>
+						resolve({
+							...initialSettings,
+							slurm_user: 'user',
+							project_dir: '/path/to/project/dir'
+						})
+					)
+			});
+
 		const user = userEvent.setup();
 
 		render(UserEditor, {
@@ -70,19 +102,6 @@ describe('UserEditor', () => {
 				settings: { ...initialSettings },
 				saveUser: mockSaveUser
 			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
-			ok: true,
-			status: 200,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						...initialSettings,
-						slurm_user: 'user',
-						project_dir: '/path/to/project/dir'
-					})
-				)
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), '/path/to/project/dir');
@@ -108,6 +127,42 @@ describe('UserEditor', () => {
 	});
 
 	it('Update settings with slurm_sudo runner backend - validation error', async () => {
+		const mockRequest = /** @type {import('vitest').Mock} */ (fetch)
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				// mock profile
+				json: () => new Promise((resolve) => resolve({ id: 1, resource_id: 1 }))
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				// mock resources
+				json: () => new Promise((resolve) => resolve([{ id: 1 }]))
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				status: 200,
+				// mock profiles
+				json: () => new Promise((resolve) => resolve([{ id: 1 }]))
+			})
+			.mockResolvedValue({
+				ok: false,
+				status: 422,
+				json: () =>
+					new Promise((resolve) =>
+						resolve({
+							detail: [
+								{
+									loc: ['body', 'project_dir'],
+									msg: 'mocked_error',
+									type: 'value_error'
+								}
+							]
+						})
+					)
+			});
+
 		const user = userEvent.setup();
 
 		render(UserEditor, {
@@ -117,23 +172,6 @@ describe('UserEditor', () => {
 				settings: { ...initialSettings },
 				saveUser: mockSaveUser
 			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
-			ok: false,
-			status: 422,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						detail: [
-							{
-								loc: ['body', 'project_dir'],
-								msg: 'mocked_error',
-								type: 'value_error'
-							}
-						]
-					})
-				)
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), 'xxx');
