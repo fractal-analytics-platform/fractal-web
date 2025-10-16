@@ -294,6 +294,7 @@
 		if (autoselectProfile && resources.length > 0) {
 			selectedResourceId = resources[0].id;
 			selectedResource = resources[0];
+			await resourceChanged();
 		}
 		if (selectedResourceId) {
 			await loadProfiles(false);
@@ -314,11 +315,11 @@
 		if (!editableUser || editableUser.profile_id === null) {
 			return;
 		}
-		const response = await fetch(`/api/admin/v2/resource-of-profile/${editableUser.profile_id}`);
+		const response = await fetch(`/api/admin/v2/profile/${editableUser.profile_id}`);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').Resource} */
-			const resource = await response.json();
-			selectedResourceId = resource.id;
+			/** @type {import('fractal-components/types/api').Profile} */
+			const profile = await response.json();
+			selectedResourceId = profile.resource_id;
 		} else {
 			profilesErrorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),

@@ -5,6 +5,8 @@
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user || []);
+	/** @type {import('fractal-components/types/api').Profile | undefined} */
+	const profile = $derived(page.data.profile);
 	/** @type {import('fractal-components/types/api').UserSettings} */
 	const settings = $derived(page.data.settings);
 	/** @type {Array<import('fractal-components/types/api').Group>} */
@@ -78,7 +80,15 @@
 				</tr>
 				<tr>
 					<th>Profile</th>
-					<td>{user.profile_id || '-'}</td>
+					<td>
+						{#if profile}
+							<a href="/v2/admin/resources/{profile.resource_id}/profiles/{profile.id}">
+								{profile.name}
+							</a>
+						{:else}
+							-
+						{/if}
+					</td>
 				</tr>
 			</tbody>
 		</table>

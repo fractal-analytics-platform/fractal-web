@@ -7,7 +7,7 @@ export async function load({ fetch, params }) {
 	logger.debug('Loading resource %d', params.resourceId);
 	const resource = await getResource(fetch, Number(params.resourceId));
 	logger.debug('Loading profile %d', params.profileId);
-	const profile = await getProfile(fetch, Number(params.resourceId), Number(params.profileId));
+	const profile = await getProfile(fetch, Number(params.profileId));
 	return {
 		resource,
 		profile

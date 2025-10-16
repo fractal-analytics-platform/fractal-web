@@ -20,7 +20,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		return await fetch(`/api/admin/v2/resource/${resource.id}/profile/${profile.id}`, {
+		return await fetch(`/api/admin/v2/profile/${profile.id}`, {
 			method: 'PUT',
 			credentials: 'include',
 			headers,

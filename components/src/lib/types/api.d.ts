@@ -344,7 +344,6 @@ export type Resource = {
 	tasks_local_dir: string;
 	tasks_python_config: Record<string, any>;
 	tasks_pixi_config: Record<string, any>;
-	tasks_pip_cache_dir: string | null;
 };
 
 export type Profile = {

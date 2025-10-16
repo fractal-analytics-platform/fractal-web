@@ -1,6 +1,10 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import {
+		AlertError,
+		displayStandardErrorAlert,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
@@ -74,6 +78,8 @@
 					'saveError'
 				);
 			}
+		} catch (err) {
+			saveErrorAlert = displayStandardErrorAlert(new AlertError(err), 'saveError');
 		} finally {
 			saving = false;
 		}

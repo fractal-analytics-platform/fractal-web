@@ -46,19 +46,15 @@ export async function getResource(fetch, resourceId) {
 
 /**
  * @param {typeof fetch} fetch
- * @param {number} resourceId
  * @param {number} profileId
  * @returns {Promise<import('fractal-components/types/api').Resource>}
  */
-export async function getProfile(fetch, resourceId, profileId) {
-	logger.debug(`Retrieving profile ${profileId} of resource ${resourceId}`);
-	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/${resourceId}/profile/${profileId}`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
-	);
+export async function getProfile(fetch, profileId) {
+	logger.debug(`Retrieving profile ${profileId}`);
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}`, {
+		method: 'GET',
+		credentials: 'include'
+	});
 
 	if (!response.ok) {
 		await responseError(response);

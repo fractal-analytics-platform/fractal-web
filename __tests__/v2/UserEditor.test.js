@@ -65,7 +65,7 @@ describe('UserEditor', () => {
 
 		render(UserEditor, {
 			props: {
-				runnerBackend: 'slurm',
+				runnerBackend: 'slurm_sudo',
 				user: selectedUser,
 				settings: { ...initialSettings },
 				saveUser: mockSaveUser
@@ -107,12 +107,12 @@ describe('UserEditor', () => {
 		);
 	});
 
-	it('Update settings with slurm runner backend - validation error', async () => {
+	it('Update settings with slurm_sudo runner backend - validation error', async () => {
 		const user = userEvent.setup();
 
 		render(UserEditor, {
 			props: {
-				runnerBackend: 'slurm',
+				runnerBackend: 'slurm_sudo',
 				user: selectedUser,
 				settings: { ...initialSettings },
 				saveUser: mockSaveUser
