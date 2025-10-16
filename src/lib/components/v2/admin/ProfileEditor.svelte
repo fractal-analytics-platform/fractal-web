@@ -9,10 +9,11 @@
 	 * @property {Omit<import('fractal-components/types/api').Profile, 'id'>} profile
 	 * @property {import('fractal-components/types/api').Resource} resource
 	 * @property {(user: import('fractal-components/types/api').Profile & { id: number | undefined }) => Promise<Response>} saveProfile
+	 * @property {boolean} [showSaveButton]
 	 */
 
 	/** @type {Props} */
-	let { profile = $bindable(), resource, saveProfile } = $props();
+	let { profile = $bindable(), resource, saveProfile, showSaveButton = true } = $props();
 
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
 	let editableProfile = $state();
@@ -32,7 +33,10 @@
 
 	const profileValidationErrors = profileFormErrorHandler.getValidationErrorStore();
 
-	async function handleSave() {
+	/**
+	 * @returns {Promise<number | undefined>} the profile id, if successfully created
+	 */
+	export async function handleSave() {
 		if (!editableProfile) {
 			return;
 		}
@@ -50,8 +54,11 @@
 			}
 			if (editableProfile.id) {
 				profileUpdatedMessage = 'Profile successfully updated';
-			} else {
+			} else if (showSaveButton) {
 				await goto(`/v2/admin/resources/${profile.resource_id}/profiles`);
+			} else {
+				const { id } = await response.json();
+				return id;
 			}
 		} finally {
 			saving = false;
@@ -80,7 +87,7 @@
 			{/if}
 			<div class="row mb-3 has-validation">
 				<label for="name" class="col-sm-3 col-form-label text-end">
-					<strong>Name</strong>
+					<strong>Profile name</strong>
 				</label>
 				<div class="col-sm-9">
 					<input
@@ -179,13 +186,15 @@
 					<div class="col-sm-9 offset-sm-3">
 						<StandardDismissableAlert message={profileUpdatedMessage} />
 						<div id="genericProfileError"></div>
-						<button type="button" onclick={handleSave} class="btn btn-primary" disabled={saving}>
-							{#if saving}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
-								</span>
-							{/if}
-							Save
-						</button>
+						{#if showSaveButton}
+							<button type="button" onclick={handleSave} class="btn btn-primary" disabled={saving}>
+								{#if saving}
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+									</span>
+								{/if}
+								Save
+							</button>
+						{/if}
 					</div>
 				</div>
 			</div>
