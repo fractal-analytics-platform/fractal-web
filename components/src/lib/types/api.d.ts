@@ -31,6 +31,13 @@ export type UserSettings = {
 	ssh_jobs_dir: string | null;
 };
 
+export type ProfileInfo = {
+	has_profile: boolean;
+	resource_name: string | null;
+	profile_name: string | null;
+	username: string | null;
+};
+
 export type Group = {
 	id: number;
 	name: string;

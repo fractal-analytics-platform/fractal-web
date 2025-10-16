@@ -3,7 +3,9 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
-	let user = $derived(page.data.user);
+	const user = $derived(page.data.user);
+	/** @type {import('fractal-components/types/api').ProfileInfo} */
+	const profile = $derived(page.data.profile);
 </script>
 
 <div class="container mt-3">
@@ -64,6 +66,26 @@
 							{/if}
 						</td>
 					</tr>
+					<tr>
+						<th>Has profile</th>
+						<td><BooleanIcon value={profile.has_profile} /></td>
+					</tr>
+					{#if profile.has_profile}
+						<tr>
+							<th>Profile name</th>
+							<td>{profile.profile_name}</td>
+						</tr>
+						<tr>
+							<th>Resource name</th>
+							<td>{profile.resource_name}</td>
+						</tr>
+						{#if profile.username}
+							<tr>
+								<th>Profile username</th>
+								<td>{profile.username}</td>
+							</tr>
+						{/if}
+					{/if}
 				</tbody>
 			</table>
 		</div>
