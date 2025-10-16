@@ -82,6 +82,7 @@
 			<thead>
 				<tr>
 					<th>Id</th>
+					<th>Name</th>
 					{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
 						<th>Username</th>
 					{/if}
@@ -101,6 +102,7 @@
 				{#each profiles as profile}
 					<tr>
 						<td>{profile.id}</td>
+						<td>{profile.name}</td>
 						{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
 							<td>{profile.username || '-'}</td>
 						{/if}

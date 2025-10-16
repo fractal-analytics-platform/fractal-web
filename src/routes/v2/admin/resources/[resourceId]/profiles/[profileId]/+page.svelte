@@ -22,7 +22,7 @@
 			<li class="breadcrumb-item">
 				<a href="/v2/admin/resources/{resource.id}/profiles">Profiles</a>
 			</li>
-			<li class="breadcrumb-item active" aria-current="page">#{profile.id}</li>
+			<li class="breadcrumb-item active" aria-current="page">{profile.name}</li>
 		</ol>
 	</nav>
 
@@ -44,8 +44,16 @@
 					<td>{profile.id}</td>
 				</tr>
 				<tr>
+					<th>Profile Name</th>
+					<td>{profile.name}</td>
+				</tr>
+				<tr>
 					<th>Resource ID</th>
 					<td>{profile.resource_id}</td>
+				</tr>
+				<tr>
+					<th>Resource Type</th>
+					<td>{profile.resource_type}</td>
 				</tr>
 				{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
 					<tr>

@@ -13,6 +13,8 @@
 	onMount(() => {
 		profile = {
 			resource_id: resource.id,
+			resource_type: resource.type,
+			name: '',
 			jobs_remote_dir: '',
 			ssh_key_path: '',
 			tasks_remote_dir: '',

@@ -24,12 +24,11 @@
 		editableProfile = deepCopy(profile);
 	});
 
-	const profileFormErrorHandler = new FormErrorHandler('genericProfileError', [
-		'username',
-		'ssh_key_path',
-		'jobs_remote_dir',
-		'tasks_remote_dir'
-	]);
+	const profileFormErrorHandler = new FormErrorHandler(
+		'genericProfileError',
+		['name', 'username', 'ssh_key_path', 'jobs_remote_dir', 'tasks_remote_dir'],
+		['body', resource.type]
+	);
 
 	const profileValidationErrors = profileFormErrorHandler.getValidationErrorStore();
 
@@ -79,13 +78,23 @@
 					</div>
 				</div>
 			{/if}
-			{#if resource.type === 'local'}
-				<div class="row">
-					<div class="col-sm-9 offset-sm-3">
-						<div class="alert alert-info">Profiles of local resources have no fields</div>
-					</div>
+			<div class="row mb-3 has-validation">
+				<label for="name" class="col-sm-3 col-form-label text-end">
+					<strong>Name</strong>
+				</label>
+				<div class="col-sm-9">
+					<input
+						autocomplete="off"
+						type="text"
+						class="form-control"
+						id="name"
+						bind:value={editableProfile.name}
+						class:is-invalid={profileFormSubmitted && $profileValidationErrors['name']}
+						required
+					/>
+					<span class="invalid-feedback">{$profileValidationErrors['name']}</span>
 				</div>
-			{/if}
+			</div>
 			{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
 				<div class="row mb-3 has-validation">
 					<label for="username" class="col-sm-3 col-form-label text-end">

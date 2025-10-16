@@ -565,7 +565,7 @@
 							>
 								<option value={null}>Select profile...</option>
 								{#each profiles as profile}
-									<option value={profile.id}>{profile.id}</option>
+									<option value={profile.id}>{profile.name}</option>
 								{/each}
 							</select>
 							<span class="invalid-feedback">{$userValidationErrors['profile_id']}</span>

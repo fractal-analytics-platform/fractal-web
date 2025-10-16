@@ -45,7 +45,7 @@
 				<a href="/v2/admin/resources/{resource.id}/profiles">Profiles</a>
 			</li>
 			{#if profile}
-				<li class="breadcrumb-item active" aria-current="page">Edit #{profile.id}</li>
+				<li class="breadcrumb-item active" aria-current="page">Edit {profile.name} (#{profile.id})</li>
 			{/if}
 		</ol>
 	</nav>

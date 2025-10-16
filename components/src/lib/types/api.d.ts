@@ -343,7 +343,9 @@ export type Resource = {
 
 export type Profile = {
 	id: number;
+	name: string;
 	resource_id: number;
+	resource_type: string;
 	username: string | null;
 	ssh_key_path: string | null;
 	jobs_remote_dir: string | null;
