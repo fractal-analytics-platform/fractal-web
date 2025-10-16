@@ -36,28 +36,15 @@
 
 		try {
 			const value = JSON.parse(content);
-			data = JSON.stringify(removeUnmodifiableFields(value), null, 2);
+			data = JSON.stringify(value, null, 2);
 		} catch {
 			fileError = "File doesn't contain valid JSON";
 		}
 	}
 
 	onMount(() => {
-		data = JSON.stringify(removeUnmodifiableFields(resource), null, 2);
+		data = JSON.stringify(resource, null, 2);
 	});
-
-	/**
-	 * @param {import('fractal-components/types/api').Resource} resource
-	 */
-	function removeUnmodifiableFields(resource) {
-		return {
-			...resource,
-			id: undefined,
-			type: undefined,
-			timestamp_created: undefined,
-			jobs_runner_config: undefined
-		};
-	}
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let saveErrorAlert;
@@ -73,7 +60,7 @@
 			headers.set('Content-Type', 'application/json');
 
 			const response = await fetch(`/api/admin/v2/resource/${resource.id}`, {
-				method: 'PATCH',
+				method: 'PUT',
 				credentials: 'include',
 				headers,
 				body: normalizePayload(JSON.parse(data))

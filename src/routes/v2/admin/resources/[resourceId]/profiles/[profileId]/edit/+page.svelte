@@ -21,10 +21,10 @@
 		headers.set('Content-Type', 'application/json');
 
 		return await fetch(`/api/admin/v2/resource/${resource.id}/profile/${profile.id}`, {
-			method: 'PATCH',
+			method: 'PUT',
 			credentials: 'include',
 			headers,
-			body: normalizePayload({ ...profile, resource_id: undefined }, { nullifyEmptyStrings: true })
+			body: normalizePayload(profile, { nullifyEmptyStrings: true })
 		});
 	}
 </script>
@@ -45,7 +45,9 @@
 				<a href="/v2/admin/resources/{resource.id}/profiles">Profiles</a>
 			</li>
 			{#if profile}
-				<li class="breadcrumb-item active" aria-current="page">Edit {profile.name} (#{profile.id})</li>
+				<li class="breadcrumb-item active" aria-current="page">
+					Edit {profile.name} (#{profile.id})
+				</li>
 			{/if}
 		</ol>
 	</nav>
