@@ -119,9 +119,6 @@ test('Admin groups management', async ({ page }) => {
 		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp/test/project-dir');
-		await page.getByRole('textbox', { name: 'SLURM user' }).fill('test-slurm-user');
-		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page.getByLabel('SLURM account #1', { exact: true }).fill('test-slurm-account');
 		await page.getByRole('button', { name: 'Save' }).nth(1).click();
 		await expect(page.getByText('Settings successfully updated')).toBeVisible();
 	});
@@ -133,10 +130,6 @@ test('Admin groups management', async ({ page }) => {
 		await waitPageLoading(page);
 		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue(
 			'/tmp/test/project-dir'
-		);
-		await expect(page.getByRole('textbox', { name: 'SLURM user' })).toHaveValue('test-slurm-user');
-		await expect(page.getByLabel('SLURM account #1', { exact: true })).toHaveValue(
-			'test-slurm-account'
 		);
 	});
 

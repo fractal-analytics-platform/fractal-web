@@ -52,6 +52,30 @@ export function createPostProxy(path, forbiddenPaths = []) {
  * @param {string} path
  * @param {string[]} forbiddenPaths
  */
+export function createPutProxy(path, forbiddenPaths = []) {
+	return async function PUT({ params, url, request }) {
+		checkForbiddenPaths(params.path, forbiddenPaths);
+		try {
+			logger.info('[PUT] - /%s/%s/%s', path, params.path, url.search);
+			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
+				method: 'PUT',
+				credentials: 'include',
+				headers: filterHeaders(request.headers),
+				body: request.body,
+				// To avoid error "RequestInit: duplex option is required when sending a body"
+				// @ts-ignore, not standard, but supported by undici; enable re-streaming of request
+				duplex: 'half'
+			});
+		} catch (err) {
+			handleError(err);
+		}
+	};
+}
+
+/**
+ * @param {string} path
+ * @param {string[]} forbiddenPaths
+ */
 export function createPatchProxy(path, forbiddenPaths = []) {
 	return async function PATCH({ params, url, request }) {
 		checkForbiddenPaths(params.path, forbiddenPaths);

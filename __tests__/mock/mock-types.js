@@ -9,9 +9,9 @@ export function mockUser(fields = {}) {
 		is_superuser: false,
 		is_active: true,
 		is_verified: true,
-		username: null,
 		group_ids_names: [],
 		oauth_accounts: [],
+		profile_id: 1,
 		...fields
 	};
 }

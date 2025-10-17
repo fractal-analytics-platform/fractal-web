@@ -220,3 +220,24 @@ export async function getGroup(fetch, groupId) {
 
 	return await response.json();
 }
+
+/**
+ * Fetches user settings
+ * @param {typeof fetch} fetch
+ * @returns {Promise<import('fractal-components/types/api').ProfileInfo>}
+ */
+export async function getProfileInfo(fetch) {
+	logger.debug('Retrieving current user profile');
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/profile-info/`;
+	const response = await fetch(url, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to retrieve the current user profile');
+		await responseError(response);
+	}
+
+	return await response.json();
+}

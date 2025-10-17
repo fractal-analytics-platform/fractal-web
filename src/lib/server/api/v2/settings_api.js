@@ -7,11 +7,12 @@ const logger = getLogger('settings API');
 /**
  * Fetches the settings from the server
  * @param {typeof fetch} fetch
+ * @param {string} type
  * @returns {Promise<any>}
  */
-export async function listSettings(fetch) {
+export async function listSettings(fetch, type) {
 	logger.debug('Fetching the settings');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/api/settings/', {
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/settings/${type}`, {
 		method: 'GET',
 		credentials: 'include'
 	});

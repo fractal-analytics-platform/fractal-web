@@ -11,9 +11,6 @@ test('Import user settings from another user', async ({ page }) => {
 
 	await test.step('Fill user1 settings', async () => {
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/test/import/proj_dir');
-		await page.getByRole('textbox', { name: 'SLURM user' }).fill('test-import-slurm-user');
-		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page.getByLabel('SLURM account #1', { exact: true }).fill('test-import-slurm-account');
 		await page.getByRole('button', { name: 'Save' }).click();
 	});
 
@@ -50,12 +47,6 @@ test('Import user settings from another user', async ({ page }) => {
 		await waitModalClosed(page);
 		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue(
 			'/test/import/proj_dir'
-		);
-		await expect(page.getByRole('textbox', { name: 'SLURM user' })).toHaveValue(
-			'test-import-slurm-user'
-		);
-		await expect(page.getByLabel('SLURM account #1', { exact: true })).toHaveValue(
-			'test-import-slurm-account'
 		);
 	});
 

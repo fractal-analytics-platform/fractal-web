@@ -154,9 +154,10 @@ function extractFieldValidationError(simpleValidationMessage, loc) {
 /**
  * @param {any} reason
  * @param {number | null} statusCode
+ * @param {string[]} errorLocPrefix part of the "loc" array to strip
  * @returns {null | { [key: string]: string | string[] }}
  */
-export function getValidationMessagesMap(reason, statusCode) {
+export function getValidationMessagesMap(reason, statusCode, errorLocPrefix = ['body']) {
 	if (!isValidationError(reason, statusCode)) {
 		return null;
 	}
@@ -169,16 +170,23 @@ export function getValidationMessagesMap(reason, statusCode) {
 		if (!hasValidationErrorPayload(error)) {
 			return null;
 		}
-		if (error.loc[0] !== 'body') {
+		if (error.loc.length <= errorLocPrefix.length) {
 			return null;
 		}
-		if (error.loc.length === 2) {
-			map[error.loc[1]] = error.msg;
-		} else if (error.loc.length === 3 && typeof error.loc[2] === 'number') {
-			if (!(error.loc[1] in map)) {
-				map[error.loc[1]] = [];
+		// check prefix match
+		for (let i = 0; i < errorLocPrefix.length; i++) {
+			if (error.loc[i] !== errorLocPrefix[i]) {
+				return null;
 			}
-			/** @type {string[]} */ (map[error.loc[1]])[error.loc[2]] = error.msg;
+		}
+		const loc = error.loc.slice(errorLocPrefix.length);
+		if (loc.length === 1) {
+			map[loc[0]] = error.msg;
+		} else if (loc.length === 2 && typeof loc[1] === 'number') {
+			if (!(loc[0] in map)) {
+				map[loc[0]] = [];
+			}
+			/** @type {string[]} */ (map[loc[0]])[loc[1]] = error.msg;
 		} else {
 			return null;
 		}
@@ -235,13 +243,15 @@ export class FormErrorHandler {
 	/**
 	 * @param {string} errorAlertId id of the generic error alert component
 	 * @param {string[]} handledErrorKeys keys associated with form fields
+	 * @param {string[]} errorLoc part of the "loc" array to strip
 	 */
-	constructor(errorAlertId, handledErrorKeys) {
+	constructor(errorAlertId, handledErrorKeys, errorLoc = ['body']) {
 		this.validationErrors = writable({});
 		/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 		this.errorAlert = undefined;
 		this.errorAlertId = errorAlertId;
 		this.handledErrorKeys = handledErrorKeys;
+		this.errorLoc = errorLoc;
 	}
 
 	/**
@@ -287,7 +297,7 @@ export class FormErrorHandler {
 	 */
 	async handleErrorResponse(response) {
 		const result = await parseErrorResponse(response);
-		const errorsMap = getValidationMessagesMap(result, response.status);
+		const errorsMap = getValidationMessagesMap(result, response.status, this.errorLoc);
 		if (errorsMap && this.validateErrorMapKeys(errorsMap)) {
 			this.validationErrors.set(errorsMap);
 		} else {

@@ -7,7 +7,7 @@
 	let selectedTab = $state('accounting');
 
 	const useSlurm = $derived(
-		page.data.runnerBackend === 'slurm' || page.data.runnerBackend === 'slurm_ssh'
+		page.data.runnerBackend === 'slurm_sudo' || page.data.runnerBackend === 'slurm_ssh'
 	);
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(page.data.users);

@@ -13,7 +13,6 @@ else
   exit 2
 fi
 
-fractal_server_path="$(pwd)/lib/fractal-server"
 fractal_server_test_path="/tmp/fractal-test-server"
 
 PIXI_VERSION="0.48.0"
@@ -32,6 +31,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cp "$(pwd)/lib/fractal-server/config_local.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/.fractal_server.env" "$fractal_server_test_path"
   cp "$(pwd)/tests/pixi.json" "$fractal_server_test_path"
+  cp "$(pwd)/tests/resource.json" "$fractal_server_test_path"
 
   if [ "$SKIP_OAUTH_TEST" != "true" ]; then
     echo "\nOAUTH_DEXIDP_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
@@ -43,13 +43,14 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cd "$fractal_server_test_path"
 
   # Virtualenv, dependencies and db
-  python3 -m venv myenv
-  . myenv/bin/activate
+  python3 -m venv venv
+  . venv/bin/activate
   pip install "$pip_arg"
   fractalctl set-db
+  fractalctl init-db-data --resource resource.json --profile default
 else
   cd "$fractal_server_test_path"
-  . myenv/bin/activate
+  . venv/bin/activate
 fi
 
 # Start

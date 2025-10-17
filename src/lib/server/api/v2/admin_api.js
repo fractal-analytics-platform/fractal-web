@@ -24,3 +24,41 @@ export async function userImpersonation(fetch, userId) {
 
 	return await response.json();
 }
+
+/**
+ * @param {typeof fetch} fetch
+ * @param {number} resourceId
+ * @returns {Promise<import('fractal-components/types/api').Resource>}
+ */
+export async function getResource(fetch, resourceId) {
+	logger.debug(`Retrieving resource ${resourceId}`);
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/${resourceId}/`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * @param {typeof fetch} fetch
+ * @param {number} profileId
+ * @returns {Promise<import('fractal-components/types/api').Resource>}
+ */
+export async function getProfile(fetch, profileId) {
+	logger.debug(`Retrieving profile ${profileId}`);
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		await responseError(response);
+	}
+
+	return await response.json();
+}
