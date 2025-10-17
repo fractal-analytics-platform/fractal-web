@@ -1,8 +1,6 @@
 {
-	"id": 1,
 	"type": "local",
 	"name": "Local resource",
-	"timestamp_created": "2025-10-17T07:42:59.824955Z",
 	"host": null,
 	"jobs_local_dir": "/tmp/fractal-test-server/data-jobs",
 	"jobs_runner_config": {},

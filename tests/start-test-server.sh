@@ -13,7 +13,6 @@ else
   exit 2
 fi
 
-fractal_server_path="$(pwd)/lib/fractal-server"
 fractal_server_test_path="/tmp/fractal-test-server"
 
 PIXI_VERSION="0.48.0"
@@ -44,14 +43,14 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cd "$fractal_server_test_path"
 
   # Virtualenv, dependencies and db
-  python3 -m venv myenv
-  . myenv/bin/activate
+  python3 -m venv venv
+  . venv/bin/activate
   pip install "$pip_arg"
   fractalctl set-db
   fractalctl init-db-data --resource resource.json --profile default
 else
   cd "$fractal_server_test_path"
-  . myenv/bin/activate
+  . venv/bin/activate
 fi
 
 # Start
