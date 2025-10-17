@@ -194,7 +194,7 @@ export function showExecutorErrorLog(job) {
 		return false;
 	}
 	const log = job.executor_error_log.toLowerCase();
-	const errorKeywords = ['oom', 'killed', 'srun: error', 'out of memory', 'due to time limit'];
+	const errorKeywords = ['oom', 'killed', 'srun: error', 'out of memory', 'due to time limit', 'exceeded job memory limit', 'application launch failed', 'job credential expired', 'job step aborted'];
 	for (const keyword of errorKeywords) {
 		if (log.includes(keyword)) {
 			return true;
