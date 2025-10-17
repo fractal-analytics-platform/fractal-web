@@ -32,6 +32,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cp "$(pwd)/lib/fractal-server/config_local.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/.fractal_server.env" "$fractal_server_test_path"
   cp "$(pwd)/tests/pixi.json" "$fractal_server_test_path"
+  cp "$(pwd)/tests/resource.json" "$fractal_server_test_path"
 
   if [ "$SKIP_OAUTH_TEST" != "true" ]; then
     echo "\nOAUTH_DEXIDP_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
@@ -47,7 +48,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   . myenv/bin/activate
   pip install "$pip_arg"
   fractalctl set-db
-  fractalctl init-db-data --resource default --profile default
+  fractalctl init-db-data --resource resource.json --profile default
 else
   cd "$fractal_server_test_path"
   . myenv/bin/activate
