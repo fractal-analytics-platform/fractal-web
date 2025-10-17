@@ -88,7 +88,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch dev',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
@@ -104,7 +104,7 @@ export default defineConfig({
 		},
 		{
 			command:
-				'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 FRACTAL_RUNNER_BACKEND=slurm node build',
+				'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 FRACTAL_RUNNER_BACKEND=local node build',
 			port: 5173,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI

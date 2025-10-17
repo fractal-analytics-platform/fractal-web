@@ -119,14 +119,6 @@
 						<th>SSH Private Key Path</th>
 						<td>{settings.ssh_private_key_path || '-'}</td>
 					</tr>
-					<tr>
-						<th>SSH Tasks Dir</th>
-						<td>{settings.ssh_tasks_dir || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH Jobs Dir</th>
-						<td>{settings.ssh_jobs_dir || '-'}</td>
-					</tr>
 				{/if}
 				{#if runnerBackend === 'slurm_sudo' || runnerBackend === 'slurm_ssh'}
 					<tr>

@@ -62,11 +62,11 @@ test('Viewer paths', async ({ page }) => {
 	});
 
 	await test.step('Remove viewer paths', async () => {
-		await expect(page.getByRole('textbox')).toHaveCount(5);
+		await expect(page.getByRole('textbox')).toHaveCount(4);
 		await page.getByLabel('Remove viewer path #2').click();
 		await page.getByRole('button', { name: 'Save' }).first().click();
 		await expect(page.getByText('Paths successfully updated')).toBeVisible();
-		await expect(page.getByRole('textbox')).toHaveCount(4);
+		await expect(page.getByRole('textbox')).toHaveCount(3);
 	});
 
 	await test.step('Check viewer paths in info page', async () => {

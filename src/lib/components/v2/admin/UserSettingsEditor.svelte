@@ -50,9 +50,7 @@
 		'slurm_user',
 		'ssh_host',
 		'ssh_username',
-		'ssh_private_key_path',
-		'ssh_tasks_dir',
-		'ssh_jobs_dir'
+		'ssh_private_key_path'
 	]);
 	const settingsValidationErrors = settingsFormErrorHandler.getValidationErrorStore();
 
@@ -76,7 +74,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: normalizePayload({ ...editableSettings, id: undefined }, { nullifyEmptyStrings: true })
+			body: normalizePayload({ ...editableSettings, id: undefined }, { stripEmptyElements: true })
 		});
 		if (!response.ok) {
 			await settingsFormErrorHandler.handleErrorResponse(response);
@@ -183,42 +181,6 @@
 						</div>
 						<span class="invalid-feedback">{$settingsValidationErrors['ssh_private_key_path']}</span
 						>
-					</div>
-				</div>
-				<div class="row mb-3 has-validation">
-					<label for="sshTasksDir" class="col-sm-3 col-form-label text-end">
-						<strong>SSH Tasks Dir</strong>
-					</label>
-					<div class="col-sm-9">
-						<input
-							type="text"
-							class="form-control"
-							id="sshTasksDir"
-							bind:value={editableSettings.ssh_tasks_dir}
-							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_tasks_dir']}
-						/>
-						<div class="form-text">
-							Task-venvs base folder on <code>ssh_host</code>
-						</div>
-						<span class="invalid-feedback">{$settingsValidationErrors['ssh_tasks_dir']}</span>
-					</div>
-				</div>
-				<div class="row mb-3 has-validation">
-					<label for="sshJobsDir" class="col-sm-3 col-form-label text-end">
-						<strong>SSH Jobs Dir</strong>
-					</label>
-					<div class="col-sm-9">
-						<input
-							type="text"
-							class="form-control"
-							id="sshJobsDir"
-							bind:value={editableSettings.ssh_jobs_dir}
-							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_jobs_dir']}
-						/>
-						<div class="form-text">
-							Jobs base folder on <code>ssh_host</code>
-						</div>
-						<span class="invalid-feedback">{$settingsValidationErrors['ssh_jobs_dir']}</span>
 					</div>
 				</div>
 			{/if}

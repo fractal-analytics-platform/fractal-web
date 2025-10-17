@@ -47,6 +47,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   . myenv/bin/activate
   pip install "$pip_arg"
   fractalctl set-db
+  fractalctl init-db-data --resource default --profile default
 else
   cd "$fractal_server_test_path"
   . myenv/bin/activate

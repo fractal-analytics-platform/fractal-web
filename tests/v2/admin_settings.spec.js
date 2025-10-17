@@ -5,7 +5,7 @@ test('Show the admin settings page', async ({ page }) => {
 	await test.step('Open the admin settings page', async () => {
 		await page.goto('/v2/admin/settings');
 		await waitPageLoading(page);
-		await expect(page.getByRole('cell', { name: 'FRACTAL_TASKS_DIR', exact: true })).toBeVisible();
+		await expect(page.getByRole('cell', { name: 'FRACTAL_RUNNER_BACKEND', exact: true })).toBeVisible();
 		await expect(page.getByText('**********')).not.toBeVisible();
 	});
 

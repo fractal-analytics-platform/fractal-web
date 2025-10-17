@@ -7,7 +7,6 @@ test.use({ storageState: { cookies: [], origins: [] } });
 test('User settings', async ({ page }) => {
 	const randomUsername = Math.random().toString(36).substring(7);
 	const randomEmail = `${randomUsername}@example.com`;
-	const randomSlurmAccount = `${randomUsername}_slurm`;
 
 	await test.step('Login as admin and create test user', async () => {
 		await login(page, 'admin@fractal.xy', '1234');
@@ -18,6 +17,9 @@ test('User settings', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Confirm password' }).fill('1234');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
+		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp/project');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
 		await logout(page, 'admin@fractal.xy');
 	});
 
@@ -26,28 +28,7 @@ test('User settings', async ({ page }) => {
 		await page.getByRole('button', { name: randomEmail }).click();
 		await page.getByRole('link', { name: 'My settings' }).click();
 		await waitPageLoading(page);
-	});
-
-	await test.step('Add SLURM account (validation error)', async () => {
-		const addAccountBtn = page.getByRole('button', { name: 'Add SLURM account' });
-		await addAccountBtn.click();
-		await addAccountBtn.click();
-		await page.getByLabel('SLURM account 1').fill(randomSlurmAccount);
-		await page.getByLabel('SLURM account 2').fill(randomSlurmAccount);
-		await page.getByRole('button', { name: 'Save' }).click();
-		await page.getByText('List has repetitions').waitFor();
-	});
-
-	await test.step('Add SLURM account (success)', async () => {
-		await page.getByLabel('Remove SLURM account').last().click();
-		await page.getByRole('button', { name: 'Save' }).click();
-		await expect(page.getByText('User settings successfully updated')).toBeVisible();
-	});
-
-	await test.step('Verify data was updated', async () => {
-		await page.reload();
-		await waitPageLoading(page);
-		await expect(page.getByLabel('SLURM account 1')).toHaveValue(randomSlurmAccount);
+		await expect(page.getByText('/tmp/project')).toBeVisible();
 	});
 
 	await test.step('Logout test user', async () => {
