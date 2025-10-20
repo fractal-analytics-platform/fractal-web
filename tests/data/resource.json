@@ -1,0 +1,21 @@
+{
+	"id": 1,
+	"type": "local",
+	"name": "test resource",
+	"host": null,
+	"jobs_local_dir": "/path/to/fractal-server/data-jobs",
+	"jobs_runner_config": {
+		"parallel_tasks_per_job": null
+	},
+	"jobs_slurm_python_worker": null,
+	"jobs_poll_interval": 0,
+	"tasks_local_dir": "/path/to/fractal-server/data-tasks",
+	"tasks_python_config": {
+		"versions": {
+			"3.12": "/path/to/fractal-server/venv/bin/python"
+		},
+		"pip_cache_dir": null,
+		"default_version": "3.12"
+	},
+	"tasks_pixi_config": {}
+}

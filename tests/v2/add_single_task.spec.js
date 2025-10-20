@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitModalClosed, waitPageLoading, waitStopSpinnerIn } from '../utils.js';
+import { setUploadFile, waitModalClosed, waitPageLoading, waitStopSpinnerIn } from '../utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { collapseExpandedRows, deleteTask } from './task_utils.js';
@@ -391,16 +391,4 @@ async function getExpandedTaskRow(page) {
 		}
 	}
 	throw new Error('Unable to find expanded task row');
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} selectorText
- * @param {string} filePath
- */
-async function setUploadFile(page, selectorText, filePath) {
-	const fileChooserPromise = page.waitForEvent('filechooser');
-	await page.getByText(selectorText).click();
-	const fileChooser = await fileChooserPromise;
-	await fileChooser.setFiles(filePath);
 }

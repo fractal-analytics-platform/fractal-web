@@ -27,6 +27,17 @@ export async function closeModal(page) {
 }
 
 /**
+ * Wait until modal is opened
+ * @param {import('@playwright/test').Page} page
+ * @returns {Promise<import('@playwright/test').Locator>}
+ */
+export async function waitModal(page) {
+	const modal = page.locator('.modal.show');
+	await modal.waitFor();
+	return modal;
+}
+
+/**
  * Wait until modal is closed
  * @param {import('@playwright/test').Page} page
  */
@@ -142,4 +153,16 @@ export async function logout(page, email) {
 	await page.getByRole('button', { name: 'Logout' }).click();
 	await waitPageLoading(page);
 	await expect(page.getByRole('link', { name: 'Login' }).first()).toBeVisible();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} selectorText
+ * @param {string} filePath
+ */
+export async function setUploadFile(page, selectorText, filePath) {
+	const fileChooserPromise = page.waitForEvent('filechooser');
+	await page.getByText(selectorText).click();
+	const fileChooser = await fileChooserPromise;
+	await fileChooser.setFiles(filePath);
 }
