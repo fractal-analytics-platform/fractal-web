@@ -22,7 +22,7 @@ This variable has to match the client name defined in fractal-server configurati
     * Authorization callback URL: http://127.0.0.1:5173/auth/login/oauth2/
 2. Set up the following env variables for fractal-server:
 ```
-OAUTH_CLIENT_name=github
+OAUTH_CLIENT_NAME=github
 OAUTH_CLIENT_ID=...
 OAUTH_CLIENT_SECRET=...
 OAUTH_REDIRECT_URL=http://127.0.0.1:5173/auth/login/oauth2/
