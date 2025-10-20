@@ -21,14 +21,6 @@ export type User = {
 export type UserSettings = {
 	slurm_accounts: string[];
 	project_dir: string | null;
-	// Slurm
-	slurm_user: string | null;
-	// Slurm SSH
-	ssh_host: string | null;
-	ssh_username: string | null;
-	ssh_private_key_path: string | null;
-	ssh_tasks_dir: string | null;
-	ssh_jobs_dir: string | null;
 };
 
 export type ProfileInfo = {

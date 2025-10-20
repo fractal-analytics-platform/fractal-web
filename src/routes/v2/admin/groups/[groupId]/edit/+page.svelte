@@ -181,13 +181,7 @@
 	function createEmptySettings() {
 		return {
 			slurm_accounts: [],
-			project_dir: '',
-			slurm_user: '',
-			ssh_host: '',
-			ssh_username: '',
-			ssh_private_key_path: '',
-			ssh_tasks_dir: '',
-			ssh_jobs_dir: ''
+			project_dir: ''
 		};
 	}
 

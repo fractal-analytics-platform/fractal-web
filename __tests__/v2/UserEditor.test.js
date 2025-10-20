@@ -46,13 +46,7 @@ describe('UserEditor', () => {
 	/** @type {import('fractal-components/types/api').UserSettings} */
 	const initialSettings = {
 		slurm_accounts: [],
-		project_dir: null,
-		slurm_user: null,
-		ssh_host: null,
-		ssh_username: null,
-		ssh_private_key_path: null,
-		ssh_tasks_dir: null,
-		ssh_jobs_dir: null
+		project_dir: null
 	};
 
 	/**
@@ -60,7 +54,7 @@ describe('UserEditor', () => {
 	 */
 	const mockSaveUser = vi.fn();
 
-	it('Update settings with slurm_sudo runner backend - success', async () => {
+	it('Update settings - success', async () => {
 		const mockRequest = /** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
@@ -105,7 +99,6 @@ describe('UserEditor', () => {
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), '/path/to/project/dir');
-		await user.type(screen.getByRole('textbox', { name: 'SLURM user' }), 'user');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
@@ -113,14 +106,14 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
-					project_dir: '/path/to/project/dir',
-					slurm_user: 'user'
+					slurm_accounts: [],
+					project_dir: '/path/to/project/dir'
 				})
 			})
 		);
 	});
 
-	it('Update settings with slurm_sudo runner backend - validation error', async () => {
+	it('Update settings - validation error', async () => {
 		const mockRequest = /** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
@@ -176,120 +169,8 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
+					slurm_accounts: [],
 					project_dir: 'xxx'
-				})
-			})
-		);
-	});
-
-	it('Update settings with slurm_ssh runner backend - success', async () => {
-		const user = userEvent.setup();
-
-		render(UserEditor, {
-			props: {
-				runnerBackend: 'slurm_ssh',
-				user: selectedUser,
-				settings: { ...initialSettings },
-				saveUser: mockSaveUser
-			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
-			ok: true,
-			status: 200,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						...initialSettings,
-						ssh_host: 'localhost',
-						ssh_username: 'username',
-						ssh_private_key_path: '/path/to/private/key'
-					})
-				)
-		});
-
-		await user.type(screen.getByRole('textbox', { name: 'SSH host' }), 'localhost');
-		await user.type(screen.getByRole('textbox', { name: 'SSH username' }), 'username');
-		await user.type(screen.getByRole('textbox', { name: 'SSH Private Key Path' }), 'xxx');
-		await user.click(screen.getByRole('button', { name: 'Save' }));
-		await screen.findByText('User successfully updated');
-
-		expect(mockRequest).toHaveBeenCalledWith(
-			expect.anything(),
-			expect.objectContaining({
-				body: JSON.stringify({
-					ssh_host: 'localhost',
-					ssh_username: 'username',
-					ssh_private_key_path: 'xxx'
-				})
-			})
-		);
-	});
-
-	it('Update settings with slurm_ssh runner backend - validation error', async () => {
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch)
-			.mockResolvedValueOnce({
-				ok: true,
-				status: 200,
-				// mock profile
-				json: () => new Promise((resolve) => resolve({ id: 1, resource_id: 1 }))
-			})
-			.mockResolvedValueOnce({
-				ok: true,
-				status: 200,
-				// mock resources
-				json: () => new Promise((resolve) => resolve([{ id: 1 }]))
-			})
-			.mockResolvedValueOnce({
-				ok: true,
-				status: 200,
-				// mock profiles
-				json: () => new Promise((resolve) => resolve([{ id: 1 }]))
-			})
-			.mockResolvedValueOnce({
-				ok: false,
-				status: 422,
-				json: () =>
-					new Promise((resolve) =>
-						resolve({
-							detail: [
-								{
-									loc: ['body', 'ssh_private_key_path'],
-									msg: 'mock_error_ssh_private_key_path',
-									type: 'value_error'
-								}
-							]
-						})
-					)
-			});
-
-		const user = userEvent.setup();
-
-		render(UserEditor, {
-			props: {
-				runnerBackend: 'slurm_ssh',
-				user: selectedUser,
-				settings: { ...initialSettings },
-				saveUser: mockSaveUser
-			}
-		});
-
-		await user.type(screen.getByRole('textbox', { name: 'SSH host' }), 'localhost');
-		await user.type(screen.getByRole('textbox', { name: 'SSH username' }), 'username');
-		await user.type(
-			screen.getByRole('textbox', { name: 'SSH Private Key Path' }),
-			'/path/to/private/key'
-		);
-		await user.click(screen.getByRole('button', { name: 'Save' }));
-		await screen.findByText('mock_error_ssh_private_key_path');
-
-		expect(mockRequest).toHaveBeenCalledWith(
-			expect.anything(),
-			expect.objectContaining({
-				body: JSON.stringify({
-					ssh_host: 'localhost',
-					ssh_username: 'username',
-					ssh_private_key_path: '/path/to/private/key'
 				})
 			})
 		);

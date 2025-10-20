@@ -46,11 +46,7 @@
 
 	const settingsFormErrorHandler = new FormErrorHandler('genericSettingsError', [
 		'slurm_accounts',
-		'project_dir',
-		'slurm_user',
-		'ssh_host',
-		'ssh_username',
-		'ssh_private_key_path'
+		'project_dir'
 	]);
 	const settingsValidationErrors = settingsFormErrorHandler.getValidationErrorStore();
 
@@ -74,7 +70,7 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: normalizePayload({ ...editableSettings, id: undefined }, { stripEmptyElements: true })
+			body: normalizePayload({ ...editableSettings, id: undefined }, { nullifyEmptyStrings: true })
 		});
 		if (!response.ok) {
 			await settingsFormErrorHandler.handleErrorResponse(response);
@@ -107,83 +103,6 @@
 					<span class="invalid-feedback">{$settingsValidationErrors['project_dir']}</span>
 				</div>
 			</div>
-			{#if runnerBackend === 'slurm_sudo'}
-				<div class="row mb-3 has-validation">
-					<label for="slurmUser" class="col-sm-3 col-form-label text-end">
-						<strong>SLURM user</strong>
-					</label>
-					<div class="col-sm-9">
-						<input
-							type="text"
-							class="form-control"
-							id="slurmUser"
-							bind:value={editableSettings.slurm_user}
-							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['slurm_user']}
-						/>
-						<div class="form-text">
-							The user on the local SLURM cluster who will be impersonated by Fractal through
-							<code>sudo -u</code>
-						</div>
-						<span class="invalid-feedback">{$settingsValidationErrors['slurm_user']}</span>
-					</div>
-				</div>
-			{:else if runnerBackend === 'slurm_ssh'}
-				<div class="row mb-3 has-validation">
-					<label for="sshHost" class="col-sm-3 col-form-label text-end">
-						<strong>SSH host</strong>
-					</label>
-					<div class="col-sm-9">
-						<input
-							type="text"
-							class="form-control"
-							id="sshHost"
-							bind:value={editableSettings.ssh_host}
-							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_host']}
-						/>
-						<div class="form-text">SSH-reachable host where a SLURM client is available</div>
-						<span class="invalid-feedback">{$settingsValidationErrors['ssh_host']}</span>
-					</div>
-				</div>
-				<div class="row mb-3 has-validation">
-					<label for="sshUsername" class="col-sm-3 col-form-label text-end">
-						<strong>SSH username</strong>
-					</label>
-					<div class="col-sm-9">
-						<input
-							type="text"
-							class="form-control"
-							id="sshUsername"
-							bind:value={editableSettings.ssh_username}
-							class:is-invalid={settingsFormSubmitted && $settingsValidationErrors['ssh_username']}
-						/>
-						<div class="form-text">
-							The user on the remote SLURM cluster who will be impersonated by Fractal through
-							<code>ssh</code>
-						</div>
-						<span class="invalid-feedback">{$settingsValidationErrors['ssh_username']}</span>
-					</div>
-				</div>
-				<div class="row mb-3 has-validation">
-					<label for="sshPrivateKeyPath" class="col-sm-3 col-form-label text-end">
-						<strong>SSH Private Key Path</strong>
-					</label>
-					<div class="col-sm-9">
-						<input
-							type="text"
-							class="form-control"
-							id="sshPrivateKeyPath"
-							bind:value={editableSettings.ssh_private_key_path}
-							class:is-invalid={settingsFormSubmitted &&
-								$settingsValidationErrors['ssh_private_key_path']}
-						/>
-						<div class="form-text">
-							Path of private SSH key for <code>ssh_username</code>
-						</div>
-						<span class="invalid-feedback">{$settingsValidationErrors['ssh_private_key_path']}</span
-						>
-					</div>
-				</div>
-			{/if}
 			{#if runnerBackend !== 'local'}
 				<div class="row mb-3 has-validation">
 					<label for="slurmAccount-0" class="col-sm-3 col-form-label text-end">

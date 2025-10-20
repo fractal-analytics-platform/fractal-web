@@ -117,6 +117,17 @@
 							class:is-invalid={profileFormSubmitted && $profileValidationErrors['username']}
 							required
 						/>
+						{#if resource.type === 'slurm_sudo'}
+							<div class="form-text">
+								The user on the local SLURM cluster who will be impersonated by Fractal through
+								<code>sudo -u</code>
+							</div>
+						{:else}
+							<div class="form-text">
+								The user on the remote SLURM cluster who will be impersonated by Fractal through
+								<code>ssh</code>
+							</div>
+						{/if}
 						<span class="invalid-feedback">{$profileValidationErrors['username']}</span>
 					</div>
 				</div>
@@ -136,6 +147,9 @@
 							class:is-invalid={profileFormSubmitted && $profileValidationErrors['ssh_key_path']}
 							required
 						/>
+						<div class="form-text">
+							Path of private SSH key for <code>username</code>
+						</div>
 						<span class="invalid-feedback">{$profileValidationErrors['ssh_key_path']}</span>
 					</div>
 				</div>
