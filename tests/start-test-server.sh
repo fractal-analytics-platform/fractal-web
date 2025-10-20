@@ -34,10 +34,11 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cp "$(pwd)/tests/resource.json" "$fractal_server_test_path"
 
   if [ "$SKIP_OAUTH_TEST" != "true" ]; then
-    echo "\nOAUTH_DEXIDP_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_DEXIDP_CLIENT_SECRET=client_test_web_secret" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_DEXIDP_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
+    echo "\nOAUTH_CLIENT_NAME=dexidp" >> "${fractal_server_test_path}/.fractal_server.env"
+    echo "OAUTH_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
+    echo "OAUTH_CLIENT_SECRET=client_test_web_secret" >> "${fractal_server_test_path}/.fractal_server.env"
+    echo "OAUTH_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/" >> "${fractal_server_test_path}/.fractal_server.env"
+    echo "OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
   fi
 
   cd "$fractal_server_test_path"
