@@ -1,4 +1,9 @@
-import { getCurrentUser, getProfileInfo } from '$lib/server/api/auth_api.js';
+import {
+	getCurrentUser,
+	getCurrentUserSettings,
+	getProfileInfo
+} from '$lib/server/api/auth_api.js';
+import { env } from '$env/dynamic/private';
 import { getLogger } from '$lib/server/logger.js';
 
 const logger = getLogger('profile page');
@@ -8,9 +13,12 @@ export async function load({ fetch }) {
 
 	const user = await getCurrentUser(fetch, true);
 	const profile = await getProfileInfo(fetch);
+	const settings = await getCurrentUserSettings(fetch);
 
 	return {
 		user,
-		profile
+		profile,
+		settings,
+		runnerBackend: env.FRACTAL_RUNNER_BACKEND
 	};
 }
