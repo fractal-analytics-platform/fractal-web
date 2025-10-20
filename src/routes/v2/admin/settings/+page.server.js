@@ -9,10 +9,12 @@ export async function load({ fetch }) {
 	const appSettings = await listSettings(fetch, 'app');
 	const databaseSettings = await listSettings(fetch, 'database');
 	const emailSettings = await listSettings(fetch, 'email');
+	const oauthSettings = await listSettings(fetch, 'oauth');
 
 	return {
 		appSettings,
 		databaseSettings,
-		emailSettings
+		emailSettings,
+		oauthSettings
 	};
 }

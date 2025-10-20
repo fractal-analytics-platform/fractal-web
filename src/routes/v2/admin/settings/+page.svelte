@@ -4,13 +4,15 @@
 	const appSettings = $derived(page.data.appSettings);
 	const databaseSettings = $derived(page.data.databaseSettings);
 	const emailSettings = $derived(page.data.emailSettings);
+	const oauthSettings = $derived(page.data.oauthSettings);
 
 	let showObfuscated = $state(false);
 
 	const settings = $derived([
 		['App settings', appSettings],
 		['Database settings', databaseSettings],
-		['E-mail settings', emailSettings]
+		['E-mail settings', emailSettings],
+		['OAuth settings', oauthSettings]
 	]);
 </script>
 
