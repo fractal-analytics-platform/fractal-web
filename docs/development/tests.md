@@ -25,7 +25,7 @@ To skip Pixi test set the environment variable `SKIP_PIXI_TEST` to `true`.
 To run the OAuth2 test locally add the following configuration to `.fractal_server.env`:
 
 ```
-OAUTH_CLIENT_name=dexidp
+OAUTH_CLIENT_NAME=dexidp
 OAUTH_CLIENT_ID=client_test_web_id
 OAUTH_CLIENT_SECRET=client_test_web_secret
 OAUTH_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
