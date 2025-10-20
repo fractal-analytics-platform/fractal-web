@@ -6,7 +6,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Omit<import('fractal-components/types/api').Profile, 'id'>} profile
+	 * @property {import('fractal-components/types/api').Profile | Omit<import('fractal-components/types/api').Profile, 'id'>} profile
 	 * @property {import('fractal-components/types/api').Resource} resource
 	 * @property {(user: import('fractal-components/types/api').Profile & { id: number | undefined }) => Promise<Response>} saveProfile
 	 * @property {boolean} [showSaveButton]

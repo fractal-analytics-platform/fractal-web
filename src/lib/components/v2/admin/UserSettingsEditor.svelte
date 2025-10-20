@@ -26,13 +26,15 @@
 		pendingChanges = $bindable(false)
 	} = $props();
 
+	/** @type {import('fractal-components/types/api').UserSettings|undefined} */
 	let editableSettings = $state();
 
 	$effect(() => {
 		const original = $state.snapshot(originalSettings);
 		const edited = $state.snapshot(editableSettings);
 		pendingChanges =
-			editableSettings && JSON.stringify(original) !== JSON.stringify(nullifyEmptyStrings(edited));
+			!!editableSettings &&
+			JSON.stringify(original) !== JSON.stringify(nullifyEmptyStrings(edited));
 	});
 
 	$effect(() => {
@@ -51,17 +53,26 @@
 	const settingsValidationErrors = settingsFormErrorHandler.getValidationErrorStore();
 
 	function addSlurmAccount() {
-		editableSettings.slurm_accounts = [...editableSettings.slurm_accounts, ''];
+		if (editableSettings) {
+			editableSettings.slurm_accounts = [...editableSettings.slurm_accounts, ''];
+		}
 	}
 
 	/**
 	 * @param {number} index
 	 */
 	function removeSlurmAccount(index) {
-		editableSettings.slurm_accounts = editableSettings.slurm_accounts.filter((_, i) => i !== index);
+		if (editableSettings) {
+			editableSettings.slurm_accounts = editableSettings.slurm_accounts.filter(
+				(_, i) => i !== index
+			);
+		}
 	}
 
 	export async function handleSaveSettings() {
+		if (!editableSettings) {
+			return;
+		}
 		settingsFormSubmitted = true;
 		settingsFormErrorHandler.clearErrors();
 		const headers = new Headers();
@@ -70,7 +81,13 @@
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: normalizePayload({ ...editableSettings, id: undefined }, { nullifyEmptyStrings: true })
+			body: normalizePayload(
+				{
+					slurm_accounts: editableSettings.slurm_accounts,
+					project_dir: editableSettings.project_dir
+				},
+				{ nullifyEmptyStrings: true }
+			)
 		});
 		if (!response.ok) {
 			await settingsFormErrorHandler.handleErrorResponse(response);
