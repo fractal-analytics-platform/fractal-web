@@ -100,27 +100,7 @@
 					<th>Project dir</th>
 					<td>{settings.project_dir || '-'}</td>
 				</tr>
-				{#if runnerBackend === 'slurm_sudo'}
-					<tr>
-						<th>SLURM user</th>
-						<td>{settings.slurm_user || '-'}</td>
-					</tr>
-				{/if}
-				{#if runnerBackend === 'slurm_ssh'}
-					<tr>
-						<th>SSH host</th>
-						<td>{settings.ssh_host || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH username</th>
-						<td>{settings.ssh_username || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH Private Key Path</th>
-						<td>{settings.ssh_private_key_path || '-'}</td>
-					</tr>
-				{/if}
-				{#if runnerBackend === 'slurm_sudo' || runnerBackend === 'slurm_ssh'}
+				{#if runnerBackend !== 'local'}
 					<tr>
 						<th>SLURM accounts</th>
 						<td>
