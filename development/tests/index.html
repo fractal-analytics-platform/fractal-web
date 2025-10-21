@@ -682,10 +682,11 @@
 <p>To skip OAuth2 test set the environment variable <code>SKIP_OAUTH_TEST</code> to <code>true</code>.</p>
 <p>To skip Pixi test set the environment variable <code>SKIP_PIXI_TEST</code> to <code>true</code>.</p>
 <p>To run the OAuth2 test locally add the following configuration to <code>.fractal_server.env</code>:</p>
-<div class="highlight"><pre><span></span><code>OAUTH_DEXIDP_CLIENT_ID=client_test_web_id
-OAUTH_DEXIDP_CLIENT_SECRET=client_test_web_secret
-OAUTH_DEXIDP_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
-OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration
+<div class="highlight"><pre><span></span><code>OAUTH_CLIENT_NAME=dexidp
+OAUTH_CLIENT_ID=client_test_web_id
+OAUTH_CLIENT_SECRET=client_test_web_secret
+OAUTH_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
+OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration
 </code></pre></div>
 <p>And then start the test IdP container:</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--rm<span class="w"> </span>-p<span class="w"> </span><span class="m">5556</span>:5556<span class="w"> </span>ghcr.io/fractal-analytics-platform/oauth:0.1
