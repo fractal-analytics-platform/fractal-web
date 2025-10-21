@@ -80,15 +80,6 @@
 					{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
 						<th>Username</th>
 					{/if}
-					{#if resource.type === 'slurm_ssh'}
-						<th>SSH key path</th>
-					{/if}
-					{#if resource.type === 'slurm_ssh'}
-						<th>Jobs remote dir</th>
-					{/if}
-					{#if resource.type === 'slurm_ssh'}
-						<th>Tasks remote dir</th>
-					{/if}
 					<th>Actions</th>
 				</tr>
 			</thead>
@@ -99,15 +90,6 @@
 						<td>{profile.name}</td>
 						{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
 							<td>{profile.username || '-'}</td>
-						{/if}
-						{#if resource.type === 'slurm_ssh'}
-							<td>{profile.ssh_key_path || '-'}</td>
-						{/if}
-						{#if resource.type === 'slurm_ssh'}
-							<td>{profile.jobs_remote_dir || '-'}</td>
-						{/if}
-						{#if resource.type === 'slurm_ssh'}
-							<td>{profile.tasks_remote_dir || '-'}</td>
 						{/if}
 						<td>
 							<a
