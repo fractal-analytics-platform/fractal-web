@@ -6,9 +6,15 @@ const logger = getLogger('admin settings page');
 export async function load({ fetch }) {
 	logger.trace('Loading settings page');
 
-	const settings = await listSettings(fetch);
+	const appSettings = await listSettings(fetch, 'app');
+	const databaseSettings = await listSettings(fetch, 'database');
+	const emailSettings = await listSettings(fetch, 'email');
+	const oauthSettings = await listSettings(fetch, 'oauth');
 
 	return {
-		settings
+		appSettings,
+		databaseSettings,
+		emailSettings,
+		oauthSettings
 	};
 }

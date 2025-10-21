@@ -54,4 +54,26 @@ describe('Error utility functions', () => {
 		expect(errors[2]).toBeUndefined();
 		expect(errors[3]).toEqual("Value error, String must be an absolute path (given 'foobar').");
 	});
+
+	it('strip custom loc', () => {
+		const errorMap = getValidationMessagesMap(
+			{
+				detail: [
+					{
+						type: 'string_type',
+						loc: ['body', 'local', 'name'],
+						msg: 'Input should be a valid string',
+						input: null
+					}
+				]
+			},
+			422,
+			['body', 'local']
+		);
+
+		/** @type {string} */
+		const error = /** @type {string} */ (errorMap && errorMap['name']);
+
+		expect(error).toEqual('Input should be a valid string');
+	});
 });

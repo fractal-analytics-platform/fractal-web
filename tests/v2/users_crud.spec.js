@@ -22,10 +22,9 @@ test('Create and update a user', async ({ page }) => {
 	const randomUserName = Math.random().toString(36).substring(7);
 
 	await test.step('Test required fields validation errors', async () => {
-		await page.getByLabel('Username').fill(randomUserName);
-		await page.getByRole('button', { name: 'Save' }).click();
-		expect(await page.getByText('Field is required').count()).toEqual(2);
 		await page.getByLabel('E-mail').fill(randomUserName + '@example.com');
+		await page.getByRole('button', { name: 'Save' }).click();
+		expect(await page.getByText('Field is required').count()).toEqual(1);
 	});
 
 	await test.step('Test password confirm validation errors', async () => {
@@ -47,34 +46,31 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Check user in users list', async () => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
-		await expect(page.getByRole('cell', { name: randomUserName })).toHaveCount(2);
+		await expect(page.getByRole('cell', { name: randomUserName })).toHaveCount(1);
 		const userRowCells = await getUserRowCells(page, randomUserName);
 		userId = (await userRowCells[0].innerText()).trim();
-		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
-		expect(await userRowCells[2].innerText()).toEqual(randomUserName);
-		verifyChecked(userRowCells, 3, true);
-		verifyChecked(userRowCells, 4, false);
-		verifyChecked(userRowCells, 5, true);
+		await expect(userRowCells[1]).toContainText(randomUserName + '@example.com');
+		await verifyChecked(userRowCells, 2, true);
+		await verifyChecked(userRowCells, 3, false);
+		await verifyChecked(userRowCells, 4, true);
 	});
 
 	expect(userId).not.toBeNull();
 
 	await test.step('Display the user info page', async () => {
-		const userRow = await getUserRow(page, randomUserName);
+		const userRow = getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Info' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
-		expect(await cells[0].innerText()).toEqual(userId);
-		expect(await cells[1].innerText()).toEqual(randomUserName + '@example.com');
-		expect(await cells[2].innerText()).toEqual(randomUserName);
-		verifyChecked(cells, 3, true);
-		verifyChecked(cells, 4, false);
-		verifyChecked(cells, 5, true);
-		expect(await cells[6].innerText()).toEqual('All');
-		expect(await cells[7].innerText()).toEqual('-');
-		expect(await cells[8].innerText()).toEqual('-');
-		expect(await cells[9].innerText()).toEqual('-');
+		await expect(cells[0]).toHaveText(/** @type {string} */ (userId));
+		await expect(cells[1]).toHaveText(randomUserName + '@example.com');
+		await verifyChecked(cells, 2, true);
+		await verifyChecked(cells, 3, false);
+		await verifyChecked(cells, 4, true);
+		await expect(cells[5]).toHaveText('All');
+		await expect(cells[6]).toHaveText('Local profile');
+		await expect(cells[7]).toHaveText('-');
 	});
 
 	await test.step('Go back to previous page', async () => {
@@ -84,7 +80,7 @@ test('Create and update a user', async ({ page }) => {
 	});
 
 	await test.step('Open edit user page', async () => {
-		const userRow = await getUserRow(page, randomUserName);
+		const userRow = getUserRow(page, randomUserName);
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
@@ -99,22 +95,8 @@ test('Create and update a user', async ({ page }) => {
 		await page.getByLabel('Project dir').fill('/tmp/test/project-dir');
 	});
 
-	await test.step('SLURM account validation error', async () => {
-		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page.getByRole('button', { name: 'Add SLURM account' }).click();
-		await page
-			.getByRole('textbox', { name: /^SLURM account #1/ })
-			.fill(randomUserName + '-slurm-account');
-		await page
-			.getByRole('textbox', { name: /^SLURM account #2/ })
-			.fill(randomUserName + '-slurm-account');
-		await page.getByRole('button', { name: 'Save' }).click();
-		await expect(page.getByText('Value error, List has repetitions')).toBeVisible();
-		await page.getByLabel('Remove SLURM account').first().click();
-	});
-
-	await test.step('Rename username and unset verified checkbox', async () => {
-		await page.getByLabel('Username').fill(randomUserName + '-renamed');
+	await test.step('Rename email and unset verified checkbox', async () => {
+		await page.getByLabel('E-mail').fill(randomUserName + '-renamed@example.com');
 		const verifiedCheckbox = page.getByLabel('Verified');
 		await verifiedCheckbox.waitFor();
 		expect(await verifiedCheckbox.isChecked()).toEqual(true);
@@ -124,8 +106,7 @@ test('Create and update a user', async ({ page }) => {
 	});
 
 	await test.step('Update settings', async () => {
-		await page.getByLabel('Project dir').fill('/tmp/test/project-dir');
-		await page.getByLabel('SLURM user').fill(randomUserName + '_slurm-renamed');
+		await page.getByLabel('Project dir').fill('/tmp/test/project-dir-renamed');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
@@ -134,29 +115,26 @@ test('Create and update a user', async ({ page }) => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed');
-		expect(await userRowCells[1].innerText()).toEqual(randomUserName + '@example.com');
-		expect(await userRowCells[2].innerText()).toEqual(randomUserName + '-renamed');
-		verifyChecked(userRowCells, 3, true);
-		verifyChecked(userRowCells, 4, false);
-		verifyChecked(userRowCells, 5, false);
+		await expect(userRowCells[1]).toContainText(randomUserName + '-renamed@example.com');
+		await verifyChecked(userRowCells, 2, true);
+		await verifyChecked(userRowCells, 3, false);
+		await verifyChecked(userRowCells, 4, false);
 	});
 
 	await test.step('Display the user info page', async () => {
-		const userRow = await getUserRow(page, randomUserName + '-renamed');
+		const userRow = getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Info' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
-		expect(await cells[0].innerText()).toEqual(userId);
-		expect(await cells[1].innerText()).toEqual(randomUserName + '@example.com');
-		expect(await cells[2].innerText()).toEqual(randomUserName + '-renamed');
-		verifyChecked(cells, 3, true);
-		verifyChecked(cells, 4, false);
-		verifyChecked(cells, 5, false);
-		expect(await cells[6].innerText()).toEqual('All');
-		expect(await cells[7].innerText()).toEqual('/tmp/test/project-dir');
-		expect(await cells[8].innerText()).toEqual(randomUserName + '_slurm-renamed');
-		expect(await cells[9].innerText()).toContain(randomUserName + '-slurm-account');
+		await expect(cells[0]).toContainText(/**@type {string} */ (userId));
+		await expect(cells[1]).toContainText(randomUserName + '-renamed@example.com');
+		await verifyChecked(cells, 2, true);
+		await verifyChecked(cells, 3, false);
+		await verifyChecked(cells, 4, false);
+		await expect(cells[5]).toContainText('All');
+		await expect(cells[6]).toContainText('Local profile');
+		expect(await cells[7].innerText()).toEqual('/tmp/test/project-dir-renamed');
 	});
 
 	await test.step('Go back clicking on breadcrumb', async () => {
@@ -166,7 +144,7 @@ test('Create and update a user', async ({ page }) => {
 	});
 
 	await test.step('Grant superuser privilege', async () => {
-		const userRow = await getUserRow(page, randomUserName + '-renamed');
+		const userRow = getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await page.locator('#superuser').check();
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -184,7 +162,9 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Edit user after having granted superuser privilege', async () => {
 		await page.getByRole('button', { name: 'Close' }).click();
 		await expect(page.getByText('User successfully updated')).not.toBeVisible();
-		await page.getByRole('textbox', { name: 'Username' }).fill(`${randomUserName}-renamed-2`);
+		await page
+			.getByRole('textbox', { name: 'E-mail' })
+			.fill(`${randomUserName}-renamed-2@example.com`);
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
@@ -194,13 +174,13 @@ test('Create and update a user', async ({ page }) => {
 		await waitPageLoading(page);
 		await expect(page.getByText('Users list')).toBeVisible();
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed-2');
-		verifyChecked(userRowCells, 3, true);
-		verifyChecked(userRowCells, 4, true);
-		verifyChecked(userRowCells, 5, false);
+		await verifyChecked(userRowCells, 2, true);
+		await verifyChecked(userRowCells, 3, true);
+		await verifyChecked(userRowCells, 4, false);
 	});
 
 	await test.step('Revoke superuser privilege', async () => {
-		const userRow = await getUserRow(page, randomUserName + '-renamed-2');
+		const userRow = getUserRow(page, randomUserName + '-renamed-2');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
@@ -223,9 +203,9 @@ test('Create and update a user', async ({ page }) => {
 		await waitPageLoading(page);
 		await expect(page.getByText('Users list')).toBeVisible();
 		const userRowCells = await getUserRowCells(page, randomUserName + '-renamed-2');
-		verifyChecked(userRowCells, 3, true);
-		verifyChecked(userRowCells, 4, false);
-		verifyChecked(userRowCells, 5, false);
+		await verifyChecked(userRowCells, 2, true);
+		await verifyChecked(userRowCells, 3, false);
+		await verifyChecked(userRowCells, 4, false);
 	});
 
 	await test.step("Verify that the admin can't edit his/her superuser status", async () => {
@@ -241,25 +221,18 @@ test('Create and update a user', async ({ page }) => {
  * @returns {Promise<import('@playwright/test').Locator[]>}
  */
 async function getUserRowCells(page, username) {
-	const row = await getUserRow(page, username);
+	const row = getUserRow(page, username);
 	return await row.locator('td').all();
 }
 
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} username
- * @returns {Promise<import('@playwright/test').Locator>}
+ * @returns {import('@playwright/test').Locator}
  */
-async function getUserRow(page, username) {
-	await page.getByRole('row').getByText(username, { exact: true }).waitFor();
-	const rows = await page.locator('tbody tr').all();
-	for (const row of rows) {
-		const cells = await row.locator('td').all();
-		if (username === (await cells[2].innerText())) {
-			return row;
-		}
-	}
-	throw new Error(`Row not found for user ${username}`);
+function getUserRow(page, username) {
+	const email = `${username}@example.com`;
+	return page.getByRole('row', { name: email });
 }
 
 /**

@@ -25,10 +25,11 @@ To skip Pixi test set the environment variable `SKIP_PIXI_TEST` to `true`.
 To run the OAuth2 test locally add the following configuration to `.fractal_server.env`:
 
 ```
-OAUTH_DEXIDP_CLIENT_ID=client_test_web_id
-OAUTH_DEXIDP_CLIENT_SECRET=client_test_web_secret
-OAUTH_DEXIDP_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
-OAUTH_DEXIDP_OIDC_CONFIGURATION_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration
+OAUTH_CLIENT_NAME=dexidp
+OAUTH_CLIENT_ID=client_test_web_id
+OAUTH_CLIENT_SECRET=client_test_web_secret
+OAUTH_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
+OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration
 ```
 
 And then start the test IdP container:

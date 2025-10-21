@@ -43,50 +43,39 @@ describe('UserEditor', () => {
 
 	const selectedUser = mockUser();
 
-	/** @type {import('fractal-components/types/api').UserSettings} */
-	const initialSettings = {
-		slurm_accounts: [],
-		project_dir: null,
-		slurm_user: null,
-		ssh_host: null,
-		ssh_username: null,
-		ssh_private_key_path: null,
-		ssh_tasks_dir: null,
-		ssh_jobs_dir: null
-	};
-
 	/**
 	 * @type {() => Promise<Response>}
 	 */
 	const mockSaveUser = vi.fn();
 
-	it('Update settings with slurm runner backend - success', async () => {
-		const user = userEvent.setup();
-
-		render(UserEditor, {
-			props: {
-				runnerBackend: 'slurm',
-				user: selectedUser,
-				settings: { ...initialSettings },
-				saveUser: mockSaveUser
-			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
+	it('Update settings - success', async () => {
+		const mockRequest = mockSettingsUpdate({
 			ok: true,
 			status: 200,
 			json: () =>
 				new Promise((resolve) =>
 					resolve({
-						...initialSettings,
-						slurm_user: 'user',
+						slurm_accounts: [],
 						project_dir: '/path/to/project/dir'
 					})
 				)
 		});
 
+		const user = userEvent.setup();
+
+		render(UserEditor, {
+			props: {
+				runnerBackend: 'slurm_sudo',
+				user: selectedUser,
+				settings: {
+					slurm_accounts: [],
+					project_dir: null
+				},
+				saveUser: mockSaveUser
+			}
+		});
+
 		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), '/path/to/project/dir');
-		await user.type(screen.getByRole('textbox', { name: 'SLURM user' }), 'user');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
@@ -95,31 +84,14 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
-					project_dir: '/path/to/project/dir',
-					slurm_user: 'user',
-					ssh_host: null,
-					ssh_username: null,
-					ssh_private_key_path: null,
-					ssh_tasks_dir: null,
-					ssh_jobs_dir: null
+					project_dir: '/path/to/project/dir'
 				})
 			})
 		);
 	});
 
-	it('Update settings with slurm runner backend - validation error', async () => {
-		const user = userEvent.setup();
-
-		render(UserEditor, {
-			props: {
-				runnerBackend: 'slurm',
-				user: selectedUser,
-				settings: { ...initialSettings },
-				saveUser: mockSaveUser
-			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
+	it('Update settings - validation error', async () => {
+		const mockRequest = mockSettingsUpdate({
 			ok: false,
 			status: 422,
 			json: () =>
@@ -136,6 +108,20 @@ describe('UserEditor', () => {
 				)
 		});
 
+		const user = userEvent.setup();
+
+		render(UserEditor, {
+			props: {
+				runnerBackend: 'slurm_sudo',
+				user: selectedUser,
+				settings: {
+					slurm_accounts: [],
+					project_dir: null
+				},
+				saveUser: mockSaveUser
+			}
+		});
+
 		await user.type(screen.getByRole('textbox', { name: 'Project dir' }), 'xxx');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('mocked_error');
@@ -145,51 +131,46 @@ describe('UserEditor', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					slurm_accounts: [],
-					project_dir: 'xxx',
-					slurm_user: null,
-					ssh_host: null,
-					ssh_username: null,
-					ssh_private_key_path: null,
-					ssh_tasks_dir: null,
-					ssh_jobs_dir: null
+					project_dir: 'xxx'
 				})
 			})
 		);
 	});
 
-	it('Update settings with slurm_ssh runner backend - success', async () => {
-		const user = userEvent.setup();
-
-		render(UserEditor, {
-			props: {
-				runnerBackend: 'slurm_ssh',
-				user: selectedUser,
-				settings: { ...initialSettings },
-				saveUser: mockSaveUser
-			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
+	it('Update settings - add slurm accounts', async () => {
+		const mockRequest = mockSettingsUpdate({
 			ok: true,
 			status: 200,
 			json: () =>
 				new Promise((resolve) =>
 					resolve({
-						...initialSettings,
-						ssh_host: 'localhost',
-						ssh_username: 'username',
-						ssh_private_key_path: '/path/to/private/key',
-						ssh_tasks_dir: '/path/to/tasks/dir',
-						ssh_jobs_dir: '/path/to/jobs/dir'
+						slurm_accounts: ['foo', 'bar'],
+						project_dir: '/path/to/project/dir'
 					})
 				)
 		});
 
-		await user.type(screen.getByRole('textbox', { name: 'SSH host' }), 'localhost');
-		await user.type(screen.getByRole('textbox', { name: 'SSH username' }), 'username');
-		await user.type(screen.getByRole('textbox', { name: 'SSH Private Key Path' }), 'xxx');
-		await user.type(screen.getByRole('textbox', { name: 'SSH Tasks Dir' }), 'yyy');
-		await user.type(screen.getByRole('textbox', { name: 'SSH Jobs Dir' }), 'zzz');
+		const user = userEvent.setup();
+
+		render(UserEditor, {
+			props: {
+				runnerBackend: 'slurm_sudo',
+				user: selectedUser,
+				settings: {
+					slurm_accounts: [],
+					project_dir: '/path/to/project/dir'
+				},
+				saveUser: mockSaveUser
+			}
+		});
+
+		expect(await screen.findByRole('textbox', { name: 'Project dir' })).toHaveValue(
+			'/path/to/project/dir'
+		);
+		await user.click(screen.getByRole('button', { name: 'Add SLURM account' }));
+		await user.type(screen.getByRole('textbox', { name: 'SLURM account #1' }), 'foo');
+		await user.click(screen.getByRole('button', { name: 'Add SLURM account' }));
+		await user.type(screen.getByRole('textbox', { name: 'SLURM account #2' }), 'bar');
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
@@ -197,85 +178,78 @@ describe('UserEditor', () => {
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
-					slurm_accounts: [],
-					project_dir: null,
-					slurm_user: null,
-					ssh_host: 'localhost',
-					ssh_username: 'username',
-					ssh_private_key_path: 'xxx',
-					ssh_tasks_dir: 'yyy',
-					ssh_jobs_dir: 'zzz'
+					slurm_accounts: ['foo', 'bar'],
+					project_dir: '/path/to/project/dir'
 				})
 			})
 		);
 	});
 
-	it('Update settings with slurm_ssh runner backend - validation error', async () => {
-		const user = userEvent.setup();
-
-		render(UserEditor, {
-			props: {
-				runnerBackend: 'slurm_ssh',
-				user: selectedUser,
-				settings: { ...initialSettings },
-				saveUser: mockSaveUser
-			}
-		});
-
-		const mockRequest = /** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
-			ok: false,
-			status: 422,
+	it('Update settings - remove slurm account', async () => {
+		const mockRequest = mockSettingsUpdate({
+			ok: true,
+			status: 200,
 			json: () =>
 				new Promise((resolve) =>
 					resolve({
-						detail: [
-							{
-								loc: ['body', 'ssh_private_key_path'],
-								msg: 'mock_error_ssh_private_key_path',
-								type: 'value_error'
-							},
-							{
-								loc: ['body', 'ssh_tasks_dir'],
-								msg: 'mock_error_ssh_tasks_dir',
-								type: 'value_error'
-							},
-							{
-								loc: ['body', 'ssh_jobs_dir'],
-								msg: 'mock_error_ssh_jobs_dir',
-								type: 'value_error'
-							}
-						]
+						slurm_accounts: ['foo', 'bar'],
+						project_dir: '/path/to/project/dir'
 					})
 				)
 		});
 
-		await user.type(screen.getByRole('textbox', { name: 'SSH host' }), 'localhost');
-		await user.type(screen.getByRole('textbox', { name: 'SSH username' }), 'username');
-		await user.type(
-			screen.getByRole('textbox', { name: 'SSH Private Key Path' }),
-			'/path/to/private/key'
+		const user = userEvent.setup();
+
+		render(UserEditor, {
+			props: {
+				runnerBackend: 'slurm_sudo',
+				user: selectedUser,
+				settings: {
+					slurm_accounts: ['foo', 'bar'],
+					project_dir: '/path/to/project/dir'
+				},
+				saveUser: mockSaveUser
+			}
+		});
+
+		expect(await screen.findByRole('textbox', { name: 'Project dir' })).toHaveValue(
+			'/path/to/project/dir'
 		);
-		await user.type(screen.getByRole('textbox', { name: 'SSH Tasks Dir' }), '/path/to/tasks/dir');
-		await user.type(screen.getByRole('textbox', { name: 'SSH Jobs Dir' }), '/path/to/jobs/dir');
+		await user.click(screen.getByRole('button', { name: 'Remove SLURM account #2' }));
 		await user.click(screen.getByRole('button', { name: 'Save' }));
-		await screen.findByText('mock_error_ssh_private_key_path');
-		await screen.findByText('mock_error_ssh_tasks_dir');
-		await screen.findByText('mock_error_ssh_jobs_dir');
+		await screen.findByText('User successfully updated');
 
 		expect(mockRequest).toHaveBeenCalledWith(
 			expect.anything(),
 			expect.objectContaining({
 				body: JSON.stringify({
-					slurm_accounts: [],
-					project_dir: null,
-					slurm_user: null,
-					ssh_host: 'localhost',
-					ssh_username: 'username',
-					ssh_private_key_path: '/path/to/private/key',
-					ssh_tasks_dir: '/path/to/tasks/dir',
-					ssh_jobs_dir: '/path/to/jobs/dir'
+					slurm_accounts: ['foo'],
+					project_dir: '/path/to/project/dir'
 				})
 			})
 		);
 	});
 });
+
+function mockSettingsUpdate(updateSettings) {
+	return /** @type {import('vitest').Mock} */ (fetch)
+		.mockResolvedValueOnce({
+			ok: true,
+			status: 200,
+			// mock profile
+			json: () => new Promise((resolve) => resolve({ id: 1, resource_id: 1 }))
+		})
+		.mockResolvedValueOnce({
+			ok: true,
+			status: 200,
+			// mock resources
+			json: () => new Promise((resolve) => resolve([{ id: 1 }]))
+		})
+		.mockResolvedValueOnce({
+			ok: true,
+			status: 200,
+			// mock profiles
+			json: () => new Promise((resolve) => resolve([{ id: 1 }]))
+		})
+		.mockResolvedValue(updateSettings);
+}

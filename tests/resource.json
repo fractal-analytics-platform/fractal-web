@@ -1,0 +1,27 @@
+{
+	"type": "local",
+	"name": "Local resource",
+	"host": null,
+	"jobs_local_dir": "/tmp/fractal-test-server/data-jobs",
+	"jobs_runner_config": {},
+	"jobs_slurm_python_worker": null,
+	"jobs_poll_interval": 0,
+	"tasks_local_dir": "/tmp/fractal-test-server/data-tasks",
+	"tasks_python_config": {
+		"versions": {
+			"3.12": "/tmp/fractal-test-server/venv/bin/python"
+		},
+		"default_version": "3.12"
+	},
+	"tasks_pixi_config": {
+		"default_version": "0.48.0",
+		"versions": {
+			"0.48.0": "/tmp/pixi/0.48.0"
+		},
+		"PIXI_CONCURRENT_SOLVES": 4,
+		"PIXI_CONCURRENT_DOWNLOADS": 4,
+		"TOKIO_WORKER_THREADS": 2,
+		"DEFAULT_ENVIRONMENT": "default",
+		"DEFAULT_PLATFORM": "linux-64"
+	}
+}

@@ -14,6 +14,7 @@
 	import UserSettingsEditor from './UserSettingsEditor.svelte';
 	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
+	import ProfileEditor from './ProfileEditor.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -44,6 +45,8 @@
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let profilesErrorAlert = undefined;
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	let originalUser = $state();
@@ -66,21 +69,35 @@
 	let password = $state('');
 	let confirmPassword = $state('');
 
+	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	let resources = $state([]);
+	/** @type {number|undefined} */
+	let selectedResourceId = $state();
+	/** @type {import('fractal-components/types/api').Resource|undefined} */
+	let selectedResource = $state();
+
+	/** @type {'create_new'|'use_existing'} */
+	let profileOption = $state('use_existing');
+	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	let profiles = $state([]);
+	/** @type {Omit<import('fractal-components/types/api').Profile, 'id'>|undefined} */
+	let newProfile = $state();
+	/** @type {import('$lib/components/v2/admin/ProfileEditor.svelte').default|undefined} */
+	let profileEditor = $state();
+
 	let saving = $state(false);
 	let userFormSubmitted = $state(false);
 
 	let userUpdatedMessage = $state('');
 
-	const userFormErrorHandler = new FormErrorHandler('genericUserError', [
-		'email',
-		'username',
-		'password'
-	]);
+	const userFormErrorHandler = new FormErrorHandler('genericUserError', ['email', 'password']);
 
 	const userValidationErrors = userFormErrorHandler.getValidationErrorStore();
 
 	/** @type {Modal|undefined} */
 	let confirmSuperuserChange = $state();
+
+	const showCreateProfile = $derived(editableUser && !editableUser.id);
 
 	async function handleSave() {
 		saving = true;
@@ -115,6 +132,14 @@
 				return;
 			}
 			if (userPendingChanges || password) {
+				if (showCreateProfile && profileOption === 'create_new' && profileEditor) {
+					const newProfileId = await profileEditor.handleSave();
+					if (!newProfileId) {
+						return;
+					}
+					editableUser.profile_id = newProfileId;
+				}
+
 				if (password) {
 					editableUser.password = password;
 				}
@@ -260,9 +285,23 @@
 		settings = { ...result };
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		originalUser = deepCopy(nullifyEmptyStrings($state.snapshot(editableUser)));
 		loadUserGroups();
+		await initProfile();
+		await loadResources(false);
+		const autoselectProfile = editableUser && !editableUser.id && runnerBackend === 'local';
+		if (autoselectProfile && resources.length > 0) {
+			selectedResourceId = resources[0].id;
+			selectedResource = resources[0];
+			await resourceChanged();
+		}
+		if (selectedResourceId) {
+			await loadProfiles(false);
+		}
+		if (editableUser && autoselectProfile && profiles.length > 0) {
+			editableUser.profile_id = profiles[0].id;
+		}
 	});
 
 	function loadUserGroups() {
@@ -270,6 +309,109 @@
 			editableUser?.group_ids_names
 				.map((ni) => groups.filter((g) => g.id === ni[0])[0])
 				.sort(sortGroupByNameAllFirstComparator) || [];
+	}
+
+	async function initProfile() {
+		if (!editableUser || editableUser.profile_id === null) {
+			return;
+		}
+		const response = await fetch(`/api/admin/v2/profile/${editableUser.profile_id}`);
+		if (response.ok) {
+			/** @type {import('fractal-components/types/api').Profile} */
+			const profile = await response.json();
+			selectedResourceId = profile.resource_id;
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
+	}
+
+	async function loadResources(hideOldError = true) {
+		profiles = [];
+		if (hideOldError) {
+			profilesErrorAlert?.hide();
+		}
+		const response = await fetch(`/api/admin/v2/resource`);
+		if (response.ok) {
+			resources = await response.json();
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
+	}
+
+	async function resourceChanged() {
+		if (editableUser) {
+			editableUser.profile_id = null;
+		}
+
+		if (showCreateProfile) {
+			await loadResource();
+			if (selectedResource) {
+				newProfile = {
+					resource_id: selectedResource.id,
+					resource_type: selectedResource.type,
+					name: '',
+					jobs_remote_dir: '',
+					ssh_key_path: '',
+					tasks_remote_dir: '',
+					username: ''
+				};
+			}
+		}
+		await loadProfiles();
+	}
+
+	async function loadResource() {
+		if (!selectedResourceId) {
+			selectedResource = undefined;
+			return;
+		}
+		const response = await fetch(`/api/admin/v2/resource/${selectedResourceId}`);
+		if (response.ok) {
+			selectedResource = await response.json();
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
+	}
+
+	/**
+	 * @param {Omit<import('fractal-components/types/api').Profile, 'id'>} profile
+	 */
+	async function createProfile(profile) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		return await fetch(`/api/admin/v2/resource/${selectedResourceId}/profile`, {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: normalizePayload({ ...profile, resource_id: undefined }, { nullifyEmptyStrings: true })
+		});
+	}
+
+	async function loadProfiles(hideOldError = true) {
+		if (selectedResourceId === undefined) {
+			return;
+		}
+		if (hideOldError) {
+			profilesErrorAlert?.hide();
+		}
+		const response = await fetch(`/api/admin/v2/resource/${selectedResourceId}/profile`);
+		if (response.ok) {
+			profiles = await response.json();
+		} else {
+			profilesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-profiles'
+			);
+		}
 	}
 
 	function setGroupsSlimSelect() {
@@ -449,23 +591,91 @@
 				</div>
 			</div>
 			<div class="row mb-3 has-validation">
-				<label for="username" class="col-sm-3 col-form-label text-end">
-					<strong>Username</strong>
+				<label for="profile" class="col-sm-3 col-form-label text-end">
+					<strong>Profile</strong>
 				</label>
 				<div class="col-sm-9">
-					<input
-						autocomplete="off"
-						aria-autocomplete="none"
-						type="text"
-						class="form-control"
-						id="username"
-						class:is-invalid={userFormSubmitted && $userValidationErrors['username']}
-						bind:value={editableUser.username}
-					/>
-					<span class="form-text"> Optional property </span>
-					<span class="invalid-feedback">{$userValidationErrors['username']}</span>
+					{#if showCreateProfile}
+						<div class="row mb-1">
+							<div class="col">
+								<div class="form-check form-check-inline">
+									<input
+										class="form-check-input"
+										type="radio"
+										name="profileOptions"
+										id="use_existing"
+										value="use_existing"
+										bind:group={profileOption}
+									/>
+									<label class="form-check-label" for="use_existing">Use existing</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input
+										class="form-check-input"
+										type="radio"
+										name="profileOptions"
+										id="create_new"
+										value="create_new"
+										bind:group={profileOption}
+									/>
+									<label class="form-check-label" for="create_new">Create new</label>
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<div class="row">
+						<div class="col-lg-6">
+							<select
+								class="form-select"
+								bind:value={selectedResourceId}
+								onchange={resourceChanged}
+								aria-label="Select resource"
+							>
+								<option value={undefined}>Select resource...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
+						</div>
+						{#if profileOption === 'use_existing'}
+							<div class="col-lg-6">
+								<select
+									class="form-select"
+									bind:value={editableUser.profile_id}
+									class:is-invalid={userFormSubmitted && $userValidationErrors['profile_id']}
+									disabled={selectedResourceId === undefined}
+									aria-label="Select profile"
+								>
+									<option value={null}>Select profile...</option>
+									{#each profiles as profile (profile.id)}
+										<option value={profile.id}>{profile.name}</option>
+									{/each}
+								</select>
+								<span class="invalid-feedback">{$userValidationErrors['profile_id']}</span>
+							</div>
+						{/if}
+					</div>
+					<div class="row">
+						<div class="col">
+							<div id="errorAlert-profiles" class="mt-2 mb-0"></div>
+						</div>
+					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+	{#if showCreateProfile && profileOption === 'create_new' && selectedResource && newProfile}
+		<ProfileEditor
+			profile={newProfile}
+			resource={selectedResource}
+			saveProfile={createProfile}
+			showSaveButton={false}
+			bind:this={profileEditor}
+		/>
+	{/if}
+	<div class="row">
+		<div class="col-lg-7 needs-validation">
 			{#if editableUser.id}
 				<div class="row mb-3 has-validation">
 					<span class="col-sm-3 col-form-label text-end fw-bold">Groups</span>

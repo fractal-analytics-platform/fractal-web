@@ -13,11 +13,13 @@ test('User profile', async ({ page }) => {
 		const cells = await page.locator('table td').all();
 		await expect(cells[0]).toHaveText('1');
 		await expect(cells[1]).toHaveText('admin@fractal.xy');
-		await expect(cells[2]).toHaveText('admin');
+		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, true);
-		await verifyChecked(cells, 4, true);
-		await expect(cells[6]).toContainText('All');
-		await expect(cells[7]).toHaveText('-');
+		await expect(cells[5]).toContainText('All');
+		await expect(cells[6]).toHaveText('-');
+		await verifyChecked(cells, 7, true);
+		await expect(cells[8]).toContainText('Local profile');
+		await expect(cells[9]).toContainText('Local resource');
 	});
 });
 

@@ -8,7 +8,7 @@ export type User = {
 	is_active: boolean;
 	is_superuser: boolean;
 	is_verified: boolean;
-	username: string | null;
+	profile_id: number | null;
 	password?: string;
 	group_ids_names: Array<[number, string]> | null;
 	oauth_accounts: Array<{
@@ -21,14 +21,13 @@ export type User = {
 export type UserSettings = {
 	slurm_accounts: string[];
 	project_dir: string | null;
-	// Slurm
-	slurm_user: string | null;
-	// Slurm SSH
-	ssh_host: string | null;
-	ssh_username: string | null;
-	ssh_private_key_path: string | null;
-	ssh_tasks_dir: string | null;
-	ssh_jobs_dir: string | null;
+};
+
+export type ProfileInfo = {
+	has_profile: boolean;
+	resource_name: string | null;
+	profile_name: string | null;
+	username: string | null;
 };
 
 export type Group = {
@@ -151,15 +150,17 @@ export type ApplyWorkflowV2 = {
 
 export type JobStatus = 'submitted' | 'done' | 'failed';
 
-export type ImagesStatus = {
-	status: JobStatus;
-} | {
-	status: JobStatus;
-	num_submitted_images: number;
-	num_done_images: number;
-	num_failed_images: number;
-	num_available_images: number | null;
-};
+export type ImagesStatus =
+	| {
+			status: JobStatus;
+	  }
+	| {
+			status: JobStatus;
+			num_submitted_images: number;
+			num_done_images: number;
+			num_failed_images: number;
+			num_available_images: number | null;
+	  };
 
 export type WorkflowV2 = {
 	id: number;
@@ -320,4 +321,30 @@ export type HistoryRunAggregated = {
 	num_failed_units: number;
 	args_schema_parallel: JSONSchemaObjectProperty | null;
 	args_schema_non_parallel: JSONSchemaObjectProperty | null;
+};
+
+export type Resource = {
+	id: number;
+	type: 'local' | 'slurm_sudo' | 'slurm_ssh';
+	name: string;
+	timestamp_created: string;
+	host: string | null;
+	jobs_local_dir: string;
+	jobs_runner_config: Record<string, any>;
+	jobs_slurm_python_worker: string;
+	jobs_poll_interval: number;
+	tasks_local_dir: string;
+	tasks_python_config: Record<string, any>;
+	tasks_pixi_config: Record<string, any>;
+};
+
+export type Profile = {
+	id: number;
+	name: string;
+	resource_id: number;
+	resource_type: string;
+	username: string | null;
+	ssh_key_path: string | null;
+	jobs_remote_dir: string | null;
+	tasks_remote_dir: string | null;
 };

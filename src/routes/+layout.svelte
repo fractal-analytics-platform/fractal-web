@@ -174,7 +174,6 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/profile">My profile</a></li>
-							<li><a class="dropdown-item" href="/settings">My settings</a></li>
 							{#if env.PUBLIC_FRACTAL_DATA_URL && env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}

@@ -181,13 +181,7 @@
 	function createEmptySettings() {
 		return {
 			slurm_accounts: [],
-			project_dir: '',
-			slurm_user: '',
-			ssh_host: '',
-			ssh_username: '',
-			ssh_private_key_path: '',
-			ssh_tasks_dir: '',
-			ssh_jobs_dir: ''
+			project_dir: ''
 		};
 	}
 
@@ -416,8 +410,8 @@
 						disabled={savingSettings || !settingsPendingChanges}
 					>
 						{#if savingSettings}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-							></span>
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+							</span>
 						{/if}
 						Save
 					</button>

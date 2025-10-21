@@ -5,6 +5,8 @@
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user || []);
+	/** @type {import('fractal-components/types/api').Profile | undefined} */
+	const profile = $derived(page.data.profile);
 	/** @type {import('fractal-components/types/api').UserSettings} */
 	const settings = $derived(page.data.settings);
 	/** @type {Array<import('fractal-components/types/api').Group>} */
@@ -57,10 +59,6 @@
 					<td>{user.email}</td>
 				</tr>
 				<tr>
-					<th>Username</th>
-					<td>{user.username || '-'}</td>
-				</tr>
-				<tr>
 					<th>Active</th>
 					<td><BooleanIcon value={user.is_active} /></td>
 				</tr>
@@ -80,6 +78,18 @@
 						{/each}
 					</td>
 				</tr>
+				<tr>
+					<th>Profile</th>
+					<td>
+						{#if profile}
+							<a href="/v2/admin/resources/{profile.resource_id}/profiles/{profile.id}">
+								{profile.name}
+							</a>
+						{:else}
+							-
+						{/if}
+					</td>
+				</tr>
 			</tbody>
 		</table>
 
@@ -90,35 +100,7 @@
 					<th>Project dir</th>
 					<td>{settings.project_dir || '-'}</td>
 				</tr>
-				{#if runnerBackend === 'slurm'}
-					<tr>
-						<th>SLURM user</th>
-						<td>{settings.slurm_user || '-'}</td>
-					</tr>
-				{/if}
-				{#if runnerBackend === 'slurm_ssh'}
-					<tr>
-						<th>SSH host</th>
-						<td>{settings.ssh_host || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH username</th>
-						<td>{settings.ssh_username || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH Private Key Path</th>
-						<td>{settings.ssh_private_key_path || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH Tasks Dir</th>
-						<td>{settings.ssh_tasks_dir || '-'}</td>
-					</tr>
-					<tr>
-						<th>SSH Jobs Dir</th>
-						<td>{settings.ssh_jobs_dir || '-'}</td>
-					</tr>
-				{/if}
-				{#if runnerBackend === 'slurm' || runnerBackend === 'slurm_ssh'}
+				{#if runnerBackend !== 'local'}
 					<tr>
 						<th>SLURM accounts</th>
 						<td>
