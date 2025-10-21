@@ -44,8 +44,15 @@ test('Associate a profile to a user', async ({ page }) => {
 		await waitPageLoading(page);
 	});
 
+	const profileUrl =
+		(await page
+			.getByRole('row', { name: randomProfileName })
+			.getByRole('link', { name: 'Info' })
+			.getAttribute('href')) || '';
+
+	const randomEmail = Math.random().toString(36).substring(7) + '@example.com';
+
 	await test.step('Create test user and associate it with new profile', async () => {
-		const randomEmail = Math.random().toString(36).substring(7) + '@example.com';
 		await page.goto('/v2/admin/users/register');
 		await waitPageLoading(page);
 		await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
@@ -58,8 +65,19 @@ test('Associate a profile to a user', async ({ page }) => {
 		await waitPageLoading(page);
 	});
 
-	await test.step('Reload the page and verify the selected profile', async () => {
-		await page.reload();
+	await test.step('Go to the profile page and check the listed users', async () => {
+		await page.goto(profileUrl);
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Users (1)' }).click();
+		const userLink = page.getByRole('link', { name: randomEmail });
+		await expect(userLink).toBeVisible();
+		await userLink.click();
+		await page.waitForURL(/\/v2\/admin\/users\/\d+$/);
+		await waitPageLoading(page);
+	});
+
+	await test.step('Go to user editing page and verify the selected profile', async () => {
+		await page.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		await expect(
 			page
@@ -88,6 +106,12 @@ test('Associate a profile to a user', async ({ page }) => {
 		await expect(
 			page.getByRole('combobox', { name: 'Select profile' }).getByRole('option', { selected: true })
 		).toHaveText('Select profile...');
+	});
+
+	await test.step('Go to the profile page and check the listed users', async () => {
+		await page.goto(profileUrl);
+		await waitPageLoading(page);
+		await expect(page.getByText('There are no users associated with this profile')).toBeVisible();
 	});
 
 	await test.step('Delete profile', async () => {

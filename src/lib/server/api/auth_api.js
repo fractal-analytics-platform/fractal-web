@@ -241,3 +241,22 @@ export async function getProfileInfo(fetch) {
 
 	return await response.json();
 }
+
+/**
+ * @param {typeof fetch} fetch
+ * @param {number} profileId
+ * @returns {Promise<Array<import('fractal-components/types/api').User>>}
+ */
+export async function getProfileUsers(fetch, profileId) {
+	logger.debug(`Retrieving users of profile ${profileId}`);
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/?profile_id=${profileId}`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		await responseError(response);
+	}
+
+	return await response.json();
+}
