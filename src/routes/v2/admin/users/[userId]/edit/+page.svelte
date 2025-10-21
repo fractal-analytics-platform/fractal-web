@@ -35,7 +35,7 @@
 					is_verified: user.is_verified,
 					profile_id: user.profile_id
 				},
-				{ stripEmptyElements: true }
+				{ nullifyEmptyStrings: true }
 			)
 		});
 	}

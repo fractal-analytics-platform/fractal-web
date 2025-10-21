@@ -630,6 +630,7 @@
 								class="form-select"
 								bind:value={selectedResourceId}
 								onchange={resourceChanged}
+								aria-label="Select resource"
 							>
 								<option value={undefined}>Select resource...</option>
 								{#each resources as resource (resource.id)}
@@ -644,6 +645,7 @@
 									bind:value={editableUser.profile_id}
 									class:is-invalid={userFormSubmitted && $userValidationErrors['profile_id']}
 									disabled={selectedResourceId === undefined}
+									aria-label="Select profile"
 								>
 									<option value={null}>Select profile...</option>
 									{#each profiles as profile (profile.id)}
