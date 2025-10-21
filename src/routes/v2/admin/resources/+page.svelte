@@ -1,4 +1,5 @@
 <script>
+	import { downloadBlob } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
@@ -6,16 +7,16 @@
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	let resources = $state([]);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let searchErrorAlert;
+	let resourcesErrorAlert;
 
 	async function loadResources() {
-		searchErrorAlert?.hide();
+		resourcesErrorAlert?.hide();
 		const url = new URL('/api/admin/v2/resource', window.location.origin);
 		const response = await fetch(url);
 		if (!response.ok) {
-			searchErrorAlert = displayStandardErrorAlert(
+			resourcesErrorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'searchError'
+				'resourcesError'
 			);
 			return;
 		}
@@ -34,6 +35,23 @@
 			resources = resources.filter((r) => r.id !== id);
 		} else {
 			throw await getAlertErrorFromResponse(response);
+		}
+	}
+
+	/**
+	 * @param {number} resourceId
+	 */
+	async function exportToFile(resourceId) {
+		const response = await fetch(`/api/admin/v2/resource/${resourceId}`);
+		if (response.ok) {
+			/** @type {import('fractal-components/types/api').Resource} */
+			const resource = await response.json();
+			downloadBlob(JSON.stringify(resource, null, 2), `${resource.name}.json`, 'application/json');
+		} else {
+			resourcesErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'resourcesError'
+			);
 		}
 	}
 
@@ -78,6 +96,13 @@
 							<a href="/v2/admin/resources/{resource.id}/edit" class="btn btn-primary">
 								<i class="bi bi-pencil"></i> Edit
 							</a>
+							<button
+								type="button"
+								class="btn btn-outline-primary"
+								onclick={() => exportToFile(resource.id)}
+							>
+								<i class="bi bi-download"></i> Export to file
+							</button>
 							<ConfirmActionButton
 								modalId={'confirmDeleteResource' + resource.id}
 								style="danger"
@@ -93,6 +118,6 @@
 			</tbody>
 		</table>
 
-		<div id="searchError" class="mt-3"></div>
+		<div id="resourcesError" class="mt-3"></div>
 	</div>
 </div>

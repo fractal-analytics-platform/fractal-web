@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 import { setUploadFile, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,9 +60,23 @@ test('Create, update and delete a resource', async ({ page }) => {
 		await expect(page.getByText('Resource updated')).toBeVisible();
 	});
 
-	await test.step('Delete the resource', async () => {
+	await test.step('Export the resource to file', async () => {
 		await page.getByRole('link', { name: 'Resources' }).click();
 		await waitPageLoading(page);
+		const downloadPromise = page.waitForEvent('download');
+		await page
+			.getByRole('row', { name: `${randomResourceName}-renamed` })
+			.getByRole('button', { name: 'Export to file' })
+			.click();
+		const download = await downloadPromise;
+		const file = path.join(os.tmpdir(), download.suggestedFilename());
+		await download.saveAs(file);
+		const data = JSON.parse(fs.readFileSync(file).toString());
+		expect(data.name).toEqual(`${randomResourceName}-renamed`);
+		expect(data.type).toEqual('local');
+	});
+
+	await test.step('Delete the resource', async () => {
 		await page
 			.getByRole('row', { name: `${randomResourceName}-renamed` })
 			.getByRole('button', { name: 'Delete' })
