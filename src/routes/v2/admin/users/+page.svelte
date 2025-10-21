@@ -52,6 +52,7 @@
 				<th>Active</th>
 				<th>Superuser</th>
 				<th>Verified</th>
+				<th>Has Profile</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
@@ -64,6 +65,7 @@
 						<td><BooleanIcon value={user.is_active} /></td>
 						<td><BooleanIcon value={user.is_superuser} /></td>
 						<td><BooleanIcon value={user.is_verified} /></td>
+						<td><BooleanIcon value={user.profile_id !== null} /></td>
 						<td>
 							<a href="/v2/admin/users/{user.id}" class="btn btn-light">
 								<i class="bi-info-circle"></i> Info
