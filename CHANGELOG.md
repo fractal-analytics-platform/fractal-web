@@ -2,6 +2,7 @@
 
 # 1.21.1
 
+* Updated usage of `fractalctl init-db-data` for tests (\#858).
 * Added more keywords to match SLURM errors (\#843).
 * Fixed bug in sandbox pages (\#839);
 * Displayed all kinds of recent task activities in tasks management page. (\#835);
