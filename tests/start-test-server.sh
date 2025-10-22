@@ -48,7 +48,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   . venv/bin/activate
   pip install "$pip_arg"
   fractalctl set-db
-  fractalctl init-db-data --resource resource.json --profile default
+  fractalctl init-db-data --resource resource.json --profile default --admin-email admin@fractal.xy --admin-pwd 1234
 else
   cd "$fractal_server_test_path"
   . venv/bin/activate
