@@ -16,11 +16,8 @@ export type User = {
 		account_email: string;
 		oauth_name: string;
 	}>;
-};
-
-export type UserSettings = {
+	project_dir: string;
 	slurm_accounts: string[];
-	project_dir: string | null;
 };
 
 export type ProfileInfo = {
