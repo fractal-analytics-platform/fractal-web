@@ -31,7 +31,7 @@ describe('String properties', () => {
 	});
 
 	it('StringProperty referenced', async () => {
-		const { component } = renderSchemaWithReferencedProperty({ type: 'string' });
+		const { component } = renderSchemaWithReferencedProperty({ type: 'string' }, 'pydantic_v2');
 		checkBold(screen.getByText('testProp'), false);
 		const textbox = screen.getByRole('textbox', { name: 'testProp' });
 		expect(textbox).toBeDefined();

@@ -90,9 +90,9 @@
 		if (!schema) {
 			return;
 		}
-		const jsonSchema = adaptJsonSchema(schema, getPropertiesToIgnore(false));
+		const adapted = adaptJsonSchema(schema, getPropertiesToIgnore(false));
 		const validator = new SchemaValidator(schemaVersion);
-		const isSchemaValid = validator.loadSchema(jsonSchema);
+		const isSchemaValid = validator.loadSchema(adapted.schema);
 		if (!isSchemaValid) {
 			throw new Error('Invalid JSON Schema');
 		}

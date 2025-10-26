@@ -17,8 +17,8 @@ describe('Array properties', () => {
 		checkBold(screen.getByText('ArrayProperty'), false);
 		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
-		expect(inputs[0].value).eq('foo');
-		expect(inputs[1].value).eq('bar');
+		expect(inputs[0]).toHaveValue('foo');
+		expect(inputs[1]).toHaveValue('bar');
 		expect(component.getArguments()).deep.eq({ testProp: ['foo', 'bar'] });
 	});
 
@@ -42,7 +42,7 @@ describe('Array properties', () => {
 		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['foo', null, null] });
 		const addBtn = screen.getByRole('button', { name: 'Add argument to list' });
-		expect(addBtn.disabled).toBe(false);
+		expect(addBtn).not.toBeDisabled();
 		await fireEvent.click(addBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['foo', null, null, null] });
 		expect(screen.getAllByRole('button', { name: 'Remove' }).length).eq(4);
@@ -52,7 +52,7 @@ describe('Array properties', () => {
 		expect(onChange).toHaveBeenCalledWith({
 			testProp: ['foo', null, null, null, null]
 		});
-		expect(addBtn.disabled).toBe(true);
+		expect(addBtn).toBeDisabled();
 	});
 
 	it('Optional ArrayProperty with minItems and maxItems', async () => {
@@ -78,7 +78,7 @@ describe('Array properties', () => {
 		expect(onChange).toHaveBeenCalledWith({ testProp: [null, null] });
 		await fireEvent.click(addBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: [null, null, null] });
-		expect(addBtn.disabled).toBe(true);
+		expect(addBtn).toBeDisabled();
 		await fireEvent.click(addBtn);
 		inputs = screen.queryAllByRole('textbox');
 		expect(inputs.length).eq(3);

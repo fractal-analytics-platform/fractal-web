@@ -45,10 +45,13 @@ describe('Enum properties', () => {
 	});
 
 	it('EnumProperty referenced', async () => {
-		const { component, onChange } = renderSchemaWithReferencedProperty({
-			enum: ['option1', 'option2'],
-			type: 'string'
-		});
+		const { component, onChange } = renderSchemaWithReferencedProperty(
+			{
+				enum: ['option1', 'option2'],
+				type: 'string'
+			},
+			'pydantic_v2'
+		);
 		checkBold(screen.getByText('testProp'), false);
 		const combobox = screen.getByRole('combobox', { name: 'testProp' });
 		const options = combobox.querySelectorAll('option');
@@ -88,7 +91,7 @@ describe('Enum properties', () => {
 
 		const dropdowns = screen.getAllByRole('combobox');
 		expect(dropdowns.length).eq(1);
-		const [dropdown] = dropdowns;
+		const dropdown = /** @type {HTMLSelectElement} */ (dropdowns[0]);
 		expect(dropdown.options.length).eq(3);
 		expect(dropdown.options[0].text).eq('Select...');
 		expect(dropdown.options[1].text).eq('1');

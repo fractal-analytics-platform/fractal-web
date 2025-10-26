@@ -19,7 +19,7 @@ import {
 } from './common/workflow_task_utils';
 import { getPropertiesToIgnore } from './jschema/property_utils';
 import { JsonSchemaDataError } from './jschema/form_manager';
-import { stripIgnoredProperties } from './jschema/jschema_adapter';
+import { stripDiscriminator, stripIgnoredProperties } from './jschema/jschema_adapter';
 import FilteredTasksTable from './tasks/FilteredTasksTable.svelte';
 
 // Exporting components for public usage
@@ -43,5 +43,6 @@ export {
 	hasNonParallelArguments,
 	hasParallelArguments,
 	normalizePayload,
-	nullifyEmptyStrings
+	nullifyEmptyStrings,
+	stripDiscriminator
 };

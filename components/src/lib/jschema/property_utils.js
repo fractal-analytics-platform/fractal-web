@@ -71,3 +71,16 @@ export function getPropertiesToIgnore(legacy) {
 		? ['input_paths', 'output_path', 'metadata', 'component']
 		: ['zarr_url', 'zarr_urls', 'init_args', 'zarr_dir'];
 }
+
+/**
+ * @param {object} obj 
+ * @returns 
+ */
+export function isDiscriminator(obj) {
+	return (
+		'mapping' in obj &&
+		typeof obj.mapping === 'object' &&
+		'propertyName' in obj &&
+		typeof obj.propertyName === 'string'
+	);
+}

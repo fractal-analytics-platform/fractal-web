@@ -11,6 +11,7 @@ describe('Reset properties to their default values', async () => {
 				properties: { key1: { type: 'object', properties: { key2: { type: 'string' } } } },
 				required: ['key1']
 			},
+			'pydantic_v2',
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: { key1: { key2: 'foo' } } });
