@@ -50,7 +50,10 @@ describe('Boolean properties', () => {
 	});
 
 	it('BooleanProperty referenced', async () => {
-		const { component, onChange } = renderSchemaWithReferencedProperty({ type: 'boolean' });
+		const { component, onChange } = renderSchemaWithReferencedProperty(
+			{ type: 'boolean' },
+			'pydantic_v2'
+		);
 		const title = screen.getByText('testProp');
 		checkBold(title, false);
 		expect(title).toBeDefined();

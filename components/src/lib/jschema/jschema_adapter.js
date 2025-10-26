@@ -1,4 +1,5 @@
 import { deepCopy, isObject } from '../common/utils.js';
+import { isDiscriminator } from './property_utils.js';
 
 /**
  * Creates a simpler but still equivalent JSON Schema. Removes properties to ignore,
@@ -9,6 +10,7 @@ import { deepCopy, isObject } from '../common/utils.js';
  */
 export function adaptJsonSchema(originalJsonSchema, propertiesToIgnore = []) {
 	let adaptedJsonSchema = stripIgnoredProperties(originalJsonSchema, propertiesToIgnore);
+	adaptedJsonSchema = adaptDiscriminators(adaptedJsonSchema, adaptedJsonSchema);
 	adaptedJsonSchema = replaceReferences(adaptedJsonSchema, adaptedJsonSchema);
 	adaptedJsonSchema = mergeAllOf(adaptedJsonSchema);
 	return adaptedJsonSchema;
@@ -55,6 +57,39 @@ function replaceReferences(jschema, parentObject) {
 				}
 			} else {
 				adaptedObject[key] = replaceReferences(jschema, child);
+			}
+		}
+		return adaptedObject;
+	} else {
+		return parentObject;
+	}
+}
+
+/**
+ * @param {import("../types/jschema.js").JSONSchemaProperty} jschema
+ * @param {any} parentObject
+ */
+function adaptDiscriminators(jschema, parentObject) {
+	if (Array.isArray(parentObject)) {
+		const adaptedArray = [];
+		for (let i = 0; i < parentObject.length; i++) {
+			const item = parentObject[i];
+			adaptedArray.push(adaptDiscriminators(jschema, item));
+		}
+		return adaptedArray;
+	} else if (isObject(parentObject)) {
+		const adaptedObject = {};
+		for (const [key, child] of Object.entries(parentObject)) {
+			if (key === 'discriminator' && isDiscriminator(child) && 'oneOf' in parentObject) {
+				const refs = parentObject.oneOf.map((o) => o['$ref']);
+				adaptedObject[key] = {
+					propertyName: child.propertyName,
+					mapping: Object.fromEntries(
+						Object.entries(child.mapping).map(([k, v]) => [k, refs.indexOf(v)])
+					)
+				};
+			} else {
+				adaptedObject[key] = adaptDiscriminators(jschema, child);
 			}
 		}
 		return adaptedObject;
@@ -129,5 +164,35 @@ function mergeProperty(parentObject, key, value) {
 		}
 	} else {
 		parentObject[key] = value;
+	}
+}
+
+/**
+ * @param {import("../types/jschema.js").JSONSchema} jschema
+ * @param {any} parentObject
+ * @returns {object}
+ */
+export function stripDiscriminator(jschema, parentObject = null) {
+	if (parentObject === null) {
+		parentObject = deepCopy(jschema);
+	}
+	if (Array.isArray(parentObject)) {
+		const adaptedArray = [];
+		for (const item of parentObject) {
+			adaptedArray.push(stripDiscriminator(jschema, item));
+		}
+		return adaptedArray;
+	} else if (isObject(parentObject)) {
+		const adaptedObject = {};
+		for (const [key, child] of Object.entries(parentObject)) {
+			const discriminator =
+				key === 'discriminator' && 'oneOf' in parentObject && isDiscriminator(child);
+			if (!discriminator) {
+				adaptedObject[key] = stripDiscriminator(jschema, child);
+			}
+		}
+		return adaptedObject;
+	} else {
+		return parentObject;
 	}
 }

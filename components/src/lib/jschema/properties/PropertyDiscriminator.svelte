@@ -7,10 +7,11 @@
 	import NumberProperty from './NumberProperty.svelte';
 	import EnumProperty from './EnumProperty.svelte';
 	import TupleProperty from './TupleProperty.svelte';
-	
+	import ConditionalProperty from './ConditionalProperty.svelte';
+
 	/**
 	 * @typedef {Object} Props
-	 * @property {any} formElement
+	 * @property {any} formElement BaseFormElement
 	 * @property {boolean} [editable]
 	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
 	 */
@@ -35,6 +36,8 @@
 	<ArrayProperty {formElement} {editable} {reset} />
 {:else if formElement.type === 'tuple'}
 	<TupleProperty {formElement} {editable} {reset} />
+{:else if formElement.type === 'conditional'}
+	<ConditionalProperty {formElement} {editable} {reset} />
 {:else}
 	<p>Unsupported property type {formElement.type}</p>
 {/if}

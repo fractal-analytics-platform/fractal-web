@@ -22,7 +22,15 @@ describe('badInput', () => {
 			'pydantic_v1'
 		);
 		expect(manager.getFormData()).deep.eq({ foo: { bar: null } });
-		manager.root.children[0].children[0].badInput = true;
+		const objElement =
+			/** @type {import('../../src/lib/jschema/form_element').ObjectFormElement} */ (
+				manager.root.children[0]
+			);
+		const numElement =
+			/** @type {import('../../src/lib/jschema/form_element').NumberFormElement} */ (
+				objElement.children[0]
+			);
+		numElement.badInput = true;
 		expect(manager.getFormData()).deep.eq({ foo: { bar: 'invalid' } });
 	});
 
@@ -45,7 +53,16 @@ describe('badInput', () => {
 			'pydantic_v1'
 		);
 		expect(manager.getFormData()).deep.eq({ foo: [0] });
-		manager.root.children[0].children[0].badInput = true;
+
+		const objElement =
+			/** @type {import('../../src/lib/jschema/form_element').ObjectFormElement} */ (
+				manager.root.children[0]
+			);
+		const numElement =
+			/** @type {import('../../src/lib/jschema/form_element').NumberFormElement} */ (
+				objElement.children[0]
+			);
+		numElement.badInput = true;
 		expect(manager.getFormData()).deep.eq({ foo: ['invalid'] });
 	});
 
@@ -72,7 +89,15 @@ describe('badInput', () => {
 			'pydantic_v1'
 		);
 		expect(manager.getFormData()).deep.eq({ foo: [0] });
-		manager.root.children[0].children[0].badInput = true;
+		const objElement =
+			/** @type {import('../../src/lib/jschema/form_element').ObjectFormElement} */ (
+				manager.root.children[0]
+			);
+		const numElement =
+			/** @type {import('../../src/lib/jschema/form_element').NumberFormElement} */ (
+				objElement.children[0]
+			);
+		numElement.badInput = true;
 		expect(manager.getFormData()).deep.eq({ foo: ['invalid'] });
 	});
 });

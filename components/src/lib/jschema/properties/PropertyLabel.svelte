@@ -1,8 +1,6 @@
 <script>
 	import PropertyDescription from './PropertyDescription.svelte';
 
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').BaseFormElement} formElement
@@ -13,12 +11,16 @@
 	/** @type {Props} */
 	let { formElement, tag = 'label', defaultTitle = '' } = $props();
 
-	let classValue = $derived(formElement.required
-		? 'fw-bold'
-		: !('value' in formElement) ||
-		  (formElement.value !== null && formElement.value !== undefined && formElement.value !== '')
-		? ''
-		: 'text-secondary fw-light');
+	let classValue = $derived(
+		formElement.required
+			? 'fw-bold'
+			: !('value' in formElement) ||
+				  (formElement.value !== null &&
+						formElement.value !== undefined &&
+						formElement.value !== '')
+				? ''
+				: 'text-secondary fw-light'
+	);
 </script>
 
 {#if tag === 'label'}

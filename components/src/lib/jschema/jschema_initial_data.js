@@ -38,6 +38,32 @@ function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaul
 	return data;
 }
 
+function getConditionalPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
+	if ('discriminator' in property) {
+		const { discriminator } = property;
+		if (initialValue) {
+			const key = initialValue[discriminator.propertyName];
+			const index = discriminator.mapping[key];
+			return getPropertyData(
+				property.oneOf[index],
+				schemaVersion,
+				required,
+				initialValue,
+				loadDefaults
+			);
+		} else if (property.oneOf.length > 0) {
+			return getPropertyData(
+				property.oneOf[0],
+				schemaVersion,
+				required,
+				initialValue,
+				loadDefaults
+			);
+		}
+	}
+	return {};
+}
+
 /**
  * @param {import("../types/jschema.js").JSONSchemaProperty | null} property
  * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
@@ -51,6 +77,18 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 	}
 	if (loadDefaults && 'default' in property) {
 		return getPropertyData(property, schemaVersion, required, property.default, false);
+	}
+	if ('oneOf' in property) {
+		return getConditionalPropertyData(
+			property,
+			schemaVersion,
+			required,
+			initialValue,
+			loadDefaults
+		);
+	}
+	if ('const' in property) {
+		return property.const;
 	}
 	if (property.type === null) {
 		return null;

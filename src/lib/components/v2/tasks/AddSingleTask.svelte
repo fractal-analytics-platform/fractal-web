@@ -9,7 +9,10 @@
 		isNonParallelType,
 		isParallelType,
 		normalizePayload,
-		SchemaValidator
+		SchemaValidator,
+
+		stripDiscriminator
+
 	} from 'fractal-components';
 
 	/**
@@ -230,7 +233,7 @@
 		} else {
 			try {
 				const schemaValidator = new SchemaValidator(args_schema_version);
-				schemaValidator.validateSchema(json);
+				schemaValidator.validateSchema(stripDiscriminator(json));
 				return json;
 			} catch (err) {
 				return new Error(

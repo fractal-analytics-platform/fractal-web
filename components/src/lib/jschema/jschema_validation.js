@@ -1,6 +1,7 @@
 import Ajv from 'ajv/dist/ajv';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
+import { stripDiscriminator } from './jschema_adapter';
 
 export class SchemaValidator {
 	/**
@@ -66,11 +67,11 @@ export class SchemaValidator {
 export function detectSchemaVersion(schema) {
 	try {
 		const schemaValidatorV2 = new SchemaValidator('pydantic_v2');
-		schemaValidatorV2.validateSchema(schema);
+		schemaValidatorV2.validateSchema(stripDiscriminator(schema));
 		return 'pydantic_v2';
 	} catch {
 		const schemaValidatorV1 = new SchemaValidator('pydantic_v1');
-		schemaValidatorV1.validateSchema(schema);
+		schemaValidatorV1.validateSchema(stripDiscriminator(schema));
 		return 'pydantic_v1';
 	}
 }
