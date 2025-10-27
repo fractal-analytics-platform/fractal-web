@@ -102,6 +102,8 @@ describe('TaskGroupActivities', () => {
 						group_ids_names: [],
 						oauth_accounts: [],
 						profile_id: 1,
+						project_dir: '/tmp',
+						slurm_accounts: []
 					}
 				]
 			}

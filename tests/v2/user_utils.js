@@ -12,6 +12,7 @@ export async function createTestUser(page) {
 	await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
 	await page.getByLabel('Password', { exact: true }).fill('test');
 	await page.getByLabel('Confirm password').fill('test');
+	await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
 	await page.getByRole('button', { name: 'Save' }).click();
 	await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	await waitPageLoading(page);

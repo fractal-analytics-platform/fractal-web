@@ -22,6 +22,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 
 	await test.step('Fill dataset mandatory values', async () => {
 		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
+		await page.getByRole('button', { name: 'Advanced options' }).click();
 		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
 	});
 

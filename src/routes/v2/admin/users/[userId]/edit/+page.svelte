@@ -6,9 +6,6 @@
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user);
 
-	/** @type {import('fractal-components/types/api').UserSettings} */
-	const settings = $derived(page.data.settings);
-
 	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups);
 
@@ -22,21 +19,25 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		const payload = {
+			email: user.email,
+			password: user.password,
+			is_active: user.is_active,
+			is_superuser: user.is_superuser,
+			is_verified: user.is_verified,
+			profile_id: user.profile_id,
+			project_dir: user.project_dir
+		};
+
+		if (runnerBackend !== 'local') {
+			payload.slurm_accounts = user.slurm_accounts;
+		}
+
 		return await fetch(`/api/auth/users/${user.id}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
-			body: normalizePayload(
-				{
-					email: user.email,
-					password: user.password,
-					is_active: user.is_active,
-					is_superuser: user.is_superuser,
-					is_verified: user.is_verified,
-					profile_id: user.profile_id
-				},
-				{ nullifyEmptyStrings: true }
-			)
+			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});
 	}
 </script>
@@ -56,5 +57,5 @@
 		</ol>
 	</nav>
 
-	<UserEditor {user} {settings} {groups} saveUser={save} {runnerBackend} />
+	<UserEditor {user} {groups} saveUser={save} {runnerBackend} />
 </div>

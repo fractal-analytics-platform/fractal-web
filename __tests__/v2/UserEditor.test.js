@@ -39,35 +39,27 @@ import UserEditor from '../../src/lib/components/v2/admin/UserEditor.svelte';
 describe('UserEditor', () => {
 	beforeEach(() => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
+		mockResourcesAndProfiles();
 	});
 
 	const selectedUser = mockUser();
 
-	/**
-	 * @type {() => Promise<Response>}
-	 */
-	const mockSaveUser = vi.fn();
-
 	it('Update settings - success', async () => {
-		const mockRequest = mockSettingsUpdate({
-			ok: true,
-			status: 200,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						slurm_accounts: [],
-						project_dir: '/path/to/project/dir'
-					})
-				)
-		});
-
 		const user = userEvent.setup();
+
+		const mockSaveUser = vi.fn(async (u) => {
+			return /** @type {Response} */ ({
+				ok: true,
+				status: 200,
+				json: () => new Promise((resolve) => resolve(u))
+			});
+		});
 
 		render(UserEditor, {
 			props: {
 				runnerBackend: 'slurm_sudo',
-				user: selectedUser,
-				settings: {
+				user: {
+					...selectedUser,
 					slurm_accounts: [],
 					project_dir: null
 				},
@@ -79,42 +71,41 @@ describe('UserEditor', () => {
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
-		expect(mockRequest).toHaveBeenCalledWith(
-			expect.anything(),
+		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
-				body: JSON.stringify({
-					slurm_accounts: [],
-					project_dir: '/path/to/project/dir'
-				})
+				slurm_accounts: [],
+				project_dir: '/path/to/project/dir'
 			})
 		);
 	});
 
 	it('Update settings - validation error', async () => {
-		const mockRequest = mockSettingsUpdate({
-			ok: false,
-			status: 422,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						detail: [
-							{
-								loc: ['body', 'project_dir'],
-								msg: 'mocked_error',
-								type: 'value_error'
-							}
-						]
-					})
-				)
-		});
-
 		const user = userEvent.setup();
+
+		const mockSaveUser = vi.fn(async () => {
+			return /** @type {Response} */ ({
+				ok: false,
+				status: 422,
+				json: () =>
+					new Promise((resolve) =>
+						resolve({
+							detail: [
+								{
+									loc: ['body', 'project_dir'],
+									msg: 'mocked_error',
+									type: 'value_error'
+								}
+							]
+						})
+					)
+			});
+		});
 
 		render(UserEditor, {
 			props: {
 				runnerBackend: 'slurm_sudo',
-				user: selectedUser,
-				settings: {
+				user: {
+					...selectedUser,
 					slurm_accounts: [],
 					project_dir: null
 				},
@@ -126,28 +117,21 @@ describe('UserEditor', () => {
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('mocked_error');
 
-		expect(mockRequest).toHaveBeenCalledWith(
-			expect.anything(),
+		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
-				body: JSON.stringify({
-					slurm_accounts: [],
-					project_dir: 'xxx'
-				})
+				slurm_accounts: [],
+				project_dir: 'xxx'
 			})
 		);
 	});
 
 	it('Update settings - add slurm accounts', async () => {
-		const mockRequest = mockSettingsUpdate({
-			ok: true,
-			status: 200,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						slurm_accounts: ['foo', 'bar'],
-						project_dir: '/path/to/project/dir'
-					})
-				)
+		const mockSaveUser = vi.fn(async (u) => {
+			return /** @type {Response} */ ({
+				ok: true,
+				status: 200,
+				json: () => new Promise((resolve) => resolve(u))
+			});
 		});
 
 		const user = userEvent.setup();
@@ -155,8 +139,8 @@ describe('UserEditor', () => {
 		render(UserEditor, {
 			props: {
 				runnerBackend: 'slurm_sudo',
-				user: selectedUser,
-				settings: {
+				user: {
+					...selectedUser,
 					slurm_accounts: [],
 					project_dir: '/path/to/project/dir'
 				},
@@ -174,28 +158,21 @@ describe('UserEditor', () => {
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
-		expect(mockRequest).toHaveBeenCalledWith(
-			expect.anything(),
+		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
-				body: JSON.stringify({
-					slurm_accounts: ['foo', 'bar'],
-					project_dir: '/path/to/project/dir'
-				})
+				slurm_accounts: ['foo', 'bar'],
+				project_dir: '/path/to/project/dir'
 			})
 		);
 	});
 
 	it('Update settings - remove slurm account', async () => {
-		const mockRequest = mockSettingsUpdate({
-			ok: true,
-			status: 200,
-			json: () =>
-				new Promise((resolve) =>
-					resolve({
-						slurm_accounts: ['foo', 'bar'],
-						project_dir: '/path/to/project/dir'
-					})
-				)
+		const mockSaveUser = vi.fn(async (u) => {
+			return /** @type {Response} */ ({
+				ok: true,
+				status: 200,
+				json: () => new Promise((resolve) => resolve(u))
+			});
 		});
 
 		const user = userEvent.setup();
@@ -203,8 +180,8 @@ describe('UserEditor', () => {
 		render(UserEditor, {
 			props: {
 				runnerBackend: 'slurm_sudo',
-				user: selectedUser,
-				settings: {
+				user: {
+					...selectedUser,
 					slurm_accounts: ['foo', 'bar'],
 					project_dir: '/path/to/project/dir'
 				},
@@ -219,19 +196,16 @@ describe('UserEditor', () => {
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 		await screen.findByText('User successfully updated');
 
-		expect(mockRequest).toHaveBeenCalledWith(
-			expect.anything(),
+		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
-				body: JSON.stringify({
-					slurm_accounts: ['foo'],
-					project_dir: '/path/to/project/dir'
-				})
+				slurm_accounts: ['foo'],
+				project_dir: '/path/to/project/dir'
 			})
 		);
 	});
 });
 
-function mockSettingsUpdate(updateSettings) {
+function mockResourcesAndProfiles() {
 	return /** @type {import('vitest').Mock} */ (fetch)
 		.mockResolvedValueOnce({
 			ok: true,
@@ -250,6 +224,5 @@ function mockSettingsUpdate(updateSettings) {
 			status: 200,
 			// mock profiles
 			json: () => new Promise((resolve) => resolve([{ id: 1 }]))
-		})
-		.mockResolvedValue(updateSettings);
+		});
 }

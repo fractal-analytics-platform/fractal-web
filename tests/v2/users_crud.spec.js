@@ -38,6 +38,7 @@ test('Create and update a user', async ({ page }) => {
 
 	await test.step('Create user', async () => {
 		await page.getByLabel('Confirm password').fill('test');
+		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await waitPageLoading(page);
 		await page.getByText('Editing user').waitFor();
@@ -70,7 +71,7 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 4, true);
 		await expect(cells[5]).toHaveText('All');
 		await expect(cells[6]).toHaveText('Local profile');
-		await expect(cells[7]).toHaveText('-');
+		await expect(cells[7]).toHaveText('/tmp');
 	});
 
 	await test.step('Go back to previous page', async () => {

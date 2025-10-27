@@ -44,7 +44,7 @@ function mockFetch(project_dir) {
 		status: 200,
 		json: () =>
 			new Promise((resolve) => {
-				if (url === '/api/auth/current-user/settings') {
+				if (url === '/api/auth/current-user') {
 					resolve({
 						project_dir
 					});

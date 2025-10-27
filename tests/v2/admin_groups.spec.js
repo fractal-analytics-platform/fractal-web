@@ -115,24 +115,6 @@ test('Admin groups management', async ({ page }) => {
 		await waitModalClosed(page);
 	});
 
-	await test.step('Edit user settings in group page', async () => {
-		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
-		await waitPageLoading(page);
-		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp/test/project-dir');
-		await page.getByRole('button', { name: 'Save' }).nth(1).click();
-		await expect(page.getByText('Settings successfully updated')).toBeVisible();
-	});
-
-	await test.step('Check user settings have been updated', async () => {
-		await page.goto('/v2/admin/users');
-		await waitPageLoading(page);
-		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
-		await waitPageLoading(page);
-		await expect(page.getByRole('textbox', { name: 'Project dir' })).toHaveValue(
-			'/tmp/test/project-dir'
-		);
-	});
-
 	await test.step('Remove user from group1 by editing group', async () => {
 		await page.goto('/v2/admin/groups');
 		await waitPageLoading(page);

@@ -15,7 +15,9 @@
 		password: '',
 		group_ids_names: [],
 		oauth_accounts: [],
-		profile_id: null
+		profile_id: null,
+		project_dir: '',
+		slurm_accounts: []
 	};
 
 	/** @type {boolean|undefined} */
@@ -34,18 +36,22 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		let payload = {
+			email: user.email,
+			password: user.password,
+			profile_id: user.profile_id,
+			project_dir: user.project_dir
+		};
+
+		if (runnerBackend !== 'local') {
+			payload.slurm_accounts = user.slurm_accounts;
+		}
+
 		const createResponse = await fetch(`/api/auth/register`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: normalizePayload(
-				{
-					email: user.email,
-					password: user.password,
-					profile_id: user.profile_id
-				},
-				{ stripEmptyElements: true }
-			)
+			body: normalizePayload(payload, { stripEmptyElements: true })
 		});
 
 		if (!createResponse.ok) {

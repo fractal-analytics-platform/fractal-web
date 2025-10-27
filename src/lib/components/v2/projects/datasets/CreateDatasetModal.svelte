@@ -159,11 +159,11 @@
 	});
 
 	async function loadProjectDir() {
-		const response = await fetch('/api/auth/current-user/settings');
+		const response = await fetch('/api/auth/current-user');
 		if (!response.ok) {
 			return;
 		}
-		/** @type {import('fractal-components/types/api').UserSettings} */
+		/** @type {import('fractal-components/types/api').User} */
 		const result = await response.json();
 		projectDir = result.project_dir;
 	}

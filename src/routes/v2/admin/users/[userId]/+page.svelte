@@ -7,8 +7,6 @@
 	const user = $derived(page.data.user || []);
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
 	const profile = $derived(page.data.profile);
-	/** @type {import('fractal-components/types/api').UserSettings} */
-	const settings = $derived(page.data.settings);
 	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups || []);
 	/** @type {string} */
@@ -90,22 +88,16 @@
 						{/if}
 					</td>
 				</tr>
-			</tbody>
-		</table>
-
-		<h4 class="fw-light ms-2 mt-4">Settings</h4>
-		<table class="table">
-			<tbody>
 				<tr>
 					<th>Project dir</th>
-					<td>{settings.project_dir || '-'}</td>
+					<td>{user.project_dir || '-'}</td>
 				</tr>
 				{#if runnerBackend !== 'local'}
 					<tr>
 						<th>SLURM accounts</th>
 						<td>
-							{#if settings.slurm_accounts.length > 0}
-								{#each settings.slurm_accounts as account (account)}
+							{#if user.slurm_accounts.length > 0}
+								{#each user.slurm_accounts as account (account)}
 									<span class="badge text-bg-light fw-normal fs-6">{account}</span>
 									&nbsp;
 								{/each}

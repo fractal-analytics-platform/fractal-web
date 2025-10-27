@@ -16,6 +16,7 @@ test('Viewer paths', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
 		await page.getByRole('textbox', { name: 'Password', exact: true }).fill('1234');
 		await page.getByRole('textbox', { name: 'Confirm password' }).fill('1234');
+		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
 		await page.getByRole('button', { name: 'Save' }).first().click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	});
@@ -43,11 +44,6 @@ test('Viewer paths', async ({ page }) => {
 		await addUserToGroup(page, randomEmail);
 	});
 
-	await test.step('Add project dir to the group', async () => {
-		await page.getByRole('textbox', { name: 'Project dir' }).fill('/path/to/project_dir');
-		await page.getByRole('button', { name: 'Save' }).nth(1).click();
-	});
-
 	await test.step('Add viewer paths', async () => {
 		const addViewerPathBtn = page.getByRole('button', { name: 'Add viewer path' });
 		await addViewerPathBtn.click();
@@ -62,11 +58,11 @@ test('Viewer paths', async ({ page }) => {
 	});
 
 	await test.step('Remove viewer paths', async () => {
-		await expect(page.getByRole('textbox')).toHaveCount(4);
+		await expect(page.getByRole('textbox')).toHaveCount(3);
 		await page.getByLabel('Remove viewer path #2').click();
 		await page.getByRole('button', { name: 'Save' }).first().click();
 		await expect(page.getByText('Paths successfully updated')).toBeVisible();
-		await expect(page.getByRole('textbox')).toHaveCount(3);
+		await expect(page.getByRole('textbox')).toHaveCount(2);
 	});
 
 	await test.step('Check viewer paths in info page', async () => {
@@ -82,7 +78,6 @@ test('Viewer paths', async ({ page }) => {
 		await page.getByRole('link', { name: 'Viewer paths' }).click();
 		await waitPageLoading(page);
 		await expect(page.getByText('/path/to/1')).toBeVisible();
-		await expect(page.getByText('/path/to/project_dir')).toBeVisible();
 		await logout(page, randomEmail);
 	});
 });

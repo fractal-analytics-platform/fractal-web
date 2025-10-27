@@ -11,6 +11,8 @@
     * Updated admin user pages to associate users with profiles;
     * Updated admin settings page;
     * Merged "My Profile" and "My settings" pages;
+* Merged user settings into user (\#862);
+* Adapted to OAuth2 changes (\#862);
 
 # 1.20.0
 

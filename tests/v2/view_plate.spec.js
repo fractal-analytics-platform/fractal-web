@@ -13,6 +13,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
+		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
@@ -85,6 +86,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-2');
+		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);

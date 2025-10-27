@@ -15,10 +15,6 @@
 	/** @type {import('fractal-components/types/api').ProfileInfo} */
 	const profile = $derived(page.data.profile);
 
-	/**
-	 * @type {import('fractal-components/types/api').UserSettings}
-	 */
-	const settings = $derived(page.data.settings);
 	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -81,14 +77,14 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').UserSettings} settings
+	 * @param {import('fractal-components/types/api').User} user
 	 */
-	function initFields(settings) {
-		slurmAccounts = settings.slurm_accounts;
+	function initFields(user) {
+		slurmAccounts = user.slurm_accounts;
 	}
 
 	onMount(() => {
-		initFields(page.data.settings);
+		initFields(page.data.user);
 	});
 </script>
 
@@ -172,7 +168,7 @@
 					{/if}
 					<tr>
 						<th>Project dir</th>
-						<td>{settings.project_dir || '-'}</td>
+						<td>{user.project_dir || '-'}</td>
 					</tr>
 				</tbody>
 			</table>

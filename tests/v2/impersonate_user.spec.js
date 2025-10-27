@@ -15,6 +15,7 @@ test('Impersonate user', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
 		await page.getByRole('textbox', { name: 'Password', exact: true }).fill('1234');
 		await page.getByRole('textbox', { name: 'Confirm password' }).fill('1234');
+		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
 		await page.getByRole('button', { name: 'Save' }).first().click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	});

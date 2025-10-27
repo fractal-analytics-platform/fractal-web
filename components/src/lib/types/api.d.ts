@@ -11,16 +11,13 @@ export type User = {
 	profile_id: number | null;
 	password?: string;
 	group_ids_names: Array<[number, string]> | null;
+	project_dir: string | null;
+	slurm_accounts: string[];
 	oauth_accounts: Array<{
 		id: number;
 		account_email: string;
 		oauth_name: string;
 	}>;
-};
-
-export type UserSettings = {
-	slurm_accounts: string[];
-	project_dir: string | null;
 };
 
 export type ProfileInfo = {
