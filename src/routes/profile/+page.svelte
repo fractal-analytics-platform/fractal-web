@@ -24,7 +24,7 @@
 	let slurmAccounts = $state([]);
 	let slurmAccountsError = $state('');
 
-	let settingsUpdatedMessage = $state('');
+	let userUpdatedMessage = $state('');
 
 	function addSlurmAccount() {
 		slurmAccounts = [...slurmAccounts, ''];
@@ -41,14 +41,14 @@
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		settingsUpdatedMessage = '';
+		userUpdatedMessage = '';
 		slurmAccountsError = '';
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const payload = {
 			slurm_accounts: slurmAccounts
 		};
-		const response = await fetch(`/api/auth/current-user/settings`, {
+		const response = await fetch(`/api/auth/current-user`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
@@ -57,7 +57,7 @@
 		const result = await response.json();
 		if (response.ok) {
 			initFields(result);
-			settingsUpdatedMessage = 'User settings successfully updated';
+			userUpdatedMessage = 'User successfully updated';
 		} else {
 			const errorMap = getValidationMessagesMap(result, response.status);
 			let errorShown = false;
@@ -70,7 +70,7 @@
 			if (!errorShown) {
 				errorAlert = displayStandardErrorAlert(
 					new AlertError(result, response.status),
-					'settingsUpdate-error'
+					'userUpdate-error'
 				);
 			}
 		}
@@ -170,54 +170,55 @@
 						<th>Project dir</th>
 						<td>{user.project_dir || '-'}</td>
 					</tr>
+
+					{#if runnerBackend !== 'local'}
+						<tr>
+							<th>SLURM accounts</th>
+							<td>
+								<div class="row">
+									<div class="col has-validation">
+										<!-- eslint-disable-next-line no-unused-vars -->
+										{#each slurmAccounts as _, i (i)}
+											<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
+												<input
+													type="text"
+													class="form-control"
+													id={`slurmAccount-${i}`}
+													bind:value={slurmAccounts[i]}
+													class:is-invalid={slurmAccountsError}
+													aria-label="SLURM account {i + 1}"
+													required
+												/>
+												<button
+													class="btn btn-outline-secondary"
+													type="button"
+													id="slurm_account_remove_{i}"
+													aria-label="Remove SLURM account"
+													onclick={() => removeSlurmAccount(i)}
+												>
+													<i class="bi bi-trash"></i>
+												</button>
+											</div>
+										{/each}
+										<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
+										<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
+											<i class="bi bi-plus-circle"></i>
+											Add SLURM account
+										</button>
+									</div>
+								</div>
+								<div class="row mt-2">
+									<div class="col">
+										<div id="userUpdate-error"></div>
+										<StandardDismissableAlert message={userUpdatedMessage} />
+										<button class="btn btn-primary" onclick={save}> Save </button>
+									</div>
+								</div>
+							</td>
+						</tr>
+					{/if}
 				</tbody>
 			</table>
 		</div>
 	</div>
-
-	{#if runnerBackend !== 'local'}
-		<div class="row mb-3">
-			<div class="col-lg-2 col-sm-4 ms-2 fw-bold">SLURM accounts</div>
-			<div class="col-lg-6 col-sm-8">
-				<div class="col-sm-9 has-validation">
-					<!-- eslint-disable-next-line no-unused-vars -->
-					{#each slurmAccounts as _, i (i)}
-						<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
-							<input
-								type="text"
-								class="form-control"
-								id={`slurmAccount-${i}`}
-								bind:value={slurmAccounts[i]}
-								class:is-invalid={slurmAccountsError}
-								aria-label="SLURM account {i + 1}"
-								required
-							/>
-							<button
-								class="btn btn-outline-secondary"
-								type="button"
-								id="slurm_account_remove_{i}"
-								aria-label="Remove SLURM account"
-								onclick={() => removeSlurmAccount(i)}
-							>
-								<i class="bi bi-trash"></i>
-							</button>
-						</div>
-					{/each}
-					<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
-					<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
-						<i class="bi bi-plus-circle"></i>
-						Add SLURM account
-					</button>
-				</div>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-lg-6 col-sm-8 offset-lg-2 offset-sm-4">
-				<div id="settingsUpdate-error"></div>
-				<StandardDismissableAlert message={settingsUpdatedMessage} />
-				<button class="btn btn-primary ms-2" onclick={save}> Save </button>
-			</div>
-		</div>
-	{/if}
 </div>
