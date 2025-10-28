@@ -10,12 +10,24 @@
 
 	let mounted = $state(false);
 
+	let temporaryMessage = $state('');
+
 	onMount(() => {
 		mounted = true;
+		if (sessionStorage && sessionStorage.getItem('temporary-message')) {
+			temporaryMessage = sessionStorage.getItem('temporary-message') || '';
+			sessionStorage.removeItem('temporary-message');
+		}
 	});
 </script>
 
 <div class="container mt-3">
+	{#if temporaryMessage}
+		<div class="alert alert-info">
+			{temporaryMessage}
+		</div>
+	{/if}
+
 	<img alt="Fractal logo" src={logoMedium} class="float-end" id="fractal-logo-home" />
 
 	<h1 class="fw-light">Welcome to Fractal web client.</h1>
