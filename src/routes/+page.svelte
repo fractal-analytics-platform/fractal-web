@@ -5,7 +5,8 @@
 	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { onMount } from 'svelte';
 
-	let userLoggedIn = $derived(!!page.data.userInfo);
+	/** @type {import('fractal-components/types/api').User|undefined} */
+	let userInfo = $derived(page.data.userInfo);
 	let news = $derived(page.data.news);
 
 	let mounted = $state(false);
@@ -22,6 +23,12 @@
 </script>
 
 <div class="container mt-3">
+	{#if userInfo && userInfo.profile_id === null}
+		<div class="alert alert-warning">
+			This user is not authorized to use this Fractal instance - please contact {env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}.
+		</div>
+	{/if}
+
 	{#if temporaryMessage}
 		<div class="alert alert-info">
 			{temporaryMessage}
@@ -49,7 +56,7 @@
 		</p>
 
 		<div class="col mb-3">
-			{#if !userLoggedIn}
+			{#if !userInfo}
 				<a href="/auth/login" class="btn btn-primary">Login</a>
 			{/if}
 			<a href="/v2/projects" class="btn btn-primary">Projects</a>
