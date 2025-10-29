@@ -23,8 +23,9 @@
 </script>
 
 <div class="container mt-3">
-	{#if userInfo && userInfo.profile_id === null}
+	{#if userInfo && !userInfo.is_superuser && (userInfo.profile_id === null || !userInfo.is_verified)}
 		<div class="alert alert-warning">
+			<i class="bi bi-exclamation-triangle"></i>
 			This user is not authorized to use this Fractal instance - please contact {env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}.
 		</div>
 	{/if}

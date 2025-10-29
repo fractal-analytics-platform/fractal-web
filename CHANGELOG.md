@@ -13,6 +13,7 @@
     * Merged "My Profile" and "My settings" pages;
 * Merged user settings into user (\#862);
 * Adapted to OAuth2 changes (\#862);
+* Handled user without profile as not verified users (\#862);
 
 # 1.20.0
 

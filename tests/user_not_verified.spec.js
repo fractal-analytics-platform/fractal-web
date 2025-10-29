@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login, logout, waitPageLoading } from '../utils.js';
+import { login, logout, waitPageLoading } from './utils.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -15,17 +15,16 @@ test('User without profile', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
 		await page.getByRole('textbox', { name: 'Password', exact: true }).fill('1234');
 		await page.getByRole('textbox', { name: 'Confirm password' }).fill('1234');
+		await page.getByRole('combobox', { name: 'Select resource' }).selectOption('Local resource');
+		await page.getByRole('combobox', { name: 'Select profile' }).selectOption('Local profile');
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
-
-		// Unset the profile
-		await page
-			.getByRole('combobox', { name: 'Select resource' })
-			.selectOption('Select resource...');
-		await expect(page.getByRole('combobox', { name: 'Select profile' })).toBeDisabled();
-		await expect(page.getByRole('combobox', { name: 'Select profile' })).toHaveValue('');
-
-		await page.getByRole('button', { name: 'Save' }).first().click();
+		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
+
+		// Uncheck the verified checkbox
+		await page.getByLabel('Verified').uncheck();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
 
 	await test.step('Login as test user', async () => {

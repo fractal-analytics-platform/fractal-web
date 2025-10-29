@@ -83,8 +83,8 @@ export async function handle({ event, resolve }) {
 		if (userInfo === null) {
 			logger.debug('Authentication required - No auth cookie found - Redirecting to login');
 			redirect(302, '/auth/login?invalidate=true');
-		} else if (userInfo.profile_id === null) {
-			logger.debug('User without profile - Redirecting to home');
+		} else if (!userInfo.is_superuser && (userInfo.profile_id === null || !userInfo.is_verified)) {
+			logger.debug('User not verified or without profile - Redirecting to home');
 			redirect(302, '/');
 		}
 	}
