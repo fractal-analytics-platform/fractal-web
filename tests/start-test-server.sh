@@ -28,9 +28,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   mkdir "$fractal_server_test_path"
 
   # Copy test configuration files
-  cp "$(pwd)/lib/fractal-server/config_local.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/.fractal_server.env" "$fractal_server_test_path"
-  cp "$(pwd)/tests/pixi.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/resource.json" "$fractal_server_test_path"
 
   if [ "$SKIP_OAUTH_TEST" != "true" ]; then
