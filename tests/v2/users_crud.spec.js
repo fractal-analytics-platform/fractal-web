@@ -120,6 +120,7 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(userRowCells, 2, true);
 		await verifyChecked(userRowCells, 3, false);
 		await verifyChecked(userRowCells, 4, false);
+		await expect(userRowCells[5]).toContainText('Local profile');
 	});
 
 	await test.step('Display the user info page', async () => {

@@ -8,9 +8,15 @@
 
 	const currentUserId = $derived(page.data.userInfo?.id);
 	const currentUserEmail = $derived(page.data.userInfo?.email);
+	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	const profiles = $derived(page.data.profiles);
 
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let users = $state([]);
+	/** @type {Record<string, import('fractal-components/types/api').Profile | undefined>} */
+	const userProfiles = $derived(
+		Object.fromEntries(users.map((u) => [u.id, profiles.find((p) => p.id === u.profile_id)]))
+	);
 
 	const deleteEnabled = false;
 
@@ -52,7 +58,7 @@
 				<th>Active</th>
 				<th>Superuser</th>
 				<th>Verified</th>
-				<th>Has Profile</th>
+				<th>Profile</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
@@ -65,7 +71,18 @@
 						<td><BooleanIcon value={user.is_active} /></td>
 						<td><BooleanIcon value={user.is_superuser} /></td>
 						<td><BooleanIcon value={user.is_verified} /></td>
-						<td><BooleanIcon value={user.profile_id !== null} /></td>
+						<td>
+							{#if userProfiles[user.id]}
+								<a
+									href="/v2/admin/resources/{userProfiles[user.id]
+										?.resource_id}/profiles/{userProfiles[user.id]?.id}"
+								>
+									{userProfiles[user.id]?.name}
+								</a>
+							{:else}
+								-
+							{/if}
+						</td>
 						<td>
 							<a href="/v2/admin/users/{user.id}" class="btn btn-light">
 								<i class="bi-info-circle"></i> Info
