@@ -46,12 +46,30 @@ export async function getResource(fetch, resourceId) {
 
 /**
  * @param {typeof fetch} fetch
+ * @returns {Promise<import('fractal-components/types/api').Profile[]>}
+ */
+export async function getProfiles(fetch) {
+	logger.debug(`Retrieving profiles`);
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * @param {typeof fetch} fetch
  * @param {number} profileId
- * @returns {Promise<import('fractal-components/types/api').Resource>}
+ * @returns {Promise<import('fractal-components/types/api').Profile>}
  */
 export async function getProfile(fetch, profileId) {
 	logger.debug(`Retrieving profile ${profileId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}`, {
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}/`, {
 		method: 'GET',
 		credentials: 'include'
 	});

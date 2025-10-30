@@ -6,11 +6,14 @@
 * Added more keywords to match SLURM errors (\#843).
 * Fixed bug in sandbox pages (\#839);
 * Displayed all kinds of recent task activities in tasks management page. (\#835);
-* Managed resources and profiles (\#845):
+* Managed resources and profiles (\#845, \#862):
     * Added new admin pages for resources and profiles;
     * Updated admin user pages to associate users with profiles;
     * Updated admin settings page;
     * Merged "My Profile" and "My settings" pages;
+* Merged user settings into user (\#862);
+* Adapted to OAuth2 changes (\#862);
+* Handled user without profile as not verified users (\#862);
 
 # 1.20.0
 

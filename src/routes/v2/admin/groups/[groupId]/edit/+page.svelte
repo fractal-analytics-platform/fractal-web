@@ -7,7 +7,6 @@
 	} from '$lib/common/errors';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import UserSettingsEditor from '$lib/components/v2/admin/UserSettingsEditor.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
@@ -15,7 +14,6 @@
 	let group = $state(page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	const users = $derived(page.data.users);
-	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToAdd = $state(null);
@@ -23,17 +21,9 @@
 	let addingUser = $state(null);
 	let addUserHovering = $state(false);
 	let userFilter = $state('');
-	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
-	let userSettingsEditor = $state();
-	let settingsUpdatedMessage = $state('');
-	let settingsPendingChanges = $state(false);
-	let savingSettings = $state(false);
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToRemove = $state(null);
-
-	/** @type {import('fractal-components/types/api').UserSettings} */
-	let settings = $state(createEmptySettings());
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -175,30 +165,6 @@
 		originalViewPaths = [...group.viewer_paths];
 	});
 
-	/**
-	 * @returns {import('fractal-components/types/api').UserSettings}
-	 */
-	function createEmptySettings() {
-		return {
-			slurm_accounts: [],
-			project_dir: ''
-		};
-	}
-
-	async function onSettingsUpdated() {
-		settings = createEmptySettings();
-		settingsUpdatedMessage = 'Settings successfully updated';
-	}
-
-	async function handleSaveSettings() {
-		settingsUpdatedMessage = '';
-		savingSettings = true;
-		try {
-			await userSettingsEditor?.handleSaveSettings();
-		} finally {
-			savingSettings = false;
-		}
-	}
 	let availableUsers = $derived(
 		users.filter((u) => !group.user_ids.includes(u.id)).sort(sortUserByEmailComparator)
 	);
@@ -368,55 +334,6 @@
 			<button class="btn btn-primary" onclick={saveViewerPaths} disabled={!saveViewerPathsEnabled}>
 				Save
 			</button>
-		</div>
-	</div>
-
-	<hr />
-	<div class="row">
-		<div class="mt-4 col-lg-7">
-			<div class="row">
-				<div class="offset-sm-3">
-					<h4 class="fw-light">Users settings</h4>
-				</div>
-			</div>
-			<div class="row">
-				<div class="offset-sm-3 col-10">
-					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle"></i>
-						<strong>Warning</strong>: this PATCH will be applied to all the {group.user_ids.length} users
-						of this user group.
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<UserSettingsEditor
-		bind:this={userSettingsEditor}
-		bind:pendingChanges={settingsPendingChanges}
-		{settings}
-		{runnerBackend}
-		settingsApiEndpoint="/api/auth/group/{group.id}/user-settings"
-		{onSettingsUpdated}
-	/>
-	<div class="row">
-		<div class="mt-2 col-lg-7">
-			<div class="row mb-3">
-				<div class="col-sm-9 offset-sm-3">
-					<StandardDismissableAlert message={settingsUpdatedMessage} />
-					<button
-						type="button"
-						onclick={handleSaveSettings}
-						class="btn btn-primary"
-						disabled={savingSettings || !settingsPendingChanges}
-					>
-						{#if savingSettings}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
-							</span>
-						{/if}
-						Save
-					</button>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

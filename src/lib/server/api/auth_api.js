@@ -49,27 +49,6 @@ export async function getCurrentUser(fetch, groupIdsNames = false) {
 }
 
 /**
- * Fetches user settings
- * @param {typeof fetch} fetch
- * @returns {Promise<import('fractal-components/types/api').UserSettings>}
- */
-export async function getCurrentUserSettings(fetch) {
-	logger.debug('Retrieving current user settings');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/settings/`;
-	const response = await fetch(url, {
-		method: 'GET',
-		credentials: 'include'
-	});
-
-	if (!response.ok) {
-		logger.error('Unable to retrieve the current user settings');
-		await responseError(response);
-	}
-
-	return await response.json();
-}
-
-/**
  * Fetches user viewer paths
  * @param {typeof fetch} fetch
  * @returns {Promise<string[]>}
@@ -150,27 +129,6 @@ export async function getUser(fetch, userId, groupIdsNames = true) {
 
 	if (!response.ok) {
 		logger.error('Unable to fetch user [user_id=%d]', userId);
-		await responseError(response);
-	}
-
-	return await response.json();
-}
-
-/**
- * Fetches user settings from the server
- * @param {typeof fetch} fetch
- * @param {number|string} userId
- * @returns {Promise<import('fractal-components/types/api').UserSettings>}
- */
-export async function getUserSettings(fetch, userId) {
-	logger.debug('Fetching settings for user [user_id=%d]', userId);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/${userId}/settings/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
-
-	if (!response.ok) {
-		logger.error('Unable to fetch user settings [user_id=%d]', userId);
 		await responseError(response);
 	}
 

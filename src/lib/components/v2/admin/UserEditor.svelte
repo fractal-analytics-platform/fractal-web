@@ -11,8 +11,6 @@
 	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import UserSettingsEditor from './UserSettingsEditor.svelte';
-	import UserSettingsImportModal from './UserSettingsImportModal.svelte';
 	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 	import ProfileEditor from './ProfileEditor.svelte';
 
@@ -20,19 +18,12 @@
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
 	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
-	 * @property {import('fractal-components/types/api').UserSettings|null} [settings]
 	 * @property {(user: import('fractal-components/types/api').User) => Promise<Response>} saveUser
 	 * @property {string} runnerBackend
 	 */
 
 	/** @type {Props} */
-	let {
-		user = $bindable(),
-		groups = [],
-		settings = $bindable(null),
-		saveUser,
-		runnerBackend
-	} = $props();
+	let { user = $bindable(), groups = [], saveUser, runnerBackend } = $props();
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	let editableUser = $state();
@@ -55,13 +46,6 @@
 			JSON.stringify($state.snapshot(originalUser)) !==
 				JSON.stringify(nullifyEmptyStrings($state.snapshot(editableUser)))
 	);
-
-	/** @type {import('$lib/components/v2/admin/UserSettingsEditor.svelte').default|undefined} */
-	let userSettingsEditor = $state();
-	let settingsPendingChanges = $state(false);
-
-	/** @type {UserSettingsImportModal|undefined} */
-	let userSettingsImportModal = $state();
 
 	/** @type {Array<import('fractal-components/types/api').Group>} */
 	let userGroups = $state([]);
@@ -90,7 +74,12 @@
 
 	let userUpdatedMessage = $state('');
 
-	const userFormErrorHandler = new FormErrorHandler('genericUserError', ['email', 'password']);
+	const userFormErrorHandler = new FormErrorHandler('genericUserError', [
+		'email',
+		'password',
+		'project_dir',
+		'slurm_accounts'
+	]);
 
 	const userValidationErrors = userFormErrorHandler.getValidationErrorStore();
 
@@ -160,12 +149,6 @@
 					originalUser = deepCopy($state.snapshot(editableUser));
 				} else {
 					await goto(`/v2/admin/users/${result.id}/edit`);
-				}
-			}
-			if (settingsPendingChanges && userSettingsEditor) {
-				const settingsSuccess = await userSettingsEditor.handleSaveSettings();
-				if (!settingsSuccess) {
-					return;
 				}
 			}
 			userUpdatedMessage = 'User successfully updated';
@@ -275,14 +258,6 @@
 			'genericUserError'
 		);
 		return false;
-	}
-
-	/**
-	 * @param {Response} response
-	 */
-	async function onSettingsUpdated(response) {
-		const result = await response.json();
-		settings = { ...result };
 	}
 
 	onMount(async () => {
@@ -451,12 +426,21 @@
 		select.setData([{ text: 'Select...', placeholder: true }, ...options]);
 	}
 
-	/**
-	 * @param {import('fractal-components/types/api').UserSettings} importedSettings
-	 */
-	function onSettingsImported(importedSettings) {
-		settings = importedSettings;
+	function addSlurmAccount() {
+		if (editableUser){
+		editableUser.slurm_accounts = [...editableUser.slurm_accounts, ''];
 	}
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeSlurmAccount(index) {
+		if (editableUser){
+		editableUser.slurm_accounts = editableUser.slurm_accounts.filter((_, i) => i !== index);
+		}
+	}
+
 	let addedGroups = $derived(
 		userGroups.filter((g) => !editableUser?.group_ids_names.map((ni) => ni[0]).includes(g.id))
 	);
@@ -473,11 +457,7 @@
 
 	let enableSave = $derived(
 		!saving &&
-			(userPendingChanges ||
-				settingsPendingChanges ||
-				addedGroups.length > 0 ||
-				removedGroups.length > 0 ||
-				password)
+			(userPendingChanges || addedGroups.length > 0 || removedGroups.length > 0 || password)
 	);
 </script>
 
@@ -590,6 +570,7 @@
 					<span class="invalid-feedback">{$userValidationErrors['confirmPassword']}</span>
 				</div>
 			</div>
+
 			<div class="row mb-3 has-validation">
 				<label for="profile" class="col-sm-3 col-form-label text-end">
 					<strong>Profile</strong>
@@ -663,6 +644,69 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="row mb-3 has-validation">
+				<label for="project_dir" class="col-sm-3 col-form-label text-end">
+					<strong>Project dir</strong>
+				</label>
+				<div class="col-sm-9">
+					<input
+						type="text"
+						class="form-control"
+						id="project_dir"
+						bind:value={editableUser.project_dir}
+						class:is-invalid={userFormSubmitted && $userValidationErrors['project_dir']}
+					/>
+					<span class="form-text">
+						A base folder used for default <code>zarr_dir</code> paths
+					</span>
+					<span class="invalid-feedback">{$userValidationErrors['project_dir']}</span>
+				</div>
+			</div>
+
+			{#if runnerBackend !== 'local'}
+				<div class="row mb-3 has-validation">
+					<label for="slurmAccount-0" class="col-sm-3 col-form-label text-end">
+						<strong>SLURM accounts</strong>
+					</label>
+					<div class="col-sm-9 has-validation">
+						<!-- eslint-disable-next-line no-unused-vars -->
+						{#each editableUser.slurm_accounts as _, i (i)}
+							<div
+								class="input-group mb-2"
+								class:is-invalid={userFormSubmitted && $userValidationErrors['slurm_accounts']}
+							>
+								<input
+									type="text"
+									class="form-control"
+									id={`slurmAccount-${i}`}
+									bind:value={editableUser.slurm_accounts[i]}
+									aria-label={`SLURM account #${i + 1}`}
+									class:is-invalid={userFormSubmitted && $userValidationErrors['slurm_accounts']}
+									required
+								/>
+								<button
+									class="btn btn-outline-secondary"
+									type="button"
+									id="slurm_account_remove_{i}"
+									aria-label={`Remove SLURM account #${i + 1}`}
+									onclick={() => removeSlurmAccount(i)}
+								>
+									<i class="bi bi-trash"></i>
+								</button>
+							</div>
+						{/each}
+						<span class="invalid-feedback mb-2">{userFormSubmitted && $userValidationErrors['slurm_accounts']}</span>
+						<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
+							<i class="bi bi-plus-circle"></i>
+							Add SLURM account
+						</button>
+						<div class="form-text">
+							The first account in the list will be used as a default for job execution.
+						</div>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 	{#if showCreateProfile && profileOption === 'create_new' && selectedResource && newProfile}
@@ -708,42 +752,11 @@
 			{:else}
 				<div class="row">
 					<div class="col-sm-9 offset-sm-3">
-						<div class="alert alert-info">
-							User settings can be modified after creating the user
-						</div>
+						<div class="alert alert-info">User groups can be modified after creating the user</div>
 					</div>
 				</div>
 			{/if}
 		</div>
-
-		{#if settings}
-			<div class="row">
-				<div class="mt-3 col-lg-7">
-					<div class="row">
-						<div class="col offset-sm-3">
-							<button
-								class="btn btn-primary float-end mb-2"
-								onclick={() =>
-									userSettingsImportModal?.open(
-										userGroups.filter((g) => g.name !== 'All').map((g) => g.id)
-									)}
-							>
-								Import from another user
-							</button>
-							<h4 class="fw-light mt-2">Settings</h4>
-						</div>
-					</div>
-				</div>
-			</div>
-			<UserSettingsEditor
-				bind:this={userSettingsEditor}
-				bind:pendingChanges={settingsPendingChanges}
-				{settings}
-				{runnerBackend}
-				settingsApiEndpoint="/api/auth/users/{editableUser.id}/settings"
-				{onSettingsUpdated}
-			/>
-		{/if}
 
 		<div class="row">
 			<div class="col-lg-7">
@@ -758,8 +771,8 @@
 							disabled={!enableSave}
 						>
 							{#if saving}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-								></span>
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+								</span>
 							{/if}
 							Save
 						</button>
@@ -807,12 +820,6 @@
 				<button class="btn btn-primary" onclick={addGroupToUser}> Add </button>
 			{/snippet}
 		</Modal>
-
-		<UserSettingsImportModal
-			currentUserId={Number(editableUser.id)}
-			bind:this={userSettingsImportModal}
-			{onSettingsImported}
-		/>
 	</div>
 {/if}
 

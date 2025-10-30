@@ -124,7 +124,6 @@
 	const server = $derived(page.data.serverInfo || {});
 	const warningBanner = $derived(page.data.warningBanner);
 	const userEmail = $derived(userLoggedIn ? page.data.userInfo.email : undefined);
-	const isVerified = $derived(userLoggedIn && page.data.userInfo.is_verified);
 </script>
 
 <main>
@@ -213,19 +212,6 @@
 					{/if}
 					{line}
 				{/each}
-			</div>
-		</div>
-	{/if}
-	{#if userLoggedIn && !isVerified}
-		<div class="container mt-3">
-			<div class="row">
-				<div class="col">
-					<div class="alert alert-warning">
-						<i class="bi bi-exclamation-triangle"></i>
-						<strong>Warning</strong>: as a non-verified user, you have limited access; please
-						contact an admin.
-					</div>
-				</div>
 			</div>
 		</div>
 	{/if}

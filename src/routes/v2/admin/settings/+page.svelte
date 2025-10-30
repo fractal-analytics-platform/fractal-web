@@ -5,6 +5,7 @@
 	const databaseSettings = $derived(page.data.databaseSettings);
 	const emailSettings = $derived(page.data.emailSettings);
 	const oauthSettings = $derived(page.data.oauthSettings);
+	const dataSettings = $derived(page.data.dataSettings);
 
 	let showObfuscated = $state(false);
 
@@ -12,6 +13,7 @@
 		['App settings', appSettings],
 		['Database settings', databaseSettings],
 		['E-mail settings', emailSettings],
+		['Data settings', dataSettings],
 		['OAuth settings', oauthSettings]
 	]);
 </script>

@@ -28,9 +28,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   mkdir "$fractal_server_test_path"
 
   # Copy test configuration files
-  cp "$(pwd)/lib/fractal-server/config_local.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/.fractal_server.env" "$fractal_server_test_path"
-  cp "$(pwd)/tests/pixi.json" "$fractal_server_test_path"
   cp "$(pwd)/tests/resource.json" "$fractal_server_test_path"
 
   if [ "$SKIP_OAUTH_TEST" != "true" ]; then
@@ -48,7 +46,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   . venv/bin/activate
   pip install "$pip_arg"
   fractalctl set-db
-  fractalctl init-db-data --resource resource.json --profile default --admin-email admin@fractal.xy --admin-pwd 1234
+  fractalctl init-db-data --resource resource.json --profile default --admin-email admin@fractal.xy --admin-pwd 1234  --admin-project-dir /tmp
 else
   cd "$fractal_server_test_path"
   . venv/bin/activate

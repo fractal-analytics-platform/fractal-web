@@ -79,9 +79,14 @@ export async function handle({ event, resolve }) {
 	}
 
 	// Authentication guard
-	if (!isPublicPage && userInfo === null) {
-		logger.debug('Authentication required - No auth cookie found - Redirecting to login');
-		redirect(302, '/auth/login?invalidate=true');
+	if (!isPublicPage) {
+		if (userInfo === null) {
+			logger.debug('Authentication required - No auth cookie found - Redirecting to login');
+			redirect(302, '/auth/login?invalidate=true');
+		} else if (!userInfo.is_superuser && (userInfo.profile_id === null || !userInfo.is_verified)) {
+			logger.debug('User not verified or without profile - Redirecting to home');
+			redirect(302, '/');
+		}
 	}
 
 	// Admin area check

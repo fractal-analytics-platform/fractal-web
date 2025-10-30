@@ -21,6 +21,9 @@ export async function load({ request, fetch, cookies }) {
 
 	if (!response.ok) {
 		const result = await response.json();
+		if ('detail' in result) {
+			return { message: result.detail };
+		}
 		error(400, { message: JSON.stringify(result) });
 	}
 

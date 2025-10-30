@@ -21,22 +21,10 @@ test('OAuth2 account', async ({ page }) => {
 		await waitPageLoading(page);
 
 		await page.getByText('Log in with institutional account').click();
-		await expect(page.getByText('as a non-verified user, you have limited access')).toBeVisible();
-	});
-
-	await test.step('Check that OAuth2 account is listed on profile', async () => {
-		await page.goto('/profile');
-		const row = page.getByRole('row', { name: 'OAuth2 accounts' });
-		await expect(row).toContainText('kilgore@kilgore.trout');
-		await expect(row).toContainText('openid');
-	});
-
-	await test.step('Logout', async () => {
-		await page.getByRole('button', { name: 'kilgore@kilgore.trout' }).click();
-		await page.getByRole('button', { name: 'Logout' }).click();
-		await page.waitForURL('/');
-
-		await expect(page.getByText('kilgore@kilgore.trout')).toHaveCount(0);
-		await expect(page.getByText('Login')).toHaveCount(2);
+		await expect(
+			page.getByText(
+				'Thank you for registering for the Fractal service. Administrators have been informed to configure your account and will get back to you.'
+			)
+		).toBeVisible();
 	});
 });

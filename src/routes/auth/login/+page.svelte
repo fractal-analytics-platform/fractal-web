@@ -90,12 +90,13 @@
 						{#if oauth2Provider}
 							<h2 class="accordion-header">
 								<button
-									class="accordion-button collapsed"
+									class="accordion-button"
 									type="button"
 									data-bs-toggle="collapse"
 									data-bs-target="#localLoginCollapse"
 									aria-expanded="false"
 									aria-controls="localLoginCollapse"
+									class:collapsed={!form?.invalidMessage}
 								>
 									Log in with username & password
 								</button>
@@ -104,7 +105,7 @@
 						<div
 							id="localLoginCollapse"
 							class="accordion-collapse collapse"
-							class:show={!oauth2Provider}
+							class:show={!oauth2Provider || form?.invalidMessage}
 						>
 							<div class="accordion-body">
 								<form method="POST">

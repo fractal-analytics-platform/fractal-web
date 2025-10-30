@@ -80,7 +80,7 @@ describe('Workflow page', () => {
 								status: 'failed',
 								log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
 							};
-						case '/api/auth/current-user/settings':
+						case '/api/auth/current-user':
 							return { slurm_accounts: [] };
 						case '/api/v2/project/1/workflow/1/version-update-candidates':
 							return [];

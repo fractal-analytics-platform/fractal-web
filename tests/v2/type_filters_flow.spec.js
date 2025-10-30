@@ -17,6 +17,7 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 		await createDatasetButton.click();
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
+		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);

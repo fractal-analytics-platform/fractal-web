@@ -370,16 +370,15 @@
 	}
 
 	async function loadSlurmAccounts() {
-		const response = await fetch(`/api/auth/current-user/settings`, {
+		const response = await fetch(`/api/auth/current-user`, {
 			method: 'GET',
 			credentials: 'include'
 		});
-		const result = await response.json();
 		if (response.ok) {
-			slurmAccounts = result.slurm_accounts;
+			/** @type {import('fractal-components/types/api').User} */
+			const user = await response.json();
+			slurmAccounts = user.slurm_accounts;
 			slurmAccount = slurmAccounts.length === 0 ? '' : slurmAccounts[0];
-		} else {
-			console.error('Error while loading current user settings', result);
 		}
 	}
 
