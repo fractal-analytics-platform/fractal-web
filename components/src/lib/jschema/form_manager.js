@@ -7,9 +7,10 @@ import {
 	TupleFormElement,
 	StringFormElement,
 	ValueFormElement,
-	BooleanFormElement
+	BooleanFormElement,
+	ConditionalFormElement
 } from './form_element.js';
-import { adaptJsonSchema } from './jschema_adapter.js';
+import { adaptJsonSchema, stripDiscriminator } from './jschema_adapter.js';
 import { getJsonSchemaData } from './jschema_initial_data.js';
 import {
 	getAllObjectProperties,
@@ -45,7 +46,7 @@ export class FormManager {
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
 
 		this.validator = new SchemaValidator(schemaVersion);
-		const isSchemaValid = this.validator.loadSchema(this.jsonSchema);
+		const isSchemaValid = this.validator.loadSchema(stripDiscriminator(this.jsonSchema));
 		if (!isSchemaValid) {
 			throw new Error('Invalid JSON Schema');
 		}
@@ -88,7 +89,17 @@ export class FormManager {
 	createFormElement(params) {
 		const { property } = params;
 		if ('enum' in property) {
-			return this.createEnumElement(params);
+			return this.createEnumElement(
+				/** @type {{ key: null|string, property: import("../types/jschema").JSONSchemaNumberProperty, required: boolean, removable: boolean, value: any }} */ (
+					params
+				)
+			);
+		}
+		if ('oneOf' in property) {
+			const oneOfProperty = /** @type {import("../types/jschema").JSONSchemaOneOfProperty} */ (
+				property
+			);
+			return this.createConditionalElement({ ...params, property: oneOfProperty });
 		}
 		switch (property.type) {
 			case 'object': {
@@ -320,6 +331,52 @@ export class FormManager {
 	}
 
 	/**
+	 * @param {{
+	 * key: null|string,
+	 * property: import("../types/jschema").JSONSchemaOneOfProperty,
+	 * required: boolean,
+	 * removable: boolean,
+	 * value: any
+	 * }} params
+	 */
+	createConditionalElement({ key, property, required, removable, value }) {
+		const fields = this.getBaseElementFields({ key, property, required, removable });
+		const selectedValue = value ?? {};
+		const selectedIndex = this.getConditionalElementSelectedChildIndex(property, selectedValue);
+		const selectedProperty = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
+			property.oneOf[selectedIndex]
+		);
+		return new ConditionalFormElement({
+			...fields,
+			type: 'conditional',
+			selectedIndex: selectedIndex,
+			selectedItem: this.createFormElement({
+				key,
+				property: selectedProperty,
+				required,
+				removable,
+				value: selectedValue
+			})
+		});
+	}
+
+	getConditionalElementSelectedChildIndex(property, value) {
+		if ('discriminator' in property) {
+			const { discriminator } = property;
+			if ('propertyName' in discriminator && discriminator.propertyName in value) {
+				const key = value[discriminator.propertyName];
+				if ('mapping' in discriminator && key in discriminator.mapping) {
+					const index = discriminator.mapping[key];
+					if (typeof index === 'number' && index >= 0) {
+						return index;
+					}
+				}
+			}
+		}
+		return 0;
+	}
+
+	/**
 	 * Initializes the common base fields (title, description, ...) to create a new element
 	 * @param {{
 	 * key: null|string,
@@ -336,7 +393,7 @@ export class FormManager {
 			removable,
 			manager: this,
 			id: this.getUniqueId(),
-			type: property.type || null,
+			type: 'type' in property && property.type ? property.type : null,
 			title: key && removable ? key : property.title || key || '',
 			description: property.description || '',
 			property: deepCopy(property),
@@ -370,11 +427,11 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {ObjectFormElement} objectElement
+	 * @param {ObjectFormElement} element
 	 */
-	getDataFromObjectElement(objectElement) {
+	getDataFromObjectElement(element) {
 		const data = {};
-		for (const child of objectElement.children) {
+		for (const child of element.children) {
 			let childData = this.getDataFromElement(child);
 			const value =
 				childData == null
@@ -387,6 +444,14 @@ export class FormManager {
 			data[child.key] = value;
 		}
 		return data;
+	}
+
+	/**
+	 * @param {ConditionalFormElement} element
+	 */
+	getDataFromConditionalElement(element) {
+		const selectedChild = element.selectedItem;
+		return this.getDataFromElement(selectedChild);
 	}
 
 	validate() {
@@ -410,6 +475,8 @@ export class FormManager {
 				return this.getDataFromArrayElement(
 					/** @type {ArrayFormElement|TupleFormElement}*/ (element)
 				);
+			case 'conditional':
+				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/ (element));
 			default:
 				if (element instanceof ValueFormElement) {
 					if (element instanceof NumberFormElement && element.badInput) {

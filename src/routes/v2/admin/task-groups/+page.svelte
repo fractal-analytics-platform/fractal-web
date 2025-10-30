@@ -12,11 +12,14 @@
 	const users = $derived(page.data.users || []);
 	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups || []);
+	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	const resources = $derived(page.data.resources || []);
 
 	let user_id = $state('');
 	let user_group_id = $state('');
 	let pkg_name = $state('');
 	let origin = $state('');
+	let resource = $state('');
 	/** @type {boolean|null} */
 	let privateGroup = $state(null);
 	/** @type {boolean|null} */
@@ -63,6 +66,9 @@
 			if (origin) {
 				url.searchParams.append('origin', origin);
 			}
+			if (resource) {
+				url.searchParams.append('resource_id', resource);
+			}
 			if (privateGroup !== null) {
 				url.searchParams.append('private', privateGroup.toString());
 			}
@@ -100,6 +106,7 @@
 		user_group_id = '';
 		pkg_name = '';
 		origin = '';
+		resource = '';
 		lastUsedDateMin = '';
 		lastUsedTimeMin = '';
 		lastUsedDateMax = '';
@@ -137,6 +144,14 @@
 	 */
 	function getGroupName(userGroupId) {
 		return groups.find((g) => g.id === userGroupId)?.name || '-';
+	}
+
+	/**
+	 * @param {number} resourceId
+	 * @returns {string}
+	 */
+	function getResourceName(resourceId) {
+		return resources.find((r) => r.id === resourceId)?.name || '-';
 	}
 </script>
 
@@ -238,8 +253,8 @@
 			</div>
 
 			<div class="row mt-3">
-				<div class="col-md-3 col-lg-2 mt-2">Last used</div>
-				<div class="col-md-9 col-lg-10">
+				<div class="col-md-3 col-lg-1 mt-2">Last used</div>
+				<div class="col-md-9 col-lg-7">
 					<div class="row row-cols-md-auto">
 						<div class="col-12 mt-1">
 							<div class="input-group">
@@ -277,6 +292,21 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -301,62 +331,73 @@
 		</p>
 
 		{#if results.length > 0}
-			<table class="table task-groups-table mt-4">
-				<colgroup>
-					<col width="60" />
-					<col width="auto" />
-					<col width="90" />
-					<col width="190" />
-					<col width="100" />
-					<col width="90" />
-					<col width="90" />
-					<col width="90" />
-					<col width="400" />
-				</colgroup>
-				<thead>
-					<tr>
-						<th>Id</th>
-						<th>Package Name</th>
-						<th>Version</th>
-						<th>User</th>
-						<th>Group</th>
-						<th>Active</th>
-						<th>Origin</th>
-						<th># Tasks</th>
-						<th>Options</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each results as taskGroup, taskGroupIndex (taskGroup.id)}
-						<tr class:row-grey={taskGroupIndex % 2 === 0}>
-							<td>{taskGroup.id}</td>
-							<td>{taskGroup.pkg_name}</td>
-							<td>{taskGroup.version || '-'}</td>
-							<td>{getUserEmail(taskGroup.user_id)}</td>
-							<td>{getGroupName(taskGroup.user_group_id)}</td>
-							<td>
-								<BooleanIcon value={taskGroup.active} />
-							</td>
-							<td>{taskGroup.origin || '-'}</td>
-							<td>{taskGroup.task_list.length}</td>
-							<td>
-								<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
-									<i class="bi bi-info-circle"></i>
-									Info
-								</button>
-								<button class="btn btn-primary" onclick={() => taskGroupEditModal?.open(taskGroup)}>
-									<i class="bi bi-pencil"></i>
-									Edit
-								</button>
-								<button class="btn btn-info" onclick={() => taskGroupManageModal?.open(taskGroup)}>
-									<i class="bi bi-gear"></i>
-									Manage
-								</button>
-							</td>
+			<div class="table-responsive">
+				<table class="table task-groups-table mt-4">
+					<colgroup>
+						<col width="60" />
+						<col width="190" />
+						<col width="90" />
+						<col width="190" />
+						<col width="100" />
+						<col width="190" />
+						<col width="90" />
+						<col width="90" />
+						<col width="90" />
+						<col width="380" />
+					</colgroup>
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>Package Name</th>
+							<th>Version</th>
+							<th>User</th>
+							<th>Group</th>
+							<th>Resource</th>
+							<th>Active</th>
+							<th>Origin</th>
+							<th># Tasks</th>
+							<th>Options</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{#each results as taskGroup, taskGroupIndex (taskGroup.id)}
+							<tr class:row-grey={taskGroupIndex % 2 === 0}>
+								<td>{taskGroup.id}</td>
+								<td>{taskGroup.pkg_name}</td>
+								<td>{taskGroup.version || '-'}</td>
+								<td>{getUserEmail(taskGroup.user_id)}</td>
+								<td>{getGroupName(taskGroup.user_group_id)}</td>
+								<td>{getResourceName(taskGroup.resource_id)}</td>
+								<td>
+									<BooleanIcon value={taskGroup.active} />
+								</td>
+								<td>{taskGroup.origin || '-'}</td>
+								<td>{taskGroup.task_list.length}</td>
+								<td>
+									<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
+										<i class="bi bi-info-circle"></i>
+										Info
+									</button>
+									<button
+										class="btn btn-primary"
+										onclick={() => taskGroupEditModal?.open(taskGroup)}
+									>
+										<i class="bi bi-pencil"></i>
+										Edit
+									</button>
+									<button
+										class="btn btn-info"
+										onclick={() => taskGroupManageModal?.open(taskGroup)}
+									>
+										<i class="bi bi-gear"></i>
+										Manage
+									</button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -383,6 +424,8 @@
 				<li class="list-group-item">{getUserEmail(selectedTaskGroup.user_id)}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Group</li>
 				<li class="list-group-item">{getGroupName(selectedTaskGroup.user_group_id)}</li>
+				<li class="list-group-item list-group-item-light fw-bold">Resource</li>
+				<li class="list-group-item">{getResourceName(selectedTaskGroup.resource_id)}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Active</li>
 				<li class="list-group-item">
 					<BooleanIcon value={selectedTaskGroup.active} />

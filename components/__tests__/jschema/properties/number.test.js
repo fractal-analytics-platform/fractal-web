@@ -31,7 +31,7 @@ describe('Number properties', () => {
 	});
 
 	it('NumberProperty referenced', async () => {
-		const { component } = renderSchemaWithReferencedProperty({ type: 'number' });
+		const { component } = renderSchemaWithReferencedProperty({ type: 'number' }, 'pydantic_v2');
 		checkBold(screen.getByText('testProp'), false);
 		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
 		expect(spinbutton).toBeDefined();

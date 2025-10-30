@@ -6,7 +6,8 @@
 		getValidationErrorMessage,
 		getPropertiesToIgnore,
 		detectSchemaVersion,
-		SchemaValidator
+		SchemaValidator,
+		stripDiscriminator
 	} from 'fractal-components';
 	import { tick } from 'svelte';
 	import example from './example.json';
@@ -44,7 +45,7 @@
 
 		try {
 			const schemaValidator = new SchemaValidator(schemaVersion);
-			schemaValidator.validateSchema(parsedSchema);
+			schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
 		} catch (_) {
 			try {
 				schemaVersion = detectSchemaVersion(parsedSchema);

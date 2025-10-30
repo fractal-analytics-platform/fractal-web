@@ -39,7 +39,7 @@ describe('allOf properties', () => {
 			'pydantic_v1'
 		);
 
-		const dropdown = screen.getByRole('combobox');
+		const dropdown = /** @type {HTMLSelectElement} */ (screen.getByRole('combobox'));
 		expect(dropdown.options.length).eq(3);
 		expect(dropdown.options[0].text).eq('Select...');
 		expect(dropdown.options[1].text).eq('A');
@@ -97,7 +97,7 @@ describe('allOf properties', () => {
 
 		const dropdowns = screen.getAllByRole('combobox');
 		expect(dropdowns.length).eq(2);
-		const [dropdown1, dropdown2] = dropdowns;
+		const [dropdown1, dropdown2] = /** @type {HTMLSelectElement[]} */ (dropdowns);
 		expect(dropdown1.options.length).eq(3);
 		expect(dropdown1.options[0].text).eq('Select...');
 		expect(dropdown1.options[1].text).eq('A');

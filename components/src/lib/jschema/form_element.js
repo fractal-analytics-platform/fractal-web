@@ -1,5 +1,5 @@
 import { getPropertyData } from './jschema_initial_data';
-import { writable } from "svelte/store"
+import { writable } from 'svelte/store';
 
 /**
  * Base class for representing data associated with a form element.
@@ -303,6 +303,37 @@ export class TupleFormElement extends BaseFormElement {
 
 	removeTuple() {
 		this.children = [];
+		this.notifyChange();
+	}
+}
+
+export class ConditionalFormElement extends BaseFormElement {
+	/**
+	 * @param {import("../types/form").ConditionalElementFields} fields
+	 */
+	constructor(fields) {
+		super(fields);
+		this.selectedItem = fields.selectedItem;
+		this.selectedIndex = writable(fields.selectedIndex);
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	selectChild(index) {
+		this.selectedIndex.set(index);
+		if ('oneOf' in this.property) {
+			const selectedProp = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
+				this.property.oneOf[index]
+			);
+			this.selectedItem = this.manager.createFormElement({
+				key: this.key,
+				property: selectedProp,
+				required: this.required,
+				removable: this.removable,
+				value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true)
+			});
+		}
 		this.notifyChange();
 	}
 }

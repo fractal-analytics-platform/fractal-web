@@ -1,4 +1,4 @@
-import { render } from '@testing-library/svelte';
+import { render, screen } from '@testing-library/svelte';
 import { expect, vi } from 'vitest';
 import JSchemaTestWrapper from '../JSchemaTestWrapper.svelte';
 

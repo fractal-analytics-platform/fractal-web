@@ -36,9 +36,9 @@ describe('Tuple properties', () => {
 
 		let inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(2);
-		expect(inputs[0].value).eq('1300');
-		expect(screen.getByRole('textbox').value).eq('foo');
-		expect(inputs[1].value).eq('1');
+		expect(inputs[0]).toHaveValue(1300);
+		expect(screen.getByRole('textbox')).toHaveValue('foo');
+		expect(inputs[1]).toHaveValue(1);
 		await fireEvent.input(inputs[0], { target: { value: '500' } });
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [500, 'foo', 1] });
 		expect(inputs[0]).toHaveValue(500);
@@ -87,13 +87,13 @@ describe('Tuple properties', () => {
 		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
 		let inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
-		expect(inputs[0].value).eq('');
-		expect(inputs[1].value).eq('');
+		expect(inputs[0]).toHaveValue('');
+		expect(inputs[1]).toHaveValue('');
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, null] });
 
 		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
-		expect(inputs[0].value).eq('foo');
+		expect(inputs[0]).toHaveValue('foo');
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: ['foo', null] });
 
@@ -106,8 +106,8 @@ describe('Tuple properties', () => {
 		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
 		inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
-		expect(inputs[0].value).eq(''); // verify that value has been reset
-		expect(inputs[1].value).eq('');
+		expect(inputs[0]).toHaveValue(''); // verify that value has been reset
+		expect(inputs[1]).toHaveValue('');
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, null] });
 	});
@@ -146,9 +146,9 @@ describe('Tuple properties', () => {
 
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(3);
-		expect(inputs[0].value).eq('1300');
-		expect(inputs[1].value).eq('1500');
-		expect(inputs[2].value).eq('1');
+		expect(inputs[0]).toHaveValue(1300);
+		expect(inputs[1]).toHaveValue(1500);
+		expect(inputs[2]).toHaveValue(1);
 		expect(screen.queryAllByRole('button', { name: 'Remove tuple' }).length).eq(0);
 		await fireEvent.input(screen.getAllByRole('spinbutton')[0], { target: { value: 10 } });
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [10, 1500, 1] });
@@ -186,11 +186,11 @@ describe('Tuple properties', () => {
 
 		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
-		expect(inputs[0].value).eq('');
-		expect(inputs[1].value).eq('');
+		expect(inputs[0]).toHaveValue('');
+		expect(inputs[1]).toHaveValue('');
 		expect(screen.queryAllByRole('button', { name: 'Remove tuple' }).length).eq(0);
 		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
-		expect(inputs[0].value).eq('foo');
+		expect(inputs[0]).toHaveValue('foo');
 		expect(onChange).toHaveBeenCalledWith({ patch_size: ['foo', null] });
 		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
 	});

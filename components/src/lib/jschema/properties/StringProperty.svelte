@@ -19,6 +19,8 @@
 	let field = $state();
 	let validationError = $state('');
 
+	let constant = $derived('const' in formElement.property);
+
 	/**
 	 * @param {any} value
 	 */
@@ -48,7 +50,7 @@
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={validationError}
-			disabled={!editable}
+			disabled={!editable || constant}
 		/>
 		<span class="invalid-feedback">{validationError}</span>
 	</div>

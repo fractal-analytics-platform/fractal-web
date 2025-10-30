@@ -227,6 +227,7 @@ export type TaskGroupV2 = {
 	active: boolean;
 	timestamp_created: string;
 	timestamp_last_used: string;
+	resource_id: number;
 };
 
 export type WorkflowTasksTableRowGroup = {
