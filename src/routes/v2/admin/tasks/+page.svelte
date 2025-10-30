@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { PropertyDescription } from 'fractal-components';
@@ -6,7 +7,10 @@
 	let name = $state('');
 	let id = $state('');
 	let version = $state('');
+	let resource = $state('');
 	let max_number_of_results = $state('25');
+	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	const resources = $derived(page.data.resources || []);
 
 	let searched = $state(false);
 	let searching = $state(false);
@@ -37,6 +41,9 @@
 			if (version) {
 				url.searchParams.append('version', version);
 			}
+			if (resource) {
+				url.searchParams.append('resource_id', resource);
+			}
 			if (max_number_of_results) {
 				url.searchParams.append('max_number_of_results', max_number_of_results);
 			}
@@ -62,6 +69,7 @@
 		name = '';
 		id = '';
 		version = '';
+		resource = '';
 		max_number_of_results = '25';
 		searched = false;
 		results = [];
@@ -177,6 +185,21 @@
 								bind:value={max_number_of_results}
 								id="max_number_of_results"
 							/>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
 						</div>
 					</div>
 				</div>
