@@ -14,6 +14,8 @@
 * Merged user settings into user (\#862);
 * Adapted to OAuth2 changes (\#862);
 * Handled user without profile as not verified users (\#862);
+* Added support for oneOf and discriminator (\#867);
+* Added resource filter on admin task and task-group pages (\#867);
 
 # 1.20.0
 
