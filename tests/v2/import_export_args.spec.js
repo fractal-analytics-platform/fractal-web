@@ -152,7 +152,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		expect(data.args_parallel).toEqual(null);
 		const newData = { args_non_parallel: { test_non_parallel: 'value_non_parallel-updated' } };
 		await importValidArgs(page, file, newData);
-		await expect(await page.getByRole('textbox', { name: 'test_non_parallel' })).toHaveValue(
+		await expect(page.getByRole('textbox', { name: 'test_non_parallel' })).toHaveValue(
 			'value_non_parallel-updated'
 		);
 		await workflow.removeCurrentTask();

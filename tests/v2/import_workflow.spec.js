@@ -20,17 +20,17 @@ test('Import workflow', async ({ page, project }) => {
 		expect(await page.getByRole('button', { name: 'Create empty workflow' }).count()).toEqual(1);
 	});
 
-	let importWorkflowBtn;
+	let importWorkflowBtn = page.getByRole('button', { name: 'Import workflow', exact: true });
+
 	await test.step('Attempt to import workflow using invalid JSON', async () => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Import workflow from file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
-		importWorkflowBtn = page.getByRole('button', { name: 'Import workflow' });
 		await importWorkflowBtn.waitFor();
 		await expect(page.getByRole('button', { name: 'Create empty workflow' })).toHaveCount(0);
 		await importWorkflowBtn.click();
-		expect(await page.getByText('The workflow file is not a valid JSON file').count()).toEqual(1);
+		await expect(page.getByText('The workflow file is not a valid JSON file')).toBeVisible();
 	});
 
 	await test.step('Attempt to import workflow using invalid fractal_tasks_core version', async () => {
@@ -62,7 +62,7 @@ test('Import workflow', async ({ page, project }) => {
 		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
-		expect(await page.locator('.breadcrumb-item.active').innerText()).toEqual(randomWorkflowName1);
+		await expect(page.locator('.breadcrumb-item.active')).toContainText(randomWorkflowName1);
 	});
 
 	await test.step('Go back to project page', async () => {
@@ -77,7 +77,7 @@ test('Import workflow', async ({ page, project }) => {
 		const modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
 		await expect(modalTitle).toHaveText('Create new workflow');
-		expect(await page.getByRole('button', { name: 'Create empty workflow' }).count()).toEqual(1);
+		await expect(page.getByRole('button', { name: 'Create empty workflow' })).toBeVisible();
 	});
 
 	const randomWorkflowName2 = Math.random().toString(36).substring(7);
@@ -99,7 +99,7 @@ test('Import workflow', async ({ page, project }) => {
 		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
-		expect(await page.locator('.breadcrumb-item.active').innerText()).toEqual(randomWorkflowName2);
+		await expect(page.locator('.breadcrumb-item.active')).toContainText(randomWorkflowName2);
 	});
 
 	await test.step('Go back to project page', async () => {
@@ -109,12 +109,12 @@ test('Import workflow', async ({ page, project }) => {
 
 	await test.step('Filter workflows', async () => {
 		const workflowTable = page.getByRole('table').nth(1).locator('tbody');
-		expect(await workflowTable.getByRole('row').count()).toEqual(2);
+		await expect(workflowTable.getByRole('row')).toHaveCount(2);
 		await page.getByPlaceholder('Search workflow').fill(randomWorkflowName1);
-		expect(await workflowTable.getByRole('row').count()).toEqual(1);
-		expect(await workflowTable.getByRole('row').first().innerText()).toContain(randomWorkflowName1);
+		await expect(workflowTable.getByRole('row')).toHaveCount(1);
+		await expect(workflowTable.getByRole('row').first()).toContainText(randomWorkflowName1);
 		await page.getByPlaceholder('Search workflow').fill(randomWorkflowName2);
-		expect(await workflowTable.getByRole('row').count()).toEqual(1);
-		expect(await workflowTable.getByRole('row').first().innerText()).toContain(randomWorkflowName2);
+		await expect(workflowTable.getByRole('row')).toHaveCount(1);
+		await expect(workflowTable.getByRole('row').first()).toContainText(randomWorkflowName2);
 	});
 });
