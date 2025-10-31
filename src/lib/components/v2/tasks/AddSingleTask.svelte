@@ -10,19 +10,18 @@
 		isParallelType,
 		normalizePayload,
 		SchemaValidator,
-
 		stripDiscriminator
-
 	} from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { addNewTasks, user } = $props();
+	let { addNewTasks, user, defaultGroupName } = $props();
 
 	let taskSuccessMessage = $state('');
 
@@ -650,6 +649,7 @@
 	<TaskGroupSelector
 		id="add-single-task"
 		groupIdsNames={user.group_ids_names || []}
+		{defaultGroupName}
 		bind:privateTask
 		bind:selectedGroup
 	/>

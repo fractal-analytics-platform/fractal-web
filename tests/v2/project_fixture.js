@@ -67,14 +67,14 @@ export class PageWithProject {
 	}
 }
 
-const projectTest = baseTest.extend({
+const projectTest = baseTest.extend(/** @type {any} */ ({
 	project: async ({ page }, use) => {
 		const project = new PageWithProject(page);
 		await project.createProject();
 		await use(project);
 		await project.deleteProject();
 	}
-});
+}));
 
-export const test = mergeTests(baseTest, projectTest);
+export const test = /** @type {any} */ (mergeTests(baseTest, projectTest));
 export const expect = test.expect;

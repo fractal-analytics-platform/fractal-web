@@ -8,10 +8,11 @@
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
 	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupV2) => void} updateEditedTaskGroup
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { groupIdsNames, updateEditedTaskGroup } = $props();
+	let { groupIdsNames, updateEditedTaskGroup, defaultGroupName } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -90,6 +91,7 @@
 						<TaskGroupSelector
 							id="edit-{taskGroup.id}"
 							{groupIdsNames}
+							{defaultGroupName}
 							bind:privateTask
 							bind:selectedGroup
 							wrapperClass="mb-1"
