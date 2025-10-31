@@ -5,6 +5,7 @@
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
 	 * @property {string} id
+	 * @property {string|null} defaultGroupName
 	 * @property {boolean} [privateTask]
 	 * @property {any} [selectedGroup]
 	 * @property {string} [wrapperClass]
@@ -14,6 +15,7 @@
 	let {
 		groupIdsNames,
 		id,
+		defaultGroupName,
 		privateTask = $bindable(false),
 		selectedGroup = $bindable(null),
 		wrapperClass = 'mt-3 mb-3'
@@ -25,7 +27,7 @@
 
 	function selectAllGroup() {
 		if (selectedGroup === null) {
-			const groupAll = groupIdsNames.find((i) => i[1] === 'All');
+			const groupAll = groupIdsNames.find((i) => i[1] === defaultGroupName);
 			if (groupAll) {
 				selectedGroup = groupAll[0];
 			}
@@ -60,11 +62,12 @@
 				<label class="form-check-label" for="taskSelectorPrivate-{id}">Private task</label>
 			</div>
 		</div>
-		{#if !privateTask}
+		{#if !privateTask && groupIdsNames.length > 0}
 			<div class="col-12">
 				<div class="input-group">
 					<label class="input-group-text" for="task-group-selector">Group</label>
 					<select class="form-select" id="task-group-selector" bind:value={selectedGroup}>
+						<option value={null}>Select...</option>
 						{#if groupIdsNames}
 							{#each groupIdsNames as [groupId, groupName] (groupId)}
 								<option value={groupId}>{groupName}</option>

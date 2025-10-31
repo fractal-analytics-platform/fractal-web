@@ -14,6 +14,8 @@
 	let group = $state(page.data.group);
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	const users = $derived(page.data.users);
+	/** @type {string|null} */
+	const defaultGroupName = $derived(page.data.defaultGroupName);
 
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToAdd = $state(null);
@@ -213,7 +215,7 @@
 			>
 				<div class="p-2">
 					{#each members as user (user.id)}
-						{#if group.name === 'All'}
+						{#if group.name === defaultGroupName}
 							<span class="badge text-bg-secondary me-2 mb-2 fw-normal fs-6">
 								{user.email}
 								{#if addingUser && addingUser.id === user.id}

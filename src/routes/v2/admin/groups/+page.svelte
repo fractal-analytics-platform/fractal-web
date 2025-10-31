@@ -8,6 +8,8 @@
 
 	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
 	let groups = $derived(page.data.groups);
+	/** @type {string|undefined} */
+	let defaultGroupName = $derived(page.data.defaultGroupName);
 
 	/** @type {Modal|undefined} */
 	let createGroupModal = $state();
@@ -105,7 +107,7 @@
 						<a href="/v2/admin/groups/{group.id}/edit" class="btn btn-primary">
 							<i class="bi bi-pencil"></i> Edit
 						</a>
-						{#if group.name !== 'All'}
+						{#if group.name !== defaultGroupName}
 							<ConfirmActionButton
 								modalId="confirmGroupDeleteModal{group.id}"
 								style="danger"

@@ -8,7 +8,7 @@ const logger = getLogger('settings API');
  * Fetches the settings from the server
  * @param {typeof fetch} fetch
  * @param {string} type
- * @returns {Promise<any>}
+ * @returns {Promise<Record<string, string>>}
  */
 export async function listSettings(fetch, type) {
 	logger.debug('Fetching the settings');

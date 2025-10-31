@@ -16,6 +16,7 @@
 * Handled user without profile as not verified users (\#862);
 * Added support for oneOf and discriminator (\#867);
 * Added resource filter on admin task and task-group pages (\#867);
+* Handled `FRACTAL_DEFAULT_GROUP_NAME` environment variable, to specify if a default group is used (\#870);
 
 # 1.20.0
 

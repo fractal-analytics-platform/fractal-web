@@ -8,7 +8,7 @@
 	} from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
+	import { getSortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
@@ -20,10 +20,11 @@
 	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
 	 * @property {(user: import('fractal-components/types/api').User) => Promise<Response>} saveUser
 	 * @property {string} runnerBackend
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { user = $bindable(), groups = [], saveUser, runnerBackend } = $props();
+	let { user = $bindable(), groups = [], saveUser, runnerBackend, defaultGroupName } = $props();
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	let editableUser = $state();
@@ -207,7 +208,7 @@
 		);
 
 		const newUserGroups = [...userGroups, ...selectedGroupToAdd];
-		newUserGroups.sort(sortGroupByNameAllFirstComparator);
+		newUserGroups.sort(getSortGroupByNameAllFirstComparator(defaultGroupName));
 
 		userGroups = newUserGroups;
 		selectedGroupIdsToAdd = [];
@@ -219,7 +220,7 @@
 	 */
 	function removeGroup(groupId) {
 		const newUserGroups = userGroups.filter((g) => g.id !== groupId);
-		newUserGroups.sort(sortGroupByNameAllFirstComparator);
+		newUserGroups.sort(getSortGroupByNameAllFirstComparator(defaultGroupName));
 		userGroups = newUserGroups;
 	}
 
@@ -283,7 +284,7 @@
 		userGroups =
 			editableUser?.group_ids_names
 				.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-				.sort(sortGroupByNameAllFirstComparator) || [];
+				.sort(getSortGroupByNameAllFirstComparator(defaultGroupName)) || [];
 	}
 
 	async function initProfile() {
@@ -427,17 +428,17 @@
 	}
 
 	function addSlurmAccount() {
-		if (editableUser){
-		editableUser.slurm_accounts = [...editableUser.slurm_accounts, ''];
-	}
+		if (editableUser) {
+			editableUser.slurm_accounts = [...editableUser.slurm_accounts, ''];
+		}
 	}
 
 	/**
 	 * @param {number} index
 	 */
 	function removeSlurmAccount(index) {
-		if (editableUser){
-		editableUser.slurm_accounts = editableUser.slurm_accounts.filter((_, i) => i !== index);
+		if (editableUser) {
+			editableUser.slurm_accounts = editableUser.slurm_accounts.filter((_, i) => i !== index);
 		}
 	}
 
@@ -452,7 +453,7 @@
 	let availableGroups = $derived(
 		groups
 			.filter((g) => !userGroups.map((ug) => ug.id).includes(g.id))
-			.sort(sortGroupByNameAllFirstComparator)
+			.sort(getSortGroupByNameAllFirstComparator(defaultGroupName))
 	);
 
 	let enableSave = $derived(
@@ -696,7 +697,9 @@
 								</button>
 							</div>
 						{/each}
-						<span class="invalid-feedback mb-2">{userFormSubmitted && $userValidationErrors['slurm_accounts']}</span>
+						<span class="invalid-feedback mb-2"
+							>{userFormSubmitted && $userValidationErrors['slurm_accounts']}</span
+						>
 						<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
 							<i class="bi bi-plus-circle"></i>
 							Add SLURM account
@@ -728,7 +731,7 @@
 							{#each userGroups as group (group.id)}
 								<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">
 									{group.name}
-									{#if group.name !== 'All'}
+									{#if group.name !== defaultGroupName}
 										<button
 											class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
 											type="button"

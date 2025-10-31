@@ -9,6 +9,8 @@
 	import TaskActivitiesTable from '$lib/components/v2/tasks/TaskActivitiesTable.svelte';
 
 	const user = $derived(page.data.user);
+	/** @type {string|null} */
+	const defaultGroupName = $derived(page.data.defaultGroupName);
 
 	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
 	let taskGroups = $state(page.data.taskGroups || []);
@@ -104,13 +106,13 @@
 
 	<div class="mt-3">
 		{#if packageType === 'pypi' || packageType === 'local'}
-			<TaskCollection {packageType} bind:this={taskCollectionComponent} {user} />
+			<TaskCollection {packageType} bind:this={taskCollectionComponent} {user} {defaultGroupName} />
 		{:else if packageType === 'single'}
-			<AddSingleTask addNewTasks={reloadTaskGroupsList} {user} />
+			<AddSingleTask addNewTasks={reloadTaskGroupsList} {defaultGroupName} {user} />
 		{:else if packageType === 'custom_env'}
-			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {user} />
+			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {defaultGroupName} {user} />
 		{:else if packageType === 'pixi'}
-			<PixiTask {user} />
+			<PixiTask {user} {defaultGroupName} />
 		{/if}
 	</div>
 
@@ -120,7 +122,7 @@
 		<h3 class="fw-light">Task List</h3>
 		<div class="col-12">
 			{#key taskGroups}
-				<TaskGroupsTable {taskGroups} {updateTaskGroups} {user} bind:expandedTaskGroupRow />
+				<TaskGroupsTable {taskGroups} {updateTaskGroups} {defaultGroupName} {user} bind:expandedTaskGroupRow />
 			{/key}
 		</div>
 	</div>

@@ -7,6 +7,7 @@ export async function load() {
 	logger.trace('Loading create user page');
 
 	return {
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
+		runnerBackend: env.FRACTAL_RUNNER_BACKEND,
+		defaultGroupName: env.FRACTAL_DEFAULT_GROUP_NAME ?? null
 	};
 }

@@ -14,10 +14,17 @@
 	 * @property {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} taskGroups
 	 * @property {string|undefined} expandedTaskGroupRow
 	 * @property {(updatedGroups: Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>) => void} updateTaskGroups
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { user, taskGroups, expandedTaskGroupRow = $bindable(), updateTaskGroups } = $props();
+	let {
+		user,
+		taskGroups,
+		expandedTaskGroupRow = $bindable(),
+		updateTaskGroups,
+		defaultGroupName
+	} = $props();
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default|undefined} */
 	let taskGroupInfoModal = $state();
@@ -236,6 +243,7 @@
 <TaskGroupEditModal
 	bind:this={taskGroupEditModal}
 	{updateEditedTaskGroup}
+	{defaultGroupName}
 	groupIdsNames={user.group_ids_names || []}
 />
 <TaskGroupManageModal bind:this={taskGroupManageModal} admin={false} />

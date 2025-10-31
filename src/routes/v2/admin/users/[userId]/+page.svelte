@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { sortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
+	import { getSortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
@@ -11,11 +11,13 @@
 	const groups = $derived(page.data.groups || []);
 	/** @type {string} */
 	const runnerBackend = $derived(page.data.runnerBackend);
+	/** @type {string|null} */
+	const defaultGroupName = $derived(page.data.defaultGroupName);
 
 	let userGroups = $derived(
 		user.group_ids_names
 			.map((ni) => groups.filter((g) => g.id === ni[0])[0])
-			.sort(sortGroupByNameAllFirstComparator)
+			.sort(getSortGroupByNameAllFirstComparator(defaultGroupName))
 	);
 </script>
 

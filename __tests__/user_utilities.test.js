@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import {
 	sortUsers,
-	sortGroupByNameAllFirstComparator,
+	getSortGroupByNameAllFirstComparator,
 	sortUserToImportSettings
 } from '$lib/components/admin/user_utilities';
 import { mockGroup, mockUser } from './mock/mock-types';
@@ -43,7 +43,7 @@ it('should sort groups by name, but keeping the All group first', () => {
 		mockGroup({ id: 3, name: 'g3' })
 	];
 
-	groups.sort(sortGroupByNameAllFirstComparator);
+	groups.sort(getSortGroupByNameAllFirstComparator('All'));
 
 	expect(groups[0].name).eq('All');
 	expect(groups[1].name).eq('g2');

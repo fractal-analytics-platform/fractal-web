@@ -10,10 +10,11 @@
 	 * @typedef {Object} Props
 	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { addNewTasks, user } = $props();
+	let { addNewTasks, user, defaultGroupName } = $props();
 
 	let python_interpreter = $state('');
 	let label = $state('');
@@ -280,6 +281,7 @@
 	<TaskGroupSelector
 		id="custom-env-task"
 		groupIdsNames={user.group_ids_names || []}
+		{defaultGroupName}
 		bind:privateTask
 		bind:selectedGroup
 	/>

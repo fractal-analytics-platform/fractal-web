@@ -6,10 +6,11 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { user } = $props();
+	let { user, defaultGroupName } = $props();
 
 	/** @type {FileList|null} */
 	let tarFiles = $state(null);
@@ -130,6 +131,7 @@
 			<TaskGroupSelector
 				id="task-collection"
 				groupIdsNames={user.group_ids_names || []}
+				{defaultGroupName}
 				bind:privateTask
 				bind:selectedGroup
 			/>

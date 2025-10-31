@@ -8,10 +8,11 @@
 	 * @typedef {Object} Props
 	 * @property {'pypi'|'local'} [packageType]
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { packageType = 'pypi', user } = $props();
+	let { packageType = 'pypi', user, defaultGroupName } = $props();
 
 	let python_package = $state('');
 	let package_version = $state('');
@@ -89,7 +90,7 @@
 		}
 
 		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
-		if (!privateTask) {
+		if (!privateTask && selectedGroup) {
 			url += `&user_group_id=${selectedGroup}`;
 		}
 
@@ -360,6 +361,7 @@
 		<TaskGroupSelector
 			id="task-collection"
 			groupIdsNames={user.group_ids_names || []}
+			{defaultGroupName}
 			bind:privateTask
 			bind:selectedGroup
 		/>

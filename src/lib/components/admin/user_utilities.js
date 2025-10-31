@@ -27,17 +27,22 @@ export function sortUsers(users, currentAdminId, prioritizeSuperusers = true) {
 }
 
 /**
- * Sort groups by name, but keeping the All group first.
- * @param {import('fractal-components/types/api').Group} g1
- * @param {import('fractal-components/types/api').Group} g2
+ * @param {string | null} defaultGroupName
  */
-export const sortGroupByNameAllFirstComparator = function (g1, g2) {
-	return g1.name === 'All'
-		? -1
-		: g2.name === 'All'
-		? 1
-		: g1.name.localeCompare(g2.name, undefined, { sensitivity: 'base' });
-};
+export function getSortGroupByNameAllFirstComparator(defaultGroupName) {
+	/**
+	 * Sort groups by name, but keeping the All group first.
+	 * @param {import('fractal-components/types/api').Group} g1
+	 * @param {import('fractal-components/types/api').Group} g2
+	 */
+	return function (g1, g2) {
+		return g1.name === defaultGroupName
+			? -1
+			: g2.name === defaultGroupName
+				? 1
+				: g1.name.localeCompare(g2.name, undefined, { sensitivity: 'base' });
+	};
+}
 
 /**
  * @param {Array<import('fractal-components/types/api').User & {id: number}>} users
@@ -69,7 +74,8 @@ export const sortUserToImportSettings = function (users, desiredGroups, allGroup
  * @param {number} currentUserId
  */
 export function sortDropdownUsers(users, currentUserId) {
-	const usersCopy = /** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
+	const usersCopy =
+		/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
 	sortUsers(usersCopy, currentUserId, false);
 	return usersCopy;
 }

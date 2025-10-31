@@ -33,7 +33,8 @@ describe('AddSingleTask', () => {
 		render(AddSingleTask, {
 			props: {
 				user: mockedUser,
-				addNewTasks: vi.fn()
+				addNewTasks: vi.fn(),
+				defaultGroupName: 'All'
 			}
 		});
 
@@ -68,7 +69,8 @@ describe('AddSingleTask', () => {
 		render(AddSingleTask, {
 			props: {
 				user: mockedUser,
-				addNewTasks: vi.fn()
+				addNewTasks: vi.fn(),
+				defaultGroupName: 'All'
 			}
 		});
 

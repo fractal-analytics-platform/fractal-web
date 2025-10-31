@@ -73,6 +73,7 @@ jobs:
         run: npx playwright test
         env:
           FRACTAL_RUNNER_BACKEND: local
+          FRACTAL_DEFAULT_GROUP_NAME: All
 
       - name: Archive test results
         if: always()

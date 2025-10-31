@@ -14,6 +14,8 @@
 	const groups = $derived(page.data.groups || []);
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	const resources = $derived(page.data.resources || []);
+	/** @type {string|null} */
+	const defaultGroupName = $derived(page.data.defaultGroupName);
 
 	let user_id = $state('');
 	let user_group_id = $state('');
@@ -403,6 +405,7 @@
 </div>
 
 <TaskGroupEditModal
+	{defaultGroupName}
 	bind:this={taskGroupEditModal}
 	updateEditedTaskGroup={searchTaskGroups}
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
