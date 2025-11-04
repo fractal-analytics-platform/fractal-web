@@ -1,11 +1,16 @@
 <div class="container mt-3">
 	<div class="row">
 		<div class="col">
-			<h2 class="fw-light">Settings</h2>
+			<h2 class="fw-light">Settings and Computational Area</h2>
 
 			<a href="/v2/admin/settings" class="btn btn-primary me-2">
 				<i class="bi bi-gear-fill"></i>
 				Settings
+			</a>
+
+			<a href="/v2/admin/resources" class="btn btn-primary me-2">
+				<i class="bi bi-diagram-2"></i>
+				Resources
 			</a>
 
 			<h2 class="fw-light mt-3">Users</h2>
@@ -54,13 +59,6 @@
 			<a href="/v2/admin/accounting" class="btn btn-primary me-2">
 				<i class="bi bi-search"></i>
 				Accounting
-			</a>
-
-			<h2 class="fw-light mt-3">Computational Area</h2>
-
-			<a href="/v2/admin/resources" class="btn btn-primary me-2">
-				<i class="bi bi-diagram-2"></i>
-				Resources
 			</a>
 		</div>
 	</div>
