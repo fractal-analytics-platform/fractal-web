@@ -172,14 +172,14 @@ function mergeProperty(parentObject, key, value) {
  * @param {any} parentObject
  * @returns {object}
  */
-export function stripDiscriminator(jschema, parentObject = null) {
-	if (parentObject === null) {
+export function stripDiscriminator(jschema, parentObject = null, initialized = false) {
+	if (!initialized) {
 		parentObject = deepCopy(jschema);
 	}
 	if (Array.isArray(parentObject)) {
 		const adaptedArray = [];
 		for (const item of parentObject) {
-			adaptedArray.push(stripDiscriminator(jschema, item));
+			adaptedArray.push(stripDiscriminator(jschema, item, true));
 		}
 		return adaptedArray;
 	} else if (isObject(parentObject)) {
@@ -188,7 +188,7 @@ export function stripDiscriminator(jschema, parentObject = null) {
 			const discriminator =
 				key === 'discriminator' && 'oneOf' in parentObject && isDiscriminator(child);
 			if (!discriminator) {
-				adaptedObject[key] = stripDiscriminator(jschema, child);
+				adaptedObject[key] = stripDiscriminator(jschema, child, true);
 			}
 		}
 		return adaptedObject;
