@@ -139,15 +139,17 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 }
 
-const workflowTest = baseTest.extend({
-	workflow: async ({ page, request }, use) => {
-		const workflow = new PageWithWorkflow(page, request);
-		await workflow.createProject();
-		await workflow.createWorkflow();
-		await use(workflow);
-		await workflow.deleteProject();
-	}
-});
+const workflowTest = baseTest.extend(
+	/** @type {any} */ ({
+		workflow: async ({ page, request }, use) => {
+			const workflow = new PageWithWorkflow(page, request);
+			await workflow.createProject();
+			await workflow.createWorkflow();
+			await use(workflow);
+			await workflow.deleteProject();
+		}
+	})
+);
 
-export const test = mergeTests(baseTest, workflowTest);
+export const test = /** @type {any} */ (mergeTests(baseTest, workflowTest));
 export const expect = test.expect;

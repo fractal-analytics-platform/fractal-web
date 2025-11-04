@@ -10,19 +10,18 @@
 		isParallelType,
 		normalizePayload,
 		SchemaValidator,
-
 		stripDiscriminator
-
 	} from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { addNewTasks, user } = $props();
+	let { addNewTasks, user, defaultGroupName } = $props();
 
 	let taskSuccessMessage = $state('');
 
@@ -39,6 +38,8 @@
 	let taskType = $state('non_parallel');
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 
 	/** @type {TypesEditor|undefined} */
 	let typesEditor = $state();
@@ -95,7 +96,7 @@
 
 		const typesValid = typesEditor?.validate();
 
-		if (Object.keys($validationErrors).length > 0 || !typesValid) {
+		if (Object.keys($validationErrors).length > 0 || !typesValid || !taskGroupSelector?.validate()) {
 			return;
 		}
 
@@ -650,8 +651,10 @@
 	<TaskGroupSelector
 		id="add-single-task"
 		groupIdsNames={user.group_ids_names || []}
+		{defaultGroupName}
 		bind:privateTask
 		bind:selectedGroup
+		bind:this={taskGroupSelector}
 	/>
 
 	<div class="row">

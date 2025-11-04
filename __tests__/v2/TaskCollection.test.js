@@ -62,7 +62,7 @@ describe('TaskCollection', () => {
 			});
 
 		render(TaskCollection, {
-			props: { user: mockedUser }
+			props: { user: mockedUser, defaultGroupName: 'All' }
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Package' }), 'test-task');
@@ -94,7 +94,7 @@ describe('TaskCollection', () => {
 			});
 
 		render(TaskCollection, {
-			props: { user: mockedUser }
+			props: { user: mockedUser, defaultGroupName: 'All' }
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Package' }), 'test-task');
@@ -124,7 +124,7 @@ describe('TaskCollection', () => {
 			});
 
 		render(TaskCollection, {
-			props: { user: mockedUser }
+			props: { user: mockedUser, defaultGroupName: 'All' }
 		});
 
 		const addPpvBtn = screen.getByRole('button', { name: 'Add pinned package version' });

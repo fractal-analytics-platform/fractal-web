@@ -5,6 +5,7 @@
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
 	 * @property {string} id
+	 * @property {string|null} defaultGroupName
 	 * @property {boolean} [privateTask]
 	 * @property {any} [selectedGroup]
 	 * @property {string} [wrapperClass]
@@ -14,22 +15,40 @@
 	let {
 		groupIdsNames,
 		id,
+		defaultGroupName,
 		privateTask = $bindable(false),
 		selectedGroup = $bindable(null),
 		wrapperClass = 'mt-3 mb-3'
 	} = $props();
 
+	let validationError = $state('');
+
 	onMount(() => {
-		selectAllGroup();
+		selectDefaultGroup();
 	});
 
-	function selectAllGroup() {
+	function selectDefaultGroup() {
 		if (selectedGroup === null) {
-			const groupAll = groupIdsNames.find((i) => i[1] === 'All');
+			const groupAll = groupIdsNames.find((i) => i[1] === defaultGroupName);
 			if (groupAll) {
 				selectedGroup = groupAll[0];
+			} else if (groupIdsNames.length === 1) {
+				selectedGroup = groupIdsNames[0][0];
 			}
 		}
+	}
+
+	export function validate() {
+		validationError = '';
+		if (!privateTask && selectedGroup === null) {
+			validationError = 'Shared tasks must be associated with a group';
+			return false;
+		}
+		return true;
+	}
+
+	export function clear() {
+		validationError = '';
 	}
 </script>
 
@@ -44,7 +63,10 @@
 					id="taskSelectorShared-{id}"
 					value={false}
 					bind:group={privateTask}
-					onchange={selectAllGroup}
+					onchange={() => {
+						validationError = '';
+						selectDefaultGroup();
+					}}
 				/>
 				<label class="form-check-label" for="taskSelectorShared-{id}">Shared task</label>
 			</div>
@@ -55,6 +77,7 @@
 					name="privateTaskSelector-{id}"
 					id="taskSelectorPrivate-{id}"
 					value={true}
+					onchange={() => (validationError = '')}
 					bind:group={privateTask}
 				/>
 				<label class="form-check-label" for="taskSelectorPrivate-{id}">Private task</label>
@@ -64,7 +87,13 @@
 			<div class="col-12">
 				<div class="input-group">
 					<label class="input-group-text" for="task-group-selector">Group</label>
-					<select class="form-select" id="task-group-selector" bind:value={selectedGroup}>
+					<select
+						class="form-select"
+						id="task-group-selector"
+						bind:value={selectedGroup}
+						class:is-invalid={validationError}
+					>
+						<option value={null}>Select...</option>
 						{#if groupIdsNames}
 							{#each groupIdsNames as [groupId, groupName] (groupId)}
 								<option value={groupId}>{groupName}</option>
@@ -75,4 +104,9 @@
 			</div>
 		{/if}
 	</div>
+	{#if validationError}
+		<div class="row text-danger mt-2">
+			<div class="col">{validationError}</div>
+		</div>
+	{/if}
 </div>

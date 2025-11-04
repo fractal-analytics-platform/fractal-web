@@ -63,7 +63,8 @@ describe('UserEditor', () => {
 					slurm_accounts: [],
 					project_dir: null
 				},
-				saveUser: mockSaveUser
+				saveUser: mockSaveUser,
+				defaultGroupName: 'All'
 			}
 		});
 
@@ -109,7 +110,8 @@ describe('UserEditor', () => {
 					slurm_accounts: [],
 					project_dir: null
 				},
-				saveUser: mockSaveUser
+				saveUser: mockSaveUser,
+				defaultGroupName: 'All'
 			}
 		});
 
@@ -144,7 +146,8 @@ describe('UserEditor', () => {
 					slurm_accounts: [],
 					project_dir: '/path/to/project/dir'
 				},
-				saveUser: mockSaveUser
+				saveUser: mockSaveUser,
+				defaultGroupName: 'All'
 			}
 		});
 
@@ -185,7 +188,8 @@ describe('UserEditor', () => {
 					slurm_accounts: ['foo', 'bar'],
 					project_dir: '/path/to/project/dir'
 				},
-				saveUser: mockSaveUser
+				saveUser: mockSaveUser,
+				defaultGroupName: 'All'
 			}
 		});
 

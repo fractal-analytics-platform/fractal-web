@@ -9,6 +9,9 @@
 	/** @type {Array<import('fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups);
 
+	/** @type {string|null} */
+	const defaultGroupName = $derived(page.data.defaultGroupName);
+
 	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/**
@@ -57,5 +60,5 @@
 		</ol>
 	</nav>
 
-	<UserEditor {user} {groups} saveUser={save} {runnerBackend} />
+	<UserEditor {user} {groups} saveUser={save} {runnerBackend} {defaultGroupName} />
 </div>

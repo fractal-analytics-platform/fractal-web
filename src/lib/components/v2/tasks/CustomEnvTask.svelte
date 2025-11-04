@@ -10,10 +10,11 @@
 	 * @typedef {Object} Props
 	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { addNewTasks, user } = $props();
+	let { addNewTasks, user, defaultGroupName } = $props();
 
 	let python_interpreter = $state('');
 	let label = $state('');
@@ -23,6 +24,8 @@
 	let manifestData = null;
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 	let successMessage = $state('');
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-customEnvTask', [
@@ -102,7 +105,7 @@
 			headers.append('Content-Type', 'application/json');
 
 			let url = `/api/v2/task/collect/custom?private=${privateTask}`;
-			if (!privateTask) {
+			if (!privateTask && selectedGroup) {
 				url += `&user_group_id=${selectedGroup}`;
 			}
 
@@ -145,9 +148,11 @@
 <StandardDismissableAlert message={successMessage} />
 
 <form
-	onsubmit={(e) => {
+	onsubmit={async (e) => {
 		e.preventDefault();
-		handleCollect();
+		if (taskGroupSelector?.validate()) {
+			await handleCollect();
+		}
 	}}
 	class="mb-5"
 >
@@ -280,8 +285,10 @@
 	<TaskGroupSelector
 		id="custom-env-task"
 		groupIdsNames={user.group_ids_names || []}
+		{defaultGroupName}
 		bind:privateTask
 		bind:selectedGroup
+		bind:this={taskGroupSelector}
 	/>
 
 	<button type="submit" class="btn btn-primary" disabled={collecting}>

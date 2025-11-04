@@ -8,10 +8,11 @@
 	 * @typedef {Object} Props
 	 * @property {'pypi'|'local'} [packageType]
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { packageType = 'pypi', user } = $props();
+	let { packageType = 'pypi', user, defaultGroupName } = $props();
 
 	let python_package = $state('');
 	let package_version = $state('');
@@ -21,6 +22,8 @@
 	let pinnedPackageVersions = $state([]);
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 
 	/** @type {FileList|null} */
 	let wheelFiles = $state(null);
@@ -43,6 +46,7 @@
 		python_version = '';
 		package_extras = '';
 		pinnedPackageVersions = [];
+		taskGroupSelector?.clear();
 	}
 
 	let taskCollectionInProgress = $state(false);
@@ -89,7 +93,7 @@
 		}
 
 		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
-		if (!privateTask) {
+		if (!privateTask && selectedGroup) {
 			url += `&user_group_id=${selectedGroup}`;
 		}
 
@@ -161,7 +165,9 @@
 	<form
 		onsubmit={(e) => {
 			e.preventDefault();
-			handleTaskCollection();
+			if (taskGroupSelector?.validate()) {
+				handleTaskCollection();
+			}
 		}}
 	>
 		<div class="row">
@@ -251,6 +257,8 @@
 						<option>3.10</option>
 						<option>3.11</option>
 						<option>3.12</option>
+						<option>3.13</option>
+						<option>3.14</option>
 					</select>
 					<span class="invalid-feedback">{$validationErrors['python_version']}</span>
 				</div>
@@ -360,8 +368,10 @@
 		<TaskGroupSelector
 			id="task-collection"
 			groupIdsNames={user.group_ids_names || []}
+			{defaultGroupName}
 			bind:privateTask
 			bind:selectedGroup
+			bind:this={taskGroupSelector}
 		/>
 
 		<div id="taskCollectionError" class="mt-3"></div>

@@ -19,6 +19,7 @@ export async function load({ fetch, params }) {
 		user,
 		profile,
 		groups,
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
+		runnerBackend: env.FRACTAL_RUNNER_BACKEND,
+		defaultGroupName: env.FRACTAL_DEFAULT_GROUP_NAME ?? null
 	};
 }

@@ -278,67 +278,97 @@ describe('jschema_adapter', () => {
 			title: 'ProcessTask'
 		});
 
-		expect(JSON.stringify(cleanJschema)).eq(
-			JSON.stringify({
-				$defs: {
-					ProcessAModel: {
-						description: 'A process model with the same parameter name as ProcessBModel.',
-						properties: {
-							step: {
-								const: 'ProcessA',
-								title: 'Step',
-								type: 'string',
-								description: 'A literal to identify the process type.'
-							},
-							parameter1: {
-								title: 'Parameter1',
-								type: 'number',
-								description: 'An integer parameter in A.'
-							}
+		expect(cleanJschema).deep.eq({
+			$defs: {
+				ProcessAModel: {
+					description: 'A process model with the same parameter name as ProcessBModel.',
+					properties: {
+						step: {
+							const: 'ProcessA',
+							title: 'Step',
+							type: 'string',
+							description: 'A literal to identify the process type.'
 						},
-						required: ['step', 'parameter1'],
-						title: 'ProcessAModel',
-						type: 'object'
+						parameter1: {
+							title: 'Parameter1',
+							type: 'number',
+							description: 'An integer parameter in A.'
+						}
 					},
-					ProcessBModel: {
-						description: 'B process model with the same parameter name as ProcessAModel.',
-						properties: {
-							step: {
-								const: 'ProcessB',
-								title: 'Step',
-								type: 'string',
-								description: 'A literal to identify the process type.'
-							},
-							parameter1: {
-								title: 'Parameter1',
-								type: 'number',
-								description: 'An integer parameter in B.'
-							}
+					required: ['step', 'parameter1'],
+					title: 'ProcessAModel',
+					type: 'object'
+				},
+				ProcessBModel: {
+					description: 'B process model with the same parameter name as ProcessAModel.',
+					properties: {
+						step: {
+							const: 'ProcessB',
+							title: 'Step',
+							type: 'string',
+							description: 'A literal to identify the process type.'
 						},
-						required: ['step', 'parameter1'],
-						title: 'ProcessBModel',
-						type: 'object'
+						parameter1: {
+							title: 'Parameter1',
+							type: 'number',
+							description: 'An integer parameter in B.'
+						}
+					},
+					required: ['step', 'parameter1'],
+					title: 'ProcessBModel',
+					type: 'object'
+				}
+			},
+			additionalProperties: false,
+			properties: {
+				proc_step: {
+					oneOf: [
+						{
+							$ref: '#/$defs/ProcessAModel'
+						},
+						{
+							$ref: '#/$defs/ProcessBModel'
+						}
+					],
+					title: 'Proc Step',
+					description: 'The processing step to apply.'
+				}
+			},
+			required: ['proc_step'],
+			type: 'object',
+			title: 'ProcessTask'
+		});
+	});
+
+	it('Strip discriminator, schema with default null value (ref #871)', () => {
+		const schema = stripDiscriminator({
+			properties: {
+				advanced_options: {
+					type: 'object',
+					properties: {
+						position_scale: { type: 'number' }
+					},
+					default: {
+						position_scale: null
 					}
-				},
-				additionalProperties: false,
-				properties: {
-					proc_step: {
-						oneOf: [
-							{
-								$ref: '#/$defs/ProcessAModel'
-							},
-							{
-								$ref: '#/$defs/ProcessBModel'
-							}
-						],
-						title: 'Proc Step',
-						description: 'The processing step to apply.'
+				}
+			},
+			type: 'object'
+		});
+
+		expect(schema).deep.eq({
+			properties: {
+				advanced_options: {
+					type: 'object',
+					properties: {
+						position_scale: { type: 'number' }
+					},
+					default: {
+						position_scale: null
 					}
-				},
-				required: ['proc_step'],
-				type: 'object',
-				title: 'ProcessTask'
-			})
-		);
+				}
+			},
+			type: 'object'
+		});
 	});
 });

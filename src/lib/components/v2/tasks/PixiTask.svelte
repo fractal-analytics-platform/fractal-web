@@ -6,10 +6,11 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User} user
+	 * @property {string|null} defaultGroupName
 	 */
 
 	/** @type {Props} */
-	let { user } = $props();
+	let { user, defaultGroupName } = $props();
 
 	/** @type {FileList|null} */
 	let tarFiles = $state(null);
@@ -19,6 +20,8 @@
 	let version = $state('');
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 
 	let taskCollectionInProgress = $state(false);
 
@@ -51,7 +54,7 @@
 		}
 
 		let url = `/api/v2/task/collect/pixi?private=${privateTask}`;
-		if (!privateTask) {
+		if (!privateTask && selectedGroup) {
 			url += `&user_group_id=${selectedGroup}`;
 		}
 
@@ -80,7 +83,9 @@
 <form
 	onsubmit={(e) => {
 		e.preventDefault();
-		handlePixiCollection();
+		if (taskGroupSelector?.validate()) {
+			handlePixiCollection();
+		}
 	}}
 >
 	<div class="row">
@@ -130,8 +135,10 @@
 			<TaskGroupSelector
 				id="task-collection"
 				groupIdsNames={user.group_ids_names || []}
+				{defaultGroupName}
 				bind:privateTask
 				bind:selectedGroup
+				bind:this={taskGroupSelector}
 			/>
 		</div>
 	</div>
