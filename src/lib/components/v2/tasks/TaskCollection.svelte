@@ -22,6 +22,8 @@
 	let pinnedPackageVersions = $state([]);
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 
 	/** @type {FileList|null} */
 	let wheelFiles = $state(null);
@@ -44,6 +46,7 @@
 		python_version = '';
 		package_extras = '';
 		pinnedPackageVersions = [];
+		taskGroupSelector?.clear();
 	}
 
 	let taskCollectionInProgress = $state(false);
@@ -162,7 +165,9 @@
 	<form
 		onsubmit={(e) => {
 			e.preventDefault();
-			handleTaskCollection();
+			if (taskGroupSelector?.validate()) {
+				handleTaskCollection();
+			}
 		}}
 	>
 		<div class="row">
@@ -364,6 +369,7 @@
 			{defaultGroupName}
 			bind:privateTask
 			bind:selectedGroup
+			bind:this={taskGroupSelector}
 		/>
 
 		<div id="taskCollectionError" class="mt-3"></div>

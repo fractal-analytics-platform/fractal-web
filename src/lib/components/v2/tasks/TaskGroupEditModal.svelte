@@ -23,6 +23,8 @@
 	let privateTask = $state(false);
 	/** @type {number|undefined} */
 	let selectedGroup = $state();
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 
 	let saving = $state(false);
 
@@ -42,6 +44,9 @@
 	}
 
 	async function handleUpdate() {
+		if (!taskGroupSelector?.validate()) {
+			return;
+		}
 		modal?.confirmAndHide(
 			async () => {
 				saving = true;
@@ -94,6 +99,7 @@
 							{defaultGroupName}
 							bind:privateTask
 							bind:selectedGroup
+							bind:this={taskGroupSelector}
 							wrapperClass="mb-1"
 						/>
 					{/key}

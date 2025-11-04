@@ -24,6 +24,8 @@
 	let manifestData = null;
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 	let successMessage = $state('');
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-customEnvTask', [
@@ -103,7 +105,7 @@
 			headers.append('Content-Type', 'application/json');
 
 			let url = `/api/v2/task/collect/custom?private=${privateTask}`;
-			if (!privateTask) {
+			if (!privateTask && selectedGroup) {
 				url += `&user_group_id=${selectedGroup}`;
 			}
 
@@ -146,9 +148,11 @@
 <StandardDismissableAlert message={successMessage} />
 
 <form
-	onsubmit={(e) => {
+	onsubmit={async (e) => {
 		e.preventDefault();
-		handleCollect();
+		if (taskGroupSelector?.validate()) {
+			await handleCollect();
+		}
 	}}
 	class="mb-5"
 >
@@ -284,6 +288,7 @@
 		{defaultGroupName}
 		bind:privateTask
 		bind:selectedGroup
+		bind:this={taskGroupSelector}
 	/>
 
 	<button type="submit" class="btn btn-primary" disabled={collecting}>

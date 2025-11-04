@@ -38,6 +38,8 @@
 	let taskType = $state('non_parallel');
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
+	/** @type {TaskGroupSelector|undefined} */
+	let taskGroupSelector = $state();
 
 	/** @type {TypesEditor|undefined} */
 	let typesEditor = $state();
@@ -94,7 +96,7 @@
 
 		const typesValid = typesEditor?.validate();
 
-		if (Object.keys($validationErrors).length > 0 || !typesValid) {
+		if (Object.keys($validationErrors).length > 0 || !typesValid || !taskGroupSelector?.validate()) {
 			return;
 		}
 
@@ -652,6 +654,7 @@
 		{defaultGroupName}
 		bind:privateTask
 		bind:selectedGroup
+		bind:this={taskGroupSelector}
 	/>
 
 	<div class="row">
