@@ -526,7 +526,7 @@
 			{:else if mode === 'continue'}
 				Continue workflow
 			{:else}
-				Restart workflow
+				Reset workflow
 			{/if}
 		</h5>
 	{/snippet}
@@ -535,10 +535,10 @@
 		<form id="runWorkflowForm">
 			{#if mode === 'restart'}
 				<div class="alert alert-warning">
-					<strong>WARNING</strong>: Restarting a workflow will create a new dataset and optionally
-					delete the old dataset with its image list, filters & history. It does not remove the
-					existing Zarr data though. Either remove it yourself before rerunning or set the overwrite
-					option to True in the corresponding tasks.
+					<strong>WARNING</strong>: Restarting a workflow will reset your dataset and its processing
+					history. It deletes the existing dataset and creates a new one. Thus, you should only
+					restart a workflow if you don't need access anymore to the dataset and its processing
+					history. Be aware that resetting the dataset will not remove the on-disk Zarr data though.
 				</div>
 			{/if}
 			{#if mode === 'restart'}
@@ -600,7 +600,7 @@
 						name="firstTaskIndex"
 						id="firstTaskIndex"
 						class="form-select"
-						disabled={checkingConfiguration}
+						disabled={checkingConfiguration || mode === 'restart'}
 						bind:value={firstTaskIndex}
 						onchange={firstTaskIndexChanged}
 						class:is-invalid={mode === 'continue' && firstTaskIndex === undefined}
