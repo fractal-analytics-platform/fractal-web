@@ -742,22 +742,26 @@
 							<i class="bi-play-fill"></i> Run workflow
 						</button>
 					{:else}
-						<button
-							class="btn btn-success"
-							onclick={() => openRunWorkflowModal('continue')}
-							type="button"
-							disabled={workflow.task_list.length === 0}
-						>
-							<i class="bi-play-fill"></i> Continue workflow
-						</button>
-						<button
-							class="btn btn-primary"
-							onclick={() => openRunWorkflowModal('restart')}
-							type="button"
-							disabled={workflow.task_list.length === 0}
-						>
-							<i class="bi bi-arrow-clockwise"></i> Restart workflow
-						</button>
+						<div class="d-flex mb-2">
+							<div>
+								<button
+									class="btn btn-success mb-1"
+									onclick={() => openRunWorkflowModal('continue')}
+									type="button"
+									disabled={workflow.task_list.length === 0}
+								>
+									<i class="bi-play-fill"></i> Continue workflow
+								</button>
+								<button
+									class="btn btn-warning ms-1 mb-1"
+									onclick={() => openRunWorkflowModal('restart')}
+									type="button"
+									disabled={workflow.task_list.length === 0}
+								>
+									<i class="bi bi-exclamation-diamond"></i> Reset workflow
+								</button>
+							</div>
+						</div>
 					{/if}
 				</div>
 			</div>

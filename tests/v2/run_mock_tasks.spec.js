@@ -191,8 +191,8 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
 	});
 
-	await test.step('Restart the workflow replacing dataset', async () => {
-		await page.getByRole('button', { name: 'Restart workflow' }).click();
+	await test.step('Reset the workflow replacing dataset', async () => {
+		await page.getByRole('button', { name: 'Reset workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await expect(
@@ -223,8 +223,8 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		fs.rmSync(`/tmp/playwright/datasets/${datasetName2}`, { recursive: true });
 	});
 
-	await test.step('Restart the workflow creating a new dataset', async () => {
-		await page.getByRole('button', { name: 'Restart workflow' }).click();
+	await test.step('Reset the workflow creating a new dataset', async () => {
+		await page.getByRole('button', { name: 'Reset workflow' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByRole('checkbox', { name: 'Replace existing dataset' }).uncheck();

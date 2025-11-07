@@ -33,12 +33,10 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 	});
 
-	/** @type {number} */
-	let total;
 	await test.step('Search tasks without filters', async () => {
 		await searchTasks(page);
 		await expect(page.getByRole('table')).toBeVisible();
-		total = await page.getByRole('row').count();
+		const total = await page.getByRole('row').count();
 		expect(total).toBeGreaterThan(0);
 		await reset(page);
 	});
@@ -79,6 +77,13 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 	});
 
+	await test.step('Search tasks by type', async () => {
+		await reset(page);
+		await page.getByRole('combobox', { name: 'Task type' }).selectOption('non_parallel');
+		await searchTasks(page);
+		await expect(page.getByRole('row', { name: 'non_parallel' }).first()).toBeVisible();
+	});
+
 	await test.step('Cleanup test tasks', async () => {
 		await workflow.openWorkflowPage();
 		await workflow.selectTask(taskName);
@@ -91,8 +96,6 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
  * @param {import('@playwright/test').Page} page
  */
 async function searchTasks(page) {
-	// Increasing the results limit since during the tests many tasks may have been created
-	await page.getByRole('spinbutton', { name: 'Max number of results' }).fill('500');
 	await page.getByRole('button', { name: 'Search tasks' }).click();
 }
 

@@ -2,13 +2,14 @@
 	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { PropertyDescription } from 'fractal-components';
 
 	let name = $state('');
 	let id = $state('');
 	let version = $state('');
 	let resource = $state('');
-	let max_number_of_results = $state('25');
+	let taskType = $state('');
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	const resources = $derived(page.data.resources || []);
 
@@ -17,15 +18,22 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('fractal-components/types/api').TaskV2Info[]} */
-	let results = $state([]);
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info> | undefined} */
+	let results = $state();
+	let currentPage = $state(1);
+	let pageSize = $state(50);
+	let totalCount = $state(0);
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
 	/** @type {import('fractal-components/types/api').TaskV2Info|null} */
 	let selectedTaskInfo = $state(null);
 
-	async function searchTasks() {
+	/**
+	 * @param {number} selectedPage
+	 * @param {number} selectedPageSize
+	 */
+	async function searchTasks(selectedPage, selectedPageSize) {
 		searching = true;
 		try {
 			if (searchErrorAlert) {
@@ -44,9 +52,11 @@
 			if (resource) {
 				url.searchParams.append('resource_id', resource);
 			}
-			if (max_number_of_results) {
-				url.searchParams.append('max_number_of_results', max_number_of_results);
+			if (taskType) {
+				url.searchParams.append('task_type', taskType);
 			}
+			url.searchParams.append('page', selectedPage.toString());
+			url.searchParams.append('page_size', selectedPageSize.toString());
 			const response = await fetch(url);
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
@@ -57,6 +67,11 @@
 			}
 			searched = true;
 			results = await response.json();
+			if (results) {
+				currentPage = results.current_page;
+				pageSize = results.page_size;
+				totalCount = results.total_count;
+			}
 		} finally {
 			searching = false;
 		}
@@ -70,9 +85,12 @@
 		id = '';
 		version = '';
 		resource = '';
-		max_number_of_results = '25';
+		taskType = '';
 		searched = false;
-		results = [];
+		results = undefined;
+		currentPage = 1;
+		totalCount = 0;
+		pageSize = 50;
 	}
 
 	/**
@@ -169,25 +187,6 @@
 			</div>
 
 			<div class="row mt-lg-3">
-				<div class="col-xl-5 col-lg-6 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-7 col-lg-8 col-6 col-form-label">
-							<label for="max_number_of_results">Max number of results</label>
-							<PropertyDescription
-								description="Upper limit on the number of tasks in the response."
-								html={true}
-							/>
-						</div>
-						<div class="col-xl-4 col-lg-4 col-6">
-							<input
-								type="number"
-								class="form-control"
-								bind:value={max_number_of_results}
-								id="max_number_of_results"
-							/>
-						</div>
-					</div>
-				</div>
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -203,11 +202,32 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="task_type">Task type</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={taskType} id="task_type">
+								<option value="">Select...</option>
+								<option value="compound">compound</option>
+								<option value="converter_compound">converter_compound</option>
+								<option value="non_parallel">non_parallel</option>
+								<option value="converter_non_parallel">converter_non_parallel</option>
+								<option value="parallel">parallel</option>
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" onclick={searchTasks} disabled={searching}>
+	<button
+		class="btn btn-primary mt-4"
+		onclick={() => searchTasks(1, pageSize)}
+		disabled={searching}
+	>
 		{#if searching}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
@@ -222,16 +242,17 @@
 	<div id="searchError" class="mt-3 mb-3"></div>
 
 	<div class:d-none={!searched}>
-		<p class="text-center">
-			The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
-		</p>
+		{#if results && results.total_count === 0}
+			<p class="text-center">The query returned 0 matching results</p>
+		{/if}
 
-		{#if results.length > 0}
-			<table class="table tasks-table mt-4">
+		{#if results && results.items.length > 0}
+			<table class="table tasks-table mt-4 mb-4">
 				<colgroup>
 					<col width="60" />
 					<col width="auto" />
 					<col width="90" />
+					<col width="195" />
 					<col width="120" />
 					<col width="150" />
 					<col width="100" />
@@ -241,17 +262,19 @@
 						<th>Id</th>
 						<th>Name</th>
 						<th>Version</th>
+						<th>Type</th>
 						<th># Workflows</th>
 						<th># Users</th>
 						<th>Options</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each results as taskInfo, taskInfoIndex (taskInfoIndex)}
+					{#each results.items as taskInfo, taskInfoIndex (taskInfoIndex)}
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
 							<td>{taskInfo.task.id}</td>
 							<td>{taskInfo.task.name}</td>
 							<td>{taskInfo.task.version || '-'}</td>
+							<td>{taskInfo.task.type}</td>
 							<td>
 								{taskInfo.relationships.length || '-'}
 							</td>
@@ -284,6 +307,14 @@
 					{/each}
 				</tbody>
 			</table>
+
+			<Paginator
+				{currentPage}
+				{pageSize}
+				{totalCount}
+				singleLine={true}
+				onPageChange={(currentPage, pageSize) => searchTasks(currentPage, pageSize)}
+			/>
 		{/if}
 	</div>
 </div>

@@ -139,6 +139,9 @@
 	 * @param {Array<import('fractal-components/types/api').ApplyWorkflowV2>} jobs
 	 */
 	function getSortedJobs(jobs) {
+		if (admin) {
+			return jobs;
+		}
 		const sortedRows = [...jobs];
 		const sortColumns = columns.filter(
 			(c) => c.direction !== undefined && c.priority !== undefined && c.field
@@ -413,12 +416,14 @@
 						{#if column.field}
 							<th onclick={() => updateSortField(column)} style="cursor: pointer">
 								{column.label}
-								{#if column.direction === 'asc'}
-									↑
-								{:else if column.direction === 'desc'}
-									↓
-								{:else}
-									⇅
+								{#if !admin}
+									{#if column.direction === 'asc'}
+										↑
+									{:else if column.direction === 'desc'}
+										↓
+									{:else}
+										⇅
+									{/if}
 								{/if}
 							</th>
 						{:else}
@@ -480,23 +485,29 @@
 				<td>
 					<button
 						class="btn btn-info"
+						aria-label="Info"
 						onclick={(event) => {
 							event.preventDefault();
 							jobInfoModal.show(row);
 						}}
 					>
 						<i class="bi-info-circle"></i>
-						Info
+						{#if !admin}
+							Info
+						{/if}
 					</button>
 					<button
 						class="btn btn-light"
+						aria-label="Logs"
 						onclick={(event) => {
 							event.preventDefault();
 							jobLogsModal.show(row, admin);
 						}}
 					>
 						<i class="bi-list-columns-reverse"></i>
-						Logs
+						{#if !admin}
+							Logs
+						{/if}
 					</button>
 					{#if (admin && row.id) || (row.project_id !== null && row.user_email === currentUserEmail)}
 						<a

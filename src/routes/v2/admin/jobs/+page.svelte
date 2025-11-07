@@ -4,6 +4,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import Paginator from '$lib/components/common/Paginator.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 	import { normalizePayload } from 'fractal-components';
 
@@ -12,13 +13,17 @@
 
 	let searched = $state(false);
 	let searching = $state(false);
+	let processingCsv = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {JobsList|undefined} */
 	let jobsListComponent = $state();
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-	let jobs = $state([]);
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ApplyWorkflowV2> | undefined} */
+	let jobs = $state();
+	let currentPage = $state(1);
+	let pageSize = $state(50);
+	let totalCount = $state(0);
 
 	let status = $state();
 	let userId = $state();
@@ -42,8 +47,12 @@
 	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
 	 */
 	async function jobUpdater() {
+		if (!jobs) {
+			return [];
+		}
+
 		/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
-		const jobsToCheck = jobs.filter((j) => j.status === 'submitted');
+		const jobsToCheck = jobs.items.filter((j) => j.status === 'submitted');
 		/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
 		const updatedJobs = [];
 		for (const job of jobsToCheck) {
@@ -52,10 +61,11 @@
 			url.searchParams.append('id', job.id.toString());
 			const response = await fetch(url);
 			if (response.ok) {
-				updatedJobs.push((await response.json())[0]);
+				const { items } = await response.json();
+				updatedJobs.push(items[0]);
 			}
 		}
-		jobs = jobs.map((j) => {
+		jobs.items = jobs.items.map((j) => {
 			if (j.status === 'failed') {
 				// The admin has manually updated the job status while the AJAX call was in progress
 				return j;
@@ -63,51 +73,22 @@
 			const updatedJob = updatedJobs.find((uj) => uj.id === j.id);
 			return updatedJob ?? j;
 		});
-		return jobs;
+		return jobs.items;
 	}
 
-	async function searchJobs() {
+	/**
+	 * @param {number} selectedPage
+	 * @param {number} selectedPageSize
+	 */
+	async function searchJobs(selectedPage, selectedPageSize) {
 		searching = true;
 		try {
 			if (searchErrorAlert) {
 				searchErrorAlert.hide();
 			}
-			const url = new URL('/api/admin/v2/job', window.location.origin);
-			url.searchParams.append('log', 'false');
-			if (status) {
-				url.searchParams.append('status', status);
-			}
-			if (userId) {
-				url.searchParams.append('user_id', userId);
-			}
-			if (jobId) {
-				url.searchParams.append('id', jobId);
-			}
-			const startTimestampMin = getTimestamp(startDateMin, startTimeMin);
-			if (startTimestampMin) {
-				url.searchParams.append('start_timestamp_min', startTimestampMin);
-			}
-			const startTimestampMax = getTimestamp(startDateMax, startTimeMax);
-			if (startTimestampMax) {
-				url.searchParams.append('start_timestamp_max', startTimestampMax);
-			}
-			const endTimestampMin = getTimestamp(endDateMin, endTimeMin);
-			if (endTimestampMin) {
-				url.searchParams.append('end_timestamp_min', endTimestampMin);
-			}
-			const endTimestampMax = getTimestamp(endDateMax, endTimeMax);
-			if (endTimestampMax) {
-				url.searchParams.append('end_timestamp_max', endTimestampMax);
-			}
-			if (projectId) {
-				url.searchParams.append('project_id', projectId);
-			}
-			if (workflowId) {
-				url.searchParams.append('workflow_id', workflowId);
-			}
-			if (datasetId) {
-				url.searchParams.append('dataset_id', datasetId);
-			}
+			const url = getBaseJobsSearchUrl();
+			url.searchParams.append('page', selectedPage.toString());
+			url.searchParams.append('page_size', selectedPageSize.toString());
 			const response = await fetch(url);
 			if (!response.ok) {
 				searchErrorAlert = displayStandardErrorAlert(
@@ -118,10 +99,55 @@
 			}
 			searched = true;
 			jobs = await response.json();
-			jobsListComponent?.setJobs(jobs);
+			if (jobs) {
+				currentPage = jobs.current_page;
+				pageSize = jobs.page_size;
+				totalCount = jobs.total_count;
+				jobsListComponent?.setJobs(jobs.items);
+			}
 		} finally {
 			searching = false;
 		}
+	}
+
+	function getBaseJobsSearchUrl() {
+		const url = new URL('/api/admin/v2/job', window.location.origin);
+		url.searchParams.append('log', 'false');
+		if (status) {
+			url.searchParams.append('status', status);
+		}
+		if (userId) {
+			url.searchParams.append('user_id', userId);
+		}
+		if (jobId) {
+			url.searchParams.append('id', jobId);
+		}
+		const startTimestampMin = getTimestamp(startDateMin, startTimeMin);
+		if (startTimestampMin) {
+			url.searchParams.append('start_timestamp_min', startTimestampMin);
+		}
+		const startTimestampMax = getTimestamp(startDateMax, startTimeMax);
+		if (startTimestampMax) {
+			url.searchParams.append('start_timestamp_max', startTimestampMax);
+		}
+		const endTimestampMin = getTimestamp(endDateMin, endTimeMin);
+		if (endTimestampMin) {
+			url.searchParams.append('end_timestamp_min', endTimestampMin);
+		}
+		const endTimestampMax = getTimestamp(endDateMax, endTimeMax);
+		if (endTimestampMax) {
+			url.searchParams.append('end_timestamp_max', endTimestampMax);
+		}
+		if (projectId) {
+			url.searchParams.append('project_id', projectId);
+		}
+		if (workflowId) {
+			url.searchParams.append('workflow_id', workflowId);
+		}
+		if (datasetId) {
+			url.searchParams.append('dataset_id', datasetId);
+		}
+		return url;
 	}
 
 	function resetSearchFields() {
@@ -143,11 +169,20 @@
 		workflowId = '';
 		datasetId = '';
 		searched = false;
-		jobs = [];
+		jobs = undefined;
+		currentPage = 1;
+		pageSize = 50;
+		totalCount = 0;
 		jobsListComponent?.setJobs([]);
 	}
 
 	async function downloadCSV() {
+		if (!jobs) {
+			return;
+		}
+
+		processingCsv = true;
+
 		const header = [
 			'id',
 			'status',
@@ -164,7 +199,24 @@
 			'first_task_index',
 			'last_task_index'
 		];
-		const rows = jobs.map((job) => [
+
+		const url = getBaseJobsSearchUrl();
+		const response = await fetch(url);
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			processingCsv = false;
+			return;
+		}
+
+		const { items } =
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ApplyWorkflowV2>} */ (
+				await response.json()
+			);
+
+		const rows = items.map((job) => [
 			job.id,
 			job.status,
 			job.start_timestamp,
@@ -180,8 +232,11 @@
 			job.first_task_index,
 			job.last_task_index
 		]);
+
 		const csv = arrayToCsv([header, ...rows]);
 		downloadBlob(csv, 'jobs.csv', 'text/csv;charset=utf-8;');
+
+		processingCsv = false;
 	}
 
 	/** @type {Modal|undefined} */
@@ -202,6 +257,10 @@
 	async function updateJobStatus() {
 		statusModal?.confirmAndHide(
 			async () => {
+				if (!jobs) {
+					return;
+				}
+
 				updatingStatus = true;
 				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (
 					jobInEditing
@@ -221,8 +280,8 @@
 					throw await getAlertErrorFromResponse(response);
 				}
 
-				jobs = jobs.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));
-				jobsListComponent?.setJobs(jobs);
+				jobs.items = jobs.items.map((j) => (j.id === jobId ? { ...j, status: 'failed' } : j));
+				jobsListComponent?.setJobs(jobs.items);
 			},
 			() => {
 				updatingStatus = false;
@@ -357,7 +416,7 @@
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" onclick={searchJobs} disabled={searching}>
+	<button class="btn btn-primary mt-4" onclick={() => searchJobs(1, pageSize)} disabled={searching}>
 		{#if searching}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
@@ -372,13 +431,18 @@
 	<div id="searchError" class="mt-3"></div>
 
 	<div class:d-none={!searched}>
-		<p class="text-center">
-			The query returned {jobs.length} matching {jobs.length !== 1 ? 'jobs' : 'job'}
-		</p>
+		{#if jobs && jobs.total_count === 0}
+			<p class="text-center">The query returned 0 matching jobs</p>
+		{/if}
 		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
 			{#snippet buttons()}
-				<button class="btn btn-outline-secondary" onclick={downloadCSV}>
-					<i class="bi-download"></i> Download CSV
+				<button class="btn btn-outline-secondary" onclick={downloadCSV} disabled={processingCsv}>
+					{#if processingCsv}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{:else}
+						<i class="bi-download"></i>
+					{/if}
+					Download CSV
 				</button>
 			{/snippet}
 			{#snippet editStatus(row)}
@@ -394,6 +458,16 @@
 				{/if}
 			{/snippet}
 		</JobsList>
+
+		{#if jobs && jobs.total_count > 0}
+			<Paginator
+				{currentPage}
+				{pageSize}
+				{totalCount}
+				singleLine={true}
+				onPageChange={(currentPage, pageSize) => searchJobs(currentPage, pageSize)}
+			/>
+		{/if}
 	</div>
 </div>
 
