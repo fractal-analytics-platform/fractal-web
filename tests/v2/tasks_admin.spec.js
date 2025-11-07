@@ -77,6 +77,13 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 	});
 
+	await test.step('Search tasks by type', async () => {
+		await reset(page);
+		await page.getByRole('combobox', { name: 'Task type' }).selectOption('non_parallel');
+		await searchTasks(page);
+		await expect(page.getByRole('row', { name: 'non_parallel' }).first()).toBeVisible();
+	});
+
 	await test.step('Cleanup test tasks', async () => {
 		await workflow.openWorkflowPage();
 		await workflow.selectTask(taskName);

@@ -22,7 +22,7 @@
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ApplyWorkflowV2> | undefined} */
 	let jobs = $state();
 	let currentPage = $state(1);
-	let pageSize = $state(10);
+	let pageSize = $state(50);
 	let totalCount = $state(0);
 
 	let status = $state();
@@ -170,6 +170,9 @@
 		datasetId = '';
 		searched = false;
 		jobs = undefined;
+		currentPage = 1;
+		pageSize = 50;
+		totalCount = 0;
 		jobsListComponent?.setJobs([]);
 	}
 

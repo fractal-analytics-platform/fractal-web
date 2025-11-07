@@ -9,6 +9,7 @@
 	let id = $state('');
 	let version = $state('');
 	let resource = $state('');
+	let taskType = $state('');
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	const resources = $derived(page.data.resources || []);
 
@@ -20,7 +21,7 @@
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info> | undefined} */
 	let results = $state();
 	let currentPage = $state(1);
-	let pageSize = $state(10);
+	let pageSize = $state(50);
 	let totalCount = $state(0);
 
 	/** @type {Modal|undefined} */
@@ -50,6 +51,9 @@
 			}
 			if (resource) {
 				url.searchParams.append('resource_id', resource);
+			}
+			if (taskType) {
+				url.searchParams.append('task_type', taskType);
 			}
 			url.searchParams.append('page', selectedPage.toString());
 			url.searchParams.append('page_size', selectedPageSize.toString());
@@ -81,11 +85,12 @@
 		id = '';
 		version = '';
 		resource = '';
+		taskType = '';
 		searched = false;
 		results = undefined;
 		currentPage = 1;
 		totalCount = 0;
-		pageSize = 10;
+		pageSize = 50;
 	}
 
 	/**
@@ -197,6 +202,23 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="task_type">Task type</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={taskType} id="task_type">
+								<option value="">Select...</option>
+								<option value="compound">compound</option>
+								<option value="converter_compound">converter_compound</option>
+								<option value="non_parallel">non_parallel</option>
+								<option value="converter_non_parallel">converter_non_parallel</option>
+								<option value="parallel">parallel</option>
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -230,6 +252,7 @@
 					<col width="60" />
 					<col width="auto" />
 					<col width="90" />
+					<col width="195" />
 					<col width="120" />
 					<col width="150" />
 					<col width="100" />
@@ -239,6 +262,7 @@
 						<th>Id</th>
 						<th>Name</th>
 						<th>Version</th>
+						<th>Type</th>
 						<th># Workflows</th>
 						<th># Users</th>
 						<th>Options</th>
@@ -250,6 +274,7 @@
 							<td>{taskInfo.task.id}</td>
 							<td>{taskInfo.task.name}</td>
 							<td>{taskInfo.task.version || '-'}</td>
+							<td>{taskInfo.task.type}</td>
 							<td>
 								{taskInfo.relationships.length || '-'}
 							</td>
