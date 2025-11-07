@@ -18,6 +18,8 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	let workflow1;
 	/** @type {string} */
 	let dataset1;
+	/** @type {number} */
+	let jobId1;
 	await test.step('Create first job and wait its failure', async () => {
 		const job = await createJob(page, request, async function (workflow) {
 			await workflow.addTask('generic_task');
@@ -28,6 +30,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		});
 		workflow1 = job.workflow;
 		dataset1 = job.dataset;
+		jobId1 = job.jobId;
 		await waitTaskSubmitted(page);
 		await waitTaskFailure(page);
 		await workflow1.deleteProject();
@@ -56,19 +59,32 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	});
 
 	await test.step('Search with empty form fields', async () => {
+		await expect(page.getByRole('row')).not.toBeVisible();
+		await search(page);
+		await expect(page.getByRole('row').first()).toBeVisible();
+	});
+
+	await test.step('Search workflow 1 by job id', async () => {
+		await page.getByRole('spinbutton', { name: 'Job Id' }).fill(jobId1.toString());
 		await search(page);
 
-		const row1 = await getWorkflowRow(page, workflow1.workflowName);
-		const cells1 = await row1.locator('td').all();
-		expect(await cells1[5].innerText()).toEqual(workflow1.projectName);
-		expect(await cells1[7].innerText()).toEqual(dataset1);
-		expect(await cells1[8].innerText()).toEqual('admin@fractal.xy');
+		const row1 = page.getByRole('row', { name: workflow1.workflowName });
+		const cells1 = row1.locator('td');
+		await expect(cells1.nth(5)).toHaveText(workflow1.projectName);
+		await expect(cells1.nth(7)).toHaveText(dataset1);
+		await expect(cells1.nth(8)).toHaveText('admin@fractal.xy');
+	});
 
-		const row2 = await getWorkflowRow(page, workflow2.workflowName);
-		const cells2 = await row2.locator('td').all();
-		expect(await cells2[5].innerText()).toEqual(workflow2.projectName);
-		expect(await cells2[7].innerText()).toEqual(dataset2);
-		expect(await cells2[8].innerText()).toEqual('admin@fractal.xy');
+	await test.step('Search workflow 2 by workflow id', async () => {
+		await page.getByRole('button', { name: 'Reset' }).click();
+		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(workflow2.workflowId || '');
+		await search(page);
+
+		const row2 = page.getByRole('row', { name: workflow2.workflowName });
+		const cells2 = row2.locator('td');
+		await expect(cells2.nth(5)).toHaveText(workflow2.projectName);
+		await expect(cells2.nth(7)).toHaveText(dataset2);
+		await expect(cells2.nth(8)).toHaveText('admin@fractal.xy');
 	});
 
 	await test.step('Download CSV', async () => {
@@ -80,7 +96,10 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		expect(content.split('\n').length).toEqual(rowsCount + 1);
 	});
 
-	await test.step('Download job logs', async () => {
+	await test.step('Download job1 logs', async () => {
+		await page.getByRole('button', { name: 'Reset' }).click();
+		await page.getByRole('spinbutton', { name: 'Job Id' }).fill(jobId1.toString());
+		await search(page);
 		const downloadPromise = page.waitForEvent('download');
 		await page.getByRole('row', { name: workflow1.workflowName }).getByRole('link').click();
 		const download = await downloadPromise;
@@ -89,17 +108,21 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	});
 
 	await test.step('Search workflow2 job', async () => {
-		await page.getByText('Reset').click();
-		await page.selectOption('#user', '1');
-		await page.locator('#project').fill(workflow2.projectId?.toString() || '');
-		await page.locator('#workflow').fill(workflow2.workflowId?.toString() || '');
+		await page.getByRole('button', { name: 'Reset' }).click();
+		await page.getByRole('combobox', { name: 'User' }).selectOption('1');
+		await page
+			.getByRole('spinbutton', { name: 'Project Id' })
+			.fill(workflow2.projectId?.toString() || '');
+		await page
+			.getByRole('spinbutton', { name: 'Workflow Id' })
+			.fill(workflow2.workflowId?.toString() || '');
 		await search(page);
-		expect(await page.locator('table tbody tr').count()).toEqual(1);
-		await getWorkflowRow(page, workflow2.workflowName);
+		await expect(page.locator('table tbody tr')).toHaveCount(1);
+		await expect(page.getByRole('row', { name: workflow2.workflowName })).toBeVisible();
 	});
 
 	await test.step('Search running jobs', async () => {
-		await page.getByText('Reset').click();
+		await page.getByRole('button', { name: 'Reset' }).click();
 		await page.getByRole('combobox', { name: 'Status' }).selectOption('submitted');
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(workflow2.projectId || '');
 		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(workflow2.workflowId || '');
@@ -113,11 +136,11 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		await workflow2.triggerTaskSuccess(jobId2);
 		const jobBadge = page.locator('.badge.text-bg-success');
 		await jobBadge.waitFor();
-		expect(await jobBadge.innerText()).toEqual('done');
+		await expect(jobBadge).toHaveText('done');
 	});
 
 	await test.step('Search failed jobs', async () => {
-		await page.getByText('Reset').click();
+		await page.getByRole('button', { name: 'Reset' }).click();
 		await page.selectOption('#status', 'failed');
 		await search(page);
 		const statuses = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
@@ -127,7 +150,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	});
 
 	await test.step('Search by date', async () => {
-		await page.getByText('Reset').click();
+		await page.getByRole('button', { name: 'Reset' }).click();
 		await page.selectOption('#status', 'failed');
 		await page.locator('#start_date_min').fill('2020-01-01');
 		await page.locator('#start_time_min').fill('10:00');
@@ -136,17 +159,17 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		await page.locator('#end_date_max').fill('2020-01-05');
 		await page.locator('#end_time_max').fill('23:00');
 		await search(page);
-		expect(await page.locator('table tbody tr').count()).toEqual(0);
+		await expect(page.locator('table tbody tr')).toHaveCount(0);
 	});
 
 	await test.step('Search by id', async () => {
-		await page.getByText('Reset').click();
+		await page.getByRole('button', { name: 'Reset' }).click();
 		await search(page);
 		await expect(page.getByRole('table')).toBeVisible();
 		const firstRowId = await page.locator('table tbody tr td:first-child').first().innerText();
 		await page.getByRole('spinbutton', { name: 'Job Id' }).fill(firstRowId);
 		await search(page);
-		expect(await page.locator('table tbody tr').count()).toEqual(1);
+		await expect(page.locator('table tbody tr')).toHaveCount(1);
 	});
 });
 
@@ -159,25 +182,6 @@ async function search(page) {
 	await page.waitForFunction(
 		() => document.querySelectorAll('button .spinner-border').length === 0
 	);
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} workflowName
- * @returns {Promise<import('@playwright/test').Locator>}
- */
-async function getWorkflowRow(page, workflowName) {
-	const rows = await page.locator('table tbody tr').all();
-	let workflowRow = null;
-	for (const row of rows) {
-		const cells = await row.locator('td').all();
-		if ((await cells[6].innerText()) === workflowName) {
-			workflowRow = row;
-			break;
-		}
-	}
-	expect(workflowRow).not.toBeNull();
-	return /** @type {import('@playwright/test').Locator} */ (workflowRow);
 }
 
 /**

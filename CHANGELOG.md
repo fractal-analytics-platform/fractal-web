@@ -17,6 +17,8 @@
 * Added support for oneOf and discriminator (\#867);
 * Added resource filter on admin task and task-group pages (\#867);
 * Handled `FRACTAL_DEFAULT_GROUP_NAME` environment variable, to specify if a default group is used (\#870);
+* Renamed "Restart workflow" to "Reset workflow" (\#876);
+* Added paginator to admin tasks and jobs pages (\#876);
 
 # 1.20.0
 
