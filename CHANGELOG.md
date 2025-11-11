@@ -1,6 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# 1.21.1
+# 1.21.0
+
+This version is aligned with [fractal-server 2.17.10](https://github.com/fractal-analytics-platform/fractal-server/blob/main/CHANGELOG.md#2170).
 
 * Updated usage of `fractalctl init-db-data` for tests (\#858).
 * Added more keywords to match SLURM errors (\#843).
