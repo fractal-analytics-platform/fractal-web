@@ -4,6 +4,14 @@ import log4js from 'log4js';
 const logLevelConsole = env.LOG_LEVEL_CONSOLE || 'warn';
 
 /**
+ * @param {Date} date
+ * @returns {string}
+ */
+export function formatDate(date) {
+	return date.toISOString().replace('T', ' ').replace('Z', '').replace('.', ',');
+}
+
+/**
  * @param {string} pattern
  */
 function getLayout(pattern) {
@@ -12,11 +20,7 @@ function getLayout(pattern) {
 		pattern,
 		tokens: {
 			timestamp: function (logEvent) {
-				return logEvent.startTime
-					.toISOString()
-					.replace('T', ' ')
-					.replace('Z', '')
-					.replace('.', ',');
+				return formatDate(logEvent.startTime);
 			},
 			component: function (logEvent) {
 				return logEvent.context?.component || 'general';

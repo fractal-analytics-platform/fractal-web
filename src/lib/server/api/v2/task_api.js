@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.js';
+import { responseError } from '$lib/common/errors.server';
 import { getLogger } from '$lib/server/logger.js';
 
 const logger = getLogger('task API [v2]');

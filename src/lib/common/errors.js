@@ -1,19 +1,6 @@
-import { error } from '@sveltejs/kit';
 import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 import { writable } from 'svelte/store';
 import { mount } from 'svelte';
-
-/**
- * Propagates an error response.
- * @param {Response} response
- */
-export async function responseError(response) {
-	let errorResponse = await response.json();
-	if ('detail' in errorResponse) {
-		errorResponse = errorResponse.detail;
-	}
-	error(response.status, errorResponse);
-}
 
 /**
  * @param {Response} response
