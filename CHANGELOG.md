@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.21.1
+
+* Improved logging of error responses received from fractal-server (\#880).
+* Added delete option in task-group activities admin page (\#880).
+* Adapted the code to avoid non-converter tasks executing on empty images (\#880).
+
 # 1.21.0
 
 This version is aligned with [fractal-server 2.17.10](https://github.com/fractal-analytics-platform/fractal-server/blob/main/CHANGELOG.md#2170).
