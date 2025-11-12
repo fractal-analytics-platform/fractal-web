@@ -26,12 +26,14 @@ export async function createFakeTask(page, task) {
 			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Parallel');
 		} else if (task.type === 'compound') {
 			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Compound');
+		} else if (task.type === 'converter_non_parallel') {
+			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Converter Non Parallel');
 		}
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);
 
 		const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
-		if (task.type === 'non_parallel' || task.type === 'compound') {
+		if (task.type === 'non_parallel' || task.type === 'compound' || task.type === 'converter_non_parallel') {
 			await page
 				.getByRole('textbox', { name: 'Command non parallel' })
 				.fill(task.command_non_parallel || command);

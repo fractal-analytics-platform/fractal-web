@@ -96,7 +96,11 @@
 
 		const typesValid = typesEditor?.validate();
 
-		if (Object.keys($validationErrors).length > 0 || !typesValid || !taskGroupSelector?.validate()) {
+		if (
+			Object.keys($validationErrors).length > 0 ||
+			!typesValid ||
+			!taskGroupSelector?.validate()
+		) {
 			return;
 		}
 
@@ -115,11 +119,19 @@
 			docs_link
 		};
 
-		if (argsSchemaNonParallel && (taskType === 'non_parallel' || taskType === 'compound')) {
+		if (
+			argsSchemaNonParallel &&
+			(taskType === 'non_parallel' ||
+				taskType === 'compound' ||
+				taskType === 'converter_non_parallel')
+		) {
 			bodyData.args_schema_non_parallel = argsSchemaNonParallel;
 		}
 
-		if (argsSchemaParallel && (taskType === 'parallel' || taskType === 'compound')) {
+		if (
+			argsSchemaParallel &&
+			(taskType === 'parallel' || taskType === 'compound' || taskType === 'converter_compound')
+		) {
 			bodyData.args_schema_parallel = argsSchemaParallel;
 		}
 

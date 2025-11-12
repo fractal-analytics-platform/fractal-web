@@ -1,6 +1,8 @@
 import { expect, test } from './workflow_fixture.js';
 import { selectSlimSelect, waitPageLoading } from '../utils.js';
 
+const NUM_MOCK_TASKS = 19
+
 test('Tasks filtering', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
@@ -31,7 +33,7 @@ async function testFiltering(page) {
 	const rows = page.getByRole('row');
 
 	await selectSlimSelect(page, packageFilter, 'fractal-tasks-mock');
-	await expect(rows).toHaveCount(18);
+	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 	await selectSlimSelect(page, modalityFilter, 'HCS');
 	await expect(rows).toHaveCount(8);
 	await selectSlimSelect(page, categoryFilter, 'Conversion');
@@ -40,14 +42,14 @@ async function testFiltering(page) {
 
 	await deselect(modalityFilter);
 	await deselect(categoryFilter);
-	await expect(rows).toHaveCount(18);
+	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 
 	await selectSlimSelect(page, tagFilter, 'Deep Learning');
 	await expect(rows).toHaveCount(3);
 	await expect(page.getByRole('row', { name: 'cellpose_segmentation' })).toBeVisible();
 
 	await deselect(tagFilter);
-	await expect(rows).toHaveCount(18);
+	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 
 	await search(page, 'mip', 'MIP_compound'); // search by task_name
 	await search(page, 'deep', 'cellpose_segmentation'); // search by tag
@@ -74,5 +76,5 @@ async function search(page, query, expectedTaskName) {
 	await expect(page.getByRole('row')).toHaveCount(3);
 	await expect(page.getByRole('row', { name: expectedTaskName })).toBeVisible();
 	await page.getByPlaceholder('Search...').fill('');
-	await expect(page.getByRole('row')).toHaveCount(18);
+	await expect(page.getByRole('row')).toHaveCount(NUM_MOCK_TASKS);
 }

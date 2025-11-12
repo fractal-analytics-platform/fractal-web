@@ -15,7 +15,7 @@ test('Display accounting page', async ({ page, workflow }) => {
 	await test.step('Go to workflow page and add generic_task', async () => {
 		await page.goto(workflow.url);
 		await waitPageLoading(page);
-		await workflow.addTask('generic_task');
+		await workflow.addTask('generic_task_converter');
 	});
 
 	await test.step('Start the job', async () => {

@@ -10,7 +10,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	let taskName;
 	await test.step('Create test tasks', async () => {
 		taskName = await createFakeTask(page, {
-			type: 'non_parallel'
+			type: 'converter_non_parallel'
 		});
 	});
 
@@ -22,8 +22,8 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	let jobId1;
 	await test.step('Create first job and wait its failure', async () => {
 		const job = await createJob(page, request, async function (workflow) {
-			await workflow.addTask('generic_task');
-			await workflow.selectTask('generic_task');
+			await workflow.addTask('generic_task_converter');
+			await workflow.selectTask('generic_task_converter');
 			await page.getByRole('switch').check();
 			await page.getByRole('button', { name: 'Save changes' }).click();
 			await page.getByText('Arguments changes saved successfully').waitFor();
@@ -31,7 +31,6 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		workflow1 = job.workflow;
 		dataset1 = job.dataset;
 		jobId1 = job.jobId;
-		await waitTaskSubmitted(page);
 		await waitTaskFailure(page);
 		await workflow1.deleteProject();
 	});
