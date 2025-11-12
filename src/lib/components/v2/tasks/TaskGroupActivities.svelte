@@ -213,6 +213,7 @@
 				<option value="collect">Collect</option>
 				<option value="deactivate">Deactivate</option>
 				<option value="reactivate">Reactivate</option>
+				<option value="delete">Delete</option>
 			</select>
 		</div>
 	</div>

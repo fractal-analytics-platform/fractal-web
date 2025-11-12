@@ -24,7 +24,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 
 	await test.step('Create test tasks', async () => {
 		taskName = await createFakeTask(page, {
-			type: 'non_parallel',
+			type: 'converter_non_parallel',
 			version: '0.0.1',
 			command_non_parallel: 'echo',
 			args_schema_non_parallel: {
@@ -36,7 +36,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 		});
 		await createFakeTask(page, {
 			name: taskName,
-			type: 'non_parallel',
+			type: 'converter_non_parallel',
 			version: '0.0.2',
 			command_non_parallel: 'echo',
 			args_schema_non_parallel: {

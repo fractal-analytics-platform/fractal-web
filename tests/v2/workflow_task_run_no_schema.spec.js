@@ -21,7 +21,7 @@ test('Workflow task runs on task without arguments', async ({ page, workflow }) 
 
 	await test.step('Create test tasks', async () => {
 		taskName = await createFakeTask(page, {
-			type: 'non_parallel',
+			type: 'converter_non_parallel',
 			version: '0.0.1',
 			command_non_parallel: 'echo'
 		});

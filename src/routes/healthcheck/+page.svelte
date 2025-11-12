@@ -116,6 +116,7 @@
 			headers,
 			body: normalizePayload({
 				name: '__TEST_ECHO_TASK__',
+				type: 'converter_non_parallel',
 				command_non_parallel: 'echo',
 				version: '9.9.9',
 				input_types: {},

@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
+import { formatDate, getLogger } from '$lib/server/logger.js';
 import { getServerInfo } from '$lib/server/api/alive';
 import { getCurrentUser } from '$lib/server/api/auth_api';
-import { getLogger } from '$lib/server/logger.js';
 import { error, redirect } from '@sveltejs/kit';
 
 const logger = getLogger('hooks');
@@ -113,7 +113,17 @@ export async function handleFetch({ event, request, fetch }) {
 			request.headers.set('cookie', cookie);
 		}
 	}
-	return fetch(request);
+	const startTime = new Date();
+	const response = await fetch(request);
+	if (!response.ok) {
+		logger.error(
+			'Error response from %s - Status=%d - Start Time=%s',
+			request.url,
+			response.status,
+			formatDate(startTime)
+		);
+	}
+	return response;
 }
 
 /**
