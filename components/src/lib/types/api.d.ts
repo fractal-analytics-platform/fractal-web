@@ -57,12 +57,12 @@ export type ProjectInvitation = {
 	project_id: number;
 	project_name: string;
 	owner_email: string;
-	pemissions: string;
+	permissions: string;
 };
 
 export type LinkUserProjectV2 = {
 	owner_email: string;
-	pemissions: string;
+	permissions: string;
 	is_owner: boolean;
 };
 

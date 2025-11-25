@@ -71,7 +71,7 @@
 	<div class="row mt-4">
 		<div class="col">
 			{#if invitations.length > 0}
-				{#each invitations as invitation}
+				{#each invitations as invitation, i (i)}
 					<InvitationNotification {invitation} onAccept={loadSharedProjects} />
 				{/each}
 			{/if}
@@ -117,7 +117,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each sharedProjects as project}
+				{#each sharedProjects as project (project.id)}
 					<tr>
 						<td>
 							<a href={`/v2/projects/${project.id}`}>

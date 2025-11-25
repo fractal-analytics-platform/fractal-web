@@ -60,9 +60,9 @@
 							<li class="list-group-item">{info.owner_email}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Permissions</li>
 							<li class="list-group-item">
-								{info.pemissions === 'r'
+								{info.permissions === 'r'
 									? 'Read'
-									: info.pemissions === 'rw'
+									: info.permissions === 'rw'
 										? 'Read, Write'
 										: 'Read, Write, Execute'}
 							</li>

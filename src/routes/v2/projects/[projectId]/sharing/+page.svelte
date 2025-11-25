@@ -149,7 +149,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each sortedGuests as guest}
+						{#each sortedGuests as guest (guest.email)}
 							<tr class="align-middle">
 								<td>{guest.email}</td>
 								<td>
@@ -242,7 +242,7 @@
 				<div class="row">
 					<div class="offset-md-3">
 						<div id="genericShareError"></div>
-						<input type="submit" class="btn btn-primary" value="Share" />
+						<input type="submit" class="btn btn-primary" value="Share" disabled={sharing} />
 					</div>
 				</div>
 			</form>
