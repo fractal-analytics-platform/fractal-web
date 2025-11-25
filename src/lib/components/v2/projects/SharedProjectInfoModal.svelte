@@ -11,7 +11,7 @@
 	let project = $state();
 	let loading = $state(false);
 	/**
-	 * @type {import('fractal-components/types/api').LinkUserProjectV2|undefined}
+	 * @type {import('fractal-components/types/api').ProjectAccessRead|undefined}
 	 */
 	let info = $state();
 

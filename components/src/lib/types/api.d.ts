@@ -60,10 +60,20 @@ export type ProjectInvitation = {
 	permissions: string;
 };
 
-export type LinkUserProjectV2 = {
-	owner_email: string;
-	permissions: string;
+export type ProjectAccessRead = {
 	is_owner: boolean;
+	permissions: string;
+	owner_email: string;
+};
+
+export type LinkUserProjectRead = {
+	user_id: number;
+	user_email: string;
+	project_id: number;
+	project_name: string;
+	is_verified: boolean;
+	is_owner: boolean;
+	permissions: string;
 };
 
 export type DatasetV2 = {
