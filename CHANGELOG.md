@@ -1,5 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Implemented project sharing (\#893).
+* Handled paginated responses in task-group admin pages (\#893).
+
 # 1.21.1
 
 * Improved logging of error responses received from fractal-server (\#880).

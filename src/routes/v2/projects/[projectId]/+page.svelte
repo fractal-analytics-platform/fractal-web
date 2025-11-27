@@ -6,11 +6,19 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import { normalizePayload } from 'fractal-components';
+	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
 
-	// Component properties
+	/** @type {import('fractal-components/types/api').ProjectV2} */
 	const project = $derived(page.data.project);
+	/** @type {import('fractal-components/types/api').ProjectAccessRead} */
+	const projectAccess = $derived(page.data.projectAccess);
+	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	const datasets = $derived(page.data.datasets);
+	/** @type {import('fractal-components/types/api').WorkflowV2[]} */
 	const workflows = $derived(page.data.workflows);
+
+	/** @type {SharedProjectInfoModal|undefined} */
+	let sharedProjectInfoModal = $state();
 
 	let projectUpdatesSuccessMessage = $state('');
 
@@ -61,6 +69,10 @@
 	function onEditProjectModalOpen() {
 		projectUpdatesSuccessMessage = '';
 	}
+
+	async function showSharedProjectInfo() {
+		await sharedProjectInfoModal?.open(project);
+	}
 </script>
 
 {#if project}
@@ -78,6 +90,16 @@
 			>
 				<i class="bi-pencil"></i>
 			</button>
+			{#if projectAccess.is_owner}
+				<a href="/v2/projects/{project.id}/sharing" class="btn btn-info">
+					<i class="bi bi-share"></i>
+					Sharing
+				</a>
+			{:else}
+				<button class="btn btn-light" onclick={() => showSharedProjectInfo()}>
+					<i class="bi bi-info-circle"></i> Info
+				</button>
+			{/if}
 		</div>
 	</div>
 
@@ -128,3 +150,5 @@
 		</button>
 	{/snippet}
 </Modal>
+
+<SharedProjectInfoModal bind:this={sharedProjectInfoModal} />

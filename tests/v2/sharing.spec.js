@@ -144,7 +144,20 @@ test('Project sharing', async ({ page }) => {
 		await closeModal(page);
 	});
 
+	await test.step('Check info button inside project', async () => {
+		await page.getByRole('link', { name: projectToAccept }).click();
+		await page.waitForURL(/\/v2\/projects\/\d+/);
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Info' }).click();
+		const modal = await waitModal(page);
+		await expect(modal.getByText('admin@fractal.xy')).toBeVisible();
+		await closeModal(page);
+	});
+
 	await test.step('Leave project', async () => {
+		await page.goto('/v2/projects');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Shared with me' }).click();
 		const row = page.getByRole('row', { name: projectToLeave });
 		await row.getByRole('button', { name: 'Leave' }).click();
 		const modal = await waitModal(page);
@@ -206,6 +219,16 @@ test('Project sharing', async ({ page }) => {
 		await page.waitForURL(/\/v2\/projects\/\d+\/sharing/);
 		await waitPageLoading(page);
 		await expect(page.getByText('This project has not been shared with anyone yet.')).toBeVisible();
+	});
+
+	await test.step('Check sharing button inside project', async () => {
+		await page.goto('/v2/projects');
+		await waitPageLoading(page);
+		await page.getByRole('link', { name: projectToAccept }).click();
+		await page.waitForURL(/\/v2\/projects\/\d+/);
+		await waitPageLoading(page);
+		await page.getByRole('link', { name: 'Sharing' }).click();
+		await page.waitForURL(/\/v2\/projects\/\d+\/sharing/);
 	});
 
 	await test.step('Cleanup', async () => {

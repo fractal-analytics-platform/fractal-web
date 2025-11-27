@@ -49,6 +49,27 @@ export async function getProject(fetch, projectId) {
 }
 
 /**
+ * Fetches a project access
+ * @param {typeof fetch} fetch
+ * @param {string} projectId
+ * @returns {Promise<import('fractal-components/types/api').ProjectAccessRead>}
+ */
+export async function getProjectAccess(fetch, projectId) {
+	logger.debug('Fetching project [project_id=%d]', projectId);
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to fetch project access [project_id=%d]', projectId);
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
  * Fetches project guests from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
