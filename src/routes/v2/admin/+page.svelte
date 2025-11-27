@@ -25,9 +25,14 @@
 				Manage groups
 			</a>
 
-			<a href="/v2/admin/impersonate" class="btn btn-primary">
+			<a href="/v2/admin/impersonate" class="btn btn-primary me-2">
 				<i class="bi bi-incognito"></i>
 				Impersonate users
+			</a>
+
+			<a href="/v2/admin/sharing" class="btn btn-primary me-2">
+				<i class="bi bi-share"></i>
+				Projects sharing
 			</a>
 
 			<h2 class="fw-light mt-3">Jobs</h2>

@@ -9,11 +9,12 @@ const logger = getLogger('projects API [v2]');
 /**
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
+ * @param {boolean} isOwner
  * @returns {Promise<import('fractal-components/types/api').ProjectV2[]>}
  */
-export async function listProjects(fetch) {
+export async function listProjects(fetch, isOwner) {
 	logger.debug('Fetching the list of projects');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/api/v2/project/', {
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/v2/project/?is_owner=${isOwner}`, {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -41,6 +42,68 @@ export async function getProject(fetch, projectId) {
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project [project_id=%d]', projectId);
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * Fetches a project access
+ * @param {typeof fetch} fetch
+ * @param {string} projectId
+ * @returns {Promise<import('fractal-components/types/api').ProjectAccessRead>}
+ */
+export async function getProjectAccess(fetch, projectId) {
+	logger.debug('Fetching project [project_id=%d]', projectId);
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to fetch project access [project_id=%d]', projectId);
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * Fetches project guests from the server
+ * @param {typeof fetch} fetch
+ * @param {string} projectId
+ * @returns {Promise<import('fractal-components/types/api').ProjectGuest>}
+ */
+export async function getProjectGuests(fetch, projectId) {
+	logger.debug('Fetching project guests [project_id=%d]', projectId);
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/guest/`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to fetch project guests [project_id=%d]', projectId);
+		await responseError(response);
+	}
+
+	return await response.json();
+}
+
+/**
+ * Fetches project invitations from the server
+ * @param {typeof fetch} fetch
+ * @returns {Promise<import('fractal-components/types/api').ProjectInvitation>}
+ */
+export async function getProjectInvitations(fetch) {
+	logger.debug('Fetching project invitations');
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/invitation/`, {
+		method: 'GET',
+		credentials: 'include'
+	});
+
+	if (!response.ok) {
+		logger.error('Unable to fetch project invitations');
 		await responseError(response);
 	}
 

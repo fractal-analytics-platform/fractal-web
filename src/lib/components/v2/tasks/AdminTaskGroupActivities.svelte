@@ -4,13 +4,26 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { getTaskGroupActivitiesToUpdate } from './task_group_utilities';
 	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
-	import TaskGroupActivityLogsModal from './TaskGroupActivityLogsModal.svelte';
+	import AdminTaskGroupActivityLogsModal from './AdminTaskGroupActivityLogsModal.svelte';
 	import { getTimestamp } from '$lib/common/component_utilities';
 	import { page } from '$app/state';
-	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
+	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
+	import Paginator from '$lib/components/common/Paginator.svelte';
 
-	/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
-	let results = $state([]);
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<import('fractal-components/types/api').User & {id: number}>} [users]
+	 */
+
+	/** @type {Props} */
+	let { users = [] } = $props();
+	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
+	const sortedUsers = $derived([...users].sort(sortUserByEmailComparator));
+
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>|undefined} */
+	let results = $state();
+	let currentPage = $state(1);
+	let pageSize = $state(10);
 
 	let pkg_name = $state('');
 	let status = $state('');
@@ -22,6 +35,8 @@
 	/** @type {string|undefined} */
 	let startTimeMin = $state(undefined);
 	/** @type {number|null} */
+	let user_id = $state(null);
+	/** @type {number|null} */
 	let task_group_activity_id = null;
 
 	let searched = $state(false);
@@ -30,7 +45,7 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
-	/** @type {TaskGroupActivityLogsModal|undefined} */
+	/** @type {AdminTaskGroupActivityLogsModal|undefined} */
 	let taskGroupActivityLogsModal = $state();
 	/** @type {number|null} */
 	let openedTaskCollectionLogId = null;
@@ -43,11 +58,17 @@
 		await taskGroupActivityLogsModal?.open(taskCollectionId);
 	}
 
-	async function searchActivities() {
+	/**
+	 * @param {number} newCurrentPage
+	 * @param {number} newPageSize
+	 */
+	async function searchActivities(newCurrentPage = currentPage, newPageSize = pageSize) {
 		searching = true;
 		try {
 			errorAlert?.hide();
-			const url = new URL('/api/v2/task-group/activity', window.location.origin);
+			const url = new URL('/api/admin/v2/task-group/activity', window.location.origin);
+			url.searchParams.append('page', newCurrentPage.toString());
+			url.searchParams.append('page_size', newPageSize.toString());
 			if (pkg_name) {
 				url.searchParams.append('pkg_name', pkg_name);
 			}
@@ -59,6 +80,9 @@
 			}
 			if (taskgroupv2_id !== null) {
 				url.searchParams.append('taskgroupv2_id', taskgroupv2_id.toString());
+			}
+			if (user_id !== null) {
+				url.searchParams.append('user_id', user_id.toString());
 			}
 			if (task_group_activity_id !== null) {
 				url.searchParams.append('task_group_activity_id', task_group_activity_id.toString());
@@ -79,10 +103,11 @@
 				);
 				return;
 			}
-			/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */
 			const activities = await response.json();
-			activities.sort(sortActivitiesByTimestampStarted);
 			results = activities;
+			pageSize = results.page_size;
+			currentPage = results.current_page;
 		} finally {
 			searching = false;
 			searched = true;
@@ -96,8 +121,11 @@
 		taskgroupv2_id = null;
 		startDateMin = undefined;
 		startTimeMin = undefined;
+		user_id = null;
 		task_group_activity_id = null;
-		await searchActivities();
+		searched = false;
+		currentPage = 1;
+		pageSize = 10;
 	}
 
 	const updateTasksCollectionInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
@@ -109,7 +137,10 @@
 	 * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
 	async function updateTaskCollectionsState(activitiesToUpdate) {
-		results = results.map((a) => {
+		if (!results) {
+			return;
+		}
+		results.items = results.items.map((a) => {
 			const updatedActivity = activitiesToUpdate.find((u) => u.id === a.id);
 			return updatedActivity ?? a;
 		});
@@ -122,9 +153,11 @@
 	}
 
 	async function updateTaskCollectionsInBackground() {
-		const activitiesToUpdate = await getTaskGroupActivitiesToUpdate(results, false);
-		if (activitiesToUpdate.length > 0) {
-			await updateTaskCollectionsState(activitiesToUpdate);
+		if (results) {
+			const activitiesToUpdate = await getTaskGroupActivitiesToUpdate(results.items, true);
+			if (activitiesToUpdate.length > 0) {
+				await updateTaskCollectionsState(activitiesToUpdate);
+			}
 		}
 		clearTimeout(updateTasksCollectionTimeout);
 		updateTasksCollectionTimeout = setTimeout(
@@ -133,12 +166,21 @@
 		);
 	}
 
+	/**
+	 * @param {number} userId
+	 */
+	function getUserEmail(userId) {
+		return users.find((u) => u.id === userId)?.email || '-';
+	}
+
 	onMount(async () => {
 		const activityId = page.url.searchParams.get('activity_id');
 		if (activityId && !isNaN(Number(activityId))) {
 			task_group_activity_id = Number(activityId);
 		}
-		await searchActivities();
+		if (task_group_activity_id !== null) {
+			await searchActivities();
+		}
 		updateTasksCollectionTimeout = setTimeout(
 			updateTaskCollectionsInBackground,
 			updateTasksCollectionInterval
@@ -199,9 +241,20 @@
 			<input type="time" class="form-control" bind:value={startTimeMin} id="start_time_min" />
 		</div>
 	</div>
+	<div class="col-lg-4 mb-3">
+		<div class="input-group">
+			<label class="input-group-text" for="user"> User </label>
+			<select class="form-select" id="user" bind:value={user_id}>
+				<option value={null}>Select...</option>
+				{#each sortedUsers as user (user.id)}
+					<option value={user.id}>{user.email}</option>
+				{/each}
+			</select>
+		</div>
+	</div>
 </div>
 
-<button class="btn btn-primary mt-2" onclick={searchActivities} disabled={searching}>
+<button class="btn btn-primary mt-2" onclick={() => searchActivities()} disabled={searching}>
 	{#if searching}
 		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 	{:else}
@@ -215,59 +268,75 @@
 
 <div id="searchError" class="mt-3 mb-3"></div>
 
-<div class:d-none={!searched}>
-	<p class="text-center">
-		The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
-	</p>
+{#if results}
+	<div class:d-none={!searched}>
+		<p class="text-center">
+			The query returned {results.items.length} matching {results.items.length !== 1
+				? 'results'
+				: 'result'}
+		</p>
 
-	<table class="table table-hover align-middle">
-		<thead>
-			<tr>
-				<th>Package</th>
-				<th>Version</th>
-				<th>Action</th>
-				<th>Status</th>
-				<th>Started</th>
-				<th>Ended</th>
-				<th>Options</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each results as taskGroupActivity (taskGroupActivity.id)}
+		<table class="table table-hover align-middle">
+			<thead>
 				<tr>
-					<td>{taskGroupActivity.pkg_name}</td>
-					<td>
-						{taskGroupActivity.version || '-'}
-					</td>
-					<td>
-						{taskGroupActivity.action}
-					</td>
-					<td>
-						<span class="badge {getTaskActivityStatusBadgeClass(taskGroupActivity.status)}">
-							{taskGroupActivity.status}
-						</span>
-					</td>
-					<td>{new Date(taskGroupActivity.timestamp_started).toLocaleString()}</td>
-					<td>
-						{taskGroupActivity.timestamp_ended
-							? new Date(taskGroupActivity.timestamp_ended).toLocaleString()
-							: '-'}
-					</td>
-					<td>
-						{#if taskGroupActivity.status !== 'pending' && taskGroupActivity.log}
-							<button
-								class="btn btn-info"
-								aria-label="Show activity log"
-								onclick={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
-							>
-								<i class="bi bi-info-circle"></i>
-							</button>
-						{/if}
-					</td>
+					<th>Package</th>
+					<th>Version</th>
+					<th>Action</th>
+					<th>Status</th>
+					<th>Started</th>
+					<th>Ended</th>
+					<th>User</th>
+					<th>Options</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
+			</thead>
+			<tbody>
+				{#each results.items as taskGroupActivity (taskGroupActivity.id)}
+					<tr>
+						<td>{taskGroupActivity.pkg_name}</td>
+						<td>
+							{taskGroupActivity.version || '-'}
+						</td>
+						<td>
+							{taskGroupActivity.action}
+						</td>
+						<td>
+							<span class="badge {getTaskActivityStatusBadgeClass(taskGroupActivity.status)}">
+								{taskGroupActivity.status}
+							</span>
+						</td>
+						<td>{new Date(taskGroupActivity.timestamp_started).toLocaleString()}</td>
+						<td>
+							{taskGroupActivity.timestamp_ended
+								? new Date(taskGroupActivity.timestamp_ended).toLocaleString()
+								: '-'}
+						</td>
+						<td>{getUserEmail(taskGroupActivity.user_id)}</td>
+						<td>
+							{#if taskGroupActivity.status !== 'pending' && taskGroupActivity.log}
+								<button
+									class="btn btn-info"
+									aria-label="Show activity log"
+									onclick={() => openTaskGroupActivityLogsModal(taskGroupActivity.id)}
+								>
+									<i class="bi bi-info-circle"></i>
+								</button>
+							{/if}
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 
-<TaskGroupActivityLogsModal bind:this={taskGroupActivityLogsModal} />
+		{#if results.total_count > 0}
+			<Paginator
+				{currentPage}
+				{pageSize}
+				singleLine={true}
+				totalCount={results.total_count}
+				onPageChange={(currentPage, pageSize) => searchActivities(currentPage, pageSize)}
+			/>
+		{/if}
+	</div>
+{/if}
+
+<AdminTaskGroupActivityLogsModal bind:this={taskGroupActivityLogsModal} />

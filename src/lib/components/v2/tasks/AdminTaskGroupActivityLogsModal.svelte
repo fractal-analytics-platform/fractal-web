@@ -26,7 +26,7 @@
 		modal?.show();
 
 		const response = await fetch(
-			`/api/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`,
+			`/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`,
 			{
 				method: 'GET',
 				credentials: 'include'
@@ -34,15 +34,15 @@
 		);
 
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */
 			const activities = await response.json();
-			if (activities.length === 0) {
+			if (activities.items.length === 0) {
 				errorAlert = displayStandardErrorAlert(
 					new AlertError('Task-group activity not found'),
 					'collectionTaskLogsError'
 				);
-			} else if (activities[0].log) {
-				log = activities[0].log;
+			} else if (activities.items[0].log) {
+				log = activities.items[0].log;
 			}
 		} else {
 			console.error('Failed to fetch collection logs');

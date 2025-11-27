@@ -47,6 +47,35 @@ export type ProjectV2 = {
 	timestamp_created: string;
 };
 
+export type ProjectGuest = {
+	email: string;
+	is_verified: boolean;
+	permissions: string;
+};
+
+export type ProjectInvitation = {
+	project_id: number;
+	project_name: string;
+	owner_email: string;
+	permissions: string;
+};
+
+export type ProjectAccessRead = {
+	is_owner: boolean;
+	permissions: string;
+	owner_email: string;
+};
+
+export type LinkUserProjectRead = {
+	user_id: number;
+	user_email: string;
+	project_id: number;
+	project_name: string;
+	is_verified: boolean;
+	is_owner: boolean;
+	permissions: string;
+};
+
 export type DatasetV2 = {
 	id: number;
 	name: string;
@@ -149,15 +178,15 @@ export type JobStatus = 'submitted' | 'done' | 'failed';
 
 export type ImagesStatus =
 	| {
-			status: JobStatus;
-	  }
+		status: JobStatus;
+	}
 	| {
-			status: JobStatus;
-			num_submitted_images: number;
-			num_done_images: number;
-			num_failed_images: number;
-			num_available_images: number | null;
-	  };
+		status: JobStatus;
+		num_submitted_images: number;
+		num_done_images: number;
+		num_failed_images: number;
+		num_available_images: number | null;
+	};
 
 export type WorkflowV2 = {
 	id: number;

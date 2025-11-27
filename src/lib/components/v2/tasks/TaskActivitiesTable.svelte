@@ -172,4 +172,4 @@
 	</div>
 {/if}
 
-<TaskGroupActivityLogsModal bind:this={taskGroupActivitiesLogsModal} admin={false} />
+<TaskGroupActivityLogsModal bind:this={taskGroupActivitiesLogsModal} />

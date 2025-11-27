@@ -7,6 +7,7 @@
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
+	import Paginator from '$lib/components/common/Paginator.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User>} */
 	const users = $derived(page.data.users || []);
@@ -36,8 +37,10 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2[]} */
-	let results = $state([]);
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>|undefined} */
+	let results = $state();
+	let currentPage = $state(1);
+	let pageSize = $state(10);
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
@@ -49,13 +52,19 @@
 	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
 
-	async function searchTaskGroups() {
+	/**
+	 * @param {number} newCurrentPage
+	 * @param {number} newPageSize
+	 */
+	async function searchTaskGroups(newCurrentPage = currentPage, newPageSize = pageSize) {
 		searching = true;
 		try {
 			if (searchErrorAlert) {
 				searchErrorAlert.hide();
 			}
 			const url = new URL('/api/admin/v2/task-group', window.location.origin);
+			url.searchParams.append('page', newCurrentPage.toString());
+			url.searchParams.append('page_size', newPageSize.toString());
 			if (user_id) {
 				url.searchParams.append('user_id', user_id);
 			}
@@ -94,7 +103,11 @@
 				return;
 			}
 			searched = true;
-			results = await response.json();
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>} */
+			const data = await response.json();
+			results = data;
+			pageSize = data.page_size;
+			currentPage = data.current_page;
 		} finally {
 			searching = false;
 		}
@@ -116,7 +129,9 @@
 		privateGroup = null;
 		active = null;
 		searched = false;
-		results = [];
+		results = undefined;
+		currentPage = 1;
+		pageSize = 10;
 	}
 
 	/**
@@ -313,7 +328,7 @@
 		</div>
 	</div>
 
-	<button class="btn btn-primary mt-4" onclick={searchTaskGroups} disabled={searching}>
+	<button class="btn btn-primary mt-4" onclick={() => searchTaskGroups()} disabled={searching}>
 		{#if searching}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
@@ -327,87 +342,101 @@
 
 	<div id="searchError" class="mt-3 mb-3"></div>
 
-	<div class:d-none={!searched}>
-		<p class="text-center">
-			The query returned {results.length} matching {results.length !== 1 ? 'results' : 'result'}
-		</p>
+	{#if results}
+		<div class:d-none={!searched}>
+			<p class="text-center">
+				The query returned {results.items.length} matching {results.items.length !== 1
+					? 'results'
+					: 'result'}
+			</p>
 
-		{#if results.length > 0}
-			<div class="table-responsive">
-				<table class="table task-groups-table mt-4">
-					<colgroup>
-						<col width="60" />
-						<col width="190" />
-						<col width="90" />
-						<col width="190" />
-						<col width="100" />
-						<col width="190" />
-						<col width="90" />
-						<col width="90" />
-						<col width="90" />
-						<col width="380" />
-					</colgroup>
-					<thead>
-						<tr>
-							<th>Id</th>
-							<th>Package Name</th>
-							<th>Version</th>
-							<th>User</th>
-							<th>Group</th>
-							<th>Resource</th>
-							<th>Active</th>
-							<th>Origin</th>
-							<th># Tasks</th>
-							<th>Options</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each results as taskGroup, taskGroupIndex (taskGroup.id)}
-							<tr class:row-grey={taskGroupIndex % 2 === 0}>
-								<td>{taskGroup.id}</td>
-								<td>{taskGroup.pkg_name}</td>
-								<td>{taskGroup.version || '-'}</td>
-								<td>{getUserEmail(taskGroup.user_id)}</td>
-								<td>{getGroupName(taskGroup.user_group_id)}</td>
-								<td>{getResourceName(taskGroup.resource_id)}</td>
-								<td>
-									<BooleanIcon value={taskGroup.active} />
-								</td>
-								<td>{taskGroup.origin || '-'}</td>
-								<td>{taskGroup.task_list.length}</td>
-								<td>
-									<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
-										<i class="bi bi-info-circle"></i>
-										Info
-									</button>
-									<button
-										class="btn btn-primary"
-										onclick={() => taskGroupEditModal?.open(taskGroup)}
-									>
-										<i class="bi bi-pencil"></i>
-										Edit
-									</button>
-									<button
-										class="btn btn-info"
-										onclick={() => taskGroupManageModal?.open(taskGroup)}
-									>
-										<i class="bi bi-gear"></i>
-										Manage
-									</button>
-								</td>
+			{#if results.items.length > 0}
+				<div class="table-responsive mb-3">
+					<table class="table task-groups-table mt-4">
+						<colgroup>
+							<col width="60" />
+							<col width="190" />
+							<col width="90" />
+							<col width="190" />
+							<col width="100" />
+							<col width="190" />
+							<col width="90" />
+							<col width="90" />
+							<col width="90" />
+							<col width="380" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Package Name</th>
+								<th>Version</th>
+								<th>User</th>
+								<th>Group</th>
+								<th>Resource</th>
+								<th>Active</th>
+								<th>Origin</th>
+								<th># Tasks</th>
+								<th>Options</th>
 							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
+						</thead>
+						<tbody>
+							{#each results.items as taskGroup, taskGroupIndex (taskGroup.id)}
+								<tr class:row-grey={taskGroupIndex % 2 === 0}>
+									<td>{taskGroup.id}</td>
+									<td>{taskGroup.pkg_name}</td>
+									<td>{taskGroup.version || '-'}</td>
+									<td>{getUserEmail(taskGroup.user_id)}</td>
+									<td>{getGroupName(taskGroup.user_group_id)}</td>
+									<td>{getResourceName(taskGroup.resource_id)}</td>
+									<td>
+										<BooleanIcon value={taskGroup.active} />
+									</td>
+									<td>{taskGroup.origin || '-'}</td>
+									<td>{taskGroup.task_list.length}</td>
+									<td>
+										<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
+											<i class="bi bi-info-circle"></i>
+											Info
+										</button>
+										<button
+											class="btn btn-primary"
+											onclick={() => taskGroupEditModal?.open(taskGroup)}
+										>
+											<i class="bi bi-pencil"></i>
+											Edit
+										</button>
+										<button
+											class="btn btn-info"
+											onclick={() => taskGroupManageModal?.open(taskGroup)}
+										>
+											<i class="bi bi-gear"></i>
+											Manage
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		</div>
+
+		{#if results.total_count > 0}
+			<Paginator
+				{currentPage}
+				{pageSize}
+				singleLine={true}
+				totalCount={results.total_count}
+				onPageChange={(currentPage, pageSize) => searchTaskGroups(currentPage, pageSize)}
+			/>
 		{/if}
-	</div>
+	{/if}
 </div>
 
 <TaskGroupEditModal
 	{defaultGroupName}
 	bind:this={taskGroupEditModal}
-	updateEditedTaskGroup={searchTaskGroups}
+	updateEditedTaskGroup={() => searchTaskGroups()}
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
 />
 <TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} />

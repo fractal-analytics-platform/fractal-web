@@ -10,7 +10,7 @@ const logger = getLogger('jobs page [v2]');
 export async function load({ fetch }) {
 	logger.trace('Loading jobs page');
 
-	const projects = await listProjects(fetch);
+	const projects = await listProjects(fetch, true);
 	sortProjectsByTimestampCreatedDesc(projects);
 
 	const jobs = await getUserJobs(fetch);

@@ -32,19 +32,22 @@ function mockTaskGroups() {
 		status: 200,
 		json: () =>
 			new Promise((resolve) =>
-				resolve([
-					{
-						id: 1,
-						task_list: [],
-						user_id: 1,
-						user_group_id: 1,
-						origin: 'pypi',
-						pkg_name: 'fractal-tasks-core',
-						version: '1.3.2',
-						python_version: '3.10',
-						active: true
-					}
-				])
+				resolve({
+					items: [
+						{
+							id: 1,
+							task_list: [],
+							user_id: 1,
+							user_group_id: 1,
+							origin: 'pypi',
+							pkg_name: 'fractal-tasks-core',
+							version: '1.3.2',
+							python_version: '3.10',
+							active: true
+						}
+					],
+					total_count: 1
+				})
 			)
 	});
 }
@@ -62,7 +65,7 @@ describe('Admin task-groups page', () => {
 		await user.click(screen.getByRole('button', { name: 'Search task groups' }));
 
 		expect(mockRequest).toHaveBeenCalledWith(
-			expect.objectContaining({ pathname: '/api/admin/v2/task-group', search: '' })
+			new URL('http://localhost:3000/api/admin/v2/task-group?page=1&page_size=10')
 		);
 
 		expect(screen.getAllByRole('row').length).toEqual(2);
@@ -87,7 +90,7 @@ describe('Admin task-groups page', () => {
 			expect.objectContaining({
 				pathname: '/api/admin/v2/task-group',
 				search:
-					'?user_id=2&user_group_id=1&pkg_name=fractal-tasks-core&origin=pypi&private=false&active=true'
+					'?page=1&page_size=10&user_id=2&user_group_id=1&pkg_name=fractal-tasks-core&origin=pypi&private=false&active=true'
 			})
 		);
 

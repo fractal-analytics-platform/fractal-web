@@ -5,7 +5,6 @@
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').DatasetV2[]} [datasets]
@@ -17,9 +16,9 @@
 	let datasetSearch = $state('');
 	let datasetCreatedMessage = $state('');
 
-	let filteredDatasets = $derived(datasets.filter((p) =>
-		p.name.toLowerCase().includes(datasetSearch.toLowerCase())
-	));
+	let filteredDatasets = $derived(
+		datasets.filter((p) => p.name.toLowerCase().includes(datasetSearch.toLowerCase()))
+	);
 
 	function createDatasetCallback(
 		/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset
