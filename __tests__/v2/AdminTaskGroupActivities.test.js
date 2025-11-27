@@ -7,7 +7,7 @@ global.fetch = vi.fn();
 
 // Mocking public variables
 vi.mock('$env/dynamic/public', () => {
-	return { env: { PUBLIC_UPDATE_JOBS_INTERVAL: 90 } };
+	return { env: { PUBLIC_UPDATE_JOBS_INTERVAL: 500 } };
 });
 
 // Mocking the page store
@@ -36,7 +36,7 @@ describe('AdminTaskGroupActivities', () => {
 					items: [{ id: 1, pkg_name: 'fractal-tasks-core', status: 'ongoing' }]
 				})
 			})
-			.mockResolvedValue({
+			.mockResolvedValueOnce({
 				ok: true,
 				status: 200,
 				json: async () => ({ items: [{ id: 1, pkg_name: 'fractal-tasks-core', status: 'OK' }] })
