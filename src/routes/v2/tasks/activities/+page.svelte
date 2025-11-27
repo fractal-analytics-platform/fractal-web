@@ -3,5 +3,5 @@
 </script>
 
 <div class="container mt-3">
-	<TaskGroupActivities admin={false} />
+	<TaskGroupActivities />
 </div>

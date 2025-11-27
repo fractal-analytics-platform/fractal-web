@@ -37,12 +37,12 @@ async function getAdminTaskActivity(taskGroupActivityId) {
 		}
 	);
 	if (response.ok) {
-		/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
+		/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */
 		const activities = await response.json();
-		if (activities.length === 0) {
+		if (activities.items.length === 0) {
 			return undefined;
 		}
-		return activities[0];
+		return activities.items[0];
 	}
 	console.error('Failed to fetch task-group activity');
 	throw await getAlertErrorFromResponse(response);

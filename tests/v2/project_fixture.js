@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { deleteProject, waitPageLoading } from '../utils.js';
+import { deleteProject as utilsDeleteProject, waitPageLoading } from '../utils.js';
 
 export class PageWithProject {
 	/**
@@ -42,6 +42,10 @@ export class PageWithProject {
 		}
 		return /** @type {string} */ (this.projectId);
 	}
+
+	async deleteProject() {
+		await utilsDeleteProject(this.page, this.projectName);
+	}
 }
 
 const projectTest = baseTest.extend(
@@ -50,7 +54,7 @@ const projectTest = baseTest.extend(
 			const project = new PageWithProject(page);
 			await project.createProject();
 			await use(project);
-			await deleteProject(page, project.projectName);
+			await project.deleteProject();
 		}
 	})
 );
