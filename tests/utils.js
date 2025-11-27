@@ -166,3 +166,88 @@ export async function setUploadFile(page, selectorText, filePath) {
 	const fileChooser = await fileChooserPromise;
 	await fileChooser.setFiles(filePath);
 }
+
+/**
+ * @param {import('@playwright/test').Locator} locator
+ * @param {boolean} expectedValue
+ */
+export async function expectBooleanIcon(locator, expectedValue) {
+	const value = await locator.locator('.boolean-icon').getAttribute('aria-checked');
+	expect(value).toEqual(expectedValue.toString());
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+export async function createProject(page) {
+	await page.goto('/v2/projects');
+	await waitPageLoading(page);
+
+	await page.getByRole('button', { name: 'Create new project' }).click();
+
+	const modal = await waitModal(page);
+
+	const projectName = Math.random().toString(36).substring(7);
+	await modal.getByLabel('Project name').fill(projectName);
+	const createProjectBtn = modal.getByRole('button', { name: 'Create' });
+	await createProjectBtn.click();
+	await waitModalClosed(page);
+
+	await page.waitForURL(/\/v2\/projects\/\d+/);
+	await waitPageLoading(page);
+
+	let projectId = undefined;
+	const match = page.url().match(/\/v2\/projects\/(\d+)/);
+	if (match) {
+		projectId = match[1];
+	}
+	expect(projectId).toBeDefined();
+
+	return { id: /** @type {string} */ (projectId), name: projectName };
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} projectName
+ * @param {string} userEmail
+ * @param {string} permissions
+ */
+export async function shareProject(page, projectName, userEmail, permissions) {
+	await page.goto('/v2/projects');
+	await waitPageLoading(page);
+	await page.getByRole('row', { name: projectName }).getByRole('link', { name: 'Sharing' }).click();
+	await page.waitForURL(/\/v2\/projects\/\d+\/sharing/);
+	await waitPageLoading(page);
+	await page.getByRole('textbox', { name: 'User e-mail' }).fill(userEmail);
+	await page.getByRole('combobox', { name: 'Permission' }).selectOption(permissions);
+	await page.getByRole('button', { name: 'Share' }).click();
+	const row = page.getByRole('row', { name: userEmail });
+	await expect(row).toBeVisible();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} projectName
+ */
+export async function deleteProject(page, projectName) {
+	await page.goto('/v2/projects');
+	await waitPageLoading(page);
+	const rows = await page.getByRole('row').all();
+	for (const row of rows) {
+		if ((await row.getByRole('cell', { name: projectName }).count()) === 1) {
+			const deleteBtn = row.getByRole('button', { name: 'Delete' });
+			await deleteBtn.click();
+			break;
+		}
+	}
+
+	await page.getByRole('button', { name: 'Confirm' }).click();
+
+	await page.waitForFunction((projectName) => {
+		const projectNames = [...document.querySelectorAll('table td:nth-child(1)')].map(
+			(c) => /** @type {HTMLElement} */ (c).innerText
+		);
+		return !projectNames.includes(projectName);
+	}, projectName);
+	await expect(page.getByRole('cell', { name: projectName })).toHaveCount(0);
+}

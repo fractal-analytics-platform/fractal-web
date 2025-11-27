@@ -250,7 +250,7 @@
 	</div>
 </div>
 
-<Modal id="editGuestModal" size="lg" bind:this={editGuestModal}>
+<Modal id="editGuestModal" size="lg" bind:this={editGuestModal} focus={false}>
 	{#snippet header()}
 		{#if guestToEdit}
 			<h1 class="h5 modal-title flex-grow-1">Edit {guestToEdit.email} sharing options</h1>
@@ -258,10 +258,10 @@
 	{/snippet}
 	{#snippet body()}
 		<div class="row mb-2">
-			<label for="permissions" class="col-md-3 col-form-label">Permissions</label>
+			<label for="edit-permissions" class="col-md-3 col-form-label">Permissions</label>
 			<div class="col-md-9">
 				<div class="col-xl-8 col-lg-7 col-9">
-					<select class="form-select" bind:value={permissionsToEdit} id="permissions" required>
+					<select class="form-select" bind:value={permissionsToEdit} id="edit-permissions" required>
 						<option value="r">Read</option>
 						<option value="rw">Read, Write</option>
 						<option value="rwx">Read, Write, Execute</option>
