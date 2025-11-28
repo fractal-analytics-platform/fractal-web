@@ -11,7 +11,7 @@ export type User = {
 	profile_id: number | null;
 	password?: string;
 	group_ids_names: Array<[number, string]> | null;
-	project_dir: string | null;
+	project_dirs: string[];
 	slurm_accounts: string[];
 	oauth_accounts: Array<{
 		id: number;
@@ -32,7 +32,6 @@ export type Group = {
 	name: string;
 	timestamp_created: string;
 	user_ids?: number[];
-	viewer_paths: string[];
 };
 
 export type DatasetHistoryItem = {

@@ -29,7 +29,7 @@
 			is_superuser: user.is_superuser,
 			is_verified: user.is_verified,
 			profile_id: user.profile_id,
-			project_dir: user.project_dir
+			project_dirs: user.project_dirs
 		};
 
 		if (runnerBackend !== 'local') {

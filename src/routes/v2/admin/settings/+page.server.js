@@ -10,13 +10,11 @@ export async function load({ fetch }) {
 	const databaseSettings = await listSettings(fetch, 'database');
 	const emailSettings = await listSettings(fetch, 'email');
 	const oauthSettings = await listSettings(fetch, 'oauth');
-	const dataSettings = await listSettings(fetch, 'data');
 
 	return {
 		appSettings,
 		databaseSettings,
 		emailSettings,
-		oauthSettings,
-		dataSettings
+		oauthSettings
 	};
 }

@@ -78,7 +78,7 @@
 	const userFormErrorHandler = new FormErrorHandler('genericUserError', [
 		'email',
 		'password',
-		'project_dir',
+		'project_dirs',
 		'slurm_accounts'
 	]);
 
@@ -460,6 +460,38 @@
 		!saving &&
 			(userPendingChanges || addedGroups.length > 0 || removedGroups.length > 0 || password)
 	);
+
+	function addProjectDir() {
+		if (!editableUser) {
+			return;
+		}
+		editableUser.project_dirs = [...editableUser.project_dirs, ''];
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeProjectDir(index) {
+		if (!editableUser) {
+			return;
+		}
+		editableUser.project_dirs = editableUser.project_dirs.filter((_, i) => i !== index);
+		userFormErrorHandler.removeValidationError('project_dirs', index);
+	}
+
+	/**
+	 * @param {string | string[]} error
+	 * @param {number} index
+	 */
+	function getProjectDirError(error, index) {
+		if (typeof error === 'string') {
+			return error;
+		}
+		if (Array.isArray(error) && error[index]) {
+			return error[index];
+		}
+		return undefined;
+	}
 </script>
 
 {#if editableUser}
@@ -647,21 +679,47 @@
 			</div>
 
 			<div class="row mb-3 has-validation">
-				<label for="project_dir" class="col-sm-3 col-form-label text-end">
-					<strong>Project dir</strong>
-				</label>
+				<span class="col-sm-3 col-form-label text-end">
+					<strong>Project dirs</strong>
+				</span>
 				<div class="col-sm-9">
-					<input
-						type="text"
-						class="form-control"
-						id="project_dir"
-						bind:value={editableUser.project_dir}
-						class:is-invalid={userFormSubmitted && $userValidationErrors['project_dir']}
-					/>
+					<!-- eslint-disable-next-line no-unused-vars -->
+					{#each editableUser.project_dirs as _, i (i)}
+						<div class="input-group mb-2 has-validation">
+							<input
+								type="text"
+								class="form-control"
+								id="project_dir_{i}"
+								aria-label="Project dir"
+								bind:value={editableUser.project_dirs[i]}
+								class:is-invalid={userFormSubmitted &&
+									getProjectDirError($userValidationErrors['project_dirs'], i)}
+							/>
+							{#if editableUser.project_dirs.length > 1}
+								<button
+									class="btn btn-outline-secondary"
+									type="button"
+									aria-label="Remove project dir"
+									onclick={() => removeProjectDir(i)}
+								>
+									<i class="bi bi-trash"></i>
+								</button>
+							{/if}
+							{#if getProjectDirError($userValidationErrors['project_dirs'], i)}
+								<span class="invalid-feedback">
+									{getProjectDirError($userValidationErrors['project_dirs'], i)}
+								</span>
+							{/if}
+						</div>
+					{/each}
 					<span class="form-text">
-						A base folder used for default <code>zarr_dir</code> paths
+						Base folders used for default <code>zarr_dir</code> paths
 					</span>
-					<span class="invalid-feedback">{$userValidationErrors['project_dir']}</span>
+					<div>
+						<button type="button" class="btn btn-outline-secondary mt-2" onclick={addProjectDir}>
+							Add project dir
+						</button>
+					</div>
 				</div>
 			</div>
 

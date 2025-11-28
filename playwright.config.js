@@ -88,7 +88,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3024-move-from-project_dir-to-project_dirs',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

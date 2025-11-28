@@ -10,6 +10,11 @@ vi.mock('$app/state', () => {
 		page: {
 			params: {
 				projectId: 1
+			},
+			data: {
+				userInfo: {
+					project_dirs: ['/path/to/proj/dir']
+				}
 			}
 		}
 	};
@@ -35,24 +40,15 @@ const defaultProps = {
 	props: { createDatasetCallback: vi.fn() }
 };
 
-/**
- * @param {string|null} project_dir
- */
-function mockFetch(project_dir) {
-	/** @type {import('vitest').Mock} */ (fetch).mockImplementation((url) => ({
+function mockFetch() {
+	/** @type {import('vitest').Mock} */ (fetch).mockImplementation(() => ({
 		ok: true,
 		status: 200,
 		json: () =>
 			new Promise((resolve) => {
-				if (url === '/api/auth/current-user') {
-					resolve({
-						project_dir
-					});
-				} else {
-					resolve({
-						id: 1
-					});
-				}
+				resolve({
+					id: 1
+				});
 			})
 	}));
 }
@@ -62,15 +58,15 @@ describe('CreateDatasetModal', () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
-	it('validate missing name and zarr dir', async () => {
-		mockFetch(null);
+	it('validate missing name', async () => {
+		mockFetch();
 		const result = render(CreateDatasetModal, defaultProps);
 		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
-		expect(result.queryAllByText('Required field').length).eq(2);
+		expect(result.queryAllByText('Required field').length).eq(1);
 	});
 
 	it('create dataset with string filter', async () => {
-		mockFetch(null);
+		mockFetch();
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {
 			props: { createDatasetCallback }
@@ -94,7 +90,7 @@ describe('CreateDatasetModal', () => {
 	});
 
 	it('create dataset without specifying zarr dir', async () => {
-		mockFetch('/path/to/zarr/dir');
+		mockFetch();
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {
 			props: { createDatasetCallback }
@@ -114,33 +110,26 @@ describe('CreateDatasetModal', () => {
 	});
 
 	it('validate missing dataset name', async () => {
-		mockFetch('/path/to/zarr/dir');
 		const result = render(CreateDatasetModal, defaultProps);
-		expect(await result.findByText('/path/to/zarr/dir')).toBeVisible();
+		expect(await result.findByText('/path/to/proj/dir')).toBeVisible();
 		await fireEvent.click(result.getByRole('button', { name: 'Save' }));
 		expect(result.queryAllByText('Required field').length).eq(1);
 	});
 
 	it('display invalid zarr dir error', async () => {
-		/** @type {import('vitest').Mock} */ (fetch)
-			.mockResolvedValueOnce({
-				ok: true,
-				status: 200,
-				json: async () => ({ project_dir: null })
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValueOnce({
+			ok: false,
+			status: 422,
+			json: async () => ({
+				detail: [
+					{
+						loc: ['body', 'zarr_dir'],
+						msg: "URLs must begin with '/' or 's3'.",
+						type: 'value_error'
+					}
+				]
 			})
-			.mockResolvedValueOnce({
-				ok: false,
-				status: 422,
-				json: async () => ({
-					detail: [
-						{
-							loc: ['body', 'zarr_dir'],
-							msg: "URLs must begin with '/' or 's3'.",
-							type: 'value_error'
-						}
-					]
-				})
-			});
+		});
 
 		const createDatasetCallback = vi.fn();
 		const result = render(CreateDatasetModal, {

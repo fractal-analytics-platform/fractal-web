@@ -4,6 +4,10 @@
 
 * Implemented project sharing (\#893).
 * Handled paginated responses in task-group admin pages (\#893).
+* Supported multiple project directories (\#895).
+* Dropped `viewer_paths` from groups (\#895).
+* Added validation of environment variables at startup (\#895).
+* Added Node 24 in CI configuration (\#895).
 
 # 1.21.1
 

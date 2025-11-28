@@ -268,11 +268,16 @@ export class FormErrorHandler {
 	/**
 	 * Manually remove a validation error.
 	 * @param {string} key
+	 * @param {number|undefined} index
 	 */
-	removeValidationError(key) {
+	removeValidationError(key, index = undefined) {
 		this.validationErrors.update((errors) => {
 			const newErrors = { ...errors };
-			delete newErrors[key];
+			if (index !== undefined && Array.isArray(newErrors[key])) {
+				newErrors[key] = newErrors[key].filter((_, i) => i !== index);
+			} else {
+				delete newErrors[key];
+			}
 			return newErrors;
 		});
 	}

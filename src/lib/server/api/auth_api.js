@@ -51,11 +51,12 @@ export async function getCurrentUser(fetch, groupIdsNames = false) {
 /**
  * Fetches user viewer paths
  * @param {typeof fetch} fetch
+ * @param {boolean} includeSharedProjects
  * @returns {Promise<string[]>}
  */
-export async function getCurrentUserAllowedViewerPaths(fetch) {
+export async function getCurrentUserAllowedViewerPaths(fetch, includeSharedProjects = false) {
 	logger.debug('Retrieving current user viewer paths');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/allowed-viewer-paths/`;
+	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/allowed-viewer-paths/?include_shared_projects=${includeSharedProjects}`;
 	const response = await fetch(url, {
 		method: 'GET',
 		credentials: 'include'

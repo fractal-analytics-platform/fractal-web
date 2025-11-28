@@ -1,14 +1,7 @@
 <script>
 	import { page } from '$app/state';
-	import {
-		displayStandardErrorAlert,
-		FormErrorHandler,
-		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import { normalizePayload } from 'fractal-components';
-	import { onMount } from 'svelte';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
 	let group = $state(page.data.group);
@@ -115,58 +108,6 @@
 		);
 	}
 
-	/** @type {string[]} */
-	let editableViewPaths = $state([]);
-	/** @type {string[]} */
-	let originalViewPaths = $state([]);
-	let viewerPathsUpdatedMessage = $state('');
-	const viewerPathsErrorHandler = new FormErrorHandler('viewerPathGenericError', ['viewer_paths']);
-	const viewerPathsValidationErrors = viewerPathsErrorHandler.getValidationErrorStore();
-
-	function addViewerPath() {
-		editableViewPaths = [...editableViewPaths, ''];
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function removeViewerPath(index) {
-		if ($viewerPathsValidationErrors['viewer_paths']) {
-			$viewerPathsValidationErrors['viewer_paths'] = $viewerPathsValidationErrors[
-				'viewer_paths'
-			].filter((_, i) => i !== index);
-		}
-		editableViewPaths = editableViewPaths.filter((_, i) => i !== index);
-	}
-
-	async function saveViewerPaths() {
-		viewerPathsUpdatedMessage = '';
-		viewerPathsErrorHandler.clearErrors();
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch(`/api/auth/group/${group.id}`, {
-			method: 'PATCH',
-			credentials: 'include',
-			headers,
-			body: normalizePayload({
-				viewer_paths: [...editableViewPaths]
-			})
-		});
-		if (!response.ok) {
-			await viewerPathsErrorHandler.handleErrorResponse(response);
-			return;
-		}
-		const { viewer_paths } = await response.json();
-		editableViewPaths = [...viewer_paths];
-		originalViewPaths = [...viewer_paths];
-		viewerPathsUpdatedMessage = 'Paths successfully updated';
-	}
-
-	onMount(() => {
-		editableViewPaths = [...group.viewer_paths];
-		originalViewPaths = [...group.viewer_paths];
-	});
-
 	let availableUsers = $derived(
 		users.filter((u) => !group.user_ids.includes(u.id)).sort(sortUserByEmailComparator)
 	);
@@ -175,9 +116,6 @@
 	);
 	let members = $derived(
 		users.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator)
-	);
-	let saveViewerPathsEnabled = $derived(
-		JSON.stringify(originalViewPaths) !== JSON.stringify(editableViewPaths)
 	);
 </script>
 
@@ -286,56 +224,6 @@
 			{:else}
 				<p>No more users available</p>
 			{/if}
-		</div>
-	</div>
-
-	<div class="row mt-4 mb-4">
-		<div class="col-lg-9">
-			<h4 class="fw-light">Viewer paths</h4>
-			<!-- eslint-disable-next-line no-unused-vars -->
-			{#each editableViewPaths as _, i (i)}
-				<div
-					class="input-group mb-2"
-					class:has-validation={$viewerPathsValidationErrors['viewer_paths'] &&
-						$viewerPathsValidationErrors['viewer_paths'][i]}
-				>
-					<input
-						type="text"
-						class="form-control"
-						id={`viewerPath-${i}`}
-						bind:value={editableViewPaths[i]}
-						aria-label={`Viewer path #${i + 1}`}
-						class:is-invalid={$viewerPathsValidationErrors['viewer_paths'] &&
-							$viewerPathsValidationErrors['viewer_paths'][i]}
-						required
-					/>
-					<button
-						class="btn btn-outline-secondary"
-						type="button"
-						id="viewer_path_remove_{i}"
-						aria-label={`Remove viewer path #${i + 1}`}
-						onclick={() => removeViewerPath(i)}
-					>
-						<i class="bi bi-trash"></i>
-					</button>
-					{#if $viewerPathsValidationErrors['viewer_paths'] && $viewerPathsValidationErrors['viewer_paths'][i]}
-						<div class="invalid-feedback">
-							{$viewerPathsValidationErrors['viewer_paths'][i]}
-						</div>
-					{/if}
-				</div>
-			{/each}
-			<button class="btn btn-secondary mb-2" onclick={addViewerPath}>Add viewer path</button>
-			<div id="viewerPathGenericError"></div>
-			{#if $viewerPathsValidationErrors['viewer_paths'] && !Array.isArray($viewerPathsValidationErrors['viewer_paths'])}
-				<div class="alert alert-danger mb-2">
-					{$viewerPathsValidationErrors['viewer_paths']}
-				</div>
-			{/if}
-			<StandardDismissableAlert message={viewerPathsUpdatedMessage} />
-			<button class="btn btn-primary" onclick={saveViewerPaths} disabled={!saveViewerPathsEnabled}>
-				Save
-			</button>
 		</div>
 	</div>
 </div>

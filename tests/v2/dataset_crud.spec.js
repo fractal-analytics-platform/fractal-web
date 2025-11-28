@@ -23,14 +23,14 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Fill dataset mandatory values', async () => {
 		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await page.getByRole('button', { name: 'Advanced options' }).click();
-		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
+		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp/test');
 	});
 
 	await test.step('Save dataset', async () => {
 		const saveBtn = page.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
 		await waitModalClosed(page);
-		await expect(page.getByText(/Created new dataset with Zarr dir \/tmp/)).toBeVisible();
+		await expect(page.getByText(/Created new dataset with Zarr dir \/tmp\/test/)).toBeVisible();
 	});
 
 	/** @type {import('@playwright/test').Locator} */
@@ -79,7 +79,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Edit Zarr dir', async () => {
 		const modal = page.locator('.modal.show');
 		await modal.getByRole('button', { name: 'Edit Zarr dir' }).click();
-		await modal.getByRole('textbox').fill('/tmp-renamed');
+		await modal.getByRole('textbox').fill('/tmp/test-renamed');
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await expect(modal.getByRole('textbox')).toHaveCount(0);
 	});
