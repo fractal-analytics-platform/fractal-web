@@ -16,18 +16,14 @@
 
 	<p>
 		Note that access to image data is restricted to OME-Zarrs within certain paths (and their
-		subfolders).
-		{#if viewerPaths.length > 0}
-			These are the accessible paths:
-		{:else}
-			The list of paths accessible to the current user is empty.
-		{/if}
+		subfolders). The accessible paths are:
 	</p>
 
 	<ul>
 		{#each viewerPaths as viewerPath (viewerPath)}
 			<li><code>{viewerPath}</code></li>
 		{/each}
+		<li>and the zarr directories of all datasets you have access to.</li>
 	</ul>
 
 	<p>

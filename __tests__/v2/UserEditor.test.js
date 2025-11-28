@@ -61,7 +61,7 @@ describe('UserEditor', () => {
 				user: {
 					...selectedUser,
 					slurm_accounts: [],
-					project_dir: null
+					project_dirs: ['']
 				},
 				saveUser: mockSaveUser,
 				defaultGroupName: 'All'
@@ -75,7 +75,7 @@ describe('UserEditor', () => {
 		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
 				slurm_accounts: [],
-				project_dir: '/path/to/project/dir'
+				project_dirs: ['/path/to/project/dir']
 			})
 		);
 	});
@@ -92,7 +92,7 @@ describe('UserEditor', () => {
 						resolve({
 							detail: [
 								{
-									loc: ['body', 'project_dir'],
+									loc: ['body', 'project_dirs', 0],
 									msg: 'mocked_error',
 									type: 'value_error'
 								}
@@ -108,7 +108,7 @@ describe('UserEditor', () => {
 				user: {
 					...selectedUser,
 					slurm_accounts: [],
-					project_dir: null
+					project_dirs: ['']
 				},
 				saveUser: mockSaveUser,
 				defaultGroupName: 'All'
@@ -122,7 +122,7 @@ describe('UserEditor', () => {
 		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
 				slurm_accounts: [],
-				project_dir: 'xxx'
+				project_dirs: ['xxx']
 			})
 		);
 	});
@@ -144,7 +144,7 @@ describe('UserEditor', () => {
 				user: {
 					...selectedUser,
 					slurm_accounts: [],
-					project_dir: '/path/to/project/dir'
+					project_dirs: ['/path/to/project/dir']
 				},
 				saveUser: mockSaveUser,
 				defaultGroupName: 'All'
@@ -164,7 +164,7 @@ describe('UserEditor', () => {
 		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
 				slurm_accounts: ['foo', 'bar'],
-				project_dir: '/path/to/project/dir'
+				project_dirs: ['/path/to/project/dir']
 			})
 		);
 	});
@@ -186,7 +186,7 @@ describe('UserEditor', () => {
 				user: {
 					...selectedUser,
 					slurm_accounts: ['foo', 'bar'],
-					project_dir: '/path/to/project/dir'
+					project_dirs: ['/path/to/project/dir']
 				},
 				saveUser: mockSaveUser,
 				defaultGroupName: 'All'
@@ -203,7 +203,7 @@ describe('UserEditor', () => {
 		expect(mockSaveUser).toHaveBeenCalledWith(
 			expect.objectContaining({
 				slurm_accounts: ['foo'],
-				project_dir: '/path/to/project/dir'
+				project_dirs: ['/path/to/project/dir']
 			})
 		);
 	});

@@ -1,5 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { addFinalSlash } from '$lib/common/component_utilities';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
@@ -9,12 +11,12 @@
 	let stepMessage = $state('');
 	let error = $state();
 	let randomProjectName = $state('');
-
-	const zarrDir = '/invalid/zarr/dir/not/to/be/used/';
+	let zarrDir = $state('');
 
 	onMount(() => {
 		const randomPart = new Date().getTime();
 		randomProjectName = `test_${randomPart}`;
+		zarrDir = `${addFinalSlash(page.data.userInfo.project_dirs[0])}fractal_test/`;
 	});
 
 	async function startTest() {
