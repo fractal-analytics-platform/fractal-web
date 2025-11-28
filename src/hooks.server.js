@@ -3,23 +3,11 @@ import { formatDate, getLogger } from '$lib/server/logger.js';
 import { getServerInfo } from '$lib/server/api/alive';
 import { getCurrentUser } from '$lib/server/api/auth_api';
 import { error, redirect } from '@sveltejs/kit';
+import { checkEnvironmentVariables } from './environment-variables';
 
 const logger = getLogger('hooks');
 
-if (!env.FRACTAL_RUNNER_BACKEND) {
-	throw new Error('Environment variable FRACTAL_RUNNER_BACKEND is mandatory');
-}
-
-if (env.FRACTAL_SERVER_HOST.endsWith('/')) {
-	env.FRACTAL_SERVER_HOST = env.FRACTAL_SERVER_HOST.substring(
-		0,
-		env.FRACTAL_SERVER_HOST.length - 1
-	);
-	logger.trace(
-		'Removing final slash from FRACTAL_SERVER_HOST, new value is %s',
-		env.FRACTAL_SERVER_HOST
-	);
-}
+checkEnvironmentVariables();
 
 export async function handle({ event, resolve }) {
 	if (event.url.pathname.startsWith('/api')) {
