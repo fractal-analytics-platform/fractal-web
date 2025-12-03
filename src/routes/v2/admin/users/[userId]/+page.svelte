@@ -92,7 +92,13 @@
 				</tr>
 				<tr>
 					<th>Project dir</th>
-					<td>{user.project_dir || '-'}</td>
+					<td>
+						<ul class="ps-3">
+							{#each user.project_dirs as dir (dir)}
+								<li>{dir}</li>
+							{/each}
+						</ul>
+					</td>
 				</tr>
 				{#if runnerBackend !== 'local'}
 					<tr>

@@ -17,7 +17,7 @@
 		group_ids_names: [],
 		oauth_accounts: [],
 		profile_id: null,
-		project_dir: '',
+		project_dirs: [''],
 		slurm_accounts: []
 	};
 
@@ -41,7 +41,7 @@
 			email: user.email,
 			password: user.password,
 			profile_id: user.profile_id,
-			project_dir: user.project_dir
+			project_dirs: user.project_dirs
 		};
 
 		if (runnerBackend !== 'local') {
@@ -52,7 +52,7 @@
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: normalizePayload(payload, { stripEmptyElements: true })
+			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});
 
 		if (!createResponse.ok) {

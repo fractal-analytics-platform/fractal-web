@@ -155,18 +155,8 @@
 	}
 
 	onMount(async () => {
-		await loadProjectDir();
+		projectDir = page.data.userInfo.project_dirs[0];
 	});
-
-	async function loadProjectDir() {
-		const response = await fetch('/api/auth/current-user');
-		if (!response.ok) {
-			return;
-		}
-		/** @type {import('fractal-components/types/api').User} */
-		const result = await response.json();
-		projectDir = result.project_dir;
-	}
 </script>
 
 <Modal id="createDatasetModal" bind:this={modal} size="lg" centered={true} {onOpen}>

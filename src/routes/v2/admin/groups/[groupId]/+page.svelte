@@ -7,9 +7,9 @@
 	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
 	let allUsers = $derived(page.data.users);
 
-	let groupUsers = $derived(allUsers
-		.filter((u) => group.user_ids.includes(u.id))
-		.sort(sortUserByEmailComparator));
+	let groupUsers = $derived(
+		allUsers.filter((u) => group.user_ids.includes(u.id)).sort(sortUserByEmailComparator)
+	);
 </script>
 
 <div class="container mt-3">
@@ -45,19 +45,4 @@
 			{/each}
 		</div>
 	{/if}
-
-	<div class="row mt-4">
-		<div class="col">
-			<h4 class="fw-light mb-3">Viewer paths</h4>
-			{#if group.viewer_paths.length > 0}
-				<ul>
-					{#each group.viewer_paths as viewerPath (viewerPath)}
-						<li><code>{viewerPath}</code></li>
-					{/each}
-				</ul>
-			{:else}
-				This group has no viewer paths.
-			{/if}
-		</div>
-	</div>
 </div>
