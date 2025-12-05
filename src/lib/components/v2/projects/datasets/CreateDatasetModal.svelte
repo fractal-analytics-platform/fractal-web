@@ -3,15 +3,16 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload, PropertyDescription } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').ProjectV2} project
 	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} createDatasetCallback
 	 */
 
 	/** @type {Props} */
-	let { createDatasetCallback } = $props();
+	let { project, createDatasetCallback } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -19,9 +20,11 @@
 	/** @type {'new'|'import'} */
 	let mode = $state('new');
 	let datasetName = $state('');
+	/** @type {string[]} */
+	let projectDirs = $state([]);
 	/** @type {string|null} */
 	let projectDir = $state(null);
-	let zarrDir = $state('');
+	let zarrSubfolder = $state('');
 	let submitted = $state(false);
 	let saving = $state(false);
 
@@ -33,7 +36,8 @@
 
 	const formErrorHandler = new FormErrorHandler('errorAlert-createDatasetModal', [
 		'name',
-		'zarr_dir'
+		'project_dir',
+		'zarr_subfolder'
 	]);
 
 	const validationErrors = formErrorHandler.getValidationErrorStore();
@@ -41,7 +45,7 @@
 	function onOpen() {
 		mode = 'new';
 		datasetName = '';
-		zarrDir = '';
+		zarrSubfolder = '';
 		submitted = false;
 		files = null;
 		if (fileInput) {
@@ -131,10 +135,11 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const body = {
-			name: datasetName
+			name: datasetName,
+			project_dir: projectDir
 		};
-		if (zarrDir) {
-			body.zarr_dir = zarrDir;
+		if (zarrSubfolder) {
+			body.zarr_subfolder = zarrSubfolder;
 		}
 		const response = await fetch(`/api/v2/project/${projectId}/dataset`, {
 			method: 'POST',
@@ -151,11 +156,34 @@
 	}
 
 	function fieldsAreValid() {
-		return !!datasetName.trim() && (projectDir !== null || !!zarrDir.trim());
+		return (
+			!!datasetName.trim() &&
+			projectDir !== null &&
+			(zarrSubfolder === '' || !zarrSubfolder.startsWith('/'))
+		);
 	}
 
+	/**
+	 * See sanitize_string in fractal-server.
+	 * Note: \s matches all whitespaces
+	 * !"#$%&\'()*+,-./:;<=>?@[\\\\]^_`{|}~
+	 * @param {string} value
+	 */
+	function sanitizeString(value) {
+		return value.toLowerCase().replace(/[\s!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]/g, '_');
+	}
+
+	const defaultZarrDir = $derived(
+		`fractal/${project.id}_${sanitizeString(project.name)}/{dataset_id}_${sanitizeString(datasetName)}`
+	);
+
+	const completePath = $derived(
+		zarrSubfolder ? `${projectDir}/${zarrSubfolder}` : `${projectDir}/${defaultZarrDir}`
+	);
+
 	onMount(async () => {
-		projectDir = page.data.userInfo.project_dirs[0];
+		projectDirs = page.data.userInfo.project_dirs;
+		projectDir = projectDirs[0];
 	});
 </script>
 
@@ -212,7 +240,7 @@
 								class="form-control"
 								class:is-invalid={submitted && (!datasetName.trim() || $validationErrors['name'])}
 							/>
-							{#if submitted && !datasetName.trim()}
+							{#if submitted && (!datasetName.trim() || $validationErrors['name'])}
 								<div class="invalid-feedback">
 									{#if !datasetName.trim()}
 										Required field
@@ -230,14 +258,14 @@
 								<input
 									id="zarrDir"
 									type="text"
-									bind:value={zarrDir}
+									bind:value={zarrSubfolder}
 									class="form-control"
-									class:is-invalid={submitted && (!zarrDir || $validationErrors['zarr_dir'])}
+									class:is-invalid={submitted && (!zarrSubfolder || $validationErrors['zarr_dir'])}
 								/>
 								<div class="form-text">The main folder for OME-Zarrs of this dataset.</div>
-								{#if submitted && (!zarrDir || $validationErrors['zarr_dir'])}
+								{#if submitted && (!zarrSubfolder || $validationErrors['zarr_dir'])}
 									<div class="invalid-feedback">
-										{#if !zarrDir}
+										{#if !zarrSubfolder}
 											Required field
 										{:else}
 											{$validationErrors['zarr_dir']}
@@ -268,23 +296,60 @@
 										data-bs-parent="#zarrDirAccordion"
 									>
 										<div class="accordion-body">
+											<div class="row mb-3">
+												<div class="col-3 col-form-label">
+													<label for="projectDir">Project directory</label>
+													<PropertyDescription
+														description="Choose which project directory your dataset zarr directory is placed in. To add additional project directory choices, contact an admin."
+													/>
+												</div>
+												<div class="col-9">
+													<select
+														class="form-select"
+														bind:value={projectDir}
+														id="projectDir"
+														class:is-invalid={submitted && $validationErrors['project_dir']}
+													>
+														{#each projectDirs as dir (dir)}
+															<option>{dir}</option>
+														{/each}
+													</select>
+													{#if submitted && $validationErrors['project_dir']}
+														<div class="invalid-feedback">
+															{$validationErrors['project_dir']}
+														</div>
+													{/if}
+												</div>
+											</div>
 											<div class="row">
-												<label for="zarrDir" class="col-2 col-form-label text-end">Zarr dir</label>
-												<div class="col-10">
+												<div class="col-3 col-form-label">
+													<label for="zarrDir">Zarr subfolder</label>
+													<PropertyDescription
+														description="Specify where in your project directory the dataset zarr directory should be. This is a path relative to the project directory and needs to stay within the chosen project directory. By default, Fractal will create a folder for the project with a subfolder for the dataset."
+													/>
+												</div>
+												<div class="col-9">
 													<input
 														id="zarrDir"
 														type="text"
-														bind:value={zarrDir}
+														bind:value={zarrSubfolder}
+														placeholder={defaultZarrDir}
 														class="form-control"
-														class:is-invalid={submitted && $validationErrors['zarr_dir']}
+														class:is-invalid={(submitted && $validationErrors['zarr_subfolder']) ||
+															zarrSubfolder.startsWith('/')}
 													/>
 													<div class="form-text">
-														The main folder for OME-Zarrs of this dataset. If not set, a default
-														subfolder of <code>{projectDir}</code> will be used.
+														Output data generated by Fractal will be put into
+														<code>{completePath}</code>. You can change the project directory or the
+														Zarr subfolder above.
 													</div>
-													{#if submitted && $validationErrors['zarr_dir']}
+													{#if submitted && $validationErrors['zarr_subfolder']}
 														<div class="invalid-feedback">
-															{$validationErrors['zarr_dir']}
+															{$validationErrors['zarr_subfolder']}
+														</div>
+													{:else if zarrSubfolder.startsWith('/')}
+														<div class="invalid-feedback">
+															Zarr subfolder must be a relative path
 														</div>
 													{/if}
 												</div>

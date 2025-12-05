@@ -8,10 +8,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		description,
-		html = false
-	} = $props();
+	let { description, html = false } = $props();
 
 	/** @type {HTMLElement|undefined} */
 	let element = $state();

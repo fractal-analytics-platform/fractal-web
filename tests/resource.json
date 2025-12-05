@@ -2,6 +2,7 @@
 	"type": "local",
 	"name": "Local resource",
 	"host": null,
+	"prevent_new_submissions": false,
 	"jobs_local_dir": "/tmp/fractal-test-server/data-jobs",
 	"jobs_runner_config": {},
 	"jobs_slurm_python_worker": null,

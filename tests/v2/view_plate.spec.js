@@ -5,7 +5,8 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 	await page.waitForURL(project.url);
 	await waitPageLoading(page);
 
-	const randomPath = `/tmp/${Math.random().toString(36).substring(7)}`;
+	const randomZarrSubfolder = Math.random().toString(36).substring(7);
+	const randomPath = `/tmp/${randomZarrSubfolder}`;
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
@@ -14,7 +15,8 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
-		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
+		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
+		await modal.getByRole('textbox', { name: 'Zarr subfolder' }).fill(randomZarrSubfolder);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -87,7 +89,8 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-2');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
-		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp');
+		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
+		await modal.getByRole('textbox', { name: 'Zarr subfolder' }).fill('invalid');
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -96,7 +99,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 		await page.getByRole('link', { name: 'test-dataset-2' }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/datasets\/\d+/);
 		await expect(page.getByText('No entries in the image list yet')).toBeVisible();
-		await createImageWithPlate(page, '/tmp/invalid', 'plate1');
+		await createImageWithPlate(page, '/tmp/invalid/foo', 'plate1');
 		await checkPlateSelector(page, 'plate1');
 		await page.getByRole('combobox', { name: 'Select plate' }).selectOption('plate1');
 		await expect(

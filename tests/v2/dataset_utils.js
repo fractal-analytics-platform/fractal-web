@@ -16,11 +16,12 @@ export async function createDataset(page, projectId) {
 	await modal.waitFor();
 
 	const randomDatasetName = Math.random().toString(36).substring(7);
-	const zarrDir = `/tmp/playwright/datasets/${randomDatasetName}`;
+	const zarrSubfolder = `playwright/datasets/${randomDatasetName}`;
 
 	await modal.getByRole('textbox', { name: 'Dataset Name' }).fill(randomDatasetName);
 	await modal.getByRole('button', { name: 'Advanced options' }).click();
-	await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(zarrDir);
+	await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
+	await modal.getByRole('textbox', { name: 'Zarr subfolder' }).fill(zarrSubfolder);
 	const saveBtn = page.getByRole('button', { name: 'Save' });
 	await saveBtn.click();
 	await waitModalClosed(page);
@@ -43,5 +44,5 @@ export async function createDataset(page, projectId) {
 		throw new Error('Unable to extract dataset id');
 	}
 	const datasetId = match[1];
-	return { name: randomDatasetName, id: Number(datasetId), zarrDir };
+	return { name: randomDatasetName, id: Number(datasetId), zarrDir: zarrSubfolder };
 }

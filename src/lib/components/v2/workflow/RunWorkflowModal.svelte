@@ -15,6 +15,8 @@
 		STATUS_KEY
 	} from '$lib/common/workflow_utilities';
 	import { normalizePayload } from 'fractal-components';
+	import { splitZarrDir } from '$lib/common/component_utilities';
+	import { page } from '$app/state';
 
 	/**
 	 * @typedef {Object} Props
@@ -196,13 +198,15 @@
 	async function handleDatasetCreate(datasetName, zarrDir) {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
+		const { projectDir, zarrSubfolder } = splitZarrDir(zarrDir, page.data.userInfo.project_dirs);
 		const response = await fetch(`/api/v2/project/${workflow.project_id}/dataset`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: datasetName,
-				zarr_dir: zarrDir
+				project_dir: projectDir,
+				zarr_subfolder: zarrSubfolder
 			})
 		});
 		if (!response.ok) {

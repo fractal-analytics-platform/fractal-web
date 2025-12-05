@@ -9,7 +9,8 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 	await page.goto(`/v2/projects/${workflow.projectId}`);
 	await waitPageLoading(page);
 
-	const randomPath = `/tmp/${Math.random().toString(36).substring(7)}`;
+	const randomZarrSubfolder = Math.random().toString(36).substring(7);
+	const randomPath = `/tmp/${randomZarrSubfolder}`;
 	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
@@ -18,7 +19,8 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 		await modal.waitFor();
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
-		await modal.getByRole('textbox', { name: 'Zarr dir' }).fill(randomPath);
+		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
+		await modal.getByRole('textbox', { name: 'Zarr subfolder' }).fill(randomZarrSubfolder);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});

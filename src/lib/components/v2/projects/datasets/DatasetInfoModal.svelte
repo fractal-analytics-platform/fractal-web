@@ -18,20 +18,13 @@
 
 	let editName = $state(false);
 	let name = $state('');
-	let editZarrDir = $state(false);
-	let zarrDir = $state('');
 
-	const formErrorHandler = new FormErrorHandler('errorAlert-datasetInfoModal', [
-		'name',
-		'zarr_dir'
-	]);
+	const formErrorHandler = new FormErrorHandler('errorAlert-datasetInfoModal', ['name']);
 	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	function onOpen() {
 		editName = false;
-		editZarrDir = false;
 		name = dataset.name;
-		zarrDir = dataset.zarr_dir;
 		formErrorHandler.clearErrors();
 	}
 
@@ -52,27 +45,6 @@
 	function undoEditName() {
 		editName = false;
 		name = dataset.name;
-	}
-
-	let savingZarrDir = $state(false);
-
-	async function saveZarrDir() {
-		if (!zarrDir) {
-			return;
-		}
-		formErrorHandler.clearErrors();
-		savingZarrDir = true;
-		const updated = await updateDataset({ zarr_dir: zarrDir });
-		if (updated) {
-			editZarrDir = false;
-		}
-		savingZarrDir = false;
-	}
-
-	function undoEditZarrDir() {
-		editZarrDir = false;
-		zarrDir = dataset.zarr_dir;
-		formErrorHandler.removeValidationError('zarr_dir');
 	}
 
 	/**
@@ -170,54 +142,7 @@
 				<strong>Zarr dir</strong>
 			</li>
 			<li class="list-group-item">
-				{#if editZarrDir}
-					<div class="input-group has-validation">
-						<input
-							type="text"
-							bind:value={zarrDir}
-							class="form-control"
-							class:is-invalid={$validationErrors['zarr_dir']}
-							onkeydown={(e) => {
-								if (e.key === 'Enter') {
-									saveZarrDir();
-								}
-							}}
-						/>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							onclick={undoEditZarrDir}
-							aria-label="Undo edit zarr dir"
-						>
-							<i class="bi bi-arrow-counterclockwise"></i>
-						</button>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							onclick={saveZarrDir}
-							disabled={!zarrDir || savingZarrDir}
-						>
-							{#if savingZarrDir}
-								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-								></span>
-							{/if}
-							Save
-						</button>
-						<span class="invalid-feedback">{$validationErrors['zarr_dir']}</span>
-					</div>
-				{:else}
-					<span>
-						<button
-							class="btn btn-primary float-end pt-0 pb-0"
-							onclick={() => (editZarrDir = true)}
-							aria-label="Edit Zarr dir"
-						>
-							<i class="bi bi-pencil"></i>
-							Edit
-						</button>
-						<pre>{dataset.zarr_dir}</pre>
-					</span>
-				{/if}
+				<pre>{dataset.zarr_dir}</pre>
 			</li>
 		</ul>
 	{/snippet}
