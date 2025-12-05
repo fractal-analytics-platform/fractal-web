@@ -151,3 +151,20 @@ export function addFinalSlash(url) {
 	}
 	return url.replace(/\/$|$/, '/');
 }
+
+/**
+ * @param {string} zarrDir
+ * @param {string[]} projectDirs
+ */
+export function splitZarrDir(zarrDir, projectDirs) {
+	let projectDir = '';
+	for (const dir of projectDirs) {
+		if (zarrDir.startsWith(dir) && dir.length > projectDir.length) {
+			projectDir = dir;
+		}
+	}
+	return {
+		projectDir,
+		zarrSubfolder: zarrDir.substring(projectDir.length + 1, zarrDir.length)
+	};
+}

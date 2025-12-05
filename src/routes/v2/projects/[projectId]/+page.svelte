@@ -104,7 +104,7 @@
 	</div>
 
 	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
-	<ProjectDatasetsList {datasets} />
+	<ProjectDatasetsList {datasets} {project} />
 	<WorkflowsList {workflows} projectId={project.id} />
 {/if}
 

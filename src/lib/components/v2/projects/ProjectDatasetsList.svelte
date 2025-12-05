@@ -7,11 +7,12 @@
 
 	/**
 	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').ProjectV2} project
 	 * @property {import('fractal-components/types/api').DatasetV2[]} [datasets]
 	 */
 
 	/** @type {Props} */
-	let { datasets = $bindable([]) } = $props();
+	let { project, datasets = $bindable([]) } = $props();
 
 	let datasetSearch = $state('');
 	let datasetCreatedMessage = $state('');
@@ -124,4 +125,4 @@
 	</table>
 </div>
 
-<CreateDatasetModal {createDatasetCallback} />
+<CreateDatasetModal {createDatasetCallback} {project} />

@@ -23,14 +23,14 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Fill dataset mandatory values', async () => {
 		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await page.getByRole('button', { name: 'Advanced options' }).click();
-		await page.getByRole('textbox', { name: 'Zarr dir' }).fill('/tmp/test');
+		await expect(page.getByRole('combobox', { name: 'Project directory' })).toHaveValue('/tmp');
 	});
 
 	await test.step('Save dataset', async () => {
 		const saveBtn = page.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
 		await waitModalClosed(page);
-		await expect(page.getByText(/Created new dataset with Zarr dir \/tmp\/test/)).toBeVisible();
+		await expect(page.getByText(/Created new dataset with Zarr dir \/tmp/)).toBeVisible();
 	});
 
 	/** @type {import('@playwright/test').Locator} */
@@ -73,25 +73,6 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await modal.getByRole('button', { name: 'Edit dataset name' }).click();
 		await modal.getByRole('textbox').fill('test-dataset-renamed');
 		await modal.getByRole('button', { name: 'Save' }).click();
-		await expect(modal.getByRole('textbox')).toHaveCount(0);
-	});
-
-	await test.step('Edit Zarr dir', async () => {
-		const modal = page.locator('.modal.show');
-		await modal.getByRole('button', { name: 'Edit Zarr dir' }).click();
-		await modal.getByRole('textbox').fill('/tmp/test-renamed');
-		await modal.getByRole('button', { name: 'Save' }).click();
-		await expect(modal.getByRole('textbox')).toHaveCount(0);
-	});
-
-	await test.step('Attempt to set invalid Zarr dir', async () => {
-		const modal = page.locator('.modal.show');
-		await modal.getByRole('button', { name: 'Edit Zarr dir' }).click();
-		await modal.getByRole('textbox').fill('foo');
-		await modal.getByRole('button', { name: 'Save' }).click();
-		await expect(modal.getByText(`URLs must begin with '/' or 's3'.`)).toBeVisible();
-		await expect(modal.getByRole('textbox')).toHaveCount(1);
-		await modal.getByRole('button', { name: 'Undo edit zarr dir' }).click();
 		await expect(modal.getByRole('textbox')).toHaveCount(0);
 	});
 

@@ -3,6 +3,7 @@
 	"type": "local",
 	"name": "test resource",
 	"host": null,
+	"prevent_new_submissions": false,
 	"jobs_local_dir": "/path/to/fractal-server/data-jobs",
 	"jobs_runner_config": {
 		"parallel_tasks_per_job": null
