@@ -3,6 +3,7 @@
 	import DOMPurify from 'dompurify';
 	import tasks from '../tasks.json';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import 'slim-select/styles';
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = $state(null);

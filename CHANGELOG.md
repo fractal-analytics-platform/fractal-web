@@ -8,6 +8,7 @@
 * Dropped `viewer_paths` from groups (\#895).
 * Added validation of environment variables at startup (\#895).
 * Added Node 24 in CI configuration (\#895).
+* Updated dataset creation modal with project directory selector and zarr subfolder input (\#899).
 
 # 1.21.1
 

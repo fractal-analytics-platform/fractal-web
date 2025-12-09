@@ -1,5 +1,5 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { addTaskToWorkflow, createWorkflow, waitModalClosed, waitPageLoading } from '../utils.js';
 import { PageWithProject } from './project_fixture.js';
 
 export class PageWithWorkflow extends PageWithProject {
@@ -14,26 +14,9 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 
 	async createWorkflow() {
-		await this.page.goto('/v2/projects/' + this.projectId);
-		await waitPageLoading(this.page);
-		const createWorkflowBtn = this.page.getByRole('button', { name: 'Create new workflow' });
-		await createWorkflowBtn.waitFor();
-		await createWorkflowBtn.click();
-		const modalTitle = this.page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Create new workflow');
-		const workflowNameInput = this.page.getByRole('textbox', { name: 'Workflow name' });
-		await workflowNameInput.fill(this.workflowName);
-		await workflowNameInput.blur();
-		const createNewWorkflowBtn = this.page.getByRole('button', { name: 'Create empty workflow' });
-		await createNewWorkflowBtn.click();
-		await this.page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
-		this.url = this.page.url();
-		const match = this.url.match(/\/v2\/projects\/\d+\/workflows\/(\d+)/);
-		if (match) {
-			this.workflowId = match[1];
-		}
-		await waitPageLoading(this.page);
+		const { url, id } = await createWorkflow(this.page, Number(this.projectId), this.workflowName);
+		this.url = url;
+		this.workflowId = String(id);
 	}
 
 	async addFirstCollectedTask() {
@@ -97,37 +80,7 @@ export class PageWithWorkflow extends PageWithProject {
 	 * @param {string|null=} taskVersion
 	 */
 	async addTask(taskName, taskVersion = null) {
-		await this.page.getByRole('button', { name: 'Add task to workflow' }).click();
-		const modal = this.page.locator('.modal.show');
-		await modal.waitFor();
-		await expect(modal.locator('.spinner-border')).toHaveCount(0);
-		const row = await this.getTaskRow(modal, taskName);
-		await row.scrollIntoViewIfNeeded();
-		if (taskVersion) {
-			await row
-				.getByRole('combobox', { name: `Version for task ${taskName}` })
-				.selectOption(taskVersion);
-		}
-		await row.getByRole('button', { name: 'Add task' }).click();
-		await waitModalClosed(this.page);
-	}
-
-	/**
-	 * @param {import('@playwright/test').Locator} modal
-	 * @param {string} taskName
-	 */
-	async getTaskRow(modal, taskName) {
-		const rows = await modal
-			.getByRole('row', { name: taskName })
-			.filter({ hasText: /Add task/ })
-			.all();
-		for (const row of rows) {
-			const cellContent = (await row.getByRole('cell').first().innerText()).trim();
-			if (cellContent === taskName) {
-				return row;
-			}
-		}
-		throw new Error(`Unable to find row for task ${taskName}`);
+		await addTaskToWorkflow(this.page, taskName, taskVersion);
 	}
 
 	async removeCurrentTask() {
