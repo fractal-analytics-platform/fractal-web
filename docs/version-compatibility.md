@@ -3,7 +3,8 @@
 The following table shows which `fractal-server` versions are compatible with which `fractal-web` versions.
 
 | fractal-web | fractal-server |
-|-------------|----------------|
+| ----------- | -------------- |
+| 1.22.0      | 2.18.1         |
 | 1.21.0      | 2.17.0         |
 | 1.20.1      | 2.16.0         |
 | 1.20.0      | 2.16.0         |
