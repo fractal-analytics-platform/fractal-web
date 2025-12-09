@@ -175,6 +175,14 @@
 		const { id, name, zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (
 			selectedDataset
 		);
+
+		const { projectDir } = splitZarrDir(zarr_dir, page.data.userInfo.project_dirs);
+		if (projectDir === '') {
+			throw new Error(
+				`You cannot reset dataset "${selectedDataset?.name}", because its Zarr directory is not part of your project directories. Create a fresh dataset instead to rerun the workflow on.`
+			);
+		}
+
 		await handleDatasetDelete(id);
 		const newDatasets = datasets.filter((d) => d.id !== id);
 		const newDataset = await handleDatasetCreate(name, zarr_dir);

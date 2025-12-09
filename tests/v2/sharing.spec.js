@@ -6,7 +6,7 @@ import {
 	expectBooleanIcon,
 	login,
 	logout,
-	shareProject,
+	shareProjectByName,
 	waitModal,
 	waitModalClosed,
 	waitPageLoading
@@ -75,7 +75,7 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Share project 2', async () => {
-		await shareProject(page, projectToReject, userEmail, 'Read');
+		await shareProjectByName(page, projectToReject, userEmail, 'Read');
 		const row = page.getByRole('row', { name: userEmail });
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
@@ -84,7 +84,7 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Share project 3', async () => {
-		await shareProject(page, projectToLeave, userEmail, 'Read, Write, Execute');
+		await shareProjectByName(page, projectToLeave, userEmail, 'Read, Write, Execute');
 		const row = page.getByRole('row', { name: userEmail });
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);

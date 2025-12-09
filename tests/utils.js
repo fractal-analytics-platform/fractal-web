@@ -212,7 +212,7 @@ export async function createProject(page) {
  * @param {string} userEmail
  * @param {string} permissions
  */
-export async function shareProject(page, projectName, userEmail, permissions) {
+export async function shareProjectByName(page, projectName, userEmail, permissions) {
 	await page.goto('/v2/projects');
 	await waitPageLoading(page);
 	await page.getByRole('row', { name: projectName }).getByRole('link', { name: 'Sharing' }).click();
@@ -223,6 +223,91 @@ export async function shareProject(page, projectName, userEmail, permissions) {
 	await page.getByRole('button', { name: 'Share' }).click();
 	const row = page.getByRole('row', { name: userEmail });
 	await expect(row).toBeVisible();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {number} projectId
+ * @param {string} userEmail
+ * @param {string} permissions
+ */
+export async function shareProjectById(page, projectId, userEmail, permissions) {
+	await page.goto(`/v2/projects/${projectId}/sharing`);
+	await waitPageLoading(page);
+	await page.getByRole('textbox', { name: 'User e-mail' }).fill(userEmail);
+	await page.getByRole('combobox', { name: 'Permission' }).selectOption(permissions);
+	await page.getByRole('button', { name: 'Share' }).click();
+	const row = page.getByRole('row', { name: userEmail });
+	await expect(row).toBeVisible();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {number|string} projectId
+ * @param {string} workflowName
+ */
+export async function createWorkflow(page, projectId, workflowName = '') {
+	await page.goto(`/v2/projects/${projectId}`);
+	await waitPageLoading(page);
+	const createWorkflowBtn = page.getByRole('button', { name: 'Create new workflow' });
+	await createWorkflowBtn.waitFor();
+	await createWorkflowBtn.click();
+	const modal = await waitModal(page);
+	const workflowNameInput = modal.getByRole('textbox', { name: 'Workflow name' });
+	if (!workflowName) {
+		workflowName = Math.random().toString(36).substring(7);
+	}
+	await workflowNameInput.fill(workflowName);
+	await workflowNameInput.blur();
+	await modal.getByRole('button', { name: 'Create empty workflow' }).click();
+	await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
+	const url = page.url();
+	const match = url.match(/\/v2\/projects\/\d+\/workflows\/(\d+)/);
+	let workflowId;
+	if (match) {
+		workflowId = Number(match[1]);
+	}
+	await waitPageLoading(page);
+	return { url, id: workflowId, name: workflowName };
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} taskName
+ * @param {string | null} taskVersion
+ */
+export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
+	await page.getByRole('button', { name: 'Add task to workflow' }).click();
+	const modal = page.locator('.modal.show');
+	await modal.waitFor();
+	await expect(modal.locator('.spinner-border')).toHaveCount(0);
+	const row = await getTaskRow(modal, taskName);
+	await row.scrollIntoViewIfNeeded();
+	if (taskVersion) {
+		await row
+			.getByRole('combobox', { name: `Version for task ${taskName}` })
+			.selectOption(taskVersion);
+	}
+	await row.getByRole('button', { name: 'Add task' }).click();
+	await waitModalClosed(page);
+}
+
+/**
+ * @param {import('@playwright/test').Locator} modal
+ * @param {string} taskName
+ */
+async function getTaskRow(modal, taskName) {
+	const rows = await modal
+		.getByRole('row', { name: taskName })
+		.filter({ hasText: /Add task/ })
+		.all();
+	for (const row of rows) {
+		const cellContent = (await row.getByRole('cell').first().innerText()).trim();
+		if (cellContent === taskName) {
+			return row;
+		}
+	}
+	throw new Error(`Unable to find row for task ${taskName}`);
 }
 
 /**

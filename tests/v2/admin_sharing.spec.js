@@ -5,7 +5,7 @@ import {
 	expectBooleanIcon,
 	login,
 	logout,
-	shareProject,
+	shareProjectByName,
 	waitPageLoading
 } from '../utils.js';
 import { createTestUser } from './user_utils.js';
@@ -24,7 +24,7 @@ test('Adming page for project sharing', async ({ page }) => {
 	const p2 = await createProject(page);
 
 	await test.step('Share project 1', async () => {
-		await shareProject(page, p1.name, userEmail1, 'Read');
+		await shareProjectByName(page, p1.name, userEmail1, 'Read');
 		const row = page.getByRole('row', { name: userEmail1 });
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
@@ -33,7 +33,7 @@ test('Adming page for project sharing', async ({ page }) => {
 	});
 
 	await test.step('Share project 2', async () => {
-		await shareProject(page, p2.name, userEmail2, 'Read, Write');
+		await shareProjectByName(page, p2.name, userEmail2, 'Read, Write');
 		const row = page.getByRole('row', { name: userEmail2 });
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
