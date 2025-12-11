@@ -28,8 +28,7 @@ test('Create, update and delete a resource', async ({ page }) => {
 	await test.step('Create a new resource', async () => {
 		await setUploadFile(page, 'Load from file', resourceFile);
 		await expect(page.locator('textarea')).toHaveValue(/{/);
-		const text = await page.locator('textarea').inputValue();
-		const resource = JSON.parse(/**@type {string} */ (text));
+		const resource = await getResourceConfig(page);
 		await page.locator('textarea').fill(JSON.stringify({ ...resource, name: randomResourceName }));
 		await page.getByRole('button', { name: 'Create resource' }).click();
 		await page.waitForURL(/\/v2\/admin\/resources$/);
@@ -50,14 +49,29 @@ test('Create, update and delete a resource', async ({ page }) => {
 		await page.getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/edit$/);
 		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Edit JSON' }).click();
 		await expect(page.locator('textarea')).toHaveValue(/{/);
-		const text = await page.locator('textarea').inputValue();
-		const resource = JSON.parse(/**@type {string} */ (text));
+		const resource = await getResourceConfig(page);
 		await page
 			.locator('textarea')
 			.fill(JSON.stringify({ ...resource, name: `${randomResourceName}-renamed` }));
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('Resource updated')).toBeVisible();
+	});
+
+	await test.step('Deactivate and reactivate the resource', async () => {
+		await page.getByRole('switch').click();
+		let resource = await getResourceConfig(page);
+		expect(resource.prevent_new_submissions).toEqual(false);
+		const modal = await waitModal(page);
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
+		resource = await getResourceConfig(page);
+		expect(resource.prevent_new_submissions).toEqual(true);
+		await page.getByRole('switch').click();
+		await expect(page.getByRole('switch')).toBeEnabled();
+		resource = await getResourceConfig(page);
+		expect(resource.prevent_new_submissions).toEqual(false);
 	});
 
 	await test.step('Export the resource to file', async () => {
@@ -89,3 +103,11 @@ test('Create, update and delete a resource', async ({ page }) => {
 		).not.toBeVisible();
 	});
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+async function getResourceConfig(page) {
+	const text = await page.locator('textarea').inputValue();
+	return JSON.parse(text);
+}

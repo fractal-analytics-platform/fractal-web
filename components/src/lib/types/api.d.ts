@@ -362,6 +362,7 @@ export type Resource = {
 	tasks_local_dir: string;
 	tasks_python_config: Record<string, any>;
 	tasks_pixi_config: Record<string, any>;
+	prevent_new_submissions: boolean;
 };
 
 export type Profile = {

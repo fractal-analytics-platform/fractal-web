@@ -3,6 +3,7 @@
 # Unreleased
 
 * Added user column to job lists (\#903).
+* Added switch to enable/disable a resource (\#903).
 
 # 1.22.0
 
