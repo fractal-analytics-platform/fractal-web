@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added user column to job lists (\#903).
+
 # 1.22.0
 
 * Implemented project sharing (\#893).
