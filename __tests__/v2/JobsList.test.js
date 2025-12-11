@@ -41,7 +41,7 @@ describe('JobsList', () => {
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
 
 		const filters = result.getAllByRole('listbox', { hidden: false });
-		expect(filters.length).eq(4);
+		expect(filters.length).eq(5);
 
 		const statusFilter = filters[0];
 		verifyOptions(statusFilter, ['Submitted', 'Done', 'Failed']);
@@ -49,6 +49,8 @@ describe('JobsList', () => {
 		verifyOptions(projectFilter, ['project 1', 'project 2']);
 		const workflowFilter = filters[2];
 		verifyOptions(workflowFilter, ['workflow 1', 'workflow 2']);
+		const userFilter = filters[4];
+		verifyOptions(userFilter, ['admin@fractal.xy']);
 
 		// Filter by project
 		const optionProject1 = within(projectFilter).getByRole('option', { name: 'project 1' });

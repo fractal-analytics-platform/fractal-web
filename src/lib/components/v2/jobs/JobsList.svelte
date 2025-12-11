@@ -272,32 +272,53 @@
 					updateRows();
 				}
 			},
+			'Select status',
 			false
 		);
-		projectSelect = setSlimSelect('project-select', projects, (value) => {
-			if (projectFilter !== value) {
-				projectFilter = value;
-				updateRows();
-			}
-		});
-		workflowSelect = setSlimSelect('workflow-select', workflows, (value) => {
-			if (workflowFilter !== value) {
-				workflowFilter = value;
-				updateRows();
-			}
-		});
-		datasetSelect = setSlimSelect('dataset-select', datasets, (value) => {
-			if (datasetFilter !== value) {
-				datasetFilter = value;
-				updateRows();
-			}
-		});
-		userSelect = setSlimSelect('user-select', userEmails, (value) => {
-			if (userFilter !== value) {
-				userFilter = value;
-				updateRows();
-			}
-		});
+		projectSelect = setSlimSelect(
+			'project-select',
+			projects,
+			(value) => {
+				if (projectFilter !== value) {
+					projectFilter = value;
+					updateRows();
+				}
+			},
+			'Select project'
+		);
+		workflowSelect = setSlimSelect(
+			'workflow-select',
+			workflows,
+			(value) => {
+				if (workflowFilter !== value) {
+					workflowFilter = value;
+					updateRows();
+				}
+			},
+			'Select workflow'
+		);
+		datasetSelect = setSlimSelect(
+			'dataset-select',
+			datasets,
+			(value) => {
+				if (datasetFilter !== value) {
+					datasetFilter = value;
+					updateRows();
+				}
+			},
+			'Select dataset'
+		);
+		userSelect = setSlimSelect(
+			'user-select',
+			userEmails,
+			(value) => {
+				if (userFilter !== value) {
+					userFilter = value;
+					updateRows();
+				}
+			},
+			'Select user'
+		);
 	});
 
 	/**
@@ -305,10 +326,11 @@
 	 * @param {string} id id of HTML element where slim-select has to be configured
 	 * @param {Array<{ name: string, id: number|string }>} values
 	 * @param {(value: string) => void} setter function executed when a dropdown value is selected
+	 * @param {string} label
 	 * @param {boolean} showSearch
 	 * @returns the SlimSelect instance
 	 */
-	function setSlimSelect(id, values, setter, showSearch = true) {
+	function setSlimSelect(id, values, setter, label, showSearch = true) {
 		if (!values) {
 			return;
 		}
@@ -322,7 +344,8 @@
 			settings: {
 				maxValuesShown: 5,
 				showSearch,
-				allowDeselect: true
+				allowDeselect: true,
+				ariaLabel: label
 			},
 			events: {
 				afterChange: (selection) => {
