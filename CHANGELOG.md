@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Added user column to job lists (\#903).
+* Added switch to enable/disable a resource (\#903).
+* Added option for re-ordering `project_dirs` in edit-users page (\#903).
+
 # 1.22.0
 
 * Implemented project sharing (\#893).

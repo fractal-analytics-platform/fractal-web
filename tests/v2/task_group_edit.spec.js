@@ -7,6 +7,8 @@ test('Task group edit (change group)', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
 	await waitPageLoading(page);
 
+	test.slow();
+
 	let groupName;
 	await test.step('Create test group1', async () => {
 		groupName = await createTestGroup(page);

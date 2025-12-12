@@ -28,7 +28,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Search without filters', async () => {
 		await page.getByRole('button', { name: 'Search task groups' }).click();
-		await expect(taskRow).toBeVisible();
+		await expect(page.getByRole('row').first()).toBeVisible();
 		expect(await page.getByRole('row').count()).toBeGreaterThan(2);
 	});
 

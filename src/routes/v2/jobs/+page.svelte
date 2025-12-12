@@ -19,5 +19,5 @@
 </script>
 
 <div class="container mt-3">
-	<JobsList {jobUpdater} columnsToHide={['user_email', 'id']} />
+	<JobsList {jobUpdater} columnsToHide={['id']} />
 </div>

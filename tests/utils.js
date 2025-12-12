@@ -278,8 +278,7 @@ export async function createWorkflow(page, projectId, workflowName = '') {
  */
 export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
 	await page.getByRole('button', { name: 'Add task to workflow' }).click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	const modal = await waitModal(page);
 	await expect(modal.locator('.spinner-border')).toHaveCount(0);
 	const row = await getTaskRow(modal, taskName);
 	await row.scrollIntoViewIfNeeded();
@@ -297,10 +296,10 @@ export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
  * @param {string} taskName
  */
 async function getTaskRow(modal, taskName) {
-	const rows = await modal
-		.getByRole('row', { name: taskName })
-		.filter({ hasText: /Add task/ })
-		.all();
+	const rowLocator = modal.getByRole('row', { name: taskName }).filter({ hasText: /Add task/ });
+	await expect(rowLocator.first()).toBeVisible();
+	const rows = await rowLocator.all();
+
 	for (const row of rows) {
 		const cellContent = (await row.getByRole('cell').first().innerText()).trim();
 		if (cellContent === taskName) {
@@ -317,22 +316,16 @@ async function getTaskRow(modal, taskName) {
 export async function deleteProject(page, projectName) {
 	await page.goto('/v2/projects');
 	await waitPageLoading(page);
-	const rows = await page.getByRole('row').all();
-	for (const row of rows) {
-		if ((await row.getByRole('cell', { name: projectName }).count()) === 1) {
-			const deleteBtn = row.getByRole('button', { name: 'Delete' });
-			await deleteBtn.click();
-			break;
-		}
-	}
 
-	await page.getByRole('button', { name: 'Confirm' }).click();
+	await page
+		.getByRole('row', { name: projectName })
+		.getByRole('button', { name: 'Delete' })
+		.click();
 
-	await page.waitForFunction((projectName) => {
-		const projectNames = [...document.querySelectorAll('table td:nth-child(1)')].map(
-			(c) => /** @type {HTMLElement} */ (c).innerText
-		);
-		return !projectNames.includes(projectName);
-	}, projectName);
-	await expect(page.getByRole('cell', { name: projectName })).toHaveCount(0);
+	const modal = await waitModal(page);
+	await modal.getByRole('button', { name: 'Confirm' }).click();
+
+	await waitModalClosed(page);
+
+	await expect(page.getByRole('row', { name: projectName })).toHaveCount(0);
 }
