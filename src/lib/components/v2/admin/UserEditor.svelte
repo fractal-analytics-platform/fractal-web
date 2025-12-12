@@ -471,12 +471,50 @@
 	/**
 	 * @param {number} index
 	 */
+	function moveProjectDirUp(index) {
+		if (!editableUser) {
+			return;
+		}
+		const { project_dirs } = editableUser;
+		// Check if the index is valid and not the first item
+		if (index > 0 && index < project_dirs.length) {
+			userFormErrorHandler.removeValidationError('project_dirs');
+			// Swap the elements
+			[project_dirs[index - 1], project_dirs[index]] = [
+				project_dirs[index],
+				project_dirs[index - 1]
+			];
+		}
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function moveProjectDirDown(index) {
+		if (!editableUser) {
+			return;
+		}
+		const { project_dirs } = editableUser;
+		// Check if the index is valid and not the last item
+		if (index >= 0 && index < project_dirs.length - 1) {
+			userFormErrorHandler.removeValidationError('project_dirs');
+			// Swap the elements
+			[project_dirs[index], project_dirs[index + 1]] = [
+				project_dirs[index + 1],
+				project_dirs[index]
+			];
+		}
+	}
+
+	/**
+	 * @param {number} index
+	 */
 	function removeProjectDir(index) {
 		if (!editableUser) {
 			return;
 		}
+		userFormErrorHandler.removeValidationError('project_dirs');
 		editableUser.project_dirs = editableUser.project_dirs.filter((_, i) => i !== index);
-		userFormErrorHandler.removeValidationError('project_dirs', index);
 	}
 
 	/**
@@ -685,7 +723,11 @@
 				<div class="col-sm-9">
 					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each editableUser.project_dirs as _, i (i)}
-						<div class="input-group mb-2 has-validation">
+						<div
+							class="input-group mb-2"
+							class:has-validation={userFormSubmitted &&
+								getProjectDirError($userValidationErrors['project_dirs'], i)}
+						>
 							<input
 								type="text"
 								class="form-control"
@@ -696,6 +738,26 @@
 									getProjectDirError($userValidationErrors['project_dirs'], i)}
 							/>
 							{#if editableUser.project_dirs.length > 1}
+								{#if i > 0}
+									<button
+										class="btn btn-outline-secondary"
+										type="button"
+										aria-label="Move project dir up"
+										onclick={() => moveProjectDirUp(i)}
+									>
+										<i class="bi bi-arrow-up"></i>
+									</button>
+								{/if}
+								{#if i < editableUser.project_dirs.length - 1}
+									<button
+										class="btn btn-outline-secondary"
+										type="button"
+										aria-label="Move project dir down"
+										onclick={() => moveProjectDirDown(i)}
+									>
+										<i class="bi bi-arrow-down"></i>
+									</button>
+								{/if}
 								<button
 									class="btn btn-outline-secondary"
 									type="button"

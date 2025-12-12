@@ -207,7 +207,101 @@ describe('UserEditor', () => {
 			})
 		);
 	});
+
+	it('Update settings - add project dir', async () => {
+		const user = userEvent.setup();
+
+		const mockSaveUser = setupProjectDirTest(selectedUser, ['/foo']);
+
+		await user.click(screen.getByRole('button', { name: 'Add project dir' }));
+		await user.type(screen.getAllByRole('textbox', { name: 'Project dir' })[1], '/bar');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await screen.findByText('User successfully updated');
+
+		expect(mockSaveUser).toHaveBeenCalledWith(
+			expect.objectContaining({
+				project_dirs: ['/foo', '/bar']
+			})
+		);
+	});
+
+	it('Update settings - remove project dir', async () => {
+		const user = userEvent.setup();
+
+		const mockSaveUser = setupProjectDirTest(selectedUser, ['/foo', '/bar']);
+
+		await user.click(screen.getAllByRole('button', { name: 'Remove project dir' })[1]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await screen.findByText('User successfully updated');
+
+		expect(mockSaveUser).toHaveBeenCalledWith(
+			expect.objectContaining({
+				project_dirs: ['/foo']
+			})
+		);
+	});
+
+	it('Update settings - move project dir up', async () => {
+		const user = userEvent.setup();
+
+		const mockSaveUser = setupProjectDirTest(selectedUser, ['/foo', '/bar', '/baz']);
+
+		await user.click(screen.getAllByRole('button', { name: 'Move project dir up' })[1]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await screen.findByText('User successfully updated');
+
+		expect(mockSaveUser).toHaveBeenCalledWith(
+			expect.objectContaining({
+				project_dirs: ['/foo', '/baz', '/bar']
+			})
+		);
+	});
+
+	it('Update settings - move project dir down', async () => {
+		const user = userEvent.setup();
+
+		const mockSaveUser = setupProjectDirTest(selectedUser, ['/foo', '/bar', '/baz']);
+
+		await user.click(screen.getAllByRole('button', { name: 'Move project dir down' })[0]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await screen.findByText('User successfully updated');
+
+		expect(mockSaveUser).toHaveBeenCalledWith(
+			expect.objectContaining({
+				project_dirs: ['/bar', '/foo', '/baz']
+			})
+		);
+	});
 });
+
+/**
+ * @param {any} selectedUser
+ * @param {string[]} projectDirs
+ */
+function setupProjectDirTest(selectedUser, projectDirs) {
+	const mockSaveUser = vi.fn(async (u) => {
+		return /** @type {Response} */ ({
+			ok: true,
+			status: 200,
+			json: () => new Promise((resolve) => resolve(u))
+		});
+	});
+
+	render(UserEditor, {
+		props: {
+			runnerBackend: 'slurm_sudo',
+			user: {
+				...selectedUser,
+				slurm_accounts: [],
+				project_dirs: projectDirs
+			},
+			saveUser: mockSaveUser,
+			defaultGroupName: 'All'
+		}
+	});
+
+	return mockSaveUser;
+}
 
 function mockResourcesAndProfiles() {
 	return /** @type {import('vitest').Mock} */ (fetch)
