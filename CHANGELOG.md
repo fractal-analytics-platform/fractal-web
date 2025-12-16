@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.22.1
 
 * Added user column to job lists (\#903).
 * Added switch to enable/disable a resource (\#903).
