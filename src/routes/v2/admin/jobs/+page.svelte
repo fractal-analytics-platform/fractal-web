@@ -7,6 +7,7 @@
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 	import { normalizePayload } from 'fractal-components';
+	import { onMount } from 'svelte';
 
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users));
@@ -42,6 +43,10 @@
 	let projectId = $state();
 	let workflowId = $state();
 	let datasetId = $state();
+	let resourceId = $state();
+
+	/** @type {import('fractal-components/types/api').Resource[]} */
+	let resources = $state([]);
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
@@ -147,6 +152,9 @@
 		if (datasetId) {
 			url.searchParams.append('dataset_id', datasetId);
 		}
+		if (resourceId) {
+			url.searchParams.append('resource_id', resourceId);
+		}
 		return url;
 	}
 
@@ -168,6 +176,7 @@
 		projectId = '';
 		workflowId = '';
 		datasetId = '';
+		resourceId = '';
 		searched = false;
 		jobs = undefined;
 		currentPage = 1;
@@ -298,6 +307,16 @@
 		sortUsers(usersCopy, currentUserId, false);
 		return usersCopy;
 	}
+
+	onMount(async () => {
+		const response = await fetch(`/api/admin/v2/resource`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (response.ok) {
+			resources = await response.json();
+		}
+	});
 </script>
 
 <div class="container mt-3">
@@ -411,6 +430,19 @@
 				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="dataset"> Dataset Id </label>
 				<div class="col-6">
 					<input type="number" class="form-control" bind:value={datasetId} id="dataset" />
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-5 offset-lg-1 col-xl-4 offset-xl-1">
+			<div class="row mt-1">
+				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="resource"> Resource Id </label>
+				<div class="col-6">
+					<select class="form-select" bind:value={resourceId} id="resource">
+						<option value="">All</option>
+						{#each resources as resource (resource.id)}
+							<option value={resource.id}>{resource.name}</option>
+						{/each}
+					</select>
 				</div>
 			</div>
 		</div>
