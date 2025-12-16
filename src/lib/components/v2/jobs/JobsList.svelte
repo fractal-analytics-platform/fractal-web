@@ -44,6 +44,8 @@
 	let jobs = [];
 	/** @type {{ id: number, name: string }[]} */
 	let datasets = $state([]);
+	/** @type {{ id: string, name: string }[]} */
+	let userEmails = $state([]);
 
 	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
 	let rows = $state(jobs);
@@ -58,6 +60,8 @@
 	/** @type {SlimSelect|undefined} */
 	let datasetSelect;
 	/** @type {SlimSelect|undefined} */
+	let userSelect;
+	/** @type {SlimSelect|undefined} */
 	let outputDatasetSelect;
 
 	// Filters
@@ -65,6 +69,7 @@
 	let projectFilter = '';
 	let workflowFilter = '';
 	let datasetFilter = '';
+	let userFilter = '';
 
 	/**
 	 * @typedef {{ key: string, label: string, direction?: 'asc'|'desc', priority?: number, field?: (j: import('fractal-components/types/api').ApplyWorkflowV2) => number | string | null}} SortField
@@ -124,12 +129,15 @@
 			return;
 		}
 
+		updateUserEmails();
+
 		rows = getSortedJobs(
 			jobs
 				.filter((j) => (statusFilter ? j.status === statusFilter : j))
 				.filter((j) => (projectFilter ? j.project_dump.id.toString() === projectFilter : j))
 				.filter((j) => (workflowFilter ? j.workflow_dump.id.toString() === workflowFilter : j))
 				.filter((j) => (datasetFilter ? j.dataset_dump.id.toString() === datasetFilter : j))
+				.filter((j) => (userFilter ? j.user_email === userFilter : j))
 		);
 
 		rebuildSlimSelectOptions(rows);
@@ -236,6 +244,7 @@
 		projectSelect?.setSelected('');
 		workflowSelect?.setSelected('');
 		datasetSelect?.setSelected('');
+		userSelect?.setSelected('');
 		outputDatasetSelect?.setSelected('');
 	}
 
@@ -263,26 +272,53 @@
 					updateRows();
 				}
 			},
+			'Select status',
 			false
 		);
-		projectSelect = setSlimSelect('project-select', projects, (value) => {
-			if (projectFilter !== value) {
-				projectFilter = value;
-				updateRows();
-			}
-		});
-		workflowSelect = setSlimSelect('workflow-select', workflows, (value) => {
-			if (workflowFilter !== value) {
-				workflowFilter = value;
-				updateRows();
-			}
-		});
-		datasetSelect = setSlimSelect('dataset-select', datasets, (value) => {
-			if (datasetFilter !== value) {
-				datasetFilter = value;
-				updateRows();
-			}
-		});
+		projectSelect = setSlimSelect(
+			'project-select',
+			projects,
+			(value) => {
+				if (projectFilter !== value) {
+					projectFilter = value;
+					updateRows();
+				}
+			},
+			'Select project'
+		);
+		workflowSelect = setSlimSelect(
+			'workflow-select',
+			workflows,
+			(value) => {
+				if (workflowFilter !== value) {
+					workflowFilter = value;
+					updateRows();
+				}
+			},
+			'Select workflow'
+		);
+		datasetSelect = setSlimSelect(
+			'dataset-select',
+			datasets,
+			(value) => {
+				if (datasetFilter !== value) {
+					datasetFilter = value;
+					updateRows();
+				}
+			},
+			'Select dataset'
+		);
+		userSelect = setSlimSelect(
+			'user-select',
+			userEmails,
+			(value) => {
+				if (userFilter !== value) {
+					userFilter = value;
+					updateRows();
+				}
+			},
+			'Select user'
+		);
 	});
 
 	/**
@@ -290,10 +326,11 @@
 	 * @param {string} id id of HTML element where slim-select has to be configured
 	 * @param {Array<{ name: string, id: number|string }>} values
 	 * @param {(value: string) => void} setter function executed when a dropdown value is selected
+	 * @param {string} label
 	 * @param {boolean} showSearch
 	 * @returns the SlimSelect instance
 	 */
-	function setSlimSelect(id, values, setter, showSearch = true) {
+	function setSlimSelect(id, values, setter, label, showSearch = true) {
 		if (!values) {
 			return;
 		}
@@ -307,7 +344,8 @@
 			settings: {
 				maxValuesShown: 5,
 				showSearch,
-				allowDeselect: true
+				allowDeselect: true,
+				ariaLabel: label
 			},
 			events: {
 				afterChange: (selection) => {
@@ -338,13 +376,19 @@
 			datasetSelect,
 			datasets.filter((d) => rows.filter((r) => r.dataset_dump.id === d.id).length > 0)
 		);
+		setValidSlimSelectOptions(
+			userSelect,
+			userEmails.filter(
+				(e) => rows.filter((r) => r.user_email === e.name || e.name === currentUserEmail).length > 0
+			)
+		);
 	}
 
 	/**
 	 * Updates the available options only when needed, to avoid unsetting the selected value when the desired list of
 	 * options is already set (e.g. if we change the selected dataset we don't want to change the selected workflow).
 	 * @param {SlimSelect|undefined} select
-	 * @param {{id: number, name: string}[]} validValues
+	 * @param {{id: number|string, name: string}[]} validValues
 	 */
 	function setValidSlimSelectOptions(select, validValues) {
 		if (!select) {
@@ -367,6 +411,13 @@
 		}
 		const options = values.map((p) => ({ text: p.name, value: p.id.toString() }));
 		select.setData([{ text: 'All', placeholder: true }, ...options]);
+	}
+
+	function updateUserEmails() {
+		let emails = jobs.map((r) => r.user_email).filter((e) => e !== currentUserEmail);
+		emails = [...new Set(emails)];
+		emails.sort((e1, e2) => e1.localeCompare(e2, undefined, { sensitivity: 'base' }));
+		userEmails = [currentUserEmail, ...emails].map((e) => ({ id: e, name: e }));
 	}
 
 	onDestroy(() => {
@@ -462,7 +513,9 @@
 					<select id="dataset-select" class="invisible"></select>
 				</th>
 				{#if !columnsToHide.includes('user_email')}
-					<th></th>
+					<th>
+						<select id="user-select" class="invisible"></select>
+					</th>
 				{/if}
 			</tr>
 		{/if}

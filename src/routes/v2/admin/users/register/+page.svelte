@@ -7,6 +7,9 @@
 	const runnerBackend = $derived(page.data.runnerBackend);
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
+	/** @type {Array<import('fractal-components/types/api').Group>} */
+	const groups = $derived(page.data.groups);
+
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let user = {
 		email: '',
@@ -62,7 +65,7 @@
 		created = true;
 		const createdUser = await createResponse.json();
 
-		const verifiedResponse = await fetch(`/api/auth/users/${createdUser.id}`, {
+		const response = await fetch(`/api/auth/users/${createdUser.id}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers,
@@ -71,11 +74,11 @@
 			})
 		});
 
-		if (!verifiedResponse.ok) {
+		if (!response.ok) {
 			verified = false;
 		}
 
-		return verifiedResponse;
+		return response;
 	}
 
 	onMount(() => {
@@ -104,5 +107,5 @@
 		</div>
 	{/if}
 
-	<UserEditor {user} saveUser={save} {runnerBackend} {defaultGroupName} />
+	<UserEditor {user} {groups} saveUser={save} {runnerBackend} {defaultGroupName} />
 </div>

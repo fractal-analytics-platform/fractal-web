@@ -1,7 +1,20 @@
 import { expect, test } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { addGroupToUser } from './user_utils.js';
 
 test('Create and update a user', async ({ page }) => {
+	const randomGroupName = Math.random().toString(36).substring(7);
+
+	await test.step('Add test group', async () => {
+		await page.goto('/v2/admin/groups');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Create new group' }).click();
+		const modal = await waitModal(page);
+		await modal.getByRole('textbox', { name: 'Group name' }).fill(randomGroupName);
+		await modal.getByRole('button', { name: 'Create' }).click();
+		await waitModalClosed(page);
+	});
+
 	await test.step('Open the admin area', async () => {
 		await page.goto('/v2/admin');
 		await waitPageLoading(page);
@@ -39,6 +52,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Create user', async () => {
 		await page.getByLabel('Confirm password').fill('test');
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
+		await addGroupToUser(page, randomGroupName);
 		await page.getByRole('button', { name: 'Save' }).click();
 		await waitPageLoading(page);
 		await page.getByText('Editing user').waitFor();
@@ -69,7 +83,8 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
 		await verifyChecked(cells, 4, true);
-		await expect(cells[5]).toHaveText('All');
+		await expect(cells[5]).toContainText('All');
+		await expect(cells[5]).toContainText(randomGroupName);
 		await expect(cells[6]).toHaveText('Local profile');
 		await expect(cells[7]).toHaveText('/tmp');
 	});

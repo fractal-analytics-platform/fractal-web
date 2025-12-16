@@ -25,6 +25,15 @@ vi.mock('$env/dynamic/public', () => {
 	return { env: {} };
 });
 
+// Mocking fetch
+global.fetch = vi.fn();
+
+/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
+	ok: true,
+	status: 200,
+	json: async () => []
+});
+
 // The component to be tested must be imported after the mock setup
 import page from '../../src/routes/v2/admin/jobs/+page.svelte';
 

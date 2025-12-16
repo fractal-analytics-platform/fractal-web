@@ -117,11 +117,9 @@
 		confirmSuperuserChange?.hide();
 		try {
 			let existing = !!editableUser.id;
-			const groupsSuccess = await setGroups();
-			if (!groupsSuccess) {
-				return;
-			}
-			if (userPendingChanges || password) {
+			const needsUserEdit = userPendingChanges || password;
+
+			if (needsUserEdit) {
 				if (showCreateProfile && profileOption === 'create_new' && profileEditor) {
 					const newProfileId = await profileEditor.handleSave();
 					if (!newProfileId) {
@@ -139,17 +137,28 @@
 					return;
 				}
 				const result = await response.json();
-				if (result.id === currentUserId) {
+				editableUser.id = result.id;
+				if (existing) {
+					editableUser = { ...result };
+				}
+			}
+
+			const groupsSuccess = await setGroups();
+			if (!groupsSuccess) {
+				return;
+			}
+
+			if (needsUserEdit) {
+				if (editableUser?.id === currentUserId) {
 					// If the user modifies their own account the userInfo cached in the store has to be reloaded
 					await invalidateAll();
 				}
 				password = '';
 				confirmPassword = '';
 				if (existing) {
-					editableUser = { ...result };
 					originalUser = deepCopy($state.snapshot(editableUser));
 				} else {
-					await goto(`/v2/admin/users/${result.id}/edit`);
+					await goto(`/v2/admin/users/${editableUser?.id}/edit`);
 				}
 			}
 			userUpdatedMessage = 'User successfully updated';
@@ -263,6 +272,11 @@
 
 	onMount(async () => {
 		originalUser = deepCopy(nullifyEmptyStrings($state.snapshot(editableUser)));
+		if (editableUser && !editableUser.id) {
+			editableUser.group_ids_names = availableGroups
+				.filter((g) => g.name === 'All')
+				.map((g) => [g.id, g.name]);
+		}
 		loadUserGroups();
 		await initProfile();
 		await loadResources(false);
@@ -471,12 +485,50 @@
 	/**
 	 * @param {number} index
 	 */
+	function moveProjectDirUp(index) {
+		if (!editableUser) {
+			return;
+		}
+		const { project_dirs } = editableUser;
+		// Check if the index is valid and not the first item
+		if (index > 0 && index < project_dirs.length) {
+			userFormErrorHandler.removeValidationError('project_dirs');
+			// Swap the elements
+			[project_dirs[index - 1], project_dirs[index]] = [
+				project_dirs[index],
+				project_dirs[index - 1]
+			];
+		}
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function moveProjectDirDown(index) {
+		if (!editableUser) {
+			return;
+		}
+		const { project_dirs } = editableUser;
+		// Check if the index is valid and not the last item
+		if (index >= 0 && index < project_dirs.length - 1) {
+			userFormErrorHandler.removeValidationError('project_dirs');
+			// Swap the elements
+			[project_dirs[index], project_dirs[index + 1]] = [
+				project_dirs[index + 1],
+				project_dirs[index]
+			];
+		}
+	}
+
+	/**
+	 * @param {number} index
+	 */
 	function removeProjectDir(index) {
 		if (!editableUser) {
 			return;
 		}
+		userFormErrorHandler.removeValidationError('project_dirs');
 		editableUser.project_dirs = editableUser.project_dirs.filter((_, i) => i !== index);
-		userFormErrorHandler.removeValidationError('project_dirs', index);
 	}
 
 	/**
@@ -685,7 +737,11 @@
 				<div class="col-sm-9">
 					<!-- eslint-disable-next-line no-unused-vars -->
 					{#each editableUser.project_dirs as _, i (i)}
-						<div class="input-group mb-2 has-validation">
+						<div
+							class="input-group mb-2"
+							class:has-validation={userFormSubmitted &&
+								getProjectDirError($userValidationErrors['project_dirs'], i)}
+						>
 							<input
 								type="text"
 								class="form-control"
@@ -696,6 +752,26 @@
 									getProjectDirError($userValidationErrors['project_dirs'], i)}
 							/>
 							{#if editableUser.project_dirs.length > 1}
+								{#if i > 0}
+									<button
+										class="btn btn-outline-secondary"
+										type="button"
+										aria-label="Move project dir up"
+										onclick={() => moveProjectDirUp(i)}
+									>
+										<i class="bi bi-arrow-up"></i>
+									</button>
+								{/if}
+								{#if i < editableUser.project_dirs.length - 1}
+									<button
+										class="btn btn-outline-secondary"
+										type="button"
+										aria-label="Move project dir down"
+										onclick={() => moveProjectDirDown(i)}
+									>
+										<i class="bi bi-arrow-down"></i>
+									</button>
+								{/if}
 								<button
 									class="btn btn-outline-secondary"
 									type="button"
@@ -781,42 +857,34 @@
 	{/if}
 	<div class="row">
 		<div class="col-lg-7 needs-validation">
-			{#if editableUser.id}
-				<div class="row mb-3 has-validation">
-					<span class="col-sm-3 col-form-label text-end fw-bold">Groups</span>
-					<div class="col-sm-9">
-						<div>
-							{#each userGroups as group (group.id)}
-								<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">
-									{group.name}
-									{#if group.name !== defaultGroupName}
-										<button
-											class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
-											type="button"
-											aria-label="Remove group {group.name}"
-											onclick={() => removeGroup(group.id)}
-										>
-											&times;
-										</button>
-									{/if}
-								</span>
-							{/each}
-							{#if availableGroups.length > 0}
-								<button class="btn btn-light" type="button" onclick={openAddGroupModal}>
-									<i class="bi bi-plus-circle"></i>
-									Add group
-								</button>
-							{/if}
-						</div>
+			<div class="row mb-3 has-validation">
+				<span class="col-sm-3 col-form-label text-end fw-bold">Groups</span>
+				<div class="col-sm-9">
+					<div>
+						{#each userGroups as group (group.id)}
+							<span class="badge text-bg-light me-2 mb-2 fs-6 fw-normal">
+								{group.name}
+								{#if group.name !== defaultGroupName}
+									<button
+										class="btn btn-link p-0 text-danger text-decoration-none remove-badge"
+										type="button"
+										aria-label="Remove group {group.name}"
+										onclick={() => removeGroup(group.id)}
+									>
+										&times;
+									</button>
+								{/if}
+							</span>
+						{/each}
+						{#if availableGroups.length > 0}
+							<button class="btn btn-light" type="button" onclick={openAddGroupModal}>
+								<i class="bi bi-plus-circle"></i>
+								Add group
+							</button>
+						{/if}
 					</div>
 				</div>
-			{:else}
-				<div class="row">
-					<div class="col-sm-9 offset-sm-3">
-						<div class="alert alert-info">User groups can be modified after creating the user</div>
-					</div>
-				</div>
-			{/if}
+			</div>
 		</div>
 
 		<div class="row">
