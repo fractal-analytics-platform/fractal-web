@@ -607,7 +607,7 @@
 <ul>
 <li><code>FRACTAL_SERVER_HOST</code>: represents the URL of the fractal-server application (e.g. <a href="http://localhost:8000">http://localhost:8000</a>, or <a href="http://subdomain.example.org:8000">http://subdomain.example.org:8000</a>); this variable is <strong>required</strong>;</li>
 <li><code>AUTH_COOKIE_NAME</code>: the name of the cookie used to store the user session; the default value is <code>fastapiusersauth</code>;</li>
-<li><code>AUTH_COOKIE_DOMAIN</code>: specifies which server can receive the cookie; <strong>remember to set it in production</strong>;</li>
+<li><code>AUTH_COOKIE_DOMAIN</code>: specifies which server can receive the cookie (note: this must <strong>not</strong> include the <code>http</code> or <code>https</code> URL scheme); <strong>remember to set it in production</strong>;</li>
 <li><code>AUTH_COOKIE_PATH</code>: the URL path where the cookie will be available; the default value is <code>/</code>;</li>
 <li><code>AUTH_COOKIE_SECURE</code>: sends the cookie only if the server is using HTTPS; the default value is <code>true</code>, can be set to <code>false</code> during development;</li>
 <li><code>AUTH_COOKIE_SAME_SITE</code>: set the <a href="https://web.dev/articles/samesite-cookies-explained">SameSite</a> attribute to the cookie; the default value is <code>lax</code>;</li>
