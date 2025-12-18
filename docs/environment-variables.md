@@ -6,7 +6,7 @@ The following environment variables can be used to configure fractal-web.
 
 * `FRACTAL_SERVER_HOST`: represents the URL of the fractal-server application (e.g. http://localhost:8000, or http://subdomain.example.org:8000); this variable is **required**;
 * `AUTH_COOKIE_NAME`: the name of the cookie used to store the user session; the default value is `fastapiusersauth`;
-* `AUTH_COOKIE_DOMAIN`: specifies which server can receive the cookie; **remember to set it in production**;
+* `AUTH_COOKIE_DOMAIN`: specifies which server can receive the cookie (note: this must **not** include the `http` or `https` URL scheme); **remember to set it in production**;
 * `AUTH_COOKIE_PATH`: the URL path where the cookie will be available; the default value is `/`;
 * `AUTH_COOKIE_SECURE`: sends the cookie only if the server is using HTTPS; the default value is `true`, can be set to `false` during development;
 * `AUTH_COOKIE_SAME_SITE`: set the [SameSite](https://web.dev/articles/samesite-cookies-explained) attribute to the cookie; the default value is `lax`;
