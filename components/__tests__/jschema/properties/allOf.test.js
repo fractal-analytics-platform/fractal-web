@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderSchema } from './property_test_utils';
 import { screen } from '@testing-library/svelte';
+import { adaptJsonSchema } from '../../../src/lib/jschema/jschema_adapter';
 
 describe('allOf properties', () => {
 	it('allOf property with single $ref', async () => {
@@ -134,5 +135,47 @@ describe('allOf properties', () => {
 		expect(input.getAttribute('max')).eq('10');
 
 		expect(component.getArguments()).deep.eq({ myNumber: null });
+	});
+
+	it('Replace nested referenced allOf', () => {
+		const schema = adaptJsonSchema({
+			$defs: {
+				AdvancedCellposeParameters: {
+					type: 'object',
+					properties: {
+						normalization: {
+							allOf: [
+								{
+									$ref: '#/$defs/NormalizationParameters'
+								}
+							]
+						}
+					}
+				},
+				NormalizationParameters: {
+					type: 'object',
+					properties: {
+						refstring: {
+							type: 'string'
+						}
+					}
+				}
+			},
+			type: 'object',
+			properties: {
+				advanced_parameters: {
+					allOf: [
+						{
+							$ref: '#/$defs/AdvancedCellposeParameters'
+						}
+					]
+				}
+			}
+		});
+
+		expect(schema.properties.advanced_parameters.properties.normalization).deep.eq({
+			type: 'object',
+			properties: { refstring: { type: 'string' } }
+		});
 	});
 });

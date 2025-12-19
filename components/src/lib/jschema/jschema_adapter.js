@@ -158,12 +158,12 @@ function mergeAllOf(parentObject) {
 function mergeProperty(parentObject, key, value) {
 	if (key in parentObject) {
 		if (Array.isArray(parentObject[key]) && Array.isArray(value)) {
-			parentObject[key] = [...parentObject[key], ...value];
+			parentObject[key] = [...parentObject[key], ...value.map((v) => mergeAllOf(v))];
 		} else if (isObject(parentObject) && isObject(value)) {
-			parentObject[key] = { ...parentObject[key], ...value };
+			parentObject[key] = { ...parentObject[key], ...mergeAllOf(value) };
 		}
 	} else {
-		parentObject[key] = value;
+		parentObject[key] = mergeAllOf(value);
 	}
 }
 
