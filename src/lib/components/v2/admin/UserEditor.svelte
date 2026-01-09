@@ -1,18 +1,20 @@
 <script>
 	import { invalidateAll, goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { get } from 'svelte/store';
 	import {
 		displayStandardErrorAlert,
 		FormErrorHandler,
 		getAlertErrorFromResponse
 	} from '$lib/common/errors';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { getSortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 	import ProfileEditor from './ProfileEditor.svelte';
+	import { groupsErrorOnUserCreation } from '$lib/stores';
 
 	/**
 	 * @typedef {Object} Props
@@ -143,7 +145,7 @@
 				}
 			}
 
-			const groupsSuccess = await setGroups();
+			const groupsSuccess = await setGroups(existing);
 			if (!groupsSuccess) {
 				return;
 			}
@@ -233,7 +235,10 @@
 		userGroups = newUserGroups;
 	}
 
-	async function setGroups() {
+	/**
+	 * @param {boolean} userExists
+	 */
+	async function setGroups(userExists) {
 		if (!editableUser) {
 			return;
 		}
@@ -263,10 +268,13 @@
 			return true;
 		}
 
-		errorAlert = displayStandardErrorAlert(
-			await getAlertErrorFromResponse(response),
-			'genericUserError'
-		);
+		const error = await getAlertErrorFromResponse(response);
+		if (userExists) {
+			errorAlert = displayStandardErrorAlert(error, 'genericUserError');
+		} else {
+			groupsErrorOnUserCreation.set(error);
+			await goto(`/v2/admin/users/${editableUser?.id}/edit`);
+		}
 		return false;
 	}
 
@@ -291,6 +299,14 @@
 		}
 		if (editableUser && autoselectProfile && profiles.length > 0) {
 			editableUser.profile_id = profiles[0].id;
+		}
+		await tick();
+		if (editableUser && editableUser.id) {
+			const creationError = get(groupsErrorOnUserCreation);
+			if (creationError) {
+				errorAlert = displayStandardErrorAlert(creationError, 'userCreationError');
+				groupsErrorOnUserCreation.set(null);
+			}
 		}
 	});
 

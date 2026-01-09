@@ -11,3 +11,10 @@ export const navigationCancelled = writable(false);
 
 /** @type {import('svelte/store').Writable<Array<import('fractal-components/types/api').TaskGroupActivityV2>>} */
 export const recentActivities = writable([]);
+
+/** 
+ * @type {import('svelte/store').Writable<import('$lib/common/errors').AlertError|null>}
+ * Groups can be added during user creation. In that case, 2 API calls are performed.
+ * This writable is used to store the groups call error and display it after the redirect.
+ */
+export const groupsErrorOnUserCreation = writable(null);

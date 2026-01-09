@@ -60,5 +60,7 @@
 		</ol>
 	</nav>
 
+	<div id="userCreationError"></div>
+
 	<UserEditor {user} {groups} saveUser={save} {runnerBackend} {defaultGroupName} />
 </div>
