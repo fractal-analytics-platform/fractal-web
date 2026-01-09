@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed issue with nested `allOf` elements in JSON schema (\#908).
+
 # 1.22.1
 
 * Added user column to job lists (\#903).
