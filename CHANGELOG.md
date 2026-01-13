@@ -3,6 +3,7 @@
 # Unreleased
 
 * Fixed issue with nested `allOf` elements in JSON schema (\#908).
+* Fixed glitch with non-atomic user registration (\#909);
 
 # 1.22.1
 
