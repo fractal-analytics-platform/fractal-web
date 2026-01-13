@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.22.2
 
 * Fixed issue with nested `allOf` elements in JSON schema (\#908).
 * Fixed glitch with non-atomic user registration (\#909);
