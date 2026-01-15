@@ -25,7 +25,9 @@ const keys = [
 	'PUBLIC_OAUTH_CLIENT_NAME',
 	'PUBLIC_FRACTAL_DATA_URL',
 	'PUBLIC_FRACTAL_VIZARR_VIEWER_URL',
-	'PUBLIC_FRACTAL_FEATURE_EXPLORER_URL'
+	'PUBLIC_FRACTAL_FEATURE_EXPLORER_URL',
+	'PUBLIC_GUEST_USERNAME',
+	'PUBLIC_GUEST_PASSWORD'
 ];
 
 const logLevels = ['all', 'mark', 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'off'];

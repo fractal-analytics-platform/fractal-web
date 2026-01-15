@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Implemented guest login (\#913).
+
 # 1.22.2
 
 * Fixed issue with nested `allOf` elements in JSON schema (\#908).
