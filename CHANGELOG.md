@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+* Added the option to customize the login invite, for example to add a disclaimer.
+* Typo fixed in UI
+
 # 1.22.2
 
 * Fixed issue with nested `allOf` elements in JSON schema (\#908).
