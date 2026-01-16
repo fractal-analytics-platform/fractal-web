@@ -12,6 +12,8 @@
 	const projects = $derived(page.data.projects || []);
 	/** @type {import('fractal-components/types/api').ProjectInvitation[]} */
 	const invitations = $derived(page.data.invitations);
+	/** @type {import('fractal-components/types/api').User} */
+	const user = $derived(page.data.user);
 
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	let sharedProjects = $state([]);
@@ -70,7 +72,7 @@
 <div class="container">
 	<div class="row mt-4">
 		<div class="col">
-			{#if invitations.length > 0}
+			{#if invitations.length > 0 && !user.is_guest}
 				{#each invitations as invitation, i (i)}
 					<InvitationNotification {invitation} onAccept={loadSharedProjects} />
 				{/each}
