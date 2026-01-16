@@ -42,3 +42,15 @@ export async function addGroupToUser(page, groupName) {
 	await expect(page.getByRole('button', { name: `Remove group ${groupName}` })).toBeVisible();
 	return selectableGroups;
 }
+
+
+/**
+ * @param {import('@playwright/test').Locator[]} row
+ * @param {number} index
+ * @param {boolean} checked
+ */
+export async function verifyChecked(row, index, checked) {
+	expect(await row[index].locator('.boolean-icon').getAttribute('aria-checked')).toEqual(
+		checked.toString()
+	);
+}

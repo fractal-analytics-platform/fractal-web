@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { addGroupToUser } from './user_utils.js';
+import { addGroupToUser, verifyChecked } from './user_utils.js';
 
 test('Create and update a user', async ({ page }) => {
 	const randomGroupName = Math.random().toString(36).substring(7);
@@ -250,15 +250,4 @@ async function getUserRowCells(page, username) {
 function getUserRow(page, username) {
 	const email = `${username}@example.com`;
 	return page.getByRole('row', { name: email });
-}
-
-/**
- * @param {import('@playwright/test').Locator[]} row
- * @param {number} index
- * @param {boolean} checked
- */
-async function verifyChecked(row, index, checked) {
-	expect(await row[index].locator('.boolean-icon').getAttribute('aria-checked')).toEqual(
-		checked.toString()
-	);
 }
