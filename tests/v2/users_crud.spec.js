@@ -83,10 +83,11 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
 		await verifyChecked(cells, 4, true);
-		await expect(cells[5]).toContainText('All');
-		await expect(cells[5]).toContainText(randomGroupName);
-		await expect(cells[6]).toHaveText('Local profile');
-		await expect(cells[7]).toHaveText('/tmp');
+		await verifyChecked(cells, 5, false);
+		await expect(cells[6]).toContainText('All');
+		await expect(cells[6]).toContainText(randomGroupName);
+		await expect(cells[7]).toHaveText('Local profile');
+		await expect(cells[8]).toHaveText('/tmp');
 	});
 
 	await test.step('Go back to previous page', async () => {
@@ -149,9 +150,10 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
 		await verifyChecked(cells, 4, false);
-		await expect(cells[5]).toContainText('All');
-		await expect(cells[6]).toContainText('Local profile');
-		expect(await cells[7].innerText()).toEqual('/tmp/test/project-dir-renamed');
+		await verifyChecked(cells, 5, false);
+		await expect(cells[6]).toContainText('All');
+		await expect(cells[7]).toContainText('Local profile');
+		expect(await cells[8].innerText()).toEqual('/tmp/test/project-dir-renamed');
 	});
 
 	await test.step('Go back clicking on breadcrumb', async () => {
