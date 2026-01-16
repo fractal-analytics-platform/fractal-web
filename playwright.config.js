@@ -88,7 +88,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3126-support-guest-api-user',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
