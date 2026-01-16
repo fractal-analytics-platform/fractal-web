@@ -71,6 +71,10 @@
 					<td><BooleanIcon value={user.is_verified} /></td>
 				</tr>
 				<tr>
+					<th>Guest</th>
+					<td><BooleanIcon value={user.is_guest} /></td>
+				</tr>
+				<tr>
 					<th>Groups</th>
 					<td>
 						{#each userGroups as group (group.id)}
