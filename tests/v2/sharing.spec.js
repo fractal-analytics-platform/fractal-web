@@ -11,7 +11,7 @@ import {
 	waitModalClosed,
 	waitPageLoading
 } from '../utils.js';
-import { createTestUser } from './user_utils.js';
+import { createGuestUser, createTestUser } from './user_utils.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -21,6 +21,7 @@ test('Project sharing', async ({ page }) => {
 	await waitPageLoading(page);
 
 	const userEmail = await createTestUser(page);
+	const guestEmail = await createGuestUser(page);
 
 	const projectToAccept = (await createProject(page)).name;
 	const projectToReject = (await createProject(page)).name;
@@ -48,6 +49,7 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Share project', async () => {
+		// API user
 		await page.getByRole('textbox', { name: 'User e-mail' }).fill(userEmail);
 		await page.getByRole('button', { name: 'Share' }).click();
 		await expect(
@@ -60,6 +62,18 @@ test('Project sharing', async ({ page }) => {
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
 		await expectBooleanIcon(row.getByRole('cell').nth(3), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(4), false);
+
+		// Guest user
+		await page.getByRole('textbox', { name: 'User e-mail' }).fill(guestEmail);
+		await page.getByRole('combobox', { name: 'Permission' }).selectOption('Read');
+		await page.getByRole('button', { name: 'Share' }).click();
+
+		const row2 = page.getByRole('row', { name: guestEmail });
+		await expect(row2).toBeVisible();
+		await expectBooleanIcon(row2.getByRole('cell').nth(1), false);
+		await expectBooleanIcon(row2.getByRole('cell').nth(2), true);
+		await expectBooleanIcon(row2.getByRole('cell').nth(3), false);
+		await expectBooleanIcon(row2.getByRole('cell').nth(4), false);
 	});
 
 	await test.step('Edit sharing options', async () => {
@@ -166,8 +180,14 @@ test('Project sharing', async ({ page }) => {
 		await expect(row).not.toBeVisible();
 	});
 
-	await test.step('Login as admin again', async () => {
+	await test.step('Login as guest, cannot see invitations', async () => {
 		await logout(page, userEmail);
+		await login(page, guestEmail, 'test');
+		await expect(page.locator('.alert')).toHaveCount(0);
+	});
+
+	await test.step('Login as admin again', async () => {
+		await logout(page, guestEmail);
 		await login(page, 'admin@fractal.xy', '1234');
 	});
 
