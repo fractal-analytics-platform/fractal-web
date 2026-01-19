@@ -2,7 +2,7 @@
 
 # Unreleased
 
-* Fixed issue to get correct URL for s3 zarr paths
+* Fixed issue to get correct URL for s3 zarr paths (\#921).
 
 # 1.22.2
 
