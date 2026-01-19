@@ -136,6 +136,11 @@ export function hideAllTooltips() {
  */
 export function encodePathForUrl(zarrUrl) {
 	let encodedPath = encodeURIComponent(zarrUrl);
+	// If zarrUrl is a file path it starts start with a / so they can ne just appended to the URL
+	// If zarrUrl is s3, it does not, so we prepend a / and then it can be appended to the URL
+	if (zarrUrl.startsWith('s3://')) {
+		encodedPath = '/' + zarrUrl;
+	}
 	// Replace encoded slashes back to slashes
 	encodedPath = encodedPath.replace(/%2F/g, '/');
 	return encodedPath;

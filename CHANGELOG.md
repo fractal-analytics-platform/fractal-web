@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Fixed issue to get correct URL for s3 zarr paths
+
 # 1.22.2
 
 * Fixed issue with nested `allOf` elements in JSON schema (\#908).
