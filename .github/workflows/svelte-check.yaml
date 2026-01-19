@@ -1,4 +1,4 @@
-kname: Svelte Check tests
+name: Svelte Check tests
 
 on:
   push:
