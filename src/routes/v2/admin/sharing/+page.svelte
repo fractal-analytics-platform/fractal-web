@@ -95,7 +95,7 @@
 			method: 'POST'
 		});
 		if (response.ok) {
-			const link = results.items.find(
+			const link = results?.items.find(
 				link => link.project_id === projectId && link.user_id === guestUserId
 			);
 			link.is_verified = true;
