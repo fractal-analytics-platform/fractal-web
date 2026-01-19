@@ -54,7 +54,7 @@
 			if (!response.ok) {
 				genericErrorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),
-					'searchError'
+					'genericError'
 				);
 				return;
 			}
@@ -105,7 +105,7 @@
 		} else {
 			genericErrorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'searchError'
+				'genericError'
 			);
 			return;
 		}
@@ -199,7 +199,7 @@
 			<button class="btn btn-warning mt-4" onclick={resetSearchFields} disabled={searching}>
 				Reset
 			</button>
-			<div id="searchError" class="mt-3 mb-3"></div>
+			<div id="genericError" class="mt-3 mb-3"></div>
 		</div>
 	</div>
 
