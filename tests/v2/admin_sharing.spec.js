@@ -76,17 +76,6 @@ test('Admin page for project sharing', async ({ page }) => {
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
 		await search(page, 3);
     	await expect(page.getByRole('row', {name: p1.name})).toHaveCount(3);
-		// non guests
-		const row1 = page.getByRole('row', { name: userEmail1 });
-		await expect(row1.getByRole('button', { name: 'Verify' })).toHaveCount(0);
-		const row2 = page.getByRole('row', { name: userEmail2 });
-		await expect(row2.getByRole('button', { name: 'Verify' })).toHaveCount(0);
-		// guest
-		const row3 = page.getByRole('row', { name: userEmail3 });
-		await expect(row3.getByRole('button', { name: 'Verify' })).toHaveCount(1);
-		await expectBooleanIcon(row3.getByRole('cell').nth(4), false);
-		await row3.getByRole('button', { name: 'Verify' }).click();
-		await expectBooleanIcon(row3.getByRole('cell').nth(4), true);
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail2);
@@ -118,6 +107,24 @@ test('Admin page for project sharing', async ({ page }) => {
 		await page.getByRole('combobox', { name: 'Is Owner' }).selectOption('False');
 		await search(page, 0);
 		await reset(page);
+	});
+
+	await test.step('Test Verify button', async () => {
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
+		await search(page, 3);
+    	await expect(page.getByRole('row', {name: p1.name})).toHaveCount(3);
+		// for non-guests users there is no Verify button
+		const row1 = page.getByRole('row', { name: userEmail1 });
+		await expect(row1.getByRole('button', { name: 'Verify' })).toHaveCount(0);
+		const row2 = page.getByRole('row', { name: userEmail2 });
+		await expect(row2.getByRole('button', { name: 'Verify' })).toHaveCount(0);
+		// for guest users there is the Verify button
+		const row3 = page.getByRole('row', { name: userEmail3 });
+		//  click the Verify button and assert link is verified
+		await expectBooleanIcon(row3.getByRole('cell').nth(4), false);
+		await row3.getByRole('button', { name: 'Verify' }).click();
+		await page.waitForTimeout(100);
+		await expectBooleanIcon(row3.getByRole('cell').nth(4), true);
 	});
 
 	await test.step('Cleanup', async () => {
