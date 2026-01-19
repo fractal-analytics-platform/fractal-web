@@ -1,0 +1,36 @@
+kname: Svelte Check tests
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  svelte_check_tests:
+    name: 'Node ${{ matrix.node-version }}'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        node-version: ['18', '20', '24']
+
+    services:
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Svelte Check
+        run: npx svelte-check
