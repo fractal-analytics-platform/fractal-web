@@ -28,7 +28,7 @@ jobs:
           cache: npm
       
       - name: Install dependencies
-        run: npm install
+        run: npm install && npx svelte-kit sync
 
       - name: Run Svelte Check
         run: npx svelte-check
