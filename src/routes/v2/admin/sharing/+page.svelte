@@ -101,13 +101,11 @@
 			if (link) {
 				link.is_verified = true;
 			}
-			return response.ok;
 		} else {
 			genericErrorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
 				'genericError'
 			);
-			return;
 		}
 	}
 </script>
