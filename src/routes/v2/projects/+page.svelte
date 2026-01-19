@@ -19,7 +19,7 @@
 	let sharedProjectInfoModal = $state();
 
 	/** @type {'my_projects'|'shared_projects'} */
-	let selectedTab = $state('my_projects');
+	let selectedTab = $state(page.data.userInfo.is_guest ? 'shared_projects' : 'my_projects');
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;

@@ -24,6 +24,8 @@ jobs:
       PUBLIC_FRACTAL_FEATURE_EXPLORER_URL: http://localhost:8501
       FRACTAL_RUNNER_BACKEND: local
       FRACTAL_DEFAULT_GROUP_NAME: All
+      PUBLIC_GUEST_USERNAME: guest@fractal.xy
+      PUBLIC_GUEST_PASSWORD: guest
 
     strategy:
       matrix:
