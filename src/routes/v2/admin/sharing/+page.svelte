@@ -98,7 +98,9 @@
 			const link = results?.items.find(
 				link => link.project_id === projectId && link.user_id === guestUserId
 			);
-			link.is_verified = true;
+			if (link) {
+				link.is_verified = true;
+			}
 			return response.ok;
 		} else {
 			throw await getAlertErrorFromResponse(response);
