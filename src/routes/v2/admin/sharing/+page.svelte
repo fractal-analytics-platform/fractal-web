@@ -11,7 +11,7 @@
 	let searched = $state(false);
 	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let searchErrorAlert;
+	let genericErrorAlert;
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').LinkUserProjectRead> | undefined} */
 	let results = $state();
@@ -31,8 +31,8 @@
 	async function search(selectedPage, selectedPageSize) {
 		searching = true;
 		try {
-			if (searchErrorAlert) {
-				searchErrorAlert.hide();
+			if (genericErrorAlert) {
+				genericErrorAlert.hide();
 			}
 			const url = new URL('/api/admin/v2/linkuserproject', window.location.origin);
 			if (projectId) {
@@ -52,7 +52,7 @@
 			url.searchParams.append('page_size', selectedPageSize.toString());
 			const response = await fetch(url);
 			if (!response.ok) {
-				searchErrorAlert = displayStandardErrorAlert(
+				genericErrorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),
 					'searchError'
 				);
@@ -71,8 +71,8 @@
 	}
 
 	async function resetSearchFields() {
-		if (searchErrorAlert) {
-			searchErrorAlert.hide();
+		if (genericErrorAlert) {
+			genericErrorAlert.hide();
 		}
 		projectId = '';
 		userId = '';
@@ -103,7 +103,11 @@
 			}
 			return response.ok;
 		} else {
-			throw await getAlertErrorFromResponse(response);
+			genericErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			return;
 		}
 	}
 </script>
