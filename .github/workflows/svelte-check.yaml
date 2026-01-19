@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches: ['main']
+    branches: ['guest-login']
 
 jobs:
   svelte_check_tests:

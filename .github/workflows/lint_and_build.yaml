@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches: ['main']
+    branches: ['guest-login']
 
 jobs:
   lint_and_build:
