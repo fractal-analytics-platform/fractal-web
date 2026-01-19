@@ -58,6 +58,14 @@ const v2Tests = [
 		dependencies: ['auth']
 	},
 	{
+		name: 'create_default_guest_user',
+		testMatch: /v2\/create_default_guest_user\.setup\.js/,
+		use: {
+			storageState: 'tests/.auth/user.json'
+		},
+		dependencies: ['auth']
+	},
+	{
 		name: 'chromium',
 		testMatch: /v2\/.*\.spec\.js/,
 		use: {
@@ -67,7 +75,7 @@ const v2Tests = [
 				permissions: ['clipboard-read', 'clipboard-write']
 			}
 		},
-		dependencies: ['collect_mock_tasks', 'create_fake_task']
+		dependencies: ['collect_mock_tasks', 'create_fake_task', 'create_default_guest_user']
 	},
 	{
 		name: 'firefox',
@@ -76,13 +84,13 @@ const v2Tests = [
 			...devices['Desktop Firefox'],
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['collect_mock_tasks', 'create_fake_task']
+		dependencies: ['collect_mock_tasks', 'create_fake_task', 'create_default_guest_user']
 	}
 ];
 
 export default defineConfig({
 	testDir: 'tests',
-	retries: 3,
+	retries: process.env.CI ? 3 : 0,
 
 	projects: [...commonTests, ...v2Tests],
 
