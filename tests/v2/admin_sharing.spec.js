@@ -125,6 +125,7 @@ test('Admin page for project sharing', async ({ page }) => {
 		await row3.getByRole('button', { name: 'Verify' }).click();
 		await page.waitForTimeout(100);
 		await expectBooleanIcon(row3.getByRole('cell').nth(4), true);
+		await reset(page);
 	});
 
 	await test.step('Cleanup', async () => {
