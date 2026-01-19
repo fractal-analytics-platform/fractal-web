@@ -84,6 +84,26 @@
 		totalCount = 0;
 		pageSize = 50;
 	}
+
+	/**
+	 * @param {number} guestUserId
+	 * @param {number} projectId
+	 */
+	async function verifyGuestInvitation(guestUserId, projectId) {
+		const response = await fetch(
+			`/api/admin/v2/linkuserproject/verify/?guest_user_id=${guestUserId}&project_id=${projectId}`, {
+			method: 'POST'
+		});
+		if (response.ok) {
+			const link = results.items.find(
+				link => link.project_id === projectId && link.user_id === guestUserId
+			);
+			link.is_verified = true;
+			return response.ok;
+		} else {
+			throw await getAlertErrorFromResponse(response);
+		}
+	}
 </script>
 
 <div class="container mt-3">
@@ -194,6 +214,7 @@
 								<th>Owner</th>
 								<th>Verified</th>
 								<th>Permissions</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -213,6 +234,18 @@
 										<BooleanIcon value={link.is_verified} />
 									</td>
 									<td>{link.permissions}</td>
+									<td>
+										{#if !link.is_verified && sortedUsers.find(user => user.email === link.user_email)?.is_guest}
+											<button
+												type="button"
+												class="btn btn-primary"
+												onclick={() => verifyGuestInvitation(link.user_id, link.project_id)}
+											>
+												<i class="bi bi-shield-fill-check"></i>
+												Verify
+											</button>
+										{/if}
+									</td>
 								</tr>
 							{/each}
 						</tbody>
