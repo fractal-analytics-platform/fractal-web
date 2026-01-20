@@ -2,9 +2,7 @@
 
 # 1.22.3 (unreleased)
 
-* Run GitHub Actions when targeting `ihb-develop` branch (\#922).
-
-
+* Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
 
 # 1.22.2
 
