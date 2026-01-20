@@ -22,6 +22,20 @@ export async function createTestUser(page, projectDir = '/tmp') {
 
 /**
  * @param {import('@playwright/test').Page} page
+ * @param {string} projectDir
+ * @returns {Promise<string>}
+ */
+export async function createGuestUser(page, projectDir = '/tmp') {
+	const randomEmail = await createTestUser(page, projectDir);
+	await page.getByRole('checkbox', { name: 'Guest' }).check();
+    await page.getByRole('button', { name: 'Save' }).click();
+	await waitPageLoading(page);
+    await expect(page.getByText('User successfully updated')).toBeVisible();
+	return randomEmail;
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
  * @param {string} groupName
  * @returns {Promise<number>} the number of selectable groups
  */
