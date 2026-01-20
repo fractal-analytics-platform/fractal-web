@@ -2,9 +2,9 @@ name: Lint and build
 
 on:
   push:
-    branches: ['main']
+    branches: ['main', 'ihb-develop']
   pull_request:
-    branches: ['main']
+    branches: ['main', 'ihb-develop']
 
 jobs:
   lint_and_build:
