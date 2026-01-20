@@ -1,8 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.22.3 (unreleased)
 
-* Implemented guest login (\#913).
+* Added support for guest user (\#913).
 * Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
 
 # 1.22.2
