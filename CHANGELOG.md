@@ -1,5 +1,11 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.22.3 (unreleased)
+
+* Run GitHub Actions when targeting `ihb-develop` branch (\#922).
+
+
+
 # 1.22.2
 
 * Fixed issue with nested `allOf` elements in JSON schema (\#908).
