@@ -1,8 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
 # Unreleased
-* Added the option to customize the login invite, for example to add a disclaimer.
-* Typo fixed in UI
+* Added the option to customize the login invite, for example to add a disclaimer (\#917).
+* Typo fixed in UI (\#917).
 
 # 1.22.2
 
