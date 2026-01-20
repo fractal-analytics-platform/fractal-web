@@ -123,7 +123,7 @@ test('Admin page for project sharing', async ({ page }) => {
 		//  click the Verify button and assert link is verified
 		await expectBooleanIcon(row3.getByRole('cell').nth(4), false);
 		await row3.getByRole('button', { name: 'Verify' }).click();
-		await page.waitForTimeout(100);
+		await expect(row3.getByRole('button', { name: 'Verify' })).not.toBeVisible();
 		await expectBooleanIcon(row3.getByRole('cell').nth(4), true);
 		await reset(page);
 	});
