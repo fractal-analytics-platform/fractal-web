@@ -11,7 +11,7 @@
 	let searched = $state(false);
 	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let searchErrorAlert;
+	let genericErrorAlert;
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').LinkUserProjectRead> | undefined} */
 	let results = $state();
@@ -31,8 +31,8 @@
 	async function search(selectedPage, selectedPageSize) {
 		searching = true;
 		try {
-			if (searchErrorAlert) {
-				searchErrorAlert.hide();
+			if (genericErrorAlert) {
+				genericErrorAlert.hide();
 			}
 			const url = new URL('/api/admin/v2/linkuserproject', window.location.origin);
 			if (projectId) {
@@ -52,9 +52,9 @@
 			url.searchParams.append('page_size', selectedPageSize.toString());
 			const response = await fetch(url);
 			if (!response.ok) {
-				searchErrorAlert = displayStandardErrorAlert(
+				genericErrorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),
-					'searchError'
+					'genericError'
 				);
 				return;
 			}
@@ -71,8 +71,8 @@
 	}
 
 	async function resetSearchFields() {
-		if (searchErrorAlert) {
-			searchErrorAlert.hide();
+		if (genericErrorAlert) {
+			genericErrorAlert.hide();
 		}
 		projectId = '';
 		userId = '';
@@ -83,6 +83,30 @@
 		currentPage = 1;
 		totalCount = 0;
 		pageSize = 50;
+	}
+
+	/**
+	 * @param {number} guestUserId
+	 * @param {number} projectId
+	 */
+	async function verifyGuestInvitation(guestUserId, projectId) {
+		const response = await fetch(
+			`/api/admin/v2/linkuserproject/verify/?guest_user_id=${guestUserId}&project_id=${projectId}`, {
+			method: 'POST'
+		});
+		if (response.ok) {
+			const link = results?.items.find(
+				link => link.project_id === projectId && link.user_id === guestUserId
+			);
+			if (link) {
+				link.is_verified = true;
+			}
+		} else {
+			genericErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'genericError'
+			);
+		}
 	}
 </script>
 
@@ -173,7 +197,7 @@
 			<button class="btn btn-warning mt-4" onclick={resetSearchFields} disabled={searching}>
 				Reset
 			</button>
-			<div id="searchError" class="mt-3 mb-3"></div>
+			<div id="genericError" class="mt-3 mb-3"></div>
 		</div>
 	</div>
 
@@ -194,6 +218,7 @@
 								<th>Owner</th>
 								<th>Verified</th>
 								<th>Permissions</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -213,6 +238,18 @@
 										<BooleanIcon value={link.is_verified} />
 									</td>
 									<td>{link.permissions}</td>
+									<td>
+										{#if !link.is_verified && sortedUsers.find(user => user.email === link.user_email)?.is_guest}
+											<button
+												type="button"
+												class="btn btn-primary"
+												onclick={() => verifyGuestInvitation(link.user_id, link.project_id)}
+											>
+												<i class="bi bi-shield-fill-check"></i>
+												Verify
+											</button>
+										{/if}
+									</td>
 								</tr>
 							{/each}
 						</tbody>

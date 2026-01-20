@@ -2,6 +2,7 @@
 
 # 1.22.3 (unreleased)
 
+* Added support for guest user (\#913).
 * Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
 
 # 1.22.2

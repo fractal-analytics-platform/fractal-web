@@ -8,17 +8,19 @@ import {
 	shareProjectByName,
 	waitPageLoading
 } from '../utils.js';
-import { createTestUser } from './user_utils.js';
+import { createTestUser, createGuestUser } from './user_utils.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test('Adming page for project sharing', async ({ page }) => {
+test('Admin page for project sharing', async ({ page }) => {
 	await login(page, 'admin@fractal.xy', '1234');
 	await waitPageLoading(page);
 
 	const userEmail1 = await createTestUser(page);
 	const userEmail2 = await createTestUser(page);
+
+	const userEmail3 = await createGuestUser(page);
 
 	const p1 = await createProject(page);
 	const p2 = await createProject(page);
@@ -38,6 +40,15 @@ test('Adming page for project sharing', async ({ page }) => {
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
 		await expectBooleanIcon(row.getByRole('cell').nth(3), true);
+		await expectBooleanIcon(row.getByRole('cell').nth(4), false);
+	});
+
+	await test.step('Share project 1 with guest user', async () => {
+		await shareProjectByName(page, p1.name, userEmail3, 'Read');
+		const row = page.getByRole('row', { name: userEmail3 });
+		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
+		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
+		await expectBooleanIcon(row.getByRole('cell').nth(3), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(4), false);
 	});
 
@@ -63,38 +74,57 @@ test('Adming page for project sharing', async ({ page }) => {
 
 	await test.step('Test search fields', async () => {
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
-		await search(page, 2);
-    await expect(page.getByRole('row', {name: p1.name})).toHaveCount(2);
+		await search(page, 3);
+    	await expect(page.getByRole('row', {name: p1.name})).toHaveCount(3);
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail2);
 		await search(page, 1);
-    await expect(page.getByRole('row', {name: p2.name})).toBeVisible();
+    	await expect(page.getByRole('row', {name: p2.name})).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail1);
 		await page.getByRole('combobox', { name: 'Is Verified' }).selectOption('True');
 		await search(page, 1);
-    await expect(page.getByRole('row', {name: p1.name})).toBeVisible();
+    	await expect(page.getByRole('row', {name: p1.name})).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail2);
 		await page.getByRole('combobox', { name: 'Is Verified' }).selectOption('False');
 		await search(page, 1);
-    await expect(page.getByRole('row', {name: p2.name})).toBeVisible();
+    	await expect(page.getByRole('row', {name: p2.name})).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
 		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
 		await page.getByRole('combobox', { name: 'Is Owner' }).selectOption('True');
 		await search(page, 1);
-    await expect(page.getByRole('row', {name: p1.name})).toBeVisible();
+    	await expect(page.getByRole('row', {name: p1.name})).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
 		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
 		await page.getByRole('combobox', { name: 'Is Owner' }).selectOption('False');
 		await search(page, 0);
+		await reset(page);
+	});
+
+	await test.step('Test Verify button', async () => {
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
+		await search(page, 3);
+    	await expect(page.getByRole('row', {name: p1.name})).toHaveCount(3);
+		// for non-guests users there is no Verify button
+		const row1 = page.getByRole('row', { name: userEmail1 });
+		await expect(row1.getByRole('button', { name: 'Verify' })).toHaveCount(0);
+		const row2 = page.getByRole('row', { name: userEmail2 });
+		await expect(row2.getByRole('button', { name: 'Verify' })).toHaveCount(0);
+		// for guest users there is the Verify button
+		const row3 = page.getByRole('row', { name: userEmail3 });
+		//  click the Verify button and assert link is verified
+		await expectBooleanIcon(row3.getByRole('cell').nth(4), false);
+		await row3.getByRole('button', { name: 'Verify' }).click();
+		await expect(row3.getByRole('button', { name: 'Verify' })).not.toBeVisible();
+		await expectBooleanIcon(row3.getByRole('cell').nth(4), true);
 		await reset(page);
 	});
 

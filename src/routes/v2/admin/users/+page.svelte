@@ -58,6 +58,7 @@
 				<th>Active</th>
 				<th>Superuser</th>
 				<th>Verified</th>
+				<th>Guest</th>
 				<th>Profile</th>
 				<th>Actions</th>
 			</tr>
@@ -71,6 +72,7 @@
 						<td><BooleanIcon value={user.is_active} /></td>
 						<td><BooleanIcon value={user.is_superuser} /></td>
 						<td><BooleanIcon value={user.is_verified} /></td>
+						<td><BooleanIcon value={user.is_guest} /></td>
 						<td>
 							{#if userProfiles[user.id]}
 								<a

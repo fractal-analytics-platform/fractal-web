@@ -64,3 +64,6 @@ jobs:
         run: |
           cd tasks-list
           npm run build
+      
+      - name: Run Svelte Check
+        run: npm run check
