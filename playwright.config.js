@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3143-drop-support-for-task-source',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
