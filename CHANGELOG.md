@@ -2,6 +2,7 @@
 
 # 1.22.3 (unreleased)
 
+* Dropped support for node v18 (\#930).
 * Added support for guest user (\#913).
 * Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
 
