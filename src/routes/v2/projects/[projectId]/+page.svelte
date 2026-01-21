@@ -95,10 +95,6 @@
 					<i class="bi bi-share"></i>
 					Sharing
 				</a>
-			{:else}
-				<button class="btn btn-light" onclick={() => showSharedProjectInfo()}>
-					<i class="bi bi-info-circle"></i> Info
-				</button>
 			{/if}
 		</div>
 	</div>
