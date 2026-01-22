@@ -40,9 +40,6 @@
 	{#snippet header()}
 		{#if project}
 			<h1 class="h5 modal-title flex-grow-1">Project {project.name}</h1>
-			<a href={'/v2/projects/' + project.id} class="btn btn-light me-3">
-				Open <i class="bi bi-arrow-up-right-square"></i>
-			</a>
 		{/if}
 	{/snippet}
 	{#snippet body()}
