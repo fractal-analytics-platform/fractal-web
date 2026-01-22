@@ -7,6 +7,7 @@
 * Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
 * Remove support for `Task.source` (\#931).
 * Remove open button from `sharedProjectInfoModal` (\#927).
+* Prevent Guest selection when Superuser is checked and vice versa (\#932).
 * Added the option to customize the login invite, for example to add a disclaimer (\#934).
 * Fixed typo in UI (\#934).
 
