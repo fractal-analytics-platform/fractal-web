@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { addGroupToUser } from './user_utils.js';
+import { addGroupToUser, verifyChecked } from './user_utils.js';
 
 test('Create and update a user', async ({ page }) => {
 	const randomGroupName = Math.random().toString(36).substring(7);
@@ -83,10 +83,11 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
 		await verifyChecked(cells, 4, true);
-		await expect(cells[5]).toContainText('All');
-		await expect(cells[5]).toContainText(randomGroupName);
-		await expect(cells[6]).toHaveText('Local profile');
-		await expect(cells[7]).toHaveText('/tmp');
+		await verifyChecked(cells, 5, false);
+		await expect(cells[6]).toContainText('All');
+		await expect(cells[6]).toContainText(randomGroupName);
+		await expect(cells[7]).toHaveText('Local profile');
+		await expect(cells[8]).toHaveText('/tmp');
 	});
 
 	await test.step('Go back to previous page', async () => {
@@ -135,7 +136,8 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(userRowCells, 2, true);
 		await verifyChecked(userRowCells, 3, false);
 		await verifyChecked(userRowCells, 4, false);
-		await expect(userRowCells[5]).toContainText('Local profile');
+		await verifyChecked(userRowCells, 5, false);
+		await expect(userRowCells[6]).toContainText('Local profile');
 	});
 
 	await test.step('Display the user info page', async () => {
@@ -149,9 +151,10 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
 		await verifyChecked(cells, 4, false);
-		await expect(cells[5]).toContainText('All');
-		await expect(cells[6]).toContainText('Local profile');
-		expect(await cells[7].innerText()).toEqual('/tmp/test/project-dir-renamed');
+		await verifyChecked(cells, 5, false);
+		await expect(cells[6]).toContainText('All');
+		await expect(cells[7]).toContainText('Local profile');
+		expect(await cells[8].innerText()).toEqual('/tmp/test/project-dir-renamed');
 	});
 
 	await test.step('Go back clicking on breadcrumb', async () => {
@@ -250,15 +253,4 @@ async function getUserRowCells(page, username) {
 function getUserRow(page, username) {
 	const email = `${username}@example.com`;
 	return page.getByRole('row', { name: email });
-}
-
-/**
- * @param {import('@playwright/test').Locator[]} row
- * @param {number} index
- * @param {boolean} checked
- */
-async function verifyChecked(row, index, checked) {
-	expect(await row[index].locator('.boolean-icon').getAttribute('aria-checked')).toEqual(
-		checked.toString()
-	);
 }

@@ -1,7 +1,12 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.22.3 (unreleased)
 
+* Dropped support for node v18 (\#930).
+* Added support for guest user (\#913).
+* Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
+* Remove support for `Task.source` (\#931).
+* Remove open button from `sharedProjectInfoModal` (\#927).
 * Fixed issue to get correct URL for s3 zarr paths (\#921).
 
 # 1.22.2

@@ -16,6 +16,7 @@
 		is_active: true,
 		is_superuser: false,
 		is_verified: false,
+		is_guest: false,
 		password: '',
 		group_ids_names: [],
 		oauth_accounts: [],

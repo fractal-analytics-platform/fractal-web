@@ -638,6 +638,19 @@
 						</div>
 					</div>
 				</div>
+				<div class="row mb-3">
+					<div class="col-sm-9 offset-sm-3">
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="guest"
+								bind:checked={editableUser.is_guest}
+							/>
+							<label class="form-check-label" for="guest"> Guest </label>
+						</div>
+					</div>
+				</div>
 			{/if}
 			<div class="row mb-3 has-validation">
 				<label for="password" class="col-sm-3 col-form-label text-end">
