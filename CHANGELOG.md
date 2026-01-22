@@ -7,7 +7,7 @@
 * Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
 * Remove support for `Task.source` (\#931).
 * Remove open button from `sharedProjectInfoModal` (\#927).
-* Fixed issue to get correct URL for s3 zarr paths (\#921).
+* Fixed issue to get correct URL for s3 zarr paths (\#935).
 
 # 1.22.2
 
