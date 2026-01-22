@@ -78,7 +78,7 @@ test('Create and update a user', async ({ page }) => {
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
-		await expect(cells[0]).toHaveText(/** @type {string} */ (userId));
+		await expect(cells[0]).toHaveText(/** @type {string} */(userId));
 		await expect(cells[1]).toHaveText(randomUserName + '@example.com');
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
@@ -146,7 +146,7 @@ test('Create and update a user', async ({ page }) => {
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
-		await expect(cells[0]).toContainText(/**@type {string} */ (userId));
+		await expect(cells[0]).toContainText(/**@type {string} */(userId));
 		await expect(cells[1]).toContainText(randomUserName + '-renamed@example.com');
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
@@ -166,7 +166,9 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Grant superuser privilege', async () => {
 		const userRow = getUserRow(page, randomUserName + '-renamed');
 		await userRow.getByRole('link', { name: 'Edit' }).click();
-		await page.locator('#superuser').check();
+		await expect(page.getByRole('checkbox', { name: 'Guest' })).toBeEnabled();
+		await page.getByRole('checkbox', { name: 'Superuser' }).check();
+		await expect(page.getByRole('checkbox', { name: 'Guest' })).not.toBeEnabled();
 		await page.getByRole('button', { name: 'Save' }).click();
 
 		const modalTitle = page.locator('.modal.show .modal-title');
@@ -204,7 +206,7 @@ test('Create and update a user', async ({ page }) => {
 		await userRow.getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
-		await page.locator('#superuser').uncheck();
+		await page.getByRole('checkbox', { name: 'Superuser' }).uncheck();
 		await page.getByRole('button', { name: 'Save' }).click();
 
 		const modalTitle = page.locator('.modal.show .modal-title');
