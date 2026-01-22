@@ -620,6 +620,7 @@
 								type="checkbox"
 								id="superuser"
 								bind:checked={editableUser.is_superuser}
+								disabled={editableUser.is_guest}
 							/>
 							<label class="form-check-label" for="superuser"> Superuser </label>
 						</div>
@@ -646,6 +647,7 @@
 								type="checkbox"
 								id="guest"
 								bind:checked={editableUser.is_guest}
+								disabled={editableUser.is_superuser}
 							/>
 							<label class="form-check-label" for="guest"> Guest </label>
 						</div>
