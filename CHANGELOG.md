@@ -1,6 +1,12 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.22.3 (unreleased)
+
+* Dropped support for node v18 (\#930).
+* Added support for guest user (\#913).
+* Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
+* Remove support for `Task.source` (\#931).
+* Remove open button from `sharedProjectInfoModal` (\#927).
 * Added the option to customize the login invite, for example to add a disclaimer (\#917).
 * Fixed typo in UI (\#917).
 

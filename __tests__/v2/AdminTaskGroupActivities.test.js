@@ -72,6 +72,7 @@ describe('AdminTaskGroupActivities', () => {
 						is_active: true,
 						is_superuser: true,
 						is_verified: true,
+						is_guest: false,
 						group_ids_names: [],
 						oauth_accounts: [],
 						profile_id: 1,

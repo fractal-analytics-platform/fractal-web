@@ -4,6 +4,7 @@ import { userAuthentication } from '$lib/server/api/auth_api';
 import { setCookieFromToken } from './cookie';
 import { getLogger } from '$lib/server/logger.js';
 import fs from 'fs/promises';
+import { env } from '$env/dynamic/public';
 
 const logger = getLogger('page /auth/login');
 
@@ -20,7 +21,12 @@ export const actions = {
 			authData = await userAuthentication(fetch, formData);
 		} catch (error) {
 			logger.debug(error);
-			return fail(400, { invalidMessage: 'Invalid credentials', invalid: true });
+			const guestUsername = env.PUBLIC_GUEST_USERNAME;
+			if (guestUsername && formData.get('username') === guestUsername) {
+				return fail(400, { invalidGuestMessage: 'Invalid credentials', invalid: true });
+			} else {
+				return fail(400, { invalidMessage: 'Invalid credentials', invalid: true });
+			}
 		}
 
 		setCookieFromToken(request, cookies, authData.access_token);

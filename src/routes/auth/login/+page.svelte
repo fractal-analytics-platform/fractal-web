@@ -6,11 +6,6 @@
 	import { invalidateAll } from '$app/navigation';
 
 	let { form } = $props();
-	let loginError = $state(false);
-
-	if (form?.invalid) {
-		loginError = true;
-	}
 
 	let userLoggedIn = $derived(!!page.data.userInfo);
 
@@ -18,6 +13,9 @@
 	let externalLoginErrorAlert = undefined;
 
 	const oauth2Provider = env.PUBLIC_OAUTH_CLIENT_NAME;
+
+	const guestUsername = env.PUBLIC_GUEST_USERNAME;
+	const guestPassword = env.PUBLIC_GUEST_PASSWORD;
 
 	async function oauth2Login() {
 		if (externalLoginErrorAlert) {
@@ -66,9 +64,28 @@
 				</div>
 			</div>
 		{/if}
+		{#if guestUsername && guestPassword}
+			<div class="row">
+				<div class="col-xl-4 col-lg-7 col-md-9 mb-4">
+					<h3 class="fw-light">Guest login</h3>
+					<div id="guestLoginError"></div>
+					<form method="POST" class="mb-3">
+						<input type="hidden" name="username" value={guestUsername} />
+						<input type="hidden" name="password" value={guestPassword} />
+						<button class="btn btn-primary">Log in as guest</button>
+					</form>
+					{#if form?.invalidGuestMessage}
+						<div class="alert alert-danger">
+							{form?.invalidGuestMessage}
+						</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
+
 		{#if oauth2Provider}
 			<div class="row">
-				<div class="col mb-4 pb-3">
+				<div class="col mb-4 mb-5">
 					<h3 class="fw-light">Institutional login</h3>
 					<div id="externalLoginError"></div>
 					<button type="button" onclick={oauth2Login} class="btn btn-primary">
@@ -118,7 +135,7 @@
 										<input
 											name="username"
 											type="email"
-											class="form-control {loginError ? 'is-invalid' : ''}"
+											class="form-control {form?.invalidMessage ? 'is-invalid' : ''}"
 											id="userEmail"
 											required
 										/>

@@ -28,6 +28,7 @@
 			is_active: user.is_active,
 			is_superuser: user.is_superuser,
 			is_verified: user.is_verified,
+			is_guest: user.is_guest,
 			profile_id: user.profile_id,
 			project_dirs: user.project_dirs
 		};

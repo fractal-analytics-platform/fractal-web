@@ -24,6 +24,8 @@ The following environment variables can be used to configure fractal-web.
 * `LOGIN_INVITE_PATH`: specifies the path to a text file containing the message to display when user wants to log on. This can be for example a disclaimer or special instructions. Text can contain html tags for formatting. If the variable is empty default message is displayed;
 * `NEWS_INFO_PATH`: specifies the path to a Markdown file containing the news section of the home page; the title of the section is automatically added; if the variable is empty or unset the news section is not displayed;
 * `FRACTAL_DEFAULT_GROUP_NAME`: specifies if a default group exists; allowed values are `All` or empty string (no default group).
+* `PUBLIC_GUEST_USERNAME`: username for guest user;
+* `PUBLIC_GUEST_PASSWORD`: password for guest user;
 
 When running directly using `node` command these extra variables can also be configured:
 
