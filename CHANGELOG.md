@@ -2,8 +2,11 @@
 
 # 1.22.3 (unreleased)
 
+* Dropped support for node v18 (\#930).
 * Added support for guest user (\#913).
 * Run some GitHub Actions when targeting `ihb-develop` branch (\#922).
+* Remove support for `Task.source` (\#931).
+* Remove open button from `sharedProjectInfoModal` (\#927).
 
 # 1.22.2
 
