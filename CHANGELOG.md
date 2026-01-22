@@ -2,7 +2,7 @@
 
 # Unreleased
 * Added the option to customize the login invite, for example to add a disclaimer (\#917).
-* Typo fixed in UI (\#917).
+* Fixed typo in UI (\#917).
 
 # 1.22.2
 
