@@ -4,7 +4,6 @@ import { userAuthentication } from '$lib/server/api/auth_api';
 import { setCookieFromToken } from './cookie';
 import { getLogger } from '$lib/server/logger.js';
 import fs from 'fs/promises';
-import { env } from '$env/dynamic/public';
 
 const logger = getLogger('page /auth/login');
 

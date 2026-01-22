@@ -129,6 +129,7 @@
 								<form method="POST">
 									<div class="mb-3">
 										<p class="fw-light">
+											<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 											{@html loginInvite}
 										</p>
 										<label for="userEmail" class="form-label">Email address</label>
