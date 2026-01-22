@@ -41,7 +41,9 @@
         ]
       },
       "task": {
-        "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::create_ome-zarr_structure"
+        "name": "create_ome-zarr_structure",
+        "version": "0.10.1",
+        "pkg_name": "fractal_tasks_core"
       }
     },
     {
@@ -54,7 +56,9 @@
         "delete_input": false
       },
       "task": {
-        "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::convert_yokogawa_to_ome-zarr"
+        "name": "convert_yokogawa_to_ome-zarr",
+        "version": "0.10.1",
+        "pkg_name": "fractal_tasks_core"
       }
     },
     {
@@ -67,7 +71,9 @@
         "suffix": "mip"
       },
       "task": {
-        "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::copy_ome-zarr_structure"
+        "name": "copy_ome-zarr_structure",
+        "version": "0.10.1",
+        "pkg_name": "fractal_tasks_core"
       }
     },
     {
@@ -78,7 +84,9 @@
       },
       "args_non_parallel": null,
       "task": {
-        "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::maximum_intensity_projection"
+        "name": "maximum_intensity_projection",
+        "version": "0.10.1",
+        "pkg_name": "fractal_tasks_core"
       }
     },
     {
@@ -107,7 +115,9 @@
         "output_label_name": "nuclei"
       },
       "task": {
-        "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::cellpose_segmentation"
+        "name": "cellpose_segmentation",
+        "version": "0.10.1",
+        "pkg_name": "fractal_tasks_core"
       }
     },
     {
@@ -142,7 +152,9 @@
         }
       },
       "task": {
-        "source": "pip_remote:fractal_tasks_core:0.10.1:fractal-tasks::napari_workflows_wrapper"
+        "name": "napari_workflows_wrapper",
+        "version": "0.10.1",
+        "pkg_name": "fractal_tasks_core"
       }
     }
   ]
