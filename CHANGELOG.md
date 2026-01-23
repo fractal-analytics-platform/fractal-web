@@ -10,6 +10,7 @@
 * Prevent Guest selection when Superuser is checked and vice versa (\#932).
 * Added the option to customize the login invite, for example to add a disclaimer (\#934).
 * Fixed typo in UI (\#934).
+* Fixed issue to get correct URL for s3 zarr paths (\#935).
 
 # 1.22.2
 
