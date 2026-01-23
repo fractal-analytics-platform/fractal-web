@@ -32,7 +32,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	let tmpManifest;
 
 	await test.step('Test "Python interpreter path must be absolute" error', async () => {
-		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('foo');
+		await page.getByRole('textbox', { name: 'Python Interpreter' }).fill('foo');
 		await page.getByRole('textbox', { name: 'Label' }).fill(`${randomName}-label`);
 		tmpManifest = await uploadFile(
 			page,
@@ -52,7 +52,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	});
 
 	await test.step("Test \"One and only one must be set between 'package_root' and 'package_name'\" error", async () => {
-		await page.getByRole('textbox', { name: 'Python Intepreter' }).fill('/usr/bin/python3');
+		await page.getByRole('textbox', { name: 'Python Interpreter' }).fill('/usr/bin/python3');
 		await page.getByRole('textbox', { name: 'Package Name' }).fill(randomName);
 
 		await page.getByRole('button', { name: 'Collect' }).click();
@@ -73,7 +73,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	});
 
 	await test.step('Verify that fields have been cleaned', async () => {
-		await expect(page.getByRole('textbox', { name: 'Python Intepreter' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Python Interpreter' })).toHaveValue('');
 		await expect(page.getByRole('textbox', { name: 'Label' })).toHaveValue('');
 		await expect(page.getByLabel('Manifest')).toHaveValue('');
 		await expect(page.getByRole('textbox', { name: 'Package Name' })).toHaveValue('');
