@@ -160,7 +160,7 @@
 		<div class="col">
 			<div class="input-group has-validation">
 				<div class="input-group-text">
-					<label class="font-monospace" for="python_interpreter">Python Intepreter</label>
+					<label class="font-monospace" for="python_interpreter">Python Interpreter</label>
 				</div>
 				<input
 					bind:value={python_interpreter}

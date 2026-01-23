@@ -43,6 +43,7 @@
 			sessionStorage.removeItem('userLoggedIn');
 		}
 	});
+	const loginInvite = $derived(page.data.loginInvite);
 </script>
 
 <div class="container mt-3">
@@ -128,8 +129,8 @@
 								<form method="POST">
 									<div class="mb-3">
 										<p class="fw-light">
-											Log in with Fractal specific email & password provided to you by the Fractal
-											admin
+											<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+											{@html loginInvite}
 										</p>
 										<label for="userEmail" class="form-label">Email address</label>
 										<input

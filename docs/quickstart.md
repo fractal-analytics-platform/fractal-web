@@ -63,6 +63,7 @@ export FRACTAL_RUNNER_BACKEND=local
 #export PUBLIC_FRACTAL_FEATURE_EXPLORER_URL=
 #export WARNING_BANNER_PATH=
 #export NEWS_INFO_PATH=
+#export LOGIN_INVITE_PATH=
 
 # default values are usually fine for the following variables; remove comments if needed
 #export AUTH_COOKIE_NAME=fastapiusersauth
