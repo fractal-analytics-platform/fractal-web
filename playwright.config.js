@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch richer-wf-wft-metadata',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
