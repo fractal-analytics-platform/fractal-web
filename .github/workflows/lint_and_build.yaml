@@ -28,12 +28,12 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install components dependencies
         run: |
           cd components
-          npm install
+          npm ci
 
       - name: Run static code analysis on components module
         run: |
@@ -58,7 +58,7 @@ jobs:
       - name: Install tasks-list dependencies
         run: |
           cd tasks-list
-          npm install
+          npm ci
 
       - name: Build tasks-list
         run: |
