@@ -34,6 +34,9 @@
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
 
+	const maxDescriptionLength = 50;
+	const descriptionLengthOffset = 10;
+
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
 
@@ -119,7 +122,7 @@
 	let selectedSubmittedJob = $state();
 	let jobCancelledMessage = $state('');
 
-	let showWorkflowDescription = $state(false);
+	let expandWorkflowDescription = $state(false);
 
 	const workflowPropsErrorHandler = new FormErrorHandler('errorAlert-editWorkflowModal', [
 		'name',
@@ -721,28 +724,50 @@
 			{/if}
 		</ol>
 	</nav>
-	<div>
-		{#if workflow.description}
-			<div class="form-check form-switch float-end">
-				<input
-					class="form-check-input"
-					bind:checked={showWorkflowDescription}
-					type="checkbox"
-					role="switch"
-					id="showWorkflowDescriptionSwitch"
-				/>
-				<label class="form-check-label" for="showWorkflowDescriptionSwitch">
-					Show description
-				</label>
-			</div>
-		{/if}
-	</div>
 </div>
 
 <div class="container">
-	{#if workflow.description && showWorkflowDescription}
+	{#if workflow.description}
 		<div class="mb-3">
-			{workflow.description}
+			{#if workflow.description.length > maxDescriptionLength + descriptionLengthOffset}
+				{#if expandWorkflowDescription}
+					{workflow.description}
+				{:else}
+					{workflow.description.substring(0, maxDescriptionLength)}...
+				{/if}
+				{#if expandWorkflowDescription}
+					<button
+						class="btn btn-link fw-light p-0 mb-2"
+						onclick={() => (expandWorkflowDescription = false)}
+					>
+						Show less
+					</button>
+				{:else}
+					<button
+						class="btn btn-link fw-light p-0 mb-2"
+						onclick={() => (expandWorkflowDescription = true)}
+					>
+						Show more
+					</button>
+				{/if}
+			{:else}
+				{workflow.description}
+			{/if}
+			{#if workflow.description.length <= maxDescriptionLength + descriptionLengthOffset || expandWorkflowDescription}
+				<button
+					class="btn btn-link p-0 mb-2 ms-2"
+					data-bs-toggle="modal"
+					data-bs-target="#editWorkflowModal"
+					aria-label="Edit description"
+					onclick={async () => {
+						resetWorkflowUpdateModal();
+						await tick();
+						document.getElementById('workflowDescription')?.focus();
+					}}
+				>
+					<i class="bi bi-pencil"></i>
+				</button>
+			{/if}
 		</div>
 	{/if}
 

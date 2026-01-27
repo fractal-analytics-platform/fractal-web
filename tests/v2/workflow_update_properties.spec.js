@@ -29,7 +29,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
     await expect(page.getByText('new_workflow_name')).toBeVisible();
   });
 
-  await test.step('Set workflow description', async () => {
+  await test.step('Set short workflow description', async () => {
     await page.getByRole('button', { name: 'Edit workflow' }).click();
     const modal = await waitModal(page);
 
@@ -37,10 +37,21 @@ test('Update workflow name and description', async ({ page, workflow }) => {
     await modal.getByRole('button', { name: 'Save' }).click();
     await waitModalClosed(page);
 
-    await page.getByRole('switch', { name: 'Show description' }).click();
     await expect(page.getByText('This is the workflow description')).toBeVisible();
-    await page.getByRole('switch', { name: 'Show description' }).click();
-    await expect(page.getByText('This is the workflow description')).not.toBeVisible();
+  });
+
+  await test.step('Set long workflow description', async () => {
+    await page.getByRole('button', { name: 'Edit description' }).click()
+    const modal = await waitModal(page);
+
+    await modal.getByRole('textbox', { name: 'Workflow description' }).fill(
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+    );
+    await modal.getByRole('button', { name: 'Save' }).click();
+    await waitModalClosed(page);
+
+    await page.getByRole('button', { name: 'Show more' }).click();
+    await page.getByRole('button', { name: 'Show less' }).click();
   });
 
   await test.step('Unset workflow description', async () => {
@@ -51,6 +62,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
     await modal.getByRole('button', { name: 'Save' }).click();
     await waitModalClosed(page);
 
-    await expect(page.getByRole('switch', { name: 'Show description' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Edit description' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Show more' })).not.toBeVisible();
   });
 });
