@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { normalizePayload } from 'fractal-components';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -31,6 +32,19 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
+	let workflowImportErrorData = $state(undefined);
+	let selectedVersions = $state([]);
+
+	$effect(() => {
+		if (!workflowImportErrorData) {
+			selectedVersions = [];
+			return;
+		}
+		selectedVersions = workflowImportErrorData.map(item =>
+			item.outcome === "fail" ? undefined : item.version
+		);
+	});
+
 	export function show() {
 		modal?.show();
 	}
@@ -45,6 +59,8 @@
 		}
 		workflowName = '';
 		creating = false;
+		workflowImportErrorData = undefined;
+		selectedVersions = [];
 		modal?.hideErrorAlert();
 	}
 
@@ -107,6 +123,13 @@
 			handleWorkflowImported(workflow);
 		} else {
 			console.error('Import workflow failed');
+
+			const responseJson = await response.clone().json();
+			if (responseJson.detail.includes("HAS_ERROR_DATA")) {
+				workflowImportErrorData = responseJson.data
+				throw new Error();
+			}
+
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
@@ -149,6 +172,7 @@
 	centered={true}
 	scrollable={true}
 	onOpen={reset}
+	onClose={reset}
 	bind:this={modal}
 >
 	{#snippet header()}
@@ -172,34 +196,91 @@
 				/>
 			</div>
 
-			<div class="mb-3">
-				<label for="workflowFile" class="form-label">Import workflow from file</label>
-				<input
-					class="form-control"
-					accept="application/json"
-					type="file"
-					name="workflowFile"
-					id="workflowFile"
-					bind:this={fileInput}
-					bind:files
-				/>
-			</div>
+			{#if !workflowImportErrorData}
 
+				<div class="mb-3">
+					<label for="workflowFile" class="form-label">Import workflow from file</label>
+					<input
+						class="form-control"
+						accept="application/json"
+						type="file"
+						name="workflowFile"
+						id="workflowFile"
+						bind:this={fileInput}
+						bind:files
+					/>
+				</div>
+				<button
+					class="btn btn-primary mt-2"
+					disabled={(!workflowName && !workflowFileSelected) || creating}
+				>
+					{#if creating}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{/if}
+					{#if workflowFileSelected}
+						Import workflow
+					{:else}
+						Create empty workflow
+					{/if}
+				</button>
+
+			{:else}
+				{#each workflowImportErrorData as data, index}
+					{#if data.outcome === "success"}
+						<div>
+							<BooleanIcon value={true} />
+							<!-- {data.task_id} -->
+							{data.pkg_name}::{data.version} - {data.task_name}
+						</div>
+					{:else }
+						<div>
+							<BooleanIcon value={false} />
+							{data.pkg_name}::{data.version} - {data.task_name}
+						</div>
+						{#each data.available_tasks as task}
+							<label>
+								<input
+									type="radio"
+									name={"version-choice-" + index}
+									value={task.version}
+									bind:group={selectedVersions[index]}
+									/>
+								{task.version} {task.active ? ' ' : ' (non active) '}
+							</label>
+						{/each}
+					{/if}
+				{/each}
+
+					<div>
+						<button
+							class="btn btn-primary mt-2"
+							disabled={selectedVersions.some(v => v === undefined) || creating}
+						>
+							{#if creating}
+								<span
+									class="spinner-border spinner-border-sm"
+									role="status"
+									aria-hidden="true"
+								></span>
+							{/if}
+							Use selected versions
+						</button>
+						<button
+							class="btn btn-danger mt-2"
+							onclick={() => {workflowImportErrorData = undefined;}}
+						>
+							Change file
+						</button>
+						<button
+							class="btn btn-warning mt-2"
+							onclick={() => {console.log($state.snapshot(selectedVersions));}}
+						>
+							Show selected version
+						</button>
+					</div>
+				
+			{/if}
 			<div id="errorAlert-createWorkflowModal"></div>
-
-			<button
-				class="btn btn-primary mt-2"
-				disabled={(!workflowName && !workflowFileSelected) || creating}
-			>
-				{#if creating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				{#if workflowFileSelected}
-					Import workflow
-				{:else}
-					Create empty workflow
-				{/if}
-			</button>
 		</form>
 
 		{#if importSuccess}
