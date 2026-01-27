@@ -35,6 +35,8 @@
 	let workflowImportErrorData = $state(undefined);
 	let selectedVersions = $state([]);
 
+	let workflowMetadata = $state(undefined);
+
 	$effect(() => {
 		if (!workflowImportErrorData) {
 			selectedVersions = [];
@@ -60,6 +62,7 @@
 		workflowName = '';
 		creating = false;
 		workflowImportErrorData = undefined;
+		workflowMetadata = undefined;
 		selectedVersions = [];
 		modal?.hideErrorAlert();
 	}
@@ -81,15 +84,22 @@
 	}
 
 	async function handleImportWorkflow() {
-		const workflowFile = /** @type {FileList}*/ (files)[0];
 
-		const workflowFileContent = await workflowFile.text();
-		let workflowMetadata;
-		try {
-			workflowMetadata = JSON.parse(workflowFileContent);
-		} catch (err) {
-			console.error(err);
-			throw new AlertError('The workflow file is not a valid JSON file');
+		if (!workflowImportErrorData) {
+			const workflowFile = /** @type {FileList}*/ (files)[0];
+			const workflowFileContent = await workflowFile.text();
+			
+			try {
+				workflowMetadata = JSON.parse(workflowFileContent);
+			} catch (err) {
+				console.error(err);
+				throw new AlertError('The workflow file is not a valid JSON file');
+			}
+		}
+		else {
+			workflowMetadata.task_list.forEach((item, index) => {
+				item.task.version = selectedVersions[index];
+			});
 		}
 
 		if (workflowName) {
@@ -267,15 +277,12 @@
 						</button>
 						<button
 							class="btn btn-danger mt-2"
-							onclick={() => {workflowImportErrorData = undefined;}}
+							onclick={() => {
+								workflowImportErrorData = undefined;
+								workflowMetadata = undefined;
+							}}
 						>
 							Change file
-						</button>
-						<button
-							class="btn btn-warning mt-2"
-							onclick={() => {console.log($state.snapshot(selectedVersions));}}
-						>
-							Show selected version
 						</button>
 					</div>
 				
