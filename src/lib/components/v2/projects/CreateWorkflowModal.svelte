@@ -207,7 +207,6 @@
 			</div>
 
 			{#if !workflowImportErrorData}
-
 				<div class="mb-3">
 					<label for="workflowFile" class="form-label">Import workflow from file</label>
 					<input
@@ -235,56 +234,67 @@
 				</button>
 
 			{:else}
+				<b>+++ HINT PLACEHOLDER +++</b>
 				{#each workflowImportErrorData as data, index}
-					{#if data.outcome === "success"}
-						<div>
-							<BooleanIcon value={true} />
-							<!-- {data.task_id} -->
-							{data.pkg_name}::{data.version} - {data.task_name}
-						</div>
-					{:else }
-						<div>
-							<BooleanIcon value={false} />
-							{data.pkg_name}::{data.version} - {data.task_name}
-						</div>
-						{#each data.available_tasks as task}
-							<label>
-								<input
-									type="radio"
-									name={"version-choice-" + index}
-									value={task.version}
-									bind:group={selectedVersions[index]}
-									/>
-								{task.version} {task.active ? ' ' : ' (non active) '}
-							</label>
-						{/each}
-					{/if}
+					<section>
+						<header>
+							<BooleanIcon value={data.outcome === 'success'} />
+							<strong>
+								{data.pkg_name}::{data.version}
+							</strong>
+							<span> — {data.task_name}</span>
+						</header>
+						{#if data.outcome !== "success"}
+							<fieldset>
+								{#each [...data.available_tasks].sort(
+									(a, b) => a.version.localeCompare(b.version)
+								) as task}
+									<div>
+										<label>
+											<input
+												type="radio"
+												name={"version-choice-" + index}
+												value={task.version}
+												bind:group={selectedVersions[index]}
+											/>
+											<span>
+												{task.version}
+												{#if !task.active}
+													<small>(non active)</small>
+												{/if}
+											</span>
+										</label>
+									</div>
+								{/each}
+							</fieldset>
+						{/if}
+						<hr />
+					</section>
 				{/each}
-
-					<div>
-						<button
-							class="btn btn-primary mt-2"
-							disabled={selectedVersions.some(v => v === undefined) || creating}
-						>
-							{#if creating}
-								<span
-									class="spinner-border spinner-border-sm"
-									role="status"
-									aria-hidden="true"
-								></span>
-							{/if}
-							Use selected versions
-						</button>
-						<button
-							class="btn btn-danger mt-2"
-							onclick={() => {
-								workflowImportErrorData = undefined;
-								workflowMetadata = undefined;
-							}}
-						>
-							Change file
-						</button>
-					</div>
+				<div>
+					<button
+						class="btn btn-primary mt-2"
+						disabled={selectedVersions.some(v => v === undefined) || creating}
+					>
+						{#if creating}
+							<span
+								class="spinner-border spinner-border-sm"
+								role="status"
+								aria-hidden="true"
+							></span>
+						{/if}
+						Use selected versions
+					</button>
+					<button
+						class="btn btn-danger mt-2"
+						onclick={() => {
+							workflowImportErrorData = undefined;
+							workflowMetadata = undefined;
+						}}
+					>
+						Change file
+					</button>
+				</div>
 				
 			{/if}
 			<div id="errorAlert-createWorkflowModal"></div>
