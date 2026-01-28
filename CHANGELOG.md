@@ -12,6 +12,7 @@
 * Fixed typo in UI (\#934).
 * Fixed issue to get correct URL for s3 zarr paths (\#935).
 * Replace `npm install` with `npm ci` in GitHub Actions (\#939).
+* Supported richer workflow/workflowtask metadata (\#938).
 
 # 1.22.2
 
