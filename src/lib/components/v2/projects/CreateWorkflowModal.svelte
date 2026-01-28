@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { normalizePayload } from 'fractal-components';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -31,6 +32,21 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
+	let workflowImportErrorData = $state(undefined);
+	let selectedVersions = $state([]);
+
+	let workflowMetadata = $state(undefined);
+
+	$effect(() => {
+		if (!workflowImportErrorData) {
+			selectedVersions = [];
+			return;
+		}
+		selectedVersions = workflowImportErrorData.map(item =>
+			item.outcome === "fail" ? undefined : item.version
+		);
+	});
+
 	export function show() {
 		modal?.show();
 	}
@@ -45,6 +61,9 @@
 		}
 		workflowName = '';
 		creating = false;
+		workflowImportErrorData = undefined;
+		workflowMetadata = undefined;
+		selectedVersions = [];
 		modal?.hideErrorAlert();
 	}
 
@@ -65,15 +84,22 @@
 	}
 
 	async function handleImportWorkflow() {
-		const workflowFile = /** @type {FileList}*/ (files)[0];
 
-		const workflowFileContent = await workflowFile.text();
-		let workflowMetadata;
-		try {
-			workflowMetadata = JSON.parse(workflowFileContent);
-		} catch (err) {
-			console.error(err);
-			throw new AlertError('The workflow file is not a valid JSON file');
+		if (!workflowImportErrorData) {
+			const workflowFile = /** @type {FileList}*/ (files)[0];
+			const workflowFileContent = await workflowFile.text();
+			
+			try {
+				workflowMetadata = JSON.parse(workflowFileContent);
+			} catch (err) {
+				console.error(err);
+				throw new AlertError('The workflow file is not a valid JSON file');
+			}
+		}
+		else {
+			workflowMetadata.task_list.forEach((item, index) => {
+				item.task.version = selectedVersions[index];
+			});
 		}
 
 		if (workflowName) {
@@ -107,6 +133,13 @@
 			handleWorkflowImported(workflow);
 		} else {
 			console.error('Import workflow failed');
+
+			const responseJson = await response.clone().json();
+			if (responseJson.detail.includes("HAS_ERROR_DATA")) {
+				workflowImportErrorData = responseJson.data
+				throw new Error();
+			}
+
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
@@ -141,6 +174,27 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
+	async function handleTaskReactivation(taskGroupId) {
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		const response = await fetch(
+			`/api/v2/task-group/${taskGroupId}/reactivate`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify({})
+			}
+		);
+		if (response.ok) {
+			for (let i = 0; i < workflowImportErrorData.length; i++) {
+				if (workflowImportErrorData[i]) {available_tasks}
+			}
+		} else {
+			throw await getAlertErrorFromResponse(response);
+		}
+	}
 </script>
 
 <Modal
@@ -149,6 +203,7 @@
 	centered={true}
 	scrollable={true}
 	onOpen={reset}
+	onClose={reset}
 	bind:this={modal}
 >
 	{#snippet header()}
@@ -172,34 +227,125 @@
 				/>
 			</div>
 
-			<div class="mb-3">
-				<label for="workflowFile" class="form-label">Import workflow from file</label>
-				<input
-					class="form-control"
-					accept="application/json"
-					type="file"
-					name="workflowFile"
-					id="workflowFile"
-					bind:this={fileInput}
-					bind:files
-				/>
-			</div>
+			{#if !workflowImportErrorData}
+				<div class="mb-3">
+					<label for="workflowFile" class="form-label">Import workflow from file</label>
+					<input
+						class="form-control"
+						accept="application/json"
+						type="file"
+						name="workflowFile"
+						id="workflowFile"
+						bind:this={fileInput}
+						bind:files
+					/>
+				</div>
+				<button
+					class="btn btn-primary mt-2"
+					disabled={(!workflowName && !workflowFileSelected) || creating}
+				>
+					{#if creating}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{/if}
+					{#if workflowFileSelected}
+						Import workflow
+					{:else}
+						Create empty workflow
+					{/if}
+				</button>
 
+			{:else}
+					(MESSAGE TBD)
+					Some of the requested tasks could not be found.
+					Here are some alternative options.
+
+				{#each workflowImportErrorData as data, index}
+					<hr />	
+					<section>
+						{#if data.outcome !== "success"}
+							<header>
+								<BooleanIcon value={false} />
+								Task
+								<strong>
+									{data.task_name}
+								</strong>
+								<span>({data.pkg_name}::{data.version})</span>
+								not found.
+							</header>
+							Alternative options
+							<fieldset>
+								{#each [...data.available_tasks].sort(
+									(a, b) => a.version.localeCompare(b.version)
+								) as task}
+									<div>
+										<label>
+											<input
+												type="radio"
+												name={"version-choice-" + index}
+												value={task.version}
+												bind:group={selectedVersions[index]}
+											/>
+											<span>
+												{task.version}
+												{#if !task.active}
+													<small>(non active)</small>
+													{#if task.taskgroup_write_access}
+														<button
+															type="button"
+															class="btn btn-warning ms-3"
+															onclick={() => {handleTaskReactivation(task.taskgroup_id);}}
+														>
+															Trigger reactivation
+														</button>
+														Help message TBD
+													{/if}
+												{/if}
+											</span>
+										</label>
+									</div>
+								{/each}
+							</fieldset>
+						{:else}
+							<header>
+							<BooleanIcon value={true} />
+							Task 
+							<strong>
+								{data.task_name}
+							</strong>
+							<span>({data.pkg_name}::{data.version})</span>
+							found.
+							</header>
+						{/if}
+					</section>
+					{/each}
+				<hr />
+				<div>
+					<button
+						class="btn btn-primary mt-2"
+						disabled={selectedVersions.some(v => v === undefined) || creating}
+					>
+						{#if creating}
+							<span
+								class="spinner-border spinner-border-sm"
+								role="status"
+								aria-hidden="true"
+							></span>
+						{/if}
+						Use selected versions
+					</button>
+					<button
+						class="btn btn-danger mt-2"
+						onclick={() => {
+							workflowImportErrorData = undefined;
+							workflowMetadata = undefined;
+						}}
+					>
+						Cancel
+					</button>
+				</div>
+				
+			{/if}
 			<div id="errorAlert-createWorkflowModal"></div>
-
-			<button
-				class="btn btn-primary mt-2"
-				disabled={(!workflowName && !workflowFileSelected) || creating}
-			>
-				{#if creating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				{#if workflowFileSelected}
-					Import workflow
-				{:else}
-					Create empty workflow
-				{/if}
-			</button>
 		</form>
 
 		{#if importSuccess}
