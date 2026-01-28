@@ -174,6 +174,27 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
+	async function handleTaskReactivation(taskGroupId) {
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		const response = await fetch(
+			`/api/v2/task-group/${taskGroupId}/reactivate`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify({})
+			}
+		);
+		if (response.ok) {
+			for (let i = 0; i < workflowImportErrorData.length; i++) {
+				if (workflowImportErrorData[i]) {available_tasks}
+			}
+		} else {
+			throw await getAlertErrorFromResponse(response);
+		}
+	}
 </script>
 
 <Modal
@@ -234,17 +255,24 @@
 				</button>
 
 			{:else}
-				<b>+++ HINT PLACEHOLDER +++</b>
+					(MESSAGE TBD)
+					Some of the requested tasks could not be found.
+					Here are some alternative options.
+
 				{#each workflowImportErrorData as data, index}
+					<hr />	
 					<section>
-						<header>
-							<BooleanIcon value={data.outcome === 'success'} />
-							<strong>
-								{data.pkg_name}::{data.version}
-							</strong>
-							<span> — {data.task_name}</span>
-						</header>
 						{#if data.outcome !== "success"}
+							<header>
+								<BooleanIcon value={false} />
+								Task
+								<strong>
+									{data.task_name}
+								</strong>
+								<span>({data.pkg_name}::{data.version})</span>
+								not found.
+							</header>
+							Alternative options
 							<fieldset>
 								{#each [...data.available_tasks].sort(
 									(a, b) => a.version.localeCompare(b.version)
@@ -261,16 +289,36 @@
 												{task.version}
 												{#if !task.active}
 													<small>(non active)</small>
+													{#if task.taskgroup_write_access}
+														<button
+															type="button"
+															class="btn btn-warning ms-3"
+															onclick={() => {handleTaskReactivation(task.taskgroup_id);}}
+														>
+															Trigger reactivation
+														</button>
+														Help message TBD
+													{/if}
 												{/if}
 											</span>
 										</label>
 									</div>
 								{/each}
 							</fieldset>
+						{:else}
+							<header>
+							<BooleanIcon value={true} />
+							Task 
+							<strong>
+								{data.task_name}
+							</strong>
+							<span>({data.pkg_name}::{data.version})</span>
+							found.
+							</header>
 						{/if}
-						<hr />
 					</section>
-				{/each}
+					{/each}
+				<hr />
 				<div>
 					<button
 						class="btn btn-primary mt-2"
@@ -292,7 +340,7 @@
 							workflowMetadata = undefined;
 						}}
 					>
-						Change file
+						Cancel
 					</button>
 				</div>
 				
