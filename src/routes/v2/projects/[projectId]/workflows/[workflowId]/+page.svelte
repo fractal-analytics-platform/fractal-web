@@ -26,7 +26,6 @@
 	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 	import { slide } from 'svelte/transition';
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
-	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
@@ -50,9 +49,7 @@
 	let selectedDatasetId = $state();
 	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
 
-	let isLegacy = $state(false);
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
-	let legacyStatuses = $state({});
+	let showMissingStatusesWarning = $state(false);
 
 	let jobError = $state('');
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
@@ -513,9 +510,7 @@
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = $state({});
 
-	let hasAnyJobRun = $derived(
-		Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0
-	);
+	let hasAnyJobRun = $derived(Object.keys(statuses).length > 0);
 
 	let runningTaskId = $derived(
 		workflow.task_list.find((t) => statuses[t.id]?.status === 'submitted')?.id
@@ -526,6 +521,7 @@
 
 	async function selectedDatasetChanged() {
 		expandedWorkflowTaskId = undefined;
+		showMissingStatusesWarning = false;
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
@@ -533,7 +529,6 @@
 	}
 
 	async function loadJobsStatus() {
-		legacyStatuses = {};
 		if (selectedDatasetId === undefined) {
 			statuses = {};
 			jobError = '';
@@ -564,11 +559,7 @@
 		}
 
 		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
-		if (selectedSubmittedJob && Object.keys(statuses).length === 0) {
-			await loadLegacyStatus();
-		} else {
-			isLegacy = false;
-		}
+		showMissingStatusesWarning = !!selectedSubmittedJob && Object.keys(statuses).length === 0;
 		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
@@ -586,22 +577,6 @@
 				loadHistoryRunStatuses(expandedWorkflowTaskId, false);
 			}
 		}
-	}
-
-	async function loadLegacyStatus() {
-		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/status-legacy?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`
-		);
-		if (!response.ok) {
-			console.log('Error loading legacy status');
-			return;
-		}
-		const result = await response.json();
-		if (Object.keys(result).length === 0) {
-			return;
-		}
-		legacyStatuses = result.status;
-		isLegacy = true;
 	}
 
 	async function reloadSelectedDataset() {
@@ -903,6 +878,19 @@
 			</div>
 		{/if}
 
+		{#if showMissingStatusesWarning}
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-warning">
+						Some jobs ran for this workflow and dataset, but no information is available about the
+						tasks' execution statuses. Possible reasons include: (1) All jobs ran with an old
+						Fractal version (before v2.14, which has been available since May 2025), or (2) an
+						job-execution error took place before the first task started running.
+					</div>
+				</div>
+			</div>
+		{/if}
+
 		<div class="row">
 			<div class="col-4">
 				<div class="card">
@@ -978,9 +966,7 @@
 									{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
 									<span class="float-end ps-2">
 										{#if selectedDataset}
-											{#if isLegacy}
-												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
-											{:else if imagesStatusModal}
+											{#if !showMissingStatusesWarning && imagesStatusModal}
 												<ImagesStatus
 													status={statuses[workflowTask.id]}
 													dataset={selectedDataset}
@@ -1308,7 +1294,6 @@
 	{selectedWorkflowTask}
 	{onJobSubmitted}
 	{statuses}
-	{legacyStatuses}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;

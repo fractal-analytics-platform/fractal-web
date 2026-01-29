@@ -27,7 +27,6 @@
 	 * @property {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} onJobSubmitted
 	 * @property {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
 	 * @property {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
-	 * @property {{[key: number]: import('fractal-components/types/api').JobStatus}} legacyStatuses
 	 */
 
 	/** @type {Props} */
@@ -38,8 +37,7 @@
 		selectedWorkflowTask,
 		onJobSubmitted,
 		onDatasetsUpdated,
-		statuses,
-		legacyStatuses
+		statuses
 	} = $props();
 
 	/** @type {Modal|undefined} */
@@ -100,8 +98,7 @@
 			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(
 				workflow.task_list,
 				selectedWorkflowTask,
-				statuses,
-				legacyStatuses
+				statuses
 			);
 		}
 		lastTaskIndex = undefined;
