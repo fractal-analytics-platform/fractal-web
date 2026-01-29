@@ -889,7 +889,7 @@
 					<div class="alert alert-warning">
 						Some jobs ran for this workflow and dataset, but no information is available about the
 						tasks' execution statuses. Possible reasons include: (1) All jobs ran with an old
-						Fractal version (before v2.14, which has been available since May 2025), or (2) an
+						Fractal version (before v2.14, which has been available since May 2025), or (2) a
 						job-execution error took place before the first task started running.
 					</div>
 				</div>
