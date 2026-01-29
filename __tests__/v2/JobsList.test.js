@@ -180,6 +180,14 @@ describe('JobsList', () => {
 			vi.useRealTimers();
 		}
 	});
+
+	it('pre-select dataset', async () => {
+		const result = render(JobsList, {
+			props: { jobUpdater: vi.fn(), selectedDataset: '2' }
+		});
+		let table = result.getByRole('table');
+		expect(table.querySelectorAll('tbody tr').length).eq(1);
+	});
 });
 
 function verifyOptions(element, expectedOptions) {

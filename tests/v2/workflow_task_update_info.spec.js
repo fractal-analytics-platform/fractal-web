@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitPageLoading } from '../utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
 
 test('Update workflow task info (alias, description)', async ({ page, workflow }) => {
@@ -27,6 +27,15 @@ test('Update workflow task info (alias, description)', async ({ page, workflow }
     await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).not.toBeVisible();
     await expect(page.getByRole('button', { name: 'create_ome_zarr_compound' })).not.toBeVisible();
     await expect(page.getByRole('button', { name: 'foo' })).toBeVisible();
+  });
+
+  await test.step('Verify that alias is visible in "Run workflow" modal', async () => {
+    await page.getByRole('button', { name: 'Run workflow' }).click();
+    const modal = await waitModal(page);
+    await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('foo');
+    await modal.getByRole('combobox', { name: '(Optional) Stop workflow early' }).selectOption('foo');
+    await modal.getByRole('button', { name: 'Close' }).click();
+    await waitModalClosed(page);
   });
 
   await test.step('Edit workflow task description', async () => {

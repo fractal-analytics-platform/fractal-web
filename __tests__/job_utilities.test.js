@@ -242,22 +242,19 @@ it('generates new unique dataset name', () => {
 describe('get first task index for continuing workflow', () => {
 	const dummyTasks = [getDummyTask(0), getDummyTask(1)];
 
-	it('should return undefined if legacy statuses are present', () => {
-		/** @type {{ [key: number]: import('fractal-components/types/api').JobStatus }} */
-		const legacyStatuses = { 1: 'done' };
+	it('should return undefined if there are no statuses', () => {
 		const selectedWorkflowTask = dummyTasks[0];
 
 		const result = getFirstTaskIndexForContinuingWorkflow(
 			dummyTasks,
 			selectedWorkflowTask,
-			{},
-			legacyStatuses
+			{}
 		);
 		expect(result).toBeUndefined();
 	});
 
 	it('should return undefined if no selectedWorkflowTask is provided', () => {
-		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, undefined, {}, {});
+		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, undefined, {});
 		expect(result).toBeUndefined();
 	});
 
@@ -269,8 +266,7 @@ describe('get first task index for continuing workflow', () => {
 		const result = getFirstTaskIndexForContinuingWorkflow(
 			dummyTasks,
 			selectedWorkflowTask,
-			statuses,
-			{}
+			statuses
 		);
 		expect(result).toEqual(selectedWorkflowTask.order);
 	});
@@ -283,8 +279,7 @@ describe('get first task index for continuing workflow', () => {
 		const result = getFirstTaskIndexForContinuingWorkflow(
 			dummyTasks,
 			selectedWorkflowTask,
-			statuses,
-			{}
+			statuses
 		);
 		expect(result).toEqual(selectedWorkflowTask.order);
 	});
@@ -297,8 +292,7 @@ describe('get first task index for continuing workflow', () => {
 		const result = getFirstTaskIndexForContinuingWorkflow(
 			dummyTasks,
 			selectedWorkflowTask,
-			statuses,
-			{}
+			statuses
 		);
 		expect(result).toEqual(selectedWorkflowTask.order);
 	});
@@ -311,15 +305,14 @@ describe('get first task index for continuing workflow', () => {
 		const result = getFirstTaskIndexForContinuingWorkflow(
 			dummyTasks,
 			selectedWorkflowTask,
-			statuses,
-			{}
+			statuses
 		);
 		expect(result).toBeUndefined();
 	});
 
 	it('should return undefined if selected task is not in statuses and there is no previous task with status', () => {
 		const selectedWorkflowTask = dummyTasks[1];
-		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, selectedWorkflowTask, {}, {});
+		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, selectedWorkflowTask, {});
 		expect(result).toBeUndefined();
 	});
 });

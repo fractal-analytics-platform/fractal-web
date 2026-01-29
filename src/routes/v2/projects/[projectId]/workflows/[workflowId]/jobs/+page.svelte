@@ -22,6 +22,8 @@
 		}
 		return await response.json();
 	}
+
+	const selectedDataset = $derived(page.url.searchParams.get('dataset') ?? undefined);
 </script>
 
 {#if project && workflow}
@@ -45,6 +47,6 @@
 	</div>
 
 	<div class="container">
-		<JobsList columnsToHide={['project', 'workflow', 'id']} {jobUpdater} />
+		<JobsList columnsToHide={['project', 'workflow', 'id']} {jobUpdater} {selectedDataset} />
 	</div>
 {/if}

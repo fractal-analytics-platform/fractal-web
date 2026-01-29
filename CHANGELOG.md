@@ -13,6 +13,9 @@
 * Fixed issue to get correct URL for s3 zarr paths (\#935).
 * Replace `npm install` with `npm ci` in GitHub Actions (\#939).
 * Supported richer workflow/workflowtask metadata (\#938).
+* Removed retrieval of legacy tasks status (\#944).
+* Pre-selected dataset in workflow jobs list (\#944).
+* Displayed task aliases also in "Run workflow" modal (\#944).
 
 # 1.22.2
 

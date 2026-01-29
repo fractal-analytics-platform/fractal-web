@@ -59,7 +59,7 @@ describe('Workflow page', () => {
 						case '/api/v2/project/1/dataset/1':
 							return { id: 1, name: 'test' };
 						case '/api/v2/project/1/status?dataset_id=1&workflow_id=1':
-							return { status: {} }; // status is an empty object, since no tasks started
+							return { 1: null }; // status is null, since no tasks started
 						case '/api/v2/project/1/workflow/1/job':
 							return [
 								{
@@ -94,6 +94,9 @@ describe('Workflow page', () => {
 		const result = render(page);
 		expect(
 			await result.findByText(/Exception error occurred while creating job folder and subfolders/)
+		).toBeDefined();
+		expect(
+			await result.findByText(/Some jobs ran for this workflow and dataset, but/)
 		).toBeDefined();
 	});
 });
