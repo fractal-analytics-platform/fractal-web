@@ -616,7 +616,7 @@
 					>
 						<option value={undefined}>Select first task</option>
 						{#each workflow.task_list as wft (wft.id)}
-							<option value={wft.order}>{wft.task.name}</option>
+							<option value={wft.order}>{wft.alias ?? wft.task.name}</option>
 						{/each}
 					</select>
 					<span class="invalid-feedback"> The first task is required </span>
@@ -633,7 +633,7 @@
 						<option value={undefined}>Select last task</option>
 						{#each workflow.task_list as wft (wft.id)}
 							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
-								<option value={wft.order}>{wft.task.name}</option>
+								<option value={wft.order}>{wft.alias ?? wft.task.name}</option>
 							{/if}
 						{/each}
 					</select>
