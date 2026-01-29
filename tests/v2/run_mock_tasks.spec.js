@@ -253,7 +253,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	await test.step('Open the workflow jobs page', async () => {
 		await page.getByRole('link', { name: 'List jobs' }).click();
 		await page.waitForURL(
-			new RegExp(`\/v2\/projects\/${workflow.projectId}\/workflows\/${workflow.workflowId}\/jobs\\?dataset=(\\d+)`)
+			new RegExp(`/v2/projects/${workflow.projectId}/workflows/${workflow.workflowId}/jobs\\?dataset=(\\d+)`)
 		);
 		await expect(page.locator('table tbody tr')).toHaveCount(1);
 		await page.getByRole('button', { name: 'Clear filters' }).click();
