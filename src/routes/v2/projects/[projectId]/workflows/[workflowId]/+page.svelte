@@ -819,7 +819,12 @@
 						Type filters flow
 					</button>
 				{/if}
-				<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+				<a
+					href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs{selectedDataset
+						? '?dataset=' + selectedDataset.id
+						: ''}"
+					class="btn btn-light"
+				>
 					<i class="bi-journal-code"></i> List jobs
 				</a>
 				<button
