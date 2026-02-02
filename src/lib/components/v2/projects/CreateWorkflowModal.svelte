@@ -39,6 +39,7 @@
 	let showOlderVersions = $state(false)
 
 	$effect(() => {
+		showOlderVersions;
 		if (!workflowImportErrorData) {
 			selectedVersions = [];
 			return;
@@ -294,9 +295,9 @@
 										(a, b) => a.version.localeCompare(b.version)
 									) as task}
 										{#if showOlderVersions || (!showOlderVersions && task.version > data.version)}
-										<option value={task.version} disabled={!task.active}>
-											{task.version}{task.active ? "" : " (non active)"}
-										</option>
+											<option value={task.version} title={!task.active ? "Not active" : ""}>
+												{task.version}{task.active ? "" : " ⚠️"}
+											</option>
 										{/if}
 									{/each}
 								</select>
