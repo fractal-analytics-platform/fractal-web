@@ -272,39 +272,18 @@
 								<span>({data.pkg_name}::{data.version})</span>
 								not found.
 							</header>
-							Alternative options
-							<fieldset>
-								{#each [...data.available_tasks].sort(
-									(a, b) => a.version.localeCompare(b.version)
-								) as task}
-									<div>
-										<label>
-											<input
-												type="radio"
-												name={"version-choice-" + index}
-												value={task.version}
-												bind:group={selectedVersions[index]}
-											/>
-											<span>
-												{task.version}
-												{#if !task.active}
-													<small>(non active)</small>
-													{#if task.taskgroup_write_access}
-														<button
-															type="button"
-															class="btn btn-warning ms-3"
-															onclick={() => {handleTaskReactivation(task.taskgroup_id);}}
-														>
-															Trigger reactivation
-														</button>
-														Help message TBD
-													{/if}
-												{/if}
-											</span>
-										</label>
-									</div>
-								{/each}
-							</fieldset>
+							Alternative options:
+							<div>
+								<select bind:value={selectedVersions[index]}>
+									{#each [...data.available_tasks].sort(
+										(a, b) => a.version.localeCompare(b.version)
+									) as task}
+										<option value={task.version} disabled={!task.active}>
+											{task.version}{task.active ? "" : " (non active)"}
+										</option>
+									{/each}
+								</select>
+							</div>
 						{:else}
 							<header>
 							<BooleanIcon value={true} />
