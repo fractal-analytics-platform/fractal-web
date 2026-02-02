@@ -36,6 +36,7 @@
 	let selectedVersions = $state([]);
 
 	let workflowMetadata = $state(undefined);
+	let showOlderVersions = $state(false)
 
 	$effect(() => {
 		if (!workflowImportErrorData) {
@@ -64,6 +65,7 @@
 		workflowImportErrorData = undefined;
 		workflowMetadata = undefined;
 		selectedVersions = [];
+		showOlderVersions = false;
 		modal?.hideErrorAlert();
 	}
 
@@ -258,6 +260,19 @@
 					(MESSAGE TBD)
 					Some of the requested tasks could not be found.
 					Here are some alternative options.
+					<div class="mb-3">
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="checkShowOlderVersions"
+								bind:checked={showOlderVersions}
+							/>
+							<label class="form-check-label" for="checkShowOlderVersions">
+								Show older versions
+							</label>
+						</div>
+					</div>
 
 				{#each workflowImportErrorData as data, index}
 					<hr />	
@@ -278,9 +293,11 @@
 									{#each [...data.available_tasks].sort(
 										(a, b) => a.version.localeCompare(b.version)
 									) as task}
+										{#if showOlderVersions || (!showOlderVersions && task.version > data.version)}
 										<option value={task.version} disabled={!task.active}>
 											{task.version}{task.active ? "" : " (non active)"}
 										</option>
+										{/if}
 									{/each}
 								</select>
 							</div>
@@ -317,6 +334,7 @@
 						onclick={() => {
 							workflowImportErrorData = undefined;
 							workflowMetadata = undefined;
+							showOlderVersions = false;
 						}}
 					>
 						Cancel
