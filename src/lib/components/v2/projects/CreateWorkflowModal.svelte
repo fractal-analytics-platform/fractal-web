@@ -300,7 +300,10 @@
 							{#if data.available_tasks.length > 0}
 								Alternative options:
 								<div>
-									<select bind:value={selectedVersions[index]}>
+									<select
+										bind:value={selectedVersions[index]}
+										style="width: 10ch"
+									>
 										{#each [...data.available_tasks].sort(
 											(a, b) => a.version.localeCompare(b.version)
 										) as task}
