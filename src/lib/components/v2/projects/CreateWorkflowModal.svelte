@@ -263,9 +263,9 @@
 						Some of the requested tasks could not be found.
 					</p>
 					<p>
-						Where possible, we provide alternative available version.
+						If the problem is a version mismatch, the list of available versions is provided.
 						<br>
-						Missing task packages can be collected at the
+						Missing tasks must be collected at the
 						<a href="/v2/tasks/management">Tasks management</a> page.
 					</p>
 
@@ -289,17 +289,21 @@
 						{#if data.outcome !== "success"}
 							<header>
 								<BooleanIcon value={false} />
-								Task
-								<strong>
-									{data.task_name}
-								</strong>
-								<span>({data.pkg_name}::{data.version})</span>
-								not found.
+								Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
 							</header>
 
+							<br>
 							{#if data.available_tasks.length > 0}
-								Alternative options:
 								<div>
+								{#if data.version}
+									Version {data.version} not found.
+								{:else}
+									No version provided.
+								{/if}
+								</div>
+
+								<div>
+									Available versions:
 									<select
 										bind:value={selectedVersions[index]}
 										style="width: 10ch"
@@ -307,8 +311,11 @@
 										{#each [...data.available_tasks].sort(
 											(a, b) => a.version.localeCompare(b.version)
 										) as task}
-											{#if showOlderVersions || (!showOlderVersions && task.version > data.version)}
-												<option value={task.version} title={!task.active ? "Not active" : ""}>
+											{#if !data.version || showOlderVersions || (!showOlderVersions && task.version > data.version)}
+												<option
+													value={task.version}
+													title={task.active ? "" : "Not active"}
+												>
 													{task.version}{task.active ? "" : " ⚠️"}
 												</option>
 											{/if}
@@ -316,8 +323,18 @@
 									</select>
 								</div>
 							{:else}
-								No alternative option available.
-								You must collect this package.
+							<div>
+								Missing task:
+								<pre><code>{JSON.stringify(
+									{
+										pkg_name: data.pkg_name,
+										task_name: data.task_name,
+										...(data.version != null && { version: data.version })
+									},
+									null,
+									2
+								)}</code></pre>
+							</div>
 							{/if}
 						{:else}
 							<header>
@@ -326,7 +343,7 @@
 							<strong>
 								{data.task_name}
 							</strong>
-							<span>({data.pkg_name}::{data.version})</span>
+							<span>({data.pkg_name}{#if data.version}, version {data.version}{/if})</span>
 							found.
 							</header>
 						{/if}
