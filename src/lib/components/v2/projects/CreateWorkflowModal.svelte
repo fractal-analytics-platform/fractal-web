@@ -258,9 +258,17 @@
 				</button>
 
 			{:else}
-					(MESSAGE TBD)
-					Some of the requested tasks could not be found.
-					Here are some alternative options.
+					<hr />
+					<p>
+						Some of the requested tasks could not be found.
+					</p>
+					<p>
+						Where possible, we provide alternative available version.
+						<br>
+						Missing task packages can be collected at the
+						<a href="/v2/tasks/management">Tasks management</a> page.
+					</p>
+
 					<div class="mb-3">
 						<div class="form-check">
 							<input
@@ -288,20 +296,26 @@
 								<span>({data.pkg_name}::{data.version})</span>
 								not found.
 							</header>
-							Alternative options:
-							<div>
-								<select bind:value={selectedVersions[index]}>
-									{#each [...data.available_tasks].sort(
-										(a, b) => a.version.localeCompare(b.version)
-									) as task}
-										{#if showOlderVersions || (!showOlderVersions && task.version > data.version)}
-											<option value={task.version} title={!task.active ? "Not active" : ""}>
-												{task.version}{task.active ? "" : " ⚠️"}
-											</option>
-										{/if}
-									{/each}
-								</select>
-							</div>
+
+							{#if data.available_tasks.length > 0}
+								Alternative options:
+								<div>
+									<select bind:value={selectedVersions[index]}>
+										{#each [...data.available_tasks].sort(
+											(a, b) => a.version.localeCompare(b.version)
+										) as task}
+											{#if showOlderVersions || (!showOlderVersions && task.version > data.version)}
+												<option value={task.version} title={!task.active ? "Not active" : ""}>
+													{task.version}{task.active ? "" : " ⚠️"}
+												</option>
+											{/if}
+										{/each}
+									</select>
+								</div>
+							{:else}
+								No alternative option available.
+								You must collect this package.
+							{/if}
 						{:else}
 							<header>
 							<BooleanIcon value={true} />
