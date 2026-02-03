@@ -353,7 +353,7 @@
 				<div>
 					<button
 						class="btn btn-primary mt-2"
-						disabled={selectedVersions.some(v => v === undefined) || creating}
+						disabled={creating}
 					>
 						{#if creating}
 							<span
@@ -362,7 +362,7 @@
 								aria-hidden="true"
 							></span>
 						{/if}
-						Use selected versions
+						Import workflow
 					</button>
 					<button
 						class="btn btn-danger mt-2"
