@@ -282,10 +282,14 @@
 				{#each workflowImportErrorData as data, index}
 					<hr />	
 					<section>
-						<header>
-							<BooleanIcon value={data.outcome === "success"} />
-							Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
-						</header>
+						<div style="display: flex; align-items: center; gap: 8px;">
+							<div>
+								<BooleanIcon value={data.outcome === "success"} />
+							</div>
+							<div>
+								Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
+							</div>
+						</div>
 						<br>
 						<div>
 							Requested version:
