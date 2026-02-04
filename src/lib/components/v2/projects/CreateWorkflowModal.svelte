@@ -259,8 +259,8 @@
 
 			{:else}
 					<hr />
-					<p>Some of the requested tasks are not available on this Fractal instance.</p>
 					<p>
+						Some of the requested tasks are not available on this Fractal instance.
 						You can collect missing task packages at the <a href="/v2/tasks/management">Tasks management</a> page, 
 						or select one of the available versions listed below.
 					</p>
@@ -290,12 +290,10 @@
 								Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
 							</div>
 						</div>
-						<br>
 						<div>
 							Requested version:
 							{#if data.version} {data.version} {:else} - {/if}
 						</div>
-						<br>
 						<div>
 						{#if data.outcome !== "success"}
 							{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version))}
