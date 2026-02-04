@@ -36,10 +36,10 @@
 	let selectedVersions = $state([]);
 
 	let workflowMetadata = $state(undefined);
-	let showOlderVersions = $state(false)
+	let includeOlderVersions = $state(false)
 
 	$effect(() => {
-		showOlderVersions;
+		includeOlderVersions;
 		if (!workflowImportErrorData) {
 			selectedVersions = [];
 			return;
@@ -66,7 +66,7 @@
 		workflowImportErrorData = undefined;
 		workflowMetadata = undefined;
 		selectedVersions = [];
-		showOlderVersions = false;
+		includeOlderVersions = false;
 		modal?.hideErrorAlert();
 	}
 
@@ -259,14 +259,10 @@
 
 			{:else}
 					<hr />
+					<p>Some of the requested tasks are not available on this Fractal instance.</p>
 					<p>
-						Some of the requested tasks could not be found.
-					</p>
-					<p>
-						If the problem is a version mismatch, the list of available versions is provided.
-						<br>
-						Missing tasks must be collected at the
-						<a href="/v2/tasks/management">Tasks management</a> page.
+						You can collect missing task packages at the <a href="/v2/tasks/management">Tasks management</a> page, 
+						or select one of the available versions listed below.
 					</p>
 
 					<div class="mb-3">
@@ -274,11 +270,11 @@
 							<input
 								class="form-check-input"
 								type="checkbox"
-								id="checkShowOlderVersions"
-								bind:checked={showOlderVersions}
+								id="checkIncludeOlderVersions"
+								bind:checked={includeOlderVersions}
 							/>
-							<label class="form-check-label" for="checkShowOlderVersions">
-								Show older versions
+							<label class="form-check-label" for="checkIncludeOlderVersions">
+								<i>Include older versions</i>
 							</label>
 						</div>
 					</div>
@@ -286,67 +282,44 @@
 				{#each workflowImportErrorData as data, index}
 					<hr />	
 					<section>
+						<header>
+							<BooleanIcon value={data.outcome === "success"} />
+							Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
+						</header>
+						<br>
+						<div>
+							Requested version:
+							{#if data.version} {data.version} {:else} - {/if}
+						</div>
+						<br>
+						<div>
 						{#if data.outcome !== "success"}
-							<header>
-								<BooleanIcon value={false} />
-								Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
-							</header>
-
-							<br>
-							{#if data.available_tasks.length > 0}
-								<div>
-								{#if data.version}
-									Version {data.version} not found.
-								{:else}
-									No version provided.
-								{/if}
-								</div>
-
-								<div>
-									Available versions:
-									<select
-										bind:value={selectedVersions[index]}
-										style="width: 10ch"
-									>
-										{#each [...data.available_tasks].sort(
-											(a, b) => a.version.localeCompare(b.version)
-										) as task}
-											{#if !data.version || showOlderVersions || (!showOlderVersions && task.version > data.version)}
-												<option
-													value={task.version}
-													title={task.active ? "" : "Not active"}
-												>
+							{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version))}
+								Available versions:
+								<select
+									bind:value={selectedVersions[index]}
+									style="width: 10ch"
+								>
+									{#each [...data.available_tasks].sort(
+										(a, b) => a.version.localeCompare(b.version)
+									) as task}
+										{#if !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version)}
+											<option
+												value={task.version}
+												title={task.active ? "" : "Not active"}
+											>
 													{task.version}{task.active ? "" : " ⚠️"}
-												</option>
-											{/if}
-										{/each}
-									</select>
-								</div>
+											</option>
+										{/if}
+									{/each}
+								</select>
 							{:else}
-							<div>
-								Missing task:
-								<pre><code>{JSON.stringify(
-									{
-										pkg_name: data.pkg_name,
-										task_name: data.task_name,
-										...(data.version != null && { version: data.version })
-									},
-									null,
-									2
-								)}</code></pre>
-							</div>
+								No available versions.<br>
+								You should collect the task package at the tasks management
+								page{#if !includeOlderVersions}, or try including older versions{/if}.
 							{/if}
-						{:else}
-							<header>
-							<BooleanIcon value={true} />
-							Task 
-							<strong>
-								{data.task_name}
-							</strong>
-							<span>({data.pkg_name}{#if data.version}, version {data.version}{/if})</span>
-							found.
-							</header>
 						{/if}
+						</div>
 					</section>
 					{/each}
 				<hr />
@@ -369,7 +342,7 @@
 						onclick={() => {
 							workflowImportErrorData = undefined;
 							workflowMetadata = undefined;
-							showOlderVersions = false;
+							includeOlderVersions = false;
 						}}
 					>
 						Cancel
