@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.23.1 (unreleased)
+
+* Added new cases of valid SLURM errors (\#950).
+
 # 1.23.0
 
 * Dropped support for node v18 (\#930).
