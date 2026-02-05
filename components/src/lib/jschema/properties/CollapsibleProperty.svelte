@@ -13,6 +13,12 @@
 
 	/** @type {boolean} */
 	let collapsed = $state(false);
+	/** @type {boolean} */
+	let hasErrors = $state(false);
+	formElement.hasErrors.subscribe((v) => (hasErrors = v));
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
 
 	$effect(() => {
 		collapsed = formElement.collapsed;
@@ -44,7 +50,7 @@
 <div class="d-flex flex-column p-2">
 	<div class="my-2">
 		<div class="accordion" id="accordion-{formElement.id}">
-			<div class="accordion-item">
+			<div class="accordion-item" class:border-danger={hasErrors}>
 				<div class="accordion-header">
 					<button
 						class="accordion-button"
@@ -72,6 +78,9 @@
 					class:show={!collapsed}
 				>
 					<div class="accordion-body p-1">
+						{#each errors as error}
+							<div class="alert alert-danger mb-1">{error}</div>
+						{/each}
 						{@render children?.()}
 					</div>
 				</div>

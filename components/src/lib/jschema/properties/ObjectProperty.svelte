@@ -18,6 +18,10 @@
 	 */
 	let children = $state([]);
 
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
+
 	onMount(() => {
 		children = formElement.children;
 	});
@@ -51,7 +55,12 @@
 		formElement.resetChild(index);
 		children = formElement.children;
 	}
+
 </script>
+
+{#each errors as error}
+  <div class="alert alert-danger mb-1">{error}</div>
+{/each}
 
 {#if formElement.additionalProperties}
 	<div class="d-flex justify-content-center">

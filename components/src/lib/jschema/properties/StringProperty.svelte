@@ -19,6 +19,10 @@
 	let field = $state();
 	let validationError = $state('');
 
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
+
 	let constant = $derived('const' in formElement.property);
 
 	/**
@@ -49,9 +53,9 @@
 			bind:value
 			class="form-control"
 			id="property-{formElement.id}"
-			class:is-invalid={validationError}
+			class:is-invalid={errors.length > 0 || validationError}
 			disabled={!editable || constant}
 		/>
-		<span class="invalid-feedback">{validationError}</span>
+		<span class="invalid-feedback">{errors.length > 0 ? errors.join(', ') : validationError}</span>
 	</div>
 </div>

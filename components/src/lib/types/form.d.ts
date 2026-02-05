@@ -2,6 +2,7 @@ import { FormManager } from '../jschema/form_manager.js';
 import {
 	StringFormElement,
 	BooleanFormElement,
+	NumberFormElement,
 	EnumFormElement,
 	ObjectFormElement,
 	ArrayFormElement,
@@ -14,7 +15,7 @@ export type FormElement = (
 	| StringFormElement
 	| BooleanFormElement
 	| EnumFormElement
-	| NumberFormElementFields
+	| NumberFormElement
 	| ObjectFormElement
 	| ArrayFormElement
 	| TupleFormElement
@@ -29,6 +30,7 @@ export type BaseFormElementFields = {
 	manager: FormManager;
 	id: string;
 	key: string | null;
+	path: string;
 	type: string | null;
 	title: string;
 	description: string;

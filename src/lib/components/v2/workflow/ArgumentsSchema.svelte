@@ -8,7 +8,7 @@
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
 	import FormBuilder from './FormBuilder.svelte';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
 	import {
 		isCompoundType,
@@ -208,6 +208,10 @@
 	let isSchemaValid = $derived(argsSchemaVersionValid(workflowTask.task.args_schema_version));
 	let schemaVersion = $derived(workflowTask.task.args_schema_version);
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
+
+  onMount(() => {
+    validateArguments()
+  })
 </script>
 
 <div id="workflow-arguments-schema-panel">

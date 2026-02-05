@@ -7,6 +7,15 @@ import { writable } from 'svelte/store';
  * @abstract
  */
 export class BaseFormElement {
+
+	/** @type {import('svelte/store').Writable<string[]>} */
+	errors;
+	/** 
+	 * This property is true also for parents of elements having an error
+	 * @type {import('svelte/store').Writable<boolean>}
+	 */
+	hasErrors;
+
 	/**
 	 * @param {import("../types/form").BaseFormElementFields} fields
 	 */
@@ -17,6 +26,7 @@ export class BaseFormElement {
 		 */
 		this.id = fields.id;
 		this.key = fields.key;
+		this.path = fields.path;
 		this.type = fields.type;
 		this.title = fields.title;
 		this.required = fields.required;
@@ -30,6 +40,24 @@ export class BaseFormElement {
 		 * @type {import("../types/jschema").JSONSchemaProperty}
 		 */
 		this.property = fields.property;
+		this.errors = writable([]);
+		this.hasErrors = writable(false);
+	}
+
+	/**
+	 * @param {string} message 
+	 */
+	addError(message) {
+		this.hasErrors.set(true);
+		this.errors.update(items => {
+			items.push(message)
+			return items
+		});
+	}
+
+	clearErrors() {
+		this.errors.set([]);
+		this.hasErrors.set(false);
 	}
 
 	notifyChange() {
@@ -122,6 +150,7 @@ export class ObjectFormElement extends BaseFormElement {
 		}
 		const child = this.manager.createFormElement({
 			key,
+			path: `${this.path}/${key}`,
 			property: this.additionalProperties,
 			required: false,
 			removable: true,
@@ -173,6 +202,7 @@ export class ObjectFormElement extends BaseFormElement {
 		}
 		const newChild = this.manager.createFormElement({
 			key: child.key,
+			path: `${this.path}/${index}`,
 			property: child.property,
 			required: child.required,
 			removable: child.removable,
@@ -203,6 +233,7 @@ export class ArrayFormElement extends BaseFormElement {
 		}
 		const child = this.manager.createFormElement({
 			key: null,
+			path: `${this.path}/${this.children.length}`,
 			property: this.items,
 			required: false,
 			removable: true,
@@ -297,7 +328,7 @@ export class TupleFormElement extends BaseFormElement {
 				)
 			);
 		}
-		this.children = this.manager.createTupleChildren({ items: this.items, size: this.size, value });
+		this.children = this.manager.createTupleChildren({ path: this.path, items: this.items, size: this.size, value });
 		this.notifyChange();
 	}
 
@@ -328,6 +359,7 @@ export class ConditionalFormElement extends BaseFormElement {
 			);
 			this.selectedItem = this.manager.createFormElement({
 				key: this.key,
+				path: `${this.path}/${index}`,
 				property: selectedProp,
 				required: this.required,
 				removable: this.removable,
