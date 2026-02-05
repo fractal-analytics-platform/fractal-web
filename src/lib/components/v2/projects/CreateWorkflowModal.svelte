@@ -137,13 +137,15 @@
 		} else {
 			console.error('Import workflow failed');
 
-			const responseJson = await response.clone().json();
-			if (responseJson.detail.includes("HAS_ERROR_DATA")) {
-				workflowImportErrorData = responseJson.data
+			const alertError = await getAlertErrorFromResponse(response);
+			const result = alertError.reason;
+
+			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
+				workflowImportErrorData = result.data
 				throw new Error();
 			}
 
-			throw await getAlertErrorFromResponse(response);
+			throw alertError;
 		}
 	}
 
