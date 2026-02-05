@@ -321,7 +321,7 @@
 								</select>
 							{:else}
 								No available versions.<br>
-								You should collect the task package at the tasks management
+								You should collect the task package at the <a href="/v2/tasks/management">Tasks management</a>
 								page{#if !includeOlderVersions}, or try including older versions{/if}.
 							{/if}
 						{/if}
