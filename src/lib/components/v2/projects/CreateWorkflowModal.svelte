@@ -178,26 +178,6 @@
 		}
 	}
 
-	async function handleTaskReactivation(taskGroupId) {
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		const response = await fetch(
-			`/api/v2/task-group/${taskGroupId}/reactivate`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({})
-			}
-		);
-		if (response.ok) {
-			for (let i = 0; i < workflowImportErrorData.length; i++) {
-				if (workflowImportErrorData[i]) {available_tasks}
-			}
-		} else {
-			throw await getAlertErrorFromResponse(response);
-		}
-	}
 </script>
 
 <Modal
