@@ -284,7 +284,11 @@
 					<section>
 						<div style="display: flex; align-items: center; gap: 8px;">
 							<div>
-								<BooleanIcon value={data.outcome === "success"} />
+								{#if data.outcome === "success" || selectedVersions[index]}
+									<BooleanIcon value={true} />
+								{:else}
+									<BooleanIcon value={false} />
+								{/if}
 							</div>
 							<div>
 								Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
@@ -328,7 +332,7 @@
 				<div>
 					<button
 						class="btn btn-primary mt-2"
-						disabled={creating}
+						disabled={creating || selectedVersions.some(v => v === undefined)}
 					>
 						{#if creating}
 							<span
