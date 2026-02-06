@@ -270,7 +270,7 @@
 						</div>
 					</div>
 
-				{#each workflowImportErrorData as data, index}
+				{#each workflowImportErrorData as data, index (index)}
 					<hr />	
 					<section>
 						<div style="display: flex; align-items: center; gap: 8px;">
@@ -285,10 +285,7 @@
 								Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
 							</div>
 						</div>
-						<div>
-							Requested version:
-							{#if data.version} {data.version} {:else} - {/if}
-						</div>
+						<div>Requested version: {data.version || '-'}</div>
 						<div>
 						{#if data.outcome !== "success"}
 							{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version))}
@@ -305,7 +302,7 @@
 									<option value={undefined}>-- select --</option>
 									{#each [...data.available_tasks].sort(
 										(a, b) => a.version.localeCompare(b.version)
-									) as task}
+									) as task (task.task_id)}
 										{#if !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version)}
 											<option
 												value={task.version}
@@ -355,7 +352,7 @@
 				</div>
 				
 			{/if}
-			<div id="errorAlert-createWorkflowModal"></div>
+			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
 		</form>
 
 		{#if importSuccess}
