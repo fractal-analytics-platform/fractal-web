@@ -236,10 +236,6 @@ type TaskImport = {
 }
 
 export type WorkflowImportErrorData = {
-	name: string
-    description: string | None = None
-    task_list: WorkflowTaskImport[]
-
 	outcome: 'success' | 'fail' ;
     pkg_name: string;
     task_name: string;
