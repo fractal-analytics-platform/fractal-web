@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3144-make-workflow-import-more-flexible',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
