@@ -32,17 +32,12 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {any[]|undefined} */
+	/** @type {import('fractal-components/types/api').WorkflowImportErrorData|undefined} */
 	let workflowImportErrorData = $state(undefined);
 	/** @type {string[]} */
 	let selectedVersions = $state([]);
 
-	/**
-	 * @typedef {Object} WorkflowMetadata
-	 * @property {string} name
-	 * @property {any[]} task_list
-	 */
-	/** @type {WorkflowMetadata | undefined} */
+	/** @type {import('fractal-components/types/api').WorkflowImport|undefined} */
 	let workflowMetadata = $state(undefined);
 
 	let includeOlderVersions = $state(false)

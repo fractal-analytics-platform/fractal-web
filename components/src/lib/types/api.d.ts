@@ -211,6 +211,49 @@ export type WorkflowTaskV2 = {
 	warning: string | null;
 };
 
+export type WorkflowImport = {
+	name: string;
+    description: string | null;
+    task_list: WorkflowTaskImport[];
+};
+
+type WorkflowTaskImport = {
+	meta_non_parallel: object | null;
+	meta_parallel: object | null;
+	args_non_parallel: object | null;
+	args_parallel: object | null;
+    type_filters: object | null;
+    input_filters: object | null;
+    description: string | null;
+    alias: string | null;
+    task: TaskImport;
+}
+
+type TaskImport = {
+    pkg_name: string;
+    name: string;
+    version: string | null;
+}
+
+export type WorkflowImportErrorData = {
+	name: string
+    description: string | None = None
+    task_list: WorkflowTaskImport[]
+
+	outcome: 'success' | 'fail' ;
+    pkg_name: string;
+    task_name: string;
+    version: string | null;
+    available_tasks: AvailableTask[];
+};
+
+type AvailableTask = {
+	task_id: number;
+    taskgroup_id: number;
+    version: string;
+    active: boolean;
+}
+
 type TaskV2Minimal = {
 	id: number;
 	name: string;
