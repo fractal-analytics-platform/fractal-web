@@ -292,11 +292,17 @@
 						<div>
 						{#if data.outcome !== "success"}
 							{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version))}
+							<div class="row row-cols-lg-auto g-3 align-items-center">
+  							<div class="col-12">
 								Available versions:
+							</div>
+							<div class="col-12">
 								<select
 									bind:value={selectedVersions[index]}
-									style="width: 10ch"
+									style="width: 15ch"
+									class="form-select"
 								>
+									<option value={undefined}>-- select --</option>
 									{#each [...data.available_tasks].sort(
 										(a, b) => a.version.localeCompare(b.version)
 									) as task}
@@ -310,6 +316,8 @@
 										{/if}
 									{/each}
 								</select>
+							</div>
+							</div>
 							{:else}
 								No available versions.<br>
 								You should collect the task package at the <a href="/v2/tasks/management">Tasks management</a>
