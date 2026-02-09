@@ -294,10 +294,10 @@
 									style="width: 15ch"
 									class="form-select"
 								>
-									<option value={undefined}>-- select --</option>
+									<option value={undefined}>Select...</option>
 									{#each [...data.available_tasks].sort(
 										(a, b) => a.version.localeCompare(b.version)
-									) as task (task.task_id)}
+									) as task, i (i)}
 										{#if !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version)}
 											<option
 												value={task.version}

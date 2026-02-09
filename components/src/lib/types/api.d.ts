@@ -244,8 +244,6 @@ export type WorkflowImportErrorData = {
 };
 
 type AvailableTask = {
-	task_id: number;
-    taskgroup_id: number;
     version: string;
     active: boolean;
 }
