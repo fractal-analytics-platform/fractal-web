@@ -39,7 +39,8 @@ test('Import workflow', async ({ page, project }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'workflow_to_import.json'));
 		await importWorkflowBtn.click();
-		await page.getByText(/Could not find a task matching/).waitFor();
+		await expect(page.getByText('No available versions')).toHaveCount(6);
+		await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 	});
 
 	const randomWorkflowName1 = Math.random().toString(36).substring(7);
