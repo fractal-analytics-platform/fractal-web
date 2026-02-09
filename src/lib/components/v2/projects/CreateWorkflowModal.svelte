@@ -32,9 +32,9 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {import('fractal-components/types/api').WorkflowImportErrorData|undefined} */
+	/** @type {import('fractal-components/types/api').WorkflowImportErrorData[]|undefined} */
 	let workflowImportErrorData = $state(undefined);
-	/** @type {string[]} */
+	/** @type {(string|undefined)[]} */
 	let selectedVersions = $state([]);
 
 	/** @type {import('fractal-components/types/api').WorkflowImport|undefined} */
@@ -49,7 +49,11 @@
 			return;
 		}
 		selectedVersions = workflowImportErrorData.map(item =>
-			item.outcome === "fail" ? undefined : item.version
+			item.outcome === "fail"
+			? undefined
+			: item.version !== null
+				? item.version
+				: undefined
 		);
 	});
 
@@ -93,26 +97,31 @@
 	async function handleImportWorkflow() {
 
 		if (!workflowImportErrorData) {
-			const workflowFile = /** @type {FileList}*/ (files)[0];
-			const workflowFileContent = await workflowFile.text();
-			
+			const workflowFile = /** @type {FileList} */ (files)[0];
+
 			try {
-				workflowMetadata = JSON.parse(workflowFileContent);
+				workflowMetadata = JSON.parse(await workflowFile.text());
 			} catch (err) {
 				console.error(err);
 				throw new AlertError('The workflow file is not a valid JSON file');
 			}
-		}
-		else {
-			workflowMetadata.task_list.forEach((item, index) => {
-				item.task.version = selectedVersions[index];
-			});
+			return
 		}
 
-		if (workflowName) {
-			console.log(`Overriding workflow name from ${workflowMetadata.name} to ${workflowName}`);
-			workflowMetadata.name = workflowName;
+		if (workflowMetadata) {
+			workflowMetadata.task_list.forEach((item, index) => {
+				const version = selectedVersions[index];
+				if (version !== undefined) {
+					item.task.version = version;
+				}
+			});
+
+			if (workflowName) {
+				console.log(`Overriding workflow name from ${workflowMetadata.name} to ${workflowName}`);
+				workflowMetadata.name = workflowName;
+			}
 		}
+
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');

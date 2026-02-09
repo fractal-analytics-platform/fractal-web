@@ -232,7 +232,7 @@ type WorkflowTaskImport = {
 type TaskImport = {
     pkg_name: string;
     name: string;
-    version: string | null;
+    version: string;
 }
 
 export type WorkflowImportErrorData = {
