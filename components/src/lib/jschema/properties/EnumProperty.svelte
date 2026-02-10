@@ -53,7 +53,7 @@
 			class:is-invalid={errors.length > 0 || validationError}
 			disabled={!editable}
 		>
-			<option value="">Select...</option>
+			<option value={null}>Select...</option>
 			{#each formElement.options as optionValue, index (index)}
 				<option>{optionValue}</option>
 			{/each}

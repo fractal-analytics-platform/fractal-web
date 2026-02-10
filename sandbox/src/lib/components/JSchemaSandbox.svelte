@@ -70,7 +70,7 @@
 		} catch (err) {
 			if (!jsonDataString) {
 				schemaData = undefined;
-				jschemaComponent.update(schema, schemaData);
+				jschemaComponent?.update(schema, schemaData);
 			}
 			dataError = 'Invalid JSON';
 		}

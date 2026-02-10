@@ -33,6 +33,7 @@
 				}}
 				allowAddingProperty={false}
 				{editable}
+				idPrefix={formElement.id}
 			/>
 		</CollapsibleProperty>
 	{:else}

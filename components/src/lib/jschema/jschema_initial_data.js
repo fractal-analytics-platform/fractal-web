@@ -21,6 +21,10 @@ export function getJsonSchemaData(jsonSchema, schemaVersion, initialValue = unde
 function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaults) {
 	const requiredChildren = property.required || [];
 	const data = {};
+	if (initialValue && (typeof initialValue !== 'object' || Array.isArray(initialValue))) {
+		// invalid data (to be fixed by user)
+		return initialValue;
+	}
 	if (initialValue === null || initialValue === undefined) {
 		initialValue = {};
 	}

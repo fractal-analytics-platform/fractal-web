@@ -9,6 +9,7 @@
 	 * @property {boolean} [editable]
 	 * @property {(data: any) => void} [onChange]
 	 * @property {boolean} [allowAddingProperty]
+	 * @property {string} [idPrefix]
 	 */
 
 	/** @type {Props} */
@@ -17,7 +18,8 @@
 		unsavedChanges = $bindable(false),
 		editable = true,
 		onChange = () => {},
-		allowAddingProperty = true
+		allowAddingProperty = true,
+		idPrefix = ''
 	} = $props();
 
 	/**
@@ -61,7 +63,7 @@
 	function buildEditableEntry(value, key) {
 		counter++;
 		let entry = {
-			id: `item-${counter}`,
+			id: `item-${idPrefix}-${counter}`,
 			error: ''
 		};
 		if (Array.isArray(value)) {

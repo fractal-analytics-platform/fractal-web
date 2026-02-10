@@ -247,7 +247,7 @@ export class ObjectFormElement extends BaseFormElement {
 			},
 			required: child.required,
 			removable: child.removable,
-			value: child.property.default
+			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true)
 		});
 		this.children[index] = newChild;
 		this.notifyChange();

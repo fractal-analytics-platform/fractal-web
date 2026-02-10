@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderSchema, renderSchemaWithReferencedProperty } from './property_test_utils';
 import { fireEvent, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
 
 describe('Tuple properties', () => {
 	it('optional tuple with default values', async function () {
@@ -312,5 +313,69 @@ describe('Tuple properties', () => {
 
 		// verify that value has been reset to default
 		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 1] });
+	});
+
+	it('tuple with extra arguments (pydantic_v1)', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					k: {
+						type: 'array',
+						minItems: 2,
+						maxItems: 2,
+						items: [{ type: 'string' }, { type: 'number' }]
+					}
+				},
+				additionalProperties: false
+			},
+			'pydantic_v1',
+			{ k: ['a', 42, 'xxx'] }
+		);
+
+		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxx'] });
+		expect(screen.queryAllByText('must NOT have more than 2 items')).toHaveLength(1);
+		expect(component.valid).toEqual(false);
+
+		await user.type(screen.getByRole('textbox', { name: '2' }), 'y');
+		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxxy'] });
+		expect(component.valid).toEqual(false);
+
+		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
+		expect(component.getArguments()).deep.eq({ k: ['a', 42] });
+		expect(component.valid).toEqual(true);
+	});
+
+	it('tuple with extra arguments (pydantic_v2)', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					k: {
+						type: 'array',
+						minItems: 2,
+						maxItems: 2,
+						prefixItems: [{ type: 'string' }, { type: 'number' }]
+					}
+				},
+				additionalProperties: false
+			},
+			'pydantic_v2',
+			{ k: ['a', 42, 'xxx'] }
+		);
+
+		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxx'] });
+		expect(screen.queryAllByText('must NOT have more than 2 items')).toHaveLength(1);
+		expect(component.valid).toEqual(false);
+
+		await user.type(screen.getByRole('textbox', { name: '2' }), 'y');
+		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxxy'] });
+		expect(component.valid).toEqual(false);
+
+		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
+		expect(component.getArguments()).deep.eq({ k: ['a', 42] });
+		expect(component.valid).toEqual(true);
 	});
 });
