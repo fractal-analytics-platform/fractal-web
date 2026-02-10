@@ -98,14 +98,12 @@
 
 		if (!workflowImportErrorData) {
 			const workflowFile = /** @type {FileList} */ (files)[0];
-
 			try {
 				workflowMetadata = JSON.parse(await workflowFile.text());
 			} catch (err) {
 				console.error(err);
 				throw new AlertError('The workflow file is not a valid JSON file');
 			}
-			return
 		}
 
 		if (workflowMetadata) {
