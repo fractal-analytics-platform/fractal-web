@@ -23,9 +23,6 @@
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
@@ -64,12 +61,53 @@
 
 	let savingChanges = $state(false);
 
-	function handleNonParallelChanged() {
-		unsavedChangesNonParallel = true;
+	let nonParallelSavedData = $state();
+	let nonParallelValid = $state(true);
+	/** @type {string[]} */
+	let nonParallelGenericErrors = $state([]);
+
+	/**
+	 * @param {any} data
+	 * @param {boolean} valid
+	 * @param {string[]} genericErrors
+	 */
+	function handleNonParallelChanged(data, valid, genericErrors) {
+		if (changed(nonParallelSavedData, data)) {
+			unsavedChangesNonParallel = true;
+		}
+		nonParallelSavedData = data;
+		nonParallelValid = valid;
+		nonParallelGenericErrors = genericErrors;
 	}
 
-	function handleParallelChanged() {
-		unsavedChangesParallel = true;
+	let parallelSavedData = $state();
+	let parallelValid = $state(true);
+	/** @type {string[]} */
+	let parallelGenericErrors = $state([]);
+
+	/**
+	 * @param {any} data
+	 * @param {boolean} valid
+	 * @param {string[]} genericErrors
+	 */
+	function handleParallelChanged(data, valid, genericErrors) {
+		if (changed(parallelSavedData, data)) {
+			unsavedChangesParallel = true;
+		}
+		parallelSavedData = data;
+		parallelValid = valid;
+		parallelGenericErrors = genericErrors;
+	}
+
+	/**
+	 * @param {any} oldValue
+	 * @param {any} newValue
+	 */
+	function changed(oldValue, newValue) {
+		if (!oldValue) {
+			return false;
+		}
+		return JSON.stringify($state.snapshot(oldValue)) !== newValue;
 	}
 
 	export function hasUnsavedChanges() {
@@ -77,9 +115,6 @@
 	}
 
 	export async function saveChanges() {
-		if (!validateArguments()) {
-			return;
-		}
 		const invalidFormBuilderNonParallel =
 			nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments();
 		const invalidFormBuilderParallel =
@@ -131,19 +166,6 @@
 			throw new AlertError(getValidationErrorMessage(err));
 		}
 		await patchWorkflow(payload);
-	}
-
-	function validateArguments() {
-		errorAlert?.hide();
-		try {
-			nonParallelSchemaComponent?.validateArguments();
-			parallelSchemaComponent?.validateArguments();
-		} catch (err) {
-			const errorAlertData = getValidationErrorMessage(err);
-			errorAlert = displayStandardErrorAlert(errorAlertData, 'task-args-validation-errors');
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -209,23 +231,39 @@
 	let schemaVersion = $derived(workflowTask.task.args_schema_version);
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 
-  onMount(() => {
-    validateArguments()
-  })
+	onMount(() => {
+		if (argsSchemaNonParallel && isSchemaValid) {
+			nonParallelSchemaComponent?.update(
+				argsSchemaNonParallel,
+				editable ? workflowTask.args_non_parallel : argsNonParallel
+			);
+		}
+
+		if (argsSchemaParallel && isSchemaValid) {
+			parallelSchemaComponent?.update(
+				argsSchemaParallel,
+				editable ? workflowTask.args_parallel : argsParallel
+			);
+		}
+	});
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="task-args-validation-errors"></div>
+	{#if !nonParallelValid || !parallelValid}
+		<div class="alert alert-danger m-2">Data is not valid</div>
+	{/if}
 	{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
 		{#if hasInitialisationArguments(workflowTask)}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
 		{#if argsSchemaNonParallel && isSchemaValid}
+			{#each nonParallelGenericErrors as error, index (index)}
+				<div class="alert alert-danger mt-1">{error}</div>
+			{/each}
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-non-parallel"
-					schema={argsSchemaNonParallel}
-					schemaData={editable ? workflowTask.args_non_parallel : argsNonParallel}
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
@@ -252,11 +290,12 @@
 			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
+			{#each parallelGenericErrors as error, index (index)}
+				<div class="alert alert-danger mt-1">{error}</div>
+			{/each}
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-parallel"
-					schema={argsSchemaParallel}
-					schemaData={editable ? workflowTask.args_parallel : argsParallel}
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}

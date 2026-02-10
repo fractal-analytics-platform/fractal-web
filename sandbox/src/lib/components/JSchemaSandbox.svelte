@@ -209,9 +209,7 @@
 			<JSchema
 				componentId="json-schema-sandbox"
 				onchange={updateData}
-				{schema}
 				{schemaVersion}
-				{schemaData}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}
 			/>

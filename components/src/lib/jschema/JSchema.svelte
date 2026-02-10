@@ -4,8 +4,6 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {object} schema
-	 * @property {object} schemaData
 	 * @property {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @property {string[]} [propertiesToIgnore]
 	 * @property {string} componentId

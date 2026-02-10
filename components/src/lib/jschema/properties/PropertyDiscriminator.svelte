@@ -31,7 +31,7 @@
 	<EnumProperty {formElement} {editable} />
 {:else if formElement.type === 'object'}
 	<CollapsibleProperty {formElement} {reset}>
-		<ObjectProperty {formElement} {editable} />
+		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
 	<ArrayProperty {formElement} {editable} {reset} />

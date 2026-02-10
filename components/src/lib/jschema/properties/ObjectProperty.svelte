@@ -7,10 +7,11 @@
 	 * @property {import("../form_element.js").ObjectFormElement} formElement
 	 * @property {boolean} [isRoot]
 	 * @property {boolean} [editable]
+	 * @property {boolean} [showErrors]
 	 */
 
 	/** @type {Props} */
-	let { formElement, isRoot = false, editable = true } = $props();
+	let { formElement, isRoot = false, editable = true, showErrors = true } = $props();
 
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
@@ -99,9 +100,11 @@
 	{/each}
 {/key}
 
-{#each errors as error, index (index)}
-	<div class="alert alert-danger mt-2 mb-1 py-1 px-2">{error}</div>
-{/each}
+{#if showErrors}
+	{#each errors as error, index (index)}
+		<div class="alert alert-danger mt-2 mb-1 py-1 px-2">{error}</div>
+	{/each}
+{/if}
 
 {#if formElement.additionalProperties}
 	<div class="d-flex justify-content-center">
