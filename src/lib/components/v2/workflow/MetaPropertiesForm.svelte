@@ -7,7 +7,7 @@
 	// This component also manages the overall form structure of meta properties.
 	// The form should be structured in multiple levels of depth, and support complex structure.
 	import { page } from '$app/state';
-	import FormBuilder from '$lib/components/v2/workflow/FormBuilder.svelte';
+	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { isCompoundType, isNonParallelType, isParallelType, normalizePayload } from 'fractal-components';
 

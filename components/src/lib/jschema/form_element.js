@@ -50,7 +50,10 @@ export class BaseFormElement {
 	addError(message) {
 		this.hasErrors.set(true);
 		this.errors.update(items => {
-			items.push(message)
+			// Note: some messages might appear twice (e.g. for conditional properties)
+			if (!items.includes(message)) {
+				items.push(message);
+			}
 			return items
 		});
 	}
@@ -120,6 +123,27 @@ export class NumberFormElement extends ValueFormElement {
 	}
 }
 
+export class UnexpectedFormElement extends ValueFormElement {
+	/**
+	 * @param {import("../types/form").ValueFormElementFields<any>} fields
+	 */
+	constructor(fields) {
+		super(fields);
+		this.type = 'unexpected';
+	}
+}
+
+export class InvalidFormElement extends ValueFormElement {
+	/**
+	 * @param {import("../types/form").ValueFormElementFields<any>} fields
+	 */
+	constructor(fields) {
+		super(fields);
+		this.originalType = fields.type;
+		this.type = 'invalid';
+	}
+}
+
 export class ObjectFormElement extends BaseFormElement {
 	/**
 	 * @param {import("../types/form").ObjectFormElementFields} fields
@@ -172,10 +196,6 @@ export class ObjectFormElement extends BaseFormElement {
 	 * @param {string} key
 	 */
 	removeChild(key) {
-		if (!this.additionalProperties) {
-			console.warn('Attempted to call remove child on element without additional properties');
-			return;
-		}
 		const filteredChildren = this.children.filter((c) => c.key === key);
 		if (filteredChildren.length === 0) {
 			console.warn('Attempted to remove not existing key %s', key);
@@ -202,13 +222,33 @@ export class ObjectFormElement extends BaseFormElement {
 		}
 		const newChild = this.manager.createFormElement({
 			key: child.key,
-			path: `${this.path}/${index}`,
+			path: `${this.path}/${child.key}`,
 			property: child.property,
 			required: child.required,
 			removable: child.removable,
 			value: defaultValue
 		});
 		newChild.collapsed = child.collapsed;
+		this.children[index] = newChild;
+		this.notifyChange();
+	}
+
+	/**
+	 * @param {number} index 
+	 */
+	fixInvalidChild(index) {
+		const child = /** @type {InvalidFormElement} */ (this.children[index]);
+		const newChild = this.manager.createFormElement({
+			key: child.key,
+			path: `${this.path}/${child.key}`,
+			property: {
+				...child.property,
+				type: child.originalType
+			},
+			required: child.required,
+			removable: child.removable,
+			value: child.property.default
+		});
 		this.children[index] = newChild;
 		this.notifyChange();
 	}
@@ -336,6 +376,14 @@ export class TupleFormElement extends BaseFormElement {
 		this.children = [];
 		this.notifyChange();
 	}
+
+	/**
+	 * @param {number} index 
+	 */
+	removeUnexpectedChild(index) {
+		this.children = this.children.filter((_, i) => i !== index);
+		this.notifyChange();
+	}
 }
 
 export class ConditionalFormElement extends BaseFormElement {
@@ -359,7 +407,7 @@ export class ConditionalFormElement extends BaseFormElement {
 			);
 			this.selectedItem = this.manager.createFormElement({
 				key: this.key,
-				path: `${this.path}/${index}`,
+				path: this.path,
 				property: selectedProp,
 				required: this.required,
 				removable: this.removable,

@@ -1,5 +1,6 @@
 import { FormManager } from '../jschema/form_manager.js';
 import {
+	ValueFormElement,
 	StringFormElement,
 	BooleanFormElement,
 	NumberFormElement,
@@ -24,7 +25,7 @@ export type FormElement = (
 	collapsed?: boolean;
 };
 
-export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement;
+export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement | ValueFormElement;
 
 export type BaseFormElementFields = {
 	manager: FormManager;
@@ -79,3 +80,17 @@ export type ConditionalElementFields = BaseFormElementFields & {
 	selectedIndex: number;
 	selectedItem: FormElement;
 };
+
+export type FormBuilderEntryType = 'object' | 'array' | 'string' | 'number' | 'boolean';
+
+export type FormBuilderEntry = ({
+	type: 'object' | 'array'
+	children: Array<FormBuilderEntry>
+} | {
+	value: string | number | boolean
+	type: 'string' | 'number' | 'boolean'
+}) & {
+	id: string
+	error: string
+	key?: string
+}

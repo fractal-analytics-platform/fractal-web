@@ -6,10 +6,11 @@
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').ValueFormElement} formElement
 	 * @property {boolean} [editable]
+	 * @property {boolean} [showErrors]
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable = true } = $props();
+	let { formElement = $bindable(), editable = true, showErrors = true } = $props();
 
 	let value = $state();
 	formElement.value.subscribe((v) => (value = v));
@@ -53,9 +54,11 @@
 			bind:value
 			class="form-control"
 			id="property-{formElement.id}"
-			class:is-invalid={errors.length > 0 || validationError}
+			class:is-invalid={(showErrors && errors.length > 0) || validationError}
 			disabled={!editable || constant}
 		/>
-		<span class="invalid-feedback">{errors.length > 0 ? errors.join(', ') : validationError}</span>
+		<span class="invalid-feedback"
+			>{showErrors && errors.length > 0 ? errors.join(', ') : validationError}</span
+		>
 	</div>
 </div>

@@ -3,7 +3,6 @@
 		JSchema,
 		stripNullAndEmptyObjectsAndArrays,
 		deepCopy,
-		getValidationErrorMessage,
 		getPropertiesToIgnore,
 		detectSchemaVersion,
 		SchemaValidator,
@@ -27,7 +26,7 @@
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = $state();
 
-	function handleJsonSchemaStringChanged() {
+	async function handleJsonSchemaStringChanged() {
 		validationError = '';
 		jsonSchemaError = '';
 		if (jsonSchemaString === '') {
@@ -57,33 +56,30 @@
 		}
 
 		schema = parsedSchema;
+		await tick();
+		jschemaComponent?.update(schema, schemaData);
 		handleDataChanged();
 	}
 
-	function handleDataStringChanged() {
-		validationError = '';
+	async function handleDataStringChanged() {
+		await tick();
 		dataError = '';
 		try {
 			schemaData = JSON.parse(jsonDataString);
+			jschemaComponent?.update(schema, schemaData);
 		} catch (err) {
-			schemaData = undefined;
+			if (!jsonDataString) {
+				schemaData = undefined;
+				jschemaComponent.update(schema, schemaData);
+			}
 			dataError = 'Invalid JSON';
 		}
 	}
 
 	let validationError = $state('');
 	let valid = $state(false);
-
-	function validate() {
-		try {
-			validationError = '';
-			valid = false;
-			jschemaComponent?.validateArguments();
-			valid = true;
-		} catch (err) {
-			validationError = getValidationErrorMessage(err);
-		}
-	}
+	/** @type {string[]} */
+	let genericErrors = $state([]);
 
 	function loadExample() {
 		schemaVersion = 'pydantic_v2';
@@ -102,12 +98,22 @@
 	/**
 	 * @param {object} newData
 	 */
-	function updateData(newData) {
+	function updateData(newData, isValid = undefined, errors = undefined) {
+		if (!newData) {
+			return;
+		}
 		const newDataCopy = deepCopy(newData);
 		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
 		// Update the data only if something is changed, to avoid triggering uneccessary events
 		if (updatedOldData !== jsonDataString) {
 			jsonDataString = updatedOldData;
+			dataError = '';
+			schemaData = JSON.parse(jsonDataString);
+		}
+
+		if (isValid !== undefined && errors !== undefined) {
+			valid = isValid;
+			genericErrors = errors;
 		}
 	}
 
@@ -185,10 +191,16 @@
 						<pre>{validationError}</pre>
 					</div>
 				{/if}
-				{#if valid}
-					<div class="alert alert-success">Data is valid</div>
+				{#if schema && !jsonSchemaError}
+					{#if valid}
+						<div class="alert alert-success">Data is valid</div>
+					{:else}
+						<div class="alert alert-danger">Data is not valid</div>
+						{#each genericErrors as error}
+							<div class="alert alert-danger mt-1">{error}</div>
+						{/each}
+					{/if}
 				{/if}
-				<button class="btn btn-primary" onclick={validate}>Validate</button>
 			</div>
 		</div>
 	</div>

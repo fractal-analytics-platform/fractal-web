@@ -8,7 +8,9 @@ import {
 	StringFormElement,
 	ValueFormElement,
 	BooleanFormElement,
-	ConditionalFormElement
+	ConditionalFormElement,
+	InvalidFormElement,
+	UnexpectedFormElement
 } from './form_element.js';
 import { adaptJsonSchema, stripDiscriminator } from './jschema_adapter.js';
 import { getJsonSchemaData } from './jschema_initial_data.js';
@@ -29,7 +31,7 @@ import { get } from 'svelte/store';
 export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
-	 * @param {(data: any) => void} onchange
+	 * @param {(data: any, valid: boolean, genericErrors: string[]) => void} onchange
 	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
@@ -61,7 +63,8 @@ export class FormManager {
 		this.onchange = onchange;
 		this.notifyChange = () => {
 			const data = this.getFormData();
-			this.onchange(data);
+			const { valid, genericErrors } = this.validate();
+			this.onchange(data, valid, genericErrors);
 		};
 
 		/**
@@ -76,6 +79,8 @@ export class FormManager {
 			removable: false,
 			value: data
 		});
+		const { valid, genericErrors } = this.validate();
+		this.onchange(data, valid, genericErrors);
 	}
 
 	/**
@@ -108,12 +113,18 @@ export class FormManager {
 				const objectProperty = /** @type {import("../types/jschema").JSONSchemaObjectProperty} */ (
 					property
 				);
+				if (params.value && (typeof params.value !== 'object' || Array.isArray(params.value))) {
+					return this.createInvalidElement({ ...params, property: objectProperty });
+				}
 				return this.createObjectElement({ ...params, property: objectProperty });
 			}
 			case 'array': {
 				const arrayProperty = /** @type {import("../types/jschema").JSONSchemaArrayProperty} */ (
 					property
 				);
+				if (params.value && !Array.isArray(params.value)) {
+					return this.createInvalidElement({ ...params, property: arrayProperty });
+				}
 				if (isTuple(arrayProperty)) {
 					return this.createTupleElement({ ...params, property: arrayProperty });
 				} else {
@@ -125,20 +136,55 @@ export class FormManager {
 				const numberProperty = /** @type {import("../types/jschema").JSONSchemaNumberProperty} */ (
 					property
 				);
+				if (params.value && typeof params.value !== 'number') {
+					return this.createInvalidElement({ ...params, property: numberProperty });
+				}
 				return this.createNumberElement({ ...params, property: numberProperty });
 			}
 			case 'boolean': {
 				const booleanProperty =
 					/** @type {import("../types/jschema").JSONSchemaBooleanProperty} */ (property);
+				if (params.value && typeof params.value !== 'boolean') {
+					return this.createInvalidElement({ ...params, property: booleanProperty });
+				}
 				return this.createBooleanElement({ ...params, property: booleanProperty });
 			}
 			default: {
 				const stringProperty = /** @type {import("../types/jschema").JSONSchemaStringProperty} */ (
 					property
 				);
+				if (params.value && typeof params.value === 'object') {
+					return this.createInvalidElement({ ...params, property: stringProperty });
+				} else if (params.value && typeof params.value !== 'string') {
+					params.value = params.value.toString();
+				}
 				return this.createStringElement({ ...params, property: stringProperty });
 			}
 		}
+	}
+
+	/**
+	 * Extra property that should not be present (additionalProperties: false)
+	 */
+	createUnexpectedElement({ key, path, value }) {
+		const fields = this.getBaseElementFields({ key, path, property: { type: 'unexpected' }, required: false, removable: true });
+		const element = new UnexpectedFormElement({
+			...fields,
+			value: value
+		});
+		return element;
+	}
+
+	/**
+	 * Property with invalid type (e.g. array instead of boolean)
+	 */
+	createInvalidElement({ key, path, property, required, removable, value }) {
+		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+		const element = new InvalidFormElement({
+			...fields,
+			value
+		});
+		return element;
 	}
 
 	/**
@@ -237,7 +283,10 @@ export class FormManager {
 		const requiredChildren = property.required || [];
 		const children = [];
 		const properties = Object.entries(getAllObjectProperties(property, value));
+		/** @type {string[]} */
+		const validKeys = [];
 		for (const [childKey, childProperty] of properties) {
+			validKeys.push(childKey)
 			const childRequired = requiredChildren.includes(childKey);
 			const childElement = this.createFormElement({
 				key: childKey,
@@ -248,6 +297,16 @@ export class FormManager {
 				value: value[childKey]
 			});
 			children.push(childElement);
+		}
+
+		for (const [k, v] of Object.entries(value)) {
+			if (!validKeys.includes(k)) {
+				children.push(this.createUnexpectedElement({
+					key: k,
+					path: `${path}/${k}`,
+					value: v
+				}))
+			}
 		}
 		const element = new ObjectFormElement({
 			...fields,
@@ -270,7 +329,7 @@ export class FormManager {
 	createArrayElement({ key, path, property, required, removable, value }) {
 		const fields = this.getBaseElementFields({ key, path, property, required, removable });
 		const items = /** @type {import("../types/jschema").JSONSchemaProperty} */ (property.items);
-		const children = value.map((v, i) =>
+		const children = (value || []).map((v, i) =>
 			this.createFormElement({
 				key: null,
 				path: `${path}/${i}`,
@@ -330,15 +389,22 @@ export class FormManager {
 			required: false,
 			removable: false
 		};
+		let children = [];
 		if (Array.isArray(items)) {
-			return items.map((item, index) =>
+			children = items.map((item, index) =>
 				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: item, value: value[index] })
 			);
 		} else {
-			return Array(size).map((_, index) =>
+			children = Array(size).map((_, index) =>
 				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: items, value: value[index] })
 			);
 		}
+		if (Array.isArray(value)) {
+			for (let i = items.length; i < value.length; i++) {
+				children.push(this.createUnexpectedElement({ ...params, key: i.toString(), path: `${path}/${i}`, value: value[i] }));
+			}
+		}
+		return children;
 	}
 
 	/**
@@ -472,23 +538,25 @@ export class FormManager {
 	validate() {
 		this.clearErrors(this.root);
 		const strippedNullData = stripNullAndEmptyObjectsAndArrays(this.getFormData());
-		const isDataValid = this.validator.isValid(strippedNullData);
-		if (!isDataValid) {
+		const valid = this.validator.isValid(strippedNullData);
+		/** 
+		 * Errors that have not been set to any form element
+		 * @type {string[]}
+		 */
+		const genericErrors = [];
+		if (!valid) {
 			const errors = this.validator.getErrors();
-			// Array containing errors that have not been set to any form element
-			const unsetErrors = [];
 			if (errors && Array.isArray(errors)) {
 				for (const error of errors) {
 					const errorIsSet = this.addErrorToForm(error, this.root);
 					if (!errorIsSet) {
-						unsetErrors.push(error);
+						console.warn(error)
+						genericErrors.push(error.message || error.keyword);
 					}
 				}
 			}
-			if (unsetErrors.length > 0) {
-				throw new JsonSchemaDataError(unsetErrors);
-			}
 		}
+		return { valid, genericErrors }
 	}
 
 	/**
@@ -496,7 +564,9 @@ export class FormManager {
 	 */
 	clearErrors(parentElement) {
 		parentElement.clearErrors();
-		if ('children' in parentElement) {
+		if ('selectedItem' in parentElement) {
+			this.clearErrors(parentElement.selectedItem);
+		} else if ('children' in parentElement) {
 			for (const element of parentElement.children) {
 				this.clearErrors(element);
 			}
@@ -514,13 +584,15 @@ export class FormManager {
 		if (parentElement.path === error.instancePath) {
 			this.setErrorToElement(error, parentElement);
 			return true;
+		} else if ('selectedItem' in parentElement && this.addErrorToForm(error, parentElement.selectedItem)) {
+			return true;
 		} else if ('children' in parentElement) {
 			for (const element of parentElement.children) {
 				if (element.path === error.instancePath) {
 					this.setErrorToElement(error, element);
 					return true;
 				}
-				if ('children' in element && Array.isArray(element.children) && this.addErrorToForm(error, element)) {
+				if (this.addErrorToForm(error, element)) {
 					return true;
 				}
 			}
@@ -534,23 +606,25 @@ export class FormManager {
 	 */
 	setErrorToElement(error, element) {
 		element.hasErrors.set(true);
-		if ('params' in error && 'missingProperty' in error.params
-			&& this.setMissingPropertyError(error.message, error.params.missingProperty, element)
-		) {
-			return;
+		if ('params' in error) {
+			if ('missingProperty' in error.params && this.setErrorToChildElement(error.message, error.params.missingProperty, element)) {
+				return;
+			} else if ('additionalProperty' in error.params && this.setErrorToChildElement(error.message, error.params.additionalProperty, element)) {
+				return;
+			}
 		}
 		element.addError(error.message);
 	}
 
 	/**
 	 * @param {string} message 
-	 * @param {string} missingProperty 
+	 * @param {string} key 
 	 * @param {import('../types/form').FormElement} parentElement 
 	 */
-	setMissingPropertyError(message, missingProperty, parentElement) {
+	setErrorToChildElement(message, key, parentElement) {
 		if ('children' in parentElement) {
 			for (const element of parentElement.children) {
-				if (element.key === missingProperty) {
+				if (element.key === key) {
 					element.addError(message);
 					return true;
 				}

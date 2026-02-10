@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from 'svelte';
 	import { FormManager } from './form_manager.js';
 	import ObjectProperty from './properties/ObjectProperty.svelte';
 
@@ -11,25 +10,14 @@
 	 * @property {string[]} [propertiesToIgnore]
 	 * @property {string} componentId
 	 * @property {boolean} [editable]
-	 * @property {() => void} onchange
+	 * @property {(data: any, valid: boolean, errors: string[]) => void} onchange
 	 */
 
 	/** @type {Props} */
-	let {
-		schema,
-		schemaData,
-		schemaVersion,
-		propertiesToIgnore = [],
-		componentId,
-		editable = true,
-		onchange
-	} = $props();
+	let { schemaVersion, propertiesToIgnore = [], componentId, editable = true, onchange } = $props();
 
 	/** @type {FormManager|undefined} */
 	let formManager = $state();
-	onMount(() => {
-		initFormManager();
-	});
 
 	export function getArguments() {
 		return formManager?.getFormData();
@@ -45,7 +33,11 @@
 		formManager?.validate();
 	}
 
-	function initFormManager() {
+	/**
+	 * @param {any} schema
+	 * @param {any}  schemaData
+	 */
+	function initFormManager(schema, schemaData = undefined) {
 		if (schema) {
 			try {
 				formManager = new FormManager(
@@ -64,11 +56,13 @@
 		}
 	}
 
-	$effect(() => {
-		if (schema || schemaData || propertiesToIgnore) {
-			initFormManager();
-		}
-	});
+	/**
+	 * @param {any} schema
+	 * @param {any}  schemaData
+	 */
+	export function update(schema, schemaData = undefined) {
+		initFormManager(schema, schemaData);
+	}
 </script>
 
 {#if formManager}

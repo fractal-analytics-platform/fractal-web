@@ -19,6 +19,10 @@
 	let field = $state();
 	let validationError = $state('');
 
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
+
 	/**
 	 * @param {any} value
 	 */
@@ -46,7 +50,7 @@
 			bind:value
 			class="form-select"
 			id="property-{formElement.id}"
-			class:is-invalid={validationError}
+			class:is-invalid={errors.length > 0 || validationError}
 			disabled={!editable}
 		>
 			<option value="">Select...</option>
@@ -54,6 +58,6 @@
 				<option>{optionValue}</option>
 			{/each}
 		</select>
-		<span class="invalid-feedback">{validationError}</span>
+		<span class="invalid-feedback">{errors.length > 0 ? errors.join(', ') : validationError}</span>
 	</div>
 </div>

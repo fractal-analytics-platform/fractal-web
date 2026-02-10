@@ -56,10 +56,51 @@
 		children = formElement.children;
 	}
 
+	/**
+	 * @param {number} index
+	 */
+	function fixInvalidChild(index) {
+		formElement.fixInvalidChild(index);
+		children = formElement.children;
+	}
 </script>
 
-{#each errors as error}
-  <div class="alert alert-danger mb-1">{error}</div>
+{#key children}
+	{#each children as child, index (index)}
+		<div class="property-block">
+			{#if child.removable}
+				<button
+					class="btn btn-danger w-100 mt-2"
+					type="button"
+					onclick={() => removeProperty(/**@type {string}*/ (child.key))}
+					disabled={!editable}
+				>
+					Remove Property Block
+				</button>
+			{/if}
+			{#if child.type === 'invalid'}
+				<button
+					class="btn btn-danger w-100 mt-2"
+					type="button"
+					onclick={() => fixInvalidChild(index)}
+					disabled={!editable}
+				>
+					Reset to Default Value
+				</button>
+			{/if}
+			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
+				<PropertyDiscriminator
+					formElement={children[index]}
+					{editable}
+					reset={isRoot ? () => resetChild(index) : null}
+				/>
+			</div>
+		</div>
+	{/each}
+{/key}
+
+{#each errors as error, index (index)}
+	<div class="alert alert-danger mt-2 mb-1 py-1 px-2">{error}</div>
 {/each}
 
 {#if formElement.additionalProperties}
@@ -86,29 +127,6 @@
 		</form>
 	</div>
 {/if}
-{#key children}
-	{#each children as child, index (index)}
-		<div class="property-block">
-			{#if child.removable}
-				<button
-					class="btn btn-danger w-100"
-					type="button"
-					onclick={() => removeProperty(/**@type {string}*/ (child.key))}
-					disabled={!editable}
-				>
-					Remove Property Block
-				</button>
-			{/if}
-			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
-				<PropertyDiscriminator
-					formElement={children[index]}
-					{editable}
-					reset={isRoot ? () => resetChild(index) : null}
-				/>
-			</div>
-		</div>
-	{/each}
-{/key}
 
 <style>
 	.property-block:not(:last-child) {

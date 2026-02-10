@@ -7,7 +7,7 @@
 	} from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
-	import FormBuilder from './FormBuilder.svelte';
+	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
 	import { onMount, tick } from 'svelte';
 	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
 	import {

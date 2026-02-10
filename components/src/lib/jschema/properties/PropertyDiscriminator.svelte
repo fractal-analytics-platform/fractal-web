@@ -8,6 +8,7 @@
 	import EnumProperty from './EnumProperty.svelte';
 	import TupleProperty from './TupleProperty.svelte';
 	import ConditionalProperty from './ConditionalProperty.svelte';
+	import UnexpectedProperty from './UnexpectedProperty.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -38,6 +39,8 @@
 	<TupleProperty {formElement} {editable} {reset} />
 {:else if formElement.type === 'conditional'}
 	<ConditionalProperty {formElement} {editable} {reset} />
+{:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}
+	<UnexpectedProperty {formElement} {editable} />
 {:else}
 	<p>Unsupported property type {formElement.type}</p>
 {/if}

@@ -6,10 +6,18 @@
 	 * @property {import("../../types/form").CollapsibleFormElement} formElement
 	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
 	 * @property {import('svelte').Snippet} [children]
+	 * @property {number} [padding]
+	 * @property {boolean} [showErrors]
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), reset = null, children } = $props();
+	let {
+		formElement = $bindable(),
+		reset = null,
+		children,
+		padding = 2,
+		showErrors = true
+	} = $props();
 
 	/** @type {boolean} */
 	let collapsed = $state(false);
@@ -47,7 +55,7 @@
 	}
 </script>
 
-<div class="d-flex flex-column p-2">
+<div class="d-flex flex-column p-{padding}">
 	<div class="my-2">
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item" class:border-danger={hasErrors}>
@@ -78,9 +86,11 @@
 					class:show={!collapsed}
 				>
 					<div class="accordion-body p-1">
-						{#each errors as error}
-							<div class="alert alert-danger mb-1">{error}</div>
-						{/each}
+						{#if showErrors}
+							{#each errors as error, index (index)}
+								<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
+							{/each}
+						{/if}
 						{@render children?.()}
 					</div>
 				</div>
