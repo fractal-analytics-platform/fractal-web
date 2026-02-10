@@ -62,7 +62,18 @@
 		resourceUpdatedMessage = '';
 		saveErrorAlert?.hide();
 
-		const response = await callPutResource(JSON.parse(data));
+		let parsedData;
+		try {
+			parsedData = JSON.parse(data);
+		} catch (err) {
+			saveErrorAlert = displayStandardErrorAlert(
+				'The JSON you entered is not valid. Please fix the syntax and try again.',
+				'saveError'
+			);
+			return;
+		}
+
+		const response = await callPutResource(parsedData);
 
 		if (response.ok) {
 			resourceUpdatedMessage = 'Resource updated';
