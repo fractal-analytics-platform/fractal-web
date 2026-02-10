@@ -67,7 +67,7 @@
 			parsedData = JSON.parse(data);
 		} catch (err) {
 			saveErrorAlert = displayStandardErrorAlert(
-				'The JSON you entered is not valid. Please fix the syntax and try again.',
+				`Invalid JSON: ${err.message}`,
 				'saveError'
 			);
 			return;
