@@ -66,8 +66,9 @@
 		try {
 			parsedData = JSON.parse(data);
 		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Unknown error.';
 			saveErrorAlert = displayStandardErrorAlert(
-				`Invalid JSON: ${err.message}`,
+				`Invalid JSON: ${message}`,
 				'saveError'
 			);
 			return;
