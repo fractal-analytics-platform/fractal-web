@@ -606,7 +606,10 @@ export class FormManager {
 	 */
 	setErrorToElement(error, element) {
 		element.hasErrors.set(true);
-		if ('params' in error) {
+		if ('selectedItem' in element) {
+			element.selectedItem.addError(error.message);
+			return;
+		} else if ('params' in error) {
 			if ('missingProperty' in error.params && this.setErrorToChildElement(error.message, error.params.missingProperty, element)) {
 				return;
 			} else if ('additionalProperty' in error.params && this.setErrorToChildElement(error.message, error.params.additionalProperty, element)) {

@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderSchema } from './property_test_utils';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/svelte';
+import { FormManager } from '../../../src/lib/jschema/form_manager';
+import { get } from 'svelte/store';
 
 describe('oneOf properties', () => {
 
@@ -139,4 +141,13 @@ describe('oneOf properties', () => {
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: 42 } });
 		expect(component.valid).toEqual(true);
 	});
+
+	it('Errors should be attached to the selected item', () => {
+		const formManager = new FormManager(schema, vi.fn(), 'pydantic_v2');
+		const errors = get(formManager.root.children[0].selectedItem.errors);
+		expect(errors).deep.eq([
+			"must have required property 'parameter1'",
+			'must match exactly one schema in oneOf'
+		]);
+	})
 });
