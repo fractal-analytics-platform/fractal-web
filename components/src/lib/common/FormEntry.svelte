@@ -4,12 +4,12 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('./form-builder-types').FormBuilderEntry} entry
-	 * @property {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @property {import('../types/form').FormBuilderEntry} entry
+	 * @property {Array<import('../types/form').FormBuilderEntry>} parent
 	 * @property {number} index
-	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number, type: string) => void} changeType
-	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, hasKey: boolean) => void} addProperty
-	 * @property {(parent: Array<import('./form-builder-types').FormBuilderEntry>, index: number) => void} removeProperty
+	 * @property {(parent: Array<import('../types/form').FormBuilderEntry>, index: number, type: string) => void} changeType
+	 * @property {(parent: Array<import('../types/form').FormBuilderEntry>, hasKey: boolean) => void} addProperty
+	 * @property {(parent: Array<import('../types/form').FormBuilderEntry>, index: number) => void} removeProperty
 	 * @property {() => void} triggerChanges
 	 * @property {boolean} [editable]
 	 */

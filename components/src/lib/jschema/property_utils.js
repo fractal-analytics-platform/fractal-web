@@ -6,8 +6,8 @@ export function getMin(property) {
 	return 'minimum' in property && property.minimum !== undefined
 		? Number(property.minimum)
 		: 'exclusiveMinimum' in property && property.exclusiveMinimum !== undefined
-		? Number(property.exclusiveMinimum) + 1
-		: null;
+			? Number(property.exclusiveMinimum) + 1
+			: null;
 }
 
 /**
@@ -18,8 +18,8 @@ export function getMax(property) {
 	return 'maximum' in property && property.maximum !== undefined
 		? Number(property.maximum)
 		: 'exclusiveMaximum' in property && property.exclusiveMaximum !== undefined
-		? Number(property.exclusiveMaximum) - 1
-		: null;
+			? Number(property.exclusiveMaximum) - 1
+			: null;
 }
 
 /**

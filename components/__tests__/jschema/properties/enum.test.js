@@ -102,4 +102,23 @@ describe('Enum properties', () => {
 		await fireEvent.change(dropdown, { target: { value: '1' } });
 		expect(onChange).toHaveBeenCalledWith({ arg2: 1 });
 	});
+
+	it('Enum initialized with invalid value', async () => {
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					k: {
+						enum: ['A', 'B']
+					}
+				},
+			},
+			'pydantic_v2',
+			{ k: 'C' }
+		);
+
+		expect(component.getArguments()).deep.eq({ k: 'C' });
+		expect(screen.queryAllByText('must be equal to one of the allowed values')).toHaveLength(1);
+		expect(component.valid).toEqual(false);
+	});
 });

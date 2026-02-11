@@ -27,6 +27,14 @@
 		formElement.removeTuple();
 		children = formElement.children;
 	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeUnexpectedChild(index) {
+		formElement.removeUnexpectedChild(index);
+		children = formElement.children;
+	}
 </script>
 
 <CollapsibleProperty {formElement} {reset}>
@@ -47,6 +55,16 @@
 		{#each children as nestedProperty, index (index)}
 			<div class="d-flex">
 				<div class="flex-fill">
+					{#if nestedProperty.removable}
+						<button
+							class="btn btn-danger w-100 mt-2"
+							type="button"
+							onclick={() => removeUnexpectedChild(index)}
+							disabled={!editable}
+						>
+							Remove Property Block
+						</button>
+					{/if}
 					<PropertyDiscriminator {editable} formElement={nestedProperty} />
 				</div>
 			</div>

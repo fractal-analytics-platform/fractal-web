@@ -203,7 +203,7 @@ describe('jschema_intial_data', () => {
 		expect(data.t1[2].p2).eq(null);
 	});
 
-	it('Truncates tuple with initial value longer than expected', () => {
+	it('Keep tuple with initial value longer than expected', () => {
 		const data = getJsonSchemaData(
 			{
 				type: 'object',
@@ -220,9 +220,11 @@ describe('jschema_intial_data', () => {
 			{ t1: ['a', 'b', 'c', 'd'] }
 		);
 
-		expect(data.t1.length).eq(2);
+		expect(data.t1.length).eq(4);
 		expect(data.t1[0]).eq('a');
 		expect(data.t1[1]).eq('b');
+		expect(data.t1[2]).eq('c');
+		expect(data.t1[3]).eq('d');
 	});
 
 	it('Fill additional properties', () => {
@@ -498,7 +500,7 @@ describe('jschema_intial_data', () => {
 			},
 			'pydantic_v1'
 		);
-		expect(data).deep.eq({ foo: [1, null] });
+		expect(data).deep.eq({ foo: [1, 2] });
 	});
 
 	it('Tuple with prefixItems (pydantic_v2)', async function () {
@@ -596,5 +598,22 @@ describe('jschema_intial_data', () => {
 			{ foo: 5 }
 		);
 		expect(data).deep.eq({ foo: 5, bar: null });
+	});
+
+	it('Leave extra properties intact', async function () {
+		const data = getJsonSchemaData(
+			{
+				title: 'test',
+				type: 'object',
+				properties: {
+					foo: {
+						type: 'number'
+					},
+				}
+			},
+			'pydantic_v2',
+			{ foo: 5, bar: 8 }
+		);
+		expect(data).deep.eq({ foo: 5, bar: 8 });
 	});
 });

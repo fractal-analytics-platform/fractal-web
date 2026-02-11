@@ -21,6 +21,9 @@ import { getPropertiesToIgnore } from './jschema/property_utils';
 import { JsonSchemaDataError } from './jschema/form_manager';
 import { stripDiscriminator, stripIgnoredProperties } from './jschema/jschema_adapter';
 import FilteredTasksTable from './tasks/FilteredTasksTable.svelte';
+import FormBaseEntry from './common/FormBaseEntry.svelte';
+import FormEntry from './common/FormEntry.svelte';
+import FormBuilder from './common/FormBuilder.svelte';
 
 // Exporting components for public usage
 export {
@@ -44,5 +47,8 @@ export {
 	hasParallelArguments,
 	normalizePayload,
 	nullifyEmptyStrings,
-	stripDiscriminator
+	stripDiscriminator,
+	FormBaseEntry,
+	FormEntry,
+	FormBuilder
 };

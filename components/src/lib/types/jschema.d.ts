@@ -1,4 +1,4 @@
-export type BaseJSONSchemaProperty<JSONSchemaType> = {
+export type BaseJSONSchemaProperty<T> = {
 	title?: string;
 	description?: string;
 	$ref?: string;

@@ -12,6 +12,10 @@
 	/** @type {Props} */
 	let { formElement = $bindable(), editable, reset = null } = $props();
 
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
+
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
 	 * @type {import("../../types/form").FormElement | undefined}
@@ -39,6 +43,9 @@
 			<option value={index}>{option}</option>
 		{/each}
 	</select>
+	{#each errors as error, index (index)}
+		<div class="alert alert-danger mt-2 mb-1 py-1 px-2">{error}</div>
+	{/each}
 </div>
 
 {#key selectedItem}
