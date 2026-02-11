@@ -17,7 +17,6 @@
 
 	/** @type {HTMLSelectElement|undefined} */
 	let field = $state();
-	let validationError = $state('');
 
 	/** @type {string[]} */
 	let errors = $state([]);
@@ -33,10 +32,6 @@
 		}
 		formElement.value.set(value);
 		formElement.notifyChange();
-		validationError = '';
-		if (formElement.required && field?.value === '') {
-			validationError = 'Field is required';
-		}
 	}
 </script>
 
@@ -50,7 +45,7 @@
 			bind:value
 			class="form-select"
 			id="property-{formElement.id}"
-			class:is-invalid={errors.length > 0 || validationError}
+			class:is-invalid={errors.length > 0}
 			disabled={!editable}
 		>
 			<option value={null}>Select...</option>
@@ -58,6 +53,6 @@
 				<option>{optionValue}</option>
 			{/each}
 		</select>
-		<span class="invalid-feedback">{errors.length > 0 ? errors.join(', ') : validationError}</span>
+		<span class="invalid-feedback">{errors.join(', ')}</span>
 	</div>
 </div>

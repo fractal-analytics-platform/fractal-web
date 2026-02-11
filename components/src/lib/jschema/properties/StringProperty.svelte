@@ -18,7 +18,6 @@
 
 	/** @type {HTMLInputElement|undefined} */
 	let field = $state();
-	let validationError = $state('');
 
 	/** @type {string[]} */
 	let errors = $state([]);
@@ -36,10 +35,6 @@
 		}
 		formElement.value.set(value);
 		formElement.notifyChange();
-		validationError = '';
-		if (formElement.required && field?.value === '') {
-			validationError = 'Field is required';
-		}
 	}
 </script>
 
@@ -54,11 +49,11 @@
 			bind:value
 			class="form-control"
 			id="property-{formElement.id}"
-			class:is-invalid={(showErrors && errors.length > 0) || validationError}
+			class:is-invalid={showErrors && errors.length > 0}
 			disabled={!editable || constant}
 		/>
-		<span class="invalid-feedback"
-			>{showErrors && errors.length > 0 ? errors.join(', ') : validationError}</span
-		>
+		<span class="invalid-feedback">
+			{showErrors && errors.length > 0 ? errors.join(', ') : ''}
+		</span>
 	</div>
 </div>
