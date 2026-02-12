@@ -27,7 +27,6 @@
 	 * @property {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} onJobSubmitted
 	 * @property {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
 	 * @property {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
-	 * @property {{[key: number]: import('fractal-components/types/api').JobStatus}} legacyStatuses
 	 */
 
 	/** @type {Props} */
@@ -38,8 +37,7 @@
 		selectedWorkflowTask,
 		onJobSubmitted,
 		onDatasetsUpdated,
-		statuses,
-		legacyStatuses
+		statuses
 	} = $props();
 
 	/** @type {Modal|undefined} */
@@ -100,8 +98,7 @@
 			firstTaskIndex = getFirstTaskIndexForContinuingWorkflow(
 				workflow.task_list,
 				selectedWorkflowTask,
-				statuses,
-				legacyStatuses
+				statuses
 			);
 		}
 		lastTaskIndex = undefined;
@@ -619,7 +616,7 @@
 					>
 						<option value={undefined}>Select first task</option>
 						{#each workflow.task_list as wft (wft.id)}
-							<option value={wft.order}>{wft.task.name}</option>
+							<option value={wft.order}>{wft.alias ?? wft.task.name}</option>
 						{/each}
 					</select>
 					<span class="invalid-feedback"> The first task is required </span>
@@ -636,7 +633,7 @@
 						<option value={undefined}>Select last task</option>
 						{#each workflow.task_list as wft (wft.id)}
 							{#if firstTaskIndex === undefined || wft.order >= firstTaskIndex}
-								<option value={wft.order}>{wft.task.name}</option>
+								<option value={wft.order}>{wft.alias ?? wft.task.name}</option>
 							{/if}
 						{/each}
 					</select>

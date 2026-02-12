@@ -62,7 +62,19 @@
 		resourceUpdatedMessage = '';
 		saveErrorAlert?.hide();
 
-		const response = await callPutResource(JSON.parse(data));
+		let parsedData;
+		try {
+			parsedData = JSON.parse(data);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Unknown error.';
+			saveErrorAlert = displayStandardErrorAlert(
+				`Invalid JSON: ${message}`,
+				'saveError'
+			);
+			return;
+		}
+
+		const response = await callPutResource(parsedData);
 
 		if (response.ok) {
 			resourceUpdatedMessage = 'Resource updated';

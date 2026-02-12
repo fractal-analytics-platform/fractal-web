@@ -6,7 +6,11 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
 	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import {
+		displayStandardErrorAlert,
+		FormErrorHandler,
+		getAlertErrorFromResponse
+	} from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
@@ -14,7 +18,7 @@
 	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
 	import { extractRelevantJobError, showExecutorErrorLog } from '$lib/common/job_utilities';
 	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import TaskInfoTab from '$lib/components/v2/workflow/TaskInfoTab.svelte';
+	import WorkflowTaskInfoTab from '$lib/components/v2/workflow/WorkflowTaskInfoTab.svelte';
 	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
 	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
 	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
@@ -22,13 +26,15 @@
 	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 	import { slide } from 'svelte/transition';
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
-	import JobStatusIcon from '$lib/components/jobs/JobStatusIcon.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
+
+	const maxDescriptionLength = 50;
+	const descriptionLengthOffset = 10;
 
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
@@ -43,9 +49,7 @@
 	let selectedDatasetId = $state();
 	let selectedDataset = $derived(datasets.find((d) => d.id === selectedDatasetId));
 
-	let isLegacy = $state(false);
-	/** @type {{[key: number]: import('fractal-components/types/api').JobStatus}} */
-	let legacyStatuses = $state({});
+	let showMissingStatusesWarning = $state(false);
 
 	let jobError = $state('');
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
@@ -88,6 +92,7 @@
 
 	// Update workflow modal
 	let updatedWorkflowName = $state('');
+	let updatedWorkflowDescription = $state('');
 
 	// Modals
 	/** @type {Modal|undefined} */
@@ -113,6 +118,14 @@
 	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
 	let selectedSubmittedJob = $state();
 	let jobCancelledMessage = $state('');
+
+	let expandWorkflowDescription = $state(false);
+
+	const workflowPropsErrorHandler = new FormErrorHandler('errorAlert-editWorkflowModal', [
+		'name',
+		'description'
+	]);
+	const workflowPropsValidationErrors = workflowPropsErrorHandler.getValidationErrorStore();
 
 	let updatableWorkflowList = $derived(workflow.task_list || []);
 
@@ -220,6 +233,7 @@
 			return;
 		}
 		updatedWorkflowName = workflow.name;
+		updatedWorkflowDescription = workflow.description || '';
 	}
 
 	let workflowUpdating = $state(false);
@@ -229,38 +243,40 @@
 	 * @returns {Promise<void>}
 	 */
 	async function handleWorkflowUpdate() {
-		editWorkflowModal?.confirmAndHide(
-			async () => {
-				workflowSuccessMessage = '';
-				if (!workflow) {
-					return;
-				}
-				workflowUpdating = true;
+		workflowSuccessMessage = '';
+		workflowPropsErrorHandler.clearErrors();
 
-				const headers = new Headers();
-				headers.set('Content-Type', 'application/json');
+		if (!workflow) {
+			return;
+		}
+		workflowUpdating = true;
 
-				const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
-					method: 'PATCH',
-					credentials: 'include',
-					headers,
-					body: normalizePayload({
-						name: updatedWorkflowName
-					})
-				});
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 
-				if (response.ok) {
-					workflow = await response.json();
-					workflowSuccessMessage = 'Workflow updated correctly';
-				} else {
-					console.error('Error updating workflow properties');
-					throw await getAlertErrorFromResponse(response);
-				}
-			},
-			() => {
-				workflowUpdating = false;
-			}
-		);
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
+			method: 'PATCH',
+			credentials: 'include',
+			headers,
+			body: normalizePayload(
+				{
+					name: updatedWorkflowName,
+					description: updatedWorkflowDescription
+				},
+				{ nullifyEmptyStrings: true }
+			)
+		});
+
+		if (response.ok) {
+			workflow = await response.json();
+			workflowSuccessMessage = 'Workflow updated correctly';
+			editWorkflowModal?.hide();
+		} else {
+			console.error('Error updating workflow properties');
+			await workflowPropsErrorHandler.handleErrorResponse(response);
+		}
+
+		workflowUpdating = false;
 	}
 
 	/**
@@ -494,9 +510,7 @@
 	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
 	let statuses = $state({});
 
-	let hasAnyJobRun = $derived(
-		Object.keys(statuses).length > 0 || Object.keys(legacyStatuses).length > 0
-	);
+	let hasAnyJobRun = $derived(Object.keys(statuses).length > 0);
 
 	let runningTaskId = $derived(
 		workflow.task_list.find((t) => statuses[t.id]?.status === 'submitted')?.id
@@ -507,6 +521,7 @@
 
 	async function selectedDatasetChanged() {
 		expandedWorkflowTaskId = undefined;
+		showMissingStatusesWarning = false;
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
 		await inputFiltersTab?.init();
@@ -514,7 +529,6 @@
 	}
 
 	async function loadJobsStatus() {
-		legacyStatuses = {};
 		if (selectedDatasetId === undefined) {
 			statuses = {};
 			jobError = '';
@@ -545,11 +559,7 @@
 		}
 
 		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
-		if (selectedSubmittedJob && Object.keys(statuses).length === 0) {
-			await loadLegacyStatus();
-		} else {
-			isLegacy = false;
-		}
+		showMissingStatusesWarning = !!selectedSubmittedJob && Object.keys(statuses).length === 0;
 		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
 		if (submitted.length > 0 || selectedSubmittedJob?.status === 'submitted') {
 			window.clearTimeout(statusWatcherTimer);
@@ -567,22 +577,6 @@
 				loadHistoryRunStatuses(expandedWorkflowTaskId, false);
 			}
 		}
-	}
-
-	async function loadLegacyStatus() {
-		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/status-legacy?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`
-		);
-		if (!response.ok) {
-			console.log('Error loading legacy status');
-			return;
-		}
-		const result = await response.json();
-		if (Object.keys(result).length === 0) {
-			return;
-		}
-		legacyStatuses = result.status;
-		isLegacy = true;
 	}
 
 	async function reloadSelectedDataset() {
@@ -686,8 +680,8 @@
 	});
 </script>
 
-<div class="container mt-3">
-	<nav aria-label="breadcrumb">
+<div class="container mt-3 d-flex">
+	<nav aria-label="breadcrumb" class="flex-grow-1">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item" aria-current="page">
 				<a href="/v2/projects">Projects</a>
@@ -707,7 +701,51 @@
 	</nav>
 </div>
 
-<div class="container mt-2">
+<div class="container">
+	{#if workflow.description}
+		<div class="mb-3">
+			{#if workflow.description.length > maxDescriptionLength + descriptionLengthOffset}
+				{#if expandWorkflowDescription}
+					{workflow.description}
+				{:else}
+					{workflow.description.substring(0, maxDescriptionLength)}...
+				{/if}
+				{#if expandWorkflowDescription}
+					<button
+						class="btn btn-link fw-light p-0 mb-2"
+						onclick={() => (expandWorkflowDescription = false)}
+					>
+						Show less
+					</button>
+				{:else}
+					<button
+						class="btn btn-link fw-light p-0 mb-2"
+						onclick={() => (expandWorkflowDescription = true)}
+					>
+						Show more
+					</button>
+				{/if}
+			{:else}
+				{workflow.description}
+			{/if}
+			{#if workflow.description.length <= maxDescriptionLength + descriptionLengthOffset || expandWorkflowDescription}
+				<button
+					class="btn btn-link p-0 mb-2 ms-2"
+					data-bs-toggle="modal"
+					data-bs-target="#editWorkflowModal"
+					aria-label="Edit description"
+					onclick={async () => {
+						resetWorkflowUpdateModal();
+						await tick();
+						document.getElementById('workflowDescription')?.focus();
+					}}
+				>
+					<i class="bi bi-pencil"></i>
+				</button>
+			{/if}
+		</div>
+	{/if}
+
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="row">
@@ -781,7 +819,12 @@
 						Type filters flow
 					</button>
 				{/if}
-				<a href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs" class="btn btn-light">
+				<a
+					href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs{selectedDataset
+						? '?dataset=' + selectedDataset.id
+						: ''}"
+					class="btn btn-light"
+				>
 					<i class="bi-journal-code"></i> List jobs
 				</a>
 				<button
@@ -812,7 +855,7 @@
 <TypeFiltersFlowModal {workflow} bind:this={typeFiltersFlowModal} />
 
 {#if workflow}
-	<div class="container mt-2">
+	<div class="container">
 		<StandardDismissableAlert message={jobCancelledMessage} />
 		<StandardDismissableAlert message={workflowSuccessMessage} />
 
@@ -835,6 +878,19 @@
 						<button class="btn btn-outline-secondary float-end" onclick={showJobLogsModal}>
 							Show complete log
 						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		{#if showMissingStatusesWarning}
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-warning">
+						Some jobs ran for this workflow and dataset, but no information is available about the
+						tasks' execution statuses. Possible reasons include: (1) All jobs ran with an old
+						Fractal version (before v2.14, which has been available since May 2025), or (2) a
+						job-execution error took place before the first task started running.
 					</div>
 				</div>
 			</div>
@@ -912,12 +968,10 @@
 											</button>
 										{/if}
 									{/if}
-									{workflowTask.task.name}
+									{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
 									<span class="float-end ps-2">
 										{#if selectedDataset}
-											{#if isLegacy}
-												<JobStatusIcon status={legacyStatuses[workflowTask.id]} />
-											{:else if imagesStatusModal}
+											{#if !showMissingStatusesWarning && imagesStatusModal}
 												<ImagesStatus
 													status={statuses[workflowTask.id]}
 													dataset={selectedDataset}
@@ -1127,7 +1181,16 @@
 							<div id="info-tab" class="tab-pane show active">
 								<div class="card-body">
 									{#if selectedWorkflowTask}
-										<TaskInfoTab task={selectedWorkflowTask.task} />
+										<WorkflowTaskInfoTab
+											projectId={workflow.project_id}
+											workflowTask={selectedWorkflowTask}
+											updateWorkflowTaskCallback={(up) => {
+												selectedWorkflowTask = up;
+												workflow.task_list = workflow.task_list.map((wt) =>
+													wt.id === up.id ? up : wt
+												);
+											}}
+										/>
 									{/if}
 								</div>
 							</div>
@@ -1176,7 +1239,6 @@
 		<h5 class="modal-title">Workflow properties</h5>
 	{/snippet}
 	{#snippet body()}
-		<div id="errorAlert-editWorkflowModal"></div>
 		{#if workflow}
 			<form
 				id="updateWorkflow"
@@ -1184,18 +1246,33 @@
 					e.preventDefault();
 					handleWorkflowUpdate();
 				}}
+				class="has-validation"
 			>
 				<div class="mb-3">
 					<label for="workflowName" class="form-label">Workflow name</label>
 					<input
 						type="text"
 						class="form-control"
+						class:is-invalid={$workflowPropsValidationErrors['name']}
 						name="workflowName"
 						id="workflowName"
 						bind:value={updatedWorkflowName}
 					/>
+					<span class="invalid-feedback">{$workflowPropsValidationErrors['name']}</span>
+				</div>
+				<div class="mb-3">
+					<label for="workflowDescription" class="form-label">Workflow description</label>
+					<textarea
+						class="form-control"
+						class:is-invalid={$workflowPropsValidationErrors['description']}
+						name="workflowDescription"
+						id="workflowDescription"
+						bind:value={updatedWorkflowDescription}
+					></textarea>
+					<span class="invalid-feedback">{$workflowPropsValidationErrors['description']}</span>
 				</div>
 			</form>
+			<div id="errorAlert-editWorkflowModal"></div>
 		{/if}
 	{/snippet}
 	{#snippet footer()}
@@ -1222,7 +1299,6 @@
 	{selectedWorkflowTask}
 	{onJobSubmitted}
 	{statuses}
-	{legacyStatuses}
 	onDatasetsUpdated={(updatedDatasets, newSelectedDatasetId) => {
 		datasets = updatedDatasets;
 		selectedDatasetId = newSelectedDatasetId;

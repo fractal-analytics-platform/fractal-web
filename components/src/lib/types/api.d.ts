@@ -194,6 +194,7 @@ export type WorkflowV2 = {
 	project: ProjectV2;
 	task_list: Array<WorkflowTaskV2>;
 	timestamp_created: string;
+	description: string | null;
 };
 
 export type WorkflowTaskV2 = {
@@ -209,6 +210,8 @@ export type WorkflowTaskV2 = {
 	task_id: number;
 	task: TaskV2;
 	warning: string | null;
+	alias: string | null;
+	description: string | null;
 };
 
 export type WorkflowImport = {

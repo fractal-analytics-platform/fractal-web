@@ -1,6 +1,10 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# 1.22.3 (unreleased)
+# 1.23.1 (unreleased)
+
+* Added new cases of valid SLURM errors (\#950).
+
+# 1.23.0
 
 * Dropped support for node v18 (\#930).
 * Added support for guest user (\#913).
@@ -11,6 +15,11 @@
 * Added the option to customize the login invite, for example to add a disclaimer (\#934).
 * Fixed typo in UI (\#934).
 * Fixed issue to get correct URL for s3 zarr paths (\#935).
+* Replace `npm install` with `npm ci` in GitHub Actions (\#939).
+* Supported richer workflow/workflowtask metadata (\#938).
+* Removed retrieval of legacy tasks status (\#944).
+* Pre-selected dataset in workflow jobs list (\#944).
+* Displayed task aliases also in "Run workflow" modal (\#944).
 
 # 1.22.2
 

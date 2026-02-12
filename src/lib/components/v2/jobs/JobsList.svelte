@@ -18,6 +18,7 @@
 	 * @property {boolean} [admin]
 	 * @property {import('svelte').Snippet} [buttons]
 	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').ApplyWorkflowV2]>} [editStatus]
+	 * @property {string} [selectedDataset]
 	 */
 
 	/** @type {Props} */
@@ -26,7 +27,8 @@
 		columnsToHide = [],
 		admin = false,
 		buttons = undefined,
-		editStatus = undefined
+		editStatus = undefined,
+		selectedDataset = undefined
 	} = $props();
 
 	/** @type {JobInfoModal} */
@@ -319,6 +321,12 @@
 			},
 			'Select user'
 		);
+
+		if (selectedDataset && datasets.find((d) => d.id.toString() === selectedDataset)) {
+			datasetSelect?.setSelected(selectedDataset);
+			datasetFilter = selectedDataset;
+			updateRows();
+		}
 	});
 
 	/**

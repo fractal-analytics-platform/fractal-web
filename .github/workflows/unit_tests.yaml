@@ -28,12 +28,12 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install components dependencies
         run: |
           cd components
-          npm install
+          npm ci
 
       - name: Run vitest tests on components module
         run: |
