@@ -22,7 +22,7 @@ import {
 	isTuple
 } from './property_utils.js';
 import { SchemaValidator } from './jschema_validation.js';
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 /**
  * Creates the object used to draw the JSON Schema form, provides the functions to initialize new form elements,
@@ -31,7 +31,7 @@ import { get } from 'svelte/store';
 export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
-	 * @param {(data: any, valid: boolean, genericErrors: string[]) => void} onchange
+	 * @param {(data: any, valid: boolean) => void} onchange
 	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
@@ -58,13 +58,16 @@ export class FormManager {
 		 * @type {string[]}
 		 */
 		this.ids = [];
+		/** @type {import('svelte/store').Writable<string[]>} */
+		this.genericErrors = writable([]);
+		this.dataValid = writable(true);
 
 		const data = getJsonSchemaData(this.jsonSchema, schemaVersion, initialValue);
 		this.onchange = onchange;
 		this.notifyChange = () => {
 			const data = this.getFormData();
-			const { valid, genericErrors } = this.validate();
-			this.onchange(data, valid, genericErrors);
+			const valid = this.validate();
+			this.onchange(data, valid);
 		};
 
 		/**
@@ -79,8 +82,8 @@ export class FormManager {
 			removable: false,
 			value: data
 		});
-		const { valid, genericErrors } = this.validate();
-		this.onchange(data, valid, genericErrors);
+		const valid = this.validate();
+		this.onchange(data, valid);
 	}
 
 	/**
@@ -550,13 +553,14 @@ export class FormManager {
 				for (const error of errors) {
 					const errorIsSet = this.addErrorToForm(error, this.root);
 					if (!errorIsSet) {
-						console.warn(error)
-						genericErrors.push(error.message || error.keyword);
+						genericErrors.push(JSON.stringify(error.message, null, 2));
 					}
 				}
 			}
 		}
-		return { valid, genericErrors }
+		this.genericErrors.set(genericErrors);
+		this.dataValid.set(valid);
+		return valid
 	}
 
 	/**

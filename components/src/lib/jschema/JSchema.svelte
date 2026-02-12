@@ -8,14 +8,24 @@
 	 * @property {string[]} [propertiesToIgnore]
 	 * @property {string} componentId
 	 * @property {boolean} [editable]
-	 * @property {(data: any, valid: boolean, errors: string[]) => void} onchange
+	 * @property {(data: any, valid: boolean) => void} onchange
+	 * @property {boolean} dataValid
 	 */
 
 	/** @type {Props} */
-	let { schemaVersion, propertiesToIgnore = [], componentId, editable = true, onchange } = $props();
+	let {
+		schemaVersion,
+		propertiesToIgnore = [],
+		componentId,
+		editable = true,
+		onchange,
+		dataValid = $bindable()
+	} = $props();
 
 	/** @type {FormManager|undefined} */
 	let formManager = $state();
+	/** @type {string[]} */
+	let genericErrors = $state([]);
 
 	export function getArguments() {
 		return formManager?.getFormData();
@@ -45,6 +55,8 @@
 					propertiesToIgnore,
 					schemaData
 				);
+				formManager.genericErrors.subscribe((e) => (genericErrors = e));
+				formManager.dataValid.subscribe((v) => (dataValid = v));
 			} catch (err) {
 				console.error(err);
 				formManager = undefined;
@@ -65,6 +77,9 @@
 
 {#if formManager}
 	{#key formManager}
+		{#each genericErrors as error}
+			<div class="alert alert-danger mt-1">{error}</div>
+		{/each}
 		<div id={componentId}>
 			<ObjectProperty formElement={formManager.root} isRoot={true} {editable} />
 		</div>

@@ -25,13 +25,12 @@
 	/**
 	 * @param {any} data
 	 */
-	function innerOnChange(data, isValid) {
+	function innerOnChange(data) {
 		if (schemaData !== undefined && JSON.stringify(schemaData) !== JSON.stringify(data)) {
 			unsavedChanges = true;
 			onChange(data);
 		}
 		schemaData = data;
-		valid = isValid;
 	}
 
 	onMount(() => {
@@ -39,4 +38,10 @@
 	});
 </script>
 
-<JSchema componentId="test" bind:this={jschema} {schemaVersion} onchange={innerOnChange} />
+<JSchema
+	componentId="test"
+	bind:this={jschema}
+	{schemaVersion}
+	onchange={innerOnChange}
+	bind:dataValid={valid}
+/>

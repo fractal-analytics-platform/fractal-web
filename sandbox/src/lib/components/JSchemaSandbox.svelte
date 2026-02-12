@@ -78,8 +78,6 @@
 
 	let validationError = $state('');
 	let valid = $state(false);
-	/** @type {string[]} */
-	let genericErrors = $state([]);
 
 	function loadExample() {
 		schemaVersion = 'pydantic_v2';
@@ -98,7 +96,7 @@
 	/**
 	 * @param {object} newData
 	 */
-	function updateData(newData, isValid = undefined, errors = undefined) {
+	function updateData(newData) {
 		if (!newData) {
 			return;
 		}
@@ -109,11 +107,6 @@
 			jsonDataString = updatedOldData;
 			dataError = '';
 			schemaData = JSON.parse(jsonDataString);
-		}
-
-		if (isValid !== undefined && errors !== undefined) {
-			valid = isValid;
-			genericErrors = errors;
 		}
 	}
 
@@ -196,9 +189,6 @@
 						<div class="alert alert-success">Data is valid</div>
 					{:else}
 						<div class="alert alert-danger">Data is not valid</div>
-						{#each genericErrors as error}
-							<div class="alert alert-danger mt-1">{error}</div>
-						{/each}
 					{/if}
 				{/if}
 			</div>
@@ -212,6 +202,7 @@
 				{schemaVersion}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}
+				bind:dataValid={valid}
 			/>
 		{/if}
 	</div>

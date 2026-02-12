@@ -63,40 +63,28 @@
 
 	let nonParallelSavedData = $state();
 	let nonParallelValid = $state(true);
-	/** @type {string[]} */
-	let nonParallelGenericErrors = $state([]);
 
 	/**
 	 * @param {any} data
-	 * @param {boolean} valid
-	 * @param {string[]} genericErrors
 	 */
-	function handleNonParallelChanged(data, valid, genericErrors) {
+	function handleNonParallelChanged(data) {
 		if (changed(nonParallelSavedData, data)) {
 			unsavedChangesNonParallel = true;
 		}
 		nonParallelSavedData = data;
-		nonParallelValid = valid;
-		nonParallelGenericErrors = genericErrors;
 	}
 
 	let parallelSavedData = $state();
 	let parallelValid = $state(true);
-	/** @type {string[]} */
-	let parallelGenericErrors = $state([]);
 
 	/**
 	 * @param {any} data
-	 * @param {boolean} valid
-	 * @param {string[]} genericErrors
 	 */
-	function handleParallelChanged(data, valid, genericErrors) {
+	function handleParallelChanged(data) {
 		if (changed(parallelSavedData, data)) {
 			unsavedChangesParallel = true;
 		}
 		parallelSavedData = data;
-		parallelValid = valid;
-		parallelGenericErrors = genericErrors;
 	}
 
 	/**
@@ -258,9 +246,6 @@
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
 		{#if argsSchemaNonParallel && isSchemaValid}
-			{#each nonParallelGenericErrors as error, index (index)}
-				<div class="alert alert-danger mt-1">{error}</div>
-			{/each}
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-non-parallel"
@@ -269,6 +254,7 @@
 					{propertiesToIgnore}
 					onchange={handleNonParallelChanged}
 					bind:this={nonParallelSchemaComponent}
+					bind:dataValid={nonParallelValid}
 				/>
 			</div>
 		{:else}
@@ -290,9 +276,6 @@
 			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
-			{#each parallelGenericErrors as error, index (index)}
-				<div class="alert alert-danger mt-1">{error}</div>
-			{/each}
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-parallel"
@@ -301,6 +284,7 @@
 					{propertiesToIgnore}
 					onchange={handleParallelChanged}
 					bind:this={parallelSchemaComponent}
+					bind:dataValid={parallelValid}
 				/>
 			</div>
 		{:else}
