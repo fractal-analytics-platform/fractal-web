@@ -1213,12 +1213,14 @@
 						>
 							<div class="card-body">
 								{#if selectedWorkflowTask}
-									<VersionUpdate
-										workflowTask={selectedWorkflowTask}
-										updateWorkflowCallback={taskUpdated}
-										updateCandidates={newVersionsMap[selectedWorkflowTask.task_id] || []}
-										{newVersionsCount}
-									/>
+									{#key selectedWorkflowTask}
+										<VersionUpdate
+											workflowTask={selectedWorkflowTask}
+											updateWorkflowCallback={taskUpdated}
+											updateCandidates={newVersionsMap[selectedWorkflowTask.task_id] || []}
+											{newVersionsCount}
+										/>
+									{/key}
 								{/if}
 							</div>
 						</div>
