@@ -104,18 +104,28 @@ export function nullifyEmptyStrings(inputValues) {
 }
 
 /**
- * Replacer function to ignore empty strings when using JSON.stringify().
- * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description}
- * @param {string} _key
- * @param {any} value
- * @returns {any}
+ * Remove all the empty strings from an object
+ * @param {object} inputValues
+ * @returns {object}
  */
-function stripEmptyStrings(_key, value) {
-	if (typeof value === 'string' && value.trim() === '') {
-		return undefined;
-	} else {
-		return value;
+function stripEmptyStrings(inputValues) {
+	const clearedValues = {};
+	for (let key in inputValues) {
+		if (typeof inputValues[key] === 'string') {
+			if (inputValues[key].trim() !== '') {
+				clearedValues[key] = inputValues[key];
+			}
+		} else if (
+			inputValues[key] !== null &&
+			typeof inputValues[key] === 'object' &&
+			!Array.isArray(inputValues[key])
+		) {
+			clearedValues[key] = nullifyEmptyStrings(inputValues[key]);
+		} else {
+			clearedValues[key] = inputValues[key];
+		}
 	}
+	return clearedValues;
 }
 
 /**
@@ -125,6 +135,7 @@ function stripEmptyStrings(_key, value) {
  * @property {boolean} nullifyEmptyStrings - Convert empty strings to null
  * @property {boolean} deepCopy - Indicates whether to create a deep copy of the input.
  * @property {boolean} showWarning - Indicates whether to show a warning when normalization has been applied.
+ * @property {boolean} stringify
  */
 
 /** @type {NormalizerOptions} */
@@ -133,7 +144,8 @@ const defaultNormalizerOptions = {
 	stripEmptyElements: false,
 	nullifyEmptyStrings: false,
 	deepCopy: false,
-	showWarning: true
+	showWarning: true,
+	stringify: true
 };
 
 /**
@@ -142,6 +154,9 @@ const defaultNormalizerOptions = {
  * @returns {string}
  */
 export function normalizePayload(payload, options = {}) {
+	if (!payload) {
+		return payload;
+	}
 	options = {
 		...defaultNormalizerOptions,
 		...options
@@ -150,6 +165,8 @@ export function normalizePayload(payload, options = {}) {
 	const normalizedPaths = _normalize(payload);
 	if (options.nullifyEmptyStrings) {
 		payload = nullifyEmptyStrings(payload);
+	} else if (options.stripEmptyStrings) {
+		payload = stripEmptyStrings(payload);
 	}
 	if (options.stripEmptyElements) {
 		payload = stripNullAndEmptyObjectsAndArrays(payload);
@@ -157,10 +174,10 @@ export function normalizePayload(payload, options = {}) {
 	if (options.showWarning) {
 		showNormalizationWarning(normalizedPaths);
 	}
-	if (options.stripEmptyStrings) {
-		return JSON.stringify(payload, stripEmptyStrings);
+	if (options.stringify) {
+		return JSON.stringify(payload);
 	}
-	return JSON.stringify(payload);
+	return payload;
 }
 
 /**

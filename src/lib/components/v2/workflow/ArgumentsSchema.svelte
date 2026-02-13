@@ -178,13 +178,18 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		const options = { deepCopy: true, stripEmptyElements: true, stringify: false };
+
 		const response = await fetch(
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: normalizePayload(payload, { deepCopy: true, stripEmptyElements: true })
+				body: JSON.stringify({
+					args_non_parallel: normalizePayload(payload.args_non_parallel, options),
+					args_parallel: normalizePayload(payload.args_parallel, options)
+				})
 			}
 		);
 
