@@ -274,8 +274,10 @@
 
 				{#each workflowImportErrorData as data, index (index)}
 					<hr />	
-					<section>
-						<div style="display: flex; align-items: center; gap: 8px;">
+					<section class="task-to-import">
+						<div
+							style="display: flex; align-items: center; gap: 8px;"
+						>
 							<div>
 								{#if data.outcome === "success" || selectedVersions[index]}
 									<BooleanIcon value={true} />
