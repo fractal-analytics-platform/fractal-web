@@ -43,17 +43,6 @@
 		dataError = '';
 	}
 
-	function validate() {
-		try {
-			validationError = '';
-			valid = false;
-			jschemaComponent?.validateArguments();
-			valid = true;
-		} catch (err) {
-			validationError = getValidationErrorMessage(err);
-		}
-	}
-
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = $state(undefined);
 

@@ -1,15 +1,10 @@
 <script>
 	import { page } from '$app/state';
-	import {
-		AlertError,
-		displayStandardErrorAlert,
-		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
-	import { onMount, tick } from 'svelte';
-	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
+	import { onMount } from 'svelte';
 	import {
 		isCompoundType,
 		hasComputeArguments,
@@ -134,38 +129,6 @@
 		unsavedChangesParallel = false;
 		unsavedChangesFormBuilderParallel = false;
 		unsavedChangesFormBuilderNonParallel = false;
-	}
-
-	/**
-	 * @param {object} payload
-	 */
-	async function handleImport(payload) {
-		if (nonParallelSchemaComponent) {
-			workflowTask.args_non_parallel = payload.args_non_parallel;
-		}
-		if (parallelSchemaComponent) {
-			workflowTask.args_parallel = payload.args_parallel;
-		}
-		await tick();
-		try {
-			nonParallelSchemaComponent?.validateArguments();
-			parallelSchemaComponent?.validateArguments();
-		} catch (err) {
-			throw new AlertError(getValidationErrorMessage(err));
-		}
-		await patchWorkflow(payload);
-	}
-
-	/**
-	 * @param {any} err
-	 */
-	function getValidationErrorMessage(err) {
-		if (err instanceof JsonSchemaDataError) {
-			return err.errors.length === 1 ? err.errors[0] : err.errors;
-		} else {
-			console.error(err);
-			return /** @type {Error}*/ (err).message;
-		}
 	}
 
 	/**
@@ -309,7 +272,7 @@
 	<div class="d-flex jschema-controls-bar p-3">
 		<ImportExportArgs
 			{workflowTask}
-			onImport={handleImport}
+			onImport={patchWorkflow}
 			exportDisabled={!editable || unsavedChanges || savingChanges}
 		/>
 		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}

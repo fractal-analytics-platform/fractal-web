@@ -31,17 +31,7 @@
 		return formManager?.getFormData();
 	}
 
-	export function validateArguments() {
-		// Trigger validation on input fields
-		for (const field of document.querySelectorAll(
-			`#${componentId} input, #${componentId} select`
-		)) {
-			field.dispatchEvent(new Event('input'));
-		}
-		formManager?.validate();
-	}
-
-	/**
+  /**
 	 * @param {any} schema
 	 * @param {any}  schemaData
 	 */
@@ -77,7 +67,7 @@
 
 {#if formManager}
 	{#key formManager}
-		{#each genericErrors as error}
+		{#each genericErrors as error, index (index)}
 			<div class="alert alert-danger mt-1"><pre>{error}</pre></div>
 		{/each}
 		<div id={componentId}>
