@@ -79,6 +79,12 @@ export type TupleFormElementFields = BaseFormElementFields & {
 export type ConditionalElementFields = BaseFormElementFields & {
 	selectedIndex: number;
 	selectedItem: FormElement;
+	discriminator?: {
+		key: string;
+		values: string[];
+		title: string;
+		description: string;
+	}
 };
 
 export type FormBuilderEntryType = 'object' | 'array' | 'string' | 'number' | 'boolean';

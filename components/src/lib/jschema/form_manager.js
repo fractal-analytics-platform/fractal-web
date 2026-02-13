@@ -80,7 +80,8 @@ export class FormManager {
 			property: this.jsonSchema,
 			required: true,
 			removable: false,
-			value: data
+			value: data,
+			parentProperty: undefined
 		});
 		const valid = this.validate();
 		this.onchange(data, valid);
@@ -93,7 +94,8 @@ export class FormManager {
 	 * property: import("../types/jschema").JSONSchemaProperty,
 	 * required: boolean,
 	 * removable: boolean,
-	 * value: any
+	 * value: any,
+	 * parentProperty: import("../types/jschema").JSONSchemaProperty | undefined
 	 * }} params
 	 */
 	createFormElement(params) {
@@ -278,10 +280,11 @@ export class FormManager {
 	 * property: import("../types/jschema").JSONSchemaObjectProperty,
 	 * required: boolean,
 	 * removable: boolean,
-	 * value: any
+	 * value: any,
+	 * parentProperty: import("../types/jschema").JSONSchemaProperty | undefined
 	 * }} params
 	 */
-	createObjectElement({ key, path, property, required, removable, value }) {
+	createObjectElement({ key, path, property, required, removable, value, parentProperty }) {
 		const fields = this.getBaseElementFields({ key, path, property, required, removable });
 		const requiredChildren = property.required || [];
 		const children = [];
@@ -297,9 +300,17 @@ export class FormManager {
 				property: childProperty,
 				required: childRequired,
 				removable: isRemovableChildProperty(property, childKey),
-				value: value[childKey]
+				value: value[childKey],
+				parentProperty: property
 			});
 			children.push(childElement);
+		}
+
+		const discriminatorKey = this.getDiscriminatorKey(parentProperty);
+		if (discriminatorKey) {
+			// Discriminator property is removed from the child and handled separatedly
+			// Adding it to the valid keys to prevent the value to being treated as an unexpected element
+			validKeys.push(discriminatorKey);
 		}
 
 		for (const [k, v] of Object.entries(value)) {
@@ -339,7 +350,8 @@ export class FormManager {
 				property: items,
 				required: false,
 				removable: true,
-				value: v
+				value: v,
+				parentProperty: property
 			})
 		);
 		const element = new ArrayFormElement({
@@ -373,7 +385,7 @@ export class FormManager {
 			size,
 			children:
 				required || (Array.isArray(value) && value.length > 0)
-					? this.createTupleChildren({ path, items, size, value })
+					? this.createTupleChildren({ path, items, size, value, parentProperty: property })
 					: []
 		});
 		return element;
@@ -384,10 +396,11 @@ export class FormManager {
 	 * path: string,
 	 * items: import("../types/jschema").JSONSchemaProperty|import("../types/jschema").JSONSchemaProperty[],
 	 * size: number,
-	 * value: any
+	 * value: any,
+	 * parentProperty: import("../types/jschema").JSONSchemaProperty | undefined
 	 * }} params
 	 */
-	createTupleChildren({ path, items, size, value }) {
+	createTupleChildren({ path, items, size, value, parentProperty }) {
 		const params = {
 			required: false,
 			removable: false
@@ -395,11 +408,11 @@ export class FormManager {
 		let children = [];
 		if (Array.isArray(items)) {
 			children = items.map((item, index) =>
-				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: item, value: value[index] })
+				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: item, value: value[index], parentProperty })
 			);
 		} else {
 			children = Array(size).map((_, index) =>
-				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: items, value: value[index] })
+				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: items, value: value[index], parentProperty })
 			);
 		}
 		if (Array.isArray(value)) {
@@ -424,22 +437,109 @@ export class FormManager {
 		const fields = this.getBaseElementFields({ key, path, property, required, removable });
 		const selectedValue = value ?? {};
 		const selectedIndex = this.getConditionalElementSelectedChildIndex(property, selectedValue);
-		const selectedProperty = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
-			property.oneOf[selectedIndex]
-		);
+		const { discriminator, oneOfProperty } = this.extractDiscriminatorProperty(property);
+		const selectedProperty = oneOfProperty.oneOf[selectedIndex];
 		return new ConditionalFormElement({
 			...fields,
 			type: 'conditional',
+			property: oneOfProperty,
 			selectedIndex: selectedIndex,
+			discriminator,
 			selectedItem: this.createFormElement({
 				key,
 				path,
 				property: selectedProperty,
 				required,
 				removable,
-				value: selectedValue
+				value: selectedValue,
+				parentProperty: property
 			})
 		});
+	}
+
+	/**
+	 * @param {import("../types/jschema").JSONSchemaProperty | undefined} property 
+	 * @returns {string|undefined}
+	 */
+	getDiscriminatorKey(property) {
+		if (!property) {
+			return undefined;
+		}
+		if ('oneOf' in property && 'discriminator' in property && property.discriminator) {
+			/** @type {string | undefined} */
+			let discriminatorKey = undefined;
+			const { propertyName } = property.discriminator;
+			for (const prop of property.oneOf) {
+				if (prop.type === 'object' && 'properties' in prop && prop.properties[propertyName]) {
+					const discrProp = prop.properties[propertyName];
+					if (discrProp.type === 'string' && 'const' in discrProp) {
+						if (discriminatorKey !== undefined && discriminatorKey !== propertyName) {
+							// all the objects should have the same discriminator key
+							return undefined;
+						}
+						discriminatorKey = propertyName;
+					} else {
+						// we support only constant strings as discriminators
+						return undefined;
+					}
+				} else {
+					// each child should have the discriminator property
+					return undefined;
+				}
+			}
+			return discriminatorKey;
+		}
+		return undefined;
+	}
+
+	/**
+	 * Extract the discriminator values and remove the discriminator property from each oneOf child.
+	 * @param {import("../types/jschema").JSONSchemaOneOfProperty} oneOfProperty 
+	 */
+	extractDiscriminatorProperty(oneOfProperty) {
+		if ('discriminator' in oneOfProperty && oneOfProperty.discriminator) {
+			const { propertyName } = oneOfProperty.discriminator;
+			const discriminator = {
+				key: propertyName,
+				title: '',
+				description: '',
+				values: /** @type {string[]} */ ([])
+			}
+			for (const prop of oneOfProperty.oneOf) {
+				if (prop.type === 'object' && 'properties' in prop && prop.properties[propertyName]) {
+					const discrProp = prop.properties[propertyName];
+					if (discrProp.type === 'string' && 'const' in discrProp) {
+						discriminator.values.push(discrProp.const);
+						if (!discriminator.title && discrProp.title) {
+							discriminator.title = discrProp.title;
+						}
+						if (!discriminator.description && discrProp.description) {
+							discriminator.description = discrProp.description;
+						}
+					}
+				}
+			}
+			if (oneOfProperty.oneOf.length > 0 && oneOfProperty.oneOf.length === discriminator.values.length) {
+				return {
+					discriminator,
+					oneOfProperty: {
+						...oneOfProperty,
+						oneOf: oneOfProperty.oneOf.map(p => {
+							const properties = { ...p.properties };
+							delete properties[propertyName];
+							return {
+								...p,
+								properties
+							}
+						})
+					}
+				}
+			}
+		}
+		return {
+			discriminator: undefined,
+			oneOfProperty
+		}
 	}
 
 	getConditionalElementSelectedChildIndex(property, value) {
@@ -535,7 +635,12 @@ export class FormManager {
 	 */
 	getDataFromConditionalElement(element) {
 		const selectedChild = element.selectedItem;
-		return this.getDataFromElement(selectedChild);
+		const data = this.getDataFromElement(selectedChild);
+		if (element.discriminator) {
+			const { key } = element.discriminator;
+			data[key] = element.discriminator.values[get(element.selectedIndex)];
+		}
+		return data;
 	}
 
 	validate() {
@@ -553,7 +658,7 @@ export class FormManager {
 				for (const error of errors) {
 					const errorIsSet = this.addErrorToForm(error, this.root);
 					if (!errorIsSet) {
-						genericErrors.push(JSON.stringify(error.message, null, 2));
+						genericErrors.push(JSON.stringify(error, null, 2));
 					}
 				}
 			}

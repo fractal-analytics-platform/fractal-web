@@ -184,7 +184,8 @@ export class ObjectFormElement extends BaseFormElement {
 				false,
 				this.additionalProperties.default,
 				false
-			)
+			),
+			parentProperty: this.property
 		});
 		child.title = key;
 		child.removable = true;
@@ -226,7 +227,8 @@ export class ObjectFormElement extends BaseFormElement {
 			property: child.property,
 			required: child.required,
 			removable: child.removable,
-			value: defaultValue
+			value: defaultValue,
+			parentProperty: this.property
 		});
 		newChild.collapsed = child.collapsed;
 		this.children[index] = newChild;
@@ -247,7 +249,8 @@ export class ObjectFormElement extends BaseFormElement {
 			},
 			required: child.required,
 			removable: child.removable,
-			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true)
+			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true),
+			parentProperty: this.property
 		});
 		this.children[index] = newChild;
 		this.notifyChange();
@@ -277,7 +280,8 @@ export class ArrayFormElement extends BaseFormElement {
 			property: this.items,
 			required: false,
 			removable: true,
-			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true)
+			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true),
+			parentProperty: this.property
 		});
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -368,7 +372,9 @@ export class TupleFormElement extends BaseFormElement {
 				)
 			);
 		}
-		this.children = this.manager.createTupleChildren({ path: this.path, items: this.items, size: this.size, value });
+		this.children = this.manager.createTupleChildren({
+			path: this.path, items: this.items, size: this.size, value, parentProperty: this.property
+		});
 		this.notifyChange();
 	}
 
@@ -394,6 +400,7 @@ export class ConditionalFormElement extends BaseFormElement {
 		super(fields);
 		this.selectedItem = fields.selectedItem;
 		this.selectedIndex = writable(fields.selectedIndex);
+		this.discriminator = fields.discriminator;
 	}
 
 	/**
@@ -411,7 +418,8 @@ export class ConditionalFormElement extends BaseFormElement {
 				property: selectedProp,
 				required: this.required,
 				removable: this.removable,
-				value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true)
+				value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
+				parentProperty: this.property
 			});
 		}
 		this.notifyChange();
