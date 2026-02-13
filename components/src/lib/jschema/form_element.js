@@ -401,6 +401,7 @@ export class ConditionalFormElement extends BaseFormElement {
 		this.selectedItem = fields.selectedItem;
 		this.selectedIndex = writable(fields.selectedIndex);
 		this.discriminator = fields.discriminator;
+		this.unexpectedChildren = fields.unexpectedChildren;
 	}
 
 	/**
@@ -408,20 +409,33 @@ export class ConditionalFormElement extends BaseFormElement {
 	 */
 	selectChild(index) {
 		this.selectedIndex.set(index);
-		if ('oneOf' in this.property) {
-			const selectedProp = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
-				this.property.oneOf[index]
-			);
-			this.selectedItem = this.manager.createFormElement({
-				key: this.key,
-				path: this.path,
-				property: selectedProp,
-				required: this.required,
-				removable: this.removable,
-				value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
-				parentProperty: this.property
-			});
+		if (index === -1) {
+			this.selectedItem = null;
+		} else {
+			this.unexpectedChildren = [];
+			if ('oneOf' in this.property) {
+				const selectedProp = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
+					this.property.oneOf[index]
+				);
+				this.selectedItem = this.manager.createFormElement({
+					key: this.key,
+					path: this.path,
+					property: selectedProp,
+					required: this.required,
+					removable: this.removable,
+					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
+					parentProperty: this.property
+				});
+			}
 		}
+		this.notifyChange();
+	}
+
+	/**
+	 * @param {number} index 
+	 */
+	removeUnexpectedChild(index) {
+		this.unexpectedChildren = this.unexpectedChildren.filter((_, i) => i !== index);
 		this.notifyChange();
 	}
 }

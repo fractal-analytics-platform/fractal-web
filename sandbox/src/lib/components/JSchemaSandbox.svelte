@@ -57,7 +57,7 @@
 
 		schema = parsedSchema;
 		await tick();
-		jschemaComponent?.update(schema, schemaData);
+		jschemaComponent?.update(parsedSchema, $state.snapshot(schemaData));
 		handleDataChanged();
 	}
 
@@ -66,11 +66,11 @@
 		dataError = '';
 		try {
 			schemaData = JSON.parse(jsonDataString);
-			jschemaComponent?.update(schema, schemaData);
+			jschemaComponent?.update(schema, $state.snapshot(schemaData));
 		} catch (err) {
 			if (!jsonDataString) {
 				schemaData = undefined;
-				jschemaComponent?.update(schema, schemaData);
+				jschemaComponent?.update(schema, undefined);
 			}
 			dataError = 'Invalid JSON';
 		}

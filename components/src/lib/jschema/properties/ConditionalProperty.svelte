@@ -31,15 +31,30 @@
 	/** @type {string[]} */
 	let options = $state([]);
 
+	/**
+	 * @type {Array<import("../../types/form").FormElement>}
+	 */
+	let unexpectedChildren = $state([]);
+
 	onMount(() => {
 		options = formElement.property.oneOf.map((o) => o.title);
 		selectedItem = formElement.selectedItem;
 		formElement.selectedIndex.subscribe((v) => (selectedIndex = v));
+		unexpectedChildren = formElement.unexpectedChildren;
 	});
 
 	function selectionChanged() {
 		formElement.selectChild(selectedIndex);
 		selectedItem = formElement.selectedItem;
+		unexpectedChildren = formElement.unexpectedChildren;
+	}
+
+	/**
+	 * @param {number} index
+	 */
+	function removeUnexpectedChild(index) {
+		formElement.removeUnexpectedChild(index);
+		unexpectedChildren = formElement.unexpectedChildren;
 	}
 
 	$effect(() => {
@@ -49,19 +64,19 @@
 	});
 </script>
 
-{#if formElement.discriminator && selectedItem}
+{#if formElement.discriminator}
 	{#key selectedItem}
-		<CollapsibleProperty {formElement} {reset}>
+		<CollapsibleProperty {formElement} {reset} showErrors={false}>
 			<div class="mx-2">
 				{#each errors as error, index (index)}
-					<div class="alert alert-danger mt-2 mb-1 py-1 px-2">{error}</div>
+					<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
 				{/each}
 				{#each selectedElementErrors as error, index (index)}
-					<div class="alert alert-danger mt-2 mb-1 py-1 px-2">{error}</div>
+					<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
 				{/each}
 				<div class="d-flex align-items-center mt-2">
 					<div class="property-metadata d-flex flex-row align-self-center w-50">
-						<label for="discriminator-{formElement.id}">
+						<label for="discriminator-{formElement.id}" class="fw-bold">
 							{formElement.discriminator.title || formElement.discriminator.key}
 						</label>
 						<PropertyDescription description={formElement.discriminator.description} />
@@ -72,7 +87,11 @@
 							bind:value={selectedIndex}
 							onchange={selectionChanged}
 							id="discriminator-{formElement.id}"
+							class:is-invalid={selectedIndex === -1}
 						>
+							{#if selectedIndex === -1}
+								<option value={-1}>Select...</option>
+							{/if}
 							{#each formElement.discriminator.values as option, index (index)}
 								<option value={index}>{option}</option>
 							{/each}
@@ -80,7 +99,9 @@
 					</div>
 				</div>
 			</div>
-			<ObjectProperty formElement={selectedItem} {editable} showErrors={false} />
+			{#if selectedItem}
+				<ObjectProperty formElement={selectedItem} {editable} showErrors={false} />
+			{/if}
 		</CollapsibleProperty>
 	{/key}
 {:else}
@@ -101,3 +122,23 @@
 		{/if}
 	{/key}
 {/if}
+
+{#key unexpectedChildren}
+	{#each unexpectedChildren as child, index (index)}
+		<div class="property-block">
+			{#if child.removable}
+				<button
+					class="btn btn-danger w-100 mt-2"
+					type="button"
+					onclick={() => removeUnexpectedChild(index)}
+					disabled={!editable}
+				>
+					Remove Property Block
+				</button>
+			{/if}
+			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
+				<PropertyDiscriminator formElement={unexpectedChildren[index]} {editable} />
+			</div>
+		</div>
+	{/each}
+{/key}

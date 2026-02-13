@@ -23,6 +23,7 @@ import {
 } from './property_utils.js';
 import { SchemaValidator } from './jschema_validation.js';
 import { get, writable } from 'svelte/store';
+import { processErrors } from './form_errors';
 
 /**
  * Creates the object used to draw the JSON Schema form, provides the functions to initialize new form elements,
@@ -437,15 +438,29 @@ export class FormManager {
 		const fields = this.getBaseElementFields({ key, path, property, required, removable });
 		const selectedValue = value ?? {};
 		const selectedIndex = this.getConditionalElementSelectedChildIndex(property, selectedValue);
-		const { discriminator, oneOfProperty } = this.extractDiscriminatorProperty(property);
+		const { discriminator, oneOfProperty } = this.extractDiscriminatorProperty(property, selectedValue);
 		const selectedProperty = oneOfProperty.oneOf[selectedIndex];
+
+		const unexpectedChildren = [];
+		if (selectedIndex === -1) {
+			for (const [k, v] of Object.entries(value)) {
+				if (k !== discriminator?.key) {
+					unexpectedChildren.push(this.createUnexpectedElement({
+						key: k,
+						path: `${path}/${k}`,
+						value: v
+					}));
+				}
+			}
+		}
+
 		return new ConditionalFormElement({
 			...fields,
 			type: 'conditional',
 			property: oneOfProperty,
 			selectedIndex: selectedIndex,
 			discriminator,
-			selectedItem: this.createFormElement({
+			selectedItem: selectedIndex === -1 ? null : this.createFormElement({
 				key,
 				path,
 				property: selectedProperty,
@@ -453,7 +468,8 @@ export class FormManager {
 				removable,
 				value: selectedValue,
 				parentProperty: property
-			})
+			}),
+			unexpectedChildren
 		});
 	}
 
@@ -495,15 +511,17 @@ export class FormManager {
 	/**
 	 * Extract the discriminator values and remove the discriminator property from each oneOf child.
 	 * @param {import("../types/jschema").JSONSchemaOneOfProperty} oneOfProperty 
+	 * @param {any} selectedValue
 	 */
-	extractDiscriminatorProperty(oneOfProperty) {
+	extractDiscriminatorProperty(oneOfProperty, selectedValue) {
 		if ('discriminator' in oneOfProperty && oneOfProperty.discriminator) {
 			const { propertyName } = oneOfProperty.discriminator;
 			const discriminator = {
 				key: propertyName,
 				title: '',
 				description: '',
-				values: /** @type {string[]} */ ([])
+				values: /** @type {string[]} */ ([]),
+				value: selectedValue[propertyName],
 			}
 			for (const prop of oneOfProperty.oneOf) {
 				if (prop.type === 'object' && 'properties' in prop && prop.properties[propertyName]) {
@@ -520,6 +538,9 @@ export class FormManager {
 				}
 			}
 			if (oneOfProperty.oneOf.length > 0 && oneOfProperty.oneOf.length === discriminator.values.length) {
+				if (!discriminator.value) {
+					discriminator.value = discriminator.values[0];
+				}
 				return {
 					discriminator,
 					oneOfProperty: {
@@ -554,6 +575,9 @@ export class FormManager {
 					}
 				}
 			}
+		}
+		if (value) {
+			return -1;
 		}
 		return 0;
 	}
@@ -635,12 +659,24 @@ export class FormManager {
 	 */
 	getDataFromConditionalElement(element) {
 		const selectedChild = element.selectedItem;
-		const data = this.getDataFromElement(selectedChild);
-		if (element.discriminator) {
-			const { key } = element.discriminator;
-			data[key] = element.discriminator.values[get(element.selectedIndex)];
+		if (selectedChild) {
+			const data = this.getDataFromElement(selectedChild);
+			if (element.discriminator) {
+				const { key } = element.discriminator;
+				data[key] = element.discriminator.values[get(element.selectedIndex)];
+			}
+			return data;
 		}
-		return data;
+		if (element.discriminator) {
+			const data = {
+				[element.discriminator.key]: element.discriminator.value
+			};
+			for (const child of element.unexpectedChildren) {
+				data[child.key] = this.getDataFromElement(child);
+			}
+			return data;
+		}
+		return null;
 	}
 
 	validate() {
@@ -655,12 +691,7 @@ export class FormManager {
 		if (!valid) {
 			const errors = this.validator.getErrors();
 			if (errors && Array.isArray(errors)) {
-				for (const error of errors) {
-					const errorIsSet = this.addErrorToForm(error, this.root);
-					if (!errorIsSet) {
-						genericErrors.push(JSON.stringify(error, null, 2));
-					}
-				}
+				genericErrors.push(...processErrors(this.root, errors));
 			}
 		}
 		this.genericErrors.set(genericErrors);
@@ -673,76 +704,13 @@ export class FormManager {
 	 */
 	clearErrors(parentElement) {
 		parentElement.clearErrors();
-		if ('selectedItem' in parentElement) {
+		if ('selectedItem' in parentElement && parentElement.selectedItem) {
 			this.clearErrors(parentElement.selectedItem);
 		} else if ('children' in parentElement) {
 			for (const element of parentElement.children) {
 				this.clearErrors(element);
 			}
 		}
-	}
-
-	/**
-	 * @param {object} error
-	 * @param {import('../types/form').FormElement} parentElement 
-	 */
-	addErrorToForm(error, parentElement) {
-		if (error.instancePath.startsWith(parentElement.path)) {
-			parentElement.hasErrors.set(true);
-		}
-		if (parentElement.path === error.instancePath) {
-			this.setErrorToElement(error, parentElement);
-			return true;
-		} else if ('selectedItem' in parentElement && this.addErrorToForm(error, parentElement.selectedItem)) {
-			return true;
-		} else if ('children' in parentElement) {
-			for (const element of parentElement.children) {
-				if (element.path === error.instancePath) {
-					this.setErrorToElement(error, element);
-					return true;
-				}
-				if (this.addErrorToForm(error, element)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param {object} error 
-	 * @param {import('../types/form').FormElement} element 
-	 */
-	setErrorToElement(error, element) {
-		element.hasErrors.set(true);
-		if ('selectedItem' in element) {
-			element.selectedItem.addError(error.message);
-			return;
-		} else if ('params' in error) {
-			if ('missingProperty' in error.params && this.setErrorToChildElement(error.message, error.params.missingProperty, element)) {
-				return;
-			} else if ('additionalProperty' in error.params && this.setErrorToChildElement(error.message, error.params.additionalProperty, element)) {
-				return;
-			}
-		}
-		element.addError(error.message);
-	}
-
-	/**
-	 * @param {string} message 
-	 * @param {string} key 
-	 * @param {import('../types/form').FormElement} parentElement 
-	 */
-	setErrorToChildElement(message, key, parentElement) {
-		if ('children' in parentElement) {
-			for (const element of parentElement.children) {
-				if (element.key === key) {
-					element.addError(message);
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	/**
