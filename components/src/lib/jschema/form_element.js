@@ -292,7 +292,14 @@ export class ArrayFormElement extends BaseFormElement {
 	 */
 	removeChild(index) {
 		this.children.splice(index, 1);
+		this.recomputePaths();
 		this.notifyChange();
+	}
+
+	recomputePaths() {
+		this.children.forEach((c, i) => {
+			c.path = c.path.replace(/\d+$/, i.toString());
+		});
 	}
 
 	/**
@@ -311,6 +318,7 @@ export class ArrayFormElement extends BaseFormElement {
 				}
 			}
 			this.children = updatedArray;
+			this.recomputePaths();
 			this.notifyChange();
 		}
 	}
@@ -331,6 +339,7 @@ export class ArrayFormElement extends BaseFormElement {
 				}
 			}
 			this.children = updatedArray;
+			this.recomputePaths();
 			this.notifyChange();
 		}
 	}

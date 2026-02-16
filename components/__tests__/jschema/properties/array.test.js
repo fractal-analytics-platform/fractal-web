@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, screen } from '@testing-library/svelte';
 import { checkBold, renderSchemaWithSingleProperty, renderSchema } from './property_test_utils';
+import { FormManager } from '../../../src/lib/jschema/form_manager';
 
 describe('Array properties', () => {
 	it('Optional ArrayProperty with default values', async () => {
@@ -380,5 +381,42 @@ describe('Array properties', () => {
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(1);
 		expect(inputs[0]).toHaveValue(0);
+	});
+
+	it('handles array path update when adding and removing children', () => {
+		const formManager = new FormManager({
+			type: 'object',
+			properties: {
+				foo: {
+					type: 'array',
+					items: {
+						type: 'object',
+						properties: {
+							bar: { type: 'string' }
+						},
+						required: ['bar']
+					}
+				}
+			}
+		}, vi.fn(), 'pydantic_v2');
+
+		const foo = formManager.root.children[0];
+
+		foo.addChild();
+		foo.addChild();
+		foo.addChild();
+
+		expect(foo.children.length).eq(3);
+
+		expect(foo.children[0].path).eq('/foo/0');
+		expect(foo.children[1].path).eq('/foo/1');
+		expect(foo.children[2].path).eq('/foo/2');
+
+		foo.removeChild(1)
+
+		expect(foo.children.length).eq(2);
+
+		expect(foo.children[0].path).eq('/foo/0');
+		expect(foo.children[1].path).eq('/foo/1');
 	});
 });
