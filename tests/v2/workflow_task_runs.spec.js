@@ -28,6 +28,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await workflow.addTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Add meta properties', async () => {

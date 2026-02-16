@@ -86,7 +86,6 @@
 				body: normalizePayload(payload)
 			}
 		);
-		savingChanges = false;
 
 		if (response.ok) {
 			const result = await response.json();
@@ -97,6 +96,7 @@
 				'metaPropertiesFormError'
 			);
 		}
+		savingChanges = false;
 	}
 
 	export function discardChanges() {

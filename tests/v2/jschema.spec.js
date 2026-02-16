@@ -37,15 +37,15 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await workflow.selectTask(randomTaskName);
 	});
 
-	const form = page.locator('#jschema-parallel');
+	const form = page.locator('#workflow-arguments-schema-panel');
 
 	await test.step('Fill required string', async () => {
 		const input = form.getByLabel('Required string', { exact: true });
 		await input.fill('foo');
 		await input.fill('');
-		await expect(form.getByText("must have required property 'requiredString'")).toHaveCount(1);
+		await expect(form.getByText("required property")).toHaveCount(4);
 		await input.fill('bar');
-		await expect(form.getByText("must have required property 'requiredString'")).toHaveCount(0);
+		await expect(form.getByText("required property")).toHaveCount(3);
 		// Check that export button is disabled when there are some pending changes
 		await expect(page.getByRole('button', { name: /.*Export$/ })).toBeDisabled();
 	});
@@ -59,9 +59,9 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	await test.step('Select required option', async () => {
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('');
-		await expect(form.getByText("must have required property 'requiredEnum'")).toHaveCount(1);
+		await expect(form.getByText("required property")).toHaveCount(3);
 		await page.getByRole('combobox', { name: 'Required enum' }).selectOption('option1');
-		await expect(form.getByText("must have required property 'requiredEnum'")).toHaveCount(0);
+		await expect(form.getByText("required property")).toHaveCount(2);
 	});
 
 	await test.step('Select optional option', async () => {
@@ -71,7 +71,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Fill required integer with min and max', async () => {
 		const input = form.getByLabel('minMaxRequiredInt', { exact: true });
-		await expect(form.getByText("must have required property 'minMaxRequiredInt'")).toHaveCount(1);
+		await expect(form.getByText("required property")).toHaveCount(2);
 		await input.fill('1');
 		await expect(form.getByText('must be >= 5')).toHaveCount(1);
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
@@ -80,16 +80,16 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await input.fill('15');
 		await expect(form.getByText('must be <= 10')).toHaveCount(1);
 		await input.fill('');
-		await expect(form.getByText("must have required property 'minMaxRequiredInt'")).toHaveCount(1);
+		await expect(form.getByText("required property")).toHaveCount(2);
 		await input.fill('8');
-		await expect(form.getByText("must have required property 'minMaxRequiredInt'")).toHaveCount(0);
+		await expect(form.getByText("required property")).toHaveCount(1);
 	});
 
 	await test.step('Fill optional integer with min and max', async () => {
 		const input = form.getByLabel('minMaxOptionalInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		await expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('must be integer')).toHaveCount(1);
 		await input.fill('-7');
 		await expect(form.getByText('must be >= 0')).toHaveCount(1);
 		await input.fill('33');
@@ -101,7 +101,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		await expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('must be integer')).toHaveCount(1);
 		await input.fill('2');
 		await expect(form.getByText('must be > 3')).toHaveCount(1);
 		await input.fill('99');
@@ -112,16 +112,16 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	await test.step('Required boolean', async () => {
 		const booleanSwitch = form.getByRole('switch');
 		await expect(booleanSwitch).not.toBeChecked();
-		await expect(form.getByText("must have required property 'requiredBoolean'")).toHaveCount(1);
+		await expect(form.getByText("required property")).toHaveCount(1);
 		await booleanSwitch.check();
 		await expect(booleanSwitch).toBeChecked();
 		await booleanSwitch.uncheck();
 		await expect(booleanSwitch).not.toBeChecked();
-		await expect(form.getByText("must have required property 'requiredBoolean'")).toHaveCount(0);
+		await expect(form.getByText("required property")).toHaveCount(0);
 	});
 
 	await test.step('Required array with minItems and maxItems', async () => {
-		await expect(form.getByText("must have required property 'requiredArrayWithMinMaxItems'")).toHaveCount(1);
+		await expect(form.getByText("missing required child value")).toHaveCount(2);
 		const block = form.locator('.property-block', {
 			has: page.getByText('requiredArrayWithMinMaxItems')
 		});
@@ -183,13 +183,13 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	});
 
 	await test.step('Object with nested properties', async () => {
-		await expect(form.getByText("must have required property 'requiredObject'")).toHaveCount(1);
+		await expect(form.getByText("missing required child value")).toHaveCount(1);
 		await page.getByRole('textbox', { name: 'requiredNestedString' }).fill('nested string');
-		await expect(form.getByText("must have required property 'requiredObject'")).toHaveCount(0);
+		await expect(form.getByText("missing required child value")).toHaveCount(1);
 
-		await expect(form.getByText("must have required property 'referencedRequiredNestedObject'")).toHaveCount(1);
+		await expect(form.getByText("missing required child value")).toHaveCount(1);
 		await page.getByLabel('Required Min', { exact: true }).fill('1');
-		await expect(form.getByText("must have required property 'referencedRequiredNestedObject'")).toHaveCount(0);
+		await expect(form.getByText("missing required child value")).toHaveCount(0);
 		await page.getByLabel('Optional Max', { exact: true }).fill('5');
 	});
 
@@ -218,7 +218,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
 		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
 		await input.pressSequentially('e');
-		await expect(form.getByText('Should be a number')).toHaveCount(1);
+		await expect(form.getByText('must be integer')).toHaveCount(1);
 	});
 
 	await test.step('Must be integer is validated', async () => {

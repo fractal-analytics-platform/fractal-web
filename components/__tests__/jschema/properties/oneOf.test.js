@@ -1,9 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderSchema } from './property_test_utils';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/svelte';
-import { FormManager } from '../../../src/lib/jschema/form_manager';
-import { get } from 'svelte/store';
 
 describe('oneOf properties', () => {
 
