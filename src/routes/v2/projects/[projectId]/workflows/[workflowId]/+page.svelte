@@ -893,7 +893,7 @@
 						job-execution error took place before the first task started running.
 						<br>
 						If you need to review what jobs already ran, have a look at the
-						<a href="/v2/projects/{project.id}/workflows/{workflow.id}/jobs?dataset={selectedDataset.id}">job list</a>.
+						<a href="/v2/projects/{project.id}/workflows/{workflow.id}/jobs{selectedDataset ? '?dataset='+selectedDataset.id : ''}">job list</a>.
 					</div>
 				</div>
 			</div>
