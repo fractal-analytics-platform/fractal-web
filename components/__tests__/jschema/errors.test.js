@@ -3,7 +3,7 @@ import { FormManager } from '../../src/lib/jschema/form_manager';
 import { get } from 'svelte/store';
 
 describe('JSchema form errors', () => {
-  it('missingProperty error is set to child element', () => {
+  it('missing required child value (object)', () => {
     const formManager = new FormManager({
       type: 'object',
       properties: {
@@ -17,7 +17,39 @@ describe('JSchema form errors', () => {
       required: ['foo']
     }, vi.fn(), 'pydantic_v2');
     const errors = get(formManager.root.children[0].errors);
+    expect(errors).deep.eq(["missing required child value"]);
+  });
+
+  it('missingProperty error is set to child element', () => {
+    const formManager = new FormManager({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'array',
+          items: { type: 'string' },
+        }
+      },
+      required: ['foo']
+    }, vi.fn(), 'pydantic_v2');
+    expect(formManager.getFormData()).deep.eq({ foo: [] });
+    const errors = get(formManager.root.children[0].errors);
     expect(errors).deep.eq(["must have required property 'foo'"]);
+  });
+
+  it('missing required child value (array)', () => {
+    const formManager = new FormManager({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'array',
+          items: { type: 'string' },
+        }
+      },
+      required: ['foo']
+    }, vi.fn(), 'pydantic_v2', [], { foo: [null] });
+    expect(formManager.getFormData()).deep.eq({ foo: [null] });
+    const errors = get(formManager.root.children[0].errors);
+    expect(errors).deep.eq(["missing required child value"]);
   });
 
   it('additionalProperty error is set to child element', () => {
@@ -91,7 +123,7 @@ describe('JSchema form errors', () => {
 
     expect(get(foo.errors)).deep.eq(["must match exactly one schema in oneOf"]);
     expect(get(foo.selectedItem.errors)).deep.eq([]);
-    expect(get(foo.selectedItem.children[0].errors)).deep.eq(["must have required property 'a'"]);
+    expect(get(foo.selectedItem.children[0].errors)).deep.eq(["required property"]);
   });
 
   it('oneOf errors with invalid discriminator', () => {

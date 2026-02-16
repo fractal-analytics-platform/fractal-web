@@ -89,9 +89,8 @@ describe('oneOf properties', () => {
 			}
 		);
 
-		const select = await screen.findByRole('combobox');
+		const select = await screen.findByRole('combobox', { name: 'Step' });
 		expect(select).toHaveValue('1');
-		expect(screen.getByRole('textbox', { name: 'Step' })).toHaveValue('ProcessB');
 		expect(screen.getByRole('spinbutton')).toHaveValue(1);
 		expect(component.getArguments()).deep.eq({
 			proc_step: {
@@ -100,14 +99,13 @@ describe('oneOf properties', () => {
 			}
 		});
 
-		await user.selectOptions(select, 'ProcessAModel');
+		await user.selectOptions(select, 'ProcessA');
 		expect(onChange).toHaveBeenCalledWith({
 			proc_step: {
 				step: 'ProcessA',
 				parameter1: null
 			}
 		});
-		expect(screen.getByRole('textbox', { name: 'Step' })).toHaveValue('ProcessA');
 		expect(screen.getByRole('spinbutton')).toHaveValue(null);
 		expect(component.getArguments()).deep.eq({
 			proc_step: {
@@ -117,37 +115,34 @@ describe('oneOf properties', () => {
 		});
 	});
 
-	it('Invalid oneOf discriminator', async () => {
+	it('Handle invalid initial discriminator value', async () => {
 		const user = userEvent.setup();
 
 		const { component } = renderSchema(
 			schema,
 			'pydantic_v2',
-			{ proc_step: { step: 'XXX' } }
+			{ proc_step: { step: 'XXX', foo: 'bar' } }
 		);
 
+		expect(component.getArguments()).deep.eq({ proc_step: { step: 'XXX', foo: 'bar' } });
 
-		expect(screen.queryAllByText("must have required property 'parameter1'")).toHaveLength(1);
 		expect(screen.queryAllByText("must match exactly one schema in oneOf")).toHaveLength(1);
-		expect(screen.queryAllByText("must be equal to constant")).toHaveLength(1);
 
-		expect(component.getArguments()).deep.eq({ proc_step: { step: 'XXX', parameter1: null } });
+		expect(screen.getByRole('textbox', { name: 'foo' })).toHaveValue('bar');
+		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
+
+		expect(component.getArguments()).deep.eq({ proc_step: { step: 'XXX' } });
 		expect(component.valid).toEqual(false);
 
-		await user.selectOptions(screen.getByRole('combobox'), 'ProcessBModel');
+		await user.selectOptions(screen.getByRole('combobox'), 'ProcessB');
+
+		expect(screen.queryAllByText("required property")).toHaveLength(1);
+		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: null } });
+
 		await user.type(screen.getByRole('spinbutton'), '42');
 
 		expect(screen.queryAllByText("must match exactly one schema in oneOf")).toHaveLength(0);
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: 42 } });
 		expect(component.valid).toEqual(true);
 	});
-
-	it('Errors should be attached to the selected item', () => {
-		const formManager = new FormManager(schema, vi.fn(), 'pydantic_v2');
-		const errors = get(formManager.root.children[0].selectedItem.errors);
-		expect(errors).deep.eq([
-			"must have required property 'parameter1'",
-			'must match exactly one schema in oneOf'
-		]);
-	})
 });

@@ -60,32 +60,56 @@ function addErrorToForm(error, parentElement) {
 function setErrorToElement(error, element) {
   element.hasErrors.set(true);
   if ('params' in error) {
-    if ('missingProperty' in error.params && setErrorToChildElement(error.message, error.params.missingProperty, element)) {
+    if ('missingProperty' in error.params && setErrorToChildElement(error, error.params.missingProperty, element)) {
       return;
-    } else if ('additionalProperty' in error.params && setErrorToChildElement(error.message, error.params.additionalProperty, element)) {
+    } else if ('additionalProperty' in error.params && setErrorToChildElement(error, error.params.additionalProperty, element)) {
       return;
     }
   } else if ('selectedItem' in element && element.selectedItem) {
-    element.selectedItem.addError(error.message);
+    element.selectedItem.addError(getErrorMessage(error, element.selectedItem));
     return;
   }
-  element.addError(error.message);
+  element.addError(getErrorMessage(error, element));
 }
 
 /**
- * @param {string} message 
+ * @param {any} error 
  * @param {string} key 
  * @param {import('../types/form').FormElement} parentElement 
  */
-function setErrorToChildElement(message, key, parentElement) {
+function setErrorToChildElement(error, key, parentElement) {
   const children = getChildren(parentElement);
   for (const element of children) {
     if (element.key === key) {
+      const message = getErrorMessage(error, element);
       element.addError(message);
       return true;
     }
   }
   return false;
+}
+
+/**
+ * @param {any} error 
+ * @param {import('../types/form').FormElement} element 
+ */
+function getErrorMessage(error, element) {
+  if ('missingProperty' in error.params) {
+    if ('children' in element && element.children.length > 0) {
+      return 'missing required child value';
+    }
+    if (isPrimitiveTypeElement(element)) {
+      return 'required property';
+    }
+  }
+  return error.message;
+}
+
+/**
+ * @param {import('../types/form').FormElement} element 
+ */
+function isPrimitiveTypeElement(element) {
+  return element.type && ['string', 'number', 'boolean', 'enum'].includes(element.type);
 }
 
 /**
