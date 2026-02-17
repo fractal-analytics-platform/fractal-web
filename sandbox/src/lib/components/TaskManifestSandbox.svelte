@@ -2,7 +2,6 @@
 	import {
 		deepCopy,
 		getPropertiesToIgnore,
-		getValidationErrorMessage,
 		JSchema,
 		SchemaValidator,
 		stripNullAndEmptyObjectsAndArrays
@@ -11,8 +10,9 @@
 	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
 	import { tick } from 'svelte';
 	import DragAndDropUploader from './DragAndDropUploader.svelte';
+	import example from './example-task-manifest.json';
 
-	let manifest = null;
+	let manifest = $state();
 	/** @type {string[]} */
 	let tasks = $state([]);
 	let selectedTaskName = $state('');
@@ -34,7 +34,6 @@
 
 	function clearFields() {
 		manifest = null;
-		valid = false;
 		validationError = '';
 		tasks = [];
 		selectedTaskName = '';
@@ -94,6 +93,10 @@
 	 */
 	function loadManifest(manifestData) {
 		manifest = manifestData;
+		selectedSchema = null;
+		selectedTask = null;
+		selectedTaskName = '';
+    dataError = '';
 		tasks = manifest.task_list.map((t) => t.name);
 	}
 
@@ -145,8 +148,16 @@
 		dataError = '';
 		try {
 			schemaData = JSON.parse(jsonDataString);
+			if (selectedSchema) {
+				jschemaComponent?.update($state.snapshot(selectedSchema), $state.snapshot(schemaData));
+			}
 		} catch (err) {
-			schemaData = undefined;
+			if (!jsonDataString) {
+				schemaData = undefined;
+				if (selectedSchema) {
+					jschemaComponent?.update($state.snapshot(selectedSchema), undefined);
+				}
+			}
 			dataError = 'Invalid JSON';
 		}
 	}
@@ -156,28 +167,34 @@
 		if (!jschemaComponent) {
 			return;
 		}
-		updateData(jschemaComponent.getArguments());
-	}
-
-	function detectChange(value) {
-		updateData(value);
+		jschemaComponent?.update($state.snapshot(selectedSchema), undefined);
 	}
 
 	/**
 	 * @param {object} newData
 	 */
 	function updateData(newData) {
+		if (!newData) {
+			return;
+		}
 		const newDataCopy = deepCopy(newData);
 		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
 		// Update the data only if something is changed, to avoid triggering uneccessary events
 		if (updatedOldData !== jsonDataString) {
 			jsonDataString = updatedOldData;
+			dataError = '';
+			schemaData = JSON.parse(jsonDataString);
 		}
 	}
 
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
+
+	function loadExample() {
+		loadManifest(example);
+	}
 </script>
 
+<button class="btn btn-outline-primary float-end" onclick={loadExample}> Load example </button>
 <h1 class="fw-light">Sandbox page for task package manifest</h1>
 <p>This is a test page for the JSON Schema form of a whole task package manifest</p>
 
@@ -283,20 +300,20 @@
 					{/if}
 					{#if valid}
 						<div class="alert alert-success">Data is valid</div>
+					{:else}
+						<div class="alert alert-danger">Data is not valid</div>
 					{/if}
-					<button class="btn btn-primary" onclick={validate}>Validate</button>
 				</div>
 			</div>
 		</div>
 		<div class="col-lg-6">
 			<JSchema
 				componentId="json-schema-task-manifest-sandbox"
-				onchange={detectChange}
-				schema={selectedSchema}
+				onchange={(d) => updateData(d)}
 				{schemaVersion}
-				{schemaData}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}
+				bind:dataValid={valid}
 			/>
 		</div>
 	</div>

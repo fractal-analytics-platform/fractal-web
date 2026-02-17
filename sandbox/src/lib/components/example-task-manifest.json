@@ -1,0 +1,497 @@
+{
+  "manifest_version": "2",
+  "task_list": [
+    {
+      "name": "task1",
+      "type": "non_parallel",
+      "executable_non_parallel": "task1.py",
+      "args_schema_non_parallel": {
+        "$defs": {
+          "MyEnum": {
+            "enum": [
+              "Value 1",
+              "Value 2"
+            ],
+            "title": "MyEnum",
+            "type": "string",
+            "description": "Missing description for MyEnum."
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "zarr_urls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Zarr Urls",
+            "type": "array",
+            "description": "Missing description"
+          },
+          "zarr_dir": {
+            "title": "Zarr Dir",
+            "type": "string",
+            "description": "Missing description"
+          },
+          "int_1": {
+            "title": "Int 1",
+            "type": "integer",
+            "description": "Integer argument."
+          },
+          "int_2": {
+            "default": 1,
+            "title": "Int 2",
+            "type": "integer",
+            "description": "Integer argument with a default value."
+          },
+          "int_3": {
+            "title": "Int 3",
+            "type": "integer",
+            "description": "Integer or null argument, with default value set to null."
+          },
+          "int_4": {
+            "title": "Int 4",
+            "type": "integer",
+            "description": "Integer or null argument, with default value set to null."
+          },
+          "str_1": {
+            "title": "Str 1",
+            "type": "string",
+            "description": "String argument."
+          },
+          "str_2": {
+            "default": "default",
+            "title": "Str 2",
+            "type": "string",
+            "description": "String argument with a default value."
+          },
+          "bool_1": {
+            "title": "Bool 1",
+            "type": "boolean",
+            "description": "Boolean argument."
+          },
+          "bool_2": {
+            "default": false,
+            "title": "Bool 2",
+            "type": "boolean",
+            "description": "Boolean argument with a default value."
+          },
+          "float_1": {
+            "title": "Float 1",
+            "type": "number",
+            "description": "Float argument."
+          },
+          "float_2": {
+            "default": 1.23,
+            "title": "Float 2",
+            "type": "number",
+            "description": "Float argument with a default value"
+          },
+          "enum_1": {
+            "$ref": "#/$defs/MyEnum",
+            "title": "Enum 1",
+            "description": "Enum argument."
+          },
+          "enum_2": {
+            "$ref": "#/$defs/MyEnum",
+            "default": "Value 1",
+            "title": "Enum 2",
+            "description": "Enum argument with a default."
+          },
+          "literal_1": {
+            "enum": [
+              "a",
+              "b",
+              "c"
+            ],
+            "title": "Literal 1",
+            "type": "string",
+            "description": "Literal argument."
+          },
+          "literal_2": {
+            "default": "a",
+            "enum": [
+              "a",
+              "b",
+              "c"
+            ],
+            "title": "Literal 2",
+            "type": "string",
+            "description": "Literal argument with a default value."
+          }
+        },
+        "required": [
+          "zarr_urls",
+          "zarr_dir",
+          "int_1",
+          "str_1",
+          "bool_1",
+          "float_1",
+          "enum_1",
+          "literal_1"
+        ],
+        "type": "object",
+        "title": "Task1"
+      },
+      "docs_info": "## task1\nShort description of task1\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+    },
+    {
+      "name": "task2",
+      "type": "non_parallel",
+      "executable_non_parallel": "task2.py",
+      "args_schema_non_parallel": {
+        "additionalProperties": false,
+        "properties": {
+          "zarr_urls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Zarr Urls",
+            "type": "array",
+            "description": "Missing description"
+          },
+          "zarr_dir": {
+            "title": "Zarr Dir",
+            "type": "string",
+            "description": "Missing description"
+          },
+          "list_arg": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "List Arg",
+            "type": "array",
+            "description": "An arbitrary-size array of integers."
+          },
+          "tuple_arg": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Tuple Arg",
+            "type": "array",
+            "description": "A fixed-size array of integers."
+          },
+          "optional_list_arg": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Optional List Arg",
+            "type": "array",
+            "description": "An optional arbitrary-size array of integers."
+          },
+          "optional_tuple_arg": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Optional Tuple Arg",
+            "type": "array",
+            "description": "An optional fixed-size array of integers."
+          }
+        },
+        "required": [
+          "zarr_urls",
+          "zarr_dir",
+          "list_arg",
+          "tuple_arg"
+        ],
+        "type": "object",
+        "title": "Task2"
+      },
+      "docs_info": "## task2\nShort description of task2\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+    },
+    {
+      "name": "task3",
+      "type": "non_parallel",
+      "executable_non_parallel": "task3.py",
+      "args_schema_non_parallel": {
+        "additionalProperties": false,
+        "properties": {
+          "zarr_urls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Zarr Urls",
+            "type": "array",
+            "description": "Missing description"
+          },
+          "zarr_dir": {
+            "title": "Zarr Dir",
+            "type": "string",
+            "description": "Missing description"
+          },
+          "object_arg": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Object Arg",
+            "type": "object",
+            "description": "Object argument."
+          },
+          "optional_object_arg": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Optional Object Arg",
+            "type": "object",
+            "description": "Optional object argument."
+          },
+          "nested_object_arg": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Nested Object Arg",
+            "type": "object",
+            "description": "Nested object argument."
+          }
+        },
+        "required": [
+          "zarr_urls",
+          "zarr_dir",
+          "object_arg",
+          "nested_object_arg"
+        ],
+        "type": "object",
+        "title": "Task3"
+      },
+      "docs_info": "## task3\nShort description of task3\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+    },
+    {
+      "name": "task4",
+      "type": "non_parallel",
+      "executable_non_parallel": "task4.py",
+      "args_schema_non_parallel": {
+        "$defs": {
+          "InternalModel1": {
+            "description": "Description of InternalModel1.",
+            "properties": {
+              "label": {
+                "const": "label1",
+                "default": "label1",
+                "title": "Label",
+                "type": "string",
+                "description": "FIXME"
+              },
+              "field": {
+                "default": 1,
+                "title": "Field",
+                "type": "integer",
+                "description": "Missing description"
+              }
+            },
+            "title": "InternalModel1",
+            "type": "object"
+          },
+          "InternalModel2": {
+            "description": "Description of InternalModel2.",
+            "properties": {
+              "label": {
+                "const": "label2",
+                "default": "label2",
+                "title": "Label",
+                "type": "string",
+                "description": "FIXME"
+              },
+              "field": {
+                "title": "Field",
+                "type": "string",
+                "description": "Missing description"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "title": "InternalModel2",
+            "type": "object"
+          },
+          "InternalModel3": {
+            "description": "Description of InternalModel3.",
+            "properties": {
+              "label": {
+                "const": "label3",
+                "default": "label3",
+                "title": "Label",
+                "type": "string",
+                "description": "xxx"
+              },
+              "field": {
+                "title": "Field",
+                "type": "boolean",
+                "description": "yyy"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "title": "InternalModel3",
+            "type": "object"
+          },
+          "ModelAllOptional": {
+            "description": "Short description of `ModelAllOptional`.",
+            "properties": {
+              "x": {
+                "title": "X",
+                "type": "integer",
+                "description": "FIXME"
+              },
+              "y": {
+                "default": 1,
+                "title": "Y",
+                "type": "integer",
+                "description": "FIXME"
+              }
+            },
+            "title": "ModelAllOptional",
+            "type": "object"
+          },
+          "ModelSomeRequired": {
+            "description": "Short description of `ModelSomeRequired`.",
+            "properties": {
+              "x": {
+                "title": "X",
+                "type": "integer",
+                "description": "FIXME"
+              },
+              "y": {
+                "title": "Y",
+                "type": "string",
+                "description": "FIXME"
+              }
+            },
+            "required": [
+              "y"
+            ],
+            "title": "ModelSomeRequired",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "zarr_urls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Zarr Urls",
+            "type": "array",
+            "description": "Missing description"
+          },
+          "zarr_dir": {
+            "title": "Zarr Dir",
+            "type": "string",
+            "description": "Missing description"
+          },
+          "pydantic_1": {
+            "$ref": "#/$defs/ModelAllOptional",
+            "title": "Pydantic 1",
+            "description": "Example of a Pydantic model with no required field."
+          },
+          "pydantic_2": {
+            "$ref": "#/$defs/ModelAllOptional",
+            "default": {
+              "x": null,
+              "y": 1
+            },
+            "title": "Pydantic 2",
+            "description": "Example of a Pydantic model with no required field, with a default value."
+          },
+          "pydantic_3": {
+            "$ref": "#/$defs/ModelAllOptional",
+            "title": "Pydantic 3",
+            "description": "Example of a Pydantic model with no required field, with a default factory."
+          },
+          "pydantic_4": {
+            "$ref": "#/$defs/ModelSomeRequired",
+            "title": "Pydantic 4",
+            "description": "Example of a Pydantic model with some required field."
+          },
+          "tagged_union": {
+            "default": {
+              "label": "label1",
+              "field": 1
+            },
+            "discriminator": {
+              "mapping": {
+                "label1": "#/$defs/InternalModel1",
+                "label2": "#/$defs/InternalModel2",
+                "label3": "#/$defs/InternalModel3"
+              },
+              "propertyName": "label"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/InternalModel1"
+              },
+              {
+                "$ref": "#/$defs/InternalModel2"
+              },
+              {
+                "$ref": "#/$defs/InternalModel3"
+              }
+            ],
+            "title": "Tagged Union",
+            "description": "Example of a top-level tagged union, with a default value."
+          },
+          "nested_tagged_union": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "label1": "#/$defs/InternalModel1",
+                  "label2": "#/$defs/InternalModel2",
+                  "label3": "#/$defs/InternalModel3"
+                },
+                "propertyName": "label"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/InternalModel1"
+                },
+                {
+                  "$ref": "#/$defs/InternalModel2"
+                },
+                {
+                  "$ref": "#/$defs/InternalModel3"
+                }
+              ]
+            },
+            "title": "Nested Tagged Union",
+            "type": "array",
+            "description": "Example of a nested tagged union, with a default value."
+          }
+        },
+        "required": [
+          "zarr_urls",
+          "zarr_dir",
+          "pydantic_1",
+          "pydantic_4"
+        ],
+        "type": "object",
+        "title": "Task4"
+      },
+      "docs_info": "## task4\nShort description of task4\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+    }
+  ],
+  "has_args_schemas": true,
+  "args_schema_version": "pydantic_v2",
+  "authors": "Your Name"
+}

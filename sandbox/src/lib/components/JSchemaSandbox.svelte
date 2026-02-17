@@ -56,8 +56,9 @@
 		}
 
 		schema = parsedSchema;
+    schemaData = undefined;
 		await tick();
-		jschemaComponent?.update(parsedSchema, $state.snapshot(schemaData));
+		jschemaComponent?.update(parsedSchema, undefined);
 		handleDataChanged();
 	}
 
