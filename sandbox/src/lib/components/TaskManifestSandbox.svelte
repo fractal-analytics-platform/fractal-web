@@ -7,7 +7,7 @@
 		stripNullAndEmptyObjectsAndArrays
 	} from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
-	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
+	import { adaptJsonSchema, stripDiscriminator } from 'fractal-components/jschema/jschema_adapter';
 	import { tick } from 'svelte';
 	import DragAndDropUploader from './DragAndDropUploader.svelte';
 	import example from './example-task-manifest.json';
@@ -84,7 +84,7 @@
 	 */
 	function isManifestValid(data) {
 		const validator = new SchemaValidator(schemaVersion);
-		validator.loadSchema(manifestSchema);
+		validator.loadSchema(stripDiscriminator(manifestSchema));
 		return validator.isValid(data);
 	}
 
