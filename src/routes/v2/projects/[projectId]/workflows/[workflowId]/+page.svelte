@@ -660,11 +660,11 @@
 	 */
 	function onWorkflowTaskUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
+		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
 		argsChangesSaved = true;
 		setTimeout(() => {
 			argsChangesSaved = false;
 		}, 3000);
-		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
 	}
 
 	/**
