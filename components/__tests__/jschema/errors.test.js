@@ -133,4 +133,70 @@ describe('JSchema form errors', () => {
     expect(get(foo.errors)).deep.eq(["must match exactly one schema in oneOf"]);
     expect(foo.selectedItem).null;
   });
+
+  it('oneOf errors with nested tagged union', async () => {
+    const schema = {
+      $defs: {
+        "InternalModel1": {
+          "properties": {
+            "label": {
+              "const": "label1",
+              "default": "label1",
+              "type": "string",
+            },
+            "field": {
+              "default": 1,
+              "type": "integer",
+            }
+          },
+          "type": "object"
+        },
+        "InternalModel2": {
+          "properties": {
+            "label": {
+              "const": "label2",
+              "default": "label2",
+              "type": "string",
+            },
+            "field": { "type": "string", }
+          },
+          "required": ["field"],
+          "type": "object"
+        },
+      },
+      properties: {
+        foo: {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "label1": "#/$defs/InternalModel1",
+                "label2": "#/$defs/InternalModel2",
+              },
+              "propertyName": "label"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/InternalModel1"
+              },
+              {
+                "$ref": "#/$defs/InternalModel2"
+              }
+            ]
+          },
+          "title": "Nested Tagged Union",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    };
+
+    const formManager = new FormManager(schema, vi.fn(), 'pydantic_v2', [],
+      { "foo": [{ "label": "label2" }] }
+    );
+
+    expect(formManager.getFormData()).deep.eq({ "foo": [{ "label": "label2", field: null }] });
+    expect(get(formManager.genericErrors).length).eq(0);
+
+    expect(get(formManager.root.children[0].children[0].selectedItem.children[0].errors)).deep.eq(['required property']);
+  });
 });

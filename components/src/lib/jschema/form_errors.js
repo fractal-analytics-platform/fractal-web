@@ -121,9 +121,17 @@ function isPrimitiveTypeElement(element) {
 function ignoreUnselectedConditionalError(error, element) {
   if ('selectedItem' in element) {
     const { oneOf } = element.property;
+    const selectedIndex = get(element.selectedIndex);
     for (let i = 0; i < oneOf.length; i++) {
-      if (i === get(element.selectedIndex)) {
+      if (i === selectedIndex) {
         continue;
+      }
+      if (element.discriminator && selectedIndex >= 0 && error.keyword === 'const' && 'params' in error && 'allowedValue' in error.params) {
+        const { allowedValue } = error.params;
+        const selectedValue = element.discriminator.values[selectedIndex];
+        if (allowedValue !== selectedValue) {
+          return true;
+        }
       }
       if (error.schemaPath.startsWith(`#/properties${element.path}/oneOf/${i}`)) {
         return true;

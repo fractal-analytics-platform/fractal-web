@@ -41,7 +41,7 @@
 	<div class="d-flex justify-content-center p-2">
 		{#if !formElement.required}
 			{#if children.length > 0}
-				<button class="btn btn-primary" type="button" onclick={removeTuple} disabled={!editable}>
+				<button class="btn btn-danger" type="button" onclick={removeTuple} disabled={!editable}>
 					Remove tuple
 				</button>
 			{:else}
