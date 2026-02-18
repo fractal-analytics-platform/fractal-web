@@ -320,4 +320,42 @@ describe('Object properties', () => {
 		expect(component.getArguments()).deep.eq({});
 		expect(component.valid).toEqual(true);
 	});
+
+	it('Attempt to add the same object key twice', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema({
+			properties: {
+				"object_arg": {
+					"additionalProperties": {
+						"type": "boolean"
+					},
+					"type": "object"
+				},
+			},
+			type: 'object'
+		}, 'pydantic_v2');
+
+		expect(component.getArguments()).deep.eq({ object_arg: {} });
+
+		await user.type(screen.getByRole('textbox'), 'foo');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.getByRole('textbox')).toHaveValue('');
+		await user.click(screen.getByRole('switch'));
+		expect(component.getArguments()).deep.eq({ object_arg: { foo: true } });
+
+		await user.type(screen.getByRole('textbox'), 'foo');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.queryByText('Schema property already has a property with the same name')).not.toBeNull();
+
+		await user.clear(screen.getByRole('textbox'));
+		expect(screen.queryByText('Schema property already has a property with the same name')).toBeNull();
+
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.queryByText('Schema property has no name')).not.toBeNull();
+
+		await user.type(screen.getByRole('textbox'), 'bar');
+		expect(screen.queryByText('Schema property has no name')).toBeNull();
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.getByRole('textbox')).toHaveValue('');
+	});
 });
