@@ -514,7 +514,7 @@
 		<div class="alert alert-warning">
 			<i class="bi bi-exclamation-triangle"></i>
 			<strong>Warning</strong>: this operation will not cancel job execution but only modify its
-			status in the database
+			status in the database. You should then issue `scancel` commands manually, when appropriate.
 		</div>
 		<div class="d-flex justify-content-center">
 			<button class="btn btn-danger" onclick={updateJobStatus} disabled={updatingStatus}>
