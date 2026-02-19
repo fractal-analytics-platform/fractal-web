@@ -1,0 +1,25 @@
+{
+  "name": "workflow-with-flexibility",
+  "task_list": [
+    {
+      "task": {
+        "pkg_name": "fractal-tasks-mock",
+        "name": "generic_task",
+        "version": "0.0.2"
+      }
+    },
+    {
+      "task": {
+        "pkg_name": "fractal-tasks-mock",
+        "name": "create_ome_zarr_compound",
+        "version": "0.0.1"
+      }
+    },
+    {
+      "task": {
+        "pkg_name": "fractal-tasks-mock",
+        "name": "illumination_correction_compound"
+      }
+    }
+  ]
+}
