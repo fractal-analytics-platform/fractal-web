@@ -4,7 +4,7 @@
 
 * Added new cases of valid SLURM errors (\#950).
 * Add link to Job list page in no-history Workflow warning message (\#966).
-* Expand some user-facing messages (\#XXX).
+* Expand some user-facing messages (\#972).
 
 # 1.23.0
 
