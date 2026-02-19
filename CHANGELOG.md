@@ -3,6 +3,7 @@
 # 1.23.1 (unreleased)
 
 * Added new cases of valid SLURM errors (\#950).
+* Add link to Job list page in no-history Workflow warning message (\#966).
 
 # 1.23.0
 
