@@ -1,6 +1,8 @@
 <script>
     import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-    import UpdateTemplateModal from '$lib/components/v2/templates/UpdateTemplateModal.svelte';
+	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
+    import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
+
     /**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
@@ -8,8 +10,10 @@
 	/** @type {Props} */
 	let {templatePage = $bindable()} = $props();
 
-    /** @type {UpdateTemplateModal|undefined} */
+    /** @type {TemplateUpdateModal|undefined} */
 	let updateTemplateModal = undefined;
+    /** @type {TemplateInfoModal|undefined} */
+	let infoTemplateModal = undefined;
     
     /** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -69,14 +73,36 @@
                     <td>{template.version}</td>
                     <td class="col-2">
                         <button
-							class="btn btn-light"
+							class="btn btn-outline-primary"
+							onclick={() => infoTemplateModal?.openInfo(template)}
+							aria-label="Info"
+						>
+							<i class="bi bi-info-circle"></i>
+						</button>
+                        <button
+							class="btn btn-outline-primary"
 							onclick={() => updateTemplateModal?.openForEditing(template)}
 							aria-label="Edit"
-							>
-							<span class="text-primary">
+						>
 							<i class="bi bi-pencil"></i>
-							</span>
+
 						</button>
+                        <button
+                            class="btn btn-outline-primary"
+                            type="button"
+                            onclick={() => null}
+                            aria-label="Download"
+                        >
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button
+                            class="btn btn-outline-danger"
+                            type="button"
+                            onclick={() => null}
+                            aria-label="Delete"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </td>
 				</tr>
 			{/each}
@@ -84,7 +110,11 @@
 	</table>
 </div>
 
-<UpdateTemplateModal
+<TemplateUpdateModal
     onTemplateSave={async () => {await searchTemplate();}}
 	bind:this={updateTemplateModal}
+/>
+
+<TemplateInfoModal
+	bind:this={infoTemplateModal}
 />
