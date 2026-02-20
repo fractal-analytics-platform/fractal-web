@@ -108,6 +108,15 @@ export class FormManager {
 				)
 			);
 		}
+		if ('anyOf' in property) {
+			const { anyOf } = property;
+			if (Array.isArray(anyOf) && anyOf.length === 2 && anyOf[1].type === 'null') {
+				const newDef = { ...deepCopy(params.property), ...deepCopy(anyOf[0]) };
+				delete newDef['anyOf'];
+				params.property = newDef;
+				return this.createFormElement({ ...params })
+			}
+		}
 		if ('oneOf' in property) {
 			const oneOfProperty = /** @type {import("../types/jschema").JSONSchemaOneOfProperty} */ (
 				property
@@ -301,7 +310,7 @@ export class FormManager {
 				property: childProperty,
 				required: childRequired,
 				removable: isRemovableChildProperty(property, childKey),
-				value: value[childKey],
+				value: value === null ? null : value[childKey] || null,
 				parentProperty: property
 			});
 			children.push(childElement);
@@ -314,13 +323,15 @@ export class FormManager {
 			validKeys.push(discriminatorKey);
 		}
 
-		for (const [k, v] of Object.entries(value)) {
-			if (!validKeys.includes(k)) {
-				children.push(this.createUnexpectedElement({
-					key: k,
-					path: `${path}/${k}`,
-					value: v
-				}))
+		if (value !== null) {
+			for (const [k, v] of Object.entries(value)) {
+				if (!validKeys.includes(k)) {
+					children.push(this.createUnexpectedElement({
+						key: k,
+						path: `${path}/${k}`,
+						value: v
+					}))
+				}
 			}
 		}
 		const element = new ObjectFormElement({
@@ -681,8 +692,8 @@ export class FormManager {
 
 	validate() {
 		this.clearErrors(this.root);
-		const strippedNullData = stripNullAndEmptyObjectsAndArrays(this.getFormData());
-		const valid = this.validator.isValid(strippedNullData);
+		//const strippedNullData = stripNullAndEmptyObjectsAndArrays(this.getFormData());
+		const valid = this.validator.isValid(this.getFormData());
 		/** 
 		 * Errors that have not been set to any form element
 		 * @type {string[]}

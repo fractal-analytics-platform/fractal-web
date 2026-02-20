@@ -44,9 +44,11 @@ export function isTuple(property) {
 export function getAllObjectProperties(property, value) {
 	const properties = property.properties || {};
 	if (property.additionalProperties) {
-		for (const key of Object.keys(value)) {
-			if (!Object.keys(properties).includes(key)) {
-				properties[key] = property.additionalProperties;
+		if (value !== null) {
+			for (const key of Object.keys(value)) {
+				if (!Object.keys(properties).includes(key)) {
+					properties[key] = property.additionalProperties;
+				}
 			}
 		}
 	}
