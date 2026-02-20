@@ -69,7 +69,7 @@
 	>
 		{#snippet header()}
 			<h5 class="modal-title">
-				EDI Workflow Template {template.id}
+				EDIT Workflow Template {template.id}
 			</h5>
 		{/snippet}
 		{#snippet body()}
