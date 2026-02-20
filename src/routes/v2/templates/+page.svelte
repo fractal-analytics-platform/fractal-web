@@ -9,7 +9,7 @@
 <div class="container mt-3">
 	<div class="row mt-2 mb-2">
 		<div class="col">
-			There are {templatePage.total_count} available templates.
+			There are {templatePage.total_count} templates available.
 		</div>
 	</div>
 </div>
