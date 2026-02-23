@@ -50,7 +50,7 @@
 		if (pathname === '/') {
 			return 'home';
 		}
-		for (const section of ['projects', 'tasks', 'jobs', 'admin', 'auth']) {
+		for (const section of ['projects', 'tasks', 'jobs', 'templates', 'admin', 'auth']) {
 			if (pathname.startsWith(`/${section}`) || pathname.startsWith(`/v2/${section}`)) {
 				return section;
 			}
@@ -148,6 +148,9 @@
 					</li>
 					<li class="nav-item">
 						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}> Jobs </a>
+					</li>
+					<li class="nav-item">
+						<a href="/v2/templates" class="nav-link" class:active={selectedSection === 'templates'}> Templates </a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
