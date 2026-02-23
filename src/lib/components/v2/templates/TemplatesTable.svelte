@@ -52,6 +52,38 @@
 		}
 	}
 
+	/**
+	 * @param {number} templateId
+	 * @returns {Promise<void>}
+	 */
+	async function exportTemplate(templateId) {
+		const response = await fetch(`/api/v2/workflow_template/${templateId}/export`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (!response.ok) {
+			console.error(await response.json());
+			return;
+		}
+		const templateData = await response.json();
+		if (templateData !== null) {
+			const name = `template-${templateId}-${Date.now().toString()}.json`;
+			const file = new File(
+				[JSON.stringify(templateData, null, 2)],
+				name,
+				{
+					type: `application/json`
+				}
+			);
+			const fileUrl = URL.createObjectURL(file);
+			const linkElement = /** @type {HTMLAnchorElement} */ (
+				document.getElementById('downloadTemplateButton')
+			);
+			linkElement.download = name;
+			linkElement.href = fileUrl;
+			linkElement.click();
+		}
+	}
 
 </script>
 
@@ -90,11 +122,12 @@
                         <button
                             class="btn btn-outline-primary"
                             type="button"
-                            onclick={() => null}
+                            onclick={() => {exportTemplate(template.id);}}
                             aria-label="Download"
                         >
                             <i class="bi bi-download"></i>
                         </button>
+						<a id="downloadTemplateButton" class="d-none">Download template link</a>
                         <button
                             class="btn btn-outline-danger"
                             type="button"
