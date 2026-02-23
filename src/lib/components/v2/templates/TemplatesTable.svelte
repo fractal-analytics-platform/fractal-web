@@ -95,7 +95,12 @@
 
 		if (response.ok) {
 			console.log('Template deleted');
-			await searchTemplate(templatePage.current_page, templatePage.page_size)
+			if (templatePage.items.length === 1 && templatePage.current_page > 1) {
+				await searchTemplate(templatePage.current_page - 1, templatePage.page_size)
+			}
+			else {
+				await searchTemplate(templatePage.current_page, templatePage.page_size)
+			}
 		} else {
 			console.error('Workflow not deleted');
 			throw await getAlertErrorFromResponse(response);
