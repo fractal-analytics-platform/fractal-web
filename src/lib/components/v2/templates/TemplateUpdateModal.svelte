@@ -6,16 +6,13 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => Promise<void>} onTemplateSave
+	 * @property {import('fractal-components/types/api').WorkflowTemplate} [template]
 	 */
-
 	/** @type {Props} */
-	let { onTemplateSave} = $props();
+	let { onTemplateSave, template} = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
-
-	/** @type {import('fractal-components/types/api').WorkflowTemplate|undefined} */
-	let template = $state();
 
 	let saving = $state(false);
 
@@ -23,16 +20,10 @@
         'errorAlert-updateTemplateModal', ['user_group_id', 'description']
     );
 
-
-	/**
-	 * @param {import('fractal-components/types/api').WorkflowTemplate} templateObj
-	*/
-	export function openForEditing(templateObj) {
+	export function open() {
 		saving = false;
-        template = templateObj;
 		modal?.show();
 	}
-
 	    
     async function updateTemplate() {
 		saving = true;
@@ -59,57 +50,55 @@
 	}
 </script>
 
-{#if template}
-	<Modal
-		id="datasetCreateUpdateImageModal"
-		size="lg"
-		centered={true}
-		scrollable={true}
-		bind:this={modal}
-	>
-		{#snippet header()}
-			<h5 class="modal-title">
-				EDIT Workflow Template {template.id}
-			</h5>
-		{/snippet}
-		{#snippet body()}
-			<div class="row mb-3 has-validation">
-				<label
-					class="col-3 col-lg-2 col-form-label"
-					for="template-user-group-id"
-				> User Group ID </label>
-				<div class="col col-lg-10">
-					<input
-						type="number"
-						class="form-control"
-						bind:value={template.user_group_id}
-						id="template-user-group-id"
-					/>
-				</div>
+<Modal
+	id="datasetCreateUpdateImageModal"
+	size="lg"
+	centered={true}
+	scrollable={true}
+	bind:this={modal}
+>
+	{#snippet header()}
+		<h5 class="modal-title">
+			EDIT Workflow Template {template.id}
+		</h5>
+	{/snippet}
+	{#snippet body()}
+		<div class="row mb-3 has-validation">
+			<label
+				class="col-3 col-lg-2 col-form-label"
+				for="template-user-group-id"
+			> User Group ID </label>
+			<div class="col col-lg-10">
+				<input
+					type="number"
+					class="form-control"
+					bind:value={template.user_group_id}
+					id="template-user-group-id"
+				/>
 			</div>
-			<div class="row mb-3 has-validation">
-				<label
-					class="col-3 col-lg-2 col-form-label"
-					for="template-description"
-				> Description </label>
-				<div class="col col-lg-10">
-					<input
-						type="text"
-						class="form-control"
-						bind:value={template.description}
-						id="template-description"
-					/>
-				</div>
+		</div>
+		<div class="row mb-3 has-validation">
+			<label
+				class="col-3 col-lg-2 col-form-label"
+				for="template-description"
+			> Description </label>
+			<div class="col col-lg-10">
+				<input
+					type="text"
+					class="form-control"
+					bind:value={template.description}
+					id="template-description"
+				/>
 			</div>
-		{/snippet}
-		{#snippet footer()}
-			<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>
-				{#if saving}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Save
-			</button>
-			<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
-		{/snippet}
-	</Modal>
-{/if}
+		</div>
+	{/snippet}
+	{#snippet footer()}
+		<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>
+			{#if saving}
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			{/if}
+			Save
+		</button>
+		<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
+	{/snippet}
+</Modal>

@@ -1,17 +1,18 @@
 <script>
 	import Modal from '$lib/components/common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').WorkflowTemplate|undefined} */
-	let template = $state();
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('fractal-components/types/api').WorkflowTemplate} [template]
+	 */
+	/** @type {Props} */
+	let { template} = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-    /**
-	 * @param {import('fractal-components/types/api').WorkflowTemplate} templateObj
-	*/
-	export function openInfo(templateObj) {
-		template = templateObj;
+	export function open() {
 		modal?.show();
 	}
 

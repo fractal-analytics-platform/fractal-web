@@ -10,6 +10,9 @@
 	/** @type {Props} */
 	let {templatePage = $bindable()} = $props();
 
+	/** @type {import('fractal-components/types/api').WorkflowTemplate}*/
+	let templateOnModal = $state(templatePage.items[0]);
+
     /** @type {TemplateUpdateModal|undefined} */
 	let updateTemplateModal = undefined;
     /** @type {TemplateInfoModal|undefined} */
@@ -106,14 +109,20 @@
                     <td class="col-2">
                         <button
 							class="btn btn-outline-primary"
-							onclick={() => infoTemplateModal?.openInfo(template)}
+							onclick={() => {
+								templateOnModal=template;
+								infoTemplateModal?.open();
+							}}
 							aria-label="Info"
 						>
 							<i class="bi bi-info-circle"></i>
 						</button>
                         <button
 							class="btn btn-outline-primary"
-							onclick={() => updateTemplateModal?.openForEditing(template)}
+							onclick={() => {
+								templateOnModal=template;
+								updateTemplateModal?.open();
+							}}
 							aria-label="Edit"
 						>
 							<i class="bi bi-pencil"></i>
@@ -145,9 +154,11 @@
 
 <TemplateUpdateModal
     onTemplateSave={async () => {await searchTemplate();}}
+	template={templateOnModal}
 	bind:this={updateTemplateModal}
 />
 
 <TemplateInfoModal
+	template={templateOnModal}
 	bind:this={infoTemplateModal}
 />
