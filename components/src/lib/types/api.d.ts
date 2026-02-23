@@ -109,6 +109,13 @@ export type WorkflowTemplate = {
     data: WorkflowImport;
 }
 
+export type WorkflowTemplateImport = {
+	name: string;
+    version: number;
+    description: string | null;
+    data: WorkflowImport;
+}
+
 export type Pagination<T> = {
 	total_count: number;
 	page_size: number;

@@ -2,6 +2,7 @@
     import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
     import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
+	import TemplateImportModal from '$lib/components/v2/templates/TemplateImportModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 
@@ -15,10 +16,12 @@
 	/** @type {import('fractal-components/types/api').WorkflowTemplate}*/
 	let templateOnModal = $state(templatePage.items[0]);
 
+	/** @type {TemplateImportModal|undefined} */
+	let importTemplateModal = $state(undefined);
     /** @type {TemplateUpdateModal|undefined} */
-	let updateTemplateModal = undefined;
+	let updateTemplateModal = $state(undefined);
     /** @type {TemplateInfoModal|undefined} */
-	let infoTemplateModal = undefined;
+	let infoTemplateModal = $state(undefined);
     
     /** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -44,7 +47,7 @@
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'datasetImagesError'
+				'templateError'
 			);
 		}
 	}
@@ -112,7 +115,10 @@
 <div class="container mt-2">
 <div class="d-flex justify-content-end align-items-center mb-3">
 	<div>
-		<button class="btn btn-outline-success btn-sm" onclick={() => {}}>
+		<button
+			class="btn btn-outline-success btn-sm"
+			onclick={() => {importTemplateModal?.show();}}
+		>
 			<i class="bi-upload"></i>
 			Import from file
 		</button>
@@ -203,4 +209,11 @@
 <TemplateInfoModal
 	template={templateOnModal}
 	bind:this={infoTemplateModal}
+/>
+
+<TemplateImportModal
+	onTemplateImport={async () => {
+		await searchTemplate(templatePage.current_page, templatePage.page_size);
+	}}
+	bind:this={importTemplateModal}
 />
