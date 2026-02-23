@@ -6,7 +6,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => Promise<void>} onTemplateSave
-	 * @property {import('fractal-components/types/api').WorkflowTemplate} [template]
+	 * @property {import('fractal-components/types/api').WorkflowTemplate} template
 	 */
 	/** @type {Props} */
 	let { onTemplateSave, template} = $props();
@@ -30,13 +30,13 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/workflow_template/${template?.id}`,
+			`/api/v2/workflow_template/${template.id}`,
 			{
 				method: 'PATCH',
 				headers,
 				body: normalizePayload({
-					user_group_id: template?.user_group_id,
-					description: template?.description
+					user_group_id: template.user_group_id,
+					description: template.description
 				})
 			}
 		);
