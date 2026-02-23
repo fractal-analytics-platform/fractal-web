@@ -2,6 +2,7 @@
     import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
     import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
+	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -22,19 +23,11 @@
 	let errorAlert = undefined;
 
 
+	let currentPage = $derived(templatePage.current_page);
+	let pageSize = $derived(templatePage.page_size);
 
-    /**
-	 * @param {number|null} currentPage
-	 * @param {number|null} pageSize
-	 */
-	export async function searchTemplate(currentPage = null, pageSize = null) {
-		if (currentPage === null) {
-			currentPage = templatePage.current_page;
-		}
-		if (pageSize === null) {
-			pageSize = templatePage.page_size;
-		}
-		
+
+	export async function searchTemplate() {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		let response = await fetch(
@@ -88,6 +81,26 @@
 		}
 	}
 
+	/**
+	 * Deletes a template from the server
+	 * @param {number} templateId
+	 * @returns {Promise<*>}
+	*/
+	async function handleDeleteTemplate(templateId) {
+		const response = await fetch(`/api/v2/workflow_template/${templateId}`, {
+			method: 'DELETE',
+			credentials: 'include'
+		});
+
+		if (response.ok) {
+			console.log('Template deleted');
+			await searchTemplate()
+		} else {
+			console.error('Workflow not deleted');
+			throw await getAlertErrorFromResponse(response);
+		}
+	}
+
 </script>
 
 <div class="table-responsive mt-2">
@@ -137,14 +150,15 @@
                             <i class="bi bi-download"></i>
                         </button>
 						<a id="downloadTemplateButton" class="d-none">Download template link</a>
-                        <button
-                            class="btn btn-outline-danger"
-                            type="button"
-                            onclick={() => null}
-                            aria-label="Delete"
-                        >
-                            <i class="bi bi-trash"></i>
-                        </button>
+						<ConfirmActionButton
+							modalId={'downloadTemplateButton' + template.id}
+							style="danger"
+							btnStyle="outline-danger"
+							buttonIcon="trash"
+							label=""
+							message="Delete template {template.id}"
+							callbackAction={() => handleDeleteTemplate(template.id)}
+						/>
                     </td>
 				</tr>
 			{/each}
