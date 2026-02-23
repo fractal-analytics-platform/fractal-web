@@ -36,7 +36,7 @@
 				<span>{template?.name}</span>
 			</li>
             <li class="list-group-item text-bg-light">
-				<strong>Vesion</strong>
+				<strong>Version</strong>
 			</li>
 			<li class="list-group-item">
 				<span>{template?.version}</span>
@@ -54,7 +54,7 @@
 				<span>{template?.description}</span>
 			</li>
             <li class="list-group-item text-bg-light">
-				<strong>Timestamp</strong>
+				<strong>Created at</strong>
 			</li>
 			<li class="list-group-item">
 				<span>{template?.timestamp_created}</span>
