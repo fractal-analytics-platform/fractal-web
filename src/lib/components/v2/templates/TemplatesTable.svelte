@@ -109,6 +109,15 @@
 
 </script>
 
+<div class="container mt-2">
+<div class="d-flex justify-content-end align-items-center mb-3">
+	<div>
+		<button class="btn btn-outline-success btn-sm" onclick={() => {}}>
+			<i class="bi-upload"></i>
+			Import from file
+		</button>
+	</div>
+</div>
 <div class="table-responsive mt-2">
 	<table class="table" id="dataset-images-table">
 		<thead>
@@ -180,6 +189,7 @@
 			await searchTemplate(currentPage, pageSize);
 		}}
 	/>
+</div>
 </div>
 
 <TemplateUpdateModal
