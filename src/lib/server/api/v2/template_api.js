@@ -7,14 +7,12 @@ const logger = getLogger('Template API');
 /**
  * Fetches the available workflow templates from the server
  * @param {typeof fetch} fetch
-*  @param {number} page
- * @param {number} pageSize
  * @returns {Promise<Array<import('fractal-components/types/api').TemplatePage>>}
  */
-export async function getTemplates(fetch, page, pageSize) {
+export async function getTemplates(fetch) {
 	logger.debug('Fetching workflow templates');
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/workflow_template/?page=${page}&page_size=${pageSize}`,
+		env.FRACTAL_SERVER_HOST + `/api/v2/workflow_template/`,
 		{
 			method: 'GET',
 			credentials: 'include'
