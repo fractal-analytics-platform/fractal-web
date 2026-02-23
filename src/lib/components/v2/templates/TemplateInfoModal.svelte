@@ -31,6 +31,12 @@
 	{/snippet}
 	{#snippet body()}
 		<ul class="list-group">
+		<li class="list-group-item text-bg-light">
+				<strong>User email</strong>
+			</li>
+			<li class="list-group-item">
+				<span>{template.user_email}</span>
+			</li>
             <li class="list-group-item text-bg-light">
 				<strong>Name</strong>
 			</li>
@@ -44,7 +50,7 @@
 				<span>{template.version}</span>
 			</li>
             <li class="list-group-item text-bg-light">
-				<strong>Group</strong>
+				<strong>User Group</strong>
 			</li>
 			<li class="list-group-item">
 				<span>{template.user_group_id ? template.user_group_id : '-'}</span>
@@ -53,7 +59,7 @@
 				<strong>Description</strong>
 			</li>
 			<li class="list-group-item">
-				<span>{template.description}</span>
+				<span>{template.description ? template.description : '-'}</span>
 			</li>
             <li class="list-group-item text-bg-light">
 				<strong>Creation timestamp</strong>
