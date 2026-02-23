@@ -3,6 +3,7 @@
 	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
     import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import Paginator from '$lib/components/common/Paginator.svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -23,11 +24,11 @@
 	let errorAlert = undefined;
 
 
-	let currentPage = $derived(templatePage.current_page);
-	let pageSize = $derived(templatePage.page_size);
-
-
-	export async function searchTemplate() {
+	/**
+	 * @param {number} currentPage
+	 * @param {number} pageSize
+	 */
+	export async function searchTemplate(currentPage, pageSize) {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		let response = await fetch(
@@ -94,7 +95,7 @@
 
 		if (response.ok) {
 			console.log('Template deleted');
-			await searchTemplate()
+			await searchTemplate(templatePage.current_page, templatePage.page_size)
 		} else {
 			console.error('Workflow not deleted');
 			throw await getAlertErrorFromResponse(response);
@@ -165,9 +166,21 @@
 		</tbody>
 	</table>
 </div>
+<div>
+	<Paginator
+		currentPage={templatePage.current_page}
+		pageSize={templatePage.page_size}
+		totalCount={templatePage.total_count}
+		onPageChange={async (currentPage, pageSize) => {
+			await searchTemplate(currentPage, pageSize);
+		}}
+	/>
+</div>
 
 <TemplateUpdateModal
-    onTemplateSave={async () => {await searchTemplate();}}
+    onTemplateSave={async () => {
+		await searchTemplate(templatePage.current_page, templatePage.page_size);
+	}}
 	template={templateOnModal}
 	bind:this={updateTemplateModal}
 />

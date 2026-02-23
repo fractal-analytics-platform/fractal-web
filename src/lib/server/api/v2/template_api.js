@@ -12,7 +12,7 @@ const logger = getLogger('Template API');
 export async function getTemplates(fetch) {
 	logger.debug('Fetching workflow templates');
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/workflow_template/`,
+		env.FRACTAL_SERVER_HOST + `/api/v2/workflow_template/?page_size=10&page=1`,
 		{
 			method: 'GET',
 			credentials: 'include'
