@@ -1,5 +1,6 @@
 <script>
 	import Modal from '$lib/components/common/Modal.svelte';
+	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
 
 	/**
@@ -46,7 +47,7 @@
 				<strong>Group</strong>
 			</li>
 			<li class="list-group-item">
-				<span>{template?.user_group_id}</span>
+				<span>{template?.user_group_id ? template.user_group_id : '-'}</span>
 			</li>
             <li class="list-group-item text-bg-light">
 				<strong>Description</strong>
@@ -55,10 +56,10 @@
 				<span>{template?.description}</span>
 			</li>
             <li class="list-group-item text-bg-light">
-				<strong>Created at</strong>
+				<strong>Creation timestamp</strong>
 			</li>
 			<li class="list-group-item">
-				<span>{template?.timestamp_created}</span>
+				<TimestampCell timestamp={template ? template.timestamp_created : null} />
 			</li>
 		</ul>
 	{/snippet}
