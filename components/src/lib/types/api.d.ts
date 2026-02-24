@@ -109,6 +109,18 @@ export type WorkflowTemplate = {
     data: WorkflowImport;
 }
 
+export type WorkflowTemplateGroupMember = {
+	template_id: number;
+	template_version: number;
+}
+
+export type WorkflowTemplateGroup = {
+    user_email: string;
+    template_name: string;
+	templates: Array<WorkflowTemplateGroupMember>
+}
+
+
 export type WorkflowTemplateImport = {
 	name: string;
     version: number;
@@ -128,7 +140,7 @@ export type ImagePage = Pagination<Image> & {
 	types: Array<string>;
 };
 
-export type TemplatePage = Pagination<WorkflowTemplate> & {
+export type TemplatePage = Pagination<WorkflowTemplateGroup> & {
 	email_list: Array<string>;
 };
 

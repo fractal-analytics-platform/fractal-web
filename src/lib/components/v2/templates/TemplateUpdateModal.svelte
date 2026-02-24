@@ -6,23 +6,46 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => Promise<void>} onTemplateSave
-	 * @property {import('fractal-components/types/api').WorkflowTemplate} template
 	 */
 	/** @type {Props} */
-	let { onTemplateSave, template} = $props();
+	let { onTemplateSave} = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
+	
+	/**
+	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
+	 */
+	let template = $state()
 
 	let saving = $state(false);
+
 
     const formErrorHandler = new FormErrorHandler(
         'errorAlert-updateTemplateModal', ['user_group_id', 'description']
     );
 
-	export function open() {
+	/**
+	 * @param {number} template_id
+	 */
+	export async function open(template_id) {
 		saving = false;
-		modal?.show();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(
+			`/api/v2/workflow_template/${template_id}`,
+			{
+				method: 'GET',
+				headers,
+			}
+		);
+		if (response.ok) {
+            template = await response.json()
+			modal?.show();
+		} else {
+			await formErrorHandler.handleErrorResponse(response);
+		}
+
 	}
 	    
     async function updateTemplate() {
@@ -30,13 +53,13 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/workflow_template/${template.id}`,
+			`/api/v2/workflow_template/${template_id}`,
 			{
 				method: 'PATCH',
 				headers,
 				body: normalizePayload({
-					user_group_id: template.user_group_id,
-					description: template.description
+					user_group_id: template?.user_group_id,
+					description: template?.description
 				})
 			}
 		);
@@ -59,38 +82,40 @@
 >
 	{#snippet header()}
 		<h5 class="modal-title">
-			EDIT Workflow Template {template.id}
+			EDIT Workflow Template {template?.id}
 		</h5>
 	{/snippet}
 	{#snippet body()}
-		<div class="row mb-3 has-validation">
-			<label
-				class="col-3 col-lg-2 col-form-label"
-				for="template-user-group-id"
-			> User Group ID </label>
-			<div class="col col-lg-10">
-				<input
-					type="number"
-					class="form-control"
-					bind:value={template.user_group_id}
-					id="template-user-group-id"
-				/>
+		{#if template}
+			<div class="row mb-3 has-validation">
+				<label
+					class="col-3 col-lg-2 col-form-label"
+					for="template-user-group-id"
+				> User Group ID </label>
+				<div class="col col-lg-10">
+					<input
+						type="number"
+						class="form-control"
+						bind:value={template.user_group_id}
+						id="template-user-group-id"
+					/>
+				</div>
 			</div>
-		</div>
-		<div class="row mb-3 has-validation">
-			<label
-				class="col-3 col-lg-2 col-form-label"
-				for="template-description"
-			> Description </label>
-			<div class="col col-lg-10">
-				<input
-					type="text"
-					class="form-control"
-					bind:value={template.description}
-					id="template-description"
-				/>
+			<div class="row mb-3 has-validation">
+				<label
+					class="col-3 col-lg-2 col-form-label"
+					for="template-description"
+				> Description </label>
+				<div class="col col-lg-10">
+					<input
+						type="text"
+						class="form-control"
+						bind:value={template.description}
+						id="template-description"
+					/>
+				</div>
 			</div>
-		</div>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
 		<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>

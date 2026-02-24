@@ -5,6 +5,7 @@
 	import TemplateImportModal from '$lib/components/v2/templates/TemplateImportModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { onMount } from 'svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -13,8 +14,8 @@
 	/** @type {Props} */
 	let {templatePage = $bindable()} = $props();
 
-	/** @type {import('fractal-components/types/api').WorkflowTemplate}*/
-	let templateOnModal = $state(templatePage.items[0]);
+	/** @type {import('fractal-components/types/api').WorkflowTemplateGroupMember []}*/
+	let selectedTemplates = $state(templatePage.items.map(item => item.templates[0]));	 
 
 	/** @type {TemplateImportModal|undefined} */
 	let importTemplateModal = $state(undefined);
@@ -22,7 +23,7 @@
 	let updateTemplateModal = $state(undefined);
     /** @type {TemplateInfoModal|undefined} */
 	let infoTemplateModal = $state(undefined);
-    
+
 	/**
 	 * @param {number} currentPage
 	 * @param {number} pageSize
@@ -40,6 +41,7 @@
 		);
 		if (response.ok) {
 			templatePage = await response.json();
+			selectedTemplates = templatePage.items.map(item => item.templates[0]);
 		} else {
 			throw await getAlertErrorFromResponse(response);
 		}
@@ -123,22 +125,31 @@
 			<tr>
 				<th>User email</th>
                 <th>Name</th>
-                <th>Version</th>
+                <th>Versions</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
-			{#each templatePage.items as template, index (index)}
+			{#each templatePage.items as templateGroup, index (index)}
 				<tr>
-					<td>{template.user_email}</td>
-                    <td>{template.name}</td>
-                    <td>{template.version}</td>
+					<td>{templateGroup.user_email}</td>
+                    <td>{templateGroup.template_name}</td>
+                    <td>
+						<select
+							class="form-select"
+							aria-label="Version for template '{templateGroup.template_name}' of {templateGroup.user_email}"
+							bind:value={selectedTemplates[index]}
+						>
+							{#each templateGroup.templates as template, i (i)}
+								<option value={template}>{template.template_version}</option>
+							{/each}
+						</select>
+					</td>
                     <td class="col-2">
                         <button
 							class="btn btn-outline-primary"
-							onclick={() => {
-								templateOnModal=template;
-								infoTemplateModal?.open();
+							onclick={async () => {
+								await infoTemplateModal?.open(selectedTemplates[index].template_id);
 							}}
 							aria-label="Info"
 						>
@@ -146,9 +157,8 @@
 						</button>
                         <button
 							class="btn btn-outline-primary"
-							onclick={() => {
-								templateOnModal=template;
-								updateTemplateModal?.open();
+							onclick={async () => {
+								await updateTemplateModal?.open(selectedTemplates[index].template_id);
 							}}
 							aria-label="Edit"
 						>
@@ -158,20 +168,20 @@
                         <button
                             class="btn btn-outline-primary"
                             type="button"
-                            onclick={() => {exportTemplate(template.id);}}
+                            onclick={() => {exportTemplate(selectedTemplates[index].template_id);}}
                             aria-label="Download"
                         >
                             <i class="bi bi-download"></i>
                         </button>
 						<a id="downloadTemplateButton" class="d-none">Download template link</a>
 						<ConfirmActionButton
-							modalId={'downloadTemplateButton' + template.id}
+							modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
 							style="danger"
 							btnStyle="outline-danger"
 							buttonIcon="trash"
 							label=""
-							message="Delete template {template.id}"
-							callbackAction={() => handleDeleteTemplate(template.id)}
+							message="Delete template {selectedTemplates[index].template_id}"
+							callbackAction={() => handleDeleteTemplate(selectedTemplates[index].template_id)}
 						/>
                     </td>
 				</tr>
@@ -195,12 +205,10 @@
     onTemplateSave={async () => {
 		await searchTemplate(templatePage.current_page, templatePage.page_size);
 	}}
-	template={templateOnModal}
 	bind:this={updateTemplateModal}
 />
 
 <TemplateInfoModal
-	template={templateOnModal}
 	bind:this={infoTemplateModal}
 />
 
