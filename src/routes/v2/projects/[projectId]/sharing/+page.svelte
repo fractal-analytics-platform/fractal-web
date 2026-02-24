@@ -98,7 +98,7 @@
 	/**
 	 * @param {string} email
 	 */
-	async function handleDeleteGuest(email) {
+	async function handleRevokeGuestAccess(email) {
 		const response = await fetch(
 			`/api/v2/project/${project.id}/guest/?email=${encodeURIComponent(email)}`,
 			{
@@ -174,13 +174,13 @@
 										Edit
 									</button>
 									<ConfirmActionButton
-										modalId="confirmDeleteGuestModal{guest.email.replaceAll(/[^\w]/g, '')}"
+										modalId="confirmRevokeGuestAccessModal{guest.email.replaceAll(/[^\w]/g, '')}"
 										style="danger"
 										btnStyle="danger"
 										buttonIcon="trash"
-										label="Delete"
-										message={`Delete guest ${guest.email}`}
-										callbackAction={() => handleDeleteGuest(guest.email)}
+										label="Revoke access"
+										message={`Revoke access for guest ${guest.email}`}
+										callbackAction={() => handleRevokeGuestAccess(guest.email)}
 									/>
 								</td>
 							</tr>
