@@ -1,5 +1,5 @@
 <script>
-    import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+    import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
     import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
 	import TemplateImportModal from '$lib/components/v2/templates/TemplateImportModal.svelte';
@@ -23,10 +23,6 @@
     /** @type {TemplateInfoModal|undefined} */
 	let infoTemplateModal = $state(undefined);
     
-    /** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
-
-
 	/**
 	 * @param {number} currentPage
 	 * @param {number} pageSize
@@ -45,10 +41,7 @@
 		if (response.ok) {
 			templatePage = await response.json();
 		} else {
-			errorAlert = displayStandardErrorAlert(
-				await getAlertErrorFromResponse(response),
-				'templateError'
-			);
+			throw await getAlertErrorFromResponse(response);
 		}
 	}
 
@@ -105,7 +98,7 @@
 				await searchTemplate(templatePage.current_page, templatePage.page_size)
 			}
 		} else {
-			console.error('Workflow not deleted');
+			console.error('Template not deleted');
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
