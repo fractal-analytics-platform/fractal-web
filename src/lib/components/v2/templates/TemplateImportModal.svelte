@@ -13,21 +13,18 @@
 
 	// Component properties
 	let creating = $state(false);
-	/** @type {boolean|undefined} */
-	let importSuccess = $state();
-	let templateName = $state('');
+	/** @type {string|undefined} */
+	let templateName = $state(undefined);
+	/** @type {number|undefined} */
+	let templateVersion = $state(undefined);
 
 	/** @type {FileList|undefined} */
-	let files = $state();
+	let files = $state(undefined);
 	/** @type {HTMLInputElement|undefined} */
 	let fileInput = $state(undefined);
 
 	/** @type {Modal|undefined} */
-	let modal = $state();
-
-	/** @type {import('fractal-components/types/api').WorkflowTemplateImport|undefined} */
-	let template = $state(undefined);
-
+	let modal = $state(undefined);
 
 	export function show() {
 		modal?.show();
@@ -36,14 +33,14 @@
 	/**
 	 * Reset the form fields.
 	 */
-	export async function close() {
+	export function close() {
 		files = undefined;
+		templateName = undefined;
+		templateVersion = undefined;
+		creating = false;
 		if (fileInput) {
 			fileInput.value = '';
 		}
-		templateName = '';
-		creating = false;
-        await onTemplateImport();
 		modal?.hideErrorAlert();
 	}
 
@@ -62,15 +59,23 @@
 	async function handleImportTemplate() {
 
 		const templateFile = /** @type {FileList} */ (files)[0];
+		/** @type {import('fractal-components/types/api').WorkflowTemplateImport} */
+		let template;
+		
 		try {
-				template = JSON.parse(await templateFile.text());
+			template = JSON.parse(await templateFile.text());
 		} catch (err) {
 			console.error(err);
 			throw new AlertError('The workflow file is not a valid JSON file');
 		}
+
 		if (templateName) {
-			console.log(`Overriding template name from ${template.name} to ${templateName}`);
+			console.log(`Overriding template name from '${template.name}' to '${templateName}'`);
 			template.name = templateName;
+		}
+		if (templateVersion) {
+			console.log(`Overriding template version from '${template.version}' to '${templateVersion}'`);
+			template.version = templateVersion;
 		}
 
 		const headers = new Headers();
@@ -88,6 +93,9 @@
 			const alertError = await getAlertErrorFromResponse(response);
 			throw alertError;
 		}
+		else {
+			await onTemplateImport();
+		}
     }
 
 
@@ -103,7 +111,7 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-		<h5 class="modal-title">Import workflow template</h5>
+		<h5 class="modal-title">Import workflow template from file</h5>
 	{/snippet}
 	{#snippet body()}
 		<form
@@ -111,9 +119,20 @@
 				e.preventDefault();
 				importTemplate();
 			}}
-		>
+		>		
+			<div class="mb-3">
+				<input
+					class="form-control"
+					accept="application/json"
+					type="file"
+					name="templateFil"
+					id="templateFile"
+					bind:this={fileInput}
+					bind:files
+				/>
+			</div>
 			<div class="mb-2">
-				<label for="templateName" class="form-label">Template name</label>
+				<label for="templateName" class="form-label">Override template name</label>
 				<input
 					id="templateName"
 					name="templateName"
@@ -122,22 +141,19 @@
 					class="form-control"
 				/>
 			</div>
-
-			<div class="mb-3">
-				<label for="templateFile" class="form-label">Import template from file</label>
+			<div class="mb-2">
+				<label for="templateVersion" class="form-label">Override template version</label>
 				<input
+					id="templateVersion"
+					name="templateVersion"
+					type="number"
+					bind:value={templateVersion}
 					class="form-control"
-					accept="application/json"
-					type="file"
-					name="templateFile"
-					id="templateFile"
-					bind:this={fileInput}
-					bind:files
 				/>
 			</div>
 			<button
 				class="btn btn-primary mt-2"
-				disabled={!fileInput || creating}
+				disabled={!files || creating}
 			>
 				{#if creating}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -146,9 +162,5 @@
 			</button>
 			<div class="mt-2" id="errorAlert-importTemplateModal"></div>
 		</form>
-
-		{#if importSuccess}
-			<p class="alert alert-primary mt-3">Template imported successfully</p>
-		{/if}
 	{/snippet}
 </Modal>
