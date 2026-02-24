@@ -39,6 +39,7 @@
 
 </script>
 
+{#if template}
 <Modal
     id="templateInfoModal"
     centered={true}
@@ -46,7 +47,6 @@
     bind:this={modal}
     size="lg"
 >
-	{#if template}
 		{#snippet header()}
 			<h5 class="modal-title">Workflow Template {template.id}</h5>
 		{/snippet}
@@ -90,5 +90,5 @@
 				</li>
 			</ul>
 		{/snippet}
-	{/if}
-</Modal>
+	</Modal>
+{/if}
