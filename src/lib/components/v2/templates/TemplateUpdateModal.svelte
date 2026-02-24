@@ -53,7 +53,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/workflow_template/${template_id}`,
+			`/api/v2/workflow_template/${template.id}`,
 			{
 				method: 'PATCH',
 				headers,
@@ -73,6 +73,7 @@
 	}
 </script>
 
+{#if template}
 <Modal
 	id="datasetCreateUpdateImageModal"
 	size="lg"
@@ -86,7 +87,6 @@
 		</h5>
 	{/snippet}
 	{#snippet body()}
-		{#if template}
 			<div class="row mb-3 has-validation">
 				<label
 					class="col-3 col-lg-2 col-form-label"
@@ -115,15 +115,15 @@
 					/>
 				</div>
 			</div>
-		{/if}
-	{/snippet}
-	{#snippet footer()}
-		<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>
-			{#if saving}
+			{/snippet}
+			{#snippet footer()}
+			<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>
+				{#if saving}
 				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-			{/if}
-			Save
-		</button>
-		<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
-	{/snippet}
+				{/if}
+				Save
+			</button>
+			<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
+			{/snippet}
 </Modal>
+{/if}
