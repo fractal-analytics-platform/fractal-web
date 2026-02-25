@@ -23,10 +23,6 @@
 
 
 <div class="card mb-3">
-	<div class="card-header bg-light fw-semibold">
-		Filter options
-	</div>
-
 	<div class="card-body">
 		<div class="row g-3 align-items-end">
 
@@ -82,7 +78,7 @@
 						class="form-check-label small"
 						for="isOwnerCheckbox"
 					>
-						Is owner
+						Only owned
 					</label>
 				</div>
 			</div>
@@ -92,7 +88,7 @@
 					class="btn btn-warning btn-sm px-4"
 					onclick={onSubmit}
 				>
-					Apply
+					Apply filters
 				</button>
 			</div>
 

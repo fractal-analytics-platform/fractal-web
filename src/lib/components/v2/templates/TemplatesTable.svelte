@@ -167,9 +167,6 @@
 </div>
 
 <div class="card mb-3">
-<div class="card-header bg-light fw-semibold">
-	Templates
-</div>
 <div class="card-body">
 <div class="table-responsive mt-2">
 	<table class="table" id="dataset-images-table">
