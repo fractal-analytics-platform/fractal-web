@@ -142,15 +142,15 @@
 						</a>
 					</li>
 					<li class="nav-item">
+						<a href="/v2/templates" class="nav-link" class:active={selectedSection === 'templates'}> Templates </a>
+					</li>
+					<li class="nav-item">
 						<a href="/v2/tasks" class="nav-link" class:active={selectedSection === 'tasks'}>
 							Tasks
 						</a>
 					</li>
 					<li class="nav-item">
 						<a href="/v2/jobs" class="nav-link" class:active={selectedSection === 'jobs'}> Jobs </a>
-					</li>
-					<li class="nav-item">
-						<a href="/v2/templates" class="nav-link" class:active={selectedSection === 'templates'}> Templates </a>
 					</li>
 					{#if isAdmin}
 						<li class="nav-item">
