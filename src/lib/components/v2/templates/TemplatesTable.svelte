@@ -40,21 +40,7 @@
 	/** @type {number|undefined} */
 	let templateVersion = $state(undefined);
 
-	/**
-	 * @param {number|undefined} templateId
-	 * @param {boolean} isOwner
-	 * @param {string|undefined} userEmail
-	 * @param {string|undefined} templateName
-	 * @param {number|undefined} templateVersion
-	 * @returns {Promise<void>}
-	 */
-	export async function searchTemplate(
-		templateId=undefined,
-		isOwner=false,
-		userEmail=undefined,
-		templateName=undefined,
-		templateVersion=undefined,
-	) {
+	export async function searchTemplate() {
 		// Headers
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -221,13 +207,7 @@
 					class="btn btn-warning btn-sm px-4"
 					onclick={async () => {
 						currentPage=1;
-						await searchTemplate(
-							templateId=templateId,
-							isOwner=isOwner,
-							userEmail=userEmail,
-							templateName=templateName,
-							templateVersion=templateVersion,
-						);
+						await searchTemplate();
 					}}
 				>
 					Apply filters
