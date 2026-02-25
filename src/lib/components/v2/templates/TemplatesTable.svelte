@@ -6,6 +6,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -40,6 +41,10 @@
 	/** @type {number|undefined} */
 	let templateVersion = $state(undefined);
 
+	onMount(() => {
+		isOwner = false;
+	});
+	
 	export async function searchTemplate() {
 		// Headers
 		const headers = new Headers();
