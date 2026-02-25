@@ -7,13 +7,23 @@
 	 * @property {object} args
 	 * @property {boolean} [unsavedChanges]
 	 * @property {boolean} [editable]
+	 * @property {(data: any) => void} [onChange]
+	 * @property {boolean} [allowAddingProperty]
+	 * @property {string} [idPrefix]
 	 */
 
 	/** @type {Props} */
-	let { args, unsavedChanges = $bindable(false), editable = true } = $props();
+	let {
+		args,
+		unsavedChanges = $bindable(false),
+		editable = true,
+		onChange = () => {},
+		allowAddingProperty = true,
+		idPrefix = ''
+	} = $props();
 
 	/**
-	 * @type {Array<import('./form-builder-types').FormBuilderEntry>}
+	 * @type {Array<import('../types/form').FormBuilderEntry>}
 	 */
 	let editableArgs = $state([]);
 	let savedEditableArgs = $state('');
@@ -30,8 +40,12 @@
 	 * @param {object} newArgs
 	 */
 	function init(newArgs) {
-		for (const [k, v] of Object.entries(newArgs || {})) {
-			editableArgs.push(buildEditableEntry(v, k));
+		if (Array.isArray(newArgs)) {
+			editableArgs.push(buildEditableEntry(newArgs, null));
+		} else {
+			for (const [k, v] of Object.entries(newArgs || {})) {
+				editableArgs.push(buildEditableEntry(v, k));
+			}
 		}
 		triggerChanges();
 		savedEditableArgs = JSON.stringify(editableArgs);
@@ -44,12 +58,12 @@
 	/**
 	 * @param {any} value
 	 * @param {string|null} key
-	 * @return {import('./form-builder-types').FormBuilderEntry}
+	 * @return {import('../types/form').FormBuilderEntry}
 	 */
 	function buildEditableEntry(value, key) {
 		counter++;
 		let entry = {
-			id: `item-${counter}`,
+			id: `item-${idPrefix}-${counter}`,
 			error: ''
 		};
 		if (Array.isArray(value)) {
@@ -73,11 +87,11 @@
 		if (key !== null) {
 			entry.key = key;
 		}
-		return /** @type {import('./form-builder-types').FormBuilderEntry} */ (entry);
+		return /** @type {import('../types/form').FormBuilderEntry} */ (entry);
 	}
 
 	/**
-	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @param {Array<import('../types/form').FormBuilderEntry>} parent
 	 * @param {boolean} hasKey
 	 */
 	function addProperty(parent, hasKey) {
@@ -86,7 +100,7 @@
 	}
 
 	/**
-	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @param {Array<import('../types/form').FormBuilderEntry>} parent
 	 * @param {number} index
 	 */
 	function removeProperty(parent, index) {
@@ -95,7 +109,7 @@
 	}
 
 	/**
-	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} parent
+	 * @param {Array<import('../types/form').FormBuilderEntry>} parent
 	 * @param {number} index
 	 * @param {string} type
 	 */
@@ -104,7 +118,7 @@
 			getDefaultValue(type),
 			'key' in parent[index] ? parent[index].key || '' : null
 		);
-		parent[index].type = /** @type {import('./form-builder-types').FormBuilderEntryType} */ (type);
+		parent[index].type = /** @type {import('../types/form').FormBuilderEntryType} */ (type);
 		triggerChanges();
 	}
 
@@ -136,7 +150,7 @@
 	}
 
 	/**
-	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} values
+	 * @param {Array<import('../types/form').FormBuilderEntry>} values
 	 */
 	function cleanErrors(values) {
 		for (const value of values) {
@@ -148,7 +162,7 @@
 	}
 
 	/**
-	 * @param {Array<import('./form-builder-types').FormBuilderEntry>} values
+	 * @param {Array<import('../types/form').FormBuilderEntry>} values
 	 * @param {Array<string>} errors
 	 */
 	function validate(values, errors) {
@@ -184,14 +198,19 @@
 	 */
 	export function getArguments() {
 		const args = {};
-		for (const item of editableArgs) {
-			args[item.key] = toArgs(item);
+		if (editableArgs.length === 1 && editableArgs[0].type === 'array' && !editableArgs[0].key) {
+			// root is array
+			return toArgs(editableArgs[0]);
+		} else {
+			for (const item of editableArgs) {
+				args[item.key] = toArgs(item);
+			}
 		}
 		return args;
 	}
 
 	/**
-	 * @param {import('./form-builder-types').FormBuilderEntry} item
+	 * @param {import('../types/form').FormBuilderEntry} item
 	 */
 	function toArgs(item) {
 		if (item.type === 'object') {
@@ -222,6 +241,7 @@
 	}
 
 	function triggerChanges() {
+		onChange(getArguments());
 		editableArgs = editableArgs;
 	}
 </script>
@@ -241,13 +261,15 @@
 		/>
 	{/each}
 
-	<div class="d-flex justify-content-center align-items-center mt-3">
-		<button
-			class="btn btn-secondary"
-			onclick={() => addProperty(editableArgs, true)}
-			disabled={!editable}
-		>
-			Add property
-		</button>
-	</div>
+	{#if allowAddingProperty}
+		<div class="d-flex justify-content-center align-items-center mt-3">
+			<button
+				class="btn btn-secondary"
+				onclick={() => addProperty(editableArgs, true)}
+				disabled={!editable}
+			>
+				Add property
+			</button>
+		</div>
+	{/if}
 </div>

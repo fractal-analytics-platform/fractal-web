@@ -8,6 +8,7 @@
 	import EnumProperty from './EnumProperty.svelte';
 	import TupleProperty from './TupleProperty.svelte';
 	import ConditionalProperty from './ConditionalProperty.svelte';
+	import UnexpectedProperty from './UnexpectedProperty.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -30,7 +31,7 @@
 	<EnumProperty {formElement} {editable} />
 {:else if formElement.type === 'object'}
 	<CollapsibleProperty {formElement} {reset}>
-		<ObjectProperty {formElement} {editable} />
+		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
 	<ArrayProperty {formElement} {editable} {reset} />
@@ -38,6 +39,8 @@
 	<TupleProperty {formElement} {editable} {reset} />
 {:else if formElement.type === 'conditional'}
 	<ConditionalProperty {formElement} {editable} {reset} />
+{:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}
+	<UnexpectedProperty {formElement} {editable} />
 {:else}
 	<p>Unsupported property type {formElement.type}</p>
 {/if}

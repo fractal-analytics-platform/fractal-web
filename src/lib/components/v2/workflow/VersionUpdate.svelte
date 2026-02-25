@@ -5,14 +5,7 @@
 		getAlertErrorFromResponse
 	} from '$lib/common/errors';
 	import { page } from '$app/state';
-	import VersionUpdateFixArgs from './VersionUpdateFixArgs.svelte';
-	import { tick } from 'svelte';
-	import {
-		isCompoundType,
-		isNonParallelType,
-		isParallelType,
-		normalizePayload
-	} from 'fractal-components';
+	import { normalizePayload, SchemaValidator, stripDiscriminator } from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -25,22 +18,10 @@
 	/** @type {Props} */
 	let { workflowTask, updateCandidates, updateWorkflowCallback, newVersionsCount } = $props();
 
-	/** @type {VersionUpdateFixArgs|undefined} */
-	let fixArgsComponentNonParallel = $state();
-	/** @type {VersionUpdateFixArgs|undefined} */
-	let fixArgsComponentParallel = $state();
-
-	let nonParallelCanBeUpdated = $state(false);
-	let parallelCanBeUpdated = $state(false);
-
-	let nonParallelArgsChanged = $state(false);
-	let parallelArgsChanged = $state(false);
-
-	let displayCheckAndCancelBtn = $state(true);
-
 	let selectedUpdateVersion = $state('');
 	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
 	let updateCandidate = $state();
+	let dataValid = $state(true);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -50,14 +31,14 @@
 			errorAlert.hide();
 		}
 		selectedUpdateVersion = '';
-		fixArgsComponentNonParallel?.reset();
-		fixArgsComponentParallel?.reset();
 	}
 
 	/**
 	 * @param {string} selectedVersion
 	 */
 	async function loadSelectedTask(selectedVersion) {
+		errorAlert?.hide();
+
 		const taskId = updateCandidates.find((u) => u.version === selectedVersion)?.task_id;
 
 		if (taskId === undefined) {
@@ -67,7 +48,23 @@
 		const response = await fetch(`/api/v2/task/${taskId}`);
 		if (response.ok) {
 			updateCandidate = await response.json();
-			await checkArgumentsWithNewSchema();
+			if (updateCandidate) {
+				const nonParallelValid =
+					!updateCandidate.args_schema_non_parallel ||
+					isDataValid(
+						updateCandidate.args_schema_non_parallel,
+						updateCandidate.args_schema_version,
+						workflowTask.args_non_parallel
+					);
+				const parallelValid =
+					!updateCandidate.args_schema_parallel ||
+					isDataValid(
+						updateCandidate.args_schema_parallel,
+						updateCandidate.args_schema_version,
+						workflowTask.args_parallel
+					);
+				dataValid = nonParallelValid && parallelValid;
+			}
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
@@ -76,52 +73,27 @@
 		}
 	}
 
-	async function checkArgumentsWithNewSchema() {
-		if (errorAlert) {
-			errorAlert.hide();
+	/**
+	 * @param {any} schema
+	 * @param {'pydantic_v1'|'pydantic_v2'} version
+	 * @param {any} data
+	 */
+	function isDataValid(schema, version, data) {
+		if (schema) {
+			const validator = new SchemaValidator(version, true);
+			const isSchemaValid = validator.loadSchema(stripDiscriminator(schema));
+			if (!isSchemaValid) {
+				errorAlert = displayStandardErrorAlert('Invalid JSON Schema', 'versionUpdateError');
+			}
+			return validator.isValid(data);
 		}
-		fixArgsComponentNonParallel?.reset();
-		fixArgsComponentParallel?.reset();
-		if (!selectedUpdateVersion) {
-			return;
-		}
-		// await components rendering
-		await tick();
-		const displayTextareaNonParallel =
-			fixArgsComponentNonParallel?.checkArgumentsWithNewSchema() || false;
-		const displayTextareaParallel =
-			fixArgsComponentParallel?.checkArgumentsWithNewSchema() || false;
-		displayCheckAndCancelBtn = displayTextareaNonParallel || displayTextareaParallel;
-	}
-
-	function check() {
-		fixArgsComponentNonParallel?.check();
-		fixArgsComponentParallel?.check();
-	}
-
-	function cancel() {
-		fixArgsComponentNonParallel?.cancel();
-		fixArgsComponentParallel?.cancel();
+		return true;
 	}
 
 	async function update() {
 		if (errorAlert) {
 			errorAlert.hide();
 		}
-		try {
-			fixArgsComponentNonParallel?.check();
-			fixArgsComponentParallel?.check();
-		} catch (err) {
-			errorAlert = displayStandardErrorAlert(err, 'versionUpdateError');
-			return;
-		}
-		if (
-			fixArgsComponentNonParallel?.hasValidationErrors() ||
-			fixArgsComponentParallel?.hasValidationErrors()
-		) {
-			return;
-		}
-
 		try {
 			const updatedWorkflowTask = await replaceWorkflowTask();
 			updateWorkflowCallback(updatedWorkflowTask);
@@ -151,9 +123,8 @@
 				credentials: 'include',
 				headers,
 				body: normalizePayload({
-					args_non_parallel:
-						fixArgsComponentNonParallel?.getNewArgs() || workflowTask.args_non_parallel,
-					args_parallel: fixArgsComponentParallel?.getNewArgs() || workflowTask.args_parallel
+					args_non_parallel: workflowTask.args_non_parallel,
+					args_parallel: workflowTask.args_parallel
 				})
 			}
 		);
@@ -175,20 +146,8 @@
 		}
 	});
 
-	const cancelEnabled = $derived(nonParallelArgsChanged || parallelArgsChanged);
 	const taskHasArgsSchema = $derived(
 		!!(workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel)
-	);
-	const updateCandidateType = $derived(
-		updateCandidate && 'type' in updateCandidate ? updateCandidate.type : 'parallel'
-	);
-	const canBeUpdated = $derived(
-		selectedUpdateVersion &&
-			updateCandidate &&
-			(((isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
-				nonParallelCanBeUpdated) ||
-				((isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)) &&
-					parallelCanBeUpdated))
 	);
 
 	$effect(() => {
@@ -214,50 +173,21 @@
 				{/each}
 			</select>
 			{#if selectedUpdateVersion && updateCandidate}
-				<div class="alert alert-warning mt-3">
+				<div class="alert alert-info mt-3">
 					You are updating version from {task.version} to {selectedUpdateVersion}<br />
 					{#if updateCandidate.docs_link}
 						Information on different version may be found on
 						<a href={updateCandidate.docs_link} target="_blank"> task documentation </a>
 					{/if}
 				</div>
-				{#if isNonParallelType(updateCandidateType) || isCompoundType(updateCandidateType)}
-					<VersionUpdateFixArgs
-						{workflowTask}
-						{updateCandidate}
-						parallel={false}
-						bind:canBeUpdated={nonParallelCanBeUpdated}
-						bind:argsChanged={nonParallelArgsChanged}
-						bind:this={fixArgsComponentNonParallel}
-					/>
-				{/if}
-				{#if isParallelType(updateCandidateType) || isCompoundType(updateCandidateType)}
-					<VersionUpdateFixArgs
-						{workflowTask}
-						{updateCandidate}
-						parallel={true}
-						bind:canBeUpdated={parallelCanBeUpdated}
-						bind:argsChanged={parallelArgsChanged}
-						bind:this={fixArgsComponentParallel}
-					/>
-				{/if}
-				{#if displayCheckAndCancelBtn}
-					<button type="button" class="btn btn-warning mt-3" onclick={check}> Check </button>
-					&nbsp;
-					<button
-						type="button"
-						class="btn btn-secondary mt-3"
-						onclick={cancel}
-						disabled={!cancelEnabled}
-					>
-						Cancel
-					</button>
-					&nbsp;
+				{#if !dataValid}
+					<div class="alert alert-warning mt-3">
+						The old arguments are not compatible with the new schema. You can apply the version
+						upgrade, and you will then have to review/modify some arguments afterwards.
+					</div>
 				{/if}
 			{/if}
-			<button type="button" class="btn btn-primary mt-3" onclick={update} disabled={!canBeUpdated}>
-				Update
-			</button>
+			<button type="button" class="btn btn-primary mt-2" onclick={update}> Update </button>
 		{:else}
 			<p>No new versions available</p>
 		{/if}

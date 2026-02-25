@@ -1,11 +1,7 @@
 <script>
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('./form-builder-types').FormBuilderEntry} entry
+	 * @property {import('../types/form').FormBuilderEntry} entry
 	 * @property {() => void} changeType
 	 * @property {() => void} removeProperty
 	 * @property {() => void} triggerChanges

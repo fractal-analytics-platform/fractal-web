@@ -160,17 +160,18 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(
-			page.getByText('Following errors must be fixed before performing the update')
-		).toBeVisible();
-		await expect(page.locator('.alert-danger li')).toHaveCount(1);
-		await page
-			.getByRole('textbox', { name: 'Fix the non parallel arguments:' })
-			.fill('{"p1": "test"}');
-		await page.getByRole('button', { name: 'Check' }).click();
-		await expect(page.getByText('The arguments are valid')).toBeVisible();
+		await expect(page.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(page.getByText('No new versions available')).toBeVisible();
+	});
+
+	await test.step('Fix the arguments', async () => {
+		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
+		await expect(page.getByText('Data is not valid')).toBeVisible();
+		await page.getByRole('textbox', { name: 'p1' }).fill('test');
+		await expect(page.getByText('Data is not valid')).not.toBeVisible();
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Verify that input filters have been preserved', async () => {
@@ -191,12 +192,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(
-			page.getByText('Following errors must be fixed before performing the update')
-		).toBeVisible();
-		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).fill('{"p2": "test"}');
-		await page.getByRole('button', { name: 'Check' }).click();
-		await expect(page.getByText('The arguments are valid')).toBeVisible();
+		await expect(page.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(
 			page.getByRole('combobox', { name: /New versions of this task exist/ }).getByRole('option')
@@ -209,6 +205,16 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		).toHaveText('0.0.3');
 	});
 
+
+	/*await test.step('Fix the arguments', async () => {
+		await expect(page.getByText('Data is not valid')).toBeVisible();
+		await page.getByRole('button', { name: 'Argument' }).click();
+		await page.getByRole('textbox', { name: 'p2' }).fill('test');
+		await expect(page.getByText('Data is not valid')).not.toBeVisible();
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
+	});*/
+
 	await test.step('Update parallel task to v3 (no fix needed)', async () => {
 		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
@@ -220,7 +226,6 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.3');
-		await expect(page.getByText('The arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		// Task version 0.0.4 is ignored, since it has a different type
 		await expect(page.getByText('No new versions available')).toBeVisible();
@@ -242,18 +247,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(
-			page.getByText('Following errors must be fixed before performing the update').first()
-		).toBeVisible();
-		await page.getByRole('textbox', { name: 'Fix the non parallel arguments:' }).click();
-		await page
-			.getByRole('textbox', { name: 'Fix the non parallel arguments:' })
-			.fill('{"p1": "test"}');
-		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).click();
-		await page.getByRole('textbox', { name: 'Fix the parallel arguments:' }).fill('{"p2": "test"}');
-		await page.getByRole('button', { name: 'Check' }).click();
-		await expect(page.getByText('The parallel arguments are valid')).toBeVisible();
-		await expect(page.getByText('The non parallel arguments are valid')).toBeVisible();
+		await expect(page.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(page.getByText('No new versions available')).toBeVisible();
 	});

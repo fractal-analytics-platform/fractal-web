@@ -1,7 +1,9 @@
 import { FormManager } from '../jschema/form_manager.js';
 import {
+	ValueFormElement,
 	StringFormElement,
 	BooleanFormElement,
+	NumberFormElement,
 	EnumFormElement,
 	ObjectFormElement,
 	ArrayFormElement,
@@ -14,7 +16,7 @@ export type FormElement = (
 	| StringFormElement
 	| BooleanFormElement
 	| EnumFormElement
-	| NumberFormElementFields
+	| NumberFormElement
 	| ObjectFormElement
 	| ArrayFormElement
 	| TupleFormElement
@@ -23,12 +25,13 @@ export type FormElement = (
 	collapsed?: boolean;
 };
 
-export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement;
+export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement | ValueFormElement;
 
 export type BaseFormElementFields = {
 	manager: FormManager;
 	id: string;
 	key: string | null;
+	path: string;
 	type: string | null;
 	title: string;
 	description: string;
@@ -75,5 +78,27 @@ export type TupleFormElementFields = BaseFormElementFields & {
 
 export type ConditionalElementFields = BaseFormElementFields & {
 	selectedIndex: number;
-	selectedItem: FormElement;
+	selectedItem: FormElement | null;
+	discriminator?: {
+		key: string;
+		values: string[];
+		title: string;
+		description: string;
+		value: string;
+	},
+	unexpectedChildren: FormElement[];
 };
+
+export type FormBuilderEntryType = 'object' | 'array' | 'string' | 'number' | 'boolean';
+
+export type FormBuilderEntry = ({
+	type: 'object' | 'array'
+	children: Array<FormBuilderEntry>
+} | {
+	value: string | number | boolean
+	type: 'string' | 'number' | 'boolean'
+}) & {
+	id: string
+	error: string
+	key?: string
+}

@@ -21,6 +21,10 @@ export function getJsonSchemaData(jsonSchema, schemaVersion, initialValue = unde
 function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaults) {
 	const requiredChildren = property.required || [];
 	const data = {};
+	if (initialValue && (typeof initialValue !== 'object' || Array.isArray(initialValue))) {
+		// invalid data (to be fixed by user)
+		return initialValue;
+	}
 	if (initialValue === null || initialValue === undefined) {
 		initialValue = {};
 	}
@@ -35,6 +39,14 @@ function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaul
 			loadDefaults
 		);
 	}
+	// Added extra properties
+	if (initialValue && typeof initialValue === 'object') {
+		for (const [k, v] of Object.entries(initialValue)) {
+			if (!Object.keys(data).includes(k)) {
+				data[k] = v;
+			}
+		}
+	}
 	return data;
 }
 
@@ -43,6 +55,10 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 		const { discriminator } = property;
 		if (initialValue) {
 			const key = initialValue[discriminator.propertyName];
+			if (!key || discriminator.mapping[key] === undefined) {
+				// invalid data (to be fixed by user)
+				return initialValue;
+			}
 			const index = discriminator.mapping[key];
 			return getPropertyData(
 				property.oneOf[index],
@@ -96,7 +112,7 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 	switch (property.type) {
 		case 'object':
 			return getObjectPropertyData(
-				/** @type {import("../types/jschema.js").JSONSchemaObjectProperty}*/ (property),
+				/** @type {import("../types/jschema.js").JSONSchemaObjectProperty}*/(property),
 				schemaVersion,
 				initialValue,
 				loadDefaults
@@ -137,6 +153,10 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
  */
 function getArrayPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
 	if (!Array.isArray(initialValue)) {
+		if (initialValue) {
+			// return invalid data (to be fixed by user)
+			return initialValue;
+		}
 		initialValue = [];
 	}
 	const childProperty = /** @type {import("../types/jschema.js").JSONSchemaProperty} */ (
@@ -165,23 +185,34 @@ function getArrayPropertyData(property, schemaVersion, required, initialValue, l
  * @param {boolean} loadDefaults
  */
 function getTuplePropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
-	if (!Array.isArray(initialValue)) {
+	if (initialValue && !Array.isArray(initialValue)) {
+		// return invalid data (to be fixed by user)
+		return initialValue;
+	}
+	if (!initialValue) {
 		initialValue = [];
 	}
 	if (!required && initialValue.length === 0) {
 		return initialValue;
 	}
+
 	let data = [];
 	for (let i = 0; i < initialValue.length; i++) {
-		data.push(
-			getPropertyData(
-				getTupleChildProperty(property, schemaVersion, i),
-				schemaVersion,
-				required,
-				initialValue[i],
-				loadDefaults
-			)
-		);
+		const childProperty = getTupleChildProperty(property, schemaVersion, i)
+		if (childProperty) {
+			data.push(
+				getPropertyData(
+					childProperty,
+					schemaVersion,
+					required,
+					initialValue[i],
+					loadDefaults
+				)
+			);
+		} else {
+			// invalid extra value (to be removed by user)
+			data.push(initialValue[i]);
+		}
 	}
 	const size = /** @type {number} */ (property.minItems);
 	// Create the minimum required number of items
@@ -195,10 +226,6 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 				loadDefaults
 			)
 		);
-	}
-	if (data.length > size) {
-		console.warn('Tuple initial value has more items than allowed (%d)', size, initialValue);
-		data.splice(size, data.length);
 	}
 	return data;
 }
@@ -215,7 +242,6 @@ function getTupleChildProperty(tupleProperty, schemaVersion, index) {
 		if (index < items.length) {
 			return items[index];
 		}
-		console.warn('Unable to retrieve tuple child on index %d', index);
 		return null;
 	} else {
 		return items;

@@ -3,7 +3,6 @@
 		JSchema,
 		stripNullAndEmptyObjectsAndArrays,
 		deepCopy,
-		getValidationErrorMessage,
 		getPropertiesToIgnore,
 		detectSchemaVersion,
 		SchemaValidator,
@@ -27,7 +26,7 @@
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = $state();
 
-	function handleJsonSchemaStringChanged() {
+	async function handleJsonSchemaStringChanged() {
 		validationError = '';
 		jsonSchemaError = '';
 		if (jsonSchemaString === '') {
@@ -57,33 +56,29 @@
 		}
 
 		schema = parsedSchema;
+    schemaData = undefined;
+		await tick();
+		jschemaComponent?.update(parsedSchema, undefined);
 		handleDataChanged();
 	}
 
-	function handleDataStringChanged() {
-		validationError = '';
+	async function handleDataStringChanged() {
+		await tick();
 		dataError = '';
 		try {
 			schemaData = JSON.parse(jsonDataString);
+			jschemaComponent?.update(schema, $state.snapshot(schemaData));
 		} catch (err) {
-			schemaData = undefined;
+			if (!jsonDataString) {
+				schemaData = undefined;
+				jschemaComponent?.update(schema, undefined);
+			}
 			dataError = 'Invalid JSON';
 		}
 	}
 
 	let validationError = $state('');
 	let valid = $state(false);
-
-	function validate() {
-		try {
-			validationError = '';
-			valid = false;
-			jschemaComponent?.validateArguments();
-			valid = true;
-		} catch (err) {
-			validationError = getValidationErrorMessage(err);
-		}
-	}
 
 	function loadExample() {
 		schemaVersion = 'pydantic_v2';
@@ -103,11 +98,16 @@
 	 * @param {object} newData
 	 */
 	function updateData(newData) {
+		if (!newData) {
+			return;
+		}
 		const newDataCopy = deepCopy(newData);
 		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
 		// Update the data only if something is changed, to avoid triggering uneccessary events
 		if (updatedOldData !== jsonDataString) {
 			jsonDataString = updatedOldData;
+			dataError = '';
+			schemaData = JSON.parse(jsonDataString);
 		}
 	}
 
@@ -185,10 +185,13 @@
 						<pre>{validationError}</pre>
 					</div>
 				{/if}
-				{#if valid}
-					<div class="alert alert-success">Data is valid</div>
+				{#if schema && !jsonSchemaError}
+					{#if valid}
+						<div class="alert alert-success">Data is valid</div>
+					{:else}
+						<div class="alert alert-danger">Data is not valid</div>
+					{/if}
 				{/if}
-				<button class="btn btn-primary" onclick={validate}>Validate</button>
 			</div>
 		</div>
 	</div>
@@ -197,11 +200,10 @@
 			<JSchema
 				componentId="json-schema-sandbox"
 				onchange={updateData}
-				{schema}
 				{schemaVersion}
-				{schemaData}
 				{propertiesToIgnore}
 				bind:this={jschemaComponent}
+				bind:dataValid={valid}
 			/>
 		{/if}
 	</div>

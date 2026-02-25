@@ -7,7 +7,7 @@
 		SchemaValidator,
 		stripNullAndEmptyObjectsAndArrays
 	} from 'fractal-components';
-	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
+	import { adaptJsonSchema, stripDiscriminator } from 'fractal-components/jschema/jschema_adapter';
 	import JsonSchemaValidationErrors from './JsonSchemaValidationErrors.svelte';
 
 	/**
@@ -92,7 +92,7 @@
 		}
 		const adapted = adaptJsonSchema(schema, getPropertiesToIgnore(false));
 		const validator = new SchemaValidator(schemaVersion);
-		const isSchemaValid = validator.loadSchema(adapted);
+		const isSchemaValid = validator.loadSchema(stripDiscriminator(adapted));
 		if (!isSchemaValid) {
 			throw new Error('Invalid JSON Schema');
 		}

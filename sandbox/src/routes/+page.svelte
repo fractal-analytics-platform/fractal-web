@@ -1,10 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
 	import JSchemaSandbox from '../lib/components/JSchemaSandbox.svelte';
-	import VersionUpdateSandbox from '../lib/components/VersionUpdateSandbox.svelte';
 	import TaskManifestSandbox from '../lib/components/TaskManifestSandbox.svelte';
 
-	const pages = ['jschema', 'version-update', 'task-manifest'];
+	const pages = ['jschema', 'task-manifest'];
 
 	let currentPage = $state('jschema');
 
@@ -37,16 +36,6 @@
 			<li class="nav-item">
 				<a
 					class="nav-link"
-					class:active={currentPage === 'version-update'}
-					onclick={() => (currentPage = 'version-update')}
-					href="#version-update"
-				>
-					Version update
-				</a>
-			</li>
-			<li class="nav-item">
-				<a
-					class="nav-link"
 					class:active={currentPage === 'task-manifest'}
 					onclick={() => (currentPage = 'task-manifest')}
 					href="#task-manifest"
@@ -61,8 +50,6 @@
 <div class="container">
 	{#if currentPage === 'jschema'}
 		<JSchemaSandbox />
-	{:else if currentPage === 'version-update'}
-		<VersionUpdateSandbox />
 	{:else if currentPage === 'task-manifest'}
 		<TaskManifestSandbox />
 	{/if}
