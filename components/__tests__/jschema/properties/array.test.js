@@ -86,7 +86,7 @@ describe('Array properties', () => {
 		expect(component.getArguments()).deep.eq({ testProp: [null, null, null] });
 	});
 
-	it('Object with additional array propery', async () => {
+	it('Object with additional array property', async () => {
 		const { component, onChange } = renderSchema(
 			{
 				title: 'Object with additionalProperties',
