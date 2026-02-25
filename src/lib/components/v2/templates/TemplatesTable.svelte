@@ -7,6 +7,7 @@
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import FilteredTemplateTable from './FilteredTemplateTable.svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -25,15 +26,46 @@
     /** @type {TemplateInfoModal|undefined} */
 	let infoTemplateModal = $state(undefined);
 
-	/**
-	 * @param {number} currentPage
-	 * @param {number} pageSize
-	 */
-	export async function searchTemplate(currentPage, pageSize) {
+	// query parametes
+	/** @type {number} */
+	let currentPage = $derived(templatePage.current_page);
+	/** @type {number} */
+	let pageSize = $derived(templatePage.page_size);
+	/** @type {number|undefined} */
+	let queryTemplateId = $state(undefined);
+	/** @type {boolean} */
+	let queryIsOwner = $state(false);
+	/** @type {string|undefined} */
+	let queryUserEmail = $state(undefined);
+	/** @type {string|undefined} */
+	let queryName = $state(undefined);
+	/** @type {number|undefined} */
+	let queryVersion = $state(undefined);
+
+	onMount(() => {
+		queryTemplateId=undefined;
+		queryIsOwner=false;
+		queryUserEmail=undefined;
+		queryName=undefined;
+		queryVersion=undefined;
+	});
+
+	export async function searchTemplate() {
+		// Headers
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
+		// Query parametes
+		const params = new URLSearchParams();
+		params.set('page', String(currentPage));
+		params.set('page_size', String(pageSize));
+		params.set('is_owner', String(queryIsOwner));
+		if (queryTemplateId) params.set('template_id', String(queryTemplateId));
+		if (queryUserEmail) params.set('user_email', queryUserEmail);
+		if (queryName) params.set('name', queryName);
+		if (queryVersion) params.set('version', String(queryVersion));
+
 		let response = await fetch(
-            `/api/v2/workflow_template?page=${currentPage}&page_size=${pageSize}`,
+            `/api/v2/workflow_template?${params.toString()}`,
 			{
 				method: 'GET',
 				headers,
@@ -94,12 +126,10 @@
 
 		if (response.ok) {
 			console.log('Template deleted');
-			if (templatePage.items.length === 1 && templatePage.current_page > 1) {
-				await searchTemplate(templatePage.current_page - 1, templatePage.page_size)
+			if (templatePage.items.length === 1 && currentPage > 1) {
+				currentPage = currentPage - 1;
 			}
-			else {
-				await searchTemplate(templatePage.current_page, templatePage.page_size)
-			}
+			await searchTemplate();
 		} else {
 			console.error('Template not deleted');
 			throw await getAlertErrorFromResponse(response);
@@ -120,6 +150,22 @@
 		</button>
 	</div>
 </div>
+
+<div>
+	<FilteredTemplateTable 
+		emailList={templatePage.email_list}
+		bind:queryTemplateId
+		bind:queryIsOwner
+		bind:queryUserEmail
+		bind:queryName
+		bind:queryVersion
+		onSubmit={async () => {
+			currentPage=1;
+			await searchTemplate();
+		}}
+	/>
+</div>
+
 <div class="table-responsive mt-2">
 	<table class="table" id="dataset-images-table">
 		<thead>
@@ -196,22 +242,23 @@
 		</tbody>
 	</table>
 </div>
+
 <div>
 	<Paginator
-		currentPage={templatePage.current_page}
-		pageSize={templatePage.page_size}
+		currentPage={currentPage}
+		pageSize={pageSize}
 		totalCount={templatePage.total_count}
-		onPageChange={async (currentPage, pageSize) => {
-			await searchTemplate(currentPage, pageSize);
+		onPageChange={async (a, b) => {
+			currentPage=a;
+			pageSize=b;
+			await searchTemplate();
 		}}
 	/>
 </div>
 </div>
 
 <TemplateUpdateModal
-    onTemplateSave={async () => {
-		await searchTemplate(templatePage.current_page, templatePage.page_size);
-	}}
+    onTemplateSave={searchTemplate}
 	bind:this={updateTemplateModal}
 />
 
@@ -220,8 +267,6 @@
 />
 
 <TemplateImportModal
-	onTemplateImport={async () => {
-		await searchTemplate(templatePage.current_page, templatePage.page_size);
-	}}
+	onTemplateImport={searchTemplate}
 	bind:this={importTemplateModal}
 />
