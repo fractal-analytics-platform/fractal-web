@@ -22,9 +22,9 @@
 </script>
 
 
-<div class="card mb-3 shadow-sm">
+<div class="card mb-3">
 	<div class="card-header bg-light fw-semibold">
-		Filter templates
+		Filter options
 	</div>
 
 	<div class="card-body">

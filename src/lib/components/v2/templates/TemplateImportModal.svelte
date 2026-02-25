@@ -111,7 +111,7 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-		<h5 class="modal-title">Import workflow template from file</h5>
+		<h5 class="modal-title">Import workflow template from JSON file</h5>
 	{/snippet}
 	{#snippet body()}
 		<form

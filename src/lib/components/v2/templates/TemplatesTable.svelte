@@ -142,11 +142,11 @@
 <div class="d-flex justify-content-end align-items-center mb-3">
 	<div class="col-2">
 		<button
-			class="btn btn-outline-primary btn-sm"
+			class="btn btn-outline-primary"
 			onclick={() => {importTemplateModal?.show();}}
 		>
 			<i class="bi-upload"></i>
-			Import from file
+			Import from JSON file
 		</button>
 	</div>
 </div>
@@ -166,6 +166,11 @@
 	/>
 </div>
 
+<div class="card mb-3">
+<div class="card-header bg-light fw-semibold">
+	Templates
+</div>
+<div class="card-body">
 <div class="table-responsive mt-2">
 	<table class="table" id="dataset-images-table">
 		<thead>
@@ -241,6 +246,8 @@
 			{/each}
 		</tbody>
 	</table>
+</div>
+</div>
 </div>
 
 <div>
