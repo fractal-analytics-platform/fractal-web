@@ -6,6 +6,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 
     /**
 	 * @typedef {Object} Props
@@ -155,34 +156,36 @@
 						>
 							<i class="bi bi-info-circle"></i>
 						</button>
-                        <button
+						<button
 							class="btn btn-outline-primary"
-							onclick={async () => {
-								await updateTemplateModal?.open(selectedTemplates[index].template_id);
-							}}
-							aria-label="Edit"
+							type="button"
+							onclick={() => {exportTemplate(selectedTemplates[index].template_id);}}
+							aria-label="Download"
 						>
-							<i class="bi bi-pencil"></i>
-
+							<i class="bi bi-download"></i>
 						</button>
-                        <button
-                            class="btn btn-outline-primary"
-                            type="button"
-                            onclick={() => {exportTemplate(selectedTemplates[index].template_id);}}
-                            aria-label="Download"
-                        >
-                            <i class="bi bi-download"></i>
-                        </button>
 						<a id="downloadTemplateButton" class="d-none">Download template link</a>
-						<ConfirmActionButton
-							modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
-							style="danger"
-							btnStyle="outline-danger"
-							buttonIcon="trash"
-							label=""
-							message="Delete template {selectedTemplates[index].template_id}"
-							callbackAction={() => handleDeleteTemplate(selectedTemplates[index].template_id)}
-						/>
+						{#if page.data.userInfo.email == templateGroup.user_email}
+							<button
+								class="btn btn-outline-primary"
+								onclick={async () => {
+									await updateTemplateModal?.open(selectedTemplates[index].template_id);
+								}}
+								aria-label="Edit"
+							>
+								<i class="bi bi-pencil"></i>
+
+							</button>
+							<ConfirmActionButton
+								modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
+								style="danger"
+								btnStyle="outline-danger"
+								buttonIcon="trash"
+								label=""
+								message="Delete template {selectedTemplates[index].template_id}"
+								callbackAction={() => handleDeleteTemplate(selectedTemplates[index].template_id)}
+							/>
+						{/if}
                     </td>
 				</tr>
 			{/each}
