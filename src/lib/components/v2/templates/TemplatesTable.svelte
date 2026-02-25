@@ -124,8 +124,8 @@
 	<table class="table" id="dataset-images-table">
 		<thead>
 			<tr>
-				<th>User email</th>
                 <th>Name</th>
+				<th>User email</th>
                 <th>Versions</th>
 				<th>Actions</th>
 			</tr>
@@ -133,8 +133,8 @@
 		<tbody>
 			{#each templatePage.items as templateGroup, index (index)}
 				<tr>
-					<td>{templateGroup.user_email}</td>
                     <td>{templateGroup.template_name}</td>
+					<td>{templateGroup.user_email}</td>
                     <td>
 						<select
 							class="form-select"
