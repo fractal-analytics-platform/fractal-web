@@ -5,9 +5,7 @@
 	import TemplateImportModal from '$lib/components/v2/templates/TemplateImportModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import FilteredTemplateTable from './FilteredTemplateTable.svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -32,25 +30,31 @@
 	/** @type {number} */
 	let pageSize = $derived(templatePage.page_size);
 	/** @type {number|undefined} */
-	let queryTemplateId = $state(undefined);
+	let templateId = $state(undefined);
 	/** @type {boolean} */
-	let queryIsOwner = $state(false);
+	let isOwner = $state(false);
 	/** @type {string|undefined} */
-	let queryUserEmail = $state(undefined);
+	let userEmail = $state(undefined);
 	/** @type {string|undefined} */
-	let queryName = $state(undefined);
+	let templateName = $state(undefined);
 	/** @type {number|undefined} */
-	let queryVersion = $state(undefined);
+	let templateVersion = $state(undefined);
 
-	onMount(() => {
-		queryTemplateId=undefined;
-		queryIsOwner=false;
-		queryUserEmail=undefined;
-		queryName=undefined;
-		queryVersion=undefined;
-	});
-
-	export async function searchTemplate() {
+	/**
+	 * @param {number|undefined} templateId
+	 * @param {boolean} isOwner
+	 * @param {string|undefined} userEmail
+	 * @param {string|undefined} templateName
+	 * @param {number|undefined} templateVersion
+	 * @returns {Promise<void>}
+	 */
+	export async function searchTemplate(
+		templateId=undefined,
+		isOwner=false,
+		userEmail=undefined,
+		templateName=undefined,
+		templateVersion=undefined,
+	) {
 		// Headers
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -58,11 +62,11 @@
 		const params = new URLSearchParams();
 		params.set('page', String(currentPage));
 		params.set('page_size', String(pageSize));
-		params.set('is_owner', String(queryIsOwner));
-		if (queryTemplateId) params.set('template_id', String(queryTemplateId));
-		if (queryUserEmail) params.set('user_email', queryUserEmail);
-		if (queryName) params.set('name', queryName);
-		if (queryVersion) params.set('version', String(queryVersion));
+		params.set('is_owner', String(isOwner));
+		if (templateId) params.set('template_id', String(templateId));
+		if (userEmail) params.set('user_email', userEmail);
+		if (templateName) params.set('name', templateName);
+		if (templateVersion) params.set('version', String(templateVersion));
 
 		let response = await fetch(
             `/api/v2/workflow_template?${params.toString()}`,
@@ -79,6 +83,7 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
 
 	/**
 	 * @param {number} templateId
@@ -151,19 +156,86 @@
 	</div>
 </div>
 
-<div>
-	<FilteredTemplateTable 
-		emailList={templatePage.email_list}
-		bind:queryTemplateId
-		bind:queryIsOwner
-		bind:queryUserEmail
-		bind:queryName
-		bind:queryVersion
-		onSubmit={async () => {
-			currentPage=1;
-			await searchTemplate();
-		}}
-	/>
+<div class="card mb-3">
+	<div class="card-body">
+		<div class="row g-3 align-items-end">
+			<div class="col-md">
+				<label class="form-label small text-muted">Template ID</label>
+				<input
+					type="number"
+					class="form-control form-control-sm"
+					bind:value={templateId}
+				/>
+			</div>
+
+			<div class="col-md">
+				<label class="form-label small text-muted">Name</label>
+				<input
+					type="text"
+					class="form-control form-control-sm"
+					bind:value={templateName}
+				/>
+			</div>
+
+			<div class="col-md">
+				<label class="form-label small text-muted">User email</label>
+				<select
+					class="form-select form-select-sm"
+					bind:value={userEmail}
+				>
+					<option value={undefined}>All users</option>
+					{#each templatePage.email_list as email}
+						<option value={email}>{email}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="col-md">
+				<label class="form-label small text-muted">Version</label>
+				<input
+					type="number"
+					class="form-control form-control-sm"
+					bind:value={templateVersion}
+				/>
+			</div>
+
+			<div class="col-md-auto">
+				<div class="form-check mt-4 pt-1">
+					<input
+						id="isOwnerCheckbox"
+						type="checkbox"
+						class="form-check-input"
+						bind:checked={isOwner}
+					/>
+					<label
+						class="form-check-label small"
+						for="isOwnerCheckbox"
+					>
+						Only owned
+					</label>
+				</div>
+			</div>
+
+			<div class="col-md-auto">
+				<button
+					class="btn btn-warning btn-sm px-4"
+					onclick={async () => {
+						currentPage=1;
+						await searchTemplate(
+							templateId=templateId,
+							isOwner=isOwner,
+							userEmail=userEmail,
+							templateName=templateName,
+							templateVersion=templateVersion,
+						);
+					}}
+				>
+					Apply filters
+				</button>
+			</div>
+
+		</div>
+	</div>
 </div>
 
 <div class="card mb-3">
