@@ -110,9 +110,9 @@
 
 <div class="container mt-2">
 <div class="d-flex justify-content-end align-items-center mb-3">
-	<div>
+	<div class="col-2">
 		<button
-			class="btn btn-outline-success btn-sm"
+			class="btn btn-outline-primary btn-sm"
 			onclick={() => {importTemplateModal?.show();}}
 		>
 			<i class="bi-upload"></i>
@@ -149,6 +149,7 @@
                     <td class="col-2">
                         <button
 							class="btn btn-outline-primary"
+							title="Info"
 							onclick={async () => {
 								await infoTemplateModal?.open(selectedTemplates[index].template_id);
 							}}
@@ -158,6 +159,7 @@
 						</button>
 						<button
 							class="btn btn-outline-primary"
+							title="Download"
 							type="button"
 							onclick={() => {exportTemplate(selectedTemplates[index].template_id);}}
 							aria-label="Download"
@@ -168,6 +170,7 @@
 						{#if page.data.userInfo.email == templateGroup.user_email}
 							<button
 								class="btn btn-outline-primary"
+								title="Edit"
 								onclick={async () => {
 									await updateTemplateModal?.open(selectedTemplates[index].template_id);
 								}}
@@ -179,6 +182,7 @@
 							<ConfirmActionButton
 								modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
 								style="danger"
+								title="Delete"
 								btnStyle="outline-danger"
 								buttonIcon="trash"
 								label=""
