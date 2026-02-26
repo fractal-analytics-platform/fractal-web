@@ -275,7 +275,7 @@ export class ArrayFormElement extends BaseFormElement {
 			return;
 		}
 		const child = this.manager.createFormElement({
-			key: null,
+			key: (this.children.length).toString(),
 			path: `${this.path}/${this.children.length}`,
 			property: this.items,
 			required: false,
@@ -292,13 +292,15 @@ export class ArrayFormElement extends BaseFormElement {
 	 */
 	removeChild(index) {
 		this.children.splice(index, 1);
-		this.recomputePaths();
+		this.recomputeIndexes();
 		this.notifyChange();
 	}
 
-	recomputePaths() {
+	recomputeIndexes() {
 		this.children.forEach((c, i) => {
+			c.key = i.toString();
 			c.path = c.path.replace(/\d+$/, i.toString());
+			c.title = c.key && c.removable ? c.key : c.property.title || c.key || '';
 		});
 	}
 
@@ -318,7 +320,7 @@ export class ArrayFormElement extends BaseFormElement {
 				}
 			}
 			this.children = updatedArray;
-			this.recomputePaths();
+			this.recomputeIndexes();
 			this.notifyChange();
 		}
 	}
@@ -339,7 +341,7 @@ export class ArrayFormElement extends BaseFormElement {
 				}
 			}
 			this.children = updatedArray;
-			this.recomputePaths();
+			this.recomputeIndexes();
 			this.notifyChange();
 		}
 	}
@@ -435,6 +437,9 @@ export class ConditionalFormElement extends BaseFormElement {
 					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
 					parentProperty: this.property
 				});
+				if (this.selectedItem) {
+					this.selectedItem.title = selectedProp.title || this.key || '';
+				}
 			}
 		}
 		this.notifyChange();

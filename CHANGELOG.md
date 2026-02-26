@@ -5,6 +5,14 @@
 * Support new backend API for workflow imports, with flexible version matching (\#941).
 * Added new cases of valid SLURM errors (\#950).
 * Add link to Job list page in no-history Workflow warning message (\#966).
+* Expand some user-facing messages (\#972).
+* JSON Schema form improvements (\#957):
+    * displayed error messages near the invalid elements;
+    * displayed unexpected properties, with the possibility to fix them;
+    * avoided duplication of discriminator properties;
+    * various fixes;
+* Simplified task version upgrade, to allow for fixing invalid arguments at a later stage;
+* Added task manifest sandbox example (\#957);
 
 # 1.23.0
 

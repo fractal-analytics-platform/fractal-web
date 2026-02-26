@@ -21,6 +21,15 @@
 				? ''
 				: 'text-secondary fw-light'
 	);
+
+	const description = $derived(
+		formElement.description ||
+			('selectedItem' in formElement && formElement.selectedItem
+				? /** @type {import('../form_element.js').ConditionalFormElement} */ (
+						formElement.selectedItem
+					).description
+				: '')
+	);
 </script>
 
 {#if tag === 'label'}
@@ -41,4 +50,4 @@
 	</span>
 {/if}
 
-<PropertyDescription description={formElement.description} />
+<PropertyDescription {description} />
