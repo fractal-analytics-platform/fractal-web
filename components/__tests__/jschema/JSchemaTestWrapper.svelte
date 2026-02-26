@@ -2,16 +2,18 @@
 	import { onMount } from 'svelte';
 	import JSchema from '../../src/lib/jschema/JSchema.svelte';
 
-	/** @type {any} */
-	export let schema;
-	/** @type {any} */
-	export let schemaData;
-	/** @type {'pydantic_v1'|'pydantic_v2'} */
-	export let schemaVersion;
-	/** @type {(data: any) => void} */
-	export let onChange = function () {};
-	/** @type {boolean|undefined} */
-	export let valid;
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} schema
+	 * @property {any} schemaData
+	 * @property {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @property {(data: any) => void} onChange
+	 * @property {boolean} valid
+	 * @property {boolean} unsavedChanges
+	 */
+
+	/** @type {Props} */
+	let { schema, schemaData, schemaVersion, onChange, valid, unsavedChanges = false } = $props();
 
 	/** @type {JSchema} */
 	let jschema;
@@ -20,7 +22,8 @@
 		return jschema.getArguments();
 	}
 
-	export let unsavedChanges = false;
+	export const hasUnsavedChanges = () => unsavedChanges;
+	export const isValid = () => valid;
 
 	/**
 	 * @param {any} data
