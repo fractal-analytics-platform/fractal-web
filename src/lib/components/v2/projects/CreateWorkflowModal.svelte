@@ -6,6 +6,7 @@
 	import { tick } from 'svelte';
 	import { normalizePayload } from 'fractal-components';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import TemplatesTable from '../templates/TemplatesTable.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -45,6 +46,10 @@
 
 	let includeOlderVersions = $state(false)
 
+	/** @type {import('fractal-components/types/api').TemplatePage|undefined} */
+	let templatePage = $state();
+
+
 	$effect(() => {
 		includeOlderVersions;
 		if (!workflowImportErrorData) {
@@ -64,9 +69,25 @@
 		modal?.show();
 	}
 
-	/**
-	 * Reset the form fields.
-	 */
+	export async function searchTemplate() {
+		
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		let response = await fetch(
+            `/api/v2/workflow_template?page=1&page_size=10`,
+			{
+				method: 'GET',
+				headers,
+				credentials: 'include',
+			}
+		);
+		if (response.ok) {
+			templatePage = await response.json();
+		} else {
+			throw await getAlertErrorFromResponse(response);
+		}
+	}
+
 	export function reset() {
 		files=undefined;
 		if (fileInput) {
@@ -172,10 +193,6 @@
 		}
 	}
 
-	/**
-	 * Creates a new workflow in the server
-	 * @returns {Promise<*>}
-	 */
 	async function _handleCreateWorkflow() {
 		if (!workflowName) {
 			return;
@@ -227,7 +244,7 @@
 				name="createWorkflowMode"
 				id="createWorkflowModeNew"
 				value="new"
-				onclick={(reset)}
+				onclick={reset}
 				bind:group={mode}
 			/>
 			<label class="btn btn-outline-primary" for="createWorkflowModeNew">
@@ -251,7 +268,10 @@
 				name="createWorkflowMode"
 				id="createWorkflowModeTemplate"
 				value="template"
-				onclick={reset}
+				onclick={async () => {
+					reset();
+					await searchTemplate();
+				}}
 				bind:group={mode}
 			/>
 			<label class="btn btn-outline-primary" for="createWorkflowModeTemplate">
@@ -444,7 +464,9 @@
 			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
 		{/if}
 	{:else}
-		---
+		{#if templatePage}
+			<TemplatesTable {templatePage} />
+		{/if}
 	{/if}
 
 	{/snippet}
