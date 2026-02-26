@@ -136,7 +136,6 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		console.log(workflowMetadata)
 		const response = await fetch(`/api/v2/project/${page.params.projectId}/workflow/import`, {
 			method: 'POST',
 			credentials: 'include',
