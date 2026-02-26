@@ -277,7 +277,7 @@
 
 <Modal
 	id="createWorkflowModal"
-	size="lg"
+	size="xl"
 	centered={true}
 	scrollable={true}
 	onOpen={reset}
@@ -385,7 +385,7 @@
 	
 			{#if !workflowImportErrorData}
 				<div class="mb-3">
-					<label for="workflowFile" class="form-label">Import workflow from file</label>
+					<label for="workflowFile" class="form-label">Select a file</label>
 					<input
 						class="form-control"
 						accept="application/json"
@@ -528,6 +528,7 @@
 					class="form-control"
 				/>
 			</div>
+			<div>Select a template</div>
 			<TemplatesTable 
 				modalType='select'
 				{templatePage}
