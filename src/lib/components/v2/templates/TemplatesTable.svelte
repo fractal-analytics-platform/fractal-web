@@ -242,15 +242,21 @@
                 <th>Name</th>
 				<th>User email</th>
                 <th>Versions</th>
-				<th>Actions</th>
+				<th>
+					{#if modalType==='edit'}
+						Actions
+					{:else}
+						Select
+					{/if}
+				</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each templatePage.items as templateGroup, index (index)}
 				<tr>
-                    <td>{templateGroup.template_name}</td>
+                    <td class="col-5">{templateGroup.template_name}</td>
 					<td>{templateGroup.user_email}</td>
-                    <td>
+                    <td class="col-2">
 						<select
 							class="form-select"
 							aria-label="Version for template '{templateGroup.template_name}' of {templateGroup.user_email}"
@@ -261,8 +267,8 @@
 							{/each}
 						</select>
 					</td>
-                    <td class="col-2">
 						{#if modalType === 'edit'}
+						<td class="col-2">
 							<button
 								class="btn btn-outline-primary"
 								title="Info"
@@ -306,7 +312,9 @@
 									callbackAction={() => handleDeleteTemplate(selectedTemplates[index].template_id)}
 								/>
 							{/if}
+							</td>
 						{:else if modalType === 'select'}
+							<td class="col-1">
 								<button
 									class="btn btn-outline-primary"
 									title="Select"
@@ -315,10 +323,10 @@
 										await handleSelect(selectedTemplates[index].template_id);
 									}}
 								>
-									<i class="bi bi-plus-circle-fill"></i>
+									<i class="bi bi-check-circle"></i>
 								</button>
+							</td>
 						{/if}
-                    </td>
 				</tr>
 			{/each}
 		</tbody>
