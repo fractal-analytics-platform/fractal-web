@@ -32,6 +32,9 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
+	/** @type {'new'|'import'|'template'} */
+	let mode = $state('new');
+
 	/** @type {import('fractal-components/types/api').WorkflowImportErrorData[]|undefined} */
 	let workflowImportErrorData = $state(undefined);
 	/** @type {(string|undefined)[]} */
@@ -56,7 +59,7 @@
 				: undefined
 		);
 	});
-
+	
 	export function show() {
 		modal?.show();
 	}
@@ -65,7 +68,7 @@
 	 * Reset the form fields.
 	 */
 	export function reset() {
-		files = undefined;
+		files=undefined;
 		if (fileInput) {
 			fileInput.value = '';
 		}
@@ -75,18 +78,15 @@
 		workflowMetadata = undefined;
 		selectedVersions = [];
 		includeOlderVersions = false;
+		mode='new';
 		modal?.hideErrorAlert();
 	}
 
-	function handleImportOrCreateWorkflow() {
+	function handleImportWorkflow() {
 		modal?.confirmAndHide(
 			async () => {
 				creating = true;
-				if (workflowFileSelected) {
-					await handleImportWorkflow();
-				} else {
-					await handleCreateWorkflow();
-				}
+				await _handleImportWorkflow();
 			},
 			() => {
 				creating = false;
@@ -94,7 +94,19 @@
 		);
 	}
 
-	async function handleImportWorkflow() {
+	function handleCreateWorkflow() {
+		modal?.confirmAndHide(
+			async () => {
+				creating = true;
+				await _handleCreateWorkflow();
+			},
+			() => {
+				creating = false;
+			}
+		);
+	}
+
+	async function _handleImportWorkflow() {
 
 		if (!workflowImportErrorData) {
 			const workflowFile = /** @type {FileList} */ (files)[0];
@@ -124,6 +136,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		console.log(workflowMetadata)
 		const response = await fetch(`/api/v2/project/${page.params.projectId}/workflow/import`, {
 			method: 'POST',
 			credentials: 'include',
@@ -164,7 +177,7 @@
 	 * Creates a new workflow in the server
 	 * @returns {Promise<*>}
 	 */
-	async function handleCreateWorkflow() {
+	async function _handleCreateWorkflow() {
 		if (!workflowName) {
 			return;
 		}
@@ -206,10 +219,52 @@
 		<h5 class="modal-title">Create new workflow</h5>
 	{/snippet}
 	{#snippet body()}
+	<!-- SWITCHER -->
+	<div class="row mb-3">
+		 <div class="btn-group w-100" role="group" aria-label="Dataset mode">
+			<input
+				class="btn-check"
+				type="radio"
+				name="createWorkflowMode"
+				id="createWorkflowModeNew"
+				value="new"
+				onclick={(reset)}
+				bind:group={mode}
+			/>
+			<label class="btn btn-outline-primary" for="createWorkflowModeNew">
+				Create new
+			</label>
+			<input
+				class="btn-check"
+				type="radio"
+				name="createWorkflowMode"
+				id="createWorkflowModeImport"
+				value="import"
+				onclick={reset}
+				bind:group={mode}
+			/>
+			<label class="btn btn-outline-primary" for="createWorkflowModeImport">
+				Import from file
+			</label>
+			<input
+				class="btn-check"
+				type="radio"
+				name="createWorkflowMode"
+				id="createWorkflowModeTemplate"
+				value="template"
+				onclick={reset}
+				bind:group={mode}
+			/>
+			<label class="btn btn-outline-primary" for="createWorkflowModeTemplate">
+				Create from template
+			</label>
+		</div>
+	</div>
+	{#if mode==='new'}
 		<form
 			onsubmit={(e) => {
 				e.preventDefault();
-				handleImportOrCreateWorkflow();
+				handleCreateWorkflow();
 			}}
 		>
 			<div class="mb-2">
@@ -222,7 +277,40 @@
 					class="form-control"
 				/>
 			</div>
+			<button
+				class="btn btn-primary mt-2"
+				disabled={(!workflowName) || creating}
+			>
+				{#if creating}
+					<span
+						class="spinner-border spinner-border-sm"
+						role="status"
+						aria-hidden="true">
+					</span>
+				{/if}			
+				Create empty workflow
+			</button>
+			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
+		</form>
 
+	{:else if mode==='import'}
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleImportWorkflow();
+			}}
+		>
+			<div class="mb-2">
+				<label for="workflowName" class="form-label">Workflow name</label>
+				<input
+					id="workflowName"
+					name="workflowName"
+					type="text"
+					bind:value={workflowName}
+					class="form-control"
+				/>
+			</div>
+	
 			{#if !workflowImportErrorData}
 				<div class="mb-3">
 					<label for="workflowFile" class="form-label">Import workflow from file</label>
@@ -238,18 +326,13 @@
 				</div>
 				<button
 					class="btn btn-primary mt-2"
-					disabled={(!workflowName && !workflowFileSelected) || creating}
+					disabled={!workflowFileSelected || creating}
 				>
 					{#if creating}
 						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 					{/if}
-					{#if workflowFileSelected}
-						Import workflow
-					{:else}
-						Create empty workflow
-					{/if}
+					Import workflow
 				</button>
-
 			{:else}
 					<hr />
 					<p>
@@ -257,7 +340,7 @@
 						You can collect missing task packages at the <a href="/v2/tasks/management">Tasks management</a> page, 
 						or select one of the available versions listed below.
 					</p>
-
+	
 					<div class="mb-3">
 						<div class="form-check">
 							<input
@@ -271,7 +354,7 @@
 							</label>
 						</div>
 					</div>
-
+	
 				{#each workflowImportErrorData as data, index (index)}
 					<hr />	
 					<section class="task-to-import">
@@ -294,7 +377,7 @@
 						{#if data.outcome !== "success"}
 							{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version))}
 							<div class="row row-cols-lg-auto g-3 align-items-center">
-  							<div class="col-12">
+							  <div class="col-12">
 								Available versions:
 							</div>
 							<div class="col-12">
@@ -358,9 +441,12 @@
 			{/if}
 			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
 		</form>
-
 		{#if importSuccess}
 			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
 		{/if}
+	{:else}
+		---
+	{/if}
+
 	{/snippet}
 </Modal>
