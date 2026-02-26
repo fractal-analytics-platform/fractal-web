@@ -220,6 +220,59 @@
 		}
 	}
 
+	/**
+	 * @param {number} templateId
+	*/
+	async function handleSelect(templateId) {
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		
+		const options = {
+			method: 'POST',
+			credentials: 'include',
+			headers
+		};
+
+		if (workflowName) {
+			options.body = JSON.stringify({
+				name: workflowName
+			});
+		}
+
+		const response = await fetch(
+			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
+			options
+		);
+
+		if (response.ok) {
+			// Return a workflow item
+			importSuccess = true;
+			setTimeout(() => {
+				importSuccess = false;
+			}, 3000);
+			reset();
+
+			/** @type {import('fractal-components/types/api').WorkflowV2} */
+			const workflow = await response.json();
+
+			await tick();
+
+			handleWorkflowImported(workflow);
+		} else {
+			console.error('Import workflow failed');
+
+			const alertError = await getAlertErrorFromResponse(response);
+			const result = alertError.reason;
+
+			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
+				workflowImportErrorData = result.data
+				throw new Error();
+			}
+
+			throw alertError;
+		}
+	}
 </script>
 
 <Modal
@@ -237,7 +290,7 @@
 	{#snippet body()}
 	<!-- SWITCHER -->
 	<div class="row mb-3">
-		 <div class="btn-group w-100" role="group" aria-label="Dataset mode">
+		 <div class="btn-group w-100" role="group" aria-label="Workflow mode">
 			<input
 				class="btn-check"
 				type="radio"
@@ -465,7 +518,21 @@
 		{/if}
 	{:else}
 		{#if templatePage}
-			<TemplatesTable {templatePage} />
+			<div class="mb-2">
+				<label for="workflowName" class="form-label">Workflow name</label>
+				<input
+					id="workflowName"
+					name="workflowName"
+					type="text"
+					bind:value={workflowName}
+					class="form-control"
+				/>
+			</div>
+			<TemplatesTable 
+				modalType='select'
+				{templatePage}
+				{handleSelect}
+			/>
 		{/if}
 	{/if}
 

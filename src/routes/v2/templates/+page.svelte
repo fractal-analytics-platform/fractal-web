@@ -8,5 +8,5 @@
 
 
 <div class="container-fluid">
-	<TemplatesTable  bind:templatePage/>
+	<TemplatesTable modalType='edit' bind:templatePage/>
 </div>

@@ -11,9 +11,16 @@
     /**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
+	 * @property {any} [handleSelect] - A default empty function
+	 * @property {'edit'|'select'} modalType
 	 */
 	/** @type {Props} */
-	let {templatePage = $bindable()} = $props();
+	let {
+		templatePage = $bindable(),
+		modalType,
+		handleSelect,
+	} = $props();
+
 
 	/** @type {import('fractal-components/types/api').WorkflowTemplateGroupMember []}*/
 	let selectedTemplates = $state(templatePage.items.map(item => item.templates[0]));	 
@@ -135,17 +142,20 @@
 </script>
 
 <div class="container mt-2">
-<div class="d-flex justify-content-end align-items-center mb-3">
-	<div class="col-2">
-		<button
-			class="btn btn-outline-primary"
-			onclick={() => {importTemplateModal?.show();}}
-		>
-			<i class="bi-upload"></i>
-			Import from JSON file
-		</button>
+
+	{#if modalType==='edit'}
+	<div class="d-flex justify-content-end align-items-center mb-3">
+		<div class="col-2">
+			<button
+				class="btn btn-outline-primary"
+				onclick={() => {importTemplateModal?.show();}}
+			>
+				<i class="bi-upload"></i>
+				Import from JSON file
+			</button>
+		</div>
 	</div>
-</div>
+	{/if}
 
 <div class="card mb-3">
 	<div class="card-body">
@@ -252,48 +262,61 @@
 						</select>
 					</td>
                     <td class="col-2">
-                        <button
-							class="btn btn-outline-primary"
-							title="Info"
-							onclick={async () => {
-								await infoTemplateModal?.open(selectedTemplates[index].template_id);
-							}}
-							aria-label="Info"
-						>
-							<i class="bi bi-info-circle"></i>
-						</button>
-						<button
-							class="btn btn-outline-primary"
-							title="Download"
-							type="button"
-							onclick={() => {exportTemplate(selectedTemplates[index].template_id);}}
-							aria-label="Download"
-						>
-							<i class="bi bi-download"></i>
-						</button>
-						<a id="downloadTemplateButton" class="d-none">Download template link</a>
-						{#if page.data.userInfo.email == templateGroup.user_email}
+						{#if modalType === 'edit'}
 							<button
 								class="btn btn-outline-primary"
-								title="Edit"
+								title="Info"
 								onclick={async () => {
-									await updateTemplateModal?.open(selectedTemplates[index].template_id);
+									await infoTemplateModal?.open(selectedTemplates[index].template_id);
 								}}
-								aria-label="Edit"
+								aria-label="Info"
 							>
-								<i class="bi bi-pencil"></i>
-
+								<i class="bi bi-info-circle"></i>
 							</button>
-							<ConfirmActionButton
-								modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
-								style="danger"
-								title="Delete"
-								btnStyle="outline-danger"
-								buttonIcon="trash"
-								label=""
-								message="Delete template {selectedTemplates[index].template_id}"
-								callbackAction={() => handleDeleteTemplate(selectedTemplates[index].template_id)}
-							/>
+							<button
+								class="btn btn-outline-primary"
+								title="Download"
+								type="button"
+								onclick={() => {exportTemplate(selectedTemplates[index].template_id);}}
+								aria-label="Download"
+							>
+								<i class="bi bi-download"></i>
+							</button>
+							<a id="downloadTemplateButton" class="d-none">Download template link</a>
+							{#if page.data.userInfo.email == templateGroup.user_email}
+								<button
+									class="btn btn-outline-primary"
+									title="Edit"
+									onclick={async () => {
+										await updateTemplateModal?.open(selectedTemplates[index].template_id);
+									}}
+									aria-label="Edit"
+								>
+									<i class="bi bi-pencil"></i>
+
+								</button>
+								<ConfirmActionButton
+									modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
+									style="danger"
+									title="Delete"
+									btnStyle="outline-danger"
+									buttonIcon="trash"
+									label=""
+									message="Delete template {selectedTemplates[index].template_id}"
+									callbackAction={() => handleDeleteTemplate(selectedTemplates[index].template_id)}
+								/>
+							{/if}
+						{:else if modalType === 'select'}
+								<button
+									class="btn btn-outline-primary"
+									title="Select"
+									aria-label="Select"
+									onclick={async () => {
+										await handleSelect(selectedTemplates[index].template_id);
+									}}
+								>
+									<i class="bi bi-plus-circle-fill"></i>
+								</button>
 						{/if}
                     </td>
 				</tr>
