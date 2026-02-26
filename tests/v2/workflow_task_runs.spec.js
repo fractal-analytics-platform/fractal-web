@@ -81,7 +81,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 				.getByRole('combobox', { name: 'Start workflow at' })
 				.getByRole('option', { selected: true })
 		).toHaveText('cellpose_segmentation');
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute well'), 'A02');
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for attribute well' }), 'A02');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
 		await modal.getByRole('button', { name: 'Run' }).click();

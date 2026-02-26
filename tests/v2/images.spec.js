@@ -29,7 +29,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Create an image without filters', async () => {
-		await createImage(page, `${randomPath}/img1`, async function () {});
+		await createImage(page, `${randomPath}/img1`, async function () { });
 	});
 
 	await test.step('Create an image with string attribute filter', async () => {
@@ -92,22 +92,22 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Filter by string attribute', async () => {
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute k1'), 'v1');
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for attribute k1' }), 'v1');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Filter by numeric attribute', async () => {
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute k2'), '42');
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for attribute k2' }), '42');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Filter by false type', async () => {
-		await selectSlimSelect(page, page.getByLabel('Selector for type k3'), 'False');
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for type k3' }), 'False');
 		await searchImages(page, 4);
 	});
 
 	await test.step('Filter by true type', async () => {
-		await selectSlimSelect(page, page.getByLabel('Selector for type k3'), 'True');
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for type k3' }), 'True');
 		await searchImages(page, 1);
 	});
 
@@ -157,7 +157,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
  * @param {string} zarr_url
  * @param {(modal: import('@playwright/test').Locator) => Promise<void>} filtersFunction
  */
-async function createImage(page, zarr_url, filtersFunction = async () => {}) {
+async function createImage(page, zarr_url, filtersFunction = async () => { }) {
 	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
 	await newImageBtn.waitFor();
 	await newImageBtn.click();

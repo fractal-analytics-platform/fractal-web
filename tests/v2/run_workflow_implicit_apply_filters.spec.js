@@ -64,7 +64,7 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 	});
 
 	await test.step('Add a filter and click on Run without clicking Apply', async () => {
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute a1'), 'v1', true);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for attribute a1' }), 'v1', true);
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeEnabled();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 	});
