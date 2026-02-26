@@ -35,67 +35,83 @@
           "int_1": {
             "title": "Int 1",
             "type": "integer",
-            "description": "Integer argument."
+            "description": "Type hint `int`"
           },
           "int_2": {
             "default": 1,
             "title": "Int 2",
             "type": "integer",
-            "description": "Integer argument with a default value."
+            "description": "Type hint `int = 1`"
           },
           "int_3": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "title": "Int 3",
-            "type": "integer",
-            "description": "Integer or null argument, with default value set to null."
+            "description": "Type hint `int | None = None`"
           },
           "int_4": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "title": "Int 4",
-            "type": "integer",
-            "description": "Integer or null argument, with default value set to null."
+            "description": "Type hint `Optional[int] = None`"
           },
           "str_1": {
             "title": "Str 1",
             "type": "string",
-            "description": "String argument."
+            "description": "Type hint `str`"
           },
           "str_2": {
             "default": "default",
             "title": "Str 2",
             "type": "string",
-            "description": "String argument with a default value."
+            "description": "Type hint `str = \"default\"`"
           },
           "bool_1": {
             "title": "Bool 1",
             "type": "boolean",
-            "description": "Boolean argument."
+            "description": "Type hint `bool`"
           },
           "bool_2": {
             "default": false,
             "title": "Bool 2",
             "type": "boolean",
-            "description": "Boolean argument with a default value."
+            "description": "Type hint `bool = False`"
           },
           "float_1": {
             "title": "Float 1",
             "type": "number",
-            "description": "Float argument."
+            "description": "Type hint `float`"
           },
           "float_2": {
             "default": 1.23,
             "title": "Float 2",
             "type": "number",
-            "description": "Float argument with a default value"
+            "description": "Type hint `float = 1.23`"
           },
           "enum_1": {
             "$ref": "#/$defs/MyEnum",
             "title": "Enum 1",
-            "description": "Enum argument."
+            "description": "Type hint `MyEnum`"
           },
           "enum_2": {
             "$ref": "#/$defs/MyEnum",
             "default": "Value 1",
             "title": "Enum 2",
-            "description": "Enum argument with a default."
+            "description": "Type hint `MyEnum = MyEnum.name1`"
           },
           "literal_1": {
             "enum": [
@@ -105,7 +121,7 @@
             ],
             "title": "Literal 1",
             "type": "string",
-            "description": "Literal argument."
+            "description": "Missing description"
           },
           "literal_2": {
             "default": "a",
@@ -116,7 +132,7 @@
             ],
             "title": "Literal 2",
             "type": "string",
-            "description": "Literal argument with a default value."
+            "description": "Type hint `Literal[\"a\", \"b\", \"c\"] = \"a\"`"
           }
         },
         "required": [
@@ -160,7 +176,7 @@
             },
             "title": "List Arg",
             "type": "array",
-            "description": "An arbitrary-size array of integers."
+            "description": "Type hint `list[int]`"
           },
           "tuple_arg": {
             "maxItems": 3,
@@ -178,33 +194,49 @@
             ],
             "title": "Tuple Arg",
             "type": "array",
-            "description": "A fixed-size array of integers."
+            "description": "Type hint `tuple[int, int, int]`"
           },
           "optional_list_arg": {
-            "items": {
-              "type": "integer"
-            },
-            "title": "Optional List Arg",
-            "type": "array",
-            "description": "An optional arbitrary-size array of integers."
-          },
-          "optional_tuple_arg": {
-            "maxItems": 3,
-            "minItems": 3,
-            "prefixItems": [
+            "anyOf": [
               {
-                "type": "integer"
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
               },
               {
-                "type": "integer"
-              },
-              {
-                "type": "integer"
+                "type": "null"
               }
             ],
+            "default": null,
+            "title": "Optional List Arg",
+            "description": "Type hint `list[int] | None = None`"
+          },
+          "optional_tuple_arg": {
+            "anyOf": [
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "title": "Optional Tuple Arg",
-            "type": "array",
-            "description": "An optional fixed-size array of integers."
+            "description": "Type hint `tuple[int, int, int] | None = None`"
           }
         },
         "required": [
@@ -244,15 +276,23 @@
             },
             "title": "Object Arg",
             "type": "object",
-            "description": "Object argument."
+            "description": "Type hint `dict[int, bool]`"
           },
           "optional_object_arg": {
-            "additionalProperties": {
-              "type": "boolean"
-            },
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "boolean"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "title": "Optional Object Arg",
-            "type": "object",
-            "description": "Optional object argument."
+            "description": "Type hint `dict[int, bool] | None = None`"
           },
           "nested_object_arg": {
             "additionalProperties": {
@@ -263,7 +303,7 @@
             },
             "title": "Nested Object Arg",
             "type": "object",
-            "description": "Nested object argument."
+            "description": "Type hint `dict[str, dict[str, str]]`"
           }
         },
         "required": [
@@ -284,39 +324,39 @@
       "args_schema_non_parallel": {
         "$defs": {
           "InternalModel1": {
-            "description": "Description of InternalModel1.",
+            "description": "Description of `InternalModel1`.",
             "properties": {
               "label": {
                 "const": "label1",
                 "default": "label1",
+                "description": "Type hint: `Literal[\"label1\"] = \"label1\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "FIXME"
+                "type": "string"
               },
               "field": {
                 "default": 1,
+                "description": "Type hint: `int = 1`",
                 "title": "Field",
-                "type": "integer",
-                "description": "Missing description"
+                "type": "integer"
               }
             },
             "title": "InternalModel1",
             "type": "object"
           },
           "InternalModel2": {
-            "description": "Description of InternalModel2.",
+            "description": "Description of `InternalModel2`.",
             "properties": {
               "label": {
                 "const": "label2",
                 "default": "label2",
+                "description": "Type hint: `Literal[\"label2\"] = \"label2\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "FIXME"
+                "type": "string"
               },
               "field": {
+                "description": "Type hint: `str`",
                 "title": "Field",
-                "type": "string",
-                "description": "Missing description"
+                "type": "string"
               }
             },
             "required": [
@@ -326,19 +366,19 @@
             "type": "object"
           },
           "InternalModel3": {
-            "description": "Description of InternalModel3.",
+            "description": "Description of `InternalModel3`.",
             "properties": {
               "label": {
                 "const": "label3",
                 "default": "label3",
+                "description": "Type hint: `Literal[\"label3\"] = \"label3\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "xxx"
+                "type": "string"
               },
               "field": {
+                "description": "Type hint: `bool`",
                 "title": "Field",
-                "type": "boolean",
-                "description": "yyy"
+                "type": "boolean"
               }
             },
             "required": [
@@ -348,35 +388,51 @@
             "type": "object"
           },
           "ModelAllOptional": {
-            "description": "Short description of `ModelAllOptional`.",
+            "description": "Description of `ModelAllOptional`.",
             "properties": {
               "x": {
-                "title": "X",
-                "type": "integer",
-                "description": "FIXME"
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Type hint: `int | None = None`",
+                "title": "X"
               },
               "y": {
                 "default": 1,
+                "description": "Type hint: `int = 1`",
                 "title": "Y",
-                "type": "integer",
-                "description": "FIXME"
+                "type": "integer"
               }
             },
             "title": "ModelAllOptional",
             "type": "object"
           },
           "ModelSomeRequired": {
-            "description": "Short description of `ModelSomeRequired`.",
+            "description": "Description of `ModelSomeRequired`.",
             "properties": {
               "x": {
-                "title": "X",
-                "type": "integer",
-                "description": "FIXME"
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Type hint: `int | None = None`",
+                "title": "X"
               },
               "y": {
+                "description": "Type hint: `str`",
                 "title": "Y",
-                "type": "string",
-                "description": "FIXME"
+                "type": "string"
               }
             },
             "required": [
@@ -404,7 +460,7 @@
           "pydantic_1": {
             "$ref": "#/$defs/ModelAllOptional",
             "title": "Pydantic 1",
-            "description": "Example of a Pydantic model with no required field."
+            "description": "Type hint `ModelAllOptional`"
           },
           "pydantic_2": {
             "$ref": "#/$defs/ModelAllOptional",
@@ -413,7 +469,7 @@
               "y": 1
             },
             "title": "Pydantic 2",
-            "description": "Example of a Pydantic model with no required field, with a default value."
+            "description": "Type hint `ModelAllOptional = ModelAllOptional()`"
           },
           "pydantic_3": {
             "$ref": "#/$defs/ModelAllOptional",
@@ -422,12 +478,12 @@
               "y": 1
             },
             "title": "Pydantic 3",
-            "description": "Example of a Pydantic model with no required field, with a default factory."
+            "description": "Type hint `ModelAllOptional = Field(default_factory=ModelAllOptional)`"
           },
           "pydantic_4": {
             "$ref": "#/$defs/ModelSomeRequired",
             "title": "Pydantic 4",
-            "description": "Example of a Pydantic model with some required field."
+            "description": "Type hint `ModelSomeRequired`"
           },
           "tagged_union": {
             "default": {
@@ -454,7 +510,7 @@
               }
             ],
             "title": "Tagged Union",
-            "description": "Example of a top-level tagged union, with a default value."
+            "description": "Type hint `TaggedUnion = InternalModel1()`"
           },
           "nested_tagged_union": {
             "default": [],
@@ -481,7 +537,7 @@
             },
             "title": "Nested Tagged Union",
             "type": "array",
-            "description": "Example of a nested tagged union, with a default value."
+            "description": "Type hint `list[TaggedUnion] = Field(default_factory=list)`"
           }
         },
         "required": [
@@ -502,48 +558,48 @@
       "args_schema_non_parallel": {
         "$defs": {
           "EnumDropdown": {
+            "description": "Description of `EnumDropdown`",
             "enum": [
               "Value 1",
               "Value 2"
             ],
             "title": "EnumDropdown",
-            "type": "string",
-            "description": "Missing description for EnumDropdown."
+            "type": "string"
           },
           "InternalModel1": {
-            "description": "Description of InternalModel1.",
+            "description": "Description of `InternalModel1`.",
             "properties": {
               "label": {
                 "const": "label1",
                 "default": "label1",
+                "description": "Type hint: `Literal[\"label1\"] = \"label1\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "FIXME"
+                "type": "string"
               },
               "field": {
                 "default": 1,
+                "description": "Type hint: `int = 1`",
                 "title": "Field",
-                "type": "integer",
-                "description": "Missing description"
+                "type": "integer"
               }
             },
             "title": "InternalModel1",
             "type": "object"
           },
           "InternalModel2": {
-            "description": "Description of InternalModel2.",
+            "description": "Description of `InternalModel2`.",
             "properties": {
               "label": {
                 "const": "label2",
                 "default": "label2",
+                "description": "Type hint: `Literal[\"label2\"] = \"label2\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "FIXME"
+                "type": "string"
               },
               "field": {
+                "description": "Type hint: `str`",
                 "title": "Field",
-                "type": "string",
-                "description": "Missing description"
+                "type": "string"
               }
             },
             "required": [
@@ -553,19 +609,19 @@
             "type": "object"
           },
           "InternalModel3": {
-            "description": "Description of InternalModel3.",
+            "description": "Description of `InternalModel3`.",
             "properties": {
               "label": {
                 "const": "label3",
                 "default": "label3",
+                "description": "Type hint: `Literal[\"label3\"] = \"label3\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "xxx"
+                "type": "string"
               },
               "field": {
+                "description": "Type hint: `bool`",
                 "title": "Field",
-                "type": "boolean",
-                "description": "yyy"
+                "type": "boolean"
               }
             },
             "required": [
@@ -580,67 +636,76 @@
               "label": {
                 "const": "label4",
                 "default": "label4",
+                "description": "Type hint: `Literal[\"label5\"] = \"label5\"`",
                 "title": "Label",
-                "type": "string",
-                "description": "FIXME"
+                "type": "string"
               },
               "field": {
                 "default": 1,
+                "description": "Type hint: `int = 1`",
                 "title": "Field",
-                "type": "integer",
-                "description": "Missing description"
+                "type": "integer"
               }
             },
             "title": "InternalModel4",
             "type": "object"
           },
           "NestedModel": {
-            "description": "Description of NestedModel.",
+            "description": "Description of `NestedModel`.",
             "properties": {
               "field_1": {
                 "default": "default value",
+                "description": "Type hint: `str = \"default_value\"`",
                 "title": "Field 1",
-                "type": "string",
-                "description": "xxx"
+                "type": "string"
               },
               "field_2": {
                 "default": 1,
+                "description": "Type hint: `int = 1`",
                 "title": "Field 2",
-                "type": "integer",
-                "description": "yyy"
+                "type": "integer"
               },
               "field_3": {
-                "items": {
-                  "discriminator": {
-                    "mapping": {
-                      "label1": "#/$defs/InternalModel1",
-                      "label2": "#/$defs/InternalModel2",
-                      "label3": "#/$defs/InternalModel3",
-                      "label4": "#/$defs/InternalModel4"
+                "anyOf": [
+                  {
+                    "items": {
+                      "discriminator": {
+                        "mapping": {
+                          "label1": "#/$defs/InternalModel1",
+                          "label2": "#/$defs/InternalModel2",
+                          "label3": "#/$defs/InternalModel3",
+                          "label4": "#/$defs/InternalModel4"
+                        },
+                        "propertyName": "label"
+                      },
+                      "oneOf": [
+                        {
+                          "$ref": "#/$defs/InternalModel1"
+                        },
+                        {
+                          "$ref": "#/$defs/InternalModel2"
+                        },
+                        {
+                          "$ref": "#/$defs/InternalModel3"
+                        },
+                        {
+                          "$ref": "#/$defs/InternalModel4"
+                        }
+                      ]
                     },
-                    "propertyName": "label"
+                    "type": "array"
                   },
-                  "oneOf": [
-                    {
-                      "$ref": "#/$defs/InternalModel1"
-                    },
-                    {
-                      "$ref": "#/$defs/InternalModel2"
-                    },
-                    {
-                      "$ref": "#/$defs/InternalModel3"
-                    },
-                    {
-                      "$ref": "#/$defs/InternalModel4"
-                    }
-                  ]
-                },
-                "title": "Field 3",
-                "type": "array",
-                "description": "list of pydantic models union with none. When the list is empty the field will be set to none."
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Type hint: `list[NestedTaggedUnion] | None = Field(default=None)`",
+                "title": "Field 3"
               },
               "field_4": {
                 "default": [],
+                "description": "Type hint `list[NestedTaggedUnion] = Field(default_factory=list)`",
                 "items": {
                   "discriminator": {
                     "mapping": {
@@ -667,8 +732,7 @@
                   ]
                 },
                 "title": "Field 4",
-                "type": "array",
-                "description": "same as field_3 but with default value set to an empty list instead of none."
+                "type": "array"
               }
             },
             "title": "NestedModel",
@@ -694,14 +758,14 @@
             "default": "test",
             "title": "Custom title 2",
             "type": "string",
-            "description": "example of a way to add a custom title to the schema of an argument."
+            "description": "Type hint `str = Field(default=\"test\",title=\"Custom title 2\")`"
           },
           "regex_arg": {
             "default": "test",
             "pattern": "^[a-zA-Z0-9_]+$",
             "title": "Regex Arg",
             "type": "string",
-            "description": "example of a way to add a regex pattern to the schema of an argument."
+            "description": "Type hint `str = Field(default=\"test\", pattern=r\"^[a-zA-Z0-9_]+$\")`"
           },
           "list_arg": {
             "default": [
@@ -717,7 +781,7 @@
             "title": "List Arg",
             "type": "array",
             "uniqueItems": true,
-            "description": "example of a way to add a list with minimum and maximum length constraints to the schema of an argument."
+            "description": "Type hint `list[int] = Field(min_length=0, max_length=10, json_schema_extra={\"uniqueItems\": True}, default_factory=lambda: [1, 2, 3])`"
           },
           "float_arg": {
             "default": 50.0,
@@ -726,7 +790,7 @@
             "multipleOf": 5.0,
             "title": "Float Arg",
             "type": "number",
-            "description": "example of a way to add a float with minimum and maximum value constraints to the schema of an argument."
+            "description": "Type hint `float = Field(ge=0.0, le=100.0, default=50.0, multiple_of=5.0)`"
           },
           "nested_tagged_union_arg": {
             "discriminator": {
@@ -753,12 +817,20 @@
               }
             ],
             "title": "Nested Tagged Union Arg",
-            "description": "example of a way to add a nested tagged union argument (usefull to extend tagged unions defined in other tasks)."
+            "description": "Type hint `NestedTaggedUnion`"
           },
           "enum_arg": {
-            "$ref": "#/$defs/EnumDropdown",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EnumDropdown"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "title": "Enum Arg",
-            "description": "menu argument using StrEnum, which will be rendered as a dropdown in the UI."
+            "description": "Type hint `EnumDropdown | None = None`"
           },
           "literal_arg": {
             "default": "option1",
@@ -769,7 +841,7 @@
             ],
             "title": "Literal Arg",
             "type": "string",
-            "description": "menu argument using Literal, which will be rendered as a dropdown in the UI."
+            "description": "Type hint `Literal[\"option1\", \"option2\", \"option3\"] = \"option1\"`"
           },
           "nested_model_arg": {
             "$ref": "#/$defs/NestedModel",
@@ -780,12 +852,33 @@
               "field_4": []
             },
             "title": "Nested Model Arg",
-            "description": "example of a way to add a nested Pydantic model as an argument."
+            "description": "Type hint `NestedModel = NestedModel()`"
           },
           "model_or_none": {
-            "$ref": "#/$defs/InternalModel4",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/InternalModel4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
             "title": "Model Or None",
-            "description": "example of a field that is currently not correctly handled by the UI."
+            "description": "Type hint `InternalModel4 | None = None`"
+          },
+          "string_or_none": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "String Or None",
+            "description": "Type hint `str | None = Field(default=None)`"
           },
           "factory_args": {
             "default": [
@@ -798,7 +891,7 @@
             },
             "title": "Factory Args",
             "type": "array",
-            "description": "example of a field with a default factory, which is not evaluated during the build process."
+            "description": "Type hint `list[int] = Field(default_factory=lambda: [1, 2, 3])`"
           }
         },
         "required": [
@@ -809,10 +902,10 @@
         "type": "object",
         "title": "Task5"
       },
-      "docs_info": "## task5\nShort description of task5\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+      "docs_info": "## task5\nShort description of task5\n"
     }
   ],
   "has_args_schemas": true,
-  "args_schema_version": "pydantic_v2",
+  "args_schema_version": "pydantic_v2_next",
   "authors": "Your Name"
 }
