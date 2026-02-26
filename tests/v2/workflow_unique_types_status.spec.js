@@ -25,7 +25,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
 		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('2');
 		await page.getByRole('button', { name: 'Save changes' }).click();
-		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Run workflow', async () => {
@@ -45,7 +45,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('cellpose_segmentation');
-		await selectSlimSelect(page, modal.getByLabel('Selector for attribute well'), 'A01');
+		await selectSlimSelect(page, modal.getByRole('combobox', { name: 'Selector for attribute well' }), 'A01');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run' }).click();
@@ -66,7 +66,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 				.getByRole('option', { selected: true })
 		).toHaveText('MIP_compound');
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
-		await selectSlimSelect(page, modal.getByLabel('Selector for attribute well'), 'A01');
+		await selectSlimSelect(page, modal.getByRole('combobox', { name: 'Selector for attribute well' }), 'A01');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run' }).click();
@@ -85,7 +85,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 				.getByRole('combobox', { name: 'Start workflow at' })
 				.getByRole('option', { selected: true })
 		).toHaveText('cellpose_segmentation');
-		await selectSlimSelect(page, modal.getByLabel('Selector for attribute Status'), 'unset');
+		await selectSlimSelect(page, modal.getByRole('combobox', { name: 'Selector for attribute Status' }), 'unset');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run' }).click();

@@ -667,7 +667,7 @@
 							<th>
 								<div class="row">
 									<div class="col">
-										<div class="attribute-select-wrapper mb-1">
+										<div class="attribute-select-wrapper">
 											<select id="attribute-{getIdFromValue(attributeKey)}" class="invisible">
 											</select>
 										</div>
@@ -677,7 +677,7 @@
 						{/each}
 						{#each getTypeKeys(imagePage) as typeKey (typeKey)}
 							<th class:bg-warning-subtle={highlightedTypes.includes(typeKey)}>
-								<div class="type-select-wrapper mb-1">
+								<div class="type-select-wrapper">
 									<select id="type-{getIdFromValue(typeKey)}" class="invisible"></select>
 								</div>
 							</th>

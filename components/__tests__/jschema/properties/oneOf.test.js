@@ -130,7 +130,7 @@ describe('oneOf properties', () => {
 		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'XXX' } });
-		expect(component.valid).toEqual(false);
+		expect(component.isValid()).toEqual(false);
 
 		await user.selectOptions(screen.getByRole('combobox'), 'ProcessB');
 
@@ -141,7 +141,7 @@ describe('oneOf properties', () => {
 
 		expect(screen.queryAllByText("must match exactly one schema in oneOf")).toHaveLength(0);
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: 42 } });
-		expect(component.valid).toEqual(true);
+		expect(component.isValid()).toEqual(true);
 	});
 
 	it('Array with oneOf items - indexes are displayed in the title', async () => {

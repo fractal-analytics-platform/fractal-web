@@ -28,9 +28,9 @@ export async function createTestUser(page, projectDir = '/tmp') {
 export async function createGuestUser(page, projectDir = '/tmp') {
 	const randomEmail = await createTestUser(page, projectDir);
 	await page.getByRole('checkbox', { name: 'Guest' }).check();
-    await page.getByRole('button', { name: 'Save' }).click();
+	await page.getByRole('button', { name: 'Save' }).click();
 	await waitPageLoading(page);
-    await expect(page.getByText('User successfully updated')).toBeVisible();
+	await expect(page.getByText('User successfully updated')).toBeVisible();
 	return randomEmail;
 }
 
@@ -44,7 +44,7 @@ export async function addGroupToUser(page, groupName) {
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
 	const selectableGroups = await page.getByRole('option').count();
-	await selectSlimSelect(page, page.getByLabel('Select groups'), groupName, true);
+	await selectSlimSelect(page, page.getByRole('combobox', { name: 'Select groups' }), groupName, true);
 	await modal.getByRole('button', { name: 'Add' }).click();
 	if (await modal.getByText('Group is required').isVisible()) {
 		// Sometimes playwright clicks the "Add" button before the slim-select change event

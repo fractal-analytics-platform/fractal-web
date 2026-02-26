@@ -33,6 +33,7 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('2');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Run workflow', async () => {
@@ -49,7 +50,7 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 		await modal.waitFor();
 		await expect(modal.getByLabel('Selector for type 3D')).toBeEnabled();
 		await expect(modal.getByText('Total results: 4')).toBeVisible();
-		await selectSlimSelect(page, modal.getByLabel('Selector for type 3D'), 'False');
+		await selectSlimSelect(page, modal.getByRole('combobox', { name: 'Selector for type 3D' }), 'False');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();

@@ -147,13 +147,13 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: {} });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.input(screen.getByPlaceholderText('Key'), {
 			target: { value: 'key1' }
 		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(onChange).toHaveBeenCalledWith({ test: { key1: { prop1: null } } });
 	});
 
@@ -184,10 +184,10 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(onChange).toHaveBeenCalledWith({ test: {} });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
 
 	it('add and remove additional object property', async function () {
@@ -214,12 +214,12 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: {} });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.input(screen.getByPlaceholderText('Key'), {
 			target: { value: 'key1' }
 		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
 		await fireEvent.input(screen.getAllByRole('textbox')[0], {
 			target: { value: 'foo' }
@@ -310,15 +310,15 @@ describe('Object properties', () => {
 			{ k1: 'foo', k2: 'bar' }
 		);
 		expect(component.getArguments()).deep.eq({ k1: 'foo', k2: 'bar' });
-		expect(component.valid).toEqual(true);
+		expect(component.isValid()).toEqual(true);
 		await user.type(screen.getByRole('textbox', { name: 'k1' }), 'x');
 		await user.type(screen.getByRole('textbox', { name: 'k2' }), 'y');
 		expect(component.getArguments()).deep.eq({ k1: 'foox', k2: 'bary' });
-		expect(component.valid).toEqual(true);
+		expect(component.isValid()).toEqual(true);
 		await user.click(screen.getAllByRole('button', { name: 'Remove Property Block' })[0]);
 		await user.click(screen.getAllByRole('button', { name: 'Remove Property Block' })[0]);
 		expect(component.getArguments()).deep.eq({});
-		expect(component.valid).toEqual(true);
+		expect(component.isValid()).toEqual(true);
 	});
 
 	it('Attempt to add the same object key twice', async function () {

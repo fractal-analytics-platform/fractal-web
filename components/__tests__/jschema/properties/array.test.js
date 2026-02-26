@@ -172,10 +172,10 @@ describe('Array properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: [] });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.click(screen.getByRole('button', { name: 'Add argument to list' }));
 		expect(onChange).toHaveBeenCalledWith({ test: [null] });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
 
 	it('remove array element', async function () {
@@ -198,10 +198,10 @@ describe('Array properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: ['foo'] });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
 		expect(onChange).toHaveBeenCalledWith({ test: [] });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
 
 	it('A list of numbers', async () => {

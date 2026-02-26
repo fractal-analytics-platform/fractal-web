@@ -44,7 +44,7 @@ test('Admin groups management', async ({ page }) => {
 		await waitPageLoading(page);
 		const currentGroups = (await groupBadges.allInnerTexts()).map(
 			// extract the group name from the element without the removal button text content
-			(t) => /** @type {RegExpMatchArray} */ (t.match(/^\S+/))[0]
+			(t) => /** @type {RegExpMatchArray} */(t.match(/^\S+/))[0]
 		);
 		initialGroupBadgesCount = await groupBadges.count();
 		expect(currentGroups.includes('All')).toBeTruthy();
@@ -80,7 +80,7 @@ test('Admin groups management', async ({ page }) => {
 		const selectableGroups = await page.getByRole('option').allInnerTexts();
 		expect(selectableGroups.length).toEqual(selectableGroups1);
 		for (let group of [group2, group3].sort()) {
-			await selectSlimSelect(page, page.getByLabel('Select groups'), group, true);
+			await selectSlimSelect(page, page.getByRole('combobox', { name: 'Select groups' }), group, true);
 		}
 		// Await slim-select change events are propagated before clicking the Add button
 		await new Promise((r) => setTimeout(r, 500));
