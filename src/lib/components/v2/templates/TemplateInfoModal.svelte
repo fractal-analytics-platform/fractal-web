@@ -48,7 +48,7 @@
     size="lg"
 >
 		{#snippet header()}
-			<h5 class="modal-title">Workflow Template {template.id}</h5>
+			<h5 class="modal-title">Workflow Template {template?.id}</h5>
 		{/snippet}
 		{#snippet body()}
 			<ul class="list-group">
@@ -56,37 +56,47 @@
 					<strong>User email</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.user_email}</span>
+					<span>{template?.user_email}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Name</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.name}</span>
+					<span>{template?.name}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Version</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.version}</span>
+					<span>{template?.version}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>User Group</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.user_group_id ? template.user_group_id : '-'}</span>
+					<span>{template?.user_group_id ? template.user_group_id : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Description</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.description ? template.description : '-'}</span>
+					<span>{template?.description ? template.description : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Creation timestamp</strong>
 				</li>
 				<li class="list-group-item">
 					<TimestampCell timestamp={template.timestamp_created} />
+				</li>
+				<li class="list-group-item text-bg-light">
+					<strong>Last use timestamp</strong>
+				</li>
+				<li class="list-group-item">
+					{#if template?.timestamp_last_used}
+						<TimestampCell timestamp={template.timestamp_last_used} />
+					{:else}
+						<span>-</span>
+					{/if}
 				</li>
 			</ul>
 		{/snippet}
