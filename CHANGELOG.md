@@ -13,6 +13,7 @@
     * various fixes;
 * Simplified task version upgrade, to allow for fixing invalid arguments at a later stage;
 * Added task manifest sandbox example (\#957);
+* Updated slim-select (v3.4.3) and other dependencies (\#980);
 
 # 1.23.0
 
