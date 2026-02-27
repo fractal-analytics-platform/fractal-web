@@ -218,15 +218,33 @@
 			</div>
 
 			<div class="col-md-auto">
-				<button
-					class="btn btn-warning btn-sm px-4"
-					onclick={async () => {
-						currentPage=1;
-						await searchTemplate();
-					}}
-				>
-					Apply filters
-				</button>
+				<div class="row mb-1">
+					<button
+						class="btn btn-secondary btn-sm px-4"
+						onclick={async () => {
+							currentPage=1;
+							templateId=undefined;
+							isOwner=false;
+							userEmail=undefined;
+							templateName=undefined;
+							templateVersion=undefined;
+							await searchTemplate();
+						}}
+					>
+						Reset filters
+					</button>
+				</div>
+				<div class="row mb-1">
+					<button
+						class="btn btn-warning btn-sm px-4"
+						onclick={async () => {
+							currentPage=1;
+							await searchTemplate();
+						}}
+					>
+						Apply filters
+					</button>
+				</div>
 			</div>
 
 		</div>
