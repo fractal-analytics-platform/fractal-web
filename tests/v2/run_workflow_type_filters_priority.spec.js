@@ -97,7 +97,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	await test.step('Add 3D type filter to illumination_correction', async () => {
 		await workflow.selectTask('illumination_correction');
 		await page.getByRole('button', { name: 'Types', exact: true }).click();
-		await page.getByRole('button', { name: 'Add type filter' }).click();
+		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
 		await page.getByPlaceholder('Key').fill('3D');
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save' }).click();
