@@ -73,7 +73,6 @@
 	}
 </script>
 
-{#if template}
 <Modal
 	id="datasetCreateUpdateImageModal"
 	size="lg"
@@ -82,11 +81,12 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-		<h5 class="modal-title">
-			EDIT Workflow Template {template?.id}
-		</h5>
+	<h5 class="modal-title">
+		EDIT Workflow Template {template?.id}
+	</h5>
 	{/snippet}
 	{#snippet body()}
+		{#if template}
 			<div class="row mb-3 has-validation">
 				<label
 					class="col-3 col-lg-2 col-form-label"
@@ -115,6 +115,7 @@
 					/>
 				</div>
 			</div>
+			{/if}
 			{/snippet}
 			{#snippet footer()}
 			<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>
@@ -126,4 +127,3 @@
 			<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
 			{/snippet}
 </Modal>
-{/if}

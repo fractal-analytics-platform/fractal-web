@@ -39,7 +39,6 @@
 
 </script>
 
-{#if template}
 <Modal
     id="templateInfoModal"
     centered={true}
@@ -48,9 +47,10 @@
     size="lg"
 >
 		{#snippet header()}
-			<h5 class="modal-title">Workflow Template {template?.id}</h5>
+		<h5 class="modal-title">Workflow Template {template?.id}</h5>
 		{/snippet}
 		{#snippet body()}
+			{#if template}
 			<ul class="list-group">
 			<li class="list-group-item text-bg-light">
 					<strong>User email</strong>
@@ -99,6 +99,6 @@
 					{/if}
 				</li>
 			</ul>
+			{/if}
 		{/snippet}
 	</Modal>
-{/if}
