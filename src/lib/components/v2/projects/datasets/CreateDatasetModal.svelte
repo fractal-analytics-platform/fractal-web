@@ -194,32 +194,29 @@
 	{#snippet body()}
 		<span id="errorAlert-createDatasetModal"></span>
 		<div class="row mb-3">
-			 <div class="btn-group w-100" role="group" aria-label="Dataset mode">
-
-				<input
-					class="btn-check"
-					type="radio"
-					name="createDatasetMode"
-					id="createDatasetModeNew"
-					value="new"
-					bind:group={mode}
-				/>
-				<label class="btn btn-outline-primary" for="createDatasetModeNew">
-					Create new
-				</label>
-
-				<input
-					class="btn-check"
-					type="radio"
-					name="createDatasetMode"
-					id="createDatasetModeImport"
-					value="import"
-					bind:group={mode}
-				/>
-				<label class="btn btn-outline-primary" for="createDatasetModeImport">
-					Import from file
-				</label>
-
+			<div class="col-10">
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createDatasetMode"
+						id="createDatasetModeNew"
+						value="new"
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createDatasetModeNew">Create new</label>
+				</div>
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createDatasetMode"
+						id="createDatasetModeImport"
+						value="import"
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createDatasetModeImport">Import from file</label>
+				</div>
 			</div>
 		</div>
 		{#if mode === 'new'}

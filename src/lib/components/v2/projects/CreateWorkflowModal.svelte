@@ -290,46 +290,47 @@
 	{#snippet body()}
 	<!-- SWITCHER -->
 	<div class="row mb-3">
-		 <div class="btn-group w-100" role="group" aria-label="Workflow mode">
-			<input
-				class="btn-check"
-				type="radio"
-				name="createWorkflowMode"
-				id="createWorkflowModeNew"
-				value="new"
-				onclick={reset}
-				bind:group={mode}
-			/>
-			<label class="btn btn-outline-primary" for="createWorkflowModeNew">
-				Create new
-			</label>
-			<input
-				class="btn-check"
-				type="radio"
-				name="createWorkflowMode"
-				id="createWorkflowModeImport"
-				value="import"
-				onclick={reset}
-				bind:group={mode}
-			/>
-			<label class="btn btn-outline-primary" for="createWorkflowModeImport">
-				Import from file
-			</label>
-			<input
-				class="btn-check"
-				type="radio"
-				name="createWorkflowMode"
-				id="createWorkflowModeTemplate"
-				value="template"
-				onclick={async () => {
-					reset();
-					await searchTemplate();
-				}}
-				bind:group={mode}
-			/>
-			<label class="btn btn-outline-primary" for="createWorkflowModeTemplate">
-				Create from template
-			</label>
+
+		<div class="col-10">
+			<div class="form-check form-check-inline mb-3">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="createWorkflowMode"
+					id="createWorkflowModeNew"
+					value="new"
+					onclick={reset}
+					bind:group={mode}
+				/>
+				<label class="form-check-label" for="createWorkflowModeNew">Create new</label>
+			</div>
+			<div class="form-check form-check-inline mb-3">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="createWorkflowMode"
+					id="createWorkflowModeImport"
+					value="import"
+					onclick={reset}
+					bind:group={mode}
+				/>
+				<label class="form-check-label" for="createWorkflowModeImport">Import from file</label>
+			</div>
+			<div class="form-check form-check-inline mb-3">
+				<input
+					class="form-check-input"
+					type="radio"
+					name="createWorkflowMode"
+					id="createWorkflowModeTemplate"
+					value="template"
+					onclick={async () => {
+						reset();
+						await searchTemplate();
+					}}
+					bind:group={mode}
+				/>
+				<label class="form-check-label" for="createWorkflowModeTemplate">Create from template</label>
+			</div>
 		</div>
 	</div>
 	{#if mode==='new'}
