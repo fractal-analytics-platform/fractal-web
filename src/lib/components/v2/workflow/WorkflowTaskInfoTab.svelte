@@ -8,11 +8,12 @@
 	 * @typedef {Object} Props
 	 * @property {number} projectId
 	 * @property {import("fractal-components/types/api").WorkflowTaskV2} workflowTask
+	 * @property {boolean} editable
 	 * @property {(dataset: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowTaskCallback
 	 */
 
 	/** @type {Props} */
-	let { projectId, workflowTask, updateWorkflowTaskCallback } = $props();
+	let { projectId, workflowTask, editable, updateWorkflowTaskCallback } = $props();
 
 	const task = $derived(workflowTask.task);
 
@@ -147,14 +148,16 @@
 		{:else}
 			<span>
 				{workflowTask.alias || '–'}
-				<button
-					class="btn btn-primary float-end pt-0 pb-0"
-					onclick={showEditAlias}
-					aria-label="Edit workflow task alias"
-				>
-					<i class="bi bi-pencil"></i>
-					Edit
-				</button>
+				{#if editable}
+					<button
+						class="btn btn-primary float-end pt-0 pb-0"
+						onclick={showEditAlias}
+						aria-label="Edit workflow task alias"
+					>
+						<i class="bi bi-pencil"></i>
+						Edit
+					</button>
+				{/if}
 			</span>
 		{/if}
 		<div id="errorAlert-alias"></div>
@@ -200,14 +203,16 @@
 		{:else}
 			<span>
 				{workflowTask.description || '–'}
-				<button
-					class="btn btn-primary float-end pt-0 pb-0"
-					onclick={showEditDescription}
-					aria-label="Edit workflow task description"
-				>
-					<i class="bi bi-pencil"></i>
-					Edit
-				</button>
+				{#if editable}
+					<button
+						class="btn btn-primary float-end pt-0 pb-0"
+						onclick={showEditDescription}
+						aria-label="Edit workflow task description"
+					>
+						<i class="bi bi-pencil"></i>
+						Edit
+					</button>
+				{/if}
 			</span>
 		{/if}
 		<div id="errorAlert-description"></div>
