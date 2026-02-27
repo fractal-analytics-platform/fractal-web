@@ -189,11 +189,11 @@
 
 <Modal id="createDatasetModal" bind:this={modal} size="lg" centered={true} {onOpen}>
 	{#snippet header()}
-		<h4 class="modal-title">Create new dataset</h4>
+		<h5 class="modal-title">Create new dataset</h5>
 	{/snippet}
 	{#snippet body()}
 		<span id="errorAlert-createDatasetModal"></span>
-		<div class="row">
+		<div class="row mb-3">
 			<div class="col-10">
 				<div class="form-check form-check-inline mb-3">
 					<input

@@ -98,6 +98,37 @@ export type Image = {
 	types: { [key: string]: boolean };
 };
 
+export type WorkflowTemplate = {
+    id: number;
+    user_email: string;
+    name: string;
+    version: number;
+    timestamp_created: string;
+	timestamp_last_used: string | null;
+    user_group_id: number | null;
+    description: string | null;
+    data: WorkflowImport;
+}
+
+export type WorkflowTemplateGroupMember = {
+	template_id: number;
+	template_version: number;
+}
+
+export type WorkflowTemplateGroup = {
+    user_email: string;
+    template_name: string;
+	templates: Array<WorkflowTemplateGroupMember>
+}
+
+
+export type WorkflowTemplateImport = {
+	name: string;
+    version: number;
+    description: string | null;
+    data: WorkflowImport;
+}
+
 export type Pagination<T> = {
 	total_count: number;
 	page_size: number;
@@ -108,6 +139,10 @@ export type Pagination<T> = {
 export type ImagePage = Pagination<Image> & {
 	attributes: { [key: string]: Array<string | number | boolean> };
 	types: Array<string>;
+};
+
+export type TemplatePage = Pagination<WorkflowTemplateGroup> & {
+	email_list: Array<string>;
 };
 
 export type TaskV2Type =
