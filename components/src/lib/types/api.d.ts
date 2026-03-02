@@ -230,6 +230,7 @@ export type WorkflowV2 = {
 	task_list: Array<WorkflowTaskV2>;
 	timestamp_created: string;
 	description: string | null;
+	template_id: number | null;
 };
 
 export type WorkflowTaskV2 = {
