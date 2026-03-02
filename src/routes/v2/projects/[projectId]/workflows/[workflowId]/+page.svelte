@@ -1,5 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
+	import { goto } from '$app/navigation';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
@@ -658,6 +659,10 @@
 		}
 	}
 
+	async function gotoLinkedTemplate() {
+		await goto(`/v2/templates?template_id=${workflow.template_id}`);
+	}
+
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
@@ -808,7 +813,7 @@
 			</div>
 		</div>
 
-		<div class="col-lg-5 mb-2">
+		<div class="col-xl-12 mb-2">
 			<div class="float-end">
 				{#if page.data.userInfo.is_superuser}
 					<button
@@ -833,13 +838,21 @@
 				<button
 					class="btn btn-light"
 					aria-label="Create template"
-					onclick={async () => {
-						await templateCreateModal?.show();
-					}}
+					onclick={templateCreateModal?.show}
 				>
 					<i class="bi-plus-square"></i>
 					Create template
 				</button>
+				{#if workflow.template_id}
+					<button
+						class="btn btn-light"
+						aria-label="Original template"
+						onclick={gotoLinkedTemplate}
+					>
+						<i class="bi-box-arrow-up-right"></i>
+						Original template
+					</button>
+				{/if}
 				<button
 					class="btn btn-light"
 					onclick={(e) => {
