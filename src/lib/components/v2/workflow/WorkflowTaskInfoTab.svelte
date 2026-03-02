@@ -8,11 +8,12 @@
 	 * @typedef {Object} Props
 	 * @property {number} projectId
 	 * @property {import("fractal-components/types/api").WorkflowTaskV2} workflowTask
+	 * @property {boolean} editable
 	 * @property {(dataset: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowTaskCallback
 	 */
 
 	/** @type {Props} */
-	let { projectId, workflowTask, updateWorkflowTaskCallback } = $props();
+	let { projectId, workflowTask, editable, updateWorkflowTaskCallback } = $props();
 
 	const task = $derived(workflowTask.task);
 
@@ -147,14 +148,16 @@
 		{:else}
 			<span>
 				{workflowTask.alias || '–'}
-				<button
-					class="btn btn-primary float-end pt-0 pb-0"
-					onclick={showEditAlias}
-					aria-label="Edit workflow task alias"
-				>
-					<i class="bi bi-pencil"></i>
-					Edit
-				</button>
+				{#if editable}
+					<button
+						class="btn btn-primary float-end pt-0 pb-0"
+						onclick={showEditAlias}
+						aria-label="Edit workflow task alias"
+					>
+						<i class="bi bi-pencil"></i>
+						Edit
+					</button>
+				{/if}
 			</span>
 		{/if}
 		<div id="errorAlert-alias"></div>
@@ -200,37 +203,41 @@
 		{:else}
 			<span>
 				{workflowTask.description || '–'}
-				<button
-					class="btn btn-primary float-end pt-0 pb-0"
-					onclick={showEditDescription}
-					aria-label="Edit workflow task description"
-				>
-					<i class="bi bi-pencil"></i>
-					Edit
-				</button>
+				{#if editable}
+					<button
+						class="btn btn-primary float-end pt-0 pb-0"
+						onclick={showEditDescription}
+						aria-label="Edit workflow task description"
+					>
+						<i class="bi bi-pencil"></i>
+						Edit
+					</button>
+				{/if}
 			</span>
 		{/if}
 		<div id="errorAlert-description"></div>
 	</li>
 	<li class="list-group-item list-group-item-light fw-bold">Version</li>
 	<li class="list-group-item">{task.version || '–'}</li>
-	<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
-	<li class="list-group-item">
-		{#if task.docs_link}
-			<a href={task.docs_link} target="_blank">{task.docs_link}</a>
-		{:else}
-			-
-		{/if}
-	</li>
-	<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
-	<li class="list-group-item">
-		{#if task.docs_info}
-			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html formatMarkdown(task.docs_info)}
-		{:else}
-			-
-		{/if}
-	</li>
+	{#if editable}
+		<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
+		<li class="list-group-item">
+			{#if task.docs_link}
+				<a href={task.docs_link} target="_blank">{task.docs_link}</a>
+			{:else}
+				-
+			{/if}
+		</li>
+		<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
+		<li class="list-group-item">
+			{#if task.docs_info}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html formatMarkdown(task.docs_info)}
+			{:else}
+				-
+			{/if}
+		</li>
+	{/if}
 </ul>
 
 <div class="accordion mt-4" id="workflowTaskAdvancedInfo">
@@ -271,12 +278,14 @@
 						</li>
 					{/if}
 
-					<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
-					<li class="list-group-item">
-						{task.args_schema_version || '–'}
-					</li>
+					{#if editable}
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
+						<li class="list-group-item">
+							{task.args_schema_version || '–'}
+						</li>
+					{/if}
 
-					{#if task.command_parallel !== null}
+					{#if editable && task.command_parallel !== null}
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema parallel</li>
 						<li class="list-group-item">
 							{#if task.args_schema_parallel}
@@ -289,7 +298,7 @@
 						</li>
 					{/if}
 
-					{#if task.command_non_parallel !== null}
+					{#if editable && task.command_non_parallel !== null}
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema non parallel</li>
 						<li class="list-group-item">
 							{#if task.args_schema_non_parallel}

@@ -14,6 +14,9 @@
 * Simplified task version upgrade, to allow for fixing invalid arguments at a later stage;
 * Added task manifest sandbox example (\#957);
 * Updated slim-select (v3.4.3) and other dependencies (\#980);
+* Display run data in workflow task Info tab (\#987);
+* Drop support for dataset history (\#987);
+* Updated e2e test docs (\#987);
 
 # 1.23.0
 
