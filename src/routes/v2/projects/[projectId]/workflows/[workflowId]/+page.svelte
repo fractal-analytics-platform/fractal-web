@@ -32,6 +32,7 @@
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
+	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -111,6 +112,8 @@
 	let editWorkflowModal = $state();
 	/** @type {TypeFiltersFlowModal|undefined} */
 	let typeFiltersFlowModal = $state();
+	/** @type {TemplateCreateModal|undefined} */
+	let templateCreateModal = $state();
 
 	/** @type {{ [id: string]: Array<{ task_id: number, version: string }> }} */
 	let newVersionsMap = $state({});
@@ -805,7 +808,7 @@
 			</div>
 		</div>
 
-		<div class="col-lg-4 mb-2">
+		<div class="col-lg-5 mb-2">
 			<div class="float-end">
 				{#if page.data.userInfo.is_superuser}
 					<button
@@ -827,6 +830,16 @@
 				>
 					<i class="bi-journal-code"></i> List jobs
 				</a>
+				<button
+					class="btn btn-light"
+					aria-label="Create template"
+					onclick={async () => {
+						await templateCreateModal?.show();
+					}}
+				>
+					<i class="bi-plus-square"></i>
+					Create template
+				</button>
 				<button
 					class="btn btn-light"
 					onclick={(e) => {
@@ -1419,6 +1432,11 @@
 </Modal>
 
 <JobLogsModal bind:this={jobLogsModal} />
+
+<TemplateCreateModal
+	bind:this={templateCreateModal}
+	{workflow}
+/>
 
 <style>
 	.run-item {
