@@ -219,23 +219,25 @@
 	</li>
 	<li class="list-group-item list-group-item-light fw-bold">Version</li>
 	<li class="list-group-item">{task.version || '–'}</li>
-	<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
-	<li class="list-group-item">
-		{#if task.docs_link}
-			<a href={task.docs_link} target="_blank">{task.docs_link}</a>
-		{:else}
-			-
-		{/if}
-	</li>
-	<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
-	<li class="list-group-item">
-		{#if task.docs_info}
-			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html formatMarkdown(task.docs_info)}
-		{:else}
-			-
-		{/if}
-	</li>
+	{#if editable}
+		<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
+		<li class="list-group-item">
+			{#if task.docs_link}
+				<a href={task.docs_link} target="_blank">{task.docs_link}</a>
+			{:else}
+				-
+			{/if}
+		</li>
+		<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
+		<li class="list-group-item">
+			{#if task.docs_info}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html formatMarkdown(task.docs_info)}
+			{:else}
+				-
+			{/if}
+		</li>
+	{/if}
 </ul>
 
 <div class="accordion mt-4" id="workflowTaskAdvancedInfo">
@@ -276,12 +278,14 @@
 						</li>
 					{/if}
 
-					<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
-					<li class="list-group-item">
-						{task.args_schema_version || '–'}
-					</li>
+					{#if editable}
+						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
+						<li class="list-group-item">
+							{task.args_schema_version || '–'}
+						</li>
+					{/if}
 
-					{#if task.command_parallel !== null}
+					{#if editable && task.command_parallel !== null}
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema parallel</li>
 						<li class="list-group-item">
 							{#if task.args_schema_parallel}
@@ -294,7 +298,7 @@
 						</li>
 					{/if}
 
-					{#if task.command_non_parallel !== null}
+					{#if editable && task.command_non_parallel !== null}
 						<li class="list-group-item list-group-item-light fw-bold">Args Schema non parallel</li>
 						<li class="list-group-item">
 							{#if task.args_schema_non_parallel}
