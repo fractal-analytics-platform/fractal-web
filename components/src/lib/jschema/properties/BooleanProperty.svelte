@@ -48,7 +48,12 @@
 				class:is-invalid={errors.length > 0}
 				disabled={!editable}
 			/>
-			<span class="invalid-feedback">{errors.join(', ')}</span>
+			{#if value === null}
+				(unset)
+			{/if}
 		</div>
+		{#if errors.length > 0}
+			<span class="text-danger">{errors.join(', ')}</span>
+		{/if}
 	</div>
 </div>

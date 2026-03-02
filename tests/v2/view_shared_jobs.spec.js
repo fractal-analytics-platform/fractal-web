@@ -66,23 +66,23 @@ test('View shared jobs', async ({ page }) => {
 
 	await test.step('Check jobs page', async () => {
 		await page.goto('/v2/jobs');
-		await selectSlimSelect(page, page.getByLabel('Select project'), project.name);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Select project' }), project.name);
 		await expect(page.getByRole('row')).toHaveCount(4);
 
 		// Select dataset
-		await selectSlimSelect(page, page.getByLabel('Select dataset'), dataset.name);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Select dataset' }), dataset.name);
 		await expect(page.getByRole('row')).toHaveCount(3);
 		await expect(page.getByRole('row', { name: 'admin@fractal.xy' })).toBeVisible();
 		await expect(page.getByRole('row', { name: userEmail })).not.toBeVisible();
 
 		// Deselect dataset
-		await page.getByLabel('Select dataset').locator('.ss-deselect').click();
+		await page.getByRole('combobox', { name: 'Select dataset' }).locator('.ss-deselect').click();
 		await expect(page.getByRole('row')).toHaveCount(4);
 		await expect(page.getByRole('row', { name: 'admin@fractal.xy' })).toBeVisible();
 		await expect(page.getByRole('row', { name: userEmail })).toBeVisible();
 
 		// Select user
-		await selectSlimSelect(page, page.getByLabel('Select user'), userEmail);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Select user' }), userEmail);
 		await expect(page.getByRole('row')).toHaveCount(3);
 		await expect(page.getByRole('row', { name: 'admin@fractal.xy' })).not.toBeVisible();
 		await expect(page.getByRole('row', { name: userEmail })).toBeVisible();

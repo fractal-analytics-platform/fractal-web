@@ -234,10 +234,10 @@ describe('Tuple properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ arg_A: [[]] });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(onChange).toHaveBeenCalledWith({ arg_A: [[[]]] });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(screen.getAllByRole('button', { name: 'Remove tuple' }).length).toEqual(1);
 		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(onChange).toHaveBeenCalledWith({ arg_A: [[[null]]] });
@@ -265,9 +265,9 @@ describe('Tuple properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ testProp: [] });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(onChange).toHaveBeenCalledWith({ testProp: [[]] });
 		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(onChange).toHaveBeenCalledWith({ testProp: [[null, null]] });
@@ -294,13 +294,13 @@ describe('Tuple properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ testProp: [] });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 
 		const addTupleBtn = screen.getByRole('button', { name: 'Add tuple' });
 		await fireEvent.click(addTupleBtn);
 
 		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 1] });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		const inputs = screen.getAllByRole('spinbutton');
 		expect(inputs.length).eq(2);
 
@@ -336,15 +336,15 @@ describe('Tuple properties', () => {
 
 		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxx'] });
 		expect(screen.queryAllByText('must NOT have more than 2 items')).toHaveLength(1);
-		expect(component.valid).toEqual(false);
+		expect(component.isValid()).toEqual(false);
 
 		await user.type(screen.getByRole('textbox', { name: '2' }), 'y');
 		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxxy'] });
-		expect(component.valid).toEqual(false);
+		expect(component.isValid()).toEqual(false);
 
 		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(component.getArguments()).deep.eq({ k: ['a', 42] });
-		expect(component.valid).toEqual(true);
+		expect(component.isValid()).toEqual(true);
 	});
 
 	it('tuple with extra arguments (pydantic_v2)', async function () {
@@ -368,14 +368,14 @@ describe('Tuple properties', () => {
 
 		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxx'] });
 		expect(screen.queryAllByText('must NOT have more than 2 items')).toHaveLength(1);
-		expect(component.valid).toEqual(false);
+		expect(component.isValid()).toEqual(false);
 
 		await user.type(screen.getByRole('textbox', { name: '2' }), 'y');
 		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxxy'] });
-		expect(component.valid).toEqual(false);
+		expect(component.isValid()).toEqual(false);
 
 		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(component.getArguments()).deep.eq({ k: ['a', 42] });
-		expect(component.valid).toEqual(true);
+		expect(component.isValid()).toEqual(true);
 	});
 });

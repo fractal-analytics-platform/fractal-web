@@ -34,14 +34,14 @@ describe('Unexpected properties (extra properties)', () => {
       unexpectedProperty: 'barx'
     });
 
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
 
     await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
     expect(component.getArguments()).deep.eq({
       validProperty: 'foo'
     });
 
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 
   it('Extra array', async function () {
@@ -73,14 +73,14 @@ describe('Unexpected properties (extra properties)', () => {
       unexpectedProperty: ['ax', 'b']
     });
 
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
 
     await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
     expect(component.getArguments()).deep.eq({
       validProperty: 'foo'
     });
 
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 
   it('Extra object', async function () {
@@ -114,13 +114,13 @@ describe('Unexpected properties (extra properties)', () => {
       unexpectedProperty: { fooA: { barB: 'bazC' } }
     });
 
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
 
     await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
     expect(component.getArguments()).deep.eq({
       validProperty: 'foo'
     });
 
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 });

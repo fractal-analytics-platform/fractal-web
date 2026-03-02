@@ -21,10 +21,10 @@
 
 	/** @type {string[]} */
 	let errors = $state([]);
-	formElement.errors.subscribe((v) => (errors = v));
 
 	onMount(() => {
 		children = formElement.children;
+		formElement.errors.subscribe((v) => (errors = v));
 	});
 
 	let newPropertyKey = $state('');

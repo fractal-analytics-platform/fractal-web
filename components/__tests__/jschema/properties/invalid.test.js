@@ -22,7 +22,7 @@ describe('Invalid properties (type mismatch)', () => {
     );
 
     expect(component.getArguments()).deep.eq({ k: 'xxx' });
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
     expect(screen.queryAllByText('must be object')).toHaveLength(1);
 
     await user.type(screen.getByRole('textbox'), 'y');
@@ -33,7 +33,7 @@ describe('Invalid properties (type mismatch)', () => {
       k: { foo: null }
     });
     expect(screen.queryAllByText('must be object')).toHaveLength(0);
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 
   it('Array instead of object', async function () {
@@ -53,7 +53,7 @@ describe('Invalid properties (type mismatch)', () => {
     );
 
     expect(component.getArguments()).deep.eq({ k: ['xxx'] });
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
     expect(screen.queryAllByText('must be object')).toHaveLength(1);
 
     await user.type(screen.getByRole('textbox'), 'y');
@@ -64,7 +64,7 @@ describe('Invalid properties (type mismatch)', () => {
       k: { foo: null }
     });
     expect(screen.queryAllByText('must be object')).toHaveLength(0);
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 
   it('Object instead of array', async function () {
@@ -84,13 +84,13 @@ describe('Invalid properties (type mismatch)', () => {
     );
 
     expect(component.getArguments()).deep.eq({ k: { foo: 'bar' } });
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
     expect(screen.queryAllByText('must be array')).toHaveLength(1);
 
     await user.click(screen.getByRole('button', { name: 'Reset to Default Value' }));
     expect(component.getArguments()).deep.eq({ k: [] });
     expect(screen.queryAllByText('must be array')).toHaveLength(0);
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 
   it('Object instead of string', async function () {
@@ -107,7 +107,7 @@ describe('Invalid properties (type mismatch)', () => {
     );
 
     expect(component.getArguments()).deep.eq({ k: { foo: 'bar' } });
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
     expect(screen.queryAllByText('must be string')).toHaveLength(1);
 
     await user.type(screen.getAllByRole('textbox')[0], 'x');
@@ -117,7 +117,7 @@ describe('Invalid properties (type mismatch)', () => {
     await user.click(screen.getByRole('button', { name: 'Reset to Default Value' }));
     expect(component.getArguments()).deep.eq({ k: null });
     expect(screen.queryAllByText('must be string')).toHaveLength(0);
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 
   it('Array instead of string', async function () {
@@ -134,7 +134,7 @@ describe('Invalid properties (type mismatch)', () => {
     );
 
     expect(component.getArguments()).deep.eq({ k: ['foo'] });
-    expect(component.valid).toEqual(false);
+    expect(component.isValid()).toEqual(false);
     expect(screen.queryAllByText('must be string')).toHaveLength(1);
 
     await user.type(screen.getByRole('textbox'), 'x');
@@ -143,6 +143,6 @@ describe('Invalid properties (type mismatch)', () => {
     await user.click(screen.getByRole('button', { name: 'Reset to Default Value' }));
     expect(component.getArguments()).deep.eq({ k: null });
     expect(screen.queryAllByText('must be string')).toHaveLength(0);
-    expect(component.valid).toEqual(true);
+    expect(component.isValid()).toEqual(true);
   });
 });

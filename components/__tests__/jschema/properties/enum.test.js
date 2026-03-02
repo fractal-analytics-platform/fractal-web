@@ -119,6 +119,6 @@ describe('Enum properties', () => {
 
 		expect(component.getArguments()).deep.eq({ k: 'C' });
 		expect(screen.queryAllByText('must be equal to one of the allowed values')).toHaveLength(1);
-		expect(component.valid).toEqual(false);
+		expect(component.isValid()).toEqual(false);
 	});
 });

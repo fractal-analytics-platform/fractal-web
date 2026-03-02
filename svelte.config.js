@@ -17,10 +17,6 @@ const config = {
 				return cfg;
 			}
 		}
-	},
-	compilerOptions: {
-		// allow accessing private object properties in unit tests
-		accessors: !!process.env.TEST
 	}
 };
 

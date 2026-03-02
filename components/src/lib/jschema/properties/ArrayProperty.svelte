@@ -75,7 +75,7 @@
 		</button>
 	</div>
 	<div>
-		{#each children as nestedProperty, index (nestedProperty.id)}
+		{#each children as nestedProperty, index (nestedProperty.id + index)}
 			<div class="d-flex">
 				<div class="align-self-center m-2">
 					{#if canRemoveChildren}

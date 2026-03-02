@@ -658,9 +658,10 @@
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
-	function onWorkflowTaskUpdated(updatedWft) {
+	async function onWorkflowTaskUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
 		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
+    await tick();
 		argsChangesSaved = true;
 		setTimeout(() => {
 			argsChangesSaved = false;

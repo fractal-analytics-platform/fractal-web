@@ -205,16 +205,6 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		).toHaveText('0.0.3');
 	});
 
-
-	/*await test.step('Fix the arguments', async () => {
-		await expect(page.getByText('Data is not valid')).toBeVisible();
-		await page.getByRole('button', { name: 'Argument' }).click();
-		await page.getByRole('textbox', { name: 'p2' }).fill('test');
-		await expect(page.getByText('Data is not valid')).not.toBeVisible();
-		await page.getByRole('button', { name: 'Save changes' }).click();
-		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
-	});*/
-
 	await test.step('Update parallel task to v3 (no fix needed)', async () => {
 		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();

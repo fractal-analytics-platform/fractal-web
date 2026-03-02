@@ -357,7 +357,7 @@ export class FormManager {
 		const items = /** @type {import("../types/jschema").JSONSchemaProperty} */ (property.items);
 		const children = (value || []).map((v, i) =>
 			this.createFormElement({
-				key: null,
+				key: i.toString(),
 				path: `${path}/${i}`,
 				property: items,
 				required: false,
@@ -465,21 +465,27 @@ export class FormManager {
 			}
 		}
 
+		const selectedItem = selectedIndex === -1 ? null : this.createFormElement({
+			key,
+			path,
+			property: selectedProperty,
+			required,
+			removable,
+			value: selectedValue,
+			parentProperty: property
+		});
+
+		if (selectedItem) {
+			selectedItem.title = selectedProperty.title || key || '';
+		}
+
 		return new ConditionalFormElement({
 			...fields,
 			type: 'conditional',
 			property: oneOfProperty,
 			selectedIndex: selectedIndex,
 			discriminator,
-			selectedItem: selectedIndex === -1 ? null : this.createFormElement({
-				key,
-				path,
-				property: selectedProperty,
-				required,
-				removable,
-				value: selectedValue,
-				parentProperty: property
-			}),
+			selectedItem,
 			unexpectedChildren
 		});
 	}
@@ -613,7 +619,7 @@ export class FormManager {
 			manager: this,
 			id: this.getUniqueId(),
 			type: 'type' in property && property.type ? property.type : null,
-			title: key && removable ? key : property.title || key || '',
+			title: key && removable && !key.match(/^\d+$/) ? key : property.title || key || '',
 			description: property.description || '',
 			property: deepCopy(property),
 			notifyChange: this.notifyChange
