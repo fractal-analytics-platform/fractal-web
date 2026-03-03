@@ -7,6 +7,7 @@
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { pushState } from '$app/navigation';
 
     /**
 	 * @typedef {Object} Props
@@ -79,14 +80,14 @@
 		templateVersion && params.set('version', String(templateVersion));
 
 		if (modalType === "edit") {
-			url.searchParams.set('is_owner', String(isOwner));
-			templateId ? url.searchParams.set('template_id', String(templateId)) : url.searchParams.delete('template_id');;
+			isOwner ? url.searchParams.set('is_owner', String(isOwner)): url.searchParams.delete('is_owner');
+			templateId ? url.searchParams.set('template_id', String(templateId)) : url.searchParams.delete('template_id');
 			userEmail ? url.searchParams.set('user_email', userEmail) : url.searchParams.delete('user_email');
 			templateName ? url.searchParams.set('name', templateName) : url.searchParams.delete('name');
 			templateVersion ? url.searchParams.set('version', String(templateVersion)) : url.searchParams.delete('version');
 		}
-		
-		history.pushState({}, '', url);
+		pushState(url, {});
+
 		let response = await fetch(
             `/api/v2/workflow_template?${params.toString()}`,
 			{
