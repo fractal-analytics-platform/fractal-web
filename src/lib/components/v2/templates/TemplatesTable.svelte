@@ -63,6 +63,7 @@
 	});
 	
 	export async function searchTemplate() {
+		const url = new URL(window.location.href);
 		// Headers
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -71,11 +72,33 @@
 		params.set('page', String(currentPage));
 		params.set('page_size', String(pageSize));
 		params.set('is_owner', String(isOwner));
-		if (templateId) params.set('template_id', String(templateId));
-		if (userEmail) params.set('user_email', userEmail);
-		if (templateName) params.set('name', templateName);
-		if (templateVersion) params.set('version', String(templateVersion));
+		url.searchParams.set('is_owner', String(isOwner));
+		if (templateId) {
+			params.set('template_id', String(templateId));
+			url.searchParams.set('template_id', String(templateId));
+		} else {
+			url.searchParams.delete('template_id');
+		}
+		if (userEmail) {
+			params.set('user_email', userEmail);
+			url.searchParams.set('user_email', userEmail);
+		} else {
+			url.searchParams.delete('user_email');
+		}
+		if (templateName) {
+			params.set('name', templateName);
+			url.searchParams.set('name', templateName);
+		} else {
+			url.searchParams.delete('name');
+		}
+		if (templateVersion) {
+			params.set('version', String(templateVersion));
+			url.searchParams.set('version', String(templateVersion));
+		} else {
+			url.searchParams.delete('version');
+		}
 		
+		history.pushState({}, '', url);
 		let response = await fetch(
             `/api/v2/workflow_template?${params.toString()}`,
 			{

@@ -13,9 +13,7 @@
 	);
 	/** @type {boolean} */
 	let isOwner = $derived(
-		page.url.searchParams.get('is_owner')
-		? Boolean(page.url.searchParams.get('is_owner'))
-		: false
+		page.url.searchParams.get('is_owner') === 'true'
 	);
 	/** @type {string|undefined} */
 	let userEmail = $derived(
