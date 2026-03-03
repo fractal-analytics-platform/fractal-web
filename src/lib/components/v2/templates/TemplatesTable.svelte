@@ -72,30 +72,18 @@
 		params.set('page', String(currentPage));
 		params.set('page_size', String(pageSize));
 		params.set('is_owner', String(isOwner));
-		url.searchParams.set('is_owner', String(isOwner));
-		if (templateId) {
-			params.set('template_id', String(templateId));
-			url.searchParams.set('template_id', String(templateId));
-		} else {
-			url.searchParams.delete('template_id');
-		}
-		if (userEmail) {
-			params.set('user_email', userEmail);
-			url.searchParams.set('user_email', userEmail);
-		} else {
-			url.searchParams.delete('user_email');
-		}
-		if (templateName) {
-			params.set('name', templateName);
-			url.searchParams.set('name', templateName);
-		} else {
-			url.searchParams.delete('name');
-		}
-		if (templateVersion) {
-			params.set('version', String(templateVersion));
-			url.searchParams.set('version', String(templateVersion));
-		} else {
-			url.searchParams.delete('version');
+
+		templateId && params.set('template_id', String(templateId));
+		userEmail && params.set('user_email', userEmail);
+		templateName && params.set('name', templateName);
+		templateVersion && params.set('version', String(templateVersion));
+
+		if (modalType === "edit") {
+			url.searchParams.set('is_owner', String(isOwner));
+			templateId ? url.searchParams.set('template_id', String(templateId)) : url.searchParams.delete('template_id');;
+			userEmail ? url.searchParams.set('user_email', userEmail) : url.searchParams.delete('user_email');
+			templateName ? url.searchParams.set('name', templateName) : url.searchParams.delete('name');
+			templateVersion ? url.searchParams.set('version', String(templateVersion)) : url.searchParams.delete('version');
 		}
 		
 		history.pushState({}, '', url);
