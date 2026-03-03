@@ -224,25 +224,24 @@
 	 * @param {number} templateId
 	*/
 	async function handleSelect(templateId) {
+		modal?.hideErrorAlert();
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		
-		const options = {
-			method: 'POST',
-			credentials: 'include',
-			headers
-		};
-
+		let body = {}
 		if (workflowName) {
-			options.body = JSON.stringify({
-				name: workflowName
-			});
+			body = {name: workflowName};
 		}
 
 		const response = await fetch(
 			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
-			options
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify(body),
+			}
 		);
 
 		if (response.ok) {
@@ -261,16 +260,8 @@
 			handleWorkflowImported(workflow);
 		} else {
 			console.error('Import workflow failed');
-
 			const alertError = await getAlertErrorFromResponse(response);
-			const result = alertError.reason;
-
-			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
-				workflowImportErrorData = result.data
-				throw new Error();
-			}
-
-			throw alertError;
+			modal?.displayErrorAlert(alertError);
 		}
 	}
 </script>
@@ -529,6 +520,7 @@
 					class="form-control"
 				/>
 			</div>
+			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
 			<div>Select a template</div>
 			<TemplatesTable 
 				modalType='select'

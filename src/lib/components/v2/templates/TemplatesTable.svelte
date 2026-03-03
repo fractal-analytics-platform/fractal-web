@@ -11,11 +11,11 @@
     /**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
-	 * @property {number|undefined} templateId
-	 * @property {boolean} isOwner
-	 * @property {string|undefined} userEmail
-	 * @property {string|undefined} templateName
-	 * @property {number|undefined} templateVersion
+	 * @property {number|undefined} [templateId]
+	 * @property {boolean} [isOwner]
+	 * @property {string|undefined} [userEmail]
+	 * @property {string|undefined} [templateName]
+	 * @property {number|undefined} [templateVersion]
 	 * @property {'edit'|'select'} modalType
 	 * @property {any} [handleSelect]
 	 */
