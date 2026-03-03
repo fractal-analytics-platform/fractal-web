@@ -11,12 +11,22 @@
     /**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
-	 * @property {any} [handleSelect]
+	 * @property {number|undefined} templateId
+	 * @property {boolean} isOwner
+	 * @property {string|undefined} userEmail
+	 * @property {string|undefined} templateName
+	 * @property {number|undefined} templateVersion
 	 * @property {'edit'|'select'} modalType
+	 * @property {any} [handleSelect]
 	 */
 	/** @type {Props} */
 	let {
 		templatePage = $bindable(),
+		templateId: initialTemplateId = undefined,
+		isOwner: initialIsOwner = false,
+		userEmail: initialUserEmail = undefined,
+		templateName: initialTemplateName = undefined,
+		templateVersion: initialTemplateVersion = undefined,
 		modalType,
 		handleSelect,
 	} = $props();
@@ -34,22 +44,22 @@
 
 	// query parametes
 	/** @type {number} */
-	let currentPage = $derived(templatePage.current_page);
+	let currentPage = $state(templatePage.current_page);
 	/** @type {number} */
-	let pageSize = $derived(templatePage.page_size);
+	let pageSize = $state(templatePage.page_size);
 	/** @type {number|undefined} */
-	let templateId = $state(undefined);
+	let templateId = $state(initialTemplateId);
 	/** @type {boolean} */
-	let isOwner = $state(false);
+	let isOwner = $state(initialIsOwner);
 	/** @type {string|undefined} */
-	let userEmail = $state(undefined);
+	let userEmail = $state(initialUserEmail);
 	/** @type {string|undefined} */
-	let templateName = $state(undefined);
+	let templateName = $state(initialTemplateName);
 	/** @type {number|undefined} */
-	let templateVersion = $state(undefined);
+	let templateVersion = $state(initialTemplateVersion);
 
 	onMount(() => {
-		isOwner = false;
+		searchTemplate();
 	});
 	
 	export async function searchTemplate() {
@@ -65,7 +75,7 @@
 		if (userEmail) params.set('user_email', userEmail);
 		if (templateName) params.set('name', templateName);
 		if (templateVersion) params.set('version', String(templateVersion));
-
+		
 		let response = await fetch(
             `/api/v2/workflow_template?${params.toString()}`,
 			{
