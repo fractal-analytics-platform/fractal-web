@@ -31,13 +31,10 @@
 	 */
 	export async function open(template_id) {
 		saving = false;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/workflow_template/${template_id}`,
 			{
-				method: 'GET',
-				headers,
+				method: 'GET'
 			}
 		);
 		if (response.ok) {
