@@ -229,20 +229,28 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		
-		let body = {}
+		let response;
 		if (workflowName) {
-			body = {name: workflowName};
+			response = await fetch(
+				`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
+				{
+					method: 'POST',
+					credentials: 'include',
+					headers,
+					body: JSON.stringify({name: workflowName}),
+				}
+			);
+		} else {
+			response = await fetch(
+				`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
+				{
+					method: 'POST',
+					credentials: 'include',
+					headers,
+				}
+			);
 		}
 
-		const response = await fetch(
-			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify(body),
-			}
-		);
 
 		if (response.ok) {
 			// Return a workflow item
