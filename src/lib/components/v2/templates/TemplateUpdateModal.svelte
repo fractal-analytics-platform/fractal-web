@@ -6,9 +6,10 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => Promise<void>} onTemplateSave
+	 * @property {Array<import('fractal-components/types/api').Group>} groups
 	 */
 	/** @type {Props} */
-	let { onTemplateSave} = $props();
+	let { onTemplateSave, groups } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -88,19 +89,24 @@
 	{#snippet body()}
 		{#if template}
 			<div class="row mb-3 has-validation">
-				<label
-					class="col-3 col-lg-2 col-form-label"
-					for="template-user-group-id"
-				> User Group ID </label>
-				<div class="col col-lg-10">
-					<input
-						type="number"
-						class="form-control"
-						bind:value={template.user_group_id}
-						id="template-user-group-id"
-					/>
+				<div class="col-12">
+					<div class="input-group">
+						<label class="input-group-text" for="template-user-group-id">User Group</label>
+						<select
+							class="form-select"
+							id="template-user-group-id"
+							bind:value={template.user_group_id}
+						>
+							<option value={null}>Select...</option>
+							{#each groups as group }
+									<option value={group.id}>{group.name}</option>
+							{/each}
+							
+						</select>
+					</div>
 				</div>
 			</div>
+
 			<div class="row mb-3 has-validation">
 				<label
 					class="col-3 col-lg-2 col-form-label"

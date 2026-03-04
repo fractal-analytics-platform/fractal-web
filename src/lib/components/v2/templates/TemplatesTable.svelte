@@ -17,6 +17,7 @@
 	 * @property {string|undefined} [userEmail]
 	 * @property {string|undefined} [templateName]
 	 * @property {number|undefined} [templateVersion]
+	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
 	 * @property {'edit'|'select'} modalType
 	 * @property {any} [handleSelect]
 	 */
@@ -28,6 +29,7 @@
 		userEmail: initialUserEmail = undefined,
 		templateName: initialTemplateName = undefined,
 		templateVersion: initialTemplateVersion = undefined,
+		groups = [],
 		modalType,
 		handleSelect,
 	} = $props();
@@ -391,6 +393,7 @@
 
 <TemplateUpdateModal
     onTemplateSave={searchTemplate}
+	{groups}
 	bind:this={updateTemplateModal}
 />
 
