@@ -313,6 +313,7 @@
                     <td class="col-5">{templateGroup.template_name}</td>
 					<td>{templateGroup.user_email}</td>
                     <td class="col-2">
+						{#if templateGroup.templates.length>1}
 						<select
 							class="form-select"
 							aria-label="Version for template '{templateGroup.template_name}' of {templateGroup.user_email}"
@@ -322,6 +323,9 @@
 								<option value={template}>{template.template_version}</option>
 							{/each}
 						</select>
+						{:else}
+							{templateGroup.templates[0].template_version}
+						{/if}
 					</td>
 					{#if modalType === 'edit'}
 					<td class="col-2">
