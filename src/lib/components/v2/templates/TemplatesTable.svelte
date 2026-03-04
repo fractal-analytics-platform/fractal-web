@@ -6,7 +6,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
 
     /**
@@ -96,8 +96,8 @@
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
 	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
 
-	onMount(() => {
-		searchTemplate();
+	onMount(async () => {
+		await searchTemplate();
 	});
 	
 	export async function searchTemplate() {
@@ -123,6 +123,7 @@
 			templateName ? url.searchParams.set('name', templateName) : url.searchParams.delete('name');
 			templateVersion ? url.searchParams.set('version', String(templateVersion)) : url.searchParams.delete('version');
 		}
+		await tick();
 		pushState(url, {});
 
 		let response = await fetch(
