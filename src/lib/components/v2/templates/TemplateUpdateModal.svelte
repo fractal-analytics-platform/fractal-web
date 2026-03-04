@@ -27,9 +27,12 @@
 	 */
 	let originalDescription = $state(null)
 
-	const isThereSomethingToPatch = $derived(
-		originalUserGroupId != template?.user_group_id ||
-		originalDescription != template?.description
+	const nothingToPatch = $derived(
+		originalUserGroupId == template?.user_group_id &&
+		(
+			originalDescription == template?.description ||
+			(originalDescription === null && template?.description === "")
+		)
 	);
 
 	let saving = $state(false);
@@ -72,7 +75,7 @@
 				headers,
 				body: normalizePayload({
 					user_group_id: template?.user_group_id,
-					description: template?.description
+					description: template?.description || null
 				})
 			}
 		);
@@ -142,7 +145,7 @@
 			<button
 				class="btn btn-primary"
 				onclick={updateTemplate}
-				disabled={saving || !isThereSomethingToPatch}
+				disabled={saving || nothingToPatch}
 			>
 				{#if saving}
 				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
