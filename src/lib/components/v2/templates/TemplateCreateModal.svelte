@@ -21,8 +21,8 @@
 	let templateName = $state(undefined);
 	/** @type {number} */
 	let templateVersion = $state(1);
-    /** @type {string|null} */
-	let templateDescription = $state(null);
+    /** @type {string|undefined} */
+	let templateDescription = $state();
 
     /**
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
@@ -33,8 +33,6 @@
 	let modal = $state(undefined);
 
 	export async function show() {
-        templateName = workflow.name;
-		templateDescription = workflow.description;
         if (workflow.template_id) {
             const response = await fetch(
                 `/api/v2/workflow_template/${workflow.template_id}`, {
@@ -49,18 +47,24 @@
             }
             else {
                 originaleTemplate = await response.json()
+				templateName = originaleTemplate?.name;
+				templateDescription = originaleTemplate?.description;
                 if (originaleTemplate?.user_email === page.data.userInfo.email) {
                     templateVersion = originaleTemplate?.version + 1
                 }
             }
         }
+		else {
+			templateName = workflow.name;
+			templateDescription = workflow.description;
+		}
         modal?.show();
         }
 
 	export function close() {
 		templateName = undefined;
 		templateVersion = 1;
-        templateDescription = null;
+        templateDescription = undefined;
 		creating = false;
 		modal?.hideErrorAlert();
 	}
@@ -89,7 +93,7 @@
 			body: normalizePayload({
                 name: templateName,
                 version: templateVersion,
-                description: templateDescription
+                description: templateDescription || null
             })
 		});
 
@@ -143,6 +147,7 @@
 					id="templateVersion"
 					name="templateVersion"
 					type="number"
+					min="1"
 					bind:value={templateVersion}
 					class="form-control"
 				/>
