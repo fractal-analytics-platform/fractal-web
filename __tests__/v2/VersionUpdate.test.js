@@ -1,5 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
+import { render, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
 
 // Mocking the page store
 vi.mock('$app/state', () => {
@@ -328,8 +329,8 @@ function getTask(name, version) {
 	);
 	return /** @type {import('fractal-components/types/api').TaskV2} */ (
 		/** @type {import('fractal-components/types/api').TaskGroupV2} */ (taskGroup).task_list.find(
-			(t) => t.name === name
-		)
+		(t) => t.name === name
+	)
 	);
 }
 
@@ -347,7 +348,8 @@ describe('VersionUpdate', () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
-	it('update task without changing the arguments', async () => {
+	it('update task with compatible arguments', async () => {
+		const user = userEvent.setup();
 		const task = getTask('My Task', '1.2.3');
 		const newTask = getTask('My Task', '1.2.4');
 		mockTaskRequest(newTask);
@@ -360,15 +362,15 @@ describe('VersionUpdate', () => {
 		expect(versions[0]).toBe('2.0.0');
 		expect(versions[1]).toBe('1.2.4');
 
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.2.4' } });
+		await user.selectOptions(screen.getByRole('combobox'), '1.2.4');
 
-		/** @type {HTMLButtonElement} */
-		const btn = screen.getByRole('button', { name: 'Update' });
-		await waitFor(() => expect(btn).toBeEnabled());
-		await fireEvent.click(btn);
+		expect(screen.queryByText(/The old arguments are not compatible with the new schema/)).null;
+
+		await user.click(screen.getByRole('button', { name: 'Update' }));
 	});
 
-	it('update task fixing the arguments', async () => {
+	it('update task with non compatible arguments', async () => {
+		const user = userEvent.setup();
 		const task = getTask('My Task', '1.2.4');
 		const newTask = getTask('My Task', '2.0.0');
 		mockTaskRequest(newTask);
@@ -385,107 +387,11 @@ describe('VersionUpdate', () => {
 		);
 		expect(versions[0]).toBe('2.0.0');
 
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
+		await user.selectOptions(screen.getByRole('combobox'), '2.0.0');
 
-		await screen.findAllByRole('button', { name: 'more' });
+		expect(screen.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
 
-		/** @type {HTMLButtonElement[]} */
-		const [moreLink1, moreLink2, moreLink3, checkBtn, cancelBtn, updateBtnDisabled] =
-			screen.getAllByRole('button');
-		expect(moreLink1.textContent).eq('more');
-		expect(moreLink2.textContent).eq('more');
-		expect(moreLink3.textContent).eq('more');
-		expect(checkBtn.textContent).eq('Check');
-		expect(cancelBtn.textContent).eq('Cancel');
-		expect(updateBtnDisabled.textContent).eq('Update');
-		expect(updateBtnDisabled.disabled).eq(true);
-
-		expect(
-			screen.getByText('Following errors must be fixed before performing the update:')
-		).toBeDefined();
-
-		const list = screen.getAllByRole('listitem');
-		expect(list.length).eq(3);
-		expect(list[0].textContent).contain("must have required property 'new_property'");
-		expect(list[1].textContent).contain("must NOT have additional property 'extra_property'");
-		expect(list[2].textContent).contain('/changed_property: must be boolean');
-
-		await fireEvent.input(screen.getByRole('textbox'), {
-			target: { value: '{"changed_property": true, "new_property": "test"}' }
-		});
-		await fireEvent.click(checkBtn);
-
-		const updateBtnEnabled = /** @type {HTMLButtonElement} */ (screen.getAllByRole('button')[2]);
-		expect(updateBtnEnabled.textContent).eq('Update');
-		expect(updateBtnEnabled.disabled).eq(false);
-	});
-
-	it('use the cancel button when fixing the arguments', async () => {
-		const task = getTask('My Task', '1.2.4');
-		const newTask = getTask('My Task', '2.0.0');
-		mockTaskRequest(newTask);
-		const versions = /** @type {string[]} */ (
-			await checkVersions(
-				task,
-				1,
-				{
-					...getMockedWorkflowTask(),
-					args_non_parallel: { changed_property: 'x' }
-				},
-				[{ task_id: newTask.id, version: newTask.version }]
-			)
-		);
-		expect(versions[0]).toBe('2.0.0');
-
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
-
-		const textbox = await screen.findByRole('textbox');
-
-		expect(textbox).toHaveValue(JSON.stringify({ changed_property: 'x' }, null, 2));
-
-		/** @type {HTMLButtonElement} */
-		const cancelBtnDisabled = screen.getByRole('button', { name: 'Cancel' });
-		expect(cancelBtnDisabled.disabled).eq(true);
-
-		await fireEvent.input(screen.getByRole('textbox'), {
-			target: { value: '{"changed_property": "y"}' }
-		});
-
-		/** @type {HTMLButtonElement} */
-		const cancelBtnEnabled = screen.getByRole('button', { name: 'Cancel' });
-		expect(cancelBtnEnabled.disabled).eq(false);
-		await fireEvent.click(cancelBtnEnabled);
-
-		expect(/** @type {HTMLInputElement} */ (screen.getByRole('textbox')).value).eq(
-			JSON.stringify({ changed_property: 'x' }, null, 2)
-		);
-	});
-
-	it('trying to fix the arguments with invalid JSON', async () => {
-		const task = getTask('My Task', '1.2.4');
-		const newTask = getTask('My Task', '2.0.0');
-		mockTaskRequest(newTask);
-		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, getMockedWorkflowTask(), [
-				{ task_id: newTask.id, version: newTask.version }
-			])
-		);
-		expect(versions[0]).toBe('2.0.0');
-
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '2.0.0' } });
-
-		const checkBtn = await screen.findByRole('button', { name: 'Check' });
-		/** @type {HTMLButtonElement} */
-		const updateBtn = screen.getByRole('button', { name: 'Update' });
-		await waitFor(() => expect(updateBtn).toBeEnabled());
-
-		await fireEvent.input(screen.getByRole('textbox'), {
-			target: { value: '}{' }
-		});
-		await fireEvent.click(checkBtn);
-
-		expect(screen.getByRole('textbox').classList.contains('is-invalid')).eq(true);
-		expect(screen.getByText('Invalid JSON')).toBeDefined();
+		await user.click(screen.getByRole('button', { name: 'Update' }));
 	});
 
 	it('no new versions available', async () => {
@@ -511,83 +417,8 @@ describe('VersionUpdate', () => {
 		).toBeDefined();
 	});
 
-	it('update task with default parameters and no previous values', async () => {
-		const task = getTask('task_default_values', '0.0.1');
-		const newTask = getTask('task_default_values', '0.0.2');
-		mockTaskRequest(newTask);
-		const versions = /** @type {string[]} */ (
-			await checkVersions(task, 1, getMockedWorkflowTask(), [
-				{ task_id: newTask.id, version: newTask.version }
-			])
-		);
-		expect(versions[0]).toBe('0.0.2');
-
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
-
-		const btn = screen.getByRole('button', { name: 'Update' });
-		await waitFor(() => expect(btn).toBeEnabled());
-		await fireEvent.click(btn);
-
-		expect(fetch).toHaveBeenNthCalledWith(
-			2,
-			expect.stringContaining('/wftask/replace-task'),
-			expect.objectContaining({
-				body: JSON.stringify({
-					args_non_parallel: {
-						default_boolean1: false,
-						default_boolean2: true,
-						default_string: 'foo'
-					},
-					args_parallel: null
-				})
-			})
-		);
-	});
-
-	it('update task with default parameters and previous values', async () => {
-		const task = getTask('task_default_values', '0.0.1');
-		const newTask = getTask('task_default_values', '0.0.2');
-		mockTaskRequest(newTask);
-		const versions = /** @type {string[]} */ (
-			await checkVersions(
-				task,
-				1,
-				{
-					...getMockedWorkflowTask(),
-					...{
-						args_non_parallel: {
-							default_boolean1: true
-						}
-					}
-				},
-				[{ task_id: newTask.id, version: newTask.version }]
-			)
-		);
-		expect(versions[0]).toBe('0.0.2');
-
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '0.0.2' } });
-
-		const btn = screen.getByRole('button', { name: 'Update' });
-		await waitFor(() => expect(btn).toBeEnabled());
-		await fireEvent.click(btn);
-
-		expect(fetch).toHaveBeenNthCalledWith(
-			2,
-			expect.stringContaining('/wftask/replace-task'),
-			expect.objectContaining({
-				body: JSON.stringify({
-					args_non_parallel: {
-						default_boolean1: true,
-						default_boolean2: true,
-						default_string: 'foo'
-					},
-					args_parallel: null
-				})
-			})
-		);
-	});
-
 	it('update compound to converter_compound', async () => {
+		const user = userEvent.setup();
 		const task = getTask('test_converter_compound', '1.4.2');
 		const newTask = getTask('test_converter_compound', '1.5.0');
 		mockTaskRequest(newTask);
@@ -607,11 +438,9 @@ describe('VersionUpdate', () => {
 		);
 		expect(versions[0]).toBe('1.5.0');
 
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
+		await user.selectOptions(screen.getByRole('combobox'), '1.5.0');
 
-		const btn = screen.getByRole('button', { name: 'Update' });
-		await waitFor(() => expect(btn).toBeEnabled());
-		await fireEvent.click(btn);
+		await user.click(screen.getByRole('button', { name: 'Update' }));
 
 		expect(fetch).toHaveBeenNthCalledWith(
 			2,
@@ -626,6 +455,7 @@ describe('VersionUpdate', () => {
 	});
 
 	it('update non_parallel to converter_non_parallel', async () => {
+		const user = userEvent.setup();
 		const task = getTask('test_converter_non_parallel', '1.4.2');
 		const newTask = getTask('test_converter_non_parallel', '1.5.0');
 		mockTaskRequest(newTask);
@@ -644,11 +474,9 @@ describe('VersionUpdate', () => {
 		);
 		expect(versions[0]).toBe('1.5.0');
 
-		await fireEvent.change(screen.getByRole('combobox'), { target: { value: '1.5.0' } });
+		await user.selectOptions(screen.getByRole('combobox'), '1.5.0');
 
-		const btn = screen.getByRole('button', { name: 'Update' });
-		await waitFor(() => expect(btn).toBeEnabled());
-		await fireEvent.click(btn);
+		await user.click(screen.getByRole('button', { name: 'Update' }));
 
 		expect(fetch).toHaveBeenNthCalledWith(
 			2,
@@ -683,8 +511,8 @@ async function checkVersions(task, expectedCount, workflowTask, updateCandidates
 
 	const options = result.getAllByRole('option');
 	expect(options.length).toBe(expectedCount + 1);
-	expect(/** @type {HTMLOptionElement} **/ (options[0]).value).toBe('');
-	return options.filter((_, i) => i > 0).map((o) => /** @type {HTMLOptionElement} **/ (o).value);
+	expect(/** @type {HTMLOptionElement} **/(options[0]).value).toBe('');
+	return options.filter((_, i) => i > 0).map((o) => /** @type {HTMLOptionElement} **/(o).value);
 }
 
 /**
@@ -695,7 +523,7 @@ async function checkVersions(task, expectedCount, workflowTask, updateCandidates
  */
 function renderVersionUpdate(task, workflowTask, updateCandidates) {
 	workflowTask.task = task;
-	const nop = async function () {};
+	const nop = async function () { };
 	return render(VersionUpdate, {
 		props: {
 			workflowTask,

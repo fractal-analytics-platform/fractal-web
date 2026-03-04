@@ -17,51 +17,31 @@
 
 	/** @type {HTMLInputElement|undefined} */
 	let field = $state();
-	let validationError = $state('');
+
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
 
 	/**
 	 * @param {any} value
 	 */
 	function handleValueChange(value) {
+		onInput();
 		const previousValue = get(formElement.value);
 		if (previousValue === value) {
 			return;
 		}
-		validate();
 		formElement.value.set(value);
 		formElement.notifyChange();
 	}
 
-	function validate() {
-		validationError = '';
-		if (!field) {
-			return;
-		}
-		formElement.badInput = field.validity.badInput;
-		if (formElement.badInput) {
-			validationError = 'Should be a number';
-			return;
-		}
-		if (field.value === '') {
-			if (formElement.required) {
-				validationError = 'Field is required';
-			} else {
-				validationError = '';
+	function onInput() {
+		if (field) {
+			if (formElement.badInput !== field.validity.badInput) {
+				formElement.badInput = field.validity.badInput;
+				formElement.notifyChange();
 			}
-			return;
 		}
-		const num = parseInt(field.value);
-		const min = formElement.min;
-		const max = formElement.max;
-		if (min !== null && num < min) {
-			validationError = 'Should be greater or equal than ' + min;
-			return;
-		}
-		if (max !== null && num > max) {
-			validationError = 'Should be lower or equal than ' + max;
-			return;
-		}
-		validationError = '';
 	}
 </script>
 
@@ -76,12 +56,12 @@
 			bind:value
 			min={formElement.min}
 			max={formElement.max}
-			oninput={() => validate()}
+			oninput={onInput}
 			class="form-control"
 			id="property-{formElement.id}"
-			class:is-invalid={validationError}
+			class:is-invalid={errors.length > 0}
 			disabled={!editable}
 		/>
-		<span class="invalid-feedback">{validationError}</span>
+		<span class="invalid-feedback">{errors.join(', ')}</span>
 	</div>
 </div>

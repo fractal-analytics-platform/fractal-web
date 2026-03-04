@@ -29,10 +29,41 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		nonParallelTaskWithArgsSchema = await createFakeTask(page, {
 			type: 'non_parallel',
 			args_schema_non_parallel: {
+				$defs: {
+					A: {
+						type: 'object',
+						properties: {
+							discr: { type: 'string', const: 'A' },
+							a: { type: 'string' },
+						},
+						required: ['discr', 'a']
+					},
+					B: {
+						type: 'object',
+						properties: {
+							discr: { type: 'string', const: 'B' },
+							b: { type: 'string' },
+						},
+						required: ['discr', 'b']
+					},
+				},
 				properties: {
 					test_non_parallel: {
 						type: 'string',
 						title: 'test_non_parallel'
+					},
+					discriminator_prop: {
+						discriminator: {
+							mapping: {
+								A: '#/$defs/A',
+								B: '#/$defs/B'
+							},
+							propertyName: 'discr'
+						},
+						oneOf: [
+							{ $ref: '#/$defs/A' },
+							{ $ref: '#/$defs/B' }
+						]
 					}
 				},
 				type: 'object'

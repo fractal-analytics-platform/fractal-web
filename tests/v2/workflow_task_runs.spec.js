@@ -28,6 +28,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await workflow.addTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Add meta properties', async () => {
@@ -80,7 +81,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 				.getByRole('combobox', { name: 'Start workflow at' })
 				.getByRole('option', { selected: true })
 		).toHaveText('cellpose_segmentation');
-		await selectSlimSelect(page, page.getByLabel('Selector for attribute well'), 'A02');
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'Selector for attribute well' }), 'A02');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
 		await modal.getByRole('button', { name: 'Run' }).click();

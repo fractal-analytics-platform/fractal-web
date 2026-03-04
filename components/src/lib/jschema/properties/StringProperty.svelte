@@ -6,10 +6,11 @@
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').ValueFormElement} formElement
 	 * @property {boolean} [editable]
+	 * @property {boolean} [showErrors]
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable = true } = $props();
+	let { formElement = $bindable(), editable = true, showErrors = true } = $props();
 
 	let value = $state();
 	formElement.value.subscribe((v) => (value = v));
@@ -17,7 +18,10 @@
 
 	/** @type {HTMLInputElement|undefined} */
 	let field = $state();
-	let validationError = $state('');
+
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
 
 	let constant = $derived('const' in formElement.property);
 
@@ -31,10 +35,6 @@
 		}
 		formElement.value.set(value);
 		formElement.notifyChange();
-		validationError = '';
-		if (formElement.required && field?.value === '') {
-			validationError = 'Field is required';
-		}
 	}
 </script>
 
@@ -49,9 +49,11 @@
 			bind:value
 			class="form-control"
 			id="property-{formElement.id}"
-			class:is-invalid={validationError}
+			class:is-invalid={showErrors && errors.length > 0}
 			disabled={!editable || constant}
 		/>
-		<span class="invalid-feedback">{validationError}</span>
+		<span class="invalid-feedback">
+			{showErrors && errors.length > 0 ? errors.join(', ') : ''}
+		</span>
 	</div>
 </div>

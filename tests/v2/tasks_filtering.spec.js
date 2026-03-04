@@ -25,10 +25,10 @@ test('Tasks filtering', async ({ page, workflow }) => {
  * @param {import('@playwright/test').Page} page
  */
 async function testFiltering(page) {
-	const packageFilter = page.getByLabel('Select package');
-	const modalityFilter = page.getByLabel('Select modality');
-	const categoryFilter = page.getByLabel('Select category');
-	const tagFilter = page.getByLabel('Select tag');
+	const packageFilter = page.getByRole('combobox', { name: 'Select package' });
+	const modalityFilter = page.getByRole('combobox', { name: 'Select modality' });
+	const categoryFilter = page.getByRole('combobox', { name: 'Select category' });
+	const tagFilter = page.getByRole('combobox', { name: 'Select tag' });
 
 	const rows = page.getByRole('row');
 
@@ -55,7 +55,7 @@ async function testFiltering(page) {
 	await search(page, 'deep', 'cellpose_segmentation'); // search by tag
 	await search(page, 'my_type', 'generic_task_parallel'); // search by input type
 	// search by modality
-	await page.getByPlaceholder('Search...').fill('hcs');
+	await page.getByRole('textbox', { name: 'Search...' }).fill('hcs');
 	await expect(rows).toHaveCount(8);
 }
 
@@ -72,9 +72,9 @@ async function deselect(selector) {
  * @param {string} expectedTaskName
  */
 async function search(page, query, expectedTaskName) {
-	await page.getByPlaceholder('Search...').fill(query);
+	await page.getByRole('textbox', { name: 'Search...' }).fill(query);
 	await expect(page.getByRole('row')).toHaveCount(3);
 	await expect(page.getByRole('row', { name: expectedTaskName })).toBeVisible();
-	await page.getByPlaceholder('Search...').fill('');
+	await page.getByRole('textbox', { name: 'Search...' }).fill('');
 	await expect(page.getByRole('row')).toHaveCount(NUM_MOCK_TASKS);
 }

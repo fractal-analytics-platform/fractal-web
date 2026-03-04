@@ -666,13 +666,14 @@
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
-	function onWorkflowTaskUpdated(updatedWft) {
+	async function onWorkflowTaskUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
+		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
+		await tick();
 		argsChangesSaved = true;
 		setTimeout(() => {
 			argsChangesSaved = false;
 		}, 3000);
-		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
 	}
 
 	/**
@@ -917,9 +918,13 @@
 						tasks' execution statuses. Possible reasons include: (1) All jobs ran with an old
 						Fractal version (before v2.14, which has been available since May 2025), or (2) a
 						job-execution error took place before the first task started running.
-						<br>
+						<br />
 						If you need to review what jobs already ran, have a look at the
-						<a href="/v2/projects/{project.id}/workflows/{workflow.id}/jobs{selectedDataset ? '?dataset='+selectedDataset.id : ''}">job list</a>.
+						<a
+							href="/v2/projects/{project.id}/workflows/{workflow.id}/jobs{selectedDataset
+								? '?dataset=' + selectedDataset.id
+								: ''}">job list</a
+						>.
 					</div>
 				</div>
 			</div>
@@ -1212,13 +1217,29 @@
 									{#if selectedWorkflowTask}
 										<WorkflowTaskInfoTab
 											projectId={workflow.project_id}
-											workflowTask={selectedWorkflowTask}
+											workflowTask={selectedHistoryRun
+												? {
+														...selectedWorkflowTask,
+														task: {
+															...selectedWorkflowTask.task,
+															version: selectedHistoryRun.workflowtask_dump.task.version,
+															type: selectedHistoryRun.workflowtask_dump.task.type,
+															command_non_parallel:
+																selectedHistoryRun.workflowtask_dump.task.command_non_parallel,
+															command_parallel:
+																selectedHistoryRun.workflowtask_dump.task.command_parallel
+														},
+														alias: selectedHistoryRun.workflowtask_dump.alias,
+														description: selectedHistoryRun.workflowtask_dump.description
+													}
+												: selectedWorkflowTask}
 											updateWorkflowTaskCallback={(up) => {
 												selectedWorkflowTask = up;
 												workflow.task_list = workflow.task_list.map((wt) =>
 													wt.id === up.id ? up : wt
 												);
 											}}
+											editable={!selectedHistoryRun}
 										/>
 									{/if}
 								</div>
@@ -1242,12 +1263,14 @@
 						>
 							<div class="card-body">
 								{#if selectedWorkflowTask}
-									<VersionUpdate
-										workflowTask={selectedWorkflowTask}
-										updateWorkflowCallback={taskUpdated}
-										updateCandidates={newVersionsMap[selectedWorkflowTask.task_id] || []}
-										{newVersionsCount}
-									/>
+									{#key selectedWorkflowTask}
+										<VersionUpdate
+											workflowTask={selectedWorkflowTask}
+											updateWorkflowCallback={taskUpdated}
+											updateCandidates={newVersionsMap[selectedWorkflowTask.task_id] || []}
+											{newVersionsCount}
+										/>
+									{/key}
 								{/if}
 							</div>
 						</div>
