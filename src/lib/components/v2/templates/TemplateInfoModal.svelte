@@ -9,6 +9,11 @@
 	 */
 	let template = $state()
 
+	/**
+	 * @type {import('fractal-components/types/api').Group|undefined}
+	 */
+	let group = $state()
+
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
@@ -31,10 +36,25 @@
 		);
 		if (response.ok) {
             template = await response.json()
+			if (template?.user_group_id) {
+				const response2 = await fetch(
+					`/api/auth/group/${template?.user_group_id}`,
+					{
+						method: 'GET',
+						headers,
+					}
+				);
+				if (response2.ok) {
+					group = await response2.json()
+				} else {
+					await formErrorHandler.handleErrorResponse(response2);
+				}
+			}
 			modal?.show();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
+		
 	}
 
 </script>
@@ -47,12 +67,18 @@
     size="lg"
 >
 		{#snippet header()}
-		<h5 class="modal-title">Workflow Template {template?.id}</h5>
+		<h5 class="modal-title">Workflow Template '{template?.name}'</h5>
 		{/snippet}
 		{#snippet body()}
 			{#if template}
 			<ul class="list-group">
-			<li class="list-group-item text-bg-light">
+				<li class="list-group-item text-bg-light">
+					<strong>Template ID</strong>
+				</li>
+				<li class="list-group-item">
+					<span>{template?.id}</span>
+				</li>
+				<li class="list-group-item text-bg-light">
 					<strong>User email</strong>
 				</li>
 				<li class="list-group-item">
@@ -74,7 +100,7 @@
 					<strong>User Group</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template?.user_group_id ? template.user_group_id : '-'}</span>
+					<span>{template.user_group_id ? group?.name : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Description</strong>
