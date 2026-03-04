@@ -38,8 +38,8 @@
 </script>
 
 <CollapsibleProperty {formElement} {reset}>
-	<div class="d-flex justify-content-center p-2">
-		{#if !formElement.required}
+	{#if !formElement.required}
+		<div class="d-flex justify-content-center p-2">
 			{#if children.length > 0}
 				<button class="btn btn-danger" type="button" onclick={removeTuple} disabled={!editable}>
 					Remove tuple
@@ -49,8 +49,8 @@
 					Add tuple
 				</button>
 			{/if}
-		{/if}
-	</div>
+		</div>
+	{/if}
 	<div>
 		{#each children as nestedProperty, index (index)}
 			<div class="d-flex">

@@ -12,6 +12,8 @@ import {
 } from '../jschema/form_element.js';
 import type { JSONSchemaProperty } from './jschema.js';
 
+export type TitleType = 'key' | 'prefer_title' | 'title_only' | 'inner_title';
+
 export type FormElement = (
 	| StringFormElement
 	| BooleanFormElement
@@ -38,6 +40,7 @@ export type BaseFormElementFields = {
 	required: boolean;
 	removable: boolean;
 	property: JSONSchemaProperty;
+	titleType: TitleType;
 	notifyChange: () => void;
 };
 

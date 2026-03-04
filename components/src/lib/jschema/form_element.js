@@ -28,7 +28,8 @@ export class BaseFormElement {
 		this.key = fields.key;
 		this.path = fields.path;
 		this.type = fields.type;
-		this.title = fields.title;
+		this.title = writable(fields.title);
+		this.titleType = fields.titleType;
 		this.required = fields.required;
 		this.description = fields.description;
 		/**
@@ -185,9 +186,11 @@ export class ObjectFormElement extends BaseFormElement {
 				this.additionalProperties.default,
 				false
 			),
-			parentProperty: this.property
+			parentProperty: this.property,
+			// always use the user-defined key as title
+			titleType: 'key'
 		});
-		child.title = key;
+		child.title.set(key);
 		child.removable = true;
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -228,7 +231,8 @@ export class ObjectFormElement extends BaseFormElement {
 			required: child.required,
 			removable: child.removable,
 			value: defaultValue,
-			parentProperty: this.property
+			parentProperty: this.property,
+			titleType: this.titleType
 		});
 		newChild.collapsed = child.collapsed;
 		this.children[index] = newChild;
@@ -250,7 +254,8 @@ export class ObjectFormElement extends BaseFormElement {
 			required: child.required,
 			removable: child.removable,
 			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true),
-			parentProperty: this.property
+			parentProperty: this.property,
+			titleType: this.titleType
 		});
 		this.children[index] = newChild;
 		this.notifyChange();
@@ -281,7 +286,8 @@ export class ArrayFormElement extends BaseFormElement {
 			required: false,
 			removable: true,
 			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true),
-			parentProperty: this.property
+			parentProperty: this.property,
+			titleType: 'oneOf' in this.items ? 'inner_title' : 'title_only',
 		});
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -300,7 +306,6 @@ export class ArrayFormElement extends BaseFormElement {
 		this.children.forEach((c, i) => {
 			c.key = i.toString();
 			c.path = c.path.replace(/\d+$/, i.toString());
-			c.title = c.key && c.removable ? c.key : c.property.title || c.key || '';
 		});
 	}
 
@@ -384,7 +389,7 @@ export class TupleFormElement extends BaseFormElement {
 			);
 		}
 		this.children = this.manager.createTupleChildren({
-			path: this.path, items: this.items, size: this.size, value, parentProperty: this.property
+			path: this.path, items: this.items, size: this.size, value, parentProperty: this.property, titleType: 'title_only'
 		});
 		this.notifyChange();
 	}
@@ -422,6 +427,9 @@ export class ConditionalFormElement extends BaseFormElement {
 		this.selectedIndex.set(index);
 		if (index === -1) {
 			this.selectedItem = null;
+			if (this.titleType === 'inner_title') {
+				this.title.set('');
+			}
 		} else {
 			this.unexpectedChildren = [];
 			if ('oneOf' in this.property) {
@@ -435,10 +443,11 @@ export class ConditionalFormElement extends BaseFormElement {
 					required: this.required,
 					removable: this.removable,
 					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
-					parentProperty: this.property
+					parentProperty: this.property,
+					titleType: this.titleType,
 				});
-				if (this.selectedItem) {
-					this.selectedItem.title = selectedProp.title || this.key || '';
+				if (this.titleType === 'inner_title' && this.selectedItem) {
+					this.title.set(selectedProp.title || '');
 				}
 			}
 		}

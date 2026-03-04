@@ -87,6 +87,9 @@ describe('oneOf properties', () => {
 			}
 		);
 
+		// Should display the property title
+		expect(screen.getByText('Proc Step')).toBeVisible();
+
 		const select = await screen.findByRole('combobox', { name: 'Step' });
 		expect(select).toHaveValue('1');
 		expect(screen.getByRole('spinbutton')).toHaveValue(1);
@@ -144,7 +147,7 @@ describe('oneOf properties', () => {
 		expect(component.isValid()).toEqual(true);
 	});
 
-	it('Array with oneOf items - indexes are displayed in the title', async () => {
+	it('Array with oneOf items', async () => {
 		const user = userEvent.setup();
 
 		const { component } = renderSchema({
@@ -225,28 +228,199 @@ describe('oneOf properties', () => {
 		expect(component.getArguments()).deep.eq({ foo: [] });
 
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
-		expect(screen.getByRole('button', { name: '0' })).toBeVisible();
+		expect(screen.getByRole('button', { name: 'InternalModel1Title' })).toBeVisible();
 		await user.selectOptions(screen.getByRole('combobox'), 'label2');
 
 		expect(component.getArguments()).deep.eq({ foo: [{ label: 'label2', field: null }] });
 
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
-		expect(screen.getByRole('button', { name: '1' })).toBeVisible();
+		expect(screen.getByRole('button', { name: 'InternalModel2Title' })).toBeVisible();
 
 		expect(component.getArguments()).deep.eq({ foo: [{ label: 'label2', field: null }, { label: 'label1', field: 1 }] });
-
-		// Verify that indexes are in the correct order
-		expect(screen.getAllByRole('button').map(
-			b => b === screen.getByRole('button', { name: '0' }) ? 0 : b === screen.getByRole('button', { name: '1' }) ? 1 : null
-		).filter(b => b !== null)).deep.eq([0, 1]);
 
 		await user.click(screen.getAllByRole('button', { name: 'Move item up' })[1]);
 
 		expect(component.getArguments()).deep.eq({ foo: [{ label: 'label1', field: 1 }, { label: 'label2', field: null }] });
+	});
 
-		// Verify that indexes have been regenerated in the correct order
-		expect(screen.getAllByRole('button').map(
-			b => b === screen.getByRole('button', { name: '0' }) ? 0 : b === screen.getByRole('button', { name: '1' }) ? 1 : null
-		).filter(b => b !== null)).deep.eq([0, 1]);
+	it('oneOf items as additionalProperties', async () => {
+		const user = userEvent.setup();
+
+		const { component } = renderSchema({
+			"$defs": {
+				"InternalModel1": {
+					"description": "Description of InternalModel1.",
+					"properties": {
+						"label": {
+							"const": "label1",
+							"default": "label1",
+							"title": "Label",
+							"type": "string",
+							"description": "FIXME"
+						},
+						"field": {
+							"default": 1,
+							"title": "Field",
+							"type": "integer",
+							"description": "Missing description"
+						}
+					},
+					"title": "InternalModel1Title",
+					"type": "object"
+				},
+				"InternalModel2": {
+					"description": "Description of InternalModel2.",
+					"properties": {
+						"label": {
+							"const": "label2",
+							"default": "label2",
+							"title": "Label",
+							"type": "string",
+							"description": "FIXME"
+						},
+						"field": {
+							"title": "Field",
+							"type": "string",
+							"description": "Missing description"
+						}
+					},
+					"required": [
+						"field"
+					],
+					"title": "InternalModel2Title",
+					"type": "object"
+				}
+			},
+			"type": "object",
+			"properties": {
+				"foo": {
+					"type": "object",
+					"additionalProperties": {
+						"discriminator": {
+							"mapping": {
+								"label1": "#/$defs/InternalModel1",
+								"label2": "#/$defs/InternalModel2"
+							},
+							"propertyName": "label"
+						},
+						"oneOf": [
+							{
+								"$ref": "#/$defs/InternalModel1"
+							},
+							{
+								"$ref": "#/$defs/InternalModel2"
+							}
+						]
+					},
+					"title": "FooTitle",
+					"description": "Foo Description"
+				}
+			}
+		});
+
+		expect(screen.getByText('FooTitle')).toBeVisible();
+
+		await user.type(screen.getByPlaceholderText('Key'), 'k1');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+
+		expect(screen.getByRole('button', { name: 'k1' })).toBeVisible();
+		expect(component.getArguments()).deep.eq({ "foo": { "k1": { "label": "label1", "field": 1 } } });
+
+		await user.selectOptions(screen.getByRole('combobox'), 'label2');
+		expect(component.getArguments()).deep.eq({ "foo": { "k1": { "label": "label2", "field": null } } });
+
+		expect(screen.getByRole('button', { name: 'k1' })).toBeVisible();
+	});
+
+	it('Nested oneOf', async () => {
+		const user = userEvent.setup();
+
+		const { component } = renderSchema({
+			"$defs": {
+				"InternalModel1": {
+					"description": "Description of InternalModel1.",
+					"properties": {
+						"label": {
+							"const": "label1",
+							"default": "label1",
+							"title": "Label",
+							"type": "string",
+							"description": "FIXME"
+						},
+						"field": {
+							"default": 1,
+							"title": "Field",
+							"type": "integer",
+							"description": "Missing description"
+						}
+					},
+					"title": "InternalModel1Title",
+					"type": "object"
+				},
+				"InternalModel2": {
+					"description": "Description of InternalModel2.",
+					"properties": {
+						"label": {
+							"const": "label2",
+							"default": "label2",
+							"title": "Label",
+							"type": "string",
+							"description": "FIXME"
+						},
+						"field": {
+							"title": "Field",
+							"type": "string",
+							"description": "Missing description"
+						}
+					},
+					"required": [
+						"field"
+					],
+					"title": "InternalModel2Title",
+					"type": "object"
+				}
+			},
+			"type": "object",
+			"properties": {
+				"foo": {
+					"type": "object",
+					"properties": {
+						"bar": {
+							"type": "object",
+							"title": "BarTitle",
+							"discriminator": {
+								"mapping": {
+									"label1": "#/$defs/InternalModel1",
+									"label2": "#/$defs/InternalModel2"
+								},
+								"propertyName": "label"
+							},
+							"oneOf": [
+								{
+									"$ref": "#/$defs/InternalModel1"
+								},
+								{
+									"$ref": "#/$defs/InternalModel2"
+								}
+							]
+						}
+					},
+					"title": "FooTitle",
+					"description": "Foo Description"
+				}
+			}
+		});
+
+
+		expect(screen.getByText('FooTitle')).toBeVisible();
+		expect(screen.getByText('BarTitle')).toBeVisible();
+
+		expect(component.getArguments()).deep.eq({ "foo": { "bar": { "label": "label1", "field": 1 } } });
+
+		await user.selectOptions(screen.getByRole('combobox'), 'label2');
+		expect(component.getArguments()).deep.eq({ "foo": { "bar": { "label": "label2", "field": null } } });
+
+		expect(screen.getByText('FooTitle')).toBeVisible();
+		expect(screen.getByText('BarTitle')).toBeVisible();
 	});
 });

@@ -445,17 +445,7 @@ describe('Array properties', () => {
 		await user.type(screen.getAllByRole('spinbutton')[1], '6');
 		expect(component.getArguments()).deep.eq({ foo: [5, 6] });
 
-		// Verify that indexes are in the correct order
-		expect(screen.getAllByText(/^0|1$/).map(
-			b => b === screen.getByText('0') ? 0 : screen.getByText('1') ? 1 : null
-		).filter(b => b !== null)).deep.eq([0, 1]);
-
 		await user.click(screen.getAllByRole('button', { name: 'Move item up' })[1]);
 		expect(component.getArguments()).deep.eq({ foo: [6, 5] });
-
-		// Verify that indexes are in the correct order
-		expect(screen.getAllByText(/^0|1$/).map(
-			b => b === screen.getByText('0') ? 0 : screen.getByText('1') ? 1 : null
-		).filter(b => b !== null)).deep.eq([0, 1]);
 	});
 });
