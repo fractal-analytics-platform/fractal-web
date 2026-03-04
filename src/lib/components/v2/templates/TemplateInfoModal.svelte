@@ -124,6 +124,12 @@
 						<span>-</span>
 					{/if}
 				</li>
+				<li class="list-group-item text-bg-light">
+					<strong>Fractal Server version</strong>
+				</li>
+				<li class="list-group-item">
+					<span>{template?.fractal_server_version}</span>
+				</li>
 			</ul>
 			{/if}
 		{/snippet}

@@ -108,6 +108,7 @@ export type WorkflowTemplate = {
     user_group_id: number | null;
     description: string | null;
     data: WorkflowImport;
+	fractal_server_version: string;
 }
 
 export type WorkflowTemplateGroupMember = {
