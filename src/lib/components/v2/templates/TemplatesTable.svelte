@@ -226,8 +226,9 @@
 	<div class="card-body">
 		<div class="row g-3 align-items-end">
 			<div class="col">
-				<label class="form-label small text-muted">Template ID</label>
+				<label for="searchTemplateId" class="form-label small text-muted">Template ID</label>
 				<input
+					id="searchTemplateId"
 					type="number"
 					class="form-control form-control-sm"
 					min="1"
@@ -236,8 +237,9 @@
 			</div>
 
 			<div class="col">
-				<label class="form-label small text-muted">Name</label>
+				<label for="searchTemplateName" class="form-label small text-muted">Name</label>
 				<input
+					id="searchTemplateName"
 					type="text"
 					class="form-control form-control-sm"
 					bind:value={templateName}
@@ -245,8 +247,9 @@
 			</div>
 
 			<div class="col">
-				<label class="form-label small text-muted">User email</label>
+				<label for="searchUserEmail" class="form-label small text-muted">User email</label>
 				<select
+					id="searchUserEmail"
 					class="form-select form-select-sm"
 					bind:value={userEmail}
 				>
@@ -258,8 +261,9 @@
 			</div>
 
 			<div class="col">
-				<label class="form-label small text-muted">Version</label>
+				<label for="searchTemplateVersion" class="form-label small text-muted">Version</label>
 				<input
+					id="searchTemplateVersion"
 					type="number"
 					class="form-control form-control-sm"
 					min="1"
