@@ -51,15 +51,15 @@
 	/** @type {number} */
 	let pageSize = $state(templatePage.page_size);
 	/** @type {number|undefined} */
-	let templateId = $state(initialTemplateId);
+	let templateId = $state(undefined);
 	/** @type {boolean} */
-	let isOwner = $state(initialIsOwner);
+	let isOwner = $state(false);
 	/** @type {string|undefined} */
-	let userEmail = $state(initialUserEmail);
+	let userEmail = $state(undefined);
 	/** @type {string|undefined} */
-	let templateName = $state(initialTemplateName);
+	let templateName = $state(undefined);
 	/** @type {number|undefined} */
-	let templateVersion = $state(initialTemplateVersion);
+	let templateVersion = $state(undefined);
 
 	let lastAppliedState = $state({
 		templateId: initialTemplateId,
@@ -96,7 +96,12 @@
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
 	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
 
-	onMount(async () => {
+	onMount(async () => {/** @type {number|undefined} */
+		templateId = initialTemplateId;
+		isOwner = initialIsOwner;
+		userEmail = initialUserEmail;
+		templateName = initialTemplateName;
+		templateVersion = initialTemplateVersion;
 		await searchTemplate();
 	});
 	

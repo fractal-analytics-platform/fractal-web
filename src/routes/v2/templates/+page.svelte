@@ -19,15 +19,11 @@
 	);
 	/** @type {string|undefined} */
 	let userEmail = $derived(
-		page.url.searchParams.get('user_email')
-		? String(page.url.searchParams.get('user_email'))
-		: undefined
+		page.url.searchParams.get('user_email') || undefined
 	);
 	/** @type {string|undefined} */
 	let templateName = $derived(
-		page.url.searchParams.get('name')
-		? String(page.url.searchParams.get('name'))
-		: undefined
+		page.url.searchParams.get('name') || undefined
 	);
 	/** @type {number|undefined} */
 	let templateVersion = $derived(
