@@ -220,6 +220,7 @@
 				<input
 					type="number"
 					class="form-control form-control-sm"
+					min="1"
 					bind:value={templateVersion}
 				/>
 			</div>
