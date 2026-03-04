@@ -18,9 +18,21 @@
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
 	let template = $state()
+	/**
+	 * @type {number | null}
+	 */
+	let originalUserGroupId = $state(null)
+	/**
+	 * @type {string | null}
+	 */
+	let originalDescription = $state(null)
+
+	const isThereSomethingToPatch = $derived(
+		originalUserGroupId != template?.user_group_id ||
+		originalDescription != template?.description
+	);
 
 	let saving = $state(false);
-
 
     const formErrorHandler = new FormErrorHandler(
         'errorAlert-updateTemplateModal', ['user_group_id', 'description']
@@ -39,11 +51,14 @@
 		);
 		if (response.ok) {
             template = await response.json()
+			if (template) {
+				originalUserGroupId = template.user_group_id;
+				originalDescription = template.description
+			}
 			modal?.show();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
-
 	}
 	    
     async function updateTemplate() {
@@ -124,7 +139,11 @@
 			{/if}
 			{/snippet}
 			{#snippet footer()}
-			<button class="btn btn-primary" onclick={updateTemplate} disabled={saving}>
+			<button
+				class="btn btn-primary"
+				onclick={updateTemplate}
+				disabled={saving || !isThereSomethingToPatch}
+			>
 				{#if saving}
 				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 				{/if}
