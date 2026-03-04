@@ -54,7 +54,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/workflow_template/${template.id}`,
+			`/api/v2/workflow_template/${template?.id}`,
 			{
 				method: 'PATCH',
 				headers,
@@ -111,14 +111,17 @@
 				<label
 					class="col-3 col-lg-2 col-form-label"
 					for="template-description"
-				> Description </label>
+				>
+					Description
+				</label>
+
 				<div class="col col-lg-10">
-					<input
-						type="text"
+					<textarea
 						class="form-control"
 						bind:value={template.description}
 						id="template-description"
-					/>
+						rows="6"
+					></textarea>
 				</div>
 			</div>
 			{/if}
