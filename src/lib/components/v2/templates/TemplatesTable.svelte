@@ -61,6 +61,41 @@
 	/** @type {number|undefined} */
 	let templateVersion = $state(initialTemplateVersion);
 
+	let lastAppliedState = $state({
+		templateId: initialTemplateId,
+		isOwner: initialIsOwner,
+		userEmail: initialUserEmail,
+		templateName: initialTemplateName,
+		templateVersion: initialTemplateVersion,
+	});
+
+	const currentState = $derived({
+		templateId,
+		isOwner,
+		userEmail,
+		templateName,
+		templateVersion,
+	});
+
+	const isDefault = $derived(
+		templateId === undefined &&
+		isOwner === false &&
+		userEmail === undefined &&
+		templateName === undefined &&
+		templateVersion === undefined
+	);
+
+	const isDirtyFromApplied = $derived(
+		currentState.templateId !== lastAppliedState.templateId ||
+		currentState.isOwner !== lastAppliedState.isOwner ||
+		currentState.userEmail !== lastAppliedState.userEmail ||
+		currentState.templateName !== lastAppliedState.templateName ||
+		currentState.templateVersion !== lastAppliedState.templateVersion
+	);
+
+	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
+	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
+
 	onMount(() => {
 		searchTemplate();
 	});
@@ -184,16 +219,17 @@
 <div class="card mb-3">
 	<div class="card-body">
 		<div class="row g-3 align-items-end">
-			<div class="col-md">
+			<div class="col">
 				<label class="form-label small text-muted">Template ID</label>
 				<input
 					type="number"
 					class="form-control form-control-sm"
+					min="1"
 					bind:value={templateId}
 				/>
 			</div>
 
-			<div class="col-md">
+			<div class="col">
 				<label class="form-label small text-muted">Name</label>
 				<input
 					type="text"
@@ -202,7 +238,7 @@
 				/>
 			</div>
 
-			<div class="col-md">
+			<div class="col">
 				<label class="form-label small text-muted">User email</label>
 				<select
 					class="form-select form-select-sm"
@@ -215,7 +251,7 @@
 				</select>
 			</div>
 
-			<div class="col-md">
+			<div class="col">
 				<label class="form-label small text-muted">Version</label>
 				<input
 					type="number"
@@ -225,53 +261,49 @@
 				/>
 			</div>
 
-			<div class="col-md-auto">
-				<div class="form-check mt-4 pt-1">
+			<div class="col-auto">
+				<div class="form-check mb-1">
 					<input
 						id="isOwnerCheckbox"
 						type="checkbox"
 						class="form-check-input"
 						bind:checked={isOwner}
 					/>
-					<label
-						class="form-check-label small"
-						for="isOwnerCheckbox"
-					>
+					<label class="form-check-label small" for="isOwnerCheckbox">
 						Only owned
 					</label>
 				</div>
 			</div>
 
-			<div class="col-md-auto">
-				<div class="row mb-1">
-					<button
-						class="btn btn-secondary btn-sm px-4"
-						onclick={async () => {
-							currentPage=1;
-							templateId=undefined;
-							isOwner=false;
-							userEmail=undefined;
-							templateName=undefined;
-							templateVersion=undefined;
-							await searchTemplate();
-						}}
-					>
-						Reset filters
-					</button>
-				</div>
-				<div class="row mb-1">
-					<button
-						class="btn btn-warning btn-sm px-4"
-						onclick={async () => {
-							currentPage=1;
-							await searchTemplate();
-						}}
-					>
-						Apply filters
-					</button>
-				</div>
+			<div class="col-auto d-flex gap-2">
+				<button
+					class="btn {applyClass} btn-sm px-3"
+					disabled={!isDirtyFromApplied}
+					onclick={async () => {
+						currentPage = 1;
+						lastAppliedState = { ...currentState };
+						await searchTemplate();
+					}}
+				>
+					Apply
+				</button>
+				<button
+					class="btn {resetClass} btn-sm px-3"
+					disabled={isDefault}
+					onclick={async () => {
+						currentPage = 1;
+						templateId = undefined;
+						isOwner = false;
+						userEmail = undefined;
+						templateName = undefined;
+						templateVersion = undefined;
+						lastAppliedState = { ...currentState };
+						await searchTemplate();
+					}}
+				>
+					Reset
+				</button>
 			</div>
-
 		</div>
 	</div>
 </div>
