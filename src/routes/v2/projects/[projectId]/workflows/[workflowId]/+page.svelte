@@ -839,10 +839,10 @@
 				<button
 					class="btn btn-light"
 					aria-label="Create template"
+					title="Create template"
 					onclick={templateCreateModal?.show}
 				>
-					<i class="bi-plus-square"></i>
-					Create template
+					<i class="bi bi-file-earmark-plus"></i>
 				</button>
 				{#if workflow.template_id}
 					<button
