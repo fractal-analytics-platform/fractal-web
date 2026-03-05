@@ -849,8 +849,8 @@
 					data-bs-toggle="modal"
 					data-bs-target="#editWorkflowModal"
 					onclick={resetWorkflowUpdateModal}
-					aria-label="Workflow details"
-					title="Workflow details"
+					aria-label="Workflow properties"
+					title="Workflow properties"
 				>
 					<i class="bi-info-circle"></i>
 				</button>
