@@ -848,10 +848,10 @@
 					<button
 						class="btn btn-light"
 						aria-label="Original template"
+						title="Original template"
 						onclick={gotoLinkedTemplate}
 					>
 						<i class="bi-box-arrow-up-right"></i>
-						Original template
 					</button>
 				{/if}
 				<button
@@ -861,6 +861,7 @@
 						handleExportWorkflow();
 					}}
 					aria-label="Export workflow"
+					title="Export workflow"
 				>
 					<i class="bi-download"></i>
 				</button>
@@ -871,6 +872,7 @@
 					data-bs-target="#editWorkflowModal"
 					onclick={resetWorkflowUpdateModal}
 					aria-label="Edit workflow"
+					title="Edit workflow"
 				>
 					<i class="bi-pencil"></i>
 				</button>
