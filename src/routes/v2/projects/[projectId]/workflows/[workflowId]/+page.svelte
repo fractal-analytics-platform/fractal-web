@@ -844,16 +844,16 @@
 				>
 					<i class="bi bi-file-earmark-plus"></i>
 				</button>
-				{#if workflow.template_id}
-					<button
-						class="btn btn-light"
-						aria-label="Original template"
-						title="Original template"
-						onclick={gotoLinkedTemplate}
-					>
-						<i class="bi-box-arrow-up-right"></i>
-					</button>
-				{/if}
+				<button
+					class="btn btn-light"
+					data-bs-toggle="modal"
+					data-bs-target="#editWorkflowModal"
+					onclick={resetWorkflowUpdateModal}
+					aria-label="Workflow details"
+					title="Workflow details"
+				>
+					<i class="bi-info-circle"></i>
+				</button>
 				<button
 					class="btn btn-light"
 					onclick={(e) => {
@@ -866,16 +866,6 @@
 					<i class="bi-download"></i>
 				</button>
 				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-				<button
-					class="btn btn-light"
-					data-bs-toggle="modal"
-					data-bs-target="#editWorkflowModal"
-					onclick={resetWorkflowUpdateModal}
-					aria-label="Edit workflow"
-					title="Edit workflow"
-				>
-					<i class="bi-pencil"></i>
-				</button>
 			</div>
 		</div>
 	</div>
@@ -1294,6 +1284,14 @@
 	{/snippet}
 	{#snippet body()}
 		{#if workflow}
+			{#if workflow.template_id}
+			<div class="mb-3">
+				This workflow comes from a 
+				<button class="btn btn-link p-0" onclick={gotoLinkedTemplate}>
+					template
+				</button>.
+			</div>
+			{/if}
 			<form
 				id="updateWorkflow"
 				onsubmit={(e) => {
