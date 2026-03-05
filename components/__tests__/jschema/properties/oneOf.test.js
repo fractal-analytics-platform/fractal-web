@@ -127,8 +127,6 @@ describe('oneOf properties', () => {
 
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'XXX', foo: 'bar' } });
 
-		expect(screen.queryAllByText("must match exactly one schema in oneOf")).toHaveLength(1);
-
 		expect(screen.getByRole('textbox', { name: 'foo' })).toHaveValue('bar');
 		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 
@@ -142,7 +140,6 @@ describe('oneOf properties', () => {
 
 		await user.type(screen.getByRole('spinbutton'), '42');
 
-		expect(screen.queryAllByText("must match exactly one schema in oneOf")).toHaveLength(0);
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: 42 } });
 		expect(component.isValid()).toEqual(true);
 	});
@@ -411,7 +408,6 @@ describe('oneOf properties', () => {
 			}
 		});
 
-
 		expect(screen.getByText('FooTitle')).toBeVisible();
 		expect(screen.getByText('BarTitle')).toBeVisible();
 
@@ -423,4 +419,104 @@ describe('oneOf properties', () => {
 		expect(screen.getByText('FooTitle')).toBeVisible();
 		expect(screen.getByText('BarTitle')).toBeVisible();
 	});
+
+	it('oneOf inside tuple', async () => {
+		const user = userEvent.setup();
+
+		const { component } = renderSchema({
+			"$defs": {
+				"InternalModel1": {
+					"properties": {
+						"label": {
+							"const": "label1",
+							"default": "label1",
+							"type": "string"
+						},
+						"field1": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"field1"
+					],
+					"type": "object"
+				},
+				"InternalModel2": {
+					"properties": {
+						"label": {
+							"const": "label2",
+							"default": "label2",
+							"type": "string"
+						},
+						"field2": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"field2"
+					],
+					"type": "object"
+				}
+			},
+			"properties": {
+				"foo": {
+					"items": {
+						"type": "object",
+						"properties": {
+							"baz": {
+								"type": "array",
+								"minItems": 2,
+								"maxItems": 2,
+								"prefixItems": [
+									{
+										"discriminator": {
+											"mapping": {
+												"label1": "#/$defs/InternalModel1",
+												"label2": "#/$defs/InternalModel2"
+											},
+											"propertyName": "label"
+										},
+										"oneOf": [
+											{
+												"$ref": "#/$defs/InternalModel1"
+											},
+											{
+												"$ref": "#/$defs/InternalModel2"
+											}
+										]
+									},
+									{ "type": "number" }
+								]
+							}
+						}
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		});
+
+		expect(component.getArguments()).deep.eq({ "foo": [] });
+
+		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
+		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }, null] }] });
+
+		expect(screen.getByText('must NOT have fewer than 2 items')).toBeVisible();
+		expect(screen.getByText('required property')).toBeVisible();
+
+		await user.type(screen.getByRole('spinbutton'), '42');
+		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }, 42] }] });
+		expect(screen.getByText('required property')).toBeVisible();
+
+		expect(component.isValid()).false;
+		await user.type(screen.getByRole('textbox', { name: 'field1' }), 'xxx');
+		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": "xxx" }, 42] }] });
+		expect(component.isValid()).true;
+
+		await user.selectOptions(screen.getByRole('combobox'), 'label2');
+		expect(component.isValid()).false;
+		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label2", "field2": null }, 42] }] });
+		expect(screen.getByText('required property')).toBeVisible();
+	})
 });

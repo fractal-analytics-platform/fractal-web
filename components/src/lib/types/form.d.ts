@@ -34,6 +34,7 @@ export type BaseFormElementFields = {
 	id: string;
 	key: string | null;
 	path: string;
+	schemaPath: string;
 	type: string | null;
 	title: string;
 	description: string;
@@ -104,4 +105,16 @@ export type FormBuilderEntry = ({
 	id: string
 	error: string
 	key?: string
+}
+
+export type FormElementParams<T extends JSONSchemaProperty, V> = {
+	key: null | string
+	path: string
+	schemaPath: string
+	property: T
+	parentProperty: JSONSchemaProperty | undefined
+	required: boolean
+	removable: boolean
+	titleType: TitleType
+	value: V
 }

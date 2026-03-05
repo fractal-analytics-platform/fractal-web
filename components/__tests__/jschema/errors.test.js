@@ -121,7 +121,7 @@ describe('JSchema form errors', () => {
 
     const foo = formManager.root.children[0];
 
-    expect(get(foo.errors)).deep.eq(["must match exactly one schema in oneOf"]);
+    expect(get(foo.errors)).deep.eq([]);
     expect(get(foo.selectedItem.errors)).deep.eq([]);
     expect(get(foo.selectedItem.children[0].errors)).deep.eq(["required property"]);
   });
@@ -130,11 +130,11 @@ describe('JSchema form errors', () => {
     const formManager = new FormManager(oneOfSchema, vi.fn(), 'pydantic_v2', [], { foo: { discr: 'X', u: 'U' } });
     expect(formManager.getFormData()).deep.eq({ foo: { discr: 'X', u: 'U' } });
     const foo = formManager.root.children[0];
-    expect(get(foo.errors)).deep.eq(["must match exactly one schema in oneOf"]);
+    expect(get(foo.errors)).deep.eq([]);
     expect(foo.selectedItem).null;
   });
 
-  it('oneOf errors with nested tagged union', async () => {
+  it('oneOf errors with array (nested tagged union)', async () => {
     const schema = {
       $defs: {
         "InternalModel1": {
@@ -163,6 +163,18 @@ describe('JSchema form errors', () => {
           "required": ["field"],
           "type": "object"
         },
+        "InternalModel3": {
+          "properties": {
+            "label": {
+              "const": "label3",
+              "default": "label3",
+              "type": "string",
+            },
+            "field3": { "type": "string", }
+          },
+          "required": ["field3"],
+          "type": "object"
+        },
       },
       properties: {
         foo: {
@@ -171,6 +183,7 @@ describe('JSchema form errors', () => {
               "mapping": {
                 "label1": "#/$defs/InternalModel1",
                 "label2": "#/$defs/InternalModel2",
+                "label3": "#/$defs/InternalModel3",
               },
               "propertyName": "label"
             },
@@ -180,6 +193,9 @@ describe('JSchema form errors', () => {
               },
               {
                 "$ref": "#/$defs/InternalModel2"
+              },
+              {
+                "$ref": "#/$defs/InternalModel3"
               }
             ]
           },
@@ -196,7 +212,179 @@ describe('JSchema form errors', () => {
 
     expect(formManager.getFormData()).deep.eq({ "foo": [{ "label": "label2", field: null }] });
     expect(get(formManager.genericErrors).length).eq(0);
-
+    expect(get(formManager.root.children[0].children[0].errors)).deep.eq([]);
     expect(get(formManager.root.children[0].children[0].selectedItem.children[0].errors)).deep.eq(['required property']);
+  });
+
+  it('oneOf errors with deeply nested array', async () => {
+    const schema = {
+      "$defs": {
+        "InternalModel1": {
+          "properties": {
+            "label": {
+              "const": "label1",
+              "default": "label1",
+              "type": "string"
+            },
+            "field1": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "field1"
+          ],
+          "type": "object"
+        },
+        "InternalModel2": {
+          "properties": {
+            "label": {
+              "const": "label2",
+              "default": "label2",
+              "type": "string"
+            },
+            "field2": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "field2"
+          ],
+          "type": "object"
+        }
+      },
+      "properties": {
+        "foo": {
+          "items": {
+            "type": "object",
+            "properties": {
+              "baz": {
+                "type": "array",
+                "items": {
+                  "discriminator": {
+                    "mapping": {
+                      "label1": "#/$defs/InternalModel1",
+                      "label2": "#/$defs/InternalModel2"
+                    },
+                    "propertyName": "label"
+                  },
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/InternalModel1"
+                    },
+                    {
+                      "$ref": "#/$defs/InternalModel2"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "title": "Deeply Nested Tagged Union",
+          "type": "array"
+        }
+      },
+      "type": "object"
+    };
+
+    const formManager = new FormManager(schema, vi.fn(), 'pydantic_v2', [],
+      { "foo": [{ "baz": [{ "label": "label1" }] }] }
+    );
+
+    expect(formManager.getFormData()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }] }] });
+    expect(get(formManager.genericErrors).length).eq(0);
+
+    expect(get(formManager.root.children[0].children[0].children[0].children[0].errors)).deep.eq([]);
+    expect(get(formManager.root.children[0].children[0].children[0].children[0].selectedItem.children[0].errors)).deep.eq(['required property']);
+  });
+
+  it('oneOf errors inside tuple', async () => {
+    const schema = {
+      "$defs": {
+        "InternalModel1": {
+          "properties": {
+            "label": {
+              "const": "label1",
+              "default": "label1",
+              "type": "string"
+            },
+            "field1": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "field1"
+          ],
+          "type": "object"
+        },
+        "InternalModel2": {
+          "properties": {
+            "label": {
+              "const": "label2",
+              "default": "label2",
+              "type": "string"
+            },
+            "field2": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "field2"
+          ],
+          "type": "object"
+        }
+      },
+      "properties": {
+        "foo": {
+          "items": {
+            "type": "object",
+            "properties": {
+              "baz": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "prefixItems": [
+                  {
+                    "discriminator": {
+                      "mapping": {
+                        "label1": "#/$defs/InternalModel1",
+                        "label2": "#/$defs/InternalModel2"
+                      },
+                      "propertyName": "label"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/InternalModel1"
+                      },
+                      {
+                        "$ref": "#/$defs/InternalModel2"
+                      }
+                    ]
+                  },
+                  { "type": "string" }
+                ]
+              }
+            }
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    };
+
+    const formManager = new FormManager(schema, vi.fn(), 'pydantic_v2', [],
+      { "foo": [{ "baz": [{ "label": "label1" }] }] }
+    );
+
+    expect(formManager.getFormData()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }, null] }] });
+    expect(get(formManager.genericErrors).length).eq(0);
+
+    expect(get(formManager.root.children[0].children[0].children[0].errors)).deep.eq([
+      'must NOT have fewer than 2 items'
+    ]);
+    expect(get(formManager.root.children[0].children[0].children[0].children[0].errors)).deep.eq([]);
+    expect(get(formManager.root.children[0].children[0].children[0].children[0].selectedItem.errors)).deep.eq([]);
+    expect(get(formManager.root.children[0].children[0].children[0].children[0].selectedItem.children[0].errors)).deep.eq([
+      'required property'
+    ]);
   });
 });
