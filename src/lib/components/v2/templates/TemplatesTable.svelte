@@ -86,11 +86,17 @@
 	);
 
 	const isDirtyFromApplied = $derived(
-		currentState.templateId !== lastAppliedState.templateId ||
+		currentState.templateId != lastAppliedState.templateId ||
 		currentState.isOwner !== lastAppliedState.isOwner ||
 		currentState.userEmail !== lastAppliedState.userEmail ||
-		currentState.templateName !== lastAppliedState.templateName ||
-		currentState.templateVersion !== lastAppliedState.templateVersion
+		(
+			currentState.templateName !== lastAppliedState.templateName  &&
+			!(
+				currentState.templateName === "" &&
+				lastAppliedState.templateName === undefined
+			)
+		) ||
+		currentState.templateVersion != lastAppliedState.templateVersion
 	);
 
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
