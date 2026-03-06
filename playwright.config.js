@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3186-workflow-templates---core',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
