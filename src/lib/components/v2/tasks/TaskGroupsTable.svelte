@@ -223,7 +223,7 @@
 				{#each selectedGroup.task_list as task (task.id)}
 					{#if task}
 						<tr class:collapsed={selectedGroup.pkg_name !== expandedTaskGroupRow} class="task-row">
-							<td colspan="5" class="text-end">
+							<td colspan="6" class="text-end">
 								<span class="pe-4">{task.name}</span>
 							</td>
 							<td>
