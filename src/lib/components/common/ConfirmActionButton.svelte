@@ -5,6 +5,7 @@
 	 * @typedef {Object} Props
 	 * @property {any} [callbackAction] - A default empty function
 	 * @property {string} [style]
+	 * @property {string} [title]
 	 * @property {string} [btnStyle]
 	 * @property {string} [label]
 	 * @property {string|undefined} [ariaLabel]
@@ -19,6 +20,7 @@
 	let {
 		callbackAction = async () => {},
 		style = 'primary',
+		title = '',
 		btnStyle = 'primary',
 		label = '',
 		ariaLabel = undefined,
@@ -83,6 +85,7 @@
 	data-bs-toggle="modal"
 	data-bs-target="#{modalId}"
 	aria-label={ariaLabel}
+	{title}
 	{disabled}
 >
 	{#if buttonIcon}
