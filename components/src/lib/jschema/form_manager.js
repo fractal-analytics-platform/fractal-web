@@ -706,7 +706,7 @@ export class FormManager {
 			default:
 				if (element instanceof ValueFormElement) {
 					if (element instanceof NumberFormElement && element.badInput) {
-						return 'invalid';
+						return '__invalid__';
 					}
 					return get(element.value);
 				}
