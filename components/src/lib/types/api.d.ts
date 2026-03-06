@@ -279,7 +279,6 @@ export type TaskV2Info = {
 export type TaskGroupV2 = {
 	id: number;
 	task_list: TaskV2[];
-	user_id: number;
 	user_email: string;
 	user_group_id: number;
 	origin: string;
