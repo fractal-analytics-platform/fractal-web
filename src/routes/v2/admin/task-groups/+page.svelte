@@ -148,14 +148,6 @@
 	}
 
 	/**
-	 * @param {number} userId
-	 * @returns {string}
-	 */
-	function getUserEmail(userId) {
-		return users.find((u) => u.id === userId)?.email || '-';
-	}
-
-	/**
 	 * @param {number} userGroupId
 	 * @returns {string}
 	 */
