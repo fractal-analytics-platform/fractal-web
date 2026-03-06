@@ -140,7 +140,7 @@
 	<thead class="table-light">
 		<tr>
 			<th>Package</th>
-			<th>User</th>
+			<th>Owner</th>
 			<th>Active</th>
 			<th>Group</th>
 			<th>Version</th>
