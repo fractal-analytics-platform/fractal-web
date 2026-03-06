@@ -4,13 +4,16 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {string} name
+	 * @property {object} argsParallel
+	 * @property {object} argsNonParallel
 	 * @property {(json: object) => Promise<void>} onImport
+	 * @property {boolean} importDisabled
 	 * @property {boolean} exportDisabled
 	 */
 
 	/** @type {Props} */
-	let { workflowTask, onImport, exportDisabled } = $props();
+	let { name, argsParallel, argsNonParallel, onImport, importDisabled, exportDisabled } = $props();
 
 	/** @type {Modal|undefined} */
 	let importArgsModal = $state();
@@ -50,15 +53,11 @@
 
 	function exportArgs() {
 		const args = {
-			args_parallel: workflowTask.args_parallel,
-			args_non_parallel: workflowTask.args_non_parallel
+			args_parallel: argsParallel,
+			args_non_parallel: argsNonParallel
 		};
 		const serializedArgs = JSON.stringify(args, null, 2);
-		downloadBlob(
-			serializedArgs,
-			`args-${createSlug(workflowTask.task.name)}.json`,
-			'text/json;charset=utf-8;'
-		);
+		downloadBlob(serializedArgs, `args-${createSlug(name)}.json`, 'text/json;charset=utf-8;');
 	}
 
 	/**
@@ -70,7 +69,11 @@
 </script>
 
 <div class="me-auto">
-	<button class="btn btn-outline-primary" onclick={() => importArgsModal?.show()}>
+	<button
+		class="btn btn-outline-primary"
+		onclick={() => importArgsModal?.show()}
+		disabled={importDisabled}
+	>
 		<i class="bi bi-upload"></i>
 		Import
 	</button>
