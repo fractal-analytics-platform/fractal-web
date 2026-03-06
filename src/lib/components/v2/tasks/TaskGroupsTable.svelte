@@ -139,6 +139,7 @@
 	<thead class="table-light">
 		<tr>
 			<th>Package</th>
+			<th>User</th>
 			<th>Active</th>
 			<th>Group</th>
 			<th>Version</th>
@@ -151,6 +152,7 @@
 			{#if selectedGroup}
 				<tr>
 					<td>{selectedGroup.pkg_name}</td>
+					<td>{selectedGroup.user_email}</td>
 					<td>
 						<BooleanIcon value={selectedGroup.active} />
 					</td>

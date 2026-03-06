@@ -280,6 +280,7 @@ export type TaskGroupV2 = {
 	id: number;
 	task_list: TaskV2[];
 	user_id: number;
+	user_email: string;
 	user_group_id: number;
 	origin: string;
 	pkg_name: string;
