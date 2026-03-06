@@ -385,7 +385,7 @@
 									<td>{taskGroup.id}</td>
 									<td>{taskGroup.pkg_name}</td>
 									<td>{taskGroup.version || '-'}</td>
-									<td>{getUserEmail(taskGroup.user_id)}</td>
+									<td>{taskGroup.user_email}</td>
 									<td>{getGroupName(taskGroup.user_group_id)}</td>
 									<td>{getResourceName(taskGroup.resource_id)}</td>
 									<td>
@@ -453,7 +453,7 @@
 				<li class="list-group-item list-group-item-light fw-bold">Package name</li>
 				<li class="list-group-item">{selectedTaskGroup.pkg_name}</li>
 				<li class="list-group-item list-group-item-light fw-bold">User</li>
-				<li class="list-group-item">{getUserEmail(selectedTaskGroup.user_id)}</li>
+				<li class="list-group-item">{selectedTaskGroup.user_email}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Group</li>
 				<li class="list-group-item">{getGroupName(selectedTaskGroup.user_group_id)}</li>
 				<li class="list-group-item list-group-item-light fw-bold">Resource</li>
