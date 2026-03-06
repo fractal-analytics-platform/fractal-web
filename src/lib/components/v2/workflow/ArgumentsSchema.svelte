@@ -22,6 +22,7 @@
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
+	 * @property {string} taskName
 	 * @property {boolean} [editable]
 	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaNonParallel
 	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaParallel
@@ -33,6 +34,7 @@
 	let {
 		workflowTask = $bindable(),
 		onWorkflowTaskUpdated,
+		taskName,
 		editable = true,
 		argsSchemaNonParallel = null,
 		argsSchemaParallel = null,
@@ -271,9 +273,12 @@
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
 		<ImportExportArgs
-			{workflowTask}
+			argsNonParallel={editable ? workflowTask.args_non_parallel : argsNonParallel}
+			argsParallel={editable ? workflowTask.args_parallel : argsParallel}
+			name={taskName}
 			onImport={patchWorkflow}
-			exportDisabled={!editable || unsavedChanges || savingChanges}
+			importDisabled={!editable}
+			exportDisabled={unsavedChanges || savingChanges}
 		/>
 		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}
 			<div>

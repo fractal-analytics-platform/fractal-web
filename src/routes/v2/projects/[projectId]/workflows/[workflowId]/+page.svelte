@@ -1131,6 +1131,8 @@
 													<ArgumentsSchema
 														bind:workflowTask={selectedWorkflowTask}
 														{onWorkflowTaskUpdated}
+														taskName={selectedHistoryRun.workflowtask_dump.alias ??
+															selectedHistoryRun.workflowtask_dump.task.name}
 														editable={false}
 														bind:this={argsSchemaForm}
 														argsSchemaNonParallel={selectedHistoryRun.args_schema_non_parallel}
@@ -1143,6 +1145,7 @@
 												<ArgumentsSchema
 													bind:workflowTask={selectedWorkflowTask}
 													{onWorkflowTaskUpdated}
+													taskName={selectedWorkflowTask.alias ?? selectedWorkflowTask.task.name}
 													editable={true}
 													bind:this={argsSchemaForm}
 													argsSchemaNonParallel={selectedWorkflowTask.task.args_schema_non_parallel}

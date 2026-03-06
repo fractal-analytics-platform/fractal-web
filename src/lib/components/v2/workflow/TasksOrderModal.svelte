@@ -16,7 +16,7 @@
 	/** @type {Modal|undefined} */
 	let editWorkflowTasksOrderModal = $state();
 
-	/** @type {{id: number, name: string}[]} */
+	/** @type {{id: number, name: string, alias: string | null}[]} */
 	let editableTasksList = $state([]);
 
 	// used to hide drag and drop ghost image
@@ -28,7 +28,8 @@
 	export function show(originalTasksList) {
 		editableTasksList = originalTasksList.map((wt) => ({
 			id: wt.id,
-			name: wt.task.name
+			name: wt.task.name,
+			alias: wt.alias
 		}));
 		editWorkflowTasksOrderModal?.show();
 	}
@@ -200,7 +201,7 @@
 						ondragstart={(event) => handleDragStart(workflowTask.id, i, event)}
 						ondragend={handleDragEnd}
 					>
-						{workflowTask.name}
+						{workflowTask.alias ?? workflowTask.name}
 					</div>
 				{/each}
 			</div>

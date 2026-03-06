@@ -73,7 +73,7 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 				schemaVersion,
 				required,
 				initialValue,
-				loadDefaults
+				true
 			);
 		}
 	}

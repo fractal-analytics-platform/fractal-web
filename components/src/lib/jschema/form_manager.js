@@ -82,31 +82,21 @@ export class FormManager {
 			required: true,
 			removable: false,
 			value: data,
-			parentProperty: undefined
+			parentProperty: undefined,
+			titleType: 'prefer_title',
+			schemaPath: '#'
 		});
 		const valid = this.validate();
 		this.onchange(data, valid);
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any,
-	 * parentProperty: import("../types/jschema").JSONSchemaProperty | undefined
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaProperty, any>} params
 	 */
 	createFormElement(params) {
 		const { property } = params;
 		if ('enum' in property) {
-			return this.createEnumElement(
-				/** @type {{ key: null|string, path: string, property: import("../types/jschema").JSONSchemaNumberProperty, required: boolean, removable: boolean, value: any }} */(
-					params
-				)
-			);
+			return this.createEnumElement(params);
 		}
 		if ('oneOf' in property) {
 			const oneOfProperty = /** @type {import("../types/jschema").JSONSchemaOneOfProperty} */ (
@@ -171,78 +161,67 @@ export class FormManager {
 
 	/**
 	 * Extra property that should not be present (additionalProperties: false)
+	 * @param {Omit<import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaProperty, any>, 
+	 * 'property' | 'required' | 'removable' | 'schemaPath'>} params
 	 */
-	createUnexpectedElement({ key, path, value }) {
-		const fields = this.getBaseElementFields({ key, path, property: { type: 'unexpected' }, required: false, removable: true });
+	createUnexpectedElement(params) {
+		const fields = this.getBaseElementFields({
+			...params,
+			schemaPath: '',
+			property: { type: 'unexpected' },
+			required: false,
+			removable: true
+		});
 		const element = new UnexpectedFormElement({
 			...fields,
-			value: value
+			value: params.value
 		});
 		return element;
 	}
 
 	/**
 	 * Property with invalid type (e.g. array instead of boolean)
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaProperty, any>} params
 	 */
-	createInvalidElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createInvalidElement(params) {
+		const fields = this.getBaseElementFields(params);
 		const element = new InvalidFormElement({
 			...fields,
-			value
+			value: params.value
 		});
 		return element;
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaStringProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaStringProperty, any>} params
 	 */
-	createStringElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createStringElement(params) {
+		const fields = this.getBaseElementFields(params);
 		const element = new StringFormElement({
 			...fields,
-			value: value || null
+			value: params.value || null
 		});
 		return element;
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaBooleanProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaBooleanProperty, any>} params
 	 */
-	createBooleanElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createBooleanElement(params) {
+		const fields = this.getBaseElementFields(params);
 		const element = new BooleanFormElement({
 			...fields,
-			value: undefinedToNull(value)
+			value: undefinedToNull(params.value)
 		});
 		return element;
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaNumberProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaNumberProperty, any>} params
 	 */
-	createNumberElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createNumberElement(params) {
+		const { property, value } = params;
+		const fields = this.getBaseElementFields(params);
 		const element = new NumberFormElement({
 			...fields,
 			type: 'number',
@@ -254,17 +233,11 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaNumberProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaNumberProperty, any>} params
 	 */
-	createEnumElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createEnumElement(params) {
+		const { property, value } = params;
+		const fields = this.getBaseElementFields(params);
 		const element = new EnumFormElement({
 			...fields,
 			type: 'enum',
@@ -275,18 +248,11 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaObjectProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any,
-	 * parentProperty: import("../types/jschema").JSONSchemaProperty | undefined
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaObjectProperty, any[]>} params
 	 */
-	createObjectElement({ key, path, property, required, removable, value, parentProperty }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createObjectElement(params) {
+		const { path, schemaPath, property, value, parentProperty } = params;
+		const fields = this.getBaseElementFields(params);
 		const requiredChildren = property.required || [];
 		const children = [];
 		const properties = Object.entries(getAllObjectProperties(property, value));
@@ -295,14 +261,17 @@ export class FormManager {
 		for (const [childKey, childProperty] of properties) {
 			validKeys.push(childKey)
 			const childRequired = requiredChildren.includes(childKey);
+			const removable = isRemovableChildProperty(property, childKey);
 			const childElement = this.createFormElement({
 				key: childKey,
 				path: `${path}/${childKey}`,
 				property: childProperty,
 				required: childRequired,
-				removable: isRemovableChildProperty(property, childKey),
+				removable,
 				value: value[childKey],
-				parentProperty: property
+				parentProperty: property,
+				titleType: removable ? 'key' : 'prefer_title',
+				schemaPath: `${schemaPath}/properties/${childKey}`
 			});
 			children.push(childElement);
 		}
@@ -319,7 +288,9 @@ export class FormManager {
 				children.push(this.createUnexpectedElement({
 					key: k,
 					path: `${path}/${k}`,
-					value: v
+					parentProperty: property,
+					value: v,
+					titleType: 'key'
 				}))
 			}
 		}
@@ -332,27 +303,23 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaArrayProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any[]
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]>} params
 	 */
-	createArrayElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createArrayElement(params) {
+		const { path, schemaPath, property, value } = params;
+		const fields = this.getBaseElementFields(params);
 		const items = /** @type {import("../types/jschema").JSONSchemaProperty} */ (property.items);
 		const children = (value || []).map((v, i) =>
 			this.createFormElement({
 				key: i.toString(),
 				path: `${path}/${i}`,
+				schemaPath: `${schemaPath}/items`,
 				property: items,
 				required: false,
 				removable: true,
 				value: v,
-				parentProperty: property
+				parentProperty: property,
+				titleType: 'oneOf' in items ? 'inner_title' : 'title_only'
 			})
 		);
 		const element = new ArrayFormElement({
@@ -366,17 +333,11 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaArrayProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any[]
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]>} params
 	 */
-	createTupleElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createTupleElement(params) {
+		const { property, required, value } = params;
+		const fields = this.getBaseElementFields(params);
 		const size = /** @type {number} */ (property.minItems);
 		const items = this.schemaVersion === 'pydantic_v1' ? property.items : property.prefixItems;
 		const element = new TupleFormElement({
@@ -386,56 +347,50 @@ export class FormManager {
 			size,
 			children:
 				required || (Array.isArray(value) && value.length > 0)
-					? this.createTupleChildren({ path, items, size, value, parentProperty: property })
+					? this.createTupleChildren({ ...params, items, size, value, parentProperty: property, titleType: 'title_only' })
 					: []
 		});
 		return element;
 	}
 
 	/**
-	 * @param {{
-	 * path: string,
-	 * items: import("../types/jschema").JSONSchemaProperty|import("../types/jschema").JSONSchemaProperty[],
-	 * size: number,
-	 * value: any,
-	 * parentProperty: import("../types/jschema").JSONSchemaProperty | undefined
-	 * }} params
+	 * @param {Omit<import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]> & {
+	 * items: import("../types/jschema").JSONSchemaProperty|import("../types/jschema").JSONSchemaProperty[]
+	 * size: number
+	 * }, 'required' | 'removable' | 'key' | 'property'>} params
 	 */
-	createTupleChildren({ path, items, size, value, parentProperty }) {
-		const params = {
+	createTupleChildren(params) {
+		const { path, items, size, value } = params;
+		const schemaPath = `${params.schemaPath}/${this.schemaVersion === 'pydantic_v1' ? 'items' : 'prefixItems'}`;
+		const childParams = {
+			...params,
 			required: false,
 			removable: false
 		};
 		let children = [];
 		if (Array.isArray(items)) {
 			children = items.map((item, index) =>
-				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: item, value: value[index], parentProperty })
+				this.createFormElement({ ...childParams, key: index.toString(), path: `${path}/${index}`, schemaPath: `${schemaPath}/${index}`, property: item, value: value[index] })
 			);
 		} else {
 			children = Array(size).map((_, index) =>
-				this.createFormElement({ ...params, key: index.toString(), path: `${path}/${index}`, property: items, value: value[index], parentProperty })
+				this.createFormElement({ ...childParams, key: index.toString(), path: `${path}/${index}`, schemaPath: `${schemaPath}/${index}`, property: items, value: value[index] })
 			);
 		}
 		if (Array.isArray(value)) {
 			for (let i = items.length; i < value.length; i++) {
-				children.push(this.createUnexpectedElement({ ...params, key: i.toString(), path: `${path}/${i}`, value: value[i] }));
+				children.push(this.createUnexpectedElement({ ...childParams, key: i.toString(), path: `${path}/${i}`, value: value[i] }));
 			}
 		}
 		return children;
 	}
 
 	/**
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaOneOfProperty,
-	 * required: boolean,
-	 * removable: boolean,
-	 * value: any
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaOneOfProperty, any>} params
 	 */
-	createConditionalElement({ key, path, property, required, removable, value }) {
-		const fields = this.getBaseElementFields({ key, path, property, required, removable });
+	createConditionalElement(params) {
+		const { key, path, schemaPath, property, required, removable, value, titleType } = params;
+		const fields = this.getBaseElementFields(params);
 		const selectedValue = value ?? {};
 		const selectedIndex = this.getConditionalElementSelectedChildIndex(property, selectedValue);
 		const { discriminator, oneOfProperty } = this.extractDiscriminatorProperty(property, selectedValue);
@@ -448,7 +403,9 @@ export class FormManager {
 					unexpectedChildren.push(this.createUnexpectedElement({
 						key: k,
 						path: `${path}/${k}`,
-						value: v
+						value: v,
+						titleType: 'key',
+						parentProperty: property
 					}));
 				}
 			}
@@ -457,15 +414,17 @@ export class FormManager {
 		const selectedItem = selectedIndex === -1 ? null : this.createFormElement({
 			key,
 			path,
+			schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
 			property: selectedProperty,
 			required,
 			removable,
 			value: selectedValue,
-			parentProperty: property
+			parentProperty: property,
+			titleType,
 		});
 
-		if (selectedItem) {
-			selectedItem.title = selectedProperty.title || key || '';
+		if (selectedItem && titleType === 'inner_title') {
+			fields.title = selectedProperty.title || '';
 		}
 
 		return new ConditionalFormElement({
@@ -475,7 +434,8 @@ export class FormManager {
 			selectedIndex: selectedIndex,
 			discriminator,
 			selectedItem,
-			unexpectedChildren
+			unexpectedChildren,
+			titleType
 		});
 	}
 
@@ -590,29 +550,39 @@ export class FormManager {
 
 	/**
 	 * Initializes the common base fields (title, description, ...) to create a new element
-	 * @param {{
-	 * key: null|string,
-	 * path: string,
-	 * property: import("../types/jschema").JSONSchemaProperty,
-	 * required: boolean,
-	 * removable: boolean
-	 * }} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaProperty, any>} params
 	 * @returns {import("../types/form").BaseFormElementFields}
 	 */
-	getBaseElementFields({ key, path, property, required, removable }) {
+	getBaseElementFields(params) {
+		const { key, property, titleType } = params;
 		return {
-			key,
-			path,
-			required,
-			removable,
+			...params,
 			manager: this,
 			id: this.getUniqueId(),
 			type: 'type' in property && property.type ? property.type : null,
-			title: key && removable && !key.match(/^\d+$/) ? key : property.title || key || '',
+			title: this.getElementTitle(property, key, titleType),
 			description: property.description || '',
 			property: deepCopy(property),
 			notifyChange: this.notifyChange
 		};
+	}
+
+	/**
+	 * @param {import("../types/jschema").JSONSchemaProperty} property 
+	 * @param {string | null} key 
+	 * @param {import("../types/form").TitleType} titleType 
+	 */
+	getElementTitle(property, key, titleType) {
+		switch (titleType) {
+			case 'key':
+				return key;
+			case 'prefer_title':
+				return property.title || key || '';
+			case 'title_only':
+				return property.title || '';
+			default:
+				return '';
+		}
 	}
 
 	/**
@@ -736,7 +706,7 @@ export class FormManager {
 			default:
 				if (element instanceof ValueFormElement) {
 					if (element instanceof NumberFormElement && element.badInput) {
-						return 'invalid';
+						return '__invalid__';
 					}
 					return get(element.value);
 				}
