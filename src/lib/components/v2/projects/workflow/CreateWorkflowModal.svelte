@@ -252,7 +252,6 @@
 			);
 		}
 
-
 		if (response.ok) {
 			// Return a workflow item
 			importSuccess = true;
@@ -270,9 +269,15 @@
 		} else {
 			console.error('Import workflow failed');
 			const alertError = await getAlertErrorFromResponse(response);
+			const result = alertError.reason;
+			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
+				workflowImportErrorData = result.data
+				throw new Error();
+			}
 			modal?.displayErrorAlert(alertError);
 		}
 	}
+
 </script>
 
 <Modal
@@ -433,12 +438,29 @@
 				/>
 			</div>
 			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
+			{#if !workflowImportErrorData}
 			<div>Select a template</div>
-			<TemplatesTable 
-				modalType='select'
-				{templatePage}
-				{handleSelect}
-			/>
+				<TemplatesTable 
+					modalType='select'
+					{templatePage}
+					{handleSelect}
+				/>
+			{:else}
+				<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleImportWorkflow();
+				}}
+				>
+				<WorkflowImportFlexibility
+					bind:workflowImportErrorData
+					bind:selectedVersions
+					bind:includeOlderVersions
+					bind:workflowMetadata
+					{creating}
+				/>
+				</form>
+			{/if}
 		{/if}
 	{/if}
 
