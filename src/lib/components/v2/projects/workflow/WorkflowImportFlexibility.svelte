@@ -75,9 +75,7 @@
 					class="form-select"
 				>
 					<option value={undefined}>Select...</option>
-					{#each [...data.available_tasks].sort(
-						(a, b) => a.version.localeCompare(b.version)
-					) as task, i (i)}
+					{#each [...data.available_tasks] as task, i (i)}
 						{#if !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version)}
 							<option
 								value={task.version}
