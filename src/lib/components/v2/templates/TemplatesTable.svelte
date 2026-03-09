@@ -456,5 +456,6 @@
 
 <TemplateImportModal
 	onTemplateImport={searchTemplate}
+	{groups}
 	bind:this={importTemplateModal}
 />

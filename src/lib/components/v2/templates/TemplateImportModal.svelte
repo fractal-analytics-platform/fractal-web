@@ -6,10 +6,11 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => void} onTemplateImport
+	 * @property {Array<import('fractal-components/types/api').Group>} groups
 	 */
 
 	/** @type {Props} */
-	let { onTemplateImport } = $props();
+	let { onTemplateImport, groups } = $props();
 
 	// Component properties
 	let creating = $state(false);
@@ -22,6 +23,8 @@
 	let files = $state(undefined);
 	/** @type {HTMLInputElement|undefined} */
 	let fileInput = $state(undefined);
+	/** @type {number|undefined} */
+	let userGroupId = $state(undefined)
 
 	/** @type {Modal|undefined} */
 	let modal = $state(undefined);
@@ -38,6 +41,7 @@
 		templateName = undefined;
 		templateVersion = undefined;
 		creating = false;
+		userGroupId = undefined;
 		if (fileInput) {
 			fileInput.value = '';
 		}
@@ -79,9 +83,15 @@
 		}
 
 		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
+		headers.set('Content-Type', 'application/json')
+		
+		const url = new URL('/api/v2/workflow_template/import', window.location.origin);
 
-		const response = await fetch(`/api/v2/workflow_template/import`, {
+		if (userGroupId) {
+			url.searchParams.set('user_group_id', String(userGroupId));
+		};
+
+		const response = await fetch(url, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -151,6 +161,20 @@
 					class="form-control"
 				/>
 			</div>
+			<div class="mb-2">
+				<label class="form-label" for="template-user-group-id">User Group</label>
+				<select
+					class="form-select"
+					id="template-user-group-id"
+					bind:value={userGroupId}
+				>
+					<option value={null}>Select...</option>
+					{#each groups as group }
+						<option value={group.id}>{group.name}</option>
+					{/each}
+					
+				</select>
+			</div>
 			<button
 				class="btn btn-primary mt-2"
 				disabled={!files || creating}
@@ -160,6 +184,7 @@
 				{/if}
 				Import template
 			</button>
+
 			<div class="mt-2" id="errorAlert-importTemplateModal"></div>
 		</form>
 	{/snippet}
