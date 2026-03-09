@@ -12,6 +12,7 @@
     /**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
+	 * @property {number|undefined} [singleSelectedTemplateId]
 	 * @property {number|undefined} [templateId]
 	 * @property {boolean} [isOwner]
 	 * @property {string|undefined} [userEmail]
@@ -24,6 +25,7 @@
 	/** @type {Props} */
 	let {
 		templatePage = $bindable(),
+		singleSelectedTemplateId = $bindable(undefined),
 		templateId: initialTemplateId = undefined,
 		isOwner: initialIsOwner = false,
 		userEmail: initialUserEmail = undefined,
@@ -351,7 +353,8 @@
 								title="Select"
 								aria-label="Select"
 								onclick={async () => {
-									await handleSelect(selectedTemplates[index].template_id);
+									singleSelectedTemplateId = selectedTemplates[index].template_id;
+									await handleSelect();
 								}}
 							>
 								<i class="bi bi-plus-circle"></i>

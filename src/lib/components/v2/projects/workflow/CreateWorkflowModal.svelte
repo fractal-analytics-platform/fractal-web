@@ -50,6 +50,9 @@
 	/** @type {import('fractal-components/types/api').TemplatePage|undefined} */
 	let templatePage = $state();
 
+	/** @type {number|undefined} */
+	let singleSelectedTemplateId = $state();
+
 
 	$effect(() => {
 		includeOlderVersions;
@@ -221,36 +224,32 @@
 		}
 	}
 
-	/**
-	 * @param {number} templateId
-	*/
-	async function handleSelect(templateId) {
+
+	async function handleSelect() {
 		modal?.hideErrorAlert();
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		
-		let response;
+
+		const payload = {};
 		if (workflowName) {
-			response = await fetch(
-				`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers,
-					body: JSON.stringify({name: workflowName}),
-				}
-			);
-		} else {
-			response = await fetch(
-				`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${templateId}`, 
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers,
-				}
-			);
+			payload.name = workflowName;
 		}
+		
+		if (selectedVersions.length > 0) {
+			payload.override_versions = selectedVersions;
+		}
+		const response = await fetch(
+			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`, 
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: JSON.stringify(payload),
+			}
+		);
+		
 
 		if (response.ok) {
 			// Return a workflow item
@@ -444,12 +443,13 @@
 					modalType='select'
 					{templatePage}
 					{handleSelect}
+					bind:singleSelectedTemplateId
 				/>
 			{:else}
 				<form
 				onsubmit={(e) => {
 					e.preventDefault();
-					handleImportWorkflow();
+					handleSelect();
 				}}
 				>
 				<WorkflowImportFlexibility
