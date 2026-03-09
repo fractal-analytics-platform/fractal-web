@@ -1,10 +1,10 @@
 <script>
-	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { resetClipboardStubOnView } from '@testing-library/user-event/dist/cjs/utils/index.js';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -23,6 +23,11 @@
 	let templateVersion = $state(1);
     /** @type {string|undefined} */
 	let templateDescription = $state();
+	/** @type {number|undefined} */
+	let userGroupId = $state(undefined)
+	
+	/** @type {Array<import('fractal-components/types/api').Group>} */
+	let groups = $state([])
 
     /**
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
@@ -31,6 +36,22 @@
 
 	/** @type {Modal|undefined} */
 	let modal = $state(undefined);
+
+	onMount(
+		async () => {
+			const response = await fetch(
+				`/api/auth/group`, {
+				method: 'GET',
+				credentials: 'include',
+            });
+
+			if (!response.ok) {
+			}
+			else {
+				groups = await response.json();
+			}
+		}
+	)
 
 	export async function show() {
         if (workflow.template_id) {
@@ -86,15 +107,23 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v2/workflow_template?workflow_id=${workflow.id}`, {
+		const url = new URL('/api/v2/workflow_template', window.location.origin);
+
+		url.searchParams.set('workflow_id', String(workflow.id));
+
+		if (userGroupId) {
+			url.searchParams.set('user_group_id', String(userGroupId));
+		}
+
+		const response = await fetch(url, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
 			body: normalizePayload({
-                name: templateName,
-                version: templateVersion,
-                description: templateDescription || null
-            })
+				name: templateName,
+				version: templateVersion,
+				description: templateDescription || null
+			})
 		});
 
 		if (!response.ok) {
@@ -162,6 +191,21 @@
 					class="form-control"
 				/>
 			</div>
+			<div class="mb-2">
+				<label class="form-label" for="template-user-group-id">User Group</label>
+				<select
+					class="form-select"
+					id="template-user-group-id"
+					bind:value={userGroupId}
+				>
+					<option value={null}>Select...</option>
+					{#each groups as group }
+						<option value={group.id}>{group.name}</option>
+					{/each}
+					
+				</select>
+			</div>
+
 			<button
 				class="btn btn-primary mt-2"
 				disabled={templateVersion<1 || !templateName || creating}
