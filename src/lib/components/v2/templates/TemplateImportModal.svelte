@@ -168,7 +168,7 @@
 					id="template-user-group-id"
 					bind:value={userGroupId}
 				>
-					<option value={null}>Select...</option>
+					<option value={undefined}>Select...</option>
 					{#each groups as group }
 						<option value={group.id}>{group.name}</option>
 					{/each}
