@@ -69,7 +69,7 @@
             else {
                 originaleTemplate = await response.json()
 				templateName = originaleTemplate?.name;
-				templateDescription = originaleTemplate?.description;
+				templateDescription = originaleTemplate?.description || workflow.description;
                 if (originaleTemplate?.user_email === page.data.userInfo.email) {
                     templateVersion = originaleTemplate?.version + 1
                 }
