@@ -286,6 +286,7 @@ export type WorkflowImportErrorData = {
 type AvailableTask = {
     version: string;
     active: boolean;
+	older: boolean;
 }
 
 type TaskV2Minimal = {

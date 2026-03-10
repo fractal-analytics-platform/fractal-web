@@ -63,7 +63,7 @@
 		<div>Requested version: {data.version || '-'}</div>
 		<div>
 		{#if data.outcome !== "success"}
-			{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version))}
+			{#if data.available_tasks.some(task => !data.version || includeOlderVersions || (!includeOlderVersions && !task.older))}
 			<div class="row row-cols-lg-auto g-3 align-items-center">
 			  <div class="col-12">
 				Available versions:
@@ -76,7 +76,7 @@
 				>
 					<option value={undefined}>Select...</option>
 					{#each [...data.available_tasks] as task, i (i)}
-						{#if !data.version || includeOlderVersions || (!includeOlderVersions && task.version > data.version)}
+						{#if !data.version || includeOlderVersions || (!includeOlderVersions && !task.older)}
 							<option
 								value={task.version}
 								title={task.active ? "" : "Not active"}
