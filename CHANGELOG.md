@@ -19,6 +19,8 @@
 * Display run data in workflow task Info tab (\#987);
 * Drop support for dataset history (\#987);
 * Updated e2e test docs (\#987);
+* Workflow-duplication feature (\#1005);
+* Add CSV download button to admin/tasks page (\#1005);
 
 # 1.23.0
 
