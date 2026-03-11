@@ -1,10 +1,11 @@
 <script>
 	import { goto } from '$app/navigation';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
+	import { normalizePayload } from 'fractal-components';
 
 	// The list of workflows
 
@@ -25,6 +26,9 @@
 
 	/** @type {CreateWorkflowModal|undefined} */
 	let createWorkflowModal = $state();
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let errorAlert = undefined;
 
 	/**
 	 * Deletes a project's workflow from the server
@@ -55,6 +59,91 @@
 		workflows.push(importedWorkflow);
 		workflows = workflows;
 		goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+	}
+
+	/**
+	 * @param {number} id
+	 */
+	async function exportWorkflow(id) {
+		const response = await fetch(`/api/v2/project/${projectId}/workflow/${id}/export`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-workflow-list'
+			);
+			return;
+		}
+
+		return await response.json();
+	}
+
+	/**
+	 * @param {object} data
+	 */
+	async function importWorkflow(data) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(`/api/v2/project/${projectId}/workflow/import`, {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: normalizePayload(data)
+		});
+
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'errorAlert-workflow-list'
+			);
+			return;
+		}
+
+		const newWorkflow = await response.json();
+		handleWorkflowImported(newWorkflow);
+	}
+
+	/**
+	 * @param {string} name
+	 */
+	function getNewWorkflowName(name) {
+		// remove _copy{_n} suffix, if present
+		name = name.replace(/_copy_?\d*$/, '');
+
+		const names = new Set(workflows.map((w) => w.name));
+		const baseCopy = `${name}_copy`;
+		if (!names.has(baseCopy)) {
+			return baseCopy;
+		}
+
+		let i = 1;
+		while (true) {
+			const candidate = `${baseCopy}_${i}`;
+			if (!names.has(candidate)) {
+				return candidate;
+			}
+			i++;
+		}
+	}
+
+	/**
+	 * @param {number} id
+	 */
+	async function duplicateWorkflow(id) {
+		errorAlert?.hide();
+
+		const workflowData = await exportWorkflow(id);
+		if (!workflowData) {
+			return;
+		}
+		await importWorkflow({
+			...workflowData,
+			name: getNewWorkflowName(workflowData.name)
+		});
 	}
 
 	onMount(() => {
@@ -95,6 +184,8 @@
 		</div>
 	</div>
 
+	<div id="errorAlert-workflow-list"></div>
+
 	<table class="table align-middle caption-top">
 		<thead class="table-light">
 			<tr>
@@ -115,6 +206,9 @@
 							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
 								<i class="bi-journal-code"></i> List jobs
 							</a>
+							<button class="btn btn-info" type="button" onclick={() => duplicateWorkflow(id)}>
+								<i class="bi bi-copy"></i> Duplicate
+							</button>
 							<ConfirmActionButton
 								modalId={'deleteConfirmModal' + id}
 								style="danger"
