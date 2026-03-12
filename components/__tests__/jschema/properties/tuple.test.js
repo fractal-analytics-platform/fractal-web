@@ -338,7 +338,7 @@ describe('Tuple properties', () => {
 		expect(screen.queryAllByText('must NOT have more than 2 items')).toHaveLength(1);
 		expect(component.isValid()).toEqual(false);
 
-		await user.type(screen.getByRole('textbox', { name: '2' }), 'y');
+		await user.type(screen.getAllByRole('textbox')[1], 'y');
 		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxxy'] });
 		expect(component.isValid()).toEqual(false);
 
@@ -370,7 +370,7 @@ describe('Tuple properties', () => {
 		expect(screen.queryAllByText('must NOT have more than 2 items')).toHaveLength(1);
 		expect(component.isValid()).toEqual(false);
 
-		await user.type(screen.getByRole('textbox', { name: '2' }), 'y');
+		await user.type(screen.getAllByRole('textbox')[1], 'y');
 		expect(component.getArguments()).deep.eq({ k: ['a', 42, 'xxxy'] });
 		expect(component.isValid()).toEqual(false);
 

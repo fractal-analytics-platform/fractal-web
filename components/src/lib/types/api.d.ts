@@ -358,17 +358,6 @@ export type Accounting = Pagination<{
 	num_new_images: number;
 }>;
 
-export type HistoryItemV2 = {
-	id: number;
-	dataset_id: number;
-	workflowtask_id: number;
-	workflowtask_dump: WorkflowTaskV2;
-	task_group_dump: TaskGroupV2;
-	timestamp_started: string;
-	status: ImagesStatus;
-	num_available_images: number;
-};
-
 export type HistoryUnit = {
 	id: number;
 	status: JobStatus;

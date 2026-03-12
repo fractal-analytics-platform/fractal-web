@@ -31,7 +31,7 @@ describe('badInput', () => {
 				objElement.children[0]
 			);
 		numElement.badInput = true;
-		expect(manager.getFormData()).deep.eq({ foo: { bar: 'invalid' } });
+		expect(manager.getFormData()).deep.eq({ foo: { bar: '__invalid__' } });
 	});
 
 	it('Detect bad input in nested array', () => {
@@ -63,7 +63,7 @@ describe('badInput', () => {
 				objElement.children[0]
 			);
 		numElement.badInput = true;
-		expect(manager.getFormData()).deep.eq({ foo: ['invalid'] });
+		expect(manager.getFormData()).deep.eq({ foo: ['__invalid__'] });
 	});
 
 	it('Detect bad input in nested tuple', () => {
@@ -98,6 +98,6 @@ describe('badInput', () => {
 				objElement.children[0]
 			);
 		numElement.badInput = true;
-		expect(manager.getFormData()).deep.eq({ foo: ['invalid'] });
+		expect(manager.getFormData()).deep.eq({ foo: ['__invalid__'] });
 	});
 });

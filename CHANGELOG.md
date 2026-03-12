@@ -6,14 +6,19 @@
 * Added new cases of valid SLURM errors (\#950).
 * Add link to Job list page in no-history Workflow warning message (\#966).
 * Expand some user-facing messages (\#972).
-* JSON Schema form improvements (\#957):
+* JSON Schema form improvements (\#957, \#993):
     * displayed error messages near the invalid elements;
     * displayed unexpected properties, with the possibility to fix them;
     * avoided duplication of discriminator properties;
+    * hided indexes from tuple and array properties;
+    * improved titles and errors for tagged-union blocks;
     * various fixes;
 * Simplified task version upgrade, to allow for fixing invalid arguments at a later stage;
 * Added task manifest sandbox example (\#957);
 * Updated slim-select (v3.4.3) and other dependencies (\#980);
+* Display run data in workflow task Info tab (\#987);
+* Drop support for dataset history (\#987);
+* Updated e2e test docs (\#987);
 
 # 1.23.0
 

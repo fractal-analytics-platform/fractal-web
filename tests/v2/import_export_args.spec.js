@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { closeModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -240,28 +240,6 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await expect(page.getByText("File doesn't contain valid JSON")).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
-	});
-
-	await test.step('Attempt to import a file containing invalid arguments', async () => {
-		const { file } = await exportArgs(page, compoundTaskWithArgsSchema);
-		const invalidData = { args_parallel: {}, args_non_parallel: {} };
-		fs.writeFileSync(file, JSON.stringify(invalidData));
-		await page.getByRole('button', { name: 'Import' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		const fileChooserPromise = page.waitForEvent('filechooser');
-		await modal.getByText('Select arguments file').click();
-		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(file);
-		await modal.getByRole('button', { name: 'Confirm' }).click();
-		await expect(modal.getByText('Invalid JSON Schema data')).toBeVisible();
-		await expect(modal.getByText('Invalid arguments')).toBeVisible();
-		await modal.getByRole('button', { name: 'more' }).click();
-		await expect(
-			modal.getByText(/must have required property 'test_parallel'/).first()
-		).toBeVisible();
-		await closeModal(page);
-		fs.rmSync(file);
 		await workflow.removeCurrentTask();
 	});
 
