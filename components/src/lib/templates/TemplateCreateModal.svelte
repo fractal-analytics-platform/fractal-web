@@ -1,6 +1,6 @@
 <script>
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '../../common/Modal.svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';

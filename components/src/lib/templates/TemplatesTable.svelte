@@ -1,8 +1,8 @@
 <script>
     import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
-    import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
-	import TemplateImportModal from '$lib/components/v2/templates/TemplateImportModal.svelte';
+	import TemplateUpdateModal from './TemplateUpdateModal.svelte';
+    import TemplateInfoModal from './TemplateInfoModal.svelte';
+	import TemplateImportModal from './TemplateImportModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { page } from '$app/state';
