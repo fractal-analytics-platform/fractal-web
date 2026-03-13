@@ -105,6 +105,7 @@ export class FormManager {
 				delete newDef['anyOf'];
 				params.property = newDef;
 				params.nullable = true;
+				params.schemaPath = `${params.schemaPath}/anyOf/0`
 				return this.createFormElement({ ...params });
 			}
 		}
