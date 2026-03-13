@@ -26,14 +26,14 @@ export function processErrors(formElement, errors) {
  * @param {import('../types/form').FormElement} parentElement 
  */
 function addErrorToForm(error, parentElement) {
-  if (ignoreUnselectedConditionalError(error, parentElement)) {
-    return true;
-  }
   if (error.instancePath.startsWith(parentElement.path)) {
     parentElement.hasErrors.set(true);
   }
   if (parentElement.path === error.instancePath) {
-    setErrorToElement(error, parentElement);
+    const baseErrorPath = error.schemaPath.replace(/\/(required|additionalProperties)$/, '')
+    if (parentElement.schemaPath.startsWith(baseErrorPath)) {
+      setErrorToElement(error, parentElement);
+    }
     return true;
   } else {
     const children = getChildren(parentElement);
@@ -42,7 +42,9 @@ function addErrorToForm(error, parentElement) {
         return true;
       }
       if (element.path === error.instancePath) {
-        setErrorToElement(error, element);
+        if (error.schemaPath.startsWith(element.schemaPath)) {
+          setErrorToElement(error, element);
+        }
         return true;
       }
       if (addErrorToForm(error, element)) {
