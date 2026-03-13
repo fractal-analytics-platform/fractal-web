@@ -1,11 +1,12 @@
 <script>
 	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { page } from '$app/state';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import Modal from '../../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { normalizePayload } from 'fractal-components';
-	import TemplatesTable from 'fractal-components/templates/TemplatesTable.svelte';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import TemplatesTable from '../../templates/TemplatesTable.svelte';
 	import WorkflowImportFlexibility from './WorkflowImportFlexibility.svelte';
 
 	/**

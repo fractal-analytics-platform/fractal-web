@@ -33,7 +33,7 @@
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
-	import TemplateCreateModal from 'fractal-components/templates/TemplateCreateModal.svelte';
+	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
