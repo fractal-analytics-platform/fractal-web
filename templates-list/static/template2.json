@@ -1,0 +1,62 @@
+{
+  "name": "templateX",
+  "version": 2,
+  "description": "aaaaaaaaa",
+  "data": {
+    "name": "workflowY",
+    "description": null,
+    "task_list": [
+      {
+        "meta_non_parallel": {
+          "key1": "value1"
+        },
+        "meta_parallel": {
+          "key2": "value2"
+        },
+        "args_non_parallel": {
+          "num_images": 2
+        },
+        "args_parallel": {},
+        "type_filters": {},
+        "description": null,
+        "alias": null,
+        "task": {
+          "pkg_name": "fractal-tasks-mock",
+          "version": "1.0.0",
+          "name": "create_ome_zarr_compound"
+        }
+      },
+      {
+        "meta_non_parallel": null,
+        "meta_parallel": null,
+        "args_non_parallel": {},
+        "args_parallel": {},
+        "type_filters": {},
+        "description": null,
+        "alias": null,
+        "task": {
+          "pkg_name": "fractal-tasks-mock",
+          "version": "0.2.14",
+          "name": "create_ome_zarr_multiplex_compound"
+        }
+      },
+      {
+        "meta_non_parallel": null,
+        "meta_parallel": null,
+        "args_non_parallel": {
+          "overwrite_input": false
+        },
+        "args_parallel": {},
+        "type_filters": {},
+        "description": null,
+        "alias": null,
+        "task": {
+          "pkg_name": "fractal-tasks-mock",
+          "version": "0.2.2",
+          "name": "illumination_correction_compound"
+        }
+      }
+    ]
+  },
+  "fractal_server_version": "2.20.0a1"
+}

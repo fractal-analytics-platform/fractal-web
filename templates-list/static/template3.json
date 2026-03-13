@@ -1,0 +1,57 @@
+{
+  "name": "New template",
+  "version": 1,
+  "description": "random tasks",
+  "data": {
+    "name": "My Workflow",
+    "description": null,
+    "task_list": [
+      {
+        "meta_non_parallel": null,
+        "meta_parallel": null,
+        "args_non_parallel": null,
+        "args_parallel": {},
+        "type_filters": {},
+        "description": null,
+        "alias": null,
+        "task": {
+          "pkg_name": "fractal-tasks-mock",
+          "version": "0.2.14",
+          "name": "cellpose_segmentation"
+        }
+      },
+      {
+        "meta_non_parallel": null,
+        "meta_parallel": null,
+        "args_non_parallel": {
+          "size_MB": 10,
+          "sleep_time": 10
+        },
+        "args_parallel": null,
+        "type_filters": {},
+        "description": null,
+        "alias": null,
+        "task": {
+          "pkg_name": "fractal-tasks-mock",
+          "version": "1.0.0",
+          "name": "out_of_memory"
+        }
+      },
+      {
+        "meta_non_parallel": null,
+        "meta_parallel": null,
+        "args_non_parallel": {},
+        "args_parallel": null,
+        "type_filters": {},
+        "description": null,
+        "alias": null,
+        "task": {
+          "pkg_name": "fractal-tasks-mock",
+          "version": "0.2.2",
+          "name": "dummy_unset_attribute"
+        }
+      }
+    ]
+  },
+  "fractal_server_version": "2.20.0a1"
+}
