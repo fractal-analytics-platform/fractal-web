@@ -14,11 +14,12 @@
 	 * @typedef {Object} Props
 	 * @property {any} formElement BaseFormElement
 	 * @property {boolean} [editable]
-	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @property {null|(() => void)} [reset] - Function passed by the parent that resets this element to its default value (used only on top-level objects)
+	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable = true, reset = null } = $props();
+	let { formElement, editable = true, reset = null, init = null } = $props();
 </script>
 
 {#if formElement.type === 'string'}
@@ -30,7 +31,7 @@
 {:else if formElement.type === 'enum'}
 	<EnumProperty {formElement} {editable} />
 {:else if formElement.type === 'object'}
-	<CollapsibleProperty {formElement} {reset}>
+	<CollapsibleProperty {formElement} {reset} {init}>
 		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}

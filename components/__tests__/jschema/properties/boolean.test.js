@@ -81,4 +81,17 @@ describe('Boolean properties', () => {
 		);
 		expect(component.getArguments()).deep.eq({ b: false });
 	});
+
+	it('Optional BooleanProperty with default value', async () => {
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					b: { type: 'boolean', default: false }
+				},
+			},
+			'pydantic_v2'
+		);
+		expect(component.getArguments()).deep.eq({ b: false });
+	});
 });

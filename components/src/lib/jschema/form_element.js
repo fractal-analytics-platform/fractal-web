@@ -1,3 +1,4 @@
+import { deepCopy } from '../common/utils';
 import { getPropertyData } from './jschema_initial_data';
 import { writable } from 'svelte/store';
 
@@ -15,6 +16,9 @@ export class BaseFormElement {
 	 * @type {import('svelte/store').Writable<boolean>}
 	 */
 	hasErrors;
+
+	/** @type {boolean} */
+	nullable;
 
 	/**
 	 * @param {import("../types/form").BaseFormElementFields} fields
@@ -44,6 +48,7 @@ export class BaseFormElement {
 		this.property = fields.property;
 		this.errors = writable([]);
 		this.hasErrors = writable(false);
+		this.nullable = false;
 	}
 
 	/**
@@ -158,6 +163,8 @@ export class ObjectFormElement extends BaseFormElement {
 		this.additionalProperties = fields.additionalProperties;
 		this.children = fields.children;
 		this.collapsed = !fields.required;
+		this.nullable = fields.nullable;
+		this.isNull = writable(fields.nullable && fields.isNull);
 	}
 
 	/**
@@ -226,6 +233,38 @@ export class ObjectFormElement extends BaseFormElement {
 		if (defaultValue === undefined) {
 			return;
 		}
+		const newChild = this.createChildElement(child, defaultValue);
+		this.children[index] = newChild;
+		this.isNull.set(defaultValue === null);
+		this.notifyChange();
+	}
+
+	/**
+	 * Set a nullable child to a valid value
+	 * @param {number} index
+	 */
+	initChild(index) {
+		const child = this.children[index];
+		if (!child.nullable) {
+			return;
+		}
+		const propCopy = deepCopy(child.property);
+		if (propCopy.default === null) {
+			delete propCopy['default'];
+		}
+		const value = getPropertyData(propCopy, this.manager.schemaVersion, child.required, undefined, true);
+		const newChild = this.createChildElement(child, value);
+		newChild.isNull.set(false);
+		newChild.collapsed = false;
+		this.children[index] = newChild;
+		this.notifyChange();
+	}
+
+	/**
+	 * @param {import("../types/form").FormElement} child 
+	 * @param {any} value
+	 */
+	createChildElement(child, value) {
 		const newChild = this.manager.createFormElement({
 			key: child.key,
 			path: `${this.path}/${child.key}`,
@@ -233,13 +272,13 @@ export class ObjectFormElement extends BaseFormElement {
 			property: child.property,
 			required: child.required,
 			removable: child.removable,
-			value: defaultValue,
+			nullable: child.nullable,
+			value,
 			parentProperty: this.property,
 			titleType: this.titleType
 		});
 		newChild.collapsed = child.collapsed;
-		this.children[index] = newChild;
-		this.notifyChange();
+		return newChild;
 	}
 
 	/**
@@ -262,6 +301,13 @@ export class ObjectFormElement extends BaseFormElement {
 			titleType: this.titleType
 		});
 		this.children[index] = newChild;
+		this.isNull.set(false);
+		this.notifyChange();
+	}
+
+	setToNull() {
+		this.children = [];
+		this.isNull.set(true);
 		this.notifyChange();
 	}
 }

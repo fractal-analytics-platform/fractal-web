@@ -3,8 +3,7 @@
 		deepCopy,
 		getPropertiesToIgnore,
 		JSchema,
-		SchemaValidator,
-		stripNullAndEmptyObjectsAndArrays
+		SchemaValidator
 	} from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { adaptJsonSchema, stripDiscriminator } from 'fractal-components/jschema/jschema_adapter';
@@ -96,7 +95,7 @@
 		selectedSchema = null;
 		selectedTask = null;
 		selectedTaskName = '';
-    dataError = '';
+		dataError = '';
 		tasks = manifest.task_list.map((t) => t.name);
 	}
 
@@ -178,7 +177,7 @@
 			return;
 		}
 		const newDataCopy = deepCopy(newData);
-		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
+		const updatedOldData = JSON.stringify(newDataCopy, null, 2);
 		// Update the data only if something is changed, to avoid triggering uneccessary events
 		if (updatedOldData !== jsonDataString) {
 			jsonDataString = updatedOldData;

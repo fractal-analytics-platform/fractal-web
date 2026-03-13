@@ -1,4 +1,4 @@
-import { deepCopy, stripNullAndEmptyObjectsAndArrays, undefinedToNull } from '../common/utils';
+import { deepCopy, undefinedToNull } from '../common/utils';
 import {
 	ArrayFormElement,
 	EnumFormElement,
@@ -104,7 +104,8 @@ export class FormManager {
 				const newDef = { ...deepCopy(params.property), ...deepCopy(anyOf[0]) };
 				delete newDef['anyOf'];
 				params.property = newDef;
-				return this.createFormElement({ ...params })
+				params.nullable = true;
+				return this.createFormElement({ ...params });
 			}
 		}
 		if ('oneOf' in property) {
@@ -257,42 +258,42 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaObjectProperty, any[]>} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaObjectProperty, any>} params
 	 */
 	createObjectElement(params) {
 		const { path, schemaPath, property, value, parentProperty } = params;
 		const fields = this.getBaseElementFields(params);
 		const requiredChildren = property.required || [];
 		const children = [];
-		const properties = Object.entries(getAllObjectProperties(property, value));
-		/** @type {string[]} */
-		const validKeys = [];
-		for (const [childKey, childProperty] of properties) {
-			validKeys.push(childKey)
-			const childRequired = requiredChildren.includes(childKey);
-			const removable = isRemovableChildProperty(property, childKey);
-			const childElement = this.createFormElement({
-				key: childKey,
-				path: `${path}/${childKey}`,
-				property: childProperty,
-				required: childRequired,
-				removable,
-				value: value === null ? null : value[childKey] || null,
-				parentProperty: property,
-				titleType: removable ? 'key' : 'prefer_title',
-				schemaPath: `${schemaPath}/properties/${childKey}`
-			});
-			children.push(childElement);
-		}
-
-		const discriminatorKey = this.getDiscriminatorKey(parentProperty);
-		if (discriminatorKey) {
-			// Discriminator property is removed from the child and handled separatedly
-			// Adding it to the valid keys to prevent the value to being treated as an unexpected element
-			validKeys.push(discriminatorKey);
-		}
 
 		if (value !== null) {
+			const properties = Object.entries(getAllObjectProperties(property, value));
+			/** @type {string[]} */
+			const validKeys = [];
+			for (const [childKey, childProperty] of properties) {
+				validKeys.push(childKey)
+				const childRequired = requiredChildren.includes(childKey);
+				const removable = isRemovableChildProperty(property, childKey);
+				const childElement = this.createFormElement({
+					key: childKey,
+					path: `${path}/${childKey}`,
+					property: childProperty,
+					required: childRequired,
+					removable,
+					value: undefinedToNull(value[childKey]),
+					parentProperty: property,
+					titleType: removable ? 'key' : 'prefer_title',
+					schemaPath: `${schemaPath}/properties/${childKey}`
+				});
+				children.push(childElement);
+			}
+
+			const discriminatorKey = this.getDiscriminatorKey(parentProperty);
+			if (discriminatorKey) {
+				// Discriminator property is removed from the child and handled separatedly
+				// Adding it to the valid keys to prevent the value to being treated as an unexpected element
+				validKeys.push(discriminatorKey);
+			}
 			for (const [k, v] of Object.entries(value)) {
 				if (!validKeys.includes(k)) {
 					children.push(this.createUnexpectedElement({
@@ -305,10 +306,12 @@ export class FormManager {
 				}
 			}
 		}
+
 		const element = new ObjectFormElement({
 			...fields,
 			children,
-			additionalProperties: property.additionalProperties || false
+			additionalProperties: property.additionalProperties || false,
+			isNull: value === null
 		});
 		return element;
 	}
@@ -565,7 +568,7 @@ export class FormManager {
 	 * @returns {import("../types/form").BaseFormElementFields}
 	 */
 	getBaseElementFields(params) {
-		const { key, property, titleType } = params;
+		const { key, property, titleType, nullable } = params;
 		return {
 			...params,
 			manager: this,
@@ -574,7 +577,8 @@ export class FormManager {
 			title: this.getElementTitle(property, key, titleType),
 			description: property.description || '',
 			property: deepCopy(property),
-			notifyChange: this.notifyChange
+			notifyChange: this.notifyChange,
+			nullable: nullable || false
 		};
 	}
 
@@ -637,6 +641,9 @@ export class FormManager {
 						? get(childData)
 						: childData;
 			data[child.key] = value;
+		}
+		if (element.nullable && get(element.isNull)) {
+			return null;
 		}
 		return data;
 	}
@@ -719,7 +726,11 @@ export class FormManager {
 					if (element instanceof NumberFormElement && element.badInput) {
 						return '__invalid__';
 					}
-					return get(element.value);
+					const value = get(element.value);
+					if (element instanceof StringFormElement && value === '') {
+						return null;
+					}
+					return value;
 				}
 				throw new Error(`Unsupported type ${element.type}`);
 		}

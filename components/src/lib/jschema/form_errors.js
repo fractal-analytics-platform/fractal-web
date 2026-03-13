@@ -12,7 +12,7 @@ export function processErrors(formElement, errors) {
    */
   const genericErrors = [];
   for (const error of errors) {
-    const errorIsSet = addErrorToForm(error, formElement);
+    const errorIsSet = addErrorToForm(error, errors, formElement);
     if (!errorIsSet) {
       genericErrors.push(JSON.stringify(error, null, 2));
     }
@@ -23,17 +23,26 @@ export function processErrors(formElement, errors) {
 
 /**
  * @param {object} error
+ * @param {object[]} errors
  * @param {import('../types/form').FormElement} parentElement 
  */
-function addErrorToForm(error, parentElement) {
+function addErrorToForm(error, errors, parentElement) {
   if (ignoreUnselectedConditionalError(error, parentElement)) {
+    return true;
+  }
+  if (ignoreEnumNullError(error, errors)) {
+    return true;
+  }
+  if (ignoreNullAnyOfError(error, errors)) {
     return true;
   }
   if (error.instancePath.startsWith(parentElement.path)) {
     parentElement.hasErrors.set(true);
   }
   if (parentElement.path === error.instancePath) {
-    setErrorToElement(error, parentElement);
+    if (parentElement.schemaPath.startsWith(error.schemaPath)) {
+      setErrorToElement(error, parentElement);
+    }
     return true;
   } else {
     const children = getChildren(parentElement);
@@ -42,10 +51,12 @@ function addErrorToForm(error, parentElement) {
         return true;
       }
       if (element.path === error.instancePath) {
-        setErrorToElement(error, element);
+        if (error.schemaPath.startsWith(element.schemaPath)) {
+          setErrorToElement(error, element);
+        }
         return true;
       }
-      if (addErrorToForm(error, element)) {
+      if (addErrorToForm(error, errors, element)) {
         return true;
       }
     }
@@ -147,6 +158,44 @@ function ignoreUnselectedConditionalError(error, element) {
       ) {
         // ignore oneOf errors when invalid discriminator value is selected
         return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * @param {object} error 
+ * @param {object[]} errors 
+ */
+function ignoreNullAnyOfError(error, errors) {
+  if (error.message === 'must match a schema in anyOf') {
+    return true;
+  }
+  if (error.message === 'must be null') {
+    for (const e of errors) {
+      if (e.message === 'must match a schema in anyOf') {
+        const basePath = error.schemaPath.replace(/\/\d+\/type/, '')
+        if (e.schemaPath === basePath) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * @param {object} error 
+ * @param {object[]} errors 
+ */
+function ignoreEnumNullError(error, errors) {
+  if (error.message === 'must be string') {
+    for (const e of errors) {
+      if (e.message === 'must be equal to one of the allowed values') {
+        if (e.instancePath === error.instancePath) {
+          return true;
+        }
       }
     }
   }

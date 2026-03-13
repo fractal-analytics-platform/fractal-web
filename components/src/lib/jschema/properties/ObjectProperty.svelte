@@ -60,6 +60,14 @@
 	/**
 	 * @param {number} index
 	 */
+	function initChild(index) {
+		formElement.initChild(index);
+		children = formElement.children;
+	}
+
+	/**
+	 * @param {number} index
+	 */
 	function fixInvalidChild(index) {
 		formElement.fixInvalidChild(index);
 		children = formElement.children;
@@ -94,6 +102,7 @@
 					formElement={children[index]}
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
+					init={() => initChild(index)}
 				/>
 			</div>
 		</div>
