@@ -40,7 +40,7 @@ export async function load() {
 
 async function getLoginInvite() {
 	if (!env.LOGIN_INVITE_PATH) {
-		return "Log in with Fractal specific email & password provided to you by the Fractal admin";
+		return null;
 	}
 	try {
 		try {
