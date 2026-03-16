@@ -7,8 +7,35 @@
     /** @type {Props} */
     let { templates } = $props();
 
-    /** @type {import('./types').TemplateItem}*/
+	/** @type {Array<import('./types').TemplateEntry>}*/
+    let filteredTemplates = $derived((() => {
+
+		let result = lastAppliedState.templateName
+			? templates.filter(entry =>
+				entry.template_name.toLowerCase().includes(lastAppliedState.templateName.toLowerCase())
+			)
+			: templates;
+
+		if (lastAppliedState.templateVersion) {
+			result = result
+				.map(entry => ({
+					...entry,
+					templates: entry.templates.filter(t =>
+						t.template_version === lastAppliedState.templateVersion
+					)
+				}))
+				.filter(entry => entry.templates.length > 0);
+		}
+
+		return result;
+	})());
+
+	/** @type {import('./types').TemplateItem}*/
 	let selectedTemplates = $state(templates.map(item => item.templates[0]));
+
+	$effect(() => {
+		selectedTemplates = filteredTemplates.map(item => item.templates[0]);
+	});
 
 	/** @type {string|undefined} */
 	let templateName = $state(undefined);
@@ -19,8 +46,10 @@
 		templateName: undefined,
 		templateVersion: undefined,
 	});
+	
+
     const currentState = $derived({templateName, templateVersion});
-    const isDefault = $derived(templateName === undefined && templateVersion === undefined);
+    const isDefault = $derived(lastAppliedState.templateName === undefined && lastAppliedState.templateVersion === undefined);
     const isDirtyFromApplied = $derived(
 		(
 			currentState.templateName !== lastAppliedState.templateName  &&
@@ -83,7 +112,8 @@
 					class="btn {applyClass} btn-sm px-3"
                     disabled={!isDirtyFromApplied}
                     onclick={() => {
-                        lastAppliedState = { ...currentState };
+						lastAppliedState.templateName = currentState.templateName || undefined;
+						lastAppliedState.templateVersion = currentState.templateVersion || undefined;
                     }}
 				>
 					Apply
@@ -118,7 +148,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each templates as templateGroup, index (index)}
+			{#each filteredTemplates as templateGroup, index (index)}
 				<tr>
                     <td class="col-5">{templateGroup.template_name}</td>
                     <td class="col-2">
