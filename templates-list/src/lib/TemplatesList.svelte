@@ -1,4 +1,7 @@
 <script>
+	import { marked } from 'marked';
+	import DOMPurify from 'dompurify';
+
     /**
      * @typedef {Object} Props
      * @property {Array<import('./types').TemplateEntry>} templates
@@ -81,6 +84,47 @@
 
         URL.revokeObjectURL(url);
     }
+
+	/**
+	* @param {number} templateId
+	*/
+	async function showSelectedTemplateModal(templateId) {
+		const response = await fetch(`/templates-table/template${templateId}.json`);
+        templateInfo = await response.json();
+		getBootstrapModal('template-info-modal').show();
+	}
+
+	function getBootstrapModal(id) {
+		const modalElement = document.getElementById(id);
+		// @ts-ignore
+		// eslint-disable-next-line no-undef
+		const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+		if (bootstrapModal) {
+			return bootstrapModal;
+		}
+		// @ts-ignore
+		// eslint-disable-next-line no-undef
+		return new bootstrap.Modal(modalElement);
+	}
+
+	export function formatMarkdown(markdownValue) {
+		if (!markdownValue) {
+			return '';
+		}
+		return DOMPurify.sanitize(marked.parse(markdownValue));
+	}
+
+	/**
+     * @typedef {Object} TemplateInfo
+     * @property {string} name
+	 * @property {number} version
+	 * @property {string} description
+    */
+	/** @type {TemplateInfo}*/
+	let templateInfo = $state({name: "-", version: 0, description: ""})
+	
+
+
 </script>
 
 <div class="card mb-3">
@@ -172,6 +216,18 @@
 					<td class="col-1">
 						<button
 								class="btn btn-outline-primary"
+								title="Info"
+								type="button"
+								aria-label="Info"
+                                onclick={async () => {
+                                    await showSelectedTemplateModal(selectedTemplates[index].template_id);
+                                }}
+							>
+								<i class="bi bi-info-circle"></i>
+						</button>
+
+						<button
+								class="btn btn-outline-primary"
 								title="Download"
 								type="button"
 								aria-label="Download"
@@ -189,4 +245,38 @@
 	</table>
 </div>
 </div>
+</div>
+
+<div class="modal modal-xl" id="template-info-modal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-scrollable">
+		<div class="modal-content">
+			<!-- <div class="modal-header">
+				<h5 class="modal-title">Template info</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div> -->
+			<div class="modal-body">
+				<ul class="list-group">
+					<li class="list-group-item text-bg-light">
+						<strong>TEMPLATE NAME</strong>
+					</li>
+					<li class="list-group-item">
+						<span>{templateInfo.name}</span>
+					</li>
+					<li class="list-group-item text-bg-light">
+						<strong>TEMPLATE VERSION</strong>
+					</li>
+					<li class="list-group-item">
+						<span>{templateInfo.version}</span>
+					</li>
+					
+					<li class="list-group-item text-bg-light">
+						<strong>TEMPLATE DESCRIPTION</strong>
+					</li>
+					<li class="list-group-item">
+						<span>{templateInfo.description}</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 </div>
