@@ -54,11 +54,14 @@
 
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowV2} importedWorkflow
+	 * @param {boolean} redirect
 	 */
-	function handleWorkflowImported(importedWorkflow) {
+	async function handleWorkflowImported(importedWorkflow, redirect = true) {
 		workflows.push(importedWorkflow);
 		workflows = workflows;
-		goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+		if (redirect) {
+			await goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+		}
 	}
 
 	/**
@@ -83,8 +86,9 @@
 
 	/**
 	 * @param {object} data
+	 * @param {boolean} redirect
 	 */
-	async function importWorkflow(data) {
+	async function importWorkflow(data, redirect) {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -104,7 +108,7 @@
 		}
 
 		const newWorkflow = await response.json();
-		handleWorkflowImported(newWorkflow);
+		await handleWorkflowImported(newWorkflow, redirect);
 	}
 
 	/**
@@ -140,10 +144,13 @@
 		if (!workflowData) {
 			return;
 		}
-		await importWorkflow({
-			...workflowData,
-			name: getNewWorkflowName(workflowData.name)
-		});
+		await importWorkflow(
+			{
+				...workflowData,
+				name: getNewWorkflowName(workflowData.name)
+			},
+			false
+		);
 	}
 
 	onMount(() => {

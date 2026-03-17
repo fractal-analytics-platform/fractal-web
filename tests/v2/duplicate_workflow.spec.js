@@ -21,9 +21,6 @@ test('Duplicate workflow', async ({ page, project }) => {
     await page.goto(project.url);
     await waitPageLoading(page);
     await page.getByRole('row', { name: 'myworkflow' }).getByRole('button', { name: 'Duplicate' }).click();
-    await page.waitForURL(workflowPageUrlRegex);
-    await waitPageLoading(page);
-    await page.goto(project.url);
     await expect(page.getByRole('row', { name: 'myworkflow_copy' })).toBeVisible();
   });
 
@@ -31,9 +28,6 @@ test('Duplicate workflow', async ({ page, project }) => {
     await page.goto(project.url);
     await waitPageLoading(page);
     await page.getByRole('row', { name: 'myworkflow_copy' }).getByRole('button', { name: 'Duplicate' }).click();
-    await page.waitForURL(workflowPageUrlRegex);
-    await waitPageLoading(page);
-    await page.goto(project.url);
     await expect(page.getByRole('row', { name: 'myworkflow_copy_1' })).toBeVisible();
   });
 
@@ -41,9 +35,6 @@ test('Duplicate workflow', async ({ page, project }) => {
     await page.goto(project.url);
     await waitPageLoading(page);
     await page.getByRole('row', { name: 'myworkflow_copy_1' }).getByRole('button', { name: 'Duplicate' }).click();
-    await page.waitForURL(workflowPageUrlRegex);
-    await waitPageLoading(page);
-    await page.goto(project.url);
     await expect(page.getByRole('row', { name: 'myworkflow_copy_2' })).toBeVisible();
   });
 });
