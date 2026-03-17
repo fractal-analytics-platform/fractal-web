@@ -85,7 +85,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json')
 		
-		const url = new URL('/api/v2/workflow_template/import', window.location.origin);
+		const url = new URL('/api/v2/workflow-template/import', window.location.origin);
 
 		if (userGroupId) {
 			url.searchParams.set('user_group_id', String(userGroupId));

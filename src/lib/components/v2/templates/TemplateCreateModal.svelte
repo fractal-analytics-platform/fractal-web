@@ -56,7 +56,7 @@
 	export async function show() {
         if (workflow.template_id) {
             const response = await fetch(
-                `/api/v2/workflow_template/${workflow.template_id}`, {
+                `/api/v2/workflow-template/${workflow.template_id}`, {
                 method: 'GET',
                 credentials: 'include',
             });
@@ -107,7 +107,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const url = new URL('/api/v2/workflow_template', window.location.origin);
+		const url = new URL('/api/v2/workflow-template', window.location.origin);
 
 		url.searchParams.set('workflow_id', String(workflow.id));
 

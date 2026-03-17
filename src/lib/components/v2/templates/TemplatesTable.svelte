@@ -140,7 +140,7 @@
 		pushState(url, {});
 
 		let response = await fetch(
-            `/api/v2/workflow_template?${params.toString()}`,
+            `/api/v2/workflow-template?${params.toString()}`,
 			{
 				method: 'GET',
 				headers,
@@ -161,7 +161,7 @@
 	 * @returns {Promise<void>}
 	 */
 	async function exportTemplate(templateId) {
-		const response = await fetch(`/api/v2/workflow_template/${templateId}/export`, {
+		const response = await fetch(`/api/v2/workflow-template/${templateId}/export`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -195,7 +195,7 @@
 	 * @returns {Promise<*>}
 	*/
 	async function handleDeleteTemplate(templateId) {
-		const response = await fetch(`/api/v2/workflow_template/${templateId}`, {
+		const response = await fetch(`/api/v2/workflow-template/${templateId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});

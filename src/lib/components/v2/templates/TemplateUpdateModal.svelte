@@ -47,7 +47,7 @@
 	export async function open(template_id) {
 		saving = false;
 		const response = await fetch(
-			`/api/v2/workflow_template/${template_id}`,
+			`/api/v2/workflow-template/${template_id}`,
 			{
 				method: 'GET'
 			}
@@ -69,7 +69,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
-			`/api/v2/workflow_template/${template?.id}`,
+			`/api/v2/workflow-template/${template?.id}`,
 			{
 				method: 'PATCH',
 				headers,
