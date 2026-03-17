@@ -104,7 +104,7 @@ export type WorkflowTemplate = {
     name: string;
     version: number;
     timestamp_created: string;
-	timestamp_last_used: string | null;
+	timestamp_last_used: string;
     user_group_id: number | null;
     description: string | null;
     data: WorkflowImport;

@@ -118,11 +118,7 @@
 					<strong>Last use timestamp</strong>
 				</li>
 				<li class="list-group-item">
-					{#if template?.timestamp_last_used}
-						<TimestampCell timestamp={template.timestamp_last_used} />
-					{:else}
-						<span>-</span>
-					{/if}
+					<TimestampCell timestamp={template.timestamp_last_used} />
 				</li>
 			</ul>
 			{/if}
