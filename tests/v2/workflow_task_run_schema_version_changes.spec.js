@@ -72,7 +72,6 @@ test('Workflow task runs display different versions of arguments schema', async 
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(page.getByText('The arguments are valid')).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(page.getByText('No new versions available')).toBeVisible();
 	});

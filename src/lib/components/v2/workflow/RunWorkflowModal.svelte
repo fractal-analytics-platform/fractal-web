@@ -14,9 +14,16 @@
 		getTypeFilterValues,
 		STATUS_KEY
 	} from '$lib/common/workflow_utilities';
-	import { normalizePayload } from 'fractal-components';
+	import {
+		getPropertiesToIgnore,
+		normalizePayload,
+		SchemaValidator,
+		stripDiscriminator,
+		stripNullAndEmptyObjectsAndArrays
+	} from 'fractal-components';
 	import { splitZarrDir } from '$lib/common/component_utilities';
 	import { page } from '$app/state';
+	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
 
 	/**
 	 * @typedef {Object} Props
@@ -79,6 +86,9 @@
 	/** @type {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} */
 	let initialFilterValues = $state(null);
 
+	/** @type {string[]} */
+	let tasksWithInvalidArguments = $state([]);
+
 	/**
 	 * @param {'run'|'restart'|'continue'} action
 	 */
@@ -92,6 +102,7 @@
 		preSubmissionCheckNotProcessedResults = [];
 		ignorePreSubmissionCheckNotProcessed = false;
 		workerInitControl = '';
+		tasksWithInvalidArguments = [];
 		if (mode === 'run' || mode === 'restart') {
 			firstTaskIndex = 0;
 		} else {
@@ -255,6 +266,10 @@
 	let appliedTypeFilters = $state({});
 
 	async function showConfirmRun() {
+		tasksWithInvalidArguments = validateTasksArguments();
+		if (tasksWithInvalidArguments.length > 0) {
+			return;
+		}
 		if (datasetImagesTable) {
 			const params = await datasetImagesTable.applySearchFields();
 			if (ignorePreSubmissionCheckUniqueTypes) {
@@ -290,6 +305,60 @@
 		}
 		checkingConfiguration = true;
 		modal?.restoreModalFocus();
+	}
+
+	function validateTasksArguments() {
+		/** @type {string[]} */
+		const invalidTasks = [];
+		const startIndex = firstTaskIndex || 0;
+		const endIndex = lastTaskIndex || workflow.task_list.length;
+		const workflowTasks = workflow.task_list.filter((t, i) => i >= startIndex && i < endIndex);
+		for (const wft of workflowTasks) {
+			let invalid = false;
+			if (wft.task.args_schema_non_parallel) {
+				if (
+					!validateTaskArguments(
+						wft.task.args_schema_non_parallel,
+						wft.task.args_schema_version,
+						wft.args_non_parallel
+					)
+				) {
+					invalidTasks.push(wft.alias ? wft.alias : wft.task.name);
+					invalid = true;
+				}
+			}
+			if (!invalid && wft.task.args_schema_parallel) {
+				if (
+					!validateTaskArguments(
+						wft.task.args_schema_parallel,
+						wft.task.args_schema_version,
+						wft.args_parallel
+					)
+				) {
+					invalidTasks.push(wft.alias ? wft.alias : wft.task.name);
+				}
+			}
+		}
+		return invalidTasks;
+	}
+
+	/**
+	 *
+	 * @param {any} schema
+	 * @param {any} schemaVersion
+	 * @param {any} data
+	 */
+	function validateTaskArguments(schema, schemaVersion, data) {
+		if (!schema) {
+			return true;
+		}
+		const adapted = adaptJsonSchema(schema, getPropertiesToIgnore(false));
+		const validator = new SchemaValidator(schemaVersion);
+		const isSchemaValid = validator.loadSchema(stripDiscriminator(adapted));
+		if (!isSchemaValid) {
+			return false;
+		}
+		return validator.isValid(data ? stripNullAndEmptyObjectsAndArrays(data) : {});
 	}
 
 	/**
@@ -809,6 +878,19 @@
 				{/if}
 			{/if}
 		</form>
+		{#if tasksWithInvalidArguments.length > 0}
+			<div class="alert alert-danger mb-0 mt-3 pb-0">
+				<p>
+					You cannot run submit this workflow for execution since the following tasks contain
+					invalid arguments:
+				</p>
+				<ul>
+					{#each tasksWithInvalidArguments as task, index (index)}
+						<li>{task}</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
 	{/snippet}
 	{#snippet footer()}
 		{#if checkingConfiguration}

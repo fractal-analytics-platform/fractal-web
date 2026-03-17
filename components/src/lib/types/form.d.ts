@@ -1,7 +1,9 @@
 import { FormManager } from '../jschema/form_manager.js';
 import {
+	ValueFormElement,
 	StringFormElement,
 	BooleanFormElement,
+	NumberFormElement,
 	EnumFormElement,
 	ObjectFormElement,
 	ArrayFormElement,
@@ -10,11 +12,13 @@ import {
 } from '../jschema/form_element.js';
 import type { JSONSchemaProperty } from './jschema.js';
 
+export type TitleType = 'key' | 'prefer_title' | 'title_only' | 'inner_title';
+
 export type FormElement = (
 	| StringFormElement
 	| BooleanFormElement
 	| EnumFormElement
-	| NumberFormElementFields
+	| NumberFormElement
 	| ObjectFormElement
 	| ArrayFormElement
 	| TupleFormElement
@@ -23,18 +27,21 @@ export type FormElement = (
 	collapsed?: boolean;
 };
 
-export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement;
+export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement | ValueFormElement;
 
 export type BaseFormElementFields = {
 	manager: FormManager;
 	id: string;
 	key: string | null;
+	path: string;
+	schemaPath: string;
 	type: string | null;
 	title: string;
 	description: string;
 	required: boolean;
 	removable: boolean;
 	property: JSONSchemaProperty;
+	titleType: TitleType;
 	notifyChange: () => void;
 };
 
@@ -75,5 +82,39 @@ export type TupleFormElementFields = BaseFormElementFields & {
 
 export type ConditionalElementFields = BaseFormElementFields & {
 	selectedIndex: number;
-	selectedItem: FormElement;
+	selectedItem: FormElement | null;
+	discriminator?: {
+		key: string;
+		values: string[];
+		title: string;
+		description: string;
+		value: string;
+	},
+	unexpectedChildren: FormElement[];
 };
+
+export type FormBuilderEntryType = 'object' | 'array' | 'string' | 'number' | 'boolean';
+
+export type FormBuilderEntry = ({
+	type: 'object' | 'array'
+	children: Array<FormBuilderEntry>
+} | {
+	value: string | number | boolean
+	type: 'string' | 'number' | 'boolean'
+}) & {
+	id: string
+	error: string
+	key?: string
+}
+
+export type FormElementParams<T extends JSONSchemaProperty, V> = {
+	key: null | string
+	path: string
+	schemaPath: string
+	property: T
+	parentProperty: JSONSchemaProperty | undefined
+	required: boolean
+	removable: boolean
+	titleType: TitleType
+	value: V
+}

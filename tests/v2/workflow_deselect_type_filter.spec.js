@@ -28,6 +28,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('2');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Run workflow', async () => {

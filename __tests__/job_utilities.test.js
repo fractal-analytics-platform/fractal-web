@@ -333,6 +333,13 @@ it('should handle executor_error_log', () => {
 		showExecutorErrorLog({
 			...job,
 			status: 'failed',
+			executor_error_log: `error: execve(): /something/fractal-server-env-3-12-11/bin/python: Permission denied`
+		})
+	).toBeTruthy();
+	expect(
+		showExecutorErrorLog({
+			...job,
+			status: 'failed',
 			executor_error_log: `foobar`
 		})
 	).toBeFalsy();

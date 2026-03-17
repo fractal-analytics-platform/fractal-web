@@ -75,12 +75,12 @@
 		</button>
 	</div>
 	<div>
-		{#each children as nestedProperty, index (nestedProperty.id)}
+		{#each children as nestedProperty, index (nestedProperty.id + index)}
 			<div class="d-flex">
 				<div class="align-self-center m-2">
 					{#if canRemoveChildren}
-						<button class="btn btn-warning" type="button" onclick={() => removeChild(index)}>
-							Remove
+						<button class="btn btn-danger" type="button" onclick={() => removeChild(index)} aria-label="Remove">
+							<i class="bi bi-trash"></i>
 						</button>
 					{/if}
 				</div>

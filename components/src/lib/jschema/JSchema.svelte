@@ -1,51 +1,41 @@
 <script>
-	import { onMount } from 'svelte';
 	import { FormManager } from './form_manager.js';
 	import ObjectProperty from './properties/ObjectProperty.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {object} schema
-	 * @property {object} schemaData
 	 * @property {'pydantic_v1'|'pydantic_v2'} schemaVersion
 	 * @property {string[]} [propertiesToIgnore]
 	 * @property {string} componentId
 	 * @property {boolean} [editable]
-	 * @property {() => void} onchange
+	 * @property {(data: any, valid: boolean) => void} onchange
+	 * @property {boolean} dataValid
 	 */
 
 	/** @type {Props} */
 	let {
-		schema,
-		schemaData,
 		schemaVersion,
 		propertiesToIgnore = [],
 		componentId,
 		editable = true,
-		onchange
+		onchange,
+		dataValid = $bindable()
 	} = $props();
 
 	/** @type {FormManager|undefined} */
 	let formManager = $state();
-	onMount(() => {
-		initFormManager();
-	});
+	/** @type {string[]} */
+	let genericErrors = $state([]);
 
 	export function getArguments() {
 		return formManager?.getFormData();
 	}
 
-	export function validateArguments() {
-		// Trigger validation on input fields
-		for (const field of document.querySelectorAll(
-			`#${componentId} input, #${componentId} select`
-		)) {
-			field.dispatchEvent(new Event('input'));
-		}
-		formManager?.validate();
-	}
-
-	function initFormManager() {
+  /**
+	 * @param {any} schema
+	 * @param {any}  schemaData
+	 */
+	function initFormManager(schema, schemaData = undefined) {
 		if (schema) {
 			try {
 				formManager = new FormManager(
@@ -55,6 +45,8 @@
 					propertiesToIgnore,
 					schemaData
 				);
+				formManager.genericErrors.subscribe((e) => (genericErrors = e));
+				formManager.dataValid.subscribe((v) => (dataValid = v));
 			} catch (err) {
 				console.error(err);
 				formManager = undefined;
@@ -64,15 +56,20 @@
 		}
 	}
 
-	$effect(() => {
-		if (schema || schemaData || propertiesToIgnore) {
-			initFormManager();
-		}
-	});
+	/**
+	 * @param {any} schema
+	 * @param {any}  schemaData
+	 */
+	export function update(schema, schemaData = undefined) {
+		initFormManager(schema, schemaData);
+	}
 </script>
 
 {#if formManager}
 	{#key formManager}
+		{#each genericErrors as error, index (index)}
+			<div class="alert alert-danger mt-1"><pre>{error}</pre></div>
+		{/each}
 		<div id={componentId}>
 			<ObjectProperty formElement={formManager.root} isRoot={true} {editable} />
 		</div>

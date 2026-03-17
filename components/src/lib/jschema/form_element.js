@@ -7,6 +7,15 @@ import { writable } from 'svelte/store';
  * @abstract
  */
 export class BaseFormElement {
+
+	/** @type {import('svelte/store').Writable<string[]>} */
+	errors;
+	/** 
+	 * This property is true also for parents of elements having an error
+	 * @type {import('svelte/store').Writable<boolean>}
+	 */
+	hasErrors;
+
 	/**
 	 * @param {import("../types/form").BaseFormElementFields} fields
 	 */
@@ -17,8 +26,11 @@ export class BaseFormElement {
 		 */
 		this.id = fields.id;
 		this.key = fields.key;
+		this.path = fields.path;
+		this.schemaPath = fields.schemaPath;
 		this.type = fields.type;
-		this.title = fields.title;
+		this.title = writable(fields.title);
+		this.titleType = fields.titleType;
 		this.required = fields.required;
 		this.description = fields.description;
 		/**
@@ -30,6 +42,27 @@ export class BaseFormElement {
 		 * @type {import("../types/jschema").JSONSchemaProperty}
 		 */
 		this.property = fields.property;
+		this.errors = writable([]);
+		this.hasErrors = writable(false);
+	}
+
+	/**
+	 * @param {string} message 
+	 */
+	addError(message) {
+		this.hasErrors.set(true);
+		this.errors.update(items => {
+			// Note: some messages might appear twice (e.g. for conditional properties)
+			if (!items.includes(message)) {
+				items.push(message);
+			}
+			return items
+		});
+	}
+
+	clearErrors() {
+		this.errors.set([]);
+		this.hasErrors.set(false);
 	}
 
 	notifyChange() {
@@ -92,6 +125,27 @@ export class NumberFormElement extends ValueFormElement {
 	}
 }
 
+export class UnexpectedFormElement extends ValueFormElement {
+	/**
+	 * @param {import("../types/form").ValueFormElementFields<any>} fields
+	 */
+	constructor(fields) {
+		super(fields);
+		this.type = 'unexpected';
+	}
+}
+
+export class InvalidFormElement extends ValueFormElement {
+	/**
+	 * @param {import("../types/form").ValueFormElementFields<any>} fields
+	 */
+	constructor(fields) {
+		super(fields);
+		this.originalType = fields.type;
+		this.type = 'invalid';
+	}
+}
+
 export class ObjectFormElement extends BaseFormElement {
 	/**
 	 * @param {import("../types/form").ObjectFormElementFields} fields
@@ -122,6 +176,8 @@ export class ObjectFormElement extends BaseFormElement {
 		}
 		const child = this.manager.createFormElement({
 			key,
+			path: `${this.path}/${key}`,
+			schemaPath: `${this.schemaPath}/additionalProperties`,
 			property: this.additionalProperties,
 			required: false,
 			removable: true,
@@ -131,9 +187,12 @@ export class ObjectFormElement extends BaseFormElement {
 				false,
 				this.additionalProperties.default,
 				false
-			)
+			),
+			parentProperty: this.property,
+			// always use the user-defined key as title
+			titleType: 'key'
 		});
-		child.title = key;
+		child.title.set(key);
 		child.removable = true;
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -143,10 +202,6 @@ export class ObjectFormElement extends BaseFormElement {
 	 * @param {string} key
 	 */
 	removeChild(key) {
-		if (!this.additionalProperties) {
-			console.warn('Attempted to call remove child on element without additional properties');
-			return;
-		}
 		const filteredChildren = this.children.filter((c) => c.key === key);
 		if (filteredChildren.length === 0) {
 			console.warn('Attempted to remove not existing key %s', key);
@@ -173,12 +228,39 @@ export class ObjectFormElement extends BaseFormElement {
 		}
 		const newChild = this.manager.createFormElement({
 			key: child.key,
+			path: `${this.path}/${child.key}`,
+			schemaPath: child.schemaPath,
 			property: child.property,
 			required: child.required,
 			removable: child.removable,
-			value: defaultValue
+			value: defaultValue,
+			parentProperty: this.property,
+			titleType: this.titleType
 		});
 		newChild.collapsed = child.collapsed;
+		this.children[index] = newChild;
+		this.notifyChange();
+	}
+
+	/**
+	 * @param {number} index 
+	 */
+	fixInvalidChild(index) {
+		const child = /** @type {InvalidFormElement} */ (this.children[index]);
+		const newChild = this.manager.createFormElement({
+			key: child.key,
+			path: `${this.path}/${child.key}`,
+			schemaPath: child.schemaPath,
+			property: {
+				...child.property,
+				type: child.originalType
+			},
+			required: child.required,
+			removable: child.removable,
+			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true),
+			parentProperty: this.property,
+			titleType: this.titleType
+		});
 		this.children[index] = newChild;
 		this.notifyChange();
 	}
@@ -202,11 +284,15 @@ export class ArrayFormElement extends BaseFormElement {
 			return;
 		}
 		const child = this.manager.createFormElement({
-			key: null,
+			key: (this.children.length).toString(),
+			path: `${this.path}/${this.children.length}`,
+			schemaPath: `${this.schemaPath}/items`,
 			property: this.items,
 			required: false,
 			removable: true,
-			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true)
+			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true),
+			parentProperty: this.property,
+			titleType: 'oneOf' in this.items ? 'inner_title' : 'title_only',
 		});
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -217,7 +303,15 @@ export class ArrayFormElement extends BaseFormElement {
 	 */
 	removeChild(index) {
 		this.children.splice(index, 1);
+		this.recomputeIndexes();
 		this.notifyChange();
+	}
+
+	recomputeIndexes() {
+		this.children.forEach((c, i) => {
+			c.key = i.toString();
+			c.path = c.path.replace(/\d+$/, i.toString());
+		});
 	}
 
 	/**
@@ -236,6 +330,7 @@ export class ArrayFormElement extends BaseFormElement {
 				}
 			}
 			this.children = updatedArray;
+			this.recomputeIndexes();
 			this.notifyChange();
 		}
 	}
@@ -256,6 +351,7 @@ export class ArrayFormElement extends BaseFormElement {
 				}
 			}
 			this.children = updatedArray;
+			this.recomputeIndexes();
 			this.notifyChange();
 		}
 	}
@@ -297,12 +393,28 @@ export class TupleFormElement extends BaseFormElement {
 				)
 			);
 		}
-		this.children = this.manager.createTupleChildren({ items: this.items, size: this.size, value });
+		this.children = this.manager.createTupleChildren({
+			path: this.path,
+			schemaPath: this.schemaPath,
+			items: this.items,
+			size: this.size,
+			value,
+			parentProperty: this.property,
+			titleType: 'title_only'
+		});
 		this.notifyChange();
 	}
 
 	removeTuple() {
 		this.children = [];
+		this.notifyChange();
+	}
+
+	/**
+	 * @param {number} index 
+	 */
+	removeUnexpectedChild(index) {
+		this.children = this.children.filter((_, i) => i !== index);
 		this.notifyChange();
 	}
 }
@@ -315,6 +427,8 @@ export class ConditionalFormElement extends BaseFormElement {
 		super(fields);
 		this.selectedItem = fields.selectedItem;
 		this.selectedIndex = writable(fields.selectedIndex);
+		this.discriminator = fields.discriminator;
+		this.unexpectedChildren = fields.unexpectedChildren;
 	}
 
 	/**
@@ -322,18 +436,41 @@ export class ConditionalFormElement extends BaseFormElement {
 	 */
 	selectChild(index) {
 		this.selectedIndex.set(index);
-		if ('oneOf' in this.property) {
-			const selectedProp = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
-				this.property.oneOf[index]
-			);
-			this.selectedItem = this.manager.createFormElement({
-				key: this.key,
-				property: selectedProp,
-				required: this.required,
-				removable: this.removable,
-				value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true)
-			});
+		if (index === -1) {
+			this.selectedItem = null;
+			if (this.titleType === 'inner_title') {
+				this.title.set('');
+			}
+		} else {
+			this.unexpectedChildren = [];
+			if ('oneOf' in this.property) {
+				const selectedProp = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
+					this.property.oneOf[index]
+				);
+				this.selectedItem = this.manager.createFormElement({
+					key: this.key,
+					path: this.path,
+					schemaPath: `${this.schemaPath}/oneOf/${index}`,
+					property: selectedProp,
+					required: this.required,
+					removable: this.removable,
+					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
+					parentProperty: this.property,
+					titleType: this.titleType,
+				});
+				if (this.titleType === 'inner_title' && this.selectedItem) {
+					this.title.set(selectedProp.title || '');
+				}
+			}
 		}
+		this.notifyChange();
+	}
+
+	/**
+	 * @param {number} index 
+	 */
+	removeUnexpectedChild(index) {
+		this.unexpectedChildren = this.unexpectedChildren.filter((_, i) => i !== index);
 		this.notifyChange();
 	}
 }

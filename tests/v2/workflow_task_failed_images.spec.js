@@ -26,6 +26,7 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
 
 	await test.step('Run workflow', async () => {

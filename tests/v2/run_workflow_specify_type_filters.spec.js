@@ -69,7 +69,7 @@ test('Warning message "You are trying to run a workflow without specifying what 
 	});
 
 	await test.step('Select type', async () => {
-		await selectSlimSelect(page, modal.getByLabel('Selector for type 3D'), 'True');
+		await selectSlimSelect(page, modal.getByRole('combobox', { name: 'Selector for type 3D' }), 'True');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();

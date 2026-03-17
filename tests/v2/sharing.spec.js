@@ -190,7 +190,7 @@ test('Project sharing', async ({ page }) => {
 
 	await test.step('Delete project 1 sharing', async () => {
 		const row = page.getByRole('row', { name: userEmail });
-		await row.getByRole('button', { name: 'Delete' }).click();
+		await row.getByRole('button', { name: 'Revoke access' }).click();
 		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);

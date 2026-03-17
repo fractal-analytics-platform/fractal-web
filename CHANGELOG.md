@@ -1,7 +1,26 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# 1.23.1 [Unreleased]
+# 1.24.0 (unreleased)
 
+* Support new backend API for workflow imports, with flexible version matching (\#941).
+* Added new cases of valid SLURM errors (\#950).
+* Add link to Job list page in no-history Workflow warning message (\#966).
+* Expand some user-facing messages (\#972).
+* JSON Schema form improvements (\#957, \#993):
+    * displayed error messages near the invalid elements;
+    * displayed unexpected properties, with the possibility to fix them;
+    * avoided duplication of discriminator properties;
+    * hided indexes from tuple and array properties;
+    * improved titles and errors for tagged-union blocks;
+    * various fixes;
+* Simplified task version upgrade, to allow for fixing invalid arguments at a later stage;
+* Added task manifest sandbox example (\#957);
+* Updated slim-select (v3.4.3) and other dependencies (\#980);
+* Display run data in workflow task Info tab (\#987);
+* Drop support for dataset history (\#987);
+* Updated e2e test docs (\#987);
+* Workflow-duplication feature (\#1005);
+* Add CSV download button to admin/tasks page (\#1005);
 * Customized login invite also added for Institutional login when available (\#1006)
 
 # 1.23.0

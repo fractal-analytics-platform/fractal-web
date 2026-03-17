@@ -59,6 +59,16 @@ test('Create, update and delete a resource', async ({ page }) => {
 		await expect(page.getByText('Resource updated')).toBeVisible();
 	});
 
+	await test.step('Get SyntaxError while update the resource', async () => {
+		const textarea = page.locator('textarea');
+		await textarea.fill('abc{');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('Invalid JSON')).toBeVisible();
+		await expect(page.getByText('Resource updated')).not.toBeVisible();
+		await page.reload();
+		await waitPageLoading(page);
+	});
+
 	await test.step('Deactivate and reactivate the resource', async () => {
 		await page.getByRole('switch').click();
 		let resource = await getResourceConfig(page);

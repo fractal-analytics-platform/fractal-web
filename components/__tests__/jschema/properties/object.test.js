@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { screen, fireEvent } from '@testing-library/svelte';
 import { checkBold, renderSchema } from './property_test_utils';
+import userEvent from '@testing-library/user-event';
 
 describe('Object properties', () => {
 	it('Required nested objects', async () => {
@@ -146,13 +147,13 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: {} });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.input(screen.getByPlaceholderText('Key'), {
 			target: { value: 'key1' }
 		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(onChange).toHaveBeenCalledWith({ test: { key1: { prop1: null } } });
 	});
 
@@ -183,10 +184,10 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(onChange).toHaveBeenCalledWith({ test: {} });
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
 
 	it('add and remove additional object property', async function () {
@@ -213,14 +214,14 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: {} });
-		expect(component.unsavedChanges).toEqual(false);
+		expect(component.hasUnsavedChanges()).toEqual(false);
 		await fireEvent.input(screen.getByPlaceholderText('Key'), {
 			target: { value: 'key1' }
 		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
-		expect(component.unsavedChanges).toEqual(true);
+		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
-		await fireEvent.input(screen.getAllByRole('textbox')[1], {
+		await fireEvent.input(screen.getAllByRole('textbox')[0], {
 			target: { value: 'foo' }
 		});
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
@@ -259,6 +260,7 @@ describe('Object properties', () => {
 	});
 
 	it('Display object with custom key and title - key prevails over title', async function () {
+		const user = userEvent.setup();
 		const { component } = renderSchema(
 			{
 				type: 'object',
@@ -283,6 +285,13 @@ describe('Object properties', () => {
 		expect(component.getArguments()).deep.eq({ map: { k1: { test: 'foo' } } });
 		expect(screen.queryByText('PropertyTitle')).toBeNull();
 		expect(screen.queryByText('k1')).not.toBeNull();
+
+		await user.type(screen.getByPlaceholderText('Key'), 'k2');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+		expect(component.getArguments()).deep.eq({ map: { k1: { test: 'foo' }, k2: { test: 'bar' } } });
+		expect(screen.queryByText('PropertyTitle')).toBeNull();
+		expect(screen.queryByText('k2')).not.toBeNull();
 	});
 
 	it('Display root schema having only additionalProperties', async function () {
@@ -299,5 +308,62 @@ describe('Object properties', () => {
 		expect(component.getArguments()).deep.eq({ k1: 'foo', k2: 'bar' });
 		expect(screen.queryByText('k1')).not.toBeNull();
 		expect(screen.queryByText('k2')).not.toBeNull();
+	});
+
+	it('Handle generic object additionalProperties', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{ type: 'object' },
+			'pydantic_v1',
+			{ k1: 'foo', k2: 'bar' }
+		);
+		expect(component.getArguments()).deep.eq({ k1: 'foo', k2: 'bar' });
+		expect(component.isValid()).toEqual(true);
+		await user.type(screen.getByRole('textbox', { name: 'k1' }), 'x');
+		await user.type(screen.getByRole('textbox', { name: 'k2' }), 'y');
+		expect(component.getArguments()).deep.eq({ k1: 'foox', k2: 'bary' });
+		expect(component.isValid()).toEqual(true);
+		await user.click(screen.getAllByRole('button', { name: 'Remove Property Block' })[0]);
+		await user.click(screen.getAllByRole('button', { name: 'Remove Property Block' })[0]);
+		expect(component.getArguments()).deep.eq({});
+		expect(component.isValid()).toEqual(true);
+	});
+
+	it('Attempt to add the same object key twice', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema({
+			properties: {
+				"object_arg": {
+					"additionalProperties": {
+						"type": "boolean"
+					},
+					"type": "object"
+				},
+			},
+			type: 'object'
+		}, 'pydantic_v2');
+
+		expect(component.getArguments()).deep.eq({ object_arg: {} });
+
+		await user.type(screen.getByRole('textbox'), 'foo');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.getByRole('textbox')).toHaveValue('');
+		await user.click(screen.getByRole('switch'));
+		expect(component.getArguments()).deep.eq({ object_arg: { foo: true } });
+
+		await user.type(screen.getByRole('textbox'), 'foo');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.queryByText('Schema property already has a property with the same name')).not.toBeNull();
+
+		await user.clear(screen.getByRole('textbox'));
+		expect(screen.queryByText('Schema property already has a property with the same name')).toBeNull();
+
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.queryByText('Schema property has no name')).not.toBeNull();
+
+		await user.type(screen.getByRole('textbox'), 'bar');
+		expect(screen.queryByText('Schema property has no name')).toBeNull();
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(screen.getByRole('textbox')).toHaveValue('');
 	});
 });

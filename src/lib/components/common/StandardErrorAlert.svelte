@@ -65,9 +65,9 @@
 		}
 	}
 
-	export function hide() {
+	export const hide = () => {
 		error = undefined;
-	}
+	};
 </script>
 
 {#if errorData.errorString}

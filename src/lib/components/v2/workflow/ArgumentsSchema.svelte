@@ -1,15 +1,10 @@
 <script>
 	import { page } from '$app/state';
-	import {
-		AlertError,
-		displayStandardErrorAlert,
-		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
-	import FormBuilder from './FormBuilder.svelte';
-	import { tick } from 'svelte';
-	import { JsonSchemaDataError } from 'fractal-components/jschema/form_manager';
+	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
+	import { onMount } from 'svelte';
 	import {
 		isCompoundType,
 		hasComputeArguments,
@@ -23,13 +18,11 @@
 
 	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let errorAlert = undefined;
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
+	 * @property {string} taskName
 	 * @property {boolean} [editable]
 	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaNonParallel
 	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaParallel
@@ -41,6 +34,7 @@
 	let {
 		workflowTask = $bindable(),
 		onWorkflowTaskUpdated,
+		taskName,
 		editable = true,
 		argsSchemaNonParallel = null,
 		argsSchemaParallel = null,
@@ -64,12 +58,41 @@
 
 	let savingChanges = $state(false);
 
-	function handleNonParallelChanged() {
-		unsavedChangesNonParallel = true;
+	let nonParallelSavedData = $state();
+	let nonParallelValid = $state(true);
+
+	/**
+	 * @param {any} data
+	 */
+	function handleNonParallelChanged(data) {
+		if (changed(nonParallelSavedData, data)) {
+			unsavedChangesNonParallel = true;
+		}
+		nonParallelSavedData = data;
 	}
 
-	function handleParallelChanged() {
-		unsavedChangesParallel = true;
+	let parallelSavedData = $state();
+	let parallelValid = $state(true);
+
+	/**
+	 * @param {any} data
+	 */
+	function handleParallelChanged(data) {
+		if (changed(parallelSavedData, data)) {
+			unsavedChangesParallel = true;
+		}
+		parallelSavedData = data;
+	}
+
+	/**
+	 * @param {any} oldValue
+	 * @param {any} newValue
+	 */
+	function changed(oldValue, newValue) {
+		if (!oldValue) {
+			return false;
+		}
+		return JSON.stringify($state.snapshot(oldValue)) !== newValue;
 	}
 
 	export function hasUnsavedChanges() {
@@ -77,9 +100,6 @@
 	}
 
 	export async function saveChanges() {
-		if (!validateArguments()) {
-			return;
-		}
 		const invalidFormBuilderNonParallel =
 			nonParallelFormBuilderComponent && !nonParallelFormBuilderComponent.validateArguments();
 		const invalidFormBuilderParallel =
@@ -116,51 +136,6 @@
 	/**
 	 * @param {object} payload
 	 */
-	async function handleImport(payload) {
-		if (nonParallelSchemaComponent) {
-			workflowTask.args_non_parallel = payload.args_non_parallel;
-		}
-		if (parallelSchemaComponent) {
-			workflowTask.args_parallel = payload.args_parallel;
-		}
-		await tick();
-		try {
-			nonParallelSchemaComponent?.validateArguments();
-			parallelSchemaComponent?.validateArguments();
-		} catch (err) {
-			throw new AlertError(getValidationErrorMessage(err));
-		}
-		await patchWorkflow(payload);
-	}
-
-	function validateArguments() {
-		errorAlert?.hide();
-		try {
-			nonParallelSchemaComponent?.validateArguments();
-			parallelSchemaComponent?.validateArguments();
-		} catch (err) {
-			const errorAlertData = getValidationErrorMessage(err);
-			errorAlert = displayStandardErrorAlert(errorAlertData, 'task-args-validation-errors');
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * @param {any} err
-	 */
-	function getValidationErrorMessage(err) {
-		if (err instanceof JsonSchemaDataError) {
-			return err.errors.length === 1 ? err.errors[0] : err.errors;
-		} else {
-			console.error(err);
-			return /** @type {Error}*/ (err).message;
-		}
-	}
-
-	/**
-	 * @param {object} payload
-	 */
 	async function patchWorkflow(payload) {
 		savingChanges = true;
 		const projectId = page.params.projectId;
@@ -168,13 +143,18 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		const options = { deepCopy: true, stripEmptyElements: true, stringify: false };
+
 		const response = await fetch(
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
 				credentials: 'include',
 				headers,
-				body: normalizePayload(payload, { deepCopy: true, stripEmptyElements: true })
+				body: JSON.stringify({
+					args_non_parallel: normalizePayload(payload.args_non_parallel, options),
+					args_parallel: normalizePayload(payload.args_parallel, options)
+				})
 			}
 		);
 
@@ -208,10 +188,29 @@
 	let isSchemaValid = $derived(argsSchemaVersionValid(workflowTask.task.args_schema_version));
 	let schemaVersion = $derived(workflowTask.task.args_schema_version);
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
+
+	onMount(() => {
+		if (argsSchemaNonParallel && isSchemaValid) {
+			nonParallelSchemaComponent?.update(
+				argsSchemaNonParallel,
+				editable ? workflowTask.args_non_parallel : argsNonParallel
+			);
+		}
+
+		if (argsSchemaParallel && isSchemaValid) {
+			parallelSchemaComponent?.update(
+				argsSchemaParallel,
+				editable ? workflowTask.args_parallel : argsParallel
+			);
+		}
+	});
 </script>
 
 <div id="workflow-arguments-schema-panel">
 	<div id="task-args-validation-errors"></div>
+	{#if !nonParallelValid || !parallelValid}
+		<div class="alert alert-danger m-2">Data is not valid</div>
+	{/if}
 	{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
 		{#if hasInitialisationArguments(workflowTask)}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
@@ -220,13 +219,12 @@
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-non-parallel"
-					schema={argsSchemaNonParallel}
-					schemaData={editable ? workflowTask.args_non_parallel : argsNonParallel}
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
 					onchange={handleNonParallelChanged}
 					bind:this={nonParallelSchemaComponent}
+					bind:dataValid={nonParallelValid}
 				/>
 			</div>
 		{:else}
@@ -251,13 +249,12 @@
 			<div class="args-list">
 				<JSchema
 					componentId="jschema-parallel"
-					schema={argsSchemaParallel}
-					schemaData={editable ? workflowTask.args_parallel : argsParallel}
 					{editable}
 					{schemaVersion}
 					{propertiesToIgnore}
 					onchange={handleParallelChanged}
 					bind:this={parallelSchemaComponent}
+					bind:dataValid={parallelValid}
 				/>
 			</div>
 		{:else}
@@ -276,9 +273,12 @@
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
 		<ImportExportArgs
-			{workflowTask}
-			onImport={handleImport}
-			exportDisabled={!editable || unsavedChanges || savingChanges}
+			argsNonParallel={editable ? workflowTask.args_non_parallel : argsNonParallel}
+			argsParallel={editable ? workflowTask.args_parallel : argsParallel}
+			name={taskName}
+			onImport={patchWorkflow}
+			importDisabled={!editable}
+			exportDisabled={unsavedChanges || savingChanges}
 		/>
 		{#if isSchemaValid || nonParallelFormBuilderComponent || parallelFormBuilderComponent}
 			<div>

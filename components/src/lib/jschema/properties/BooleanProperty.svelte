@@ -14,6 +14,10 @@
 	let value = $state();
 	formElement.value.subscribe((v) => (value = v));
 
+	/** @type {string[]} */
+	let errors = $state([]);
+	formElement.errors.subscribe((v) => (errors = v));
+
 	/**
 	 * @param {any} event
 	 */
@@ -32,7 +36,7 @@
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
 		<PropertyLabel {formElement} defaultTitle="Boolean argument" tag="span" />
 	</div>
-	<div class="property-input ms-auto w-25">
+	<div class="property-input ms-auto w-25 has-validation">
 		<div class="form-check form-switch">
 			<input
 				id="property-{formElement.id}"
@@ -41,8 +45,15 @@
 				onchange={(event) => handleValueChange(event)}
 				checked={value === true}
 				role="switch"
+				class:is-invalid={errors.length > 0}
 				disabled={!editable}
 			/>
+			{#if value === null}
+				(unset)
+			{/if}
 		</div>
+		{#if errors.length > 0}
+			<span class="text-danger">{errors.join(', ')}</span>
+		{/if}
 	</div>
 </div>
