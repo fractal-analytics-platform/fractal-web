@@ -21,7 +21,7 @@
 * Updated e2e test docs (\#987);
 * Workflow-duplication feature (\#1005);
 * Add CSV download button to admin/tasks page (\#1005);
-* Customized login invite also added for Institutional login when available (\#1006)
+* Customized login invite is now displayed for all login methods (if available) (\#1006)
 
 # 1.23.0
 
