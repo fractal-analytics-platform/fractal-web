@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.23.1 [Unreleased]
+
+* Customized login invite also added for Institutional login when available (\#1006)
+
 # 1.23.0
 
 * Dropped support for node v18 (\#930).

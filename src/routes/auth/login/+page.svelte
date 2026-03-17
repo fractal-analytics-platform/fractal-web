@@ -86,6 +86,10 @@
 		{#if oauth2Provider}
 			<div class="row">
 				<div class="col mb-4 mb-5">
+					{#if loginInvite}
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+						{@html loginInvite}
+					{/if}
 					<h3 class="fw-light">Institutional login</h3>
 					<div id="externalLoginError"></div>
 					<button type="button" onclick={oauth2Login} class="btn btn-primary">
@@ -129,8 +133,12 @@
 								<form method="POST">
 									<div class="mb-3">
 										<p class="fw-light">
+										{#if loginInvite}
 											<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 											{@html loginInvite}
+										{:else}
+											Log in with Fractal specific email & password provided to you by the Fractal admin
+										{/if}
 										</p>
 										<label for="userEmail" class="form-label">Email address</label>
 										<input
