@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import PropertyDescription from './PropertyDescription.svelte';
 
 	/**
@@ -10,6 +11,11 @@
 
 	/** @type {Props} */
 	let { formElement, tag = 'label', defaultTitle = '' } = $props();
+
+	let title = $state('');
+	onMount(() => {
+		formElement.title.subscribe((t) => (title = t));
+	});
 
 	let classValue = $derived(
 		formElement.required
@@ -34,16 +40,16 @@
 
 {#if tag === 'label'}
 	<label class={classValue} for={tag === 'label' ? `property-${formElement.id}` : undefined}>
-		{#if formElement.title}
-			{formElement.title}
+		{#if title}
+			{title}
 		{:else if defaultTitle}
 			<span class="visually-hidden">{defaultTitle}</span>
 		{/if}
 	</label>
 {:else}
 	<span class={classValue}>
-		{#if formElement.title}
-			{formElement.title}
+		{#if title}
+			{title}
 		{:else if defaultTitle}
 			<span class="visually-hidden">{defaultTitle}</span>
 		{/if}

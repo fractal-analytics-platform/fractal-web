@@ -26,14 +26,14 @@ export function processErrors(formElement, errors) {
  * @param {import('../types/form').FormElement} parentElement 
  */
 function addErrorToForm(error, parentElement) {
-  if (ignoreUnselectedConditionalError(error, parentElement)) {
-    return true;
-  }
   if (error.instancePath.startsWith(parentElement.path)) {
     parentElement.hasErrors.set(true);
   }
   if (parentElement.path === error.instancePath) {
-    setErrorToElement(error, parentElement);
+    const baseErrorPath = error.schemaPath.replace(/\/(required|additionalProperties)$/, '')
+    if (parentElement.schemaPath.startsWith(baseErrorPath)) {
+      setErrorToElement(error, parentElement);
+    }
     return true;
   } else {
     const children = getChildren(parentElement);
@@ -42,7 +42,9 @@ function addErrorToForm(error, parentElement) {
         return true;
       }
       if (element.path === error.instancePath) {
-        setErrorToElement(error, element);
+        if (error.schemaPath.startsWith(element.schemaPath)) {
+          setErrorToElement(error, element);
+        }
         return true;
       }
       if (addErrorToForm(error, element)) {
@@ -116,9 +118,12 @@ function isPrimitiveTypeElement(element) {
  * For oneOf properties, AJV returns errors also for unselected elements.
  * This function returns true when such an error is found, in order to ignore them.
  * @param {object} error 
- * @param {import('../types/form').FormElement} element 
+ * @param {import('../types/form').FormElement} element
  */
 function ignoreUnselectedConditionalError(error, element) {
+  if (error.message === 'must match exactly one schema in oneOf') {
+    return true;
+  }
   if ('selectedItem' in element) {
     const { oneOf } = element.property;
     const selectedIndex = get(element.selectedIndex);
@@ -130,10 +135,19 @@ function ignoreUnselectedConditionalError(error, element) {
         const { allowedValue } = error.params;
         const selectedValue = element.discriminator.values[selectedIndex];
         if (allowedValue !== selectedValue) {
+          // ignore discriminator errors related to unselected discriminator values
           return true;
         }
       }
-      if (error.schemaPath.startsWith(`#/properties${element.path}/oneOf/${i}`)) {
+      if (element.selectedItem && error.instancePath === element.path
+        && !error.schemaPath.startsWith(element.selectedItem.schemaPath)) {
+        // ignore oneOf errors when schema path doesn't match
+        return true;
+      }
+      if (!element.selectedItem && error.instancePath === element.path
+        && error.schemaPath.startsWith(`${element.schemaPath}/oneOf/`)
+      ) {
+        // ignore oneOf errors when invalid discriminator value is selected
         return true;
       }
     }

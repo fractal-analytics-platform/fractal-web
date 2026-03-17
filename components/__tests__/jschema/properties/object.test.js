@@ -260,6 +260,7 @@ describe('Object properties', () => {
 	});
 
 	it('Display object with custom key and title - key prevails over title', async function () {
+		const user = userEvent.setup();
 		const { component } = renderSchema(
 			{
 				type: 'object',
@@ -284,6 +285,13 @@ describe('Object properties', () => {
 		expect(component.getArguments()).deep.eq({ map: { k1: { test: 'foo' } } });
 		expect(screen.queryByText('PropertyTitle')).toBeNull();
 		expect(screen.queryByText('k1')).not.toBeNull();
+
+		await user.type(screen.getByPlaceholderText('Key'), 'k2');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+		expect(component.getArguments()).deep.eq({ map: { k1: { test: 'foo' }, k2: { test: 'bar' } } });
+		expect(screen.queryByText('PropertyTitle')).toBeNull();
+		expect(screen.queryByText('k2')).not.toBeNull();
 	});
 
 	it('Display root schema having only additionalProperties', async function () {

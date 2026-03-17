@@ -1,5 +1,5 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { closeModal, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
 import { waitTaskFailure } from './workflow_task_utils.js';
 import { createDataset } from './dataset_utils.js';
@@ -47,6 +47,13 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 		await workflow.selectTask(taskName);
 	});
 
+	await test.step('Check edit task order modal', async () => {
+		await page.getByRole('button', { name: 'Edit tasks order' }).click();
+		const modal = await waitModal(page);
+		await expect(modal.getByRole('button', { name: taskName })).toBeVisible();
+		await closeModal(page);
+	});
+
 	await test.step('Set alias and description', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 
@@ -60,6 +67,13 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 		await page.getByRole('textbox', { name: 'Workflow task description' }).fill('description1');
 		await page.getByRole('button', { name: 'Save', exact: true }).click();
 		await expect(page.getByRole('button', { name: 'Edit workflow task description' })).not.toBeVisible();
+	});
+
+	await test.step('Check edit task order modal', async () => {
+		await page.getByRole('button', { name: 'Edit tasks order' }).click();
+		const modal = await waitModal(page);
+		await expect(modal.getByRole('button', { name: 'alias1' })).toBeVisible();
+		await closeModal(page);
 	});
 
 	await test.step('Run workflow', async () => {
