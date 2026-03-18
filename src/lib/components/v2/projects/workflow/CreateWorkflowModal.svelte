@@ -77,7 +77,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		let response = await fetch(
-            `/api/v2/workflow_template?page=1&page_size=10`,
+            `/api/v2/workflow-template?page=1&page_size=10`,
 			{
 				method: 'GET',
 				headers,
