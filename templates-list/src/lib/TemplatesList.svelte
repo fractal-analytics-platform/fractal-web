@@ -1,6 +1,7 @@
 <script>
 	import { marked } from 'marked';
 	import DOMPurify from 'dompurify';
+	import { onMount } from 'svelte';
 
     /**
      * @typedef {Object} Props
@@ -33,12 +34,16 @@
 		return result;
 	})());
 
-	/** @type {import('./types').TemplateItem}*/
-	let selectedTemplates = $state(templates.map(item => item.templates[0]));
+	/** @type {import('./types').TemplateItem[]}*/
+	let selectedTemplates = $state([]);
 
 	$effect(() => {
 		selectedTemplates = filteredTemplates.map(item => item.templates[0]);
 	});
+
+	onMount(() => {
+		selectedTemplates = templates.map(item => item.templates[0])
+	})
 
 	/** @type {string|undefined} */
 	let templateName = $state(undefined);
