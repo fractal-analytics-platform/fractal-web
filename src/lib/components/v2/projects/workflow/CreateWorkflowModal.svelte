@@ -5,7 +5,6 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { normalizePayload } from 'fractal-components';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TemplatesTable from '../../templates/TemplatesTable.svelte';
 	import WorkflowImportFlexibility from './WorkflowImportFlexibility.svelte';
 

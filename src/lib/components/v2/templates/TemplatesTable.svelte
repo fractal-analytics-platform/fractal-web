@@ -262,7 +262,7 @@
 					bind:value={userEmail}
 				>
 					<option value={undefined}>All users</option>
-					{#each templatePage.email_list as email}
+					{#each templatePage.email_list as email, index (index) }
 						<option value={email}>{email}</option>
 					{/each}
 				</select>
