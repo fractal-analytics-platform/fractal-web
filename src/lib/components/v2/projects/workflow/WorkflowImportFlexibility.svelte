@@ -43,7 +43,7 @@
 	</div>
 	
 
-{#each workflowImportErrorData as data, index (index)}
+{#each workflowImportErrorData ?? [] as data, index (index)}
 	<hr />	
 	<section class="task-to-import">
 		<div

@@ -70,15 +70,15 @@
             else {
                 originaleTemplate = await response.json()
 				templateName = originaleTemplate?.name;
-				templateDescription = originaleTemplate?.description || workflow.description;
+				templateDescription = originaleTemplate?.description || workflow.description || undefined;
                 if (originaleTemplate?.user_email === page.data.userInfo.email) {
-                    templateVersion = originaleTemplate?.version + 1
+                    templateVersion = originaleTemplate ? originaleTemplate.version + 1 : 1
                 }
             }
         }
 		else {
 			templateName = workflow.name;
-			templateDescription = workflow.description;
+			templateDescription = workflow.description || undefined;
 		}
         modal?.show();
         }
