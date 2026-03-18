@@ -50,11 +50,9 @@
 			style="display: flex; align-items: center; gap: 8px;"
 		>
 			<div>
-				{#if data.outcome === "success" || selectedVersions[index]}
-					<BooleanIcon value={true} />
-				{:else}
-					<BooleanIcon value={false} />
-				{/if}
+				<BooleanIcon 
+					value={data.outcome === "success" || selectedVersions[index] !== undefined}
+				/>
 			</div>
 			<div>
 				Task <strong>{data.task_name}</strong> <span>({data.pkg_name})</span>
