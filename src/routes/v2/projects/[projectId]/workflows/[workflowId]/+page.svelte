@@ -1,5 +1,6 @@
 <script>
 	import { env } from '$env/dynamic/public';
+	import { goto } from '$app/navigation';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
@@ -32,6 +33,7 @@
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
+	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -111,6 +113,8 @@
 	let editWorkflowModal = $state();
 	/** @type {TypeFiltersFlowModal|undefined} */
 	let typeFiltersFlowModal = $state();
+	/** @type {TemplateCreateModal|undefined} */
+	let templateCreateModal = $state();
 
 	/** @type {{ [id: string]: Array<{ task_id: number, version: string }> }} */
 	let newVersionsMap = $state({});
@@ -655,6 +659,10 @@
 		}
 	}
 
+	async function gotoLinkedTemplate() {
+		await goto(`/v2/templates?template_id=${workflow.template_id}`);
+	}
+
 	/**
 	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
@@ -806,7 +814,7 @@
 			</div>
 		</div>
 
-		<div class="col-lg-4 mb-2">
+		<div class="col-xl-12 mb-2">
 			<div class="float-end">
 				{#if page.data.userInfo.is_superuser}
 					<button
@@ -830,24 +838,34 @@
 				</a>
 				<button
 					class="btn btn-light"
-					onclick={(e) => {
-						e.preventDefault();
-						handleExportWorkflow();
-					}}
-					aria-label="Export workflow"
+					aria-label="Create template"
+					title="Create template"
+					onclick={templateCreateModal?.show}
 				>
-					<i class="bi-download"></i>
+					<i class="bi bi-file-earmark-plus"></i>
 				</button>
-				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 				<button
 					class="btn btn-light"
 					data-bs-toggle="modal"
 					data-bs-target="#editWorkflowModal"
 					onclick={resetWorkflowUpdateModal}
-					aria-label="Edit workflow"
+					aria-label="Workflow properties"
+					title="Workflow properties"
 				>
-					<i class="bi-pencil"></i>
+					<i class="bi-info-circle"></i>
 				</button>
+				<button
+					class="btn btn-light"
+					onclick={(e) => {
+						e.preventDefault();
+						handleExportWorkflow();
+					}}
+					aria-label="Export workflow"
+					title="Export workflow"
+				>
+					<i class="bi-download"></i>
+				</button>
+				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 			</div>
 		</div>
 	</div>
@@ -1269,6 +1287,14 @@
 	{/snippet}
 	{#snippet body()}
 		{#if workflow}
+			{#if workflow.template_id}
+			<div class="mb-3">
+				This workflow comes from a 
+				<button class="btn btn-link p-0" onclick={gotoLinkedTemplate}>
+					template
+				</button>.
+			</div>
+			{/if}
 			<form
 				id="updateWorkflow"
 				onsubmit={(e) => {
@@ -1445,6 +1471,11 @@
 </Modal>
 
 <JobLogsModal bind:this={jobLogsModal} />
+
+<TemplateCreateModal
+	bind:this={templateCreateModal}
+	{workflow}
+/>
 
 <style>
 	.run-item {

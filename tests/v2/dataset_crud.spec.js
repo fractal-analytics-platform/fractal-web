@@ -116,7 +116,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
 		await waitDatasetModal(page, 'Create new dataset');
-		await page.getByText('Import from file').click();
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		await page.getByRole('button', { name: 'Import' }).click();
 		await page.getByText('A file is required').waitFor();
 	});
@@ -145,7 +145,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
 		await waitDatasetModal(page, 'Create new dataset');
-		await page.getByText('Import from file').click();
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-renamed2');
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select dataset file').click();

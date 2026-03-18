@@ -1,5 +1,5 @@
 {
-	"name": "fractal-tasks-list-page",
+	"name": "fractal-templates-list-page",
 	"main": "index.js",
 	"scripts": {
 		"dev": "vite dev",
