@@ -11,15 +11,42 @@
     /** @type {Props} */
     let { templates } = $props();
 
+	
+	/** @type {import('./types').TemplateItem[]}*/
+	let selectedTemplates = $state([]);
+
+	$effect(() => {
+		selectedTemplates = filteredTemplates.map(item => item.templates[0]);
+	});
+	
+	onMount(() => {
+		selectedTemplates = templates.map(item => item.templates[0]);
+	})
+	
+	/** @type {string|undefined} */
+	let templateName = $state(undefined);
+	/** @type {number|undefined} */
+	let templateVersion = $state(undefined);
+	
+	/** @type {{ templateName: string | undefined, templateVersion: number | undefined }} */
+    let lastAppliedState = $state({
+		templateName: undefined,
+		templateVersion: undefined,
+	});
+	
 	/** @type {Array<import('./types').TemplateEntry>}*/
-    let filteredTemplates = $derived((() => {
-
-		let result = lastAppliedState.templateName
-			? templates.filter(entry =>
-				entry.template_name.toLowerCase().includes(lastAppliedState.templateName.toLowerCase())
-			)
-			: templates;
-
+	let filteredTemplates = $derived((() => {
+		
+		const name = lastAppliedState.templateName;
+		let result;
+		if (name) {
+			result = templates.filter(entry =>
+				entry.template_name.toLowerCase().includes(name.toLowerCase())
+			);
+		} else {
+			result = templates;
+		}
+		
 		if (lastAppliedState.templateVersion) {
 			result = result
 				.map(entry => ({
@@ -33,28 +60,6 @@
 
 		return result;
 	})());
-
-	/** @type {import('./types').TemplateItem[]}*/
-	let selectedTemplates = $state([]);
-
-	$effect(() => {
-		selectedTemplates = filteredTemplates.map(item => item.templates[0]);
-	});
-
-	onMount(() => {
-		selectedTemplates = templates.map(item => item.templates[0])
-	})
-
-	/** @type {string|undefined} */
-	let templateName = $state(undefined);
-	/** @type {number|undefined} */
-	let templateVersion = $state(undefined);
-
-    let lastAppliedState = $state({
-		templateName: undefined,
-		templateVersion: undefined,
-	});
-	
 
     const currentState = $derived({templateName, templateVersion});
     const isDefault = $derived(lastAppliedState.templateName === undefined && lastAppliedState.templateVersion === undefined);
