@@ -12,7 +12,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
 
     await expect(page.getByText(workflow.workflowName)).toBeVisible();
 
-    await page.getByRole('button', { name: 'Edit workflow' }).click();
+    await page.getByRole('button', { name: 'Workflow properties' }).click();
     const modal = await waitModal(page);
 
     // Attempt to set empty name
@@ -30,7 +30,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
   });
 
   await test.step('Set short workflow description', async () => {
-    await page.getByRole('button', { name: 'Edit workflow' }).click();
+    await page.getByRole('button', { name: 'Workflow properties' }).click();
     const modal = await waitModal(page);
 
     await modal.getByRole('textbox', { name: 'Workflow description' }).fill('This is the workflow description');
@@ -55,7 +55,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
   });
 
   await test.step('Unset workflow description', async () => {
-    await page.getByRole('button', { name: 'Edit workflow' }).click();
+    await page.getByRole('button', { name: 'Workflow properties' }).click();
     const modal = await waitModal(page);
 
     await modal.getByRole('textbox', { name: 'Workflow description' }).fill('');
