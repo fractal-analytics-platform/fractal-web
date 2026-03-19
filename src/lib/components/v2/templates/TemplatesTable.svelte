@@ -18,7 +18,7 @@
 	 * @property {string|undefined} [userEmail]
 	 * @property {string|undefined} [templateName]
 	 * @property {number|undefined} [templateVersion]
-	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
+	 * @property {Array<[number, string]>} [groups]
 	 * @property {'edit'|'select'} modalType
 	 * @property {any} [handleSelect]
 	 */

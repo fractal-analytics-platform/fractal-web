@@ -6,7 +6,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => void} onTemplateImport
-	 * @property {Array<import('fractal-components/types/api').Group>} groups
+	 * @property {Array<[number, string]>} groups
 	 */
 
 	/** @type {Props} */
@@ -170,7 +170,7 @@
 				>
 					<option value={undefined}>Select...</option>
 					{#each groups as group, index (index) }
-						<option value={group.id}>{group.name}</option>
+						<option value={group[0]}>{group[1]}</option>
 					{/each}
 					
 				</select>

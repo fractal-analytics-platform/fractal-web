@@ -4,8 +4,8 @@
 
 	/** @type {import('fractal-components/types/api').TemplatePage} */
 	let templatePage = $derived(page.data.templatePage);
-	/** @type {Array<import('fractal-components/types/api').Group>} */
-	const groups = $derived(page.data.groups || []);
+	/** @type {Array<[number, string]>} */
+	const groups = $derived(page.data.user.group_ids_names || []);
 
 	/** @type {number|undefined} */
 	let templateId = $derived(
