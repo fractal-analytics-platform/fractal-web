@@ -1290,7 +1290,7 @@
 			{#if workflow.template_id}
 			<div class="mb-3">
 				This workflow comes from a 
-				<button class="btn btn-link p-0" onclick={gotoLinkedTemplate}>
+				<button class="btn btn-link p-0 align-baseline" onclick={gotoLinkedTemplate}>
 					template
 				</button>.
 			</div>
