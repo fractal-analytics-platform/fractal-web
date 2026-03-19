@@ -704,10 +704,20 @@ export class FormManager {
 			case 'conditional':
 				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/(element));
 			default:
-				if (element instanceof ValueFormElement) {
-					if (element instanceof NumberFormElement && element.badInput) {
-						return '__invalid__';
+				if (element instanceof NumberFormElement) {
+					const value = get(element.value);
+					const numericValue = parseFloat(value);
+					if (isNaN(numericValue)) {
+						if (value === null || (typeof value === 'string' && value.trim() === '')) {
+							return null;
+						} else {
+							return value;
+						}
+					} else {
+						return numericValue;
 					}
+				}
+				if (element instanceof ValueFormElement) {
 					return get(element.value);
 				}
 				throw new Error(`Unsupported type ${element.type}`);

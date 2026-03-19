@@ -26,22 +26,12 @@
 	 * @param {any} value
 	 */
 	function handleValueChange(value) {
-		onInput();
 		const previousValue = get(formElement.value);
 		if (previousValue === value) {
 			return;
 		}
 		formElement.value.set(value);
 		formElement.notifyChange();
-	}
-
-	function onInput() {
-		if (field) {
-			if (formElement.badInput !== field.validity.badInput) {
-				formElement.badInput = field.validity.badInput;
-				formElement.notifyChange();
-			}
-		}
 	}
 </script>
 
@@ -51,12 +41,9 @@
 	</div>
 	<div class="property-input ms-auto w-50 has-validation">
 		<input
-			type="number"
+			type="text"
 			bind:this={field}
 			bind:value
-			min={formElement.min}
-			max={formElement.max}
-			oninput={onInput}
 			class="form-control"
 			id="property-{formElement.id}"
 			class:is-invalid={errors.length > 0}

@@ -129,11 +129,6 @@ describe('allOf properties', () => {
 			},
 			'pydantic_v1'
 		);
-
-		const input = screen.getByRole('spinbutton');
-		expect(input.getAttribute('min')).eq('5');
-		expect(input.getAttribute('max')).eq('10');
-
 		expect(component.getArguments()).deep.eq({ myNumber: null });
 	});
 

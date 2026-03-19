@@ -3,7 +3,8 @@ import { screen } from '@testing-library/svelte';
 import {
 	checkBold,
 	renderSchemaWithSingleProperty,
-	renderSchemaWithReferencedProperty
+	renderSchemaWithReferencedProperty,
+	renderSchema
 } from './property_test_utils';
 
 describe('Number properties', () => {
@@ -17,56 +18,24 @@ describe('Number properties', () => {
 			true
 		);
 		checkBold(screen.getByText('Number title'), true);
-		const spinbutton = screen.getByRole('spinbutton', { name: 'Number title' });
-		expect(spinbutton).toBeDefined();
+		const input = screen.getByRole('textbox', { name: 'Number title' });
+		expect(input).toBeDefined();
 		expect(component.getArguments()).deep.eq({ testProp: null });
 	});
 
 	it('Optional NumberProperty without title', async () => {
 		const { component } = renderSchemaWithSingleProperty({ type: 'integer' }, 'pydantic_v1');
 		checkBold(screen.getByText('testProp'), false);
-		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
-		expect(spinbutton).toBeDefined();
+		const input = screen.getByRole('textbox', { name: 'testProp' });
+		expect(input).toBeDefined();
 		expect(component.getArguments()).deep.eq({ testProp: null });
 	});
 
 	it('NumberProperty referenced', async () => {
 		const { component } = renderSchemaWithReferencedProperty({ type: 'number' }, 'pydantic_v2');
 		checkBold(screen.getByText('testProp'), false);
-		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
-		expect(spinbutton).toBeDefined();
-		expect(component.getArguments()).deep.eq({ testProp: null });
-	});
-
-	it('NumberProperty with min and max constraints', async () => {
-		const { component } = renderSchemaWithSingleProperty(
-			{
-				type: 'integer',
-				minimum: 5,
-				maximum: 10
-			},
-			'pydantic_v1'
-		);
-		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
-		expect(spinbutton).toBeDefined();
-		expect(spinbutton.getAttribute('min')).toBe('5');
-		expect(spinbutton.getAttribute('max')).toBe('10');
-		expect(component.getArguments()).deep.eq({ testProp: null });
-	});
-
-	it('NumberProperty with exclusive min and max constraints', async () => {
-		const { component } = renderSchemaWithSingleProperty(
-			{
-				type: 'integer',
-				exclusiveMinimum: 5,
-				exclusiveMaximum: 10
-			},
-			'pydantic_v1'
-		);
-		const spinbutton = screen.getByRole('spinbutton', { name: 'testProp' });
-		expect(spinbutton).toBeDefined();
-		expect(spinbutton.getAttribute('min')).toBe('6');
-		expect(spinbutton.getAttribute('max')).toBe('9');
+		const input = screen.getByRole('textbox', { name: 'testProp' });
+		expect(input).toBeDefined();
 		expect(component.getArguments()).deep.eq({ testProp: null });
 	});
 
@@ -79,5 +48,21 @@ describe('Number properties', () => {
 			'pydantic_v1'
 		);
 		expect(component.getArguments()).deep.eq({ testProp: 0 });
+	});
+
+	it('NumberProperty initialized to null', async () => {
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					testProp: {
+						type: 'number',
+					}
+				}
+			},
+			'pydantic_v2',
+			{ testProp: null }
+		);
+		expect(component.getArguments()).deep.eq({ testProp: null });
 	});
 });
