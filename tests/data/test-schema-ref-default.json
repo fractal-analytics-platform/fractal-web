@@ -1,0 +1,43 @@
+{
+  "title": "Test Schema",
+  "type": "object",
+  "properties": {
+    "channel": {
+      "$ref": "#/$defs/InputChannel",
+      "title": "Channel"
+    },
+    "foo": {
+      "title": "Foo",
+      "type": "string",
+      "default": "foo"
+    }
+  },
+  "required": [
+    "channel"
+  ],
+  "$defs": {
+    "InputChannel": {
+      "properties": {
+        "mode": {
+          "default": "label",
+          "enum": [
+            "label",
+            "wavelength_id",
+            "index"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "identifier": {
+          "title": "Identifier",
+          "type": "string"
+        }
+      },
+      "required": [
+        "identifier"
+      ],
+      "title": "InputChannel",
+      "type": "object"
+    }
+  }
+}
