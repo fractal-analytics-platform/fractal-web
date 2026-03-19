@@ -2,8 +2,6 @@
 	import { page } from '$app/state';
 	import TemplatesTable from '$lib/components/v2/templates/TemplatesTable.svelte';
 
-	/** @type {import('fractal-components/types/api').TemplatePage} */
-	let templatePage = $derived(page.data.templatePage);
 	/** @type {Array<[number, string]>} */
 	const groups = $derived(page.data.user.group_ids_names || []);
 
@@ -37,7 +35,6 @@
 <div class="container-fluid">
 	<TemplatesTable
 		modalType='edit'
-		bind:templatePage
 		{templateId}
 		{isOwner}
 		{userEmail}

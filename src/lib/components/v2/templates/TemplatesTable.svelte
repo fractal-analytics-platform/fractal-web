@@ -11,7 +11,7 @@
 
     /**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
+	 
 	 * @property {number|undefined} [singleSelectedTemplateId]
 	 * @property {number|undefined} [templateId]
 	 * @property {boolean} [isOwner]
@@ -24,7 +24,6 @@
 	 */
 	/** @type {Props} */
 	let {
-		templatePage = $bindable(),
 		singleSelectedTemplateId = $bindable(undefined),
 		templateId: initialTemplateId = undefined,
 		isOwner: initialIsOwner = false,
@@ -35,10 +34,22 @@
 		modalType,
 		handleSelect,
 	} = $props();
+	
+	
+	/** @type {import('fractal-components/types/api').TemplatePage} */
+	let templatePage = $state(
+		{	
+			current_page: 1,
+			page_size: 10,
+			total_count: 0,
+			items: [],
+			email_list: [],	
+		}
+	)
 
 
 	/** @type {import('fractal-components/types/api').WorkflowTemplateGroupMember []}*/
-	let selectedTemplates = $state(templatePage.items.map(item => item.templates[0]));	 
+	let selectedTemplates = $state([]);	 
 
 	/** @type {TemplateImportModal|undefined} */
 	let importTemplateModal = $state(undefined);
@@ -49,9 +60,9 @@
 
 	// query parametes
 	/** @type {number} */
-	let currentPage = $state(templatePage.current_page);
+	let currentPage = $state(1);
 	/** @type {number} */
-	let pageSize = $state(templatePage.page_size);
+	let pageSize = $state(10);
 	/** @type {number|undefined} */
 	let templateId = $state(undefined);
 	/** @type {boolean} */

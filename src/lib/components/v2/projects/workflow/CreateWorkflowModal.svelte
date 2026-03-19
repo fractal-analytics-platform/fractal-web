@@ -46,9 +46,6 @@
 
 	let includeOlderVersions = $state(false)
 
-	/** @type {import('fractal-components/types/api').TemplatePage|undefined} */
-	let templatePage = $state();
-
 	/** @type {number|undefined} */
 	let singleSelectedTemplateId = $state();
 
@@ -70,25 +67,6 @@
 	
 	export function show() {
 		modal?.show();
-	}
-
-	export async function searchTemplate() {
-		
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		let response = await fetch(
-            `/api/v2/workflow-template?page=1&page_size=10`,
-			{
-				method: 'GET',
-				headers,
-				credentials: 'include',
-			}
-		);
-		if (response.ok) {
-			templatePage = await response.json();
-		} else {
-			throw await getAlertErrorFromResponse(response);
-		}
 	}
 
 	export function reset() {
@@ -345,10 +323,7 @@
 					name="createWorkflowMode"
 					id="createWorkflowModeTemplate"
 					value="template"
-					onclick={async () => {
-						reset();
-						await searchTemplate();
-					}}
+					onclick={reset}
 					bind:group={mode}
 				/>
 				<label class="form-check-label" for="createWorkflowModeTemplate">Create from template</label>
@@ -443,8 +418,7 @@
 			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
 		{/if}
 	{:else}
-		{#if templatePage}
-			<div class="mb-2">
+		<div class="mb-2">
 				<label for="workflowName" class="form-label">Workflow name</label>
 				<input
 					id="workflowName"
@@ -459,7 +433,6 @@
 			<div>Select a template</div>
 				<TemplatesTable 
 					modalType='select'
-					{templatePage}
 					{handleSelect}
 					bind:singleSelectedTemplateId
 				/>
@@ -479,7 +452,6 @@
 				/>
 				</form>
 			{/if}
-		{/if}
 	{/if}
 
 	{/snippet}
