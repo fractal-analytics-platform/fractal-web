@@ -63,12 +63,22 @@
 	/** @type {number|undefined} */
 	let templateVersion = $state(undefined);
 
+	/**
+	 * @typedef {Object} AppliedState
+	 * @property {number|undefined} templateId
+	 * @property {boolean} isOwner
+	 * @property {string|undefined} userEmail
+	 * @property {string|undefined} templateName
+	 * @property {number|undefined} templateVersion
+	 */
+
+	/** @type {AppliedState} */
 	let lastAppliedState = $state({
-		templateId: initialTemplateId,
-		isOwner: initialIsOwner,
-		userEmail: initialUserEmail,
-		templateName: initialTemplateName,
-		templateVersion: initialTemplateVersion,
+		templateId: undefined,
+		isOwner: false,
+		userEmail: undefined,
+		templateName: undefined,
+		templateVersion: undefined,
 	});
 
 	const currentState = $derived({
@@ -104,12 +114,17 @@
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
 	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
 
-	onMount(async () => {/** @type {number|undefined} */
+	onMount(async () => {
 		templateId = initialTemplateId;
+		lastAppliedState.templateId = initialTemplateId;
 		isOwner = initialIsOwner;
+		lastAppliedState.isOwner = initialIsOwner;
 		userEmail = initialUserEmail;
+		lastAppliedState.userEmail = initialUserEmail;
 		templateName = initialTemplateName;
+		lastAppliedState.templateName = initialTemplateName;
 		templateVersion = initialTemplateVersion;
+		lastAppliedState.templateVersion = initialTemplateVersion;
 		await searchTemplate();
 	});
 	
