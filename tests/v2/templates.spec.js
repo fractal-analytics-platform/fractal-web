@@ -151,7 +151,6 @@ test('Use template page', async ({ page }) => {
 
     await test.step('Upload template', async () => {
 
-        
         const applyButton = await page.getByRole('button', { name: 'Apply' });
         await expect(applyButton).toBeDisabled();
         const resetButton = await page.getByRole('button', { name: 'Reset' });
@@ -171,11 +170,22 @@ test('Use template page', async ({ page }) => {
         await page.locator('input#templateFile').setInputFiles(fileName);
         await page.getByRole('button', { name: 'Import template' }).click();
         await waitModalClosed(page);
-        fs.rmSync(fileName);
-
+        
         await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
         await expect(page.locator('tbody tr')).toHaveCount(1);
 
+        await page.getByRole('button', { name: 'Import' }).click();
+        await page.locator('input#templateFile').setInputFiles(fileName);
+        await page.getByRole('button', { name: 'Import template' }).click();
+        await expect(page.getByText(
+            `The current user already own a workflow template with name='${workflow.name}' and version=1`
+        )).toBeVisible();
+        await page.locator('#templateVersion').fill("42");
+        await page.getByRole('button', { name: 'Import template' }).click();
+        
+        //  TODO: check we have two versions now
+        //  TODO: override template name
+        fs.rmSync(fileName);
     });
 
 });
