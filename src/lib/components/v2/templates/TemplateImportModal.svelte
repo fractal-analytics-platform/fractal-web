@@ -135,7 +135,7 @@
 					class="form-control"
 					accept="application/json"
 					type="file"
-					name="templateFil"
+					name="templateFile"
 					id="templateFile"
 					bind:this={fileInput}
 					bind:files
@@ -178,6 +178,7 @@
 			<button
 				class="btn btn-primary mt-2"
 				disabled={!files || creating}
+				aria-label="Import template"
 			>
 				{#if creating}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

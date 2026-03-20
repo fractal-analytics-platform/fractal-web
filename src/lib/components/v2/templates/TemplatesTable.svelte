@@ -356,7 +356,7 @@
 <div class="card mb-3">
 <div class="card-body">
 <div class="table-responsive mt-2">
-	<table class="table" id="dataset-images-table">
+	<table class="table" id="templates-table">
 		<thead>
 			<tr>
 				{#if modalType==='select'}
