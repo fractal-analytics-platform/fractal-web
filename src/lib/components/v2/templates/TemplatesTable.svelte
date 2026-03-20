@@ -247,6 +247,7 @@
 		<div class="col-2">
 			<button
 				class="btn btn-outline-primary"
+				aria-label="Import"
 				onclick={() => {importTemplateModal?.show();}}
 			>
 				<i class="bi-upload"></i>
@@ -442,6 +443,7 @@
 									modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
 									style="danger"
 									title="Delete"
+									ariaLabel="Delete"
 									btnStyle="outline-danger"
 									buttonIcon="trash"
 									label=""
