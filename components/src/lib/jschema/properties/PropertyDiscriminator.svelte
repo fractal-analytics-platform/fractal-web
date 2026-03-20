@@ -14,33 +14,34 @@
 	 * @typedef {Object} Props
 	 * @property {any} formElement BaseFormElement
 	 * @property {boolean} [editable]
-	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
+	 * @property {null|(() => void)} [remove] function passed by the parent that removes this element
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable = true, reset = null } = $props();
+	let { formElement, editable = true, reset = null, remove = null } = $props();
 </script>
 
 {#if formElement.type === 'string'}
-	<StringProperty {formElement} {editable} />
+	<StringProperty {formElement} {editable} {remove} />
 {:else if formElement.type === 'number'}
-	<NumberProperty {formElement} {editable} />
+	<NumberProperty {formElement} {editable} {remove} />
 {:else if formElement.type === 'boolean'}
-	<BooleanProperty {formElement} {editable} />
+	<BooleanProperty {formElement} {editable} {remove} />
 {:else if formElement.type === 'enum'}
-	<EnumProperty {formElement} {editable} />
+	<EnumProperty {formElement} {editable} {remove} />
 {:else if formElement.type === 'object'}
-	<CollapsibleProperty {formElement} {reset}>
+	<CollapsibleProperty {formElement} {reset} {remove} {editable}>
 		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
-	<ArrayProperty {formElement} {editable} {reset} />
+	<ArrayProperty {formElement} {editable} {reset} {remove} />
 {:else if formElement.type === 'tuple'}
-	<TupleProperty {formElement} {editable} {reset} />
+	<TupleProperty {formElement} {editable} {reset} {remove} />
 {:else if formElement.type === 'conditional'}
-	<ConditionalProperty {formElement} {editable} {reset} />
+	<ConditionalProperty {formElement} {editable} {reset} {remove} />
 {:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}
-	<UnexpectedProperty {formElement} {editable} />
+	<UnexpectedProperty {formElement} {editable} {remove} />
 {:else}
 	<p>Unsupported property type {formElement.type}</p>
 {/if}

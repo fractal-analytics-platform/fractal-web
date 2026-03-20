@@ -5,13 +5,13 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").ObjectFormElement} formElement
+	 * @property {boolean} editable
 	 * @property {boolean} [isRoot]
-	 * @property {boolean} [editable]
 	 * @property {boolean} [showErrors]
 	 */
 
 	/** @type {Props} */
-	let { formElement, isRoot = false, editable = true, showErrors = true } = $props();
+	let { formElement, editable = true, isRoot = false, showErrors = true } = $props();
 
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
@@ -69,16 +69,6 @@
 {#key children}
 	{#each children as child, index (index)}
 		<div class="property-block">
-			{#if child.removable}
-				<button
-					class="btn btn-danger w-100 mt-2"
-					type="button"
-					onclick={() => removeProperty(/**@type {string}*/ (child.key))}
-					disabled={!editable}
-				>
-					Remove Property Block
-				</button>
-			{/if}
 			{#if child.type === 'invalid'}
 				<button
 					class="btn btn-danger w-100 mt-2"
@@ -94,6 +84,7 @@
 					formElement={children[index]}
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
+					remove={child.removable ? () => removeProperty(/**@type {string}*/ (child.key)) : null}
 				/>
 			</div>
 		</div>
