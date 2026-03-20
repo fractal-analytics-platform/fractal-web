@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3216-enable-usage-of-lockfile-in-pixi-task-collection',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

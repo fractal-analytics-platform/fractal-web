@@ -33,7 +33,7 @@ test('Pixi task collection', async ({ page, request }) => {
 	test.slow();
 
 	const tasksMockPixiUrl =
-		'https://github.com/fractal-analytics-platform/testing-tasks-mock-pixi/releases/download/0.2.1/mock_pixi_tasks-0.2.1.tar.gz';
+		'https://github.com/fractal-analytics-platform/testing-tasks-mock-pixi/releases/download/0.2.2/mock_pixi_tasks-0.2.2.tar.gz';
 
 	/** @type {string} */
 	let tasksMockPixiFile;
@@ -46,7 +46,7 @@ test('Pixi task collection', async ({ page, request }) => {
 		if (!fs.existsSync(tasksMockPixiFolder)) {
 			fs.mkdirSync(tasksMockPixiFolder);
 		}
-		tasksMockPixiFile = path.resolve(tasksMockPixiFolder, 'mock_pixi_tasks-0.2.1.tar.gz');
+		tasksMockPixiFile = path.resolve(tasksMockPixiFolder, 'mock_pixi_tasks-0.2.2.tar.gz');
 		fs.writeFileSync(tasksMockPixiFile, body);
 	});
 
@@ -55,6 +55,9 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByText('Upload tar.gz file', { exact: true }).click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(tasksMockPixiFile);
+
+		await expect(page.getByRole('switch')).toBeChecked();
+		await page.getByRole('switch').uncheck();
 
 		await page.getByRole('button', { name: 'Collect', exact: true }).click();
 
