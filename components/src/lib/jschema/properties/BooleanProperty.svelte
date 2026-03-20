@@ -5,11 +5,12 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').ValueFormElement} formElement
-	 * @property {boolean} [editable]
+	 * @property {boolean} editable
+	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable = true } = $props();
+	let { formElement = $bindable(), editable, remove } = $props();
 
 	let value = $state();
 	formElement.value.subscribe((v) => (value = v));
@@ -34,7 +35,7 @@
 
 <div class="d-flex align-items-center p-2">
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
-		<PropertyLabel {formElement} defaultTitle="Boolean argument" tag="span" />
+		<PropertyLabel {formElement} {editable} {remove} defaultTitle="Boolean argument" tag="span" />
 	</div>
 	<div class="property-input ms-auto w-25 has-validation">
 		<div class="form-check form-switch">

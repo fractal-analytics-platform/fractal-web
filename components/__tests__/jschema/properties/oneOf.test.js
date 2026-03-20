@@ -92,7 +92,7 @@ describe('oneOf properties', () => {
 
 		const select = await screen.findByRole('combobox', { name: 'Step' });
 		expect(select).toHaveValue('1');
-		expect(screen.getByRole('spinbutton')).toHaveValue(1);
+		expect(screen.getByRole('textbox')).toHaveValue('1');
 		expect(component.getArguments()).deep.eq({
 			proc_step: {
 				step: 'ProcessB',
@@ -107,7 +107,7 @@ describe('oneOf properties', () => {
 				parameter1: null
 			}
 		});
-		expect(screen.getByRole('spinbutton')).toHaveValue(null);
+		expect(screen.getByRole('textbox')).toHaveValue('');
 		expect(component.getArguments()).deep.eq({
 			proc_step: {
 				step: 'ProcessA',
@@ -138,7 +138,7 @@ describe('oneOf properties', () => {
 		expect(screen.queryAllByText("required property")).toHaveLength(1);
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: null } });
 
-		await user.type(screen.getByRole('spinbutton'), '42');
+		await user.type(screen.getByRole('textbox'), '42');
 
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: 42 } });
 		expect(component.isValid()).toEqual(true);
@@ -505,7 +505,7 @@ describe('oneOf properties', () => {
 		expect(screen.getByText('must NOT have fewer than 2 items')).toBeVisible();
 		expect(screen.getByText('required property')).toBeVisible();
 
-		await user.type(screen.getByRole('spinbutton'), '42');
+		await user.type(screen.getAllByRole('textbox')[1], '42');
 		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }, 42] }] });
 		expect(screen.getByText('required property')).toBeVisible();
 

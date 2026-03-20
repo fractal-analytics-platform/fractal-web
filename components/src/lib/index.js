@@ -20,6 +20,7 @@ import {
 import { getPropertiesToIgnore } from './jschema/property_utils';
 import { JsonSchemaDataError } from './jschema/form_manager';
 import { stripDiscriminator, stripIgnoredProperties } from './jschema/jschema_adapter';
+import { getUpdatedData } from './jschema/jschema_updater';
 import FilteredTasksTable from './tasks/FilteredTasksTable.svelte';
 import FormBaseEntry from './common/FormBaseEntry.svelte';
 import FormEntry from './common/FormEntry.svelte';
@@ -48,6 +49,7 @@ export {
 	normalizePayload,
 	nullifyEmptyStrings,
 	stripDiscriminator,
+	getUpdatedData,
 	FormBaseEntry,
 	FormEntry,
 	FormBuilder
