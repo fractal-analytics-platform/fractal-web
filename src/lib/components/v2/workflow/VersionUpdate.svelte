@@ -5,7 +5,12 @@
 		getAlertErrorFromResponse
 	} from '$lib/common/errors';
 	import { page } from '$app/state';
-	import { normalizePayload, SchemaValidator, stripDiscriminator } from 'fractal-components';
+	import {
+		getUpdatedData,
+		normalizePayload,
+		SchemaValidator,
+		stripDiscriminator
+	} from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -113,6 +118,27 @@
 
 		const newTaskId = updateCandidate.id;
 
+		const updatedBody = {
+			args_non_parallel: workflowTask.args_non_parallel,
+			args_parallel: workflowTask.args_parallel
+		};
+
+		if (updateCandidate.args_schema_non_parallel && workflowTask.args_non_parallel) {
+			updatedBody.args_non_parallel = getUpdatedData(
+				updateCandidate.args_schema_non_parallel,
+				workflowTask.args_non_parallel,
+				updateCandidate.args_schema_version
+			);
+		}
+
+		if (updateCandidate.args_schema_parallel && workflowTask.args_parallel) {
+			updatedBody.args_parallel = getUpdatedData(
+				updateCandidate.args_schema_parallel,
+				workflowTask.args_parallel,
+				updateCandidate.args_schema_version
+			);
+		}
+
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -122,10 +148,7 @@
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: normalizePayload({
-					args_non_parallel: workflowTask.args_non_parallel,
-					args_parallel: workflowTask.args_parallel
-				})
+				body: normalizePayload(updatedBody)
 			}
 		);
 		if (!response.ok) {

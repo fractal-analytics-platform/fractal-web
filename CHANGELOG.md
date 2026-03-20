@@ -25,6 +25,7 @@
 * Customized login invite is now displayed for all login methods (if available) (\#1006)
 * Use textbox also for numeric inputs in JSON Schema form (\#1020);
 * Fix default parameters not initialized issue (\#1020);
+* Populated new defaults on task version update (\#1020);
 
 # 1.23.0
 
