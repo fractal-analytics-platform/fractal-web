@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { addTaskToWorkflow, closeModal, createProject, createWorkflow, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import path from 'path';
 import os from 'os';
+import fs from 'fs';
 
 test('Use template page', async ({ page }) => {
     
@@ -118,6 +119,8 @@ test('Use template page', async ({ page }) => {
         await waitModalClosed(page);
     });
 
+    let fileName;
+
     await test.step('Download and delete template', async () => {
         const rows = page.locator('tbody tr');
         await expect(await rows.count()).toBe(1)
@@ -126,6 +129,7 @@ test('Use template page', async ({ page }) => {
         await page.getByRole('button', { name: 'Download' }).click();
         const download = await downloadPromise;
         const file = path.join(os.tmpdir(), download.suggestedFilename());
+        fileName = file;
         await download.saveAs(file);
 
         await page.getByRole('button', { name: 'Delete' }).click();
@@ -159,8 +163,18 @@ test('Use template page', async ({ page }) => {
         await expect(applyButton).toBeEnabled();
         await applyButton.click()
         await waitPageLoading(page);
-        await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
 
+        await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
+        await expect(page.locator('tbody tr')).toHaveCount(0);
+
+        await page.getByRole('button', { name: 'Import' }).click();
+        await page.locator('input#templateFile').setInputFiles(fileName);
+        await page.getByRole('button', { name: 'Import template' }).click();
+        await waitModalClosed(page);
+        fs.rmSync(fileName);
+
+        await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
+        await expect(page.locator('tbody tr')).toHaveCount(1);
 
     });
 
