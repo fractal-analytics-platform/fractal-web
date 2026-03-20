@@ -98,7 +98,7 @@
 >
 	{#snippet header()}
 	<h5 class="modal-title">
-		Edit Workflow Template '{template?.name}'
+		Edit template '{template?.name}'
 	</h5>
 	{/snippet}
 	{#snippet body()}

@@ -67,7 +67,7 @@
     size="lg"
 >
 		{#snippet header()}
-		<h5 class="modal-title">Workflow Template '{template?.name}'</h5>
+		<h5 class="modal-title">Template '{template?.name}'</h5>
 		{/snippet}
 		{#snippet body()}
 			{#if template}
@@ -97,7 +97,7 @@
 					<span>{template?.version}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
-					<strong>User Group</strong>
+					<strong>User group</strong>
 				</li>
 				<li class="list-group-item">
 					<span>{template.user_group_id ? group?.name : '-'}</span>
