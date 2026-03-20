@@ -23,7 +23,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await workflow.addTask('create_ome_zarr_compound');
 		await workflow.selectTask('create_ome_zarr_compound');
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
-		await page.getByRole('textbox', { name: 'Num Images' }).fill('2');
+		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('2');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});

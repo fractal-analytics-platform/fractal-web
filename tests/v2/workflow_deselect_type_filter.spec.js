@@ -25,7 +25,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 		await workflow.addTask('cellpose_segmentation');
 		await workflow.selectTask('create_ome_zarr_compound');
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
-		await page.getByRole('textbox', { name: 'Num Images' }).fill('2');
+		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('2');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();

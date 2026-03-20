@@ -23,7 +23,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await workflow.addTask('create_ome_zarr_compound');
 		await workflow.selectTask('create_ome_zarr_compound');
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
-		await page.getByRole('textbox', { name: 'Num Images' }).fill('15');
+		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('15');
 		await workflow.addTask('illumination_correction');
 		await workflow.addTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Save changes' }).click();

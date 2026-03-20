@@ -78,7 +78,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 
 	await test.step('Update task arguments', async () => {
 		await page.getByRole('button', { name: 'Arguments' }).click();
-		await page.getByRole('textbox', { name: 'p2' }).fill('42');
+		await page.getByRole('spinbutton', { name: 'p2' }).fill('42');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});
@@ -99,8 +99,8 @@ test('Workflow task runs display different versions of arguments schema', async 
 		await expect(page.getByRole('textbox')).toHaveValue('foo');
 		await expect(page.getByRole('textbox')).toBeDisabled();
 		await page.getByRole('button', { name: 'Run 2' }).click();
-		await expect(page.getByRole('textbox', { name: 'p2' })).toHaveValue('42');
-		await expect(page.getByRole('textbox', { name: 'p2' }, { name: 'p2' })).toBeDisabled();
+		await expect(page.getByRole('spinbutton')).toHaveValue('42');
+		await expect(page.getByRole('spinbutton')).toBeDisabled();
 	});
 
 	await test.step('Check runs tab', async () => {
@@ -136,8 +136,8 @@ test('Workflow task runs display different versions of arguments schema', async 
 		await expect(page.getByPlaceholder('Argument value')).toBeDisabled();
 		await expect(page.getByRole('button', { name: 'Add property' })).toBeDisabled();
 		await page.getByRole('button', { name: 'Run 2' }).click();
-		await expect(page.getByRole('textbox', { name: 'p2' })).toHaveValue('42');
-		await expect(page.getByRole('textbox', { name: 'p2' })).toBeDisabled();
+		await expect(page.getByRole('spinbutton')).toHaveValue('42');
+		await expect(page.getByRole('spinbutton')).toBeDisabled();
 	});
 
 	await test.step('Cleanup', async () => {
