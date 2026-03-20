@@ -1,14 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { addTaskToWorkflow, closeModal, createProject, createWorkflow, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
 import path from 'path';
-import fs from 'fs';
 import os from 'os';
 
 test('Use template page', async ({ page }) => {
     
     const project = await createProject(page);
-    const dataset = await createDataset(page, project.id);
     const workflow = await createWorkflow(page, project.id);
 
     await test.step('Check workflow not from templates', async () => {
@@ -121,8 +118,6 @@ test('Use template page', async ({ page }) => {
         await waitModalClosed(page);
     });
 
-    let fileName;
-
     await test.step('Download and delete template', async () => {
         const rows = page.locator('tbody tr');
         await expect(await rows.count()).toBe(1)
@@ -131,7 +126,6 @@ test('Use template page', async ({ page }) => {
         await page.getByRole('button', { name: 'Download' }).click();
         const download = await downloadPromise;
         const file = path.join(os.tmpdir(), download.suggestedFilename());
-        fileName = file;
         await download.saveAs(file);
 
         await page.getByRole('button', { name: 'Delete' }).click();
@@ -166,6 +160,8 @@ test('Use template page', async ({ page }) => {
         await applyButton.click()
         await waitPageLoading(page);
         await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
+
+
     });
 
 });
