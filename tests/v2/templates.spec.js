@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { addTaskToWorkflow, closeModal, createProject, createWorkflow, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
 import { createDataset } from './dataset_utils.js';
+import path from 'path';
+import fs from 'fs';
+import os from 'os';
 
 test('Use template page', async ({ page }) => {
     
@@ -33,7 +36,7 @@ test('Use template page', async ({ page }) => {
         // default: 1
         await expect(
             modal.getByText('Template version')
-        ).toHaveValue("1");
+        ).toHaveValue('1');
         // default workflow.description
         await expect(
             modal.getByText('Template description')
@@ -57,7 +60,7 @@ test('Use template page', async ({ page }) => {
         // Create template
         await page.getByRole('button', { name: 'Create template' }).click();
         const modal2 = await waitModal(page);
-        await modal.getByText('Template description').fill("This is the template description.")
+        await modal.getByText('Template description').fill('This is the template description.')
         await modal2.getByLabel('User Group').selectOption({ label: 'All' });
         await modal2.getByRole('button', { name: 'Create template' }).click();
         await waitPageLoading(page);
@@ -88,9 +91,9 @@ test('Use template page', async ({ page }) => {
         await expect(values.nth(0).locator('span')).toHaveText(String(templateId));
         await expect(values.nth(1).locator('span')).toHaveText('admin@fractal.xy');
         await expect(values.nth(2).locator('span')).toHaveText(workflow.name);
-        await expect(values.nth(3).locator('span')).toHaveText("1");
-        await expect(values.nth(4).locator('span')).toHaveText("All");
-        await expect(values.nth(5).locator('span')).toHaveText("This is the template description.");
+        await expect(values.nth(3).locator('span')).toHaveText('1');
+        await expect(values.nth(4).locator('span')).toHaveText('All');
+        await expect(values.nth(5).locator('span')).toHaveText('This is the template description.');
         await expect(values.nth(6).locator('span')).toHaveText(
             await values.nth(7).locator('span').allInnerTexts()
         );
@@ -111,11 +114,58 @@ test('Use template page', async ({ page }) => {
         await page.getByRole('button', { name: 'Info' }).click();
         await waitModal(page);
         const values = page.locator('.list-group-item:not(.text-bg-light)');
-        await expect(values.nth(4).locator('span')).toHaveText("-");
-        await expect(values.nth(5).locator('span')).toHaveText("New description.");
+        await expect(values.nth(4).locator('span')).toHaveText('-');
+        await expect(values.nth(5).locator('span')).toHaveText('New description.');
 
         await modal.getByRole('button', { name: 'Close' }).click();
         await waitModalClosed(page);
+    });
+
+    let fileName;
+
+    await test.step('Download and delete template', async () => {
+        const rows = page.locator('tbody tr');
+        await expect(await rows.count()).toBe(1)
+
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', { name: 'Download' }).click();
+        const download = await downloadPromise;
+        const file = path.join(os.tmpdir(), download.suggestedFilename());
+        fileName = file;
+        await download.saveAs(file);
+
+        await page.getByRole('button', { name: 'Delete' }).click();
+        await waitModal(page);
+        await page.getByRole('button', { name: 'Confirm' }).click();
+        await waitModalClosed(page);
+        await expect(page).toHaveURL(`/v2/templates?template_id=${templateId}`);
+        await expect(await rows.count()).toBe(0)
+
+        const applyButton = await page.getByRole('button', { name: 'Apply' });
+        await expect(applyButton).toBeDisabled();
+        const resetButton = await page.getByRole('button', { name: 'Reset' });
+        await expect(resetButton).toBeEnabled();
+        
+        await resetButton.click()
+        await waitPageLoading(page);
+        await expect(page).toHaveURL(`/v2/templates`);
+    });
+
+    await test.step('Upload template', async () => {
+
+        
+        const applyButton = await page.getByRole('button', { name: 'Apply' });
+        await expect(applyButton).toBeDisabled();
+        const resetButton = await page.getByRole('button', { name: 'Reset' });
+        await expect(resetButton).toBeDisabled();
+        
+        const nameInput = page.locator('#searchTemplateName');
+        await expect(nameInput).toHaveValue('');
+        await nameInput.fill(workflow.name);
+        await expect(applyButton).toBeEnabled();
+        await applyButton.click()
+        await waitPageLoading(page);
+        await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
     });
 
 });
