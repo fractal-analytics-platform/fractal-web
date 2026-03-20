@@ -6,7 +6,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => void} onTemplateImport
-	 * @property {Array<import('fractal-components/types/api').Group>} groups
+	 * @property {Array<[number, string]>} groups
 	 */
 
 	/** @type {Props} */
@@ -135,7 +135,7 @@
 					class="form-control"
 					accept="application/json"
 					type="file"
-					name="templateFil"
+					name="templateFile"
 					id="templateFile"
 					bind:this={fileInput}
 					bind:files
@@ -170,7 +170,7 @@
 				>
 					<option value={undefined}>Select...</option>
 					{#each groups as group, index (index) }
-						<option value={group.id}>{group.name}</option>
+						<option value={group[0]}>{group[1]}</option>
 					{/each}
 					
 				</select>
@@ -178,6 +178,7 @@
 			<button
 				class="btn btn-primary mt-2"
 				disabled={!files || creating}
+				aria-label="Import template"
 			>
 				{#if creating}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

@@ -11,20 +11,19 @@
 
     /**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').TemplatePage} templatePage
+	 
 	 * @property {number|undefined} [singleSelectedTemplateId]
 	 * @property {number|undefined} [templateId]
 	 * @property {boolean} [isOwner]
 	 * @property {string|undefined} [userEmail]
 	 * @property {string|undefined} [templateName]
 	 * @property {number|undefined} [templateVersion]
-	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
+	 * @property {Array<[number, string]>} [groups]
 	 * @property {'edit'|'select'} modalType
 	 * @property {any} [handleSelect]
 	 */
 	/** @type {Props} */
 	let {
-		templatePage = $bindable(),
 		singleSelectedTemplateId = $bindable(undefined),
 		templateId: initialTemplateId = undefined,
 		isOwner: initialIsOwner = false,
@@ -35,10 +34,22 @@
 		modalType,
 		handleSelect,
 	} = $props();
+	
+	
+	/** @type {import('fractal-components/types/api').TemplatePage} */
+	let templatePage = $state(
+		{	
+			current_page: 1,
+			page_size: 10,
+			total_count: 0,
+			items: [],
+			email_list: [],	
+		}
+	)
 
 
 	/** @type {import('fractal-components/types/api').WorkflowTemplateGroupMember []}*/
-	let selectedTemplates = $state(templatePage.items.map(item => item.templates[0]));	 
+	let selectedTemplates = $state([]);	 
 
 	/** @type {TemplateImportModal|undefined} */
 	let importTemplateModal = $state(undefined);
@@ -49,9 +60,9 @@
 
 	// query parametes
 	/** @type {number} */
-	let currentPage = $state(templatePage.current_page);
+	let currentPage = $state(1);
 	/** @type {number} */
-	let pageSize = $state(templatePage.page_size);
+	let pageSize = $state(10);
 	/** @type {number|undefined} */
 	let templateId = $state(undefined);
 	/** @type {boolean} */
@@ -63,12 +74,22 @@
 	/** @type {number|undefined} */
 	let templateVersion = $state(undefined);
 
+	/**
+	 * @typedef {Object} AppliedState
+	 * @property {number|undefined} templateId
+	 * @property {boolean} isOwner
+	 * @property {string|undefined} userEmail
+	 * @property {string|undefined} templateName
+	 * @property {number|undefined} templateVersion
+	 */
+
+	/** @type {AppliedState} */
 	let lastAppliedState = $state({
-		templateId: initialTemplateId,
-		isOwner: initialIsOwner,
-		userEmail: initialUserEmail,
-		templateName: initialTemplateName,
-		templateVersion: initialTemplateVersion,
+		templateId: undefined,
+		isOwner: false,
+		userEmail: undefined,
+		templateName: undefined,
+		templateVersion: undefined,
 	});
 
 	const currentState = $derived({
@@ -104,12 +125,17 @@
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
 	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
 
-	onMount(async () => {/** @type {number|undefined} */
+	onMount(async () => {
 		templateId = initialTemplateId;
+		lastAppliedState.templateId = initialTemplateId;
 		isOwner = initialIsOwner;
+		lastAppliedState.isOwner = initialIsOwner;
 		userEmail = initialUserEmail;
+		lastAppliedState.userEmail = initialUserEmail;
 		templateName = initialTemplateName;
+		lastAppliedState.templateName = initialTemplateName;
 		templateVersion = initialTemplateVersion;
+		lastAppliedState.templateVersion = initialTemplateVersion;
 		await searchTemplate();
 	});
 	
@@ -221,6 +247,7 @@
 		<div class="col-2">
 			<button
 				class="btn btn-outline-primary"
+				aria-label="Import"
 				onclick={() => {importTemplateModal?.show();}}
 			>
 				<i class="bi-upload"></i>
@@ -329,7 +356,7 @@
 <div class="card mb-3">
 <div class="card-body">
 <div class="table-responsive mt-2">
-	<table class="table" id="dataset-images-table">
+	<table class="table" id="templates-table">
 		<thead>
 			<tr>
 				{#if modalType==='select'}
@@ -416,6 +443,7 @@
 									modalId={'downloadTemplateButton' + selectedTemplates[index].template_id}
 									style="danger"
 									title="Delete"
+									ariaLabel="Delete"
 									btnStyle="outline-danger"
 									buttonIcon="trash"
 									label=""

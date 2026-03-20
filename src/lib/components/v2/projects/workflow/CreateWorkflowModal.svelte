@@ -46,9 +46,6 @@
 
 	let includeOlderVersions = $state(false)
 
-	/** @type {import('fractal-components/types/api').TemplatePage|undefined} */
-	let templatePage = $state();
-
 	/** @type {number|undefined} */
 	let singleSelectedTemplateId = $state();
 
@@ -70,25 +67,6 @@
 	
 	export function show() {
 		modal?.show();
-	}
-
-	export async function searchTemplate() {
-		
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		let response = await fetch(
-            `/api/v2/workflow-template?page=1&page_size=10`,
-			{
-				method: 'GET',
-				headers,
-				credentials: 'include',
-			}
-		);
-		if (response.ok) {
-			templatePage = await response.json();
-		} else {
-			throw await getAlertErrorFromResponse(response);
-		}
 	}
 
 	export function reset() {
@@ -236,10 +214,29 @@
 			payload.name = workflowName;
 		}
 		
+		
 		if (selectedVersions.length > 0) {
-			payload.override_versions = selectedVersions;
+			const response1 = await fetch(
+				`/api/v2/workflow-template/${singleSelectedTemplateId}`, 
+				{
+					method: 'GET',
+					credentials: 'include',
+					headers,
+				}
+			);
+			/** @type {import('fractal-components/types/api').WorkflowTemplate} */
+			const template = await response1.json();
+			const originalVersions = template.data.task_list.map(t => t.task.version);
+			payload.override_versions = Object.fromEntries(
+				selectedVersions
+					.map((v, i) => (v !== originalVersions[i] ? [i, v] : null))
+					.filter(
+						/** @returns {entry is [number, string]} */
+						(entry) => entry !== null
+					)
+			);
 		}
-		const response = await fetch(
+		const response2 = await fetch(
 			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`, 
 			{
 				method: 'POST',
@@ -250,7 +247,7 @@
 		);
 		
 
-		if (response.ok) {
+		if (response2.ok) {
 			// Return a workflow item
 			importSuccess = true;
 			setTimeout(() => {
@@ -259,14 +256,14 @@
 			reset();
 
 			/** @type {import('fractal-components/types/api').WorkflowV2} */
-			const workflow = await response.json();
+			const workflow = await response2.json();
 
 			await tick();
 
 			handleWorkflowImported(workflow);
 		} else {
 			console.error('Import workflow failed');
-			const alertError = await getAlertErrorFromResponse(response);
+			const alertError = await getAlertErrorFromResponse(response2);
 			const result = alertError.reason;
 			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
 				workflowImportErrorData = result.data
@@ -326,10 +323,7 @@
 					name="createWorkflowMode"
 					id="createWorkflowModeTemplate"
 					value="template"
-					onclick={async () => {
-						reset();
-						await searchTemplate();
-					}}
+					onclick={reset}
 					bind:group={mode}
 				/>
 				<label class="form-check-label" for="createWorkflowModeTemplate">Create from template</label>
@@ -424,8 +418,7 @@
 			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
 		{/if}
 	{:else}
-		{#if templatePage}
-			<div class="mb-2">
+		<div class="mb-2">
 				<label for="workflowName" class="form-label">Workflow name</label>
 				<input
 					id="workflowName"
@@ -440,7 +433,6 @@
 			<div>Select a template</div>
 				<TemplatesTable 
 					modalType='select'
-					{templatePage}
 					{handleSelect}
 					bind:singleSelectedTemplateId
 				/>
@@ -460,7 +452,6 @@
 				/>
 				</form>
 			{/if}
-		{/if}
 	{/if}
 
 	{/snippet}
