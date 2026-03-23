@@ -84,10 +84,10 @@
 </script>
 
 <form
-	onsubmit={(e) => {
+	onsubmit={async (e) => {
 		e.preventDefault();
 		if (taskGroupSelector?.validate()) {
-			handlePixiCollection();
+			await handlePixiCollection();
 		}
 	}}
 >
