@@ -33,7 +33,7 @@ test('Pixi task collection', async ({ page, request }) => {
 	test.slow();
 
 	const tasksMockPixiUrl =
-		'https://github.com/fractal-analytics-platform/testing-tasks-mock-pixi/releases/download/0.2.2/mock_pixi_tasks-0.2.2.tar.gz';
+		'https://github.com/fractal-analytics-platform/testing-tasks-mock-pixi/releases/download/0.6.0/mock_pytorch_pixi_tasks-0.6.0.tar.gz';
 
 	/** @type {string} */
 	let tasksMockPixiFile;
@@ -46,7 +46,7 @@ test('Pixi task collection', async ({ page, request }) => {
 		if (!fs.existsSync(tasksMockPixiFolder)) {
 			fs.mkdirSync(tasksMockPixiFolder);
 		}
-		tasksMockPixiFile = path.resolve(tasksMockPixiFolder, 'mock_pixi_tasks-0.2.2.tar.gz');
+		tasksMockPixiFile = path.resolve(tasksMockPixiFolder, 'mock_pytorch_pixi_tasks-0.6.0.tar.gz');
 		fs.writeFileSync(tasksMockPixiFile, body);
 	});
 
@@ -57,7 +57,6 @@ test('Pixi task collection', async ({ page, request }) => {
 		await fileChooser.setFiles(tasksMockPixiFile);
 
 		await expect(page.getByRole('switch')).toBeChecked();
-		await page.getByRole('switch').uncheck();
 
 		await page.getByRole('button', { name: 'Collect', exact: true }).click();
 
@@ -77,7 +76,7 @@ test('Pixi task collection', async ({ page, request }) => {
 
 	await test.step('Check tasks list', async () => {
 		await expect(
-			page.getByRole('table').nth(1).getByRole('row', { name: 'mock-pixi-tasks' }).first()
+			page.getByRole('table').nth(1).getByRole('row', { name: 'mock-pytorch-pixi-tasks' }).first()
 		).toBeVisible();
 	});
 
@@ -96,6 +95,6 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByRole('combobox', { name: 'Origin' }).selectOption('Pixi');
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await expect(page.getByText('The query returned 1 matching result')).toBeVisible();
-		await expect(page.getByRole('cell', { name: 'mock-pixi-tasks' })).toBeVisible();
+		await expect(page.getByRole('cell', { name: 'mock-pytorch-pixi-tasks' })).toBeVisible();
 	});
 });
