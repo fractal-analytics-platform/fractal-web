@@ -8,12 +8,13 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").ConditionalFormElement} formElement
-	 * @property {boolean} [editable]
-	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @property {boolean} editable
+	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable, reset = null } = $props();
+	let { formElement = $bindable(), editable, remove, reset = null } = $props();
 
 	/** @type {string[]} */
 	let errors = $state([]);
@@ -66,7 +67,7 @@
 
 {#if formElement.discriminator}
 	{#key selectedItem}
-		<CollapsibleProperty {formElement} {reset} showErrors={false}>
+		<CollapsibleProperty {formElement} {editable} {reset} {remove} showErrors={false}>
 			<div class="mx-2">
 				{#each errors as error, index (index)}
 					<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
@@ -118,7 +119,7 @@
 
 	{#key selectedItem}
 		{#if selectedItem}
-			<PropertyDiscriminator {editable} {reset} formElement={selectedItem} />
+			<PropertyDiscriminator {editable} {reset} {remove} formElement={selectedItem} />
 		{/if}
 	{/key}
 {/if}
@@ -126,18 +127,12 @@
 {#key unexpectedChildren}
 	{#each unexpectedChildren as child, index (index)}
 		<div class="property-block">
-			{#if child.removable}
-				<button
-					class="btn btn-danger w-100 mt-2"
-					type="button"
-					onclick={() => removeUnexpectedChild(index)}
-					disabled={!editable}
-				>
-					Remove Property Block
-				</button>
-			{/if}
 			<div class="d-flex flex-column properties-block" id="{child.id}-wrapper">
-				<PropertyDiscriminator formElement={unexpectedChildren[index]} {editable} />
+				<PropertyDiscriminator
+					formElement={unexpectedChildren[index]}
+					{editable}
+					remove={child.removable ? () => removeUnexpectedChild(index) : null}
+				/>
 			</div>
 		</div>
 	{/each}

@@ -24,8 +24,9 @@ test('Import workflow', async ({ page, project }) => {
 	let importWorkflowBtn = page.getByRole('button', { name: 'Import workflow', exact: true });
 
 	await test.step('Attempt to import workflow using invalid JSON', async () => {
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		await importWorkflowBtn.waitFor();
@@ -36,7 +37,7 @@ test('Import workflow', async ({ page, project }) => {
 
 	await test.step('Attempt to import workflow using invalid fractal_tasks_core version', async () => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'workflow_to_import.json'));
 		await importWorkflowBtn.click();
@@ -49,7 +50,7 @@ test('Import workflow', async ({ page, project }) => {
 	await test.step('Import valid workflow overriding workflow name', async () => {
 		await page.getByRole('textbox', { name: 'Workflow name' }).fill(randomWorkflowName1);
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles({
 			name: 'valid-workflow.json',
@@ -85,8 +86,9 @@ test('Import workflow', async ({ page, project }) => {
 	const randomWorkflowName2 = Math.random().toString(36).substring(7);
 
 	await test.step('Import valid workflow without setting workflow name', async () => {
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles({
 			name: 'valid-workflow.json',
@@ -125,8 +127,9 @@ test('Import workflow', async ({ page, project }) => {
 		await createWorkflowBtn.waitFor();
 		await createWorkflowBtn.click();
 
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(
 			path.join(__dirname, '..', 'data', 'workflow_to_import_with_flexibility.json')

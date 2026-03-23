@@ -16,6 +16,7 @@ export default [
       "coverage-unit",
       "sandbox",
       "tasks-list",
+      "templates-list/.svelte-kit",
       "site",
       ".svelte-kit",
       "package",

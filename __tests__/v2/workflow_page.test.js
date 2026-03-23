@@ -82,6 +82,8 @@ describe('Workflow page', () => {
 							};
 						case '/api/auth/current-user':
 							return { slurm_accounts: [] };
+						case '/api/auth/group':
+							return [];
 						case '/api/v2/project/1/workflow/1/version-update-candidates':
 							return [];
 						default:

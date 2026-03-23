@@ -18,6 +18,7 @@
 	let tarFileInput = $state();
 
 	let version = $state('');
+	let useLockfile = $state(true);
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);
 	/** @type {TaskGroupSelector|undefined} */
@@ -28,6 +29,7 @@
 	const formErrorHandler = new FormErrorHandler('pixiCollectionError', [
 		'file',
 		'pixi_version',
+		'use_pixi_lockfile',
 		'user_group_id'
 	]);
 
@@ -52,6 +54,7 @@
 		if (version) {
 			formData.append('pixi_version', version);
 		}
+		formData.append('use_pixi_lockfile', useLockfile.toString());
 
 		let url = `/api/v2/task/collect/pixi?private=${privateTask}`;
 		if (!privateTask && selectedGroup) {
@@ -81,15 +84,15 @@
 </script>
 
 <form
-	onsubmit={(e) => {
+	onsubmit={async (e) => {
 		e.preventDefault();
 		if (taskGroupSelector?.validate()) {
-			handlePixiCollection();
+			await handlePixiCollection();
 		}
 	}}
 >
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-xl-5 mb-2 mb-xl-0">
 			<div class="input-group has-validation">
 				<label for="tarFile" class="input-group-text">
 					<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Upload tar.gz file
@@ -112,7 +115,7 @@
 			</div>
 		</div>
 
-		<div class="col-md-6">
+		<div class="col-xl-4 col-lg-6 mb-2 mb-xl-0">
 			<div class="input-group has-validation">
 				<div class="input-group-text">
 					<label for="pixi_version">Pixi version (optional)</label>
@@ -126,6 +129,23 @@
 					class:is-invalid={$validationErrors['pixi_version']}
 				/>
 				<span class="invalid-feedback">{$validationErrors['pixi_version']}</span>
+			</div>
+		</div>
+
+		<div class="col-xl-3 col-lg-6 mt-2 mb-xl-0">
+			<div class="form-check form-switch ms-xl-2">
+				<input
+					id="lockfile"
+					class="form-check-input"
+					type="checkbox"
+					bind:checked={useLockfile}
+					role="switch"
+					class:is-invalid={$validationErrors['use_pixi_lockfile']}
+				/>
+				<label class="form-check-label" for="lockfile">
+					Use <code>pixi.lock</code> file
+				</label>
+				<span class="invalid-feedback">{$validationErrors['use_pixi_lockfile']}</span>
 			</div>
 		</div>
 	</div>

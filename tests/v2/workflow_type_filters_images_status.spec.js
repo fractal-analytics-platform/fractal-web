@@ -30,7 +30,7 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 		await workflow.addTask('MIP_compound');
 		await workflow.selectTask('create_ome_zarr_compound');
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill(zarrDir);
-		await page.getByRole('spinbutton', { name: 'Num Images' }).fill('2');
+		await page.getByRole('textbox', { name: 'Num Images' }).fill('2');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();

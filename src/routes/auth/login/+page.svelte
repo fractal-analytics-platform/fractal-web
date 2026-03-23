@@ -56,6 +56,10 @@
 	{:else}
 		<div class="row">
 			<h1 class="fw-light mb-4">Login</h1>
+			{#if loginInvite}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html loginInvite}
+			{/if}
 		</div>
 		{#if showSessionExpiredMessage}
 			<div class="row">
@@ -129,8 +133,7 @@
 								<form method="POST">
 									<div class="mb-3">
 										<p class="fw-light">
-											<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-											{@html loginInvite}
+											Log in with Fractal specific email & password provided to you by the Fractal admin
 										</p>
 										<label for="userEmail" class="form-label">Email address</label>
 										<input

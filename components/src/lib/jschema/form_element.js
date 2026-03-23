@@ -27,8 +27,10 @@ export class BaseFormElement {
 		this.id = fields.id;
 		this.key = fields.key;
 		this.path = fields.path;
+		this.schemaPath = fields.schemaPath;
 		this.type = fields.type;
-		this.title = fields.title;
+		this.title = writable(fields.title);
+		this.titleType = fields.titleType;
 		this.required = fields.required;
 		this.description = fields.description;
 		/**
@@ -175,6 +177,7 @@ export class ObjectFormElement extends BaseFormElement {
 		const child = this.manager.createFormElement({
 			key,
 			path: `${this.path}/${key}`,
+			schemaPath: `${this.schemaPath}/additionalProperties`,
 			property: this.additionalProperties,
 			required: false,
 			removable: true,
@@ -185,9 +188,11 @@ export class ObjectFormElement extends BaseFormElement {
 				this.additionalProperties.default,
 				false
 			),
-			parentProperty: this.property
+			parentProperty: this.property,
+			// always use the user-defined key as title
+			titleType: 'key'
 		});
-		child.title = key;
+		child.title.set(key);
 		child.removable = true;
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -224,11 +229,13 @@ export class ObjectFormElement extends BaseFormElement {
 		const newChild = this.manager.createFormElement({
 			key: child.key,
 			path: `${this.path}/${child.key}`,
+			schemaPath: child.schemaPath,
 			property: child.property,
 			required: child.required,
 			removable: child.removable,
 			value: defaultValue,
-			parentProperty: this.property
+			parentProperty: this.property,
+			titleType: this.titleType
 		});
 		newChild.collapsed = child.collapsed;
 		this.children[index] = newChild;
@@ -243,6 +250,7 @@ export class ObjectFormElement extends BaseFormElement {
 		const newChild = this.manager.createFormElement({
 			key: child.key,
 			path: `${this.path}/${child.key}`,
+			schemaPath: child.schemaPath,
 			property: {
 				...child.property,
 				type: child.originalType
@@ -250,7 +258,8 @@ export class ObjectFormElement extends BaseFormElement {
 			required: child.required,
 			removable: child.removable,
 			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true),
-			parentProperty: this.property
+			parentProperty: this.property,
+			titleType: this.titleType
 		});
 		this.children[index] = newChild;
 		this.notifyChange();
@@ -277,11 +286,13 @@ export class ArrayFormElement extends BaseFormElement {
 		const child = this.manager.createFormElement({
 			key: (this.children.length).toString(),
 			path: `${this.path}/${this.children.length}`,
+			schemaPath: `${this.schemaPath}/items`,
 			property: this.items,
 			required: false,
 			removable: true,
 			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true),
-			parentProperty: this.property
+			parentProperty: this.property,
+			titleType: 'oneOf' in this.items ? 'inner_title' : 'title_only',
 		});
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -300,7 +311,6 @@ export class ArrayFormElement extends BaseFormElement {
 		this.children.forEach((c, i) => {
 			c.key = i.toString();
 			c.path = c.path.replace(/\d+$/, i.toString());
-			c.title = c.key && c.removable ? c.key : c.property.title || c.key || '';
 		});
 	}
 
@@ -384,7 +394,13 @@ export class TupleFormElement extends BaseFormElement {
 			);
 		}
 		this.children = this.manager.createTupleChildren({
-			path: this.path, items: this.items, size: this.size, value, parentProperty: this.property
+			path: this.path,
+			schemaPath: this.schemaPath,
+			items: this.items,
+			size: this.size,
+			value,
+			parentProperty: this.property,
+			titleType: 'title_only'
 		});
 		this.notifyChange();
 	}
@@ -422,6 +438,9 @@ export class ConditionalFormElement extends BaseFormElement {
 		this.selectedIndex.set(index);
 		if (index === -1) {
 			this.selectedItem = null;
+			if (this.titleType === 'inner_title') {
+				this.title.set('');
+			}
 		} else {
 			this.unexpectedChildren = [];
 			if ('oneOf' in this.property) {
@@ -431,14 +450,16 @@ export class ConditionalFormElement extends BaseFormElement {
 				this.selectedItem = this.manager.createFormElement({
 					key: this.key,
 					path: this.path,
+					schemaPath: `${this.schemaPath}/oneOf/${index}`,
 					property: selectedProp,
 					required: this.required,
 					removable: this.removable,
 					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
-					parentProperty: this.property
+					parentProperty: this.property,
+					titleType: this.titleType,
 				});
-				if (this.selectedItem) {
-					this.selectedItem.title = selectedProp.title || this.key || '';
+				if (this.titleType === 'inner_title' && this.selectedItem) {
+					this.title.set(selectedProp.title || '');
 				}
 			}
 		}

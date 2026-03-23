@@ -3,13 +3,16 @@
 # 1.24.0 (unreleased)
 
 * Support new backend API for workflow imports, with flexible version matching (\#941).
+* Support new workflow template features (\#975, \#1016).
 * Added new cases of valid SLURM errors (\#950).
 * Add link to Job list page in no-history Workflow warning message (\#966).
 * Expand some user-facing messages (\#972).
-* JSON Schema form improvements (\#957):
+* JSON Schema form improvements (\#957, \#993):
     * displayed error messages near the invalid elements;
     * displayed unexpected properties, with the possibility to fix them;
     * avoided duplication of discriminator properties;
+    * hided indexes from tuple and array properties;
+    * improved titles and errors for tagged-union blocks;
     * various fixes;
 * Simplified task version upgrade, to allow for fixing invalid arguments at a later stage;
 * Added task manifest sandbox example (\#957);
@@ -17,6 +20,13 @@
 * Display run data in workflow task Info tab (\#987);
 * Drop support for dataset history (\#987);
 * Updated e2e test docs (\#987);
+* Workflow-duplication feature (\#1005);
+* Add CSV download button to admin/tasks page (\#1005);
+* Customized login invite is now displayed for all login methods (if available) (\#1006)
+* Use textbox also for numeric inputs in JSON Schema form (\#1020);
+* Fix default parameters not initialized issue (\#1020);
+* Populated new defaults on task version update (\#1020);
+* Add "Use pixi.lock file" option in Pixi task collection (\#1023);
 
 # 1.23.0
 

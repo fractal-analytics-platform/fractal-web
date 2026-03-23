@@ -1,6 +1,7 @@
 import { expect, test } from './workflow_fixture.js';
 import { waitModalClosed, waitPageLoading } from '../utils.js';
 import { createFakeTask, deleteTask } from './task_utils.js';
+import * as fs from 'fs';
 
 test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
@@ -62,6 +63,15 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
+	});
+
+	await test.step('Download CSV', async () => {
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByText('Download CSV').click();
+		const download = await downloadPromise;
+		const content = fs.readFileSync(await download.path(), 'utf8');
+		const rowsCount = await page.locator('table tbody tr').count();
+		expect(content.split('\n').length).toEqual(rowsCount + 1);
 	});
 
 	await test.step('Open info modal', async () => {

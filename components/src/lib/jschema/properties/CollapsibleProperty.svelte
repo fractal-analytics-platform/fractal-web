@@ -4,7 +4,9 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../../types/form").CollapsibleFormElement} formElement
-	 * @property {null|(() => void)} [reset] - Function passed by the parent that reset this element to its default value (used only on top-level objects)
+	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {boolean} editable
+	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 * @property {import('svelte').Snippet} [children]
 	 * @property {number} [padding]
 	 * @property {boolean} [showErrors]
@@ -13,8 +15,10 @@
 	/** @type {Props} */
 	let {
 		formElement = $bindable(),
-		reset = null,
+		remove,
+		editable,
 		children,
+		reset = null,
 		padding = 2,
 		showErrors = true
 	} = $props();
@@ -60,24 +64,31 @@
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item" class:border-danger={hasErrors}>
 				<div class="accordion-header">
-					<button
-						class="accordion-button"
+					<!-- svelte-ignore a11y_missing_attribute -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_interactive_supports_focus -->
+					<a
+						class="accordion-button text-decoration-none"
 						class:collapsed
 						onclick={(event) => toggleCollapse(event)}
-						type="button"
+						role="button"
 					>
 						<div class="flex-fill">
-							<PropertyLabel {formElement} tag="span" />
+							<PropertyLabel {formElement} {editable} {remove} tag="span" />
 						</div>
 						<div>
 							{#if reset !== null && formElement.property.default !== undefined}
-								<!-- svelte-ignore a11y_interactive_supports_focus -->
-								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<!-- svelte-ignore a11y_missing_attribute -->
-								<a class="btn btn-warning me-3" role="button" onclick={handleReset}>Reset</a>
+								<button
+									class="btn btn-warning me-3"
+									type="button"
+									onclick={handleReset}
+									disabled={!editable}
+								>
+									Reset
+								</button>
 							{/if}
 						</div>
-					</button>
+					</a>
 				</div>
 				<div
 					id="collapse-{formElement.id}"

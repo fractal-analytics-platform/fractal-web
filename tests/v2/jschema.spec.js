@@ -20,6 +20,8 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	/** @type {string} */
 	let randomTaskName;
+	/** @type {string} */
+	let randomTaskName2;
 
 	await test.step('Create test task', async () => {
 		const argsSchemaFile = path.join(__dirname, '..', 'data', 'test-schema.json');
@@ -31,9 +33,20 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		});
 	});
 
-	await test.step('Add task to workflow and select it', async () => {
+	await test.step('Create test task for referenced default edge-case (issue #1018)', async () => {
+		const argsSchemaFile = path.join(__dirname, '..', 'data', 'test-schema-ref-default.json');
+		const argsSchema = JSON.parse(fs.readFileSync(argsSchemaFile).toString());
+		randomTaskName2 = await createFakeTask(page, {
+			name: randomTaskName2,
+			type: 'non_parallel',
+			args_schema_non_parallel: argsSchema
+		});
+	});
+
+	await test.step('Add tasks to workflow and select it', async () => {
 		await workflow.openWorkflowPage();
 		await workflow.addTask(randomTaskName);
+		await workflow.addTask(randomTaskName2);
 		await workflow.selectTask(randomTaskName);
 	});
 
@@ -74,8 +87,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await expect(form.getByText("required property")).toHaveCount(2);
 		await input.fill('1');
 		await expect(form.getByText('must be >= 5')).toHaveCount(1);
-		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
-		await input.pressSequentially('e');
+		await input.fill('foo');
 		await expect(form.getByText('must be integer')).toHaveCount(1);
 		await input.fill('15');
 		await expect(form.getByText('must be <= 10')).toHaveCount(1);
@@ -87,8 +99,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Fill optional integer with min and max', async () => {
 		const input = form.getByLabel('minMaxOptionalInt', { exact: true });
-		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
-		await input.pressSequentially('e');
+		await input.fill('foo');
 		await expect(form.getByText('must be integer')).toHaveCount(1);
 		await input.fill('-7');
 		await expect(form.getByText('must be >= 0')).toHaveCount(1);
@@ -99,8 +110,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 
 	await test.step('Fill optional integer with exclusive min and max', async () => {
 		const input = form.getByLabel('exclusiveMinMaxOptionalInt', { exact: true });
-		// Note: the only allowed characted in chrome is an "e" (for the scientific notation)
-		await input.pressSequentially('e');
+		await input.fill('foo');
 		await expect(form.getByText('must be integer')).toHaveCount(1);
 		await input.fill('2');
 		await expect(form.getByText('must be > 3')).toHaveCount(1);
@@ -228,7 +238,14 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await expect(page.getByText('must be integer')).toHaveCount(1);
 	});
 
+	await test.step('Test second task (default not populated edge case)', async () => {
+		await workflow.selectTask(randomTaskName2);
+		await expect(page.getByRole('combobox', { name: 'Mode' })).toHaveValue('label');
+	});
+
 	await test.step('Delete workflow task', async () => {
+		await workflow.removeCurrentTask();
+		await workflow.selectTask(randomTaskName);
 		await workflow.removeCurrentTask();
 	});
 
