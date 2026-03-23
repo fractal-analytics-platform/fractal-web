@@ -56,9 +56,9 @@ describe('Reset properties to their default values', async () => {
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [1, 2] });
-		const [input1, input2] = screen.getAllByRole('spinbutton');
-		expect(input1).toHaveValue(1);
-		expect(input2).toHaveValue(2);
+		const [input1, input2] = screen.getAllByRole('textbox');
+		expect(input1).toHaveValue('1');
+		expect(input2).toHaveValue('2');
 		await fireEvent.input(input1, { target: { value: '3' } });
 		expect(onChange).toHaveBeenCalledWith({ testProp: [3, 2] });
 		await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
@@ -80,9 +80,9 @@ describe('Reset properties to their default values', async () => {
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [1, 2] });
-		const [input1, input2] = screen.getAllByRole('spinbutton');
-		expect(input1).toHaveValue(1);
-		expect(input2).toHaveValue(2);
+		const [input1, input2] = screen.getAllByRole('textbox');
+		expect(input1).toHaveValue('1');
+		expect(input2).toHaveValue('2');
 		await fireEvent.input(input1, { target: { value: '3' } });
 		expect(onChange).toHaveBeenCalledWith({ testProp: [3, 2] });
 		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
