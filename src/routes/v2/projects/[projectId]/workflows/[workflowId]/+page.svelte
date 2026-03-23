@@ -814,59 +814,57 @@
 			</div>
 		</div>
 
-		<div class="col-xl-12 mb-2">
-			<div class="float-end">
-				{#if page.data.userInfo.is_superuser}
-					<button
-						class="btn btn-light"
-						onclick={(e) => {
-							e.preventDefault();
-							typeFiltersFlowModal?.open();
-						}}
-						disabled={workflow.task_list.length === 0}
-					>
-						Type filters flow
-					</button>
-				{/if}
-				<a
-					href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs{selectedDataset
-						? '?dataset=' + selectedDataset.id
-						: ''}"
-					class="btn btn-light"
-				>
-					<i class="bi-journal-code"></i> List jobs
-				</a>
-				<button
-					class="btn btn-light"
-					aria-label="Create template"
-					title="Create template"
-					onclick={templateCreateModal?.show}
-				>
-					<i class="bi bi-file-earmark-plus"></i>
-				</button>
-				<button
-					class="btn btn-light"
-					data-bs-toggle="modal"
-					data-bs-target="#editWorkflowModal"
-					onclick={resetWorkflowUpdateModal}
-					aria-label="Workflow properties"
-					title="Workflow properties"
-				>
-					<i class="bi-info-circle"></i>
-				</button>
+		<div class="col-lg-4 d-flex justify-content-end align-items-start gap-1">
+			{#if page.data.userInfo.is_superuser}
 				<button
 					class="btn btn-light"
 					onclick={(e) => {
 						e.preventDefault();
-						handleExportWorkflow();
+						typeFiltersFlowModal?.open();
 					}}
-					aria-label="Export workflow"
-					title="Export workflow"
+					disabled={workflow.task_list.length === 0}
 				>
-					<i class="bi-download"></i>
+					Type filters flow
 				</button>
-				<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
-			</div>
+			{/if}
+			<a
+				href="/v2/projects/{project?.id}/workflows/{workflow?.id}/jobs{selectedDataset
+					? '?dataset=' + selectedDataset.id
+					: ''}"
+				class="btn btn-light"
+			>
+				<i class="bi-journal-code"></i> List jobs
+			</a>
+			<button
+				class="btn btn-light"
+				aria-label="Create template"
+				title="Create template"
+				onclick={templateCreateModal?.show}
+			>
+				<i class="bi bi-file-earmark-plus"></i>
+			</button>
+			<button
+				class="btn btn-light"
+				data-bs-toggle="modal"
+				data-bs-target="#editWorkflowModal"
+				onclick={resetWorkflowUpdateModal}
+				aria-label="Workflow properties"
+				title="Workflow properties"
+			>
+				<i class="bi-info-circle"></i>
+			</button>
+			<button
+				class="btn btn-light"
+				onclick={(e) => {
+					e.preventDefault();
+					handleExportWorkflow();
+				}}
+				aria-label="Export workflow"
+				title="Export workflow"
+			>
+				<i class="bi-download"></i>
+			</button>
+			<a id="downloadWorkflowButton" class="d-none">Download workflow link</a>
 		</div>
 	</div>
 </div>
