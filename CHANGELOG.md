@@ -7,6 +7,7 @@
 * Added new cases of valid SLURM errors (\#950).
 * Add link to Job list page in no-history Workflow warning message (\#966).
 * Expand some user-facing messages (\#972).
+* Display TaskGroup owner's email (\#994).
 * JSON Schema form improvements (\#957, \#993):
     * displayed error messages near the invalid elements;
     * displayed unexpected properties, with the possibility to fix them;
