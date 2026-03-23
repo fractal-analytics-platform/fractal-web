@@ -26,6 +26,7 @@
 * Use textbox also for numeric inputs in JSON Schema form (\#1020);
 * Fix default parameters not initialized issue (\#1020);
 * Populated new defaults on task version update (\#1020);
+* Add "Use pixi.lock file" option in Pixi task collection (\#1023);
 
 # 1.23.0
 

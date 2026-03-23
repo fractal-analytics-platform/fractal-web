@@ -1,4 +1,5 @@
-import { describe, it, afterEach, beforeEach, expect, vi, beforeAll } from 'vitest';
+/// <reference path="../../vitest-setup.d.ts" />
+import { describe, it, afterEach, beforeEach, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { mockUser } from '../mock/mock-types';
@@ -22,20 +23,6 @@ const mockedUser = mockUser({
 import TaskCollection from '../../src/lib/components/v2/tasks/TaskCollection.svelte';
 
 describe('TaskCollection', () => {
-	beforeAll(() => {
-		expect.extend({
-			toBeFormDataWith(received, expectedProperties) {
-				const pass = received instanceof FormData;
-				const receivedObject = pass ? Object.fromEntries(received.entries()) : {};
-				expect(receivedObject).toMatchObject(expectedProperties);
-				return {
-					message: () => `expected ${received} to be FormData`,
-					pass
-				};
-			}
-		});
-	});
-
 	beforeEach(() => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 		vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -72,7 +59,6 @@ describe('TaskCollection', () => {
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=false&user_group_id=2',
 			expect.objectContaining({
-				// @ts-expect-error
 				body: expect.toBeFormDataWith({ package: 'test-task' })
 			})
 		);
@@ -104,7 +90,6 @@ describe('TaskCollection', () => {
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=true',
 			expect.objectContaining({
-				// @ts-expect-error
 				body: expect.toBeFormDataWith({ package: 'test-task' })
 			})
 		);
@@ -164,7 +149,6 @@ describe('TaskCollection', () => {
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=false&user_group_id=1',
 			expect.objectContaining({
-				// @ts-expect-error
 				body: expect.toBeFormDataWith({
 					package: 'main-package',
 					pinned_package_versions_pre: JSON.stringify({

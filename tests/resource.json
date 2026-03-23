@@ -15,9 +15,9 @@
 		"default_version": "3.12"
 	},
 	"tasks_pixi_config": {
-		"default_version": "0.48.0",
+		"default_version": "0.66.0",
 		"versions": {
-			"0.48.0": "/tmp/pixi/0.48.0"
+			"0.66.0": "/tmp/pixi/0.66.0"
 		},
 		"PIXI_CONCURRENT_SOLVES": 4,
 		"PIXI_CONCURRENT_DOWNLOADS": 4,
