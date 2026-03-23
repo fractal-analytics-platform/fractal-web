@@ -204,11 +204,12 @@
 
 	async function handleSelect() {
 		modal?.hideErrorAlert();
-		
+
 		const payload = {};
 		if (workflowName) {
 			payload.name = workflowName;
 		}
+		
 		
 		if (selectedVersions.length > 0) {
 			const response1 = await fetch(
@@ -230,6 +231,9 @@
 					)
 			);
 		}
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		
 		const response2 = await fetch(
 			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`, 
 			{
