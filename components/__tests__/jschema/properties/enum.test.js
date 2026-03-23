@@ -33,7 +33,8 @@ describe('Enum properties', () => {
 				enum: ['option1', 'option2'],
 				type: 'string'
 			},
-			'pydantic_v1'
+			'pydantic_v1',
+			false
 		);
 		checkBold(screen.getByText('testProp'), false);
 		const combobox = screen.getByRole('combobox', { name: 'testProp' });

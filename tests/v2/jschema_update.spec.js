@@ -18,12 +18,14 @@ test('Task version update [v2]', async ({ page, workflow }) => {
         properties: {
           p1: { type: 'string', default: 'p1' },
         },
+        required: ['p1'],
         type: 'object'
       },
       args_schema_non_parallel: {
         properties: {
           np1: { type: 'string', default: 'np1' },
         },
+        required: ['np1'],
         type: 'object'
       }
     });
@@ -36,6 +38,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
           p1: { type: 'string', default: 'P1' },
           p2: { type: 'string', default: 'P2' },
         },
+        required: ['p1', 'p2'],
         type: 'object'
       },
       args_schema_non_parallel: {
@@ -43,6 +46,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
           np1: { type: 'string', default: 'NP1' },
           np2: { type: 'string', default: 'NP2' },
         },
+        required: ['np1', 'np2'],
         type: 'object'
       }
     });

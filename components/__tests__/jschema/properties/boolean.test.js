@@ -90,7 +90,8 @@ describe('Boolean properties', () => {
 					b: { type: 'boolean', default: false }
 				},
 			},
-			'pydantic_v2'
+			'pydantic_v2',
+			false
 		);
 		expect(component.getArguments()).deep.eq({ b: false });
 	});

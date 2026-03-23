@@ -46,7 +46,8 @@ describe('jschema_intial_data', () => {
 													type: 'string',
 													default: 'foo'
 												}
-											}
+											},
+											required: ['p1']
 										}
 									]
 								},
@@ -63,7 +64,7 @@ describe('jschema_intial_data', () => {
 									items: { type: 'string' }
 								}
 							},
-							required: ['k3', 'k4']
+							required: ['k2', 'k3', 'k4']
 						}
 					},
 					optionalArrayWithMinItems: {
@@ -293,7 +294,8 @@ describe('jschema_intial_data', () => {
 							}
 						}
 					}
-				}
+				},
+				required: ['obj']
 			},
 			'pydantic_v1',
 			undefined
@@ -323,7 +325,8 @@ describe('jschema_intial_data', () => {
 							}
 						}
 					}
-				}
+				},
+				required: ['obj']
 			},
 			'pydantic_v1',
 			undefined
@@ -353,7 +356,8 @@ describe('jschema_intial_data', () => {
 							}
 						}
 					}
-				}
+				},
+				required: ['arr']
 			},
 			'pydantic_v1',
 			undefined
@@ -381,7 +385,8 @@ describe('jschema_intial_data', () => {
 							}
 						]
 					}
-				}
+				},
+				required: ['tuple']
 			},
 			'pydantic_v1',
 			undefined
@@ -534,7 +539,8 @@ describe('jschema_intial_data', () => {
 						default: 1,
 						type: 'number'
 					}
-				}
+				},
+				required: ['foo']
 			},
 			'pydantic_v2',
 			null
@@ -552,7 +558,8 @@ describe('jschema_intial_data', () => {
 						default: 1,
 						type: 'number'
 					}
-				}
+				},
+				required: ['foo']
 			},
 			'pydantic_v2',
 			undefined
@@ -570,7 +577,8 @@ describe('jschema_intial_data', () => {
 						default: 1,
 						type: 'number'
 					}
-				}
+				},
+				required: ['foo']
 			},
 			'pydantic_v2',
 			{}
@@ -592,7 +600,8 @@ describe('jschema_intial_data', () => {
 						default: 2,
 						type: 'number'
 					}
-				}
+				},
+				required: ['foo', 'bar']
 			},
 			'pydantic_v2',
 			{ foo: 5 }
@@ -609,7 +618,8 @@ describe('jschema_intial_data', () => {
 					foo: {
 						type: 'number'
 					},
-				}
+				},
+				required: ['foo']
 			},
 			'pydantic_v2',
 			{ foo: 5, bar: 8 }

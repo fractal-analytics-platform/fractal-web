@@ -166,6 +166,7 @@ describe('oneOf properties', () => {
 							"description": "Missing description"
 						}
 					},
+					"required": ["field"],
 					"title": "InternalModel1Title",
 					"type": "object"
 				},
@@ -185,9 +186,7 @@ describe('oneOf properties', () => {
 							"description": "Missing description"
 						}
 					},
-					"required": [
-						"field"
-					],
+					"required": ["field"],
 					"title": "InternalModel2Title",
 					"type": "object"
 				}
@@ -217,7 +216,8 @@ describe('oneOf properties', () => {
 					"type": "array",
 					"description": "Foo Description"
 				}
-			}
+			},
+			"required": ["foo"]
 		});
 
 		expect(screen.getByText('FooTitle')).toBeVisible();
@@ -262,6 +262,7 @@ describe('oneOf properties', () => {
 							"description": "Missing description"
 						}
 					},
+					"required": ["field"],
 					"title": "InternalModel1Title",
 					"type": "object"
 				},
@@ -281,9 +282,7 @@ describe('oneOf properties', () => {
 							"description": "Missing description"
 						}
 					},
-					"required": [
-						"field"
-					],
+					"required": ["field"],
 					"title": "InternalModel2Title",
 					"type": "object"
 				}
@@ -312,7 +311,8 @@ describe('oneOf properties', () => {
 					"title": "FooTitle",
 					"description": "Foo Description"
 				}
-			}
+			},
+			"required": ["foo"]
 		});
 
 		expect(screen.getByText('FooTitle')).toBeVisible();
@@ -351,6 +351,7 @@ describe('oneOf properties', () => {
 							"description": "Missing description"
 						}
 					},
+					"required": ["field"],
 					"title": "InternalModel1Title",
 					"type": "object"
 				},
@@ -402,6 +403,7 @@ describe('oneOf properties', () => {
 							]
 						}
 					},
+					"required": ["bar"],
 					"title": "FooTitle",
 					"description": "Foo Description"
 				}

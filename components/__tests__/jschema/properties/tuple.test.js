@@ -33,6 +33,10 @@ describe('Tuple properties', () => {
 			'pydantic_v1'
 		);
 
+		expect(component.getArguments()).deep.eq({ patch_size: [] });
+
+		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+
 		expect(component.getArguments()).deep.eq({ patch_size: [1300, 'foo', 1] });
 
 		let inputs = screen.getAllByRole('textbox');

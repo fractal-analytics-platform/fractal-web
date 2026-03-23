@@ -178,7 +178,8 @@ describe('Object properties', () => {
 							}
 						}
 					}
-				}
+				},
+				required: ['test']
 			},
 			'pydantic_v1'
 		);
@@ -242,7 +243,8 @@ describe('Object properties', () => {
 							type: 'string'
 						}
 					}
-				}
+				},
+				required: ['test']
 			},
 			'pydantic_v1'
 		);

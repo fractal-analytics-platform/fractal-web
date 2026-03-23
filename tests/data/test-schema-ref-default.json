@@ -34,7 +34,7 @@
         }
       },
       "required": [
-        "identifier"
+        "identifier", "mode"
       ],
       "title": "InputChannel",
       "type": "object"

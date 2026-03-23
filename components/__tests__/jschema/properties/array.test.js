@@ -17,11 +17,7 @@ describe('Array properties', () => {
 			false
 		);
 		checkBold(screen.getByText('ArrayProperty'), false);
-		const inputs = screen.getAllByRole('textbox');
-		expect(inputs.length).eq(2);
-		expect(inputs[0]).toHaveValue('foo');
-		expect(inputs[1]).toHaveValue('bar');
-		expect(component.getArguments()).deep.eq({ testProp: ['foo', 'bar'] });
+		expect(component.getArguments()).deep.eq({ testProp: [] });
 	});
 
 	it('Required ArrayProperty with minItems and maxItems', async () => {
@@ -192,7 +188,8 @@ describe('Array properties', () => {
 							type: 'string'
 						}
 					}
-				}
+				},
+				required: ['test']
 			},
 			'pydantic_v1'
 		);

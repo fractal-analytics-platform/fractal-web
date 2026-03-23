@@ -7,7 +7,7 @@ import JSchemaTestWrapper from '../JSchemaTestWrapper.svelte';
  * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
  * @param {boolean} required
  */
-export function renderSchemaWithSingleProperty(schemaProperty, schemaVersion, required = false) {
+export function renderSchemaWithSingleProperty(schemaProperty, schemaVersion, required = true) {
 	const schema = {
 		title: 'Args',
 		type: 'object',

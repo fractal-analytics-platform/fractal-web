@@ -22,6 +22,7 @@ describe('allOf properties', () => {
 						]
 					}
 				},
+				required: ['normalizer'],
 				additionalProperties: false,
 				definitions: {
 					Normalizer: {
@@ -65,6 +66,7 @@ describe('allOf properties', () => {
 						allOf: [{ $ref: '#/definitions/Normalizer1' }, { $ref: '#/definitions/Normalizer2' }]
 					}
 				},
+				required: ['normalizer'],
 				additionalProperties: false,
 				definitions: {
 					Normalizer1: {

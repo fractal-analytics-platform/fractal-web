@@ -182,6 +182,7 @@ export class ObjectFormElement extends BaseFormElement {
 			required: false,
 			removable: true,
 			value: getPropertyData(
+				this.property,
 				this.additionalProperties,
 				this.manager.schemaVersion,
 				false,
@@ -257,7 +258,7 @@ export class ObjectFormElement extends BaseFormElement {
 			},
 			required: child.required,
 			removable: child.removable,
-			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true),
+			value: getPropertyData(this.property, child.property, this.manager.schemaVersion, child.required, undefined, true),
 			parentProperty: this.property,
 			titleType: this.titleType
 		});
@@ -290,7 +291,7 @@ export class ArrayFormElement extends BaseFormElement {
 			property: this.items,
 			required: false,
 			removable: true,
-			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true),
+			value: getPropertyData(this.property, this.items, this.manager.schemaVersion, false, undefined, true),
 			parentProperty: this.property,
 			titleType: 'oneOf' in this.items ? 'inner_title' : 'title_only',
 		});
@@ -374,6 +375,7 @@ export class TupleFormElement extends BaseFormElement {
 		if (Array.isArray(this.items)) {
 			value = this.items.map((p, i) =>
 				getPropertyData(
+					this.property,
 					p,
 					this.manager.schemaVersion,
 					false,
@@ -385,6 +387,7 @@ export class TupleFormElement extends BaseFormElement {
 			const property = this.items;
 			value = Array(this.size).map((i) =>
 				getPropertyData(
+					this.property,
 					property,
 					this.manager.schemaVersion,
 					false,
@@ -454,7 +457,7 @@ export class ConditionalFormElement extends BaseFormElement {
 					property: selectedProp,
 					required: this.required,
 					removable: this.removable,
-					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
+					value: getPropertyData(this.property, selectedProp, this.manager.schemaVersion, false, undefined, true),
 					parentProperty: this.property,
 					titleType: this.titleType,
 				});

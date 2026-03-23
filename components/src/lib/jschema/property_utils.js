@@ -23,11 +23,12 @@ export function getMax(property) {
 }
 
 /**
- * @param {import("../types/jschema").JSONSchemaArrayProperty} property
+ * @param {import("../types/jschema").JSONSchemaProperty} property
  * @returns {boolean}
  */
 export function isTuple(property) {
 	return (
+		property.type === 'array' &&
 		'minItems' in property &&
 		typeof property.minItems === 'number' &&
 		'maxItems' in property &&

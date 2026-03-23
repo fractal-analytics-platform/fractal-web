@@ -30,7 +30,8 @@ it('should update schema data adding new default and preserving old values', () 
             "type": "string",
             "default": "xxx"
           }
-        }
+        },
+        "required": ["p5a"]
       },
       "p6": {
         "type": "string"
@@ -43,11 +44,13 @@ it('should update schema data adding new default and preserving old values', () 
             "p7a": {
               "type": "string"
             }
-          }
+          },
+          "required": ["p7a"]
         },
         "default": [{ "p7a": "aa1" }, { "p7a": "aa2" }]
       }
-    }
+    },
+    "required": ["p1", "p2", "p3", "p4", "p5", "p6", "p7"]
   }
 
   const schemaNew = {
@@ -97,7 +100,8 @@ it('should update schema data adding new default and preserving old values', () 
             "type": "string",
             "default": "YYY"
           }
-        }
+        },
+        "required": ["p5a", "p5b"]
       },
       "p6": {
         "type": "string",
@@ -113,8 +117,9 @@ it('should update schema data adding new default and preserving old values', () 
             },
             "p7b": {
               "type": "string"
-            }
-          }
+            },
+          },
+          "required": ["p7a", "p7b"]
         },
         "default": [{ "p7a": "AA1", "p7b": "BB1" }, { "p7a": "AA2", "p7b": "BB2" }]
       },
@@ -123,7 +128,8 @@ it('should update schema data adding new default and preserving old values', () 
         "type": "number",
         "default": 42
       }
-    }
+    },
+    "required": ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"]
   }
 
   const oldAdapted = adaptJsonSchema(schemaOld);

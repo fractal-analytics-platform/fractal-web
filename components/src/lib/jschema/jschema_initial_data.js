@@ -9,7 +9,7 @@ import { getAllObjectProperties, isTuple } from './property_utils.js';
 export function getJsonSchemaData(jsonSchema, schemaVersion, initialValue = undefined) {
 	const loadDefaults =
 		initialValue === undefined || initialValue === null || Object.keys(initialValue).length === 0;
-	return getPropertyData(jsonSchema, schemaVersion, true, initialValue, loadDefaults);
+	return getPropertyData(null, jsonSchema, schemaVersion, true, initialValue, loadDefaults);
 }
 
 /**
@@ -32,6 +32,7 @@ function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaul
 	for (const [childKey, childProperty] of Object.entries(properties)) {
 		const childRequired = requiredChildren.includes(childKey);
 		data[childKey] = getPropertyData(
+			property,
 			childProperty,
 			schemaVersion,
 			childRequired,
@@ -61,6 +62,7 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 			}
 			const index = discriminator.mapping[key];
 			return getPropertyData(
+				property,
 				property.oneOf[index],
 				schemaVersion,
 				required,
@@ -69,6 +71,7 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 			);
 		} else if (property.oneOf.length > 0) {
 			return getPropertyData(
+				property,
 				property.oneOf[0],
 				schemaVersion,
 				required,
@@ -81,18 +84,19 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 }
 
 /**
+ * @param {import("../types/jschema.js").JSONSchemaProperty | null} parentProperty
  * @param {import("../types/jschema.js").JSONSchemaProperty | null} property
  * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
  * @param {boolean} required
  * @param {any} initialValue
  * @param {boolean} loadDefaults
  */
-export function getPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
+export function getPropertyData(parentProperty, property, schemaVersion, required, initialValue, loadDefaults) {
 	if (!property) {
 		return null;
 	}
-	if (loadDefaults && 'default' in property) {
-		return getPropertyData(property, schemaVersion, required, property.default, false);
+	if (loadDefaults && 'default' in property && (required || isTuple(parentProperty) || property.type === 'boolean')) {
+		return getPropertyData(parentProperty, property, schemaVersion, required, property.default, false);
 	}
 	if ('oneOf' in property) {
 		return getConditionalPropertyData(
@@ -165,13 +169,13 @@ function getArrayPropertyData(property, schemaVersion, required, initialValue, l
 	let data = [];
 	for (let i = 0; i < initialValue.length; i++) {
 		data.push(
-			getPropertyData(childProperty, schemaVersion, required, initialValue[i], loadDefaults)
+			getPropertyData(property, childProperty, schemaVersion, required, initialValue[i], loadDefaults)
 		);
 	}
 	if (required && typeof property.minItems === 'number' && data.length < property.minItems) {
 		// Create the minimum required number of items
 		for (let i = data.length; i < property.minItems; i++) {
-			data.push(getPropertyData(childProperty, schemaVersion, required, null, loadDefaults));
+			data.push(getPropertyData(property, childProperty, schemaVersion, required, null, loadDefaults));
 		}
 	}
 	return data;
@@ -202,6 +206,7 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 		if (childProperty) {
 			data.push(
 				getPropertyData(
+					property,
 					childProperty,
 					schemaVersion,
 					required,
@@ -219,6 +224,7 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 	for (let i = data.length; i < size; i++) {
 		data.push(
 			getPropertyData(
+				property,
 				getTupleChildProperty(property, schemaVersion, i),
 				schemaVersion,
 				false,

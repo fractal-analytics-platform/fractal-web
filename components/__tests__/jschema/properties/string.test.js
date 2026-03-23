@@ -23,7 +23,7 @@ describe('String properties', () => {
 	});
 
 	it('Optional StringProperty without title', async () => {
-		const { component } = renderSchemaWithSingleProperty({ type: 'string' }, 'pydantic_v1');
+		const { component } = renderSchemaWithSingleProperty({ type: 'string' }, 'pydantic_v1', false);
 		checkBold(screen.getByText('testProp'), false);
 		const textbox = screen.getByRole('textbox', { name: 'testProp' });
 		expect(textbox).toBeDefined();

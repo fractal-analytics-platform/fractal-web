@@ -24,7 +24,7 @@ describe('Number properties', () => {
 	});
 
 	it('Optional NumberProperty without title', async () => {
-		const { component } = renderSchemaWithSingleProperty({ type: 'integer' }, 'pydantic_v1');
+		const { component } = renderSchemaWithSingleProperty({ type: 'integer' }, 'pydantic_v1', false);
 		checkBold(screen.getByText('testProp'), false);
 		const input = screen.getByRole('textbox', { name: 'testProp' });
 		expect(input).toBeDefined();
