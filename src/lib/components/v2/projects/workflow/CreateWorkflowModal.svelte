@@ -204,16 +204,11 @@
 
 	async function handleSelect() {
 		modal?.hideErrorAlert();
-
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
 		
-
 		const payload = {};
 		if (workflowName) {
 			payload.name = workflowName;
 		}
-		
 		
 		if (selectedVersions.length > 0) {
 			const response1 = await fetch(
@@ -221,7 +216,6 @@
 				{
 					method: 'GET',
 					credentials: 'include',
-					headers,
 				}
 			);
 			/** @type {import('fractal-components/types/api').WorkflowTemplate} */
