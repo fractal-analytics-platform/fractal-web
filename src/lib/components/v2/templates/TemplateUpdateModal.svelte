@@ -6,7 +6,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => Promise<void>} onTemplateSave
-	 * @property {Array<import('fractal-components/types/api').Group>} groups
+	 * @property {Array<[number, string]>} groups
 	 */
 	/** @type {Props} */
 	let { onTemplateSave, groups } = $props();
@@ -98,7 +98,7 @@
 >
 	{#snippet header()}
 	<h5 class="modal-title">
-		Edit Workflow Template '{template?.name}'
+		Edit template '{template?.name}'
 	</h5>
 	{/snippet}
 	{#snippet body()}
@@ -114,7 +114,7 @@
 						>
 							<option value={null}>Select...</option>
 							{#each groups as group, index (index) }
-									<option value={group.id}>{group.name}</option>
+									<option value={group[0]}>{group[1]}</option>
 							{/each}
 							
 						</select>
