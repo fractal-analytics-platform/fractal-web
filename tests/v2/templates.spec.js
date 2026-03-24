@@ -149,6 +149,8 @@ test('Use template page', async ({ page }) => {
         await expect(page).toHaveURL(`/v2/templates`);
     });
 
+    const newTemplateName = Math.random().toString(36).substring(7);
+
     await test.step('Upload templates', async () => {
 
         const applyButton = await page.getByRole('button', { name: 'Apply' });
@@ -199,11 +201,44 @@ test('Use template page', async ({ page }) => {
         // override name
         await page.getByRole('button', { name: 'Import' }).click();
         await page.locator('input#templateFile').setInputFiles(fileName);
-        const newName = Math.random().toString(36).substring(7);
-        await page.locator('#templateName').fill(newName);
+        
+        await page.locator('#templateName').fill(newTemplateName);
         await page.getByRole('button', { name: 'Import template' }).click();
         await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
         fs.rmSync(fileName);
     });
+
+
+    await test.step('Create a workflow from a template', async () => {
+        await page.goto(`/v2/projects/${project.id}`);
+        await page.getByRole('button', { name: 'Create new workflow' }).click();
+        const modal = await waitModal(page);
+        await modal.getByLabel('Create from template').check();
+
+        const rows = modal.locator('tbody tr');
+        await expect(rows.first()).toBeVisible();
+
+        const count1 = await rows.count();
+        expect(count1).toBeGreaterThan(1);
+
+        const applyButton = await modal.getByRole('button', { name: 'Apply' });
+        await expect(applyButton).toBeDisabled();
+        modal.locator('#searchTemplateName').fill(newTemplateName);
+        await expect(applyButton).toBeEnabled();
+        await applyButton.click()
+        
+        const rows2 = modal.locator('tbody tr');
+        await expect(rows2.first()).toBeVisible();
+        const count2 = await rows2.count();
+        expect(count2).toBe(1);
+
+        // MISSING STEPS:
+        // - click on Select button
+        // - repeated name error
+        // - change name and select again
+        // - assert in info we have "this workflow comes from a template"
+        // - asseert there is the button "go to original template"
+    });
+        
 
 });
