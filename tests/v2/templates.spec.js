@@ -65,7 +65,7 @@ test('Use template page', async ({ page }) => {
     });
     
     await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
-    const url = new URL(page.url());
+    let url = new URL(page.url());
     const templateId = url.searchParams.get('template_id');
 
     await test.step('Check template info modal', async () => {
@@ -149,7 +149,7 @@ test('Use template page', async ({ page }) => {
         await expect(page).toHaveURL(`/v2/templates`);
     });
 
-    await test.step('Upload template', async () => {
+    await test.step('Upload templates', async () => {
 
         const applyButton = await page.getByRole('button', { name: 'Apply' });
         await expect(applyButton).toBeDisabled();
@@ -171,7 +171,7 @@ test('Use template page', async ({ page }) => {
         await page.getByRole('button', { name: 'Import template' }).click();
         await waitModalClosed(page);
         
-        await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
+        await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
         await expect(page.locator('tbody tr')).toHaveCount(1);
         // version is not a combobox now
         await expect(
@@ -185,22 +185,24 @@ test('Use template page', async ({ page }) => {
         await expect(page.getByText(
             `The current user already own a workflow template with name='${workflow.name}' and version=1`
         )).toBeVisible();
+        // override version
         await page.locator('#templateVersion').fill("42");
         await page.getByRole('button', { name: 'Import template' }).click();
-        
+        await resetButton.click()
+        await page.locator('input#searchTemplateName').fill(workflow.name)
+        await applyButton.click()
         await expect(page.locator('table tbody tr')).toHaveCount(1);
         await expect(
             page.locator('tr', { hasText: workflow.name })
             .getByRole('combobox').locator('option')
         ).toHaveCount(2);
-
+        // override name
         await page.getByRole('button', { name: 'Import' }).click();
         await page.locator('input#templateFile').setInputFiles(fileName);
         const newName = Math.random().toString(36).substring(7);
         await page.locator('#templateName').fill(newName);
         await page.getByRole('button', { name: 'Import template' }).click();
-        await expect(page).toHaveURL(`/v2/templates?name=${newName}`);
-
+        await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
         fs.rmSync(fileName);
     });
 
