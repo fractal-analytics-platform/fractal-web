@@ -230,7 +230,7 @@ export class ObjectFormElement extends BaseFormElement {
 			key: child.key,
 			path: `${this.path}/${child.key}`,
 			schemaPath: child.schemaPath,
-			property: child.property,
+			property: 'originalProperty' in child ? child.originalProperty : child.property,
 			required: child.required,
 			removable: child.removable,
 			value: defaultValue,
@@ -429,6 +429,7 @@ export class ConditionalFormElement extends BaseFormElement {
 		this.selectedIndex = writable(fields.selectedIndex);
 		this.discriminator = fields.discriminator;
 		this.unexpectedChildren = fields.unexpectedChildren;
+		this.originalProperty = fields.originalProperty;
 	}
 
 	/**

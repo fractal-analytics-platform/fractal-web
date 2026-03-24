@@ -8,7 +8,7 @@
 * Add link to Job list page in no-history Workflow warning message (\#966).
 * Expand some user-facing messages (\#972).
 * Display TaskGroup owner's email (\#994).
-* JSON Schema form improvements (\#957, \#993):
+* JSON Schema form improvements (\#957, \#993, \#1032):
     * displayed error messages near the invalid elements;
     * displayed unexpected properties, with the possibility to fix them;
     * avoided duplication of discriminator properties;

@@ -435,7 +435,8 @@ export class FormManager {
 			discriminator,
 			selectedItem,
 			unexpectedChildren,
-			titleType
+			titleType,
+			originalProperty: property
 		});
 	}
 
@@ -512,7 +513,7 @@ export class FormManager {
 					oneOfProperty: {
 						...oneOfProperty,
 						oneOf: oneOfProperty.oneOf.map(p => {
-							const properties = { ...p.properties };
+							const properties = deepCopy(p.properties);
 							delete properties[propertyName];
 							return {
 								...p,

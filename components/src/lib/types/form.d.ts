@@ -91,6 +91,7 @@ export type ConditionalElementFields = BaseFormElementFields & {
 		value: string;
 	},
 	unexpectedChildren: FormElement[];
+	originalProperty: JSONSchemaProperty;
 };
 
 export type FormBuilderEntryType = 'object' | 'array' | 'string' | 'number' | 'boolean';
