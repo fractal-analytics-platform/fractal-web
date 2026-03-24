@@ -5,7 +5,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {() => void} onTemplateImport
+	 * @property {(arg0: number) => void} onTemplateImport
 	 * @property {Array<[number, string]>} groups
 	 */
 
@@ -104,7 +104,8 @@
 			throw alertError;
 		}
 		else {
-			await onTemplateImport();
+			const result = await response.json()
+			await onTemplateImport(result.id);
 		}
     }
 

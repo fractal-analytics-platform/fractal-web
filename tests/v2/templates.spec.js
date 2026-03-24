@@ -173,6 +173,11 @@ test('Use template page', async ({ page }) => {
         
         await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
         await expect(page.locator('tbody tr')).toHaveCount(1);
+        // version is not a combobox now
+        await expect(
+            page.locator('tr', { hasText: workflow.name })
+            .getByRole('combobox').locator('option')
+        ).toHaveCount(0);
 
         await page.getByRole('button', { name: 'Import' }).click();
         await page.locator('input#templateFile').setInputFiles(fileName);
@@ -183,8 +188,19 @@ test('Use template page', async ({ page }) => {
         await page.locator('#templateVersion').fill("42");
         await page.getByRole('button', { name: 'Import template' }).click();
         
-        //  TODO: check we have two versions now
-        //  TODO: override template name
+        await expect(page.locator('table tbody tr')).toHaveCount(1);
+        await expect(
+            page.locator('tr', { hasText: workflow.name })
+            .getByRole('combobox').locator('option')
+        ).toHaveCount(2);
+
+        await page.getByRole('button', { name: 'Import' }).click();
+        await page.locator('input#templateFile').setInputFiles(fileName);
+        const newName = Math.random().toString(36).substring(7);
+        await page.locator('#templateName').fill(newName);
+        await page.getByRole('button', { name: 'Import template' }).click();
+        await expect(page).toHaveURL(`/v2/templates?name=${newName}`);
+
         fs.rmSync(fileName);
     });
 

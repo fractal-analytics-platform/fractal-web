@@ -486,7 +486,16 @@
 />
 
 <TemplateImportModal
-	onTemplateImport={searchTemplate}
+	onTemplateImport={async (importedTemplateId) => {
+		currentPage = 1;
+		templateId = importedTemplateId;
+		isOwner = false;
+		userEmail = undefined;
+		templateName = undefined;
+		templateVersion = undefined;
+		lastAppliedState = { ...currentState };
+		await searchTemplate();
+	}}
 	{groups}
 	bind:this={importTemplateModal}
 />
