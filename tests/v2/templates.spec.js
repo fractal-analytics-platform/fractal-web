@@ -169,7 +169,7 @@ test('Use template page', async ({ page }) => {
         await expect(page.getByRole('row')).toHaveCount(1);
 
         await page.getByRole('button', { name: 'Import' }).click();
-        await page.locator('input#templateFile').setInputFiles(fileName);
+        await page.getByLabel('Select a file').setInputFiles(fileName);
         await page.getByRole('button', { name: 'Import template' }).click();
         await waitModalClosed(page);
         
@@ -182,7 +182,7 @@ test('Use template page', async ({ page }) => {
         ).toHaveCount(0);
 
         await page.getByRole('button', { name: 'Import' }).click();
-        await page.locator('input#templateFile').setInputFiles(fileName);
+        await page.getByLabel('Select a file').setInputFiles(fileName);
         await page.getByRole('button', { name: 'Import template' }).click();
         await expect(page.getByText(
             `The current user already own a workflow template with name='${workflow.name}' and version=1`
@@ -200,7 +200,7 @@ test('Use template page', async ({ page }) => {
         ).toHaveCount(2);
         // override name
         await page.getByRole('button', { name: 'Import' }).click();
-        await page.locator('input#templateFile').setInputFiles(fileName);
+        await page.getByLabel('Select a file').setInputFiles(fileName);
         await page.getByRole('textbox', {name: 'Override template name'}).fill(newTemplateName);
         await page.getByRole('button', { name: 'Import template' }).click();
         await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);

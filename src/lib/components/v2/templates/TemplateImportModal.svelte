@@ -132,6 +132,7 @@
 			}}
 		>		
 			<div class="mb-3">
+				<label class="form-check-label" for="templateFile">Select a file</label>
 				<input
 					class="form-control"
 					accept="application/json"
