@@ -3,7 +3,7 @@
 # 1.24.0 (unreleased)
 
 * Support new backend API for workflow imports, with flexible version matching (\#941).
-* Support new workflow template features (\#975, \#1016).
+* Support new workflow template features (\#975, \#1016, \#1031).
 * Added new cases of valid SLURM errors (\#950).
 * Add link to Job list page in no-history Workflow warning message (\#966).
 * Expand some user-facing messages (\#972).

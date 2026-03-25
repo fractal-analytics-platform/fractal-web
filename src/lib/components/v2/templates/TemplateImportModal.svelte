@@ -5,7 +5,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {() => void} onTemplateImport
+	 * @property {(arg0: number) => void} onTemplateImport
 	 * @property {Array<[number, string]>} groups
 	 */
 
@@ -104,7 +104,8 @@
 			throw alertError;
 		}
 		else {
-			await onTemplateImport();
+			const result = await response.json()
+			await onTemplateImport(result.id);
 		}
     }
 
@@ -131,6 +132,7 @@
 			}}
 		>		
 			<div class="mb-3">
+				<label class="form-check-label" for="templateFile">Select a file</label>
 				<input
 					class="form-control"
 					accept="application/json"
