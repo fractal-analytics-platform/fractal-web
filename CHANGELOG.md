@@ -1,6 +1,6 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# 1.24.0 (unreleased)
+# 1.24.0
 
 * Support new backend API for workflow imports, with flexible version matching (\#941).
 * Support new workflow template features (\#975, \#1016, \#1031).
