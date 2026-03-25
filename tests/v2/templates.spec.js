@@ -228,9 +228,7 @@ test('Use template page', async ({ page }) => {
         await applyButton.click()
         
         const rows2 = modal.locator('tbody tr');
-        await expect(rows2.first()).toBeVisible();
-        const count2 = await rows2.count();
-        expect(count2).toBe(1);
+        await expect(rows2).toHaveCount(1);
 
         // MISSING STEPS:
         // - click on Select button
