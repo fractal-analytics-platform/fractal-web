@@ -8,7 +8,6 @@ test('Use template page', async ({ page }) => {
     
     const project = await createProject(page);
     const workflow = await createWorkflow(page, project.id);
-    console.log(JSON.stringify(workflow));
 
     await test.step('Check workflow not from templates', async () => {
         await page.getByRole('button', { name: 'Workflow properties' }).click();
@@ -124,9 +123,7 @@ test('Use template page', async ({ page }) => {
     let fileName;
 
     await test.step('Download and delete template', async () => {
-        const rows = page.locator('tbody tr');
-        await expect(await rows.count()).toBe(1)
-
+        await expect(page.getByRole('row')).toHaveCount(2);
         const downloadPromise = page.waitForEvent('download');
         await page.getByRole('button', { name: 'Download' }).click();
         const download = await downloadPromise;
@@ -139,7 +136,7 @@ test('Use template page', async ({ page }) => {
         await page.getByRole('button', { name: 'Confirm' }).click();
         await waitModalClosed(page);
         await expect(page).toHaveURL(`/v2/templates?template_id=${templateId}`);
-        await expect(await rows.count()).toBe(0)
+        await expect(page.getByRole('row')).toHaveCount(1);
 
         const applyButton = await page.getByRole('button', { name: 'Apply' });
         await expect(applyButton).toBeDisabled();
@@ -160,15 +157,16 @@ test('Use template page', async ({ page }) => {
         const resetButton = await page.getByRole('button', { name: 'Reset' });
         await expect(resetButton).toBeDisabled();
         
-        const nameInput = page.locator('#searchTemplateName');
+        const nameInput = page.getByRole('textbox', { name: 'Name' });
         await expect(nameInput).toHaveValue('');
         await nameInput.fill(workflow.name);
+        
         await expect(applyButton).toBeEnabled();
         await applyButton.click()
         await waitPageLoading(page);
 
         await expect(page).toHaveURL(`/v2/templates?name=${workflow.name}`);
-        await expect(page.locator('tbody tr')).toHaveCount(0);
+        await expect(page.getByRole('row')).toHaveCount(1);
 
         await page.getByRole('button', { name: 'Import' }).click();
         await page.locator('input#templateFile').setInputFiles(fileName);
@@ -176,10 +174,10 @@ test('Use template page', async ({ page }) => {
         await waitModalClosed(page);
         
         await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
-        await expect(page.locator('tbody tr')).toHaveCount(1);
+        await expect(page.getByRole('row')).toHaveCount(2);
         // version is not a combobox now
         await expect(
-            page.locator('tr', { hasText: workflow.name })
+            page.getByRole('row', {name: workflow.name})
             .getByRole('combobox').locator('option')
         ).toHaveCount(0);
 
@@ -190,21 +188,20 @@ test('Use template page', async ({ page }) => {
             `The current user already own a workflow template with name='${workflow.name}' and version=1`
         )).toBeVisible();
         // override version
-        await page.locator('#templateVersion').fill("42");
+        await page.getByRole('spinbutton', {name: 'Override template version'}).fill('42')
         await page.getByRole('button', { name: 'Import template' }).click();
         await resetButton.click()
-        await page.locator('input#searchTemplateName').fill(workflow.name)
+        await page.getByRole('textbox', {name: 'Name'}).fill(workflow.name)
         await applyButton.click()
-        await expect(page.locator('table tbody tr')).toHaveCount(1);
+        await expect(page.getByRole('row')).toHaveCount(2);
         await expect(
-            page.locator('tr', { hasText: workflow.name })
+            page.getByRole('row', {name: workflow.name})
             .getByRole('combobox').locator('option')
         ).toHaveCount(2);
         // override name
         await page.getByRole('button', { name: 'Import' }).click();
         await page.locator('input#templateFile').setInputFiles(fileName);
-        
-        await page.locator('#templateName').fill(newTemplateName);
+        await page.getByRole('textbox', {name: 'Override template name'}).fill(newTemplateName);
         await page.getByRole('button', { name: 'Import template' }).click();
         await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
         fs.rmSync(fileName);
@@ -225,12 +222,13 @@ test('Use template page', async ({ page }) => {
 
         const applyButton = await modal.getByRole('button', { name: 'Apply' });
         await expect(applyButton).toBeDisabled();
-        modal.locator('#searchTemplateName').fill(newTemplateName);
+
+        
+        await modal.getByRole('textbox', { name: 'Name' }).nth(1).fill(newTemplateName);
         await expect(applyButton).toBeEnabled();
         await applyButton.click()
         
-        const rows2 = modal.locator('tbody tr');
-        await expect(rows2).toHaveCount(1);
+        await expect(modal.getByRole('row')).toHaveCount(2);
 
         await modal.getByRole('button', { name: 'Select' }).click();
         await expect(modal.getByText(
