@@ -518,5 +518,86 @@ describe('oneOf properties', () => {
 		expect(component.isValid()).false;
 		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label2", "field2": null }, 42] }] });
 		expect(screen.getByText('required property')).toBeVisible();
-	})
+	});
+
+	it('oneOf with default value and reset', async () => {
+
+		const user = userEvent.setup();
+
+		const { component } = renderSchema({
+			"$defs": {
+				"CreateMaskingRoiTable": {
+					"properties": {
+						"mode": {
+							"const": "create",
+							"default": "create",
+							"type": "string"
+						},
+						"table_name": {
+							"default": "table_name_default",
+							"type": "string"
+						}
+					},
+					"type": "object"
+				},
+				"SkipCreateMaskingRoiTable": {
+					"properties": {
+						"mode": {
+							"const": "skip",
+							"default": "skip",
+							"type": "string"
+						}
+					},
+					"type": "object"
+				}
+			},
+			"type": "object",
+			"properties": {
+				"foo": {
+					"default": {
+						"mode": "skip"
+					},
+					"discriminator": {
+						"mapping": {
+							"create": "#/$defs/CreateMaskingRoiTable",
+							"skip": "#/$defs/SkipCreateMaskingRoiTable"
+						},
+						"propertyName": "mode"
+					},
+					"oneOf": [
+						{
+							"$ref": "#/$defs/CreateMaskingRoiTable"
+						},
+						{
+							"$ref": "#/$defs/SkipCreateMaskingRoiTable"
+						}
+					]
+				}
+			}
+		});
+
+		expect(component.getArguments()).deep.eq({ "foo": { "mode": "skip" } });
+
+		await user.selectOptions(screen.getByRole('combobox', { name: 'mode' }), 'create');
+
+		expect(component.getArguments()).deep.eq({
+			"foo": {
+				"table_name": "table_name_default",
+				"mode": "create"
+			}
+		});
+
+		await user.click(screen.getByRole('button', { name: 'Reset' }));
+
+		expect(component.getArguments()).deep.eq({ "foo": { "mode": "skip" } });
+
+		await user.selectOptions(screen.getByRole('combobox', { name: 'mode' }), 'create');
+
+		expect(component.getArguments()).deep.eq({
+			"foo": {
+				"table_name": "table_name_default",
+				"mode": "create"
+			}
+		});
+	});
 });
