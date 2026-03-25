@@ -8,14 +8,14 @@ test('Use template page', async ({ page }) => {
     
     const project = await createProject(page);
     const workflow = await createWorkflow(page, project.id);
+    console.log(JSON.stringify(workflow));
 
     await test.step('Check workflow not from templates', async () => {
         await page.getByRole('button', { name: 'Workflow properties' }).click();
         const modal = await waitModal(page);
-        // FIXME: the test below is not really working
         await expect(
             modal.getByText('This workflow comes from a template')
-        ).toHaveCount(0);
+        ).not.toBeVisible();
 
         await modal.getByRole(
             'textbox', { name: 'Workflow description' }
@@ -99,13 +99,15 @@ test('Use template page', async ({ page }) => {
         await waitModalClosed(page);
     });
 
+    const newDescription = 'New description.'
+
     await test.step('Edit template', async () => {
 
         await page.getByRole('button', { name: 'Edit' }).click();
         const modal = await waitModal(page);
 
         await modal.getByLabel('User Group').selectOption({ label: undefined });
-        await page.getByRole('textbox', { name: 'Description' }).fill('New description.');
+        await page.getByRole('textbox', { name: 'Description' }).fill(newDescription);
         await modal.getByRole('button', { name: 'Save' }).click();
         await waitModalClosed(page);
 
@@ -113,7 +115,7 @@ test('Use template page', async ({ page }) => {
         await waitModal(page);
         const values = page.locator('.list-group-item:not(.text-bg-light)');
         await expect(values.nth(4).locator('span')).toHaveText('-');
-        await expect(values.nth(5).locator('span')).toHaveText('New description.');
+        await expect(values.nth(5).locator('span')).toHaveText(newDescription);
 
         await modal.getByRole('button', { name: 'Close' }).click();
         await waitModalClosed(page);
@@ -230,13 +232,38 @@ test('Use template page', async ({ page }) => {
         const rows2 = modal.locator('tbody tr');
         await expect(rows2).toHaveCount(1);
 
-        // MISSING STEPS:
-        // - click on Select button
-        // - repeated name error
-        // - change name and select again
-        // - assert in info we have "this workflow comes from a template"
-        // - asseert there is the button "go to original template"
-    });
-        
+        await modal.getByRole('button', { name: 'Select' }).click();
+        await expect(modal.getByText(
+            `Workflow with name='${workflow.name}' and project_id=${project.id} already exists.`
+        )).toBeVisible();
+        const workflowNameInput = modal.getByRole('textbox', { name: 'Workflow name' });
+        await workflowNameInput.fill(Math.random().toString(36).substring(7));
+        await workflowNameInput.blur();
+        await modal.getByRole('button', { name: 'Select' }).click();
 
+        await page.getByRole('button', { name: 'Workflow properties' }).click();
+        const modal2 = await waitModal(page);
+        await expect(
+            modal2.getByText('This workflow comes from a template')
+        ).toBeVisible();
+        await modal2.getByRole('button', { name: 'Close' }).click();
+        await waitModalClosed(page);
+
+        await page.getByRole('button', { name: 'Create template' }).click();
+        const modal3 = await waitModal(page);
+        // default: originalTemplate.name
+        await expect(
+            modal3.getByText('Template name')
+        ).toHaveValue(newTemplateName);
+        // default: 2
+        await expect(
+            modal3.getByText('Template version')
+        ).toHaveValue('2');
+        // default originalTemplate.description
+        await expect(
+            modal3.getByText('Template description')
+        ).toHaveValue(newDescription);
+        // default: null
+        await expect(modal3.getByLabel('User Group')).toHaveValue('');
+    });
 });
