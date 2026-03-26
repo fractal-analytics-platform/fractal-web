@@ -1,14 +1,4 @@
 <script>
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} [taskGroupOrigin]
-	 */
-
-	/** @type {Props} */
-	let { taskGroupOrigin = 'other' } = $props();
-
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
 	let inputTypesArray = $state([]);
 	/** @type {Array<{ key: string, value: boolean, error: string }>} */
@@ -123,131 +113,100 @@
 
 <div class="mb-2 row">
 	<span class="col-2 col-form-label text-end"> Input Types </span>
-
-	{#if taskGroupOrigin==='other'}
-		{#if inputTypesArray.length > 0}
-			<div class="col-7">
-				{#each inputTypesArray as inputType, index (index)}
-					<div class="row">
-						<div class="col">
-							<div class="input-group mb-1" class:has-validation={inputType.error}>
-								<input
-									type="text"
-									class="form-control type-filter-key"
-									placeholder="Key"
-									bind:value={inputType.key}
-									class:is-invalid={inputType.error}
-								/>
-								<div class="input-group-text">
-									<label>
-										<input
-											class="form-check-input me-1"
-											type="checkbox"
-											bind:checked={inputType.value}
-											aria-label="Value for {inputType.key}"
-										/>
-										{inputType.value}
-									</label>
-								</div>
-								<button
-									class="btn btn-outline-danger"
-									type="button"
-									onclick={() => removeInputType(index)}
-									aria-label="Remove input type"
-								>
-									<i class="bi bi-trash"></i>
-								</button>
-								{#if inputType.error}
-									<div class="invalid-feedback">{inputType.error}</div>
-								{/if}
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-		{/if}
-		<div class="col-3">
-			<button
-				class="btn btn-outline-primary"
-				type="button"
-				onclick={addInputType}
-			>
-				Add input type
-			</button>
-		</div>
-
-	{:else}
+	{#if inputTypesArray.length > 0}
 		<div class="col-7">
 			{#each inputTypesArray as inputType, index (index)}
 				<div class="row">
-					<div class="col d-flex">
-						{inputType.key} <BooleanIcon value={inputType.value} />
+					<div class="col">
+						<div class="input-group mb-1" class:has-validation={inputType.error}>
+							<input
+								type="text"
+								class="form-control type-filter-key"
+								placeholder="Key"
+								bind:value={inputType.key}
+								class:is-invalid={inputType.error}
+							/>
+							<div class="input-group-text">
+								<label>
+									<input
+										class="form-check-input me-1"
+										type="checkbox"
+										bind:checked={inputType.value}
+										aria-label="Value for {inputType.key}"
+									/>
+									{inputType.value}
+								</label>
+							</div>
+							<button
+								class="btn btn-outline-danger"
+								type="button"
+								onclick={() => removeInputType(index)}
+								aria-label="Remove input type"
+							>
+								<i class="bi bi-trash"></i>
+							</button>
+							{#if inputType.error}
+								<div class="invalid-feedback">{inputType.error}</div>
+							{/if}
+						</div>
 					</div>
 				</div>
 			{/each}
 		</div>
 	{/if}
+	<div class="col-3">
+		<button class="btn btn-outline-primary" onclick={addInputType} type="button">
+			Add input type
+		</button>
+	</div>
 </div>
 
 <div class="mb-2 row">
 	<span class="col-2 col-form-label text-end"> Output Types </span>
-	{#if taskGroupOrigin==='other'}
-		{#if outputTypesArray.length > 0}
-			<div class="col-7">
-				{#each outputTypesArray as outputType, index (index)}
-					<div class="row">
-						<div class="col">
-							<div class="input-group mb-1" class:has-validation={outputType.error}>
-								<input
-									type="text"
-									class="form-control type-filter-key"
-									placeholder="Key"
-									bind:value={outputType.key}
-									class:is-invalid={outputType.error}
-								/>
-								<div class="input-group-text">
-									<label>
-										<input
-											class="form-check-input me-1"
-											type="checkbox"
-											bind:checked={outputType.value}
-											aria-label="Value for {outputType.key}"
-										/>
-										{outputType.value}
-									</label>
-								</div>
-								<button
-									class="btn btn-outline-danger"
-									type="button"
-									onclick={() => removeOutputType(index)}
-									aria-label="Remove output type"
-								>
-									<i class="bi bi-trash"></i>
-								</button>
-								{#if outputType.error}
-									<div class="invalid-feedback">{outputType.error}</div>
-								{/if}
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-		{/if}
-		<div class="col-3">
-			<button class="btn btn-outline-primary" onclick={addOutputType} type="button">
-				Add output type
-			</button>
-		</div>
-	{:else}
+	{#if outputTypesArray.length > 0}
 		<div class="col-7">
 			{#each outputTypesArray as outputType, index (index)}
 				<div class="row">
-					<div class="col d-flex">
-						{outputType.key} <BooleanIcon value={outputType.value} />
+					<div class="col">
+						<div class="input-group mb-1" class:has-validation={outputType.error}>
+							<input
+								type="text"
+								class="form-control type-filter-key"
+								placeholder="Key"
+								bind:value={outputType.key}
+								class:is-invalid={outputType.error}
+							/>
+							<div class="input-group-text">
+								<label>
+									<input
+										class="form-check-input me-1"
+										type="checkbox"
+										bind:checked={outputType.value}
+										aria-label="Value for {outputType.key}"
+									/>
+									{outputType.value}
+								</label>
+							</div>
+							<button
+								class="btn btn-outline-danger"
+								type="button"
+								onclick={() => removeOutputType(index)}
+								aria-label="Remove output type"
+							>
+								<i class="bi bi-trash"></i>
+							</button>
+							{#if outputType.error}
+								<div class="invalid-feedback">{outputType.error}</div>
+							{/if}
+						</div>
 					</div>
 				</div>
 			{/each}
 		</div>
 	{/if}
-
+	<div class="col-3">
+		<button class="btn btn-outline-primary" onclick={addOutputType} type="button">
+			Add output type
+		</button>
+	</div>
 </div>

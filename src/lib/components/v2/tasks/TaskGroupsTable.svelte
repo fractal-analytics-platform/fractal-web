@@ -242,7 +242,7 @@
 									aria-label="Edit"
 									title="Edit"
 									onclick={() => {
-										taskEditModal?.open(task, selectedGroup.origin);
+										taskEditModal?.open(task);
 									}}
 								>
 									<i class="bi bi-pencil"></i>
