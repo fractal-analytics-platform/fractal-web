@@ -23,6 +23,9 @@
 	/** @type {TypesEditor|undefined} */
 	let typesEditor = $state();
 
+	
+	let taskGroupOrigin = $state('');
+
 	const formErrorHandler = new FormErrorHandler('taskEditModalError', [
 		'command_parallel',
 		'command_non_parallel'
@@ -74,8 +77,9 @@
 
 	/**
 	 * @param {import('fractal-components/types/api').TaskV2} taskToEdit
+	 * @param {string} origin
 	 */
-	export async function open(taskToEdit) {
+	export async function open(taskToEdit, origin) {
 		loading = true;
 		modal?.show();
 
@@ -89,6 +93,7 @@
 		loading = false;
 
 		if (response.ok) {
+			taskGroupOrigin = origin;
 			task = /** @type {import('fractal-components/types/api').TaskV2} */ (result);
 			command_parallel = task.command_parallel;
 			command_non_parallel = task.command_non_parallel;
@@ -147,6 +152,7 @@
 									bind:value={command_non_parallel}
 									class="form-control"
 									class:is-invalid={$validationErrors['command_non_parallel']}
+									disabled={taskGroupOrigin!=='others'}
 								/>
 								<span class="invalid-feedback">{$validationErrors['command_non_parallel']}</span>
 							</div>
@@ -165,13 +171,14 @@
 									bind:value={command_parallel}
 									class="form-control"
 									class:is-invalid={$validationErrors['command_parallel']}
+									disabled={taskGroupOrigin!=='others'}
 								/>
 								<span class="invalid-feedback">{$validationErrors['command_parallel']}</span>
 							</div>
 						</div>
 					{/if}
 
-					<TypesEditor bind:this={typesEditor} />
+					<TypesEditor bind:this={typesEditor} {taskGroupOrigin}/>
 
 					<div class="mb-2 row">
 						<label for="argsSchemaVersion" class="col-2 col-form-label text-end">
