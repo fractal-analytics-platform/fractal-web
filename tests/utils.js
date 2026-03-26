@@ -296,17 +296,7 @@ export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
  * @param {string} taskName
  */
 async function getTaskRow(modal, taskName) {
-	const rowLocator = modal.getByRole('row', { name: taskName }).filter({ hasText: /Add task/ });
-	await expect(rowLocator.first()).toBeVisible();
-	const rows = await rowLocator.all();
-
-	for (const row of rows) {
-		const cellContent = (await row.getByRole('cell').first().innerText()).trim();
-		if (cellContent === taskName) {
-			return row;
-		}
-	}
-	throw new Error(`Unable to find row for task ${taskName}`);
+	return modal.getByRole('row', { name: taskName }).filter({ hasText: /Add task/ }).first();
 }
 
 /**
