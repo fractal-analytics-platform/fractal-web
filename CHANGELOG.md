@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Add `FRACTAL_HIDE_BASIC_AUTH` environment variable (\#1039).
+
 # 1.24.0
 
 * Support new backend API for workflow imports, with flexible version matching (\#941).
