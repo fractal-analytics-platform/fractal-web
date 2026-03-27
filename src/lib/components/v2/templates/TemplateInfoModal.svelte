@@ -9,11 +9,6 @@
 	 */
 	let template = $state()
 
-	/**
-	 * @type {import('fractal-components/types/api').Group|undefined}
-	 */
-	let group = $state()
-
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
