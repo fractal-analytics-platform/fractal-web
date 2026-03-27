@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.24.1 (unreleased)
+
+* Fix user group visibility for standard user on templates creation (\#1041).
+
 # 1.24.0
 
 * Support new backend API for workflow imports, with flexible version matching (\#941).
