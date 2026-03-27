@@ -51,7 +51,11 @@
 	{#snippet extraColumns(task)}
 		<td>
 			{#if task.docs_info}
-				<button class="btn btn-info" onclick={() => showSelectedTaskModal(task, task.docs_info)}>
+				<button
+					class="btn btn-info"
+					onclick={() => showSelectedTaskModal(task, task.docs_info)}
+					aria-label="TaskInfo"
+				>
 					<i class="bi bi-info-circle"></i>
 				</button>
 			{/if}
@@ -61,6 +65,7 @@
 				<button
 					class="btn btn-primary me-2"
 					onclick={() => showSelectedTaskModal(task, task.install_instructions)}
+					aria-label="TaskInstallInstructions"
 				>
 					<i class="bi bi-plus-circle"></i>
 				</button>
