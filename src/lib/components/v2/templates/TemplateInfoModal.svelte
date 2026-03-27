@@ -21,6 +21,9 @@
         'errorAlert-updateTemplateModal', ['user_group_id', 'description']
     );
 
+	/** @type {string|undefined} */
+	let groupName = $state()
+
 	/**
 	 * @param {number} template_id
 	 */
@@ -38,14 +41,18 @@
             template = await response.json()
 			if (template?.user_group_id) {
 				const response2 = await fetch(
-					`/api/auth/group/${template?.user_group_id}`,
+					`/api/auth/current-user?group_ids_names=true`,
 					{
 						method: 'GET',
 						headers,
 					}
 				);
 				if (response2.ok) {
-					group = await response2.json()
+					const res = await response2.json()
+					groupName = res.group_ids_names.find(([id]) => id === template?.user_group_id)?.[1] ?? undefined;
+					if (!groupName) {
+						throw new Error(`User group ${template?.user_group_id} not found`);
+					}
 				} else {
 					await formErrorHandler.handleErrorResponse(response2);
 				}
@@ -100,7 +107,7 @@
 					<strong>User group</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.user_group_id ? group?.name : '-'}</span>
+					<span>{template.user_group_id ? groupName : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Description</strong>
