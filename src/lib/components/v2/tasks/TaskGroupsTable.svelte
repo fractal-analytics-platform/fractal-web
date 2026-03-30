@@ -237,16 +237,18 @@
 								>
 									<i class="bi bi-info-circle"></i>
 								</button>
-								<button
-									class="btn btn-primary"
-									aria-label="Edit"
-									title="Edit"
-									onclick={() => {
-										taskEditModal?.open(task);
-									}}
-								>
-									<i class="bi bi-pencil"></i>
-								</button>
+								{#if selectedGroup.origin==="other"}
+									<button
+										class="btn btn-primary"
+										aria-label="Edit"
+										title="Edit"
+										onclick={() => {
+											taskEditModal?.open(task);
+										}}
+									>
+										<i class="bi bi-pencil"></i>
+									</button>
+								{/if}
 							</td>
 						</tr>
 					{/if}
