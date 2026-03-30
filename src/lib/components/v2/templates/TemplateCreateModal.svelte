@@ -193,13 +193,13 @@
 				/>
 			</div>
 			<div class="mb-2">
-				<label class="form-label" for="template-user-group-id">User Group</label>
+				<label class="form-label" for="template-user-group-id">Share with User Group</label>
 				<select
 					class="form-select"
 					id="template-user-group-id"
 					bind:value={userGroupId}
 				>
-					<option value={null}>Select...</option>
+					<option value={null}>None (only me)</option>
 					{#each groups as group, index (index) }
 						<option value={group.id}>{group.name}</option>
 					{/each}
