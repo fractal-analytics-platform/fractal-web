@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.24.1 (unreleased)
+
+* Forbid single-task edit if task group has origin different from 'other' (\#1040).
+
 # 1.24.0
 
 * Support new backend API for workflow imports, with flexible version matching (\#941).
