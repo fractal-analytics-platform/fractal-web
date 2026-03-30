@@ -8,7 +8,7 @@
 
 	/**
 	 * @typedef {Object} Props
-     * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
 	 */
 
 	/** @type {Props} */
@@ -21,72 +21,66 @@
 	let templateName = $state(undefined);
 	/** @type {number} */
 	let templateVersion = $state(1);
-    /** @type {string|undefined} */
+	/** @type {string|undefined} */
 	let templateDescription = $state();
 	/** @type {number|undefined} */
-	let userGroupId = $state(undefined)
-	
-	/** @type {Array<import('fractal-components/types/api').Group>} */
-	let groups = $state([])
+	let userGroupId = $state(undefined);
 
-    /**
+	/** @type {[number, string][]} */
+	let groups = $state([]);
+
+	/**
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
-	let originaleTemplate = $state()
+	let originaleTemplate = $state();
 
 	/** @type {Modal|undefined} */
 	let modal = $state(undefined);
 
-	onMount(
-		async () => {
-			const response = await fetch(
-				`/api/auth/group`, {
-				method: 'GET',
-				credentials: 'include',
-            });
+	onMount(async () => {
+		const response = await fetch(`/api/auth/current-user?group_ids_names=true`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 
-			if (!response.ok) {
-				throw new Error('Unable to retrieve user groups.');
-			}
-			else {
-				groups = await response.json();
-			}
+		if (!response.ok) {
+			throw new Error('Unable to retrieve user groups.');
+		} else {
+			const res = await response.json()
+			groups = res.group_ids_names
 		}
-	)
+	});
 
 	export async function show() {
-        if (workflow.template_id) {
-            const response = await fetch(
-                `/api/v2/workflow-template/${workflow.template_id}`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-    
-            if (!response.ok) {
-                console.error('Import template failed');
-                const alertError = await getAlertErrorFromResponse(response);
-                throw alertError;
-            }
-            else {
-                originaleTemplate = await response.json()
+		if (workflow.template_id) {
+			const response = await fetch(`/api/v2/workflow-template/${workflow.template_id}`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			if (!response.ok) {
+				console.error('Import template failed');
+				const alertError = await getAlertErrorFromResponse(response);
+				throw alertError;
+			} else {
+				originaleTemplate = await response.json();
 				templateName = originaleTemplate?.name;
 				templateDescription = originaleTemplate?.description || workflow.description || undefined;
-                if (originaleTemplate?.user_email === page.data.userInfo.email) {
-                    templateVersion = originaleTemplate ? originaleTemplate.version + 1 : 1
-                }
-            }
-        }
-		else {
+				if (originaleTemplate?.user_email === page.data.userInfo.email) {
+					templateVersion = originaleTemplate ? originaleTemplate.version + 1 : 1;
+				}
+			}
+		} else {
 			templateName = workflow.name;
 			templateDescription = workflow.description || undefined;
 		}
-        modal?.show();
-        }
+		modal?.show();
+	}
 
 	export function close() {
 		templateName = undefined;
 		templateVersion = 1;
-        templateDescription = undefined;
+		templateDescription = undefined;
 		creating = false;
 		modal?.hideErrorAlert();
 	}
@@ -104,7 +98,6 @@
 	}
 
 	async function handleCreateTemplate() {
-
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -131,14 +124,11 @@
 			console.error('Import template failed');
 			const alertError = await getAlertErrorFromResponse(response);
 			throw alertError;
-		}
-		else {
-			let newTemplate = await response.json()
+		} else {
+			let newTemplate = await response.json();
 			await goto(`/v2/templates?template_id=${newTemplate.id}`);
 		}
-    }
-
-
+	}
 </script>
 
 <Modal
@@ -146,7 +136,7 @@
 	size="lg"
 	centered={true}
 	scrollable={true}
-	onOpen={()=>{}}
+	onOpen={() => {}}
 	onClose={close}
 	bind:this={modal}
 >
@@ -159,8 +149,7 @@
 				e.preventDefault();
 				createTemplate();
 			}}
-		>		
-			
+		>
 			<div class="mb-2">
 				<label for="templateName" class="form-label">Template name</label>
 				<input
@@ -194,22 +183,17 @@
 			</div>
 			<div class="mb-2">
 				<label class="form-label" for="template-user-group-id">User Group</label>
-				<select
-					class="form-select"
-					id="template-user-group-id"
-					bind:value={userGroupId}
-				>
+				<select class="form-select" id="template-user-group-id" bind:value={userGroupId}>
 					<option value={null}>Select...</option>
-					{#each groups as group, index (index) }
-						<option value={group.id}>{group.name}</option>
+					{#each groups as group, index (index)}
+						<option value={group[0]}>{group[1]}</option>
 					{/each}
-					
 				</select>
 			</div>
 
 			<button
 				class="btn btn-primary mt-2"
-				disabled={templateVersion<1 || !templateName || creating}
+				disabled={templateVersion < 1 || !templateName || creating}
 			>
 				{#if creating}
 					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
