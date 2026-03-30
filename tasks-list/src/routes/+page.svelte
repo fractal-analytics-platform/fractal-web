@@ -54,7 +54,7 @@
 				<button
 					class="btn btn-info"
 					onclick={() => showSelectedTaskModal(task, task.docs_info)}
-					aria-label="TaskInfo"
+					aria-label="Task info"
 				>
 					<i class="bi bi-info-circle"></i>
 				</button>
@@ -65,7 +65,7 @@
 				<button
 					class="btn btn-primary me-2"
 					onclick={() => showSelectedTaskModal(task, task.install_instructions)}
-					aria-label="TaskInstallInstructions"
+					aria-label="Task install instructions"
 				>
 					<i class="bi bi-plus-circle"></i>
 				</button>
