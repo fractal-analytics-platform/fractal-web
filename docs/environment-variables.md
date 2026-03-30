@@ -26,6 +26,7 @@ The following environment variables can be used to configure fractal-web.
 * `FRACTAL_DEFAULT_GROUP_NAME`: specifies if a default group exists; allowed values are `All` or empty string (no default group).
 * `PUBLIC_GUEST_USERNAME`: username for guest user;
 * `PUBLIC_GUEST_PASSWORD`: password for guest user;
+* `FRACTAL_HIDE_BASIC_AUTH`: hides the login form and the "Log in as guest" button; the default value is `false`;
 
 When running directly using `node` command these extra variables can also be configured:
 

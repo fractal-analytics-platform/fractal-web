@@ -14,6 +14,7 @@ const keys = [
 	'AUTH_COOKIE_DOMAIN',
 	'AUTH_COOKIE_PATH',
 	'AUTH_COOKIE_SAME_SITE',
+	'FRACTAL_HIDE_BASIC_AUTH',
 	'WARNING_BANNER_PATH',
 	'NEWS_INFO_PATH',
 	'LOG_FILE',
@@ -40,6 +41,7 @@ export function checkEnvironmentVariables() {
 	checkAllowedValues('AUTH_COOKIE_SAME_SITE', ['lax', 'strict', 'none']);
 	checkAllowedValues('LOG_LEVEL_FILE', logLevels);
 	checkAllowedValues('LOG_LEVEL_CONSOLE', logLevels);
+	checkAllowedValues('FRACTAL_HIDE_BASIC_AUTH', ['true', 'false']);
 	checkUrl('PUBLIC_FRACTAL_DATA_URL');
 	checkUrl('PUBLIC_FRACTAL_VIZARR_VIEWER_URL');
 	checkUrl('PUBLIC_FRACTAL_FEATURE_EXPLORER_URL');
