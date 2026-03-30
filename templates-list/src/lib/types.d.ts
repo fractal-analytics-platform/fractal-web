@@ -4,7 +4,6 @@ export type TemplateItem = {
 }
 
 export type TemplateEntry = {
-    user_email: string;
     template_name: string;
     templates: TemplateItem[];
 }

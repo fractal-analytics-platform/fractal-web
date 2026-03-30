@@ -6,10 +6,11 @@
     /**
      * @typedef {Object} Props
      * @property {Array<import('./types').TemplateEntry>} templates
+	 * @property {Object} template_id_map
      */
 
     /** @type {Props} */
-    let { templates } = $props();
+    let { templates, template_id_map } = $props();
 
 	
 	/** @type {import('./types').TemplateItem[]}*/
@@ -57,7 +58,7 @@
 	 * @param {number} templateId
 	 */
     async function downloadTemplate(templateId) {
-        const response = await fetch(`/templates-table/template${templateId}.json`);
+        const response = await fetch(template_id_map[templateId]);
         const data = await response.json();
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -161,7 +162,7 @@
 						{#if templateGroup.templates.length>1}
 						<select
 							class="form-select"
-							aria-label="Version for template '{templateGroup.template_name}' of {templateGroup.user_email}"
+							aria-label="Version for template '{templateGroup.template_name}'"
 							bind:value={selectedTemplates[index]}
 						>
 							{#each templateGroup.templates as template, i (i)}
