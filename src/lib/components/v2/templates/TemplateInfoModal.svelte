@@ -73,22 +73,22 @@
 			{#if template}
 			<ul class="list-group">
 				<li class="list-group-item text-bg-light">
-					<strong>Template ID</strong>
+					<strong>Name</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template?.id}</span>
+					<span>{template?.name}</span>
+				</li>
+				<li class="list-group-item text-bg-light">
+					<strong>Description</strong>
+				</li>
+				<li class="list-group-item">
+					<span>{template?.description ? template.description : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>User email</strong>
 				</li>
 				<li class="list-group-item">
 					<span>{template?.user_email}</span>
-				</li>
-				<li class="list-group-item text-bg-light">
-					<strong>Name</strong>
-				</li>
-				<li class="list-group-item">
-					<span>{template?.name}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Version</strong>
@@ -103,12 +103,6 @@
 					<span>{template.user_group_id ? group?.name : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
-					<strong>Description</strong>
-				</li>
-				<li class="list-group-item">
-					<span>{template?.description ? template.description : '-'}</span>
-				</li>
-				<li class="list-group-item text-bg-light">
 					<strong>Creation timestamp</strong>
 				</li>
 				<li class="list-group-item">
@@ -119,6 +113,12 @@
 				</li>
 				<li class="list-group-item">
 					<TimestampCell timestamp={template.timestamp_last_used} />
+				</li>
+				<li class="list-group-item text-bg-light">
+					<strong>Template ID</strong>
+				</li>
+				<li class="list-group-item">
+					<span>{template?.id}</span>
 				</li>
 			</ul>
 			{/if}
