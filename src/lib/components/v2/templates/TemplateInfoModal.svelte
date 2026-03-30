@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
@@ -12,19 +12,23 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	const formErrorHandler = new FormErrorHandler(
-        'errorAlert-updateTemplateModal', ['user_group_id', 'description']
-    );
-
 	/** @type {string|undefined} */
 	let groupName = $state()
+
+	/** @type {number|undefined} */
+	let templateId = $state()
 
 	/**
 	 * @param {number} template_id
 	 */
 	export async function open(template_id) {
+		templateId = template_id;
+		modal?.show()
+	}
+
+	export async function onOpen() {
 		const response = await fetch(
-			`/api/v2/workflow-template/${template_id}`,
+			`/api/v2/workflow-template/${templateId}`,
 			{ method: 'GET' }
 		);
 		if (response.ok) {
@@ -38,15 +42,14 @@
 					const res = await response2.json()
 					groupName = res.group_ids_names.find(([id]) => id === template?.user_group_id)?.[1] ?? undefined;
 					if (!groupName) {
-						throw new Error(`User group ${template?.user_group_id} not found`);
+						modal?.displayErrorAlert(new AlertError(`User group ${template?.user_group_id} not found`));
 					}
 				} else {
-					await formErrorHandler.handleErrorResponse(response2);
+					modal?.displayErrorAlert(await getAlertErrorFromResponse(response2));
 				}
 			}
-			modal?.show();
 		} else {
-			await formErrorHandler.handleErrorResponse(response);
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 		
 	}
@@ -59,11 +62,13 @@
     scrollable={true}
     bind:this={modal}
     size="lg"
+	{onOpen}
 >
 		{#snippet header()}
 		<h5 class="modal-title">Template '{template?.name}'</h5>
 		{/snippet}
 		{#snippet body()}
+			<div id="errorAlert-templateInfoModal"></div>
 			{#if template}
 			<ul class="list-group">
 				<li class="list-group-item text-bg-light">
