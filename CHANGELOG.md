@@ -3,6 +3,7 @@
 # 1.24.1 (unreleased)
 
 * Fix user group visibility for standard user on templates creation (\#1041).
+* Run svelte-check on `sandbox/` and `tasks-list/` (\#1042).
 * Forbid single-task edit if task group has origin different from 'other' (\#1040).
 * Add `FRACTAL_HIDE_BASIC_AUTH` environment variable (\#1039).
 
