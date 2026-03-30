@@ -23,24 +23,16 @@
 	 * @param {number} template_id
 	 */
 	export async function open(template_id) {
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/workflow-template/${template_id}`,
-			{
-				method: 'GET',
-				headers,
-			}
+			{ method: 'GET' }
 		);
 		if (response.ok) {
             template = await response.json()
 			if (template?.user_group_id) {
 				const response2 = await fetch(
 					`/api/auth/current-user?group_ids_names=true`,
-					{
-						method: 'GET',
-						headers,
-					}
+					{ method: 'GET' }
 				);
 				if (response2.ok) {
 					const res = await response2.json()
