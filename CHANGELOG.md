@@ -3,6 +3,7 @@
 # 1.24.1 (unreleased)
 
 * Run svelte-check on `sandbox/` and `tasks-list/` (\#1042).
+* Forbid single-task edit if task group has origin different from 'other' (\#1040).
 
 # 1.24.0
 
