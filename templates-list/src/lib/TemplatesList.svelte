@@ -149,7 +149,7 @@
 		<thead>
 			<tr>
                 <th>Name</th>
-                <th>Versions</th>
+                <th>Version</th>
                 <th></th>
 				<th>Actions</th>
 			</tr>
