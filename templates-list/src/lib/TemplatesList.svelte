@@ -6,10 +6,11 @@
     /**
      * @typedef {Object} Props
      * @property {Array<import('./types').TemplateEntry>} templates
+	 * @property {Object} templateIdMap
      */
 
     /** @type {Props} */
-    let { templates } = $props();
+    let { templates, templateIdMap } = $props();
 
 	
 	/** @type {import('./types').TemplateItem[]}*/
@@ -23,36 +24,28 @@
 		selectedTemplates = templates.map(item => item.templates[0]);
 	})
 	
-	/** @type {string|undefined} */
-	let templateName = $state(undefined);
+	let templateName = $state('');
 	/** @type {number|undefined} */
 	let templateVersion = $state(undefined);
-	
-	/** @type {{ templateName: string | undefined, templateVersion: number | undefined }} */
-    let lastAppliedState = $state({
-		templateName: undefined,
-		templateVersion: undefined,
-	});
 	
 	/** @type {Array<import('./types').TemplateEntry>}*/
 	let filteredTemplates = $derived((() => {
 		
-		const name = lastAppliedState.templateName;
 		let result;
-		if (name) {
+		if (templateName) {
 			result = templates.filter(entry =>
-				entry.template_name.toLowerCase().includes(name.toLowerCase())
+				entry.template_name.toLowerCase().includes(templateName.toLowerCase())
 			);
 		} else {
 			result = templates;
 		}
 		
-		if (lastAppliedState.templateVersion) {
+		if (templateVersion) {
 			result = result
 				.map(entry => ({
 					...entry,
 					templates: entry.templates.filter(t =>
-						t.template_version === lastAppliedState.templateVersion
+						t.template_version === templateVersion
 					)
 				}))
 				.filter(entry => entry.templates.length > 0);
@@ -61,27 +54,11 @@
 		return result;
 	})());
 
-    const currentState = $derived({templateName, templateVersion});
-    const isDefault = $derived(lastAppliedState.templateName === undefined && lastAppliedState.templateVersion === undefined);
-    const isDirtyFromApplied = $derived(
-		(
-			currentState.templateName !== lastAppliedState.templateName  &&
-			!(
-				currentState.templateName === "" &&
-				lastAppliedState.templateName === undefined
-			)
-		) ||
-		currentState.templateVersion != lastAppliedState.templateVersion
-	);
-
-    const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
-	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
-
     /**
 	 * @param {number} templateId
 	 */
     async function downloadTemplate(templateId) {
-        const response = await fetch(`/templates-table/template${templateId}.json`);
+        const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
         const data = await response.json();
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -89,7 +66,7 @@
 
         const link = document.createElement('a');
         link.href = url;
-        link.download = `template${templateId}.json`;
+        link.download = templateIdMap[templateId];
         link.click();
 
         URL.revokeObjectURL(url);
@@ -99,11 +76,14 @@
 	* @param {number} templateId
 	*/
 	async function showSelectedTemplateModal(templateId) {
-		const response = await fetch(`/templates-table/template${templateId}.json`);
+		const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
         templateInfo = await response.json();
 		getBootstrapModal('template-info-modal').show();
 	}
 
+	/**
+	* @param {string} id
+	*/
 	function getBootstrapModal(id) {
 		const modalElement = document.getElementById(id);
 		// @ts-ignore
@@ -160,30 +140,6 @@
 					bind:value={templateVersion}
 				/>
 			</div>
-
-			<div class="col-auto d-flex gap-2">
-				<button
-					class="btn {applyClass} btn-sm px-3"
-                    disabled={!isDirtyFromApplied}
-                    onclick={() => {
-						lastAppliedState.templateName = currentState.templateName || undefined;
-						lastAppliedState.templateVersion = currentState.templateVersion || undefined;
-                    }}
-				>
-					Apply
-				</button>
-				<button
-					class="btn {resetClass} btn-sm px-3"
-                    disabled={isDefault}
-                    onclick={() => {
-                        templateName = undefined;
-                        templateVersion = undefined;
-                        lastAppliedState = { ...currentState };
-                    }}
-				>
-					Reset
-				</button>
-			</div>
 		</div>
 	</div>
 </div>
@@ -196,7 +152,7 @@
 		<thead>
 			<tr>
                 <th>Name</th>
-                <th>Versions</th>
+                <th>Version</th>
                 <th></th>
 				<th>Actions</th>
 			</tr>
@@ -209,7 +165,7 @@
 						{#if templateGroup.templates.length>1}
 						<select
 							class="form-select"
-							aria-label="Version for template '{templateGroup.template_name}' of {templateGroup.user_email}"
+							aria-label="Version for template '{templateGroup.template_name}'"
 							bind:value={selectedTemplates[index]}
 						>
 							{#each templateGroup.templates as template, i (i)}
