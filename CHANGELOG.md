@@ -1,12 +1,15 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.24.2
+
+* Complete the `templates-list/` app (\#1037).
+
 # 1.24.1
 
 * Add `FRACTAL_HIDE_BASIC_AUTH` environment variable (\#1039).
 * Forbid single-task edit if task group has origin different from 'other' (\#1040).
 * Fix user group visibility for standard user on templates creation (\#1041).
 * Run svelte-check on `sandbox/` and `tasks-list/` (\#1042).
-* Complete the `templates-list/` app (\#1037).
 
 # 1.24.0
 
