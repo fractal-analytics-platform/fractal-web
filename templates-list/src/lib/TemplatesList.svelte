@@ -6,11 +6,11 @@
     /**
      * @typedef {Object} Props
      * @property {Array<import('./types').TemplateEntry>} templates
-	 * @property {Object} template_id_map
+	 * @property {Object} templateIdMap
      */
 
     /** @type {Props} */
-    let { templates, template_id_map } = $props();
+    let { templates, templateIdMap } = $props();
 
 	
 	/** @type {import('./types').TemplateItem[]}*/
@@ -58,7 +58,7 @@
 	 * @param {number} templateId
 	 */
     async function downloadTemplate(templateId) {
-        const response = await fetch(template_id_map[templateId]);
+        const response = await fetch(templateIdMap[templateId]);
         const data = await response.json();
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
