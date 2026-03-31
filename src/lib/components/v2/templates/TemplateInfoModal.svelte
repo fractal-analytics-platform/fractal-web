@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
@@ -9,50 +9,47 @@
 	 */
 	let template = $state()
 
-	/**
-	 * @type {import('fractal-components/types/api').Group|undefined}
-	 */
-	let group = $state()
-
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	const formErrorHandler = new FormErrorHandler(
-        'errorAlert-updateTemplateModal', ['user_group_id', 'description']
-    );
+	/** @type {string|undefined} */
+	let groupName = $state()
+
+	/** @type {number|undefined} */
+	let templateId = $state()
 
 	/**
 	 * @param {number} template_id
 	 */
 	export async function open(template_id) {
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
+		templateId = template_id;
+		modal?.show()
+	}
+
+	export async function onOpen() {
 		const response = await fetch(
-			`/api/v2/workflow-template/${template_id}`,
-			{
-				method: 'GET',
-				headers,
-			}
+			`/api/v2/workflow-template/${templateId}`,
+			{ method: 'GET' }
 		);
 		if (response.ok) {
             template = await response.json()
 			if (template?.user_group_id) {
 				const response2 = await fetch(
-					`/api/auth/group/${template?.user_group_id}`,
-					{
-						method: 'GET',
-						headers,
-					}
+					`/api/auth/current-user?group_ids_names=true`,
+					{ method: 'GET' }
 				);
 				if (response2.ok) {
-					group = await response2.json()
+					const res = await response2.json()
+					groupName = res.group_ids_names.find(([id]) => id === template?.user_group_id)?.[1] ?? undefined;
+					if (!groupName) {
+						modal?.displayErrorAlert(new AlertError(`User group ${template?.user_group_id} not found`));
+					}
 				} else {
-					await formErrorHandler.handleErrorResponse(response2);
+					modal?.displayErrorAlert(await getAlertErrorFromResponse(response2));
 				}
 			}
-			modal?.show();
 		} else {
-			await formErrorHandler.handleErrorResponse(response);
+			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
 		
 	}
@@ -65,11 +62,13 @@
     scrollable={true}
     bind:this={modal}
     size="lg"
+	{onOpen}
 >
 		{#snippet header()}
 		<h5 class="modal-title">Template '{template?.name}'</h5>
 		{/snippet}
 		{#snippet body()}
+			<div id="errorAlert-templateInfoModal"></div>
 			{#if template}
 			<ul class="list-group">
 				<li class="list-group-item text-bg-light">
@@ -100,7 +99,7 @@
 					<strong>User group</strong>
 				</li>
 				<li class="list-group-item">
-					<span>{template.user_group_id ? group?.name : '-'}</span>
+					<span>{template.user_group_id ? groupName : '-'}</span>
 				</li>
 				<li class="list-group-item text-bg-light">
 					<strong>Creation timestamp</strong>
