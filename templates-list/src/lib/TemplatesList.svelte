@@ -58,7 +58,7 @@
 	 * @param {number} templateId
 	 */
     async function downloadTemplate(templateId) {
-        const response = await fetch(templateIdMap[templateId]);
+        const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
         const data = await response.json();
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -76,7 +76,7 @@
 	* @param {number} templateId
 	*/
 	async function showSelectedTemplateModal(templateId) {
-		const response = await fetch(`/templates-table/template${templateId}.json`);
+		const response = await fetch(`/templates-table/static/${templateIdMap[templateId]}`);
         templateInfo = await response.json();
 		getBootstrapModal('template-info-modal').show();
 	}
