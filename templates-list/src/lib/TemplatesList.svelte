@@ -66,7 +66,7 @@
 
         const link = document.createElement('a');
         link.href = url;
-        link.download = `template${templateId}.json`;
+        link.download = templateIdMap[templateId];
         link.click();
 
         URL.revokeObjectURL(url);
@@ -76,11 +76,14 @@
 	* @param {number} templateId
 	*/
 	async function showSelectedTemplateModal(templateId) {
-		const response = await fetch(`/templates-table/static/${templateIdMap[templateId]}`);
+		const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
         templateInfo = await response.json();
 		getBootstrapModal('template-info-modal').show();
 	}
 
+	/**
+	* @param {string} id
+	*/
 	function getBootstrapModal(id) {
 		const modalElement = document.getElementById(id);
 		// @ts-ignore
