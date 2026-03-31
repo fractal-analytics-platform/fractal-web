@@ -9,6 +9,7 @@
 	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
 	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
+	import TemplateDescriptionPopup from './TemplateDescriptionPopup.svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -181,7 +182,6 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
-
 
 	/**
 	 * @param {number} templateId
@@ -392,7 +392,9 @@
                     <td class="col-5">
 						{templateGroup.template_name}
 						{#if modalType==='select'}
-							<PropertyDescription description={'PLACEHOLDER'} html={true} />
+							<TemplateDescriptionPopup
+								templateId={selectedTemplates[index].template_id}
+							/>
 						{/if}
 					</td>
 					<td>{templateGroup.user_email}</td>
