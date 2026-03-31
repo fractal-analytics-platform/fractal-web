@@ -8,10 +8,10 @@
     let template_id_map = $state({});
 
     onMount(async () => {
-        const response = await fetch('/template-table/templates.json');
+        const response = await fetch('/templates-table/templates.json');
         templates = await response.json();
 
-        const response2 = await fetch('/template-table/template_id_map.json');
+        const response2 = await fetch('/templates-table/template_id_map.json');
         template_id_map = await response2.json();
 
     });
