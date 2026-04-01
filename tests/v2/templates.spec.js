@@ -74,26 +74,26 @@ test('Use template page', async ({ page }) => {
 
         await expect(page.locator('.list-group-item.text-bg-light')).toContainText(
             [
-                'Template ID',
-                'User email',
                 'Name',
+                'Description',
+                'User email',
                 'Version',
                 'User group',
-                'Description',
                 'Creation timestamp',
-                'Last use timestamp'
+                'Last use timestamp',
+                'Template ID'
             ]
         );
         const values = page.locator('.list-group-item:not(.text-bg-light)');
-        await expect(values.nth(0).locator('span')).toHaveText(String(templateId));
-        await expect(values.nth(1).locator('span')).toHaveText('admin@fractal.xy');
-        await expect(values.nth(2).locator('span')).toHaveText(workflow.name);
+        await expect(values.nth(0).locator('span')).toHaveText(workflow.name);
+        await expect(values.nth(1).locator('span')).toHaveText('This is the template description.');
+        await expect(values.nth(2).locator('span')).toHaveText('admin@fractal.xy');
         await expect(values.nth(3).locator('span')).toHaveText('1');
         await expect(values.nth(4).locator('span')).toHaveText('All');
-        await expect(values.nth(5).locator('span')).toHaveText('This is the template description.');
-        await expect(values.nth(6).locator('span')).toHaveText(
-            await values.nth(7).locator('span').allInnerTexts()
+        await expect(values.nth(5).locator('span')).toHaveText(
+            await values.nth(6).locator('span').allInnerTexts()
         );
+        await expect(values.nth(7).locator('span')).toHaveText(String(templateId));
         await modal.getByRole('button', { name: 'Close' }).click();
         await waitModalClosed(page);
     });
@@ -113,8 +113,8 @@ test('Use template page', async ({ page }) => {
         await page.getByRole('button', { name: 'Info' }).click();
         await waitModal(page);
         const values = page.locator('.list-group-item:not(.text-bg-light)');
+        await expect(values.nth(1).locator('span')).toHaveText(newDescription);
         await expect(values.nth(4).locator('span')).toHaveText('-');
-        await expect(values.nth(5).locator('span')).toHaveText(newDescription);
 
         await modal.getByRole('button', { name: 'Close' }).click();
         await waitModalClosed(page);

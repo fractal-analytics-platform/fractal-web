@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.24.3 (unreleased)
+
+* Reorder template info modal items (\#1045).
+
 # 1.24.2
 
 * Complete the `templates-list/` app (\#1037).

@@ -225,17 +225,16 @@
 						<span>{templateInfo.name}</span>
 					</li>
 					<li class="list-group-item text-bg-light">
-						<strong>TEMPLATE VERSION</strong>
-					</li>
-					<li class="list-group-item">
-						<span>{templateInfo.version}</span>
-					</li>
-					
-					<li class="list-group-item text-bg-light">
 						<strong>TEMPLATE DESCRIPTION</strong>
 					</li>
 					<li class="list-group-item">
 						<span>{templateInfo.description}</span>
+					</li>
+					<li class="list-group-item text-bg-light">
+						<strong>TEMPLATE VERSION</strong>
+					</li>
+					<li class="list-group-item">
+						<span>{templateInfo.version}</span>
 					</li>
 				</ul>
 			</div>
