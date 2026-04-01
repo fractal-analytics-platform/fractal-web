@@ -82,8 +82,20 @@ describe('Workflow page', () => {
 							};
 						case '/api/auth/current-user':
 							return { slurm_accounts: [] };
-						case '/api/auth/group':
-							return [];
+						case '/api/auth/current-user?group_ids_names=true':
+							return {
+								id: 1,
+								email: 'user@example.com',
+								is_active: true,
+								is_superuser: false,
+								is_verified: false,
+								is_guest: true,
+								group_ids_names: [],
+								"oauth_accounts": [],
+								"profile_id": 1,
+								"project_dirs": ['/tmp'],
+								"slurm_accounts": []
+							};
 						case '/api/v2/project/1/workflow/1/version-update-candidates':
 							return [];
 						default:
