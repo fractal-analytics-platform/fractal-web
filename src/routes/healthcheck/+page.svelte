@@ -154,15 +154,12 @@
 	async function addTaskToWorkflow(projectId, workflowId, taskId) {
 		stepMessage = `Adding task to workflow`;
 
-		const response = await fetch(
-			`/api/v2/project/${projectId}/workflow/${workflowId}/wftask?task_id=${taskId}`,
-			{
-				method: 'POST',
-				credentials: 'include',
-				headers,
-				body: JSON.stringify({})
-			}
-		);
+		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflowId}/wftask`, {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: JSON.stringify([{ task_id: taskId }])
+		});
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);
 		}

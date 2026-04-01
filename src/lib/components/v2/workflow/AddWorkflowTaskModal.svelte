@@ -32,7 +32,16 @@
 	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
 	let taskGroups = $state([]);
 
+	/** @type {number[]} */
+	let selectedTasks = $state([]);
+
+	/**@type {number|undefined}*/
+	let selectedOrder = $state(undefined);
+	let addingMultipleTasks = $state(false);
+
 	export async function show() {
+		selectedTasks = [];
+		selectedOrder = undefined;
 		loading = true;
 		modal?.hideErrorAlert();
 		modal?.show();
@@ -57,45 +66,67 @@
 	 * @param {number} taskId
 	 */
 	async function addTaskToWorkflow(taskId) {
+		await addTasksToWorkflow([taskId]);
+	}
+
+	async function addSelectedTasksToWorkflow() {
+		addingMultipleTasks = true;
+		await addTasksToWorkflow(selectedTasks);
+		addingMultipleTasks = false;
+	}
+
+	/**
+	 * @param {number[]} taskIds
+	 */
+	async function addTasksToWorkflow(taskIds) {
 		modal?.confirmAndHide(
 			async () => {
 				addingTask = true;
 
-				const task = await getTask(taskId);
+				const payload = [];
+
+				for (const taskId of taskIds) {
+					const task = await getTask(taskId);
+
+					// Creating workflow task
+					const data = {};
+
+					if (task.args_schema_parallel) {
+						data.args_parallel = stripNullAndEmptyObjectsAndArrays(
+							getJsonSchemaData(
+								adaptJsonSchema(task.args_schema_parallel, getPropertiesToIgnore(false)),
+								'pydantic_v2'
+							)
+						);
+					}
+
+					if (task.args_schema_non_parallel) {
+						data.args_non_parallel = stripNullAndEmptyObjectsAndArrays(
+							getJsonSchemaData(
+								adaptJsonSchema(task.args_schema_non_parallel, getPropertiesToIgnore(false)),
+								'pydantic_v2'
+							)
+						);
+					}
+
+					data.task_id = task.id;
+					payload.push(data);
+				}
 
 				const headers = new Headers();
 				headers.set('Content-Type', 'application/json');
 
-				// Creating workflow task
-				const defaultData = {};
-
-				if (task.args_schema_parallel) {
-					defaultData.args_parallel = stripNullAndEmptyObjectsAndArrays(
-						getJsonSchemaData(
-							adaptJsonSchema(task.args_schema_parallel, getPropertiesToIgnore(false)),
-							'pydantic_v2'
-						)
-					);
+				let url = `/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask`;
+				if (selectedOrder !== undefined) {
+					url += `?order=${selectedOrder + 1}`;
 				}
 
-				if (task.args_schema_non_parallel) {
-					defaultData.args_non_parallel = stripNullAndEmptyObjectsAndArrays(
-						getJsonSchemaData(
-							adaptJsonSchema(task.args_schema_non_parallel, getPropertiesToIgnore(false)),
-							'pydantic_v2'
-						)
-					);
-				}
-
-				const workflowTaskResponse = await fetch(
-					`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask?task_id=${task.id}`,
-					{
-						method: 'POST',
-						credentials: 'include',
-						headers,
-						body: normalizePayload(defaultData)
-					}
-				);
+				const workflowTaskResponse = await fetch(url, {
+					method: 'POST',
+					credentials: 'include',
+					headers,
+					body: normalizePayload(payload)
+				});
 
 				if (!workflowTaskResponse.ok) {
 					console.error('Error while creating workflow task');
@@ -184,10 +215,15 @@
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{/if}
 		<div class:invisible={loading} class:collapse={loading}>
-			<FilteredTasksTable {taskGroups} showAuthorsInSeparateColumn={false}>
+			<FilteredTasksTable
+				{taskGroups}
+				showAuthorsInSeparateColumn={false}
+				selectable={true}
+				bind:selectedTasks
+			>
 				{#snippet extraColumnsColgroup()}
 					<col width="40" />
-					<col width="120" />
+					<col width="70" />
 				{/snippet}
 				{#snippet extraColumnsHeader()}
 					<th></th>
@@ -203,9 +239,10 @@
 						<button
 							class="btn btn-primary"
 							disabled={addingTask}
+							aria-label="Add task"
 							onclick={() => addTaskToWorkflow(task.task_id)}
 						>
-							Add task
+							<i class="bi bi-plus-circle"></i>
 						</button>
 					</td>
 				{/snippet}
@@ -213,6 +250,35 @@
 		</div>
 	{/snippet}
 	{#snippet footer()}
+		<div class="w-100 mb-2">
+			<div class="float-end">
+				<div class="input-group">
+					{#if workflow.task_list.length > 0}
+						<label class="input-group-text" for="add_after_task"> Add after</label>
+						<select class="form-select" id="add_after_task" bind:value={selectedOrder}>
+							<option value={undefined}>Select...</option>
+							{#each workflow.task_list as wft (wft.id)}
+								<option value={wft.order}>{wft.alias ?? wft.task.name}</option>
+							{/each}
+						</select>
+					{/if}
+					{#if selectedTasks.length > 0}
+						<button
+							class="btn btn-primary"
+							disabled={addingTask}
+							onclick={addSelectedTasksToWorkflow}
+						>
+							{#if addingMultipleTasks}
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+								></span>
+							{/if}
+							Add {selectedTasks.length}
+							{selectedTasks.length > 1 ? 'tasks' : 'task'}
+						</button>
+					{/if}
+				</div>
+			</div>
+		</div>
 		<div id="errorAlert-addWorkflowTaskModal" class="m-0 flex-fill"></div>
 	{/snippet}
 </Modal>
