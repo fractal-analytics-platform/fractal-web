@@ -8,7 +8,6 @@
 	import { page } from '$app/state';
 	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
-	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
 
     /**
 	 * @typedef {Object} Props
@@ -389,12 +388,7 @@
 							</button>
 						</td>
 					{/if}
-                    <td class="col-5">
-						{templateGroup.template_name}
-						{#if modalType==='select'}
-							<PropertyDescription description={'PLACEHOLDER'} html={true} />
-						{/if}
-					</td>
+                    <td class="col-5">{templateGroup.template_name}</td>
 					<td>{templateGroup.user_email}</td>
                     <td class="col-2">
 						{#if templateGroup.templates.length>1}
