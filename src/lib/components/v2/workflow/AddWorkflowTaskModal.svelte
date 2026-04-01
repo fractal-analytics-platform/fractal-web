@@ -118,7 +118,7 @@
 
 				let url = `/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask`;
 				if (selectedOrder !== undefined) {
-					url += `?order=${selectedOrder}`;
+					url += `?order=${selectedOrder + 1}`;
 				}
 
 				const workflowTaskResponse = await fetch(url, {
