@@ -61,10 +61,10 @@ jobs:
 
       - name: Repack the package removing parent folder
         env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-        run: tar -C package -czf "node-${{ matrix.node-version }}-fractal-web-${GITHUB_REF_NAME}.tar.gz" build package.json node_modules LICENSE
+          GH_REF_NAME: ${{ github.ref_name }}
+        run: tar -C package -czf "node-${{ matrix.node-version }}-fractal-web-${GH_REF_NAME}.tar.gz" build package.json node_modules LICENSE
 
-      - run: gh release upload "${GH_REF_NAME}" "node-${GH_REF_NAME}-fractal-web-*.tar.gz"
+      - run: gh release upload "${GH_REF_NAME}" "node-${{ matrix.node-version }}-fractal-web-${GH_REF_NAME}.tar.gz"
         env:
           GH_REF_NAME: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
