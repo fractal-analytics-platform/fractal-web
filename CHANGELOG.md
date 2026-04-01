@@ -1,6 +1,12 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# 1.25.1
+
+* Fix release github action (2545e2f4).
+
 # 1.25.0
+
+> WARNING: This version is not available as a GitHub release due to a GitHub action issue. Please use v1.25.1.
 
 * Implement bulk insertion of workflow tasks at an arbitrary position (\#1038).
 * Reorder template info modal items (\#1045).
