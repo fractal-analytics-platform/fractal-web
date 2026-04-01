@@ -126,3 +126,16 @@ export async function collapseExpandedRows(page) {
 		await expect(table.getByRole('row')).toHaveCount(totalRows - 1);
 	}
 }
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} expectedNames
+ */
+export async function checkTasksOrder(page, ...expectedNames) {
+	const tasksListContainer = page.getByTestId('workflow-tasks-list');
+	const names = await tasksListContainer.getByRole('button').allInnerTexts();
+	expect(names.length).toEqual(expectedNames.length);
+	for (let i = 0; i < expectedNames.length; i++) {
+		expect(names[i]).toEqual(expectedNames[i]);
+	}
+}

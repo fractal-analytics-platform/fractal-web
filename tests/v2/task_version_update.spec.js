@@ -1,6 +1,6 @@
 import { expect, test } from './workflow_fixture.js';
 import { waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { checkTasksOrder, createFakeTask, deleteTask } from './task_utils.js';
 
 test('Task version update [v2]', async ({ page, workflow }) => {
 	await page.waitForURL(workflow.url);
@@ -258,16 +258,3 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await deleteTask(page, compoundTask); // 0.0.1
 	});
 });
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string[]} expectedNames
- */
-async function checkTasksOrder(page, ...expectedNames) {
-	const tasksListContainer = page.getByTestId('workflow-tasks-list');
-	const names = await tasksListContainer.getByRole('button').allInnerTexts();
-	expect(names.length).toEqual(expectedNames.length);
-	for (let i = 0; i < expectedNames.length; i++) {
-		expect(names[i]).toEqual(expectedNames[i]);
-	}
-}
