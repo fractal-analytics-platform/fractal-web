@@ -10,7 +10,7 @@
 	 * @property {boolean} [showAuthorsInSeparateColumn]
 	 * @property {boolean} [showDocLinksInTable]
 	 * @property {boolean} [selectable]
-	 * @property {Record<string, boolean>} [selectedRows]
+	 * @property {number[]} [selectedTasks]
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
 	 * @property {import('svelte').Snippet} [extraColumnsHeader]
 	 * @property {import('svelte').Snippet<[import('../types/api').TasksTableRow]>} [extraColumns]
@@ -22,7 +22,7 @@
 		showAuthorsInSeparateColumn = true,
 		showDocLinksInTable = false,
 		selectable = false,
-		selectedRows = $bindable({}),
+		selectedTasks = $bindable([]),
 		extraColumnsColgroup,
 		extraColumnsHeader,
 		extraColumns
@@ -336,6 +336,17 @@
 			taskRow.taskVersions.find((t) => t.version === taskRow.selectedVersion)
 		);
 	}
+
+	/**
+	 * @param {number} taskId
+	 */
+	function selectTask(taskId) {
+		if (selectedTasks.includes(taskId)) {
+			selectedTasks = selectedTasks.filter((t) => t !== taskId);
+		} else {
+			selectedTasks = [...selectedTasks, taskId];
+		}
+	}
 </script>
 
 <div class="card mb-2" class:invisible={allRows.length === 0} class:collapse={allRows.length === 0}>
@@ -432,7 +443,8 @@
 												id="selector-{task.task_id}"
 												type="checkbox"
 												class="form-check-input"
-												bind:checked={selectedRows[task.task_id.toString()]}
+												onchange={() => selectTask(task.task_id)}
+												checked={selectedTasks.includes(task.task_id)}
 											/>
 										</td>
 									{/if}

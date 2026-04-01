@@ -32,16 +32,15 @@
 	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
 	let taskGroups = $state([]);
 
-	/** @type {Record<string, boolean>} */
-	let selectedRows = $state({});
-	const selectedTakskNumber = $derived(Object.values(selectedRows).filter((v) => !!v).length);
+	/** @type {number[]} */
+	let selectedTasks = $state([]);
 
 	/**@type {number|undefined}*/
 	let selectedOrder = $state(undefined);
 	let addingMultipleTasks = $state(false);
 
 	export async function show() {
-		selectedRows = {};
+		selectedTasks = [];
 		selectedOrder = undefined;
 		loading = true;
 		modal?.hideErrorAlert();
@@ -72,10 +71,7 @@
 
 	async function addSelectedTasksToWorkflow() {
 		addingMultipleTasks = true;
-		const taskIds = Object.entries(selectedRows)
-			.filter(([, v]) => v)
-			.map(([k]) => parseInt(k));
-		await addTasksToWorkflow(taskIds);
+		await addTasksToWorkflow(selectedTasks);
 		addingMultipleTasks = false;
 	}
 
@@ -223,11 +219,11 @@
 				{taskGroups}
 				showAuthorsInSeparateColumn={false}
 				selectable={true}
-				bind:selectedRows
+				bind:selectedTasks
 			>
 				{#snippet extraColumnsColgroup()}
 					<col width="40" />
-					<col width="120" />
+					<col width="70" />
 				{/snippet}
 				{#snippet extraColumnsHeader()}
 					<th></th>
@@ -243,9 +239,10 @@
 						<button
 							class="btn btn-primary"
 							disabled={addingTask}
+							aria-label="Add task"
 							onclick={() => addTaskToWorkflow(task.task_id)}
 						>
-							Add task
+							<i class="bi bi-plus-circle"></i>
 						</button>
 					</td>
 				{/snippet}
@@ -253,19 +250,19 @@
 		</div>
 	{/snippet}
 	{#snippet footer()}
-		<div class="row">
-			<div class="col">
+		<div class="w-100 mb-2">
+			<div class="float-end">
 				<div class="input-group">
 					{#if workflow.task_list.length > 0}
 						<label class="input-group-text" for="add_after_task"> Add after</label>
 						<select class="form-select" id="add_after_task" bind:value={selectedOrder}>
 							<option value={undefined}>Select...</option>
 							{#each workflow.task_list as wft (wft.id)}
-								<option value={wft.order}>{wft.task.name}</option>
+								<option value={wft.order}>{wft.alias ?? wft.task.name}</option>
 							{/each}
 						</select>
 					{/if}
-					{#if selectedTakskNumber > 0}
+					{#if selectedTasks.length > 0}
 						<button
 							class="btn btn-primary"
 							disabled={addingTask}
@@ -275,8 +272,8 @@
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
 								></span>
 							{/if}
-							Add {selectedTakskNumber}
-							{selectedTakskNumber > 1 ? 'tasks' : 'task'}
+							Add {selectedTasks.length}
+							{selectedTasks.length > 1 ? 'tasks' : 'task'}
 						</button>
 					{/if}
 				</div>
