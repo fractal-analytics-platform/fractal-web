@@ -1,7 +1,8 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
-# Unreleased
+# 1.24.3 (unreleased)
 
+* Reorder template info modal items (\#1045).
 * Harden GitHub Actions with `zizmor` audits (\#1047).
 
 # 1.24.2
