@@ -73,8 +73,8 @@ export function getPropertiesToIgnore(legacy) {
 }
 
 /**
- * @param {object} obj 
- * @returns 
+ * @param {object} obj
+ * @returns
  */
 export function isDiscriminator(obj) {
 	return (

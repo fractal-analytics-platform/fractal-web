@@ -36,7 +36,7 @@ export const actions = {
 };
 
 /**
- * @param {unknown} error 
+ * @param {unknown} error
  */
 function getLoginErrorMessage(error) {
 	if (isHttpError(error)) {

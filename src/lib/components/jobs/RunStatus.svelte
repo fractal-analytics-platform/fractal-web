@@ -1,11 +1,6 @@
 <script>
 	import { isParallelType } from 'fractal-components';
 
-	
-	
-	
-	
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').DatasetV2} dataset
@@ -16,13 +11,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		dataset,
-		workflowTask,
-		run,
-		index,
-		runStatusModal
-	} = $props();
+	let { dataset, workflowTask, run, index, runStatusModal } = $props();
 
 	let showNumbers = $derived(isParallelType(workflowTask.task_type));
 

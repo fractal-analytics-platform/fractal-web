@@ -111,7 +111,7 @@ describe('Enum properties', () => {
 					k: {
 						enum: ['A', 'B']
 					}
-				},
+				}
 			},
 			'pydantic_v2',
 			{ k: 'C' }

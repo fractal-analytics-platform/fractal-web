@@ -312,11 +312,7 @@ describe('Object properties', () => {
 
 	it('Handle generic object additionalProperties', async function () {
 		const user = userEvent.setup();
-		const { component } = renderSchema(
-			{ type: 'object' },
-			'pydantic_v1',
-			{ k1: 'foo', k2: 'bar' }
-		);
+		const { component } = renderSchema({ type: 'object' }, 'pydantic_v1', { k1: 'foo', k2: 'bar' });
 		expect(component.getArguments()).deep.eq({ k1: 'foo', k2: 'bar' });
 		expect(component.isValid()).toEqual(true);
 		await user.type(screen.getByRole('textbox', { name: 'k1' }), 'x');
@@ -331,17 +327,20 @@ describe('Object properties', () => {
 
 	it('Attempt to add the same object key twice', async function () {
 		const user = userEvent.setup();
-		const { component } = renderSchema({
-			properties: {
-				"object_arg": {
-					"additionalProperties": {
-						"type": "boolean"
-					},
-					"type": "object"
+		const { component } = renderSchema(
+			{
+				properties: {
+					object_arg: {
+						additionalProperties: {
+							type: 'boolean'
+						},
+						type: 'object'
+					}
 				},
+				type: 'object'
 			},
-			type: 'object'
-		}, 'pydantic_v2');
+			'pydantic_v2'
+		);
 
 		expect(component.getArguments()).deep.eq({ object_arg: {} });
 
@@ -353,10 +352,14 @@ describe('Object properties', () => {
 
 		await user.type(screen.getByRole('textbox'), 'foo');
 		await user.click(screen.getByRole('button', { name: 'Add property' }));
-		expect(screen.queryByText('Schema property already has a property with the same name')).not.toBeNull();
+		expect(
+			screen.queryByText('Schema property already has a property with the same name')
+		).not.toBeNull();
 
 		await user.clear(screen.getByRole('textbox'));
-		expect(screen.queryByText('Schema property already has a property with the same name')).toBeNull();
+		expect(
+			screen.queryByText('Schema property already has a property with the same name')
+		).toBeNull();
 
 		await user.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(screen.queryByText('Schema property has no name')).not.toBeNull();

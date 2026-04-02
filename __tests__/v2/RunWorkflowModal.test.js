@@ -33,7 +33,7 @@ const task1 = mockTask({
 			p1: { type: 'string' }
 		}
 	}
-})
+});
 const task2 = mockTask({
 	id: 2,
 	name: 'task2',
@@ -44,13 +44,14 @@ const task2 = mockTask({
 		},
 		required: ['p2']
 	}
-})
+});
 const wft1 = mockWorkflowTask({ id: 1, order: 0, task: task1, args_parallel: {} });
 const wft2 = mockWorkflowTask({ id: 2, order: 1, task: task2, args_non_parallel: {} });
 
-const datasets = [mockDataset({ name: 'dataset' })]
+const datasets = [mockDataset({ name: 'dataset' })];
 const workflow = mockWorkflow({
-	name: 'workflow', task_list: [wft1, wft2]
+	name: 'workflow',
+	task_list: [wft1, wft2]
 });
 
 // The component to be tested must be imported after the mock setup
@@ -77,7 +78,10 @@ describe('RunWorkflowModal', () => {
 
 		render(RunWorkflowModal, { props: getWorkflowModalProps() });
 
-		await user.selectOptions(screen.getByRole('combobox', { name: /Stop workflow early/ }), 'task2');
+		await user.selectOptions(
+			screen.getByRole('combobox', { name: /Stop workflow early/ }),
+			'task2'
+		);
 		await user.click(screen.getByRole('button', { name: 'Run' }));
 
 		expect(screen.getByText(/You cannot run submit/)).toBeVisible();
@@ -88,15 +92,17 @@ describe('RunWorkflowModal', () => {
 
 		render(RunWorkflowModal, { props: getWorkflowModalProps() });
 
-		/** @type {import('vitest').Mock} */ (fetch)
-			.mockResolvedValueOnce({
-				ok: true,
-				status: 200,
-				// mock type-filters-flow
-				json: () => new Promise((resolve) => resolve([]))
-			});
+		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValueOnce({
+			ok: true,
+			status: 200,
+			// mock type-filters-flow
+			json: () => new Promise((resolve) => resolve([]))
+		});
 
-		await user.selectOptions(screen.getByRole('combobox', { name: /Stop workflow early/ }), 'task1');
+		await user.selectOptions(
+			screen.getByRole('combobox', { name: /Stop workflow early/ }),
+			'task1'
+		);
 		await user.click(screen.getByRole('button', { name: 'Run' }));
 
 		expect(screen.getByRole('button', { name: 'Confirm' })).toBeVisible();
@@ -112,15 +118,15 @@ function getWorkflowModalProps() {
 		onDatasetsUpdated: vi.fn(),
 		onJobSubmitted: vi.fn(),
 		statuses: {}
-	}
+	};
 }
 
 function mockOnMountCalls() {
-	return /** @type {import('vitest').Mock} */ (fetch)
-		.mockResolvedValueOnce({
-			ok: true,
-			status: 200,
-			// mock current user
-			json: () => new Promise((resolve) => resolve({ id: 1, email: 'admin@fractal.xy', slurm_accounts: [] }))
-		});
+	return /** @type {import('vitest').Mock} */ (fetch).mockResolvedValueOnce({
+		ok: true,
+		status: 200,
+		// mock current user
+		json: () =>
+			new Promise((resolve) => resolve({ id: 1, email: 'admin@fractal.xy', slurm_accounts: [] }))
+	});
 }

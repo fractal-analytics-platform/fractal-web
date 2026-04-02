@@ -13,7 +13,12 @@
 	 */
 
 	/** @type {Props} */
-	let { profile = $bindable(), resource = $bindable(), saveProfile, showSaveButton = true } = $props();
+	let {
+		profile = $bindable(),
+		resource = $bindable(),
+		saveProfile,
+		showSaveButton = true
+	} = $props();
 
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
 	let editableProfile = $state();

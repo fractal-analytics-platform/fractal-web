@@ -122,7 +122,13 @@
 		<h3 class="fw-light">Task List</h3>
 		<div class="col-12">
 			{#key taskGroups}
-				<TaskGroupsTable {taskGroups} {updateTaskGroups} {defaultGroupName} {user} bind:expandedTaskGroupRow />
+				<TaskGroupsTable
+					{taskGroups}
+					{updateTaskGroups}
+					{defaultGroupName}
+					{user}
+					bind:expandedTaskGroupRow
+				/>
 			{/key}
 		</div>
 	</div>

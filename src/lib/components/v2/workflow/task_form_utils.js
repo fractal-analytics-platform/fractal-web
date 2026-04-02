@@ -1,14 +1,14 @@
-import { AlertError, getAlertErrorFromResponse } from "$lib/common/errors";
-import { normalizePayload } from "fractal-components";
+import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
+import { normalizePayload } from 'fractal-components';
 
 /**
  * Updates the workflow task properties.
- * @param {string} projectId 
- * @param {number} workflowId 
- * @param {number} workflowTaskId 
- * @param {any} updatingWorkflowTaskProperties 
+ * @param {string} projectId
+ * @param {number} workflowId
+ * @param {number} workflowTaskId
+ * @param {any} updatingWorkflowTaskProperties
  * @param {string} groupName
- * @returns 
+ * @returns
  */
 export async function updateFormEntry(
 	projectId,
@@ -48,12 +48,7 @@ export async function updateFormEntry(
  * @param {any} args
  * @returns {Promise<*>}
  */
-async function updateWorkflowTaskArguments(
-	projectId,
-	workflowId,
-	workflowTaskId,
-	args
-) {
+async function updateWorkflowTaskArguments(projectId, workflowId, workflowTaskId, args) {
 	const requestBody = {
 		args: args
 	};
@@ -87,12 +82,7 @@ async function updateWorkflowTaskArguments(
  * @param {any} meta
  * @returns {Promise<*>}
  */
-async function updateWorkflowTaskMetadata(
-	projectId,
-	workflowId,
-	workflowTaskId,
-	meta
-) {
+async function updateWorkflowTaskMetadata(projectId, workflowId, workflowTaskId, meta) {
 	const requestBody = {
 		meta: meta
 	};
@@ -112,7 +102,7 @@ async function updateWorkflowTaskMetadata(
 
 	if (response.ok) {
 		console.log('workflow task metadata updated successfully');
-		return await response.json()
+		return await response.json();
 	}
 
 	throw await getAlertErrorFromResponse(response);

@@ -36,7 +36,7 @@
 		let parsedSchema;
 		try {
 			parsedSchema = JSON.parse(jsonSchemaString);
-		} catch (err) {
+		} catch {
 			schema = undefined;
 			jsonSchemaError = 'Invalid JSON';
 			return;
@@ -45,9 +45,11 @@
 		try {
 			const schemaValidator = new SchemaValidator(schemaVersion);
 			schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
-		} catch (_) {
+		} catch {
+			schemaVersion = detectSchemaVersion(parsedSchema);
 			try {
-				schemaVersion = detectSchemaVersion(parsedSchema);
+				const schemaValidator = new SchemaValidator(schemaVersion);
+				schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
 			} catch (err) {
 				schema = undefined;
 				jsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
@@ -56,7 +58,7 @@
 		}
 
 		schema = parsedSchema;
-    schemaData = undefined;
+		schemaData = undefined;
 		await tick();
 		jschemaComponent?.update(parsedSchema, undefined);
 		handleDataChanged();
@@ -68,7 +70,7 @@
 		try {
 			schemaData = JSON.parse(jsonDataString);
 			jschemaComponent?.update(schema, $state.snapshot(schemaData));
-		} catch (err) {
+		} catch {
 			if (!jsonDataString) {
 				schemaData = undefined;
 				jschemaComponent?.update(schema, undefined);

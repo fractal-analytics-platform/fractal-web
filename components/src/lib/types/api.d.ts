@@ -103,36 +103,35 @@ export type Image = {
 };
 
 export type WorkflowTemplate = {
-    id: number;
-    user_email: string;
-    name: string;
-    version: number;
-    timestamp_created: string;
+	id: number;
+	user_email: string;
+	name: string;
+	version: number;
+	timestamp_created: string;
 	timestamp_last_used: string;
-    user_group_id: number | null;
-    description: string | null;
-    data: WorkflowImport;
+	user_group_id: number | null;
+	description: string | null;
+	data: WorkflowImport;
 	fractal_server_version: string;
-}
+};
 
 export type WorkflowTemplateGroupMember = {
 	template_id: number;
 	template_version: number;
-}
+};
 
 export type WorkflowTemplateGroup = {
-    user_email: string;
-    template_name: string;
-	templates: Array<WorkflowTemplateGroupMember>
-}
-
+	user_email: string;
+	template_name: string;
+	templates: Array<WorkflowTemplateGroupMember>;
+};
 
 export type WorkflowTemplateImport = {
 	name: string;
-    version: number;
-    description: string | null;
-    data: WorkflowImport;
-}
+	version: number;
+	description: string | null;
+	data: WorkflowImport;
+};
 
 export type Pagination<T> = {
 	total_count: number;
@@ -217,15 +216,15 @@ export type JobStatus = 'submitted' | 'done' | 'failed';
 
 export type ImagesStatus =
 	| {
-		status: JobStatus;
-	}
+			status: JobStatus;
+	  }
 	| {
-		status: JobStatus;
-		num_submitted_images: number;
-		num_done_images: number;
-		num_failed_images: number;
-		num_available_images: number | null;
-	};
+			status: JobStatus;
+			num_submitted_images: number;
+			num_done_images: number;
+			num_failed_images: number;
+			num_available_images: number | null;
+	  };
 
 export type WorkflowV2 = {
 	id: number;
@@ -257,8 +256,8 @@ export type WorkflowTaskV2 = {
 
 export type WorkflowImport = {
 	name: string;
-    description: string | null;
-    task_list: WorkflowTaskImport[];
+	description: string | null;
+	task_list: WorkflowTaskImport[];
 };
 
 type WorkflowTaskImport = {
@@ -266,32 +265,32 @@ type WorkflowTaskImport = {
 	meta_parallel: object | null;
 	args_non_parallel: object | null;
 	args_parallel: object | null;
-    type_filters: object | null;
-    input_filters: object | null;
-    description: string | null;
-    alias: string | null;
-    task: TaskImport;
-}
+	type_filters: object | null;
+	input_filters: object | null;
+	description: string | null;
+	alias: string | null;
+	task: TaskImport;
+};
 
 type TaskImport = {
-    pkg_name: string;
-    name: string;
-    version: string;
-}
+	pkg_name: string;
+	name: string;
+	version: string;
+};
 
 export type WorkflowImportErrorData = {
-	outcome: 'success' | 'fail' ;
-    pkg_name: string;
-    task_name: string;
-    version: string | null;
-    available_tasks: AvailableTask[];
+	outcome: 'success' | 'fail';
+	pkg_name: string;
+	task_name: string;
+	version: string | null;
+	available_tasks: AvailableTask[];
 };
 
 type AvailableTask = {
-    version: string;
-    active: boolean;
+	version: string;
+	active: boolean;
 	older_than_target: boolean;
-}
+};
 
 type TaskV2Minimal = {
 	id: number;

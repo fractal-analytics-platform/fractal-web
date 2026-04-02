@@ -4,44 +4,44 @@ repo_url: https://github.com/fractal-analytics-platform/fractal-web
 repo_name: fractal-web
 
 markdown_extensions:
-- admonition
-- pymdownx.details
-- pymdownx.emoji
-- pymdownx.magiclink
-- pymdownx.snippets:
-    check_paths: true
-- pymdownx.superfences
-- pymdownx.tabbed:
-    alternate_style: true
-- pymdownx.tasklist
-- toc:
-    permalink: true
-- attr_list
-- md_in_html
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
 
 theme:
-  name: "material"
+  name: 'material'
   logo: 'https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_logo.png'
   favicon: 'https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_favicon.png'
-  custom_dir: "docs/overrides"
+  custom_dir: 'docs/overrides'
   features:
     - content.code.annotate
     - content.code.copy
   palette:
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: deep orange
-    accent: orange
-    toggle:
-      icon: material/weather-sunny
-      name: Switch to dark mode
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: deep orange
-    accent: orange
-    toggle:
-      icon: material/weather-night
-      name: Switch to light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
   icon:
     repo: fontawesome/brands/github
   navigation:
@@ -57,7 +57,6 @@ nav:
   - Development: development/
   - Deployment examples: examples.md
   - Sandbox pages: sandbox-pages.md
-
 
 plugins:
   - search

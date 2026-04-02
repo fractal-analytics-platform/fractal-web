@@ -64,8 +64,8 @@ But how is this interaction implemented in this client?
 
 As said, the svelte client communicates with the fractal server through a set of REST APIs.
 
-In this client, every request to the fractal server is sent by the *nodejs server that is serving the svelte
-application*.
+In this client, every request to the fractal server is sent by the _nodejs server that is serving the svelte
+application_.
 
 > It is important to understand that these requests are made in the server context of the svelte client.
 > No request to the fractal server is sent directly by the browser of the user.
@@ -87,9 +87,9 @@ So, by default, the AJAX calls performed by the front-end have the same path and
 
 Summarizing, the frontend code:
 
-* uses exactly the same path of the fractal-server API for the `/api` endpoints 
-* uses `/api/auth` for `/auth` endpoints
-* uses `/api/admin` for `/admin` endpoints
+- uses exactly the same path of the fractal-server API for the `/api` endpoints
+- uses `/api/auth` for `/auth` endpoints
+- uses `/api/admin` for `/admin` endpoints
 
 Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under `src/lib/server/api/v1`. Here requests are grouped by contexts as `auth_api`, `admin_api`, [...].
 
@@ -128,7 +128,7 @@ The request is made by the svelte client application in a backend context within
 The client will, if the request succeeds, handle the fractal server response in
 a [form action](https://kit.svelte.dev/docs/form-actions).
 
-```javascript 
+```javascript
 // src/routes/auth/login/+page.server.js
 
 export const actions = {
@@ -187,44 +187,42 @@ makes when a user sends an HTML from, for completion, the one defined in:
 <!-- src/routes/auth/login/+page.svelte -->
 
 <script>
-  export let form;
-  let loginError = false;
+	export let form;
+	let loginError = false;
 
-  if (form?.invalid) {
-    loginError = true;
-  }
+	if (form?.invalid) {
+		loginError = true;
+	}
 </script>
 
-<div class='container'>
-  <div class='row'>
-    <h1>Login</h1>
-  </div>
-  <div class='row'>
-    <div class='col-md-4'>
-      <form method='POST'>
-        <div class='mb-3'>
-          <label for='userEmail' class='form-label'>Email address</label>
-          <input
-            name='username'
-            type='email'
-            class="form-control {loginError ? 'is-invalid' : ''}"
-            id='userEmail'
-            aria-describedby='emailHelp'
-            required
-          />
-          <div id='emailHelp' class='form-text'>The email you provided to the IT manager</div>
-          <div class='invalid-feedback'>
-            {form?.invalidMessage}
-          </div>
-        </div>
-        <div class='mb-3'>
-          <label for='userPassword' class='form-label'>Password</label>
-          <input name='password' type='password' class='form-control' id='userPassword' required />
-        </div>
-        <button class='btn btn-primary'>Submit</button>
-      </form>
-    </div>
-  </div>
+<div class="container">
+	<div class="row">
+		<h1>Login</h1>
+	</div>
+	<div class="row">
+		<div class="col-md-4">
+			<form method="POST">
+				<div class="mb-3">
+					<label for="userEmail" class="form-label">Email address</label>
+					<input
+						name="username"
+						type="email"
+						class="form-control {loginError ? 'is-invalid' : ''}"
+						id="userEmail"
+						aria-describedby="emailHelp"
+						required
+					/>
+					<div id="emailHelp" class="form-text">The email you provided to the IT manager</div>
+					<div class="invalid-feedback">{form?.invalidMessage}</div>
+				</div>
+				<div class="mb-3">
+					<label for="userPassword" class="form-label">Password</label>
+					<input name="password" type="password" class="form-control" id="userPassword" required />
+				</div>
+				<button class="btn btn-primary">Submit</button>
+			</form>
+		</div>
+	</div>
 </div>
 ```
 
@@ -247,4 +245,5 @@ about [server-only modules](https://kit.svelte.dev/docs/server-only-modules)
 
 _Stores_ are modules that export svelte store objects that are used by components to manage the state of the
 application.
+
 > Note that stores are currently not well-organized or used due to the youth of the client.

@@ -5,11 +5,13 @@ steps to install and run a local `fractal-server` instance, that can be then
 accessed through `fractal-web`.
 
 Briefly, one should:
-* Install fractal-server (`pip install fractal-server`);
-* Set up the database (`fractalctl set-db`);
-* Startup an instance (`fractalctl start`).
+
+- Install fractal-server (`pip install fractal-server`);
+- Set up the database (`fractalctl set-db`);
+- Startup an instance (`fractalctl start`).
 
 Notes:
+
 1. There must exist a `.fractal_server.env` file (see example in
    `../lib/fractal-server/`), with some configuration variables.
 2. It is necessary that the fractal-server instance is reachable from the

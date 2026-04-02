@@ -44,11 +44,10 @@
 	/** @type {import('fractal-components/types/api').WorkflowImport|undefined} */
 	let workflowMetadata = $state(undefined);
 
-	let includeOlderVersions = $state(false)
+	let includeOlderVersions = $state(false);
 
 	/** @type {number|undefined} */
 	let singleSelectedTemplateId = $state();
-
 
 	$effect(() => {
 		includeOlderVersions;
@@ -56,21 +55,17 @@
 			selectedVersions = [];
 			return;
 		}
-		selectedVersions = workflowImportErrorData.map(item =>
-			item.outcome === "fail"
-			? undefined
-			: item.version !== null
-				? item.version
-				: undefined
+		selectedVersions = workflowImportErrorData.map((item) =>
+			item.outcome === 'fail' ? undefined : item.version !== null ? item.version : undefined
 		);
 	});
-	
+
 	export function show() {
 		modal?.show();
 	}
 
 	export function reset() {
-		files=undefined;
+		files = undefined;
 		if (fileInput) {
 			fileInput.value = '';
 		}
@@ -80,7 +75,7 @@
 		workflowMetadata = undefined;
 		selectedVersions = [];
 		includeOlderVersions = false;
-		mode='new';
+		mode = 'new';
 		modal?.hideErrorAlert();
 	}
 
@@ -109,7 +104,6 @@
 	}
 
 	async function _handleImportWorkflow() {
-
 		if (!workflowImportErrorData) {
 			const workflowFile = /** @type {FileList} */ (files)[0];
 			try {
@@ -133,7 +127,6 @@
 				workflowMetadata.name = workflowName;
 			}
 		}
-
 
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
@@ -165,8 +158,12 @@
 			const alertError = await getAlertErrorFromResponse(response);
 			const result = alertError.reason;
 
-			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
-				workflowImportErrorData = result.data
+			if (
+				typeof result === 'object' &&
+				'detail' in result &&
+				result.detail.includes('HAS_ERROR_DATA')
+			) {
+				workflowImportErrorData = result.data;
 				throw new Error();
 			}
 
@@ -201,7 +198,6 @@
 		}
 	}
 
-
 	async function handleSelect() {
 		modal?.hideErrorAlert();
 
@@ -209,19 +205,15 @@
 		if (workflowName) {
 			payload.name = workflowName;
 		}
-		
-		
+
 		if (selectedVersions.length > 0) {
-			const response1 = await fetch(
-				`/api/v2/workflow-template/${singleSelectedTemplateId}`, 
-				{
-					method: 'GET',
-					credentials: 'include',
-				}
-			);
+			const response1 = await fetch(`/api/v2/workflow-template/${singleSelectedTemplateId}`, {
+				method: 'GET',
+				credentials: 'include'
+			});
 			/** @type {import('fractal-components/types/api').WorkflowTemplate} */
 			const template = await response1.json();
-			const originalVersions = template.data.task_list.map(t => t.task.version);
+			const originalVersions = template.data.task_list.map((t) => t.task.version);
 			payload.override_versions = Object.fromEntries(
 				selectedVersions
 					.map((v, i) => (v !== originalVersions[i] ? [i, v] : null))
@@ -233,17 +225,16 @@
 		}
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		
+
 		const response2 = await fetch(
-			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`, 
+			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`,
 			{
 				method: 'POST',
 				credentials: 'include',
 				headers,
-				body: JSON.stringify(payload),
+				body: JSON.stringify(payload)
 			}
 		);
-		
 
 		if (response2.ok) {
 			// Return a workflow item
@@ -263,14 +254,17 @@
 			console.error('Import workflow failed');
 			const alertError = await getAlertErrorFromResponse(response2);
 			const result = alertError.reason;
-			if (typeof result === 'object' && 'detail' in result && result.detail.includes("HAS_ERROR_DATA")) {
-				workflowImportErrorData = result.data
+			if (
+				typeof result === 'object' &&
+				'detail' in result &&
+				result.detail.includes('HAS_ERROR_DATA')
+			) {
+				workflowImportErrorData = result.data;
 				throw new Error();
 			}
 			modal?.displayErrorAlert(alertError);
 		}
 	}
-
 </script>
 
 <Modal
@@ -286,171 +280,157 @@
 		<h5 class="modal-title">Create new workflow</h5>
 	{/snippet}
 	{#snippet body()}
-	<!-- SWITCHER -->
-	<div class="row mb-3">
-
-		<div class="col-10">
-			<div class="form-check form-check-inline mb-3">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="createWorkflowMode"
-					id="createWorkflowModeNew"
-					value="new"
-					onclick={reset}
-					bind:group={mode}
-				/>
-				<label class="form-check-label" for="createWorkflowModeNew">Create new</label>
-			</div>
-			<div class="form-check form-check-inline mb-3">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="createWorkflowMode"
-					id="createWorkflowModeImport"
-					value="import"
-					onclick={reset}
-					bind:group={mode}
-				/>
-				<label class="form-check-label" for="createWorkflowModeImport">Import from file</label>
-			</div>
-			<div class="form-check form-check-inline mb-3">
-				<input
-					class="form-check-input"
-					type="radio"
-					name="createWorkflowMode"
-					id="createWorkflowModeTemplate"
-					value="template"
-					onclick={reset}
-					bind:group={mode}
-				/>
-				<label class="form-check-label" for="createWorkflowModeTemplate">Create from template</label>
+		<!-- SWITCHER -->
+		<div class="row mb-3">
+			<div class="col-10">
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createWorkflowMode"
+						id="createWorkflowModeNew"
+						value="new"
+						onclick={reset}
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createWorkflowModeNew">Create new</label>
+				</div>
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createWorkflowMode"
+						id="createWorkflowModeImport"
+						value="import"
+						onclick={reset}
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createWorkflowModeImport">Import from file</label>
+				</div>
+				<div class="form-check form-check-inline mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="createWorkflowMode"
+						id="createWorkflowModeTemplate"
+						value="template"
+						onclick={reset}
+						bind:group={mode}
+					/>
+					<label class="form-check-label" for="createWorkflowModeTemplate"
+						>Create from template</label
+					>
+				</div>
 			</div>
 		</div>
-	</div>
-	{#if mode==='new'}
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				handleCreateWorkflow();
-			}}
-		>
-			<div class="mb-2">
-				<label for="workflowName" class="form-label">Workflow name</label>
-				<input
-					id="workflowName"
-					name="workflowName"
-					type="text"
-					bind:value={workflowName}
-					class="form-control"
-				/>
-			</div>
-			<button
-				class="btn btn-primary mt-2"
-				disabled={(!workflowName) || creating}
-			>
-				{#if creating}
-					<span
-						class="spinner-border spinner-border-sm"
-						role="status"
-						aria-hidden="true">
-					</span>
-				{/if}			
-				Create empty workflow
-			</button>
-			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
-		</form>
-
-	{:else if mode==='import'}
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				handleImportWorkflow();
-			}}
-		>
-			<div class="mb-2">
-				<label for="workflowName" class="form-label">Workflow name</label>
-				<input
-					id="workflowName"
-					name="workflowName"
-					type="text"
-					bind:value={workflowName}
-					class="form-control"
-				/>
-			</div>
-	
-			{#if !workflowImportErrorData}
-				<div class="mb-3">
-					<label for="workflowFile" class="form-label">Select a file</label>
-					<input
-						class="form-control"
-						accept="application/json"
-						type="file"
-						name="workflowFile"
-						id="workflowFile"
-						bind:this={fileInput}
-						bind:files
-					/>
-				</div>
-				<button
-					class="btn btn-primary mt-2"
-					disabled={!workflowFileSelected || creating}
-				>
-					{#if creating}
-						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-					{/if}
-					Import workflow
-				</button>
-			{:else}
-				<WorkflowImportFlexibility
-					bind:workflowImportErrorData
-					bind:selectedVersions
-					bind:includeOlderVersions
-					bind:workflowMetadata
-					{creating}
-				/>
-			{/if}
-			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
-		</form>
-		{#if importSuccess}
-			<p class="alert alert-primary mt-3">Workflow imported successfully</p>
-		{/if}
-	{:else}
-		<div class="mb-2">
-				<label for="workflowName" class="form-label">Workflow name</label>
-				<input
-					id="workflowName"
-					name="workflowName"
-					type="text"
-					bind:value={workflowName}
-					class="form-control"
-				/>
-			</div>
-			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
-			{#if !workflowImportErrorData}
-			<div>Select a template</div>
-				<TemplatesTable 
-					modalType='select'
-					{handleSelect}
-					bind:singleSelectedTemplateId
-				/>
-			{:else}
-				<form
+		{#if mode === 'new'}
+			<form
 				onsubmit={(e) => {
 					e.preventDefault();
-					handleSelect();
+					handleCreateWorkflow();
 				}}
-				>
-				<WorkflowImportFlexibility
-					bind:workflowImportErrorData
-					bind:selectedVersions
-					bind:includeOlderVersions
-					bind:workflowMetadata
-					{creating}
+			>
+				<div class="mb-2">
+					<label for="workflowName" class="form-label">Workflow name</label>
+					<input
+						id="workflowName"
+						name="workflowName"
+						type="text"
+						bind:value={workflowName}
+						class="form-control"
+					/>
+				</div>
+				<button class="btn btn-primary mt-2" disabled={!workflowName || creating}>
+					{#if creating}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"> </span>
+					{/if}
+					Create empty workflow
+				</button>
+				<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
+			</form>
+		{:else if mode === 'import'}
+			<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleImportWorkflow();
+				}}
+			>
+				<div class="mb-2">
+					<label for="workflowName" class="form-label">Workflow name</label>
+					<input
+						id="workflowName"
+						name="workflowName"
+						type="text"
+						bind:value={workflowName}
+						class="form-control"
+					/>
+				</div>
+
+				{#if !workflowImportErrorData}
+					<div class="mb-3">
+						<label for="workflowFile" class="form-label">Select a file</label>
+						<input
+							class="form-control"
+							accept="application/json"
+							type="file"
+							name="workflowFile"
+							id="workflowFile"
+							bind:this={fileInput}
+							bind:files
+						/>
+					</div>
+					<button class="btn btn-primary mt-2" disabled={!workflowFileSelected || creating}>
+						{#if creating}
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+							></span>
+						{/if}
+						Import workflow
+					</button>
+				{:else}
+					<WorkflowImportFlexibility
+						bind:workflowImportErrorData
+						bind:selectedVersions
+						bind:includeOlderVersions
+						bind:workflowMetadata
+						{creating}
+					/>
+				{/if}
+				<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
+			</form>
+			{#if importSuccess}
+				<p class="alert alert-primary mt-3">Workflow imported successfully</p>
+			{/if}
+		{:else}
+			<div class="mb-2">
+				<label for="workflowName" class="form-label">Workflow name</label>
+				<input
+					id="workflowName"
+					name="workflowName"
+					type="text"
+					bind:value={workflowName}
+					class="form-control"
 				/>
+			</div>
+			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
+			{#if !workflowImportErrorData}
+				<div>Select a template</div>
+				<TemplatesTable modalType="select" {handleSelect} bind:singleSelectedTemplateId />
+			{:else}
+				<form
+					onsubmit={(e) => {
+						e.preventDefault();
+						handleSelect();
+					}}
+				>
+					<WorkflowImportFlexibility
+						bind:workflowImportErrorData
+						bind:selectedVersions
+						bind:includeOlderVersions
+						bind:workflowMetadata
+						{creating}
+					/>
 				</form>
 			{/if}
-	{/if}
-
+		{/if}
 	{/snippet}
 </Modal>

@@ -2,7 +2,6 @@
 	import { objectChanged } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("fractal-components/types/api").TaskV2} task
