@@ -96,7 +96,7 @@
 		selectedSchema = null;
 		selectedTask = null;
 		selectedTaskName = '';
-    dataError = '';
+		dataError = '';
 		tasks = manifest.task_list.map((t) => t.name);
 	}
 

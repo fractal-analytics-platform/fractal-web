@@ -22,7 +22,7 @@ describe('PixiTask', () => {
 
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
-			json: () => { }
+			json: () => {}
 		});
 
 		await user.type(screen.getByRole('textbox', { name: 'Pixi version (optional)' }), '0.50.0');
@@ -49,7 +49,7 @@ describe('PixiTask', () => {
 
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: true,
-			json: () => { }
+			json: () => {}
 		});
 
 		await user.click(screen.getByRole('switch'));

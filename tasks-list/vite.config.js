@@ -3,12 +3,12 @@ import { fileURLToPath } from 'url';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
-	plugins: [
-		sveltekit()
-	],
+	plugins: [sveltekit()],
 	resolve: {
 		alias: {
-			'fractal-components': fileURLToPath(new URL('../components/src/lib/index.js', import.meta.url))
+			'fractal-components': fileURLToPath(
+				new URL('../components/src/lib/index.js', import.meta.url)
+			)
 		}
 	},
 	optimizeDeps: {

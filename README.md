@@ -1,4 +1,3 @@
-
 # Fractal Web Client
 
 <p align="center">

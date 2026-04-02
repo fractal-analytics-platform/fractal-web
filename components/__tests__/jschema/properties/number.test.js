@@ -56,7 +56,7 @@ describe('Number properties', () => {
 				type: 'object',
 				properties: {
 					testProp: {
-						type: 'number',
+						type: 'number'
 					}
 				}
 			},

@@ -1,11 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 
-	
-	
-	
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {string} id
@@ -15,12 +10,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		id,
-		description,
-		accept,
-		validateFile
-	} = $props();
+	let { id, description, accept, validateFile } = $props();
 
 	/** @type {(type: string, detail?: any) => boolean} */
 	const dispatch = createEventDispatcher();

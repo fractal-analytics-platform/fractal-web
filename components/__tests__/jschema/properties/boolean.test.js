@@ -88,7 +88,7 @@ describe('Boolean properties', () => {
 				type: 'object',
 				properties: {
 					b: { type: 'boolean', default: false }
-				},
+				}
 			},
 			'pydantic_v2'
 		);

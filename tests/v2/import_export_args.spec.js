@@ -34,7 +34,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 						type: 'object',
 						properties: {
 							discr: { type: 'string', const: 'A' },
-							a: { type: 'string' },
+							a: { type: 'string' }
 						},
 						required: ['discr', 'a']
 					},
@@ -42,10 +42,10 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 						type: 'object',
 						properties: {
 							discr: { type: 'string', const: 'B' },
-							b: { type: 'string' },
+							b: { type: 'string' }
 						},
 						required: ['discr', 'b']
-					},
+					}
 				},
 				properties: {
 					test_non_parallel: {
@@ -60,10 +60,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 							},
 							propertyName: 'discr'
 						},
-						oneOf: [
-							{ $ref: '#/$defs/A' },
-							{ $ref: '#/$defs/B' }
-						]
+						oneOf: [{ $ref: '#/$defs/A' }, { $ref: '#/$defs/B' }]
 					}
 				},
 				type: 'object'

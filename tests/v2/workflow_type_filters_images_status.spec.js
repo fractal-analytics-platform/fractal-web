@@ -50,7 +50,11 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 		await modal.waitFor();
 		await expect(modal.getByLabel('Selector for type 3D')).toBeEnabled();
 		await expect(modal.getByText('Total results: 4')).toBeVisible();
-		await selectSlimSelect(page, modal.getByRole('combobox', { name: 'Selector for type 3D' }), 'False');
+		await selectSlimSelect(
+			page,
+			modal.getByRole('combobox', { name: 'Selector for type 3D' }),
+			'False'
+		);
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();

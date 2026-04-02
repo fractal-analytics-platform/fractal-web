@@ -68,13 +68,7 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 				loadDefaults
 			);
 		} else if (property.oneOf.length > 0) {
-			return getPropertyData(
-				property.oneOf[0],
-				schemaVersion,
-				required,
-				initialValue,
-				true
-			);
+			return getPropertyData(property.oneOf[0], schemaVersion, required, initialValue, true);
 		}
 	}
 	return {};
@@ -112,7 +106,7 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 	switch (property.type) {
 		case 'object':
 			return getObjectPropertyData(
-				/** @type {import("../types/jschema.js").JSONSchemaObjectProperty}*/(property),
+				/** @type {import("../types/jschema.js").JSONSchemaObjectProperty}*/ (property),
 				schemaVersion,
 				initialValue,
 				loadDefaults
@@ -198,16 +192,10 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 
 	let data = [];
 	for (let i = 0; i < initialValue.length; i++) {
-		const childProperty = getTupleChildProperty(property, schemaVersion, i)
+		const childProperty = getTupleChildProperty(property, schemaVersion, i);
 		if (childProperty) {
 			data.push(
-				getPropertyData(
-					childProperty,
-					schemaVersion,
-					required,
-					initialValue[i],
-					loadDefaults
-				)
+				getPropertyData(childProperty, schemaVersion, required, initialValue[i], loadDefaults)
 			);
 		} else {
 			// invalid extra value (to be removed by user)

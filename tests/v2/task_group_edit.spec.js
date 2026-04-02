@@ -34,7 +34,7 @@ test('Task group edit (change group)', async ({ page, workflow }) => {
 		await waitModalClosed(page);
 		await expect(taskRow.getByRole('cell').nth(3)).toContainText('-');
 	});
-	
+
 	await test.step('Set the task to test group', async () => {
 		const taskRow = page.getByRole('row', { name: taskName });
 		await taskRow.getByRole('button', { name: 'Edit' }).click();

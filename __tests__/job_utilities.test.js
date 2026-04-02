@@ -245,11 +245,7 @@ describe('get first task index for continuing workflow', () => {
 	it('should return undefined if there are no statuses', () => {
 		const selectedWorkflowTask = dummyTasks[0];
 
-		const result = getFirstTaskIndexForContinuingWorkflow(
-			dummyTasks,
-			selectedWorkflowTask,
-			{}
-		);
+		const result = getFirstTaskIndexForContinuingWorkflow(dummyTasks, selectedWorkflowTask, {});
 		expect(result).toBeUndefined();
 	});
 

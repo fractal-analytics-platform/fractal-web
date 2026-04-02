@@ -24,7 +24,7 @@
 	/** @type {HTMLInputElement|undefined} */
 	let fileInput = $state(undefined);
 	/** @type {number|undefined} */
-	let userGroupId = $state(undefined)
+	let userGroupId = $state(undefined);
 
 	/** @type {Modal|undefined} */
 	let modal = $state(undefined);
@@ -61,11 +61,10 @@
 	}
 
 	async function handleImportTemplate() {
-
 		const templateFile = /** @type {FileList} */ (files)[0];
 		/** @type {import('fractal-components/types/api').WorkflowTemplateImport} */
 		let template;
-		
+
 		try {
 			template = JSON.parse(await templateFile.text());
 		} catch (err) {
@@ -83,13 +82,13 @@
 		}
 
 		const headers = new Headers();
-		headers.set('Content-Type', 'application/json')
-		
+		headers.set('Content-Type', 'application/json');
+
 		const url = new URL('/api/v2/workflow-template/import', window.location.origin);
 
 		if (userGroupId) {
 			url.searchParams.set('user_group_id', String(userGroupId));
-		};
+		}
 
 		const response = await fetch(url, {
 			method: 'POST',
@@ -102,14 +101,11 @@
 			console.error('Import template failed');
 			const alertError = await getAlertErrorFromResponse(response);
 			throw alertError;
-		}
-		else {
-			const result = await response.json()
+		} else {
+			const result = await response.json();
 			await onTemplateImport(result.id);
 		}
-    }
-
-
+	}
 </script>
 
 <Modal
@@ -130,7 +126,7 @@
 				e.preventDefault();
 				importTemplate();
 			}}
-		>		
+		>
 			<div class="mb-3">
 				<label class="form-check-label" for="templateFile">Select a file</label>
 				<input
@@ -165,16 +161,11 @@
 			</div>
 			<div class="mb-2">
 				<label class="form-label" for="template-user-group-id">User Group</label>
-				<select
-					class="form-select"
-					id="template-user-group-id"
-					bind:value={userGroupId}
-				>
+				<select class="form-select" id="template-user-group-id" bind:value={userGroupId}>
 					<option value={undefined}>Select...</option>
-					{#each groups as group, index (index) }
+					{#each groups as group, index (index)}
 						<option value={group[0]}>{group[1]}</option>
 					{/each}
-					
 				</select>
 			</div>
 			<button

@@ -91,10 +91,10 @@ describe('Workflow page', () => {
 								is_verified: false,
 								is_guest: true,
 								group_ids_names: [],
-								"oauth_accounts": [],
-								"profile_id": 1,
-								"project_dirs": ['/tmp'],
-								"slurm_accounts": []
+								oauth_accounts: [],
+								profile_id: 1,
+								project_dirs: ['/tmp'],
+								slurm_accounts: []
 							};
 						case '/api/v2/project/1/workflow/1/version-update-candidates':
 							return [];

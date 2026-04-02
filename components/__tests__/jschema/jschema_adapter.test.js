@@ -197,80 +197,75 @@ describe('jschema_adapter', () => {
 
 	it('Does not merge allOf for if/then properties', () => {
 		const schema = {
-			"additionalProperties": false,
-			"allOf": [
+			additionalProperties: false,
+			allOf: [
 				{
-					"if": {
-						"properties": {
-							"mode": {
-								"const": "advanced",
-								"type": "string"
+					if: {
+						properties: {
+							mode: {
+								const: 'advanced',
+								type: 'string'
 							}
 						}
 					},
-					"then": {
-						"properties": {
-							"advanced_config": {
-								"type": "string"
+					then: {
+						properties: {
+							advanced_config: {
+								type: 'string'
 							}
 						},
-						"required": [
-							"advanced_config"
-						]
+						required: ['advanced_config']
 					}
 				},
 				{
-					"if": {
-						"properties": {
-							"use_cache": {
-								"const": true,
-								"type": "boolean"
+					if: {
+						properties: {
+							use_cache: {
+								const: true,
+								type: 'boolean'
 							}
 						}
 					},
-					"then": {
-						"properties": {
-							"cache_size": {
-								"minimum": 1,
-								"type": "number"
+					then: {
+						properties: {
+							cache_size: {
+								minimum: 1,
+								type: 'number'
 							}
 						}
 					}
 				}
 			],
-			"description": "Model demonstrating multiple independent conditions in allOf",
-			"properties": {
-				"mode": {
-					"default": "simple",
-					"description": "Processing mode. When set to 'advanced', advanced_config is required.",
-					"enum": [
-						"simple",
-						"advanced"
-					],
-					"title": "Mode",
-					"type": "string"
+			description: 'Model demonstrating multiple independent conditions in allOf',
+			properties: {
+				mode: {
+					default: 'simple',
+					description: "Processing mode. When set to 'advanced', advanced_config is required.",
+					enum: ['simple', 'advanced'],
+					title: 'Mode',
+					type: 'string'
 				},
-				"advanced_config": {
-					"description": "Configuration string required when mode is 'advanced'.",
-					"title": "Advanced Config",
-					"type": "string"
+				advanced_config: {
+					description: "Configuration string required when mode is 'advanced'.",
+					title: 'Advanced Config',
+					type: 'string'
 				},
-				"use_cache": {
-					"default": false,
-					"description": "Determines whether cache_size is required",
-					"title": "Use Cache",
-					"type": "boolean"
+				use_cache: {
+					default: false,
+					description: 'Determines whether cache_size is required',
+					title: 'Use Cache',
+					type: 'boolean'
 				},
-				"cache_size": {
-					"default": 1,
-					"description": "Size of the cache.",
-					"title": "Cache Size",
-					"type": "integer"
+				cache_size: {
+					default: 1,
+					description: 'Size of the cache.',
+					title: 'Cache Size',
+					type: 'integer'
 				}
 			},
-			"title": "ModelWithMultipleIfThen",
-			"type": "object"
-		}
+			title: 'ModelWithMultipleIfThen',
+			type: 'object'
+		};
 
 		const adaptedSchema = adaptJsonSchema(schema);
 		expect(adaptedSchema).to.deep.eq(schema);
@@ -278,44 +273,40 @@ describe('jschema_adapter', () => {
 
 	it('Does not merge allOf for mutually exclusive properties', () => {
 		const schema = {
-			"additionalProperties": false,
-			"not": {
-				"allOf": [
+			additionalProperties: false,
+			not: {
+				allOf: [
 					{
-						"properties": {
-							"output_path": {
-								"type": "string"
+						properties: {
+							output_path: {
+								type: 'string'
 							}
 						},
-						"required": [
-							"output_path"
-						]
+						required: ['output_path']
 					},
 					{
-						"properties": {
-							"output_url": {
-								"type": "string"
+						properties: {
+							output_url: {
+								type: 'string'
 							}
 						},
-						"required": [
-							"output_url"
-						]
+						required: ['output_url']
 					}
 				]
 			},
-			"properties": {
-				"output_path": {
-					"title": "Output Path",
-					"type": "string"
+			properties: {
+				output_path: {
+					title: 'Output Path',
+					type: 'string'
 				},
-				"output_url": {
-					"title": "Output Url",
-					"type": "string"
+				output_url: {
+					title: 'Output Url',
+					type: 'string'
 				}
 			},
-			"title": "ModelMutuallyExclusive",
-			"type": "object"
-		}
+			title: 'ModelMutuallyExclusive',
+			type: 'object'
+		};
 
 		const adaptedSchema = adaptJsonSchema(schema);
 		expect(adaptedSchema).to.deep.eq(schema);

@@ -9,7 +9,12 @@
 	import { page } from '$app/state';
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { isCompoundType, isNonParallelType, isParallelType, normalizePayload } from 'fractal-components';
+	import {
+		isCompoundType,
+		isNonParallelType,
+		isParallelType,
+		normalizePayload
+	} from 'fractal-components';
 
 	/**
 	 * @typedef {Object} Props

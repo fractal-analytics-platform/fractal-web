@@ -3,87 +3,85 @@
 	import DOMPurify from 'dompurify';
 	import { onMount } from 'svelte';
 
-    /**
-     * @typedef {Object} Props
-     * @property {Array<import('./types').TemplateEntry>} templates
+	/**
+	 * @typedef {Object} Props
+	 * @property {Array<import('./types').TemplateEntry>} templates
 	 * @property {Object} templateIdMap
-     */
+	 */
 
-    /** @type {Props} */
-    let { templates, templateIdMap } = $props();
+	/** @type {Props} */
+	let { templates, templateIdMap } = $props();
 
-	
 	/** @type {import('./types').TemplateItem[]}*/
 	let selectedTemplates = $state([]);
 
 	$effect(() => {
-		selectedTemplates = filteredTemplates.map(item => item.templates[0]);
+		selectedTemplates = filteredTemplates.map((item) => item.templates[0]);
 	});
-	
+
 	onMount(() => {
-		selectedTemplates = templates.map(item => item.templates[0]);
-	})
-	
+		selectedTemplates = templates.map((item) => item.templates[0]);
+	});
+
 	let templateName = $state('');
 	/** @type {number|undefined} */
 	let templateVersion = $state(undefined);
-	
+
 	/** @type {Array<import('./types').TemplateEntry>}*/
-	let filteredTemplates = $derived((() => {
-		
-		let result;
-		if (templateName) {
-			result = templates.filter(entry =>
-				entry.template_name.toLowerCase().includes(templateName.toLowerCase())
-			);
-		} else {
-			result = templates;
-		}
-		
-		if (templateVersion) {
-			result = result
-				.map(entry => ({
-					...entry,
-					templates: entry.templates.filter(t =>
-						t.template_version === templateVersion
-					)
-				}))
-				.filter(entry => entry.templates.length > 0);
-		}
+	let filteredTemplates = $derived(
+		(() => {
+			let result;
+			if (templateName) {
+				result = templates.filter((entry) =>
+					entry.template_name.toLowerCase().includes(templateName.toLowerCase())
+				);
+			} else {
+				result = templates;
+			}
 
-		return result;
-	})());
+			if (templateVersion) {
+				result = result
+					.map((entry) => ({
+						...entry,
+						templates: entry.templates.filter((t) => t.template_version === templateVersion)
+					}))
+					.filter((entry) => entry.templates.length > 0);
+			}
 
-    /**
-	 * @param {number} templateId
-	 */
-    async function downloadTemplate(templateId) {
-        const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
-        const data = await response.json();
-
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = templateIdMap[templateId];
-        link.click();
-
-        URL.revokeObjectURL(url);
-    }
+			return result;
+		})()
+	);
 
 	/**
-	* @param {number} templateId
-	*/
+	 * @param {number} templateId
+	 */
+	async function downloadTemplate(templateId) {
+		const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
+		const data = await response.json();
+
+		const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = templateIdMap[templateId];
+		link.click();
+
+		URL.revokeObjectURL(url);
+	}
+
+	/**
+	 * @param {number} templateId
+	 */
 	async function showSelectedTemplateModal(templateId) {
 		const response = await fetch(`/templates-table/${templateIdMap[templateId]}`);
-        templateInfo = await response.json();
+		templateInfo = await response.json();
 		getBootstrapModal('template-info-modal').show();
 	}
 
 	/**
-	* @param {string} id
-	*/
+	 * @param {string} id
+	 */
 	function getBootstrapModal(id) {
 		const modalElement = document.getElementById(id);
 		// @ts-ignore
@@ -105,16 +103,13 @@
 	}
 
 	/**
-     * @typedef {Object} TemplateInfo
-     * @property {string} name
+	 * @typedef {Object} TemplateInfo
+	 * @property {string} name
 	 * @property {number} version
 	 * @property {string} description
-    */
+	 */
 	/** @type {TemplateInfo}*/
-	let templateInfo = $state({name: "-", version: 0, description: ""})
-	
-
-
+	let templateInfo = $state({ name: '-', version: 0, description: '' });
 </script>
 
 <div class="card mb-3">
@@ -144,73 +139,70 @@
 	</div>
 </div>
 
-
 <div class="card mb-3">
-<div class="card-body">
-<div class="table-responsive mt-2">
-	<table class="table" id="dataset-images-table">
-		<thead>
-			<tr>
-                <th>Name</th>
-                <th>Version</th>
-                <th></th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each filteredTemplates as templateGroup, index (index)}
-				<tr>
-                    <td class="col-5">{templateGroup.template_name}</td>
-                    <td class="col-2">
-						{#if templateGroup.templates.length>1}
-						<select
-							class="form-select"
-							aria-label="Version for template '{templateGroup.template_name}'"
-							bind:value={selectedTemplates[index]}
-						>
-							{#each templateGroup.templates as template, i (i)}
-								<option value={template}>{template.template_version}</option>
-							{/each}
-						</select>
-						{:else}
-							{templateGroup.templates[0].template_version}
-						{/if}
-					</td>
-                    <td class="col-2">
+	<div class="card-body">
+		<div class="table-responsive mt-2">
+			<table class="table" id="dataset-images-table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Version</th>
+						<th></th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each filteredTemplates as templateGroup, index (index)}
+						<tr>
+							<td class="col-5">{templateGroup.template_name}</td>
+							<td class="col-2">
+								{#if templateGroup.templates.length > 1}
+									<select
+										class="form-select"
+										aria-label="Version for template '{templateGroup.template_name}'"
+										bind:value={selectedTemplates[index]}
+									>
+										{#each templateGroup.templates as template, i (i)}
+											<option value={template}>{template.template_version}</option>
+										{/each}
+									</select>
+								{:else}
+									{templateGroup.templates[0].template_version}
+								{/if}
+							</td>
+							<td class="col-2"> </td>
+							<td class="col-1">
+								<button
+									class="btn btn-outline-primary"
+									title="Info"
+									type="button"
+									aria-label="Info"
+									onclick={async () => {
+										await showSelectedTemplateModal(selectedTemplates[index].template_id);
+									}}
+								>
+									<i class="bi bi-info-circle"></i>
+								</button>
 
-                    </td>
-					<td class="col-1">
-						<button
-								class="btn btn-outline-primary"
-								title="Info"
-								type="button"
-								aria-label="Info"
-                                onclick={async () => {
-                                    await showSelectedTemplateModal(selectedTemplates[index].template_id);
-                                }}
-							>
-								<i class="bi bi-info-circle"></i>
-						</button>
-
-						<button
-								class="btn btn-outline-primary"
-								title="Download"
-								type="button"
-								aria-label="Download"
-                                onclick={async () => {
-                                    await downloadTemplate(selectedTemplates[index].template_id);
-                                }}
-							>
-								<i class="bi bi-download"></i>
-						</button>
-						<a id="downloadTemplateButton" class="d-none">Download template link</a>
-					</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
-</div>
+								<button
+									class="btn btn-outline-primary"
+									title="Download"
+									type="button"
+									aria-label="Download"
+									onclick={async () => {
+										await downloadTemplate(selectedTemplates[index].template_id);
+									}}
+								>
+									<i class="bi bi-download"></i>
+								</button>
+								<a id="downloadTemplateButton" class="d-none">Download template link</a>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
 <div class="modal modal-xl" id="template-info-modal" tabindex="-1">
