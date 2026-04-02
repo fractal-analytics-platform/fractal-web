@@ -235,24 +235,16 @@
 		}
 
 		if (autodetectVersion) {
-			try {
-				args_schema_version = detectSchemaVersion(json);
-				return json;
-			} catch (err) {
-				return new Error(
-					`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
-				);
-			}
-		} else {
-			try {
-				const schemaValidator = new SchemaValidator(args_schema_version);
-				schemaValidator.validateSchema(stripDiscriminator(json));
-				return json;
-			} catch (err) {
-				return new Error(
-					`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
-				);
-			}
+			args_schema_version = detectSchemaVersion(json);
+		}
+		try {
+			const schemaValidator = new SchemaValidator(args_schema_version);
+			schemaValidator.validateSchema(stripDiscriminator(json));
+			return json;
+		} catch (err) {
+			return new Error(
+				`File doesn't contain valid JSON Schema: ${/** @type {Error} */ (err).message}`
+			);
 		}
 	}
 

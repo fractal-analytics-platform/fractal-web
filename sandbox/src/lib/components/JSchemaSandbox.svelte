@@ -46,8 +46,10 @@
 			const schemaValidator = new SchemaValidator(schemaVersion);
 			schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
 		} catch (_) {
+			schemaVersion = detectSchemaVersion(parsedSchema);
 			try {
-				schemaVersion = detectSchemaVersion(parsedSchema);
+				const schemaValidator = new SchemaValidator(schemaVersion);
+				schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
 			} catch (err) {
 				schema = undefined;
 				jsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
@@ -56,7 +58,7 @@
 		}
 
 		schema = parsedSchema;
-    schemaData = undefined;
+		schemaData = undefined;
 		await tick();
 		jschemaComponent?.update(parsedSchema, undefined);
 		handleDataChanged();
