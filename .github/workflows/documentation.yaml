@@ -11,59 +11,45 @@ permissions: {}
 jobs:
 
   build:
-    name: "Generate docs"
-    runs-on: ubuntu-latest
-
+    name: "Build documentation"
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: '3.12'
           cache: pip
-
-      - name: Install dependencies
-        run: python -m pip install -r docs/requirements.txt
-
-      - name: MKDocs build
-        run: mkdocs build --config-file mkdocs.yml --strict
-
-      - name: Set up node
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+      - run: python -m pip install -r docs/requirements.txt
+      - run: mkdocs build --config-file mkdocs.yml --strict --site-dir site --clean
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: 20
           cache: npm
-
       - name: Install dependencies
         run: npm ci
-
       - name: Install components dependencies
         run: |
           cd components
           npm ci
-
       - name: Install sandbox dependencies
         run: |
           cd sandbox
           npm ci
-
       - name: Build sandbox
         run: |
           cd sandbox
           npm run build
-
       - name: Move sandbox built files in docs site
         run: mv sandbox/build/ site/sandbox
 
-      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: "site"
 
   deploy:
-    name: Deploy
+    name: "Deploy docs"
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
     needs: build
