@@ -103,6 +103,7 @@
 
 </script>
 
+
 <div class="container mt-3">
 	<div class="d-flex justify-content-between align-items-center mb-3">
 		<h1 class="fw-light">Projects</h1>
@@ -173,5 +174,54 @@
 	</button>
 
 	<div id="searchError" class="mt-3 mb-3"></div>
+
+
+	<div class="row">
+		<div class="col">
+			<div class:d-none={!searched}>
+				{#if results && results.total_count === 0}
+					<p class="text-center">The query returned 0 matching results</p>
+				{/if}
+
+
+				{#if results && results.items.length > 0}
+					<table class="table tasks-table mt-4 mb-4">
+						<thead>
+							<tr>
+								<th>Project Id</th>
+								<th>Project Name</th>
+								<th>User</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each results.items as project, index (index)}
+								<tr>
+									<td>{project.id}</td>
+									<td>{project.name}</td>
+									<td>
+										<a href={`/v2/admin/users/${users.find(user => user.email === project.user_email)?.id}`}>
+											{project.user_email}
+										</a>
+									</td>
+									<td>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+
+
+					<Paginator
+						{currentPage}
+						{pageSize}
+						{totalCount}
+						singleLine={true}
+						onPageChange={(currentPage, pageSize) => searchProject(currentPage, pageSize)}
+					/>
+				{/if}
+			</div>
+		</div>
+	</div>
 
 </div>
