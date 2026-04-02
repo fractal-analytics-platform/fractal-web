@@ -37,13 +37,27 @@ jobs:
           cd components
           npm ci
 
-      - name: Run static code analysis on components module
-        run: |
-          cd components
-          npx eslint .
-
       - name: Run static code analysis
-        run: npx eslint .
+        # Run prettier and eslint on all projects
+        run: npm run lint
+
+      - name: Run svelte-check on root and components
+        run: npx svelte-check
+
+      - name: Run svelte-check on sandbox
+        run: |
+          cd sandbox
+          npx svelte-check
+
+      - name: Run svelte-check on tasks-list
+        run: |
+          cd tasks-list
+          npx svelte-check
+
+      - name: Run svelte-check on templates-list
+        run: |
+          cd templates-list
+          npx svelte-check
 
       - name: Build site
         env:
