@@ -160,7 +160,9 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(page.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
+		await expect(
+			page.getByText(/The old arguments are not compatible with the new schema/)
+		).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(page.getByText('No new versions available')).toBeVisible();
 	});
@@ -192,7 +194,9 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(page.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
+		await expect(
+			page.getByText(/The old arguments are not compatible with the new schema/)
+		).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(
 			page.getByRole('combobox', { name: /New versions of this task exist/ }).getByRole('option')
@@ -237,7 +241,9 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await page
 			.getByRole('combobox', { name: /New versions of this task exist/ })
 			.selectOption('0.0.2');
-		await expect(page.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
+		await expect(
+			page.getByText(/The old arguments are not compatible with the new schema/)
+		).toBeVisible();
 		await page.getByRole('button', { name: 'Update' }).click();
 		await expect(page.getByText('No new versions available')).toBeVisible();
 	});

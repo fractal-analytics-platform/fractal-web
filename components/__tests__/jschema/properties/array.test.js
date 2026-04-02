@@ -385,21 +385,25 @@ describe('Array properties', () => {
 	});
 
 	it('handles array path update when adding and removing children', () => {
-		const formManager = new FormManager({
-			type: 'object',
-			properties: {
-				foo: {
-					type: 'array',
-					items: {
-						type: 'object',
-						properties: {
-							bar: { type: 'string' }
-						},
-						required: ['bar']
+		const formManager = new FormManager(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								bar: { type: 'string' }
+							},
+							required: ['bar']
+						}
 					}
 				}
-			}
-		}, vi.fn(), 'pydantic_v2');
+			},
+			vi.fn(),
+			'pydantic_v2'
+		);
 
 		const foo = formManager.root.children[0];
 
@@ -413,7 +417,7 @@ describe('Array properties', () => {
 		expect(foo.children[1].path).eq('/foo/1');
 		expect(foo.children[2].path).eq('/foo/2');
 
-		foo.removeChild(1)
+		foo.removeChild(1);
 
 		expect(foo.children.length).eq(2);
 

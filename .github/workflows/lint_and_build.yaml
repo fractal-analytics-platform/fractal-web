@@ -37,13 +37,12 @@ jobs:
           cd components
           npm ci
 
-      - name: Run static code analysis on components module
-        run: |
-          cd components
-          npx eslint .
-
       - name: Run static code analysis
-        run: npx eslint .
+        # Run prettier and eslint on all projects
+        run: npm run lint
+
+      - name: Run svelte-check on root and components
+        run: npm run check
 
       - name: Build site
         env:
@@ -57,15 +56,47 @@ jobs:
           PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL:
         run: npm run build
 
+      - name: Install sandbox dependencies
+        run: |
+          cd sandbox
+          npm ci
+
+      - name: Run svelte-check on sandbox
+        run: |
+          cd sandbox
+          npm run check
+
+      - name: Build sandbox
+        run: |
+          cd sandbox
+          npm run build
+
       - name: Install tasks-list dependencies
         run: |
           cd tasks-list
           npm ci
 
+      - name: Run svelte-check on tasks-list
+        run: |
+          cd tasks-list
+          npm run check
+
       - name: Build tasks-list
         run: |
           cd tasks-list
           npm run build
-      
-      - name: Run Svelte Check
-        run: npm run check
+
+      - name: Install templates-list dependencies
+        run: |
+          cd templates-list
+          npm ci
+
+      - name: Run svelte-check on templates-list
+        run: |
+          cd templates-list
+          npm run check
+
+      - name: Build templates-list
+        run: |
+          cd templates-list
+          npm run build

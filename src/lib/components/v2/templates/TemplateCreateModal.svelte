@@ -46,8 +46,8 @@
 		if (!response.ok) {
 			throw new Error('Unable to retrieve user groups.');
 		} else {
-			const res = await response.json()
-			groups = res.group_ids_names
+			const res = await response.json();
+			groups = res.group_ids_names;
 		}
 	});
 
@@ -183,13 +183,9 @@
 			</div>
 			<div class="mb-2">
 				<label class="form-label" for="template-user-group-id">Share with User Group</label>
-				<select
-					class="form-select"
-					id="template-user-group-id"
-					bind:value={userGroupId}
-				>
+				<select class="form-select" id="template-user-group-id" bind:value={userGroupId}>
 					<option value={null}>None (only me)</option>
-					{#each groups as group, index (index) }
+					{#each groups as group, index (index)}
 						<option value={group[0]}>{group[1]}</option>
 					{/each}
 				</select>

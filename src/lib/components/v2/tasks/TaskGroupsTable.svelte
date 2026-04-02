@@ -237,7 +237,7 @@
 								>
 									<i class="bi bi-info-circle"></i>
 								</button>
-								{#if selectedGroup.origin==="other"}
+								{#if selectedGroup.origin === 'other'}
 									<button
 										class="btn btn-primary"
 										aria-label="Edit"

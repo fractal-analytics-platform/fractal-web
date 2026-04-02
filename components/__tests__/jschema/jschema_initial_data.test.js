@@ -608,7 +608,7 @@ describe('jschema_intial_data', () => {
 				properties: {
 					foo: {
 						type: 'number'
-					},
+					}
 				}
 			},
 			'pydantic_v2',

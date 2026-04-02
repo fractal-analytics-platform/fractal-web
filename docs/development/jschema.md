@@ -16,11 +16,11 @@ The request url "/path/to/fractal-web/components/src/lib/index.js" is outside of
 
 The `JSchema` Svelte component intializes a class named `FormManager`, that handles the following features:
 
-* creates and stores an object (`root`) used to draw the form;
-* provides the functions to create new form elements;
-* attaches a `notifyChange()` function to each created form element; this function is used by each component to notify changes to the manager (e.g. the value of an input changes, a new element is added to an array, and so on), then the function dispatches a `change` event up to the `JSchema` component;
-* wraps the `SchemaValidator` and provides a `validate()` function;
-* provides a `getFormData()` function, that returns an object based on the data present in the form.
+- creates and stores an object (`root`) used to draw the form;
+- provides the functions to create new form elements;
+- attaches a `notifyChange()` function to each created form element; this function is used by each component to notify changes to the manager (e.g. the value of an input changes, a new element is added to an array, and so on), then the function dispatches a `change` event up to the `JSchema` component;
+- wraps the `SchemaValidator` and provides a `validate()` function;
+- provides a `getFormData()` function, that returns an object based on the data present in the form.
 
 The creation of the `root` object requires 2 preliminary steps, that are useful to reduce the complexity of the subsequent object creation:
 

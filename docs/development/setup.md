@@ -7,15 +7,20 @@ Versions 18 or 20 of Node.js are recommended. See the [quickstart](../quickstart
 ## Install fractal-web from git repository
 
 Clone this repository
+
 ```bash
 git clone https://github.com/fractal-analytics-platform/fractal-web.git
 cd fractal-web
 ```
+
 then optionally checkout to a specific version tag
+
 ```
 git checkout v0.6.0
 ```
+
 and finally install via
+
 ```bash
 cd components
 npm install

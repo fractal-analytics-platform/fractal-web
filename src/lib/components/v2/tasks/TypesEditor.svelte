@@ -83,7 +83,7 @@
 	/**
 	 * @param {Event} event
 	 */
-	 function addInputType(event) {
+	function addInputType(event) {
 		event.stopPropagation();
 		inputTypesArray = [...inputTypesArray, { key: '', value: false, error: '' }];
 	}

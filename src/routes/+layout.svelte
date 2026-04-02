@@ -142,7 +142,9 @@
 						</a>
 					</li>
 					<li class="nav-item">
-						<a href="/v2/templates" class="nav-link" class:active={selectedSection === 'templates'}> Templates </a>
+						<a href="/v2/templates" class="nav-link" class:active={selectedSection === 'templates'}>
+							Templates
+						</a>
 					</li>
 					<li class="nav-item">
 						<a href="/v2/tasks" class="nav-link" class:active={selectedSection === 'tasks'}>

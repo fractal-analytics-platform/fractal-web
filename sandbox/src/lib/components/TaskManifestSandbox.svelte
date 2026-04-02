@@ -53,7 +53,7 @@
 		let manifestData;
 		try {
 			manifestData = JSON.parse(content);
-		} catch (err) {
+		} catch {
 			throw new Error("File doesn't contain valid JSON");
 		}
 		if (
@@ -96,7 +96,7 @@
 		selectedSchema = null;
 		selectedTask = null;
 		selectedTaskName = '';
-    dataError = '';
+		dataError = '';
 		tasks = manifest.task_list.map((t) => t.name);
 	}
 
@@ -151,7 +151,7 @@
 			if (selectedSchema) {
 				jschemaComponent?.update($state.snapshot(selectedSchema), $state.snapshot(schemaData));
 			}
-		} catch (err) {
+		} catch {
 			if (!jsonDataString) {
 				schemaData = undefined;
 				if (selectedSchema) {
@@ -222,7 +222,7 @@
 					onchange={() => loadTaskSchema()}
 				>
 					<option value="">Select...</option>
-					{#each tasks as task}
+					{#each tasks as task (task)}
 						<option>{task}</option>
 					{/each}
 				</select>

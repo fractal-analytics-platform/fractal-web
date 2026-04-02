@@ -1,9 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 
-	
-	
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {string} id
@@ -13,12 +10,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
-		id,
-		title,
-		placement = 'top',
-		children
-	} = $props();
+	let { id, title, placement = 'top', children } = $props();
 
 	let tooltip;
 

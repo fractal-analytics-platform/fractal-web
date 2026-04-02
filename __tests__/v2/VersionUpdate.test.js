@@ -329,8 +329,8 @@ function getTask(name, version) {
 	);
 	return /** @type {import('fractal-components/types/api').TaskV2} */ (
 		/** @type {import('fractal-components/types/api').TaskGroupV2} */ (taskGroup).task_list.find(
-		(t) => t.name === name
-	)
+			(t) => t.name === name
+		)
 	);
 }
 
@@ -389,7 +389,9 @@ describe('VersionUpdate', () => {
 
 		await user.selectOptions(screen.getByRole('combobox'), '2.0.0');
 
-		expect(screen.getByText(/The old arguments are not compatible with the new schema/)).toBeVisible();
+		expect(
+			screen.getByText(/The old arguments are not compatible with the new schema/)
+		).toBeVisible();
 
 		await user.click(screen.getByRole('button', { name: 'Update' }));
 	});
@@ -511,8 +513,8 @@ async function checkVersions(task, expectedCount, workflowTask, updateCandidates
 
 	const options = result.getAllByRole('option');
 	expect(options.length).toBe(expectedCount + 1);
-	expect(/** @type {HTMLOptionElement} **/(options[0]).value).toBe('');
-	return options.filter((_, i) => i > 0).map((o) => /** @type {HTMLOptionElement} **/(o).value);
+	expect(/** @type {HTMLOptionElement} **/ (options[0]).value).toBe('');
+	return options.filter((_, i) => i > 0).map((o) => /** @type {HTMLOptionElement} **/ (o).value);
 }
 
 /**
@@ -523,7 +525,7 @@ async function checkVersions(task, expectedCount, workflowTask, updateCandidates
  */
 function renderVersionUpdate(task, workflowTask, updateCandidates) {
 	workflowTask.task = task;
-	const nop = async function () { };
+	const nop = async function () {};
 	return render(VersionUpdate, {
 		props: {
 			workflowTask,

@@ -22,7 +22,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 			command_non_parallel: 'command1',
 			args_schema_non_parallel: {
 				properties: {
-					property1: { type: 'string' },
+					property1: { type: 'string' }
 				},
 				type: 'object'
 			}
@@ -34,7 +34,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 			command_non_parallel: 'command2',
 			args_schema_non_parallel: {
 				properties: {
-					property2: { type: 'string' },
+					property2: { type: 'string' }
 				},
 				type: 'object'
 			}
@@ -57,16 +57,18 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	await test.step('Set alias and description', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 
-		await page.getByRole('button', { name: 'Edit workflow task alias' }).click()
+		await page.getByRole('button', { name: 'Edit workflow task alias' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task alias' }).fill('alias1');
 		await page.getByRole('button', { name: 'Save', exact: true }).click();
 		await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).not.toBeVisible();
 		await expect(page.getByRole('button', { name: 'Save', exact: true })).not.toBeVisible();
 
-		await page.getByRole('button', { name: 'Edit workflow task description' }).click()
+		await page.getByRole('button', { name: 'Edit workflow task description' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task description' }).fill('description1');
 		await page.getByRole('button', { name: 'Save', exact: true }).click();
-		await expect(page.getByRole('button', { name: 'Edit workflow task description' })).not.toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Edit workflow task description' })
+		).not.toBeVisible();
 	});
 
 	await test.step('Check edit task order modal', async () => {
@@ -97,16 +99,18 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	await test.step('Update alias and description', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 
-		await page.getByRole('button', { name: 'Edit workflow task alias' }).click()
+		await page.getByRole('button', { name: 'Edit workflow task alias' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task alias' }).fill('alias2');
 		await page.getByRole('button', { name: 'Save', exact: true }).click();
 		await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).not.toBeVisible();
 		await expect(page.getByRole('button', { name: 'Save', exact: true })).not.toBeVisible();
 
-		await page.getByRole('button', { name: 'Edit workflow task description' }).click()
+		await page.getByRole('button', { name: 'Edit workflow task description' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task description' }).fill('description2');
 		await page.getByRole('button', { name: 'Save', exact: true }).click();
-		await expect(page.getByRole('button', { name: 'Edit workflow task description' })).not.toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Edit workflow task description' })
+		).not.toBeVisible();
 	});
 
 	await test.step('Run workflow again', async () => {
@@ -123,7 +127,13 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Advanced Info' }).click();
 		await page.getByRole('button', { name: 'Show runs', exact: true }).click();
 
-		const excludedInRun = ['Docs Link', 'Docs Info', 'Args Schema Version', 'Args Schema non parallel', 'property2'];
+		const excludedInRun = [
+			'Docs Link',
+			'Docs Info',
+			'Args Schema Version',
+			'Args Schema non parallel',
+			'property2'
+		];
 		await expectInfoTexts(page, excludedInRun, true);
 
 		const v1Values = ['0.0.1', 'alias1', 'description1', 'command1'];
@@ -132,7 +142,9 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 		await expectInfoTexts(page, v1Values, false);
 		await expectInfoTexts(page, v2Values, true);
 		await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).toBeVisible();
-		await expect(page.getByRole('button', { name: 'Edit workflow task description' })).toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Edit workflow task description' })
+		).toBeVisible();
 
 		await page.getByRole('button', { name: 'Run 1' }).click();
 
@@ -140,7 +152,9 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 		await expectInfoTexts(page, v2Values, false);
 		await expectInfoTexts(page, excludedInRun, false);
 		await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).not.toBeVisible();
-		await expect(page.getByRole('button', { name: 'Edit workflow task description' })).not.toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Edit workflow task description' })
+		).not.toBeVisible();
 
 		await page.getByRole('button', { name: 'Run 2' }).click();
 
@@ -148,13 +162,15 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 		await expectInfoTexts(page, v2Values, true);
 		await expectInfoTexts(page, excludedInRun, false);
 		await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).not.toBeVisible();
-		await expect(page.getByRole('button', { name: 'Edit workflow task description' })).not.toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Edit workflow task description' })
+		).not.toBeVisible();
 	});
 
 	/**
-	 * @param {import('@playwright/test').Page} page 
-	 * @param {string[]} values 
-	 * @param {boolean} visible 
+	 * @param {import('@playwright/test').Page} page
+	 * @param {string[]} values
+	 * @param {boolean} visible
 	 */
 	async function expectInfoTexts(page, values, visible) {
 		for (const value of values) {

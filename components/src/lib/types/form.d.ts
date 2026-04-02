@@ -27,7 +27,11 @@ export type FormElement = (
 	collapsed?: boolean;
 };
 
-export type CollapsibleFormElement = ObjectFormElement | ArrayFormElement | TupleFormElement | ValueFormElement;
+export type CollapsibleFormElement =
+	| ObjectFormElement
+	| ArrayFormElement
+	| TupleFormElement
+	| ValueFormElement;
 
 export type BaseFormElementFields = {
 	manager: FormManager;
@@ -89,33 +93,36 @@ export type ConditionalElementFields = BaseFormElementFields & {
 		title: string;
 		description: string;
 		value: string;
-	},
+	};
 	unexpectedChildren: FormElement[];
 	originalProperty: JSONSchemaProperty;
 };
 
 export type FormBuilderEntryType = 'object' | 'array' | 'string' | 'number' | 'boolean';
 
-export type FormBuilderEntry = ({
-	type: 'object' | 'array'
-	children: Array<FormBuilderEntry>
-} | {
-	value: string | number | boolean
-	type: 'string' | 'number' | 'boolean'
-}) & {
-	id: string
-	error: string
-	key?: string
-}
+export type FormBuilderEntry = (
+	| {
+			type: 'object' | 'array';
+			children: Array<FormBuilderEntry>;
+	  }
+	| {
+			value: string | number | boolean;
+			type: 'string' | 'number' | 'boolean';
+	  }
+) & {
+	id: string;
+	error: string;
+	key?: string;
+};
 
 export type FormElementParams<T extends JSONSchemaProperty, V> = {
-	key: null | string
-	path: string
-	schemaPath: string
-	property: T
-	parentProperty: JSONSchemaProperty | undefined
-	required: boolean
-	removable: boolean
-	titleType: TitleType
-	value: V
-}
+	key: null | string;
+	path: string;
+	schemaPath: string;
+	property: T;
+	parentProperty: JSONSchemaProperty | undefined;
+	required: boolean;
+	removable: boolean;
+	titleType: TitleType;
+	value: V;
+};

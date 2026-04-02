@@ -77,7 +77,7 @@ export class FormManager {
 		 */
 		this.root = this.createObjectElement({
 			key: null,
-			path: "",
+			path: '',
 			property: this.jsonSchema,
 			required: true,
 			removable: false,
@@ -161,7 +161,7 @@ export class FormManager {
 
 	/**
 	 * Extra property that should not be present (additionalProperties: false)
-	 * @param {Omit<import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaProperty, any>, 
+	 * @param {Omit<import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaProperty, any>,
 	 * 'property' | 'required' | 'removable' | 'schemaPath'>} params
 	 */
 	createUnexpectedElement(params) {
@@ -259,7 +259,7 @@ export class FormManager {
 		/** @type {string[]} */
 		const validKeys = [];
 		for (const [childKey, childProperty] of properties) {
-			validKeys.push(childKey)
+			validKeys.push(childKey);
 			const childRequired = requiredChildren.includes(childKey);
 			const removable = isRemovableChildProperty(property, childKey);
 			const childElement = this.createFormElement({
@@ -285,13 +285,15 @@ export class FormManager {
 
 		for (const [k, v] of Object.entries(value)) {
 			if (!validKeys.includes(k)) {
-				children.push(this.createUnexpectedElement({
-					key: k,
-					path: `${path}/${k}`,
-					parentProperty: property,
-					value: v,
-					titleType: 'key'
-				}))
+				children.push(
+					this.createUnexpectedElement({
+						key: k,
+						path: `${path}/${k}`,
+						parentProperty: property,
+						value: v,
+						titleType: 'key'
+					})
+				);
 			}
 		}
 		const element = new ObjectFormElement({
@@ -347,7 +349,14 @@ export class FormManager {
 			size,
 			children:
 				required || (Array.isArray(value) && value.length > 0)
-					? this.createTupleChildren({ ...params, items, size, value, parentProperty: property, titleType: 'title_only' })
+					? this.createTupleChildren({
+							...params,
+							items,
+							size,
+							value,
+							parentProperty: property,
+							titleType: 'title_only'
+						})
 					: []
 		});
 		return element;
@@ -370,16 +379,37 @@ export class FormManager {
 		let children = [];
 		if (Array.isArray(items)) {
 			children = items.map((item, index) =>
-				this.createFormElement({ ...childParams, key: index.toString(), path: `${path}/${index}`, schemaPath: `${schemaPath}/${index}`, property: item, value: value[index] })
+				this.createFormElement({
+					...childParams,
+					key: index.toString(),
+					path: `${path}/${index}`,
+					schemaPath: `${schemaPath}/${index}`,
+					property: item,
+					value: value[index]
+				})
 			);
 		} else {
 			children = Array(size).map((_, index) =>
-				this.createFormElement({ ...childParams, key: index.toString(), path: `${path}/${index}`, schemaPath: `${schemaPath}/${index}`, property: items, value: value[index] })
+				this.createFormElement({
+					...childParams,
+					key: index.toString(),
+					path: `${path}/${index}`,
+					schemaPath: `${schemaPath}/${index}`,
+					property: items,
+					value: value[index]
+				})
 			);
 		}
 		if (Array.isArray(value)) {
 			for (let i = items.length; i < value.length; i++) {
-				children.push(this.createUnexpectedElement({ ...childParams, key: i.toString(), path: `${path}/${i}`, value: value[i] }));
+				children.push(
+					this.createUnexpectedElement({
+						...childParams,
+						key: i.toString(),
+						path: `${path}/${i}`,
+						value: value[i]
+					})
+				);
 			}
 		}
 		return children;
@@ -393,35 +423,43 @@ export class FormManager {
 		const fields = this.getBaseElementFields(params);
 		const selectedValue = value ?? {};
 		const selectedIndex = this.getConditionalElementSelectedChildIndex(property, selectedValue);
-		const { discriminator, oneOfProperty } = this.extractDiscriminatorProperty(property, selectedValue);
+		const { discriminator, oneOfProperty } = this.extractDiscriminatorProperty(
+			property,
+			selectedValue
+		);
 		const selectedProperty = oneOfProperty.oneOf[selectedIndex];
 
 		const unexpectedChildren = [];
 		if (selectedIndex === -1) {
 			for (const [k, v] of Object.entries(value)) {
 				if (k !== discriminator?.key) {
-					unexpectedChildren.push(this.createUnexpectedElement({
-						key: k,
-						path: `${path}/${k}`,
-						value: v,
-						titleType: 'key',
-						parentProperty: property
-					}));
+					unexpectedChildren.push(
+						this.createUnexpectedElement({
+							key: k,
+							path: `${path}/${k}`,
+							value: v,
+							titleType: 'key',
+							parentProperty: property
+						})
+					);
 				}
 			}
 		}
 
-		const selectedItem = selectedIndex === -1 ? null : this.createFormElement({
-			key,
-			path,
-			schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
-			property: selectedProperty,
-			required,
-			removable,
-			value: selectedValue,
-			parentProperty: property,
-			titleType,
-		});
+		const selectedItem =
+			selectedIndex === -1
+				? null
+				: this.createFormElement({
+						key,
+						path,
+						schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
+						property: selectedProperty,
+						required,
+						removable,
+						value: selectedValue,
+						parentProperty: property,
+						titleType
+					});
 
 		if (selectedItem && titleType === 'inner_title') {
 			fields.title = selectedProperty.title || '';
@@ -441,7 +479,7 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {import("../types/jschema").JSONSchemaProperty | undefined} property 
+	 * @param {import("../types/jschema").JSONSchemaProperty | undefined} property
 	 * @returns {string|undefined}
 	 */
 	getDiscriminatorKey(property) {
@@ -477,7 +515,7 @@ export class FormManager {
 
 	/**
 	 * Extract the discriminator values and remove the discriminator property from each oneOf child.
-	 * @param {import("../types/jschema").JSONSchemaOneOfProperty} oneOfProperty 
+	 * @param {import("../types/jschema").JSONSchemaOneOfProperty} oneOfProperty
 	 * @param {any} selectedValue
 	 */
 	extractDiscriminatorProperty(oneOfProperty, selectedValue) {
@@ -488,8 +526,8 @@ export class FormManager {
 				title: '',
 				description: '',
 				values: /** @type {string[]} */ ([]),
-				value: selectedValue[propertyName],
-			}
+				value: selectedValue[propertyName]
+			};
 			for (const prop of oneOfProperty.oneOf) {
 				if (prop.type === 'object' && 'properties' in prop && prop.properties[propertyName]) {
 					const discrProp = prop.properties[propertyName];
@@ -504,7 +542,10 @@ export class FormManager {
 					}
 				}
 			}
-			if (oneOfProperty.oneOf.length > 0 && oneOfProperty.oneOf.length === discriminator.values.length) {
+			if (
+				oneOfProperty.oneOf.length > 0 &&
+				oneOfProperty.oneOf.length === discriminator.values.length
+			) {
 				if (!discriminator.value) {
 					discriminator.value = discriminator.values[0];
 				}
@@ -512,22 +553,22 @@ export class FormManager {
 					discriminator,
 					oneOfProperty: {
 						...oneOfProperty,
-						oneOf: oneOfProperty.oneOf.map(p => {
+						oneOf: oneOfProperty.oneOf.map((p) => {
 							const properties = deepCopy(p.properties);
 							delete properties[propertyName];
 							return {
 								...p,
 								properties
-							}
+							};
 						})
 					}
-				}
+				};
 			}
 		}
 		return {
 			discriminator: undefined,
 			oneOfProperty
-		}
+		};
 	}
 
 	getConditionalElementSelectedChildIndex(property, value) {
@@ -569,9 +610,9 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {import("../types/jschema").JSONSchemaProperty} property 
-	 * @param {string | null} key 
-	 * @param {import("../types/form").TitleType} titleType 
+	 * @param {import("../types/jschema").JSONSchemaProperty} property
+	 * @param {string | null} key
+	 * @param {import("../types/form").TitleType} titleType
 	 */
 	getElementTitle(property, key, titleType) {
 		switch (titleType) {
@@ -622,8 +663,8 @@ export class FormManager {
 				childData == null
 					? null
 					: typeof childData === 'object' &&
-						'subscribe' in childData &&
-						typeof childData === 'function'
+						  'subscribe' in childData &&
+						  typeof childData === 'function'
 						? get(childData)
 						: childData;
 			data[child.key] = value;
@@ -660,7 +701,7 @@ export class FormManager {
 		this.clearErrors(this.root);
 		const strippedNullData = stripNullAndEmptyObjectsAndArrays(this.getFormData());
 		const valid = this.validator.isValid(strippedNullData);
-		/** 
+		/**
 		 * Errors that have not been set to any form element
 		 * @type {string[]}
 		 */
@@ -673,11 +714,11 @@ export class FormManager {
 		}
 		this.genericErrors.set(genericErrors);
 		this.dataValid.set(valid);
-		return valid
+		return valid;
 	}
 
 	/**
-	 * @param {import('../types/form').FormElement} parentElement 
+	 * @param {import('../types/form').FormElement} parentElement
 	 */
 	clearErrors(parentElement) {
 		parentElement.clearErrors();
@@ -696,14 +737,14 @@ export class FormManager {
 	getDataFromElement(element) {
 		switch (element.type) {
 			case 'object':
-				return this.getDataFromObjectElement(/** @type {ObjectFormElement}*/(element));
+				return this.getDataFromObjectElement(/** @type {ObjectFormElement}*/ (element));
 			case 'array':
 			case 'tuple':
 				return this.getDataFromArrayElement(
-					/** @type {ArrayFormElement|TupleFormElement}*/(element)
+					/** @type {ArrayFormElement|TupleFormElement}*/ (element)
 				);
 			case 'conditional':
-				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/(element));
+				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/ (element));
 			default:
 				if (element instanceof NumberFormElement) {
 					const value = get(element.value);

@@ -3,46 +3,44 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
-
 	/**
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
-	let template = $state()
+	let template = $state();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/** @type {string|undefined} */
-	let groupName = $state()
+	let groupName = $state();
 
 	/** @type {number|undefined} */
-	let templateId = $state()
+	let templateId = $state();
 
 	/**
 	 * @param {number} template_id
 	 */
 	export async function open(template_id) {
 		templateId = template_id;
-		modal?.show()
+		modal?.show();
 	}
 
 	export async function onOpen() {
-		const response = await fetch(
-			`/api/v2/workflow-template/${templateId}`,
-			{ method: 'GET' }
-		);
+		const response = await fetch(`/api/v2/workflow-template/${templateId}`, { method: 'GET' });
 		if (response.ok) {
-            template = await response.json()
+			template = await response.json();
 			if (template?.user_group_id) {
-				const response2 = await fetch(
-					`/api/auth/current-user?group_ids_names=true`,
-					{ method: 'GET' }
-				);
+				const response2 = await fetch(`/api/auth/current-user?group_ids_names=true`, {
+					method: 'GET'
+				});
 				if (response2.ok) {
-					const res = await response2.json()
-					groupName = res.group_ids_names.find(([id]) => id === template?.user_group_id)?.[1] ?? undefined;
+					const res = await response2.json();
+					groupName =
+						res.group_ids_names.find(([id]) => id === template?.user_group_id)?.[1] ?? undefined;
 					if (!groupName) {
-						modal?.displayErrorAlert(new AlertError(`User group ${template?.user_group_id} not found`));
+						modal?.displayErrorAlert(
+							new AlertError(`User group ${template?.user_group_id} not found`)
+						);
 					}
 				} else {
 					modal?.displayErrorAlert(await getAlertErrorFromResponse(response2));
@@ -51,25 +49,23 @@
 		} else {
 			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
-		
 	}
-
 </script>
 
 <Modal
-    id="templateInfoModal"
-    centered={true}
-    scrollable={true}
-    bind:this={modal}
-    size="lg"
+	id="templateInfoModal"
+	centered={true}
+	scrollable={true}
+	bind:this={modal}
+	size="lg"
 	{onOpen}
 >
-		{#snippet header()}
+	{#snippet header()}
 		<h5 class="modal-title">Template '{template?.name}'</h5>
-		{/snippet}
-		{#snippet body()}
-			<div id="errorAlert-templateInfoModal"></div>
-			{#if template}
+	{/snippet}
+	{#snippet body()}
+		<div id="errorAlert-templateInfoModal"></div>
+		{#if template}
 			<ul class="list-group">
 				<li class="list-group-item text-bg-light">
 					<strong>Name</strong>
@@ -120,6 +116,6 @@
 					<span>{template?.id}</span>
 				</li>
 			</ul>
-			{/if}
-		{/snippet}
-	</Modal>
+		{/if}
+	{/snippet}
+</Modal>

@@ -48,7 +48,7 @@ jobs:
           - 5432:5432
 
       oauth2:
-        image: ghcr.io/fractal-analytics-platform/oauth@sha256:42c80e3193d8eb5a20b5c88a90c625b9ea45ef9f5228b6676ea0b0494bed3d9a  # 0.1
+        image: ghcr.io/fractal-analytics-platform/oauth@sha256:42c80e3193d8eb5a20b5c88a90c625b9ea45ef9f5228b6676ea0b0494bed3d9a # 0.1
         ports:
           - 5556:5556
 

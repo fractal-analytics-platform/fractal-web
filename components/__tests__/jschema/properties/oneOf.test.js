@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/svelte';
 
 describe('oneOf properties', () => {
-
 	const schema = {
 		$defs: {
 			ProcessAModel: {
@@ -71,21 +70,17 @@ describe('oneOf properties', () => {
 		required: ['proc_step'],
 		type: 'object',
 		title: 'ProcessTask'
-	}
+	};
 
 	it('oneOf property', async () => {
 		const user = userEvent.setup();
 
-		const { component, onChange } = renderSchema(
-			schema,
-			'pydantic_v2',
-			{
-				proc_step: {
-					step: 'ProcessB',
-					parameter1: 1
-				}
+		const { component, onChange } = renderSchema(schema, 'pydantic_v2', {
+			proc_step: {
+				step: 'ProcessB',
+				parameter1: 1
 			}
-		);
+		});
 
 		// Should display the property title
 		expect(screen.getByText('Proc Step')).toBeVisible();
@@ -119,11 +114,9 @@ describe('oneOf properties', () => {
 	it('Handle invalid initial discriminator value', async () => {
 		const user = userEvent.setup();
 
-		const { component } = renderSchema(
-			schema,
-			'pydantic_v2',
-			{ proc_step: { step: 'XXX', foo: 'bar' } }
-		);
+		const { component } = renderSchema(schema, 'pydantic_v2', {
+			proc_step: { step: 'XXX', foo: 'bar' }
+		});
 
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'XXX', foo: 'bar' } });
 
@@ -135,7 +128,7 @@ describe('oneOf properties', () => {
 
 		await user.selectOptions(screen.getByRole('combobox'), 'ProcessB');
 
-		expect(screen.queryAllByText("required property")).toHaveLength(1);
+		expect(screen.queryAllByText('required property')).toHaveLength(1);
 		expect(component.getArguments()).deep.eq({ proc_step: { step: 'ProcessB', parameter1: null } });
 
 		await user.type(screen.getByRole('textbox'), '42');
@@ -148,74 +141,72 @@ describe('oneOf properties', () => {
 		const user = userEvent.setup();
 
 		const { component } = renderSchema({
-			"$defs": {
-				"InternalModel1": {
-					"description": "Description of InternalModel1.",
-					"properties": {
-						"label": {
-							"const": "label1",
-							"default": "label1",
-							"title": "Label",
-							"type": "string",
-							"description": "FIXME"
+			$defs: {
+				InternalModel1: {
+					description: 'Description of InternalModel1.',
+					properties: {
+						label: {
+							const: 'label1',
+							default: 'label1',
+							title: 'Label',
+							type: 'string',
+							description: 'FIXME'
 						},
-						"field": {
-							"default": 1,
-							"title": "Field",
-							"type": "integer",
-							"description": "Missing description"
+						field: {
+							default: 1,
+							title: 'Field',
+							type: 'integer',
+							description: 'Missing description'
 						}
 					},
-					"title": "InternalModel1Title",
-					"type": "object"
+					title: 'InternalModel1Title',
+					type: 'object'
 				},
-				"InternalModel2": {
-					"description": "Description of InternalModel2.",
-					"properties": {
-						"label": {
-							"const": "label2",
-							"default": "label2",
-							"title": "Label",
-							"type": "string",
-							"description": "FIXME"
+				InternalModel2: {
+					description: 'Description of InternalModel2.',
+					properties: {
+						label: {
+							const: 'label2',
+							default: 'label2',
+							title: 'Label',
+							type: 'string',
+							description: 'FIXME'
 						},
-						"field": {
-							"title": "Field",
-							"type": "string",
-							"description": "Missing description"
+						field: {
+							title: 'Field',
+							type: 'string',
+							description: 'Missing description'
 						}
 					},
-					"required": [
-						"field"
-					],
-					"title": "InternalModel2Title",
-					"type": "object"
+					required: ['field'],
+					title: 'InternalModel2Title',
+					type: 'object'
 				}
 			},
-			"type": "object",
-			"properties": {
-				"foo": {
-					"default": [],
-					"items": {
-						"discriminator": {
-							"mapping": {
-								"label1": "#/$defs/InternalModel1",
-								"label2": "#/$defs/InternalModel2"
+			type: 'object',
+			properties: {
+				foo: {
+					default: [],
+					items: {
+						discriminator: {
+							mapping: {
+								label1: '#/$defs/InternalModel1',
+								label2: '#/$defs/InternalModel2'
 							},
-							"propertyName": "label"
+							propertyName: 'label'
 						},
-						"oneOf": [
+						oneOf: [
 							{
-								"$ref": "#/$defs/InternalModel1"
+								$ref: '#/$defs/InternalModel1'
 							},
 							{
-								"$ref": "#/$defs/InternalModel2"
+								$ref: '#/$defs/InternalModel2'
 							}
 						]
 					},
-					"title": "FooTitle",
-					"type": "array",
-					"description": "Foo Description"
+					title: 'FooTitle',
+					type: 'array',
+					description: 'Foo Description'
 				}
 			}
 		});
@@ -233,84 +224,92 @@ describe('oneOf properties', () => {
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
 		expect(screen.getByRole('button', { name: 'InternalModel2Title' })).toBeVisible();
 
-		expect(component.getArguments()).deep.eq({ foo: [{ label: 'label2', field: null }, { label: 'label1', field: 1 }] });
+		expect(component.getArguments()).deep.eq({
+			foo: [
+				{ label: 'label2', field: null },
+				{ label: 'label1', field: 1 }
+			]
+		});
 
 		await user.click(screen.getAllByRole('button', { name: 'Move item up' })[1]);
 
-		expect(component.getArguments()).deep.eq({ foo: [{ label: 'label1', field: 1 }, { label: 'label2', field: null }] });
+		expect(component.getArguments()).deep.eq({
+			foo: [
+				{ label: 'label1', field: 1 },
+				{ label: 'label2', field: null }
+			]
+		});
 	});
 
 	it('oneOf items as additionalProperties', async () => {
 		const user = userEvent.setup();
 
 		const { component } = renderSchema({
-			"$defs": {
-				"InternalModel1": {
-					"description": "Description of InternalModel1.",
-					"properties": {
-						"label": {
-							"const": "label1",
-							"default": "label1",
-							"title": "Label",
-							"type": "string",
-							"description": "FIXME"
+			$defs: {
+				InternalModel1: {
+					description: 'Description of InternalModel1.',
+					properties: {
+						label: {
+							const: 'label1',
+							default: 'label1',
+							title: 'Label',
+							type: 'string',
+							description: 'FIXME'
 						},
-						"field": {
-							"default": 1,
-							"title": "Field",
-							"type": "integer",
-							"description": "Missing description"
+						field: {
+							default: 1,
+							title: 'Field',
+							type: 'integer',
+							description: 'Missing description'
 						}
 					},
-					"title": "InternalModel1Title",
-					"type": "object"
+					title: 'InternalModel1Title',
+					type: 'object'
 				},
-				"InternalModel2": {
-					"description": "Description of InternalModel2.",
-					"properties": {
-						"label": {
-							"const": "label2",
-							"default": "label2",
-							"title": "Label",
-							"type": "string",
-							"description": "FIXME"
+				InternalModel2: {
+					description: 'Description of InternalModel2.',
+					properties: {
+						label: {
+							const: 'label2',
+							default: 'label2',
+							title: 'Label',
+							type: 'string',
+							description: 'FIXME'
 						},
-						"field": {
-							"title": "Field",
-							"type": "string",
-							"description": "Missing description"
+						field: {
+							title: 'Field',
+							type: 'string',
+							description: 'Missing description'
 						}
 					},
-					"required": [
-						"field"
-					],
-					"title": "InternalModel2Title",
-					"type": "object"
+					required: ['field'],
+					title: 'InternalModel2Title',
+					type: 'object'
 				}
 			},
-			"type": "object",
-			"properties": {
-				"foo": {
-					"type": "object",
-					"additionalProperties": {
-						"discriminator": {
-							"mapping": {
-								"label1": "#/$defs/InternalModel1",
-								"label2": "#/$defs/InternalModel2"
+			type: 'object',
+			properties: {
+				foo: {
+					type: 'object',
+					additionalProperties: {
+						discriminator: {
+							mapping: {
+								label1: '#/$defs/InternalModel1',
+								label2: '#/$defs/InternalModel2'
 							},
-							"propertyName": "label"
+							propertyName: 'label'
 						},
-						"oneOf": [
+						oneOf: [
 							{
-								"$ref": "#/$defs/InternalModel1"
+								$ref: '#/$defs/InternalModel1'
 							},
 							{
-								"$ref": "#/$defs/InternalModel2"
+								$ref: '#/$defs/InternalModel2'
 							}
 						]
 					},
-					"title": "FooTitle",
-					"description": "Foo Description"
+					title: 'FooTitle',
+					description: 'Foo Description'
 				}
 			}
 		});
@@ -321,10 +320,10 @@ describe('oneOf properties', () => {
 		await user.click(screen.getByRole('button', { name: 'Add property' }));
 
 		expect(screen.getByRole('button', { name: 'k1' })).toBeVisible();
-		expect(component.getArguments()).deep.eq({ "foo": { "k1": { "label": "label1", "field": 1 } } });
+		expect(component.getArguments()).deep.eq({ foo: { k1: { label: 'label1', field: 1 } } });
 
 		await user.selectOptions(screen.getByRole('combobox'), 'label2');
-		expect(component.getArguments()).deep.eq({ "foo": { "k1": { "label": "label2", "field": null } } });
+		expect(component.getArguments()).deep.eq({ foo: { k1: { label: 'label2', field: null } } });
 
 		expect(screen.getByRole('button', { name: 'k1' })).toBeVisible();
 	});
@@ -333,77 +332,75 @@ describe('oneOf properties', () => {
 		const user = userEvent.setup();
 
 		const { component } = renderSchema({
-			"$defs": {
-				"InternalModel1": {
-					"description": "Description of InternalModel1.",
-					"properties": {
-						"label": {
-							"const": "label1",
-							"default": "label1",
-							"title": "Label",
-							"type": "string",
-							"description": "FIXME"
+			$defs: {
+				InternalModel1: {
+					description: 'Description of InternalModel1.',
+					properties: {
+						label: {
+							const: 'label1',
+							default: 'label1',
+							title: 'Label',
+							type: 'string',
+							description: 'FIXME'
 						},
-						"field": {
-							"default": 1,
-							"title": "Field",
-							"type": "integer",
-							"description": "Missing description"
+						field: {
+							default: 1,
+							title: 'Field',
+							type: 'integer',
+							description: 'Missing description'
 						}
 					},
-					"title": "InternalModel1Title",
-					"type": "object"
+					title: 'InternalModel1Title',
+					type: 'object'
 				},
-				"InternalModel2": {
-					"description": "Description of InternalModel2.",
-					"properties": {
-						"label": {
-							"const": "label2",
-							"default": "label2",
-							"title": "Label",
-							"type": "string",
-							"description": "FIXME"
+				InternalModel2: {
+					description: 'Description of InternalModel2.',
+					properties: {
+						label: {
+							const: 'label2',
+							default: 'label2',
+							title: 'Label',
+							type: 'string',
+							description: 'FIXME'
 						},
-						"field": {
-							"title": "Field",
-							"type": "string",
-							"description": "Missing description"
+						field: {
+							title: 'Field',
+							type: 'string',
+							description: 'Missing description'
 						}
 					},
-					"required": [
-						"field"
-					],
-					"title": "InternalModel2Title",
-					"type": "object"
+					required: ['field'],
+					title: 'InternalModel2Title',
+					type: 'object'
 				}
 			},
-			"type": "object",
-			"properties": {
-				"foo": {
-					"type": "object",
-					"properties": {
-						"bar": {
-							"type": "object",
-							"title": "BarTitle",
-							"discriminator": {
-								"mapping": {
-									"label1": "#/$defs/InternalModel1",
-									"label2": "#/$defs/InternalModel2"
+			type: 'object',
+			properties: {
+				foo: {
+					type: 'object',
+					properties: {
+						bar: {
+							type: 'object',
+							title: 'BarTitle',
+							discriminator: {
+								mapping: {
+									label1: '#/$defs/InternalModel1',
+									label2: '#/$defs/InternalModel2'
 								},
-								"propertyName": "label"
+								propertyName: 'label'
 							},
-							"oneOf": [
+							oneOf: [
 								{
-									"$ref": "#/$defs/InternalModel1"
+									$ref: '#/$defs/InternalModel1'
 								},
 								{
-									"$ref": "#/$defs/InternalModel2"
+									$ref: '#/$defs/InternalModel2'
 								}
 							]
 						}
 					},
-					"title": "FooTitle",
-					"description": "Foo Description"
+					title: 'FooTitle',
+					description: 'Foo Description'
 				}
 			}
 		});
@@ -411,10 +408,10 @@ describe('oneOf properties', () => {
 		expect(screen.getByText('FooTitle')).toBeVisible();
 		expect(screen.getByText('BarTitle')).toBeVisible();
 
-		expect(component.getArguments()).deep.eq({ "foo": { "bar": { "label": "label1", "field": 1 } } });
+		expect(component.getArguments()).deep.eq({ foo: { bar: { label: 'label1', field: 1 } } });
 
 		await user.selectOptions(screen.getByRole('combobox'), 'label2');
-		expect(component.getArguments()).deep.eq({ "foo": { "bar": { "label": "label2", "field": null } } });
+		expect(component.getArguments()).deep.eq({ foo: { bar: { label: 'label2', field: null } } });
 
 		expect(screen.getByText('FooTitle')).toBeVisible();
 		expect(screen.getByText('BarTitle')).toBeVisible();
@@ -424,179 +421,182 @@ describe('oneOf properties', () => {
 		const user = userEvent.setup();
 
 		const { component } = renderSchema({
-			"$defs": {
-				"InternalModel1": {
-					"properties": {
-						"label": {
-							"const": "label1",
-							"default": "label1",
-							"type": "string"
+			$defs: {
+				InternalModel1: {
+					properties: {
+						label: {
+							const: 'label1',
+							default: 'label1',
+							type: 'string'
 						},
-						"field1": {
-							"type": "string"
+						field1: {
+							type: 'string'
 						}
 					},
-					"required": [
-						"field1"
-					],
-					"type": "object"
+					required: ['field1'],
+					type: 'object'
 				},
-				"InternalModel2": {
-					"properties": {
-						"label": {
-							"const": "label2",
-							"default": "label2",
-							"type": "string"
+				InternalModel2: {
+					properties: {
+						label: {
+							const: 'label2',
+							default: 'label2',
+							type: 'string'
 						},
-						"field2": {
-							"type": "string"
+						field2: {
+							type: 'string'
 						}
 					},
-					"required": [
-						"field2"
-					],
-					"type": "object"
+					required: ['field2'],
+					type: 'object'
 				}
 			},
-			"properties": {
-				"foo": {
-					"items": {
-						"type": "object",
-						"properties": {
-							"baz": {
-								"type": "array",
-								"minItems": 2,
-								"maxItems": 2,
-								"prefixItems": [
+			properties: {
+				foo: {
+					items: {
+						type: 'object',
+						properties: {
+							baz: {
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [
 									{
-										"discriminator": {
-											"mapping": {
-												"label1": "#/$defs/InternalModel1",
-												"label2": "#/$defs/InternalModel2"
+										discriminator: {
+											mapping: {
+												label1: '#/$defs/InternalModel1',
+												label2: '#/$defs/InternalModel2'
 											},
-											"propertyName": "label"
+											propertyName: 'label'
 										},
-										"oneOf": [
+										oneOf: [
 											{
-												"$ref": "#/$defs/InternalModel1"
+												$ref: '#/$defs/InternalModel1'
 											},
 											{
-												"$ref": "#/$defs/InternalModel2"
+												$ref: '#/$defs/InternalModel2'
 											}
 										]
 									},
-									{ "type": "number" }
+									{ type: 'number' }
 								]
 							}
 						}
 					},
-					"type": "array"
+					type: 'array'
 				}
 			},
-			"type": "object"
+			type: 'object'
 		});
 
-		expect(component.getArguments()).deep.eq({ "foo": [] });
+		expect(component.getArguments()).deep.eq({ foo: [] });
 
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
 		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
-		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }, null] }] });
+		expect(component.getArguments()).deep.eq({
+			foo: [{ baz: [{ label: 'label1', field1: null }, null] }]
+		});
 
 		expect(screen.getByText('must NOT have fewer than 2 items')).toBeVisible();
 		expect(screen.getByText('required property')).toBeVisible();
 
 		await user.type(screen.getAllByRole('textbox')[1], '42');
-		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": null }, 42] }] });
+		expect(component.getArguments()).deep.eq({
+			foo: [{ baz: [{ label: 'label1', field1: null }, 42] }]
+		});
 		expect(screen.getByText('required property')).toBeVisible();
 
 		expect(component.isValid()).false;
 		await user.type(screen.getByRole('textbox', { name: 'field1' }), 'xxx');
-		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label1", "field1": "xxx" }, 42] }] });
+		expect(component.getArguments()).deep.eq({
+			foo: [{ baz: [{ label: 'label1', field1: 'xxx' }, 42] }]
+		});
 		expect(component.isValid()).true;
 
 		await user.selectOptions(screen.getByRole('combobox'), 'label2');
 		expect(component.isValid()).false;
-		expect(component.getArguments()).deep.eq({ "foo": [{ "baz": [{ "label": "label2", "field2": null }, 42] }] });
+		expect(component.getArguments()).deep.eq({
+			foo: [{ baz: [{ label: 'label2', field2: null }, 42] }]
+		});
 		expect(screen.getByText('required property')).toBeVisible();
 	});
 
 	it('oneOf with default value and reset', async () => {
-
 		const user = userEvent.setup();
 
 		const { component } = renderSchema({
-			"$defs": {
-				"CreateMaskingRoiTable": {
-					"properties": {
-						"mode": {
-							"const": "create",
-							"default": "create",
-							"type": "string"
+			$defs: {
+				CreateMaskingRoiTable: {
+					properties: {
+						mode: {
+							const: 'create',
+							default: 'create',
+							type: 'string'
 						},
-						"table_name": {
-							"default": "table_name_default",
-							"type": "string"
+						table_name: {
+							default: 'table_name_default',
+							type: 'string'
 						}
 					},
-					"type": "object"
+					type: 'object'
 				},
-				"SkipCreateMaskingRoiTable": {
-					"properties": {
-						"mode": {
-							"const": "skip",
-							"default": "skip",
-							"type": "string"
+				SkipCreateMaskingRoiTable: {
+					properties: {
+						mode: {
+							const: 'skip',
+							default: 'skip',
+							type: 'string'
 						}
 					},
-					"type": "object"
+					type: 'object'
 				}
 			},
-			"type": "object",
-			"properties": {
-				"foo": {
-					"default": {
-						"mode": "skip"
+			type: 'object',
+			properties: {
+				foo: {
+					default: {
+						mode: 'skip'
 					},
-					"discriminator": {
-						"mapping": {
-							"create": "#/$defs/CreateMaskingRoiTable",
-							"skip": "#/$defs/SkipCreateMaskingRoiTable"
+					discriminator: {
+						mapping: {
+							create: '#/$defs/CreateMaskingRoiTable',
+							skip: '#/$defs/SkipCreateMaskingRoiTable'
 						},
-						"propertyName": "mode"
+						propertyName: 'mode'
 					},
-					"oneOf": [
+					oneOf: [
 						{
-							"$ref": "#/$defs/CreateMaskingRoiTable"
+							$ref: '#/$defs/CreateMaskingRoiTable'
 						},
 						{
-							"$ref": "#/$defs/SkipCreateMaskingRoiTable"
+							$ref: '#/$defs/SkipCreateMaskingRoiTable'
 						}
 					]
 				}
 			}
 		});
 
-		expect(component.getArguments()).deep.eq({ "foo": { "mode": "skip" } });
+		expect(component.getArguments()).deep.eq({ foo: { mode: 'skip' } });
 
 		await user.selectOptions(screen.getByRole('combobox', { name: 'mode' }), 'create');
 
 		expect(component.getArguments()).deep.eq({
-			"foo": {
-				"table_name": "table_name_default",
-				"mode": "create"
+			foo: {
+				table_name: 'table_name_default',
+				mode: 'create'
 			}
 		});
 
 		await user.click(screen.getByRole('button', { name: 'Reset' }));
 
-		expect(component.getArguments()).deep.eq({ "foo": { "mode": "skip" } });
+		expect(component.getArguments()).deep.eq({ foo: { mode: 'skip' } });
 
 		await user.selectOptions(screen.getByRole('combobox', { name: 'mode' }), 'create');
 
 		expect(component.getArguments()).deep.eq({
-			"foo": {
-				"table_name": "table_name_default",
-				"mode": "create"
+			foo: {
+				table_name: 'table_name_default',
+				mode: 'create'
 			}
 		});
 	});

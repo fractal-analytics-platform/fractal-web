@@ -1,5 +1,4 @@
 <script>
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').JobStatus|null} [status]

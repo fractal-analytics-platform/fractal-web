@@ -1286,12 +1286,12 @@
 	{#snippet body()}
 		{#if workflow}
 			{#if workflow.template_id}
-			<div class="mb-3">
-				This workflow comes from a 
-				<button class="btn btn-link p-0 align-baseline" onclick={gotoLinkedTemplate}>
-					template
-				</button>.
-			</div>
+				<div class="mb-3">
+					This workflow comes from a
+					<button class="btn btn-link p-0 align-baseline" onclick={gotoLinkedTemplate}>
+						template
+					</button>.
+				</div>
 			{/if}
 			<form
 				id="updateWorkflow"
@@ -1470,10 +1470,7 @@
 
 <JobLogsModal bind:this={jobLogsModal} />
 
-<TemplateCreateModal
-	bind:this={templateCreateModal}
-	{workflow}
-/>
+<TemplateCreateModal bind:this={templateCreateModal} {workflow} />
 
 <style>
 	.run-item {

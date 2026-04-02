@@ -8,33 +8,24 @@
 	/** @type {number|undefined} */
 	let templateId = $derived(
 		page.url.searchParams.get('template_id')
-		? Number(page.url.searchParams.get('template_id'))
-		: undefined
+			? Number(page.url.searchParams.get('template_id'))
+			: undefined
 	);
 	/** @type {boolean} */
-	let isOwner = $derived(
-		page.url.searchParams.get('is_owner') === 'true'
-	);
+	let isOwner = $derived(page.url.searchParams.get('is_owner') === 'true');
 	/** @type {string|undefined} */
-	let userEmail = $derived(
-		page.url.searchParams.get('user_email') || undefined
-	);
+	let userEmail = $derived(page.url.searchParams.get('user_email') || undefined);
 	/** @type {string|undefined} */
-	let templateName = $derived(
-		page.url.searchParams.get('name') || undefined
-	);
+	let templateName = $derived(page.url.searchParams.get('name') || undefined);
 	/** @type {number|undefined} */
 	let templateVersion = $derived(
-		page.url.searchParams.get('version')
-		? Number(page.url.searchParams.get('version'))
-		: undefined
+		page.url.searchParams.get('version') ? Number(page.url.searchParams.get('version')) : undefined
 	);
 </script>
 
-
 <div class="container-fluid">
 	<TemplatesTable
-		modalType='edit'
+		modalType="edit"
 		{templateId}
 		{isOwner}
 		{userEmail}

@@ -7,10 +7,9 @@ import { writable } from 'svelte/store';
  * @abstract
  */
 export class BaseFormElement {
-
 	/** @type {import('svelte/store').Writable<string[]>} */
 	errors;
-	/** 
+	/**
 	 * This property is true also for parents of elements having an error
 	 * @type {import('svelte/store').Writable<boolean>}
 	 */
@@ -47,16 +46,16 @@ export class BaseFormElement {
 	}
 
 	/**
-	 * @param {string} message 
+	 * @param {string} message
 	 */
 	addError(message) {
 		this.hasErrors.set(true);
-		this.errors.update(items => {
+		this.errors.update((items) => {
 			// Note: some messages might appear twice (e.g. for conditional properties)
 			if (!items.includes(message)) {
 				items.push(message);
 			}
-			return items
+			return items;
 		});
 	}
 
@@ -243,7 +242,7 @@ export class ObjectFormElement extends BaseFormElement {
 	}
 
 	/**
-	 * @param {number} index 
+	 * @param {number} index
 	 */
 	fixInvalidChild(index) {
 		const child = /** @type {InvalidFormElement} */ (this.children[index]);
@@ -257,7 +256,13 @@ export class ObjectFormElement extends BaseFormElement {
 			},
 			required: child.required,
 			removable: child.removable,
-			value: getPropertyData(child.property, this.manager.schemaVersion, child.required, undefined, true),
+			value: getPropertyData(
+				child.property,
+				this.manager.schemaVersion,
+				child.required,
+				undefined,
+				true
+			),
 			parentProperty: this.property,
 			titleType: this.titleType
 		});
@@ -284,7 +289,7 @@ export class ArrayFormElement extends BaseFormElement {
 			return;
 		}
 		const child = this.manager.createFormElement({
-			key: (this.children.length).toString(),
+			key: this.children.length.toString(),
 			path: `${this.path}/${this.children.length}`,
 			schemaPath: `${this.schemaPath}/items`,
 			property: this.items,
@@ -292,7 +297,7 @@ export class ArrayFormElement extends BaseFormElement {
 			removable: true,
 			value: getPropertyData(this.items, this.manager.schemaVersion, false, undefined, true),
 			parentProperty: this.property,
-			titleType: 'oneOf' in this.items ? 'inner_title' : 'title_only',
+			titleType: 'oneOf' in this.items ? 'inner_title' : 'title_only'
 		});
 		this.children = [...this.children, child];
 		this.notifyChange();
@@ -411,7 +416,7 @@ export class TupleFormElement extends BaseFormElement {
 	}
 
 	/**
-	 * @param {number} index 
+	 * @param {number} index
 	 */
 	removeUnexpectedChild(index) {
 		this.children = this.children.filter((_, i) => i !== index);
@@ -457,7 +462,7 @@ export class ConditionalFormElement extends BaseFormElement {
 					removable: this.removable,
 					value: getPropertyData(selectedProp, this.manager.schemaVersion, false, undefined, true),
 					parentProperty: this.property,
-					titleType: this.titleType,
+					titleType: this.titleType
 				});
 				if (this.titleType === 'inner_title' && this.selectedItem) {
 					this.title.set(selectedProp.title || '');
@@ -468,7 +473,7 @@ export class ConditionalFormElement extends BaseFormElement {
 	}
 
 	/**
-	 * @param {number} index 
+	 * @param {number} index
 	 */
 	removeUnexpectedChild(index) {
 		this.unexpectedChildren = this.unexpectedChildren.filter((_, i) => i !== index);

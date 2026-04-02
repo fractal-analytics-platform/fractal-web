@@ -13,74 +13,67 @@
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
-	
+
 	/**
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
-	let template = $state()
+	let template = $state();
 	/**
 	 * @type {number | null}
 	 */
-	let originalUserGroupId = $state(null)
+	let originalUserGroupId = $state(null);
 	/**
 	 * @type {string | null}
 	 */
-	let originalDescription = $state(null)
+	let originalDescription = $state(null);
 
 	const nothingToPatch = $derived(
 		originalUserGroupId == template?.user_group_id &&
-		(
-			originalDescription == template?.description ||
-			(originalDescription === null && template?.description === "")
-		)
+			(originalDescription == template?.description ||
+				(originalDescription === null && template?.description === ''))
 	);
 
 	let saving = $state(false);
 
-    const formErrorHandler = new FormErrorHandler(
-        'errorAlert-updateTemplateModal', ['user_group_id', 'description']
-    );
+	const formErrorHandler = new FormErrorHandler('errorAlert-updateTemplateModal', [
+		'user_group_id',
+		'description'
+	]);
 
 	/**
 	 * @param {number} template_id
 	 */
 	export async function open(template_id) {
 		saving = false;
-		const response = await fetch(
-			`/api/v2/workflow-template/${template_id}`,
-			{
-				method: 'GET'
-			}
-		);
+		const response = await fetch(`/api/v2/workflow-template/${template_id}`, {
+			method: 'GET'
+		});
 		if (response.ok) {
-            template = await response.json()
+			template = await response.json();
 			if (template) {
 				originalUserGroupId = template.user_group_id;
-				originalDescription = template.description
+				originalDescription = template.description;
 			}
 			modal?.show();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
 		}
 	}
-	    
-    async function updateTemplate() {
+
+	async function updateTemplate() {
 		saving = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const response = await fetch(
-			`/api/v2/workflow-template/${template?.id}`,
-			{
-				method: 'PATCH',
-				headers,
-				body: normalizePayload({
-					user_group_id: template?.user_group_id,
-					description: template?.description || null
-				})
-			}
-		);
+		const response = await fetch(`/api/v2/workflow-template/${template?.id}`, {
+			method: 'PATCH',
+			headers,
+			body: normalizePayload({
+				user_group_id: template?.user_group_id,
+				description: template?.description || null
+			})
+		});
 		if (response.ok) {
-            await onTemplateSave();
+			await onTemplateSave();
 			modal?.hide();
 		} else {
 			await formErrorHandler.handleErrorResponse(response);
@@ -97,9 +90,9 @@
 	bind:this={modal}
 >
 	{#snippet header()}
-	<h5 class="modal-title">
-		Edit template '{template?.name}'
-	</h5>
+		<h5 class="modal-title">
+			Edit template '{template?.name}'
+		</h5>
 	{/snippet}
 	{#snippet body()}
 		{#if template}
@@ -113,20 +106,16 @@
 							bind:value={template.user_group_id}
 						>
 							<option value={null}>Select...</option>
-							{#each groups as group, index (index) }
-									<option value={group[0]}>{group[1]}</option>
+							{#each groups as group, index (index)}
+								<option value={group[0]}>{group[1]}</option>
 							{/each}
-							
 						</select>
 					</div>
 				</div>
 			</div>
 
 			<div class="row mb-3 has-validation">
-				<label
-					class="col-3 col-lg-2 col-form-label"
-					for="template-description"
-				>
+				<label class="col-3 col-lg-2 col-form-label" for="template-description">
 					Description
 				</label>
 
@@ -139,19 +128,15 @@
 					></textarea>
 				</div>
 			</div>
-			{/if}
-			{/snippet}
-			{#snippet footer()}
-			<button
-				class="btn btn-primary"
-				onclick={updateTemplate}
-				disabled={saving || nothingToPatch}
-			>
-				{#if saving}
+		{/if}
+	{/snippet}
+	{#snippet footer()}
+		<button class="btn btn-primary" onclick={updateTemplate} disabled={saving || nothingToPatch}>
+			{#if saving}
 				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Save
-			</button>
-			<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
-			{/snippet}
+			{/if}
+			Save
+		</button>
+		<button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancel</button>
+	{/snippet}
 </Modal>

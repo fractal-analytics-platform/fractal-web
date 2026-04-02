@@ -14,13 +14,13 @@ PUBLIC_OAUTH_CLIENT_NAME=github
 
 This variable has to match the client name defined in fractal-server configuration.
 
-
 ## Full details for local example
 
 1. Register an OAuth2 app on GitHub with
-    * Homepage URL: http://127.0.0.1:5173
-    * Authorization callback URL: http://127.0.0.1:5173/auth/login/oauth2/
+   - Homepage URL: http://127.0.0.1:5173
+   - Authorization callback URL: http://127.0.0.1:5173/auth/login/oauth2/
 2. Set up the following env variables for fractal-server:
+
 ```
 OAUTH_CLIENT_NAME=github
 OAUTH_CLIENT_ID=...
@@ -28,7 +28,9 @@ OAUTH_CLIENT_SECRET=...
 OAUTH_REDIRECT_URL=http://127.0.0.1:5173/auth/login/oauth2/
 # [all other variables]
 ```
+
 3. Set up the following env variables for fractal-web:
+
 ```
 FRACTAL_SERVER_HOST=http://127.0.0.1:8000
 AUTH_COOKIE_DOMAIN=127.0.0.1
