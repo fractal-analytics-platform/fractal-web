@@ -136,13 +136,20 @@ function mergeAllOf(parentObject) {
 		for (const [key, child] of Object.entries(parentObject)) {
 			if (key === 'allOf' && Array.isArray(child)) {
 				for (const schema of child) {
-					for (const [k, v] of Object.entries(schema)) {
-						if (['if', 'then', 'required'].includes(k)) {
-							if (!('allOf' in adaptedObject)) {
-								adaptedObject['allOf'] = [];
-							}
-							adaptedObject['allOf'].push(schema);
-						} else {
+					let preserveAllOf = false;
+					for (const k of ['if', 'then', 'required']) {
+						if (Object.keys(schema).includes(k)) {
+							preserveAllOf = true;
+							break;
+						}
+					}
+					if (preserveAllOf) {
+						if (!('allOf' in adaptedObject)) {
+							adaptedObject['allOf'] = [];
+						}
+						adaptedObject['allOf'].push(schema);
+					} else {
+						for (const [k, v] of Object.entries(schema)) {
 							mergeProperty(adaptedObject, k, v);
 						}
 					}
