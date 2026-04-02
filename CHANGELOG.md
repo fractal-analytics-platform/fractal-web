@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Add support for conditionals in JSON Schemas (`dependentRequired`, `if`/`then`/`else`) (\#1050).
+
 # 1.25.1
 
 * Fix release github action (2545e2f4).

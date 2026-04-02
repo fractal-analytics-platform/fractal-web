@@ -48,7 +48,7 @@ export function renderSchemaWithReferencedProperty(schemaProperty, schemaVersion
  * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
  * @param {object} schemaData
  */
-export function renderSchema(schema, schemaVersion, schemaData = undefined) {
+export function renderSchema(schema, schemaVersion = 'pydantic_v2', schemaData = undefined) {
 	const onChange = vi.fn();
 	const result = render(JSchemaTestWrapper, {
 		props: { schema, onChange, schemaData, schemaVersion }
