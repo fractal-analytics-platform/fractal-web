@@ -34,12 +34,12 @@
 
 			<a href="/v2/admin/projects" class="btn btn-primary me-2">
 				<i class="bi bi-arrow-left-right"></i>
-				Change ownership
+				Projects ownership
 			</a>
 
 			<a href="/v2/admin/sharing" class="btn btn-primary me-2">
 				<i class="bi bi-share"></i>
-				Sharing
+				Projects sharing
 			</a>
 
 			<h2 class="fw-light mt-3">Jobs</h2>
