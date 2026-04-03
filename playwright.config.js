@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3218-expose-transfer-project-ownership-endpoint-for-admins-only',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
