@@ -8,7 +8,9 @@
 
 	let name = $state('');
 	let id = $state('');
-	let userId = $state();
+
+	/** @type {string|undefined} */
+	let userId = $state(undefined);
 	
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users));
@@ -145,7 +147,7 @@
 						<label class="col-3 col-form-label" for="user">User</label>
 						<div class="col-9">
 							<select class="form-select" bind:value={userId} id="user">
-								<option value=undefined>All</option>
+								<option value={undefined}>All</option>
 								{#each users as user (user.id)}
 									<option value={user.id}>{user.email}</option>
 								{/each}
