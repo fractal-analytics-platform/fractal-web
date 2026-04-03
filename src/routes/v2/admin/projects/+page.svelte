@@ -145,7 +145,7 @@
 						<label class="col-3 col-form-label" for="user">User</label>
 						<div class="col-9">
 							<select class="form-select" bind:value={userId} id="user">
-								<option value="">All</option>
+								<option value=undefined>All</option>
 								{#each users as user (user.id)}
 									<option value={user.id}>{user.email}</option>
 								{/each}
