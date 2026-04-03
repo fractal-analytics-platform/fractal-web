@@ -14,6 +14,7 @@
 	
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users));
+
 	/**
 	 * @param {import('fractal-components/types/api').User[]} users
 	 */
@@ -26,6 +27,7 @@
 
 	let searched = $state(false);
 	let searching = $state(false);
+
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
@@ -37,7 +39,24 @@
 	let totalCount = $state(0);
 
 	/** @type {Modal|undefined} */
-	let infoModal = $state();
+	let changeOwnershipModal = $state();
+	/** @type {import('fractal-components/types/api').ProjectSuperuser|null} */
+	let selectedProject = $state(null);
+	/** @type {string|undefined} */
+	let newOwnerId = $state(undefined);
+	
+	/**
+	 * @param {import('fractal-components/types/api').ProjectSuperuser} project
+	 */
+	function openChangeOwnershipModal(project) {
+		selectedProject = project;
+		changeOwnershipModal?.show();
+	}
+
+	function onChangeOwnershipModalClose() {
+		selectedProject = null;
+		newOwnerId = undefined;
+	}
 
 	function getBaseProjectsSearchUrl() {
 		const url = new URL('/api/admin/v2/project', window.location.origin);
@@ -103,8 +122,32 @@
 		pageSize = 50;
 	}
 
-</script>
+	async function handleChangeOwner() {
+		try {
+			const response = await fetch(
+				`/api/admin/v2/project/${selectedProject?.id}?user_id=${newOwnerId}`,
+				{
+					method: 'PATCH',
+					credentials: 'include',
+				}
+			);
+			if (!response.ok) {
+				const error = await getAlertErrorFromResponse(response);
+				displayStandardErrorAlert(error, 'changeOwnerError');
+				return;
+			}
+			changeOwnershipModal?.hide();
+			await searchProject(currentPage, pageSize);
+			
+		} catch (err) {
+			displayStandardErrorAlert(
+				{ message: 'Something went wrong. Please try again.' },
+				'changeOwnerError'
+			);
+		}
+	}
 
+</script>
 
 <div class="container mt-3">
 	<div class="d-flex justify-content-between align-items-center mb-3">
@@ -207,6 +250,13 @@
 										</a>
 									</td>
 									<td>
+										<button
+											class="btn btn-outline-primary"
+											onclick={() => openChangeOwnershipModal(project)}
+										>
+											<i class="bi"></i>
+											Change ownership
+										</button>
 									</td>
 								</tr>
 							{/each}
@@ -227,3 +277,54 @@
 	</div>
 
 </div>
+
+
+
+
+<Modal
+	id="changeOwnershipModal"
+	bind:this={changeOwnershipModal}
+	size="lg"
+	onClose={onChangeOwnershipModalClose}
+>
+	{#snippet body()}
+		<p class="mb-3">
+			Transfer the ownership of Project {selectedProject?.id}
+			(<strong>{selectedProject?.name}</strong>) to a new user.
+		</p>
+
+		<div class="alert alert-warning d-flex align-items-center gap-2">
+			<i class="bi bi-exclamation-triangle-fill"></i>
+			<div>
+				The current owner (<code>{selectedProject?.user_email}</code>) 
+				will lose access to this project.
+			</div>
+		</div>
+
+
+		<div class="row mt-1">
+			<label class="col-3 col-form-label" for="user">New owner</label>
+			<div class="col-9">
+				<select class="form-select" bind:value={newOwnerId} id="user">
+					<option value={undefined}>Select...</option>
+					{#each users.filter(user => user.email !== selectedProject?.user_email) as user (user.id)}
+						<option value={user.id}>{user.email}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
+		<div id="changeOwnerError" class="mt-3"></div>
+
+		<button
+			class="btn btn-primary mt-4"
+			onclick={handleChangeOwner}
+			disabled={!newOwnerId}
+		>
+			Change owner
+		</button>
+
+
+		
+	{/snippet}
+</Modal>
