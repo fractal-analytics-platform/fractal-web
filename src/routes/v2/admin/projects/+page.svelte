@@ -5,7 +5,6 @@
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { PropertyDescription } from 'fractal-components';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
-	import { updateFormEntry } from '$lib/components/v2/workflow/task_form_utils';
 
 	let name = $state('');
 	let id = $state('');
