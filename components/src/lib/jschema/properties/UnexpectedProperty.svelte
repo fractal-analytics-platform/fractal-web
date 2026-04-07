@@ -5,11 +5,12 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('../form_element.js').ValueFormElement} formElement
-	 * @property {boolean} [editable]
+	 * @property {boolean} editable
+	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable = true } = $props();
+	let { formElement = $bindable(), editable, remove } = $props();
 
 	let value = $state({});
 	formElement.value.subscribe((v) => (value = v));
@@ -24,7 +25,7 @@
 		<div class="alert alert-danger mb-0 py-1 px-2">{errors.join(', ')}</div>
 	{/if}
 	{#if typeof value === 'object'}
-		<CollapsibleProperty {formElement} padding={1} showErrors={false}>
+		<CollapsibleProperty {formElement} padding={1} showErrors={false} {editable} {remove}>
 			<FormBuilder
 				args={value}
 				onChange={(d) => {
@@ -37,6 +38,6 @@
 			/>
 		</CollapsibleProperty>
 	{:else}
-		<StringProperty {formElement} {editable} showErrors={false} />
+		<StringProperty {formElement} {editable} showErrors={false} {remove} />
 	{/if}
 </div>

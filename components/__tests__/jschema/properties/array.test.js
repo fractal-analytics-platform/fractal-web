@@ -216,11 +216,11 @@ describe('Array properties', () => {
 			'pydantic_v1'
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [0, 1, 2] });
-		const inputs = screen.getAllByRole('spinbutton');
+		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(3);
-		expect(inputs[0]).toHaveValue(0);
-		expect(inputs[1]).toHaveValue(1);
-		expect(inputs[2]).toHaveValue(2);
+		expect(inputs[0]).toHaveValue('0');
+		expect(inputs[1]).toHaveValue('1');
+		expect(inputs[2]).toHaveValue('2');
 	});
 
 	it('A list of strings', async () => {
@@ -276,14 +276,14 @@ describe('Array properties', () => {
 			'pydantic_v1'
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [[1, 2], [3, 4], [5], [6]] });
-		const inputs = screen.getAllByRole('spinbutton');
+		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(6);
-		expect(inputs[0]).toHaveValue(1);
-		expect(inputs[1]).toHaveValue(2);
-		expect(inputs[2]).toHaveValue(3);
-		expect(inputs[3]).toHaveValue(4);
-		expect(inputs[4]).toHaveValue(5);
-		expect(inputs[5]).toHaveValue(6);
+		expect(inputs[0]).toHaveValue('1');
+		expect(inputs[1]).toHaveValue('2');
+		expect(inputs[2]).toHaveValue('3');
+		expect(inputs[3]).toHaveValue('4');
+		expect(inputs[4]).toHaveValue('5');
+		expect(inputs[5]).toHaveValue('6');
 	});
 
 	it('A nested list of integers', async () => {
@@ -301,14 +301,14 @@ describe('Array properties', () => {
 			'pydantic_v1'
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [[1, 2], [3, 4], [5], [6]] });
-		const inputs = screen.getAllByRole('spinbutton');
+		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(6);
-		expect(inputs[0]).toHaveValue(1);
-		expect(inputs[1]).toHaveValue(2);
-		expect(inputs[2]).toHaveValue(3);
-		expect(inputs[3]).toHaveValue(4);
-		expect(inputs[4]).toHaveValue(5);
-		expect(inputs[5]).toHaveValue(6);
+		expect(inputs[0]).toHaveValue('1');
+		expect(inputs[1]).toHaveValue('2');
+		expect(inputs[2]).toHaveValue('3');
+		expect(inputs[3]).toHaveValue('4');
+		expect(inputs[4]).toHaveValue('5');
+		expect(inputs[5]).toHaveValue('6');
 	});
 
 	it('A nested list of strings', async () => {
@@ -379,27 +379,31 @@ describe('Array properties', () => {
 			'pydantic_v1'
 		);
 		expect(component.getArguments()).deep.eq({ testProp: [[[0]]] });
-		const inputs = screen.getAllByRole('spinbutton');
+		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(1);
-		expect(inputs[0]).toHaveValue(0);
+		expect(inputs[0]).toHaveValue('0');
 	});
 
 	it('handles array path update when adding and removing children', () => {
-		const formManager = new FormManager({
-			type: 'object',
-			properties: {
-				foo: {
-					type: 'array',
-					items: {
-						type: 'object',
-						properties: {
-							bar: { type: 'string' }
-						},
-						required: ['bar']
+		const formManager = new FormManager(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								bar: { type: 'string' }
+							},
+							required: ['bar']
+						}
 					}
 				}
-			}
-		}, vi.fn(), 'pydantic_v2');
+			},
+			vi.fn(),
+			'pydantic_v2'
+		);
 
 		const foo = formManager.root.children[0];
 
@@ -413,7 +417,7 @@ describe('Array properties', () => {
 		expect(foo.children[1].path).eq('/foo/1');
 		expect(foo.children[2].path).eq('/foo/2');
 
-		foo.removeChild(1)
+		foo.removeChild(1);
 
 		expect(foo.children.length).eq(2);
 
@@ -439,10 +443,10 @@ describe('Array properties', () => {
 		expect(component.getArguments()).deep.eq({ foo: [] });
 
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
-		await user.type(screen.getByRole('spinbutton'), '5');
+		await user.type(screen.getByRole('textbox'), '5');
 
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
-		await user.type(screen.getAllByRole('spinbutton')[1], '6');
+		await user.type(screen.getAllByRole('textbox')[1], '6');
 		expect(component.getArguments()).deep.eq({ foo: [5, 6] });
 
 		await user.click(screen.getAllByRole('button', { name: 'Move item up' })[1]);

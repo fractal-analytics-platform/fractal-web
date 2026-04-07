@@ -28,7 +28,9 @@ export function mockGroup(fields = {}) {
 		id: 1,
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').Group & { user_ids: number[] }} */ (group);
+	return /** @type {import('fractal-components/types/api').Group & { user_ids: number[] }} */ (
+		group
+	);
 }
 
 /**

@@ -70,8 +70,12 @@ export function detectSchemaVersion(schema) {
 		schemaValidatorV2.validateSchema(stripDiscriminator(schema));
 		return 'pydantic_v2';
 	} catch {
-		const schemaValidatorV1 = new SchemaValidator('pydantic_v1');
-		schemaValidatorV1.validateSchema(stripDiscriminator(schema));
-		return 'pydantic_v1';
+		try {
+			const schemaValidatorV1 = new SchemaValidator('pydantic_v1');
+			schemaValidatorV1.validateSchema(stripDiscriminator(schema));
+			return 'pydantic_v1';
+		} catch {
+			return 'pydantic_v2';
+		}
 	}
 }

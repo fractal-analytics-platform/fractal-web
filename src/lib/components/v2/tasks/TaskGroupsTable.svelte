@@ -129,16 +129,18 @@
 
 <table class="table align-middle">
 	<colgroup>
-		<col width="auto" />
-		<col width="90" />
-		<col width="100" />
-		<col width="120" />
-		<col width="100" />
-		<col width="400" />
+		<col style="width: 25%" />
+		<col style="width: 22%" />
+		<col style="width: 8%" />
+		<col style="width: 10%" />
+		<col style="width: 12%" />
+		<col style="width: 10%" />
+		<col style="width: auto" />
 	</colgroup>
 	<thead class="table-light">
 		<tr>
 			<th>Package</th>
+			<th>Owner</th>
 			<th>Active</th>
 			<th>Group</th>
 			<th>Version</th>
@@ -151,6 +153,7 @@
 			{#if selectedGroup}
 				<tr>
 					<td>{selectedGroup.pkg_name}</td>
+					<td>{selectedGroup.user_email}</td>
 					<td>
 						<BooleanIcon value={selectedGroup.active} />
 					</td>
@@ -183,24 +186,36 @@
 								: 'Expand tasks'}
 						>
 							{#if expandedTaskGroupRow === selectedGroup.pkg_name}
-								<i class="bi bi-dash-circle"></i>
+								<i class="bi bi-chevron-up"></i>
 							{:else}
-								<i class="bi bi-plus-circle"></i>
+								<i class="bi bi-chevron-down"></i>
 							{/if}
 						</button>
 					</td>
 					<td>
-						<button class="btn btn-light" onclick={() => taskGroupInfoModal?.open(selectedGroup)}>
+						<button
+							class="btn btn-light"
+							aria-label="Info"
+							title="Info"
+							onclick={() => taskGroupInfoModal?.open(selectedGroup)}
+						>
 							<i class="bi bi-info-circle"></i>
-							Info
 						</button>
-						<button class="btn btn-primary" onclick={() => taskGroupEditModal?.open(selectedGroup)}>
+						<button
+							class="btn btn-primary"
+							aria-label="Edit"
+							title="Edit"
+							onclick={() => taskGroupEditModal?.open(selectedGroup)}
+						>
 							<i class="bi bi-pencil"></i>
-							Edit
 						</button>
-						<button class="btn btn-info" onclick={() => taskGroupManageModal?.open(selectedGroup)}>
+						<button
+							class="btn btn-info"
+							aria-label="Manage"
+							title="Manage"
+							onclick={() => taskGroupManageModal?.open(selectedGroup)}
+						>
 							<i class="bi bi-gear"></i>
-							Manage
 						</button>
 					</td>
 				</tr>
@@ -208,28 +223,32 @@
 				{#each selectedGroup.task_list as task (task.id)}
 					{#if task}
 						<tr class:collapsed={selectedGroup.pkg_name !== expandedTaskGroupRow} class="task-row">
-							<td colspan="5" class="text-end">
+							<td colspan="6" class="text-end">
 								<span class="pe-4">{task.name}</span>
 							</td>
 							<td>
 								<button
 									class="btn btn-light"
+									aria-label="Info"
+									title="Info"
 									onclick={() => {
 										taskInfoModal?.open(task, selectedGroup.version || '');
 									}}
 								>
 									<i class="bi bi-info-circle"></i>
-									Info
 								</button>
-								<button
-									class="btn btn-primary"
-									onclick={() => {
-										taskEditModal?.open(task);
-									}}
-								>
-									<i class="bi bi-pencil"></i>
-									Edit
-								</button>
+								{#if selectedGroup.origin === 'other'}
+									<button
+										class="btn btn-primary"
+										aria-label="Edit"
+										title="Edit"
+										onclick={() => {
+											taskEditModal?.open(task);
+										}}
+									>
+										<i class="bi bi-pencil"></i>
+									</button>
+								{/if}
 							</td>
 						</tr>
 					{/if}

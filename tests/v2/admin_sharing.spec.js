@@ -75,31 +75,31 @@ test('Admin page for project sharing', async ({ page }) => {
 	await test.step('Test search fields', async () => {
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
 		await search(page, 3);
-    	await expect(page.getByRole('row', {name: p1.name})).toHaveCount(3);
+		await expect(page.getByRole('row', { name: p1.name })).toHaveCount(3);
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail2);
 		await search(page, 1);
-    	await expect(page.getByRole('row', {name: p2.name})).toBeVisible();
+		await expect(page.getByRole('row', { name: p2.name })).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail1);
 		await page.getByRole('combobox', { name: 'Is Verified' }).selectOption('True');
 		await search(page, 1);
-    	await expect(page.getByRole('row', {name: p1.name})).toBeVisible();
+		await expect(page.getByRole('row', { name: p1.name })).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail2);
 		await page.getByRole('combobox', { name: 'Is Verified' }).selectOption('False');
 		await search(page, 1);
-    	await expect(page.getByRole('row', {name: p2.name})).toBeVisible();
+		await expect(page.getByRole('row', { name: p2.name })).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
 		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
 		await page.getByRole('combobox', { name: 'Is Owner' }).selectOption('True');
 		await search(page, 1);
-    	await expect(page.getByRole('row', {name: p1.name})).toBeVisible();
+		await expect(page.getByRole('row', { name: p1.name })).toBeVisible();
 		await reset(page);
 
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
@@ -112,7 +112,7 @@ test('Admin page for project sharing', async ({ page }) => {
 	await test.step('Test Verify button', async () => {
 		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
 		await search(page, 3);
-    	await expect(page.getByRole('row', {name: p1.name})).toHaveCount(3);
+		await expect(page.getByRole('row', { name: p1.name })).toHaveCount(3);
 		// for non-guests users there is no Verify button
 		const row1 = page.getByRole('row', { name: userEmail1 });
 		await expect(row1.getByRole('button', { name: 'Verify' })).toHaveCount(0);
@@ -129,9 +129,9 @@ test('Admin page for project sharing', async ({ page }) => {
 	});
 
 	await test.step('Cleanup', async () => {
-    await deleteProject(page, p1.name);
-    await deleteProject(page, p2.name);
-  });
+		await deleteProject(page, p1.name);
+		await deleteProject(page, p2.name);
+	});
 });
 
 /**
@@ -140,11 +140,11 @@ test('Admin page for project sharing', async ({ page }) => {
  */
 async function search(page, expectedRowCount) {
 	await page.getByRole('button', { name: 'Search' }).click();
-  if (expectedRowCount === 0) {
-    await expect(page.getByText('The query returned 0 matching results')).toBeVisible();
-  } else {
-    await expect(page.getByRole('row')).toHaveCount(expectedRowCount + 1);
-  }
+	if (expectedRowCount === 0) {
+		await expect(page.getByText('The query returned 0 matching results')).toBeVisible();
+	} else {
+		await expect(page.getByRole('row')).toHaveCount(expectedRowCount + 1);
+	}
 }
 
 /**

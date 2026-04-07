@@ -11,6 +11,7 @@ If these versions are not available via your favorite package installer, you
 can install them from [this link](https://nodejs.org/en/download) for your
 specific platform. Another option is to use
 [nvm](https://github.com/nvm-sh/nvm), e.g. via
+
 ```bash
 nvm install 18
 nvm alias default 18

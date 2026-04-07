@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
-import { fail, redirect } from '@sveltejs/kit';
+import { env as publicEnv } from '$env/dynamic/public';
+import { fail, isHttpError, redirect } from '@sveltejs/kit';
 import { userAuthentication } from '$lib/server/api/auth_api';
 import { setCookieFromToken } from './cookie';
 import { getLogger } from '$lib/server/logger.js';
@@ -20,11 +21,12 @@ export const actions = {
 			authData = await userAuthentication(fetch, formData);
 		} catch (error) {
 			logger.debug(error);
-			const guestUsername = env.PUBLIC_GUEST_USERNAME;
+			const errorMessage = getLoginErrorMessage(error);
+			const guestUsername = publicEnv.PUBLIC_GUEST_USERNAME;
 			if (guestUsername && formData.get('username') === guestUsername) {
-				return fail(400, { invalidGuestMessage: 'Invalid credentials', invalid: true });
+				return fail(400, { invalidGuestMessage: errorMessage, invalid: true });
 			} else {
-				return fail(400, { invalidMessage: 'Invalid credentials', invalid: true });
+				return fail(400, { invalidMessage: errorMessage, invalid: true });
 			}
 		}
 
@@ -33,14 +35,32 @@ export const actions = {
 	}
 };
 
+/**
+ * @param {unknown} error
+ */
+function getLoginErrorMessage(error) {
+	if (isHttpError(error)) {
+		if (error.status === 400 && error.body.message === 'LOGIN_BAD_CREDENTIALS') {
+			return 'Invalid credentials';
+		} else if (error.status === 404) {
+			return 'Basic auth login has been disabled';
+		}
+	}
+	return 'Unexpected error';
+}
+
 export async function load() {
 	const loginInvite = await getLoginInvite();
-	return { loginInvite };
+	const hideBasicAuth = env.FRACTAL_HIDE_BASIC_AUTH === 'true';
+	return {
+		loginInvite,
+		hideBasicAuth
+	};
 }
 
 async function getLoginInvite() {
 	if (!env.LOGIN_INVITE_PATH) {
-		return "Log in with Fractal specific email & password provided to you by the Fractal admin";
+		return null;
 	}
 	try {
 		try {

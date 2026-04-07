@@ -77,16 +77,6 @@
 {#key children}
 	{#each children as child, index (index)}
 		<div class="property-block">
-			{#if child.removable}
-				<button
-					class="btn btn-danger w-100 mt-2"
-					type="button"
-					onclick={() => removeProperty(/**@type {string}*/ (child.key))}
-					disabled={!editable}
-				>
-					Remove Property Block
-				</button>
-			{/if}
 			{#if child.type === 'invalid'}
 				<button
 					class="btn btn-danger w-100 mt-2"
@@ -103,6 +93,7 @@
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
 					init={() => initChild(index)}
+					remove={child.removable ? () => removeProperty(/**@type {string}*/ (child.key)) : null}
 				/>
 			</div>
 		</div>

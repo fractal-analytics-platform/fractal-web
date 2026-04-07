@@ -44,7 +44,12 @@ export async function addGroupToUser(page, groupName) {
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
 	const selectableGroups = await page.getByRole('option').count();
-	await selectSlimSelect(page, page.getByRole('combobox', { name: 'Select groups' }), groupName, true);
+	await selectSlimSelect(
+		page,
+		page.getByRole('combobox', { name: 'Select groups' }),
+		groupName,
+		true
+	);
 	await modal.getByRole('button', { name: 'Add' }).click();
 	if (await modal.getByText('Group is required').isVisible()) {
 		// Sometimes playwright clicks the "Add" button before the slim-select change event
@@ -56,7 +61,6 @@ export async function addGroupToUser(page, groupName) {
 	await expect(page.getByRole('button', { name: `Remove group ${groupName}` })).toBeVisible();
 	return selectableGroups;
 }
-
 
 /**
  * @param {import('@playwright/test').Locator[]} row

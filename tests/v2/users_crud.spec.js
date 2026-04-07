@@ -78,7 +78,7 @@ test('Create and update a user', async ({ page }) => {
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
-		await expect(cells[0]).toHaveText(/** @type {string} */(userId));
+		await expect(cells[0]).toHaveText(/** @type {string} */ (userId));
 		await expect(cells[1]).toHaveText(randomUserName + '@example.com');
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);
@@ -146,7 +146,7 @@ test('Create and update a user', async ({ page }) => {
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 		await waitPageLoading(page);
 		const cells = await page.locator('table td').all();
-		await expect(cells[0]).toContainText(/**@type {string} */(userId));
+		await expect(cells[0]).toContainText(/**@type {string} */ (userId));
 		await expect(cells[1]).toContainText(randomUserName + '-renamed@example.com');
 		await verifyChecked(cells, 2, true);
 		await verifyChecked(cells, 3, false);

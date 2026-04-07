@@ -278,9 +278,7 @@ export async function createWorkflow(page, projectId, workflowName = '') {
  */
 export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
 	await page.getByRole('button', { name: 'Add task to workflow' }).click();
-	const modal = await waitModal(page);
-	await expect(modal.locator('.spinner-border')).toHaveCount(0);
-	const row = await getTaskRow(modal, taskName);
+	const row = await getTaskRow(page, taskName);
 	await row.scrollIntoViewIfNeeded();
 	if (taskVersion) {
 		await row
@@ -292,21 +290,17 @@ export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
 }
 
 /**
- * @param {import('@playwright/test').Locator} modal
+ * @param {import('@playwright/test').Page} page
  * @param {string} taskName
  */
-async function getTaskRow(modal, taskName) {
-	const rowLocator = modal.getByRole('row', { name: taskName }).filter({ hasText: /Add task/ });
-	await expect(rowLocator.first()).toBeVisible();
-	const rows = await rowLocator.all();
-
-	for (const row of rows) {
-		const cellContent = (await row.getByRole('cell').first().innerText()).trim();
-		if (cellContent === taskName) {
-			return row;
-		}
-	}
-	throw new Error(`Unable to find row for task ${taskName}`);
+async function getTaskRow(page, taskName) {
+	const modal = await waitModal(page);
+	await expect(modal.locator('.spinner-border')).toHaveCount(0);
+	await modal.getByPlaceholder('Search...').fill(taskName);
+	const taskSelector = page.getByRole('checkbox', { name: taskName, exact: true });
+	const taskRow = modal.getByRole('row').filter({ has: taskSelector });
+	const addTaskButtonLocator = page.getByRole('button', { name: 'Add task' });
+	return taskRow.filter({ has: addTaskButtonLocator }).first();
 }
 
 /**

@@ -27,13 +27,19 @@ export async function createFakeTask(page, task) {
 		} else if (task.type === 'compound') {
 			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Compound');
 		} else if (task.type === 'converter_non_parallel') {
-			await page.getByRole('combobox', { name: 'Task type' }).selectOption('Converter Non Parallel');
+			await page
+				.getByRole('combobox', { name: 'Task type' })
+				.selectOption('Converter Non Parallel');
 		}
 
 		await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);
 
 		const command = path.join(__dirname, '..', 'data', 'fake-task.sh');
-		if (task.type === 'non_parallel' || task.type === 'compound' || task.type === 'converter_non_parallel') {
+		if (
+			task.type === 'non_parallel' ||
+			task.type === 'compound' ||
+			task.type === 'converter_non_parallel'
+		) {
 			await page
 				.getByRole('textbox', { name: 'Command non parallel' })
 				.fill(task.command_non_parallel || command);
@@ -124,5 +130,18 @@ export async function collapseExpandedRows(page) {
 	if (await collapseButton.isVisible()) {
 		await collapseButton.click();
 		await expect(table.getByRole('row')).toHaveCount(totalRows - 1);
+	}
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} expectedNames
+ */
+export async function checkTasksOrder(page, ...expectedNames) {
+	const tasksListContainer = page.getByTestId('workflow-tasks-list');
+	const names = await tasksListContainer.getByRole('button').allInnerTexts();
+	expect(names.length).toEqual(expectedNames.length);
+	for (let i = 0; i < expectedNames.length; i++) {
+		expect(names[i]).toEqual(expectedNames[i]);
 	}
 }

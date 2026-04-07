@@ -1,7 +1,13 @@
 /**
  * These endpoints act like a proxy, forwarding all /api/admin requests to the /admin Python backend
  */
-import { createDeleteProxy, createGetProxy, createPatchProxy, createPostProxy, createPutProxy } from '../../../proxy';
+import {
+	createDeleteProxy,
+	createGetProxy,
+	createPatchProxy,
+	createPostProxy,
+	createPutProxy
+} from '../../../proxy';
 
 export const GET = createGetProxy('admin', ['v2/impersonate']);
 export const POST = createPostProxy('admin');

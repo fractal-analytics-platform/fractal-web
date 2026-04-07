@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: ['main', 'ihb-develop']
 
+permissions: {}
+
 jobs:
   end_to_end_tests:
     name: 'Node ${{ matrix.node-version }}'
@@ -33,7 +35,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: fractal_test
@@ -46,17 +48,17 @@ jobs:
           - 5432:5432
 
       oauth2:
-        image: ghcr.io/fractal-analytics-platform/oauth:0.1
+        image: ghcr.io/fractal-analytics-platform/oauth@sha256:42c80e3193d8eb5a20b5c88a90c625b9ea45ef9f5228b6676ea0b0494bed3d9a # 0.1
         ports:
           - 5556:5556
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Set up node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -72,7 +74,7 @@ jobs:
 
       - name: Archive test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: test-results-folder-node-${{ matrix.node-version }}
           path: test-results

@@ -52,6 +52,8 @@
 						<li class="list-group-item">{taskGroup.pkg_name}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Group</li>
 						<li class="list-group-item">{getGroupName(taskGroup)}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Owner</li>
+						<li class="list-group-item">{taskGroup.user_email}</li>
 						<li class="list-group-item list-group-item-light fw-bold">Active</li>
 						<li class="list-group-item"><BooleanIcon value={taskGroup.active} /></li>
 						<li class="list-group-item list-group-item-light fw-bold">Origin</li>

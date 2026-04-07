@@ -24,14 +24,15 @@ test('Task group edit (change group)', async ({ page, workflow }) => {
 
 	await test.step('Set the task to private', async () => {
 		const taskRow = page.getByRole('row', { name: taskName });
-		await expect(taskRow.getByRole('cell').nth(2)).toContainText('All');
+		await expect(taskRow.getByRole('cell').nth(3)).toContainText('All');
+		await expect(taskRow.getByRole('cell').nth(1)).toContainText('admin@fractal.xy');
 		await taskRow.getByRole('button', { name: 'Edit' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByText('Private task').click();
 		await modal.getByRole('button', { name: 'Update' }).click();
 		await waitModalClosed(page);
-		await expect(taskRow.getByRole('cell').nth(2)).toContainText('-');
+		await expect(taskRow.getByRole('cell').nth(3)).toContainText('-');
 	});
 
 	await test.step('Set the task to test group', async () => {
@@ -43,7 +44,7 @@ test('Task group edit (change group)', async ({ page, workflow }) => {
 		await modal.getByRole('combobox').selectOption(groupName);
 		await modal.getByRole('button', { name: 'Update' }).click();
 		await waitModalClosed(page);
-		await expect(taskRow.getByRole('cell').nth(2)).toContainText(groupName);
+		await expect(taskRow.getByRole('cell').nth(3)).toContainText(groupName);
 	});
 
 	await test.step('Cleanup', async () => {

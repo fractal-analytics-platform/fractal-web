@@ -184,8 +184,6 @@ it('should detect valid pydantic_v1 schema', () => {
 	expect(version).toEqual('pydantic_v1');
 });
 
-it('should detect invalid schema', () => {
-	expect(() => detectSchemaVersion({ foo: 'bar' })).toThrowError(
-		'strict mode: unknown keyword: "foo"'
-	);
+it('should fallback to pydantic_v2 in case of invalid schema', () => {
+	expect(detectSchemaVersion({ foo: 'bar' })).toEqual('pydantic_v2');
 });

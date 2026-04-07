@@ -20,16 +20,13 @@ Validation errors associated with a specific request field are represented using
 
 ```json
 {
-  "detail": [
-    {
-      "loc": [
-        "body",
-        "zarr_url"
-      ],
-      "msg": "URLs must begin with '/' or 's3'.",
-      "type": "value_error"
-    }
-  ]
+	"detail": [
+		{
+			"loc": ["body", "zarr_url"],
+			"msg": "URLs must begin with '/' or 's3'.",
+			"type": "value_error"
+		}
+	]
 }
 ```
 
@@ -37,16 +34,13 @@ Some validation errors may not be associated with a specific field and in that c
 
 ```json
 {
-  "detail": [
-    {
-      "loc": [
-        "body",
-        "__root__"
-      ],
-      "msg": "error message",
-      "type": "value_error"
-    }
-  ]
+	"detail": [
+		{
+			"loc": ["body", "__root__"],
+			"msg": "error message",
+			"type": "value_error"
+		}
+	]
 }
 ```
 
@@ -62,7 +56,7 @@ It is suggested to handle the unsuccessful response first, in order to return th
 
 ```javascript
 if (!response.ok) {
-  await responseError(response);
+	await responseError(response);
 }
 return await response.json();
 ```
@@ -108,8 +102,8 @@ Finally, we invoke the function to display the error:
 
 ```javascript
 errorAlert = displayStandardErrorAlert(
-  new AlertError(result, response.status),
-  'errorAlert-projectInfoModal'
+	new AlertError(result, response.status),
+	'errorAlert-projectInfoModal'
 );
 ```
 
@@ -129,10 +123,10 @@ The constructor accepts as first argument the id of the div that will contain th
 
 ```javascript
 const formErrorHandler = new FormErrorHandler('taskCollectionError', [
-  'package',
-  'package_version',
-  'package_extras',
-  'python_version'
+	'package',
+	'package_version',
+	'package_extras',
+	'python_version'
 ]);
 ```
 
@@ -148,19 +142,19 @@ The Bootstrap validation classes are used inside the form: `has-validation` on p
 
 ```svelte
 <div class="input-group has-validation">
-  <div class="input-group-text">
-    <label class="font-monospace" for="package">Package</label>
-  </div>
-  <input
-    name="package"
-    id="package"
-    type="text"
-    class="form-control"
-    required
-    class:is-invalid={$validationErrors['package']}
-    bind:value={python_package}
-  />
-  <span class="invalid-feedback">{$validationErrors['package']}</span>
+	<div class="input-group-text">
+		<label class="font-monospace" for="package">Package</label>
+	</div>
+	<input
+		name="package"
+		id="package"
+		type="text"
+		class="form-control"
+		required
+		class:is-invalid={$validationErrors['package']}
+		bind:value={python_package}
+	/>
+	<span class="invalid-feedback">{$validationErrors['package']}</span>
 </div>
 ```
 
@@ -168,7 +162,7 @@ The `handleErrorResponse()` function is used to populate the fields from an erro
 
 ```javascript
 if (!response.ok) {
-  await formErrorHandler.handleErrorResponse(response);
+	await formErrorHandler.handleErrorResponse(response);
 }
 ```
 

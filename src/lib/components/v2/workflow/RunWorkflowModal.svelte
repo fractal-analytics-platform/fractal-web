@@ -310,9 +310,9 @@
 	function validateTasksArguments() {
 		/** @type {string[]} */
 		const invalidTasks = [];
-		const startIndex = firstTaskIndex || 0;
-		const endIndex = lastTaskIndex || workflow.task_list.length;
-		const workflowTasks = workflow.task_list.filter((t, i) => i >= startIndex && i < endIndex);
+		const startIndex = firstTaskIndex === undefined ? 0 : firstTaskIndex;
+		const endIndex = lastTaskIndex === undefined ? workflow.task_list.length - 1 : lastTaskIndex;
+		const workflowTasks = workflow.task_list.filter((_, i) => i >= startIndex && i <= endIndex);
 		for (const wft of workflowTasks) {
 			let invalid = false;
 			if (wft.task.args_schema_non_parallel) {

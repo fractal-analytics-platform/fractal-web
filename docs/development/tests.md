@@ -88,6 +88,7 @@ instance of `fractal-server` running.
 
 One could also test a local `fractal-web` instance with a remote `fractal-server` one.
 If SSH access is possible, then a command like
+
 ```
 REMOTE_PORT=8010
 LOCAL_PORT=8000
@@ -96,6 +97,7 @@ REMOTE_HOST_IP=...
 
 ssh $REMOTE_USER@$REMOTE_HOST_IP -L $LOCAL_PORT:127.0.0.1:$REMOTE_PORT -N
 ```
+
 should work and forward the remote port `REMOTE_PORT` to the `LOCAL_PORT` on
 localhost, so that `fractal-web` can use it from the local machine. Note that
 the required details for the `ssh -L` command may be different in each specific

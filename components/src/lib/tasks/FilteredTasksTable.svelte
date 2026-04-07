@@ -9,6 +9,8 @@
 	 * @property {Array<[ string, Array<import('../types/api').TaskGroupV2> ]>} taskGroups
 	 * @property {boolean} [showAuthorsInSeparateColumn]
 	 * @property {boolean} [showDocLinksInTable]
+	 * @property {boolean} [selectable]
+	 * @property {number[]} [selectedTasks]
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
 	 * @property {import('svelte').Snippet} [extraColumnsHeader]
 	 * @property {import('svelte').Snippet<[import('../types/api').TasksTableRow]>} [extraColumns]
@@ -19,6 +21,8 @@
 		taskGroups,
 		showAuthorsInSeparateColumn = true,
 		showDocLinksInTable = false,
+		selectable = false,
+		selectedTasks = $bindable([]),
 		extraColumnsColgroup,
 		extraColumnsHeader,
 		extraColumns
@@ -332,6 +336,17 @@
 			taskRow.taskVersions.find((t) => t.version === taskRow.selectedVersion)
 		);
 	}
+
+	/**
+	 * @param {number} taskId
+	 */
+	function selectTask(taskId) {
+		if (selectedTasks.includes(taskId)) {
+			selectedTasks = selectedTasks.filter((t) => t !== taskId);
+		} else {
+			selectedTasks = [...selectedTasks, taskId];
+		}
+	}
 </script>
 
 <div class="card mb-2" class:invisible={allRows.length === 0} class:collapse={allRows.length === 0}>
@@ -385,6 +400,9 @@
 		<div class="card-body p-0">
 			<table class="table table-borderless" id="filtered-tasks-table">
 				<colgroup>
+					{#if selectable}
+						<col width="15" />
+					{/if}
 					<col />
 					<col />
 					<col />
@@ -397,6 +415,9 @@
 				</colgroup>
 				<thead>
 					<tr>
+						{#if selectable}
+							<th></th>
+						{/if}
 						<th>{groupByLabels[groupBy]}</th>
 						<th>Category</th>
 						<th>Modality</th>
@@ -411,18 +432,31 @@
 				<tbody>
 					{#each filteredRows as row, index (index)}
 						<tr class="border-top">
-							<th colspan="3">{row.pkg_name}</th>
+							<th colspan={selectable ? 4 : 3}>{row.pkg_name}</th>
 						</tr>
 						{#each row.tasks.map((tr) => getSelectedTask(tr)) as task, index (index)}
 							{#if task}
 								<tr>
+									{#if selectable}
+										<td>
+											<input
+												id="selector-{task.task_id}"
+												type="checkbox"
+												class="form-check-input"
+												onchange={() => selectTask(task.task_id)}
+												checked={selectedTasks.includes(task.task_id)}
+											/>
+										</td>
+									{/if}
 									<td class="task-name-col">
 										{#if showDocLinksInTable && task.docs_link}
 											<a href={task.docs_link} target="_blank">
 												{task.task_name}
 											</a>
 										{:else}
-											{task.task_name}
+											<label for="selector-{task.task_id}" style="word-wrap: anywhere;">
+												{task.task_name}
+											</label>
 										{/if}
 									</td>
 									<td>

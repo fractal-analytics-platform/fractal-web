@@ -88,9 +88,7 @@ test('Workflow task meta properties [v2]', async ({ page, workflow }) => {
 
 		await expect(tab.getByLabel('Remove property')).toHaveCount(5);
 		await expect(tab.getByRole('textbox', { name: 'Argument name' }).first()).toHaveValue('k1');
-		await expect(tab.getByRole('textbox', { name: 'Argument value' }).first()).toHaveValue(
-			'v1'
-		);
+		await expect(tab.getByRole('textbox', { name: 'Argument value' }).first()).toHaveValue('v1');
 		await tab.locator('.accordion-button').first().click();
 		const objectContainer = tab.locator('.accordion-body').first();
 		await expect(objectContainer.getByRole('spinbutton')).toHaveValue('42');

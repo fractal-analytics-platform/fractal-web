@@ -91,12 +91,14 @@
 	 */
 	async function verifyGuestInvitation(guestUserId, projectId) {
 		const response = await fetch(
-			`/api/admin/v2/linkuserproject/verify/?guest_user_id=${guestUserId}&project_id=${projectId}`, {
-			method: 'POST'
-		});
+			`/api/admin/v2/linkuserproject/verify/?guest_user_id=${guestUserId}&project_id=${projectId}`,
+			{
+				method: 'POST'
+			}
+		);
 		if (response.ok) {
 			const link = results?.items.find(
-				link => link.project_id === projectId && link.user_id === guestUserId
+				(link) => link.project_id === projectId && link.user_id === guestUserId
 			);
 			if (link) {
 				link.is_verified = true;
@@ -239,7 +241,7 @@
 									</td>
 									<td>{link.permissions}</td>
 									<td>
-										{#if !link.is_verified && sortedUsers.find(user => user.email === link.user_email)?.is_guest}
+										{#if !link.is_verified && sortedUsers.find((user) => user.email === link.user_email)?.is_guest}
 											<button
 												type="button"
 												class="btn btn-primary"

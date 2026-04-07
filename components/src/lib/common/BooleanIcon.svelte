@@ -1,5 +1,4 @@
 <script>
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {boolean|null} [value]

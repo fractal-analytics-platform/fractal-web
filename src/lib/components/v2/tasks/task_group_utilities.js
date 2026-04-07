@@ -77,5 +77,7 @@ export async function getTaskGroupActivitiesToUpdate(activities, admin) {
 			.map((u) => u.value)
 			.filter((u) => u !== undefined);
 
-	return /** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */ (successfulUpdates);
+	return /** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */ (
+		successfulUpdates
+	);
 }

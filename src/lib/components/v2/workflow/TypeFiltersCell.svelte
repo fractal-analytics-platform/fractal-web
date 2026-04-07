@@ -1,7 +1,6 @@
 <script>
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {{ [key: string]: boolean }} filters

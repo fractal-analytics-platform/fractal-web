@@ -8,6 +8,7 @@
 	let { form } = $props();
 
 	let userLoggedIn = $derived(!!page.data.userInfo);
+	let hideBasicAuth = $derived(page.data.hideBasicAuth);
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;
@@ -56,6 +57,10 @@
 	{:else}
 		<div class="row">
 			<h1 class="fw-light mb-4">Login</h1>
+			{#if loginInvite}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html loginInvite}
+			{/if}
 		</div>
 		{#if showSessionExpiredMessage}
 			<div class="row">
@@ -64,7 +69,7 @@
 				</div>
 			</div>
 		{/if}
-		{#if guestUsername && guestPassword}
+		{#if guestUsername && guestPassword && !hideBasicAuth}
 			<div class="row">
 				<div class="col-xl-4 col-lg-7 col-md-9 mb-4">
 					<h3 class="fw-light">Guest login</h3>
@@ -101,66 +106,68 @@
 			</div>
 		{/if}
 
-		<div class="row">
-			<div class="col-xl-4 col-lg-7 col-md-9">
-				<div class="accordion">
-					<div class="accordion-item">
-						{#if oauth2Provider}
-							<h2 class="accordion-header">
-								<button
-									class="accordion-button"
-									type="button"
-									data-bs-toggle="collapse"
-									data-bs-target="#localLoginCollapse"
-									aria-expanded="false"
-									aria-controls="localLoginCollapse"
-									class:collapsed={!form?.invalidMessage}
-								>
-									Log in with username & password
-								</button>
-							</h2>
-						{/if}
-						<div
-							id="localLoginCollapse"
-							class="accordion-collapse collapse"
-							class:show={!oauth2Provider || form?.invalidMessage}
-						>
-							<div class="accordion-body">
-								<form method="POST">
-									<div class="mb-3">
-										<p class="fw-light">
-											<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-											{@html loginInvite}
-										</p>
-										<label for="userEmail" class="form-label">Email address</label>
-										<input
-											name="username"
-											type="email"
-											class="form-control {form?.invalidMessage ? 'is-invalid' : ''}"
-											id="userEmail"
-											required
-										/>
-										<div class="invalid-feedback">
-											{form?.invalidMessage}
+		{#if !hideBasicAuth}
+			<div class="row">
+				<div class="col-xl-4 col-lg-7 col-md-9">
+					<div class="accordion">
+						<div class="accordion-item">
+							{#if oauth2Provider}
+								<h2 class="accordion-header">
+									<button
+										class="accordion-button"
+										type="button"
+										data-bs-toggle="collapse"
+										data-bs-target="#localLoginCollapse"
+										aria-expanded="false"
+										aria-controls="localLoginCollapse"
+										class:collapsed={!form?.invalidMessage}
+									>
+										Log in with username & password
+									</button>
+								</h2>
+							{/if}
+							<div
+								id="localLoginCollapse"
+								class="accordion-collapse collapse"
+								class:show={!oauth2Provider || form?.invalidMessage}
+							>
+								<div class="accordion-body">
+									<form method="POST">
+										<div class="mb-3">
+											<p class="fw-light">
+												Log in with Fractal specific email & password provided to you by the Fractal
+												admin
+											</p>
+											<label for="userEmail" class="form-label">Email address</label>
+											<input
+												name="username"
+												type="email"
+												class="form-control {form?.invalidMessage ? 'is-invalid' : ''}"
+												id="userEmail"
+												required
+											/>
+											<div class="invalid-feedback">
+												{form?.invalidMessage}
+											</div>
 										</div>
-									</div>
-									<div class="mb-3">
-										<label for="userPassword" class="form-label">Password</label>
-										<input
-											name="password"
-											type="password"
-											class="form-control"
-											id="userPassword"
-											required
-										/>
-									</div>
-									<button class="btn btn-primary">Log in</button>
-								</form>
+										<div class="mb-3">
+											<label for="userPassword" class="form-label">Password</label>
+											<input
+												name="password"
+												type="password"
+												class="form-control"
+												id="userPassword"
+												required
+											/>
+										</div>
+										<button class="btn btn-primary">Log in</button>
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		{/if}
 	{/if}
 </div>

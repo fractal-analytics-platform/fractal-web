@@ -2,10 +2,8 @@
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onMount, tick } from 'svelte';
 
-	
 	// Set to false to avoid issues in modals containing slim-select dropdowns
-	
-	
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {any} id

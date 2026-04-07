@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/state';
+	import { arrayToCsv, downloadBlob } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
@@ -29,6 +30,28 @@
 	/** @type {import('fractal-components/types/api').TaskV2Info|null} */
 	let selectedTaskInfo = $state(null);
 
+	let processingCsv = $state(false);
+
+	function getBaseTasksSearchUrl() {
+		const url = new URL('/api/admin/v2/task', window.location.origin);
+		if (name) {
+			url.searchParams.append('name', name);
+		}
+		if (id) {
+			url.searchParams.append('id', id);
+		}
+		if (version) {
+			url.searchParams.append('version', version);
+		}
+		if (resource) {
+			url.searchParams.append('resource_id', resource);
+		}
+		if (taskType) {
+			url.searchParams.append('task_type', taskType);
+		}
+		return url;
+	}
+
 	/**
 	 * @param {number} selectedPage
 	 * @param {number} selectedPageSize
@@ -39,22 +62,7 @@
 			if (searchErrorAlert) {
 				searchErrorAlert.hide();
 			}
-			const url = new URL('/api/admin/v2/task', window.location.origin);
-			if (name) {
-				url.searchParams.append('name', name);
-			}
-			if (id) {
-				url.searchParams.append('id', id);
-			}
-			if (version) {
-				url.searchParams.append('version', version);
-			}
-			if (resource) {
-				url.searchParams.append('resource_id', resource);
-			}
-			if (taskType) {
-				url.searchParams.append('task_type', taskType);
-			}
+			const url = getBaseTasksSearchUrl();
 			url.searchParams.append('page', selectedPage.toString());
 			url.searchParams.append('page_size', selectedPageSize.toString());
 			const response = await fetch(url);
@@ -131,6 +139,46 @@
 		return Array.from(new Set(allEntries)).sort((a, b) =>
 			a.localeCompare(b, undefined, { sensitivity: 'base' })
 		);
+	}
+
+	async function downloadCSV() {
+		if (!results) {
+			return;
+		}
+
+		processingCsv = true;
+
+		const header = ['id', 'name', 'version', 'type', 'number_of_workflows', 'number_of_users'];
+
+		const url = getBaseTasksSearchUrl();
+		const response = await fetch(url);
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			processingCsv = false;
+			return;
+		}
+
+		const { items } =
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info>} */ (
+				await response.json()
+			);
+
+		const rows = items.map((info) => [
+			info.task.id,
+			info.task.name,
+			info.task.version,
+			info.task.type,
+			info.relationships.length,
+			getUsers(info).length
+		]);
+
+		const csv = arrayToCsv([header, ...rows]);
+		downloadBlob(csv, 'tasks.csv', 'text/csv;charset=utf-8;');
+
+		processingCsv = false;
 	}
 </script>
 
@@ -247,7 +295,20 @@
 		{/if}
 
 		{#if results && results.items.length > 0}
-			<table class="table tasks-table mt-4 mb-4">
+			<div class="d-flex justify-content-end align-items-center mb-3">
+				<div>
+					<button class="btn btn-outline-secondary" onclick={downloadCSV} disabled={processingCsv}>
+						{#if processingCsv}
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+							></span>
+						{:else}
+							<i class="bi-download"></i>
+						{/if}
+						Download CSV
+					</button>
+				</div>
+			</div>
+			<table class="table tasks-table mt-3 mb-4">
 				<colgroup>
 					<col width="60" />
 					<col width="auto" />

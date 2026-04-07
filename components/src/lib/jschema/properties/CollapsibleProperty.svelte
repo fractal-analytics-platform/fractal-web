@@ -5,8 +5,10 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../../types/form").CollapsibleFormElement} formElement
-	 * @property {null|(() => void)} [reset] - Function passed by the parent that resets this element to its default value (used only on top-level objects)
-	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
+	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {boolean} editable
+	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
+         * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
 	 * @property {import('svelte').Snippet} [children]
 	 * @property {number} [padding]
 	 * @property {boolean} [showErrors]
@@ -15,9 +17,11 @@
 	/** @type {Props} */
 	let {
 		formElement = $bindable(),
-		reset = null,
-		init = null,
+		remove,
+		editable,
 		children,
+		reset = null,
+                init = null,
 		padding = 2,
 		showErrors = true
 	} = $props();
@@ -106,7 +110,7 @@
 						type="button"
 					>
 						<div class="flex-fill">
-							<PropertyLabel {formElement} tag="span" />
+							<PropertyLabel {formElement} {editable} {remove} tag="span" />
 						</div>
 						<!-- svelte-ignore a11y_interactive_supports_focus -->
 						<!-- svelte-ignore a11y_click_events_have_key_events -->

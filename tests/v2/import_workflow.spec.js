@@ -3,7 +3,6 @@ import { waitPageLoading, expectBooleanIcon } from '../utils.js';
 import { expect, test } from './project_fixture.js';
 import path from 'path';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,8 +23,9 @@ test('Import workflow', async ({ page, project }) => {
 	let importWorkflowBtn = page.getByRole('button', { name: 'Import workflow', exact: true });
 
 	await test.step('Attempt to import workflow using invalid JSON', async () => {
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
 		await importWorkflowBtn.waitFor();
@@ -36,7 +36,7 @@ test('Import workflow', async ({ page, project }) => {
 
 	await test.step('Attempt to import workflow using invalid fractal_tasks_core version', async () => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'workflow_to_import.json'));
 		await importWorkflowBtn.click();
@@ -49,7 +49,7 @@ test('Import workflow', async ({ page, project }) => {
 	await test.step('Import valid workflow overriding workflow name', async () => {
 		await page.getByRole('textbox', { name: 'Workflow name' }).fill(randomWorkflowName1);
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles({
 			name: 'valid-workflow.json',
@@ -85,8 +85,9 @@ test('Import workflow', async ({ page, project }) => {
 	const randomWorkflowName2 = Math.random().toString(36).substring(7);
 
 	await test.step('Import valid workflow without setting workflow name', async () => {
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles({
 			name: 'valid-workflow.json',
@@ -125,8 +126,9 @@ test('Import workflow', async ({ page, project }) => {
 		await createWorkflowBtn.waitFor();
 		await createWorkflowBtn.click();
 
+		await page.getByRole('radio', { name: 'Import from file' }).check();
 		const fileChooserPromise = page.waitForEvent('filechooser');
-		await page.getByText('Import workflow from file').click();
+		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(
 			path.join(__dirname, '..', 'data', 'workflow_to_import_with_flexibility.json')
@@ -134,17 +136,19 @@ test('Import workflow', async ({ page, project }) => {
 		await importWorkflowBtn.click();
 
 		// not ok, no combobox
-		const genericTask = page.locator('.task-to-import', {hasText: 'generic_task'});
+		const genericTask = page.locator('.task-to-import', { hasText: 'generic_task' });
 		await genericTask.waitFor();
 		await expectBooleanIcon(genericTask, false);
 		await expect(genericTask.getByRole('combobox')).toHaveCount(0);
 		// ok, no combobox
-		const createZarrTask = page.locator('.task-to-import', {hasText: 'create_ome_zarr_compound'});
+		const createZarrTask = page.locator('.task-to-import', { hasText: 'create_ome_zarr_compound' });
 		await createZarrTask.waitFor();
 		await expectBooleanIcon(createZarrTask, true);
 		await expect(createZarrTask.getByRole('combobox')).toHaveCount(0);
 		// not ok, yes combobox
-		const illuminationTask = page.locator('.task-to-import', {hasText: 'illumination_correction_compound'});
+		const illuminationTask = page.locator('.task-to-import', {
+			hasText: 'illumination_correction_compound'
+		});
 		await illuminationTask.waitFor();
 		await expectBooleanIcon(illuminationTask, false);
 		await expect(illuminationTask.getByRole('combobox')).toHaveCount(1);
@@ -155,11 +159,11 @@ test('Import workflow', async ({ page, project }) => {
 		await expect(importWorkflowBtn).toBeDisabled();
 		// check *Include older versions*
 		await page.getByRole('checkbox', { name: 'Include older versions' }).check();
-		
+
 		// not ok, yes combobox
 		await expectBooleanIcon(genericTask, false);
 		await expect(genericTask.getByRole('combobox')).toHaveCount(1);
-		await genericTask.getByRole('combobox').selectOption({ label: '0.0.1' });;
+		await genericTask.getByRole('combobox').selectOption({ label: '0.0.1' });
 		await expectBooleanIcon(genericTask, true);
 		// still ok
 		await expectBooleanIcon(createZarrTask, true);
@@ -171,9 +175,11 @@ test('Import workflow', async ({ page, project }) => {
 
 		// 'Import Workflow' is clickable
 		await expect(importWorkflowBtn).toBeEnabled();
-		await importWorkflowBtn.click()
+		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
-		await expect(page.locator('.breadcrumb-item.active')).toContainText('workflow-with-flexibility');
+		await expect(page.locator('.breadcrumb-item.active')).toContainText(
+			'workflow-with-flexibility'
+		);
 	});
 });

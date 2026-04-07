@@ -6,12 +6,13 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").ArrayFormElement} formElement
-	 * @property {boolean} [editable]
+	 * @property {boolean} editable
+	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 * @property {null|(() => void)} [reset]
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable = true, reset = null } = $props();
+	let { formElement, editable, remove, reset = null } = $props();
 
 	/** @type {any[]} */
 	let children = $state([]);
@@ -63,7 +64,7 @@
 	);
 </script>
 
-<CollapsibleProperty {formElement} {reset}>
+<CollapsibleProperty {formElement} {reset} {editable} {remove}>
 	<div class="d-flex justify-content-center p-2">
 		<button
 			class="btn btn-primary"
@@ -79,7 +80,12 @@
 			<div class="d-flex">
 				<div class="align-self-center m-2">
 					{#if canRemoveChildren}
-						<button class="btn btn-danger" type="button" onclick={() => removeChild(index)} aria-label="Remove">
+						<button
+							class="btn btn-danger"
+							type="button"
+							onclick={() => removeChild(index)}
+							aria-label="Remove"
+						>
 							<i class="bi bi-trash"></i>
 						</button>
 					{/if}
