@@ -67,7 +67,10 @@
 			url.searchParams.append('project_id', id);
 		}
 		if (userId) {
-			url.searchParams.append('user_email', users.find((user) => user.id === userId)?.email || '');
+			url.searchParams.append(
+				'user_email',
+				users.find((user) => String(user.id) === userId)?.email || ''
+			);
 		}
 		return url;
 	}
