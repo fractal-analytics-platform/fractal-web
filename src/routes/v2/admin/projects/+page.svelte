@@ -135,7 +135,7 @@
 			}
 			changeOwnershipModal?.hide();
 			await searchProject(currentPage, pageSize);
-		} catch (err) {
+		} catch {
 			displayStandardErrorAlert(
 				{ message: 'Something went wrong. Please try again.' },
 				'changeOwnerError'
