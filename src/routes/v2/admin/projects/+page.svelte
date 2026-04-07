@@ -11,7 +11,7 @@
 
 	/** @type {string|undefined} */
 	let userId = $state(undefined);
-	
+
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users));
 
@@ -44,7 +44,7 @@
 	let selectedProject = $state(null);
 	/** @type {string|undefined} */
 	let newOwnerId = $state(undefined);
-	
+
 	/**
 	 * @param {import('fractal-components/types/api').ProjectSuperuser} project
 	 */
@@ -67,10 +67,7 @@
 			url.searchParams.append('project_id', id);
 		}
 		if (userId) {
-			url.searchParams.append(
-				'user_email',
-				users.find(user => user.id === userId)?.email || ''
-			);
+			url.searchParams.append('user_email', users.find((user) => user.id === userId)?.email || '');
 		}
 		return url;
 	}
@@ -128,7 +125,7 @@
 				`/api/admin/v2/project/${selectedProject?.id}?user_id=${newOwnerId}`,
 				{
 					method: 'PATCH',
-					credentials: 'include',
+					credentials: 'include'
 				}
 			);
 			if (!response.ok) {
@@ -138,7 +135,6 @@
 			}
 			changeOwnershipModal?.hide();
 			await searchProject(currentPage, pageSize);
-			
 		} catch (err) {
 			displayStandardErrorAlert(
 				{ message: 'Something went wrong. Please try again.' },
@@ -146,7 +142,6 @@
 			);
 		}
 	}
-
 </script>
 
 <div class="container mt-3">
@@ -220,14 +215,12 @@
 
 	<div id="searchError" class="mt-3 mb-3"></div>
 
-
 	<div class="row">
 		<div class="col">
 			<div class:d-none={!searched}>
 				{#if results && results.total_count === 0}
 					<p class="text-center">The query returned 0 matching results</p>
 				{/if}
-
 
 				{#if results && results.items.length > 0}
 					<table class="table tasks-table mt-4 mb-4">
@@ -245,7 +238,9 @@
 									<td>{project.id}</td>
 									<td>{project.name}</td>
 									<td>
-										<a href={`/v2/admin/users/${users.find(user => user.email === project.user_email)?.id}`}>
+										<a
+											href={`/v2/admin/users/${users.find((user) => user.email === project.user_email)?.id}`}
+										>
 											{project.user_email}
 										</a>
 									</td>
@@ -263,7 +258,6 @@
 						</tbody>
 					</table>
 
-
 					<Paginator
 						{currentPage}
 						{pageSize}
@@ -275,11 +269,7 @@
 			</div>
 		</div>
 	</div>
-
 </div>
-
-
-
 
 <Modal
 	id="changeOwnershipModal"
@@ -296,18 +286,17 @@
 		<div class="alert alert-warning d-flex align-items-center gap-2">
 			<i class="bi bi-exclamation-triangle-fill"></i>
 			<div>
-				The current owner (<code>{selectedProject?.user_email}</code>) 
-				will lose access to this project.
+				The current owner (<code>{selectedProject?.user_email}</code>) will lose access to this
+				project.
 			</div>
 		</div>
-
 
 		<div class="row mt-1">
 			<label class="col-3 col-form-label" for="user">New owner</label>
 			<div class="col-9">
 				<select class="form-select" bind:value={newOwnerId} id="user">
 					<option value={undefined}>Select...</option>
-					{#each users.filter(user => user.email !== selectedProject?.user_email) as user (user.id)}
+					{#each users.filter((user) => user.email !== selectedProject?.user_email) as user (user.id)}
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>
@@ -316,15 +305,8 @@
 
 		<div id="changeOwnerError" class="mt-3"></div>
 
-		<button
-			class="btn btn-primary mt-4"
-			onclick={handleChangeOwner}
-			disabled={!newOwnerId}
-		>
+		<button class="btn btn-primary mt-4" onclick={handleChangeOwner} disabled={!newOwnerId}>
 			Change owner
 		</button>
-
-
-		
 	{/snippet}
 </Modal>
