@@ -252,7 +252,6 @@
 											class="btn btn-outline-primary"
 											onclick={() => openChangeOwnershipModal(project)}
 										>
-											<i class="bi"></i>
 											Change ownership
 										</button>
 									</td>
