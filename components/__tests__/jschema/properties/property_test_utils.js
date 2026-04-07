@@ -4,7 +4,7 @@ import JSchemaTestWrapper from '../JSchemaTestWrapper.svelte';
 
 /**
  * @param {object} schemaProperty
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../../../src/lib/types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {boolean} required
  */
 export function renderSchemaWithSingleProperty(schemaProperty, schemaVersion, required = false) {
@@ -23,7 +23,7 @@ export function renderSchemaWithSingleProperty(schemaProperty, schemaVersion, re
 
 /**
  * @param {object} schemaProperty
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../../../src/lib/types/jschema").ArgsSchemaVersion} schemaVersion
  */
 export function renderSchemaWithReferencedProperty(schemaProperty, schemaVersion) {
 	return renderSchema(
@@ -45,7 +45,7 @@ export function renderSchemaWithReferencedProperty(schemaProperty, schemaVersion
 
 /**
  * @param {object} schema
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../../../src/lib/types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {object} schemaData
  */
 export function renderSchema(schema, schemaVersion = 'pydantic_v2', schemaData = undefined) {

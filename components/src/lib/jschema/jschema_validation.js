@@ -3,9 +3,14 @@ import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import { stripDiscriminator } from './jschema_adapter';
 
+/**
+ * @type {Array<import("../types/jschema").ArgsSchemaVersion>}
+ */
+const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2', 'fractal_schema_v1'];
+
 export class SchemaValidator {
 	/**
-	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
 	 * @param {boolean} allErrors if true, check all rules collecting all errors. Default is to return after the first error.
 	 */
 	constructor(schemaVersion, allErrors = false) {
@@ -62,7 +67,7 @@ export class SchemaValidator {
 
 /**
  * @param {any} schema
- * @returns {'pydantic_v1'|'pydantic_v2'}
+ * @returns {import("../types/jschema").ArgsSchemaVersion}
  */
 export function detectSchemaVersion(schema) {
 	try {
@@ -78,4 +83,11 @@ export function detectSchemaVersion(schema) {
 			return 'pydantic_v2';
 		}
 	}
+}
+
+/**
+ * @param {import("../types/jschema").ArgsSchemaVersion} argsSchemaVersion
+ */
+export function isValidArgsSchemaVersion(argsSchemaVersion) {
+	return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
 }

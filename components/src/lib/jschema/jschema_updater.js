@@ -9,7 +9,7 @@ import { getPropertiesToIgnore } from './property_utils';
  *
  * @param {object} newJschema
  * @param {object} oldData
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  */
 export function getUpdatedData(newJschema, oldData, schemaVersion) {
 	const propertiesToIgnore = getPropertiesToIgnore(schemaVersion === 'pydantic_v1');

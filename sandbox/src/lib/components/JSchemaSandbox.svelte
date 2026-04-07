@@ -1,12 +1,12 @@
 <script>
 	import {
 		JSchema,
-		stripNullAndEmptyObjectsAndArrays,
 		deepCopy,
 		getPropertiesToIgnore,
 		detectSchemaVersion,
 		SchemaValidator,
-		stripDiscriminator
+		stripDiscriminator,
+		stripNullAndEmptyObjectsAndArrays
 	} from 'fractal-components';
 	import { tick } from 'svelte';
 	import example from './example.json';
@@ -20,7 +20,7 @@
 	let jsonSchemaError = $state('');
 	let dataError = $state('');
 
-	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	/** @type {import("fractal-components/types/jschema").ArgsSchemaVersion} */
 	let schemaVersion = $state('pydantic_v2');
 
 	/** @type {JSchema|undefined} */
@@ -104,8 +104,12 @@
 			return;
 		}
 		const newDataCopy = deepCopy(newData);
-		const updatedOldData = JSON.stringify(newDataCopy, null, 2);
-		//const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
+
+		const updatedOldData =
+			schemaVersion === 'fractal_schema_v1'
+				? JSON.stringify(newDataCopy, null, 2)
+				: JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
+
 		// Update the data only if something is changed, to avoid triggering uneccessary events
 		if (updatedOldData !== jsonDataString) {
 			jsonDataString = updatedOldData;
@@ -147,6 +151,18 @@
 						onchange={handleJsonSchemaStringChanged}
 					/>
 					<label class="form-check-label" for="pydantic_v2">pydantic_v2</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="schemaVersionOptions"
+						id="fractal_schema_v1"
+						value="fractal_schema_v1"
+						bind:group={schemaVersion}
+						onchange={handleJsonSchemaStringChanged}
+					/>
+					<label class="form-check-label" for="fractal_schema_v1">fractal_schema_v1</label>
 				</div>
 				<button class="btn btn-outline-primary float-end" onclick={loadExample}>
 					Load example

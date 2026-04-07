@@ -80,7 +80,7 @@
 
 	/**
 	 * @param {any} schema
-	 * @param {'pydantic_v1'|'pydantic_v2'} version
+	 * @param {import("fractal-components/types/jschema").ArgsSchemaVersion} version
 	 * @param {any} data
 	 */
 	function isDataValid(schema, version, data) {

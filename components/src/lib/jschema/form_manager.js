@@ -1,4 +1,4 @@
-import { deepCopy, undefinedToNull } from '../common/utils';
+import { deepCopy, stripNullAndEmptyObjectsAndArrays, undefinedToNull } from '../common/utils';
 import {
 	ArrayFormElement,
 	EnumFormElement,
@@ -33,7 +33,7 @@ export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
 	 * @param {(data: any, valid: boolean) => void} onchange
-	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
 	 */
@@ -44,7 +44,7 @@ export class FormManager {
 		propertiesToIgnore = [],
 		initialValue = undefined
 	) {
-		/** @type {'pydantic_v1'|'pydantic_v2'} */
+		/** @type {import("../types/jschema").ArgsSchemaVersion} */
 		this.schemaVersion = schemaVersion;
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
 
@@ -267,49 +267,49 @@ export class FormManager {
 		const requiredChildren = property.required || [];
 		const children = [];
 
-if (value !== null) {
-		const properties = Object.entries(getAllObjectProperties(property, value));
-		/** @type {string[]} */
-		const validKeys = [];
-		for (const [childKey, childProperty] of properties) {
-			validKeys.push(childKey);
-			const childRequired = requiredChildren.includes(childKey);
-			const removable = isRemovableChildProperty(property, childKey);
-			const childElement = this.createFormElement({
-				key: childKey,
-				path: `${path}/${childKey}`,
-				property: childProperty,
-				required: childRequired,
-				removable,
-				value: undefinedToNull(value[childKey]),
-				parentProperty: property,
-				titleType: removable ? 'key' : 'prefer_title',
-				schemaPath: `${schemaPath}/properties/${childKey}`
-			});
-			children.push(childElement);
-		}
+		if (value !== null) {
+			const properties = Object.entries(getAllObjectProperties(property, value));
+			/** @type {string[]} */
+			const validKeys = [];
+			for (const [childKey, childProperty] of properties) {
+				validKeys.push(childKey);
+				const childRequired = requiredChildren.includes(childKey);
+				const removable = isRemovableChildProperty(property, childKey);
+				const childElement = this.createFormElement({
+					key: childKey,
+					path: `${path}/${childKey}`,
+					property: childProperty,
+					required: childRequired,
+					removable,
+					value: this.schemaVersion === 'fractal_schema_v1' ? undefinedToNull(value[childKey]) : value[childKey],
+					parentProperty: property,
+					titleType: removable ? 'key' : 'prefer_title',
+					schemaPath: `${schemaPath}/properties/${childKey}`
+				});
+				children.push(childElement);
+			}
 
-		const discriminatorKey = this.getDiscriminatorKey(parentProperty);
-		if (discriminatorKey) {
-			// Discriminator property is removed from the child and handled separatedly
-			// Adding it to the valid keys to prevent the value to being treated as an unexpected element
-			validKeys.push(discriminatorKey);
-		}
+			const discriminatorKey = this.getDiscriminatorKey(parentProperty);
+			if (discriminatorKey) {
+				// Discriminator property is removed from the child and handled separatedly
+				// Adding it to the valid keys to prevent the value to being treated as an unexpected element
+				validKeys.push(discriminatorKey);
+			}
 
-		for (const [k, v] of Object.entries(value)) {
-			if (!validKeys.includes(k)) {
-				children.push(
-					this.createUnexpectedElement({
-						key: k,
-						path: `${path}/${k}`,
-						parentProperty: property,
-						value: v,
-						titleType: 'key'
-					})
-				);
+			for (const [k, v] of Object.entries(value)) {
+				if (!validKeys.includes(k)) {
+					children.push(
+						this.createUnexpectedElement({
+							key: k,
+							path: `${path}/${k}`,
+							parentProperty: property,
+							value: v,
+							titleType: 'key'
+						})
+					);
+				}
 			}
 		}
-}
 		const element = new ObjectFormElement({
 			...fields,
 			children,
@@ -365,13 +365,13 @@ if (value !== null) {
 			children:
 				required || (Array.isArray(value) && value.length > 0)
 					? this.createTupleChildren({
-							...params,
-							items,
-							size,
-							value,
-							parentProperty: property,
-							titleType: 'title_only'
-						})
+						...params,
+						items,
+						size,
+						value,
+						parentProperty: property,
+						titleType: 'title_only'
+					})
 					: []
 		});
 		return element;
@@ -465,16 +465,16 @@ if (value !== null) {
 			selectedIndex === -1
 				? null
 				: this.createFormElement({
-						key,
-						path,
-						schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
-						property: selectedProperty,
-						required,
-						removable,
-						value: selectedValue,
-						parentProperty: property,
-						titleType
-					});
+					key,
+					path,
+					schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
+					property: selectedProperty,
+					required,
+					removable,
+					value: selectedValue,
+					parentProperty: property,
+					titleType
+				});
 
 		if (selectedItem && titleType === 'inner_title') {
 			fields.title = selectedProperty.title || '';
@@ -679,13 +679,13 @@ if (value !== null) {
 				childData == null
 					? null
 					: typeof childData === 'object' &&
-						  'subscribe' in childData &&
-						  typeof childData === 'function'
+						'subscribe' in childData &&
+						typeof childData === 'function'
 						? get(childData)
 						: childData;
 			data[child.key] = value;
 		}
-		if (element.nullable && get(element.isNull)) {
+		if (this.schemaVersion === 'fractal_schema_v1' && element.nullable && get(element.isNull)) {
 			return null;
 		}
 		return data;
@@ -718,8 +718,11 @@ if (value !== null) {
 
 	validate() {
 		this.clearErrors(this.root);
-		//const strippedNullData = stripNullAndEmptyObjectsAndArrays(this.getFormData());
-		const valid = this.validator.isValid(this.getFormData());
+
+		const valid = this.schemaVersion === 'fractal_schema_v1' ?
+			this.validator.isValid(this.getFormData()) :
+			this.validator.isValid(stripNullAndEmptyObjectsAndArrays(this.getFormData()));
+
 		/**
 		 * Errors that have not been set to any form element
 		 * @type {string[]}
@@ -756,14 +759,14 @@ if (value !== null) {
 	getDataFromElement(element) {
 		switch (element.type) {
 			case 'object':
-				return this.getDataFromObjectElement(/** @type {ObjectFormElement}*/ (element));
+				return this.getDataFromObjectElement(/** @type {ObjectFormElement}*/(element));
 			case 'array':
 			case 'tuple':
 				return this.getDataFromArrayElement(
-					/** @type {ArrayFormElement|TupleFormElement}*/ (element)
+					/** @type {ArrayFormElement|TupleFormElement}*/(element)
 				);
 			case 'conditional':
-				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/ (element));
+				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/(element));
 			default:
 				if (element instanceof NumberFormElement) {
 					const value = get(element.value);

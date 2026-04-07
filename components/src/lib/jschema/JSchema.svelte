@@ -4,7 +4,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @property {import("../types/jschema").ArgsSchemaVersion} schemaVersion
 	 * @property {string[]} [propertiesToIgnore]
 	 * @property {string} componentId
 	 * @property {boolean} [editable]
