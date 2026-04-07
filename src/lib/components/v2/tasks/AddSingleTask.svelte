@@ -593,7 +593,7 @@
 					>
 						<option>pydantic_v1</option>
 						<option>pydantic_v2</option>
-            <option>fractal_schema_v1</option>
+						<option>fractal_schema_v1</option>
 					</select>
 					<span class="invalid-feedback">{$validationErrors['args_schema_version']}</span>
 				</div>

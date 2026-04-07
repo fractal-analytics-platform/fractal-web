@@ -8,7 +8,7 @@
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
-         * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
+	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
 	 * @property {import('svelte').Snippet} [children]
 	 * @property {number} [padding]
 	 * @property {boolean} [showErrors]
@@ -21,7 +21,7 @@
 		editable,
 		children,
 		reset = null,
-                init = null,
+		init = null,
 		padding = 2,
 		showErrors = true
 	} = $props();

@@ -105,7 +105,7 @@ export class FormManager {
 				delete newDef['anyOf'];
 				params.property = newDef;
 				params.nullable = true;
-				params.schemaPath = `${params.schemaPath}/anyOf/0`
+				params.schemaPath = `${params.schemaPath}/anyOf/0`;
 				return this.createFormElement({ ...params });
 			}
 		}
@@ -281,7 +281,10 @@ export class FormManager {
 					property: childProperty,
 					required: childRequired,
 					removable,
-					value: this.schemaVersion === 'fractal_schema_v1' ? undefinedToNull(value[childKey]) : value[childKey],
+					value:
+						this.schemaVersion === 'fractal_schema_v1'
+							? undefinedToNull(value[childKey])
+							: value[childKey],
 					parentProperty: property,
 					titleType: removable ? 'key' : 'prefer_title',
 					schemaPath: `${schemaPath}/properties/${childKey}`
@@ -365,13 +368,13 @@ export class FormManager {
 			children:
 				required || (Array.isArray(value) && value.length > 0)
 					? this.createTupleChildren({
-						...params,
-						items,
-						size,
-						value,
-						parentProperty: property,
-						titleType: 'title_only'
-					})
+							...params,
+							items,
+							size,
+							value,
+							parentProperty: property,
+							titleType: 'title_only'
+						})
 					: []
 		});
 		return element;
@@ -465,16 +468,16 @@ export class FormManager {
 			selectedIndex === -1
 				? null
 				: this.createFormElement({
-					key,
-					path,
-					schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
-					property: selectedProperty,
-					required,
-					removable,
-					value: selectedValue,
-					parentProperty: property,
-					titleType
-				});
+						key,
+						path,
+						schemaPath: `${schemaPath}/oneOf/${selectedIndex}`,
+						property: selectedProperty,
+						required,
+						removable,
+						value: selectedValue,
+						parentProperty: property,
+						titleType
+					});
 
 		if (selectedItem && titleType === 'inner_title') {
 			fields.title = selectedProperty.title || '';
@@ -679,8 +682,8 @@ export class FormManager {
 				childData == null
 					? null
 					: typeof childData === 'object' &&
-						'subscribe' in childData &&
-						typeof childData === 'function'
+						  'subscribe' in childData &&
+						  typeof childData === 'function'
 						? get(childData)
 						: childData;
 			data[child.key] = value;
@@ -719,9 +722,10 @@ export class FormManager {
 	validate() {
 		this.clearErrors(this.root);
 
-		const valid = this.schemaVersion === 'fractal_schema_v1' ?
-			this.validator.isValid(this.getFormData()) :
-			this.validator.isValid(stripNullAndEmptyObjectsAndArrays(this.getFormData()));
+		const valid =
+			this.schemaVersion === 'fractal_schema_v1'
+				? this.validator.isValid(this.getFormData())
+				: this.validator.isValid(stripNullAndEmptyObjectsAndArrays(this.getFormData()));
 
 		/**
 		 * Errors that have not been set to any form element
@@ -759,14 +763,14 @@ export class FormManager {
 	getDataFromElement(element) {
 		switch (element.type) {
 			case 'object':
-				return this.getDataFromObjectElement(/** @type {ObjectFormElement}*/(element));
+				return this.getDataFromObjectElement(/** @type {ObjectFormElement}*/ (element));
 			case 'array':
 			case 'tuple':
 				return this.getDataFromArrayElement(
-					/** @type {ArrayFormElement|TupleFormElement}*/(element)
+					/** @type {ArrayFormElement|TupleFormElement}*/ (element)
 				);
 			case 'conditional':
-				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/(element));
+				return this.getDataFromConditionalElement(/** @type {ConditionalFormElement}*/ (element));
 			default:
 				if (element instanceof NumberFormElement) {
 					const value = get(element.value);

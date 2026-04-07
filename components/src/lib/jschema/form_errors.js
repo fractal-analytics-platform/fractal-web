@@ -27,12 +27,12 @@ export function processErrors(formElement, errors) {
  * @param {import('../types/form').FormElement} parentElement
  */
 function addErrorToForm(error, errors, parentElement) {
-  if (ignoreEnumNullError(error, errors)) {
-    return true;
-  }
-  if (ignoreNullAnyOfError(error, errors)) {
-    return true;
-  }
+	if (ignoreEnumNullError(error, errors)) {
+		return true;
+	}
+	if (ignoreNullAnyOfError(error, errors)) {
+		return true;
+	}
 	if (error.instancePath.startsWith(parentElement.path)) {
 		parentElement.hasErrors.set(true);
 	}
@@ -180,41 +180,41 @@ function ignoreUnselectedConditionalError(error, element) {
 }
 
 /**
- * @param {object} error 
- * @param {object[]} errors 
+ * @param {object} error
+ * @param {object[]} errors
  */
 function ignoreNullAnyOfError(error, errors) {
-  if (error.message === 'must match a schema in anyOf') {
-    return true;
-  }
-  if (error.message === 'must be null') {
-    for (const e of errors) {
-      if (e.message === 'must match a schema in anyOf') {
-        const basePath = error.schemaPath.replace(/\/\d+\/type/, '')
-        if (e.schemaPath === basePath) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
+	if (error.message === 'must match a schema in anyOf') {
+		return true;
+	}
+	if (error.message === 'must be null') {
+		for (const e of errors) {
+			if (e.message === 'must match a schema in anyOf') {
+				const basePath = error.schemaPath.replace(/\/\d+\/type/, '');
+				if (e.schemaPath === basePath) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 /**
- * @param {object} error 
- * @param {object[]} errors 
+ * @param {object} error
+ * @param {object[]} errors
  */
 function ignoreEnumNullError(error, errors) {
-  if (error.message === 'must be string') {
-    for (const e of errors) {
-      if (e.message === 'must be equal to one of the allowed values') {
-        if (e.instancePath === error.instancePath) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
+	if (error.message === 'must be string') {
+		for (const e of errors) {
+			if (e.message === 'must be equal to one of the allowed values') {
+				if (e.instancePath === error.instancePath) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 /**

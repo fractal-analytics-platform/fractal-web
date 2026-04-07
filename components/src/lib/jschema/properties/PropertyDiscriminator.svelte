@@ -16,7 +16,7 @@
 	 * @property {boolean} [editable]
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 * @property {null|(() => void)} [remove] function passed by the parent that removes this element
-         * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
+	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
 	 */
 
 	/** @type {Props} */

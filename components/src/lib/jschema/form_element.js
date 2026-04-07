@@ -251,7 +251,13 @@ export class ObjectFormElement extends BaseFormElement {
 		if (propCopy.default === null) {
 			delete propCopy['default'];
 		}
-		const value = getPropertyData(propCopy, this.manager.schemaVersion, child.required, undefined, true);
+		const value = getPropertyData(
+			propCopy,
+			this.manager.schemaVersion,
+			child.required,
+			undefined,
+			true
+		);
 		const newChild = this.createChildElement(child, value);
 		newChild.isNull.set(false);
 		newChild.collapsed = false;
@@ -260,7 +266,7 @@ export class ObjectFormElement extends BaseFormElement {
 	}
 
 	/**
-	 * @param {import("../types/form").FormElement} child 
+	 * @param {import("../types/form").FormElement} child
 	 * @param {any} value
 	 */
 	createChildElement(child, value) {
