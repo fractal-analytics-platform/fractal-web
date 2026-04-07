@@ -5,6 +5,7 @@
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { PropertyDescription } from 'fractal-components';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
+	import { updateFormEntry } from '$lib/components/v2/workflow/task_form_utils';
 
 	let name = $state('');
 	let id = $state('');
@@ -44,6 +45,7 @@
 	let selectedProject = $state(null);
 	/** @type {string|undefined} */
 	let newOwnerId = $state(undefined);
+	let confirmation = $state(false);
 
 	/**
 	 * @param {import('fractal-components/types/api').ProjectSuperuser} project
@@ -54,6 +56,7 @@
 	}
 
 	function onChangeOwnershipModalClose() {
+		confirmation = false;
 		selectedProject = null;
 		newOwnerId = undefined;
 	}
@@ -69,7 +72,7 @@
 		if (userId) {
 			url.searchParams.append(
 				'user_email',
-				users.find((user) => String(user.id) === userId)?.email || ''
+				users.find((user) => String(user.id) == userId)?.email || ''
 			);
 		}
 		return url;
@@ -123,7 +126,7 @@
 	}
 
 	async function handleChangeOwner() {
-		try {
+		changeOwnershipModal?.confirmAndHide(async () => {
 			const response = await fetch(
 				`/api/admin/v2/project/${selectedProject?.id}?user_id=${newOwnerId}`,
 				{
@@ -132,18 +135,10 @@
 				}
 			);
 			if (!response.ok) {
-				const error = await getAlertErrorFromResponse(response);
-				displayStandardErrorAlert(error, 'changeOwnerError');
-				return;
+				throw await getAlertErrorFromResponse(response);
 			}
-			changeOwnershipModal?.hide();
 			await searchProject(currentPage, pageSize);
-		} catch {
-			displayStandardErrorAlert(
-				{ message: 'Something went wrong. Please try again.' },
-				'changeOwnerError'
-			);
-		}
+			});
 	}
 </script>
 
@@ -280,35 +275,77 @@
 	onClose={onChangeOwnershipModalClose}
 >
 	{#snippet body()}
-		<p class="mb-3">
-			Transfer the ownership of Project {selectedProject?.id}
-			(<strong>{selectedProject?.name}</strong>) to a new user.
-		</p>
+		{#if !confirmation}
+			<p class="mb-3">
+				Transfer the ownership of Project {selectedProject?.id}
+				(<strong>{selectedProject?.name}</strong>) to a new user.
+			</p>
 
-		<div class="alert alert-warning d-flex align-items-center gap-2">
-			<i class="bi bi-exclamation-triangle-fill"></i>
-			<div>
-				The current owner (<code>{selectedProject?.user_email}</code>) will lose access to this
-				project.
+			<div class="alert alert-warning d-flex align-items-center gap-2">
+				<i class="bi bi-exclamation-triangle-fill"></i>
+				<div>
+					The current owner (<code>{selectedProject?.user_email}</code>) will lose access to this
+					project.
+				</div>
 			</div>
-		</div>
 
-		<div class="row mt-1">
-			<label class="col-3 col-form-label" for="user">New owner</label>
-			<div class="col-9">
-				<select class="form-select" bind:value={newOwnerId} id="user">
-					<option value={undefined}>Select...</option>
-					{#each users.filter((user) => user.email !== selectedProject?.user_email) as user (user.id)}
-						<option value={user.id}>{user.email}</option>
-					{/each}
-				</select>
+			<div class="row mt-1">
+				<label class="col-3 col-form-label" for="user">New owner</label>
+				<div class="col-9">
+					<select class="form-select" bind:value={newOwnerId} id="user">
+						<option value={undefined}>Select...</option>
+						{#each users.filter((user) => user.email !== selectedProject?.user_email) as user (user.id)}
+							<option value={user.id}>{user.email}</option>
+						{/each}
+					</select>
+				</div>
 			</div>
-		</div>
+			<button
+				class="btn btn-primary mt-4"
+				onclick={() => {confirmation = true;}}
+				disabled={!newOwnerId}
+			>
+				Change owner
+			</button>
+		{:else}
+			<div class="mb-4">
+				<p class="mb-2">
+					You are about to transfer ownership of Project {selectedProject?.id}
+					(<strong>{selectedProject?.name}</strong>):
+				</p>
 
-		<div id="changeOwnerError" class="mt-3"></div>
+				<div class="p-3 border rounded bg-light">
+					<div class="mb-2">
+						<span class="text-muted">From</span> <br />
+						<code>{selectedProject?.user_email}</code>
+					</div>
 
-		<button class="btn btn-primary mt-4" onclick={handleChangeOwner} disabled={!newOwnerId}>
-			Change owner
-		</button>
+					<div>
+						<span class="text-muted">To</span> <br />
+						<code>
+							{users.find((user) => String(user.id) == newOwnerId)?.email}
+						</code>
+					</div>
+				</div>
+			</div>
+			<div id="errorAlert-changeOwnershipModal" class="mt-3"></div>
+			<div class="d-flex gap-2">
+				<button class="btn btn-primary" onclick={handleChangeOwner}>
+					Confirm
+				</button>
+
+				<button
+					class="btn btn-danger"
+					onclick={() => {
+						confirmation = false;
+						newOwnerId = undefined;
+					}}
+				>
+					Cancel
+				</button>
+			</div>
+		{/if}
+
+
 	{/snippet}
 </Modal>
