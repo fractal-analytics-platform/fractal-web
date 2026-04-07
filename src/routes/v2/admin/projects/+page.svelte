@@ -138,7 +138,7 @@
 				throw await getAlertErrorFromResponse(response);
 			}
 			await searchProject(currentPage, pageSize);
-			});
+		});
 	}
 </script>
 
@@ -302,7 +302,9 @@
 			</div>
 			<button
 				class="btn btn-primary mt-4"
-				onclick={() => {confirmation = true;}}
+				onclick={() => {
+					confirmation = true;
+				}}
 				disabled={!newOwnerId}
 			>
 				Change owner
@@ -330,9 +332,7 @@
 			</div>
 			<div id="errorAlert-changeOwnershipModal" class="mt-3"></div>
 			<div class="d-flex gap-2">
-				<button class="btn btn-primary" onclick={handleChangeOwner}>
-					Confirm
-				</button>
+				<button class="btn btn-primary" onclick={handleChangeOwner}> Confirm </button>
 
 				<button
 					class="btn btn-danger"
@@ -345,7 +345,5 @@
 				</button>
 			</div>
 		{/if}
-
-
 	{/snippet}
 </Modal>
