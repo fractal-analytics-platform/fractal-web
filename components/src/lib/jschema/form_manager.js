@@ -678,7 +678,7 @@ export class FormManager {
 		const data = {};
 		for (const child of element.children) {
 			let childData = this.getDataFromElement(child);
-			const value =
+			let value =
 				childData == null
 					? null
 					: typeof childData === 'object' &&
@@ -686,6 +686,9 @@ export class FormManager {
 						  typeof childData === 'function'
 						? get(childData)
 						: childData;
+			if (typeof value === 'string' && value.trim() === '') {
+				value = null;
+			}
 			data[child.key] = value;
 		}
 		if (this.schemaVersion === 'fractal_schema_v1' && element.nullable && get(element.isNull)) {

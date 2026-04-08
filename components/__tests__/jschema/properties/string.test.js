@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
 import {
 	checkBold,
 	renderSchemaWithSingleProperty,
@@ -35,6 +36,22 @@ describe('String properties', () => {
 		checkBold(screen.getByText('testProp'), false);
 		const textbox = screen.getByRole('textbox', { name: 'testProp' });
 		expect(textbox).toBeDefined();
+		expect(component.getArguments()).deep.eq({ testProp: null });
+	});
+
+	it('Empty string always converted to null', async () => {
+		const user = userEvent.setup();
+		const { component } = renderSchemaWithReferencedProperty(
+			{ type: 'string' },
+			'fractal_schema_v1'
+		);
+		checkBold(screen.getByText('testProp'), false);
+		const textbox = screen.getByRole('textbox', { name: 'testProp' });
+		expect(textbox).toBeDefined();
+		expect(component.getArguments()).deep.eq({ testProp: null });
+		await user.type(textbox, 'foo');
+		expect(component.getArguments()).deep.eq({ testProp: 'foo' });
+		await user.clear(textbox);
 		expect(component.getArguments()).deep.eq({ testProp: null });
 	});
 });
