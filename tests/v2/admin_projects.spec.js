@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createProject, login, setUploadFile, waitPageLoading } from '../utils.js';
+import { createProject, login, setUploadFile, waitModal, waitPageLoading } from '../utils.js';
 import { createTestUser } from './user_utils.js';
 import { createDataset } from './dataset_utils.js';
 import path from 'path';
@@ -98,8 +98,36 @@ test('Admin page for projects', async ({ page }) => {
 
 	const userEmail4 = await createTestUser(page, randomProjectDir);
 
-	// TODO: find `project` in the admin-project page
-	// TODO: pass ownership to User1 -> OK
+	await test.step('Test change owners', async () => {
+		await page.goto('/v2/admin');
+		await waitPageLoading(page);
+		await page.getByRole('link', { name: 'Search projects' }).click();
+		await page.waitForURL(/\/v2\/admin\/projects$/);
+		await waitPageLoading(page);
+
+		await page.getByLabel('Name').fill(project.name.toUpperCase());
+		await page.getByRole('button', { name: 'Search projects' }).click();
+
+		const changeOwnershipButton = page.getByRole('button', { name: 'Change ownership' });
+		await expect(changeOwnershipButton).toHaveCount(1);
+		await changeOwnershipButton.click();
+
+		const modal = await waitModal(page);
+		const changeOwnerButton = modal.getByRole('button', { name: 'Change owner' });
+		await expect(changeOwnerButton).toBeDisabled();
+
+		// Pass ownership to User 1 -> OK
+		await page.getByLabel('New owner').selectOption(userEmail1);
+		await expect(changeOwnerButton).toBeEnabled();
+		await changeOwnerButton.click();
+		expect(
+			modal.getByText(`You are about to transfer ownership of Project ${project.id}`)
+		).toBeVisible();
+		expect(modal.getByText('admin@fractal.xy')).toBeVisible();
+		expect(modal.getByText(userEmail1)).toBeVisible();
+
+		await page.getByRole('button', { name: 'Confirm' }).click();
+	});
 	// TODO: pass ownership to User2 -> See profile warning -> OK
 	// TODO: pass ownership to User3 -> See profile warning -> FAIL for different resources
 	// TODO: pass ownership to User4 -> FAIL for project dirs

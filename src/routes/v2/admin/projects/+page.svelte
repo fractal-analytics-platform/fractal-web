@@ -293,9 +293,9 @@
 			</div>
 
 			<div class="row mt-1">
-				<label class="col-3 col-form-label" for="user">New owner</label>
+				<label class="col-3 col-form-label" for="selectUser">New owner</label>
 				<div class="col-9">
-					<select class="form-select" bind:value={newOwnerId} id="user">
+					<select class="form-select" bind:value={newOwnerId} id="selectUser">
 						<option value={undefined}>Select...</option>
 						{#each users.filter((user) => user.email !== selectedProject?.user_email) as user (user.id)}
 							<option value={user.id}>{user.email}</option>
@@ -344,7 +344,9 @@
 			{/if}
 			<div id="errorAlert-changeOwnershipModal" class="mt-3"></div>
 			<div class="d-flex gap-2">
-				<button class="btn btn-primary" onclick={handleChangeOwner}> Confirm </button>
+				<button class="btn btn-primary" aria-label="Confirm" onclick={handleChangeOwner}>
+					Confirm
+				</button>
 
 				<button
 					class="btn btn-danger"
