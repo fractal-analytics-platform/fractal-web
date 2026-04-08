@@ -153,7 +153,7 @@ function ignoreUnselectedConditionalError(error, element) {
 			) {
 				const { allowedValue } = error.params;
 				const selectedValue = element.discriminator.values[selectedIndex];
-				if (allowedValue !== selectedValue) {
+				if (allowedValue !== selectedValue && error.schemaPath.startsWith(element.schemaPath)) {
 					// ignore discriminator errors related to unselected discriminator values
 					return true;
 				}
