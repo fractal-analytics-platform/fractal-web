@@ -85,6 +85,7 @@
 	 */
 	function loadManifest(manifestData) {
 		manifest = manifestData;
+		schemaVersion = manifestData.args_schema_version;
 		selectedSchema = null;
 		selectedTask = null;
 		selectedTaskName = '';
