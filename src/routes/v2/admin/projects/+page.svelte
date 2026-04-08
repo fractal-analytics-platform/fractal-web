@@ -44,6 +44,13 @@
 	let selectedProject = $state(null);
 	/** @type {string|undefined} */
 	let newOwnerId = $state(undefined);
+
+	let selectedUser = $derived(users.find((u) => String(u.id) === String(newOwnerId)));
+
+	let currentOwner = $derived(users.find((u) => u.email === selectedProject?.user_email));
+
+	let differentProfiles = $derived(selectedUser?.profile_id !== currentOwner?.profile_id);
+
 	let confirmation = $state(false);
 
 	/**
@@ -69,10 +76,7 @@
 			url.searchParams.append('project_id', id);
 		}
 		if (userId) {
-			url.searchParams.append(
-				'user_email',
-				users.find((user) => String(user.id) == userId)?.email || ''
-			);
+			url.searchParams.append('user_email', selectedUser?.email || '');
 		}
 		return url;
 	}
@@ -329,6 +333,15 @@
 					</div>
 				</div>
 			</div>
+			{#if differentProfiles}
+				<div class="alert alert-warning d-flex align-items-center gap-2">
+					<div>
+						<i class="bi bi-exclamation-triangle-fill"></i>
+						Users have are associated to different profiles. The new project owner may not be able to
+						run jobs on this projects, due to on-disk permissions.
+					</div>
+				</div>
+			{/if}
 			<div id="errorAlert-changeOwnershipModal" class="mt-3"></div>
 			<div class="d-flex gap-2">
 				<button class="btn btn-primary" onclick={handleChangeOwner}> Confirm </button>
