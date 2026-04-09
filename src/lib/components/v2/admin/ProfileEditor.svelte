@@ -210,8 +210,7 @@
 							class="form-control"
 							id="pixi_cache_dir"
 							bind:value={editableProfile.pixi_cache_dir}
-							class:is-invalid={profileFormSubmitted &&
-								$profileValidationErrors['pixi_cache_dir']}
+							class:is-invalid={profileFormSubmitted && $profileValidationErrors['pixi_cache_dir']}
 							required
 						/>
 						<span class="invalid-feedback">{$profileValidationErrors['pixi_cache_dir']}</span>
