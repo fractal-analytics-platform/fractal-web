@@ -33,7 +33,7 @@ function addErrorToForm(error, errors, parentElement) {
 	if (ignoreNullAnyOfError(error, errors)) {
 		return true;
 	}
-	if (error.instancePath.startsWith(parentElement.path)) {
+	if (error.instancePath.match(new RegExp('^' + parentElement.path + '(/.*)$'))) {
 		parentElement.hasErrors.set(true);
 	}
 	if (parentElement.path === error.instancePath) {

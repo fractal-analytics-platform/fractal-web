@@ -537,4 +537,33 @@ describe('JSchema form errors', () => {
 		const errors = get(formManager.root.children[1].children[0].errors);
 		expect(errors).deep.eq(['must be equal to one of the allowed values']);
 	});
+
+	it('handle errors of properties having names starting with the same prefix', () => {
+		const formManager = new FormManager(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						items: { type: 'integer' },
+						type: 'array'
+					},
+					foo_2: {
+						items: { type: 'integer' },
+						type: 'array'
+					}
+				}
+			},
+			vi.fn(),
+			'fractal_schema_v1',
+			[],
+			{
+				foo: [],
+				foo_2: ['xxx']
+			}
+		);
+		expect(get(formManager.root.children[0].hasErrors)).eq(false);
+		expect(get(formManager.root.children[0].errors)).deep.eq([]);
+		expect(get(formManager.root.children[1].hasErrors)).eq(true);
+		expect(get(formManager.root.children[1].children[0].errors)).deep.eq(['must be integer']);
+	});
 });
