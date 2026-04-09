@@ -47,6 +47,10 @@ export type ProjectV2 = {
 	timestamp_created: string;
 };
 
+export type ProjectSuperuser = ProjectV2 & {
+	user_email: string;
+};
+
 export type ProjectGuest = {
 	email: string;
 	is_verified: boolean;
