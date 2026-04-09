@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3265-expose-custom-pixi_cache_dir-in-pro',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
