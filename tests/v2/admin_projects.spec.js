@@ -117,6 +117,10 @@ test('Admin page for projects', async ({ page }) => {
 		await page.getByRole('button', { name: 'Change ownership' }).click();
 
 		const modal = await waitModal(page);
+		expect(
+			modal.getByText(`The current owner (${adminEmail}) will loose access to this project.`)
+		).toBeVisible();
+
 		const changeOwnerButton = modal.getByRole('button', { name: 'Change owner' });
 		await expect(changeOwnerButton).toBeDisabled();
 
@@ -129,15 +133,61 @@ test('Admin page for projects', async ({ page }) => {
 		expect(modal.getByText(adminEmail)).toBeVisible();
 		expect(modal.getByText(userEmail1)).toBeVisible();
 
+		// OK
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitPageLoading(page);
+
 		const row = page.getByRole('row', { name: new RegExp(project.name) });
 		await expect(row.getByText(userEmail1)).toBeVisible();
 		await expect(row.getByText(adminEmail)).not.toBeVisible();
 	});
-	// TODO: pass ownership to User2 -> See profile warning -> OK
-	// TODO: pass ownership to User3 -> See profile warning -> FAIL for different resources
+
+	await test.step('Pass ownership to User 2', async () => {
+		await page.getByRole('button', { name: 'Change ownership' }).click();
+
+		const modal = await waitModal(page);
+		expect(
+			modal.getByText(`The current owner (${userEmail1}) will loose access to this project.`)
+		).toBeVisible();
+
+		await page.getByLabel('New owner').selectOption(userEmail2);
+		await modal.getByRole('button', { name: 'Change owner' }).click();
+
+		// Warning about profiles
+		expect(modal.getByText('Users are associated to different profiles.')).toBeVisible();
+		// OK
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitPageLoading(page);
+
+		const row = page.getByRole('row', { name: new RegExp(project.name) });
+		await expect(row.getByText(userEmail2)).toBeVisible();
+		await expect(row.getByText(userEmail1)).not.toBeVisible();
+	});
+
+	await test.step('Pass ownership to User 3', async () => {
+		await page.getByRole('button', { name: 'Change ownership' }).click();
+
+		const modal = await waitModal(page);
+		expect(
+			modal.getByText(`The current owner (${userEmail2}) will loose access to this project.`)
+		).toBeVisible();
+
+		await page.getByLabel('New owner').selectOption(userEmail3);
+		await modal.getByRole('button', { name: 'Change owner' }).click();
+
+		// Warning about profiles
+		expect(modal.getByText('Users are associated to different profiles.')).toBeVisible();
+		// FAIL
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitPageLoading(page);
+		expect(
+			modal.getByText('Users are associated to different computational resources.')
+		).toBeVisible();
+
+		await page.getByRole('button', { name: 'Cancel' }).click();
+	});
+
 	// TODO: pass ownership to User4 -> FAIL for project dirs
 
-	console.log(dataset, userEmail2, userEmail3, userEmail4);
+	console.log(dataset, userEmail3, userEmail4);
 });

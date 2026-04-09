@@ -287,7 +287,7 @@
 			<div class="alert alert-warning d-flex align-items-center gap-2">
 				<i class="bi bi-exclamation-triangle-fill"></i>
 				<div>
-					The current owner (<code>{selectedProject?.user_email}</code>) will lose access to this
+					The current owner (<code>{selectedProject?.user_email}</code>) will loose access to this
 					project.
 				</div>
 			</div>
@@ -308,6 +308,7 @@
 				onclick={() => {
 					confirmation = true;
 				}}
+				aria-label="Change owner"
 				disabled={!newOwnerId}
 			>
 				Change owner
@@ -337,8 +338,8 @@
 				<div class="alert alert-warning d-flex align-items-center gap-2">
 					<div>
 						<i class="bi bi-exclamation-triangle-fill"></i>
-						Users have are associated to different profiles. The new project owner may not be able to
-						run jobs on this projects, due to on-disk permissions.
+						Users are associated to different profiles. The new project owner may not be able to run
+						jobs on this projects, due to on-disk permissions.
 					</div>
 				</div>
 			{/if}
