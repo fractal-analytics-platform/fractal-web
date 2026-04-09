@@ -19,8 +19,10 @@ const randomProfileName2 = `${Math.random().toString(36).substring(7)} profile`;
 const randomProjectDir = `/${Math.random().toString(36).substring(7)}`;
 
 test('Admin page for projects', async ({ page }) => {
+	const adminEmail = 'admin@fractal.xy';
+
 	await test.step('Login as superuser', async () => {
-		await login(page, 'admin@fractal.xy', '1234');
+		await login(page, adminEmail, '1234');
 		await waitPageLoading(page);
 	});
 
@@ -98,7 +100,7 @@ test('Admin page for projects', async ({ page }) => {
 
 	const userEmail4 = await createTestUser(page, randomProjectDir);
 
-	await test.step('Test change owners', async () => {
+	await test.step('Open admin project page', async () => {
 		await page.goto('/v2/admin');
 		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Search projects' }).click();
@@ -108,29 +110,34 @@ test('Admin page for projects', async ({ page }) => {
 		await page.getByLabel('Name').fill(project.name.toUpperCase());
 		await page.getByRole('button', { name: 'Search projects' }).click();
 
-		const changeOwnershipButton = page.getByRole('button', { name: 'Change ownership' });
-		await expect(changeOwnershipButton).toHaveCount(1);
-		await changeOwnershipButton.click();
+		await expect(page.getByRole('button', { name: 'Change ownership' })).toHaveCount(1);
+	});
+
+	await test.step('Pass ownership to User 1', async () => {
+		await page.getByRole('button', { name: 'Change ownership' }).click();
 
 		const modal = await waitModal(page);
 		const changeOwnerButton = modal.getByRole('button', { name: 'Change owner' });
 		await expect(changeOwnerButton).toBeDisabled();
 
-		// Pass ownership to User 1 -> OK
 		await page.getByLabel('New owner').selectOption(userEmail1);
 		await expect(changeOwnerButton).toBeEnabled();
 		await changeOwnerButton.click();
 		expect(
 			modal.getByText(`You are about to transfer ownership of Project ${project.id}`)
 		).toBeVisible();
-		expect(modal.getByText('admin@fractal.xy')).toBeVisible();
+		expect(modal.getByText(adminEmail)).toBeVisible();
 		expect(modal.getByText(userEmail1)).toBeVisible();
 
 		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitPageLoading(page);
+		const row = page.getByRole('row', { name: new RegExp(project.name) });
+		await expect(row.getByText(userEmail1)).toBeVisible();
+		await expect(row.getByText(adminEmail)).not.toBeVisible();
 	});
 	// TODO: pass ownership to User2 -> See profile warning -> OK
 	// TODO: pass ownership to User3 -> See profile warning -> FAIL for different resources
 	// TODO: pass ownership to User4 -> FAIL for project dirs
 
-	console.log(dataset, userEmail1, userEmail2, userEmail3, userEmail4);
+	console.log(dataset, userEmail2, userEmail3, userEmail4);
 });
