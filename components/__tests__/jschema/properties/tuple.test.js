@@ -378,4 +378,83 @@ describe('Tuple properties', () => {
 		expect(component.getArguments()).deep.eq({ k: ['a', 42] });
 		expect(component.isValid()).toEqual(true);
 	});
+
+	it('Nullable tuples', async () => {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					tuple_or_None: {
+						anyOf: [
+							{
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [{ type: 'string' }, { type: 'string' }]
+							},
+							{
+								type: 'null'
+							}
+						]
+					},
+					tuple_or_None_with_default: {
+						anyOf: [
+							{
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [{ type: 'string' }, { type: 'string' }]
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1'
+		);
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: [null, null],
+			tuple_or_None_with_default: null
+		});
+
+		expect(screen.getByText('This element is null')).toBeVisible();
+		expect(screen.getAllByText('must be string')[0]).toBeVisible();
+
+		await user.type(screen.getAllByRole('textbox')[0], 'foo');
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: ['foo', 'bar'],
+			tuple_or_None_with_default: null
+		});
+
+		await user.click(screen.getByRole('button', { name: 'Set' }));
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: ['foo', 'bar'],
+			tuple_or_None_with_default: [null, null]
+		});
+
+		await user.click(screen.getAllByRole('button', { name: 'Unset' })[0]);
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: null,
+			tuple_or_None_with_default: [null, null]
+		});
+
+		expect(screen.getAllByText('must be string')[0]).toBeVisible();
+
+		await user.type(screen.getAllByRole('textbox')[0], 'foo');
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: null,
+			tuple_or_None_with_default: ['foo', 'bar']
+		});
+	});
 });

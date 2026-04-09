@@ -9,10 +9,11 @@
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 * @property {null|(() => void)} [reset]
+	 * @property {null|(() => void)} [init]
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable, remove, reset = null } = $props();
+	let { formElement, editable, remove, reset = null, init = null } = $props();
 
 	/** @type {any[]} */
 	let children = $state([]);
@@ -64,7 +65,7 @@
 	);
 </script>
 
-<CollapsibleProperty {formElement} {reset} {editable} {remove}>
+<CollapsibleProperty {formElement} {reset} {editable} {remove} {init}>
 	<div class="d-flex justify-content-center p-2">
 		<button
 			class="btn btn-primary"

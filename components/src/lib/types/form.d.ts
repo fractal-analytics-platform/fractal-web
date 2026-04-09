@@ -78,12 +78,13 @@ export type ArrayFormElementFields = BaseFormElementFields & {
 	items: JSONSchemaProperty;
 	minItems?: number;
 	maxItems?: number;
+	isNull: boolean;
 };
 
 export type TupleFormElementFields = BaseFormElementFields & {
 	children: FormElement[];
 	items: JSONSchemaProperty | JSONSchemaProperty[];
-	size: number;
+	isNull: boolean;
 };
 
 export type ConditionalElementFields = BaseFormElementFields & {

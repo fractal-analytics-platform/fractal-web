@@ -92,7 +92,7 @@
 					formElement={children[index]}
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
-					init={() => initChild(index)}
+					init={child.nullable ? () => initChild(index) : null}
 					remove={child.removable ? () => removeProperty(/**@type {string}*/ (child.key)) : null}
 				/>
 			</div>

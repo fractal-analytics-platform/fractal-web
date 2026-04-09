@@ -50,6 +50,16 @@ function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaul
 	return data;
 }
 
+function getAnyOfPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
+	if (loadDefaults && 'default' in property) {
+		return property.default;
+	}
+	const { anyOf } = property;
+	if (anyOf.length > 0) {
+		return getPropertyData(anyOf[0], schemaVersion, required, initialValue, loadDefaults);
+	}
+}
+
 function getConditionalPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
 	if ('discriminator' in property) {
 		const { discriminator } = property;
@@ -86,6 +96,9 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 		return null;
 	}
 	if (loadDefaults && 'default' in property) {
+		if (property.default === null) {
+			return null;
+		}
 		return getPropertyData(property, schemaVersion, required, property.default, false);
 	}
 	if ('oneOf' in property) {
@@ -96,6 +109,9 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 			initialValue,
 			loadDefaults
 		);
+	}
+	if ('anyOf' in property) {
+		return getAnyOfPropertyData(property, schemaVersion, required, initialValue, loadDefaults);
 	}
 	if ('const' in property) {
 		return property.const;
@@ -184,6 +200,17 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 		return initialValue;
 	}
 	if (!initialValue) {
+		if (schemaVersion === 'fractal_schema_v1') {
+			return property.prefixItems.map((item, index) =>
+				getPropertyData(
+					getTupleChildProperty(item, schemaVersion, index),
+					schemaVersion,
+					false,
+					null,
+					loadDefaults
+				)
+			);
+		}
 		initialValue = [];
 	}
 	if (!required && initialValue.length === 0) {

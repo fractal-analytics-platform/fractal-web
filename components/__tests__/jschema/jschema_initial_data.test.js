@@ -616,4 +616,165 @@ describe('jschema_intial_data', () => {
 		);
 		expect(data).deep.eq({ foo: 5, bar: 8 });
 	});
+
+	it('Populate default of nullable properties', async function () {
+		const data = getJsonSchemaData(
+			{
+				type: 'object',
+				properties: {
+					object_or_None: {
+						anyOf: [
+							{
+								additionalProperties: {
+									type: 'integer'
+								},
+								type: 'object'
+							},
+							{
+								type: 'null'
+							}
+						]
+					},
+					object_or_None_with_default: {
+						anyOf: [
+							{
+								additionalProperties: {
+									type: 'integer'
+								},
+								type: 'object'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					},
+					array_or_None: {
+						anyOf: [
+							{
+								items: {
+									type: 'integer'
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						]
+					},
+					array_or_None_with_default: {
+						anyOf: [
+							{
+								items: {
+									type: 'integer'
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1'
+		);
+		expect(data).deep.eq({
+			object_or_None: {},
+			object_or_None_with_default: null,
+			array_or_None: [],
+			array_or_None_with_default: null
+		});
+	});
+
+	it('Keep initial empty values of nullable properties with default', async function () {
+		const data = getJsonSchemaData(
+			{
+				type: 'object',
+				properties: {
+					object_or_None_with_default: {
+						anyOf: [
+							{
+								additionalProperties: {
+									type: 'integer'
+								},
+								type: 'object'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					},
+					array_or_None_with_default: {
+						anyOf: [
+							{
+								items: {
+									type: 'integer'
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1',
+			{
+				object_or_None_with_default: {},
+				array_or_None_with_default: []
+			}
+		);
+		expect(data).deep.eq({
+			object_or_None_with_default: {},
+			array_or_None_with_default: []
+		});
+	});
+
+	it('Initialize nullable tuple', async function () {
+		const data = getJsonSchemaData(
+			{
+				type: 'object',
+				properties: {
+					tuple_or_None: {
+						anyOf: [
+							{
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [{ type: 'string' }, { type: 'string' }]
+							},
+							{
+								type: 'null'
+							}
+						]
+					},
+					tuple_or_None_with_default: {
+						anyOf: [
+							{
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [{ type: 'string' }, { type: 'string' }]
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1'
+		);
+
+		expect(data).deep.eq({
+			tuple_or_None: [null, null],
+			tuple_or_None_with_default: null
+		});
+	});
 });

@@ -452,4 +452,96 @@ describe('Array properties', () => {
 		await user.click(screen.getAllByRole('button', { name: 'Move item up' })[1]);
 		expect(component.getArguments()).deep.eq({ foo: [6, 5] });
 	});
+
+	it('Nullable arrays', async () => {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					array_or_None: {
+						anyOf: [
+							{
+								items: {
+									type: 'integer'
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						]
+					},
+					array_or_None_with_default: {
+						anyOf: [
+							{
+								items: {
+									type: 'integer'
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1'
+		);
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: [],
+			array_or_None_with_default: null
+		});
+
+		expect(screen.getByText('This element is null')).toBeVisible();
+
+		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: [null],
+			array_or_None_with_default: null
+		});
+
+		expect(screen.getByText('must be integer')).toBeVisible();
+
+		await user.type(screen.getByRole('textbox'), '42');
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: [42],
+			array_or_None_with_default: null
+		});
+
+		await user.click(screen.getByRole('button', { name: 'Set' }));
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: [42],
+			array_or_None_with_default: []
+		});
+
+		await user.click(screen.getAllByRole('button', { name: 'Unset' })[0]);
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: null,
+			array_or_None_with_default: []
+		});
+
+		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: null,
+			array_or_None_with_default: [null]
+		});
+
+		expect(screen.getByText('must be integer')).toBeVisible();
+
+		await user.type(screen.getByRole('textbox'), '42');
+
+		expect(component.getArguments()).deep.eq({
+			array_or_None: null,
+			array_or_None_with_default: [42]
+		});
+	});
 });

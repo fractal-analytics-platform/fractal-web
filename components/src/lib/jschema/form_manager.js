@@ -347,7 +347,8 @@ export class FormManager {
 			children,
 			items,
 			minItems: property.minItems,
-			maxItems: property.maxItems
+			maxItems: property.maxItems,
+			isNull: value === null
 		});
 		return element;
 	}
@@ -358,24 +359,23 @@ export class FormManager {
 	createTupleElement(params) {
 		const { property, required, value } = params;
 		const fields = this.getBaseElementFields(params);
-		const size = /** @type {number} */ (property.minItems);
+
 		const items = this.schemaVersion === 'pydantic_v1' ? property.items : property.prefixItems;
 		const element = new TupleFormElement({
 			...fields,
 			type: 'tuple',
 			items,
-			size,
 			children:
 				required || (Array.isArray(value) && value.length > 0)
 					? this.createTupleChildren({
 							...params,
 							items,
-							size,
 							value,
 							parentProperty: property,
 							titleType: 'title_only'
 						})
-					: []
+					: [],
+			isNull: value === null
 		});
 		return element;
 	}
@@ -383,11 +383,10 @@ export class FormManager {
 	/**
 	 * @param {Omit<import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]> & {
 	 * items: import("../types/jschema").JSONSchemaProperty|import("../types/jschema").JSONSchemaProperty[]
-	 * size: number
 	 * }, 'required' | 'removable' | 'key' | 'property'>} params
 	 */
 	createTupleChildren(params) {
-		const { path, items, size, value } = params;
+		const { path, items, parentProperty, value } = params;
 		const schemaPath = `${params.schemaPath}/${this.schemaVersion === 'pydantic_v1' ? 'items' : 'prefixItems'}`;
 		const childParams = {
 			...params,
@@ -407,6 +406,7 @@ export class FormManager {
 				})
 			);
 		} else {
+			const size = /** @type {number} */ (parentProperty.minItems);
 			children = Array(size).map((_, index) =>
 				this.createFormElement({
 					...childParams,
@@ -799,6 +799,9 @@ export class FormManager {
 	 * @param {ArrayFormElement|TupleFormElement} arrayElement
 	 */
 	getDataFromArrayElement(arrayElement) {
+		if (arrayElement.nullable && get(arrayElement.isNull)) {
+			return null;
+		}
 		return arrayElement.children.map((c) => this.getDataFromElement(c));
 	}
 }

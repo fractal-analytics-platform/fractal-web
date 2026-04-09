@@ -150,7 +150,28 @@ export class InvalidFormElement extends ValueFormElement {
 	}
 }
 
-export class ObjectFormElement extends BaseFormElement {
+export class NullableFormElement extends BaseFormElement {
+	/**
+	 * @param {import("../types/form").BaseFormElementFields & { isNull: boolean }} fields
+	 */
+	constructor(fields) {
+		super(fields);
+		/** @type {boolean} */
+		this.nullable = fields.nullable;
+		/** @type {import('svelte/store').Writable<boolean>} */
+		this.isNull = writable(fields.nullable && fields.isNull);
+	}
+
+	setToNull() {
+		if (Array.isArray(this.children)) {
+			this.children = [];
+		}
+		this.isNull.set(true);
+		this.notifyChange();
+	}
+}
+
+export class ObjectFormElement extends NullableFormElement {
 	/**
 	 * @param {import("../types/form").ObjectFormElementFields} fields
 	 */
@@ -162,8 +183,6 @@ export class ObjectFormElement extends BaseFormElement {
 		this.additionalProperties = fields.additionalProperties;
 		this.children = fields.children;
 		this.collapsed = !fields.required;
-		this.nullable = fields.nullable;
-		this.isNull = writable(fields.nullable && fields.isNull);
 	}
 
 	/**
@@ -315,15 +334,9 @@ export class ObjectFormElement extends BaseFormElement {
 		this.isNull.set(false);
 		this.notifyChange();
 	}
-
-	setToNull() {
-		this.children = [];
-		this.isNull.set(true);
-		this.notifyChange();
-	}
 }
 
-export class ArrayFormElement extends BaseFormElement {
+export class ArrayFormElement extends NullableFormElement {
 	/**
 	 * @param {import("../types/form").ArrayFormElementFields} fields
 	 */
@@ -414,7 +427,7 @@ export class ArrayFormElement extends BaseFormElement {
 	}
 }
 
-export class TupleFormElement extends BaseFormElement {
+export class TupleFormElement extends NullableFormElement {
 	/**
 	 * @param {import("../types/form").TupleFormElementFields} fields
 	 */
@@ -422,7 +435,6 @@ export class TupleFormElement extends BaseFormElement {
 		super(fields);
 		this.children = fields.children;
 		this.items = fields.items;
-		this.size = fields.size;
 		this.collapsed = !fields.required;
 	}
 
@@ -440,7 +452,8 @@ export class TupleFormElement extends BaseFormElement {
 			);
 		} else {
 			const property = this.items;
-			value = Array(this.size).map((i) =>
+			const size = /** @type {number} */ (property.minItems);
+			value = Array(size).map((i) =>
 				getPropertyData(
 					property,
 					this.manager.schemaVersion,
@@ -454,7 +467,6 @@ export class TupleFormElement extends BaseFormElement {
 			path: this.path,
 			schemaPath: this.schemaPath,
 			items: this.items,
-			size: this.size,
 			value,
 			parentProperty: this.property,
 			titleType: 'title_only'

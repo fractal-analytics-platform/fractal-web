@@ -36,9 +36,9 @@
 		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
-	<ArrayProperty {formElement} {editable} {reset} {remove} />
+	<ArrayProperty {formElement} {editable} {reset} {remove} {init} />
 {:else if formElement.type === 'tuple'}
-	<TupleProperty {formElement} {editable} {reset} {remove} />
+	<TupleProperty {formElement} {editable} {reset} {remove} {init} />
 {:else if formElement.type === 'conditional'}
 	<ConditionalProperty {formElement} {editable} {reset} {remove} />
 {:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}

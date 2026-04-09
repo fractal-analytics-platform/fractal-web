@@ -458,8 +458,8 @@ describe('JSchema form errors', () => {
 					InternalModel4: {
 						properties: {
 							label: {
-								const: 'label4',
-								default: 'label4',
+								enum: ['label4A', 'label4B'],
+								default: 'label4A',
 								type: 'string'
 							},
 							field: {
@@ -530,7 +530,11 @@ describe('JSchema form errors', () => {
 				}
 			}
 		);
+		expect(formManager.getFormData()).deep.eq({
+			field_3: [{ label: 'label3', field: true }],
+			model_or_none: { label: 'INVALID', field: 1 }
+		});
 		const errors = get(formManager.root.children[1].children[0].errors);
-		expect(errors).deep.eq(['must be equal to constant']);
+		expect(errors).deep.eq(['must be equal to one of the allowed values']);
 	});
 });
