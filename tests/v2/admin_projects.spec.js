@@ -180,8 +180,9 @@ test('Admin page for projects', async ({ page }) => {
 		// FAIL
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitPageLoading(page);
+
 		expect(
-			modal.getByText('Users are associated to different computational resources.')
+			modal.getByText('Users are associated to different computational resources')
 		).toBeVisible();
 
 		await page.getByRole('button', { name: 'Cancel' }).click();
