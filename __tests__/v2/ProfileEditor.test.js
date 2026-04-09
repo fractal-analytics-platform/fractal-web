@@ -42,6 +42,7 @@ describe('ProfileEditor', () => {
 		await user.type(screen.getByRole('textbox', { name: 'SSH key path' }), '/path/to/key');
 		await user.type(screen.getByRole('textbox', { name: 'Jobs remote dir' }), '/path/to/jobs');
 		await user.type(screen.getByRole('textbox', { name: 'Tasks remote dir' }), '/path/to/tasks');
+		await user.type(screen.getByRole('textbox', { name: 'Pixi cache dir' }), '/path/to/cache');
 
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -54,6 +55,7 @@ describe('ProfileEditor', () => {
 			ssh_key_path: '/path/to/key',
 			jobs_remote_dir: '/path/to/jobs',
 			tasks_remote_dir: '/path/to/tasks',
+			pixi_cache_dir: '/path/to/cache',
 			resource_id: 1,
 			resource_type: 'slurm_ssh'
 		});
@@ -96,6 +98,11 @@ describe('ProfileEditor', () => {
 										loc: ['body', 'slurm_ssh', 'tasks_remote_dir'],
 										msg: 'mocked_error_tasks_remote_dir',
 										type: 'value_error'
+									},
+									{
+										loc: ['body', 'slurm_ssh', 'pixi_cache_dir'],
+										msg: 'mocked_error_pixi_cache_dir',
+										type: 'value_error'
 									}
 								]
 							})
@@ -115,7 +122,8 @@ describe('ProfileEditor', () => {
 					username: 'foo',
 					ssh_key_path: '/path/to/key',
 					jobs_remote_dir: '/path/to/jobs',
-					tasks_remote_dir: '/path/to/tasks'
+					tasks_remote_dir: '/path/to/tasks',
+					pixi_cache_dir: '/path/to/cache'
 				},
 				saveProfile: mockSaveProfile
 			}
@@ -126,6 +134,7 @@ describe('ProfileEditor', () => {
 		await user.clear(screen.getByRole('textbox', { name: 'SSH key path' }));
 		await user.clear(screen.getByRole('textbox', { name: 'Jobs remote dir' }));
 		await user.clear(screen.getByRole('textbox', { name: 'Tasks remote dir' }));
+		await user.clear(screen.getByRole('textbox', { name: 'Pixi cache dir' }));
 
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -134,6 +143,7 @@ describe('ProfileEditor', () => {
 		await screen.findByText('mocked_error_ssh_key_path');
 		await screen.findByText('mocked_error_jobs_remote_dir');
 		await screen.findByText('mocked_error_tasks_remote_dir');
+		await screen.findByText('mocked_error_pixi_cache_dir');
 
 		expect(mockSaveProfile).toHaveBeenCalledWith({
 			id: 1,
@@ -142,6 +152,7 @@ describe('ProfileEditor', () => {
 			ssh_key_path: '',
 			jobs_remote_dir: '',
 			tasks_remote_dir: '',
+			pixi_cache_dir: '',
 			resource_id: 1,
 			resource_type: 'slurm_ssh'
 		});
