@@ -779,7 +779,7 @@ export class FormManager {
 					const value = get(element.value);
 					const numericValue = parseFloat(value);
 					if (isNaN(numericValue)) {
-						if (value === null || (typeof value === 'string' && value.trim() === '')) {
+						if (typeof value === 'string' && value.trim() === '') {
 							return null;
 						} else {
 							return value;
@@ -789,7 +789,11 @@ export class FormManager {
 					}
 				}
 				if (element instanceof ValueFormElement) {
-					return get(element.value);
+					const value = get(element.value);
+					if (typeof value === 'string' && value.trim() === '') {
+						return null;
+					}
+					return value;
 				}
 				throw new Error(`Unsupported type ${element.type}`);
 		}

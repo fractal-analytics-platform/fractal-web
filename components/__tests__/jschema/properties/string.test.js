@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import {
 	checkBold,
 	renderSchemaWithSingleProperty,
-	renderSchemaWithReferencedProperty
+	renderSchemaWithReferencedProperty,
+	renderSchema
 } from './property_test_utils';
 
 describe('String properties', () => {
@@ -39,19 +40,38 @@ describe('String properties', () => {
 		expect(component.getArguments()).deep.eq({ testProp: null });
 	});
 
-	it('Empty string always converted to null', async () => {
+	it('Empty strings always converted to null', async () => {
 		const user = userEvent.setup();
-		const { component } = renderSchemaWithReferencedProperty(
-			{ type: 'string' },
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					simple: { type: 'string' },
+					array: {
+						type: 'array',
+						items: { type: 'string' }
+					}
+				}
+			},
 			'fractal_schema_v1'
 		);
-		checkBold(screen.getByText('testProp'), false);
-		const textbox = screen.getByRole('textbox', { name: 'testProp' });
+
+		// Simple textbox
+		checkBold(screen.getByText('simple'), false);
+		const textbox = screen.getByRole('textbox', { name: 'simple' });
 		expect(textbox).toBeDefined();
-		expect(component.getArguments()).deep.eq({ testProp: null });
+		expect(component.getArguments()).deep.eq({ simple: null, array: [] });
 		await user.type(textbox, 'foo');
-		expect(component.getArguments()).deep.eq({ testProp: 'foo' });
+		expect(component.getArguments()).deep.eq({ simple: 'foo', array: [] });
 		await user.clear(textbox);
-		expect(component.getArguments()).deep.eq({ testProp: null });
+		expect(component.getArguments()).deep.eq({ simple: null, array: [] });
+
+		// Array
+		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
+		expect(component.getArguments()).deep.eq({ simple: null, array: [null] });
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+		expect(component.getArguments()).deep.eq({ simple: null, array: ['bar'] });
+		await user.clear(screen.getAllByRole('textbox')[1]);
+		expect(component.getArguments()).deep.eq({ simple: null, array: [null] });
 	});
 });
