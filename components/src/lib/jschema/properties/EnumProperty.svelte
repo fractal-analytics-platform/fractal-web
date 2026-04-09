@@ -49,7 +49,9 @@
 			class:is-invalid={errors.length > 0}
 			disabled={!editable}
 		>
-			<option value={null}>Select...</option>
+			{#if !('default' in formElement.property)}
+				<option value={null}>Select...</option>
+			{/if}
 			{#each formElement.options as optionValue, index (index)}
 				<option>{optionValue}</option>
 			{/each}
