@@ -99,6 +99,13 @@ test('Admin page for projects', async ({ page }) => {
 	});
 
 	const userEmail4 = await createTestUser(page, randomProjectDir);
+	await test.step('Associate User4 to Profile2', async () => {
+		await page.getByRole('combobox', { name: 'Select resource' }).selectOption('Local resource');
+		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName1);
+		await page.getByRole('button', { name: 'Save' }).click();
+		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
+		await waitPageLoading(page);
+	});
 
 	await test.step('Open admin project page', async () => {
 		await page.goto('/v2/admin');
@@ -133,6 +140,8 @@ test('Admin page for projects', async ({ page }) => {
 		await expect(modal.getByText(adminEmail)).toBeVisible();
 		await expect(modal.getByText(userEmail1)).toBeVisible();
 
+		// No warning about profiles
+		await expect(modal.getByText('Users are associated to different profiles.')).not.toBeVisible();
 		// OK
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitPageLoading(page);
@@ -164,7 +173,7 @@ test('Admin page for projects', async ({ page }) => {
 		await expect(row.getByText(userEmail1)).not.toBeVisible();
 	});
 
-	await test.step('Pass ownership to User 3', async () => {
+	await test.step('Pass ownership to User 3 and User 4', async () => {
 		await page.getByRole('button', { name: 'Change ownership' }).click();
 
 		const modal = await waitModal(page);
@@ -179,15 +188,24 @@ test('Admin page for projects', async ({ page }) => {
 		await expect(modal.getByText('Users are associated to different profiles.')).toBeVisible();
 		// FAIL
 		await page.getByRole('button', { name: 'Confirm' }).click();
-
 		await expect(
 			modal.getByText('Users are associated to different computational resources')
 		).toBeVisible();
 
 		await page.getByRole('button', { name: 'Cancel' }).click();
+
+		await page.getByLabel('New owner').selectOption(userEmail4);
+		await modal.getByRole('button', { name: 'Change owner' }).click();
+
+		// No warning about profiles
+		await expect(modal.getByText('Users are associated to different profiles.')).not.toBeVisible();
+		// FAIL
+		await page.getByRole('button', { name: 'Confirm' }).click();
+
+		await expect(
+			modal.getByText(
+				`Cannot transfer project ownership because zarr_dir='/tmp/${dataset.zarrDir}' is not relative to one of ${userEmail4} project dirs.`
+			)
+		).toBeVisible();
 	});
-
-	// TODO: pass ownership to User4 -> FAIL for project dirs
-
-	console.log(dataset, userEmail4);
 });
