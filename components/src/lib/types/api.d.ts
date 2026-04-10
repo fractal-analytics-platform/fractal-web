@@ -443,4 +443,5 @@ export type Profile = {
 	ssh_key_path: string | null;
 	jobs_remote_dir: string | null;
 	tasks_remote_dir: string | null;
+	pixi_cache_dir: string | null;
 };

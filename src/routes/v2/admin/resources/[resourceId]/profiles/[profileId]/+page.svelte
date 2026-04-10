@@ -83,6 +83,12 @@
 							<td>{profile.tasks_remote_dir || '-'}</td>
 						</tr>
 					{/if}
+					{#if resource.type === 'slurm_ssh'}
+						<tr>
+							<th>Pixi cache dir</th>
+							<td>{profile.pixi_cache_dir || '-'}</td>
+						</tr>
+					{/if}
 				</tbody>
 			</table>
 		</div>

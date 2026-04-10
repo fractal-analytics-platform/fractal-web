@@ -2,6 +2,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
+- Add support for `profile.pixi_cache_dir` (\#1061).
 - Add support for conditionals in JSON Schemas (`dependentRequired`, `if`/`then`/`else`) (\#1050).
 - Apply prettier and fix static code analysis CI configuration (\#1051).
 - Add new admin page for projects (\#1052).

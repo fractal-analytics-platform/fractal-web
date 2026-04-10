@@ -365,6 +365,7 @@
 					jobs_remote_dir: '',
 					ssh_key_path: '',
 					tasks_remote_dir: '',
+					pixi_cache_dir: '',
 					username: ''
 				};
 			}
