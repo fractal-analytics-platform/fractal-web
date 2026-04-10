@@ -30,6 +30,13 @@
 				Impersonate users
 			</a>
 
+			<h2 class="fw-light mt-3">Projects</h2>
+
+			<a href="/v2/admin/projects" class="btn btn-primary me-2">
+				<i class="bi bi-search"></i>
+				Search projects
+			</a>
+
 			<a href="/v2/admin/sharing" class="btn btn-primary me-2">
 				<i class="bi bi-share"></i>
 				Projects sharing

@@ -1,8 +1,8 @@
 {
-	"*.js": ["eslint", "prettier"],
-	"*.ts": ["eslint", "prettier"],
-	"*.svelte": "prettier",
-	"*.md": "prettier",
-	"*.json": "prettier",
-	"*.yaml": "prettier"
+	"*.js": ["eslint", "prettier --write"],
+	"*.ts": ["eslint", "prettier --write"],
+	"*.svelte": "prettier --write",
+	"*.md": "prettier --write",
+	"*.json": "prettier --write",
+	"*.yaml": "prettier --write"
 }
