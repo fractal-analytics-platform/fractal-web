@@ -2,10 +2,10 @@
 	"manifest_version": "2",
 	"task_list": [
 		{
-			"name": "task1",
-			"type": "non_parallel",
-			"executable_non_parallel": "task1.py",
-			"args_schema_non_parallel": {
+			"name": "task1_scalars",
+			"type": "parallel",
+			"executable_parallel": "task1_scalars.py",
+			"args_schema_parallel": {
 				"$defs": {
 					"MyEnum": {
 						"description": "Description of `MyEnum`.",
@@ -16,16 +16,8 @@
 				},
 				"additionalProperties": false,
 				"properties": {
-					"zarr_urls": {
-						"items": {
-							"type": "string"
-						},
-						"title": "Zarr Urls",
-						"type": "array",
-						"description": "Missing description"
-					},
-					"zarr_dir": {
-						"title": "Zarr Dir",
+					"zarr_url": {
+						"title": "Zarr Url",
 						"type": "string",
 						"description": "Missing description"
 					},
@@ -78,13 +70,8 @@
 						"description": "Type hint `str = \"default\"`"
 					},
 					"bool_1": {
-						"title": "Bool 1",
-						"type": "boolean",
-						"description": "Type hint `bool`"
-					},
-					"bool_2": {
 						"default": false,
-						"title": "Bool 2",
+						"title": "Bool 1",
 						"type": "boolean",
 						"description": "Type hint `bool = False`"
 					},
@@ -98,6 +85,15 @@
 						"title": "Float 2",
 						"type": "number",
 						"description": "Type hint `float = 1.23`"
+					},
+					"float_3": {
+						"default": 50.0,
+						"maximum": 100.0,
+						"minimum": 0.0,
+						"multipleOf": 5.0,
+						"title": "Float 3",
+						"type": "number",
+						"description": "Type hint `float = Field(ge=0.0, le=100.0, default=50.0, multiple_of=5.0)`"
 					},
 					"enum_1": {
 						"$ref": "#/$defs/MyEnum",
@@ -122,61 +118,84 @@
 						"title": "Literal 2",
 						"type": "string",
 						"description": "Type hint `Literal[\"a\", \"b\", \"c\"] = \"a\"`"
+					},
+					"custom_title": {
+						"title": "This is a custom title",
+						"type": "string",
+						"description": "Type hint `str = Field(title=\"This is a custom title\")`"
+					},
+					"regex_arg": {
+						"pattern": "^[a-zA-Z0-9_]+$",
+						"title": "Regex Arg",
+						"type": "string",
+						"description": "Type hint `str = Field(pattern=r\"^[a-zA-Z0-9_]+$\")`"
 					}
 				},
 				"required": [
-					"zarr_urls",
-					"zarr_dir",
+					"zarr_url",
 					"int_1",
 					"str_1",
-					"bool_1",
 					"float_1",
 					"enum_1",
-					"literal_1"
+					"literal_1",
+					"custom_title",
+					"regex_arg"
 				],
 				"type": "object",
-				"title": "Task1"
+				"title": "Task1Scalars"
 			},
-			"docs_info": "## task1\nShort description of task1\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+			"docs_info": "## task1_scalars\nShort description of task1_scalars\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
 		},
 		{
-			"name": "task2",
-			"type": "non_parallel",
-			"executable_non_parallel": "task2.py",
-			"args_schema_non_parallel": {
+			"name": "task2_arrays",
+			"type": "parallel",
+			"executable_parallel": "task2_arrays.py",
+			"args_schema_parallel": {
 				"additionalProperties": false,
 				"properties": {
-					"zarr_urls": {
-						"items": {
-							"type": "string"
-						},
-						"title": "Zarr Urls",
-						"type": "array",
-						"description": "Missing description"
-					},
-					"zarr_dir": {
-						"title": "Zarr Dir",
+					"zarr_url": {
+						"title": "Zarr Url",
 						"type": "string",
 						"description": "Missing description"
 					},
-					"array": {
+					"simple_array": {
 						"items": {
 							"type": "integer"
 						},
-						"title": "Array",
+						"title": "Simple Array",
 						"type": "array",
 						"description": "Type hint `list[int]`"
 					},
-					"array_with_default": {
+					"array_with_empty_default": {
 						"default": [],
+						"items": {
+							"type": "integer"
+						},
+						"title": "Array With Empty Default",
+						"type": "array",
+						"description": "Type hint `list[int] = Field(default_factory=list)`"
+					},
+					"array_with_default": {
+						"default": [1, 2, 3],
 						"items": {
 							"type": "integer"
 						},
 						"title": "Array With Default",
 						"type": "array",
-						"description": "Type hint `list[int] = Field(default_factory=list)`"
+						"description": "Type hint `list[int] = Field(default=[1, 2, 3])`"
 					},
-					"array_or_None": {
+					"array_with_constraints": {
+						"items": {
+							"type": "integer"
+						},
+						"maxItems": 3,
+						"minItems": 2,
+						"title": "Array With Constraints",
+						"type": "array",
+						"uniqueItems": true,
+						"description": "Type hint `list[int] = Field(min_length=2, max_length=3, json_schema_extra={\"uniqueItems\": True})`"
+					},
+					"nullable_array": {
 						"anyOf": [
 							{
 								"items": {
@@ -188,10 +207,10 @@
 								"type": "null"
 							}
 						],
-						"title": "Array Or None",
+						"title": "Nullable Array",
 						"description": "Type hint `list[int] | None`"
 					},
-					"array_or_None_with_default": {
+					"nullable_array_with_null_default": {
 						"anyOf": [
 							{
 								"items": {
@@ -204,10 +223,10 @@
 							}
 						],
 						"default": null,
-						"title": "Array Or None With Default",
+						"title": "Nullable Array With Null Default",
 						"description": "Type hint `list[int] | None = None`"
 					},
-					"my_tuple": {
+					"simple_tuple": {
 						"maxItems": 3,
 						"minItems": 3,
 						"prefixItems": [
@@ -221,50 +240,121 @@
 								"type": "integer"
 							}
 						],
-						"title": "My Tuple",
+						"title": "Simple Tuple",
 						"type": "array",
 						"description": "Type hint `tuple[int, int, int]`"
+					},
+					"tuple_with_default": {
+						"default": [1, 2, 3],
+						"maxItems": 3,
+						"minItems": 3,
+						"prefixItems": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "integer"
+							},
+							{
+								"type": "integer"
+							}
+						],
+						"title": "Tuple With Default",
+						"type": "array",
+						"description": "Type hint `tuple[int, int, int] = (1, 2, 3)`"
+					},
+					"non_homogeneous_tuple": {
+						"maxItems": 3,
+						"minItems": 3,
+						"prefixItems": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "number"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"title": "Non Homogeneous Tuple",
+						"type": "array",
+						"description": "Type hint `tuple[int, float, str]`"
+					},
+					"nullable_tuple": {
+						"anyOf": [
+							{
+								"maxItems": 3,
+								"minItems": 3,
+								"prefixItems": [
+									{
+										"type": "integer"
+									},
+									{
+										"type": "integer"
+									},
+									{
+										"type": "integer"
+									}
+								],
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Nullable Tuple",
+						"description": "Type hint `tuple[int, int, int] | None`"
 					}
 				},
-				"required": ["zarr_urls", "zarr_dir", "array", "array_or_None", "my_tuple"],
+				"required": [
+					"zarr_url",
+					"simple_array",
+					"array_with_constraints",
+					"nullable_array",
+					"simple_tuple",
+					"non_homogeneous_tuple",
+					"nullable_tuple"
+				],
 				"type": "object",
-				"title": "Task2"
+				"title": "Task2Arrays"
 			},
-			"docs_info": "## task2\nShort description of task2\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+			"docs_info": "## task2_arrays\nShort description of task2_arrays\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
 		},
 		{
-			"name": "task3",
-			"type": "non_parallel",
-			"executable_non_parallel": "task3.py",
-			"args_schema_non_parallel": {
+			"name": "task3_objects",
+			"type": "parallel",
+			"executable_parallel": "task3_objects.py",
+			"args_schema_parallel": {
 				"additionalProperties": false,
 				"properties": {
-					"zarr_urls": {
-						"items": {
-							"type": "string"
-						},
-						"title": "Zarr Urls",
-						"type": "array",
-						"description": "Missing description"
-					},
-					"zarr_dir": {
-						"title": "Zarr Dir",
+					"zarr_url": {
+						"title": "Zarr Url",
 						"type": "string",
 						"description": "Missing description"
 					},
-					"object_arg": {
+					"simple_object": {
 						"additionalProperties": {
-							"type": "boolean"
+							"type": "string"
 						},
-						"title": "Object Arg",
+						"title": "Simple Object",
 						"type": "object",
-						"description": "Type hint `dict[int, bool]`"
+						"description": "Type hint `dict[str, str]`"
 					},
-					"optional_object_arg": {
+					"object_with_default": {
+						"additionalProperties": {
+							"type": "string"
+						},
+						"default": {},
+						"title": "Object With Default",
+						"type": "object",
+						"description": "Type hint `dict[str, str] = Field(default_factory=dict)`"
+					},
+					"nullable_object": {
 						"anyOf": [
 							{
 								"additionalProperties": {
-									"type": "boolean"
+									"type": "string"
 								},
 								"type": "object"
 							},
@@ -272,33 +362,32 @@
 								"type": "null"
 							}
 						],
-						"default": null,
-						"title": "Optional Object Arg",
-						"description": "Type hint `dict[int, bool] | None = None`"
+						"title": "Nullable Object",
+						"description": "Type hint `dict[str, str] | None`"
 					},
-					"nested_object_arg": {
+					"nested_object": {
 						"additionalProperties": {
 							"additionalProperties": {
-								"type": "string"
+								"type": "integer"
 							},
 							"type": "object"
 						},
-						"title": "Nested Object Arg",
+						"title": "Nested Object",
 						"type": "object",
-						"description": "Type hint `dict[str, dict[str, str]]`"
+						"description": "Type hint `dict[str, dict[str, int]]`"
 					}
 				},
-				"required": ["zarr_urls", "zarr_dir", "object_arg", "nested_object_arg"],
+				"required": ["zarr_url", "simple_object", "nullable_object", "nested_object"],
 				"type": "object",
-				"title": "Task3"
+				"title": "Task3Objects"
 			},
-			"docs_info": "## task3\nShort description of task3\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+			"docs_info": "## task3_objects\nShort description of task3_objects\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
 		},
 		{
-			"name": "task4",
-			"type": "non_parallel",
-			"executable_non_parallel": "task4.py",
-			"args_schema_non_parallel": {
+			"name": "task4_pydantic_models",
+			"type": "parallel",
+			"executable_parallel": "task4_pydantic_models.py",
+			"args_schema_parallel": {
 				"$defs": {
 					"InternalModel1": {
 						"description": "Description of `InternalModel1`.",
@@ -351,17 +440,88 @@
 								"type": "string"
 							},
 							"field": {
-								"description": "Type hint: `bool`",
+								"default": false,
+								"description": "Type hint: `bool = False`",
 								"title": "Field",
 								"type": "boolean"
 							}
 						},
-						"required": ["field"],
 						"title": "InternalModel3",
 						"type": "object"
 					},
-					"ModelAllOptional": {
-						"description": "Description of `ModelAllOptional`.",
+					"NestedModel": {
+						"description": "Description of `NestedModel`",
+						"properties": {
+							"tagged_union_attribute": {
+								"description": "Type hint `tagged_union_attribute: TaggedUnion`",
+								"discriminator": {
+									"mapping": {
+										"label1": "#/$defs/InternalModel1",
+										"label2": "#/$defs/InternalModel2",
+										"label3": "#/$defs/InternalModel3"
+									},
+									"propertyName": "label"
+								},
+								"oneOf": [
+									{
+										"$ref": "#/$defs/InternalModel1"
+									},
+									{
+										"$ref": "#/$defs/InternalModel2"
+									},
+									{
+										"$ref": "#/$defs/InternalModel3"
+									}
+								],
+								"title": "Tagged Union Attribute"
+							},
+							"list_of_models": {
+								"description": "Type hint `list_of_models: list[SimpleModel]`",
+								"items": {
+									"$ref": "#/$defs/SimpleModel"
+								},
+								"title": "List Of Models",
+								"type": "array"
+							}
+						},
+						"required": ["tagged_union_attribute", "list_of_models"],
+						"title": "NestedModel",
+						"type": "object"
+					},
+					"SimpleModel": {
+						"description": "Description of `SimpleModel`.",
+						"properties": {
+							"x": {
+								"anyOf": [
+									{
+										"type": "integer"
+									},
+									{
+										"type": "null"
+									}
+								],
+								"default": null,
+								"description": "Type hint: `int | None = None`",
+								"title": "X"
+							},
+							"y": {
+								"default": 1,
+								"description": "Type hint: `int = 1`",
+								"title": "Y",
+								"type": "integer"
+							},
+							"z": {
+								"description": "Type hint: `int`",
+								"title": "Z",
+								"type": "integer"
+							}
+						},
+						"required": ["z"],
+						"title": "SimpleModel",
+						"type": "object"
+					},
+					"SimpleModelAllOptional": {
+						"description": "Description of `SimpleModelAllOptional`.",
 						"properties": {
 							"x": {
 								"anyOf": [
@@ -383,84 +543,53 @@
 								"type": "integer"
 							}
 						},
-						"title": "ModelAllOptional",
-						"type": "object"
-					},
-					"ModelSomeRequired": {
-						"description": "Description of `ModelSomeRequired`.",
-						"properties": {
-							"x": {
-								"anyOf": [
-									{
-										"type": "integer"
-									},
-									{
-										"type": "null"
-									}
-								],
-								"default": null,
-								"description": "Type hint: `int | None = None`",
-								"title": "X"
-							},
-							"y": {
-								"description": "Type hint: `str`",
-								"title": "Y",
-								"type": "string"
-							}
-						},
-						"required": ["y"],
-						"title": "ModelSomeRequired",
+						"title": "SimpleModelAllOptional",
 						"type": "object"
 					}
 				},
 				"additionalProperties": false,
 				"properties": {
-					"zarr_urls": {
-						"items": {
-							"type": "string"
-						},
-						"title": "Zarr Urls",
-						"type": "array",
-						"description": "Missing description"
-					},
-					"zarr_dir": {
-						"title": "Zarr Dir",
+					"zarr_url": {
+						"title": "Zarr Url",
 						"type": "string",
 						"description": "Missing description"
 					},
-					"pydantic_1": {
-						"$ref": "#/$defs/ModelAllOptional",
-						"title": "Pydantic 1",
-						"description": "Type hint `ModelAllOptional`"
+					"simple_arg_1": {
+						"$ref": "#/$defs/SimpleModel",
+						"title": "Simple Arg 1",
+						"description": "Type hint `SimpleModel`"
 					},
-					"pydantic_2": {
-						"$ref": "#/$defs/ModelAllOptional",
-						"default": {
-							"x": null,
-							"y": 1
-						},
-						"title": "Pydantic 2",
-						"description": "Type hint `ModelAllOptional = ModelAllOptional()`"
+					"simple_arg_2": {
+						"$ref": "#/$defs/SimpleModelAllOptional",
+						"title": "Simple Arg 2",
+						"description": "Type hint `SimpleModelAllOptional`"
 					},
-					"pydantic_3": {
-						"$ref": "#/$defs/ModelAllOptional",
-						"default": {
-							"x": null,
-							"y": 1
-						},
-						"title": "Pydantic 3",
-						"description": "Type hint `ModelAllOptional = Field(default_factory=ModelAllOptional)`"
+					"nullable_arg": {
+						"anyOf": [
+							{
+								"$ref": "#/$defs/SimpleModel"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Nullable Arg",
+						"description": "Type hint `SimpleModel | None`"
 					},
-					"pydantic_4": {
-						"$ref": "#/$defs/ModelSomeRequired",
-						"title": "Pydantic 4",
-						"description": "Type hint `ModelSomeRequired`"
+					"nullable_arg_with_null_default": {
+						"anyOf": [
+							{
+								"$ref": "#/$defs/SimpleModel"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"default": null,
+						"title": "Nullable Arg With Null Default",
+						"description": "Type hint `SimpleModel | None = None`"
 					},
 					"tagged_union": {
-						"default": {
-							"label": "label1",
-							"field": 1
-						},
 						"discriminator": {
 							"mapping": {
 								"label1": "#/$defs/InternalModel1",
@@ -481,7 +610,34 @@
 							}
 						],
 						"title": "Tagged Union",
-						"description": "Type hint `TaggedUnion = InternalModel1()`"
+						"description": "Type hint `TaggedUnion`"
+					},
+					"tagged_union_with_default": {
+						"default": {
+							"label": "label3",
+							"field": false
+						},
+						"discriminator": {
+							"mapping": {
+								"label1": "#/$defs/InternalModel1",
+								"label2": "#/$defs/InternalModel2",
+								"label3": "#/$defs/InternalModel3"
+							},
+							"propertyName": "label"
+						},
+						"oneOf": [
+							{
+								"$ref": "#/$defs/InternalModel1"
+							},
+							{
+								"$ref": "#/$defs/InternalModel2"
+							},
+							{
+								"$ref": "#/$defs/InternalModel3"
+							}
+						],
+						"title": "Tagged Union With Default",
+						"description": "Type hint `TaggedUnion = InternalModel3()`"
 					},
 					"nested_tagged_union": {
 						"default": [],
@@ -509,349 +665,31 @@
 						"title": "Nested Tagged Union",
 						"type": "array",
 						"description": "Type hint `list[TaggedUnion] = Field(default_factory=list)`"
-					}
-				},
-				"required": ["zarr_urls", "zarr_dir", "pydantic_1", "pydantic_4"],
-				"type": "object",
-				"title": "Task4"
-			},
-			"docs_info": "## task4\nShort description of task4\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
-		},
-		{
-			"name": "task5",
-			"type": "non_parallel",
-			"executable_non_parallel": "task5.py",
-			"args_schema_non_parallel": {
-				"$defs": {
-					"EnumDropdown": {
-						"description": "Description of `EnumDropdown`",
-						"enum": ["Value 1", "Value 2"],
-						"title": "EnumDropdown",
-						"type": "string"
 					},
-					"InternalModel1": {
-						"description": "Description of `InternalModel1`.",
-						"properties": {
-							"label": {
-								"const": "label1",
-								"default": "label1",
-								"description": "Type hint: `Literal[\"label1\"] = \"label1\"`",
-								"title": "Label",
-								"type": "string"
-							},
-							"field": {
-								"default": 1,
-								"description": "Type hint: `int = 1`",
-								"title": "Field",
-								"type": "integer"
-							}
-						},
-						"title": "InternalModel1",
-						"type": "object"
-					},
-					"InternalModel2": {
-						"description": "Description of `InternalModel2`.",
-						"properties": {
-							"label": {
-								"const": "label2",
-								"default": "label2",
-								"description": "Type hint: `Literal[\"label2\"] = \"label2\"`",
-								"title": "Label",
-								"type": "string"
-							},
-							"field": {
-								"description": "Type hint: `str`",
-								"title": "Field",
-								"type": "string"
-							}
-						},
-						"required": ["field"],
-						"title": "InternalModel2",
-						"type": "object"
-					},
-					"InternalModel3": {
-						"description": "Description of `InternalModel3`.",
-						"properties": {
-							"label": {
-								"const": "label3",
-								"default": "label3",
-								"description": "Type hint: `Literal[\"label3\"] = \"label3\"`",
-								"title": "Label",
-								"type": "string"
-							},
-							"field": {
-								"description": "Type hint: `bool`",
-								"title": "Field",
-								"type": "boolean"
-							}
-						},
-						"required": ["field"],
-						"title": "InternalModel3",
-						"type": "object"
-					},
-					"InternalModel4": {
-						"description": "Description of InternalModel4.",
-						"properties": {
-							"label": {
-								"const": "label4",
-								"default": "label4",
-								"description": "Type hint: `Literal[\"label5\"] = \"label5\"`",
-								"title": "Label",
-								"type": "string"
-							},
-							"field": {
-								"default": 1,
-								"description": "Type hint: `int = 1`",
-								"title": "Field",
-								"type": "integer"
-							}
-						},
-						"title": "InternalModel4",
-						"type": "object"
-					},
-					"NestedModel": {
-						"description": "Description of `NestedModel`.",
-						"properties": {
-							"field_1": {
-								"default": "default value",
-								"description": "Type hint: `str = \"default_value\"`",
-								"title": "Field 1",
-								"type": "string"
-							},
-							"field_2": {
-								"default": 1,
-								"description": "Type hint: `int = 1`",
-								"title": "Field 2",
-								"type": "integer"
-							},
-							"field_3": {
-								"anyOf": [
-									{
-										"items": {
-											"discriminator": {
-												"mapping": {
-													"label1": "#/$defs/InternalModel1",
-													"label2": "#/$defs/InternalModel2",
-													"label3": "#/$defs/InternalModel3",
-													"label4": "#/$defs/InternalModel4"
-												},
-												"propertyName": "label"
-											},
-											"oneOf": [
-												{
-													"$ref": "#/$defs/InternalModel1"
-												},
-												{
-													"$ref": "#/$defs/InternalModel2"
-												},
-												{
-													"$ref": "#/$defs/InternalModel3"
-												},
-												{
-													"$ref": "#/$defs/InternalModel4"
-												}
-											]
-										},
-										"type": "array"
-									},
-									{
-										"type": "null"
-									}
-								],
-								"default": null,
-								"description": "Type hint: `list[NestedTaggedUnion] | None = Field(default=None)`",
-								"title": "Field 3"
-							},
-							"field_4": {
-								"default": [],
-								"description": "Type hint `list[NestedTaggedUnion] = Field(default_factory=list)`",
-								"items": {
-									"discriminator": {
-										"mapping": {
-											"label1": "#/$defs/InternalModel1",
-											"label2": "#/$defs/InternalModel2",
-											"label3": "#/$defs/InternalModel3",
-											"label4": "#/$defs/InternalModel4"
-										},
-										"propertyName": "label"
-									},
-									"oneOf": [
-										{
-											"$ref": "#/$defs/InternalModel1"
-										},
-										{
-											"$ref": "#/$defs/InternalModel2"
-										},
-										{
-											"$ref": "#/$defs/InternalModel3"
-										},
-										{
-											"$ref": "#/$defs/InternalModel4"
-										}
-									]
-								},
-								"title": "Field 4",
-								"type": "array"
-							}
-						},
-						"title": "NestedModel",
-						"type": "object"
-					}
-				},
-				"additionalProperties": false,
-				"properties": {
-					"zarr_urls": {
-						"items": {
-							"type": "string"
-						},
-						"title": "Zarr Urls",
-						"type": "array",
-						"description": "Missing description"
-					},
-					"zarr_dir": {
-						"title": "Zarr Dir",
-						"type": "string",
-						"description": "Missing description"
-					},
-					"custom_title": {
-						"default": "test",
-						"title": "Custom title 2",
-						"type": "string",
-						"description": "Type hint `str = Field(default=\"test\",title=\"Custom title 2\")`"
-					},
-					"regex_arg": {
-						"default": "test",
-						"pattern": "^[a-zA-Z0-9_]+$",
-						"title": "Regex Arg",
-						"type": "string",
-						"description": "Type hint `str = Field(default=\"test\", pattern=r\"^[a-zA-Z0-9_]+$\")`"
-					},
-					"list_arg": {
-						"default": [1, 2, 3],
-						"items": {
-							"type": "integer"
-						},
-						"maxItems": 10,
-						"minItems": 0,
-						"title": "List Arg",
-						"type": "array",
-						"uniqueItems": true,
-						"description": "Type hint `list[int] = Field(min_length=0, max_length=10, json_schema_extra={\"uniqueItems\": True}, default_factory=lambda: [1, 2, 3])`"
-					},
-					"float_arg": {
-						"default": 50.0,
-						"maximum": 100.0,
-						"minimum": 0.0,
-						"multipleOf": 5.0,
-						"title": "Float Arg",
-						"type": "number",
-						"description": "Type hint `float = Field(ge=0.0, le=100.0, default=50.0, multiple_of=5.0)`"
-					},
-					"nested_tagged_union_arg": {
-						"discriminator": {
-							"mapping": {
-								"label1": "#/$defs/InternalModel1",
-								"label2": "#/$defs/InternalModel2",
-								"label3": "#/$defs/InternalModel3",
-								"label4": "#/$defs/InternalModel4"
-							},
-							"propertyName": "label"
-						},
-						"oneOf": [
-							{
-								"$ref": "#/$defs/InternalModel1"
-							},
-							{
-								"$ref": "#/$defs/InternalModel2"
-							},
-							{
-								"$ref": "#/$defs/InternalModel3"
-							},
-							{
-								"$ref": "#/$defs/InternalModel4"
-							}
-						],
-						"title": "Nested Tagged Union Arg",
-						"description": "Type hint `NestedTaggedUnion`"
-					},
-					"enum_arg": {
-						"anyOf": [
-							{
-								"$ref": "#/$defs/EnumDropdown"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"default": null,
-						"title": "Enum Arg",
-						"description": "Type hint `EnumDropdown | None = None`"
-					},
-					"literal_arg": {
-						"default": "option1",
-						"enum": ["option1", "option2", "option3"],
-						"title": "Literal Arg",
-						"type": "string",
-						"description": "Type hint `Literal[\"option1\", \"option2\", \"option3\"] = \"option1\"`"
-					},
-					"nested_model_arg": {
+					"nested_model": {
 						"$ref": "#/$defs/NestedModel",
-						"default": {
-							"field_1": "default value",
-							"field_2": 1,
-							"field_3": null,
-							"field_4": []
-						},
-						"title": "Nested Model Arg",
-						"description": "Type hint `NestedModel = NestedModel()`"
-					},
-					"model_or_none": {
-						"anyOf": [
-							{
-								"$ref": "#/$defs/InternalModel4"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"default": null,
-						"title": "Model Or None",
-						"description": "Type hint `InternalModel4 | None = None`"
-					},
-					"string_or_none": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"default": null,
-						"title": "String Or None",
-						"description": "Type hint `str | None = Field(default=None)`"
-					},
-					"factory_args": {
-						"default": [1, 2, 3],
-						"items": {
-							"type": "integer"
-						},
-						"title": "Factory Args",
-						"type": "array",
-						"description": "Type hint `list[int] = Field(default_factory=lambda: [1, 2, 3])`"
+						"title": "Nested Model",
+						"description": "Type hint `NestedModel`"
 					}
 				},
-				"required": ["zarr_urls", "zarr_dir", "nested_tagged_union_arg"],
+				"required": [
+					"zarr_url",
+					"simple_arg_1",
+					"simple_arg_2",
+					"nullable_arg",
+					"tagged_union",
+					"nested_model"
+				],
 				"type": "object",
-				"title": "Task5"
+				"title": "Task4PydanticModels"
 			},
-			"docs_info": "## task5\nShort description of task5\n"
+			"docs_info": "## task4_pydantic_models\nShort description of task4_pydantic_models\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
 		},
 		{
-			"name": "task6",
-			"type": "non_parallel",
-			"executable_non_parallel": "task6.py",
-			"args_schema_non_parallel": {
+			"name": "task6_conditional_expressions",
+			"type": "parallel",
+			"executable_parallel": "task6_conditional_expressions.py",
+			"args_schema_parallel": {
 				"$defs": {
 					"ModelDependentRequired": {
 						"additionalProperties": false,
@@ -1075,18 +913,10 @@
 				},
 				"additionalProperties": false,
 				"properties": {
-					"zarr_urls": {
-						"items": {
-							"type": "string"
-						},
-						"title": "Zarr Urls",
-						"type": "array",
-						"description": "List of input Zarr URLs."
-					},
-					"zarr_dir": {
-						"title": "Zarr Dir",
+					"zarr_url": {
+						"title": "Zarr Url",
 						"type": "string",
-						"description": "Output directory for Zarr data."
+						"description": "Missing description"
 					},
 					"arg_if_then_else": {
 						"$ref": "#/$defs/ModelIfThenElse",
@@ -1110,17 +940,16 @@
 					}
 				},
 				"required": [
-					"zarr_urls",
-					"zarr_dir",
+					"zarr_url",
 					"arg_if_then_else",
 					"arg_dependent_required",
 					"arg_multiple_if_then",
 					"arg_mutually_exclusive"
 				],
 				"type": "object",
-				"title": "Task6"
+				"title": "Task6ConditionalExpressions"
 			},
-			"docs_info": "## task6\nShort description of task6\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
+			"docs_info": "## task6_conditional_expressions\nShort description of task6_conditional_expressions\n\nLong description of this wonderful task that actually only represents a\nmock task for testing.\n"
 		}
 	],
 	"has_args_schemas": true,
