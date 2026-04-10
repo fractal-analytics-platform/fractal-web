@@ -99,14 +99,13 @@ describe('allOf properties', () => {
 		const dropdowns = screen.getAllByRole('combobox');
 		expect(dropdowns.length).eq(2);
 		const [dropdown1, dropdown2] = /** @type {HTMLSelectElement[]} */ (dropdowns);
-		expect(dropdown1.options.length).eq(3);
-		expect(dropdown1.options[0].text).eq('Select...');
-		expect(dropdown1.options[1].text).eq('A');
-		expect(dropdown1.options[2].text).eq('B');
+		expect(dropdown1.options.length).eq(2);
+		expect(dropdown1.options[0].text).eq('A');
+		expect(dropdown1.options[1].text).eq('B');
 		expect(dropdown1).toHaveValue('A');
-		expect(dropdown2.options[0].text).eq('Select...');
-		expect(dropdown2.options[1].text).eq('C');
-		expect(dropdown2.options[2].text).eq('D');
+		expect(dropdown2.options.length).eq(2);
+		expect(dropdown2.options[0].text).eq('C');
+		expect(dropdown2.options[1].text).eq('D');
 		expect(dropdown2).toHaveValue('C');
 
 		expect(component.getArguments()).deep.eq({ normalizer: { type1: 'A', type2: 'C' } });

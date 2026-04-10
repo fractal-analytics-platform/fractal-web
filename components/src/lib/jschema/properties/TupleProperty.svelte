@@ -10,14 +10,29 @@
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 * @property {any} [children]
 	 * @property {null|(() => void)} [reset]
+	 * @property {null|(() => void)} [init]
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable, remove, children = $bindable([]), reset = null } = $props();
+	let {
+		formElement,
+		editable,
+		remove,
+		children = $bindable([]),
+		reset = null,
+		init = null
+	} = $props();
 
 	onMount(() => {
 		children = formElement.children;
 	});
+
+	function initTuple() {
+		if (init) {
+			init();
+			addTuple();
+		}
+	}
 
 	function addTuple() {
 		formElement.addTuple();
@@ -38,8 +53,8 @@
 	}
 </script>
 
-<CollapsibleProperty {formElement} {reset} {editable} {remove}>
-	{#if !formElement.required}
+<CollapsibleProperty {formElement} {reset} {editable} {remove} init={initTuple}>
+	{#if !formElement.required && init === null}
 		<div class="d-flex justify-content-center p-2">
 			{#if children.length > 0}
 				<button class="btn btn-danger" type="button" onclick={removeTuple} disabled={!editable}>

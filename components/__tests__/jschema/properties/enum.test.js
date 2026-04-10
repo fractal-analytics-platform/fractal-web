@@ -121,4 +121,26 @@ describe('Enum properties', () => {
 		expect(screen.queryAllByText('must be equal to one of the allowed values')).toHaveLength(1);
 		expect(component.isValid()).toEqual(false);
 	});
+
+	it('Do not show "Select..." for enum having a default value', async () => {
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						enum: ['A', 'B'],
+						type: 'string',
+						default: 'A'
+					}
+				}
+			},
+			'fractal_schema_v1'
+		);
+		checkBold(screen.getByText('foo'), false);
+		const combobox = screen.getByRole('combobox', { name: 'foo' });
+		const options = combobox.querySelectorAll('option');
+		expect(options[0].value).eq('A');
+		expect(options[1].value).eq('B');
+		expect(component.getArguments()).deep.eq({ foo: 'A' });
+	});
 });

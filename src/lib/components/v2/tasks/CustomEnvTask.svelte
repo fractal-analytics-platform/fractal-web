@@ -5,6 +5,7 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
+	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
 
 	/**
 	 * @typedef {Object} Props
@@ -52,7 +53,7 @@
 			throw new Error("File doesn't contain valid JSON");
 		}
 		const argsSchemaVersion = manifestData.args_schema_version;
-		if (argsSchemaVersion !== 'pydantic_v2' && argsSchemaVersion !== 'pydantic_v1') {
+		if (!isValidArgsSchemaVersion(argsSchemaVersion)) {
 			throw new Error('Unsupported manifest args schema version');
 		}
 		if (!isManifestValid(manifestData, argsSchemaVersion)) {
@@ -65,7 +66,7 @@
 
 	/**
 	 * @param {object} data
-	 * @param {'pydantic_v1'|'pydantic_v2'} argsSchemaVersion
+	 * @param {import("fractal-components/types/jschema").ArgsSchemaVersion} argsSchemaVersion
 	 */
 	function isManifestValid(data, argsSchemaVersion) {
 		const validator = new SchemaValidator(argsSchemaVersion);

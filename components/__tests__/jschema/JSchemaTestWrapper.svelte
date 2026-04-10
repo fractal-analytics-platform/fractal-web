@@ -6,7 +6,7 @@
 	 * @typedef {Object} Props
 	 * @property {any} schema
 	 * @property {any} schemaData
-	 * @property {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @property {import("../../src/types/jschema").ArgsSchemaVersion} schemaVersion
 	 * @property {(data: any) => void} onChange
 	 * @property {boolean} valid
 	 * @property {boolean} unsavedChanges

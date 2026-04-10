@@ -5,13 +5,13 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import("../form_element.js").ObjectFormElement} formElement
-	 * @property {boolean} editable
 	 * @property {boolean} [isRoot]
+	 * @property {boolean} [editable]
 	 * @property {boolean} [showErrors]
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable = true, isRoot = false, showErrors = true } = $props();
+	let { formElement, isRoot = false, editable = true, showErrors = true } = $props();
 
 	/**
 	 * It is necessary to copy the children reference to trigger svelte reactivity
@@ -60,6 +60,14 @@
 	/**
 	 * @param {number} index
 	 */
+	function initChild(index) {
+		formElement.initChild(index);
+		children = formElement.children;
+	}
+
+	/**
+	 * @param {number} index
+	 */
 	function fixInvalidChild(index) {
 		formElement.fixInvalidChild(index);
 		children = formElement.children;
@@ -84,6 +92,7 @@
 					formElement={children[index]}
 					{editable}
 					reset={isRoot ? () => resetChild(index) : null}
+					init={child.nullable ? () => initChild(index) : null}
 					remove={child.removable ? () => removeProperty(/**@type {string}*/ (child.key)) : null}
 				/>
 			</div>

@@ -2,8 +2,8 @@ import { undefinedToNull } from '../common/utils.js';
 import { getAllObjectProperties, isTuple } from './property_utils.js';
 
 /**
- * @param {import("../types/jschema.js").JSONSchema} jsonSchema
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").JSONSchema} jsonSchema
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {any} initialValue
  */
 export function getJsonSchemaData(jsonSchema, schemaVersion, initialValue = undefined) {
@@ -13,8 +13,8 @@ export function getJsonSchemaData(jsonSchema, schemaVersion, initialValue = unde
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaObjectProperty} property
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").JSONSchemaObjectProperty} property
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {any} initialValue
  * @param {boolean} loadDefaults
  */
@@ -50,6 +50,16 @@ function getObjectPropertyData(property, schemaVersion, initialValue, loadDefaul
 	return data;
 }
 
+function getAnyOfPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
+	if (loadDefaults && 'default' in property) {
+		return property.default;
+	}
+	const { anyOf } = property;
+	if (anyOf.length > 0) {
+		return getPropertyData(anyOf[0], schemaVersion, required, initialValue, loadDefaults);
+	}
+}
+
 function getConditionalPropertyData(property, schemaVersion, required, initialValue, loadDefaults) {
 	if ('discriminator' in property) {
 		const { discriminator } = property;
@@ -75,8 +85,8 @@ function getConditionalPropertyData(property, schemaVersion, required, initialVa
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaProperty | null} property
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").JSONSchemaProperty | null} property
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {boolean} required
  * @param {any} initialValue
  * @param {boolean} loadDefaults
@@ -86,6 +96,9 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 		return null;
 	}
 	if (loadDefaults && 'default' in property) {
+		if (property.default === null) {
+			return null;
+		}
 		return getPropertyData(property, schemaVersion, required, property.default, false);
 	}
 	if ('oneOf' in property) {
@@ -97,6 +110,9 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 			loadDefaults
 		);
 	}
+	if ('anyOf' in property) {
+		return getAnyOfPropertyData(property, schemaVersion, required, initialValue, loadDefaults);
+	}
 	if ('const' in property) {
 		return property.const;
 	}
@@ -106,13 +122,13 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 	switch (property.type) {
 		case 'object':
 			return getObjectPropertyData(
-				/** @type {import("../types/jschema.js").JSONSchemaObjectProperty}*/ (property),
+				/** @type {import("../types/jschema").JSONSchemaObjectProperty}*/ (property),
 				schemaVersion,
 				initialValue,
 				loadDefaults
 			);
 		case 'array': {
-			const arrayProperty = /** @type {import("../types/jschema.js").JSONSchemaArrayProperty}*/ (
+			const arrayProperty = /** @type {import("../types/jschema").JSONSchemaArrayProperty}*/ (
 				property
 			);
 			if (isTuple(arrayProperty)) {
@@ -139,8 +155,8 @@ export function getPropertyData(property, schemaVersion, required, initialValue,
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaArrayProperty} property
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").JSONSchemaArrayProperty} property
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {boolean} required
  * @param {any} initialValue
  * @param {boolean} loadDefaults
@@ -153,7 +169,7 @@ function getArrayPropertyData(property, schemaVersion, required, initialValue, l
 		}
 		initialValue = [];
 	}
-	const childProperty = /** @type {import("../types/jschema.js").JSONSchemaProperty} */ (
+	const childProperty = /** @type {import("../types/jschema").JSONSchemaProperty} */ (
 		property.items
 	);
 	let data = [];
@@ -172,8 +188,8 @@ function getArrayPropertyData(property, schemaVersion, required, initialValue, l
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaArrayProperty} property
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").JSONSchemaArrayProperty} property
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {boolean} required
  * @param {any} initialValue
  * @param {boolean} loadDefaults
@@ -184,6 +200,17 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 		return initialValue;
 	}
 	if (!initialValue) {
+		if (schemaVersion === 'fractal_schema_v1') {
+			return property.prefixItems.map((item, index) =>
+				getPropertyData(
+					getTupleChildProperty(item, schemaVersion, index),
+					schemaVersion,
+					false,
+					null,
+					loadDefaults
+				)
+			);
+		}
 		initialValue = [];
 	}
 	if (!required && initialValue.length === 0) {
@@ -219,10 +246,10 @@ function getTuplePropertyData(property, schemaVersion, required, initialValue, l
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaArrayProperty} tupleProperty
- * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+ * @param {import("../types/jschema").JSONSchemaArrayProperty} tupleProperty
+ * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  * @param {number} index
- * @returns {import("../types/jschema.js").JSONSchemaProperty|null}
+ * @returns {import("../types/jschema").JSONSchemaProperty|null}
  */
 function getTupleChildProperty(tupleProperty, schemaVersion, index) {
 	const items = schemaVersion === 'pydantic_v1' ? tupleProperty.items : tupleProperty.prefixItems;
