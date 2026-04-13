@@ -13,7 +13,7 @@ describe('oneOf properties', () => {
 						const: 'ProcessA',
 						title: 'Step',
 						type: 'string',
-						description: 'A literal to identify the process type.'
+						description: 'Description for step == ProcessA'
 					},
 					parameter1: {
 						title: 'Parameter1',
@@ -32,7 +32,7 @@ describe('oneOf properties', () => {
 						const: 'ProcessB',
 						title: 'Step',
 						type: 'string',
-						description: 'A literal to identify the process type.'
+						description: 'Description for step == ProcessB'
 					},
 					parameter1: {
 						title: 'Parameter1',
@@ -95,6 +95,10 @@ describe('oneOf properties', () => {
 			}
 		});
 
+		expect(screen.getAllByLabelText('Description')[1].getAttribute('data-bs-content')).eq(
+			'Description for step == ProcessB'
+		);
+
 		await user.selectOptions(select, 'ProcessA');
 		expect(onChange).toHaveBeenCalledWith({
 			proc_step: {
@@ -109,6 +113,10 @@ describe('oneOf properties', () => {
 				parameter1: null
 			}
 		});
+
+		expect(screen.getAllByLabelText('Description')[1].getAttribute('data-bs-content')).eq(
+			'Description for step == ProcessA'
+		);
 	});
 
 	it('Handle invalid initial discriminator value', async () => {

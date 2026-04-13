@@ -80,7 +80,9 @@
 						<label for="discriminator-{formElement.id}" class="fw-bold">
 							{formElement.discriminator.title || formElement.discriminator.key}
 						</label>
-						<PropertyDescription description={formElement.discriminator.description} />
+						<PropertyDescription
+							description={formElement.discriminator.descriptions[selectedIndex]}
+						/>
 					</div>
 					<div class="property-input ms-auto w-50 has-validation">
 						<select

@@ -94,7 +94,7 @@ export type ConditionalElementFields = BaseFormElementFields & {
 		key: string;
 		values: string[];
 		title: string;
-		description: string;
+		descriptions: string[];
 		value: string;
 	};
 	unexpectedChildren: FormElement[];

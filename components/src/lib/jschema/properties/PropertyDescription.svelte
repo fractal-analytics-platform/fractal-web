@@ -59,6 +59,7 @@
 			data-bs-target
 			data-bs-html={html}
 			data-bs-content={description}
+			aria-label="Description"
 		></span>
 	{/if}
 </span>

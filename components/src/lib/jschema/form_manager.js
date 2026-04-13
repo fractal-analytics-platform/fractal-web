@@ -547,7 +547,7 @@ export class FormManager {
 			const discriminator = {
 				key: propertyName,
 				title: '',
-				description: '',
+				descriptions: /** @type {string[]} */ ([]),
 				values: /** @type {string[]} */ ([]),
 				value: selectedValue[propertyName]
 			};
@@ -559,9 +559,7 @@ export class FormManager {
 						if (!discriminator.title && discrProp.title) {
 							discriminator.title = discrProp.title;
 						}
-						if (!discriminator.description && discrProp.description) {
-							discriminator.description = discrProp.description;
-						}
+						discriminator.descriptions.push(discrProp.description);
 					}
 				}
 			}
