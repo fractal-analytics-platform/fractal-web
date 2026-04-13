@@ -55,7 +55,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
-				taskgroupv2_id: 1
+				taskgroupv2_id: 1,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -72,7 +73,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
-				taskgroupv2_id: 2
+				taskgroupv2_id: 2,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -89,7 +91,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'non_parallel',
 				args_schema_non_parallel: newArgsSchema,
 				args_schema_parallel: null,
-				taskgroupv2_id: 3
+				taskgroupv2_id: 3,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -106,7 +109,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'compound',
 				args_schema_non_parallel: {},
 				args_schema_parallel: {},
-				taskgroupv2_id: 4
+				taskgroupv2_id: 4,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -123,7 +127,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: {},
-				taskgroupv2_id: 5
+				taskgroupv2_id: 5,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -140,7 +145,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: {},
-				taskgroupv2_id: 6
+				taskgroupv2_id: 6,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -157,7 +163,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: {},
-				taskgroupv2_id: 7
+				taskgroupv2_id: 7,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -174,7 +181,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'parallel',
 				args_schema_non_parallel: null,
 				args_schema_parallel: null,
-				taskgroupv2_id: 8
+				taskgroupv2_id: 8,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -201,7 +209,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 					additionalProperties: false
 				},
 				args_schema_parallel: null,
-				taskgroupv2_id: 9
+				taskgroupv2_id: 9,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -236,7 +245,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 					additionalProperties: false
 				},
 				args_schema_parallel: null,
-				taskgroupv2_id: 10
+				taskgroupv2_id: 10,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -253,7 +263,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'compound',
 				args_schema_non_parallel: {},
 				args_schema_parallel: {},
-				taskgroupv2_id: 11
+				taskgroupv2_id: 11,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -270,7 +281,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'converter_compound',
 				args_schema_non_parallel: {},
 				args_schema_parallel: {},
-				taskgroupv2_id: 12
+				taskgroupv2_id: 12,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -287,7 +299,8 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
-				taskgroupv2_id: 13
+				taskgroupv2_id: 13,
+				args_schema_version: 'pydantic_v2'
 			}
 		],
 		active: true
@@ -304,7 +317,110 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 				type: 'converter_non_parallel',
 				args_schema_non_parallel: {},
 				args_schema_parallel: null,
-				taskgroupv2_id: 14
+				taskgroupv2_id: 14,
+				args_schema_version: 'pydantic_v2'
+			}
+		],
+		active: true
+	},
+	{
+		id: 15,
+		pkg_name: 'test_schema_version_change',
+		version: '0.0.1',
+		task_list: [
+			{
+				id: 15,
+				name: 'test_schema_version_change',
+				version: '0.0.1',
+				type: 'non_parallel',
+				args_schema_non_parallel: {
+					additionalProperties: false,
+					properties: {
+						zarr_url: { type: 'string' }
+					},
+					required: ['zarr_url'],
+					type: 'object'
+				},
+				args_schema_parallel: null,
+				taskgroupv2_id: 15,
+				args_schema_version: 'pydantic_v2'
+			}
+		],
+		active: true
+	},
+	{
+		id: 16,
+		pkg_name: 'test_schema_version_change',
+		version: '0.0.2',
+		task_list: [
+			{
+				id: 16,
+				name: 'test_schema_version_change',
+				version: '0.0.2',
+				type: 'non_parallel',
+				args_schema_non_parallel: {
+					additionalProperties: false,
+					properties: {
+						zarr_url: { type: 'string' }
+					},
+					required: ['zarr_url'],
+					type: 'object'
+				},
+				args_schema_parallel: null,
+				taskgroupv2_id: 16,
+				args_schema_version: 'fractal_schema_v1'
+			}
+		],
+		active: true
+	},
+	{
+		id: 17,
+		pkg_name: 'test_schema_version_change_invalid_args',
+		version: '0.0.1',
+		task_list: [
+			{
+				id: 17,
+				name: 'test_schema_version_change_invalid_args',
+				version: '0.0.1',
+				type: 'non_parallel',
+				args_schema_non_parallel: {
+					additionalProperties: false,
+					properties: {
+						zarr_url: { type: 'string' }
+					},
+					required: ['zarr_url'],
+					type: 'object'
+				},
+				args_schema_parallel: null,
+				taskgroupv2_id: 17,
+				args_schema_version: 'pydantic_v2'
+			}
+		],
+		active: true
+	},
+	{
+		id: 18,
+		pkg_name: 'test_schema_version_change_invalid_args',
+		version: '0.0.2',
+		task_list: [
+			{
+				id: 18,
+				name: 'test_schema_version_change_invalid_args',
+				version: '0.0.2',
+				type: 'non_parallel',
+				args_schema_non_parallel: {
+					additionalProperties: false,
+					properties: {
+						zarr_url: { type: 'string' },
+						foo: { type: 'number', default: 42 },
+						bar: { type: 'string' }
+					},
+					required: ['zarr_url'],
+					type: 'object'
+				},
+				args_schema_parallel: null,
+				taskgroupv2_id: 18,
+				args_schema_version: 'fractal_schema_v1'
 			}
 		],
 		active: true
@@ -486,6 +602,87 @@ describe('VersionUpdate', () => {
 			expect.objectContaining({
 				body: JSON.stringify({
 					args_non_parallel: {},
+					args_parallel: null
+				})
+			})
+		);
+	});
+
+	it('update task from pydantic_v2 to fractal_schema_v1 (valid args)', async () => {
+		const user = userEvent.setup();
+		const task = getTask('test_schema_version_change', '0.0.1');
+		const newTask = getTask('test_schema_version_change', '0.0.2');
+		mockTaskRequest(newTask);
+		const versions = /** @type {string[]} */ (
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					...{
+						args_non_parallel: {}
+					}
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
+		);
+		expect(versions[0]).toBe('0.0.2');
+
+		await user.selectOptions(screen.getByRole('combobox'), '0.0.2');
+
+		expect(screen.queryByText(/The old arguments are not compatible with the new schema/)).null;
+
+		await user.click(screen.getByRole('button', { name: 'Update' }));
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {},
+					args_parallel: null
+				})
+			})
+		);
+	});
+
+	it('update task from pydantic_v2 to fractal_schema_v1 (invalid args)', async () => {
+		const user = userEvent.setup();
+		const task = getTask('test_schema_version_change_invalid_args', '0.0.1');
+		const newTask = getTask('test_schema_version_change_invalid_args', '0.0.2');
+		mockTaskRequest(newTask);
+		const versions = /** @type {string[]} */ (
+			await checkVersions(
+				task,
+				1,
+				{
+					...getMockedWorkflowTask(),
+					...{
+						args_non_parallel: {}
+					}
+				},
+				[{ task_id: newTask.id, version: newTask.version }]
+			)
+		);
+		expect(versions[0]).toBe('0.0.2');
+
+		await user.selectOptions(screen.getByRole('combobox'), '0.0.2');
+
+		expect(
+			screen.getByText(/The old arguments are not compatible with the new schema/)
+		).toBeVisible();
+
+		await user.click(screen.getByRole('button', { name: 'Update' }));
+
+		expect(fetch).toHaveBeenNthCalledWith(
+			2,
+			expect.stringContaining('/wftask/replace-task'),
+			expect.objectContaining({
+				body: JSON.stringify({
+					args_non_parallel: {
+						foo: 42,
+						bar: null
+					},
 					args_parallel: null
 				})
 			})

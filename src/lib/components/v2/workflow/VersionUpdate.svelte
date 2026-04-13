@@ -6,11 +6,13 @@
 	} from '$lib/common/errors';
 	import { page } from '$app/state';
 	import {
+		getPropertiesToIgnore,
 		getUpdatedData,
 		normalizePayload,
 		SchemaValidator,
 		stripDiscriminator
 	} from 'fractal-components';
+	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
 
 	/**
 	 * @typedef {Object} Props
@@ -59,14 +61,22 @@
 					isDataValid(
 						updateCandidate.args_schema_non_parallel,
 						updateCandidate.args_schema_version,
-						workflowTask.args_non_parallel
+						getUpdatedData(
+							updateCandidate.args_schema_non_parallel,
+							workflowTask.args_non_parallel,
+							updateCandidate.args_schema_version
+						)
 					);
 				const parallelValid =
 					!updateCandidate.args_schema_parallel ||
 					isDataValid(
 						updateCandidate.args_schema_parallel,
 						updateCandidate.args_schema_version,
-						workflowTask.args_parallel
+						getUpdatedData(
+							updateCandidate.args_schema_parallel,
+							workflowTask.args_parallel,
+							updateCandidate.args_schema_version
+						)
 					);
 				dataValid = nonParallelValid && parallelValid;
 			}
@@ -86,7 +96,11 @@
 	function isDataValid(schema, version, data) {
 		if (schema) {
 			const validator = new SchemaValidator(version, true);
-			const isSchemaValid = validator.loadSchema(stripDiscriminator(schema));
+			const adaptedSchema = adaptJsonSchema(
+				schema,
+				getPropertiesToIgnore(version === 'pydantic_v1')
+			);
+			const isSchemaValid = validator.loadSchema(stripDiscriminator(adaptedSchema));
 			if (!isSchemaValid) {
 				errorAlert = displayStandardErrorAlert('Invalid JSON Schema', 'versionUpdateError');
 			}

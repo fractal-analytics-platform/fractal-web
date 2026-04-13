@@ -12,6 +12,9 @@ import { getPropertiesToIgnore } from './property_utils';
  * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
  */
 export function getUpdatedData(newJschema, oldData, schemaVersion) {
+	if (oldData === null || oldData === undefined) {
+		oldData = {};
+	}
 	const propertiesToIgnore = getPropertiesToIgnore(schemaVersion === 'pydantic_v1');
 	const newAdapted = adaptJsonSchema(newJschema, propertiesToIgnore);
 	const newDefault = getJsonSchemaData(newAdapted, schemaVersion);
