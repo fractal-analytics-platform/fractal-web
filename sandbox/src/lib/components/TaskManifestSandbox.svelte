@@ -220,6 +220,9 @@
 					{/each}
 				</select>
 			</div>
+			<div class="mt-2">
+				Args Schema version: <code>{schemaVersion}</code>
+			</div>
 		{/if}
 	</div>
 </div>
