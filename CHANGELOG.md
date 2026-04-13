@@ -1,9 +1,12 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.26.0
 
+- Add support for `profile.pixi_cache_dir` (\#1061).
+- Add new admin page for projects (\#1052).
 - Add support for conditionals in JSON Schemas (`dependentRequired`, `if`/`then`/`else`) (\#1050).
 - Apply prettier and fix static code analysis CI configuration (\#1051).
+- Replace example in single-schema sandbbox page with cellpose-sam task (\#1067).
 
 # 1.25.1
 

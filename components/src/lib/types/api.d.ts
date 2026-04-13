@@ -47,6 +47,10 @@ export type ProjectV2 = {
 	timestamp_created: string;
 };
 
+export type ProjectSuperuser = ProjectV2 & {
+	user_email: string;
+};
+
 export type ProjectGuest = {
 	email: string;
 	is_verified: boolean;
@@ -439,4 +443,5 @@ export type Profile = {
 	ssh_key_path: string | null;
 	jobs_remote_dir: string | null;
 	tasks_remote_dir: string | null;
+	pixi_cache_dir: string | null;
 };

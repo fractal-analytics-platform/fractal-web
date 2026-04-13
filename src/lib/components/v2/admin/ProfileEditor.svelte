@@ -32,7 +32,7 @@
 
 	const profileFormErrorHandler = new FormErrorHandler(
 		'genericProfileError',
-		['name', 'username', 'ssh_key_path', 'jobs_remote_dir', 'tasks_remote_dir'],
+		['name', 'username', 'ssh_key_path', 'jobs_remote_dir', 'tasks_remote_dir', 'pixi_cache_dir'],
 		['body', resource.type]
 	);
 
@@ -195,6 +195,25 @@
 							required
 						/>
 						<span class="invalid-feedback">{$profileValidationErrors['tasks_remote_dir']}</span>
+					</div>
+				</div>
+			{/if}
+			{#if resource.type === 'slurm_ssh'}
+				<div class="row mb-3 has-validation">
+					<label for="pixi_cache_dir" class="col-sm-3 col-form-label text-end">
+						<strong>Pixi cache dir</strong>
+					</label>
+					<div class="col-sm-9">
+						<input
+							autocomplete="off"
+							type="text"
+							class="form-control"
+							id="pixi_cache_dir"
+							bind:value={editableProfile.pixi_cache_dir}
+							class:is-invalid={profileFormSubmitted && $profileValidationErrors['pixi_cache_dir']}
+							required
+						/>
+						<span class="invalid-feedback">{$profileValidationErrors['pixi_cache_dir']}</span>
 					</div>
 				</div>
 			{/if}
