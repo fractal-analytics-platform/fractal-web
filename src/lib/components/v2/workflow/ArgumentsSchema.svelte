@@ -142,7 +142,11 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const options = { deepCopy: true, stripEmptyElements: true, stringify: false };
+		const options = {
+			deepCopy: true,
+			stripEmptyElements: workflowTask.task.args_schema_version !== 'fractal_schema_v1',
+			stringify: false
+		};
 
 		const response = await fetch(
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
