@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.27.0
 
 - Add support for new `fractal_schema_v1` JSON schemas (\#1054).
 
