@@ -1,23 +1,18 @@
 <script>
-	import {
-		deepCopy,
-		getPropertiesToIgnore,
-		JSchema,
-		SchemaValidator,
-		stripNullAndEmptyObjectsAndArrays
-	} from 'fractal-components';
+	import { deepCopy, getPropertiesToIgnore, JSchema, SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { adaptJsonSchema, stripDiscriminator } from 'fractal-components/jschema/jschema_adapter';
 	import { tick } from 'svelte';
 	import DragAndDropUploader from './DragAndDropUploader.svelte';
 	import example from './example-task-manifest.json';
+	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
 
 	let manifest = $state();
 	/** @type {string[]} */
 	let tasks = $state([]);
 	let selectedTaskName = $state('');
 	let selectedSchema = $state();
-	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	/** @type {import("fractal-components/types/jschema").ArgsSchemaVersion} */
 	let schemaVersion = $state('pydantic_v2');
 	/** @type {'parallel'|'non_parallel'} */
 	let selectedSchemaType = $state('non_parallel');
@@ -56,10 +51,7 @@
 		} catch {
 			throw new Error("File doesn't contain valid JSON");
 		}
-		if (
-			manifestData.args_schema_version !== 'pydantic_v2' &&
-			manifestData.args_schema_version !== 'pydantic_v1'
-		) {
+		if (!isValidArgsSchemaVersion(manifestData.args_schema_version)) {
 			throw new Error('Unsupported manifest args schema version');
 		}
 		schemaVersion = manifestData.args_schema_version;
@@ -93,6 +85,7 @@
 	 */
 	function loadManifest(manifestData) {
 		manifest = manifestData;
+		schemaVersion = manifestData.args_schema_version;
 		selectedSchema = null;
 		selectedTask = null;
 		selectedTaskName = '';
@@ -178,7 +171,7 @@
 			return;
 		}
 		const newDataCopy = deepCopy(newData);
-		const updatedOldData = JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
+		const updatedOldData = JSON.stringify(newDataCopy, null, 2);
 		// Update the data only if something is changed, to avoid triggering uneccessary events
 		if (updatedOldData !== jsonDataString) {
 			jsonDataString = updatedOldData;
@@ -226,6 +219,9 @@
 						<option>{task}</option>
 					{/each}
 				</select>
+			</div>
+			<div class="mt-2">
+				Args Schema version: <code>{schemaVersion}</code>
 			</div>
 		{/if}
 	</div>

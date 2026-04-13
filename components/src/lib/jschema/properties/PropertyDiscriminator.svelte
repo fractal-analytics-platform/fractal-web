@@ -16,10 +16,11 @@
 	 * @property {boolean} [editable]
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 * @property {null|(() => void)} [remove] function passed by the parent that removes this element
+	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable = true, reset = null, remove = null } = $props();
+	let { formElement, editable = true, reset = null, remove = null, init = null } = $props();
 </script>
 
 {#if formElement.type === 'string'}
@@ -31,13 +32,13 @@
 {:else if formElement.type === 'enum'}
 	<EnumProperty {formElement} {editable} {remove} />
 {:else if formElement.type === 'object'}
-	<CollapsibleProperty {formElement} {reset} {remove} {editable}>
+	<CollapsibleProperty {formElement} {reset} {remove} {editable} {init}>
 		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
-	<ArrayProperty {formElement} {editable} {reset} {remove} />
+	<ArrayProperty {formElement} {editable} {reset} {remove} {init} />
 {:else if formElement.type === 'tuple'}
-	<TupleProperty {formElement} {editable} {reset} {remove} />
+	<TupleProperty {formElement} {editable} {reset} {remove} {init} />
 {:else if formElement.type === 'conditional'}
 	<ConditionalProperty {formElement} {editable} {reset} {remove} />
 {:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}

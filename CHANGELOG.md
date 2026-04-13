@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Add support for new `fractal_schema_v1` JSON schemas (\#1054).
+
 # 1.26.0
 
 - Add support for `profile.pixi_cache_dir` (\#1061).

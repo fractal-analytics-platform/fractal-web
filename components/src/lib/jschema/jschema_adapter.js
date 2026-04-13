@@ -4,9 +4,9 @@ import { isDiscriminator } from './property_utils.js';
 /**
  * Creates a simpler but still equivalent JSON Schema. Removes properties to ignore,
  * resolve and replace $ref values and merge the allOf definitions
- * @param {import("../types/jschema.js").JSONSchema} originalJsonSchema
+ * @param {import("../types/jschema").JSONSchema} originalJsonSchema
  * @param {string[]} propertiesToIgnore
- * @returns {import("../types/jschema.js").JSONSchema}
+ * @returns {import("../types/jschema").JSONSchema}
  */
 export function adaptJsonSchema(originalJsonSchema, propertiesToIgnore = []) {
 	let adaptedJsonSchema = stripIgnoredProperties(originalJsonSchema, propertiesToIgnore);
@@ -17,9 +17,9 @@ export function adaptJsonSchema(originalJsonSchema, propertiesToIgnore = []) {
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchema} originalJsonSchema
+ * @param {import("../types/jschema").JSONSchema} originalJsonSchema
  * @param {string[]} propertiesToIgnore
- * @returns {import("../types/jschema.js").JSONSchema}
+ * @returns {import("../types/jschema").JSONSchema}
  */
 export function stripIgnoredProperties(originalJsonSchema, propertiesToIgnore = []) {
 	const adaptedSchema = deepCopy(originalJsonSchema);
@@ -37,7 +37,7 @@ export function stripIgnoredProperties(originalJsonSchema, propertiesToIgnore = 
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaProperty} jschema
+ * @param {import("../types/jschema").JSONSchemaProperty} jschema
  * @param {any} parentObject
  */
 function replaceReferences(jschema, parentObject) {
@@ -66,7 +66,7 @@ function replaceReferences(jschema, parentObject) {
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchemaProperty} jschema
+ * @param {import("../types/jschema").JSONSchemaProperty} jschema
  * @param {any} parentObject
  */
 function adaptDiscriminators(jschema, parentObject) {
@@ -100,9 +100,9 @@ function adaptDiscriminators(jschema, parentObject) {
 
 /**
  * Resolve a reference ($ref) to an internal schema definition
- * @param {import("../types/jschema.js").JSONSchemaProperty} jsonSchema
+ * @param {import("../types/jschema").JSONSchemaProperty} jsonSchema
  * @param {string} refName
- * @returns {import("../types/jschema.js").JSONSchemaProperty}
+ * @returns {import("../types/jschema").JSONSchemaProperty}
  */
 function resolveRef(jsonSchema, refName) {
 	if (!refName.startsWith('#/')) {
@@ -182,7 +182,7 @@ function mergeProperty(parentObject, key, value) {
 }
 
 /**
- * @param {import("../types/jschema.js").JSONSchema} jschema
+ * @param {import("../types/jschema").JSONSchema} jschema
  * @param {any} parentObject
  * @returns {object}
  */

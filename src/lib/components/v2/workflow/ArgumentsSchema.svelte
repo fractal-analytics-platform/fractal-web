@@ -15,8 +15,7 @@
 		isParallelType
 	} from 'fractal-components';
 	import { deepCopy, normalizePayload } from 'fractal-components/common/utils';
-
-	const SUPPORTED_SCHEMA_VERSIONS = ['pydantic_v1', 'pydantic_v2'];
+	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
 
 	/**
 	 * @typedef {Object} Props
@@ -143,7 +142,11 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const options = { deepCopy: true, stripEmptyElements: true, stringify: false };
+		const options = {
+			deepCopy: true,
+			stripEmptyElements: workflowTask.task.args_schema_version !== 'fractal_schema_v1',
+			stringify: false
+		};
 
 		const response = await fetch(
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
@@ -172,20 +175,13 @@
 		savingChanges = false;
 	}
 
-	/**
-	 * @param {string} argsSchemaVersion
-	 */
-	function argsSchemaVersionValid(argsSchemaVersion) {
-		return argsSchemaVersion && SUPPORTED_SCHEMA_VERSIONS.includes(argsSchemaVersion);
-	}
-
 	let unsavedChanges = $derived(
 		unsavedChangesParallel ||
 			unsavedChangesNonParallel ||
 			unsavedChangesFormBuilderParallel ||
 			unsavedChangesFormBuilderNonParallel
 	);
-	let isSchemaValid = $derived(argsSchemaVersionValid(workflowTask.task.args_schema_version));
+	let isSchemaValid = $derived(isValidArgsSchemaVersion(workflowTask.task.args_schema_version));
 	let schemaVersion = $derived(workflowTask.task.args_schema_version);
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
 

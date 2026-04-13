@@ -33,7 +33,7 @@ export class FormManager {
 	/**
 	 * @param {import("../types/jschema").JSONSchema} originalJsonSchema
 	 * @param {(data: any, valid: boolean) => void} onchange
-	 * @param {'pydantic_v1'|'pydantic_v2'} schemaVersion
+	 * @param {import("../types/jschema").ArgsSchemaVersion} schemaVersion
 	 * @param {string[]} propertiesToIgnore
 	 * @param {any} initialValue
 	 */
@@ -44,7 +44,7 @@ export class FormManager {
 		propertiesToIgnore = [],
 		initialValue = undefined
 	) {
-		/** @type {'pydantic_v1'|'pydantic_v2'} */
+		/** @type {import("../types/jschema").ArgsSchemaVersion} */
 		this.schemaVersion = schemaVersion;
 		this.jsonSchema = adaptJsonSchema(originalJsonSchema, propertiesToIgnore);
 
@@ -98,6 +98,23 @@ export class FormManager {
 		if ('enum' in property) {
 			return this.createEnumElement(params);
 		}
+		if ('anyOf' in property) {
+			const { anyOf } = property;
+			if (Array.isArray(anyOf) && anyOf.length === 2 && anyOf[1].type === 'null') {
+				const newDef = { ...deepCopy(params.property), ...deepCopy(anyOf[0]) };
+				delete newDef['anyOf'];
+				params.property = newDef;
+				params.nullable = true;
+				if (property.title) {
+					newDef.title = property.title;
+				}
+				if (property.description) {
+					newDef.description = property.description;
+				}
+				params.schemaPath = `${params.schemaPath}/anyOf/0`;
+				return this.createFormElement({ ...params });
+			}
+		}
 		if ('oneOf' in property) {
 			const oneOfProperty = /** @type {import("../types/jschema").JSONSchemaOneOfProperty} */ (
 				property
@@ -132,7 +149,7 @@ export class FormManager {
 				const numberProperty = /** @type {import("../types/jschema").JSONSchemaNumberProperty} */ (
 					property
 				);
-				if (params.value && typeof params.value !== 'number') {
+				if (params.value && typeof params.value !== 'number' && typeof params.value !== 'string') {
 					return this.createInvalidElement({ ...params, property: numberProperty });
 				}
 				return this.createNumberElement({ ...params, property: numberProperty });
@@ -248,58 +265,65 @@ export class FormManager {
 	}
 
 	/**
-	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaObjectProperty, any[]>} params
+	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaObjectProperty, any>} params
 	 */
 	createObjectElement(params) {
 		const { path, schemaPath, property, value, parentProperty } = params;
 		const fields = this.getBaseElementFields(params);
 		const requiredChildren = property.required || [];
 		const children = [];
-		const properties = Object.entries(getAllObjectProperties(property, value));
-		/** @type {string[]} */
-		const validKeys = [];
-		for (const [childKey, childProperty] of properties) {
-			validKeys.push(childKey);
-			const childRequired = requiredChildren.includes(childKey);
-			const removable = isRemovableChildProperty(property, childKey);
-			const childElement = this.createFormElement({
-				key: childKey,
-				path: `${path}/${childKey}`,
-				property: childProperty,
-				required: childRequired,
-				removable,
-				value: value[childKey],
-				parentProperty: property,
-				titleType: removable ? 'key' : 'prefer_title',
-				schemaPath: `${schemaPath}/properties/${childKey}`
-			});
-			children.push(childElement);
-		}
 
-		const discriminatorKey = this.getDiscriminatorKey(parentProperty);
-		if (discriminatorKey) {
-			// Discriminator property is removed from the child and handled separatedly
-			// Adding it to the valid keys to prevent the value to being treated as an unexpected element
-			validKeys.push(discriminatorKey);
-		}
+		if (value !== null) {
+			const properties = Object.entries(getAllObjectProperties(property, value));
+			/** @type {string[]} */
+			const validKeys = [];
+			for (const [childKey, childProperty] of properties) {
+				validKeys.push(childKey);
+				const childRequired = requiredChildren.includes(childKey);
+				const removable = isRemovableChildProperty(property, childKey);
+				const childElement = this.createFormElement({
+					key: childKey,
+					path: `${path}/${childKey}`,
+					property: childProperty,
+					required: childRequired,
+					removable,
+					value:
+						this.schemaVersion === 'fractal_schema_v1'
+							? undefinedToNull(value[childKey])
+							: value[childKey],
+					parentProperty: property,
+					titleType: removable ? 'key' : 'prefer_title',
+					schemaPath: `${schemaPath}/properties/${childKey}`
+				});
+				children.push(childElement);
+			}
 
-		for (const [k, v] of Object.entries(value)) {
-			if (!validKeys.includes(k)) {
-				children.push(
-					this.createUnexpectedElement({
-						key: k,
-						path: `${path}/${k}`,
-						parentProperty: property,
-						value: v,
-						titleType: 'key'
-					})
-				);
+			const discriminatorKey = this.getDiscriminatorKey(parentProperty);
+			if (discriminatorKey) {
+				// Discriminator property is removed from the child and handled separatedly
+				// Adding it to the valid keys to prevent the value to being treated as an unexpected element
+				validKeys.push(discriminatorKey);
+			}
+
+			for (const [k, v] of Object.entries(value)) {
+				if (!validKeys.includes(k)) {
+					children.push(
+						this.createUnexpectedElement({
+							key: k,
+							path: `${path}/${k}`,
+							parentProperty: property,
+							value: v,
+							titleType: 'key'
+						})
+					);
+				}
 			}
 		}
 		const element = new ObjectFormElement({
 			...fields,
 			children,
-			additionalProperties: property.additionalProperties || false
+			additionalProperties: property.additionalProperties || false,
+			isNull: value === null
 		});
 		return element;
 	}
@@ -329,7 +353,8 @@ export class FormManager {
 			children,
 			items,
 			minItems: property.minItems,
-			maxItems: property.maxItems
+			maxItems: property.maxItems,
+			isNull: value === null
 		});
 		return element;
 	}
@@ -338,26 +363,30 @@ export class FormManager {
 	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]>} params
 	 */
 	createTupleElement(params) {
-		const { property, required, value } = params;
+		params = {
+			...params,
+			required:
+				this.schemaVersion === 'fractal_schema_v1' ? params.nullable !== true : params.required
+		};
+		const { property, value, required } = params;
 		const fields = this.getBaseElementFields(params);
-		const size = /** @type {number} */ (property.minItems);
+
 		const items = this.schemaVersion === 'pydantic_v1' ? property.items : property.prefixItems;
 		const element = new TupleFormElement({
 			...fields,
 			type: 'tuple',
 			items,
-			size,
 			children:
-				required || (Array.isArray(value) && value.length > 0)
+				(required || (Array.isArray(value) && value.length > 0)) && value !== null
 					? this.createTupleChildren({
 							...params,
 							items,
-							size,
 							value,
 							parentProperty: property,
 							titleType: 'title_only'
 						})
-					: []
+					: [],
+			isNull: value === null
 		});
 		return element;
 	}
@@ -365,11 +394,10 @@ export class FormManager {
 	/**
 	 * @param {Omit<import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]> & {
 	 * items: import("../types/jschema").JSONSchemaProperty|import("../types/jschema").JSONSchemaProperty[]
-	 * size: number
 	 * }, 'required' | 'removable' | 'key' | 'property'>} params
 	 */
 	createTupleChildren(params) {
-		const { path, items, size, value } = params;
+		const { path, items, parentProperty, value } = params;
 		const schemaPath = `${params.schemaPath}/${this.schemaVersion === 'pydantic_v1' ? 'items' : 'prefixItems'}`;
 		const childParams = {
 			...params,
@@ -389,6 +417,7 @@ export class FormManager {
 				})
 			);
 		} else {
+			const size = /** @type {number} */ (parentProperty.minItems);
 			children = Array(size).map((_, index) =>
 				this.createFormElement({
 					...childParams,
@@ -524,7 +553,7 @@ export class FormManager {
 			const discriminator = {
 				key: propertyName,
 				title: '',
-				description: '',
+				descriptions: /** @type {string[]} */ ([]),
 				values: /** @type {string[]} */ ([]),
 				value: selectedValue[propertyName]
 			};
@@ -536,9 +565,7 @@ export class FormManager {
 						if (!discriminator.title && discrProp.title) {
 							discriminator.title = discrProp.title;
 						}
-						if (!discriminator.description && discrProp.description) {
-							discriminator.description = discrProp.description;
-						}
+						discriminator.descriptions.push(discrProp.description);
 					}
 				}
 			}
@@ -596,7 +623,7 @@ export class FormManager {
 	 * @returns {import("../types/form").BaseFormElementFields}
 	 */
 	getBaseElementFields(params) {
-		const { key, property, titleType } = params;
+		const { key, property, titleType, nullable } = params;
 		return {
 			...params,
 			manager: this,
@@ -605,7 +632,8 @@ export class FormManager {
 			title: this.getElementTitle(property, key, titleType),
 			description: property.description || '',
 			property: deepCopy(property),
-			notifyChange: this.notifyChange
+			notifyChange: this.notifyChange,
+			nullable: nullable || false
 		};
 	}
 
@@ -659,7 +687,7 @@ export class FormManager {
 		const data = {};
 		for (const child of element.children) {
 			let childData = this.getDataFromElement(child);
-			const value =
+			let value =
 				childData == null
 					? null
 					: typeof childData === 'object' &&
@@ -667,7 +695,13 @@ export class FormManager {
 						  typeof childData === 'function'
 						? get(childData)
 						: childData;
+			if (typeof value === 'string' && value.trim() === '') {
+				value = null;
+			}
 			data[child.key] = value;
+		}
+		if (this.schemaVersion === 'fractal_schema_v1' && element.nullable && get(element.isNull)) {
+			return null;
 		}
 		return data;
 	}
@@ -699,8 +733,12 @@ export class FormManager {
 
 	validate() {
 		this.clearErrors(this.root);
-		const strippedNullData = stripNullAndEmptyObjectsAndArrays(this.getFormData());
-		const valid = this.validator.isValid(strippedNullData);
+
+		const valid =
+			this.schemaVersion === 'fractal_schema_v1'
+				? this.validator.isValid(this.getFormData())
+				: this.validator.isValid(stripNullAndEmptyObjectsAndArrays(this.getFormData()));
+
 		/**
 		 * Errors that have not been set to any form element
 		 * @type {string[]}
@@ -750,7 +788,7 @@ export class FormManager {
 					const value = get(element.value);
 					const numericValue = parseFloat(value);
 					if (isNaN(numericValue)) {
-						if (value === null || (typeof value === 'string' && value.trim() === '')) {
+						if (typeof value === 'string' && value.trim() === '') {
 							return null;
 						} else {
 							return value;
@@ -760,7 +798,11 @@ export class FormManager {
 					}
 				}
 				if (element instanceof ValueFormElement) {
-					return get(element.value);
+					const value = get(element.value);
+					if (typeof value === 'string' && value.trim() === '') {
+						return null;
+					}
+					return value;
 				}
 				throw new Error(`Unsupported type ${element.type}`);
 		}
@@ -770,6 +812,9 @@ export class FormManager {
 	 * @param {ArrayFormElement|TupleFormElement} arrayElement
 	 */
 	getDataFromArrayElement(arrayElement) {
+		if (arrayElement.nullable && get(arrayElement.isNull)) {
+			return null;
+		}
 		return arrayElement.children.map((c) => this.getDataFromElement(c));
 	}
 }

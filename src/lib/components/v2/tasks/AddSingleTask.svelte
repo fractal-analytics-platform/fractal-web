@@ -32,7 +32,7 @@
 	let version = $state('');
 	let docs_info = $state('');
 	let docs_link = $state('');
-	/** @type {'pydantic_v1'|'pydantic_v2'} */
+	/** @type {import("fractal-components/types/jschema").ArgsSchemaVersion} */
 	let args_schema_version = $state('pydantic_v2');
 	/** @type {import('fractal-components/types/api').TaskV2Type} */
 	let taskType = $state('non_parallel');
@@ -593,6 +593,7 @@
 					>
 						<option>pydantic_v1</option>
 						<option>pydantic_v2</option>
+						<option>fractal_schema_v1</option>
 					</select>
 					<span class="invalid-feedback">{$validationErrors['args_schema_version']}</span>
 				</div>

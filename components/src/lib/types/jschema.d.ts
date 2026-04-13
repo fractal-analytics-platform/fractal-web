@@ -1,3 +1,5 @@
+export type ArgsSchemaVersion = 'pydantic_v1' | 'pydantic_v2' | 'fractal_schema_v1';
+
 export type BaseJSONSchemaProperty<T> = {
 	title?: string;
 	description?: string;

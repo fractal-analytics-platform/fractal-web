@@ -417,4 +417,153 @@ describe('JSchema form errors', () => {
 			)
 		).deep.eq(['required property']);
 	});
+
+	it('should ignore null enum errors', () => {
+		const formManager = new FormManager(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						type: 'string',
+						enum: ['option1', 'option2']
+					}
+				},
+				required: ['foo']
+			},
+			vi.fn(),
+			'fractal_schema_v1'
+		);
+		const errors = get(formManager.root.children[0].errors);
+		expect(errors).deep.eq(['must be equal to one of the allowed values']);
+	});
+
+	it('handle invalid field in anyOf when the same model is referenced in a oneOf property', () => {
+		const formManager = new FormManager(
+			{
+				$defs: {
+					InternalModel3: {
+						properties: {
+							label: {
+								const: 'label3',
+								default: 'label3',
+								type: 'string'
+							},
+							field: {
+								type: 'boolean'
+							}
+						},
+						required: ['field'],
+						type: 'object'
+					},
+					InternalModel4: {
+						properties: {
+							label: {
+								enum: ['label4A', 'label4B'],
+								default: 'label4A',
+								type: 'string'
+							},
+							field: {
+								default: 1,
+								type: 'integer'
+							}
+						},
+						type: 'object'
+					}
+				},
+				type: 'object',
+				properties: {
+					field_3: {
+						anyOf: [
+							{
+								items: {
+									discriminator: {
+										mapping: {
+											label3: '#/$defs/InternalModel3',
+											label4: '#/$defs/InternalModel4'
+										},
+										propertyName: 'label'
+									},
+									oneOf: [
+										{
+											$ref: '#/$defs/InternalModel3'
+										},
+										{
+											$ref: '#/$defs/InternalModel4'
+										}
+									]
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					},
+					model_or_none: {
+						anyOf: [
+							{
+								$ref: '#/$defs/InternalModel4'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				},
+				required: ['model_or_none']
+			},
+			vi.fn(),
+			'fractal_schema_v1',
+			[],
+			{
+				field_3: [
+					{
+						field: true,
+						label: 'label3'
+					}
+				],
+				model_or_none: {
+					label: 'INVALID',
+					field: 1
+				}
+			}
+		);
+		expect(formManager.getFormData()).deep.eq({
+			field_3: [{ label: 'label3', field: true }],
+			model_or_none: { label: 'INVALID', field: 1 }
+		});
+		const errors = get(formManager.root.children[1].children[0].errors);
+		expect(errors).deep.eq(['must be equal to one of the allowed values']);
+	});
+
+	it('handle errors of properties having names starting with the same prefix', () => {
+		const formManager = new FormManager(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						items: { type: 'integer' },
+						type: 'array'
+					},
+					foo_2: {
+						items: { type: 'integer' },
+						type: 'array'
+					}
+				}
+			},
+			vi.fn(),
+			'fractal_schema_v1',
+			[],
+			{
+				foo: [],
+				foo_2: ['xxx']
+			}
+		);
+		expect(get(formManager.root.children[0].hasErrors)).eq(false);
+		expect(get(formManager.root.children[0].errors)).deep.eq([]);
+		expect(get(formManager.root.children[1].hasErrors)).eq(true);
+		expect(get(formManager.root.children[1].children[0].errors)).deep.eq(['must be integer']);
+	});
 });

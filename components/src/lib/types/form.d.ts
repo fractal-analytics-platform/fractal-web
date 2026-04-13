@@ -44,6 +44,7 @@ export type BaseFormElementFields = {
 	description: string;
 	required: boolean;
 	removable: boolean;
+	nullable: boolean;
 	property: JSONSchemaProperty;
 	titleType: TitleType;
 	notifyChange: () => void;
@@ -69,6 +70,7 @@ export type EnumFormElementFields = ValueFormElementFields<any> & {
 export type ObjectFormElementFields = BaseFormElementFields & {
 	children: FormElement[];
 	additionalProperties: JSONSchemaProperty | false;
+	isNull: boolean;
 };
 
 export type ArrayFormElementFields = BaseFormElementFields & {
@@ -76,12 +78,13 @@ export type ArrayFormElementFields = BaseFormElementFields & {
 	items: JSONSchemaProperty;
 	minItems?: number;
 	maxItems?: number;
+	isNull: boolean;
 };
 
 export type TupleFormElementFields = BaseFormElementFields & {
 	children: FormElement[];
 	items: JSONSchemaProperty | JSONSchemaProperty[];
-	size: number;
+	isNull: boolean;
 };
 
 export type ConditionalElementFields = BaseFormElementFields & {
@@ -91,7 +94,7 @@ export type ConditionalElementFields = BaseFormElementFields & {
 		key: string;
 		values: string[];
 		title: string;
-		description: string;
+		descriptions: string[];
 		value: string;
 	};
 	unexpectedChildren: FormElement[];
@@ -123,6 +126,7 @@ export type FormElementParams<T extends JSONSchemaProperty, V> = {
 	parentProperty: JSONSchemaProperty | undefined;
 	required: boolean;
 	removable: boolean;
+	nullable?: boolean;
 	titleType: TitleType;
 	value: V;
 };

@@ -3,7 +3,7 @@ import { screen } from '@testing-library/svelte';
 import { renderSchema } from './property_test_utils';
 import userEvent from '@testing-library/user-event';
 
-describe('Unexpected properties (extra properties)', () => {
+describe('Unexpected properties (extra properties / type mismatch)', () => {
 	it('Extra string', async function () {
 		const user = userEvent.setup();
 		const { component } = renderSchema(
@@ -121,5 +121,35 @@ describe('Unexpected properties (extra properties)', () => {
 		});
 
 		expect(component.isValid()).toEqual(true);
+	});
+
+	it('String instead of number', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					foo: { type: 'number' }
+				}
+			},
+			'pydantic_v2',
+			{
+				foo: 'bar'
+			}
+		);
+
+		expect(component.isValid()).toEqual(false);
+		expect(component.getArguments()).deep.eq({
+			foo: 'bar'
+		});
+		expect(screen.queryByRole('button', { name: 'Reset to Default Value' })).null;
+
+		await user.clear(screen.getByRole('textbox'));
+		await user.type(screen.getByRole('textbox'), '42');
+
+		expect(component.isValid()).toEqual(true);
+		expect(component.getArguments()).deep.eq({
+			foo: 42
+		});
 	});
 });

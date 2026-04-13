@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import PropertyLabel from './PropertyLabel.svelte';
 
 	/**
@@ -7,6 +8,7 @@
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
+	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
 	 * @property {import('svelte').Snippet} [children]
 	 * @property {number} [padding]
 	 * @property {boolean} [showErrors]
@@ -19,6 +21,7 @@
 		editable,
 		children,
 		reset = null,
+		init = null,
 		padding = 2,
 		showErrors = true
 	} = $props();
@@ -31,6 +34,14 @@
 	/** @type {string[]} */
 	let errors = $state([]);
 	formElement.errors.subscribe((v) => (errors = v));
+
+	let isNull = $state(false);
+
+	onMount(() => {
+		if ('isNull' in formElement) {
+			formElement.isNull.subscribe((n) => (isNull = n));
+		}
+	});
 
 	$effect(() => {
 		collapsed = formElement.collapsed;
@@ -57,6 +68,34 @@
 			reset();
 		}
 	}
+
+	/**
+	 * @param {Event} event
+	 */
+	function initValue(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		if (init) {
+			init();
+		}
+	}
+
+	/**
+	 * @param {Event} event
+	 */
+	function setToNull(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		if ('setToNull' in formElement) {
+			formElement.setToNull();
+		}
+	}
+
+	const showResetButton = $derived(
+		reset !== null &&
+			formElement.property.default !== undefined &&
+			!(formElement.nullable && formElement.property.default === null)
+	);
 </script>
 
 <div class="d-flex flex-column p-{padding}">
@@ -64,31 +103,31 @@
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item" class:border-danger={hasErrors}>
 				<div class="accordion-header">
-					<!-- svelte-ignore a11y_missing_attribute -->
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<!-- svelte-ignore a11y_interactive_supports_focus -->
-					<a
-						class="accordion-button text-decoration-none"
+					<button
+						class="accordion-button"
 						class:collapsed
 						onclick={(event) => toggleCollapse(event)}
-						role="button"
+						type="button"
 					>
 						<div class="flex-fill">
 							<PropertyLabel {formElement} {editable} {remove} tag="span" />
 						</div>
+						<!-- svelte-ignore a11y_interactive_supports_focus -->
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_missing_attribute -->
 						<div>
-							{#if reset !== null && formElement.property.default !== undefined}
-								<button
-									class="btn btn-warning me-3"
-									type="button"
-									onclick={handleReset}
-									disabled={!editable}
-								>
-									Reset
-								</button>
+							{#if formElement.nullable}
+								{#if isNull}
+									<a class="btn btn-warning me-3" role="button" onclick={initValue}>Set</a>
+								{:else}
+									<a class="btn btn-warning me-3" role="button" onclick={setToNull}>Unset</a>
+								{/if}
+							{/if}
+							{#if showResetButton}
+								<a class="btn btn-warning me-3" role="button" onclick={handleReset}>Reset</a>
 							{/if}
 						</div>
-					</a>
+					</button>
 				</div>
 				<div
 					id="collapse-{formElement.id}"
@@ -102,7 +141,11 @@
 								<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
 							{/each}
 						{/if}
-						{@render children?.()}
+						{#if isNull}
+							<div class="alert alert-info py-0 px-2 m-0 mt-1">This element is null</div>
+						{:else}
+							{@render children?.()}
+						{/if}
 					</div>
 				</div>
 			</div>

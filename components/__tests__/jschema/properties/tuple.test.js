@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderSchema, renderSchemaWithReferencedProperty } from './property_test_utils';
+import { checkBold, renderSchema, renderSchemaWithReferencedProperty } from './property_test_utils';
 import { fireEvent, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -377,5 +377,129 @@ describe('Tuple properties', () => {
 		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(component.getArguments()).deep.eq({ k: ['a', 42] });
 		expect(component.isValid()).toEqual(true);
+	});
+
+	it('Nullable tuples', async () => {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				type: 'object',
+				properties: {
+					tuple_or_None: {
+						anyOf: [
+							{
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [{ type: 'string' }, { type: 'string' }]
+							},
+							{
+								type: 'null'
+							}
+						]
+					},
+					tuple_or_None_with_default: {
+						anyOf: [
+							{
+								type: 'array',
+								minItems: 2,
+								maxItems: 2,
+								prefixItems: [{ type: 'string' }, { type: 'string' }]
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1'
+		);
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: [null, null],
+			tuple_or_None_with_default: null
+		});
+
+		checkBold(screen.getByText('tuple_or_None'), false);
+		checkBold(screen.getByText('tuple_or_None_with_default'), false);
+		expect(screen.queryByRole('button', { name: 'Remove tuple' })).null;
+
+		expect(screen.getByText('This element is null')).toBeVisible();
+		expect(screen.getAllByText('must be string')[0]).toBeVisible();
+
+		await user.type(screen.getAllByRole('textbox')[0], 'foo');
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: ['foo', 'bar'],
+			tuple_or_None_with_default: null
+		});
+
+		await user.click(screen.getByRole('button', { name: 'Set' }));
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: ['foo', 'bar'],
+			tuple_or_None_with_default: [null, null]
+		});
+
+		await user.click(screen.getAllByRole('button', { name: 'Unset' })[0]);
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: null,
+			tuple_or_None_with_default: [null, null]
+		});
+
+		expect(screen.getAllByText('must be string')[0]).toBeVisible();
+
+		await user.type(screen.getAllByRole('textbox')[0], 'foo');
+		await user.type(screen.getAllByRole('textbox')[1], 'bar');
+
+		expect(component.getArguments()).deep.eq({
+			tuple_or_None: null,
+			tuple_or_None_with_default: ['foo', 'bar']
+		});
+	});
+
+	it('fractal_schema_v1 tuple is always required', async () => {
+		const { component } = renderSchema(
+			{
+				$defs: {
+					MyModel: {
+						properties: {
+							attribute: {
+								default: [1, 2],
+								maxItems: 2,
+								minItems: 2,
+								prefixItems: [{ type: 'integer' }, { type: 'integer' }],
+								type: 'array'
+							}
+						},
+						type: 'object'
+					}
+				},
+				additionalProperties: false,
+				properties: {
+					argument: {
+						$ref: '#/$defs/MyModel'
+					}
+				},
+				required: ['argument'],
+				type: 'object'
+			},
+			'fractal_schema_v1'
+		);
+
+		expect(component.getArguments()).deep.eq({
+			argument: {
+				attribute: [1, 2]
+			}
+		});
+
+		checkBold(screen.getByText('argument'), true);
+		checkBold(screen.getByText('attribute'), true);
+		expect(screen.getAllByRole('textbox')).toHaveLength(2);
+		expect(screen.queryByRole('button', { name: 'Remove tuple' })).null;
 	});
 });
