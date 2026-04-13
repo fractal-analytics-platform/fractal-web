@@ -149,7 +149,7 @@ export class FormManager {
 				const numberProperty = /** @type {import("../types/jschema").JSONSchemaNumberProperty} */ (
 					property
 				);
-				if (params.value && typeof params.value !== 'number') {
+				if (params.value && typeof params.value !== 'number' && typeof params.value !== 'string') {
 					return this.createInvalidElement({ ...params, property: numberProperty });
 				}
 				return this.createNumberElement({ ...params, property: numberProperty });
