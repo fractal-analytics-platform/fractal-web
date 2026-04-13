@@ -357,7 +357,12 @@ export class FormManager {
 	 * @param {import("../types/form").FormElementParams<import("../types/jschema").JSONSchemaArrayProperty, any[]>} params
 	 */
 	createTupleElement(params) {
-		const { property, required, value } = params;
+		params = {
+			...params,
+			required:
+				this.schemaVersion === 'fractal_schema_v1' ? params.nullable !== true : params.required
+		};
+		const { property, value, required } = params;
 		const fields = this.getBaseElementFields(params);
 
 		const items = this.schemaVersion === 'pydantic_v1' ? property.items : property.prefixItems;
@@ -366,7 +371,7 @@ export class FormManager {
 			type: 'tuple',
 			items,
 			children:
-				required || (Array.isArray(value) && value.length > 0)
+				(required || (Array.isArray(value) && value.length > 0)) && value !== null
 					? this.createTupleChildren({
 							...params,
 							items,
