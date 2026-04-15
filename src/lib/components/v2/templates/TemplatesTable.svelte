@@ -8,6 +8,7 @@
 	import { page } from '$app/state';
 	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
+	import Popover from 'fractal-components/common/Popover.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -373,7 +374,16 @@
 										</button>
 									</td>
 								{/if}
-								<td class="col-5">{templateGroup.template_name}</td>
+								<td class="col-5">
+									{templateGroup.template_name}
+									{#if modalType === 'select'}
+										<span class="ms-2">
+											<Popover templateId={selectedTemplates[index].template_id}>
+												<span slot="trigger" class="bi bi-info-circle text-primary"></span>
+											</Popover>
+										</span>
+									{/if}
+								</td>
 								<td>{templateGroup.user_email}</td>
 								<td class="col-2">
 									{#if templateGroup.templates.length > 1}
