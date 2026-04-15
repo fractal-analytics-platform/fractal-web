@@ -11,9 +11,9 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User} user
-	 * @property {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} taskGroups
+	 * @property {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} taskGroups
 	 * @property {string|undefined} expandedTaskGroupRow
-	 * @property {(updatedGroups: Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>) => void} updateTaskGroups
+	 * @property {(updatedGroups: Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>) => void} updateTaskGroups
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -80,7 +80,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2} updatedGroup
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} updatedGroup
 	 */
 	function updateEditedTaskGroup(updatedGroup) {
 		updateTaskGroups(
@@ -93,7 +93,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskV2} editedTask
+	 * @param {import('fractal-components/types/api').TaskSlim} editedTask
 	 */
 	function updateEditedTask(editedTask) {
 		updateTaskGroups(
@@ -108,7 +108,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroup
 	 */
 	function getGroupName(taskGroup) {
 		const group = user.group_ids_names?.find((i) => i[0] === taskGroup?.user_group_id);
@@ -120,7 +120,7 @@
 
 	/**
 	 * @param {import('fractal-components/types/api').TasksTableRowGroup} taskGroupRow
-	 * @returns {import('fractal-components/types/api').TaskGroupV2 | undefined}
+	 * @returns {import('fractal-components/types/api').TaskGroupSlim | undefined}
 	 */
 	function getSelectedGroup(taskGroupRow) {
 		return taskGroupRow.groups.find((g) => g.version === taskGroupRow.selectedVersion);
@@ -232,7 +232,7 @@
 									aria-label="Info"
 									title="Info"
 									onclick={() => {
-										taskInfoModal?.open(task, selectedGroup.version || '');
+										taskInfoModal?.open(task.id, selectedGroup.version || '');
 									}}
 								>
 									<i class="bi bi-info-circle"></i>
@@ -243,7 +243,7 @@
 										aria-label="Edit"
 										title="Edit"
 										onclick={() => {
-											taskEditModal?.open(task);
+											taskEditModal?.open(task.id);
 										}}
 									>
 										<i class="bi bi-pencil"></i>

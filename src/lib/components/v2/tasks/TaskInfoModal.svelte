@@ -14,17 +14,16 @@
 
 	/**
 	 *
-	 * @param {import('fractal-components/types/api').TaskV2} taskToLoad
+	 * @param {number} taskId
 	 * @param {string|undefined} taskGroupVersion
 	 */
-	export async function open(taskToLoad, taskGroupVersion) {
+	export async function open(taskId, taskGroupVersion) {
 		modal?.show();
-		task = taskToLoad;
 		taskVersion = taskGroupVersion;
 
-		// Retrieving the args_schema field
+		// Retrieving all the fields
 		loading = true;
-		const response = await fetch(`/api/v2/task/${taskToLoad.id}`, {
+		const response = await fetch(`/api/v2/task/${taskId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

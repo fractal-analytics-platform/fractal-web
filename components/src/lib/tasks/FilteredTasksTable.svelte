@@ -6,7 +6,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Array<[ string, Array<import('../types/api').TaskGroupV2> ]>} taskGroups
+	 * @property {Array<[ string, Array<import('../types/api').TaskGroupSlim> ]>} taskGroups
 	 * @property {boolean} [showAuthorsInSeparateColumn]
 	 * @property {boolean} [showDocLinksInTable]
 	 * @property {boolean} [selectable]
@@ -55,7 +55,7 @@
 
 	/**
 	 * Needed to prevent infinite loop in $effect
-	 * @type {Array<[ string, Array<import('../types/api').TaskGroupV2> ]>|undefined}
+	 * @type {Array<[ string, Array<import('../types/api').TaskGroupSlim> ]>|undefined}
 	 */
 	let storedTaskGroups = undefined;
 
@@ -205,7 +205,7 @@
 	}
 
 	/**
-	 * @param {import('../types/api').TaskGroupV2[]} taskGroups
+	 * @param {import('../types/api').TaskGroupSlim[]} taskGroups
 	 */
 	function setFiltersValues(taskGroups) {
 		setSelectorData(
@@ -247,8 +247,8 @@
 	}
 
 	/**
-	 * @param {Array<import('../types/api').TaskGroupV2>} taskGroups
-	 * @param {(task: import('../types/api').TaskV2) => string | null} mapper
+	 * @param {Array<import('../types/api').TaskGroupSlim>} taskGroups
+	 * @param {(task: import('../types/api').TaskSlim) => string | null} mapper
 	 * @returns {string[]}
 	 */
 	function extractSlimSelectTaskValues(taskGroups, mapper) {

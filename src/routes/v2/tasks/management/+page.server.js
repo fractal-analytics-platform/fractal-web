@@ -12,7 +12,7 @@ export async function load({ fetch }) {
 		/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */ (
 			await getCurrentUser(fetch, true)
 		);
-	const taskGroups = await listTaskGroups(fetch);
+	const taskGroups = await listTaskGroups(fetch, true, false);
 
 	const defaultGroupName = env.FRACTAL_DEFAULT_GROUP_NAME ?? null;
 

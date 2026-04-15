@@ -131,6 +131,7 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 		await page.getByRole('textbox', { name: 'required_param3' }).fill('foo');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByText(/Arguments changes saved successfully/)).toBeVisible();
+		await expect(page.getByText(/Arguments changes saved successfully/)).not.toBeVisible();
 	});
 
 	await test.step('Attempt to run workflow', async () => {

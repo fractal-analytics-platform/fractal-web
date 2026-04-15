@@ -29,7 +29,7 @@
 	let addingTask = $state(false);
 	let showDocLinksInTable = false;
 
-	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
+	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
 	let taskGroups = $state([]);
 
 	/** @type {number[]} */
@@ -45,7 +45,7 @@
 		loading = true;
 		modal?.hideErrorAlert();
 		modal?.show();
-		const response = await fetch(`/api/v2/task-group?only_active=true&args_schema=false`, {
+		const response = await fetch(`/api/v2/task-group?only_active=true&slim=true`, {
 			method: 'GET',
 			credentials: 'include'
 		});

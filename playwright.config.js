@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3239-profile-get-apiv2task-group',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

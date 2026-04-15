@@ -338,6 +338,24 @@ export type TaskGroupV2 = {
 	resource_id: number;
 };
 
+export type TaskSlim = {
+	id: number;
+	name: string;
+	category: string | null;
+	modality: string | null;
+	authors: string | null;
+	tags: string[];
+	version: string;
+	input_types: { [key: string]: boolean };
+	docs_info?: string | null;
+	docs_link?: string | null;
+	install_instructions?: string | null;
+};
+
+export type TaskGroupSlim = Omit<TaskGroupV2, 'task_list'> & {
+	task_list: TaskSlim[];
+};
+
 export type WorkflowTasksTableRowGroup = {
 	pkg_name: string;
 	tasks: Array<{
@@ -349,7 +367,7 @@ export type WorkflowTasksTableRowGroup = {
 export type TasksTableRowGroup = {
 	pkg_name: string;
 	selectedVersion: string;
-	groups: Array<TaskGroupV2>;
+	groups: Array<TaskGroupSlim>;
 };
 
 export type TasksTableRow = {
@@ -364,7 +382,7 @@ export type TasksTableRow = {
 	input_types: { [key: string]: boolean };
 	docs_info: string;
 	docs_link: string | null;
-	install_instructions: string | undefined;
+	install_instructions?: string | null;
 };
 
 export type TaskGroupActivityStatusV2 = 'pending' | 'ongoing' | 'failed' | 'OK';

@@ -1,5 +1,5 @@
 /**
- * @param {Array<[string, Array<import('../types/api').TaskGroupV2>]>} taskGroups
+ * @param {Array<[string, Array<import('../types/api').TaskGroupSlim>]>} taskGroups
  * @returns {import('../types/api').WorkflowTasksTableRowGroup[]}
  */
 export function buildWorkflowTaskTableRows(taskGroups) {
@@ -33,8 +33,8 @@ export function buildWorkflowTaskTableRows(taskGroups) {
 }
 
 /**
- * @param {import('../types/api').TaskGroupV2} taskGroup
- * @param {import('../types/api').TaskV2} task
+ * @param {import('../types/api').TaskGroupSlim} taskGroup
+ * @param {import('../types/api').TaskSlim} task
  * @returns {import('../types/api').TasksTableRow}
  */
 function getTaskTableProperties(taskGroup, task) {
@@ -49,13 +49,13 @@ function getTaskTableProperties(taskGroup, task) {
 		tags: task.tags,
 		input_types: task.input_types,
 		docs_info: task.docs_info || '',
-		docs_link: task.docs_link,
-		install_instructions: task.install_instructions
+		docs_link: task.docs_link || '',
+		install_instructions: task.install_instructions || ''
 	};
 }
 
 /**
- * @param {Array<[string, Array<import('../types/api').TaskGroupV2>]>} taskGroups
+ * @param {Array<[string, Array<import('../types/api').TaskGroupSlim>]>} taskGroups
  * @returns {import('../types/api').TasksTableRowGroup[]}
  */
 export function buildTaskTableRows(taskGroups) {

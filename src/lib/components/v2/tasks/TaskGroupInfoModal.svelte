@@ -10,14 +10,14 @@
 
 	/** @type {Props} */
 	let { user } = $props();
-	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskGroupSlim|undefined} */
 	let taskGroup = $state();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToLoad
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToLoad
 	 */
 	export async function open(taskGroupToLoad) {
 		taskGroup = taskGroupToLoad;
@@ -25,7 +25,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroup
 	 */
 	function getGroupName(taskGroup) {
 		const group = user.group_ids_names?.find((i) => i[0] === taskGroup?.user_group_id);
