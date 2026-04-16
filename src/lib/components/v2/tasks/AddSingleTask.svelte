@@ -123,7 +123,8 @@
 			argsSchemaNonParallel &&
 			(taskType === 'non_parallel' ||
 				taskType === 'compound' ||
-				taskType === 'converter_non_parallel')
+				taskType === 'converter_non_parallel' ||
+				taskType === 'converter_compound')
 		) {
 			bodyData.args_schema_non_parallel = argsSchemaNonParallel;
 		}
