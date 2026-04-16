@@ -398,7 +398,8 @@
 														descriptions[index] = null;
 													}
 												}}
-												aria-label="Visualize description"
+												aria-label="Template description"
+												title={descriptions[index] ? 'Hide description' : 'Visualize description'}
 											>
 												{#if descriptions[index]}
 													<i class="bi bi-info-circle-fill"></i>
