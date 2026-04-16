@@ -8,7 +8,6 @@
 	import { page } from '$app/state';
 	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
-	import Popover from 'fractal-components/common/Popover.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -44,6 +43,8 @@
 		items: [],
 		email_list: []
 	});
+	/** @type {Array<string|null>} */
+	let descriptions = $state([]);
 
 	/** @type {import('fractal-components/types/api').WorkflowTemplateGroupMember []}*/
 	let selectedTemplates = $state([]);
@@ -173,6 +174,7 @@
 		if (response.ok) {
 			templatePage = await response.json();
 			selectedTemplates = templatePage.items.map((item) => item.templates[0]);
+			descriptions = templatePage.items.map(() => null);
 		} else {
 			throw await getAlertErrorFromResponse(response);
 		}
@@ -375,21 +377,49 @@
 									</td>
 								{/if}
 								<td class="col-5">
-									{templateGroup.template_name}
-									{#if modalType === 'select'}
-										<span class="ms-2">
-											<Popover templateId={selectedTemplates[index].template_id}>
-												<span slot="trigger" class="bi bi-info-circle text-primary"></span>
-											</Popover>
-										</span>
+									<div class="d-flex align-items-center gap-2">
+										<span>{templateGroup.template_name}</span>
+										<button
+											class="btn btn-link p-0"
+											onclick={async () => {
+												if (!descriptions[index]) {
+													try {
+														const res = await fetch(
+															`/api/v2/workflow-template/${selectedTemplates[index].template_id}`
+														);
+														const json = await res.json();
+														descriptions[index] = json.description;
+													} catch (e) {
+														descriptions[index] = 'Error loading description';
+													}
+												} else {
+													descriptions[index] = null;
+												}
+											}}
+											aria-label="Open description"
+										>
+											{#if descriptions[index]}
+												<i class="bi bi-chevron-up"></i>
+											{:else}
+												<i class="bi bi-chevron-down"></i>
+											{/if}
+										</button>
+									</div>
+
+									{#if descriptions[index]}
+										<div class="mt-1">
+											<span class="text-muted small">{descriptions[index]}</span>
+										</div>
 									{/if}
-								</td>
-								<td>{templateGroup.user_email}</td>
+								</td> <td>{templateGroup.user_email}</td>
 								<td class="col-2">
 									{#if templateGroup.templates.length > 1}
 										<select
 											class="form-select"
 											aria-label="Version for template '{templateGroup.template_name}' of {templateGroup.user_email}"
+											onchange={() => {
+												descriptions[index] = null;
+											}}
 											bind:value={selectedTemplates[index]}
 										>
 											{#each templateGroup.templates as template, i (i)}
