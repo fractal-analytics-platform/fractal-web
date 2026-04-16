@@ -21,15 +21,22 @@
 	let fileInput = $state(undefined);
 
 	/**
+	 * @typedef {import('fractal-components/types/api').WorkflowImport} WorkflowImport
+	 * @typedef {import('fractal-components/types/api').WorkflowTemplateImport} WorkflowTemplateImport
+	 */
+
+	/**
 	 * @typedef {Object} WorkflowTemplateImportTemporary
 	 * @property {string|null} name
 	 * @property {number|null} version
 	 * @property {string|null} description
-	 * @property {import('fractal-components/types/api').WorkflowImport} data
+	 * @property {WorkflowImport} data
 	 */
 
 	/** @type {WorkflowTemplateImportTemporary|undefined} */
 	let template = $state(undefined);
+	/** @type {string|undefined} */
+	let errorMessage = $state(undefined);
 
 	/** @type {number|undefined} */
 	let userGroupId = $state(undefined);
@@ -42,6 +49,7 @@
 
 	export function reset() {
 		files = undefined;
+		errorMessage = undefined;
 		template = undefined;
 		creating = false;
 		userGroupId = undefined;
@@ -67,11 +75,46 @@
 		);
 	}
 
+	/**
+	 * @param {any} obj
+	 * @returns {obj is WorkflowImport}
+	 */
+	function isWorkflowImport(obj) {
+		return (
+			obj &&
+			typeof obj === 'object' &&
+			typeof obj.name === 'string' &&
+			(obj.description === null || typeof obj.description === 'string') &&
+			Array.isArray(obj.task_list)
+		);
+	}
+
+	/**
+	 * @param {any} obj
+	 * @returns {obj is WorkflowTemplateImport}
+	 */
+	function isWorkflowTemplateImport(obj) {
+		return (
+			obj &&
+			typeof obj === 'object' &&
+			typeof obj.name === 'string' &&
+			typeof obj.version === 'number' &&
+			(obj.description === null || typeof obj.description === 'string') &&
+			isWorkflowImport(obj.data)
+		);
+	}
+
 	async function handleFileLoading() {
 		const templateFile = /** @type {FileList} */ (files)[0];
-		let input = JSON.parse(await templateFile.text());
+		const input = JSON.parse(await templateFile.text());
+
+		if (!isWorkflowImport(input) && !isWorkflowTemplateImport(input)) {
+			errorMessage = 'the input file is not a Workflow nor a WorkflowTemplate.';
+			return;
+		}
+
 		try {
-			if (input.data) {
+			if (isWorkflowTemplateImport(input)) {
 				template = input;
 			} else {
 				template = {
@@ -142,6 +185,12 @@
 					onchange={handleFileLoading}
 				/>
 			</div>
+			{#if errorMessage}
+				<div class="alert alert-danger mt-3" role="alert">
+					<strong>Error:</strong>
+					{errorMessage}
+				</div>
+			{/if}
 		{:else}
 			<form
 				onsubmit={(e) => {
