@@ -231,6 +231,26 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
+	/**
+	 * @param {number} index
+	 * @returns {Promise<void>}
+	 */
+	async function fetchOrDeleteDescription(index) {
+		if (!descriptions[index]) {
+			try {
+				const res = await fetch(
+					`/api/v2/workflow-template/${selectedTemplates[index].template_id}`
+				);
+				const json = await res.json();
+				descriptions[index] = json.description;
+			} catch {
+				descriptions[index] = 'Error loading description';
+			}
+		} else {
+			descriptions[index] = null;
+		}
+	}
 </script>
 
 <div class="container mt-2">
@@ -384,19 +404,7 @@
 											<button
 												class="btn btn-link p-0"
 												onclick={async () => {
-													if (!descriptions[index]) {
-														try {
-															const res = await fetch(
-																`/api/v2/workflow-template/${selectedTemplates[index].template_id}`
-															);
-															const json = await res.json();
-															descriptions[index] = json.description;
-														} catch {
-															descriptions[index] = 'Error loading description';
-														}
-													} else {
-														descriptions[index] = null;
-													}
+													await fetchOrDeleteDescription(index);
 												}}
 												aria-label="Template description"
 												title={descriptions[index] ? 'Hide description' : 'Visualize description'}
