@@ -14,18 +14,25 @@
 
 	// Component properties
 	let creating = $state(false);
-	/** @type {string|undefined} */
-	let templateName = $state(undefined);
-	/** @type {number|undefined} */
-	let templateVersion = $state(undefined);
 
 	/** @type {FileList|undefined} */
 	let files = $state(undefined);
 	/** @type {HTMLInputElement|undefined} */
 	let fileInput = $state(undefined);
+
+	/**
+	 * @typedef {Object} WorkflowTemplateImportTemporary
+	 * @property {string|null} name
+	 * @property {number|null} version
+	 * @property {string|null} description
+	 * @property {import('fractal-components/types/api').WorkflowImport} data
+	 */
+
+	/** @type {WorkflowTemplateImportTemporary|undefined} */
+	let template = $state(undefined);
+
 	/** @type {number|undefined} */
 	let userGroupId = $state(undefined);
-
 	/** @type {Modal|undefined} */
 	let modal = $state(undefined);
 
@@ -33,18 +40,18 @@
 		modal?.show();
 	}
 
-	/**
-	 * Reset the form fields.
-	 */
-	export function close() {
+	export function reset() {
 		files = undefined;
-		templateName = undefined;
-		templateVersion = undefined;
+		template = undefined;
 		creating = false;
 		userGroupId = undefined;
 		if (fileInput) {
 			fileInput.value = '';
 		}
+	}
+
+	export function close() {
+		reset();
 		modal?.hideErrorAlert();
 	}
 
@@ -60,27 +67,27 @@
 		);
 	}
 
-	async function handleImportTemplate() {
+	async function handleFileLoading() {
 		const templateFile = /** @type {FileList} */ (files)[0];
-		/** @type {import('fractal-components/types/api').WorkflowTemplateImport} */
-		let template;
-
+		let input = JSON.parse(await templateFile.text());
 		try {
-			template = JSON.parse(await templateFile.text());
+			if (input.data) {
+				template = input;
+			} else {
+				template = {
+					name: null,
+					version: null,
+					description: null,
+					data: input
+				};
+			}
 		} catch (err) {
 			console.error(err);
-			throw new AlertError('The workflow file is not a valid JSON file');
+			throw new AlertError('The imported file must be a Workflow or a WorkflowTemplate');
 		}
+	}
 
-		if (templateName) {
-			console.log(`Overriding template name from '${template.name}' to '${templateName}'`);
-			template.name = templateName;
-		}
-		if (templateVersion) {
-			console.log(`Overriding template version from '${template.version}' to '${templateVersion}'`);
-			template.version = templateVersion;
-		}
-
+	async function handleImportTemplate() {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
@@ -121,12 +128,7 @@
 		<h5 class="modal-title">Import workflow template from JSON file</h5>
 	{/snippet}
 	{#snippet body()}
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				importTemplate();
-			}}
-		>
+		{#if !template}
 			<div class="mb-3">
 				<label class="form-check-label" for="templateFile">Select a file</label>
 				<input
@@ -137,49 +139,71 @@
 					id="templateFile"
 					bind:this={fileInput}
 					bind:files
+					onchange={handleFileLoading}
 				/>
 			</div>
-			<div class="mb-2">
-				<label for="templateName" class="form-label">Override template name</label>
-				<input
-					id="templateName"
-					name="templateName"
-					type="text"
-					bind:value={templateName}
-					class="form-control"
-				/>
-			</div>
-			<div class="mb-2">
-				<label for="templateVersion" class="form-label">Override template version</label>
-				<input
-					id="templateVersion"
-					name="templateVersion"
-					type="number"
-					bind:value={templateVersion}
-					class="form-control"
-				/>
-			</div>
-			<div class="mb-2">
-				<label class="form-label" for="template-user-group-id">User Group</label>
-				<select class="form-select" id="template-user-group-id" bind:value={userGroupId}>
-					<option value={undefined}>Select...</option>
-					{#each groups as group, index (index)}
-						<option value={group[0]}>{group[1]}</option>
-					{/each}
-				</select>
-			</div>
-			<button
-				class="btn btn-primary mt-2"
-				disabled={!files || creating}
-				aria-label="Import template"
+		{:else}
+			<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					importTemplate();
+				}}
 			>
-				{#if creating}
-					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				{/if}
-				Import template
-			</button>
+				<div class="mb-2">
+					<label for="templateName" class="form-label">Template name</label>
+					<input
+						id="templateName"
+						name="templateName"
+						type="text"
+						bind:value={template.name}
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-2">
+					<label for="templateVersion" class="form-label">Template version</label>
+					<input
+						id="templateVersion"
+						name="templateVersion"
+						type="number"
+						bind:value={template.version}
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-2">
+					<label for="templateDescription" class="form-label">Template description</label>
+					<input
+						id="templateDescription"
+						name="templateDescription"
+						type="text"
+						bind:value={template.description}
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-2">
+					<label class="form-label" for="template-user-group-id">User Group</label>
+					<select class="form-select" id="template-user-group-id" bind:value={userGroupId}>
+						<option value={undefined}>Select...</option>
+						{#each groups as group, index (index)}
+							<option value={group[0]}>{group[1]}</option>
+						{/each}
+					</select>
+				</div>
 
-			<div class="mt-2" id="errorAlert-importTemplateModal"></div>
-		</form>
+				<button
+					class="btn btn-primary mt-2"
+					disabled={creating || !template.name || !template.version}
+					aria-label="Import template"
+				>
+					{#if creating}
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					{/if}
+					Import template
+				</button>
+
+				<button class="btn btn-danger mt-2" aria-label="Cancel" onclick={reset}> Cancel </button>
+
+				<div class="mt-2" id="errorAlert-importTemplateModal"></div>
+			</form>
+		{/if}
 	{/snippet}
 </Modal>
