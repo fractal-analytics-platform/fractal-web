@@ -73,14 +73,14 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskV2} taskToEdit
+	 * @param {number} taskId
 	 */
-	export async function open(taskToEdit) {
+	export async function open(taskId) {
 		loading = true;
 		modal?.show();
 
 		// Retrieving the args_schema field
-		const response = await fetch(`/api/v2/task/${taskToEdit.id}`, {
+		const response = await fetch(`/api/v2/task/${taskId}`, {
 			method: 'GET',
 			credentials: 'include'
 		});

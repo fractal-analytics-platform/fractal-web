@@ -12,7 +12,7 @@
 	/** @type {string|null} */
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
-	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} */
+	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
 	let taskGroups = $state(page.data.taskGroups || []);
 
 	/** @type {'pypi'|'local'|'single'|'custom_env'|'pixi'} */
@@ -25,7 +25,7 @@
 	let expandedTaskGroupRow = $state();
 
 	async function reloadTaskGroupsList() {
-		const response = await fetch(`/api/v2/task-group?args_schema=false`, {
+		const response = await fetch(`/api/v2/task-group?slim=true`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -38,7 +38,7 @@
 	}
 
 	/**
-	 * @param {Array<[ string, Array<import('fractal-components/types/api').TaskGroupV2> ]>} updatedGroups
+	 * @param {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} updatedGroups
 	 */
 	function updateTaskGroups(updatedGroups) {
 		taskGroups = updatedGroups;

@@ -7,7 +7,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
-	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupV2) => void} updateEditedTaskGroup
+	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupSlim) => void} updateEditedTaskGroup
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -17,7 +17,7 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskGroupSlim|undefined} */
 	let taskGroup = $state();
 
 	let privateTask = $state(false);
@@ -33,7 +33,7 @@
 	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToEdit
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
 	 */
 	export async function open(taskGroupToEdit) {
 		taskGroup = taskGroupToEdit;

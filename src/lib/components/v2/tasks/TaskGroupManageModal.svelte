@@ -14,7 +14,7 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2|undefined} */
+	/** @type {import('fractal-components/types/api').TaskGroupSlim|undefined} */
 	let taskGroup = $state(undefined);
 	let originalActive = $state(true);
 
@@ -26,7 +26,7 @@
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroupToEdit
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
 	 */
 	export async function open(taskGroupToEdit) {
 		taskGroup = taskGroupToEdit;

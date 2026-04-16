@@ -134,13 +134,14 @@
 	}
 
 	async function getHealthCheckTask() {
-		const response = await fetch(`/api/v2/task?args_schema=false`, {
+		const response = await fetch(`/api/v2/task?slim=true`, {
 			method: 'GET',
 			credentials: 'include'
 		});
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);
 		}
+		/** @type {Array<import('fractal-components/types/api').TaskSlim>} */
 		const result = await response.json();
 		const tasks = result.filter((t) => t.name === '__TEST_ECHO_TASK__');
 		return tasks.length > 0 ? tasks[0].id : undefined;
