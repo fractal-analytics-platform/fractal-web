@@ -376,42 +376,48 @@
 										</button>
 									</td>
 								{/if}
-								<td class="col-5">
-									<div class="d-flex align-items-center gap-2">
-										<span>{templateGroup.template_name}</span>
-										<button
-											class="btn btn-link p-0"
-											onclick={async () => {
-												if (!descriptions[index]) {
-													try {
-														const res = await fetch(
-															`/api/v2/workflow-template/${selectedTemplates[index].template_id}`
-														);
-														const json = await res.json();
-														descriptions[index] = json.description;
-													} catch (e) {
-														descriptions[index] = 'Error loading description';
-													}
-												} else {
-													descriptions[index] = null;
-												}
-											}}
-											aria-label="Open description"
-										>
-											{#if descriptions[index]}
-												<i class="bi bi-chevron-up"></i>
-											{:else}
-												<i class="bi bi-chevron-down"></i>
-											{/if}
-										</button>
-									</div>
 
-									{#if descriptions[index]}
-										<div class="mt-1">
-											<span class="text-muted small">{descriptions[index]}</span>
+								{#if modalType === 'select'}
+									<td class="col-5">
+										<div class="d-flex align-items-center gap-2">
+											<span>{templateGroup.template_name}</span>
+											<button
+												class="btn btn-link p-0"
+												onclick={async () => {
+													if (!descriptions[index]) {
+														try {
+															const res = await fetch(
+																`/api/v2/workflow-template/${selectedTemplates[index].template_id}`
+															);
+															const json = await res.json();
+															descriptions[index] = json.description;
+														} catch {
+															descriptions[index] = 'Error loading description';
+														}
+													} else {
+														descriptions[index] = null;
+													}
+												}}
+												aria-label="Visualize description"
+											>
+												{#if descriptions[index]}
+													<i class="bi bi-info-circle-fill"></i>
+												{:else}
+													<i class="bi bi-info-circle"></i>
+												{/if}
+											</button>
 										</div>
-									{/if}
-								</td> <td>{templateGroup.user_email}</td>
+										{#if descriptions[index]}
+											<div class="mt-1">
+												<span class="text-muted small">{descriptions[index]}</span>
+											</div>
+										{/if}
+									</td>
+								{:else}
+									<td class="col-5">{templateGroup.template_name}</td>
+								{/if}
+
+								<td>{templateGroup.user_email}</td>
 								<td class="col-2">
 									{#if templateGroup.templates.length > 1}
 										<select
