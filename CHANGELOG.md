@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# 1.27.1 (unreleased)
+# 1.27.1
 
 - Visualize template descriptions in create-workflow modal (\#1072).
 - Use `slim=true` instead of `args_schema=false` when loading tasks and task-groups (\#1071).
