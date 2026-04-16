@@ -137,10 +137,25 @@ function mergeAllOf(parentObject) {
 			if (key === 'allOf' && Array.isArray(child)) {
 				for (const schema of child) {
 					let preserveAllOf = false;
-					for (const k of ['if', 'then', 'required']) {
+					for (const k of ['if', 'then']) {
 						if (Object.keys(schema).includes(k)) {
 							preserveAllOf = true;
 							break;
+						}
+					}
+					if (!preserveAllOf && Object.keys(schema).includes('required')) {
+						let requiredFound = false;
+						if (child.length > 1) {
+							for (const c of child) {
+								if ('required' in c && Array.isArray(c.required) && c.required.length > 0) {
+									if (requiredFound) {
+										// preserve allOf only when the schemas contain multiple required arrays
+										// this is used for defining mutually exclusive properties
+										preserveAllOf = true;
+									}
+									requiredFound = true;
+								}
+							}
 						}
 					}
 					if (preserveAllOf) {

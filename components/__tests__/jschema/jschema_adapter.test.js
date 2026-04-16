@@ -488,4 +488,58 @@ describe('jschema_adapter', () => {
 			type: 'object'
 		});
 	});
+
+	it('Merge allOf when only one "required" array is found', () => {
+		const schema = {
+			$defs: {
+				OmeroChannel: {
+					properties: {
+						window: {
+							allOf: [{ $ref: '#/$defs/Window' }]
+						}
+					},
+					type: 'object'
+				},
+				Window: {
+					properties: {
+						start: { type: 'integer' }
+					},
+					required: ['start'],
+					type: 'object'
+				}
+			},
+			additionalProperties: false,
+			properties: {
+				allowed_channels: {
+					items: {
+						$ref: '#/$defs/OmeroChannel'
+					},
+					type: 'array'
+				}
+			},
+			type: 'object'
+		};
+
+		const adapted = adaptJsonSchema(schema, []);
+
+		expect(adapted.properties).deep.eq({
+			allowed_channels: {
+				items: {
+					properties: {
+						window: {
+							properties: {
+								start: {
+									type: 'integer'
+								}
+							},
+							required: ['start'],
+							type: 'object'
+						}
+					},
+					type: 'object'
+				},
+				type: 'array'
+			}
+		});
+	});
 });
