@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.27.3 (unreleased)
+
+- Support creating a Workflow Template from Workflow JSON file (\#1076).
+
 # 1.27.2
 
 - Fix bug of unhandled allOf containing required fields (\#1075).
