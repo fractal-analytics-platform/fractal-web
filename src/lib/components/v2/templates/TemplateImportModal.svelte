@@ -205,7 +205,7 @@
 						name="templateName"
 						type="text"
 						bind:value={template.name}
-						class="form-control"
+						class="form-control {!template.name ? 'is-invalid' : ''}"
 					/>
 				</div>
 				<div class="mb-2">
@@ -214,8 +214,9 @@
 						id="templateVersion"
 						name="templateVersion"
 						type="number"
+						min="1"
 						bind:value={template.version}
-						class="form-control"
+						class="form-control {!template.version || template.version < 1 ? 'is-invalid' : ''}"
 					/>
 				</div>
 				<div class="mb-2">
@@ -240,7 +241,7 @@
 
 				<button
 					class="btn btn-primary mt-2"
-					disabled={creating || !template.name || !template.version}
+					disabled={creating || !template.name || !template.version || template.version < 1}
 					aria-label="Import template"
 				>
 					{#if creating}
@@ -249,7 +250,9 @@
 					Import template
 				</button>
 
-				<button class="btn btn-danger mt-2" aria-label="Cancel" onclick={reset}> Cancel </button>
+				<button class="btn btn-danger mt-2" aria-label="Cancel" type="button" onclick={reset}>
+					Cancel
+				</button>
 
 				<div class="mt-2" id="errorAlert-importTemplateModal"></div>
 			</form>
