@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Add support for duplicating workflowtasks (\#1077).
+
 # 1.27.2
 
 - Fix bug of unhandled allOf containing required fields (\#1075).
