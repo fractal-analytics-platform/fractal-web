@@ -684,6 +684,51 @@
 		workflow.task_list = workflow.task_list.map((t) => (t.id === updatedWft.id ? updatedWft : t));
 	}
 
+	async function duplicateWorkflowTask() {
+		if (!selectedWorkflowTask) {
+			return;
+		}
+
+		await tick();
+		preventedSelectedTaskChange = selectedWorkflowTask;
+		if (checkUnsavedChanges()) {
+			return;
+		}
+
+		const index = workflow.task_list.findIndex((t) => t.id === selectedWorkflowTask?.id);
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+
+		const response = await fetch(
+			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask?order=${index + 1}`,
+			{
+				method: 'POST',
+				credentials: 'include',
+				headers,
+				body: normalizePayload([
+					{
+						task_id: selectedWorkflowTask.task_id,
+						args_non_parallel: selectedWorkflowTask.args_non_parallel,
+						args_parallel: selectedWorkflowTask.args_parallel
+					}
+				])
+			}
+		);
+
+		if (!response.ok) {
+			workflowErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'workflowErrorAlert'
+			);
+			return;
+		}
+
+		const [newWorkflowTask] = await response.json();
+		workflow.task_list.splice(index + 1, 0, newWorkflowTask);
+		await setSelectedWorkflowTask(newWorkflowTask);
+	}
+
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
 	});
@@ -1054,7 +1099,7 @@
 					</div>
 				{/if}
 				<div class="card">
-					<div class="card-header py-1">
+					<div class="card-header py-1 pe-2">
 						{#if selectedWorkflowTask}
 							<div class="d-flex justify-content-between">
 								<ul class="nav nav-tabs card-header-tabs">
@@ -1118,14 +1163,25 @@
 										</button>
 									</li>
 								</ul>
-								<ConfirmActionButton
-									modalId="confirmDeleteWorkflowTask"
-									btnStyle="danger"
-									buttonIcon="trash"
-									message="Delete a workflow task {selectedWorkflowTask.task.name}"
-									callbackAction={handleDeleteWorkflowTask}
-									ariaLabel="Delete workflow task"
-								/>
+								<div class="me-0">
+									<ConfirmActionButton
+										modalId="confirmDeleteWorkflowTask"
+										btnStyle="danger"
+										buttonIcon="trash"
+										message="Delete a workflow task {selectedWorkflowTask.task.name}"
+										callbackAction={handleDeleteWorkflowTask}
+										ariaLabel="Delete workflow task"
+									/>
+									<button
+										type="button"
+										class="btn btn-primary"
+										aria-label="Duplicate workflow task"
+										title="Duplicate workflow task"
+										onclick={duplicateWorkflowTask}
+									>
+										<i class="bi bi-copy"></i>
+									</button>
+								</div>
 							</div>
 						{:else}
 							Select a workflow task from the list
