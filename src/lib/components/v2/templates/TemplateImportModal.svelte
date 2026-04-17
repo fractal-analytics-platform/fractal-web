@@ -1,5 +1,5 @@
 <script>
-	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 
@@ -12,7 +12,6 @@
 	/** @type {Props} */
 	let { onTemplateImport, groups } = $props();
 
-	// Component properties
 	let creating = $state(false);
 
 	/** @type {FileList|undefined} */
