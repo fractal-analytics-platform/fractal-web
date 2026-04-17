@@ -347,8 +347,8 @@ export type TaskSlim = {
 	tags: string[];
 	version: string;
 	input_types: { [key: string]: boolean };
-	docs_info?: string | null;
-	docs_link?: string | null;
+	docs_info: string | null;
+	docs_link: string | null;
 	install_instructions?: string | null;
 };
 
