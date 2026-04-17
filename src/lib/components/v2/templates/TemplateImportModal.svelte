@@ -113,20 +113,15 @@
 			return;
 		}
 
-		try {
-			if (isWorkflowTemplateImport(input)) {
-				template = input;
-			} else {
-				template = {
-					name: null,
-					version: null,
-					description: null,
-					data: input
-				};
-			}
-		} catch (err) {
-			console.error(err);
-			throw new AlertError('The imported file must be a Workflow or a WorkflowTemplate');
+		if (isWorkflowTemplateImport(input)) {
+			template = input;
+		} else {
+			template = {
+				name: null,
+				version: null,
+				description: null,
+				data: input
+			};
 		}
 	}
 
