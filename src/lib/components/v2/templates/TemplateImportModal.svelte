@@ -105,7 +105,13 @@
 
 	async function handleFileLoading() {
 		const templateFile = /** @type {FileList} */ (files)[0];
-		const input = JSON.parse(await templateFile.text());
+		let input;
+		try {
+			input = JSON.parse(await templateFile.text());
+		} catch {
+			errorMessage = 'invalid JSON data.';
+			return;
+		}
 
 		if (!isWorkflowImport(input) && !isWorkflowTemplateImport(input)) {
 			errorMessage = 'the input file is not a Workflow nor a WorkflowTemplate.';
