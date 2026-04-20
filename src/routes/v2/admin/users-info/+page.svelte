@@ -96,11 +96,18 @@
 		</div>
 
 		<div class="row mt-3">
-			<div class="col-md-3 col-lg-3 mt-2">Exclude users with no jobs:</div>
+			<label class="col-md-3 col-lg-3 mt-2 col-form-label" for="excludeZeroJobs">
+				Exclude users with no jobs:
+			</label>
 			<div class="col-md-9 col-lg-9">
 				<div class="row row-cols-md-auto">
 					<div class="col-12 mt-1">
-						<input type="checkbox" class="form-check-input" bind:checked={excludeZeroJobs} />
+						<input
+							type="checkbox"
+							id="excludeZeroJobs"
+							class="form-check-input"
+							bind:checked={excludeZeroJobs}
+						/>
 					</div>
 				</div>
 			</div>
