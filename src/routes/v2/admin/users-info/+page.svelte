@@ -59,7 +59,8 @@
 				<div class="row row-cols-md-auto">
 					<div class="col-12 mt-1">
 						<select
-							class="form-select {!startMonth && startYear ? 'is-invalid' : ''}"
+							class="form-select"
+							class:is-invalid={!startMonth && startYear}
 							aria-label="Select job starting month"
 							bind:value={startMonth}
 						>
@@ -80,7 +81,8 @@
 					</div>
 					<div class="col-12 mt-1">
 						<select
-							class="form-select {startMonth && !startYear ? 'is-invalid' : ''}"
+							class="form-select"
+							class:is-invalid={startMonth && !startYear}
 							aria-label="Select job starting year"
 							bind:value={startYear}
 						>
