@@ -35,7 +35,6 @@
 			);
 			if (startMonth == '12') {
 				const nextYear = String(Number(startYear) + 1);
-				console.log(nextYear);
 				params.append('start_timestamp_max', String(getTimestamp(`${nextYear}-01-01`, '00:01')));
 			} else {
 				const nextMonth = String(Number(startMonth) + 1).padStart(2, '0');
