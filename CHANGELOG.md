@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # 1.27.3 (unreleased)
 
 - Support creating a Workflow Template from Workflow JSON file (\#1076).
+- Add support for duplicating workflowtasks (\#1077).
 
 # 1.27.2
 
