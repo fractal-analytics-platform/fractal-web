@@ -11,6 +11,8 @@
 	/** @type {string} */
 	let startYear = $state('');
 
+	let downloadDisabled = $derived(!!startMonth !== !!startYear);
+
 	function buildFilename() {
 		if (startMonth && startYear) {
 			return `users-${startYear}-${startMonth}.csv`;
@@ -19,50 +21,31 @@
 		}
 	}
 
-	async function downloadCsv() {
-		const url = new URL('api/admin/v2/users-csv', window.location.origin);
+	function getDownloadUrl() {
+		const base = '/api/admin/v2/users-csv';
+		const params = new URLSearchParams();
+
 		if (excludeZeroJobs) {
-			url.searchParams.append('exclude_zero_jobs', 'true');
+			params.append('exclude_zero_jobs', 'true');
 		}
 		if (startMonth && startYear) {
-			url.searchParams.append(
+			params.append(
 				'start_timestamp_min',
 				String(getTimestamp(`${startYear}-${startMonth}-01`, '00:01'))
 			);
 			if (startMonth == '12') {
 				const nextYear = String(Number(startYear) + 1);
 				console.log(nextYear);
-				url.searchParams.append(
-					'start_timestamp_max',
-					String(getTimestamp(`${nextYear}-01-01`, '00:01'))
-				);
+				params.append('start_timestamp_max', String(getTimestamp(`${nextYear}-01-01`, '00:01')));
 			} else {
 				const nextMonth = String(Number(startMonth) + 1).padStart(2, '0');
-				url.searchParams.append(
+				params.append(
 					'start_timestamp_max',
 					String(getTimestamp(`${startYear}-${nextMonth}-01`, '00:01'))
 				);
 			}
 		}
-
-		const response = await fetch(url);
-
-		if (!response.ok) {
-			alert('Failed to download CSV');
-			return;
-		}
-
-		const blob = await response.blob();
-		const downloadUrl = URL.createObjectURL(blob);
-
-		const a = document.createElement('a');
-		a.href = downloadUrl;
-		a.download = buildFilename();
-		document.body.appendChild(a);
-		a.click();
-
-		a.remove();
-		URL.revokeObjectURL(downloadUrl);
+		return params.toString() ? `${base}?${params}` : base;
 	}
 </script>
 
@@ -123,11 +106,13 @@
 		</div>
 	</div>
 
-	<button
-		class="btn btn-primary mt-4"
-		onclick={downloadCsv}
-		disabled={!!startMonth !== !!startYear}
+	<a
+		class="btn btn-primary mt-4 {downloadDisabled ? 'disabled' : ''}"
+		href={getDownloadUrl()}
+		download={buildFilename()}
+		aria-label="Download CSV"
+		aria-disabled={downloadDisabled}
 	>
-		Download CSV
-	</button>
+		<i class="bi-arrow-down-circle"></i> Download CSV
+	</a>
 </div>
