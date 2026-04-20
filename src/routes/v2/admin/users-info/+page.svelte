@@ -4,7 +4,7 @@
 	let excludeZeroJobs = $state(false);
 
 	const currentYear = new Date().getFullYear();
-	const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => String(2023 + i));
+	const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => String(currentYear - i));
 
 	/** @type {string|undefined} */
 	let startMonth = $state(undefined);
