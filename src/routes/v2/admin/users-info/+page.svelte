@@ -6,10 +6,10 @@
 	const currentYear = new Date().getFullYear();
 	const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => String(currentYear - i));
 
-	/** @type {string|undefined} */
-	let startMonth = $state(undefined);
-	/** @type {string|undefined} */
-	let startYear = $state(undefined);
+	/** @type {string} */
+	let startMonth = $state('');
+	/** @type {string} */
+	let startYear = $state('');
 
 	function buildFilename() {
 		if (startMonth && startYear) {
@@ -80,7 +80,7 @@
 							aria-label="Select job starting month"
 							bind:value={startMonth}
 						>
-							<option value={undefined}>---</option>
+							<option value="">---</option>
 							<option value="01">January</option>
 							<option value="02">February</option>
 							<option value="03">March</option>
@@ -101,7 +101,7 @@
 							aria-label="Select job starting year"
 							bind:value={startYear}
 						>
-							<option value={undefined}>---</option>
+							<option value="">---</option>
 							{#each years as year (year)}
 								<option value={year}>{String(year)}</option>
 							{/each}
