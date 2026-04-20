@@ -6,14 +6,15 @@
 	import { PropertyDescription } from 'fractal-components';
 	import { sortUsers } from '$lib/components/admin/user_utilities';
 
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(sortDropdownUsers(page.data.users));
+
 	let name = $state('');
 	let id = $state('');
 
 	/** @type {string|undefined} */
-	let userId = $state(undefined);
-
-	const currentUserId = $derived(page.data.userInfo.id);
-	const users = $derived(sortDropdownUsers(page.data.users));
+	let searchUserId = $state(undefined);
+	let searchUserEmail = $derived(users.find((u) => String(u.id) === String(searchUserId))?.email);
 
 	/**
 	 * @param {import('fractal-components/types/api').User[]} users
@@ -75,8 +76,8 @@
 		if (id) {
 			url.searchParams.append('project_id', id);
 		}
-		if (userId) {
-			url.searchParams.append('user_email', selectedUser?.email || '');
+		if (searchUserId) {
+			url.searchParams.append('user_email', searchUserEmail || '');
 		}
 		return url;
 	}
@@ -120,7 +121,7 @@
 		}
 		name = '';
 		id = '';
-		userId = undefined;
+		searchUserId = undefined;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
@@ -185,7 +186,7 @@
 					<div class="row mt-1">
 						<label class="col-3 col-form-label" for="user">User</label>
 						<div class="col-9">
-							<select class="form-select" bind:value={userId} id="user">
+							<select class="form-select" bind:value={searchUserId} id="user">
 								<option value={undefined}>All</option>
 								{#each users as user (user.id)}
 									<option value={user.id}>{user.email}</option>
