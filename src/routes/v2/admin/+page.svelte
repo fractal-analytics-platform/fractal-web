@@ -25,6 +25,11 @@
 				Manage groups
 			</a>
 
+			<a href="/v2/admin/users-info" class="btn btn-primary me-2">
+				<i class="bi bi-person-vcard"></i>
+				Users info
+			</a>
+
 			<a href="/v2/admin/impersonate" class="btn btn-primary me-2">
 				<i class="bi bi-incognito"></i>
 				Impersonate users
