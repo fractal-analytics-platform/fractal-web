@@ -183,7 +183,7 @@ test('Use template page', async ({ page }) => {
 			)
 		).toBeVisible();
 		// override version
-		await page.getByRole('spinbutton', { name: 'Override template version' }).fill('42');
+		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await resetButton.click();
 		await page.getByRole('textbox', { name: 'Name' }).fill(workflow.name);
@@ -195,7 +195,7 @@ test('Use template page', async ({ page }) => {
 		// override name
 		await page.getByRole('button', { name: 'Import' }).click();
 		await page.getByLabel('Select a file').setInputFiles(fileName);
-		await page.getByRole('textbox', { name: 'Override template name' }).fill(newTemplateName);
+		await page.getByRole('textbox', { name: 'Template name' }).fill(newTemplateName);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
 		fs.rmSync(fileName);
