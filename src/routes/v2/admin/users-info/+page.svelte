@@ -109,7 +109,8 @@
 	</div>
 
 	<a
-		class="btn btn-primary mt-4 {downloadDisabled ? 'disabled' : ''}"
+		class="btn btn-primary mt-4"
+		class:disabled={downloadDisabled}
 		href={getDownloadUrl()}
 		download={buildFilename()}
 		aria-label="Download CSV"
