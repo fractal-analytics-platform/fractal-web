@@ -102,7 +102,7 @@
 							bind:value={startYear}
 						>
 							<option value={undefined}>---</option>
-							{#each years as year}
+							{#each years as year (year)}
 								<option value={year}>{String(year)}</option>
 							{/each}
 						</select>
