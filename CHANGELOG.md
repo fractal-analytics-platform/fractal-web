@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.27.3
 
 - Add support for duplicating workflowtasks (\#1077).
 - Add `fractalJobId` for `/api/admin/v2/accounting/slurm` request (\#1081).
