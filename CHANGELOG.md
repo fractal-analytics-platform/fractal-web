@@ -1,9 +1,13 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# 1.27.3 (unreleased)
+# Unreleased
 
 - Support creating a Workflow Template from Workflow JSON file (\#1076).
+
+# 1.27.3
+
 - Add support for duplicating workflowtasks (\#1077).
+- Add `fractalJobId` for `/api/admin/v2/accounting/slurm` request (\#1081).
 - Add new users-info admin page (\#1079).
 - Fix query by email in admin's project page (\#1083).
 
