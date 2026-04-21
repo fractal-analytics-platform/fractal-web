@@ -182,7 +182,7 @@ export class ObjectFormElement extends NullableFormElement {
 		 */
 		this.additionalProperties = fields.additionalProperties;
 		this.children = fields.children;
-		this.collapsed = !fields.required;
+		this.collapsed = !fields.required || fields.isNull;
 	}
 
 	/**
@@ -346,7 +346,7 @@ export class ArrayFormElement extends NullableFormElement {
 		this.items = fields.items;
 		this.minItems = fields.minItems;
 		this.maxItems = fields.maxItems;
-		this.collapsed = !fields.required;
+		this.collapsed = !fields.required || fields.isNull;
 	}
 
 	addChild() {
@@ -435,7 +435,7 @@ export class TupleFormElement extends NullableFormElement {
 		super(fields);
 		this.children = fields.children;
 		this.items = fields.items;
-		this.collapsed = !fields.required;
+		this.collapsed = !fields.required || fields.isNull;
 	}
 
 	addTuple() {

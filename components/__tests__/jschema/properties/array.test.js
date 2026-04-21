@@ -496,7 +496,9 @@ describe('Array properties', () => {
 			array_or_None_with_default: null
 		});
 
-		expect(screen.getByText('This element is null')).toBeVisible();
+		const switches = screen.getAllByRole('switch');
+		expect(switches[0]).toBeChecked();
+		expect(switches[1]).not.toBeChecked();
 
 		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
 
@@ -514,14 +516,14 @@ describe('Array properties', () => {
 			array_or_None_with_default: null
 		});
 
-		await user.click(screen.getByRole('button', { name: 'Set' }));
+		await fireEvent.click(screen.getByRole('switch', { name: 'Set' }));
 
 		expect(component.getArguments()).deep.eq({
 			array_or_None: [42],
 			array_or_None_with_default: []
 		});
 
-		await user.click(screen.getAllByRole('button', { name: 'Unset' })[0]);
+		await user.click(screen.getAllByRole('switch', { name: 'Unset' })[0]);
 
 		expect(component.getArguments()).deep.eq({
 			array_or_None: null,

@@ -91,6 +91,7 @@
 							onchange={selectionChanged}
 							id="discriminator-{formElement.id}"
 							class:is-invalid={selectedIndex === -1}
+							disabled={!editable}
 						>
 							{#if selectedIndex === -1}
 								<option value={-1}>Select...</option>
