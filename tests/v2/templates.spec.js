@@ -168,6 +168,7 @@ test('Use template page', async ({ page }) => {
 		fs.writeFile(txtPath, 'ciao', 'utf-8', () => {});
 		await page.getByLabel('Select a file').setInputFiles(txtPath);
 		await expect(page.getByText('Invalid JSON data')).toBeVisible();
+		fs.rmSync(txtPath);
 
 		await page.getByLabel('Select a file').setInputFiles(fileName);
 		await page.getByRole('button', { name: 'Import template' }).click();
