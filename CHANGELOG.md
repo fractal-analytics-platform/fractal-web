@@ -5,6 +5,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 - Add support for duplicating workflowtasks (\#1077).
 - Add new users-info admin page (\#1079).
 - Fix query by email in admin's project page (\#1083).
+- Truncate long versions in `TaskGroupsTable` (\#1084).
 
 # 1.27.2
 
