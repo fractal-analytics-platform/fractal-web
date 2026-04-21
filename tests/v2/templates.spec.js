@@ -163,6 +163,12 @@ test('Use template page', async ({ page }) => {
 		await expect(page.getByRole('row')).toHaveCount(1);
 
 		await page.getByRole('button', { name: 'Import' }).click();
+
+		const txtPath = path.join(os.tmpdir(), 'ciao.txt');
+		fs.writeFile(txtPath, 'ciao', 'utf-8', () => {});
+		await page.getByLabel('Select a file').setInputFiles(txtPath);
+		await expect(page.getByText('Invalid JSON data')).toBeVisible();
+
 		await page.getByLabel('Select a file').setInputFiles(fileName);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await waitModalClosed(page);
