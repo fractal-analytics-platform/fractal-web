@@ -8,8 +8,6 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
-	const maxVersionLength = 10;
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User} user
