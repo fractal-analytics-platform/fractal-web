@@ -19,6 +19,7 @@ test('Use template page', async ({ page }) => {
 	let workflowFileName = '';
 	let templateFileName = '';
 	let txtFileName = '';
+	let invalidJSONFileName = '';
 
 	await test.step('Export workflow', async () => {
 		const downloadPromise = page.waitForEvent('download');
@@ -177,8 +178,17 @@ test('Use template page', async ({ page }) => {
 
 		txtFileName = path.join(os.tmpdir(), 'ciao.txt');
 		fs.writeFile(txtFileName, 'ciao', 'utf-8', () => {});
+		invalidJSONFileName = path.join(os.tmpdir(), 'invalid.json');
+		fs.writeFile(invalidJSONFileName, '{"foo": "bar"}', 'utf-8', () => {});
+
+		// test non JSON file
 		await page.getByLabel('Select a file').setInputFiles(txtFileName);
 		await expect(page.getByText('Invalid JSON data')).toBeVisible();
+		// test invalid JSON file
+		await page.getByLabel('Select a file').setInputFiles(invalidJSONFileName);
+		await expect(
+			page.getByText('the input file is not a Workflow nor a WorkflowTemplate')
+		).toBeVisible();
 
 		await page.getByLabel('Select a file').setInputFiles(templateFileName);
 		await page.getByRole('button', { name: 'Import template' }).click();
@@ -271,9 +281,12 @@ test('Use template page', async ({ page }) => {
 		await expect(modal3.getByText('Template description')).toHaveValue(newDescription);
 		// default: null
 		await expect(modal3.getByLabel('User Group')).toHaveValue('');
+
+		await closeModal(page);
 	});
 
 	fs.rmSync(templateFileName);
 	fs.rmSync(txtFileName);
+	fs.rmSync(invalidJSONFileName);
 	fs.rmSync(workflowFileName);
 });
