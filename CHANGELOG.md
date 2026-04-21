@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Add support for duplicating workflowtasks (\#1077).
+- Add new users-info admin page (\#1079).
 
 # 1.27.2
 
