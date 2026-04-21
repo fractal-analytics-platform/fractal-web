@@ -188,6 +188,12 @@ test('Use template page', async ({ page }) => {
 				`The current user already own a workflow template with name='${workflow.name}' and version=1`
 			)
 		).toBeVisible();
+		// test default
+		await expect(page.getByRole('spinbutton', { name: 'Template version' })).toHaveValue('1');
+		await expect(page.getByRole('textbox', { name: 'Template name' })).toHaveValue(workflow.name);
+		await expect(page.getByRole('textbox', { name: 'Template description' })).toHaveValue(
+			newDescription
+		);
 		// override version
 		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
 		await page.getByRole('button', { name: 'Import template' }).click();
