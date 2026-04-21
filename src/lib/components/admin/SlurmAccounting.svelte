@@ -23,6 +23,7 @@
 	let dateMax = $state('');
 	let timeMax = $state('');
 	let userId = $state('');
+	let fractalJobId = $state('');
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
@@ -50,6 +51,9 @@
 		if (userId) {
 			params.user_id = userId;
 		}
+		if (fractalJobId) {
+			params.fractal_job_id = fractalJobId;
+		}
 		const response = await fetch(`/api/admin/v2/accounting/slurm`, {
 			method: 'POST',
 			headers,
@@ -74,6 +78,7 @@
 		dateMax = '';
 		timeMax = '';
 		userId = '';
+		fractalJobId = '';
 		ids = [];
 		searched = false;
 		copyToClipboardButton?.reset();
@@ -97,6 +102,17 @@
 						<option value={user.id}>{user.email}</option>
 					{/each}
 				</select>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row mt-3 mb-3">
+	<div class="col-md-3 col-lg-2 mt-2">Fractal job ID</div>
+	<div class="col-md-9 col-lg-10">
+		<div class="row row-cols-md-auto">
+			<div class="col-12 mt-1">
+				<input type="number" id="job_id" class="form-control" bind:value={fractalJobId} />
 			</div>
 		</div>
 	</div>
