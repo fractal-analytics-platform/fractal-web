@@ -139,6 +139,15 @@ export class UnexpectedFormElement extends ValueFormElement {
 	}
 }
 
+export class UnsupportedFormElement extends ValueFormElement {
+	/**
+	 * @param {import("../types/form").ValueFormElementFields<any>} fields
+	 */
+	constructor(fields) {
+		super(fields);
+	}
+}
+
 export class InvalidFormElement extends ValueFormElement {
 	/**
 	 * @param {import("../types/form").ValueFormElementFields<any>} fields
