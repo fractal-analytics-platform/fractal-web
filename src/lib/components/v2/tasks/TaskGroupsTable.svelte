@@ -162,7 +162,7 @@
 					<td>
 						{getGroupName(selectedGroup)}
 					</td>
-					<td>
+					<td class="version-cell">
 						{#if Object.keys(taskGroupRows[i].groups).length > 1}
 							<select
 								class="form-select"
@@ -174,14 +174,10 @@
 									<option value={version}>{version || 'None'}</option>
 								{/each}
 							</select>
-						{:else if selectedGroup.version}
-							<span title={selectedGroup.version}>
-								{selectedGroup.version.length > maxVersionLength
-									? `${selectedGroup.version.slice(0, maxVersionLength)}...`
-									: selectedGroup.version}
-							</span>
 						{:else}
-							-
+							<span title={selectedGroup.version}>
+								{selectedGroup.version || '-'}
+							</span>
 						{/if}
 					</td>
 					<td>
@@ -296,5 +292,11 @@
 
 	:global(tr td) {
 		border-bottom-style: solid;
+	}
+
+	.version-cell {
+		max-width: 10px;
+		text-overflow: ellipsis;
+		overflow: hidden;
 	}
 </style>
