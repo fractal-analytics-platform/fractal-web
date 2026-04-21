@@ -8,6 +8,8 @@
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
+	const maxVersionLength = 10;
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').User} user
@@ -172,8 +174,14 @@
 									<option value={version}>{version || 'None'}</option>
 								{/each}
 							</select>
+						{:else if selectedGroup.version}
+							<span title={selectedGroup.version}>
+								{selectedGroup.version.length > maxVersionLength
+									? `${selectedGroup.version.slice(0, maxVersionLength)}...`
+									: selectedGroup.version}
+							</span>
 						{:else}
-							{selectedGroup.version || '-'}
+							-
 						{/if}
 					</td>
 					<td>
