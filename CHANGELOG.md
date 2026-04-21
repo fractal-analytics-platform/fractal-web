@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Add support for duplicating workflowtasks (\#1077).
+- Fix query by email in admin's project page (\#1083).
 
 # 1.27.2
 
