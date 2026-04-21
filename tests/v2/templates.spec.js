@@ -21,15 +21,6 @@ test('Use template page', async ({ page }) => {
 	let txtFileName = '';
 	let invalidJSONFileName = '';
 
-	await test.step('Export workflow', async () => {
-		const downloadPromise = page.waitForEvent('download');
-		await page.getByRole('button', { name: 'Export workflow' }).click();
-		const download = await downloadPromise;
-		const file = path.join(os.tmpdir(), download.suggestedFilename());
-		workflowFileName = file;
-		await download.saveAs(file);
-	});
-
 	await test.step('Check workflow not from templates', async () => {
 		await page.getByRole('button', { name: 'Workflow properties' }).click();
 		const modal = await waitModal(page);
@@ -66,6 +57,13 @@ test('Use template page', async ({ page }) => {
 		await addTaskToWorkflow(page, 'create_ome_zarr_compound');
 		await addTaskToWorkflow(page, 'cellpose_segmentation');
 		await addTaskToWorkflow(page, 'MIP_compound');
+
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByRole('button', { name: 'Export workflow' }).click();
+		const download = await downloadPromise;
+		const file = path.join(os.tmpdir(), download.suggestedFilename());
+		workflowFileName = file;
+		await download.saveAs(file);
 
 		// Create template
 		await page.getByRole('button', { name: 'Create template' }).click();
@@ -283,6 +281,30 @@ test('Use template page', async ({ page }) => {
 		await expect(modal3.getByLabel('User Group')).toHaveValue('');
 
 		await closeModal(page);
+	});
+
+	await test.step('Create a template from a exported workflow', async () => {
+		await page.goto('/v2/templates');
+
+		await page.getByRole('button', { name: 'Import' }).click();
+		await page.getByLabel('Select a file').setInputFiles(workflowFileName);
+
+		await expect(page.getByRole('spinbutton', { name: 'Template version' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Template name' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Template description' })).toHaveValue('');
+
+		await expect(page.getByRole('button', { name: 'Import template' })).not.toBeEnabled();
+
+		await page
+			.getByRole('textbox', { name: 'Template name' })
+			.fill(Math.random().toString(36).substring(7));
+		await expect(page.getByRole('button', { name: 'Import template' })).not.toBeEnabled();
+
+		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
+		await expect(page.getByRole('button', { name: 'Import template' })).toBeEnabled();
+
+		await page.getByRole('button', { name: 'Import template' }).click();
+		await waitModalClosed(page);
 	});
 
 	fs.rmSync(templateFileName);
