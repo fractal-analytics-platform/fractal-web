@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { createProject, login, setUploadFile, waitModal, waitPageLoading } from '../utils.js';
+import {
+	closeModal,
+	createProject,
+	login,
+	setUploadFile,
+	waitModal,
+	waitPageLoading
+} from '../utils.js';
 import { createTestUser } from './user_utils.js';
 import { createDataset } from './dataset_utils.js';
 import path from 'path';
@@ -207,5 +214,20 @@ test('Admin page for projects', async ({ page }) => {
 				`Cannot transfer project ownership because zarr_dir='/tmp/${dataset.zarrDir}' is not relative to one of ${userEmail4} project dirs.`
 			)
 		).toBeVisible();
+
+		await closeModal(page);
+	});
+
+	await test.step('Search by email', async () => {
+		await page.getByRole('button', { name: 'Reset' }).click();
+		await expect(page.getByRole('row', { name: new RegExp(project.name) })).toHaveCount(0);
+
+		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail2);
+		await page.getByRole('button', { name: 'Search projects' }).click();
+		await expect(page.getByRole('row', { name: new RegExp(project.name) })).toHaveCount(1);
+
+		await page.getByRole('combobox', { name: 'User' }).selectOption(userEmail1);
+		await page.getByRole('button', { name: 'Search projects' }).click();
+		await expect(page.getByRole('row', { name: new RegExp(project.name) })).toHaveCount(0);
 	});
 });
