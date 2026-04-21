@@ -293,7 +293,7 @@
 	}
 
 	.version-cell {
-		max-width: 10px;
+		max-width: 100px;
 		text-overflow: ellipsis;
 		overflow: hidden;
 	}
