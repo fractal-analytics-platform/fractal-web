@@ -16,6 +16,11 @@ test('Use template page', async ({ page }) => {
 	const project = await createProject(page);
 	const workflow = await createWorkflow(page, project.id);
 
+	let workflowFileName = '';
+	let templateFileName = '';
+	let txtFileName = '';
+	let invalidJSONFileName = '';
+
 	await test.step('Check workflow not from templates', async () => {
 		await page.getByRole('button', { name: 'Workflow properties' }).click();
 		const modal = await waitModal(page);
@@ -52,6 +57,13 @@ test('Use template page', async ({ page }) => {
 		await addTaskToWorkflow(page, 'create_ome_zarr_compound');
 		await addTaskToWorkflow(page, 'cellpose_segmentation');
 		await addTaskToWorkflow(page, 'MIP_compound');
+
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByRole('button', { name: 'Export workflow' }).click();
+		const download = await downloadPromise;
+		const file = path.join(os.tmpdir(), download.suggestedFilename());
+		workflowFileName = file;
+		await download.saveAs(file);
 
 		// Create template
 		await page.getByRole('button', { name: 'Create template' }).click();
@@ -115,15 +127,13 @@ test('Use template page', async ({ page }) => {
 		await waitModalClosed(page);
 	});
 
-	let fileName;
-
 	await test.step('Download and delete template', async () => {
 		await expect(page.getByRole('row')).toHaveCount(2);
 		const downloadPromise = page.waitForEvent('download');
 		await page.getByRole('button', { name: 'Download' }).click();
 		const download = await downloadPromise;
 		const file = path.join(os.tmpdir(), download.suggestedFilename());
-		fileName = file;
+		templateFileName = file;
 		await download.saveAs(file);
 
 		await page.getByRole('button', { name: 'Delete' }).click();
@@ -163,7 +173,22 @@ test('Use template page', async ({ page }) => {
 		await expect(page.getByRole('row')).toHaveCount(1);
 
 		await page.getByRole('button', { name: 'Import' }).click();
-		await page.getByLabel('Select a file').setInputFiles(fileName);
+
+		txtFileName = path.join(os.tmpdir(), 'ciao.txt');
+		fs.writeFile(txtFileName, 'ciao', 'utf-8', () => {});
+		invalidJSONFileName = path.join(os.tmpdir(), 'invalid.json');
+		fs.writeFile(invalidJSONFileName, '{"foo": "bar"}', 'utf-8', () => {});
+
+		// test non JSON file
+		await page.getByLabel('Select a file').setInputFiles(txtFileName);
+		await expect(page.getByText('Invalid JSON data')).toBeVisible();
+		// test invalid JSON file
+		await page.getByLabel('Select a file').setInputFiles(invalidJSONFileName);
+		await expect(
+			page.getByText('the input file is not a Workflow nor a WorkflowTemplate')
+		).toBeVisible();
+
+		await page.getByLabel('Select a file').setInputFiles(templateFileName);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await waitModalClosed(page);
 
@@ -175,15 +200,21 @@ test('Use template page', async ({ page }) => {
 		).toHaveCount(0);
 
 		await page.getByRole('button', { name: 'Import' }).click();
-		await page.getByLabel('Select a file').setInputFiles(fileName);
+		await page.getByLabel('Select a file').setInputFiles(templateFileName);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await expect(
 			page.getByText(
 				`The current user already own a workflow template with name='${workflow.name}' and version=1`
 			)
 		).toBeVisible();
+		// test default
+		await expect(page.getByRole('spinbutton', { name: 'Template version' })).toHaveValue('1');
+		await expect(page.getByRole('textbox', { name: 'Template name' })).toHaveValue(workflow.name);
+		await expect(page.getByRole('textbox', { name: 'Template description' })).toHaveValue(
+			newDescription
+		);
 		// override version
-		await page.getByRole('spinbutton', { name: 'Override template version' }).fill('42');
+		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await resetButton.click();
 		await page.getByRole('textbox', { name: 'Name' }).fill(workflow.name);
@@ -194,11 +225,10 @@ test('Use template page', async ({ page }) => {
 		).toHaveCount(2);
 		// override name
 		await page.getByRole('button', { name: 'Import' }).click();
-		await page.getByLabel('Select a file').setInputFiles(fileName);
-		await page.getByRole('textbox', { name: 'Override template name' }).fill(newTemplateName);
+		await page.getByLabel('Select a file').setInputFiles(templateFileName);
+		await page.getByRole('textbox', { name: 'Template name' }).fill(newTemplateName);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
-		fs.rmSync(fileName);
 	});
 
 	await test.step('Create a workflow from a template', async () => {
@@ -249,5 +279,36 @@ test('Use template page', async ({ page }) => {
 		await expect(modal3.getByText('Template description')).toHaveValue(newDescription);
 		// default: null
 		await expect(modal3.getByLabel('User Group')).toHaveValue('');
+
+		await closeModal(page);
 	});
+
+	await test.step('Create a template from a exported workflow', async () => {
+		await page.goto('/v2/templates');
+
+		await page.getByRole('button', { name: 'Import' }).click();
+		await page.getByLabel('Select a file').setInputFiles(workflowFileName);
+
+		await expect(page.getByRole('spinbutton', { name: 'Template version' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Template name' })).toHaveValue('');
+		await expect(page.getByRole('textbox', { name: 'Template description' })).toHaveValue('');
+
+		await expect(page.getByRole('button', { name: 'Import template' })).not.toBeEnabled();
+
+		await page
+			.getByRole('textbox', { name: 'Template name' })
+			.fill(Math.random().toString(36).substring(7));
+		await expect(page.getByRole('button', { name: 'Import template' })).not.toBeEnabled();
+
+		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
+		await expect(page.getByRole('button', { name: 'Import template' })).toBeEnabled();
+
+		await page.getByRole('button', { name: 'Import template' }).click();
+		await waitModalClosed(page);
+	});
+
+	fs.rmSync(templateFileName);
+	fs.rmSync(txtFileName);
+	fs.rmSync(invalidJSONFileName);
+	fs.rmSync(workflowFileName);
 });
