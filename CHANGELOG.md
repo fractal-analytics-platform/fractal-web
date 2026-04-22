@@ -2,6 +2,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
+- Truncate long versions in `TaskGroupsTable` (\#1084).
 - Support creating a Workflow Template from Workflow JSON file (\#1076).
 
 # 1.27.3
