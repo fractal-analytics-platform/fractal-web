@@ -68,7 +68,7 @@
 {#if formManager}
 	{#key formManager}
 		{#each genericErrors as error, index (index)}
-			<div class="alert alert-danger mt-1"><pre>{error}</pre></div>
+			<div class="alert alert-danger mt-1"><pre class="mb-0">{error}</pre></div>
 		{/each}
 		<div id={componentId}>
 			<ObjectProperty formElement={formManager.root} isRoot={true} {editable} />

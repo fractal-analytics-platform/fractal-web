@@ -10,7 +10,8 @@ import {
 	BooleanFormElement,
 	ConditionalFormElement,
 	InvalidFormElement,
-	UnexpectedFormElement
+	UnexpectedFormElement,
+	UnsupportedFormElement
 } from './form_element.js';
 import { adaptJsonSchema, stripDiscriminator } from './jschema_adapter.js';
 import { getJsonSchemaData } from './jschema_initial_data.js';
@@ -62,6 +63,8 @@ export class FormManager {
 		/** @type {import('svelte/store').Writable<string[]>} */
 		this.genericErrors = writable([]);
 		this.dataValid = writable(true);
+		/** @type {UnsupportedFormElement[]} */
+		this.unsupportedElements = [];
 
 		const data = getJsonSchemaData(this.jsonSchema, schemaVersion, initialValue);
 		this.onchange = onchange;
@@ -162,7 +165,7 @@ export class FormManager {
 				}
 				return this.createBooleanElement({ ...params, property: booleanProperty });
 			}
-			default: {
+			case 'string': {
 				const stringProperty = /** @type {import("../types/jschema").JSONSchemaStringProperty} */ (
 					property
 				);
@@ -172,6 +175,12 @@ export class FormManager {
 					params.value = params.value.toString();
 				}
 				return this.createStringElement({ ...params, property: stringProperty });
+			}
+			default: {
+				const fields = this.getBaseElementFields(params);
+				const element = new UnsupportedFormElement({ ...fields, value: params.value || null });
+				this.unsupportedElements.push(element);
+				return element;
 			}
 		}
 	}
@@ -748,6 +757,11 @@ export class FormManager {
 			const errors = this.validator.getErrors();
 			if (errors && Array.isArray(errors)) {
 				genericErrors.push(...processErrors(this.root, errors));
+			}
+		}
+		if (this.unsupportedElements.length > 0) {
+			for (const element of this.unsupportedElements) {
+				genericErrors.push(`Unsupported property at ${element.schemaPath}`);
 			}
 		}
 		this.genericErrors.set(genericErrors);

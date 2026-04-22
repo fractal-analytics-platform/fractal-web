@@ -4,6 +4,8 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 - Truncate long versions in `TaskGroupsTable` (\#1084).
 - Support creating a Workflow Template from Workflow JSON file (\#1076).
+- Improve set/unset of JSON schema nullable properties (\#1085).
+- Show errors for unsupported JSON schema properties (\#1085).
 
 # 1.27.3
 

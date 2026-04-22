@@ -426,7 +426,8 @@ describe('Tuple properties', () => {
 		checkBold(screen.getByText('tuple_or_None_with_default'), false);
 		expect(screen.queryByRole('button', { name: 'Remove tuple' })).null;
 
-		expect(screen.getByText('This element is null')).toBeVisible();
+		expect(screen.getAllByRole('switch')[0]).toBeChecked();
+		expect(screen.getAllByRole('switch')[1]).not.toBeChecked();
 		expect(screen.getAllByText('must be string')[0]).toBeVisible();
 
 		await user.type(screen.getAllByRole('textbox')[0], 'foo');
@@ -437,14 +438,14 @@ describe('Tuple properties', () => {
 			tuple_or_None_with_default: null
 		});
 
-		await user.click(screen.getByRole('button', { name: 'Set' }));
+		await fireEvent.click(screen.getByRole('switch', { name: 'Set' }));
 
 		expect(component.getArguments()).deep.eq({
 			tuple_or_None: ['foo', 'bar'],
 			tuple_or_None_with_default: [null, null]
 		});
 
-		await user.click(screen.getAllByRole('button', { name: 'Unset' })[0]);
+		await user.click(screen.getAllByRole('switch')[0]);
 
 		expect(component.getArguments()).deep.eq({
 			tuple_or_None: null,

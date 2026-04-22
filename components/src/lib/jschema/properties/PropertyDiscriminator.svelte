@@ -44,5 +44,5 @@
 {:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}
 	<UnexpectedProperty {formElement} {editable} {remove} />
 {:else}
-	<p>Unsupported property type {formElement.type}</p>
+	<alert class="alert alert-danger my-1">Unsupported property type {formElement.type}</alert>
 {/if}

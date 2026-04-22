@@ -56,6 +56,7 @@
 			return;
 		}
 		collapsed = !collapsed;
+		formElement.collapsed = collapsed;
 	}
 
 	/**
@@ -70,25 +71,19 @@
 	}
 
 	/**
-	 * @param {Event} event
+	 * @param {any} event
 	 */
-	function initValue(event) {
+	function toggleNull(event) {
 		event.preventDefault();
 		event.stopPropagation();
-		if (init) {
+		const value = event.target.checked;
+		if (value && init) {
 			init();
-		}
-	}
-
-	/**
-	 * @param {Event} event
-	 */
-	function setToNull(event) {
-		event.preventDefault();
-		event.stopPropagation();
-		if ('setToNull' in formElement) {
+		} else if (!value && 'setToNull' in formElement) {
 			formElement.setToNull();
 		}
+		formElement.collapsed = !value;
+		collapsed = formElement.collapsed;
 	}
 
 	const showResetButton = $derived(
@@ -98,7 +93,7 @@
 	);
 </script>
 
-<div class="d-flex flex-column p-{padding}">
+<div class="d-flex flex-column p-{padding}" class:is-null={isNull}>
 	<div class="my-2">
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item" class:border-danger={hasErrors}>
@@ -108,6 +103,7 @@
 						class:collapsed
 						onclick={(event) => toggleCollapse(event)}
 						type="button"
+						disabled={isNull}
 					>
 						<div class="flex-fill">
 							<PropertyLabel {formElement} {editable} {remove} tag="span" />
@@ -117,11 +113,17 @@
 						<!-- svelte-ignore a11y_missing_attribute -->
 						<div>
 							{#if formElement.nullable}
-								{#if isNull}
-									<a class="btn btn-warning me-3" role="button" onclick={initValue}>Set</a>
-								{:else}
-									<a class="btn btn-warning me-3" role="button" onclick={setToNull}>Unset</a>
-								{/if}
+								<div class="form-check form-switch">
+									<input
+										class="form-check-input"
+										disabled={!editable}
+										type="checkbox"
+										role="switch"
+										checked={isNull === false}
+										onchange={(event) => toggleNull(event)}
+										aria-label={isNull ? 'Set' : 'Unset'}
+									/>
+								</div>
 							{/if}
 							{#if showResetButton}
 								<a class="btn btn-warning me-3" role="button" onclick={handleReset}>Reset</a>
@@ -141,9 +143,7 @@
 								<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
 							{/each}
 						{/if}
-						{#if isNull}
-							<div class="alert alert-info py-0 px-2 m-0 mt-1">This element is null</div>
-						{:else}
+						{#if !isNull}
 							{@render children?.()}
 						{/if}
 					</div>
@@ -152,3 +152,15 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.is-null button {
+		background-color: #eee !important;
+		border-color: #bbb !important;
+		color: #666;
+	}
+
+	.is-null .accordion-button::after {
+		display: none;
+	}
+</style>
