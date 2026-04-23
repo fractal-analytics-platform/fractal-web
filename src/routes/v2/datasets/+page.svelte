@@ -1,7 +1,6 @@
 <script>
 	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
