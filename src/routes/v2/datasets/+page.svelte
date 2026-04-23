@@ -206,9 +206,16 @@
 						<tbody>
 							{#each datasetPage.items as dataset, index (index)}
 								<tr>
-									<td>{dataset.name}</td>
-									<td>{dataset.project_id}</td>
-
+									<td>
+										<a href={`/v2/projects/${dataset.project_id}/datasets/${dataset.id}`}>
+											{dataset.name}
+										</a>
+									</td>
+									<td>
+										<a href={`/v2/projects/${dataset.project_id}`}>
+											{dataset.project.name}
+										</a>
+									</td>
 									<td>{dataset.zarr_dir}</td>
 									<td><TimestampCell timestamp={dataset.timestamp_created} /></td>
 								</tr>
