@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.development' });
 
 const commonTests = [
-	{ name: 'auth', testMatch: /auth\.setup\.js/ },
+	{ name: 'init', testMatch: /init\.setup\.js/ },
 	{
 		name: 'chromium',
 		testMatch: /.*\.spec\.js/,
@@ -18,7 +18,7 @@ const commonTests = [
 				permissions: ['clipboard-read', 'clipboard-write']
 			}
 		},
-		dependencies: ['auth']
+		dependencies: ['init']
 	},
 	{
 		name: 'firefox',
@@ -28,42 +28,18 @@ const commonTests = [
 			...devices['Desktop Firefox'],
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['auth']
+		dependencies: ['init']
 	}
 ];
 
 const v2Tests = [
-	{
-		name: 'collect_mock_tasks',
-		testMatch: /v2\/collect_mock_tasks\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
-	{
-		name: 'create_fake_task',
-		testMatch: /v2\/create_fake_task\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
 	{
 		name: 'pixi',
 		testMatch: /v2\/pixi\.setup\.js/,
 		use: {
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['auth']
-	},
-	{
-		name: 'create_default_guest_user',
-		testMatch: /v2\/create_default_guest_user\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
+		dependencies: ['init']
 	},
 	{
 		name: 'chromium',
@@ -75,7 +51,7 @@ const v2Tests = [
 				permissions: ['clipboard-read', 'clipboard-write']
 			}
 		},
-		dependencies: ['collect_mock_tasks', 'create_fake_task', 'create_default_guest_user']
+		dependencies: ['init']
 	},
 	{
 		name: 'firefox',
@@ -84,7 +60,7 @@ const v2Tests = [
 			...devices['Desktop Firefox'],
 			storageState: 'tests/.auth/user.json'
 		},
-		dependencies: ['collect_mock_tasks', 'create_fake_task', 'create_default_guest_user']
+		dependencies: ['init']
 	}
 ];
 
