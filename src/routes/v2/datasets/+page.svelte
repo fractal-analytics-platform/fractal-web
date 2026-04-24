@@ -6,7 +6,7 @@
 	import { pushState } from '$app/navigation';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').DatasetWithImageCount>} */
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').DatasetV2Expanded>} */
 	let datasetPage = $state({
 		current_page: 1,
 		page_size: 10,
