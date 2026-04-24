@@ -1,9 +1,9 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createFakeTask } from './task_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createFakeTask } from '../utils/v2/task.js';
 
 test('Task groups admin page [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	let taskName;

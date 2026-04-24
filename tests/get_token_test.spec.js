@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from './utils.js';
+import { waitPageLoading } from './utils/utils.js';
 
 test('Copy token test', async ({ page }) => {
 	await page.goto('/profile');

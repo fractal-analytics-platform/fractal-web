@@ -1,15 +1,15 @@
-import { waitPageLoading } from '../utils.js';
+import { waitPageLoading } from '../utils/utils.js';
 import { expect, test } from './workflow_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 test('JSON Schema validation', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await test.step('Go to "Add a single task" form', async () => {
@@ -243,13 +243,8 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await expect(page.getByRole('combobox', { name: 'Mode' })).toHaveValue('label');
 	});
 
-	await test.step('Delete workflow task', async () => {
-		await workflow.removeCurrentTask();
-		await workflow.selectTask(randomTaskName);
-		await workflow.removeCurrentTask();
-	});
-
-	await test.step('Delete task', async () => {
+	await test.step('Cleanup', async () => {
+		await workflow.delete();
 		await deleteTask(page, randomTaskName);
 	});
 });

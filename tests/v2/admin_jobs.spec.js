@@ -1,12 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { PageWithWorkflow } from './workflow_fixture.js';
 import * as fs from 'fs';
-import { createDataset } from './dataset_utils.js';
-import { createFakeTask } from './task_utils.js';
-import { waitTaskFailure, waitTaskSubmitted } from './workflow_task_utils.js';
+import { waitTaskFailure, waitTaskSubmitted } from '../utils/v2/workflowtask.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
+import { createProject } from '../utils/v2/project.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createWorkflow, deleteWorkflow } from '../utils/v2/workflow.js';
 
-test('Execute a job and show it on the job tables [v2]', async ({ page, request }) => {
+test('Execute a job and show it on the job tables [v2]', async ({ page }) => {
 	let taskName;
 	await test.step('Create test tasks', async () => {
 		taskName = await createFakeTask(page, {
@@ -21,7 +23,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	/** @type {number} */
 	let jobId1;
 	await test.step('Create first job and wait its failure', async () => {
-		const job = await createJob(page, request, async function (workflow) {
+		const job = await createJob(page, async function (workflow) {
 			await workflow.addTask('generic_task_converter');
 			await workflow.selectTask('generic_task_converter');
 			await page.getByRole('switch').check();
@@ -42,7 +44,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	/** @type {number} */
 	let jobId2;
 	await test.step('Create second job', async () => {
-		const job = await createJob(page, request, async function (workflow) {
+		const job = await createJob(page, async function (workflow) {
 			await workflow.addTask(taskName);
 		});
 		workflow2 = job.workflow;
@@ -76,7 +78,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 
 	await test.step('Search workflow 2 by workflow id', async () => {
 		await page.getByRole('button', { name: 'Reset' }).click();
-		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(workflow2.workflowId || '');
+		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(String(workflow2.workflowId));
 		await search(page);
 
 		const row2 = page.getByRole('row', { name: workflow2.workflowName });
@@ -123,8 +125,8 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 	await test.step('Search running jobs', async () => {
 		await page.getByRole('button', { name: 'Reset' }).click();
 		await page.getByRole('combobox', { name: 'Status' }).selectOption('submitted');
-		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(workflow2.projectId || '');
-		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(workflow2.workflowId || '');
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(String(workflow2.projectId));
+		await page.getByRole('spinbutton', { name: 'Workflow Id' }).fill(String(workflow2.workflowId));
 		await search(page);
 		const statuses = page.locator('table tbody tr td:nth-child(2)');
 		await expect(statuses).toHaveCount(1);
@@ -170,6 +172,11 @@ test('Execute a job and show it on the job tables [v2]', async ({ page, request 
 		await search(page);
 		await expect(page.locator('table tbody tr')).toHaveCount(1);
 	});
+
+	await test.step('Cleanup', async () => {
+		await deleteWorkflow(page, workflow2.projectId, workflow2.workflowId);
+		await deleteTask(page, taskName);
+	});
 });
 
 /**
@@ -185,25 +192,21 @@ async function search(page) {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {import('@playwright/test').APIRequestContext} request
  * @param {(workflow: PageWithWorkflow) => Promise<void>} addTask
  * @returns {Promise<{ workflow: PageWithWorkflow, dataset: string, jobId: number }>}
  */
-async function createJob(page, request, addTask) {
-	const workflow = new PageWithWorkflow(page, request);
-	let datasetName = '';
-	/** @type {number|undefined} */
-	let jobId;
-	await test.step('Create workflow', async () => {
-		const projectId = await workflow.createProject();
-		const datasetResult = await createDataset(page, projectId);
-		datasetName = datasetResult.name;
-		await workflow.createWorkflow();
-		await page.waitForURL(/** @type {string} */ (workflow.url));
-		await addTask(workflow);
-		jobId = await runWorkflow(page, datasetName);
+async function createJob(page, addTask) {
+	return await test.step('Create workflow', async () => {
+		const project = await createProject(page);
+		const dataset = await createDataset(page, project.id);
+		const workflow = await createWorkflow(page, project.id);
+		const p = new PageWithWorkflow(page, project, workflow);
+		await page.goto(p.url);
+		await waitPageLoading(page);
+		await addTask(p);
+		const jobId = await runWorkflow(page, dataset.name);
+		return { workflow: p, dataset: dataset.name, jobId };
 	});
-	return { workflow, dataset: datasetName, jobId: /** @type {number} */ (jobId) };
 }
 
 /**

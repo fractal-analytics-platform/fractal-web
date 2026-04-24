@@ -1,19 +1,18 @@
 import { expect, test } from '@playwright/test';
 import {
 	addTaskToWorkflow,
-	createProject,
-	createWorkflow,
-	deleteProject,
 	login,
 	logout,
 	selectSlimSelect,
 	shareProjectById,
 	waitModal,
 	waitPageLoading
-} from '../utils.js';
-import { createTestUser } from './user_utils.js';
-import { createDataset } from './dataset_utils.js';
-import { waitTaskSubmitted } from './workflow_task_utils.js';
+} from '../utils/utils.js';
+import { createProject, deleteProject } from '../utils/v2/project.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createWorkflow } from '../utils/v2/workflow.js';
+import { waitTaskSubmitted } from '../utils/v2/workflowtask.js';
+import { createTestUser } from '../utils/v2/user.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -22,7 +21,7 @@ test('View shared jobs', async ({ page }) => {
 	await login(page, 'admin@fractal.xy', '1234');
 	await waitPageLoading(page);
 
-	const userEmail = await createTestUser(page);
+	const { email: userEmail } = await createTestUser(page);
 
 	const project = await createProject(page);
 
@@ -32,6 +31,8 @@ test('View shared jobs', async ({ page }) => {
 	const workflow = await createWorkflow(page, project.id);
 
 	await test.step('Run job', async () => {
+		await page.goto(`/v2/projects/${project.id}/workflows/${workflow.id}`);
+		await waitPageLoading(page);
 		await addTaskToWorkflow(page, 'generic_task_converter');
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = await waitModal(page);
@@ -49,7 +50,7 @@ test('View shared jobs', async ({ page }) => {
 
 	await test.step('Create new dataset and run another job', async () => {
 		const dataset = await createDataset(page, project.id);
-		await page.getByRole('link', { name: workflow.name }).click();
+		await page.goto(`/v2/projects/${project.id}/workflows/${workflow.id}`);
 		await waitPageLoading(page);
 		await page.getByRole('combobox', { name: 'Dataset' }).selectOption(dataset.name);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
@@ -97,6 +98,6 @@ test('View shared jobs', async ({ page }) => {
 	});
 
 	await test.step('Cleanup', async () => {
-		await deleteProject(page, project.name);
+		await deleteProject(page, project.id);
 	});
 });

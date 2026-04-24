@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { waitPageLoading } from '../utils/utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 	let taskName;
@@ -11,6 +11,8 @@ test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 	});
 
 	await test.step('Deactivate the task', async () => {
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();

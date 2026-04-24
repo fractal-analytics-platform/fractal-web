@@ -1,10 +1,10 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createImage } from './image_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createImage } from '../utils/v2/image.js';
+import { waitTaskFailure, waitTaskSubmitted } from '../utils/v2/workflowtask.js';
 import { expect, test } from './workflow_fixture.js';
-import { waitTaskFailure, waitTaskSubmitted } from './workflow_task_utils.js';
 
 test('Display not processed images warning', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await page.goto(`/v2/projects/${workflow.projectId}`);

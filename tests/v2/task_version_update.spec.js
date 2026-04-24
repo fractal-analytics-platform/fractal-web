@@ -1,11 +1,7 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitPageLoading } from '../utils.js';
-import { checkTasksOrder, createFakeTask, deleteTask } from './task_utils.js';
+import { checkTasksOrder, createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 test('Task version update [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
 	test.slow();
 
 	let nonParallelTask;
@@ -249,18 +245,14 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Cleanup test tasks', async () => {
-		await workflow.removeCurrentTask();
-		await workflow.selectTask(nonParallelTask);
-		await workflow.removeCurrentTask();
-		await workflow.selectTask(parallelTask);
-		await workflow.removeCurrentTask();
-		await deleteTask(page, nonParallelTask); // 0.0.2
-		await deleteTask(page, nonParallelTask); // 0.0.1
-		await deleteTask(page, parallelTask); // 0.0.4
-		await deleteTask(page, parallelTask); // 0.0.3
-		await deleteTask(page, parallelTask); // 0.0.2
-		await deleteTask(page, parallelTask); // 0.0.1
-		await deleteTask(page, compoundTask); // 0.0.2
-		await deleteTask(page, compoundTask); // 0.0.1
+		await workflow.delete();
+		await deleteTask(page, nonParallelTask, '0.0.2');
+		await deleteTask(page, nonParallelTask, '0.0.1');
+		await deleteTask(page, parallelTask, '0.0.4');
+		await deleteTask(page, parallelTask, '0.0.3');
+		await deleteTask(page, parallelTask, '0.0.2');
+		await deleteTask(page, parallelTask, '0.0.1');
+		await deleteTask(page, compoundTask, '0.0.2');
+		await deleteTask(page, compoundTask, '0.0.1');
 	});
 });

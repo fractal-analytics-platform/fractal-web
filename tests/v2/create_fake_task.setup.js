@@ -1,5 +1,5 @@
 import { test as setup } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitPageLoading } from '../utils/utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 

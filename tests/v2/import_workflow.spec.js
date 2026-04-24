@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url';
-import { waitPageLoading, expectBooleanIcon } from '../utils.js';
+import { waitPageLoading, expectBooleanIcon } from '../utils/utils.js';
 import { expect, test } from './project_fixture.js';
 import path from 'path';
 
@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 test('Import workflow', async ({ page, project }) => {
-	await page.waitForURL(project.url);
+	await page.goto(project.url);
 	await waitPageLoading(page);
 
 	await test.step('Open "Create new workflow" modal', async () => {

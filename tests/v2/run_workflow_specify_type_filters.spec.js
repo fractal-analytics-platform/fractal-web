@@ -1,13 +1,13 @@
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { waitTasksSuccess, waitTaskSubmitted } from '../utils/v2/workflowtask.js';
 import { expect, test } from './workflow_fixture.js';
-import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
 
 test('Warning message "You are trying to run a workflow without specifying what type of images should be processed"', async ({
 	page,
 	workflow
 }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await page.goto(`/v2/projects/${workflow.projectId}`);
@@ -19,7 +19,7 @@ test('Warning message "You are trying to run a workflow without specifying what 
 
 	await test.step('Create test dataset', async () => {
 		const dataset = await createDataset(page, workflow.projectId);
-		zarrDir = dataset.zarrDir;
+		zarrDir = dataset.zarr_dir;
 	});
 
 	await test.step('Prepare workflow', async () => {

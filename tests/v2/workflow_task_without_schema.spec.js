@@ -1,11 +1,8 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { waitModalClosed } from '../utils/utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
 	let taskName;
 	await test.step('Create test tasks', async () => {
 		taskName = await createFakeTask(page, { type: 'compound' });
@@ -152,7 +149,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Cleanup', async () => {
-		await workflow.removeCurrentTask();
+		await workflow.delete();
 		await deleteTask(page, taskName);
 	});
 });

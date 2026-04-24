@@ -1,16 +1,10 @@
 import { expect, test } from '@playwright/test';
-import {
-	closeModal,
-	createProject,
-	login,
-	setUploadFile,
-	waitModal,
-	waitPageLoading
-} from '../utils.js';
-import { createTestUser } from './user_utils.js';
-import { createDataset } from './dataset_utils.js';
+import { closeModal, login, setUploadFile, waitModal, waitPageLoading } from '../utils/utils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createProject } from '../utils/v2/project.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createTestUser } from '../utils/v2/user.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -85,10 +79,12 @@ test('Admin page for projects', async ({ page }) => {
 		await waitPageLoading(page);
 	});
 
-	const userEmail1 = await createTestUser(page);
+	const { email: userEmail1 } = await createTestUser(page);
+	const { email: userEmail2, id: userId2 } = await createTestUser(page);
 
-	const userEmail2 = await createTestUser(page);
 	await test.step('Associate User2 to Profile2', async () => {
+		await page.goto(`/v2/admin/users/${userId2}/edit`);
+		await waitPageLoading(page);
 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption('Local resource');
 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName1);
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -96,8 +92,10 @@ test('Admin page for projects', async ({ page }) => {
 		await waitPageLoading(page);
 	});
 
-	const userEmail3 = await createTestUser(page);
+	const { email: userEmail3, id: userId3 } = await createTestUser(page);
 	await test.step('Associate User3 to Profile3', async () => {
+		await page.goto(`/v2/admin/users/${userId3}/edit`);
+		await waitPageLoading(page);
 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption(randomResourceName);
 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName2);
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -105,8 +103,10 @@ test('Admin page for projects', async ({ page }) => {
 		await waitPageLoading(page);
 	});
 
-	const userEmail4 = await createTestUser(page, randomProjectDir);
+	const { email: userEmail4, id: userId4 } = await createTestUser(page, randomProjectDir);
 	await test.step('Associate User4 to Profile2', async () => {
+		await page.goto(`/v2/admin/users/${userId4}/edit`);
+		await waitPageLoading(page);
 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption('Local resource');
 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName1);
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -211,7 +211,7 @@ test('Admin page for projects', async ({ page }) => {
 
 		await expect(
 			modal.getByText(
-				`Cannot transfer project ownership because zarr_dir='/tmp/${dataset.zarrDir}' is not relative to one of ${userEmail4} project dirs.`
+				`Cannot transfer project ownership because zarr_dir='${dataset.zarr_dir}' is not relative to one of ${userEmail4} project dirs.`
 			)
 		).toBeVisible();
 

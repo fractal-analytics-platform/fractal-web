@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitPageLoading } from '../utils/utils.js';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';

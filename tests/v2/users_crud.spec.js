@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { addGroupToUser, verifyChecked } from './user_utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { addGroupToUser, verifyChecked } from '../utils/v2/user.js';
 
 test('Create and update a user', async ({ page }) => {
 	const randomGroupName = Math.random().toString(36).substring(7);

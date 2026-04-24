@@ -1,10 +1,10 @@
 import { expect } from '@playwright/test';
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { test } from './workflow_fixture.js';
-import { checkTasksOrder } from './task_utils.js';
+import { checkTasksOrder } from '../utils/v2/task.js';
 
 test('Duplicate workflow task', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await test.step('Add tasks to workflow', async () => {

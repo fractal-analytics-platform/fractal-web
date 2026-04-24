@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { waitPageLoading } from '../utils/utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 	let taskName;

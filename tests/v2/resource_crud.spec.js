@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { setUploadFile, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { setUploadFile, waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';

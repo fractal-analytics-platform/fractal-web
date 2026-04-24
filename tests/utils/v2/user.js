@@ -1,23 +1,32 @@
 import { expect } from '@playwright/test';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils';
+import {
+	checkApiError,
+	getFractalCookie,
+	getRandomName,
+	selectSlimSelect,
+	waitModalClosed,
+	waitPageLoading
+} from '../utils';
 
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} projectDir
- * @returns {Promise<string>}
+ * @returns {Promise<{id: number, email: string}>}
  */
 export async function createTestUser(page, projectDir = '/tmp') {
-	const randomEmail = Math.random().toString(36).substring(7) + '@example.com';
-	await page.goto('/v2/admin/users/register');
-	await waitPageLoading(page);
-	await page.getByRole('textbox', { name: 'E-mail' }).fill(randomEmail);
-	await page.getByLabel('Password', { exact: true }).fill('test');
-	await page.getByLabel('Confirm password').fill('test');
-	await page.getByRole('textbox', { name: 'Project dir' }).fill(projectDir);
-	await page.getByRole('button', { name: 'Save' }).click();
-	await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
-	await waitPageLoading(page);
-	return randomEmail;
+	const randomEmail = getRandomName() + '@example.com';
+	const response1 = await page.request.post(`/api/auth/register`, {
+		headers: { Cookie: await getFractalCookie(page) },
+		data: { email: randomEmail, password: 'test', profile_id: 1, project_dirs: [projectDir] }
+	});
+	await checkApiError(response1, 'Unable to create user');
+	const user = await response1.json();
+	const response2 = await page.request.patch(`/api/auth/users/${user.id}`, {
+		headers: { Cookie: await getFractalCookie(page) },
+		data: { is_verified: true }
+	});
+	await checkApiError(response2, 'Unable to set is_verified=true');
+	return user;
 }
 
 /**
@@ -26,12 +35,13 @@ export async function createTestUser(page, projectDir = '/tmp') {
  * @returns {Promise<string>}
  */
 export async function createGuestUser(page, projectDir = '/tmp') {
-	const randomEmail = await createTestUser(page, projectDir);
+	const { id, email } = await createTestUser(page, projectDir);
+	await page.goto(`/v2/admin/users/${id}/edit`);
 	await page.getByRole('checkbox', { name: 'Guest' }).check();
 	await page.getByRole('button', { name: 'Save' }).click();
 	await waitPageLoading(page);
 	await expect(page.getByText('User successfully updated')).toBeVisible();
-	return randomEmail;
+	return email;
 }
 
 /**

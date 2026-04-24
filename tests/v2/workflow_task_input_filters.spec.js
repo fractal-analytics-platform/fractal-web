@@ -1,12 +1,9 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
-import { createDataset } from './dataset_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
+import { createDataset } from '../utils/v2/dataset.js';
 
 test('Workflow task input filters [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
 	let taskName1, taskName2;
 	await test.step('Create test tasks', async () => {
 		taskName1 = await createFakeTask(page, { type: 'non_parallel' });
@@ -202,9 +199,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Cleanup', async () => {
-		await workflow.removeCurrentTask();
-		await workflow.selectTask(taskName1);
-		await workflow.removeCurrentTask();
+		await workflow.delete();
 		await deleteTask(page, taskName1);
 		await deleteTask(page, taskName2);
 	});

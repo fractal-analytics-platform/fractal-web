@@ -1,8 +1,8 @@
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { expect, test } from './project_fixture.js';
 
 test('Duplicate workflow', async ({ page, project }) => {
-	await page.waitForURL(project.url);
+	await page.goto(project.url);
 	await waitPageLoading(page);
 
 	const workflowPageUrlRegex = /\/v2\/projects\/\d+\/workflows\/\d+/;

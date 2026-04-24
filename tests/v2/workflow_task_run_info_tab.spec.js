@@ -1,13 +1,10 @@
 import { expect, test } from './workflow_fixture.js';
-import { closeModal, waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
-import { waitTaskFailure } from './workflow_task_utils.js';
-import { createDataset } from './dataset_utils.js';
+import { closeModal, waitModal, waitModalClosed } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
+import { waitTaskFailure } from '../utils/v2/workflowtask.js';
 
 test('Workflow task info tab show run data', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
 	test.slow();
 
 	await test.step('Create test dataset', async () => {
@@ -184,8 +181,8 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	}
 
 	await test.step('Cleanup test tasks', async () => {
-		await workflow.removeCurrentTask();
-		await deleteTask(page, taskName); // 0.0.2
-		await deleteTask(page, taskName); // 0.0.1
+		await workflow.delete();
+		await deleteTask(page, taskName, '0.0.2');
+		await deleteTask(page, taskName, '0.0.1');
 	});
 });

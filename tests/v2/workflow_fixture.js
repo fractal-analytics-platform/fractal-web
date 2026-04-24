@@ -1,22 +1,21 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { addTaskToWorkflow, createWorkflow, waitModalClosed, waitPageLoading } from '../utils.js';
+import { addTaskToWorkflow, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createWorkflow, deleteWorkflow } from '../utils/v2/workflow';
 import { PageWithProject } from './project_fixture.js';
+import { createProject } from '../utils/v2/project.js';
 
 export class PageWithWorkflow extends PageWithProject {
 	/**
 	 * @param {import('@playwright/test').Page} page
-	 * @param {import('@playwright/test').APIRequestContext} request
+	 * @param {{name: string, id: number}} project
+	 * @param {{name: string, id: number}} workflow
 	 */
-	constructor(page, request) {
-		super(page);
-		this.request = request;
-		this.workflowName = Math.random().toString(36).substring(7);
-	}
-
-	async createWorkflow() {
-		const { url, id } = await createWorkflow(this.page, Number(this.projectId), this.workflowName);
-		this.url = url;
-		this.workflowId = String(id);
+	constructor(page, project, workflow) {
+		super(page, project);
+		this.projectUrl = this.url;
+		this.url = `/v2/projects/${this.projectId}/workflows/${workflow.id}`;
+		this.workflowId = workflow.id;
+		this.workflowName = workflow.name;
 	}
 
 	async addFirstCollectedTask() {
@@ -56,7 +55,9 @@ export class PageWithWorkflow extends PageWithProject {
 	 * @param {import('fractal-components/types/api.js').JobStatus} status
 	 */
 	async setTaskStatus(jobId, status) {
-		const response = await this.request.put(`http://localhost:8080/v2/${jobId}?status=${status}`);
+		const response = await this.page.request.put(
+			`http://localhost:8080/v2/${jobId}?status=${status}`
+		);
 		expect(response.ok()).toEqual(true);
 	}
 
@@ -90,16 +91,20 @@ export class PageWithWorkflow extends PageWithProject {
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(this.page);
 	}
+
+	async delete() {
+		await deleteWorkflow(this.page, this.projectId, this.workflowId);
+	}
 }
 
 const workflowTest = baseTest.extend(
 	/** @type {any} */ ({
-		workflow: async ({ page, request }, use) => {
-			const workflow = new PageWithWorkflow(page, request);
-			await workflow.createProject();
-			await workflow.createWorkflow();
-			await use(workflow);
-			await workflow.deleteProject();
+		workflow: async ({ page }, use) => {
+			const project = await createProject(page);
+			const workflow = await createWorkflow(page, project.id);
+			const p = new PageWithWorkflow(page, project, workflow);
+			await use(p);
+			await p.deleteProject();
 		}
 	})
 );

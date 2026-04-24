@@ -1,8 +1,8 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 
 test('Update workflow name and description', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await test.step('Edit workflow name', async () => {

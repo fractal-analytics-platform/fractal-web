@@ -1,9 +1,9 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { waitPageLoading } from '../utils/utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 test('Task version update [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	test.slow();
@@ -78,8 +78,8 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Cleanup test tasks', async () => {
-		await workflow.removeCurrentTask();
-		await deleteTask(page, task); // 0.0.2
-		await deleteTask(page, task); // 0.0.1
+		await workflow.delete();
+		await deleteTask(page, task, '0.0.2');
+		await deleteTask(page, task, '0.0.1');
 	});
 });

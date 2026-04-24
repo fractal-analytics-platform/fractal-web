@@ -1,18 +1,18 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
-import { createImage } from './image_utils.js';
-import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { waitTasksSuccess, waitTaskSubmitted } from '../utils/v2/workflowtask.js';
+import { createImage } from '../utils/v2/image.js';
 
 test('Continue workflow displays image lists [#693]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	let datasetName;
 	await test.step('Create test dataset and open dataset page', async () => {
-		const { name } = await createDataset(page, workflow.projectId);
+		const { name, id } = await createDataset(page, workflow.projectId);
 		datasetName = name;
-		await page.getByRole('link', { name: datasetName }).click();
+		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${id}`);
 		await waitPageLoading(page);
 	});
 

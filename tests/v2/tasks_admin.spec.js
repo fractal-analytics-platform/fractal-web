@@ -1,12 +1,9 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import * as fs from 'fs';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
 
 test('Tasks admin page [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
 	function randomInt() {
 		return Math.floor(Math.random() * 1000);
 	}
@@ -95,9 +92,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Cleanup test tasks', async () => {
-		await workflow.openWorkflowPage();
-		await workflow.selectTask(taskName);
-		await workflow.removeCurrentTask();
+		await workflow.delete();
 		await deleteTask(page, taskName);
 	});
 });

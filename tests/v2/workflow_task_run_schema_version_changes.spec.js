@@ -1,16 +1,13 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
-import { waitTasksSuccess } from './workflow_task_utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
+import { waitTasksSuccess } from '../utils/v2/workflowtask.js';
 
 test('Workflow task runs display different versions of arguments schema', async ({
 	page,
 	workflow
 }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
 	test.slow();
 
 	const modal = page.locator('.modal.show');
@@ -49,8 +46,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 	});
 
 	await test.step('Prepare workflow', async () => {
-		await page.goto(workflow.url);
-		await waitPageLoading(page);
+		await workflow.openWorkflowPage();
 		await workflow.addTask(taskName, '0.0.1');
 		await workflow.selectTask(taskName);
 		await page.getByRole('textbox', { name: 'p1' }).fill('foo');
@@ -141,7 +137,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 	});
 
 	await test.step('Cleanup', async () => {
-		await workflow.removeCurrentTask();
+		await workflow.delete();
 		await deleteTask(page, taskName);
 	});
 });

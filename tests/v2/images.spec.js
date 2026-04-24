@@ -1,8 +1,8 @@
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { expect, test } from './project_fixture.js';
 
 test('Dataset images [v2]', async ({ page, project }) => {
-	await page.waitForURL(project.url);
+	await page.goto(project.url);
 	await waitPageLoading(page);
 
 	const randomZarrSubfolder = Math.random().toString(36).substring(7);

@@ -4,21 +4,21 @@ import {
 	expectSlimSelectValue,
 	selectSlimSelect,
 	waitPageLoading
-} from '../utils.js';
-import { createImage } from './image_utils.js';
-import { createDataset } from './dataset_utils.js';
+} from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createImage } from '../utils/v2/image.js';
 
 test('Run workflow implicit applies changed filters [#694]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	const modal = page.locator('.modal.show');
 
 	let datasetName;
 	await test.step('Create test dataset1 and open dataset page', async () => {
-		const { name } = await createDataset(page, workflow.projectId);
+		const { name, id } = await createDataset(page, workflow.projectId);
 		datasetName = name;
-		await page.getByRole('link', { name: datasetName }).click();
+		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${id}`);
 		await waitPageLoading(page);
 	});
 

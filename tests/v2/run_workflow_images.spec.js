@@ -1,9 +1,9 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createImage } from './image_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createImage } from '../utils/v2/image.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('View images in run workflow modal', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await page.goto(`/v2/projects/${workflow.projectId}`);

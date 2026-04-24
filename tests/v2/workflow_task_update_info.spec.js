@@ -1,9 +1,9 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
 
 test('Update workflow task info (alias, description)', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await test.step('Create test dataset', async () => {

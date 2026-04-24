@@ -1,11 +1,22 @@
-import * as crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { expect } from '@playwright/test';
 
-export function generateUUID() {
-	return crypto.randomBytes(16).toString('hex');
+export function getRandomName() {
+	return Math.random().toString(36).substring(7);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+export async function getFractalCookie(page) {
+	const cookies = await page.context().cookies();
+	const cookie = cookies.find((c) => c.name === 'fastapiusersauth');
+	if (!cookie) {
+		throw new Error('Cookie not found');
+	}
+	return `${cookie.name}=${cookie.value}`;
 }
 
 /**
@@ -178,36 +189,6 @@ export async function expectBooleanIcon(locator, expectedValue) {
 
 /**
  * @param {import('@playwright/test').Page} page
- */
-export async function createProject(page) {
-	await page.goto('/v2/projects');
-	await waitPageLoading(page);
-
-	await page.getByRole('button', { name: 'Create new project' }).click();
-
-	const modal = await waitModal(page);
-
-	const projectName = Math.random().toString(36).substring(7);
-	await modal.getByLabel('Project name').fill(projectName);
-	const createProjectBtn = modal.getByRole('button', { name: 'Create' });
-	await createProjectBtn.click();
-	await waitModalClosed(page);
-
-	await page.waitForURL(/\/v2\/projects\/\d+/);
-	await waitPageLoading(page);
-
-	let projectId = undefined;
-	const match = page.url().match(/\/v2\/projects\/(\d+)/);
-	if (match) {
-		projectId = match[1];
-	}
-	expect(projectId).toBeDefined();
-
-	return { id: /** @type {string} */ (projectId), name: projectName };
-}
-
-/**
- * @param {import('@playwright/test').Page} page
  * @param {string} projectName
  * @param {string} userEmail
  * @param {string} permissions
@@ -243,36 +224,6 @@ export async function shareProjectById(page, projectId, userEmail, permissions) 
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {number|string} projectId
- * @param {string} workflowName
- */
-export async function createWorkflow(page, projectId, workflowName = '') {
-	await page.goto(`/v2/projects/${projectId}`);
-	await waitPageLoading(page);
-	const createWorkflowBtn = page.getByRole('button', { name: 'Create new workflow' });
-	await createWorkflowBtn.waitFor();
-	await createWorkflowBtn.click();
-	const modal = await waitModal(page);
-	const workflowNameInput = modal.getByRole('textbox', { name: 'Workflow name' });
-	if (!workflowName) {
-		workflowName = Math.random().toString(36).substring(7);
-	}
-	await workflowNameInput.fill(workflowName);
-	await workflowNameInput.blur();
-	await modal.getByRole('button', { name: 'Create empty workflow' }).click();
-	await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
-	const url = page.url();
-	const match = url.match(/\/v2\/projects\/\d+\/workflows\/(\d+)/);
-	let workflowId;
-	if (match) {
-		workflowId = Number(match[1]);
-	}
-	await waitPageLoading(page);
-	return { url, id: workflowId, name: workflowName };
-}
-
-/**
- * @param {import('@playwright/test').Page} page
  * @param {string} taskName
  * @param {string | null} taskVersion
  */
@@ -304,22 +255,14 @@ async function getTaskRow(page, taskName) {
 }
 
 /**
- * @param {import('@playwright/test').Page} page
- * @param {string} projectName
+ * @param {import('@playwright/test').APIResponse} response
+ * @param {string} message
  */
-export async function deleteProject(page, projectName) {
-	await page.goto('/v2/projects');
-	await waitPageLoading(page);
-
-	await page
-		.getByRole('row', { name: projectName })
-		.getByRole('button', { name: 'Delete' })
-		.click();
-
-	const modal = await waitModal(page);
-	await modal.getByRole('button', { name: 'Confirm' }).click();
-
-	await waitModalClosed(page);
-
-	await expect(page.getByRole('row', { name: projectName })).toHaveCount(0);
+export async function checkApiError(response, message) {
+	if (!response.ok()) {
+		if (response.status() !== 500) {
+			console.error(await response.json());
+		}
+		throw new Error(`${message}. Response status: ${response.status()}`);
+	}
 }

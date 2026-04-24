@@ -1,10 +1,10 @@
 import { expect, test } from './workflow_fixture.js';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
-import { waitTasksSuccess } from './workflow_task_utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { waitTasksSuccess } from '../utils/v2/workflowtask.js';
 
 test('Workflow unique types are verified when using status filter', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	test.slow();
@@ -14,7 +14,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 	let zarrDir;
 	await test.step('Create test dataset', async () => {
 		const dataset = await createDataset(page, workflow.projectId);
-		zarrDir = dataset.zarrDir;
+		zarrDir = dataset.zarr_dir;
 	});
 
 	await test.step('Open workflow page and add first task', async () => {

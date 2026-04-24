@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { expect, test } from './project_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
-	await page.waitForURL(project.url);
+	await page.goto(project.url);
 	await waitPageLoading(page);
 
 	const initialDatasetsCount = (await page.getByRole('table').first().getByRole('row').count()) - 1;

@@ -1,17 +1,16 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
-import { createFakeTask, deleteTask } from './task_utils.js';
-import { addUserToGroup, createTestGroup, deleteGroup } from './group_utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createFakeTask, deleteTask } from '../utils/v2/task.js';
+import { addUserToGroup, createTestGroup, deleteGroup } from '../utils/group.js';
 
-test('Task group edit (change group)', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
-	await waitPageLoading(page);
-
+test('Task group edit (change group)', async ({ page }) => {
 	test.slow();
 
-	let groupName;
+	const group = await createTestGroup(page);
+
 	await test.step('Create test group1', async () => {
-		groupName = await createTestGroup(page);
+		await page.goto(`/v2/admin/groups/${group.id}/edit`);
+		await waitPageLoading(page);
 		await addUserToGroup(page, 'admin@fractal.xy');
 	});
 
@@ -23,6 +22,8 @@ test('Task group edit (change group)', async ({ page, workflow }) => {
 	});
 
 	await test.step('Set the task to private', async () => {
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
 		const taskRow = page.getByRole('row', { name: taskName });
 		await expect(taskRow.getByRole('cell').nth(3)).toContainText('All');
 		await expect(taskRow.getByRole('cell').nth(1)).toContainText('admin@fractal.xy');
@@ -41,14 +42,14 @@ test('Task group edit (change group)', async ({ page, workflow }) => {
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
 		await modal.getByText('Shared task').click();
-		await modal.getByRole('combobox').selectOption(groupName);
+		await modal.getByRole('combobox').selectOption(group.name);
 		await modal.getByRole('button', { name: 'Update' }).click();
 		await waitModalClosed(page);
-		await expect(taskRow.getByRole('cell').nth(3)).toContainText(groupName);
+		await expect(taskRow.getByRole('cell').nth(3)).toContainText(group.name);
 	});
 
 	await test.step('Cleanup', async () => {
 		await deleteTask(page, taskName);
-		await deleteGroup(page, groupName);
+		await deleteGroup(page, group.id);
 	});
 });

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitPageLoading } from '../utils/utils.js';
 
 test('Create and delete a project', async ({ page }) => {
 	await page.goto('/v2/projects');

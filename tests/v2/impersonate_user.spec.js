@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login, waitPageLoading } from '../utils.js';
+import { login, waitPageLoading } from '../utils/utils.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });

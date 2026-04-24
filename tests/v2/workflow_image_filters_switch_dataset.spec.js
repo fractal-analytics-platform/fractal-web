@@ -1,8 +1,8 @@
 import { expect, test } from './workflow_fixture.js';
-import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
-import { createImage } from './image_utils.js';
-import { waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
+import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { waitTasksSuccess, waitTaskSubmitted } from '../utils/v2/workflowtask.js';
+import { createImage } from '../utils/v2/image.js';
 
 test('Switching datasets on continue workflow applies correct filters [#695]', async ({
 	page,
@@ -10,15 +10,15 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 }) => {
 	test.slow();
 
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 	const modal = page.locator('.modal.show');
 
 	let datasetName1;
 	await test.step('Create test dataset1 and open dataset page', async () => {
-		const { name } = await createDataset(page, workflow.projectId);
+		const { name, id } = await createDataset(page, workflow.projectId);
 		datasetName1 = name;
-		await page.getByRole('link', { name: datasetName1 }).click();
+		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${id}`);
 		await waitPageLoading(page);
 	});
 
@@ -29,9 +29,9 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	let datasetName2;
 	await test.step('Create test dataset2 and open dataset page', async () => {
-		const { name } = await createDataset(page, workflow.projectId);
+		const { name, id } = await createDataset(page, workflow.projectId);
 		datasetName2 = name;
-		await page.getByRole('link', { name: datasetName2 }).click();
+		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${id}`);
 		await waitPageLoading(page);
 	});
 

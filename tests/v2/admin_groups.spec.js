@@ -1,37 +1,30 @@
 import { expect, test } from '@playwright/test';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils.js';
-import { addUserToGroup, createTestGroup, deleteGroup } from './group_utils.js';
-import { addGroupToUser, createTestUser } from './user_utils.js';
+import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { addGroupToUser, createTestUser } from '../utils/v2/user.js';
+import { addUserToGroup, createTestGroup, deleteGroup } from '../utils/group.js';
 
 test('Admin groups management', async ({ page }) => {
-	let user1;
-	await test.step('Create test user', async () => {
-		user1 = await createTestUser(page);
-	});
-
-	let group1;
-	await test.step('Create test group1', async () => {
-		group1 = await createTestGroup(page);
-	});
+	const user1 = await createTestUser(page);
+	const group1 = await createTestGroup(page);
 
 	await test.step('Add the test user the group', async () => {
-		await addUserToGroup(page, user1);
+		await page.goto(`/v2/admin/groups/${group1.id}/edit`);
+		await waitPageLoading(page);
+		await addUserToGroup(page, user1.email);
 	});
 
 	await test.step('Check group info page', async () => {
 		await page.goto('/v2/admin/groups');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Info' }).click();
+		await page.getByRole('row', { name: group1.name }).getByRole('link', { name: 'Info' }).click();
 		await expect(page.getByText('Members of the group')).toBeVisible();
-		const userBadge = page.getByRole('link', { name: user1, exact: true });
+		const userBadge = page.getByRole('link', { name: user1.email, exact: true });
 		await expect(userBadge).toBeVisible();
 	});
 
-	let group2, group3;
-	await test.step('Create other 2 test groups', async () => {
-		group2 = await createTestGroup(page);
-		group3 = await createTestGroup(page);
-	});
+	// Create other 2 test groups
+	const group2 = await createTestGroup(page);
+	const group3 = await createTestGroup(page);
 
 	const groupBadges = page.locator('.row', { hasText: 'Groups' }).locator('.badge');
 	let initialGroupBadgesCount;
@@ -39,7 +32,7 @@ test('Admin groups management', async ({ page }) => {
 	await test.step('Open user editing page', async () => {
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Edit' }).click();
+		await page.getByRole('row', { name: user1.email }).getByRole('link', { name: 'Edit' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 		await waitPageLoading(page);
 		const currentGroups = (await groupBadges.allInnerTexts()).map(
@@ -48,12 +41,12 @@ test('Admin groups management', async ({ page }) => {
 		);
 		initialGroupBadgesCount = await groupBadges.count();
 		expect(currentGroups.includes('All')).toBeTruthy();
-		expect(currentGroups.includes(group1)).toBeTruthy();
+		expect(currentGroups.includes(group1.name)).toBeTruthy();
 	});
 
 	let selectableGroups1;
 	await test.step('Select group2 from "Add group" modal', async () => {
-		selectableGroups1 = await addGroupToUser(page, group2);
+		selectableGroups1 = await addGroupToUser(page, group2.name);
 		await expect(groupBadges).toHaveCount(initialGroupBadgesCount + 1);
 	});
 
@@ -68,7 +61,7 @@ test('Admin groups management', async ({ page }) => {
 	});
 
 	await test.step('Remove group2 from groups to add', async () => {
-		await page.getByLabel(`Remove group ${group2}`).click();
+		await page.getByLabel(`Remove group ${group2.name}`).click();
 		await expect(groupBadges).toHaveCount(initialGroupBadgesCount);
 	});
 
@@ -79,11 +72,11 @@ test('Admin groups management', async ({ page }) => {
 		await modal.waitFor();
 		const selectableGroups = await page.getByRole('option').allInnerTexts();
 		expect(selectableGroups.length).toEqual(selectableGroups1);
-		for (let group of [group2, group3].sort()) {
+		for (let group of [group2, group3].sort((g1, g2) => g1.name.localeCompare(g2.name))) {
 			await selectSlimSelect(
 				page,
 				page.getByRole('combobox', { name: 'Select groups' }),
-				group,
+				group.name,
 				true
 			);
 		}
@@ -100,7 +93,7 @@ test('Admin groups management', async ({ page }) => {
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 		await page.goto('/v2/admin/users');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: user1 }).getByRole('link', { name: 'Info' }).click();
+		await page.getByRole('row', { name: user1.email }).getByRole('link', { name: 'Info' }).click();
 		await waitPageLoading(page);
 		await expect(page.getByRole('row', { name: 'Groups' }).getByRole('link')).toHaveCount(
 			finalCount
@@ -113,7 +106,7 @@ test('Admin groups management', async ({ page }) => {
 		await page.getByRole('button', { name: 'Create new group' }).click();
 		const modal = page.locator('.modal.show');
 		await modal.waitFor();
-		await modal.getByRole('textbox', { name: 'Group name' }).fill(group1);
+		await modal.getByRole('textbox', { name: 'Group name' }).fill(group1.name);
 		await modal.getByRole('button', { name: 'Create' }).click();
 		await expect(modal.getByText('A group with the same name already exists')).toBeVisible();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
@@ -123,17 +116,17 @@ test('Admin groups management', async ({ page }) => {
 	await test.step('Remove user from group1 by editing group', async () => {
 		await page.goto('/v2/admin/groups');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: group1 }).getByRole('link', { name: 'Edit' }).click();
+		await page.getByRole('row', { name: group1.name }).getByRole('link', { name: 'Edit' }).click();
 		await waitPageLoading(page);
 		const container = page.locator('#members-container');
-		await expect(container).toContainText(user1);
-		await page.getByLabel(`Remove user ${user1}`).click();
-		await expect(container).not.toContainText(user1);
+		await expect(container).toContainText(user1.email);
+		await page.getByLabel(`Remove user ${user1.email}`).click();
+		await expect(container).not.toContainText(user1.email);
 	});
 
 	await test.step('Delete test groups', async () => {
-		await deleteGroup(page, group1);
-		await deleteGroup(page, group2);
-		await deleteGroup(page, group3);
+		await deleteGroup(page, group1.id);
+		await deleteGroup(page, group2.id);
+		await deleteGroup(page, group3.id);
 	});
 });

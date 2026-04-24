@@ -1,11 +1,11 @@
 import { expect, test } from './workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import fs from 'fs';
-import { createDataset } from './dataset_utils.js';
-import { waitTaskFailure, waitTaskSubmitted, waitTasksSuccess } from './workflow_task_utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { waitTaskFailure, waitTasksSuccess, waitTaskSubmitted } from '../utils/v2/workflowtask.js';
 
 test('Run mock tasks [v2]', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	test.slow();

@@ -1,10 +1,10 @@
-import { closeModal, waitPageLoading } from '../utils.js';
-import { createDataset } from './dataset_utils.js';
-import { createFakeTask } from './task_utils.js';
+import { closeModal, waitPageLoading } from '../utils/utils.js';
+import { createDataset } from '../utils/v2/dataset.js';
+import { createFakeTask } from '../utils/v2/task.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Attempt to run a workflow with invalid arguments', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	let nonParallelTask;

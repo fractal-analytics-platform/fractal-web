@@ -1,8 +1,8 @@
-import { waitModalClosed, waitPageLoading } from '../utils.js';
+import { waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { expect, test } from './project_fixture.js';
 
 test('View plate and feature explorer link', async ({ page, project }) => {
-	await page.waitForURL(project.url);
+	await page.goto(project.url);
 	await waitPageLoading(page);
 
 	const randomZarrSubfolder = Math.random().toString(36).substring(7);

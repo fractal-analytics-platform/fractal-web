@@ -1,8 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { setUploadFile, waitModalClosed, waitPageLoading, waitStopSpinnerIn } from '../utils.js';
+import {
+	setUploadFile,
+	waitModalClosed,
+	waitPageLoading,
+	waitStopSpinnerIn
+} from '../utils/utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { collapseExpandedRows, deleteTask } from './task_utils.js';
+import { collapseExpandedRows, deleteTask } from '../utils/v2/task.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

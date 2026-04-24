@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
 	closeModal,
-	createProject,
-	deleteProject,
 	expectBooleanIcon,
 	login,
 	logout,
@@ -10,8 +8,9 @@ import {
 	waitModal,
 	waitModalClosed,
 	waitPageLoading
-} from '../utils.js';
-import { createTestUser } from './user_utils.js';
+} from '../utils/utils.js';
+import { createTestUser } from '../utils/v2/user.js';
+import { createProject, deleteProject } from '../utils/v2/project.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -20,18 +19,18 @@ test('Project sharing', async ({ page }) => {
 	await login(page, 'admin@fractal.xy', '1234');
 	await waitPageLoading(page);
 
-	const userEmail = await createTestUser(page);
+	const { email: userEmail } = await createTestUser(page);
 
-	const projectToAccept = (await createProject(page)).name;
-	const projectToReject = (await createProject(page)).name;
-	const projectToLeave = (await createProject(page)).name;
+	const projectToAccept = await createProject(page);
+	const projectToReject = await createProject(page);
+	const projectToLeave = await createProject(page);
 
 	await test.step('Open sharing page for project 1', async () => {
 		await page.goto('/v2/projects');
 		await waitPageLoading(page);
 
 		await page
-			.getByRole('row', { name: projectToAccept })
+			.getByRole('row', { name: projectToAccept.name })
 			.getByRole('link', { name: 'Sharing' })
 			.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/sharing/);
@@ -75,7 +74,7 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Share project 2', async () => {
-		await shareProjectByName(page, projectToReject, userEmail, 'Read');
+		await shareProjectByName(page, projectToReject.name, userEmail, 'Read');
 		const row = page.getByRole('row', { name: userEmail });
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
@@ -84,7 +83,7 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Share project 3', async () => {
-		await shareProjectByName(page, projectToLeave, userEmail, 'Read, Write, Execute');
+		await shareProjectByName(page, projectToLeave.name, userEmail, 'Read, Write, Execute');
 		const row = page.getByRole('row', { name: userEmail });
 		await expectBooleanIcon(row.getByRole('cell').nth(1), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
@@ -98,25 +97,25 @@ test('Project sharing', async ({ page }) => {
 
 		await expect(page.locator('.alert')).toHaveCount(3);
 
-		const alert1 = page.locator('.alert', { has: page.getByText(projectToAccept) });
+		const alert1 = page.locator('.alert', { has: page.getByText(projectToAccept.name) });
 		await expect(alert1).toContainText(
-			`User admin@fractal.xy wants to share project "${projectToAccept}" with you`
+			`User admin@fractal.xy wants to share project "${projectToAccept.name}" with you`
 		);
 		await alert1.getByRole('button', { name: 'Accept' }).click();
 
 		await expect(page.locator('.alert')).toHaveCount(2);
 
-		const alert2 = page.locator('.alert', { has: page.getByText(projectToReject) });
+		const alert2 = page.locator('.alert', { has: page.getByText(projectToReject.name) });
 		await expect(alert2).toContainText(
-			`User admin@fractal.xy wants to share project "${projectToReject}" with you`
+			`User admin@fractal.xy wants to share project "${projectToReject.name}" with you`
 		);
 		await alert2.getByRole('button', { name: 'Reject' }).click();
 
 		await expect(page.locator('.alert')).toHaveCount(1);
 
-		const alert3 = page.locator('.alert', { has: page.getByText(projectToLeave) });
+		const alert3 = page.locator('.alert', { has: page.getByText(projectToLeave.name) });
 		await expect(alert3).toContainText(
-			`User admin@fractal.xy wants to share project "${projectToLeave}" with you`
+			`User admin@fractal.xy wants to share project "${projectToLeave.name}" with you`
 		);
 		await alert3.getByRole('button', { name: 'Accept' }).click();
 
@@ -125,11 +124,11 @@ test('Project sharing', async ({ page }) => {
 
 	await test.step('Check shared projects', async () => {
 		await page.getByRole('button', { name: 'Shared with me' }).click();
-		const acceptedRow1 = page.getByRole('row', { name: projectToAccept });
-		const acceptedRow2 = page.getByRole('row', { name: projectToLeave });
+		const acceptedRow1 = page.getByRole('row', { name: projectToAccept.name });
+		const acceptedRow2 = page.getByRole('row', { name: projectToLeave.name });
 		await expect(acceptedRow1).toBeVisible();
 		await expect(acceptedRow2).toBeVisible();
-		await expect(page.getByRole('row', { name: projectToReject })).not.toBeVisible();
+		await expect(page.getByRole('row', { name: projectToReject.name })).not.toBeVisible();
 
 		await acceptedRow1.getByRole('button', { name: 'Info' }).click();
 		const modal1 = await waitModal(page);
@@ -145,7 +144,7 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Check info button inside project', async () => {
-		await page.getByRole('link', { name: projectToAccept }).click();
+		await page.getByRole('link', { name: projectToAccept.name }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+/);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Info' }).click();
@@ -158,7 +157,7 @@ test('Project sharing', async ({ page }) => {
 		await page.goto('/v2/projects');
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Shared with me' }).click();
-		const row = page.getByRole('row', { name: projectToLeave });
+		const row = page.getByRole('row', { name: projectToLeave.name });
 		await row.getByRole('button', { name: 'Leave' }).click();
 		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
@@ -173,7 +172,7 @@ test('Project sharing', async ({ page }) => {
 
 	await test.step('Check project 1', async () => {
 		await page
-			.getByRole('row', { name: projectToAccept })
+			.getByRole('row', { name: projectToAccept.name })
 			.getByRole('link', { name: 'Sharing' })
 			.click();
 
@@ -201,7 +200,7 @@ test('Project sharing', async ({ page }) => {
 		await page.goto('/v2/projects');
 		await waitPageLoading(page);
 		await page
-			.getByRole('row', { name: projectToReject })
+			.getByRole('row', { name: projectToReject.name })
 			.getByRole('link', { name: 'Sharing' })
 			.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/sharing/);
@@ -213,7 +212,7 @@ test('Project sharing', async ({ page }) => {
 		await page.goto('/v2/projects');
 		await waitPageLoading(page);
 		await page
-			.getByRole('row', { name: projectToLeave })
+			.getByRole('row', { name: projectToLeave.name })
 			.getByRole('link', { name: 'Sharing' })
 			.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/sharing/);
@@ -224,7 +223,7 @@ test('Project sharing', async ({ page }) => {
 	await test.step('Check sharing button inside project', async () => {
 		await page.goto('/v2/projects');
 		await waitPageLoading(page);
-		await page.getByRole('link', { name: projectToAccept }).click();
+		await page.getByRole('link', { name: projectToAccept.name }).click();
 		await page.waitForURL(/\/v2\/projects\/\d+/);
 		await waitPageLoading(page);
 		await page.getByRole('link', { name: 'Sharing' }).click();
@@ -232,8 +231,8 @@ test('Project sharing', async ({ page }) => {
 	});
 
 	await test.step('Cleanup', async () => {
-		await deleteProject(page, projectToAccept);
-		await deleteProject(page, projectToReject);
-		await deleteProject(page, projectToLeave);
+		await deleteProject(page, projectToAccept.id);
+		await deleteProject(page, projectToReject.id);
+		await deleteProject(page, projectToLeave.id);
 	});
 });

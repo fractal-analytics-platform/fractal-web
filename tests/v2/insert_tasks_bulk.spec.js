@@ -1,9 +1,9 @@
-import { waitModal, waitModalClosed, waitPageLoading } from '../utils.js';
-import { checkTasksOrder } from './task_utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { checkTasksOrder } from '../utils/v2/task.js';
 import { expect, test } from './workflow_fixture.js';
 
 test('Bulk workflow tasks insertion', async ({ page, workflow }) => {
-	await page.waitForURL(workflow.url);
+	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	await test.step('Add two tasks', async () => {

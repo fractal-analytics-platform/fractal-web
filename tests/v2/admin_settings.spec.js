@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
+import { waitPageLoading } from '../utils/utils.js';
 
 test('Show the admin settings page', async ({ page }) => {
 	await test.step('Open the admin settings page', async () => {

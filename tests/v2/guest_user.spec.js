@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../utils.js';
-import { createTestUser, verifyChecked } from './user_utils.js';
+import { waitPageLoading } from '../utils/utils.js';
+import { createTestUser, verifyChecked } from '../utils/v2/user.js';
 
 test('Guest user', async ({ page }) => {
 	await waitPageLoading(page);
-	const userEmail = await createTestUser(page);
+	const { email: userEmail } = await createTestUser(page);
 	let userId;
 
 	await test.step('Verify new user is not a guest', async () => {

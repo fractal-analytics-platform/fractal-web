@@ -1,14 +1,13 @@
 import { expect, test } from '@playwright/test';
 import {
-	createProject,
-	deleteProject,
 	expectBooleanIcon,
 	login,
 	logout,
 	shareProjectByName,
 	waitPageLoading
-} from '../utils.js';
-import { createTestUser, createGuestUser } from './user_utils.js';
+} from '../utils/utils.js';
+import { createGuestUser, createTestUser } from '../utils/v2/user.js';
+import { createProject, deleteProject } from '../utils/v2/project.js';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -17,8 +16,8 @@ test('Admin page for project sharing', async ({ page }) => {
 	await login(page, 'admin@fractal.xy', '1234');
 	await waitPageLoading(page);
 
-	const userEmail1 = await createTestUser(page);
-	const userEmail2 = await createTestUser(page);
+	const { email: userEmail1 } = await createTestUser(page);
+	const { email: userEmail2 } = await createTestUser(page);
 
 	const userEmail3 = await createGuestUser(page);
 
@@ -73,7 +72,7 @@ test('Admin page for project sharing', async ({ page }) => {
 	});
 
 	await test.step('Test search fields', async () => {
-		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(String(p1.id));
 		await search(page, 3);
 		await expect(page.getByRole('row', { name: p1.name })).toHaveCount(3);
 		await reset(page);
@@ -95,14 +94,14 @@ test('Admin page for project sharing', async ({ page }) => {
 		await expect(page.getByRole('row', { name: p2.name })).toBeVisible();
 		await reset(page);
 
-		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(String(p1.id));
 		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
 		await page.getByRole('combobox', { name: 'Is Owner' }).selectOption('True');
 		await search(page, 1);
 		await expect(page.getByRole('row', { name: p1.name })).toBeVisible();
 		await reset(page);
 
-		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(String(p1.id));
 		await page.getByRole('combobox', { name: 'User' }).selectOption('admin@fractal.xy');
 		await page.getByRole('combobox', { name: 'Is Owner' }).selectOption('False');
 		await search(page, 0);
@@ -110,7 +109,7 @@ test('Admin page for project sharing', async ({ page }) => {
 	});
 
 	await test.step('Test Verify button', async () => {
-		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(p1.id);
+		await page.getByRole('spinbutton', { name: 'Project Id' }).fill(String(p1.id));
 		await search(page, 3);
 		await expect(page.getByRole('row', { name: p1.name })).toHaveCount(3);
 		// for non-guests users there is no Verify button
@@ -129,8 +128,8 @@ test('Admin page for project sharing', async ({ page }) => {
 	});
 
 	await test.step('Cleanup', async () => {
-		await deleteProject(page, p1.name);
-		await deleteProject(page, p2.name);
+		await deleteProject(page, p1.id);
+		await deleteProject(page, p2.id);
 	});
 });
 

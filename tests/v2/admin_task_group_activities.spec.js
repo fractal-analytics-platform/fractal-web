@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from '../utils';
+import { waitModalClosed, waitPageLoading } from '../utils/utils';
 
 test('Admin task-group activities page', async ({ page }) => {
 	await test.step('Open task-group activities page', async () => {

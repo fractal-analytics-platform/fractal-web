@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { uploadFile, waitPageLoading } from '../utils.js';
+import { uploadFile, waitPageLoading } from '../utils/utils.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import { deleteTask } from './task_utils.js';
+import { deleteTask } from '../utils/v2/task.js';
 
 test('Custom Python env task [v2]', async ({ page }) => {
 	await page.goto('/v2/tasks/management');
@@ -87,7 +87,7 @@ test('Custom Python env task [v2]', async ({ page }) => {
 	});
 
 	await test.step('Delete task', async () => {
-		await deleteTask(page, randomName);
+		await deleteTask(page, `${randomName}-label`);
 	});
 
 	await test.step('Remove temporary file and folder', async () => {
