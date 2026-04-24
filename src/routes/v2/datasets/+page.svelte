@@ -168,6 +168,14 @@
 			<div class="card-body">
 				<div class="table-responsive mt-2">
 					<table class="table" id="templates-table">
+						<colgroup>
+							<col style="width: 20%" />
+							<col style="width: 20%" />
+							<col style="width: 20%" />
+							<col style="width: 20%" />
+							<col style="width: 5%" />
+							<col style="width: 15%" />
+						</colgroup>
 						<thead>
 							<tr>
 								<th>Dataset name</th>
@@ -181,20 +189,24 @@
 						<tbody>
 							{#each datasetPage.items as dataset, index (index)}
 								<tr>
-									<td class="overflow-cell">
+									<td class="wrap-cell">
 										<a href={`/v2/projects/${dataset.project_id}/datasets/${dataset.id}`}>
 											{dataset.name}
 										</a>
 									</td>
-									<td class="overflow-cell">
+									<td class="wrap-cell">
 										<a href={`/v2/projects/${dataset.project_id}`}>
 											{dataset.project.name}
 										</a>
 									</td>
-									<td class="overflow-cell">{dataset.owner_email}</td>
-									<td class="overflow-cell">{dataset.zarr_dir}</td>
-									<td>{dataset.image_count}</td>
-									<td><TimestampCell timestamp={dataset.timestamp_created} /></td>
+									<td class="wrap-cell">{dataset.owner_email}</td>
+									<td class="ellipsis-cell">
+										<span title={dataset.zarr_dir}>
+											{dataset.zarr_dir}
+										</span>
+									</td>
+									<td class="ellipsis-cell">{dataset.image_count}</td>
+									<td class="wrap-cell"><TimestampCell timestamp={dataset.timestamp_created} /></td>
 								</tr>
 							{/each}
 						</tbody>
@@ -219,9 +231,14 @@
 </div>
 
 <style>
-	.overflow-cell {
+	.ellipsis-cell {
 		max-width: 100px;
-		text-overflow: ellipsis;
+		white-space: nowrap;
 		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.wrap-cell {
+		white-space: normal;
+		word-break: break-word;
 	}
 </style>
