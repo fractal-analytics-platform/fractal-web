@@ -6,7 +6,7 @@
 	import { pushState } from '$app/navigation';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').DatasetV2>} */
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').DatasetWithImageCount>} */
 	let datasetPage = $state({
 		current_page: 1,
 		page_size: 10,
@@ -25,7 +25,7 @@
 	/** @type {string|undefined} */
 	let projectName = $derived(page.url.searchParams.get('project_name') || undefined);
 	/** @type {boolean} */
-	let isOwner = $derived(page.url.searchParams.get('is_owner') === 'true');
+	let onlyOwned = $derived(page.url.searchParams.get('only_owned') === 'true');
 	/** @type {string|undefined} */
 	let datasetName = $derived(page.url.searchParams.get('dataset_name') || undefined);
 	/** @type {number} */
@@ -37,7 +37,7 @@
 	 * @typedef {Object} AppliedState
 	 * @property {number|undefined} projectId
 	 * @property {string|undefined} projectName
-	 * @property {boolean} isOwner
+	 * @property {boolean} onlyOwned
 	 * @property {string|undefined} datasetName
 	 */
 
@@ -45,28 +45,28 @@
 	let lastAppliedState = $state({
 		projectId: undefined,
 		projectName: undefined,
-		isOwner: false,
+		onlyOwned: false,
 		datasetName: undefined
 	});
 
 	const currentState = $derived({
 		projectId,
 		projectName,
-		isOwner,
+		onlyOwned,
 		datasetName
 	});
 
 	const isDefault = $derived(
 		projectId === undefined &&
 			projectName === undefined &&
-			isOwner === false &&
+			onlyOwned === false &&
 			datasetName === undefined
 	);
 
 	const isDirtyFromApplied = $derived(
 		currentState.projectId != lastAppliedState.projectId ||
 			currentState.projectName !== lastAppliedState.projectName ||
-			currentState.isOwner !== lastAppliedState.isOwner ||
+			currentState.onlyOwned !== lastAppliedState.onlyOwned ||
 			currentState.datasetName != lastAppliedState.datasetName
 	);
 
@@ -86,13 +86,13 @@
 		const params = new URLSearchParams();
 		params.set('page', String(currentPage));
 		params.set('page_size', String(pageSize));
-		params.set('is_owner', String(isOwner));
+		params.set('only_owned', String(onlyOwned));
 
 		projectId && params.set('project_id', String(projectId));
 		projectName && params.set('project_name', projectName);
-		isOwner
-			? url.searchParams.set('is_owner', String(isOwner))
-			: url.searchParams.delete('is_owner');
+		onlyOwned
+			? url.searchParams.set('only_owned', String(onlyOwned))
+			: url.searchParams.delete('only_owned');
 		datasetName && params.set('dataset_name', datasetName);
 		await tick();
 		pushState(url, {});
@@ -149,12 +149,12 @@
 					<div class="col-auto">
 						<div class="form-check mb-1">
 							<input
-								id="isOwnerCheckbox"
+								id="onlyOwnedCheckbox"
 								type="checkbox"
 								class="form-check-input"
-								bind:checked={isOwner}
+								bind:checked={onlyOwned}
 							/>
-							<label class="form-check-label small" for="isOwnerCheckbox"> Only owned </label>
+							<label class="form-check-label small" for="onlyOwnedCheckbox"> Only owned </label>
 						</div>
 					</div>
 
@@ -177,7 +177,7 @@
 								currentPage = 1;
 								projectId = undefined;
 								projectName = undefined;
-								isOwner = false;
+								onlyOwned = false;
 								datasetName = undefined;
 								lastAppliedState = { ...currentState };
 								await searchDatasets();
@@ -199,6 +199,7 @@
 								<th>Dataset name</th>
 								<th>Project ID</th>
 								<th>Zarr dir</th>
+								<th>Number of images</th>
 								<th>Created at</th>
 							</tr>
 						</thead>
@@ -216,6 +217,7 @@
 										</a>
 									</td>
 									<td>{dataset.zarr_dir}</td>
+									<td>{dataset.image_count}</td>
 									<td><TimestampCell timestamp={dataset.timestamp_created} /></td>
 								</tr>
 							{/each}

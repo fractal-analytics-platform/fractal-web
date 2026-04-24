@@ -90,6 +90,10 @@ export type DatasetV2 = {
 	timestamp_created: string;
 };
 
+export type DatasetWithImageCount = DatasetV2 & {
+	image_count: number;
+};
+
 export type DatasetHistoryItemV2 = {
 	workflowtask: WorkflowTaskV2;
 	status: string;
