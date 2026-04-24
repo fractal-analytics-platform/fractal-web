@@ -16,12 +16,6 @@
 	});
 
 	// query parametes
-	/** @type {number|undefined} */
-	let projectId = $derived(
-		page.url.searchParams.get('project_id')
-			? Number(page.url.searchParams.get('template_id'))
-			: undefined
-	);
 	/** @type {string|undefined} */
 	let projectName = $derived(page.url.searchParams.get('project_name') || undefined);
 	/** @type {boolean} */
@@ -35,7 +29,6 @@
 
 	/**
 	 * @typedef {Object} AppliedState
-	 * @property {number|undefined} projectId
 	 * @property {string|undefined} projectName
 	 * @property {boolean} onlyOwned
 	 * @property {string|undefined} datasetName
@@ -43,29 +36,23 @@
 
 	/** @type {AppliedState} */
 	let lastAppliedState = $state({
-		projectId: undefined,
 		projectName: undefined,
 		onlyOwned: false,
 		datasetName: undefined
 	});
 
 	const currentState = $derived({
-		projectId,
 		projectName,
 		onlyOwned,
 		datasetName
 	});
 
 	const isDefault = $derived(
-		projectId === undefined &&
-			projectName === undefined &&
-			onlyOwned === false &&
-			datasetName === undefined
+		projectName === undefined && onlyOwned === false && datasetName === undefined
 	);
 
 	const isDirtyFromApplied = $derived(
-		currentState.projectId != lastAppliedState.projectId ||
-			currentState.projectName !== lastAppliedState.projectName ||
+		currentState.projectName !== lastAppliedState.projectName ||
 			currentState.onlyOwned !== lastAppliedState.onlyOwned ||
 			currentState.datasetName != lastAppliedState.datasetName
 	);
@@ -88,7 +75,6 @@
 		params.set('page_size', String(pageSize));
 		params.set('only_owned', String(onlyOwned));
 
-		projectId && params.set('project_id', String(projectId));
 		projectName && params.set('project_name', projectName);
 		onlyOwned
 			? url.searchParams.set('only_owned', String(onlyOwned))
@@ -115,17 +101,6 @@
 		<div class="card mb-3">
 			<div class="card-body">
 				<div class="row g-3 align-items-end">
-					<div class="col">
-						<label for="searchProjectId" class="form-label small text-muted">Project ID</label>
-						<input
-							id="searchProjectId"
-							type="number"
-							class="form-control form-control-sm"
-							min="1"
-							bind:value={projectId}
-						/>
-					</div>
-
 					<div class="col">
 						<label for="searchProjectName" class="form-label small text-muted">Project name</label>
 						<input
@@ -175,7 +150,6 @@
 							disabled={isDefault}
 							onclick={async () => {
 								currentPage = 1;
-								projectId = undefined;
 								projectName = undefined;
 								onlyOwned = false;
 								datasetName = undefined;
@@ -197,26 +171,28 @@
 						<thead>
 							<tr>
 								<th>Dataset name</th>
-								<th>Project ID</th>
+								<th>Project name</th>
+								<th>Owner's email</th>
 								<th>Zarr dir</th>
-								<th>Number of images</th>
+								<th># images</th>
 								<th>Created at</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each datasetPage.items as dataset, index (index)}
 								<tr>
-									<td>
+									<td class="overflow-cell">
 										<a href={`/v2/projects/${dataset.project_id}/datasets/${dataset.id}`}>
 											{dataset.name}
 										</a>
 									</td>
-									<td>
+									<td class="overflow-cell">
 										<a href={`/v2/projects/${dataset.project_id}`}>
 											{dataset.project.name}
 										</a>
 									</td>
-									<td>{dataset.zarr_dir}</td>
+									<td class="overflow-cell">{dataset.owner_email}</td>
+									<td class="overflow-cell">{dataset.zarr_dir}</td>
 									<td>{dataset.image_count}</td>
 									<td><TimestampCell timestamp={dataset.timestamp_created} /></td>
 								</tr>
@@ -241,3 +217,11 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.overflow-cell {
+		max-width: 100px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+</style>

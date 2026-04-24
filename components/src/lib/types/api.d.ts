@@ -90,7 +90,8 @@ export type DatasetV2 = {
 	timestamp_created: string;
 };
 
-export type DatasetWithImageCount = DatasetV2 & {
+export type DatasetV2Expanded = DatasetV2 & {
+	owner_email: string;
 	image_count: number;
 };
 
