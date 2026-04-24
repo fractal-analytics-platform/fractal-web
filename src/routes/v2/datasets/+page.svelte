@@ -182,7 +182,7 @@
 								<th>Project name</th>
 								<th>Owner's email</th>
 								<th>Zarr dir</th>
-								<th># images</th>
+								<th># Images</th>
 								<th>Created at</th>
 							</tr>
 						</thead>
