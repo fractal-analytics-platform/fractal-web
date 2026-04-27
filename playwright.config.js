@@ -96,7 +96,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch 3293-introduce-get-apiv2dataset',
+			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
