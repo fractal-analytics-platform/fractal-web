@@ -1,8 +1,7 @@
 <script>
 	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '$lib/common/errors';
 	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { onMount, tick } from 'svelte';
-	import { pushState } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
