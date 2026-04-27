@@ -5,6 +5,9 @@
 	import { pushState } from '$app/navigation';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let fetchErrorAlert;
+
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').DatasetV2Expanded>} */
 	let datasetPage = $state({
 		current_page: 1,
@@ -64,6 +67,7 @@
 	});
 
 	async function searchDatasets() {
+		fetchErrorAlert?.hide();
 		const url = new URL(window.location.href);
 		// Query parametes
 		const params = new URLSearchParams();
@@ -83,7 +87,10 @@
 		if (response.ok) {
 			datasetPage = await response.json();
 		} else {
-			displayStandardErrorAlert(await getAlertErrorFromResponse(response), 'fetchErrorAlert');
+			fetchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'fetchErrorAlert'
+			);
 		}
 	}
 </script>
