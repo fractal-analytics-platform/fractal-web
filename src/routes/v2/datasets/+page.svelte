@@ -1,5 +1,5 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '$lib/common/errors';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { onMount, tick } from 'svelte';
 	import { pushState } from '$app/navigation';
@@ -65,9 +65,6 @@
 
 	async function searchDatasets() {
 		const url = new URL(window.location.href);
-		// Headers
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
 		// Query parametes
 		const params = new URLSearchParams();
 		params.set('page', String(currentPage));
@@ -81,19 +78,19 @@
 
 		let response = await fetch(`/api/v2/dataset?${params.toString()}`, {
 			method: 'GET',
-			headers,
 			credentials: 'include'
 		});
 		if (response.ok) {
 			datasetPage = await response.json();
 		} else {
-			throw await getAlertErrorFromResponse(response);
+			displayStandardErrorAlert(await getAlertErrorFromResponse(response), 'fetchErrorAlert');
 		}
 	}
 </script>
 
 <div class="container-fluid">
 	<div class="container mt-2">
+		<div id="fetchErrorAlert" class="mt-3 mb-3"></div>
 		<div class="card mb-3">
 			<div class="card-body">
 				<div class="row g-3 align-items-end">
