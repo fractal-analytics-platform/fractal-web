@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Add new datasets page (\#1089).
+
 # 1.27.4
 
 - Truncate long versions in `TaskGroupsTable` (\#1084).
