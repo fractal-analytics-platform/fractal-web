@@ -56,7 +56,7 @@
 	const isDirtyFromApplied = $derived(
 		currentState.projectName !== lastAppliedState.projectName ||
 			currentState.onlyOwned !== lastAppliedState.onlyOwned ||
-			currentState.datasetName != lastAppliedState.datasetName
+			currentState.datasetName !== lastAppliedState.datasetName
 	);
 
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
@@ -68,17 +68,13 @@
 
 	async function searchDatasets() {
 		fetchErrorAlert?.hide();
-		const url = new URL(window.location.href);
-		// Query parametes
+
 		const params = new URLSearchParams();
 		params.set('page', String(currentPage));
 		params.set('page_size', String(pageSize));
 		params.set('only_owned', String(onlyOwned));
 		projectName && params.set('project_name', projectName);
 		datasetName && params.set('dataset_name', datasetName);
-
-		await tick();
-		pushState(url, {});
 
 		let response = await fetch(`/api/v2/dataset?${params.toString()}`, {
 			method: 'GET',
