@@ -34,14 +34,6 @@ const commonTests = [
 
 const v2Tests = [
 	{
-		name: 'pixi',
-		testMatch: /v2\/pixi\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['init']
-	},
-	{
 		name: 'chromium',
 		testMatch: /v2\/.*\.spec\.js/,
 		use: {
