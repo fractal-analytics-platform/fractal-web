@@ -73,6 +73,8 @@
 		params.set('page', String(currentPage));
 		params.set('page_size', String(pageSize));
 		params.set('only_owned', String(onlyOwned));
+		projectName && params.set('project_name', projectName);
+		datasetName && params.set('dataset_name', datasetName);
 
 		await tick();
 		pushState(url, {});
