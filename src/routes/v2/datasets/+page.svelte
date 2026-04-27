@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { onMount, tick } from 'svelte';
