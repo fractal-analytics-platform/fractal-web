@@ -17,11 +17,11 @@
 
 	// query parametes
 	/** @type {string|undefined} */
-	let projectName = $derived(page.url.searchParams.get('project_name') || undefined);
+	let projectName = $state(undefined);
 	/** @type {boolean} */
-	let onlyOwned = $derived(page.url.searchParams.get('only_owned') === 'true');
+	let onlyOwned = $state(false);
 	/** @type {string|undefined} */
-	let datasetName = $derived(page.url.searchParams.get('dataset_name') || undefined);
+	let datasetName = $state(undefined);
 	/** @type {number} */
 	let currentPage = $state(1);
 	/** @type {number} */
@@ -75,11 +75,6 @@
 		params.set('page_size', String(pageSize));
 		params.set('only_owned', String(onlyOwned));
 
-		projectName && params.set('project_name', projectName);
-		onlyOwned
-			? url.searchParams.set('only_owned', String(onlyOwned))
-			: url.searchParams.delete('only_owned');
-		datasetName && params.set('dataset_name', datasetName);
 		await tick();
 		pushState(url, {});
 
@@ -169,18 +164,18 @@
 				<div class="table-responsive mt-2">
 					<table class="table" id="templates-table">
 						<colgroup>
+							<col style="width: 25%" />
 							<col style="width: 20%" />
 							<col style="width: 20%" />
-							<col style="width: 20%" />
-							<col style="width: 20%" />
-							<col style="width: 7%" />
+							<col style="width: 12%" />
+							<col style="width: 10%" />
 							<col style="width: 13%" />
 						</colgroup>
 						<thead>
 							<tr>
-								<th>Dataset name</th>
-								<th>Project name</th>
-								<th>Owner's email</th>
+								<th>Dataset</th>
+								<th>Project</th>
+								<th>Owner</th>
 								<th>Zarr dir</th>
 								<th># Images</th>
 								<th>Created at</th>
