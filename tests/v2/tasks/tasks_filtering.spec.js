@@ -1,0 +1,80 @@
+import { expect, test } from '../workflow_fixture.js';
+import { selectSlimSelect, waitPageLoading } from '../../utils/utils.js';
+
+const NUM_MOCK_TASKS = 20;
+
+test('Tasks filtering', async ({ page, workflow }) => {
+	await page.goto(workflow.url);
+	await waitPageLoading(page);
+
+	await test.step('Open add task to workflow modal and filter values', async () => {
+		await page.getByRole('button', { name: 'Add task to workflow' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await testFiltering(page);
+	});
+
+	await test.step('Open tasks page and filter values', async () => {
+		await page.goto('/v2/tasks');
+		await waitPageLoading(page);
+		await testFiltering(page);
+	});
+});
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+async function testFiltering(page) {
+	const packageFilter = page.getByRole('combobox', { name: 'Select package' });
+	const modalityFilter = page.getByRole('combobox', { name: 'Select modality' });
+	const categoryFilter = page.getByRole('combobox', { name: 'Select category' });
+	const tagFilter = page.getByRole('combobox', { name: 'Select tag' });
+
+	const rows = page.getByRole('row');
+
+	await selectSlimSelect(page, packageFilter, 'fractal-tasks-mock');
+	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
+	await selectSlimSelect(page, modalityFilter, 'HCS');
+	await expect(rows).toHaveCount(8);
+	await selectSlimSelect(page, categoryFilter, 'Conversion');
+	await expect(rows).toHaveCount(4);
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
+
+	await deselect(modalityFilter);
+	await deselect(categoryFilter);
+	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
+
+	await selectSlimSelect(page, tagFilter, 'Deep Learning');
+	await expect(rows).toHaveCount(3);
+	await expect(page.getByRole('row', { name: 'cellpose_segmentation' })).toBeVisible();
+
+	await deselect(tagFilter);
+	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
+
+	await search(page, 'mip', 'MIP_compound'); // search by task_name
+	await search(page, 'deep', 'cellpose_segmentation'); // search by tag
+	await search(page, 'my_type', 'generic_task_parallel'); // search by input type
+	// search by modality
+	await page.getByRole('textbox', { name: 'Search...' }).fill('hcs');
+	await expect(rows).toHaveCount(8);
+}
+
+/**
+ * @param {import('@playwright/test').Locator} selector
+ */
+async function deselect(selector) {
+	await selector.locator('.ss-deselect').click();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} query
+ * @param {string} expectedTaskName
+ */
+async function search(page, query, expectedTaskName) {
+	await page.getByRole('textbox', { name: 'Search...' }).fill(query);
+	await expect(page.getByRole('row')).toHaveCount(3);
+	await expect(page.getByRole('row', { name: expectedTaskName })).toBeVisible();
+	await page.getByRole('textbox', { name: 'Search...' }).fill('');
+	await expect(page.getByRole('row')).toHaveCount(NUM_MOCK_TASKS);
+}
