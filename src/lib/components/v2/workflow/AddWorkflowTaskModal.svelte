@@ -101,7 +101,7 @@
 							task.args_schema_version
 						);
 						if (strip) {
-							data.args_non_parallel = stripNullAndEmptyObjectsAndArrays(data.args_non_parallel);
+							data.args_parallel = stripNullAndEmptyObjectsAndArrays(data.args_parallel);
 						}
 					}
 
