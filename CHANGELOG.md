@@ -2,6 +2,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
+- Add new datasets page (\#1089).
 - Fix missing error logs in proxy routes (\#1090).
 
 # 1.27.4
