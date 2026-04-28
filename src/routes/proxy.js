@@ -9,7 +9,7 @@ const logger = getLogger('proxy');
  * @param {string[]} forbiddenPaths
  */
 export function createGetProxy(path, forbiddenPaths = []) {
-	return async function GET({ params, url, request }) {
+	return async function GET({ params, url, request, fetch }) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[GET] - /%s/%s/%s', path, params.path, url.search);
@@ -29,7 +29,7 @@ export function createGetProxy(path, forbiddenPaths = []) {
  * @param {string[]} forbiddenPaths
  */
 export function createPostProxy(path, forbiddenPaths = []) {
-	return async function POST({ params, url, request }) {
+	return async function POST({ params, url, request, fetch }) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[POST] - /%s/%s/%s', path, params.path, url.search);
@@ -53,7 +53,7 @@ export function createPostProxy(path, forbiddenPaths = []) {
  * @param {string[]} forbiddenPaths
  */
 export function createPutProxy(path, forbiddenPaths = []) {
-	return async function PUT({ params, url, request }) {
+	return async function PUT({ params, url, request, fetch }) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[PUT] - /%s/%s/%s', path, params.path, url.search);
@@ -77,7 +77,7 @@ export function createPutProxy(path, forbiddenPaths = []) {
  * @param {string[]} forbiddenPaths
  */
 export function createPatchProxy(path, forbiddenPaths = []) {
-	return async function PATCH({ params, url, request }) {
+	return async function PATCH({ params, url, request, fetch }) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[PATCH] - /%s/%s/%s', path, params.path, url.search);
@@ -100,7 +100,7 @@ export function createPatchProxy(path, forbiddenPaths = []) {
  * @param {string[]} forbiddenPaths
  */
 export function createDeleteProxy(path, forbiddenPaths = []) {
-	return async function DELETE({ params, url, request }) {
+	return async function DELETE({ params, url, request, fetch }) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[DELETE] - /%s/%s/%s', path, params.path, url.search);

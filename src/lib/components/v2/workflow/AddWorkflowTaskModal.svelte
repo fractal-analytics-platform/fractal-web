@@ -91,22 +91,28 @@
 					// Creating workflow task
 					const data = {};
 
+					const strip =
+						task.args_schema_version === 'pydantic_v1' ||
+						task.args_schema_version === 'pydantic_v2';
+
 					if (task.args_schema_parallel) {
-						data.args_parallel = stripNullAndEmptyObjectsAndArrays(
-							getJsonSchemaData(
-								adaptJsonSchema(task.args_schema_parallel, getPropertiesToIgnore(false)),
-								'pydantic_v2'
-							)
+						data.args_parallel = getJsonSchemaData(
+							adaptJsonSchema(task.args_schema_parallel, getPropertiesToIgnore(false)),
+							task.args_schema_version
 						);
+						if (strip) {
+							data.args_parallel = stripNullAndEmptyObjectsAndArrays(data.args_parallel);
+						}
 					}
 
 					if (task.args_schema_non_parallel) {
-						data.args_non_parallel = stripNullAndEmptyObjectsAndArrays(
-							getJsonSchemaData(
-								adaptJsonSchema(task.args_schema_non_parallel, getPropertiesToIgnore(false)),
-								'pydantic_v2'
-							)
+						data.args_non_parallel = getJsonSchemaData(
+							adaptJsonSchema(task.args_schema_non_parallel, getPropertiesToIgnore(false)),
+							task.args_schema_version
 						);
+						if (strip) {
+							data.args_non_parallel = stripNullAndEmptyObjectsAndArrays(data.args_non_parallel);
+						}
 					}
 
 					data.task_id = task.id;

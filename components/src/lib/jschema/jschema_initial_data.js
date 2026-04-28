@@ -56,6 +56,9 @@ function getAnyOfPropertyData(property, schemaVersion, required, initialValue, l
 	}
 	const { anyOf } = property;
 	if (anyOf.length > 0) {
+		if (!loadDefaults && initialValue === null && anyOf.length > 1 && anyOf[1].type === 'null') {
+			return null;
+		}
 		return getPropertyData(anyOf[0], schemaVersion, required, initialValue, loadDefaults);
 	}
 }
