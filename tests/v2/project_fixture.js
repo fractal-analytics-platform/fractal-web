@@ -1,60 +1,30 @@
 import { test as baseTest, mergeTests } from '@playwright/test';
-import { deleteProject as utilsDeleteProject, waitPageLoading } from '../utils.js';
+import { createProject, deleteProject as _deleteProject } from '../utils/v2/project';
 
 export class PageWithProject {
 	/**
 	 * @param {import('@playwright/test').Page} page
+	 * @param {{name: string, id: number}} project
 	 */
-	constructor(page) {
+	constructor(page, project) {
 		this.page = page;
-		this.projectName = Math.random().toString(36).substring(7);
-	}
-
-	/**
-	 * @returns {Promise<string>} project id
-	 */
-	async createProject() {
-		await this.page.goto('/v2/projects');
-		await waitPageLoading(this.page);
-
-		await this.page.getByRole('button', { name: 'Create new project' }).click();
-
-		// Wait modal opening
-		let modalTitle = this.page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Create new project');
-
-		// Fill form and submit
-		const projectNameInput = this.page.getByLabel('Project name');
-		await projectNameInput.fill(this.projectName);
-		const createProjectBtn = this.page
-			.locator('.modal.show')
-			.getByRole('button', { name: 'Create' });
-		await createProjectBtn.click();
-
-		// Verify that the user is redirected to the project page
-		await this.page.waitForURL(/\/v2\/projects\/\d+/);
-		this.url = this.page.url();
-		const match = this.url.match(/\/v2\/projects\/(\d+)/);
-		expect(match).not.toBeNull();
-		if (match) {
-			this.projectId = match[1];
-		}
-		return /** @type {string} */ (this.projectId);
+		this.projectId = project.id;
+		this.projectName = project.name;
+		this.url = `/v2/projects/${project.id}`;
 	}
 
 	async deleteProject() {
-		await utilsDeleteProject(this.page, this.projectName);
+		await _deleteProject(this.page, this.projectId);
 	}
 }
 
 const projectTest = baseTest.extend(
 	/** @type {any} */ ({
 		project: async ({ page }, use) => {
-			const project = new PageWithProject(page);
-			await project.createProject();
-			await use(project);
-			await project.deleteProject();
+			const project = await createProject(page);
+			const p = new PageWithProject(page, project);
+			await use(p);
+			await p.deleteProject();
 		}
 	})
 );

@@ -5,86 +5,50 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.development' });
 
+const chromiumConfig = {
+	...devices['Desktop Chrome'],
+	storageState: 'tests/.auth/user.json',
+	contextOptions: {
+		permissions: ['clipboard-read', 'clipboard-write']
+	}
+};
+
+const firefoxConfig = {
+	...devices['Desktop Firefox'],
+	storageState: 'tests/.auth/user.json'
+};
+
 const commonTests = [
-	{ name: 'auth', testMatch: /auth\.setup\.js/ },
+	{ name: 'init-chromium', testMatch: /init\.setup\.js/, use: { ...devices['Desktop Chrome'] } },
+	{ name: 'init-firefox', testMatch: /init\.setup\.js/, use: { ...devices['Desktop Firefox'] } },
 	{
 		name: 'chromium',
 		testMatch: /.*\.spec\.js/,
 		testIgnore: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json',
-			contextOptions: {
-				permissions: ['clipboard-read', 'clipboard-write']
-			}
-		},
-		dependencies: ['auth']
+		use: chromiumConfig,
+		dependencies: ['init-chromium']
 	},
 	{
 		name: 'firefox',
 		testMatch: /.*\.spec\.js/,
 		testIgnore: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Firefox'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
+		use: firefoxConfig,
+		dependencies: ['init-firefox']
 	}
 ];
 
 const v2Tests = [
 	{
-		name: 'collect_mock_tasks',
-		testMatch: /v2\/collect_mock_tasks\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
-	{
-		name: 'create_fake_task',
-		testMatch: /v2\/create_fake_task\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
-	{
-		name: 'pixi',
-		testMatch: /v2\/pixi\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
-	{
-		name: 'create_default_guest_user',
-		testMatch: /v2\/create_default_guest_user\.setup\.js/,
-		use: {
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['auth']
-	},
-	{
 		name: 'chromium',
 		testMatch: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json',
-			contextOptions: {
-				permissions: ['clipboard-read', 'clipboard-write']
-			}
-		},
-		dependencies: ['collect_mock_tasks', 'create_fake_task', 'create_default_guest_user']
+		use: chromiumConfig,
+		dependencies: ['init-chromium']
 	},
 	{
 		name: 'firefox',
 		testMatch: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Firefox'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['collect_mock_tasks', 'create_fake_task', 'create_default_guest_user']
+		use: firefoxConfig,
+		dependencies: ['init-firefox']
 	}
 ];
 

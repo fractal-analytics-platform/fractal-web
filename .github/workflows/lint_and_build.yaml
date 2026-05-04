@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   lint_and_build:
-    name: 'Node ${{ matrix.node-version }}'
+    name: 'Lint and build - Node ${{ matrix.node-version }}'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

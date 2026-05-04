@@ -56,7 +56,7 @@ export async function getProject(fetch, projectId) {
  */
 export async function getProjectAccess(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access`, {
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access/`, {
 		method: 'GET',
 		credentials: 'include'
 	});

@@ -2,15 +2,15 @@ import { expect, test } from '@playwright/test';
 import {
 	addTaskToWorkflow,
 	closeModal,
-	createProject,
-	createWorkflow,
 	waitModal,
 	waitModalClosed,
 	waitPageLoading
-} from '../utils.js';
+} from '../utils/utils.js';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import { createProject, deleteProject } from '../utils/v2/project.js';
+import { createWorkflow } from '../utils/v2/workflow.js';
 
 test('Use template page', async ({ page }) => {
 	const project = await createProject(page);
@@ -22,6 +22,8 @@ test('Use template page', async ({ page }) => {
 	let invalidJSONFileName = '';
 
 	await test.step('Check workflow not from templates', async () => {
+		await page.goto(`/v2/projects/${project.id}/workflows/${workflow.id}`);
+		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Workflow properties' }).click();
 		const modal = await waitModal(page);
 		await expect(modal.getByText('This workflow comes from a template')).not.toBeVisible();
@@ -307,8 +309,11 @@ test('Use template page', async ({ page }) => {
 		await waitModalClosed(page);
 	});
 
-	fs.rmSync(templateFileName);
-	fs.rmSync(txtFileName);
-	fs.rmSync(invalidJSONFileName);
-	fs.rmSync(workflowFileName);
+	await test.step('Cleanup', async () => {
+		await deleteProject(page, project.id);
+		fs.rmSync(templateFileName);
+		fs.rmSync(txtFileName);
+		fs.rmSync(invalidJSONFileName);
+		fs.rmSync(workflowFileName);
+	});
 });
