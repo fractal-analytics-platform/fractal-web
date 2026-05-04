@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   unit_tests:
-    name: 'Node ${{ matrix.node-version }}'
+    name: 'Unit tests - Node ${{ matrix.node-version }}'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

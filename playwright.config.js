@@ -5,30 +5,35 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.development' });
 
+const chromiumConfig = {
+	...devices['Desktop Chrome'],
+	storageState: 'tests/.auth/user.json',
+	contextOptions: {
+		permissions: ['clipboard-read', 'clipboard-write']
+	}
+};
+
+const firefoxConfig = {
+	...devices['Desktop Firefox'],
+	storageState: 'tests/.auth/user.json'
+};
+
 const commonTests = [
-	{ name: 'init', testMatch: /init\.setup\.js/ },
+	{ name: 'init-chromium', testMatch: /init\.setup\.js/, use: { ...devices['Desktop Chrome'] } },
+	{ name: 'init-firefox', testMatch: /init\.setup\.js/, use: { ...devices['Desktop Firefox'] } },
 	{
 		name: 'chromium',
 		testMatch: /.*\.spec\.js/,
 		testIgnore: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json',
-			contextOptions: {
-				permissions: ['clipboard-read', 'clipboard-write']
-			}
-		},
-		dependencies: ['init']
+		use: chromiumConfig,
+		dependencies: ['init-chromium']
 	},
 	{
 		name: 'firefox',
 		testMatch: /.*\.spec\.js/,
 		testIgnore: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Firefox'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['init']
+		use: firefoxConfig,
+		dependencies: ['init-firefox']
 	}
 ];
 
@@ -36,23 +41,14 @@ const v2Tests = [
 	{
 		name: 'chromium',
 		testMatch: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Chrome'],
-			storageState: 'tests/.auth/user.json',
-			contextOptions: {
-				permissions: ['clipboard-read', 'clipboard-write']
-			}
-		},
-		dependencies: ['init']
+		use: chromiumConfig,
+		dependencies: ['init-chromium']
 	},
 	{
 		name: 'firefox',
 		testMatch: /v2\/.*\.spec\.js/,
-		use: {
-			...devices['Desktop Firefox'],
-			storageState: 'tests/.auth/user.json'
-		},
-		dependencies: ['init']
+		use: firefoxConfig,
+		dependencies: ['init-firefox']
 	}
 ];
 

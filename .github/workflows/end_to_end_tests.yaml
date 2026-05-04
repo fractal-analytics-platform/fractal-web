@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   end_to_end_tests:
-    name: 'Node ${{ matrix.node-version }}'
+    name: 'E2E tests - Node ${{ matrix.node-version }} - ${{ matrix.browser }}'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -32,6 +32,7 @@ jobs:
     strategy:
       matrix:
         node-version: ['20', '24']
+        browser: ['chromium', 'firefox']
 
     services:
       postgres:
@@ -68,10 +69,10 @@ jobs:
 
       - name: Install Playwright Browsers
         timeout-minutes: 2
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps --only-shell ${{ matrix.browser }}
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --project=${{ matrix.browser }}
 
       - name: Archive test results
         if: always()
