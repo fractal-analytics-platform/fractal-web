@@ -1,19 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import { addGroupToUser, verifyChecked } from '../../../utils/v2/user.js';
+import { createTestGroup, deleteGroup } from '../../../utils/group.js';
 
 test('Create and update a user', async ({ page }) => {
-	const randomGroupName = Math.random().toString(36).substring(7);
-
-	await test.step('Add test group', async () => {
-		await page.goto('/v2/admin/groups');
-		await waitPageLoading(page);
-		await page.getByRole('button', { name: 'Create new group' }).click();
-		const modal = await waitModal(page);
-		await modal.getByRole('textbox', { name: 'Group name' }).fill(randomGroupName);
-		await modal.getByRole('button', { name: 'Create' }).click();
-		await waitModalClosed(page);
-	});
+	const testGroup = await createTestGroup(page);
 
 	await test.step('Open the admin area', async () => {
 		await page.goto('/v2/admin');
@@ -52,7 +43,7 @@ test('Create and update a user', async ({ page }) => {
 	await test.step('Create user', async () => {
 		await page.getByLabel('Confirm password').fill('test');
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
-		await addGroupToUser(page, randomGroupName);
+		await addGroupToUser(page, testGroup.name);
 		await page.getByRole('button', { name: 'Save' }).click();
 		await waitPageLoading(page);
 		await page.getByText('Editing user').waitFor();
@@ -85,7 +76,7 @@ test('Create and update a user', async ({ page }) => {
 		await verifyChecked(cells, 4, true);
 		await verifyChecked(cells, 5, false);
 		await expect(cells[6]).toContainText('All');
-		await expect(cells[6]).toContainText(randomGroupName);
+		await expect(cells[6]).toContainText(testGroup.name);
 		await expect(cells[7]).toHaveText('Local profile');
 		await expect(cells[8]).toHaveText('/tmp');
 	});
@@ -234,6 +225,10 @@ test('Create and update a user', async ({ page }) => {
 		await page.goto(`/v2/admin/users/1/edit`);
 		await waitPageLoading(page);
 		expect(await page.locator('input[type="checkbox"]').count()).toEqual(0);
+	});
+
+	await test.step('Delete test group', async () => {
+		await deleteGroup(page, testGroup.id);
 	});
 });
 

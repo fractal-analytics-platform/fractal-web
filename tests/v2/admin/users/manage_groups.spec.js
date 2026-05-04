@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import {
+	selectSlimSelect,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../../utils/utils.js';
 import { addGroupToUser, createTestUser } from '../../../utils/v2/user.js';
 import { addUserToGroup, createTestGroup, deleteGroup } from '../../../utils/group.js';
 
@@ -124,8 +129,19 @@ test('Admin groups management', async ({ page }) => {
 		await expect(container).not.toContainText(user1.email);
 	});
 
-	await test.step('Delete test groups', async () => {
-		await deleteGroup(page, group1.id);
+	await test.step('Delete first test group', async () => {
+		await page.goto(`/v2/admin/groups`);
+		await waitPageLoading(page);
+		await page
+			.getByRole('row', { name: group1.name })
+			.getByRole('button', { name: 'Delete' })
+			.click();
+		const modal = await waitModal(page);
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await expect(page.getByRole('row', { name: group1.name })).not.toBeVisible();
+	});
+
+	await test.step('Cleanup', async () => {
 		await deleteGroup(page, group2.id);
 		await deleteGroup(page, group3.id);
 	});
