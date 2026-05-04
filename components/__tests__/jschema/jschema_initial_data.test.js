@@ -777,4 +777,36 @@ describe('jschema_intial_data', () => {
 			tuple_or_None_with_default: null
 		});
 	});
+
+	it('Preserve null default when initializing schema with existing data', () => {
+		const data = getJsonSchemaData(
+			{
+				type: 'object',
+				properties: {
+					nullable_array_with_null_default: {
+						anyOf: [
+							{
+								items: {
+									type: 'integer'
+								},
+								type: 'array'
+							},
+							{
+								type: 'null'
+							}
+						],
+						default: null
+					}
+				}
+			},
+			'fractal_schema_v1',
+			{
+				nullable_array_with_null_default: null
+			}
+		);
+
+		expect(data).deep.eq({
+			nullable_array_with_null_default: null
+		});
+	});
 });

@@ -90,6 +90,11 @@ export type DatasetV2 = {
 	timestamp_created: string;
 };
 
+export type DatasetV2Expanded = DatasetV2 & {
+	owner_email: string;
+	image_count: number;
+};
+
 export type DatasetHistoryItemV2 = {
 	workflowtask: WorkflowTaskV2;
 	status: string;
