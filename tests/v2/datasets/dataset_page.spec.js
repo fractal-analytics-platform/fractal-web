@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test';
 import {
-	createProject,
 	login,
 	logout,
 	shareProjectByName,
 	waitModalClosed,
 	waitPageLoading
-} from '../utils.js';
-import { createTestUser } from './user_utils.js';
-import { createDataset } from './dataset_utils.js';
+} from '../../utils/utils';
+import { createProject, deleteProject } from '../../utils/v2/project';
+import { createDataset } from '../../utils/v2/dataset';
+import { createTestUser } from '../../utils/v2/user';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -71,11 +71,7 @@ test('Dataset page', async ({ page }) => {
 		await page.goto(`/v2/projects/${project1.id}/datasets/${dataset1a.id}`);
 		const randomSubfolder = Math.random().toString(36).substring(7);
 		for (var i = 0; i < numberOfImages; i++) {
-			await createImage(
-				page,
-				`/tmp/${dataset1a.zarrDir}/${randomSubfolder}${i}`,
-				async function () {}
-			);
+			await createImage(page, `${dataset1a.zarr_dir}/${randomSubfolder}${i}`, async function () {});
 		}
 	});
 
@@ -103,12 +99,12 @@ test('Dataset page', async ({ page }) => {
 		await expect(row2.getByRole('cell').nth(4)).toHaveText('5');
 	});
 
-	const userEmail = await createTestUser(page);
-	await shareProjectByName(page, project1.name, userEmail, 'Read');
+	const user = await createTestUser(page);
+	await shareProjectByName(page, project1.name, user.email, 'Read');
 
 	await test.step('Login as other user and accept project', async () => {
 		await logout(page, 'admin@fractal.xy');
-		await login(page, userEmail, 'test');
+		await login(page, user.email, 'test');
 		const alert = page.locator('.alert', { has: page.getByText(project1.name) });
 		await expect(alert).toContainText(
 			`User admin@fractal.xy wants to share project "${project1.name}" with you`
@@ -164,5 +160,9 @@ test('Dataset page', async ({ page }) => {
 		await applyButton.click();
 		await expect(rows).toHaveCount(2);
 		await expect(rows.nth(1)).toContainText(dataset2.name);
+	});
+
+	await test.step('Cleanup', async () => {
+		await deleteProject(page, project2.id);
 	});
 });
