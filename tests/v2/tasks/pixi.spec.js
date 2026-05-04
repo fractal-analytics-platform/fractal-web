@@ -18,11 +18,14 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByText('Pixi', { exact: true }).click();
 	});
 
+	// Wait for Task activities table
+	await expect(page.getByRole('table')).toHaveCount(2);
+
 	if (
 		await page
 			.getByRole('table')
 			.last()
-			.getByRole('row', { name: 'mock-pixi-tasks' })
+			.getByRole('row', { name: 'mock-pytorch-pixi-tasks' })
 			.first()
 			.isVisible()
 	) {
@@ -59,12 +62,6 @@ test('Pixi task collection', async ({ page, request }) => {
 		await expect(page.getByRole('switch')).toBeChecked();
 
 		await page.getByRole('button', { name: 'Collect', exact: true }).click();
-
-		// Wait for Task activities table
-		await page.waitForFunction(
-			(expectedCount) => document.querySelectorAll('table').length === expectedCount,
-			2
-		);
 		await expect(page.getByRole('row', { name: /pending|ongoing/ })).toBeVisible();
 	});
 
