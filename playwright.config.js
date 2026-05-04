@@ -60,7 +60,8 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command:
+				'./tests/start-test-server.sh --branch 3301-let-an-admin-filter-a-task-group-list-get-request-by-task-group-id',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
