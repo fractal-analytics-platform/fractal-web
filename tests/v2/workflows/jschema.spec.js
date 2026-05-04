@@ -24,7 +24,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	let randomTaskName2;
 
 	await test.step('Create test task', async () => {
-		const argsSchemaFile = path.join(__dirname, '..', 'data', 'test-schema.json');
+		const argsSchemaFile = path.join(__dirname, '..', '..', 'data', 'test-schema.json');
 		const argsSchema = JSON.parse(fs.readFileSync(argsSchemaFile).toString());
 		randomTaskName = await createFakeTask(page, {
 			name: randomTaskName,
@@ -34,7 +34,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	});
 
 	await test.step('Create test task for referenced default edge-case (issue #1018)', async () => {
-		const argsSchemaFile = path.join(__dirname, '..', 'data', 'test-schema-ref-default.json');
+		const argsSchemaFile = path.join(__dirname, '..', '..', 'data', 'test-schema-ref-default.json');
 		const argsSchema = JSON.parse(fs.readFileSync(argsSchemaFile).toString());
 		randomTaskName2 = await createFakeTask(page, {
 			name: randomTaskName2,

@@ -125,7 +125,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select dataset file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'broken.json'));
 		await page.getByRole('button', { name: 'Import' }).click();
 		await page.getByText('The selected file is not a valid JSON file').waitFor();
 	});

@@ -13,7 +13,7 @@ import os from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const resourceFile = path.join(__dirname, '..', 'data', 'resource.json');
+const resourceFile = path.join(__dirname, '..', '..', '..', 'data', 'resource.json');
 
 const randomResourceName = `${Math.random().toString(36).substring(7)} resource`;
 

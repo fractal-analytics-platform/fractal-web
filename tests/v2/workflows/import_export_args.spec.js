@@ -232,7 +232,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select arguments file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'broken.json'));
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByText("File doesn't contain valid JSON")).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();

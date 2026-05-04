@@ -27,7 +27,7 @@ test('Import workflow', async ({ page, project }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'broken.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'broken.json'));
 		await importWorkflowBtn.waitFor();
 		await expect(page.getByRole('button', { name: 'Create empty workflow' })).toHaveCount(0);
 		await importWorkflowBtn.click();
@@ -38,7 +38,7 @@ test('Import workflow', async ({ page, project }) => {
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
-		await fileChooser.setFiles(path.join(__dirname, '..', 'data', 'workflow_to_import.json'));
+		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'workflow_to_import.json'));
 		await importWorkflowBtn.click();
 		await expect(page.getByText('No available versions')).toHaveCount(6);
 		await page.getByRole('button', { name: 'Cancel', exact: true }).click();
@@ -131,7 +131,7 @@ test('Import workflow', async ({ page, project }) => {
 		await page.getByText('Select a file').click();
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(
-			path.join(__dirname, '..', 'data', 'workflow_to_import_with_flexibility.json')
+			path.join(__dirname, '..', '..', 'data', 'workflow_to_import_with_flexibility.json')
 		);
 		await importWorkflowBtn.click();
 
