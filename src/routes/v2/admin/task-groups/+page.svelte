@@ -18,6 +18,7 @@
 	/** @type {string|null} */
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
+	let task_group_id = $state('');
 	let user_id = $state('');
 	let user_group_id = $state('');
 	let pkg_name = $state('');
@@ -65,6 +66,9 @@
 			const url = new URL('/api/admin/v2/task-group', window.location.origin);
 			url.searchParams.append('page', newCurrentPage.toString());
 			url.searchParams.append('page_size', newPageSize.toString());
+			if (task_group_id) {
+				url.searchParams.append('task_group_id', task_group_id);
+			}
 			if (user_id) {
 				url.searchParams.append('user_id', user_id);
 			}
@@ -117,6 +121,7 @@
 		if (searchErrorAlert) {
 			searchErrorAlert.hide();
 		}
+		task_group_id = '';
 		user_id = '';
 		user_group_id = '';
 		pkg_name = '';
@@ -214,6 +219,24 @@
 				</div>
 			</div>
 
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<label class="col-xl-4 col-lg-5 col-3 col-form-label" for="task_group_id"
+							>Task Group ID</label
+						>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input
+								type="number"
+								class="form-control"
+								bind:value={task_group_id}
+								id="task_group_id"
+								min="1"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
