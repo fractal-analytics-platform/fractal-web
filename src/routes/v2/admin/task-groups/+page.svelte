@@ -410,23 +410,29 @@
 									<td>{taskGroup.origin || '-'}</td>
 									<td>{taskGroup.task_list.length}</td>
 									<td>
-										<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
+										<button
+											class="btn btn-light"
+											onclick={() => openInfoModal(taskGroup)}
+											title="Info"
+											aria-label="Info"
+										>
 											<i class="bi bi-info-circle"></i>
-											Info
 										</button>
 										<button
 											class="btn btn-primary"
 											onclick={() => taskGroupEditModal?.open(taskGroup)}
+											title="Edit"
+											aria-label="Edit"
 										>
 											<i class="bi bi-pencil"></i>
-											Edit
 										</button>
 										<button
 											class="btn btn-info"
 											onclick={() => taskGroupManageModal?.open(taskGroup)}
+											title="Manage"
+											aria-label="Manage"
 										>
 											<i class="bi bi-gear"></i>
-											Manage
 										</button>
 									</td>
 								</tr>
