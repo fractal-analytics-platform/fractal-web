@@ -41,7 +41,7 @@
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>|undefined} */
 	let results = $state();
 	let currentPage = $state(1);
-	let pageSize = $state(10);
+	let pageSize = $state(20);
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
