@@ -18,6 +18,7 @@
 	/** @type {string|null} */
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
+	let task_group_id = $state('');
 	let user_id = $state('');
 	let user_group_id = $state('');
 	let pkg_name = $state('');
@@ -40,7 +41,7 @@
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>|undefined} */
 	let results = $state();
 	let currentPage = $state(1);
-	let pageSize = $state(10);
+	let pageSize = $state(20);
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
@@ -65,6 +66,9 @@
 			const url = new URL('/api/admin/v2/task-group', window.location.origin);
 			url.searchParams.append('page', newCurrentPage.toString());
 			url.searchParams.append('page_size', newPageSize.toString());
+			if (task_group_id) {
+				url.searchParams.append('task_group_id', task_group_id);
+			}
 			if (user_id) {
 				url.searchParams.append('user_id', user_id);
 			}
@@ -117,6 +121,7 @@
 		if (searchErrorAlert) {
 			searchErrorAlert.hide();
 		}
+		task_group_id = '';
 		user_id = '';
 		user_group_id = '';
 		pkg_name = '';
@@ -184,6 +189,25 @@
 				</div>
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
+						<label class="col-xl-4 col-lg-5 col-3 col-form-label" for="task_group_id"
+							>Task Group ID</label
+						>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input
+								type="number"
+								class="form-control"
+								bind:value={task_group_id}
+								id="task_group_id"
+								min="1"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
 							<label for="user_id">User</label>
 						</div>
@@ -212,9 +236,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -229,6 +250,9 @@
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -255,6 +279,21 @@
 								<option value="wheel-file">Wheel file</option>
 								<option value="pixi">Pixi</option>
 								<option value="other">Other</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
 							</select>
 						</div>
 					</div>
@@ -298,21 +337,6 @@
 									id="last_used_time_max"
 								/>
 							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Resource</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={resource} id="resource">
-								<option value="">Select...</option>
-								{#each resources as resource (resource.id)}
-									<option value={resource.id}>{resource.name}</option>
-								{/each}
-							</select>
 						</div>
 					</div>
 				</div>
@@ -386,23 +410,29 @@
 									<td>{taskGroup.origin || '-'}</td>
 									<td>{taskGroup.task_list.length}</td>
 									<td>
-										<button class="btn btn-light" onclick={() => openInfoModal(taskGroup)}>
+										<button
+											class="btn btn-light"
+											onclick={() => openInfoModal(taskGroup)}
+											title="Info"
+											aria-label="Info"
+										>
 											<i class="bi bi-info-circle"></i>
-											Info
 										</button>
 										<button
 											class="btn btn-primary"
 											onclick={() => taskGroupEditModal?.open(taskGroup)}
+											title="Edit"
+											aria-label="Edit"
 										>
 											<i class="bi bi-pencil"></i>
-											Edit
 										</button>
 										<button
 											class="btn btn-info"
 											onclick={() => taskGroupManageModal?.open(taskGroup)}
+											title="Manage"
+											aria-label="Manage"
 										>
 											<i class="bi bi-gear"></i>
-											Manage
 										</button>
 									</td>
 								</tr>
