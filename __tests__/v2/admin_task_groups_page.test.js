@@ -65,7 +65,7 @@ describe('Admin task-groups page', () => {
 		await user.click(screen.getByRole('button', { name: 'Search task groups' }));
 
 		expect(mockRequest).toHaveBeenCalledWith(
-			new URL('http://localhost:3000/api/admin/v2/task-group?page=1&page_size=10')
+			new URL('http://localhost:3000/api/admin/v2/task-group?page=1&page_size=20')
 		);
 
 		expect(screen.getAllByRole('row').length).toEqual(2);
@@ -90,7 +90,7 @@ describe('Admin task-groups page', () => {
 			expect.objectContaining({
 				pathname: '/api/admin/v2/task-group',
 				search:
-					'?page=1&page_size=10&user_id=2&user_group_id=1&pkg_name=fractal-tasks-core&origin=pypi&private=false&active=true'
+					'?page=1&page_size=20&user_id=2&user_group_id=1&pkg_name=fractal-tasks-core&origin=pypi&private=false&active=true'
 			})
 		);
 
