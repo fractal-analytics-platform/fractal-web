@@ -189,6 +189,25 @@
 				</div>
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
+						<label class="col-xl-4 col-lg-5 col-3 col-form-label" for="task_group_id"
+							>Task Group ID</label
+						>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input
+								type="number"
+								class="form-control"
+								bind:value={task_group_id}
+								id="task_group_id"
+								min="1"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
 							<label for="user_id">User</label>
 						</div>
@@ -217,27 +236,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="row mt-lg-3">
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<label class="col-xl-4 col-lg-5 col-3 col-form-label" for="task_group_id"
-							>Task Group ID</label
-						>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<input
-								type="number"
-								class="form-control"
-								bind:value={task_group_id}
-								id="task_group_id"
-								min="1"
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -252,6 +250,9 @@
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -278,6 +279,21 @@
 								<option value="wheel-file">Wheel file</option>
 								<option value="pixi">Pixi</option>
 								<option value="other">Other</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
 							</select>
 						</div>
 					</div>
@@ -321,21 +337,6 @@
 									id="last_used_time_max"
 								/>
 							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Resource</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={resource} id="resource">
-								<option value="">Select...</option>
-								{#each resources as resource (resource.id)}
-									<option value={resource.id}>{resource.name}</option>
-								{/each}
-							</select>
 						</div>
 					</div>
 				</div>
