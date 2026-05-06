@@ -34,6 +34,7 @@
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
+	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -801,9 +802,9 @@
 	{/if}
 
 	<div class="row">
-		<div class="col-lg-8">
+		<div class="col-lg-7 col-md-12">
 			<div class="row">
-				<div class="col-lg-4 col-md-6">
+				<div class="col-lg-4 col-sm-6">
 					<div class="input-group mb-3">
 						<label for="dataset" class="input-group-text">Dataset</label>
 						<select
@@ -819,7 +820,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-lg-8 col-md-12">
+				<div class="col-lg-8 col-md-12 mb-2">
 					{#if selectedSubmittedJob && selectedSubmittedJob.status === 'submitted'}
 						<button class="btn btn-danger" onclick={stopWorkflow}>
 							<i class="bi-stop-circle-fill"></i> Stop workflow
@@ -859,7 +860,7 @@
 			</div>
 		</div>
 
-		<div class="col-lg-4 d-flex justify-content-end align-items-start gap-1">
+		<div class="col-lg-5 col-md-12 mb-3 d-flex justify-content-end align-items-start gap-1">
 			{#if page.data.userInfo.is_superuser}
 				<button
 					class="btn btn-light"
@@ -898,6 +899,18 @@
 			>
 				<i class="bi-info-circle"></i>
 			</button>
+			{#if workflow.template_id}
+				<button
+					class="btn btn-light"
+					data-bs-toggle="modal"
+					data-bs-target="#compare-workflow-template"
+					onclick={resetWorkflowUpdateModal}
+					aria-label="Compare workflow to template"
+					title="Compare workflow to template"
+				>
+					<i class="bi bi-plus-slash-minus"></i>
+				</button>
+			{/if}
 			<button
 				class="btn btn-light"
 				onclick={(e) => {
@@ -1527,6 +1540,8 @@
 <JobLogsModal bind:this={jobLogsModal} />
 
 <TemplateCreateModal bind:this={templateCreateModal} {workflow} />
+
+<CompareWorkflowTemplateModal {workflow} />
 
 <style>
 	.run-item {
