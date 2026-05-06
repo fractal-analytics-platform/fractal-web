@@ -18,7 +18,7 @@
 	/** @type {Array<{match: boolean, argsMatch: boolean, title: string, templateTask: import('fractal-components/types/api').WorkflowTaskExport|undefined, workflowTask: import('fractal-components/types/api').WorkflowTaskExport|undefined}>} */
 	let comparison = $state([]);
 
-	async function loadTemplate() {
+	export async function loadTemplate() {
 		try {
 			loading = true;
 			const templateTaskList = await loadTemplateTaskList();
@@ -121,13 +121,13 @@
 		<h5 class="modal-title">Compare workflow to template</h5>
 	{/snippet}
 	{#snippet body()}
+		<div id="errorAlert-compare-workflow-template"></div>
 		{#if loading}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
-			<div id="errorAlert-compare-workflow-template"></div>
 			<div class="accordion" id="accordion-compare-workflow-template">
 				{#key comparison}
-					{#each comparison as diff, index}
+					{#each comparison as diff, index (index)}
 						<div class="accordion-item">
 							<h2 class="accordion-header">
 								<button

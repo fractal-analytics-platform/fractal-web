@@ -33,6 +33,7 @@ jobs:
       matrix:
         node-version: ['20', '24']
         browser: ['chromium', 'firefox']
+      fail-fast: false
 
     services:
       postgres:
