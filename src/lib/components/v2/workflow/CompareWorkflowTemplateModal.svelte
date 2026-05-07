@@ -112,6 +112,13 @@
 		return JSON.stringify(a1) === JSON.stringify(a2);
 	}
 
+	/**
+	 * @param {object | null} value
+	 */
+	function hasArguments(value) {
+		return value !== null && Object.keys(value).length > 0;
+	}
+
 	onMount(async () => {
 		await import('json-diff-viewer-component');
 	});
@@ -168,10 +175,10 @@
 											<strong>Matching task</strong> ({diff.templateTask.task.pkg_name},
 											{diff.templateTask.task.version}, {diff.templateTask.task.name})
 										</p>
-										{#if compareArgs(diff.templateTask.args_non_parallel, diff.workflowTask.args_non_parallel)}
+										{#if hasArguments(diff.templateTask.args_non_parallel) && compareArgs(diff.templateTask.args_non_parallel, diff.workflowTask.args_non_parallel)}
 											<p><em>Non-parallel arguments match.</em></p>
 										{/if}
-										{#if compareArgs(diff.templateTask.args_parallel, diff.workflowTask.args_parallel)}
+										{#if hasArguments(diff.templateTask.args_parallel) && compareArgs(diff.templateTask.args_parallel, diff.workflowTask.args_parallel)}
 											<p><em>Parallel arguments match.</em></p>
 										{/if}
 										{#if !diff.argsMatch}

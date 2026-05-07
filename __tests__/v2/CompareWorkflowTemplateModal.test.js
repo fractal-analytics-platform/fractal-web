@@ -16,10 +16,24 @@ describe('CompareWorkflowTemplateModal', () => {
 	it('Exact match', async () => {
 		await mockDiff(
 			{
-				data: { task_list: [{ task: { pkg_name: 'p1', name: 't1', version: '0.0.1' } }] }
+				data: {
+					task_list: [
+						{
+							task: { pkg_name: 'p1', name: 't1', version: '0.0.1' },
+							args_parallel: { x: 1 },
+							args_non_parallel: { y: 2 }
+						}
+					]
+				}
 			},
 			{
-				task_list: [{ task: { pkg_name: 'p1', name: 't1', version: '0.0.1' } }]
+				task_list: [
+					{
+						task: { pkg_name: 'p1', name: 't1', version: '0.0.1' },
+						args_parallel: { x: 1 },
+						args_non_parallel: { y: 2 }
+					}
+				]
 			}
 		);
 
@@ -122,7 +136,6 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/Parallel arguments match/)).toBeVisible();
 		expect(container.querySelector('json-diff-viewer')).not.toBeNull();
 	});
 
@@ -150,7 +163,6 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/Non-parallel arguments match/)).toBeVisible();
 		expect(container.querySelector('json-diff-viewer')).not.toBeNull();
 	});
 
