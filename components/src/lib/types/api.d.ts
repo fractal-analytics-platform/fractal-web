@@ -87,6 +87,7 @@ export type DatasetV2 = {
 	project: ProjectV2;
 	history: Array<DatasetHistoryItemV2> | null;
 	zarr_dir: string;
+	is_starred: boolean;
 	timestamp_created: string;
 };
 

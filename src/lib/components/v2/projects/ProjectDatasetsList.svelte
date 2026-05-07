@@ -53,6 +53,25 @@
 		}
 	}
 
+	/**
+	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 */
+	async function toggleStarred(dataset) {
+		const endpoint = dataset.is_starred ? 'unstar' : 'star';
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
+			{
+				method: 'PATCH'
+			}
+		);
+		if (!response.ok) {
+			console.error('Failed to toggle start');
+			return;
+		}
+
+		datasets = datasets.map((d) => (d.id === dataset.id ? { ...d, is_starred: !d.is_starred } : d));
+	}
+
 	onMount(() => {
 		datasetSearch = '';
 	});
@@ -103,6 +122,15 @@
 				{#each filteredDatasets as dataset (dataset.id)}
 					<tr>
 						<td>
+							<button
+								type="button"
+								aria-label="star dataset"
+								class="btn btn-link p-0 border-0 text-warning"
+								title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
+								onclick={() => toggleStarred(dataset)}
+							>
+								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}`}></i>
+							</button>
 							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
 								{dataset.name}
 							</a>
