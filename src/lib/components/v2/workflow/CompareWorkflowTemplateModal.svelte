@@ -2,6 +2,7 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { onMount } from 'svelte';
+	import JsonDiffViewer from './JsonDiffViewer.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -176,17 +177,19 @@
 										{#if !diff.argsMatch}
 											{#if !compareArgs(diff.templateTask.args_non_parallel, diff.workflowTask.args_non_parallel)}
 												<h5>Non-parallel arguments</h5>
-												<json-diff-viewer
+												<JsonDiffViewer
+													id={`non-parallel-${index}`}
 													left={diff.templateTask.args_non_parallel}
 													right={diff.workflowTask.args_non_parallel}
-												></json-diff-viewer>
+												/>
 											{/if}
 											{#if !compareArgs(diff.templateTask.args_parallel, diff.workflowTask.args_parallel)}
 												<h5 class="mt-2">Parallel arguments</h5>
-												<json-diff-viewer
+												<JsonDiffViewer
+													id={`parallel-${index}`}
 													left={diff.templateTask.args_parallel}
 													right={diff.workflowTask.args_parallel}
-												></json-diff-viewer>
+												/>
 											{/if}
 										{/if}
 									{:else}
@@ -250,24 +253,3 @@
 		{/if}
 	{/snippet}
 </Modal>
-
-<style>
-	/** light theme */
-	json-diff-viewer {
-		--add: #15803d;
-		--rem: #b91c1c;
-		--mod: #ca8a04;
-		--bg: #f4f4f4;
-		--bg2: #f9fafb;
-		--bdr: #d1d5db;
-		--txt: #030712;
-		--dim: #4b5563;
-		--slider: #d1d5db;
-		--key: #075985;
-		--str: #6d28d9;
-		--num: #047857;
-		--bool: #b45309;
-		--nul: #a21caf;
-		--br: #6b7280;
-	}
-</style>
