@@ -168,21 +168,21 @@
 											{diff.templateTask.task.version}, {diff.templateTask.task.name})
 										</p>
 										{#if compareArgs(diff.templateTask.args_non_parallel, diff.workflowTask.args_non_parallel)}
-											<p><em>Non-parallell arguments match.</em></p>
+											<p><em>Non-parallel arguments match.</em></p>
 										{/if}
 										{#if compareArgs(diff.templateTask.args_parallel, diff.workflowTask.args_parallel)}
-											<p><em>Parallell arguments match.</em></p>
+											<p><em>Parallel arguments match.</em></p>
 										{/if}
 										{#if !diff.argsMatch}
 											{#if !compareArgs(diff.templateTask.args_non_parallel, diff.workflowTask.args_non_parallel)}
-												<h5>Non-parallell arguments</h5>
+												<h5>Non-parallel arguments</h5>
 												<json-diff-viewer
 													left={diff.templateTask.args_non_parallel}
 													right={diff.workflowTask.args_non_parallel}
 												></json-diff-viewer>
 											{/if}
 											{#if !compareArgs(diff.templateTask.args_parallel, diff.workflowTask.args_parallel)}
-												<h5 class="mt-2">Parallell arguments</h5>
+												<h5 class="mt-2">Parallel arguments</h5>
 												<json-diff-viewer
 													left={diff.templateTask.args_parallel}
 													right={diff.workflowTask.args_parallel}

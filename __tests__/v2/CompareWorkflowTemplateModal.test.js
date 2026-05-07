@@ -23,8 +23,8 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/Non-parallell arguments match/)).toBeVisible();
-		expect(screen.getByText(/Parallell arguments match/)).toBeVisible();
+		expect(screen.getByText(/Non-parallel arguments match/)).toBeVisible();
+		expect(screen.getByText(/Parallel arguments match/)).toBeVisible();
 	});
 
 	it('Different pkg_name', async () => {
@@ -122,7 +122,7 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/Parallell arguments match/)).toBeVisible();
+		expect(screen.getByText(/Parallel arguments match/)).toBeVisible();
 		expect(container.querySelector('json-diff-viewer')).not.toBeNull();
 	});
 
@@ -150,7 +150,7 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/Non-parallell arguments match/)).toBeVisible();
+		expect(screen.getByText(/Non-parallel arguments match/)).toBeVisible();
 		expect(container.querySelector('json-diff-viewer')).not.toBeNull();
 	});
 
