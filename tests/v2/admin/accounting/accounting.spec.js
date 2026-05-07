@@ -5,9 +5,6 @@ import fs from 'fs';
 import { createDataset } from '../../../utils/v2/dataset.js';
 
 test('Display accounting page', async ({ page, workflow }) => {
-	await page.goto(workflow.url);
-	await waitPageLoading(page);
-
 	await test.step('Create test dataset', async () => {
 		await createDataset(page, workflow.projectId);
 	});

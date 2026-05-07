@@ -19,6 +19,10 @@
 	/** @type {Array<{match: boolean, argsMatch: boolean, title: string, templateTask: import('fractal-components/types/api').WorkflowTaskExport|undefined, workflowTask: import('fractal-components/types/api').WorkflowTaskExport|undefined}>} */
 	let comparison = $state([]);
 
+	export async function show() {
+		modal?.show();
+	}
+
 	export async function loadTemplate() {
 		try {
 			loading = true;

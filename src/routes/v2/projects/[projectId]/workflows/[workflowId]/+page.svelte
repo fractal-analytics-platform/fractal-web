@@ -59,6 +59,8 @@
 	let failedJob = $state();
 	/** @type {JobLogsModal|undefined} */
 	let jobLogsModal = $state();
+	/** @type {CompareWorkflowTemplateModal|undefined} */
+	let compareWorkflowToTemplateModal = $state();
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let workflowErrorAlert = undefined;
@@ -730,6 +732,14 @@
 		await setSelectedWorkflowTask(newWorkflowTask);
 	}
 
+	function openCompareWorkflowTemplateModal() {
+		if (argsSchemaForm?.hasUnsavedChanges()) {
+			toggleArgsUnsavedChangesModal();
+		} else {
+			compareWorkflowToTemplateModal?.show();
+		}
+	}
+
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
 	});
@@ -902,9 +912,7 @@
 			{#if workflow.template_id}
 				<button
 					class="btn btn-light"
-					data-bs-toggle="modal"
-					data-bs-target="#compare-workflow-template"
-					onclick={resetWorkflowUpdateModal}
+					onclick={openCompareWorkflowTemplateModal}
 					aria-label="Compare workflow to template"
 					title="Compare workflow to template"
 				>
@@ -1541,7 +1549,7 @@
 
 <TemplateCreateModal bind:this={templateCreateModal} {workflow} />
 
-<CompareWorkflowTemplateModal {workflow} />
+<CompareWorkflowTemplateModal bind:this={compareWorkflowToTemplateModal} {workflow} />
 
 <style>
 	.run-item {
