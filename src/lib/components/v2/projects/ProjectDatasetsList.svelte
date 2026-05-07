@@ -1,9 +1,12 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '$lib/common/errors';
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let startErrorAlert;
 
 	/**
 	 * @typedef {Object} Props
@@ -57,6 +60,7 @@
 	 * @param {import('fractal-components/types/api').DatasetV2} dataset
 	 */
 	async function toggleStarred(dataset) {
+		startErrorAlert?.hide();
 		const endpoint = dataset.is_starred ? 'unstar' : 'star';
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
@@ -65,11 +69,15 @@
 			}
 		);
 		if (!response.ok) {
-			console.error('Failed to toggle start');
-			return;
+			startErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'startErrorAlert'
+			);
+		} else {
+			datasets = datasets.map((d) =>
+				d.id === dataset.id ? { ...d, is_starred: !d.is_starred } : d
+			);
 		}
-
-		datasets = datasets.map((d) => (d.id === dataset.id ? { ...d, is_starred: !d.is_starred } : d));
 	}
 
 	onMount(() => {
@@ -110,6 +118,7 @@
 		</div>
 	</div>
 	<div id="datasetCreateErrorAlert"></div>
+	<div id="startErrorAlert"></div>
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
