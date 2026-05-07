@@ -4,6 +4,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 - Improve E2E tests performance and structure (\#1094).
 - Add `task_group_id` query parameter to Task Groups admin page (\#1095).
+- Add link to the datasets page in the navigation bar (\#1098).
 
 # 1.27.5
 
