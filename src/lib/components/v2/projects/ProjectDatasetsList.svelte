@@ -6,7 +6,7 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let startErrorAlert;
+	let starErrorAlert;
 
 	/**
 	 * @typedef {Object} Props
@@ -60,7 +60,7 @@
 	 * @param {import('fractal-components/types/api').DatasetV2} dataset
 	 */
 	async function toggleStarred(dataset) {
-		startErrorAlert?.hide();
+		starErrorAlert?.hide();
 		const endpoint = dataset.is_starred ? 'unstar' : 'star';
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
@@ -69,9 +69,9 @@
 			}
 		);
 		if (!response.ok) {
-			startErrorAlert = displayStandardErrorAlert(
+			starErrorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'startErrorAlert'
+				'starErrorAlert'
 			);
 		} else {
 			datasets = datasets.map((d) =>
@@ -118,7 +118,7 @@
 		</div>
 	</div>
 	<div id="datasetCreateErrorAlert"></div>
-	<div id="startErrorAlert"></div>
+	<div id="starErrorAlert"></div>
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
@@ -138,7 +138,7 @@
 								title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
 								onclick={() => toggleStarred(dataset)}
 							>
-								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}`}></i>
+								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
 							</button>
 							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
 								{dataset.name}

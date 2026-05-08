@@ -216,7 +216,7 @@
 											title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
 											onclick={() => toggleStarred(dataset)}
 										>
-											<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}`}></i>
+											<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
 										</button>
 										<a href={`/v2/projects/${dataset.project_id}/datasets/${dataset.id}`}>
 											{dataset.name}
