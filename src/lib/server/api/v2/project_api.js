@@ -135,12 +135,7 @@ export async function getProjectDatasets(fetch, projectId) {
 
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
 	const datasets = await response.json();
-	datasets.sort((a, b) => {
-		if (a.is_starred !== b.is_starred) {
-			return a.is_starred ? -1 : 1;
-		}
-		return a.name.localeCompare(b.name);
-	});
+
 	return datasets;
 }
 
