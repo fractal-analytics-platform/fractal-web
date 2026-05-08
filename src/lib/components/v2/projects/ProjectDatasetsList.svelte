@@ -134,11 +134,15 @@
 							<button
 								type="button"
 								aria-label="star dataset"
-								class="btn btn-link p-0 border-0 text-warning"
+								class="star-btn btn btn-link p-0 border-0 text-warning"
 								title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
 								onclick={() => toggleStarred(dataset)}
 							>
-								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
+								{#if dataset.is_starred}
+									<i class="bi bi-star-fill me-2"></i>
+								{:else}
+									<i class="bi bi-star me-2 star-empty"></i>
+								{/if}
 							</button>
 							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
 								{dataset.name}
@@ -163,3 +167,15 @@
 </div>
 
 <CreateDatasetModal {createDatasetCallback} {project} />
+
+<style>
+	.star-empty {
+		opacity: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	td:hover .star-empty,
+	.star-btn:hover .star-empty {
+		opacity: 1;
+	}
+</style>
