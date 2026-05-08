@@ -98,7 +98,7 @@
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
 			{
-				method: 'PATCH'
+				method: 'POST'
 			}
 		);
 		if (!response.ok) {
