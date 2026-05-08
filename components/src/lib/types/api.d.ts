@@ -242,6 +242,23 @@ export type WorkflowV2 = {
 	template_id: number | null;
 };
 
+export type WorkflowTaskExport = {
+	meta_non_parallel: object | null;
+	meta_parallel: object | null;
+	args_non_parallel: object | null;
+	args_parallel: object | null;
+	type_filters: Record<string, boolean>;
+	description: string | null;
+	alias: string | null;
+	task: TaskExport;
+};
+
+type TaskExport = {
+	pkg_name: string;
+	version: string | null;
+	name: string;
+};
+
 export type WorkflowTaskV2 = {
 	id: number;
 	meta_non_parallel: object;
