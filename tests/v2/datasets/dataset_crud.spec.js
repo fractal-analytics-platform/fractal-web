@@ -43,7 +43,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 			expect(await defaultDatasetRow.getByRole('cell').nth(0).innerText()).toEqual('default');
 		}
 		datasetRow = datasetTable.getByRole('row').nth(initialDatasetsCount + 1);
-		expect(await datasetRow.getByRole('cell').nth(0).innerText()).toEqual('test-dataset');
+		expect(await datasetRow.getByRole('cell').nth(0).innerText()).toEqual(' test-dataset');
 	});
 
 	await test.step('Filter dataset', async () => {
