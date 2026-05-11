@@ -278,7 +278,7 @@
 		transition: opacity 0.15s ease;
 	}
 
-	tr:hover .star-empty,
+	td:hover .star-empty,
 	.star-btn:hover .star-empty {
 		opacity: 1;
 	}
