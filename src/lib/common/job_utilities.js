@@ -184,7 +184,7 @@ export function getFirstTaskIndexForContinuingWorkflow(
 }
 
 /**
- * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
+ * @param {import('fractal-components/types/api').JobV2} job
  */
 export function showExecutorErrorLog(job) {
 	if (job.status !== 'failed' || !job.executor_error_log) {

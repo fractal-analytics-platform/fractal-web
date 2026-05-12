@@ -20,7 +20,7 @@
 
 	/** @type {JobsList|undefined} */
 	let jobsListComponent = $state();
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ApplyWorkflowV2> | undefined} */
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').JobV2> | undefined} */
 	let jobs = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(50);
@@ -49,16 +49,16 @@
 	let resources = $state([]);
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
+	 * @returns {Promise<import('fractal-components/types/api').JobV2[]>}
 	 */
 	async function jobUpdater() {
 		if (!jobs) {
 			return [];
 		}
 
-		/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
+		/** @type {import('fractal-components/types/api').JobV2[]} */
 		const jobsToCheck = jobs.items.filter((j) => j.status === 'submitted');
-		/** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */
+		/** @type {import('fractal-components/types/api').JobV2[]} */
 		const updatedJobs = [];
 		for (const job of jobsToCheck) {
 			const url = new URL('/api/admin/v2/job', window.location.origin);
@@ -221,7 +221,7 @@
 		}
 
 		const { items } =
-			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ApplyWorkflowV2>} */ (
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').JobV2>} */ (
 				await response.json()
 			);
 
@@ -250,11 +250,11 @@
 
 	/** @type {Modal|undefined} */
 	let statusModal = $state();
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').JobV2|undefined} */
 	let jobInEditing = $state();
 
 	/**
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} row
+	 * @param {import('fractal-components/types/api').JobV2} row
 	 */
 	function openEditStatusModal(row) {
 		jobInEditing = row;
@@ -271,9 +271,7 @@
 				}
 
 				updatingStatus = true;
-				const jobId = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (
-					jobInEditing
-				).id;
+				const jobId = /** @type {import('fractal-components/types/api').JobV2} */ (jobInEditing).id;
 
 				const headers = new Headers();
 				headers.append('Content-Type', 'application/json');

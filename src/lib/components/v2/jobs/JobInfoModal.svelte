@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').JobV2|undefined} */
 	let job = $state();
 
 	let errorAlert = undefined;
@@ -14,7 +14,7 @@
 	const currentUserEmail = $derived(page.data.userInfo?.email);
 
 	/**
-	 * @param jobToDisplay {import('fractal-components/types/api').ApplyWorkflowV2}
+	 * @param jobToDisplay {import('fractal-components/types/api').JobV2}
 	 */
 	export async function show(jobToDisplay) {
 		job = jobToDisplay;

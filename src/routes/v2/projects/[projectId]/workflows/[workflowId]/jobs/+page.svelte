@@ -9,7 +9,7 @@
 	const workflow = $derived(page.data.workflow);
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
+	 * @returns {Promise<import('fractal-components/types/api').JobV2[]>}
 	 */
 	async function jobUpdater() {
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {

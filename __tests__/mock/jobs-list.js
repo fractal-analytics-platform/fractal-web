@@ -32,7 +32,7 @@ export const data = {
 			name: 'workflow 2'
 		}
 	],
-	jobs: /** @type {import('fractal-components/types/api').ApplyWorkflowV2[]} */ ([
+	jobs: /** @type {import('fractal-components/types/api').JobV2[]} */ ([
 		{
 			id: 1,
 			project_id: 1,

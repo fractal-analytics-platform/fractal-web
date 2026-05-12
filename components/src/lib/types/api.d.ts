@@ -186,7 +186,7 @@ export type TaskV2 = {
 	install_instructions: string | undefined;
 };
 
-export type ApplyWorkflowV2 = {
+export type JobV2 = {
 	id: number;
 	project_id: number;
 	workflow_id: number;
@@ -232,7 +232,7 @@ export type ImagesStatus =
 			num_available_images: number | null;
 	  };
 
-export type JobWithTaskStatuses = ApplyWorkflowV2 & {
+export type JobWithTaskStatuses = JobV2 & {
 	task_statuses: Record<number, ImagesStatus>;
 };
 

@@ -55,7 +55,7 @@
 	let showMissingStatusesWarning = $state(false);
 
 	let jobError = $state('');
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').JobV2|undefined} */
 	let failedJob = $state();
 	/** @type {JobLogsModal|undefined} */
 	let jobLogsModal = $state();
@@ -439,7 +439,7 @@
 
 	/**
 	 *
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
+	 * @param {import('fractal-components/types/api').JobV2} job
 	 */
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = { ...job, task_statuses: {} };

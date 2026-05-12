@@ -2,7 +2,7 @@ export const STATUS_KEY = '__wftask_dataset_image_status__';
 
 /**
  * @param {Array<import("fractal-components/types/api").DatasetV2>} datasets
- * @param {Array<import("fractal-components/types/api").ApplyWorkflowV2>} jobs
+ * @param {Array<import("fractal-components/types/api").JobV2>} jobs
  * @returns {number|undefined}
  */
 export function getDefaultWorkflowDataset(datasets, jobs) {
