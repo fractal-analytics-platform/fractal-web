@@ -356,8 +356,6 @@ export type TaskGroupV2 = {
 	path: string;
 	venv_path: string | null;
 	pixi_version: string | null;
-	venv_file_number: number;
-	venv_size_in_kB: number;
 	pip_extras: string;
 	active: boolean;
 	timestamp_created: string;
