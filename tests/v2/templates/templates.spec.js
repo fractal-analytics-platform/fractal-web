@@ -5,12 +5,12 @@ import {
 	waitModal,
 	waitModalClosed,
 	waitPageLoading
-} from '../utils/utils.js';
+} from '../../utils/utils.js';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import { createProject, deleteProject } from '../utils/v2/project.js';
-import { createWorkflow } from '../utils/v2/workflow.js';
+import { createProject, deleteProject } from '../../utils/v2/project.js';
+import { createWorkflow } from '../../utils/v2/workflow.js';
 
 test('Use template page', async ({ page }) => {
 	const project = await createProject(page);
@@ -158,9 +158,9 @@ test('Use template page', async ({ page }) => {
 	const newTemplateName = Math.random().toString(36).substring(7);
 
 	await test.step('Upload templates', async () => {
-		const applyButton = await page.getByRole('button', { name: 'Apply' });
+		const applyButton = page.getByRole('button', { name: 'Apply' });
 		await expect(applyButton).toBeDisabled();
-		const resetButton = await page.getByRole('button', { name: 'Reset' });
+		const resetButton = page.getByRole('button', { name: 'Reset' });
 		await expect(resetButton).toBeDisabled();
 
 		const nameInput = page.getByRole('textbox', { name: 'Name' });
@@ -245,7 +245,7 @@ test('Use template page', async ({ page }) => {
 		const count1 = await rows.count();
 		expect(count1).toBeGreaterThan(1);
 
-		const applyButton = await modal.getByRole('button', { name: 'Apply' });
+		const applyButton = modal.getByRole('button', { name: 'Apply' });
 		await expect(applyButton).toBeDisabled();
 
 		await modal.getByRole('textbox', { name: 'Name' }).nth(1).fill(newTemplateName);
