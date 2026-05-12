@@ -40,19 +40,19 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await verifyDatasetsCount(page, initialDatasetsCount + 1);
 		if (initialDatasetsCount === 1) {
 			let defaultDatasetRow = datasetTable.getByRole('row').nth(1);
-			expect(await defaultDatasetRow.getByRole('cell').nth(0).innerText()).toEqual('default');
+			await expect(defaultDatasetRow.getByRole('cell').nth(0)).toHaveText('default');
 		}
 		datasetRow = datasetTable.getByRole('row').nth(initialDatasetsCount + 1);
-		expect(await datasetRow.getByRole('cell').nth(0).innerText()).toEqual(' test-dataset');
+		await expect(datasetRow.getByRole('cell').nth(0)).toHaveText('test-dataset');
 	});
 
 	await test.step('Filter dataset', async () => {
 		const datasetTable = page.getByRole('table').nth(0).locator('tbody');
-		expect(await datasetTable.getByRole('row').count()).toEqual(1);
+		await expect(datasetTable.getByRole('row')).toHaveCount(1);
 		await page.getByPlaceholder('Search dataset').fill('foo');
-		expect(await datasetTable.getByRole('row').count()).toEqual(0);
+		await expect(datasetTable.getByRole('row')).toHaveCount(0);
 		await page.getByPlaceholder('Search dataset').fill('test-dataset');
-		expect(await datasetTable.getByRole('row').count()).toEqual(1);
+		await expect(datasetTable.getByRole('row')).toHaveCount(1);
 	});
 
 	await test.step('Open dataset page', async () => {
@@ -162,8 +162,8 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Star datasets', async () => {
-		const name1 = ' test-dataset-renamed';
-		const name2 = ' test-dataset-renamed2';
+		const name1 = 'test-dataset-renamed';
+		const name2 = 'test-dataset-renamed2';
 
 		let datasetTable = page.getByRole('table').nth(0);
 		await verifyDatasetsCount(page, 2);
@@ -174,8 +174,8 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		let dataset1 = datasetTable.getByRole('row').nth(1).getByRole('cell').nth(0);
 		let dataset2 = datasetTable.getByRole('row').nth(2).getByRole('cell').nth(0);
 
-		expect(await dataset1.innerText()).toEqual(name1);
-		expect(await dataset2.innerText()).toEqual(name2);
+		await expect(dataset1).toHaveText(name1);
+		await expect(dataset2).toHaveText(name2);
 
 		let starButton1 = dataset1.getByRole('button', { name: 'star dataset' });
 		let starIcon1 = starButton1.locator('i');
@@ -199,8 +199,8 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		dataset1 = datasetTable.getByRole('row').nth(1).getByRole('cell').nth(0);
 		dataset2 = datasetTable.getByRole('row').nth(2).getByRole('cell').nth(0);
 
-		expect(await dataset1.innerText()).toEqual(name2);
-		expect(await dataset2.innerText()).toEqual(name1);
+		await expect(dataset1).toHaveText(name2);
+		await expect(dataset2).toHaveText(name1);
 
 		starIcon1 = dataset1.getByRole('button', { name: 'star dataset' }).locator('i');
 		starIcon2 = dataset2.getByRole('button', { name: 'star dataset' }).locator('i');
@@ -222,8 +222,8 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		dataset1 = datasetTable.getByRole('row').nth(1).getByRole('cell').nth(0);
 		dataset2 = datasetTable.getByRole('row').nth(2).getByRole('cell').nth(0);
 
-		expect(await dataset1.innerText()).toEqual(name1);
-		expect(await dataset2.innerText()).toEqual(name2);
+		await expect(dataset1).toHaveText(name1);
+		await expect(dataset2).toHaveText(name2);
 
 		starIcon1 = dataset1.getByRole('button', { name: 'star dataset' }).locator('i');
 		starIcon2 = dataset2.getByRole('button', { name: 'star dataset' }).locator('i');
