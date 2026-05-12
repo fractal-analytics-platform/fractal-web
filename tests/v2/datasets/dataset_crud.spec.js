@@ -160,6 +160,77 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Cleanup', async () => {
 		fs.rmSync(exportedDatasetFile);
 	});
+
+	await test.step('Star datasets', async () => {
+		const name1 = ' test-dataset-renamed';
+		const name2 = ' test-dataset-renamed2';
+
+		let datasetTable = page.getByRole('table').nth(0);
+		await verifyDatasetsCount(page, 2);
+
+		// Initial state:
+		// ds1 -> not starred
+		// ds2 -> not starred
+		let dataset1 = datasetTable.getByRole('row').nth(1).getByRole('cell').nth(0);
+		let dataset2 = datasetTable.getByRole('row').nth(2).getByRole('cell').nth(0);
+
+		expect(await dataset1.innerText()).toEqual(name1);
+		expect(await dataset2.innerText()).toEqual(name2);
+
+		let starButton1 = dataset1.getByRole('button', { name: 'star dataset' });
+		let starIcon1 = starButton1.locator('i');
+		let starButton2 = dataset2.getByRole('button', { name: 'star dataset' });
+		let starIcon2 = starButton2.locator('i');
+
+		await expect(starIcon1).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starIcon2).toHaveClass(/bi-star(?!-fill)/);
+
+		// Star ds2 and reload page
+		await starButton2.click();
+
+		await expect(starIcon1).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starIcon2).toHaveClass(/bi-star-fill/);
+
+		await page.reload();
+
+		// After reload:
+		// ds2 -> starred
+		// ds1 -> not starred
+		dataset1 = datasetTable.getByRole('row').nth(1).getByRole('cell').nth(0);
+		dataset2 = datasetTable.getByRole('row').nth(2).getByRole('cell').nth(0);
+
+		expect(await dataset1.innerText()).toEqual(name2);
+		expect(await dataset2.innerText()).toEqual(name1);
+
+		starIcon1 = dataset1.getByRole('button', { name: 'star dataset' }).locator('i');
+		starIcon2 = dataset2.getByRole('button', { name: 'star dataset' }).locator('i');
+
+		await expect(starIcon1).toHaveClass(/bi-star-fill/);
+		await expect(starIcon2).toHaveClass(/bi-star(?!-fill)/);
+
+		// Unstar ds2 and reload page
+		await starButton1.click();
+
+		await expect(starIcon1).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starIcon2).toHaveClass(/bi-star(?!-fill)/);
+
+		await page.reload();
+
+		// After reload:
+		// ds1 -> not starred
+		// ds2 -> not starred
+		dataset1 = datasetTable.getByRole('row').nth(1).getByRole('cell').nth(0);
+		dataset2 = datasetTable.getByRole('row').nth(2).getByRole('cell').nth(0);
+
+		expect(await dataset1.innerText()).toEqual(name1);
+		expect(await dataset2.innerText()).toEqual(name2);
+
+		starIcon1 = dataset1.getByRole('button', { name: 'star dataset' }).locator('i');
+		starIcon2 = dataset2.getByRole('button', { name: 'star dataset' }).locator('i');
+
+		await expect(starIcon1).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starIcon2).toHaveClass(/bi-star(?!-fill)/);
+	});
 });
 
 /**
