@@ -1,9 +1,12 @@
 <script>
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '$lib/common/errors';
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let starErrorAlert;
 
 	/**
 	 * @typedef {Object} Props
@@ -53,6 +56,30 @@
 		}
 	}
 
+	/**
+	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 */
+	async function toggleStarred(dataset) {
+		starErrorAlert?.hide();
+		const endpoint = dataset.is_starred ? 'unstar' : 'star';
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
+			{
+				method: 'POST'
+			}
+		);
+		if (!response.ok) {
+			starErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'starErrorAlert'
+			);
+		} else {
+			datasets = datasets.map((d) =>
+				d.id === dataset.id ? { ...d, is_starred: !d.is_starred } : d
+			);
+		}
+	}
+
 	onMount(() => {
 		datasetSearch = '';
 	});
@@ -91,6 +118,7 @@
 		</div>
 	</div>
 	<div id="datasetCreateErrorAlert"></div>
+	<div id="starErrorAlert"></div>
 	<table class="table align-middle">
 		<thead class="table-light">
 			<tr>
@@ -103,6 +131,15 @@
 				{#each filteredDatasets as dataset (dataset.id)}
 					<tr>
 						<td>
+							<button
+								type="button"
+								aria-label="star dataset"
+								class="btn btn-link p-0 border-0 text-warning"
+								title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
+								onclick={() => toggleStarred(dataset)}
+							>
+								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
+							</button>
 							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
 								{dataset.name}
 							</a>

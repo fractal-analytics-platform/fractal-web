@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Support starring datasets (\#1100).
+
 # 1.27.6
 
 - Improve E2E tests performance and structure (\#1094).

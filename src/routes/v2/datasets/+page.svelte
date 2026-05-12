@@ -88,6 +88,30 @@
 			);
 		}
 	}
+
+	/**
+	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 */
+	async function toggleStarred(dataset) {
+		fetchErrorAlert?.hide();
+		const endpoint = dataset.is_starred ? 'unstar' : 'star';
+		const response = await fetch(
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
+			{
+				method: 'POST'
+			}
+		);
+		if (!response.ok) {
+			fetchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'fetchErrorAlert'
+			);
+		} else {
+			datasetPage.items = datasetPage.items.map((d) =>
+				d.id === dataset.id ? { ...d, is_starred: !d.is_starred } : d
+			);
+		}
+	}
 </script>
 
 <div class="container-fluid">
@@ -185,6 +209,15 @@
 							{#each datasetPage.items as dataset, index (index)}
 								<tr>
 									<td class="wrap-cell">
+										<button
+											type="button"
+											aria-label="star dataset"
+											class="btn btn-link p-0 border-0 text-warning"
+											title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
+											onclick={() => toggleStarred(dataset)}
+										>
+											<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
+										</button>
 										<a href={`/v2/projects/${dataset.project_id}/datasets/${dataset.id}`}>
 											{dataset.name}
 										</a>
