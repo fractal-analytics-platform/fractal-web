@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.27.7
 
 - Support starring datasets (\#1100).
 - Use new combined latest-job & status endpoint (\#1103).
