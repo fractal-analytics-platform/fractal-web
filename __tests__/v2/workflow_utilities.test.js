@@ -10,7 +10,7 @@ describe('Workflow Utilities', () => {
 	it('Default dataset is taken from most recent job', () => {
 		const id = getDefaultWorkflowDataset(
 			[],
-			/** @type {Array<import("fractal-components/types/api").ApplyWorkflowV2>} */
+			/** @type {Array<import("fractal-components/types/api").JobV2>} */
 			([
 				{ start_timestamp: '2024-04-24T10:18:37.868655+00:00', dataset_id: 1 },
 				{ start_timestamp: '2024-04-24T15:18:37.868655+00:00', dataset_id: 2 }
@@ -88,7 +88,7 @@ describe('Workflow Utilities', () => {
 	it('Handles jobs with deleted datasets', () => {
 		const id = getDefaultWorkflowDataset(
 			[],
-			/** @type {Array<import("fractal-components/types/api").ApplyWorkflowV2>} */
+			/** @type {Array<import("fractal-components/types/api").JobV2>} */
 			([
 				{ start_timestamp: '2024-04-24T15:18:37.868655+00:00', dataset_id: null },
 				{ start_timestamp: '2024-04-24T10:18:37.868655+00:00', dataset_id: 1 }

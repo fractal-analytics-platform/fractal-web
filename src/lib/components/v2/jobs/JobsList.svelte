@@ -13,11 +13,11 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {() => Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>} jobUpdater
+	 * @property {() => Promise<import('fractal-components/types/api').JobV2[]>} jobUpdater
 	 * @property {Array<string>} [columnsToHide]
 	 * @property {boolean} [admin]
 	 * @property {import('svelte').Snippet} [buttons]
-	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').ApplyWorkflowV2]>} [editStatus]
+	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').JobV2]>} [editStatus]
 	 * @property {string} [selectedDataset]
 	 */
 
@@ -42,14 +42,14 @@
 	const projects = $derived(page.data.projects || []);
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $state([]);
-	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
+	/** @type {Array<import('fractal-components/types/api').JobV2>} */
 	let jobs = [];
 	/** @type {{ id: number, name: string }[]} */
 	let datasets = $state([]);
 	/** @type {{ id: string, name: string }[]} */
 	let userEmails = $state([]);
 
-	/** @type {Array<import('fractal-components/types/api').ApplyWorkflowV2>} */
+	/** @type {Array<import('fractal-components/types/api').JobV2>} */
 	let rows = $state(jobs);
 
 	// Selectors
@@ -74,7 +74,7 @@
 	let userFilter = '';
 
 	/**
-	 * @typedef {{ key: string, label: string, direction?: 'asc'|'desc', priority?: number, field?: (j: import('fractal-components/types/api').ApplyWorkflowV2) => number | string | null}} SortField
+	 * @typedef {{ key: string, label: string, direction?: 'asc'|'desc', priority?: number, field?: (j: import('fractal-components/types/api').JobV2) => number | string | null}} SortField
 	 */
 
 	/**
@@ -109,7 +109,7 @@
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2[]} newJobs
+	 * @param {import('fractal-components/types/api').JobV2[]} newJobs
 	 */
 	export function setJobs(newJobs) {
 		jobs = newJobs;
@@ -146,7 +146,7 @@
 	}
 
 	/**
-	 * @param {Array<import('fractal-components/types/api').ApplyWorkflowV2>} jobs
+	 * @param {Array<import('fractal-components/types/api').JobV2>} jobs
 	 */
 	function getSortedJobs(jobs) {
 		if (admin) {
@@ -176,7 +176,7 @@
 
 	/**
 	 * Requests the server to stop a job execution
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
+	 * @param {import('fractal-components/types/api').JobV2} job
 	 * @returns {Promise<void>}
 	 */
 	async function handleJobCancel(job) {
@@ -225,7 +225,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} row
+	 * @param {import('fractal-components/types/api').JobV2} row
 	 */
 	function getDownloadUrl(row) {
 		if (admin) {
@@ -373,7 +373,7 @@
 	/**
 	 * Rebuilds valid slim-select options according to the visible rows.
 	 * Example: if a project filter is selected the user can select only the workflows belonging to that project.
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2[]} rows
+	 * @param {import('fractal-components/types/api').JobV2[]} rows
 	 */
 	function rebuildSlimSelectOptions(rows) {
 		setValidSlimSelectOptions(

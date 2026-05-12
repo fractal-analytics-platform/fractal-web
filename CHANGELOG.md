@@ -3,6 +3,8 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Support starring datasets (\#1100).
+- Use new combined latest-job & status endpoint (\#1103).
+- Drop obsolete task-group properties (`venv_size_in_kB` and `venv_file_number`) (\#1103).
 
 # 1.27.6
 
