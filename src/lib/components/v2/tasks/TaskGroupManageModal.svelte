@@ -173,6 +173,14 @@
 							Reactivate task group
 						</button>
 					{/if}
+					<button
+						class="btn btn-primary"
+						onclick={async () => {
+							await goto(`/v2/admin/task-groups/${taskGroup?.id}/reset`);
+						}}
+					>
+						Reset task group
+					</button>
 				</div>
 			</div>
 			<div class="row">
