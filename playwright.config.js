@@ -60,7 +60,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch combine-latest-job-status',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

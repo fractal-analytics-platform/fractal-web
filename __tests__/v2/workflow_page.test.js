@@ -58,8 +58,6 @@ describe('Workflow page', () => {
 					switch (url) {
 						case '/api/v2/project/1/dataset/1':
 							return { id: 1, name: 'test' };
-						case '/api/v2/project/1/status?dataset_id=1&workflow_id=1':
-							return { 1: null }; // status is null, since no tasks started
 						case '/api/v2/project/1/workflow/1/job':
 							return [
 								{
@@ -78,7 +76,8 @@ describe('Workflow page', () => {
 								workflow_id: 1,
 								dataset_id: 1,
 								status: 'failed',
-								log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
+								log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test',
+								task_statuses: { 1: null } // status is null, since no tasks started
 							};
 						case '/api/auth/current-user':
 							return { slurm_accounts: [] };

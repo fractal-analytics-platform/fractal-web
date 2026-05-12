@@ -232,6 +232,10 @@ export type ImagesStatus =
 			num_available_images: number | null;
 	  };
 
+export type JobWithTaskStatuses = ApplyWorkflowV2 & {
+	task_statuses: Record<number, ImagesStatus>;
+};
+
 export type WorkflowV2 = {
 	id: number;
 	name: string;

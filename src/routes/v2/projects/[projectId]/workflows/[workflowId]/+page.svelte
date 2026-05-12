@@ -122,7 +122,7 @@
 	/** @type {{ [id: string]: Array<{ task_id: number, version: string }> }} */
 	let newVersionsMap = $state({});
 
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').JobWithTaskStatuses|undefined} */
 	let selectedSubmittedJob = $state();
 	let jobCancelledMessage = $state('');
 
@@ -442,7 +442,7 @@
 	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} job
 	 */
 	async function onJobSubmitted(job) {
-		selectedSubmittedJob = job;
+		selectedSubmittedJob = { ...job, task_statuses: {} };
 		selectedHistoryRun = undefined;
 		expandedWorkflowTaskId = undefined;
 		await loadJobsStatus();
@@ -544,18 +544,6 @@
 			return;
 		}
 		selectedSubmittedJob = await getSelectedJob(selectedDatasetId);
-		const statusResponse = await fetch(
-			`/api/v2/project/${workflow.project_id}/status?dataset_id=${selectedDatasetId}&workflow_id=${workflow.id}`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
-		);
-		if (!statusResponse.ok) {
-			console.error('Error retrieving images status');
-			return;
-		}
-		const receivedStatuses = await statusResponse.json();
 
 		if (selectedSubmittedJob && selectedSubmittedJob.status === 'failed') {
 			failedJob = { ...selectedSubmittedJob };
@@ -564,6 +552,8 @@
 			failedJob = undefined;
 			jobError = '';
 		}
+
+		const receivedStatuses = selectedSubmittedJob?.task_statuses || {};
 
 		statuses = Object.fromEntries(Object.entries(receivedStatuses).filter(([, v]) => v !== null));
 		showMissingStatusesWarning = !!selectedSubmittedJob && Object.keys(statuses).length === 0;
@@ -612,22 +602,14 @@
 
 	/**
 	 * @param {number} datasetId
-	 * @return {Promise<import('fractal-components/types/api').ApplyWorkflowV2|undefined>}
+	 * @return {Promise<import('fractal-components/types/api').JobWithTaskStatuses|undefined>}
 	 */
 	async function getSelectedJob(datasetId) {
-		const submitted = Object.values(statuses).filter((s) => s.status === 'submitted');
-		if (
-			submitted.length > 0 &&
-			selectedSubmittedJob &&
-			selectedSubmittedJob.dataset_id === datasetId
-		) {
-			return selectedSubmittedJob;
-		}
 		const response = await fetch(
 			`/api/v2/project/${project.id}/latest-job?workflow_id=${workflow.id}&dataset_id=${datasetId}`
 		);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').ApplyWorkflowV2} */
+			/** @type {import('fractal-components/types/api').JobWithTaskStatuses} */
 			return await response.json();
 		} else if (response.status !== 404) {
 			console.error('Unable to load latest job');
