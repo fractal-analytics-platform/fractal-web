@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
 
@@ -87,8 +88,8 @@
 		if (response.ok) {
 			const result = await response.json();
 			saving = false;
-			const page = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
-			goto(`${page}?activity_id=${result.id}`);
+			const url = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
+			goto(`${url}?activity_id=${result.id}`);
 			modal?.hide();
 		} else {
 			saving = false;
@@ -173,14 +174,16 @@
 							Reactivate task group
 						</button>
 					{/if}
-					<button
-						class="btn btn-primary"
-						onclick={async () => {
-							await goto(`/v2/admin/task-groups/${taskGroup?.id}/reset`);
-						}}
-					>
-						Reset task group
-					</button>
+					{#if page.data.userInfo.is_superuser}
+						<button
+							class="btn btn-primary"
+							onclick={async () => {
+								await goto(`/v2/admin/task-groups/${taskGroup?.id}/reset`);
+							}}
+						>
+							Reset task group
+						</button>
+					{/if}
 				</div>
 			</div>
 			<div class="row">
