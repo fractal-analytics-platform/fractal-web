@@ -60,8 +60,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command:
-				'./tests/start-test-server.sh --branch 3312-let-admins-re-collect-a-task-group-from-scratch',
+			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
