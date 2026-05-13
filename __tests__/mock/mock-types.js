@@ -84,13 +84,13 @@ export function mockDataset(fields = {}) {
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').ApplyWorkflowV2>} fields
- * @returns {import('fractal-components/types/api').ApplyWorkflowV2}
+ * @param {Partial<import('fractal-components/types/api').JobV2>} fields
+ * @returns {import('fractal-components/types/api').JobV2}
  */
-export function mockApplyWorkflow(fields = {}) {
+export function mockJob(fields = {}) {
 	const job = /** @type {unknown} */ ({
 		id: 1,
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ (job);
+	return /** @type {import('fractal-components/types/api').JobV2} */ (job);
 }

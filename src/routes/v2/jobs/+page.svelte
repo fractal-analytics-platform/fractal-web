@@ -3,7 +3,7 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').ApplyWorkflowV2[]>}
+	 * @returns {Promise<import('fractal-components/types/api').JobV2[]>}
 	 */
 	async function jobUpdater() {
 		const response = await fetch(`/api/v2/job?log=false`, {

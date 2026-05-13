@@ -186,7 +186,7 @@ export type TaskV2 = {
 	install_instructions: string | undefined;
 };
 
-export type ApplyWorkflowV2 = {
+export type JobV2 = {
 	id: number;
 	project_id: number;
 	workflow_id: number;
@@ -231,6 +231,10 @@ export type ImagesStatus =
 			num_failed_images: number;
 			num_available_images: number | null;
 	  };
+
+export type JobWithTaskStatuses = JobV2 & {
+	task_statuses: Record<number, ImagesStatus>;
+};
 
 export type WorkflowV2 = {
 	id: number;
@@ -352,8 +356,6 @@ export type TaskGroupV2 = {
 	path: string;
 	venv_path: string | null;
 	pixi_version: string | null;
-	venv_file_number: number;
-	venv_size_in_kB: number;
 	pip_extras: string;
 	active: boolean;
 	timestamp_created: string;

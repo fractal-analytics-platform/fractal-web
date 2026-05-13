@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
-import { mockApplyWorkflow } from '../mock/mock-types';
+import { mockJob } from '../mock/mock-types';
 
 // Mocking public variables
 vi.mock('$env/dynamic/public', () => {
@@ -32,7 +32,7 @@ describe('JobLogsModal', async () => {
 TRACEBACK:
 Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.`;
 		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
-		await result.component.show(mockApplyWorkflow({ id: 1, status: 'failed', log: null }), false);
+		await result.component.show(mockJob({ id: 1, status: 'failed', log: null }), false);
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		expect(pre.classList.contains('highlight')).eq(true);
 		expect(pre.querySelector('div')?.innerHTML).eq(error);
@@ -54,7 +54,7 @@ pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
   field required (type=value_error.missing)`;
 		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
-		await result.component.show(mockApplyWorkflow({ id: 1, status: 'failed', log: null }), true);
+		await result.component.show(mockJob({ id: 1, status: 'failed', log: null }), true);
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		let divs = pre.querySelectorAll('div');
 		expect(divs.length).eq(2);
@@ -82,7 +82,7 @@ allowed_channels
 		const result = render(JobLogsModal);
 		const log = 'Successful log...';
 		mockSuccesfulJobFetch({ id: 1, status: 'done', log });
-		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), false);
+		await result.component.show(mockJob({ id: 1, status: 'done', log: null }), false);
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
 		expect(pre.classList.contains('highlight')).eq(false);
 		expect(pre.querySelector('div')?.innerHTML).eq(log);
@@ -94,7 +94,7 @@ allowed_channels
 			ok: false,
 			json: () => new Promise((resolve) => resolve({ error: 'Something happened' }))
 		});
-		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), false);
+		await result.component.show(mockJob({ id: 1, status: 'done', log: null }), false);
 		expect(result.queryByText(/Unable to fetch job/)).not.null;
 	});
 
@@ -104,7 +104,7 @@ allowed_channels
 			ok: false,
 			json: () => new Promise((resolve) => resolve({ error: 'Something happened' }))
 		});
-		await result.component.show(mockApplyWorkflow({ id: 1, status: 'done', log: null }), true);
+		await result.component.show(mockJob({ id: 1, status: 'done', log: null }), true);
 		expect(result.queryByText(/Unable to fetch job/)).not.null;
 	});
 });

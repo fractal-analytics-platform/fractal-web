@@ -169,7 +169,7 @@ export async function getDataset(fetch, projectId, datasetId) {
 /**
  * Fetches the list of all the jobs belonging to the current user
  * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('fractal-components/types/api').ApplyWorkflowV2>>}
+ * @returns {Promise<Array<import('fractal-components/types/api').JobV2>>}
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');

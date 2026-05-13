@@ -31,7 +31,7 @@
 	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
 	 * @property {number|undefined} selectedDatasetId
 	 * @property {import('fractal-components/types/api').WorkflowTaskV2|undefined} selectedWorkflowTask
-	 * @property {(job: import('fractal-components/types/api').ApplyWorkflowV2) => Promise<void>} onJobSubmitted
+	 * @property {(job: import('fractal-components/types/api').JobV2) => Promise<void>} onJobSubmitted
 	 * @property {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
 	 * @property {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
 	 */

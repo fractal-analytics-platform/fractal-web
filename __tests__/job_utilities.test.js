@@ -314,7 +314,7 @@ describe('get first task index for continuing workflow', () => {
 });
 
 it('should handle executor_error_log', () => {
-	const job = /** @type {import('fractal-components/types/api').ApplyWorkflowV2} */ ({});
+	const job = /** @type {import('fractal-components/types/api').JobV2} */ ({});
 	expect(showExecutorErrorLog({ ...job, status: 'done', executor_error_log: null })).toBeFalsy();
 	expect(showExecutorErrorLog({ ...job, status: 'failed', executor_error_log: null })).toBeFalsy();
 	expect(

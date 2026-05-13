@@ -10,7 +10,7 @@
 	let errorAlert = undefined;
 	/** @type {Modal|undefined} */
 	let modal = $state();
-	/** @type {import('fractal-components/types/api').ApplyWorkflowV2|undefined} */
+	/** @type {import('fractal-components/types/api').JobV2|undefined} */
 	let job = $state();
 	let admin = false;
 	let log = '';
@@ -25,7 +25,7 @@
 	let updateJobTimeout = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').ApplyWorkflowV2} selectedJob
+	 * @param {import('fractal-components/types/api').JobV2} selectedJob
 	 * @param {boolean} isAdminPage
 	 */
 	export async function show(selectedJob, isAdminPage) {
