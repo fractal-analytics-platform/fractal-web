@@ -173,16 +173,16 @@
 						<button class="btn btn-primary" onclick={() => handleEditTaskGroup(true)}>
 							Reactivate task group
 						</button>
-					{/if}
-					{#if page.data.userInfo.is_superuser}
-						<button
-							class="btn btn-primary"
-							onclick={async () => {
-								await goto(`/v2/admin/task-groups/${taskGroup?.id}/reset`);
-							}}
-						>
-							Reset task group
-						</button>
+						{#if page.data.userInfo.is_superuser}
+							<button
+								class="btn btn-primary"
+								onclick={async () => {
+									await goto(`/v2/admin/task-groups/${taskGroup?.id}/reset`);
+								}}
+							>
+								Reset task group
+							</button>
+						{/if}
 					{/if}
 				</div>
 			</div>
