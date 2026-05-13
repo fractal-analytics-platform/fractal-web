@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { PropertyDescription } from 'fractal-components';
@@ -31,31 +32,109 @@
 		pinnedPackageVersions = pinnedPackageVersions.filter((_, i) => i !== index);
 	}
 
+	/**
+	 * @param {'pre'|'post'} type
+	 * @returns {{[key: string]: string}|undefined}
+	 */
+	function getPinnedPackageVersionsMap(type) {
+		/** @type {{[key: string]: string}} */
+		const map = {};
+		for (const ppv of pinnedPackageVersions) {
+			if (ppv.key && ppv.value && ppv.type === type) {
+				map[ppv.key] = ppv.value;
+			}
+		}
+		if (Object.keys(map).length === 0) {
+			return undefined;
+		}
+		return map;
+	}
+
 	async function handleReset() {
+		formErrorHandler.clearErrors();
+		const payload = {};
+
 		let url;
-		if (taskGroup.origin === 'pypi' || taskGroup.origin === 'wheel') {
-			url = `/admin/v2/task-group/${taskGroup.id}/reset/pip`;
+		if (['pypi', 'wheel-file'].includes(taskGroup.origin)) {
+			url = `/api/admin/v2/task-group/${taskGroup.id}/reset/pip`;
+			if (python_version) {
+				payload.python_version = python_version;
+			}
+			if (includePackageExtras) {
+				payload.package_extras = package_extras;
+			}
+			const ppvPre = getPinnedPackageVersionsMap('pre');
+			if (ppvPre) {
+				payload.pinned_package_versions_pre = JSON.stringify(ppvPre);
+			}
+			const ppvPost = getPinnedPackageVersionsMap('post');
+			if (ppvPost) {
+				payload.pinned_package_versions_post = JSON.stringify(ppvPost);
+			}
 		} else if (taskGroup.origin === 'pixi') {
-			url = `/admin/v2/task-group/${taskGroup.id}/reset/pixi`;
+			url = `/api/admin/v2/task-group/${taskGroup.id}/reset/pixi`;
 		} else {
 			throw new Error('Not supported');
 		}
-		console.log(url);
+
+		const response = await fetch(url, {
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(payload)
+		});
+		if (response.ok) {
+			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
+				await response.json()
+			);
+			goto(`/v2/admin/task-groups/activities?activity_id=${result.id}`);
+		} else {
+			console.error('Task collection request failed');
+			await formErrorHandler.handleErrorResponse(response);
+		}
 	}
 </script>
 
 <div class="container mt-3">
-	<div class="mb-2" id="errorSection"></div>
+	<h3 class="fw-light mb-3">Reset task group</h3>
 
-	<h3 class="fw-light mb-3">Reset Task Group</h3>
+	<div class="mb-3">You are about to reset the following task group:</div>
 
-	<div class="mb-4">
-		You are about to reset the task group
-		<code>{taskGroup.pkg_name}</code>
-		(version <code>{taskGroup.version}</code>), collected by <code>{taskGroup.user_email}</code>.
+	<div class="card mb-4">
+		<div class="card-body">
+			<div class="row mb-2">
+				<div class="col-2 fw-semibold">Package name</div>
+				<div class="col">
+					<code>{taskGroup.pkg_name}</code>
+				</div>
+			</div>
+
+			<div class="row mb-2">
+				<div class="col-2 fw-semibold">Version</div>
+				<div class="col">
+					<code>{taskGroup.version}</code>
+				</div>
+			</div>
+
+			<div class="row mb-2">
+				<div class="col-2 fw-semibold">Origin</div>
+				<div class="col">
+					<code>{taskGroup.origin}</code>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-2 fw-semibold">Collected by</div>
+				<div class="col">
+					<code>{taskGroup.user_email}</code>
+				</div>
+			</div>
+		</div>
 	</div>
 
-	{#if taskGroup.origin === 'pypi' || taskGroup.origin === 'wheel'}
+	{#if ['pypi', 'wheel-file'].includes(taskGroup.origin)}
 		<div class="mb-2">
 			<div class="row mb-2">
 				<div class="col-md-6 mb-2">
@@ -204,10 +283,15 @@
 	{:else if taskGroup.origin === 'pixi'}
 		PIXI PLACEHOLDER
 	{:else}
-		NOT AVAILABLE
+		<div class="alert alert-danger" role="alert">
+			Task group reset is not available for
+			<code>{taskGroup.origin}</code>.
+		</div>
 	{/if}
 
-	{#if ['pypi', 'wheel', 'pixi'].includes(taskGroup.origin)}
+	{#if ['pypi', 'wheel-file', 'pixi'].includes(taskGroup.origin)}
+		<div id="taskResetError" class="mt-3 mb-3"></div>
+
 		<button class="btn btn-primary" disabled={false} onclick={handleReset}> Reset </button>
 	{/if}
 </div>
