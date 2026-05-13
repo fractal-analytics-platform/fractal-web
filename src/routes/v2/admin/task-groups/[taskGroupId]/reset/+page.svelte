@@ -30,6 +30,18 @@
 	function removePackageVersion(index) {
 		pinnedPackageVersions = pinnedPackageVersions.filter((_, i) => i !== index);
 	}
+
+	async function handleReset() {
+		let url;
+		if (taskGroup.origin === 'pypi' || taskGroup.origin === 'wheel') {
+			url = `/admin/v2/task-group/${taskGroup.id}/reset/pip`;
+		} else if (taskGroup.origin === 'pixi') {
+			url = `/admin/v2/task-group/${taskGroup.id}/reset/pixi`;
+		} else {
+			throw new Error('Not supported');
+		}
+		console.log(url);
+	}
 </script>
 
 <div class="container mt-3">
@@ -43,7 +55,7 @@
 		(version <code>{taskGroup.version}</code>), collected by <code>{taskGroup.user_email}</code>.
 	</div>
 
-	{#if taskGroup.origin !== 'pixi'}
+	{#if taskGroup.origin === 'pypi' || taskGroup.origin === 'wheel'}
 		<div class="mb-2">
 			<div class="row mb-2">
 				<div class="col-md-6 mb-2">
@@ -189,9 +201,13 @@
 				</div>
 			</div>
 		</div>
-	{:else}
+	{:else if taskGroup.origin === 'pixi'}
 		PIXI PLACEHOLDER
+	{:else}
+		NOT AVAILABLE
 	{/if}
 
-	<button class="btn btn-primary" disabled={false} onclick={async () => {}}> Reset </button>
+	{#if ['pypi', 'wheel', 'pixi'].includes(taskGroup.origin)}
+		<button class="btn btn-primary" disabled={false} onclick={handleReset}> Reset </button>
+	{/if}
 </div>
