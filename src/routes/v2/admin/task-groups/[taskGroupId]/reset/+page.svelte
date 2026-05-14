@@ -61,7 +61,7 @@
 				payload.python_version = python_version;
 			}
 			if (includePackageExtras) {
-				payload.package_extras = package_extras;
+				payload.pip_extras = package_extras;
 			}
 			const ppvPre = getPinnedPackageVersionsMap('pre');
 			if (ppvPre) {
