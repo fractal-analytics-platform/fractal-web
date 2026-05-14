@@ -1,5 +1,3 @@
-import { getCurrentUser } from '$lib/server/api/auth_api.js';
-
 import { env } from '$env/dynamic/private';
 import { responseError } from '$lib/common/errors.server';
 import { getLogger } from '$lib/server/logger.js';
@@ -23,7 +21,5 @@ export async function load({ fetch, params }) {
 	/** @type {import('fractal-components/types/api').TaskGroupV2} */
 	const taskGroup = await response.json();
 
-	const user = await getCurrentUser(fetch, true);
-
-	return { taskGroup, user };
+	return { taskGroup };
 }
