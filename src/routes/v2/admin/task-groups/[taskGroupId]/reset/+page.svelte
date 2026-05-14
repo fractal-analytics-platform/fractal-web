@@ -15,8 +15,6 @@
 
 	let usePixiLockFile = $state(false);
 
-	let disableResetButton = $state(false);
-
 	const formErrorHandler = new FormErrorHandler('taskResetError', [
 		'package_version',
 		'package_extras',
@@ -311,8 +309,6 @@
 
 	{#if ['pypi', 'wheel-file', 'pixi'].includes(taskGroup.origin)}
 		<div id="taskResetError" class="mt-3 mb-3"></div>
-		<button class="btn btn-primary" disabled={disableResetButton} onclick={handleReset}>
-			Reset
-		</button>
+		<button class="btn btn-primary" onclick={handleReset}> Reset </button>
 	{/if}
 </div>
