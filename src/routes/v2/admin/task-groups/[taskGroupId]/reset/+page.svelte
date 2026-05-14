@@ -13,6 +13,10 @@
 	/** @type {Array<{key: string, value: string, type: 'pre' | 'post'}>} */
 	let pinnedPackageVersions = $state([]);
 
+	let usePixiLockFile = $state(false);
+
+	let disableResetButton = $state(false);
+
 	const formErrorHandler = new FormErrorHandler('taskResetError', [
 		'package_version',
 		'package_extras',
@@ -73,6 +77,7 @@
 			}
 		} else if (taskGroup.origin === 'pixi') {
 			url = `/api/admin/v2/task-group/${taskGroup.id}/reset/pixi`;
+			payload.use_pixi_lockfile = usePixiLockFile;
 		} else {
 			throw new Error('Not supported');
 		}
@@ -281,7 +286,22 @@
 			</div>
 		</div>
 	{:else if taskGroup.origin === 'pixi'}
-		PIXI PLACEHOLDER
+		<div class="col-xl-3 col-lg-6 mt-2 mb-xl-0">
+			<div class="form-check form-switch ms-xl-2">
+				<input
+					id="lockfile"
+					class="form-check-input"
+					type="checkbox"
+					bind:checked={usePixiLockFile}
+					role="switch"
+					class:is-invalid={$validationErrors['use_pixi_lockfile']}
+				/>
+				<label class="form-check-label" for="lockfile">
+					Use <code>pixi.lock</code> file
+				</label>
+				<span class="invalid-feedback">{$validationErrors['use_pixi_lockfile']}</span>
+			</div>
+		</div>
 	{:else}
 		<div class="alert alert-danger" role="alert">
 			Task group reset is not available for
@@ -291,7 +311,8 @@
 
 	{#if ['pypi', 'wheel-file', 'pixi'].includes(taskGroup.origin)}
 		<div id="taskResetError" class="mt-3 mb-3"></div>
-
-		<button class="btn btn-primary" disabled={false} onclick={handleReset}> Reset </button>
+		<button class="btn btn-primary" disabled={disableResetButton} onclick={handleReset}>
+			Reset
+		</button>
 	{/if}
 </div>
