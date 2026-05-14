@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { PropertyDescription } from 'fractal-components';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2} */
 	const taskGroup = $derived(page.data.taskGroup);
@@ -14,6 +15,9 @@
 	let pinnedPackageVersions = $state([]);
 
 	let usePixiLockFile = $state(false);
+
+	/** @type {Modal|undefined} */
+	let modal = $state();
 
 	const formErrorHandler = new FormErrorHandler('taskResetError', [
 		'package_version',
@@ -308,7 +312,25 @@
 	{/if}
 
 	{#if ['pypi', 'wheel-file', 'pixi'].includes(taskGroup.origin)}
-		<div id="taskResetError" class="mt-3 mb-3"></div>
-		<button class="btn btn-primary" onclick={handleReset}> Reset </button>
+		<button class="btn btn-primary" onclick={modal?.show}> Reset </button>
 	{/if}
 </div>
+
+<Modal id="confirmTaskGroupReset" bind:this={modal}>
+	{#snippet body()}
+		<div class="alert alert-warning" role="alert">
+			<b>WARNING</b><br />
+			This action may override existing information about the task-group environment (like the
+			<code>pip freeze</code>
+			output, or the <code>pixi.lock</code> contents), in a non-reversible way.
+		</div>
+		<div id="taskResetError" class="mt-3 mb-3"></div>
+
+		<div class="row">
+			<div class="col">
+				<button class="btn btn-primary" onclick={handleReset}> Confirm </button>
+				<button class="btn btn-danger" onclick={modal?.hide}> Cancel </button>
+			</div>
+		</div>
+	{/snippet}
+</Modal>
