@@ -10,9 +10,9 @@
 	/** @type {import('fractal-components/types/api').TaskGroupV2} */
 	const taskGroup = $derived(page.data.taskGroup);
 
-	let python_version = $state('');
+	let pythonVersion = $state('');
 	let includePackageExtras = $state(false);
-	let package_extras = $state('');
+	let packageExtras = $state('');
 	/** @type {Array<{key: string, value: string, type: 'pre' | 'post'}>} */
 	let pinnedPackageVersions = $state([]);
 
@@ -57,11 +57,11 @@
 		let url;
 		if (['pypi', 'wheel-file'].includes(taskGroup.origin)) {
 			url = `/api/admin/v2/task-group/${taskGroup.id}/reset/pip`;
-			if (python_version) {
-				payload.python_version = python_version;
+			if (pythonVersion) {
+				payload.python_version = pythonVersion;
 			}
 			if (includePackageExtras) {
-				payload.pip_extras = package_extras;
+				payload.pip_extras = packageExtras;
 			}
 			const ppvPre = getPinnedPackageVersionsMap('pre');
 			if (ppvPre) {
@@ -143,13 +143,13 @@
 				<div class="col-md-6 mb-2">
 					<div class="input-group has-validation">
 						<div class="input-group-text">
-							<label class="font-monospace" for="python_version">Python Version</label>
+							<label class="font-monospace" for="pythonVersion">Python Version</label>
 						</div>
 						<select
-							id="python_version"
-							name="python_version"
+							id="pythonVersion"
+							name="pythonVersion"
 							class="form-select"
-							bind:value={python_version}
+							bind:value={pythonVersion}
 						>
 							<option value="">Select...</option>
 							<option value="3.9">3.9</option>
@@ -181,14 +181,14 @@
 				<div class="col-md-6 mb-2">
 					<div class="input-group has-validation" class:opacity-50={!includePackageExtras}>
 						<div class="input-group-text">
-							<label class="font-monospace" for="package_extras"> Package extras </label>
+							<label class="font-monospace" for="packageExtras"> Package extras </label>
 						</div>
 						<input
-							id="package_extras"
-							name="package_extras"
+							id="packageExtras"
+							name="packageExtras"
 							type="text"
 							class="form-control"
-							bind:value={package_extras}
+							bind:value={packageExtras}
 							disabled={!includePackageExtras}
 						/>
 					</div>
