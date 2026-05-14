@@ -1,9 +1,11 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { PropertyDescription } from 'fractal-components';
 	import Modal from '$lib/components/common/Modal.svelte';
+
+	let errorAlert = undefined;
 
 	/** @type {import('fractal-components/types/api').TaskGroupV2} */
 	const taskGroup = $derived(page.data.taskGroup);
@@ -18,14 +20,6 @@
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
-
-	const formErrorHandler = new FormErrorHandler('taskResetError', [
-		'package_version',
-		'package_extras',
-		'python_version'
-	]);
-
-	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	function addPackageVersion() {
 		pinnedPackageVersions = [...pinnedPackageVersions, { key: '', value: '', type: 'post' }];
@@ -57,7 +51,7 @@
 	}
 
 	async function handleReset() {
-		formErrorHandler.clearErrors();
+		errorAlert?.hide();
 		const payload = {};
 
 		let url;
@@ -98,8 +92,10 @@
 			);
 			goto(`/v2/admin/task-groups/activities?activity_id=${result.id}`);
 		} else {
-			console.error('Task collection request failed');
-			await formErrorHandler.handleErrorResponse(response);
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'taskResetError'
+			);
 		}
 	}
 </script>
@@ -154,7 +150,6 @@
 							name="python_version"
 							class="form-select"
 							bind:value={python_version}
-							class:is-invalid={$validationErrors['python_version']}
 						>
 							<option value="">Select...</option>
 							<option value="3.9">3.9</option>
@@ -164,7 +159,6 @@
 							<option value="3.13">3.13</option>
 							<option value="3.14">3.14</option>
 						</select>
-						<span class="invalid-feedback">{$validationErrors['python_version']}</span>
 					</div>
 				</div>
 			</div>
@@ -189,20 +183,14 @@
 						<div class="input-group-text">
 							<label class="font-monospace" for="package_extras"> Package extras </label>
 						</div>
-
 						<input
 							id="package_extras"
 							name="package_extras"
 							type="text"
 							class="form-control"
-							class:is-invalid={$validationErrors['package_extras']}
 							bind:value={package_extras}
 							disabled={!includePackageExtras}
 						/>
-
-						<span class="invalid-feedback">
-							{$validationErrors['package_extras']}
-						</span>
 					</div>
 				</div>
 			</div>
@@ -296,12 +284,10 @@
 					type="checkbox"
 					bind:checked={usePixiLockFile}
 					role="switch"
-					class:is-invalid={$validationErrors['use_pixi_lockfile']}
 				/>
 				<label class="form-check-label" for="lockfile">
 					Use <code>pixi.lock</code> file
 				</label>
-				<span class="invalid-feedback">{$validationErrors['use_pixi_lockfile']}</span>
 			</div>
 		</div>
 	{:else}
@@ -315,7 +301,7 @@
 		<button
 			class="btn btn-primary mt-3"
 			onclick={() => {
-				formErrorHandler.clearErrors();
+				errorAlert?.hide();
 				modal?.show();
 			}}
 		>
