@@ -62,6 +62,27 @@
 		}
 	}
 
+	/**
+	 * @param {import('fractal-components/types/api').ProjectV2} project
+	 */
+	async function toggleStarredSharedProject(project) {
+		errorAlert?.hide();
+		const endpoint = project.is_starred ? 'unstar' : 'star';
+		const response = await fetch(`/api/v2/project/${project.id}/${endpoint}`, {
+			method: 'POST'
+		});
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'projectsError'
+			);
+		} else {
+			sharedProjects = sharedProjects.map((p) =>
+				p.id === project.id ? { ...p, is_starred: !p.is_starred } : p
+			);
+		}
+	}
+
 	onMount(async () => {
 		await loadSharedProjects();
 	});
@@ -120,6 +141,15 @@
 				{#each sharedProjects as project (project.id)}
 					<tr>
 						<td>
+							<button
+								type="button"
+								aria-label="star project"
+								class="btn btn-link p-0 border-0 text-warning"
+								title="{project.is_starred ? 'Unstar' : 'Star'} dataset"
+								onclick={() => toggleStarredSharedProject(project)}
+							>
+								<i class={`bi ${project.is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
+							</button>
 							<a href={`/v2/projects/${project.id}`}>
 								{project.name}
 							</a>
