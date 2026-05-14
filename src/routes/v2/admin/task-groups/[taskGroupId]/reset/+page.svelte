@@ -307,12 +307,20 @@
 	{:else}
 		<div class="alert alert-danger" role="alert">
 			Task group reset is not available for
-			<code>{taskGroup.origin}</code>.
+			<code>{taskGroup.origin}</code> origin.
 		</div>
 	{/if}
 
 	{#if ['pypi', 'wheel-file', 'pixi'].includes(taskGroup.origin)}
-		<button class="btn btn-primary" onclick={modal?.show}> Reset </button>
+		<button
+			class="btn btn-primary mt-3"
+			onclick={() => {
+				formErrorHandler.clearErrors();
+				modal?.show();
+			}}
+		>
+			Proceed
+		</button>
 	{/if}
 </div>
 
@@ -322,7 +330,7 @@
 			<b>WARNING</b><br />
 			This action may override existing information about the task-group environment (like the
 			<code>pip freeze</code>
-			output, or the <code>pixi.lock</code> contents), in a non-reversible way.
+			output, or the <code>pixi.lock</code> contents), in a <b>non-reversible</b> way.
 		</div>
 		<div id="taskResetError" class="mt-3 mb-3"></div>
 
