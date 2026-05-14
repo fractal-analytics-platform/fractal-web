@@ -59,7 +59,7 @@
 	/**
 	 * @param {import('fractal-components/types/api').DatasetV2} dataset
 	 */
-	async function toggleStarred(dataset) {
+	async function toggleStarredDataset(dataset) {
 		starErrorAlert?.hide();
 		const endpoint = dataset.is_starred ? 'unstar' : 'star';
 		const response = await fetch(
@@ -136,7 +136,7 @@
 								aria-label="star dataset"
 								class="btn btn-link p-0 border-0 text-warning"
 								title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
-								onclick={() => toggleStarred(dataset)}
+								onclick={() => toggleStarredDataset(dataset)}
 							>
 								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
 							</button>

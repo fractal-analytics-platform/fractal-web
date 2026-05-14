@@ -104,6 +104,24 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
+	/**
+	 * @param {number} project_id
+	 * @param {boolean} is_starred
+	 */
+	async function toggleStarredProject(project_id, is_starred) {
+		const endpoint = is_starred ? 'unstar' : 'star';
+		const response = await fetch(`/api/v2/project/${project_id}/${endpoint}`, {
+			method: 'POST'
+		});
+		if (!response.ok) {
+			throw await getAlertErrorFromResponse(response);
+		} else {
+			projects = projects.map((p) =>
+				p.id === project_id ? { ...p, is_starred: !p.is_starred } : p
+			);
+		}
+	}
 </script>
 
 <div class="row mt-3 mb-3">
@@ -139,9 +157,18 @@
 			</thead>
 			<tbody>
 				{#key projects}
-					{#each filteredProjects as { id, name } (id)}
+					{#each filteredProjects as { id, name, is_starred } (id)}
 						<tr>
 							<td>
+								<button
+									type="button"
+									aria-label="star project"
+									class="btn btn-link p-0 border-0 text-warning"
+									title="{is_starred ? 'Unstar' : 'Star'} dataset"
+									onclick={() => toggleStarredProject(id, is_starred)}
+								>
+									<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
+								</button>
 								<a href={'/v2/projects/' + id}>
 									{name}
 								</a>
