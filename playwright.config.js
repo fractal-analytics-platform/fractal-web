@@ -60,7 +60,8 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch 1105-ui-cleanups',
+			command:
+				'./tests/start-test-server.sh --branch 3326-add-starunstar-feature-for-projects-and-workflows',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
