@@ -88,28 +88,26 @@
 <div class="container mt-2">
 	<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
 
-	<div class="col-sm-2">
-		<h3 class="fw-light">Datasets</h3>
-	</div>
-	<div class="col-sm-10 mb-2">
-		<div class="row justify-content-end">
-			<div class="col-auto">
-				<div class="input-group">
-					<input
-						name="searchDataset"
-						type="text"
-						class="form-control"
-						placeholder="Search dataset"
-						bind:value={datasetSearch}
-					/>
-				</div>
-			</div>
-			<div class="col-auto">
+	<div class="row align-items-center mb-2">
+		<div class="col-2">
+			<h3 class="fw-light">Datasets</h3>
+		</div>
+		<div class="col-10">
+			<div class="d-flex justify-content-end gap-2">
+				<input
+					name="searchDataset"
+					type="text"
+					class="form-control w-auto"
+					placeholder="Search dataset"
+					style="width: 200px"
+					bind:value={datasetSearch}
+				/>
 				<button
-					class="btn btn-primary float-end"
+					class="btn btn-primary"
 					type="button"
 					data-bs-target="#createDatasetModal"
 					data-bs-toggle="modal"
+					style="width: 180px"
 					onclick={() => (datasetCreatedMessage = '')}
 				>
 					Create new dataset
