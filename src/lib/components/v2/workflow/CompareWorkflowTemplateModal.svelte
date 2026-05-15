@@ -123,9 +123,9 @@
 		return value !== null && Object.keys(value).length > 0;
 	}
 
-	// onMount(async () => {
-	//     await import('json-diff-viewer-component');
-	// });
+	onMount(async () => {
+		await import('json-diff-viewer-component');
+	});
 </script>
 
 <Modal id="compare-workflow-template" fullscreen={true} onOpen={loadTemplate} bind:this={modal}>
