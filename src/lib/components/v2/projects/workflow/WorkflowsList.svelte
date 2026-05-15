@@ -153,6 +153,28 @@
 		);
 	}
 
+	/**
+	 * @param {number} project_id
+	 * @param {number} workflow_id
+	 * @param {boolean} is_starred
+	 */
+	async function toggleStarredWorkflow(project_id, workflow_id, is_starred) {
+		const endpoint = is_starred ? 'unstar' : 'star';
+		const response = await fetch(
+			`/api/v2/project/${project_id}/workflow/${workflow_id}/${endpoint}`,
+			{
+				method: 'POST'
+			}
+		);
+		if (!response.ok) {
+			throw await getAlertErrorFromResponse(response);
+		} else {
+			workflows = workflows.map((w) =>
+				w.id === workflow_id ? { ...w, is_starred: !w.is_starred } : w
+			);
+		}
+	}
+
 	onMount(() => {
 		workflowSearch = '';
 	});
@@ -202,9 +224,18 @@
 		</thead>
 		<tbody>
 			{#key workflows}
-				{#each filteredWorkflows as { id, name } (id)}
+				{#each filteredWorkflows as { id, name, is_starred } (id)}
 					<tr>
 						<td>
+							<button
+								type="button"
+								aria-label="star dataset"
+								class="btn btn-link p-0 border-0 text-warning"
+								title="{is_starred ? 'Unstar' : 'Star'} dataset"
+								onclick={() => toggleStarredWorkflow(projectId, id, is_starred)}
+							>
+								<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
+							</button>
 							<a href="/v2/projects/{projectId}/workflows/{id}">
 								{name}
 							</a>

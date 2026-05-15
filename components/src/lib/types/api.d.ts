@@ -242,6 +242,7 @@ export type WorkflowV2 = {
 	name: string;
 	project_id: number;
 	project: ProjectV2;
+	is_starred: boolean;
 	task_list: Array<WorkflowTaskV2>;
 	timestamp_created: string;
 	description: string | null;
