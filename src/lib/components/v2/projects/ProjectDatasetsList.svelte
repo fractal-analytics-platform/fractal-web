@@ -120,10 +120,10 @@
 	<div id="datasetCreateErrorAlert"></div>
 	<div id="starErrorAlert"></div>
 	<table class="table align-middle">
-		<thead class="table-light">
-			<tr>
-				<th class="col-7 col-lg-8">Name</th>
-				<th>Options</th>
+		<thead style="height: 0;">
+			<tr style="border: 0;">
+				<th class="p-0 border-0 col-7 col-lg-8"></th>
+				<th class="p-0 border-0"></th>
 			</tr>
 		</thead>
 		<tbody>
