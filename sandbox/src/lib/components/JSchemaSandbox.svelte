@@ -26,7 +26,7 @@
 	/** @type {JSchema|undefined} */
 	let jschemaComponent = $state();
 
-	async function handleJsonSchemaStringChanged() {
+	async function handleJsonSchemaStringChanged(detectVersion = true) {
 		validationError = '';
 		jsonSchemaError = '';
 		if (jsonSchemaString === '') {
@@ -45,12 +45,18 @@
 		try {
 			const schemaValidator = new SchemaValidator(schemaVersion);
 			schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
-		} catch {
-			schemaVersion = detectSchemaVersion(parsedSchema);
-			try {
-				const schemaValidator = new SchemaValidator(schemaVersion);
-				schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
-			} catch (err) {
+		} catch (err) {
+			if (detectVersion) {
+				schemaVersion = detectSchemaVersion(parsedSchema);
+				try {
+					const schemaValidator = new SchemaValidator(schemaVersion);
+					schemaValidator.validateSchema(stripDiscriminator(parsedSchema));
+				} catch (err) {
+					schema = undefined;
+					jsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
+					return;
+				}
+			} else {
 				schema = undefined;
 				jsonSchemaError = `Invalid JSON Schema: ${/** @type {Error} */ (err).message}`;
 				return;
@@ -62,6 +68,10 @@
 		await tick();
 		jschemaComponent?.update(parsedSchema, undefined);
 		handleDataChanged();
+	}
+
+	async function handleSchemaVersionChanged() {
+		await handleJsonSchemaStringChanged(false);
 	}
 
 	async function handleDataStringChanged() {
@@ -136,7 +146,7 @@
 						id="pydantic_v1"
 						value="pydantic_v1"
 						bind:group={schemaVersion}
-						onchange={handleJsonSchemaStringChanged}
+						onchange={handleSchemaVersionChanged}
 					/>
 					<label class="form-check-label" for="pydantic_v1">pydantic_v1</label>
 				</div>
@@ -148,7 +158,7 @@
 						id="pydantic_v2"
 						value="pydantic_v2"
 						bind:group={schemaVersion}
-						onchange={handleJsonSchemaStringChanged}
+						onchange={handleSchemaVersionChanged}
 					/>
 					<label class="form-check-label" for="pydantic_v2">pydantic_v2</label>
 				</div>
@@ -160,7 +170,7 @@
 						id="fractal_schema_v1"
 						value="fractal_schema_v1"
 						bind:group={schemaVersion}
-						onchange={handleJsonSchemaStringChanged}
+						onchange={handleSchemaVersionChanged}
 					/>
 					<label class="form-check-label" for="fractal_schema_v1">fractal_schema_v1</label>
 				</div>
@@ -176,7 +186,7 @@
 					id="json-schema"
 					class="form-control"
 					bind:value={jsonSchemaString}
-					oninput={handleJsonSchemaStringChanged}
+					oninput={() => handleJsonSchemaStringChanged()}
 					class:is-invalid={jsonSchemaError}
 					rows="10"
 				></textarea>
