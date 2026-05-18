@@ -125,7 +125,7 @@
 <div class="row">
 	<div class="col">
 		{#if projects.length === 0}
-			<p class="mt-3">You currently have no owned projects.</p>
+			<p class="mt-3">You currently have no owned project.</p>
 		{:else}
 			<table class="table table-hover align-middle">
 				<thead class="table-light">
