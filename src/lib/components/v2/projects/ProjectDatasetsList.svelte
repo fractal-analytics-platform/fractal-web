@@ -161,7 +161,7 @@
 			</tbody>
 		</table>
 	{:else}
-		The <code>{project.name}</code> project currently has no dataset.
+		This project currently has no dataset.
 	{/if}
 </div>
 

@@ -105,7 +105,7 @@
 
 	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
 	<ProjectDatasetsList {datasets} {project} />
-	<WorkflowsList {workflows} {project} />
+	<WorkflowsList {workflows} projectId={project.id} />
 {/if}
 
 <Modal
