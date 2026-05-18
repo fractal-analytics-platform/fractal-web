@@ -7,6 +7,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	const projects = $derived(page.data.projects || []);
@@ -23,6 +24,11 @@
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
+
+	let projectSearch = $state('');
+
+	/** @type {Modal|undefined} */
+	let newProjectModal = $state();
 
 	async function loadSharedProjects() {
 		errorAlert?.hide();
@@ -121,12 +127,28 @@
 						Shared with me
 					</button>
 				</li>
+				{#if selectedTab === 'my_projects'}
+					<li class="nav-item ms-auto">
+						<div class="d-flex gap-2">
+							<input
+								name="searchProject"
+								type="text"
+								class="form-control"
+								placeholder="Search"
+								bind:value={projectSearch}
+							/>
+
+							<button class="btn btn-primary text-nowrap" onclick={() => newProjectModal?.show()}>
+								Create new project
+							</button>
+						</div>
+					</li>
+				{/if}
 			</ul>
 		</div>
 	</div>
-
 	{#if selectedTab === 'my_projects'}
-		<ProjectsList {projects} />
+		<ProjectsList {projects} {projectSearch} bind:newProjectModal />
 	{:else if sharedProjects.length === 0}
 		<p class="mt-3">There are currently no projects shared with you.</p>
 	{:else}

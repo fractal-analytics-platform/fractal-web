@@ -12,19 +12,17 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').ProjectV2[]} [projects]
+	 * @property {string} [projectSearch]
+	 * @property {Modal|undefined} [newProjectModal]
+	 *
 	 */
 
 	/** @type {Props} */
-	let { projects = $bindable([]) } = $props();
-
-	let projectSearch = $state('');
+	let { projects = $bindable([]), projectSearch = '', newProjectModal = $bindable() } = $props();
 
 	let filteredProjects = $derived(
 		projects.filter((p) => p.name.toLowerCase().includes(projectSearch.toLowerCase()))
 	);
-
-	/** @type {Modal|undefined} */
-	let newProjectModal = $state();
 
 	let newProjectName = $state('');
 	let newProjectNameError = $state('');
@@ -124,28 +122,6 @@
 	}
 </script>
 
-<div class="row mt-3 mb-3">
-	<div class="col-sm-12">
-		<div class="row justify-content-end">
-			<div class="col-auto">
-				<div class="input-group">
-					<input
-						name="searchProject"
-						type="text"
-						class="form-control"
-						placeholder="Search"
-						bind:value={projectSearch}
-					/>
-				</div>
-			</div>
-			<div class="col-auto">
-				<button class="btn btn-primary" onclick={() => newProjectModal?.show()}>
-					Create new project
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
 <div class="row">
 	<div class="col">
 		{#if projects.length === 0}
