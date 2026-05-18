@@ -90,7 +90,7 @@
 			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
-			goto(`/v2/admin/task-groups/activities?activity_id=${result.id}`);
+			await goto(`/v2/admin/task-groups/activities?activity_id=${result.id}`);
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
