@@ -148,59 +148,63 @@
 </div>
 <div class="row">
 	<div class="col">
-		<table class="table table-hover align-middle">
-			<thead class="table-light">
-				<tr>
-					<th class="col-7 col-lg-8">Name</th>
-					<th>Options</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#key projects}
-					{#each filteredProjects as { id, name, is_starred } (id)}
-						<tr>
-							<td>
-								<button
-									type="button"
-									aria-label="star project"
-									class="btn btn-link p-0 border-0 text-warning"
-									title="{is_starred ? 'Unstar' : 'Star'} dataset"
-									onclick={() => toggleStarredProject(id, is_starred)}
-								>
-									<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
-								</button>
-								<a href={'/v2/projects/' + id}>
-									{name}
-								</a>
-							</td>
-							<td>
-								<button
-									class="btn btn-light"
-									data-bs-toggle="modal"
-									data-bs-target="#projectInfoModal"
-									onclick={() => setProjectInfoModal(id)}
-								>
-									<i class="bi bi-info-circle"></i> Info
-								</button>
-								<a href="/v2/projects/{id}/sharing" class="btn btn-info">
-									<i class="bi bi-share"></i>
-									Sharing
-								</a>
-								<ConfirmActionButton
-									modalId={'confirmDeleteProject' + id}
-									style="danger"
-									btnStyle="danger"
-									message="Delete project {name}"
-									buttonIcon="trash"
-									label="Delete"
-									callbackAction={() => handleDeleteProject(id)}
-								/>
-							</td>
-						</tr>
-					{/each}
-				{/key}
-			</tbody>
-		</table>
+		{#if projects.length === 0}
+			<p class="mt-3">You currently have no owned projects.</p>
+		{:else}
+			<table class="table table-hover align-middle">
+				<thead class="table-light">
+					<tr>
+						<th class="col-7 col-lg-8">Name</th>
+						<th>Options</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#key projects}
+						{#each filteredProjects as { id, name, is_starred } (id)}
+							<tr>
+								<td>
+									<button
+										type="button"
+										aria-label="star project"
+										class="btn btn-link p-0 border-0 text-warning"
+										title="{is_starred ? 'Unstar' : 'Star'} dataset"
+										onclick={() => toggleStarredProject(id, is_starred)}
+									>
+										<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
+									</button>
+									<a href={'/v2/projects/' + id}>
+										{name}
+									</a>
+								</td>
+								<td>
+									<button
+										class="btn btn-light"
+										data-bs-toggle="modal"
+										data-bs-target="#projectInfoModal"
+										onclick={() => setProjectInfoModal(id)}
+									>
+										<i class="bi bi-info-circle"></i> Info
+									</button>
+									<a href="/v2/projects/{id}/sharing" class="btn btn-info">
+										<i class="bi bi-share"></i>
+										Sharing
+									</a>
+									<ConfirmActionButton
+										modalId={'confirmDeleteProject' + id}
+										style="danger"
+										btnStyle="danger"
+										message="Delete project {name}"
+										buttonIcon="trash"
+										label="Delete"
+										callbackAction={() => handleDeleteProject(id)}
+									/>
+								</td>
+							</tr>
+						{/each}
+					{/key}
+				</tbody>
+			</table>
+		{/if}
 	</div>
 </div>
 
