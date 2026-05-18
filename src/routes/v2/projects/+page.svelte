@@ -130,14 +130,15 @@
 				{#if selectedTab === 'my_projects'}
 					<li class="nav-item ms-auto">
 						<div class="d-flex gap-2">
-							<input
-								name="searchProject"
-								type="text"
-								class="form-control"
-								placeholder="Search"
-								bind:value={projectSearch}
-							/>
-
+							{#if projects.length > 0}
+								<input
+									name="searchProject"
+									type="text"
+									class="form-control"
+									placeholder="Search"
+									bind:value={projectSearch}
+								/>
+							{/if}
 							<button class="btn btn-primary text-nowrap" onclick={() => newProjectModal?.show()}>
 								Create new project
 							</button>

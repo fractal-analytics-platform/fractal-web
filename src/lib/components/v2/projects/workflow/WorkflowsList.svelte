@@ -189,14 +189,16 @@
 		</div>
 		<div class="col-10">
 			<div class="d-flex justify-content-end gap-2">
-				<input
-					name="searchWorkflow"
-					type="text"
-					class="form-control w-auto"
-					placeholder="Search workflow"
-					style="width: 200px"
-					bind:value={workflowSearch}
-				/>
+				{#if workflows.length > 0}
+					<input
+						name="searchWorkflow"
+						type="text"
+						class="form-control w-auto"
+						placeholder="Search workflow"
+						style="width: 200px"
+						bind:value={workflowSearch}
+					/>
+				{/if}
 				<button
 					class="btn btn-primary"
 					type="submit"
