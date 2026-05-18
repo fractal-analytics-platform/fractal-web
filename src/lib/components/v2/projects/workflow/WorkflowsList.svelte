@@ -12,11 +12,11 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
-	 * @property {any} [projectId] - Set the projectId prop to reference a specific project for each workflow
+	 * @property {import('fractal-components/types/api').ProjectV2} project
 	 */
 
 	/** @type {Props} */
-	let { workflows = $bindable([]), projectId = undefined } = $props();
+	let { workflows = $bindable([]), project } = $props();
 
 	let workflowSearch = $state('');
 
@@ -36,7 +36,7 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDeleteWorkflow(workflowId) {
-		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflowId}`, {
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflowId}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});
@@ -60,7 +60,7 @@
 		workflows.push(importedWorkflow);
 		workflows = workflows;
 		if (redirect) {
-			await goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+			await goto(`/v2/projects/${project.id}/workflows/${importedWorkflow.id}`);
 		}
 	}
 
@@ -68,7 +68,7 @@
 	 * @param {number} id
 	 */
 	async function exportWorkflow(id) {
-		const response = await fetch(`/api/v2/project/${projectId}/workflow/${id}/export`, {
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/${id}/export`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -92,7 +92,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response = await fetch(`/api/v2/project/${projectId}/workflow/import`, {
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/import`, {
 			method: 'POST',
 			credentials: 'include',
 			headers,
@@ -213,51 +213,55 @@
 
 	<div id="errorAlert-workflow-list"></div>
 
-	<table class="table align-middle caption-top">
-		<thead class="table-light">
-			<tr>
-				<th class="col-7 col-lg-8">Name</th>
-				<th>Options</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#key workflows}
-				{#each filteredWorkflows as { id, name, is_starred } (id)}
-					<tr>
-						<td>
-							<button
-								type="button"
-								aria-label="star dataset"
-								class="btn btn-link p-0 border-0 text-warning"
-								title="{is_starred ? 'Unstar' : 'Star'} dataset"
-								onclick={() => toggleStarredWorkflow(projectId, id, is_starred)}
-							>
-								<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
-							</button>
-							<a href="/v2/projects/{projectId}/workflows/{id}">
-								{name}
-							</a>
-						</td>
-						<td>
-							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
-								<i class="bi-journal-code"></i> List jobs
-							</a>
-							<button class="btn btn-info" type="button" onclick={() => duplicateWorkflow(id)}>
-								<i class="bi bi-copy"></i> Duplicate
-							</button>
-							<ConfirmActionButton
-								modalId={'deleteConfirmModal' + id}
-								style="danger"
-								btnStyle="danger"
-								buttonIcon="trash"
-								label="Delete"
-								message="Delete workflow {name}"
-								callbackAction={() => handleDeleteWorkflow(id)}
-							/>
-						</td>
-					</tr>
-				{/each}
-			{/key}
-		</tbody>
-	</table>
+	{#if workflows.length > 0}
+		<table class="table align-middle caption-top">
+			<thead class="table-light">
+				<tr>
+					<th class="col-7 col-lg-8">Name</th>
+					<th>Options</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#key workflows}
+					{#each filteredWorkflows as { id, name, is_starred } (id)}
+						<tr>
+							<td>
+								<button
+									type="button"
+									aria-label="star dataset"
+									class="btn btn-link p-0 border-0 text-warning"
+									title="{is_starred ? 'Unstar' : 'Star'} dataset"
+									onclick={() => toggleStarredWorkflow(project.id, id, is_starred)}
+								>
+									<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
+								</button>
+								<a href="/v2/projects/{project.id}/workflows/{id}">
+									{name}
+								</a>
+							</td>
+							<td>
+								<a href="/v2/projects/{project.id}/workflows/{id}/jobs" class="btn btn-light">
+									<i class="bi-journal-code"></i> List jobs
+								</a>
+								<button class="btn btn-info" type="button" onclick={() => duplicateWorkflow(id)}>
+									<i class="bi bi-copy"></i> Duplicate
+								</button>
+								<ConfirmActionButton
+									modalId={'deleteConfirmModal' + id}
+									style="danger"
+									btnStyle="danger"
+									buttonIcon="trash"
+									label="Delete"
+									message="Delete workflow {name}"
+									callbackAction={() => handleDeleteWorkflow(id)}
+								/>
+							</td>
+						</tr>
+					{/each}
+				{/key}
+			</tbody>
+		</table>
+	{:else}
+		The <code>{project.name}</code> project currently has no workflow.
+	{/if}
 </div>

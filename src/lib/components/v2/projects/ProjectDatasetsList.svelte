@@ -4,6 +4,7 @@
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL } from '$env/static/public';
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let starErrorAlert;
@@ -117,47 +118,51 @@
 	</div>
 	<div id="datasetCreateErrorAlert"></div>
 	<div id="starErrorAlert"></div>
-	<table class="table align-middle">
-		<thead class="table-light">
-			<tr>
-				<th class="col-7 col-lg-8">Name</th>
-				<th>Options</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#key datasets}
-				{#each filteredDatasets as dataset (dataset.id)}
-					<tr>
-						<td>
-							<button
-								type="button"
-								aria-label="star dataset"
-								class="btn btn-link p-0 border-0 text-warning"
-								title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
-								onclick={() => toggleStarredDataset(dataset)}
-							>
-								<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
-							</button>
-							<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
-								{dataset.name}
-							</a>
-						</td>
-						<td>
-							<ConfirmActionButton
-								modalId="confirmDatasetDeleteModal{dataset.id}"
-								style="danger"
-								btnStyle="danger"
-								buttonIcon="trash"
-								label="Delete"
-								message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
-								callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
-							/>
-						</td>
-					</tr>
-				{/each}
-			{/key}
-		</tbody>
-	</table>
+	{#if datasets.length > 0}
+		<table class="table align-middle">
+			<thead class="table-light">
+				<tr>
+					<th class="col-7 col-lg-8">Name</th>
+					<th>Options</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#key datasets}
+					{#each filteredDatasets as dataset (dataset.id)}
+						<tr>
+							<td>
+								<button
+									type="button"
+									aria-label="star dataset"
+									class="btn btn-link p-0 border-0 text-warning"
+									title="{dataset.is_starred ? 'Unstar' : 'Star'} dataset"
+									onclick={() => toggleStarredDataset(dataset)}
+								>
+									<i class={`bi ${dataset.is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
+								</button>
+								<a href="/v2/projects/{dataset.project_id}/datasets/{dataset.id}">
+									{dataset.name}
+								</a>
+							</td>
+							<td>
+								<ConfirmActionButton
+									modalId="confirmDatasetDeleteModal{dataset.id}"
+									style="danger"
+									btnStyle="danger"
+									buttonIcon="trash"
+									label="Delete"
+									message={`Delete dataset ${dataset.name} from project ${dataset.project_id}`}
+									callbackAction={() => handleDatasetDelete(dataset.project_id, dataset.id)}
+								/>
+							</td>
+						</tr>
+					{/each}
+				{/key}
+			</tbody>
+		</table>
+	{:else}
+		The <code>{project.name}</code> project currently has no dataset.
+	{/if}
 </div>
 
 <CreateDatasetModal {createDatasetCallback} {project} />
