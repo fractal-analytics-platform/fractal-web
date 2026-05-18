@@ -93,30 +93,28 @@
 		<div class="col-2">
 			<h3 class="fw-light">Datasets</h3>
 		</div>
-		{#if datasets.length > 0}
-			<div class="col-10">
-				<div class="d-flex justify-content-end gap-2">
-					<input
-						name="searchDataset"
-						type="text"
-						class="form-control w-auto"
-						placeholder="Search dataset"
-						style="width: 200px"
-						bind:value={datasetSearch}
-					/>
-					<button
-						class="btn btn-primary"
-						type="button"
-						data-bs-target="#createDatasetModal"
-						data-bs-toggle="modal"
-						style="width: 180px"
-						onclick={() => (datasetCreatedMessage = '')}
-					>
-						Create new dataset
-					</button>
-				</div>
+		<div class="col-10">
+			<div class="d-flex justify-content-end gap-2">
+				<input
+					name="searchDataset"
+					type="text"
+					class="form-control w-auto"
+					placeholder="Search dataset"
+					style="width: 200px"
+					bind:value={datasetSearch}
+				/>
+				<button
+					class="btn btn-primary"
+					type="button"
+					data-bs-target="#createDatasetModal"
+					data-bs-toggle="modal"
+					style="width: 180px"
+					onclick={() => (datasetCreatedMessage = '')}
+				>
+					Create new dataset
+				</button>
 			</div>
-		{/if}
+		</div>
 	</div>
 	<div id="datasetCreateErrorAlert"></div>
 	<div id="starErrorAlert"></div>
@@ -163,27 +161,7 @@
 			</tbody>
 		</table>
 	{:else}
-		<div
-			class="d-flex align-items-center justify-content-between gap-4 border rounded-4 p-4 bg-light-subtle"
-		>
-			<div>
-				<h2 class="h5 mb-1">No datasets yet</h2>
-				<p class="text-muted mb-0">
-					The <code>{project.name}</code> project currently has no dataset.
-				</p>
-			</div>
-
-			<button
-				class="btn btn-primary text-nowrap"
-				type="button"
-				data-bs-target="#createDatasetModal"
-				data-bs-toggle="modal"
-				style="width: 180px"
-				onclick={() => (datasetCreatedMessage = '')}
-			>
-				Create first dataset
-			</button>
-		</div>
+		The <code>{project.name}</code> project currently has no dataset.
 	{/if}
 </div>
 
