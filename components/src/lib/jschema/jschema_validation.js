@@ -2,6 +2,7 @@ import Ajv from 'ajv/dist/ajv';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import { stripDiscriminator } from './jschema_adapter';
+import { addCustomExtension } from './ajv_extension';
 
 /**
  * @type {Array<import("../types/jschema").ArgsSchemaVersion>}
@@ -17,6 +18,9 @@ export class SchemaValidator {
 		const options = { strict: true, allErrors };
 		this.ajv = schemaVersion === 'pydantic_v1' ? new Ajv(options) : new Ajv2020(options);
 		addFormats(this.ajv);
+		if (schemaVersion !== 'pydantic_v1') {
+			addCustomExtension(this.ajv, schemaVersion);
+		}
 		this.canValidate = false;
 	}
 
