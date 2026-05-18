@@ -187,28 +187,30 @@
 		<div class="col-2">
 			<h3 class="fw-light">Workflows</h3>
 		</div>
-		<div class="col-10">
-			<div class="d-flex justify-content-end gap-2">
-				<input
-					name="searchWorkflow"
-					type="text"
-					class="form-control w-auto"
-					placeholder="Search workflow"
-					style="width: 200px"
-					bind:value={workflowSearch}
-				/>
-				<button
-					class="btn btn-primary"
-					type="submit"
-					onclick={() => {
-						createWorkflowModal?.show();
-					}}
-					style="width: 180px"
-				>
-					Create new workflow
-				</button>
+		{#if workflows.length > 0}
+			<div class="col-10">
+				<div class="d-flex justify-content-end gap-2">
+					<input
+						name="searchWorkflow"
+						type="text"
+						class="form-control w-auto"
+						placeholder="Search workflow"
+						style="width: 200px"
+						bind:value={workflowSearch}
+					/>
+					<button
+						class="btn btn-primary"
+						type="submit"
+						onclick={() => {
+							createWorkflowModal?.show();
+						}}
+						style="width: 180px"
+					>
+						Create new workflow
+					</button>
+				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 
 	<div id="errorAlert-workflow-list"></div>
@@ -262,6 +264,26 @@
 			</tbody>
 		</table>
 	{:else}
-		The <code>{project.name}</code> project currently has no workflow.
+		<div
+			class="d-flex align-items-center justify-content-between gap-4 border rounded-4 p-4 bg-light-subtle"
+		>
+			<div>
+				<h2 class="h5 mb-1">No workflows yet</h2>
+				<p class="text-muted mb-0">
+					The <code>{project.name}</code> project currently has no workflow.
+				</p>
+			</div>
+
+			<button
+				class="btn btn-primary text-nowrap"
+				type="button"
+				onclick={() => {
+					createWorkflowModal?.show();
+				}}
+				style="width: 180px"
+			>
+				Create first workflow
+			</button>
+		</div>
 	{/if}
 </div>
