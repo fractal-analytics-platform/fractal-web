@@ -9,6 +9,7 @@
 	import TupleProperty from './TupleProperty.svelte';
 	import ConditionalProperty from './ConditionalProperty.svelte';
 	import UnexpectedProperty from './UnexpectedProperty.svelte';
+	import ContentSchemaProperty from './ContentSchemaProperty.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -24,7 +25,11 @@
 </script>
 
 {#if formElement.type === 'string'}
-	<StringProperty {formElement} {editable} {remove} />
+	{#if 'contentSchema' in formElement.property}
+		<ContentSchemaProperty {formElement} {editable} {remove} />
+	{:else}
+		<StringProperty {formElement} {editable} {remove} />
+	{/if}
 {:else if formElement.type === 'number'}
 	<NumberProperty {formElement} {editable} {remove} />
 {:else if formElement.type === 'boolean'}

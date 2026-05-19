@@ -17,9 +17,6 @@
 	formElement.value.subscribe((v) => (value = v));
 	$effect(() => handleValueChange(value));
 
-	/** @type {HTMLInputElement|undefined} */
-	let field = $state();
-
 	/** @type {string[]} */
 	let errors = $state([]);
 	formElement.errors.subscribe((v) => (errors = v));
@@ -46,7 +43,6 @@
 	<div class="property-input ms-auto w-50 has-validation">
 		<input
 			type="text"
-			bind:this={field}
 			bind:value
 			class="form-control"
 			id="property-{formElement.id}"

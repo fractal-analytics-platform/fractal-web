@@ -101,7 +101,7 @@ export function addCustomExtension(ajv, version) {
 						gen.assign(valid, _`${validator}.isValid(${parsed})`);
 						gen.if(not(valid), () => {
 							cxt.setParams({
-								error: _`'Invalid data:' + JSON.stringify(${validator}.getErrors())`
+								error: _`JSON.stringify(${validator}.getErrors())`
 							});
 						});
 					},
