@@ -53,6 +53,32 @@ test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 		await expect(page.getByRole('row', { name: taskName })).toContainText('reactivate');
 	});
 
+	await test.step('Go back to previous page, deactivate and reset the task', async () => {
+		await page.goBack();
+		await waitPageLoading(page);
+		await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
+		const modal = page.locator('.modal.show');
+		await modal.waitFor();
+		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
+		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);
+		await page.goBack();
+		await waitPageLoading(page);
+
+		await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
+		await modal.waitFor();
+		await modal.getByRole('link', { name: 'Reset task group' }).click();
+
+		await page.waitForURL(/\/v2\/admin\/task-groups\/\d\/reset/);
+		await expect(
+			page.getByText('Task group reset is not available for other origin.')
+		).toBeVisible();
+	});
+
 	await test.step('Cleanup', async () => {
 		await deleteTask(page, taskName);
 	});

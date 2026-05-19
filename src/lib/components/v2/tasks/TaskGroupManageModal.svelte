@@ -87,8 +87,8 @@
 		if (response.ok) {
 			const result = await response.json();
 			saving = false;
-			const page = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
-			goto(`${page}?activity_id=${result.id}`);
+			const url = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
+			await goto(`${url}?activity_id=${result.id}`);
 			modal?.hide();
 		} else {
 			saving = false;
@@ -172,6 +172,11 @@
 						<button class="btn btn-primary" onclick={() => handleEditTaskGroup(true)}>
 							Reactivate task group
 						</button>
+						{#if admin}
+							<a href="/v2/admin/task-groups/{taskGroup?.id}/reset" class="btn btn-primary">
+								Reset task group
+							</a>
+						{/if}
 					{/if}
 				</div>
 			</div>
