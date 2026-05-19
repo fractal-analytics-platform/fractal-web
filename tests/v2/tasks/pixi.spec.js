@@ -27,60 +27,57 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByRole('table').last().getByRole('row', { name: taskName }).first().isVisible()
 	) {
 		console.warn('WARNING: Pixi tasks already collected. Skipping tasks collection');
-	} else {
-		test.slow();
-
-		const tasksMockPixiUrl =
-			'https://github.com/fractal-analytics-platform/testing-tasks-mock-pixi/releases/download/0.6.0/mock_pytorch_pixi_tasks-0.6.0.tar.gz';
-
-		/** @type {string} */
-		let tasksMockPixiFile;
-
-		await test.step('Download fractal_tasks_mock wheel', async () => {
-			const response = await request.get(tasksMockPixiUrl);
-			expect(response.status()).toEqual(200);
-			const body = await response.body();
-			const tasksMockPixiFolder = path.resolve(os.tmpdir(), 'playwright');
-			if (!fs.existsSync(tasksMockPixiFolder)) {
-				fs.mkdirSync(tasksMockPixiFolder);
-			}
-			tasksMockPixiFile = path.resolve(tasksMockPixiFolder, 'mock_pytorch_pixi_tasks-0.6.0.tar.gz');
-			fs.writeFileSync(tasksMockPixiFile, body);
-		});
-
-		await test.step('Collect pixi tasks', async () => {
-			const fileChooserPromise = page.waitForEvent('filechooser');
-			await page.getByText('Upload tar.gz file', { exact: true }).click();
-			const fileChooser = await fileChooserPromise;
-			await fileChooser.setFiles(tasksMockPixiFile);
-
-			await expect(page.getByRole('switch')).toBeChecked();
-
-			await page.getByRole('button', { name: 'Collect', exact: true }).click();
-			await expect(page.getByRole('row', { name: /pending|ongoing/ })).toBeVisible();
-		});
-
-		await test.step('Wait tasks activities', async () => {
-			await expect(page.getByRole('row', { name: /pending|ongoing/ })).not.toBeVisible({
-				timeout: 30000
-			});
-		});
-
-		await test.step('Check tasks list', async () => {
-			await expect(
-				page.getByRole('table').nth(1).getByRole('row', { name: taskName }).first()
-			).toBeVisible();
-		});
-
-		await test.step('Cleanup temporary file', async () => {
-			fs.rmSync(tasksMockPixiFile);
-		});
-
-		await test.step('Attempt to collect tasks without a file', async () => {
-			await page.getByRole('button', { name: 'Collect', exact: true }).click();
-			await expect(page.getByText('Field required')).toBeVisible();
-		});
+		return;
 	}
+	test.slow();
+
+	const tasksMockPixiUrl =
+		'https://github.com/fractal-analytics-platform/testing-tasks-mock-pixi/releases/download/0.6.0/mock_pytorch_pixi_tasks-0.6.0.tar.gz';
+	/** @type {string} */
+
+	let tasksMockPixiFile;
+	await test.step('Download fractal_tasks_mock wheel', async () => {
+		const response = await request.get(tasksMockPixiUrl);
+		expect(response.status()).toEqual(200);
+		const body = await response.body();
+		const tasksMockPixiFolder = path.resolve(os.tmpdir(), 'playwright');
+		if (!fs.existsSync(tasksMockPixiFolder)) {
+			fs.mkdirSync(tasksMockPixiFolder);
+		}
+		tasksMockPixiFile = path.resolve(tasksMockPixiFolder, 'mock_pytorch_pixi_tasks-0.6.0.tar.gz');
+		fs.writeFileSync(tasksMockPixiFile, body);
+	});
+
+	await test.step('Collect pixi tasks', async () => {
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Upload tar.gz file', { exact: true }).click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(tasksMockPixiFile);
+		await expect(page.getByRole('switch')).toBeChecked();
+		await page.getByRole('button', { name: 'Collect', exact: true }).click();
+		await expect(page.getByRole('row', { name: /pending|ongoing/ })).toBeVisible();
+	});
+
+	await test.step('Wait tasks activities', async () => {
+		await expect(page.getByRole('row', { name: /pending|ongoing/ })).not.toBeVisible({
+			timeout: 30000
+		});
+	});
+
+	await test.step('Check tasks list', async () => {
+		await expect(
+			page.getByRole('table').nth(1).getByRole('row', { name: taskName }).first()
+		).toBeVisible();
+	});
+
+	await test.step('Cleanup temporary file', async () => {
+		fs.rmSync(tasksMockPixiFile);
+	});
+
+	await test.step('Attempt to collect tasks without a file', async () => {
+		await page.getByRole('button', { name: 'Collect', exact: true }).click();
+		await expect(page.getByText('Field required')).toBeVisible();
+	});
 
 	await test.step('Check pixi origin in /v2/admin/task-groups page', async () => {
 		await page.goto('/v2/admin/task-groups');
