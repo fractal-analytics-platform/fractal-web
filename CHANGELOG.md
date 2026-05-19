@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Add admin button to reset deactivated Task Group (\#1104).
+
 # 1.27.7
 
 - Support starring datasets (\#1100).
