@@ -7,7 +7,6 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
 
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	const projects = $derived(page.data.projects || []);
@@ -27,7 +26,7 @@
 
 	let projectSearch = $state('');
 
-	/** @type {Modal|undefined} */
+	/** @type {import('$lib/components/common/Modal.svelte').default|undefined} */
 	let newProjectModal = $state();
 
 	async function loadSharedProjects() {
