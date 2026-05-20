@@ -9,9 +9,9 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
-	const projects = $derived(page.data.projects || []);
+	let projects = $state([]);
 	/** @type {import('fractal-components/types/api').ProjectInvitation[]} */
-	const invitations = $derived(page.data.invitations);
+	let invitations = $state([]);
 
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	let sharedProjects = $state([]);
@@ -63,6 +63,8 @@
 	}
 
 	onMount(async () => {
+		projects = page.data.projects;
+		invitations = page.data.invitations;
 		await loadSharedProjects();
 	});
 </script>
@@ -105,7 +107,7 @@
 	</div>
 
 	{#if selectedTab === 'my_projects'}
-		<ProjectsList {projects} />
+		<ProjectsList bind:projects />
 	{:else if sharedProjects.length === 0}
 		<p class="mt-3">There are currently no projects shared with you.</p>
 	{:else}
