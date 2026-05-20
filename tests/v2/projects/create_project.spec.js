@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../../utils/utils.js';
+import { login, logout, waitPageLoading } from '../../utils/utils.js';
+import { createTestUser } from '../../utils/v2/user.js';
 
 test('Create and delete a project', async ({ page }) => {
 	await page.goto('/v2/projects');
@@ -10,6 +11,10 @@ test('Create and delete a project', async ({ page }) => {
 
 	const randomProjectName = firstName < secondName ? secondName : firstName;
 	const randomProjectName2 = firstName < secondName ? firstName : secondName;
+
+	const user = await createTestUser(page);
+	await logout(page, 'admin@fractal.xy');
+	await login(page, user.email, 'test');
 
 	await test.step('Create a new project', async () => {
 		await expect(page.getByText('You currently have no owned project.')).toBeVisible();
