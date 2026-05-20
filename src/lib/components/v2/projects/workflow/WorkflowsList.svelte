@@ -230,9 +230,9 @@
 							<td>
 								<button
 									type="button"
-									aria-label="star dataset"
+									aria-label="star workflow"
 									class="btn btn-link p-0 border-0 text-warning"
-									title="{is_starred ? 'Unstar' : 'Star'} dataset"
+									title="{is_starred ? 'Unstar' : 'Star'} workflow"
 									onclick={() => toggleStarredWorkflow(projectId, id, is_starred)}
 								>
 									<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
