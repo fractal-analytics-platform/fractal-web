@@ -123,8 +123,11 @@
 		return value !== null && Object.keys(value).length > 0;
 	}
 
+	let mounted = $state(false);
+
 	onMount(async () => {
 		await import('json-diff-viewer-component');
+		mounted = true;
 	});
 </script>
 
@@ -134,7 +137,7 @@
 	{/snippet}
 	{#snippet body()}
 		<div id="errorAlert-compare-workflow-template"></div>
-		{#if loading}
+		{#if loading || !mounted}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 		{:else}
 			<div class="accordion" id="accordion-compare-workflow-template">
