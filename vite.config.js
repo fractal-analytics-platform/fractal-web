@@ -27,8 +27,7 @@ const config = defineConfig({
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
 			reportsDirectory: './coverage-unit',
-			include: ['src'],
-			all: true
+			include: ['src']
 		}
 	},
 	resolve: {

@@ -37,8 +37,8 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/Non-parallel arguments match/)).toBeVisible();
-		expect(screen.getByText(/Parallel arguments match/)).toBeVisible();
+		expect(await screen.findByText(/Non-parallel arguments match/)).toBeVisible();
+		expect(await screen.findByText(/Parallel arguments match/)).toBeVisible();
 	});
 
 	it('Different pkg_name', async () => {
@@ -51,8 +51,8 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expectText('Template: p1, 0.0.1, t1');
-		expectText('Workflow: p2, 0.0.1, t1');
+		await expectText('Template: p1, 0.0.1, t1');
+		await expectText('Workflow: p2, 0.0.1, t1');
 	});
 
 	it('Different version', async () => {
@@ -65,8 +65,8 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expectText('Template: p1, 0.0.1, t1');
-		expectText('Workflow: p1, 0.0.2, t1');
+		await expectText('Template: p1, 0.0.1, t1');
+		await expectText('Workflow: p1, 0.0.2, t1');
 	});
 
 	it('Different task name', async () => {
@@ -79,9 +79,9 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(screen.getByText(/t1 \/ t2/)).toBeVisible();
-		expectText('Template: p1, 0.0.1, t1');
-		expectText('Workflow: p1, 0.0.1, t2');
+		expect(await screen.findByText(/t1 \/ t2/)).toBeVisible();
+		await expectText('Template: p1, 0.0.1, t1');
+		await expectText('Workflow: p1, 0.0.1, t2');
 	});
 
 	it('Missing task in template', async () => {
@@ -94,8 +94,8 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expectText('Template: not defined');
-		expectText('Workflow: p1, 0.0.1, t1');
+		await expectText('Template: not defined');
+		await expectText('Workflow: p1, 0.0.1, t1');
 	});
 
 	it('Missing task in workflow', async () => {
@@ -108,12 +108,12 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expectText('Template: p1, 0.0.1, t1');
-		expectText('Workflow: not defined');
+		await expectText('Template: p1, 0.0.1, t1');
+		await expectText('Workflow: not defined');
 	});
 
 	it('Different args_non_parallel', async () => {
-		const container = await mockDiff(
+		await mockDiff(
 			{
 				data: {
 					task_list: [
@@ -136,11 +136,11 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(container.querySelector('json-diff-viewer')).not.toBeNull();
+		expect(screen.findByTestId(`non-parallel-0`)).not.toBeNull();
 	});
 
 	it('Different args_parallel', async () => {
-		const container = await mockDiff(
+		await mockDiff(
 			{
 				data: {
 					task_list: [
@@ -163,7 +163,7 @@ describe('CompareWorkflowTemplateModal', () => {
 			}
 		);
 
-		expect(container.querySelector('json-diff-viewer')).not.toBeNull();
+		expect(screen.findByTestId(`parallel-0`)).not.toBeNull();
 	});
 
 	it('Error loading template', async () => {
@@ -225,6 +225,8 @@ async function mockDiff(payload1, payload2) {
 /**
  * @param {string} text string that may be split in multiple HTML tags
  */
-function expectText(text) {
-	expect(screen.getByText((_, element) => element?.textContent === text)).toBeInTheDocument();
+async function expectText(text) {
+	expect(
+		await screen.findByText((_, element) => element?.textContent === text)
+	).toBeInTheDocument();
 }
