@@ -53,7 +53,7 @@
 					headers,
 					body: normalizePayload({
 						name: updatedProjectName,
-						description: updatedProjectDescription || null
+						description: /^\s*$/.test(updatedProjectDescription) ? null : updatedProjectDescription
 					})
 				});
 
