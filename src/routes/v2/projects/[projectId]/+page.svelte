@@ -23,6 +23,7 @@
 	let projectUpdatesSuccessMessage = $state('');
 
 	let updatedProjectName = $state('');
+	let updatedProjectDescription = $state('');
 	let updating = $state(false);
 
 	/** @type {Modal|undefined} */
@@ -46,7 +47,8 @@
 					mode: 'cors',
 					headers,
 					body: normalizePayload({
-						name: updatedProjectName
+						name: updatedProjectName,
+						description: updatedProjectDescription || null
 					})
 				});
 
@@ -55,6 +57,7 @@
 					projectUpdatesSuccessMessage = 'Project properties successfully updated';
 					const result = await response.json();
 					project.name = result.name;
+					project.description = result.description;
 				} else {
 					console.error('Error while updating project');
 					throw await getAlertErrorFromResponse(response);
@@ -85,7 +88,10 @@
 				class="btn btn-light"
 				data-bs-toggle="modal"
 				data-bs-target="#editProjectModal"
-				onclick={() => (updatedProjectName = project.name)}
+				onclick={() => {
+					updatedProjectName = project.name;
+					updatedProjectDescription = project.description || '';
+				}}
 				aria-label="Edit project"
 			>
 				<i class="bi-pencil"></i>
@@ -136,6 +142,16 @@
 						id="projectName"
 						bind:value={updatedProjectName}
 						required
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="projectDescription" class="form-label">Description</label>
+					<input
+						type="text"
+						class="form-control"
+						name="projectDescription"
+						id="projectDescription"
+						bind:value={updatedProjectDescription}
 					/>
 				</div>
 			</form>
