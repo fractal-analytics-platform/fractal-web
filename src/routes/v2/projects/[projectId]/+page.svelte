@@ -146,13 +146,13 @@
 				</div>
 				<div class="mb-3">
 					<label for="projectDescription" class="form-label">Description</label>
-					<input
-						type="text"
-						class="form-control"
-						name="projectDescription"
+					<textarea
 						id="projectDescription"
 						bind:value={updatedProjectDescription}
-					/>
+						class="form-control"
+						name="projectDescription"
+						rows="4"
+					></textarea>
 				</div>
 			</form>
 		{/if}
