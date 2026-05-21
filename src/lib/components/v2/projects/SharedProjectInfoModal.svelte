@@ -46,7 +46,6 @@
 		{#if project}
 			<div class="row mb-3">
 				<div class="col-12">
-					<p class="lead">Project properties</p>
 					{#if loading}
 						Loading...
 					{/if}

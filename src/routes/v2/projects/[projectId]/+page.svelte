@@ -176,7 +176,9 @@
 	onOpen={onEditProjectModalOpen}
 >
 	{#snippet header()}
-		<h5 class="modal-title">Project properties</h5>
+		{#if project}
+			<h1 class="h5 modal-title flex-grow-1">Project {project.name}</h1>
+		{/if}
 	{/snippet}
 	{#snippet body()}
 		<div id="errorAlert-editProjectModal"></div>
@@ -189,7 +191,7 @@
 				}}
 			>
 				<div class="mb-3">
-					<label for="projectName" class="form-label">Project name</label>
+					<label for="projectName" class="form-label">Name</label>
 					<input
 						type="text"
 						class="form-control"
