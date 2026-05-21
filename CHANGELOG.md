@@ -1,5 +1,10 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.27.9
+
+- Support starring projects and workflow (\#1108).
+- Move search bars and 'Create new' buttons in project, dataset and workflow tables (\#1108).
+
 # 1.27.8
 
 - Add admin button to reset deactivated Task Group (\#1104).

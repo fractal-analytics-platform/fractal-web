@@ -12,19 +12,17 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').ProjectV2[]} [projects]
+	 * @property {string} [projectSearch]
+	 * @property {Modal|undefined} [newProjectModal]
+	 *
 	 */
 
 	/** @type {Props} */
-	let { projects = $bindable([]) } = $props();
-
-	let projectSearch = $state('');
+	let { projects = $bindable([]), projectSearch = '', newProjectModal = $bindable() } = $props();
 
 	let filteredProjects = $derived(
 		projects.filter((p) => p.name.toLowerCase().includes(projectSearch.toLowerCase()))
 	);
-
-	/** @type {Modal|undefined} */
-	let newProjectModal = $state();
 
 	let newProjectName = $state('');
 	let newProjectNameError = $state('');
@@ -104,76 +102,85 @@
 			throw await getAlertErrorFromResponse(response);
 		}
 	}
+
+	/**
+	 * @param {number} project_id
+	 * @param {boolean} is_starred
+	 */
+	async function toggleStarredProject(project_id, is_starred) {
+		const endpoint = is_starred ? 'unstar' : 'star';
+		const response = await fetch(`/api/v2/project/${project_id}/${endpoint}`, {
+			method: 'POST'
+		});
+		if (!response.ok) {
+			throw await getAlertErrorFromResponse(response);
+		} else {
+			projects = projects.map((p) =>
+				p.id === project_id ? { ...p, is_starred: !p.is_starred } : p
+			);
+		}
+	}
 </script>
 
-<div class="row mt-3 mb-3">
-	<div class="col-sm-12">
-		<div class="row justify-content-end">
-			<div class="col-auto">
-				<div class="input-group">
-					<input
-						name="searchProject"
-						type="text"
-						class="form-control"
-						placeholder="Search"
-						bind:value={projectSearch}
-					/>
-				</div>
-			</div>
-			<div class="col-auto">
-				<button class="btn btn-primary" onclick={() => newProjectModal?.show()}>
-					Create new project
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
 <div class="row">
 	<div class="col">
-		<table class="table table-hover align-middle">
-			<thead class="table-light">
-				<tr>
-					<th class="col-7 col-lg-8">Name</th>
-					<th>Options</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#key projects}
-					{#each filteredProjects as { id, name } (id)}
-						<tr>
-							<td>
-								<a href={'/v2/projects/' + id}>
-									{name}
-								</a>
-							</td>
-							<td>
-								<button
-									class="btn btn-light"
-									data-bs-toggle="modal"
-									data-bs-target="#projectInfoModal"
-									onclick={() => setProjectInfoModal(id)}
-								>
-									<i class="bi bi-info-circle"></i> Info
-								</button>
-								<a href="/v2/projects/{id}/sharing" class="btn btn-info">
-									<i class="bi bi-share"></i>
-									Sharing
-								</a>
-								<ConfirmActionButton
-									modalId={'confirmDeleteProject' + id}
-									style="danger"
-									btnStyle="danger"
-									message="Delete project {name}"
-									buttonIcon="trash"
-									label="Delete"
-									callbackAction={() => handleDeleteProject(id)}
-								/>
-							</td>
-						</tr>
-					{/each}
-				{/key}
-			</tbody>
-		</table>
+		{#if projects.length === 0}
+			<p class="mt-3">You currently have no owned project.</p>
+		{:else}
+			<table class="table table-hover align-middle">
+				<thead class="table-light">
+					<tr>
+						<th class="col-7 col-lg-8">Name</th>
+						<th>Options</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#key projects}
+						{#each filteredProjects as { id, name, is_starred } (id)}
+							<tr>
+								<td>
+									<button
+										type="button"
+										aria-label="star project"
+										class="btn btn-link p-0 border-0 text-warning"
+										title="{is_starred ? 'Unstar' : 'Star'} dataset"
+										onclick={() => toggleStarredProject(id, is_starred)}
+									>
+										<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
+									</button>
+									<a href={'/v2/projects/' + id}>
+										{name}
+									</a>
+								</td>
+								<td>
+									<button
+										class="btn btn-light"
+										data-bs-toggle="modal"
+										data-bs-target="#projectInfoModal"
+										onclick={() => setProjectInfoModal(id)}
+									>
+										<i class="bi bi-info-circle"></i> Info
+									</button>
+									<a href="/v2/projects/{id}/sharing" class="btn btn-info">
+										<i class="bi bi-share"></i>
+										Sharing
+									</a>
+									<ConfirmActionButton
+										modalId={'confirmDeleteProject' + id}
+										style="danger"
+										btnStyle="danger"
+										message="Delete project {name}"
+										buttonIcon="trash"
+										label="Delete"
+										callbackAction={() => handleDeleteProject(id)}
+									/>
+								</td>
+							</tr>
+						{/each}
+					{/key}
+				</tbody>
+			</table>
+		{/if}
 	</div>
 </div>
 

@@ -12,7 +12,7 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await page.goto(project.url);
 	await waitPageLoading(page);
 
-	const initialDatasetsCount = (await page.getByRole('table').first().getByRole('row').count()) - 1;
+	const initialDatasetsCount = await page.getByRole('table').first().getByRole('row').count();
 
 	await test.step('Open "Create new dataset" modal', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
@@ -107,9 +107,8 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 
 		// Confirm the deletion
 		await page.getByRole('button', { name: 'Confirm' }).click();
-
 		// Check table rows count
-		await verifyDatasetsCount(page, initialDatasetsCount);
+		await expect(page.getByText('This project currently has no dataset.')).toBeVisible();
 	});
 
 	await test.step('Attempt to import dataset without selecting a file', async () => {
