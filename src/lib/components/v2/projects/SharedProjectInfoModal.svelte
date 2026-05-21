@@ -53,6 +53,10 @@
 					<div id="errorAlert-shareProjectInfoModal"></div>
 					{#if info}
 						<ul class="list-group">
+							<li class="list-group-item list-group-item-light fw-bold">Name</li>
+							<li class="list-group-item">{project.name}</li>
+							<li class="list-group-item list-group-item-light fw-bold">Description</li>
+							<li class="list-group-item">{project.description || '-'}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Owner e-mail</li>
 							<li class="list-group-item">{info.owner_email}</li>
 							<li class="list-group-item list-group-item-light fw-bold">Permissions</li>

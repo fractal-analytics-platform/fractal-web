@@ -71,6 +71,8 @@
 					<ul class="list-group">
 						<li class="list-group-item list-group-item-light fw-bold">Name</li>
 						<li class="list-group-item">{project.name}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Description</li>
+						<li class="list-group-item">{project.description || '-'}</li>
 					</ul>
 				</div>
 			</div>
