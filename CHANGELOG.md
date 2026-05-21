@@ -2,7 +2,13 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
+- Updated dependencies: svelte, jsdom, vite, vitest (\#1112)
 - Fix glitch on projects-list update (\#1113).
+
+# 1.27.9
+
+- Support starring projects and workflow (\#1108).
+- Move search bars and 'Create new' buttons in project, dataset and workflow tables (\#1108).
 
 # 1.27.8
 

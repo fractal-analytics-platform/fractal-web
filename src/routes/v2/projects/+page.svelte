@@ -24,6 +24,11 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
+	let projectSearch = $state('');
+
+	/** @type {import('$lib/components/common/Modal.svelte').default|undefined} */
+	let newProjectModal = $state();
+
 	async function loadSharedProjects() {
 		errorAlert?.hide();
 		const response = await fetch(`/api/v2/project?is_owner=false`, {
@@ -59,6 +64,27 @@
 			});
 		} else {
 			throw await getAlertErrorFromResponse(response);
+		}
+	}
+
+	/**
+	 * @param {import('fractal-components/types/api').ProjectV2} project
+	 */
+	async function toggleStarredSharedProject(project) {
+		errorAlert?.hide();
+		const endpoint = project.is_starred ? 'unstar' : 'star';
+		const response = await fetch(`/api/v2/project/${project.id}/${endpoint}`, {
+			method: 'POST'
+		});
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'projectsError'
+			);
+		} else {
+			sharedProjects = sharedProjects.map((p) =>
+				p.id === project.id ? { ...p, is_starred: !p.is_starred } : p
+			);
 		}
 	}
 
@@ -102,12 +128,29 @@
 						Shared with me
 					</button>
 				</li>
+				{#if selectedTab === 'my_projects'}
+					<li class="nav-item ms-auto">
+						<div class="d-flex gap-2">
+							{#if projects.length > 0}
+								<input
+									name="searchProject"
+									type="text"
+									class="form-control"
+									placeholder="Search"
+									bind:value={projectSearch}
+								/>
+							{/if}
+							<button class="btn btn-primary text-nowrap" onclick={() => newProjectModal?.show()}>
+								Create new project
+							</button>
+						</div>
+					</li>
+				{/if}
 			</ul>
 		</div>
 	</div>
-
 	{#if selectedTab === 'my_projects'}
-		<ProjectsList bind:projects />
+		<ProjectsList bind:projects {projectSearch} bind:newProjectModal />
 	{:else if sharedProjects.length === 0}
 		<p class="mt-3">There are currently no projects shared with you.</p>
 	{:else}
@@ -122,6 +165,15 @@
 				{#each sharedProjects as project (project.id)}
 					<tr>
 						<td>
+							<button
+								type="button"
+								aria-label="star project"
+								class="btn btn-link p-0 border-0 text-warning"
+								title="{project.is_starred ? 'Unstar' : 'Star'} dataset"
+								onclick={() => toggleStarredSharedProject(project)}
+							>
+								<i class={`bi ${project.is_starred ? 'bi-star-fill' : 'bi-star'} me-2`}></i>
+							</button>
 							<a href={`/v2/projects/${project.id}`}>
 								{project.name}
 							</a>

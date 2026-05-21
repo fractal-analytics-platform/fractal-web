@@ -111,7 +111,7 @@ test('Import workflow', async ({ page, project }) => {
 	});
 
 	await test.step('Filter workflows', async () => {
-		const workflowTable = page.getByRole('table').nth(1).locator('tbody');
+		const workflowTable = page.getByRole('table').nth(0).locator('tbody');
 		await expect(workflowTable.getByRole('row')).toHaveCount(2);
 		await page.getByPlaceholder('Search workflow').fill(randomWorkflowName1);
 		await expect(workflowTable.getByRole('row')).toHaveCount(1);

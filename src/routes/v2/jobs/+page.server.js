@@ -1,7 +1,4 @@
-import {
-	removeDuplicatedItems,
-	sortProjectsByTimestampCreatedDesc
-} from '$lib/common/component_utilities';
+import { removeDuplicatedItems } from '$lib/common/component_utilities';
 import { getUserJobs, listProjects } from '$lib/server/api/v2/project_api';
 import { getLogger } from '$lib/server/logger.js';
 
@@ -11,7 +8,6 @@ export async function load({ fetch }) {
 	logger.trace('Loading jobs page');
 
 	const projects = await listProjects(fetch, true);
-	sortProjectsByTimestampCreatedDesc(projects);
 
 	const jobs = await getUserJobs(fetch);
 
