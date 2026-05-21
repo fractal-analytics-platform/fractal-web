@@ -6,7 +6,7 @@
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
-	let starErrorAlert;
+	let starDatasetErrorAlert;
 
 	/**
 	 * @typedef {Object} Props
@@ -60,7 +60,7 @@
 	 * @param {import('fractal-components/types/api').DatasetV2} dataset
 	 */
 	async function toggleStarredDataset(dataset) {
-		starErrorAlert?.hide();
+		starDatasetErrorAlert?.hide();
 		const endpoint = dataset.is_starred ? 'unstar' : 'star';
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
@@ -69,9 +69,9 @@
 			}
 		);
 		if (!response.ok) {
-			starErrorAlert = displayStandardErrorAlert(
+			starDatasetErrorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),
-				'starErrorAlert'
+				'starDatasetErrorAlert'
 			);
 		} else {
 			datasets = datasets.map((d) =>
@@ -118,7 +118,7 @@
 		</div>
 	</div>
 	<div id="datasetCreateErrorAlert"></div>
-	<div id="starErrorAlert"></div>
+	<div id="starDatasetErrorAlert"></div>
 	{#if datasets.length > 0}
 		<table class="table align-middle">
 			<thead class="table-light">

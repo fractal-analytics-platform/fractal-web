@@ -9,6 +9,9 @@
 
 	// The list of workflows
 
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let starWorkflowErrorAlert;
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
@@ -159,6 +162,7 @@
 	 * @param {boolean} is_starred
 	 */
 	async function toggleStarredWorkflow(project_id, workflow_id, is_starred) {
+		starWorkflowErrorAlert?.hide();
 		const endpoint = is_starred ? 'unstar' : 'star';
 		const response = await fetch(
 			`/api/v2/project/${project_id}/workflow/${workflow_id}/${endpoint}`,
@@ -167,7 +171,10 @@
 			}
 		);
 		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
+			starWorkflowErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'starWorkflowErrorAlert'
+			);
 		} else {
 			workflows = workflows.map((w) =>
 				w.id === workflow_id ? { ...w, is_starred: !w.is_starred } : w
@@ -214,6 +221,7 @@
 	</div>
 
 	<div id="errorAlert-workflow-list"></div>
+	<div id="starWorkflowErrorAlert"></div>
 
 	{#if workflows.length > 0}
 		<table class="table align-middle caption-top">
