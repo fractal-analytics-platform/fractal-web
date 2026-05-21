@@ -1,13 +1,25 @@
 import { expect, test } from '@playwright/test';
-import { waitPageLoading } from '../../utils/utils.js';
+import { getRandomName, login, logout, waitPageLoading } from '../../utils/utils.js';
+import { createTestUser } from '../../utils/v2/user.js';
 
 test('Create and delete a project', async ({ page }) => {
 	await page.goto('/v2/projects');
 	await waitPageLoading(page);
 
-	const randomProjectName = Math.random().toString(36).substring(7);
+	const firstName = getRandomName();
+	const secondName = getRandomName();
+
+	const randomProjectName = firstName < secondName ? secondName : firstName;
+	const randomProjectName2 = firstName < secondName ? firstName : secondName;
+
+	const user = await createTestUser(page);
+	await logout(page, 'admin@fractal.xy');
+	await login(page, user.email, 'test');
 
 	await test.step('Create a new project', async () => {
+		await expect(page.getByText('You currently have no owned project.')).toBeVisible();
+		await expect(page.getByPlaceholder('Search')).not.toBeVisible();
+
 		await page.getByRole('button', { name: 'Create new project' }).click();
 
 		// Wait modal opening
@@ -33,6 +45,7 @@ test('Create and delete a project', async ({ page }) => {
 		await page.goto('/v2/projects');
 		await waitPageLoading(page);
 		await expect(page.getByRole('cell', { name: randomProjectName })).toHaveCount(1);
+		await expect(page.getByPlaceholder('Search')).toBeVisible();
 
 		const projectRow = await getProjectRow(page, randomProjectName);
 
@@ -89,34 +102,78 @@ test('Create and delete a project', async ({ page }) => {
 		await closeModalBtn.click();
 	});
 
-	await test.step('Delete project', async () => {
-		const projectRow = await getProjectRow(page, randomProjectName);
+	await test.step('Create a second project, assert order and add stars', async () => {
+		await page.getByRole('button', { name: 'Create new project' }).click();
 
-		// Click on the delete project button related to the current project
-		const deleteBtn = /** @type {import('@playwright/test').Locator} */ (projectRow).getByRole(
-			'button',
-			{ name: 'Delete' }
-		);
-		await deleteBtn.click();
-
-		// Wait confirm action modal
+		// Wait modal opening
 		let modalTitle = page.locator('.modal.show .modal-title');
 		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Confirm action');
-		await expect(page.locator('.modal.show .modal-body')).toContainText(
-			'Delete project ' + randomProjectName
-		);
+		await expect(modalTitle).toHaveText('Create new project');
 
-		// Confirm the deletion of the project
-		await page.getByRole('button', { name: 'Confirm' }).click();
+		// Fill form and submit
+		const projectNameInput = page.getByLabel('Project name');
+		await projectNameInput.fill(randomProjectName2);
+		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
+		await createProjectBtn.click();
 
-		await page.waitForFunction((projectName) => {
-			const projectNames = [...document.querySelectorAll('table td:nth-child(2)')].map(
-				(c) => /** @type {HTMLElement} */ (c).innerText
-			);
-			return !projectNames.includes(projectName);
-		}, randomProjectName);
-		await expect(page.getByRole('cell', { name: randomProjectName })).toHaveCount(0);
+		// Go back to projects list
+		await page.goto('/v2/projects');
+		await waitPageLoading(page);
+
+		let projectTable = page.getByRole('table').nth(0);
+
+		// Initial state:
+		// project2 -> not starred
+		// project1 -> not starred
+		let projectRow1 = projectTable.getByRole('row').nth(1);
+		let projectRow2 = projectTable.getByRole('row').nth(2);
+		await expect(projectRow1.getByRole('cell').nth(0)).toHaveText(randomProjectName2);
+		await expect(projectRow2.getByRole('cell').nth(0)).toHaveText(randomProjectName);
+
+		let starButton1 = projectRow1
+			.getByRole('cell')
+			.nth(0)
+			.getByRole('button', { name: 'star project' });
+		let starButton2 = projectRow2
+			.getByRole('cell')
+			.nth(0)
+			.getByRole('button', { name: 'star project' });
+
+		await expect(starButton1.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starButton2.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+
+		// Star `randomProjectName` and reload page
+		await starButton2.click();
+		await expect(starButton1.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starButton2.locator('i')).toHaveClass(/bi-star-fill/);
+		await page.reload();
+
+		// After reload:
+		// project1 -> starred
+		// project2 -> not starred
+		await expect(projectRow1.getByRole('cell').nth(0)).toHaveText(randomProjectName);
+		await expect(projectRow2.getByRole('cell').nth(0)).toHaveText(randomProjectName2);
+		await expect(starButton1.locator('i')).toHaveClass(/bi-star-fill/);
+		await expect(starButton2.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+
+		// Untar `randomProjectName` and reload page
+		await starButton1.click();
+		await expect(starButton1.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starButton1.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+		await page.reload();
+
+		// After reload:
+		// project2 -> not starred
+		// project1 -> not starred
+		await expect(projectRow1.getByRole('cell').nth(0)).toHaveText(randomProjectName2);
+		await expect(projectRow2.getByRole('cell').nth(0)).toHaveText(randomProjectName);
+		await expect(starButton1.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+		await expect(starButton2.locator('i')).toHaveClass(/bi-star(?!-fill)/);
+	});
+
+	await test.step('Delete project', async () => {
+		await deleteProject(page, randomProjectName);
+		await deleteProject(page, randomProjectName2);
 	});
 });
 
@@ -136,4 +193,38 @@ async function getProjectRow(page, projectName) {
 	}
 	expect(projectRow).toBeDefined();
 	return /** @type {import('@playwright/test').Locator} */ (projectRow);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} projectName
+ */
+async function deleteProject(page, projectName) {
+	const projectRow = await getProjectRow(page, projectName);
+
+	const deleteBtn = /** @type {import('@playwright/test').Locator} */ (projectRow).getByRole(
+		'button',
+		{ name: 'Delete' }
+	);
+
+	await deleteBtn.click();
+
+	const modal = page.locator('.modal.show');
+	const modalTitle = modal.locator('.modal-title');
+
+	await modalTitle.waitFor();
+	await expect(modalTitle).toHaveText('Confirm action');
+	await expect(modal.locator('.modal-body')).toContainText('Delete project ' + projectName);
+
+	await modal.getByRole('button', { name: 'Confirm' }).click();
+
+	await page.waitForFunction((name) => {
+		const projectNames = [...document.querySelectorAll('table td:nth-child(2)')].map((c) =>
+			/** @type {HTMLElement} */ (c).innerText.trim()
+		);
+
+		return !projectNames.includes(name);
+	}, projectName);
+
+	await expect(page.getByRole('cell', { name: projectName })).toHaveCount(0);
 }

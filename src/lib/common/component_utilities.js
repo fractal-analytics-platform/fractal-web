@@ -45,20 +45,6 @@ export function removeDuplicatedItems(allItems) {
 }
 
 /**
- * @template {import('fractal-components/types/api').ProjectV2} T
- * @param {T[]} projects
- */
-export function sortProjectsByTimestampCreatedDesc(projects) {
-	projects.sort((p1, p2) =>
-		p1.timestamp_created < p2.timestamp_created
-			? 1
-			: p1.timestamp_created > p2.timestamp_created
-				? -1
-				: 0
-	);
-}
-
-/**
  * @param {string} content
  * @param {string} filename
  * @param {string} contentType
