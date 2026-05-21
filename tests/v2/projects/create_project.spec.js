@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { login, logout, waitPageLoading } from '../../utils/utils.js';
+import { getRandomName, login, logout, waitPageLoading } from '../../utils/utils.js';
 import { createTestUser } from '../../utils/v2/user.js';
 
 test('Create and delete a project', async ({ page }) => {
 	await page.goto('/v2/projects');
 	await waitPageLoading(page);
 
-	const firstName = Math.random().toString(36).substring(7);
-	const secondName = Math.random().toString(36).substring(7);
+	const firstName = getRandomName();
+	const secondName = getRandomName();
 
 	const randomProjectName = firstName < secondName ? secondName : firstName;
 	const randomProjectName2 = firstName < secondName ? firstName : secondName;
