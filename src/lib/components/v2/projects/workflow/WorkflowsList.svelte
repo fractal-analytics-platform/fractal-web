@@ -9,6 +9,9 @@
 
 	// The list of workflows
 
+	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let starWorkflowErrorAlert;
+
 	/**
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
@@ -153,6 +156,32 @@
 		);
 	}
 
+	/**
+	 * @param {number} project_id
+	 * @param {number} workflow_id
+	 * @param {boolean} is_starred
+	 */
+	async function toggleStarredWorkflow(project_id, workflow_id, is_starred) {
+		starWorkflowErrorAlert?.hide();
+		const endpoint = is_starred ? 'unstar' : 'star';
+		const response = await fetch(
+			`/api/v2/project/${project_id}/workflow/${workflow_id}/${endpoint}`,
+			{
+				method: 'POST'
+			}
+		);
+		if (!response.ok) {
+			starWorkflowErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'starWorkflowErrorAlert'
+			);
+		} else {
+			workflows = workflows.map((w) =>
+				w.id === workflow_id ? { ...w, is_starred: !w.is_starred } : w
+			);
+		}
+	}
+
 	onMount(() => {
 		workflowSearch = '';
 	});
@@ -161,26 +190,26 @@
 <CreateWorkflowModal {handleWorkflowImported} bind:this={createWorkflowModal} />
 
 <div class="container mt-5">
-	<div class="col-sm-2">
-		<h3 class="fw-light">Workflows</h3>
-	</div>
-	<div class="col-sm-10 mb-2">
-		<div class="row justify-content-end">
-			<div class="col-auto">
-				<div class="input-group">
+	<div class="row align-items-center mb-2">
+		<div class="col-2">
+			<h3 class="fw-light">Workflows</h3>
+		</div>
+
+		<div class="col-10">
+			<div class="toolbar-actions">
+				{#if workflows.length > 0}
 					<input
 						name="searchWorkflow"
 						type="text"
-						class="form-control"
+						class="form-control toolbar-search"
 						placeholder="Search workflow"
 						bind:value={workflowSearch}
 					/>
-				</div>
-			</div>
-			<div class="col-auto">
+				{/if}
+
 				<button
-					class="btn btn-primary float-end"
-					type="submit"
+					class="btn btn-primary toolbar-button"
+					type="button"
 					onclick={() => {
 						createWorkflowModal?.show();
 					}}
@@ -192,43 +221,76 @@
 	</div>
 
 	<div id="errorAlert-workflow-list"></div>
+	<div id="starWorkflowErrorAlert"></div>
 
-	<table class="table align-middle caption-top">
-		<thead class="table-light">
-			<tr>
-				<th class="col-7 col-lg-8">Name</th>
-				<th>Options</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#key workflows}
-				{#each filteredWorkflows as { id, name } (id)}
-					<tr>
-						<td>
-							<a href="/v2/projects/{projectId}/workflows/{id}">
-								{name}
-							</a>
-						</td>
-						<td>
-							<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
-								<i class="bi-journal-code"></i> List jobs
-							</a>
-							<button class="btn btn-info" type="button" onclick={() => duplicateWorkflow(id)}>
-								<i class="bi bi-copy"></i> Duplicate
-							</button>
-							<ConfirmActionButton
-								modalId={'deleteConfirmModal' + id}
-								style="danger"
-								btnStyle="danger"
-								buttonIcon="trash"
-								label="Delete"
-								message="Delete workflow {name}"
-								callbackAction={() => handleDeleteWorkflow(id)}
-							/>
-						</td>
-					</tr>
-				{/each}
-			{/key}
-		</tbody>
-	</table>
+	{#if workflows.length > 0}
+		<table class="table align-middle caption-top">
+			<thead class="table-light">
+				<tr>
+					<th class="col-7 col-lg-8">Name</th>
+					<th>Options</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#key workflows}
+					{#each filteredWorkflows as { id, name, is_starred } (id)}
+						<tr>
+							<td>
+								<button
+									type="button"
+									aria-label="star workflow"
+									class="btn btn-link p-0 border-0 text-warning"
+									title="{is_starred ? 'Unstar' : 'Star'} workflow"
+									onclick={() => toggleStarredWorkflow(projectId, id, is_starred)}
+								>
+									<i class={`bi ${is_starred ? 'bi-star-fill' : 'bi-star'}  me-2`}></i>
+								</button>
+								<a href="/v2/projects/{projectId}/workflows/{id}">
+									{name}
+								</a>
+							</td>
+							<td>
+								<a href="/v2/projects/{projectId}/workflows/{id}/jobs" class="btn btn-light">
+									<i class="bi-journal-code"></i> List jobs
+								</a>
+								<button class="btn btn-info" type="button" onclick={() => duplicateWorkflow(id)}>
+									<i class="bi bi-copy"></i> Duplicate
+								</button>
+								<ConfirmActionButton
+									modalId={'deleteConfirmModal' + id}
+									style="danger"
+									btnStyle="danger"
+									buttonIcon="trash"
+									label="Delete"
+									message="Delete workflow {name}"
+									callbackAction={() => handleDeleteWorkflow(id)}
+								/>
+							</td>
+						</tr>
+					{/each}
+				{/key}
+			</tbody>
+		</table>
+	{:else}
+		This project currently has no workflow.
+	{/if}
 </div>
+
+<style>
+	.toolbar-actions {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.toolbar-search {
+		width: 14rem;
+	}
+
+	.toolbar-button {
+		width: 12rem;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+</style>

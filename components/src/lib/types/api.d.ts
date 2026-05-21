@@ -44,6 +44,7 @@ export type DatasetHistoryItem = {
 export type ProjectV2 = {
 	id: number;
 	name: string;
+	is_starred: boolean;
 	timestamp_created: string;
 };
 
@@ -241,6 +242,7 @@ export type WorkflowV2 = {
 	name: string;
 	project_id: number;
 	project: ProjectV2;
+	is_starred: boolean;
 	task_list: Array<WorkflowTaskV2>;
 	timestamp_created: string;
 	description: string | null;
