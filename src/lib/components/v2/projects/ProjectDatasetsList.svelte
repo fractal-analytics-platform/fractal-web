@@ -92,24 +92,24 @@
 		<div class="col-2">
 			<h3 class="fw-light">Datasets</h3>
 		</div>
+
 		<div class="col-10">
-			<div class="d-flex justify-content-end gap-2">
+			<div class="toolbar-actions">
 				{#if datasets.length > 0}
 					<input
 						name="searchDataset"
 						type="text"
-						class="form-control w-auto"
+						class="form-control toolbar-search"
 						placeholder="Search dataset"
-						style="width: 200px"
 						bind:value={datasetSearch}
 					/>
 				{/if}
+
 				<button
-					class="btn btn-primary"
+					class="btn btn-primary toolbar-button"
 					type="button"
 					data-bs-target="#createDatasetModal"
 					data-bs-toggle="modal"
-					style="width: 180px"
 					onclick={() => (datasetCreatedMessage = '')}
 				>
 					Create new dataset
@@ -167,3 +167,22 @@
 </div>
 
 <CreateDatasetModal {createDatasetCallback} {project} />
+
+<style>
+	.toolbar-actions {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.toolbar-search {
+		width: 14rem;
+	}
+
+	.toolbar-button {
+		width: 12rem;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+</style>

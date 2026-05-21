@@ -194,25 +194,25 @@
 		<div class="col-2">
 			<h3 class="fw-light">Workflows</h3>
 		</div>
+
 		<div class="col-10">
-			<div class="d-flex justify-content-end gap-2">
+			<div class="toolbar-actions">
 				{#if workflows.length > 0}
 					<input
 						name="searchWorkflow"
 						type="text"
-						class="form-control w-auto"
+						class="form-control toolbar-search"
 						placeholder="Search workflow"
-						style="width: 200px"
 						bind:value={workflowSearch}
 					/>
 				{/if}
+
 				<button
-					class="btn btn-primary"
-					type="submit"
+					class="btn btn-primary toolbar-button"
+					type="button"
 					onclick={() => {
 						createWorkflowModal?.show();
 					}}
-					style="width: 180px"
 				>
 					Create new workflow
 				</button>
@@ -275,3 +275,22 @@
 		This project currently has no workflow.
 	{/if}
 </div>
+
+<style>
+	.toolbar-actions {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.toolbar-search {
+		width: 14rem;
+	}
+
+	.toolbar-button {
+		width: 12rem;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+</style>
