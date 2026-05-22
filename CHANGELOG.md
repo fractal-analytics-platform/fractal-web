@@ -2,8 +2,10 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
-- Updated dependencies: svelte, jsdom, vite, vitest (\#1112)
+- Update dependencies: svelte, jsdom, vite, vitest (\#1112).
 - Introduce project descriptions (\#1118).
+- Fix glitch on projects-list update (\#1113).
+- Update admin jobs page: add "Project owner" (previously "User") and "Job user" (\#1113).
 
 # 1.27.9
 

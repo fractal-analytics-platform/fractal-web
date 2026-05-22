@@ -35,6 +35,7 @@
 	import { normalizePayload } from 'fractal-components';
 	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
+	import { resolve } from '$app/paths';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -645,7 +646,7 @@
 	}
 
 	async function gotoLinkedTemplate() {
-		await goto(`/v2/templates?template_id=${workflow.template_id}`);
+		await goto(resolve(`/v2/templates?template_id=${workflow.template_id}`));
 	}
 
 	/**

@@ -24,6 +24,7 @@
 	 */
 	/** @type {Props} */
 	let {
+		// eslint-disable-next-line no-useless-assignment
 		singleSelectedTemplateId = $bindable(undefined),
 		templateId: initialTemplateId = undefined,
 		isOwner: initialIsOwner = false,
@@ -164,6 +165,7 @@
 				: url.searchParams.delete('version');
 		}
 		await tick();
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		pushState(url, {});
 
 		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`, {

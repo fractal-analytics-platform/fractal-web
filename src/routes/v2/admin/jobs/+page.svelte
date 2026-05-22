@@ -27,7 +27,8 @@
 	let totalCount = $state(0);
 
 	let status = $state();
-	let userId = $state();
+	let projectOwnerId = $state();
+	let jobUserEmail = $state();
 	let jobId = $state();
 
 	let startDateMin = $state();
@@ -121,8 +122,11 @@
 		if (status) {
 			url.searchParams.append('status', status);
 		}
-		if (userId) {
-			url.searchParams.append('user_id', userId);
+		if (projectOwnerId) {
+			url.searchParams.append('project_owner_id', projectOwnerId);
+		}
+		if (jobUserEmail) {
+			url.searchParams.append('job_user_email', jobUserEmail);
 		}
 		if (jobId) {
 			url.searchParams.append('id', jobId);
@@ -163,7 +167,8 @@
 			searchErrorAlert.hide();
 		}
 		status = '';
-		userId = '';
+		projectOwnerId = '';
+		jobUserEmail = '';
 		jobId = '';
 		startDateMin = '';
 		startTimeMin = '';
@@ -322,11 +327,11 @@
 		<h1 class="fw-light">Jobs</h1>
 	</div>
 
-	<div class="row">
-		<div class="col-lg-3">
+	<div class="row mt-3">
+		<div class="col-lg-5 col-xl-4">
 			<div class="row mt-1">
-				<label class="col-3 col-form-label" for="status">Status</label>
-				<div class="col-9">
+				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="status">Status</label>
+				<div class="col-6">
 					<select class="form-select" bind:value={status} id="status">
 						<option value="">All</option>
 						<option value="submitted">Submitted</option>
@@ -336,11 +341,25 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-lg-3 offset-lg-1">
+
+		<div class="col-lg-5 offset-lg-1 col-xl-4 offset-xl-1">
 			<div class="row mt-1">
-				<label class="col-3 col-form-label" for="user">User</label>
-				<div class="col-9">
-					<select class="form-select" bind:value={userId} id="user">
+				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="job_id">Job Id</label>
+				<div class="col-6">
+					<input type="number" id="job_id" class="form-control" bind:value={jobId} />
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-3">
+		<div class="col-lg-5 col-xl-4">
+			<div class="row mt-1">
+				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="project_owner_id">
+					Project owner
+				</label>
+				<div class="col-6">
+					<select class="form-select" bind:value={projectOwnerId} id="project_owner_id">
 						<option value="">All</option>
 						{#each users as user (user.id)}
 							<option value={user.id}>{user.email}</option>
@@ -349,11 +368,17 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-lg-3 offset-lg-1">
+
+		<div class="col-lg-5 offset-lg-1 col-xl-4 offset-xl-1">
 			<div class="row mt-1">
-				<label class="col-3 col-form-label" for="job_id">Job Id</label>
-				<div class="col-9">
-					<input type="number" id="job_id" class="form-control" bind:value={jobId} />
+				<label class="col-6 col-md-4 col-lg-6 col-form-label" for="job_user_email">Job user</label>
+				<div class="col-6">
+					<select class="form-select" bind:value={jobUserEmail} id="job_user_email">
+						<option value="">All</option>
+						{#each users as user (user.id)}
+							<option value={user.email}>{user.email}</option>
+						{/each}
+					</select>
 				</div>
 			</div>
 		</div>

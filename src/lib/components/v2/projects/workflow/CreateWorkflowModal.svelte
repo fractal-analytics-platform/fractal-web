@@ -7,6 +7,7 @@
 	import { normalizePayload } from 'fractal-components';
 	import TemplatesTable from '../../templates/TemplatesTable.svelte';
 	import WorkflowImportFlexibility from './WorkflowImportFlexibility.svelte';
+	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
@@ -192,7 +193,12 @@
 		if (response.ok) {
 			const result = await response.json();
 			workflowName = '';
-			goto(`/v2/projects/${projectId}/workflows/${result.id}`);
+			await goto(
+				resolve(`/v2/projects/[projectId]/workflows/[workflowId]`, {
+					projectId: String(projectId),
+					workflowId: String(result.id)
+				})
+			);
 		} else {
 			throw await getAlertErrorFromResponse(response);
 		}

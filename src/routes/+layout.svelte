@@ -6,6 +6,7 @@
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
+	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
@@ -88,7 +89,7 @@
 			credentials: 'include'
 		});
 		await invalidateAll();
-		goto('/');
+		await goto(resolve('/'));
 	}
 
 	async function getToken() {

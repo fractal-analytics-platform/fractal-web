@@ -27,7 +27,7 @@
 	</ul>
 
 	<p>
-		Please contact an admin if you see an error message like <code>403 Forbidden</code> when opening
-		the image viewer.
+		Please contact an admin if you see an error message like <code>403 Forbidden</code> when opening the
+		image viewer.
 	</p>
 </div>

@@ -44,7 +44,7 @@ function mergeDeep(oldData, newData) {
 				oldData[key] !== null
 			) {
 				oldData[key] = mergeDeep(oldData[key], newData[key]);
-			} else if (!Object.hasOwn(oldData, key)) {
+			} else if (!Object.hasOwn(oldData, key) && key !== '__proto__' && key !== 'constructor') {
 				// If the key does not exist in oldData, add it
 				oldData[key] = newData[key];
 			}

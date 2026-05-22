@@ -5,6 +5,7 @@
 	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	let inProgress = $state(false);
 	let stepMessage = $state('');
@@ -29,7 +30,12 @@
 			const taskId = await createHealthCheckTaskIfNeeded();
 			await addTaskToWorkflow(projectId, workflowId, taskId);
 			await submitWorkflow(projectId, workflowId, datasetId);
-			await goto(`/v2/projects/${projectId}/workflows/${workflowId}`);
+			await goto(
+				resolve(`/v2/projects/[projectId]/workflows/[workflowId]`, {
+					projectId: String(projectId),
+					workflowId: String(workflowId)
+				})
+			);
 		} catch (err) {
 			error = err;
 		} finally {

@@ -110,7 +110,7 @@ test('Execute a job and show it on the job tables [v2]', async ({ page }) => {
 
 	await test.step('Search workflow2 job', async () => {
 		await page.getByRole('button', { name: 'Reset' }).click();
-		await page.getByRole('combobox', { name: 'User' }).selectOption('1');
+		await page.getByRole('combobox', { name: 'Project owner' }).selectOption('1');
 		await page
 			.getByRole('spinbutton', { name: 'Project Id' })
 			.fill(workflow2.projectId?.toString() || '');

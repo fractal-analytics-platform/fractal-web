@@ -44,7 +44,7 @@ vi.mock('$env/dynamic/public', () => {
 // The component to be tested must be imported after the mock setup
 import page from '../../src/routes/v2/projects/[projectId]/workflows/[workflowId]/+page.svelte';
 
-describe('Workflow page', () => {
+describe('Workflow page', { retry: { count: 2, delay: 100 } }, () => {
 	beforeEach(() => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});

@@ -19,6 +19,7 @@
 		componentId,
 		editable = true,
 		onchange,
+		// eslint-disable-next-line no-useless-assignment
 		dataValid = $bindable()
 	} = $props();
 

@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import { normalizePayload } from 'fractal-components';
+	import { resolve } from '$app/paths';
 
 	let data = $state('');
 
@@ -23,7 +24,7 @@
 			return;
 		}
 
-		let content = '';
+		let content;
 		try {
 			const file = files[0];
 			content = await file.text();
@@ -56,7 +57,7 @@
 			});
 
 			if (response.ok) {
-				await goto(`/v2/admin/resources`);
+				await goto(resolve(`/v2/admin/resources`));
 			} else {
 				saveErrorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),

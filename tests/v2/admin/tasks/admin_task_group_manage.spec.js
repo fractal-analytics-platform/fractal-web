@@ -73,7 +73,7 @@ test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 		await modal.waitFor();
 		await modal.getByRole('link', { name: 'Reset task group' }).click();
 
-		await page.waitForURL(/\/v2\/admin\/task-groups\/\d\/reset/);
+		await page.waitForURL(/\/v2\/admin\/task-groups\/\d+\/reset/);
 		await expect(
 			page.getByText('Task group reset is not available for other origin.')
 		).toBeVisible();

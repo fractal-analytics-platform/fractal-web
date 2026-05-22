@@ -4,5 +4,6 @@
 	"*.svelte": "prettier --write",
 	"*.md": "prettier --write",
 	"*.json": "prettier --write",
-	"*.yaml": "prettier --write"
+	"*.yaml": "prettier --write",
+	"*.yml": "prettier --write"
 }

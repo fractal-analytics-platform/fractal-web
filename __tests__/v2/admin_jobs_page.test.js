@@ -40,7 +40,7 @@ import page from '../../src/routes/v2/admin/jobs/+page.svelte';
 describe('Admin jobs page', () => {
 	it('Users in dropdown are correctly sorted', async () => {
 		const result = render(page);
-		const dropdown = result.getByLabelText('User');
+		const dropdown = result.getByLabelText('Project owner');
 		const options = dropdown.querySelectorAll('option');
 		expect(options.length).eq(5);
 		expect(options[0].text).eq('All');
