@@ -10,10 +10,6 @@
 	/** @type {import('fractal-components/types/api').ProjectV2|undefined} */
 	let project = $state();
 
-	let loadingDatasets = $state(true);
-	/** @type {import('fractal-components/types/api').DatasetV2[]|undefined} */
-	let datasets = $state();
-
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let datasetErrorAlert;
 
@@ -23,8 +19,6 @@
 	const unsubscribe = projectInfoModalV2.subscribe(async (selectedProject) => {
 		project = selectedProject;
 		if (project) {
-			loadingDatasets = true;
-			datasets = undefined;
 			datasetErrorAlert?.hide();
 			const response = await fetch(`/api/v2/project/${project.id}/dataset?history=false`, {
 				method: 'GET',
@@ -34,16 +28,12 @@
 				/** @type {import('fractal-components/types/api.js').DatasetV2[]} */
 				const result = await response.json();
 				result.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-				datasets = result;
 			} else {
 				datasetErrorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),
 					'errorAlert-projectInfoModal'
 				);
 			}
-			loadingDatasets = false;
-		} else {
-			datasets = undefined;
 		}
 	});
 
@@ -67,29 +57,12 @@
 		{#if project}
 			<div class="row mb-3">
 				<div class="col-12">
-					<p class="lead">Project properties</p>
 					<ul class="list-group">
 						<li class="list-group-item list-group-item-light fw-bold">Name</li>
 						<li class="list-group-item">{project.name}</li>
+						<li class="list-group-item list-group-item-light fw-bold">Description</li>
+						<li class="list-group-item">{project.description || '-'}</li>
 					</ul>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-					{#if loadingDatasets}
-						Loading...
-					{/if}
-					<div id="errorAlert-projectInfoModal"></div>
-					{#if datasets}
-						<p class="lead">Datasets</p>
-						<ul>
-							{#each datasets as dataset (dataset.id)}
-								<li>
-									{dataset.name}
-								</li>
-							{/each}
-						</ul>
-					{/if}
 				</div>
 			</div>
 		{/if}

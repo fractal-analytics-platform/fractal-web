@@ -26,10 +26,12 @@
 	);
 
 	let newProjectName = $state('');
+	let newProjectDescription = $state('');
 	let newProjectNameError = $state('');
 
 	function onNewProjectModalOpen() {
 		newProjectName = '';
+		newProjectDescription = '';
 		newProjectNameError = '';
 		newProjectModal?.hideErrorAlert();
 	}
@@ -53,20 +55,27 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
+		const payload = {
+			name: newProjectName
+		};
+
+		if (newProjectDescription !== '') {
+			payload.description = newProjectDescription;
+		}
+
 		const response = await fetch(`/api/v2/project`, {
 			method: 'POST',
 			credentials: 'include',
 			mode: 'cors',
 			headers,
-			body: normalizePayload({
-				name: newProjectName
-			})
+			body: normalizePayload(payload)
 		});
 
 		const result = await response.json();
 		creating = false;
 		if (response.ok) {
 			newProjectName = '';
+			newProjectDescription = '';
 			projects = [...projects, result];
 			newProjectModal?.hide();
 			await goto(
@@ -224,6 +233,17 @@
 						{#if newProjectNameError}
 							<div class="invalid-feedback">{newProjectNameError}</div>
 						{/if}
+					</div>
+				</div>
+				<div class="row mb-3">
+					<label for="projectDescription" class="col-md-3 col-form-label">Description</label>
+					<div class="col-md-9">
+						<textarea
+							id="projectDescription"
+							bind:value={newProjectDescription}
+							class="form-control"
+							rows="4"
+						></textarea>
 					</div>
 				</div>
 			</div>

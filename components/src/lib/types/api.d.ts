@@ -44,6 +44,7 @@ export type DatasetHistoryItem = {
 export type ProjectV2 = {
 	id: number;
 	name: string;
+	description: string | null;
 	is_starred: boolean;
 	timestamp_created: string;
 };
