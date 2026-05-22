@@ -105,7 +105,7 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
 		await modal.waitFor();
 		await modal.getByRole('link', { name: 'Reset task group' }).click();
-		await page.waitForURL(/\/v2\/admin\/task-groups\/\d\/reset/);
+		await page.waitForURL(/\/v2\/admin\/task-groups\/\d+\/reset/);
 		const lockfileSwitch = page.getByRole('switch', {
 			name: 'Use pixi.lock file'
 		});
