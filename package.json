@@ -26,7 +26,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/color-hash": "^2.0.0",
 		"@types/node": "^22.7.4",
-		"dotenv": "^16.3.1",
+		"dotenv": "^17.4.2",
 		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.17.1",
