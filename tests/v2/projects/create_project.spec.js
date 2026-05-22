@@ -49,7 +49,7 @@ test('Create and delete a project', async ({ page }) => {
 		await expect(page.locator('h1:not(.modal-title)')).toHaveText(
 			new RegExp('Project ' + nameToEdit + ' #\\d+')
 		);
-		await expect(page.getByText('This is a short description')).toBeVisible();
+		await expect(page.getByText(shortDescription)).toBeVisible();
 	});
 
 	await test.step('Edit project name and description', async () => {
@@ -68,11 +68,20 @@ test('Create and delete a project', async ({ page }) => {
 		await expect(page.locator('h1:not(.modal-title)')).toHaveText(
 			new RegExp('Project ' + randomProjectName + ' #\\d+')
 		);
+		await expect(page.getByText(longDescription)).not.toBeVisible();
 		await expect(
 			page.getByText(`${longDescription.substring(0, maxDescriptionLength)}...`)
 		).toBeVisible();
 		await page.getByRole('button', { name: 'Show more' }).click();
 		await expect(page.getByText(longDescription)).toBeVisible();
+		await expect(
+			page.getByText(`${longDescription.substring(0, maxDescriptionLength)}...`)
+		).not.toBeVisible();
+		await page.getByRole('button', { name: 'Show less' }).click();
+		await expect(page.getByText(longDescription)).not.toBeVisible();
+		await expect(
+			page.getByText(`${longDescription.substring(0, maxDescriptionLength)}...`)
+		).toBeVisible();
 	});
 
 	await test.step('Verify that new project is visible in projects page', async () => {
