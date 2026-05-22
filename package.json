@@ -14,8 +14,8 @@
 		"test": "TZ=Europe/Rome LANG='it-IT' vitest"
 	},
 	"devDependencies": {
-		"@eslint/eslintrc": "^3.1.0",
-		"@eslint/js": "^9.0.0",
+		"@eslint/eslintrc": "^3.3.5",
+		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.41.2",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-node": "^5.5.4",
@@ -32,7 +32,7 @@
 		"eslint-plugin-svelte": "^3.17.1",
 		"globals": "^17.6.0",
 		"jsdom": "^29.1.1",
-		"lint-staged": "^15.2.10",
+		"lint-staged": "^16.4.0",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.0.0",
 		"svelte": "^5.55.8",
