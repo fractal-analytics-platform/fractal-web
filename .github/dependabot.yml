@@ -30,3 +30,10 @@ updates:
         applies-to: version-updates
         patterns:
           - '*'
+    ignore:
+      - dependency-name: 'lint-staged'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'marked'
+        update-types: ['version-update:semver-major']
