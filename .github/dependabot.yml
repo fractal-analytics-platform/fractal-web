@@ -25,3 +25,8 @@ updates:
       interval: 'weekly'
     cooldown:
       default-days: 7
+    groups:
+      version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
