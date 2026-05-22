@@ -7,9 +7,14 @@
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
 	import { normalizePayload } from 'fractal-components';
 	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
+	import { tick } from 'svelte';
+
+	const maxDescriptionLength = 50;
+	const descriptionLengthOffset = 10;
+	let expandProjectDescription = $state(false);
 
 	/** @type {import('fractal-components/types/api').ProjectV2} */
-	const project = $derived(page.data.project);
+	let project = $state(page.data.project);
 	/** @type {import('fractal-components/types/api').ProjectAccessRead} */
 	const projectAccess = $derived(page.data.projectAccess);
 	/** @type {import('fractal-components/types/api').DatasetV2[]} */
@@ -23,6 +28,7 @@
 	let projectUpdatesSuccessMessage = $state('');
 
 	let updatedProjectName = $state('');
+	let updatedProjectDescription = $state('');
 	let updating = $state(false);
 
 	/** @type {Modal|undefined} */
@@ -45,16 +51,20 @@
 					credentials: 'include',
 					mode: 'cors',
 					headers,
-					body: normalizePayload({
-						name: updatedProjectName
-					})
+					body: normalizePayload(
+						{
+							name: updatedProjectName,
+							description: updatedProjectDescription
+						},
+						{ nullifyEmptyStrings: true }
+					)
 				});
 
 				if (response.ok) {
 					console.log('Project updated successfully');
-					projectUpdatesSuccessMessage = 'Project properties successfully updated';
 					const result = await response.json();
-					project.name = result.name;
+					project = { ...project, name: result.name, description: result.description };
+					projectUpdatesSuccessMessage = 'Project properties successfully updated';
 				} else {
 					console.error('Error while updating project');
 					throw await getAlertErrorFromResponse(response);
@@ -75,21 +85,24 @@
 	}
 </script>
 
-{#if project}
-	<div class="container d-flex justify-content-between align-items-center">
-		<div class="d-flex justify-content-between align-items-center mt-3 mb-2">
-			<h1 class="fw-light">Project {project.name} #{project.id}</h1>
-		</div>
-		<div>
+<div class="container mt-3">
+	<div class="d-flex justify-content-between align-items-center mb-2">
+		<h1 class="fw-light mb-0">Project {project.name} #{project.id}</h1>
+
+		<div class="d-flex gap-2">
 			<button
 				class="btn btn-light"
 				data-bs-toggle="modal"
 				data-bs-target="#editProjectModal"
-				onclick={() => (updatedProjectName = project.name)}
+				onclick={() => {
+					updatedProjectName = project.name;
+					updatedProjectDescription = project.description || '';
+				}}
 				aria-label="Edit project"
 			>
-				<i class="bi-pencil"></i>
+				<i class="bi-info-circle"></i>
 			</button>
+
 			{#if projectAccess.is_owner}
 				<a href="/v2/projects/{project.id}/sharing" class="btn btn-info">
 					<i class="bi bi-share"></i>
@@ -97,16 +110,67 @@
 				</a>
 			{:else}
 				<button class="btn btn-light" onclick={() => showSharedProjectInfo()}>
-					<i class="bi bi-info-circle"></i> Info
+					<i class="bi bi-info-circle"></i>
+					Info
 				</button>
 			{/if}
 		</div>
 	</div>
 
+	{#if project.description}
+		<div class="mb-3">
+			<span>
+				{#if project.description.length > maxDescriptionLength + descriptionLengthOffset}
+					{#if expandProjectDescription}
+						{project.description}
+					{:else}
+						{project.description.substring(0, maxDescriptionLength)}...
+					{/if}
+
+					{#if expandProjectDescription}
+						<button
+							class="btn btn-link fw-light p-0 ms-2"
+							onclick={() => (expandProjectDescription = false)}
+						>
+							Show less
+						</button>
+					{:else}
+						<button
+							class="btn btn-link fw-light p-0 ms-2"
+							onclick={() => (expandProjectDescription = true)}
+						>
+							Show more
+						</button>
+					{/if}
+				{:else}
+					{project.description}
+				{/if}
+			</span>
+
+			{#if project.description.length <= maxDescriptionLength + descriptionLengthOffset || expandProjectDescription}
+				<button
+					class="btn btn-link p-0 ms-2 align-baseline"
+					data-bs-toggle="modal"
+					data-bs-target="#editProjectModal"
+					aria-label="Edit description"
+					onclick={async () => {
+						updatedProjectName = project.name;
+						updatedProjectDescription = project.description || '';
+						await tick();
+						document.getElementById('projectDescription')?.focus();
+					}}
+				>
+					<i class="bi bi-pencil"></i>
+				</button>
+			{/if}
+		</div>
+	{/if}
+
 	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
-	<ProjectDatasetsList {datasets} {project} />
-	<WorkflowsList {workflows} projectId={project.id} />
-{/if}
+</div>
+
+<ProjectDatasetsList {datasets} {project} />
+<WorkflowsList {workflows} projectId={project.id} />
 
 <Modal
 	id="editProjectModal"
@@ -115,7 +179,9 @@
 	onOpen={onEditProjectModalOpen}
 >
 	{#snippet header()}
-		<h5 class="modal-title">Project properties</h5>
+		{#if project}
+			<h1 class="h5 modal-title flex-grow-1">Project {project.name}</h1>
+		{/if}
 	{/snippet}
 	{#snippet body()}
 		<div id="errorAlert-editProjectModal"></div>
@@ -128,7 +194,7 @@
 				}}
 			>
 				<div class="mb-3">
-					<label for="projectName" class="form-label">Project name</label>
+					<label for="projectName" class="form-label">Name</label>
 					<input
 						type="text"
 						class="form-control"
@@ -137,6 +203,16 @@
 						bind:value={updatedProjectName}
 						required
 					/>
+				</div>
+				<div class="mb-3">
+					<label for="projectDescription" class="form-label">Description</label>
+					<textarea
+						id="projectDescription"
+						bind:value={updatedProjectDescription}
+						class="form-control"
+						name="projectDescription"
+						rows="4"
+					></textarea>
 				</div>
 			</form>
 		{/if}
