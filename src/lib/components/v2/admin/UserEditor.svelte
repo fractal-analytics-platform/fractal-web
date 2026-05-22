@@ -15,6 +15,7 @@
 	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import { groupsErrorOnUserCreation } from '$lib/stores';
+	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
@@ -29,11 +30,7 @@
 	let { user = $bindable(), groups = [], saveUser, runnerBackend, defaultGroupName } = $props();
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
-	let editableUser = $state();
-
-	$effect(() => {
-		editableUser = deepCopy(user);
-	});
+	let editableUser = $derived(deepCopy(user));
 
 	const currentUserId = $derived(page.data.userInfo?.id);
 
@@ -138,6 +135,7 @@
 					await userFormErrorHandler.handleErrorResponse(response);
 					return;
 				}
+				/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 				const result = await response.json();
 				editableUser.id = result.id;
 				if (existing) {
@@ -151,7 +149,7 @@
 			}
 
 			if (needsUserEdit) {
-				if (editableUser?.id === currentUserId) {
+				if (editableUser.id === currentUserId) {
 					// If the user modifies their own account the userInfo cached in the store has to be reloaded
 					await invalidateAll();
 				}
@@ -160,7 +158,11 @@
 				if (existing) {
 					originalUser = deepCopy($state.snapshot(editableUser));
 				} else {
-					await goto(`/v2/admin/users/${editableUser?.id}/edit`);
+					await goto(
+						resolve(`/v2/admin/users/[userId]/edit`, {
+							userId: String(editableUser.id)
+						})
+					);
 				}
 			}
 			userUpdatedMessage = 'User successfully updated';
@@ -273,7 +275,11 @@
 			errorAlert = displayStandardErrorAlert(error, 'genericUserError');
 		} else {
 			groupsErrorOnUserCreation.set(error);
-			await goto(`/v2/admin/users/${editableUser?.id}/edit`);
+			await goto(
+				resolve(`/v2/admin/users/[userId]/edit`, {
+					userId: String(editableUser?.id)
+				})
+			);
 		}
 		return false;
 	}

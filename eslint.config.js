@@ -58,8 +58,19 @@ export default [
 	},
 	{
 		rules: {
-			// Override or add rule settings here, such as:
-			// 'svelte/rule-name': 'error'
+			//  deprecated and replaced by svelte/no-navigation-without-resolve rule.
+			'svelte/no-navigation-without-base': ['off'],
+			// disabled due to large number of false positive with simple classes (e.g. Date)
+			'svelte/prefer-svelte-reactivity': ['off'],
+			'svelte/no-navigation-without-resolve': [
+				'error',
+				{
+					ignoreGoto: false,
+					ignoreLinks: true,
+					ignorePushState: false,
+					ignoreReplaceState: false
+				}
+			]
 		}
 	}
 ];

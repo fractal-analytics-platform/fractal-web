@@ -5,6 +5,7 @@
 	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
+	import { resolve } from '$app/paths';
 
 	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
 	let groups = $derived(page.data.groups);
@@ -48,7 +49,11 @@
 			newGroupName = '';
 			groups = [...groups, result];
 			createGroupModal?.hide();
-			goto(`/v2/admin/groups/${result.id}/edit`);
+			await goto(
+				resolve(`/v2/admin/groups/[groupId]/edit`, {
+					groupId: String(result.id)
+				})
+			);
 		} else {
 			const error = getFieldValidationError(result, response.status);
 			if (error) {

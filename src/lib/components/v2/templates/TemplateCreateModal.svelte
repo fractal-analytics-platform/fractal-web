@@ -5,6 +5,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
@@ -126,7 +127,7 @@
 			throw alertError;
 		} else {
 			let newTemplate = await response.json();
-			await goto(`/v2/templates?template_id=${newTemplate.id}`);
+			await goto(resolve(`/v2/templates?template_id=${newTemplate.id}`));
 		}
 	}
 </script>

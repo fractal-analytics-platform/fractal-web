@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
+	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
@@ -87,8 +88,13 @@
 		if (response.ok) {
 			const result = await response.json();
 			saving = false;
-			const url = admin ? `/v2/admin/task-groups/activities` : `/v2/tasks/activities`;
-			await goto(`${url}?activity_id=${result.id}`);
+			await goto(
+				resolve(
+					admin
+						? `/v2/admin/task-groups/activities?activity_id=${result.id}`
+						: `/v2/tasks/activities?activity_id=${result.id}`
+				)
+			);
 			modal?.hide();
 		} else {
 			saving = false;

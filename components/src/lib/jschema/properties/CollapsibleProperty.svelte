@@ -27,7 +27,7 @@
 	} = $props();
 
 	/** @type {boolean} */
-	let collapsed = $state(false);
+	let collapsed = $derived(formElement.collapsed);
 	/** @type {boolean} */
 	let hasErrors = $state(false);
 	formElement.hasErrors.subscribe((v) => (hasErrors = v));
@@ -41,10 +41,6 @@
 		if ('isNull' in formElement) {
 			formElement.isNull.subscribe((n) => (isNull = n));
 		}
-	});
-
-	$effect(() => {
-		collapsed = formElement.collapsed;
 	});
 
 	/**

@@ -3,6 +3,7 @@
 	import { FormErrorHandler } from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { deepCopy } from 'fractal-components';
+	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
@@ -21,14 +22,10 @@
 	} = $props();
 
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
-	let editableProfile = $state();
+	let editableProfile = $derived(deepCopy(profile));
 	let profileFormSubmitted = $state(false);
 	let profileUpdatedMessage = $state('');
 	let saving = $state(false);
-
-	$effect(() => {
-		editableProfile = deepCopy(profile);
-	});
 
 	const profileFormErrorHandler = new FormErrorHandler(
 		'genericProfileError',
@@ -60,7 +57,11 @@
 			if (editableProfile.id) {
 				profileUpdatedMessage = 'Profile successfully updated';
 			} else if (showSaveButton) {
-				await goto(`/v2/admin/resources/${profile.resource_id}/profiles`);
+				await goto(
+					resolve(`/v2/admin/resources/[resourceId]/profiles`, {
+						resourceId: String(profile.resource_id)
+					})
+				);
 			} else {
 				const { id } = await response.json();
 				return id;

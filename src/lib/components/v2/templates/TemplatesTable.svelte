@@ -164,6 +164,7 @@
 				: url.searchParams.delete('version');
 		}
 		await tick();
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		pushState(url, {});
 
 		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`, {

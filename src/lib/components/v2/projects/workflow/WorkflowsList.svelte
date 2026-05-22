@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
 	import { normalizePayload } from 'fractal-components';
+	import { resolve } from '$app/paths';
 
 	// The list of workflows
 
@@ -63,7 +64,12 @@
 		workflows.push(importedWorkflow);
 		workflows = workflows;
 		if (redirect) {
-			await goto(`/v2/projects/${projectId}/workflows/${importedWorkflow.id}`);
+			await goto(
+				resolve(`/v2/projects/[projectId]/workflows/[workflowId]`, {
+					projectId: String(projectId),
+					workflowId: String(importedWorkflow.id)
+				})
+			);
 		}
 	}
 

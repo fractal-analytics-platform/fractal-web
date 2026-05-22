@@ -6,6 +6,7 @@
 	import Modal from '../../common/Modal.svelte';
 	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
 	import { normalizePayload } from 'fractal-components';
+	import { resolve } from '$app/paths';
 
 	// List of projects to be displayed
 
@@ -68,7 +69,11 @@
 			newProjectName = '';
 			projects = [...projects, result];
 			newProjectModal?.hide();
-			goto(`/v2/projects/${result.id}`);
+			await goto(
+				resolve(`/v2/projects/[projectId]`, {
+					projectId: result.id
+				})
+			);
 		} else {
 			const error = getFieldValidationError(result, response.status);
 			if (error) {
