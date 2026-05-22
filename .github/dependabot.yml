@@ -7,7 +7,10 @@ updates:
     cooldown:
       default-days: 7
     groups:
-      patterns: "*"
+      gha-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
 
   - package-ecosystem: 'npm'
     # Look for `package.json` and `lock` files in the following directories
