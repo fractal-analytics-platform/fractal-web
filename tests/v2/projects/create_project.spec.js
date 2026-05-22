@@ -1,11 +1,19 @@
 import { expect, test } from '@playwright/test';
-import { getRandomName, login, logout, waitPageLoading } from '../../utils/utils.js';
+import {
+	getRandomName,
+	login,
+	logout,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createTestUser } from '../../utils/v2/user.js';
 
 test('Create and delete a project', async ({ page }) => {
 	await page.goto('/v2/projects');
 	await waitPageLoading(page);
 
+	const nameToEdit = getRandomName();
 	const firstName = getRandomName();
 	const secondName = getRandomName();
 
@@ -29,15 +37,42 @@ test('Create and delete a project', async ({ page }) => {
 
 		// Fill form and submit
 		const projectNameInput = page.getByLabel('Project name');
-		await projectNameInput.fill(randomProjectName);
+		await projectNameInput.fill(nameToEdit);
+		const projectDescriptionInput = page.getByLabel('Description');
+		const shortDescription = 'This is a short description';
+		await projectDescriptionInput.fill(shortDescription);
 		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page
 		await page.waitForURL(/\/v2\/projects\/\d+/);
 		await expect(page.locator('h1:not(.modal-title)')).toHaveText(
+			new RegExp('Project ' + nameToEdit + ' #\\d+')
+		);
+		await expect(page.getByText('This is a short description')).toBeVisible();
+	});
+
+	await test.step('Edit project name and description', async () => {
+		await page.getByRole('button', { name: 'Edit project' }).click();
+		const modal = await waitModal(page);
+
+		await modal.getByLabel('Name').fill(randomProjectName);
+		const longDescription =
+			'This is a very long project description that should be truncated in the UI';
+		await modal.getByLabel('Description').fill(longDescription);
+
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await waitModalClosed(page);
+
+		const maxDescriptionLength = 50;
+		await expect(page.locator('h1:not(.modal-title)')).toHaveText(
 			new RegExp('Project ' + randomProjectName + ' #\\d+')
 		);
+		await expect(
+			page.getByText(`${longDescription.substring(0, maxDescriptionLength)}...`)
+		).toBeVisible();
+		await page.getByRole('button', { name: 'Show more' }).click();
+		await expect(page.getByText(longDescription)).toBeVisible();
 	});
 
 	await test.step('Verify that new project is visible in projects page', async () => {
