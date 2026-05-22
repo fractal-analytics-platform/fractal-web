@@ -25,7 +25,7 @@
 		"@testing-library/svelte": "^5.3.1",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/color-hash": "^2.0.0",
-		"@types/node": "^22.7.4",
+		"@types/node": "^25.8.0",
 		"dotenv": "^16.3.1",
 		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",
