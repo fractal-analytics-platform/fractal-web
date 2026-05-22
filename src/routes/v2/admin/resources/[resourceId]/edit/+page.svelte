@@ -32,7 +32,7 @@
 			return;
 		}
 
-		let content = '';
+		let content;
 		try {
 			const file = files[0];
 			content = await file.text();

@@ -22,6 +22,7 @@
 	} = $props();
 
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let editableProfile = $state();
 	let profileFormSubmitted = $state(false);
 	let profileUpdatedMessage = $state('');

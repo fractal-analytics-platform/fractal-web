@@ -15,6 +15,7 @@
 	/** @type {Props} */
 	let {
 		args,
+		// eslint-disable-next-line no-useless-assignment
 		unsavedChanges = $bindable(false),
 		editable = true,
 		onChange = () => {},

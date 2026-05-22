@@ -15,6 +15,7 @@
 		workflowImportErrorData = $bindable(),
 		selectedVersions = $bindable(),
 		includeOlderVersions = $bindable(),
+		// eslint-disable-next-line no-useless-assignment
 		workflowMetadata = $bindable(),
 		creating
 	} = $props();

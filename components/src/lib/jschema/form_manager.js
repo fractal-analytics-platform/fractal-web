@@ -413,7 +413,7 @@ export class FormManager {
 			required: false,
 			removable: false
 		};
-		let children = [];
+		let children;
 		if (Array.isArray(items)) {
 			children = items.map((item, index) =>
 				this.createFormElement({

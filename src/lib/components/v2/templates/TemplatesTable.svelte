@@ -24,6 +24,7 @@
 	 */
 	/** @type {Props} */
 	let {
+		// eslint-disable-next-line no-useless-assignment
 		singleSelectedTemplateId = $bindable(undefined),
 		templateId: initialTemplateId = undefined,
 		isOwner: initialIsOwner = false,

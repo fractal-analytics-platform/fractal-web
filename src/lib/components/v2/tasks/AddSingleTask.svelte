@@ -221,7 +221,7 @@
 	 * @param {boolean} autodetectVersion
 	 */
 	async function parseArgsSchemaContent(argsSchemaFiles, autodetectVersion) {
-		let content = '';
+		let content;
 		try {
 			const argsSchemaFile = argsSchemaFiles[0];
 			content = await argsSchemaFile.text();
@@ -284,7 +284,7 @@
 		if (!metaFiles || metaFiles.length === 0) {
 			return;
 		}
-		let content = '';
+		let content;
 		try {
 			const metaFile = metaFiles[0];
 			content = await metaFile.text();

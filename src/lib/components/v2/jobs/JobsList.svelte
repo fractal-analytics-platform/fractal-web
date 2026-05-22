@@ -63,8 +63,6 @@
 	let datasetSelect;
 	/** @type {SlimSelect|undefined} */
 	let userSelect;
-	/** @type {SlimSelect|undefined} */
-	let outputDatasetSelect;
 
 	// Filters
 	let statusFilter = '';
@@ -247,7 +245,6 @@
 		workflowSelect?.setSelected('');
 		datasetSelect?.setSelected('');
 		userSelect?.setSelected('');
-		outputDatasetSelect?.setSelected('');
 	}
 
 	onMount(() => {
