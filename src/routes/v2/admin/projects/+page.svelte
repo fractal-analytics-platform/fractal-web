@@ -339,8 +339,8 @@
 				<div class="alert alert-warning d-flex align-items-center gap-2">
 					<div>
 						<i class="bi bi-exclamation-triangle-fill"></i>
-						Users are associated to different profiles. The new project owner may not be able to run
-						jobs on this projects, due to on-disk permissions.
+						Users are associated to different profiles. The new project owner may not be able to run jobs
+						on this projects, due to on-disk permissions.
 					</div>
 				</div>
 			{/if}
