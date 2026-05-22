@@ -30,7 +30,12 @@
 	let { user = $bindable(), groups = [], saveUser, runnerBackend, defaultGroupName } = $props();
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
-	let editableUser = $derived(deepCopy(user));
+	// eslint-disable-next-line svelte/prefer-writable-derived
+	let editableUser = $state();
+
+	$effect(() => {
+		editableUser = deepCopy(user);
+	});
 
 	const currentUserId = $derived(page.data.userInfo?.id);
 

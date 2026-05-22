@@ -22,10 +22,14 @@
 	} = $props();
 
 	/** @type {import('fractal-components/types/api').Profile | undefined} */
-	let editableProfile = $derived(deepCopy(profile));
+	let editableProfile = $state();
 	let profileFormSubmitted = $state(false);
 	let profileUpdatedMessage = $state('');
 	let saving = $state(false);
+
+	$effect(() => {
+		editableProfile = deepCopy(profile);
+	});
 
 	const profileFormErrorHandler = new FormErrorHandler(
 		'genericProfileError',

@@ -80,7 +80,7 @@
 			newProjectModal?.hide();
 			await goto(
 				resolve(`/v2/projects/[projectId]`, {
-					projectId: result.id
+					projectId: String(result.id)
 				})
 			);
 		} else {

@@ -61,6 +61,7 @@ export default [
 			//  deprecated and replaced by svelte/no-navigation-without-resolve rule.
 			'svelte/no-navigation-without-base': ['off'],
 			// disabled due to large number of false positive with simple classes (e.g. Date)
+			// See https://github.com/sveltejs/eslint-plugin-svelte/issues/1271
 			'svelte/prefer-svelte-reactivity': ['off'],
 			'svelte/no-navigation-without-resolve': [
 				'error',
