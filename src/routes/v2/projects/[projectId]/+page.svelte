@@ -51,10 +51,13 @@
 					credentials: 'include',
 					mode: 'cors',
 					headers,
-					body: normalizePayload({
-						name: updatedProjectName,
-						description: /^\s*$/.test(updatedProjectDescription) ? null : updatedProjectDescription
-					})
+					body: normalizePayload(
+						{
+							name: updatedProjectName,
+							description: updatedProjectDescription
+						},
+						{ nullifyEmptyStrings: true }
+					)
 				});
 
 				if (response.ok) {
