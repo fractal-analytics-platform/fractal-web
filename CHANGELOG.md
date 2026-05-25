@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.27.10
 
 - Update dependencies: svelte, jsdom, vite, vitest (\#1112).
 - Introduce project descriptions (\#1118).
