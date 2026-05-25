@@ -1,6 +1,6 @@
 {
 	"name": "fractal-web",
-	"version": "1.27.9",
+	"version": "1.27.10",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
