@@ -741,7 +741,7 @@
 											&nbsp;
 										</a>
 									{/if}
-									{#if voleViewerUrl && !('plate' in image.attributes)}
+									{#if voleViewerUrl}
 										<a
 											class="btn btn-info viewer-btn vole-btn"
 											href="{voleViewerUrl}viewer?url={fractalDataUrl}files{encodePathForUrl(
