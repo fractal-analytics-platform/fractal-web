@@ -17,9 +17,12 @@
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/environment';
 	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
+	import logoVizarr from '$lib/assets/logo-vizarr.svg';
+	import logoAllen from '$lib/assets/logo-allen.svg';
 
 	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
 	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
+	const voleViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VOLE_VIEWER_URL);
 
 	/**
 	 * @typedef {Object} Props
@@ -727,17 +730,31 @@
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
-								{#if fractalDataUrl && vizarrViewerUrl}
-									<a
-										class="btn btn-info"
-										href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
-											image.zarr_url
-										)}"
-										target="_blank"
-									>
-										<i class="bi bi-eye"></i>
-										View
-									</a>
+								{#if fractalDataUrl && (vizarrViewerUrl || voleViewerUrl)}
+									{#if vizarrViewerUrl}
+										<a
+											class="btn btn-info viewer-btn vizarr-btn"
+											href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
+												image.zarr_url
+											)}"
+											target="_blank"
+											aria-label="View with Vizarr"
+										>
+											&nbsp;
+										</a>
+									{/if}
+									{#if voleViewerUrl && !('plate' in image.attributes)}
+										<a
+											class="btn btn-info viewer-btn vole-btn"
+											href="{voleViewerUrl}viewer?url={fractalDataUrl}files{encodePathForUrl(
+												image.zarr_url
+											)}"
+											target="_blank"
+											aria-label="View with Vol-E viewer"
+										>
+											&nbsp;
+										</a>
+									{/if}
 									{#key imagePage.items}
 										<CopyToClipboardButton
 											btnClass="light"

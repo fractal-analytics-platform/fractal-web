@@ -184,7 +184,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/profile">My profile</a></li>
-							{#if env.PUBLIC_FRACTAL_DATA_URL && env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
+							{#if env.PUBLIC_FRACTAL_DATA_URL && (env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL || env.PUBLIC_FRACTAL_VOLE_VIEWER_URL)}
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}
 							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
