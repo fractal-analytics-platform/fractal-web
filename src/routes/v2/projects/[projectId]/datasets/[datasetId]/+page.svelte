@@ -10,7 +10,6 @@
 
 	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
 	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
-	const voleViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VOLE_VIEWER_URL);
 	const featureExplorerUrl = addFinalSlash(env.PUBLIC_FRACTAL_FEATURE_EXPLORER_URL);
 
 	let projectId = page.params.projectId;

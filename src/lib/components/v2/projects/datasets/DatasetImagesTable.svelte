@@ -17,8 +17,6 @@
 	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/environment';
 	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
-	import logoVizarr from '$lib/assets/logo-vizarr.svg';
-	import logoAllen from '$lib/assets/logo-allen.svg';
 
 	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
 	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
