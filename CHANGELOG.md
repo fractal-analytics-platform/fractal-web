@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Add links to Vol-E viewer and `PUBLIC_FRACTAL_VOLE_VIEWER_URL` environment variable (\#1147).
+
 # 1.27.10
 
 - Update dependencies: svelte, jsdom, vite, vitest (\#1112).
