@@ -1,4 +1,8 @@
 <script>
+	import 'bootstrap/dist/css/bootstrap.css';
+	import 'bootstrap-icons/font/bootstrap-icons.css';
+	import bootstrapScriptSrc from 'bootstrap/dist/js/bootstrap.bundle.js?url';
+
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/environment';
 	import { afterNavigate, beforeNavigate, goto, invalidateAll } from '$app/navigation';
@@ -126,6 +130,10 @@
 	const warningBanner = $derived(page.data.warningBanner);
 	const userEmail = $derived(userLoggedIn ? page.data.userInfo.email : undefined);
 </script>
+
+<svelte:head>
+	<script src={bootstrapScriptSrc}></script>
+</svelte:head>
 
 <main>
 	<nav class="bg-light border-bottom">

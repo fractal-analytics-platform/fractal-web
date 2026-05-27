@@ -19,13 +19,16 @@
 		"build"
 	],
 	"peerDependencies": {
-		"svelte": "^5.55.8"
+		"svelte": "^5.55.8",
+		"bootstrap": "^5.3.8",
+		"bootstrap-icons": "^1.13.1"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.60.1",
 		"@sveltejs/package": "^2.5.7",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"@types/bootstrap": "^5.2.10",
 		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.17.1",
@@ -44,6 +47,8 @@
 	"bundleDependencies": [
 		"ajv/dist/ajv",
 		"ajv/dist/2020",
-		"ajv-formats"
+		"ajv-formats",
+		"bootstrap",
+		"bootstrap-icons"
 	]
 }
