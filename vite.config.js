@@ -50,7 +50,10 @@ const config = defineConfig({
 			'dompurify',
 			'ajv/dist/ajv',
 			'ajv/dist/2020',
-			'ajv-formats'
+			'ajv-formats',
+			'json-diff-viewer-component',
+			'bootstrap',
+			'bootstrap-icons'
 		]
 	}
 });
