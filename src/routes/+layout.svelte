@@ -343,4 +343,15 @@
 		width: 3rem;
 		height: 3rem;
 	}
+
+	:global(.viewer-btn) {
+		background-repeat: no-repeat;
+		background-position: center;
+		min-width: 45px;
+	}
+
+	:global(.vizarr-btn) {
+		background-image: url('$lib/assets/logo-vizarr.svg');
+		background-size: 80%;
+	}
 </style>

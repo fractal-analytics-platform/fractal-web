@@ -234,16 +234,3 @@
 </div>
 
 <DatasetInfoModal {dataset} updateDatasetCallback={(d) => (dataset = d)} />
-
-<style>
-	:global(.viewer-btn) {
-		background-repeat: no-repeat;
-		background-position: center;
-		min-width: 45px;
-	}
-
-	:global(.vizarr-btn) {
-		background-image: url('$lib/assets/logo-vizarr.svg');
-		background-size: 80%;
-	}
-</style>
