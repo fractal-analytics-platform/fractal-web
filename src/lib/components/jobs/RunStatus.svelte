@@ -22,6 +22,11 @@
 
 <span class="d-flex">
 	<span class="d-flex">
+		{#if run.num_units_with_warnings > 0}
+			<div class="me-4">
+				<i class="bi bi-exclamation-triangle-fill"></i>
+			</div>
+		{/if}
 		{#if run.num_submitted_units > 0}
 			<button
 				aria-label="Submitted images"

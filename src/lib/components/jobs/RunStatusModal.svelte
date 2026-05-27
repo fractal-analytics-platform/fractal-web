@@ -299,7 +299,9 @@
 							</td>
 							<td>
 								<button
-									class="btn btn-light me-2"
+									class="btn me-2"
+									class:btn-light={!unit.has_warnings}
+									class:btn-warning={unit.has_warnings}
 									onclick={() => loadLogs(unit)}
 									disabled={loadingLogs}
 								>
