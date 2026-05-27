@@ -743,14 +743,14 @@
 									{/if}
 									{#if voleViewerUrl}
 										<a
-											class="btn btn-info viewer-btn vole-btn"
+											class="btn btn-info"
 											href="{voleViewerUrl}viewer?url={fractalDataUrl}files{encodePathForUrl(
 												image.zarr_url
 											)}"
 											target="_blank"
 											aria-label="View with Vol-E viewer"
 										>
-											&nbsp;
+											<i class="bi bi-flask"></i>
 										</a>
 									{/if}
 									{#key imagePage.items}

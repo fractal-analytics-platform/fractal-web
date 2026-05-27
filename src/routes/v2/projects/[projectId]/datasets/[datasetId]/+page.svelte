@@ -246,9 +246,4 @@
 		background-image: url('$lib/assets/logo-vizarr.svg');
 		background-size: 80%;
 	}
-
-	:global(.vole-btn) {
-		background-image: url('$lib/assets/logo-allen.svg');
-		background-size: 70%;
-	}
 </style>
