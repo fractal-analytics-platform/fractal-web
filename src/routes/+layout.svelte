@@ -1,7 +1,6 @@
 <script>
 	import 'bootstrap/dist/css/bootstrap.css';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
-	import bootstrapScriptSrc from 'bootstrap/dist/js/bootstrap.bundle.js?url';
 	import slimSelectCss from 'slim-select/styles?url';
 
 	import logoSmall from '$lib/assets/fractal-logo-small.png';
@@ -133,7 +132,6 @@
 </script>
 
 <svelte:head>
-	<script src={bootstrapScriptSrc}></script>
 	<link rel="stylesheet" href={slimSelectCss} />
 </svelte:head>
 

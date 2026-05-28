@@ -4,10 +4,18 @@ import { getServerInfo } from '$lib/server/api/alive';
 import { getCurrentUser } from '$lib/server/api/auth_api';
 import { error, redirect } from '@sveltejs/kit';
 import { checkEnvironmentVariables } from './environment-variables';
+import bootstrapScriptSrc from 'bootstrap/dist/js/bootstrap.bundle.js?url';
 
 const logger = getLogger('hooks');
 
 checkEnvironmentVariables();
+
+const resolveOptions = {
+	transformPageChunk: ({ html }) => {
+		// Replace the placeholder in app.html
+		return html.replace(/%bootstrap.src%/g, bootstrapScriptSrc);
+	}
+};
 
 export async function handle({ event, resolve }) {
 	if (event.url.pathname.startsWith('/api')) {
@@ -58,7 +66,7 @@ export async function handle({ event, resolve }) {
 
 	if (isPublicPage) {
 		logger.debug('Public page - No auth required');
-		return await resolve(event);
+		return await resolve(event, resolveOptions);
 	}
 
 	if (!serverInfo.alive && !isPublicPage) {
@@ -84,7 +92,7 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	return await resolve(event);
+	return await resolve(event, resolveOptions);
 }
 
 /** @type {import('@sveltejs/kit').HandleFetch} */
