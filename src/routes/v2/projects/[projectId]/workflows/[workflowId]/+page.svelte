@@ -1056,12 +1056,17 @@
 										{/if}
 									</span>
 									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
-										<span class="float-end text-info" title="new version available">
+										<span class="float-end text-info me-1" title="New version available.">
 											<i class="bi bi-arrow-up-circle-fill"></i>
 										</span>
 									{/if}
 									{#if workflowTask.warning}
-										<span class="float-end text-warning" title={workflowTask.warning}>
+										<span class="float-end text-warning me-1" title={workflowTask.warning}>
+											<i class="bi bi-ban-fill"></i>
+										</span>
+									{/if}
+									{#if statuses[workflowTask.id] && 'num_images_with_warnings' in statuses[workflowTask.id] && statuses[workflowTask.id].num_images_with_warnings > 0}
+										<span class="float-end text-secondary me-1" title="There are warnings.">
 											<i class="bi bi-exclamation-triangle-fill"></i>
 										</span>
 									{/if}

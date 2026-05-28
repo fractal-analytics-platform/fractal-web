@@ -23,9 +23,23 @@
 <span class="d-flex">
 	<span class="d-flex">
 		{#if run.num_units_with_warnings > 0}
-			<div class="me-4">
-				<i class="bi bi-exclamation-triangle-fill"></i>
-			</div>
+			<button
+				aria-label="Warnings"
+				aria-disabled="true"
+				class="status-modal-btn btn btn-link text-decoration-none p-0"
+				onclick={(event) => event.preventDefault()}
+			>
+				<span class="d-flex">
+					{#if showNumbers}
+						<span class="status-wrapper text-secondary pe-1">
+							{run.num_units_with_warnings}
+						</span>
+					{/if}
+					<i
+						class="status-icon status-icon-warning bi bi-exclamation-triangle-fill text-secondary pt-1 pe-1"
+					></i>
+				</span>
+			</button>
 		{/if}
 		{#if run.num_submitted_units > 0}
 			<button
@@ -85,3 +99,14 @@
 		{/if}
 	</span>
 </span>
+
+<style>
+	.status-modal-btn[aria-disabled='true'] {
+		pointer-events: none;
+		cursor: default;
+	}
+
+	.status-icon-warning {
+		font-size: 100%;
+	}
+</style>
