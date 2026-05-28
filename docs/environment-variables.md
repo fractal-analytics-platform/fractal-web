@@ -18,7 +18,8 @@ The following environment variables can be used to configure fractal-web.
 - `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`;
 - `FRACTAL_RUNNER_BACKEND`: specifies which runner backend is used; supported values are: `local`, `slurm`, `slurm_ssh`; setting this variable is mandatory;
 - `PUBLIC_FRACTAL_DATA_URL`: URL to [fractal-data](https://github.com/fractal-analytics-platform/fractal-data) service (e.g. http://localhost:3000/data for testing);
-- `PUBLIC_FRACTAL_VIZARR_VIEWER_URL`: URL to vizarr viewer (e.g. http://localhost:3000/data/vizarr for testing);
+- `PUBLIC_FRACTAL_VIZARR_VIEWER_URL`: URL to Vizarr viewer (e.g. http://localhost:3000/data/vizarr for testing);
+- `PUBLIC_FRACTAL_VOLE_VIEWER_URL`: URL to Vol-E viewer (e.g. http://localhost/vole-viewer for testing);
 - `PUBLIC_FRACTAL_FEATURE_EXPLORER_URL`: URL to Fractal Feature Explorer (e.g. http://localhost:8501 for testing);
 - `WARNING_BANNER_PATH`: specifies the path to a text file containing the warning banner message displayed on the site; the banner is used to inform users about important issues, such as external resources downtime or maintenance alerts; if the variable is empty or unset no banner is displayed;
 - `LOGIN_INVITE_PATH`: specifies the path to a text file containing the message to display when user wants to log on. This can be for example a disclaimer or special instructions. Text can contain html tags for formatting. If the variable is empty default message is displayed;

@@ -187,12 +187,12 @@
 					{#if vizarrViewerUrl}
 						<a
 							href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(platePath)}"
-							class="btn btn-info me-2"
+							class="btn btn-info me-2 viewer-btn vizarr-btn"
 							target="_blank"
 							class:disabled={platePathLoading}
+							aria-label="View plate with Vizarr"
 						>
-							<i class="bi bi-eye"></i>
-							View plate
+							&nbsp;
 						</a>
 					{/if}
 					{#if featureExplorerUrl}
