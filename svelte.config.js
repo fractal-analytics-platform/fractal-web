@@ -16,6 +16,21 @@ const config = {
 				cfg.compilerOptions.types = ['@testing-library/jest-dom'];
 				return cfg;
 			}
+		},
+		csp: {
+			directives: {
+				'script-src': ['strict-dynamic', 'unsafe-eval', 'unsafe-inline', 'https:', 'http:'],
+				'default-src': ['none'],
+				'img-src': ['self', 'data:'],
+				'object-src': ['none'],
+				'base-uri': ['none'],
+				'form-action': ['self'],
+				'style-src': ['self', 'unsafe-inline'],
+				'script-src-attr': ['self', 'unsafe-inline'],
+				'font-src': ['self'],
+				'frame-ancestors': ['none'],
+				'connect-src': ['self']
+			}
 		}
 	}
 };
