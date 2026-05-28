@@ -300,8 +300,9 @@
 							<td>
 								<button
 									class="btn me-2"
-									class:btn-light={!unit.has_warnings}
-									class:btn-warning={unit.has_warnings}
+									class:btn-light={unit.status !== 'failed' && !unit.has_warnings}
+									class:btn-warning={unit.status !== 'failed' && unit.has_warnings}
+									class:btn-danger={unit.status === 'failed'}
 									onclick={() => loadLogs(unit)}
 									disabled={loadingLogs}
 								>
@@ -309,7 +310,12 @@
 										<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
 										></span>
 									{/if}
-									<i class="bi-list-columns-reverse"></i> Logs
+									{#if unit.status === 'failed' || unit.has_warnings}
+										<i class="bi-exclamation-triangle-fill"></i>
+									{:else}
+										<i class="bi-list-columns-reverse"></i>
+									{/if}
+									Logs
 								</button>
 							</td>
 						</tr>
