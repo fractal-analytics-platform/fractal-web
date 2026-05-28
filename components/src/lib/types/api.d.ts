@@ -107,6 +107,7 @@ export type DatasetHistoryItemV2 = {
 export type Image = {
 	zarr_url: string;
 	attributes: { [key: string]: string | number | boolean };
+	has_warnings: boolean;
 	types: { [key: string]: boolean };
 };
 

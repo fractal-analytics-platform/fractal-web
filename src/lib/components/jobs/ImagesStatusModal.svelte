@@ -172,7 +172,12 @@
 				>
 					{#snippet extraButtons(image)}
 						<button
-							class="btn btn-light"
+							class="btn"
+							class:btn-light={image.attributes.__wftask_dataset_image_status__ !== 'failed' &&
+								!image.has_warnings}
+							class:btn-warning={image.attributes.__wftask_dataset_image_status__ !== 'failed' &&
+								image.has_warnings}
+							class:btn-danger={image.attributes.__wftask_dataset_image_status__ === 'failed'}
 							onclick={() => loadLogs(image)}
 							disabled={getImageStatus(image) === null}
 						>
@@ -180,7 +185,12 @@
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
 								></span>
 							{/if}
-							<i class="bi-list-columns-reverse"></i> Logs
+							{#if image.attributes.__wftask_dataset_image_status__ === 'failed' || image.has_warnings}
+								<i class="bi-exclamation-triangle-fill"></i>
+							{:else}
+								<i class="bi-list-columns-reverse"></i>
+							{/if}
+							Logs
 						</button>
 					{/snippet}
 				</DatasetImagesTable>
