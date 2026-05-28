@@ -36,7 +36,9 @@
 						</span>
 					{/if}
 					<i
-						class="status-icon status-icon-warning bi bi-exclamation-triangle-fill text-secondary pt-1 pe-1"
+						class="status-icon {showNumbers
+							? 'status-icon-warning-numbers'
+							: 'status-icon-warning'} bi bi-exclamation-triangle-fill text-secondary pt-1 pe-1"
 					></i>
 				</span>
 			</button>
@@ -106,7 +108,12 @@
 		cursor: default;
 	}
 
+	.status-icon-warning-numbers {
+		font-size: 100%;
+	}
+
 	.status-icon-warning {
 		font-size: 100%;
+		margin-bottom: auto;
 	}
 </style>
