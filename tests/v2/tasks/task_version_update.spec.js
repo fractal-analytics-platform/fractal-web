@@ -168,6 +168,7 @@ test('Task version update [v2]', async ({ page, workflow }) => {
 		await expect(page.getByText('Data is not valid')).toBeVisible();
 		await page.getByRole('textbox', { name: 'p1' }).fill('test');
 		await expect(page.getByText('Data is not valid')).not.toBeVisible();
+		await expect(page.getByText('Arguments changes saved successfully')).not.toBeVisible();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 	});

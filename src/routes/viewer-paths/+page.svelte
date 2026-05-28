@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/state';
+	import { env } from '$env/dynamic/public';
 
 	/** @type {string[]} */
 	const viewerPaths = $derived(page.data.viewerPaths);
@@ -9,9 +10,19 @@
 	<h1 class="fw-light mb-3">Viewer paths</h1>
 
 	<p>
-		This Fractal instance includes an online viewer for OME-Zarrs, based on
-		<a href="https://github.com/hms-dbmi/vizarr" target="_blank">vizarr</a>. Browse to a dataset
-		page, and you will find links to view the available images in the browser.
+		This Fractal instance includes
+		{#if env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
+			an online viewer for OME-Zarrs, based on
+			<a href="https://github.com/hms-dbmi/vizarr" target="_blank">Vizarr</a>
+		{/if}
+		{#if env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL && env.PUBLIC_FRACTAL_VOLE_VIEWER_URL}
+			and
+		{/if}
+		{#if env.PUBLIC_FRACTAL_VOLE_VIEWER_URL}
+			an online viewer for OME-Zarrs, based on
+			<a href="https://github.com/allen-cell-animated/vole-app" target="_blank">Vol-E</a>
+		{/if}. Browse to a dataset page, and you will find links to view the available images in the
+		browser.
 	</p>
 
 	<p>
