@@ -60,7 +60,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3238-highlight-warnings-from-task-logs',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

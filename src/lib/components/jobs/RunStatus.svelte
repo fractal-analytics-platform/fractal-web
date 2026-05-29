@@ -22,6 +22,27 @@
 
 <span class="d-flex">
 	<span class="d-flex">
+		{#if run.num_units_with_warnings > 0}
+			<button
+				aria-label="Warnings"
+				aria-disabled="true"
+				class="status-modal-btn btn btn-link text-decoration-none p-0"
+				onclick={(event) => event.preventDefault()}
+			>
+				<span class="d-flex">
+					{#if showNumbers}
+						<span class="status-wrapper text-secondary pe-1">
+							{run.num_units_with_warnings}
+						</span>
+					{/if}
+					<i
+						class="status-icon {showNumbers
+							? 'status-icon-warning-numbers'
+							: 'status-icon-warning'} bi bi-exclamation-triangle-fill text-secondary pt-1 pe-1"
+					></i>
+				</span>
+			</button>
+		{/if}
 		{#if run.num_submitted_units > 0}
 			<button
 				aria-label="Submitted images"
@@ -80,3 +101,19 @@
 		{/if}
 	</span>
 </span>
+
+<style>
+	.status-modal-btn[aria-disabled='true'] {
+		pointer-events: none;
+		cursor: default;
+	}
+
+	.status-icon-warning-numbers {
+		font-size: 100%;
+	}
+
+	.status-icon-warning {
+		font-size: 100%;
+		margin-bottom: auto;
+	}
+</style>

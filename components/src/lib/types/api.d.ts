@@ -107,6 +107,7 @@ export type DatasetHistoryItemV2 = {
 export type Image = {
 	zarr_url: string;
 	attributes: { [key: string]: string | number | boolean };
+	has_warnings: boolean;
 	types: { [key: string]: boolean };
 };
 
@@ -232,6 +233,7 @@ export type ImagesStatus =
 			num_done_images: number;
 			num_failed_images: number;
 			num_available_images: number | null;
+			num_images_with_warnings: number;
 	  };
 
 export type JobWithTaskStatuses = JobV2 & {
@@ -450,6 +452,7 @@ export type HistoryUnit = {
 	status: JobStatus;
 	zarr_urls: string[];
 	logfile: string | null;
+	has_warnings: boolean;
 };
 
 export type HistoryRunAggregated = {
@@ -460,6 +463,7 @@ export type HistoryRunAggregated = {
 	num_submitted_units: number;
 	num_done_units: number;
 	num_failed_units: number;
+	num_units_with_warnings: number;
 	args_schema_parallel: JSONSchemaObjectProperty | null;
 	args_schema_non_parallel: JSONSchemaObjectProperty | null;
 };
