@@ -70,7 +70,7 @@
 		loading = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const url = `/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}&page=1&page_size=10`;
+		const url = `/api/v2/project/${dataset?.project_id}/status/images?include_warnings=true&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}&page=1&page_size=10`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
@@ -168,7 +168,7 @@
 					disabledTypes={Object.keys(frozenTypes)}
 					{initialFilterValues}
 					imagesStatusModal={true}
-					queryUrl={`/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
+					queryUrl={`/api/v2/project/${dataset?.project_id}/status/images?include_warnings=true&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
 				>
 					{#snippet extraButtons(image)}
 						<button
