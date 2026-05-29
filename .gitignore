@@ -4,6 +4,7 @@ node_modules
 /components/build
 /sandbox/build
 /tasks-list/build
+/templates-list/build
 .svelte-kit
 /package
 .env.*local

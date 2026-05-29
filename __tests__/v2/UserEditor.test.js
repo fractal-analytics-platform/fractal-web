@@ -19,27 +19,14 @@ vi.mock('$app/state', () => {
 	};
 });
 
-// Mocking bootstrap.Modal
-class MockModal {
-	constructor() {
-		this.show = vi.fn();
-		this.hide = vi.fn();
-	}
-}
-MockModal.getInstance = vi.fn();
-
-// @ts-expect-error
-global.window.bootstrap = {
-	Modal: MockModal
-};
-
 // The component to be tested must be imported after the mock setup
 import UserEditor from '../../src/lib/components/v2/admin/UserEditor.svelte';
 
 describe('UserEditor', () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 		mockResourcesAndProfiles();
+		global.window.bootstrap = await import('bootstrap');
 	});
 
 	const selectedUser = mockUser();
