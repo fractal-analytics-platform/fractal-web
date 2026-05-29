@@ -32,7 +32,6 @@ const config = {
 					'https:',
 					'http:'
 				],
-				//'script-src-attr': ['self'],
 				// Fallback policy for not defined rules: by default forbid everything that is not defined
 				'default-src': ['none'],
 				// Control fetch requests and WebSocket connections

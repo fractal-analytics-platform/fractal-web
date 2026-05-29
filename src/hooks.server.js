@@ -11,7 +11,7 @@ checkEnvironmentVariables();
 
 export async function handle({ event, resolve }) {
 	if (event.url.pathname.startsWith('/api')) {
-		// API page - AJAX request - handled in proxy'
+		// API page - AJAX request - handled in proxy' - security headers not set here
 		logger.trace('API endpoint detected, leaving the handling to the proxy');
 		return await resolve(event);
 	}
@@ -58,7 +58,9 @@ export async function handle({ event, resolve }) {
 
 	if (isPublicPage) {
 		logger.debug('Public page - No auth required');
-		return await resolve(event);
+		const response = await resolve(event);
+		setSecurityHeaders(response);
+		return response;
 	}
 
 	if (!serverInfo.alive && !isPublicPage) {
@@ -84,7 +86,24 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	return await resolve(event);
+	const response = await resolve(event);
+	setSecurityHeaders(response);
+	return response;
+}
+
+const securityHeaders = {
+	'X-Frame-Options': 'deny',
+	'X-Content-Type-Options': 'nosniff',
+	'Referrer-Policy': 'strict-origin-when-cross-origin',
+	'Cross-Origin-Opener-Policy': 'same-origin',
+	'Cross-Origin-Embedder-Policy': 'require-corp',
+	'Cross-Origin-Resource-Policy': 'same-origin',
+	'Permissions-Policy': 'geolocation=(), camera=(), microphone=(), interest-cohort=()',
+	'X-DNS-Prefetch-Control': 'off'
+};
+
+function setSecurityHeaders(response) {
+	Object.entries(securityHeaders).forEach(([header, value]) => response.headers.set(header, value));
 }
 
 /** @type {import('@sveltejs/kit').HandleFetch} */
