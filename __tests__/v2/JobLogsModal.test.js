@@ -31,11 +31,24 @@ describe('JobLogsModal', async () => {
 		const error = `TASK ERROR:Task id: 20 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:
 Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.`;
+
 		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
+
 		await result.component.show(mockJob({ id: 1, status: 'failed', log: null }), false);
+
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
+		const divs = pre.querySelectorAll('div');
+
 		expect(pre.classList.contains('highlight')).eq(true);
-		expect(pre.querySelector('div')?.innerHTML).eq(error);
+		expect(divs.length).eq(3);
+
+		expect(divs[0].textContent).eq(
+			'TASK ERROR:Task id: 20 (Create OME-Zarr structure), e.workflow_task_order=0'
+		);
+		expect(divs[1].textContent?.trim()).eq('TRACEBACK:');
+		expect(divs[2].textContent.trim()).eq(
+			'Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/python" is not valid. Hint: make sure that it is executable.'
+		);
 	});
 
 	it('display log with highlighting and hidden details', async () => {
@@ -70,11 +83,21 @@ allowed_channels
 		expect(pre.querySelectorAll('button').length).eq(1);
 		await fireEvent.click(result.getByRole('button', { name: /details hidden/ }));
 		divs = pre.querySelectorAll('div');
-		expect(divs.length).eq(3);
-		expect(divs[0].classList.contains('highlight')).eq(true);
-		expect(divs[1].classList.contains('highlight')).eq(false);
-		expect(divs[2].classList.contains('highlight')).eq(true);
-		expect(divs[1].innerHTML.startsWith('TRACEBACK')).eq(true);
+		const highlightedDivs = Array.from(divs).filter((div) => div.classList.contains('highlight'));
+
+		const normalDivs = Array.from(divs).filter((div) => !div.classList.contains('highlight'));
+
+		expect(highlightedDivs.length).eq(2);
+		expect(normalDivs.length).toBeGreaterThan(0);
+
+		expect(highlightedDivs[0].textContent).toContain('TASK ERROR:Task id: 15');
+		expect(highlightedDivs[1].textContent).toContain('pydantic.error_wrappers.ValidationError');
+
+		expect(normalDivs.map((div) => div.textContent).join('\n')).toContain('TRACEBACK:');
+		expect(normalDivs.map((div) => div.textContent).join('\n')).toContain(
+			'Traceback (most recent call last):'
+		);
+
 		expect(pre.querySelectorAll('button').length).eq(0);
 	});
 
