@@ -723,6 +723,17 @@
 		}
 	}
 
+	/**
+	 * @param {import('fractal-components/types/api').ImagesStatus|undefined} imageStatus
+	 */
+	function hasWarnings(imageStatus) {
+		return (
+			imageStatus &&
+			'num_images_with_warnings' in imageStatus &&
+			imageStatus.num_images_with_warnings > 0
+		);
+	}
+
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
 	});
@@ -1065,7 +1076,7 @@
 											<i class="bi bi-ban-fill"></i>
 										</span>
 									{/if}
-									{#if statuses[workflowTask.id] && 'num_images_with_warnings' in statuses[workflowTask.id] && /** @type {{num_images_with_warnings: number}} */ (statuses[workflowTask.id]).num_images_with_warnings > 0}
+									{#if hasWarnings(statuses[workflowTask.id])}
 										<span class="float-end text-secondary me-1" title="There are warnings.">
 											<i class="bi bi-exclamation-triangle-fill"></i>
 										</span>
