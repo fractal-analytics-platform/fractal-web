@@ -12,7 +12,7 @@ export function getRandomName() {
  */
 export async function getFractalCookie(page) {
 	const cookies = await page.context().cookies();
-	const cookie = cookies.find((c) => c.name === 'fastapiusersauth');
+	const cookie = cookies.find((c) => c.name.includes('fastapiusersauth'));
 	if (!cookie) {
 		throw new Error('Cookie not found');
 	}

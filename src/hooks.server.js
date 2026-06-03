@@ -36,7 +36,7 @@ export async function handle({ event, resolve }) {
 	const serverInfo = await getServerInfo(event.fetch);
 
 	// Check if auth cookie is present
-	const fastApiUsersAuth = event.cookies.get('fastapiusersauth');
+	const fastApiUsersAuth = event.cookies.get(env.AUTH_COOKIE_NAME || 'fastapiusersauth');
 	if (!fastApiUsersAuth) {
 		logger.debug('No auth cookie found');
 	}
@@ -117,7 +117,13 @@ export async function handleFetch({ event, request, fetch }) {
 		logger.trace('Including cookie into request to %s, via handleFetch', request.url);
 		const cookie = event.request.headers.get('cookie');
 		if (cookie) {
-			request.headers.set('cookie', cookie);
+			const cookies = cookie.split(';').map((c) => c.trim());
+			const apiCookie = cookies.find(
+				(c) => c.split('=')[0] === (env.AUTH_COOKIE_NAME || 'fastapiusersauth')
+			);
+			if (apiCookie) {
+				request.headers.set('cookie', `fastapiusersauth=${apiCookie.split('=')[1]}`);
+			}
 		}
 	}
 	const startTime = new Date();
