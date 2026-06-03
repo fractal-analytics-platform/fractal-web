@@ -47,7 +47,8 @@ export function checkEnvironmentVariables() {
 	checkUrl('PUBLIC_FRACTAL_VIZARR_VIEWER_URL');
 	checkUrl('PUBLIC_FRACTAL_VOLE_VIEWER_URL');
 	checkUrl('PUBLIC_FRACTAL_FEATURE_EXPLORER_URL');
-	printEnvironmenVariables();
+	checkCookieVariables();
+	printEnvironmentVariables();
 }
 
 function checkRunnerBackend() {
@@ -113,7 +114,7 @@ function checkUrl(key) {
 	}
 }
 
-function printEnvironmenVariables() {
+function printEnvironmentVariables() {
 	logger.info('--------- fractal-web environment variables ---------');
 	for (const key of keys) {
 		logger.info('%s: %s', key, getValue(key) || '');
@@ -128,4 +129,23 @@ function getValue(key) {
 		return publicEnv[key];
 	}
 	return env[key];
+}
+
+function checkCookieVariables() {
+	if (!env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
+		return;
+	}
+	if (env.AUTH_COOKIE_DOMAIN) {
+		logger.error('AUTH_COOKIE_DOMAIN must not be set if cookie name prefix is __Host-');
+		exit(2);
+	}
+	console.log(env.AUTH_COOKIE_SECURE);
+	if (env.AUTH_COOKIE_SECURE && env.AUTH_COOKIE_SECURE === 'false') {
+		logger.error('AUTH_COOKIE_SECURE must be set to true if cookie name prefix is __Host-');
+		exit(2);
+	}
+	if (env.AUTH_COOKIE_PATH && env.AUTH_COOKIE_PATH !== '/') {
+		logger.error('AUTH_COOKIE_PATH must be set to / if cookie name prefix is __Host-');
+		exit(2);
+	}
 }
