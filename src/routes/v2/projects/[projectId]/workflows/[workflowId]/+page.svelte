@@ -1065,7 +1065,7 @@
 											<i class="bi bi-ban-fill"></i>
 										</span>
 									{/if}
-									{#if statuses[workflowTask.id] && 'num_images_with_warnings' in statuses[workflowTask.id] && statuses[workflowTask.id].num_images_with_warnings > 0}
+									{#if statuses[workflowTask.id] && 'num_images_with_warnings' in statuses[workflowTask.id] && /** @type {{num_images_with_warnings: number}} */ (statuses[workflowTask.id]).num_images_with_warnings > 0}
 										<span class="float-end text-secondary me-1" title="There are warnings.">
 											<i class="bi bi-exclamation-triangle-fill"></i>
 										</span>
