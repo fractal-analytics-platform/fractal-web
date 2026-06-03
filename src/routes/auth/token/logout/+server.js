@@ -6,14 +6,19 @@ export async function POST({ fetch, request, cookies }) {
 
 	// Set the fastapiusersauth cookie to expire in the past
 	// This will delete the cookie
-	cookies.set(env.AUTH_COOKIE_NAME || 'fastapiusersauth', '', {
-		domain: `${env.AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`,
+	const cookieOptions = {
 		path: `${env.AUTH_COOKIE_PATH || '/'}`,
 		expires: new Date(0),
 		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${env.AUTH_COOKIE_SAME_SITE || 'lax'}`),
 		secure: `${env.AUTH_COOKIE_SECURE}` !== 'false',
 		httpOnly: true
-	});
+	};
+
+	if (!env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
+		cookieOptions.domain = `${env.AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`;
+	}
+
+	cookies.set(env.AUTH_COOKIE_NAME || 'fastapiusersauth', '', cookieOptions);
 
 	return new Response(null, { status: 204 });
 }
