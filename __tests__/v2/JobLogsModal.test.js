@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 import { mockJob } from '../mock/mock-types';
 
@@ -7,25 +7,16 @@ vi.mock('$env/dynamic/public', () => {
 	return { env: {} };
 });
 
-// Mocking bootstrap.Modal
-class MockModal {
-	constructor() {
-		this.show = vi.fn();
-	}
-}
-MockModal.getInstance = vi.fn();
-
-// @ts-expect-error
-global.window.bootstrap = {
-	Modal: MockModal
-};
-
 // Mocking fetch
 global.fetch = vi.fn();
 
 import JobLogsModal from '../../src/lib/components/v2/jobs/JobLogsModal.svelte';
 
 describe('JobLogsModal', async () => {
+	beforeEach(async () => {
+		global.window.bootstrap = await import('bootstrap');
+	});
+
 	it('display error log fully highlighted', async () => {
 		const result = render(JobLogsModal);
 		const error = `TASK ERROR:Task id: 20 (Create OME-Zarr structure), e.workflow_task_order=0

@@ -94,11 +94,7 @@ test('Create and delete a project', async ({ page }) => {
 		const projectRow = await getProjectRow(page, randomProjectName);
 
 		// Open project info modal
-		const infoBtn = /** @type {import('@playwright/test').Locator} */ (projectRow).getByRole(
-			'button',
-			{ name: 'Info' }
-		);
-		await infoBtn.click();
+		await projectRow.getByRole('button', { name: 'Info' }).click();
 
 		// Wait info modal
 		let modalTitle = page.locator('.modal.show .modal-title');
@@ -122,8 +118,8 @@ test('Create and delete a project', async ({ page }) => {
 		await page.getByRole('button', { name: 'Create new project' }).click();
 
 		// Wait modal opening
-		let modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
+		const modal = await waitModal(page);
+		const modalTitle = modal.locator('.modal-title');
 		await expect(modalTitle).toHaveText('Create new project');
 
 		// Fill form and submit
@@ -133,13 +129,7 @@ test('Create and delete a project', async ({ page }) => {
 		await createProjectBtn.click();
 
 		// Check validation error
-		await page.waitForFunction((projectName) => {
-			const invalidFeeback = document.querySelector('.modal.show .invalid-feedback');
-			if (invalidFeeback instanceof HTMLElement) {
-				return invalidFeeback.innerText.includes(`Project name (${projectName}) already in use`);
-			}
-			return false;
-		}, randomProjectName);
+		await expect(modal).toContainText(`Project name (${randomProjectName}) already in use`);
 
 		// Close modal
 		const closeModalBtn = page.locator('.modal.show').getByRole('button', { name: 'Cancel' });
@@ -150,8 +140,8 @@ test('Create and delete a project', async ({ page }) => {
 		await page.getByRole('button', { name: 'Create new project' }).click();
 
 		// Wait modal opening
-		let modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
+		const modal = await waitModal(page);
+		const modalTitle = modal.locator('.modal-title');
 		await expect(modalTitle).toHaveText('Create new project');
 
 		// Fill form and submit
@@ -159,6 +149,9 @@ test('Create and delete a project', async ({ page }) => {
 		await projectNameInput.fill(randomProjectName2);
 		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
+
+		await waitModalClosed(page);
+		await page.waitForURL(/\/v2\/projects\/\d+/);
 
 		// Go back to projects list
 		await page.goto('/v2/projects');
@@ -169,6 +162,7 @@ test('Create and delete a project', async ({ page }) => {
 		// Initial state:
 		// project2 -> not starred
 		// project1 -> not starred
+		await expect(projectTable.getByRole('row')).toHaveCount(3);
 		let projectRow1 = projectTable.getByRole('row').nth(1);
 		let projectRow2 = projectTable.getByRole('row').nth(2);
 		await expect(projectRow1.getByRole('cell').nth(0)).toHaveText(randomProjectName2);
