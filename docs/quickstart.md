@@ -68,7 +68,7 @@ export FRACTAL_RUNNER_BACKEND=local
 #export LOGIN_INVITE_PATH=
 
 # default values are usually fine for the following variables; remove comments if needed
-#export AUTH_COOKIE_NAME=__Host-Http-fastapiusersauth
+#export AUTH_COOKIE_NAME=fastapiusersauth
 #export AUTH_COOKIE_PATH=/
 #export AUTH_COOKIE_SAME_SITE=lax
 #export PUBLIC_UPDATE_JOBS_INTERVAL=3000

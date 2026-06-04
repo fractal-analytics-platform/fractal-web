@@ -132,20 +132,30 @@ function getValue(key) {
 }
 
 function checkCookieVariables() {
-	if (!env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
-		return;
-	}
-	if (env.AUTH_COOKIE_DOMAIN) {
-		logger.error('AUTH_COOKIE_DOMAIN must not be set if cookie name prefix is __Host-');
-		exit(2);
-	}
-	console.log(env.AUTH_COOKIE_SECURE);
-	if (env.AUTH_COOKIE_SECURE && env.AUTH_COOKIE_SECURE === 'false') {
-		logger.error('AUTH_COOKIE_SECURE must be set to true if cookie name prefix is __Host-');
-		exit(2);
-	}
-	if (env.AUTH_COOKIE_PATH && env.AUTH_COOKIE_PATH !== '/') {
-		logger.error('AUTH_COOKIE_PATH must be set to / if cookie name prefix is __Host-');
-		exit(2);
+	if (env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
+		// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#cookie_prefixes
+		logger.warn(
+			'Support for cookie prefixes is experimental and may cause issues with fractal-data and fractal-feature-explorer'
+		);
+		if (env.AUTH_COOKIE_DOMAIN) {
+			logger.error('AUTH_COOKIE_DOMAIN must not be set if cookie name prefix is __Host-');
+			exit(2);
+		}
+		console.log(env.AUTH_COOKIE_SECURE);
+		if (env.AUTH_COOKIE_SECURE && env.AUTH_COOKIE_SECURE === 'false') {
+			logger.error('AUTH_COOKIE_SECURE must be set to true if cookie name prefix is __Host-');
+			exit(2);
+		}
+		if (env.AUTH_COOKIE_PATH && env.AUTH_COOKIE_PATH !== '/') {
+			logger.error('AUTH_COOKIE_PATH must be set to / if cookie name prefix is __Host-');
+			exit(2);
+		}
+	} else {
+		if (
+			!env.AUTH_COOKIE_DOMAIN &&
+			(!process.env.NODE_ENV || process.env.NODE_ENV === 'production')
+		) {
+			logger.warn('AUTH_COOKIE_DOMAIN must be set when running in production');
+		}
 	}
 }
