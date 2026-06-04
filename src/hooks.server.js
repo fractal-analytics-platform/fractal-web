@@ -121,8 +121,16 @@ export async function handleFetch({ event, request, fetch }) {
 			const apiCookie = cookies.find(
 				(c) => c.split('=')[0] === (env.AUTH_COOKIE_NAME || 'fastapiusersauth')
 			);
+			const cookiesToForward = [];
 			if (apiCookie) {
-				request.headers.set('cookie', `fastapiusersauth=${apiCookie.split('=')[1]}`);
+				cookiesToForward.push(`fastapiusersauth=${apiCookie.split('=')[1]}`);
+			}
+			const oauthCsrfCookie = cookies.find((c) => c.split('=')[0] === 'fastapiusersoauthcsrf');
+			if (oauthCsrfCookie) {
+				cookiesToForward.push('cookie', `fastapiusersoauthcsrf=${oauthCsrfCookie.split('=')[1]}`);
+			}
+			if (cookiesToForward.length > 0) {
+				request.headers.set('cookie', cookiesToForward.join('; '));
 			}
 		}
 	}
