@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.27.13
+
+- Add `fastapiusersoauthcsrf` to forwarded cookies - fix issue with OAuth2 login (\#1154).
+
 # 1.27.12
 
 - Add CSP configuration and other security headers hardening (\#1149).
