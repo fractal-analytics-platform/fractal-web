@@ -20,26 +20,13 @@ vi.mock('$app/state', () => {
 	};
 });
 
-// Mocking bootstrap.Modal
-class MockModal {
-	constructor() {
-		this.show = vi.fn();
-		this.hide = vi.fn();
-	}
-}
-MockModal.getInstance = vi.fn();
-
-// @ts-expect-error
-global.window.bootstrap = {
-	Modal: MockModal
-};
-
 // The component to be tested must be imported after the mock setup
 import page from '../../src/routes/v2/projects/+page.svelte';
 
 describe('Projects page', () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
+		global.window.bootstrap = await import('bootstrap');
 	});
 
 	it('Deleted project is propagated to parent component (#1111)', async () => {

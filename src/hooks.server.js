@@ -11,7 +11,7 @@ checkEnvironmentVariables();
 
 export async function handle({ event, resolve }) {
 	if (event.url.pathname.startsWith('/api')) {
-		// API page - AJAX request - handled in proxy'
+		// API page - AJAX request - handled in proxy' - security headers not set here
 		logger.trace('API endpoint detected, leaving the handling to the proxy');
 		return await resolve(event);
 	}
@@ -36,7 +36,7 @@ export async function handle({ event, resolve }) {
 	const serverInfo = await getServerInfo(event.fetch);
 
 	// Check if auth cookie is present
-	const fastApiUsersAuth = event.cookies.get('fastapiusersauth');
+	const fastApiUsersAuth = event.cookies.get(env.AUTH_COOKIE_NAME || 'fastapiusersauth');
 	if (!fastApiUsersAuth) {
 		logger.debug('No auth cookie found');
 	}
@@ -58,7 +58,9 @@ export async function handle({ event, resolve }) {
 
 	if (isPublicPage) {
 		logger.debug('Public page - No auth required');
-		return await resolve(event);
+		const response = await resolve(event);
+		setSecurityHeaders(response);
+		return response;
 	}
 
 	if (!serverInfo.alive && !isPublicPage) {
@@ -84,7 +86,24 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	return await resolve(event);
+	const response = await resolve(event);
+	setSecurityHeaders(response);
+	return response;
+}
+
+const securityHeaders = {
+	'X-Frame-Options': 'deny',
+	'X-Content-Type-Options': 'nosniff',
+	'Referrer-Policy': 'strict-origin-when-cross-origin',
+	'Cross-Origin-Opener-Policy': 'same-origin',
+	'Cross-Origin-Embedder-Policy': 'require-corp',
+	'Cross-Origin-Resource-Policy': 'same-origin',
+	'Permissions-Policy': 'geolocation=(), camera=(), microphone=(), interest-cohort=()',
+	'X-DNS-Prefetch-Control': 'off'
+};
+
+function setSecurityHeaders(response) {
+	Object.entries(securityHeaders).forEach(([header, value]) => response.headers.set(header, value));
 }
 
 /** @type {import('@sveltejs/kit').HandleFetch} */
@@ -98,7 +117,13 @@ export async function handleFetch({ event, request, fetch }) {
 		logger.trace('Including cookie into request to %s, via handleFetch', request.url);
 		const cookie = event.request.headers.get('cookie');
 		if (cookie) {
-			request.headers.set('cookie', cookie);
+			const cookies = cookie.split(';').map((c) => c.trim());
+			const apiCookie = cookies.find(
+				(c) => c.split('=')[0] === (env.AUTH_COOKIE_NAME || 'fastapiusersauth')
+			);
+			if (apiCookie) {
+				request.headers.set('cookie', `fastapiusersauth=${apiCookie.split('=')[1]}`);
+			}
 		}
 	}
 	const startTime = new Date();
