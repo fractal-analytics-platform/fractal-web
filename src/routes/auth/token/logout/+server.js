@@ -14,7 +14,7 @@ export async function POST({ fetch, request, cookies }) {
 		httpOnly: true
 	};
 
-	if (!env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
+	if (env.AUTH_COOKIE_NAME && !env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
 		cookieOptions.domain = `${env.AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`;
 	}
 

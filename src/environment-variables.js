@@ -132,7 +132,7 @@ function getValue(key) {
 }
 
 function checkCookieVariables() {
-	if (env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
+	if (env.AUTH_COOKIE_NAME && env.AUTH_COOKIE_NAME.startsWith('__Host-')) {
 		// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#cookie_prefixes
 		logger.warn(
 			'Support for cookie prefixes is experimental and may cause issues with fractal-data and fractal-feature-explorer'
