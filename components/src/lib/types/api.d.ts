@@ -233,7 +233,7 @@ export type ImagesStatus =
 			num_done_images: number;
 			num_failed_images: number;
 			num_available_images: number | null;
-			num_images_with_warnings: number;
+			has_warnings: bool;
 	  };
 
 export type JobWithTaskStatuses = JobV2 & {

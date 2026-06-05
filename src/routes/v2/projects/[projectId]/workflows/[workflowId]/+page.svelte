@@ -727,11 +727,7 @@
 	 * @param {import('fractal-components/types/api').ImagesStatus|undefined} imageStatus
 	 */
 	function hasWarnings(imageStatus) {
-		return (
-			imageStatus &&
-			'num_images_with_warnings' in imageStatus &&
-			imageStatus.num_images_with_warnings > 0
-		);
+		return imageStatus && 'has_warnings' in imageStatus && imageStatus.has_warnings;
 	}
 
 	onDestroy(() => {
