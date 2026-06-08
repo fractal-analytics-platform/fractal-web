@@ -72,7 +72,7 @@ describe('oneOf properties', () => {
 		title: 'ProcessTask'
 	};
 
-	it.only('oneOf property', async () => {
+	it('oneOf property', async () => {
 		const user = userEvent.setup();
 
 		const { component, onChange } = renderSchema(schema, 'pydantic_v2', {
