@@ -266,7 +266,7 @@ function showNormalizationWarning(normalizedPaths) {
 }
 
 /**
- * @param {string} markdownValue
+ * @param {string|undefined} markdownValue
  */
 export function formatMarkdown(markdownValue) {
 	if (!markdownValue) {
