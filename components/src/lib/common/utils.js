@@ -1,3 +1,5 @@
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { JsonSchemaDataError } from '../jschema/form_manager';
 
 /**
@@ -261,4 +263,14 @@ function showNormalizationWarning(normalizedPaths) {
 		const toast = new bootstrap.Toast(toastElement);
 		toast.show();
 	}
+}
+
+/**
+ * @param {string} markdownValue
+ */
+export function formatMarkdown(markdownValue) {
+	if (!markdownValue) {
+		return '';
+	}
+	return DOMPurify.sanitize(marked.parse(markdownValue));
 }

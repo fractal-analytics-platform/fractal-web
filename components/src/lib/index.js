@@ -6,7 +6,8 @@ import {
 	getValidationErrorMessage,
 	stripNullAndEmptyObjectsAndArrays,
 	normalizePayload,
-	nullifyEmptyStrings
+	nullifyEmptyStrings,
+	formatMarkdown
 } from './common/utils';
 import {
 	isCompoundType,
@@ -52,5 +53,6 @@ export {
 	getUpdatedData,
 	FormBaseEntry,
 	FormEntry,
-	FormBuilder
+	FormBuilder,
+	formatMarkdown
 };
