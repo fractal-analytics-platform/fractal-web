@@ -1,5 +1,9 @@
 *Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository.*
 
+# Unreleased
+
+* Add `LOG_CONFIG_FILE` environment variable to load an external JSON log4js configuration file; when set, it is used exclusively and `LOG_FILE` / `LOG_LEVEL_FILE` / `LOG_LEVEL_CONSOLE` are ignored.
+
 # 1.24.2
 
 * Complete the `templates-list/` app (\#1037).
