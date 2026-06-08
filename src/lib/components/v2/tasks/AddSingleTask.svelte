@@ -445,11 +445,6 @@
 			<TypesEditor bind:this={typesEditor} />
 		</div>
 	</div>
-	<div class="row mb-2 mt-2">
-		<div class="col">
-			<span class="fw-bold text-secondary">Optional arguments</span>
-		</div>
-	</div>
 	<div class="row">
 		<div class="col-md-6 mb-2">
 			<div class="input-group has-validation">
@@ -461,9 +456,15 @@
 					class="form-control"
 					bind:value={version}
 					class:is-invalid={$validationErrors['version']}
+					required
 				/>
 				<span class="invalid-feedback">{$validationErrors['version']}</span>
 			</div>
+		</div>
+	</div>
+	<div class="row mb-2 mt-2">
+		<div class="col">
+			<span class="fw-bold text-secondary">Optional arguments</span>
 		</div>
 	</div>
 	{#if isNonParallelType(taskType) || isCompoundType(taskType)}

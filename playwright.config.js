@@ -60,7 +60,8 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command:
+				'./tests/start-test-server.sh --branch 2568-make-version-required-for-tasks-and-taskgroups',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',

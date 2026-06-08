@@ -248,11 +248,12 @@
 					id="version"
 					class="form-control"
 					type="text"
+					required
 					class:is-invalid={$validationErrors['version']}
 				/>
 				<span class="invalid-feedback">{$validationErrors['version']}</span>
 			</div>
-			<div class="form-text">Optional version of tasks to be collected</div>
+			<div class="form-text">Version of tasks to be collected</div>
 		</div>
 	</div>
 	<div class="row mb-1">
