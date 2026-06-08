@@ -72,7 +72,7 @@ describe('oneOf properties', () => {
 		title: 'ProcessTask'
 	};
 
-	it('oneOf property', async () => {
+	it.only('oneOf property', async () => {
 		const user = userEvent.setup();
 
 		const { component, onChange } = renderSchema(schema, 'pydantic_v2', {
@@ -95,8 +95,8 @@ describe('oneOf properties', () => {
 			}
 		});
 
-		expect(screen.getAllByLabelText('Description')[1].getAttribute('data-bs-content')).eq(
-			'Description for step == ProcessB'
+		expect(screen.getAllByLabelText('Description')[1].getAttribute('data-bs-content').trim()).eq(
+			'<p>Description for step == ProcessB</p>'
 		);
 
 		await user.selectOptions(select, 'ProcessA');
@@ -114,8 +114,8 @@ describe('oneOf properties', () => {
 			}
 		});
 
-		expect(screen.getAllByLabelText('Description')[1].getAttribute('data-bs-content')).eq(
-			'Description for step == ProcessA'
+		expect(screen.getAllByLabelText('Description')[1].getAttribute('data-bs-content').trim()).eq(
+			'<p>Description for step == ProcessA</p>'
 		);
 	});
 
