@@ -46,8 +46,6 @@
 	"type": "module",
 	"bundleDependencies": [
 		"slim-select",
-		"dompurify",
-		"marked",
 		"bootstrap",
 		"bootstrap-icons"
 	]

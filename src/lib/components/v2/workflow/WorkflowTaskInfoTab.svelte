@@ -1,7 +1,7 @@
 <script>
-	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { FormErrorHandler } from '$lib/common/errors';
 	import { normalizePayload } from 'fractal-components';
+	import { formatMarkdown } from 'fractal-components/common/utils';
 	import { tick } from 'svelte';
 
 	/**

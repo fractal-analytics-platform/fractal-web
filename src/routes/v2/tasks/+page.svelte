@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
-	import { formatMarkdown } from '$lib/common/component_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { formatMarkdown } from 'fractal-components/common/utils';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 	import { onMount } from 'svelte';
 

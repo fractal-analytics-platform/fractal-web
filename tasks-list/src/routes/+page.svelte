@@ -1,8 +1,7 @@
 <script>
-	import { marked } from 'marked';
-	import DOMPurify from 'dompurify';
 	import tasks from '../tasks.json';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import { formatMarkdown } from 'fractal-components';
 	import { Modal } from 'bootstrap';
 	import 'slim-select/styles';
 
@@ -29,13 +28,6 @@
 			return bootstrapModal;
 		}
 		return new Modal(modalElement);
-	}
-
-	export function formatMarkdown(markdownValue) {
-		if (!markdownValue) {
-			return '';
-		}
-		return DOMPurify.sanitize(marked.parse(markdownValue));
 	}
 </script>
 

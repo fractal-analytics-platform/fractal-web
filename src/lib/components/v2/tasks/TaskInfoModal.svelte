@@ -1,7 +1,7 @@
 <script>
-	import { formatMarkdown } from '$lib/common/component_utilities';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import Modal from '../../common/Modal.svelte';
+	import { formatMarkdown } from 'fractal-components/common/utils';
 
 	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
 	let task = $state();

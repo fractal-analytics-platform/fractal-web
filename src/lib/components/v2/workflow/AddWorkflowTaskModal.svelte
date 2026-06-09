@@ -3,7 +3,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
-	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { tick } from 'svelte';
 	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
 	import {
@@ -12,6 +11,7 @@
 		stripNullAndEmptyObjectsAndArrays
 	} from 'fractal-components';
 	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
+	import { formatMarkdown } from 'fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props

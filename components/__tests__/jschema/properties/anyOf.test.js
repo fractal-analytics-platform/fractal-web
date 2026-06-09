@@ -35,8 +35,8 @@ describe('anyOf properties', () => {
 
 		// Should use parent title and description
 		expect(screen.getByText('Nullable Arg With Null Default')).toBeVisible();
-		expect(screen.getByLabelText('Description').getAttribute('data-bs-content')).eq(
-			'Type hint SimpleModel | None = None'
+		expect(screen.getByLabelText('Description').getAttribute('data-bs-content').trim()).eq(
+			'<p>Type hint SimpleModel | None = None</p>'
 		);
 
 		await fireEvent.click(screen.getByRole('switch', { name: 'Set' }));

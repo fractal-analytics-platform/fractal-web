@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Support markdown in task-argument description (\#1157).
+
 # 1.27.13
 
 - Add `fastapiusersoauthcsrf` to forwarded cookies - fix issue with OAuth2 login (\#1154).
