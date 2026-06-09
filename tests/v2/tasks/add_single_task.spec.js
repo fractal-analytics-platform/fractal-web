@@ -164,6 +164,7 @@ test.describe('Add single tasks [v2]', () => {
 			await page.getByRole('textbox', { name: 'Task name' }).fill(taskName);
 			await page.getByRole('textbox', { name: 'Command non parallel' }).fill('/tmp/test-np');
 			await page.getByRole('textbox', { name: 'Command parallel' }).fill('/tmp/test-p');
+			await page.getByRole('textbox', { name: 'Version' }).fill('0.0.1');
 			await addInputTypeBtn.click();
 			await addOutputTypeBtn.click();
 			await createBtn.click();
