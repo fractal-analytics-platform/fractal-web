@@ -4,6 +4,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 - Support markdown in task-argument description (\#1157).
 - Make version required for tasks (\#1158).
+- Highlights warnings from task logs (\#1150).
 
 # 1.27.13
 
