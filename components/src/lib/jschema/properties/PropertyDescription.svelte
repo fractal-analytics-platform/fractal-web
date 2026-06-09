@@ -63,3 +63,9 @@
 		></span>
 	{/if}
 </span>
+
+<style>
+	:global(.popover-body p:last-child) {
+		margin-bottom: 0;
+	}
+</style>

@@ -1,6 +1,4 @@
 <script>
-	import { marked } from 'marked';
-	import DOMPurify from 'dompurify';
 	import { Modal } from 'bootstrap';
 
 	/**
@@ -81,13 +79,6 @@
 			return bootstrapModal;
 		}
 		return new Modal(modalElement);
-	}
-
-	export function formatMarkdown(markdownValue) {
-		if (!markdownValue) {
-			return '';
-		}
-		return DOMPurify.sanitize(marked.parse(markdownValue));
 	}
 
 	/**
