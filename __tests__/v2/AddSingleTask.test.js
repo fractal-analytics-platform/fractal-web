@@ -40,6 +40,7 @@ describe('AddSingleTask', () => {
 
 		await user.type(screen.getByRole('textbox', { name: 'Task name' }), 'test-task');
 		await user.type(screen.getByRole('textbox', { name: 'Command non parallel' }), 'command');
+		await user.type(screen.getByRole('textbox', { name: 'Version' }), '0.0.1');
 		await user.selectOptions(screen.getByRole('combobox', { name: 'Group' }), 'Group2');
 		await user.click(screen.getByRole('button', { name: 'Create' }));
 
@@ -50,6 +51,7 @@ describe('AddSingleTask', () => {
 					name: 'test-task',
 					type: 'non_parallel',
 					command_non_parallel: 'command',
+					version: '0.0.1',
 					input_types: {},
 					output_types: {}
 				})
@@ -76,6 +78,7 @@ describe('AddSingleTask', () => {
 
 		await user.type(screen.getByRole('textbox', { name: 'Task name' }), 'test-task');
 		await user.type(screen.getByRole('textbox', { name: 'Command non parallel' }), 'command');
+		await user.type(screen.getByRole('textbox', { name: 'Version' }), '0.0.1');
 		await user.click(screen.getByText('Private task'));
 		await user.click(screen.getByRole('button', { name: 'Create' }));
 
@@ -86,6 +89,7 @@ describe('AddSingleTask', () => {
 					name: 'test-task',
 					type: 'non_parallel',
 					command_non_parallel: 'command',
+					version: '0.0.1',
 					input_types: {},
 					output_types: {}
 				})
