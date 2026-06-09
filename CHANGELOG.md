@@ -5,6 +5,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 - Support markdown in task-argument description (\#1157).
 - Set the default pagination size to 50 items across all admin pages (\#1151).
 - Make version required for tasks (\#1158).
+- Highlights warnings from task logs (\#1150).
 - Do not log 401 backend responses as errors (\#1162).
 
 # 1.27.13

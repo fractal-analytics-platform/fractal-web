@@ -70,7 +70,7 @@
 		loading = true;
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
-		const url = `/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}&page=1&page_size=10`;
+		const url = `/api/v2/project/${dataset?.project_id}/status/images?include_warnings=true&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}&page=1&page_size=10`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
@@ -168,11 +168,16 @@
 					disabledTypes={Object.keys(frozenTypes)}
 					{initialFilterValues}
 					imagesStatusModal={true}
-					queryUrl={`/api/v2/project/${dataset?.project_id}/status/images?workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
+					queryUrl={`/api/v2/project/${dataset?.project_id}/status/images?include_warnings=true&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset.id}`}
 				>
 					{#snippet extraButtons(image)}
 						<button
-							class="btn btn-light"
+							class="btn"
+							class:btn-light={image.attributes.__wftask_dataset_image_status__ !== 'failed' &&
+								!image.has_warnings}
+							class:btn-warning={image.attributes.__wftask_dataset_image_status__ !== 'failed' &&
+								image.has_warnings}
+							class:btn-danger={image.attributes.__wftask_dataset_image_status__ === 'failed'}
 							onclick={() => loadLogs(image)}
 							disabled={getImageStatus(image) === null}
 						>
@@ -180,7 +185,12 @@
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
 								></span>
 							{/if}
-							<i class="bi-list-columns-reverse"></i> Logs
+							{#if image.attributes.__wftask_dataset_image_status__ === 'failed' || image.has_warnings}
+								<i class="bi-exclamation-triangle-fill"></i>
+							{:else}
+								<i class="bi-list-columns-reverse"></i>
+							{/if}
+							Logs
 						</button>
 					{/snippet}
 				</DatasetImagesTable>
