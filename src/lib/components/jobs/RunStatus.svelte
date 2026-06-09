@@ -27,7 +27,7 @@
 				aria-label="Warnings"
 				aria-disabled="true"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
-				onclick={(event) => event.preventDefault()}
+				type="button"
 			>
 				<span class="d-flex">
 					{#if showNumbers}

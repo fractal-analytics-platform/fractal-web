@@ -351,8 +351,8 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Show runs generic_task Done' }).click();
 		await page.getByRole('button', { name: 'Failed images', exact: true }).click();
 
-		const logsButtonRed = await page.getByRole('button', { name: 'Logs' }).nth(0);
-		const logsButtonYellow = await page.getByRole('button', { name: 'Logs' }).nth(1);
+		const logsButtonRed = page.getByRole('button', { name: 'Logs' }).nth(0);
+		const logsButtonYellow = page.getByRole('button', { name: 'Logs' }).nth(1);
 		await expect(logsButtonRed).toHaveClass(/btn-danger/);
 		await expect(logsButtonYellow).toHaveClass(/btn-warning/);
 	});
