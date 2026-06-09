@@ -137,7 +137,7 @@ export async function handleFetch({ event, request, fetch }) {
 	const startTime = new Date();
 	const response = await fetch(request);
 	if (!response.ok) {
-		const logLevel = response.status === 404 || response.status === 422 ? 'info' : 'error';
+		const logLevel = response.status === 404 || response.status === 422 || response.status == 401 ? 'info' : 'error';
 		logger.log(
 			logLevel,
 			'Error response from %s - Status=%d - Start Time=%s',
