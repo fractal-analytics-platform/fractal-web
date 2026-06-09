@@ -1,8 +1,8 @@
 <script>
-	import { marked } from 'marked';
-	import DOMPurify from 'dompurify';
 	import tasks from '../tasks.json';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import { formatMarkdown } from 'fractal-components';
+	import { Modal } from 'bootstrap';
 	import 'slim-select/styles';
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
@@ -18,24 +18,16 @@
 		getBootstrapModal('task-info-modal').show();
 	}
 
+	/**
+	 * @param {string} id
+	 */
 	function getBootstrapModal(id) {
-		const modalElement = document.getElementById(id);
-		// @ts-ignore
-		// eslint-disable-next-line no-undef
-		const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+		const modalElement = /** @type {HTMLElement} */ (document.getElementById(id));
+		const bootstrapModal = Modal.getInstance(modalElement);
 		if (bootstrapModal) {
 			return bootstrapModal;
 		}
-		// @ts-ignore
-		// eslint-disable-next-line no-undef
-		return new bootstrap.Modal(modalElement);
-	}
-
-	export function formatMarkdown(markdownValue) {
-		if (!markdownValue) {
-			return '';
-		}
-		return DOMPurify.sanitize(marked.parse(markdownValue));
+		return new Modal(modalElement);
 	}
 </script>
 

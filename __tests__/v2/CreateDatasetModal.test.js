@@ -21,20 +21,6 @@ vi.mock('$app/state', () => {
 	};
 });
 
-// Mocking bootstrap.Modal
-class MockModal {
-	constructor() {
-		this.show = vi.fn();
-		this.hide = vi.fn();
-	}
-}
-MockModal.getInstance = vi.fn();
-
-// @ts-expect-error
-global.window.bootstrap = {
-	Modal: MockModal
-};
-
 import CreateDatasetModal from '../../src/lib/components/v2/projects/datasets/CreateDatasetModal.svelte';
 
 const defaultProps = {
@@ -61,8 +47,9 @@ function mockFetch() {
 }
 
 describe('CreateDatasetModal', () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
+		global.window.bootstrap = await import('bootstrap');
 	});
 
 	it('validate missing name', async () => {

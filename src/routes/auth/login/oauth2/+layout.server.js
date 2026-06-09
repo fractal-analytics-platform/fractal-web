@@ -31,7 +31,7 @@ export async function load({ request, fetch, cookies }) {
 
 	let fastApiToken = null;
 	for (const cookie of receivedCookies) {
-		const match = cookie.match(/fastapiusersauth=([^;]*);/);
+		const match = cookie.match(/fastapiusersauth=([^;]*);?/);
 		if (match) {
 			fastApiToken = match[1];
 		}

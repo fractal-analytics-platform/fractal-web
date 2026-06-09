@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import PropertyDescription from './PropertyDescription.svelte';
+	import { formatMarkdown } from '../../common/utils';
 
 	/**
 	 * @typedef {Object} Props
@@ -31,12 +32,15 @@
 	);
 
 	const description = $derived(
-		formElement.description ||
-			('selectedItem' in formElement && formElement.selectedItem
-				? /** @type {import('../form_element.js').ConditionalFormElement} */ (
-						formElement.selectedItem
-					).description
-				: '')
+		formElement.description
+			? formatMarkdown(formElement.description)
+			: 'selectedItem' in formElement && formElement.selectedItem
+				? formatMarkdown(
+						/** @type {import('../form_element.js').ConditionalFormElement} */ (
+							formElement.selectedItem
+						).description
+					)
+				: ''
 	);
 
 	/**
@@ -84,4 +88,4 @@
 	</span>
 {/if}
 
-<PropertyDescription {description} />
+<PropertyDescription {description} html={true} />

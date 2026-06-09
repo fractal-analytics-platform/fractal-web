@@ -2,8 +2,8 @@
 	import { env } from '$env/dynamic/public';
 	import { page } from '$app/state';
 	import logoMedium from '$lib/assets/fractal-logo-medium.png';
-	import { formatMarkdown } from '$lib/common/component_utilities';
 	import { onMount } from 'svelte';
+	import { formatMarkdown } from 'fractal-components/common/utils';
 
 	/** @type {import('fractal-components/types/api').User|undefined} */
 	let userInfo = $derived(page.data.userInfo);

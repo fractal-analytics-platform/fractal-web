@@ -1,6 +1,3 @@
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
-
 export function fieldHasValue(event) {
 	const inputValue = event.target?.value || undefined;
 	return inputValue !== undefined && inputValue !== '';
@@ -14,13 +11,6 @@ export function getOnlyModifiedProperties(oldProperties, newProperties) {
 		}
 	}
 	return modifiedProperties;
-}
-
-export function formatMarkdown(markdownValue) {
-	if (!markdownValue) {
-		return '';
-	}
-	return DOMPurify.sanitize(marked.parse(markdownValue));
 }
 
 /**

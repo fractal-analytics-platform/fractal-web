@@ -4,6 +4,7 @@
 	import CollapsibleProperty from './CollapsibleProperty.svelte';
 	import ObjectProperty from './ObjectProperty.svelte';
 	import PropertyDescription from './PropertyDescription.svelte';
+	import { formatMarkdown } from '../../common/utils';
 
 	/**
 	 * @typedef {Object} Props
@@ -81,7 +82,7 @@
 							{formElement.discriminator.title || formElement.discriminator.key}
 						</label>
 						<PropertyDescription
-							description={formElement.discriminator.descriptions[selectedIndex]}
+							description={formatMarkdown(formElement.discriminator.descriptions[selectedIndex])}
 						/>
 					</div>
 					<div class="property-input ms-auto w-50 has-validation">
