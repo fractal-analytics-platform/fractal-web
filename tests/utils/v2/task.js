@@ -17,6 +17,7 @@ export async function createFakeTask(page, task) {
 		input_types: {},
 		output_types: {},
 		args_schema_version: 'pydantic_v2',
+		version: '0.0.1',
 		...task,
 		name
 	};
