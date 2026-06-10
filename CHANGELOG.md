@@ -2,7 +2,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # 1.28.1 (unreleased)
 
-- Minor fixes in warnings highlight (\#1164).
+- Fix bug when opening history unit log files (\#1164).
 
 # 1.28.0
 
