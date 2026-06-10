@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.28.1 (unreleased)
+
+- Minor fixes in warnings highlight (\#1164).
+
 # 1.28.0
 
 - Support markdown in task-argument description (\#1157).
