@@ -32,7 +32,7 @@
 			>
 				<span class="d-flex">
 					{#if showNumbers}
-						<span class="status-wrapper text-secondary pe-1">
+						<span class="status-wrapper text-secondary pe-2">
 							{run.num_units_with_warnings}
 						</span>
 					{/if}
