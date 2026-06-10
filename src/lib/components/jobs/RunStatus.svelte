@@ -28,10 +28,11 @@
 				aria-disabled="true"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
 				type="button"
+				onclick={openModal}
 			>
 				<span class="d-flex">
 					{#if showNumbers}
-						<span class="status-wrapper text-secondary pe-1">
+						<span class="status-wrapper text-secondary pe-2">
 							{run.num_units_with_warnings}
 						</span>
 					{/if}
@@ -103,11 +104,6 @@
 </span>
 
 <style>
-	.status-modal-btn[aria-disabled='true'] {
-		pointer-events: none;
-		cursor: default;
-	}
-
 	.status-icon-warning-numbers {
 		font-size: 100%;
 	}

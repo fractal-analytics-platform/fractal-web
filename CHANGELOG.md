@@ -1,7 +1,8 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.28.1 (unreleased)
 
+- Fix bug when opening history unit log files (\#1164).
 - Fix oneOf descriptions glitch (\#1163).
 
 # 1.28.0

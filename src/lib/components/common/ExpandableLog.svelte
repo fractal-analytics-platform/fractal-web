@@ -57,7 +57,7 @@
 		<pre class="ps-0 pe-0">
 <!-- -->{#each logParts as part, i (i)}{#if part.highlight}<div
 						class="ps-3 pe-3 highlight">{part.text}
-<!-- --></div>{:else if showDetails || (i + 1 < logParts.length && !logParts[i + 1].highlight)}{#each splitLines(part.text) as line (line)}<div
+<!-- --></div>{:else if showDetails || (i + 1 < logParts.length && !logParts[i + 1].highlight)}{#each splitLines(part.text) as line, i (i)}<div
 							class="ps-3 pe-3"
 							class:warning-highlight={isWarningLine(line)}>{line}</div>{/each}{:else}<button
 						class="btn btn-link text-decoration-none details-btn"
@@ -65,7 +65,7 @@
 					>{/if}{/each}</pre>
 	{:else}
 		<pre class:highlight>
-<!-- -->{#each splitLines(logParts.map((p) => p.text).join('\n')) as line (line)}<div
+<!-- -->{#each splitLines(logParts.map((p) => p.text).join('\n')) as line, i (i)}<div
 					class="ps-3 pe-3"
 					class:warning-highlight={isWarningLine(line)}>{line}</div>{/each}</pre>
 	{/if}
