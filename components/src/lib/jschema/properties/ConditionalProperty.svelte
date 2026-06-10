@@ -83,6 +83,7 @@
 						</label>
 						<PropertyDescription
 							description={formatMarkdown(formElement.discriminator.descriptions[selectedIndex])}
+							html={true}
 						/>
 					</div>
 					<div class="property-input ms-auto w-50 has-validation">
