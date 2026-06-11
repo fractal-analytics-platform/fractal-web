@@ -32,7 +32,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['20', '24']
+        node-version: ['24']
         browser: ['chromium', 'firefox']
       fail-fast: false
 
