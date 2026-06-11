@@ -3,6 +3,7 @@
 	import { buildWorkflowTaskTableRows } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
 	import ColouredBadge from '../common/ColouredBadge.svelte';
+	import BooleanIcon from '../common/BooleanIcon.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -460,6 +461,7 @@
 							<th></th>
 						{/if}
 						<th>{groupByLabels[groupBy]}</th>
+						<th>Core</th>
 						<th>Category</th>
 						<th>Modality</th>
 						<th>Metadata</th>
@@ -499,6 +501,9 @@
 												{task.task_name}
 											</label>
 										{/if}
+									</td>
+									<td>
+										<BooleanIcon value={task.is_core} />
 									</td>
 									<td>
 										{#if task.category}
