@@ -48,6 +48,7 @@
 	let tagSelector = undefined;
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
+	let onlyCore = $state(false);
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -76,7 +77,8 @@
 			modalityFilter ||
 			packageFilter ||
 			tagFilter ||
-			inputTypeFilter
+			inputTypeFilter ||
+			onlyCore
 		) {
 			filterRows();
 		} else {
@@ -97,13 +99,26 @@
 	function filterRows() {
 		filteredRows = allRows
 			.map((row) => {
-				const filteredTasks = row.tasks.filter((t) => filterRow(getSelectedTask(t)));
+				const filteredTasks = row.tasks
+					.map((task) => {
+						const filteredTaskVersions = task.taskVersions.filter(
+							(taskVersion) => taskVersion.is_core
+						);
+
+						return {
+							...task,
+							taskVersions: filteredTaskVersions
+						};
+					})
+					.filter((task) => task.taskVersions.length > 0)
+					.filter((task) => filterRow(getSelectedTask(task)));
+
 				return {
 					...row,
 					tasks: filteredTasks
 				};
 			})
-			.filter((r) => r.tasks.length > 0);
+			.filter((row) => row.tasks.length > 0);
 	}
 
 	/**
@@ -116,7 +131,8 @@
 			modalityMatch(row) &&
 			tagMatch(row) &&
 			packageMatch(row) &&
-			inputTypeMatch(row)
+			inputTypeMatch(row) &&
+			onlyCoreMatch(row)
 		);
 	}
 
@@ -149,6 +165,17 @@
 			return true;
 		}
 		return row.category !== null && row.category === categoryFilter;
+	}
+
+	/**
+	 * @param {import('../types/api').TasksTableRow} row
+	 * @returns {boolean}
+	 */
+	function onlyCoreMatch(row) {
+		if (!onlyCore) {
+			return true;
+		}
+		return row.is_core;
 	}
 
 	/**
@@ -202,6 +229,7 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
+		onlyCore = false;
 	}
 
 	/**
@@ -295,6 +323,7 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
+		onlyCore = false;
 		setup();
 	});
 
@@ -386,6 +415,18 @@
 			</div>
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
+			</div>
+			<div class="col">
+				<select id="pippo-filter" class="invisible"></select>
+			</div>
+			<div class="col-auto">
+				<input
+					id="onlyCoreCheckbox"
+					type="checkbox"
+					class="form-check-input"
+					bind:checked={onlyCore}
+				/>
+				<label class="form-check-label small" for="onlyCoreCheckbox"> Only core </label>
 			</div>
 		</div>
 	</div>

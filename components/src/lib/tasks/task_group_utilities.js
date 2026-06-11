@@ -42,6 +42,7 @@ function getTaskTableProperties(taskGroup, task) {
 		pkg_name: taskGroup.pkg_name,
 		task_id: task.id,
 		task_name: task.name,
+		is_core: task.is_core,
 		version: taskGroup.version || '',
 		category: task.category,
 		modality: task.modality,
