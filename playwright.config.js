@@ -60,7 +60,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command: './tests/start-test-server.sh --branch 3163-introduce-core-tasks',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
