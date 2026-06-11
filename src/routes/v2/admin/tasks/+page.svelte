@@ -4,7 +4,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { PropertyDescription } from 'fractal-components';
+	import { normalizePayload, PropertyDescription } from 'fractal-components';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	let name = $state('');
@@ -52,7 +52,7 @@
 			url.searchParams.append('task_type', taskType);
 		}
 		if (onlyCore) {
-			url.searchParams.append('only_core', onlyCore);
+			url.searchParams.append('only_core', String(onlyCore));
 		}
 		return url;
 	}
@@ -87,6 +87,78 @@
 			}
 		} finally {
 			searching = false;
+		}
+	}
+
+	/**
+	 * @param {number} taskId
+	 */
+	async function makeCore(taskId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/api/admin/v2/task/make-core', {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: normalizePayload([taskId])
+		});
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			return;
+		} else {
+			if (results) {
+				results.items = results.items.map((item) => {
+					if (item.task.id === taskId) {
+						return {
+							...item,
+							task: {
+								...item.task,
+								is_core: true
+							}
+						};
+					}
+					return item;
+				});
+			}
+		}
+	}
+
+	/**
+	 * @param {number} taskId
+	 */
+	async function makeNotCore(taskId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/api/admin/v2/task/make-not-core', {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: normalizePayload([taskId])
+		});
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+			return;
+		} else {
+			if (results) {
+				results.items = results.items.map((item) => {
+					if (item.task.id === taskId) {
+						return {
+							...item,
+							task: {
+								...item.task,
+								is_core: false
+							}
+						};
+					}
+					return item;
+				});
+			}
 		}
 	}
 
@@ -382,10 +454,37 @@
 								{/if}
 							</td>
 							<td>
-								<button class="btn btn-light" onclick={() => openInfoModal(taskInfo)}>
+								<button
+									class="btn btn-light"
+									aria-label="Info"
+									title="Info"
+									onclick={() => openInfoModal(taskInfo)}
+								>
 									<i class="bi bi-info-circle"></i>
-									Info
 								</button>
+								{#if taskInfo.task.is_core}
+									<button
+										class="btn btn-light"
+										aria-label="Make not core"
+										title="Make not core"
+										onclick={async () => {
+											await makeNotCore(taskInfo.task.id);
+										}}
+									>
+										<i class="bi bi-x-circle"></i>
+									</button>
+								{:else}
+									<button
+										class="btn btn-light"
+										aria-label="Make core"
+										title="Make core"
+										onclick={async () => {
+											await makeCore(taskInfo.task.id);
+										}}
+									>
+										<i class="bi bi-check-circle"></i>
+									</button>
+								{/if}
 							</td>
 						</tr>
 					{/each}
