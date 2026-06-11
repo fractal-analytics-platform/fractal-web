@@ -329,6 +329,7 @@ type TaskV2Minimal = {
 	id: number;
 	name: string;
 	type: string;
+	is_core: boolean;
 	command_non_parallel: string | null;
 	command_parallel: string | null;
 	version: string | null;

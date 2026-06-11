@@ -5,12 +5,14 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { PropertyDescription } from 'fractal-components';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	let name = $state('');
 	let id = $state('');
 	let version = $state('');
 	let resource = $state('');
 	let taskType = $state('');
+	let onlyCore = $state(false);
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	const resources = $derived(page.data.resources || []);
 
@@ -48,6 +50,9 @@
 		}
 		if (taskType) {
 			url.searchParams.append('task_type', taskType);
+		}
+		if (onlyCore) {
+			url.searchParams.append('only_core', onlyCore);
 		}
 		return url;
 	}
@@ -94,6 +99,7 @@
 		version = '';
 		resource = '';
 		taskType = '';
+		onlyCore = false;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
@@ -267,6 +273,21 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="onlyCoreCheckbox">Only core</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input
+								id="onlyCoreCheckbox"
+								type="checkbox"
+								class="form-check-input"
+								bind:checked={onlyCore}
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -322,6 +343,7 @@
 					<tr>
 						<th>Id</th>
 						<th>Name</th>
+						<th>Core</th>
 						<th>Version</th>
 						<th>Type</th>
 						<th># Workflows</th>
@@ -334,6 +356,7 @@
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
 							<td>{taskInfo.task.id}</td>
 							<td>{taskInfo.task.name}</td>
+							<td><BooleanIcon value={taskInfo.task.is_core} /></td>
 							<td>{taskInfo.task.version || '-'}</td>
 							<td>{taskInfo.task.type}</td>
 							<td>
