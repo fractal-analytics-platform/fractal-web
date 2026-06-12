@@ -48,6 +48,7 @@
 	let tagSelector = undefined;
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
+	let coreTasksOnly = $state(false);
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -76,7 +77,8 @@
 			modalityFilter ||
 			packageFilter ||
 			tagFilter ||
-			inputTypeFilter
+			inputTypeFilter ||
+			coreTasksOnly
 		) {
 			filterRows();
 		} else {
@@ -202,6 +204,7 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
+		coreTasksOnly = false;
 	}
 
 	/**
@@ -295,6 +298,7 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
+		coreTasksOnly = false;
 		setup();
 	});
 
@@ -386,6 +390,20 @@
 			</div>
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
+			</div>
+			<div class="col-auto">
+				<div class="form-check form-switch">
+					<input
+						id="coreTasksOnly"
+						class="form-check-input"
+						type="checkbox"
+						bind:checked={coreTasksOnly}
+					/>
+					<label class="form-check-label" for="coreTasksOnly">
+						<i class="bi bi-patch-check-fill verified-core-icon"></i>
+						Core only
+					</label>
+				</div>
 			</div>
 		</div>
 	</div>
