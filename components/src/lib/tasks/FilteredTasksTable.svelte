@@ -403,14 +403,14 @@
 					{#if selectable}
 						<col width="15" />
 					{/if}
-					<col />
-					<col />
-					<col />
-					<col />
+					<col width="250" />
+					<col width="50" />
+					<col width="50" />
+					<col width="150" />
 					{#if showAuthorsInSeparateColumn}
-						<col />
+						<col width="150" />
 					{/if}
-					<col width="120" />
+					<col width="90" />
 					{@render extraColumnsColgroup?.()}
 				</colgroup>
 				<thead>
@@ -432,7 +432,8 @@
 				<tbody>
 					{#each filteredRows as row, index (index)}
 						<tr class="border-top">
-							<th colspan={selectable ? 4 : 3}>{row.pkg_name}</th>
+							{#if selectable}<th></th>{/if}
+							<th>{row.pkg_name}</th>
 						</tr>
 						{#each row.tasks.map((tr) => getSelectedTask(tr)) as task, index (index)}
 							{#if task}
@@ -457,6 +458,9 @@
 											<label for="selector-{task.task_id}" style="word-wrap: anywhere;">
 												{task.task_name}
 											</label>
+										{/if}
+										{#if task.is_core}
+											<i class="bi bi-patch-check-fill verified-core-icon" title="Core task"></i>
 										{/if}
 									</td>
 									<td>
@@ -535,14 +539,10 @@
 	.metadata-col,
 	.author-col {
 		font-size: 85%;
-		max-width: 150px;
 	}
 
-	.task-name-col {
-		max-width: 180px;
-	}
-
-	.version-col {
-		max-width: 90px;
+	.verified-core-icon {
+		color: #1da1f2;
+		line-height: 1;
 	}
 </style>
