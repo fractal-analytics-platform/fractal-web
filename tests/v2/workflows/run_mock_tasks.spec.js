@@ -343,7 +343,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await page.getByLabel('Selector for attribute well', { exact: true }).getByText('All').click();
+		await page.getByRole('combobox', { name: 'well', exact: true }).getByText('All').click();
 		await page.getByRole('option', { name: 'A01' }).click();
 		await page.getByRole('button', { name: 'Apply' }).click();
 		await page.getByRole('button', { name: 'Run', exact: true }).click();

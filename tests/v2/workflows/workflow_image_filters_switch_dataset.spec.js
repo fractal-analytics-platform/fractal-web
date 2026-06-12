@@ -58,7 +58,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.waitFor();
 
 		// check images and selected filters
-		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
+		await expectSlimSelectValue(page, 'd2t1', 'True');
 
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 
@@ -96,7 +96,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 		// check images
 		await expect(modal.getByText('Total results: 0')).toBeVisible();
-		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
+		await expectSlimSelectValue(page, 'd2t1', 'True');
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText('This job will process 0 images.')).toBeVisible();
 		await expect(
@@ -120,7 +120,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 
 		// check images and selected filters
-		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
+		await expectSlimSelectValue(page, 'd2t1', 'True');
 
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 
@@ -131,6 +131,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		).toBeVisible();
 
 		await modal.getByRole('button', { name: 'Cancel' }).click();
-		await expectSlimSelectValue(page, 'Selector for type d2t1', 'True');
+		await expectSlimSelectValue(page, 'd2t1', 'True');
 	});
 });
