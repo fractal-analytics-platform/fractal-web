@@ -3,7 +3,6 @@
 	import { buildWorkflowTaskTableRows } from '../tasks/task_group_utilities';
 	import SlimSelect from 'slim-select';
 	import ColouredBadge from '../common/ColouredBadge.svelte';
-	import BooleanIcon from '../common/BooleanIcon.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -49,7 +48,6 @@
 	let tagSelector = undefined;
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
-	let onlyCore = $state(false);
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -78,8 +76,7 @@
 			modalityFilter ||
 			packageFilter ||
 			tagFilter ||
-			inputTypeFilter ||
-			onlyCore
+			inputTypeFilter
 		) {
 			filterRows();
 		} else {
@@ -100,26 +97,13 @@
 	function filterRows() {
 		filteredRows = allRows
 			.map((row) => {
-				const filteredTasks = row.tasks
-					.map((task) => {
-						const filteredTaskVersions = task.taskVersions.filter(
-							(taskVersion) => taskVersion.is_core
-						);
-
-						return {
-							...task,
-							taskVersions: filteredTaskVersions
-						};
-					})
-					.filter((task) => task.taskVersions.length > 0)
-					.filter((task) => filterRow(getSelectedTask(task)));
-
+				const filteredTasks = row.tasks.filter((t) => filterRow(getSelectedTask(t)));
 				return {
 					...row,
 					tasks: filteredTasks
 				};
 			})
-			.filter((row) => row.tasks.length > 0);
+			.filter((r) => r.tasks.length > 0);
 	}
 
 	/**
@@ -132,8 +116,7 @@
 			modalityMatch(row) &&
 			tagMatch(row) &&
 			packageMatch(row) &&
-			inputTypeMatch(row) &&
-			onlyCoreMatch(row)
+			inputTypeMatch(row)
 		);
 	}
 
@@ -166,17 +149,6 @@
 			return true;
 		}
 		return row.category !== null && row.category === categoryFilter;
-	}
-
-	/**
-	 * @param {import('../types/api').TasksTableRow} row
-	 * @returns {boolean}
-	 */
-	function onlyCoreMatch(row) {
-		if (!onlyCore) {
-			return true;
-		}
-		return row.is_core;
 	}
 
 	/**
@@ -230,7 +202,6 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
-		onlyCore = false;
 	}
 
 	/**
@@ -324,7 +295,6 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
-		onlyCore = false;
 		setup();
 	});
 
@@ -417,18 +387,6 @@
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
 			</div>
-			<div class="col">
-				<select id="pippo-filter" class="invisible"></select>
-			</div>
-			<div class="col-auto">
-				<input
-					id="onlyCoreCheckbox"
-					type="checkbox"
-					class="form-check-input"
-					bind:checked={onlyCore}
-				/>
-				<label class="form-check-label small" for="onlyCoreCheckbox"> Only core </label>
-			</div>
 		</div>
 	</div>
 </div>
@@ -461,7 +419,6 @@
 							<th></th>
 						{/if}
 						<th>{groupByLabels[groupBy]}</th>
-						<th>Core</th>
 						<th>Category</th>
 						<th>Modality</th>
 						<th>Metadata</th>
@@ -501,9 +458,6 @@
 												{task.task_name}
 											</label>
 										{/if}
-									</td>
-									<td>
-										<BooleanIcon value={task.is_core} />
 									</td>
 									<td>
 										{#if task.category}
