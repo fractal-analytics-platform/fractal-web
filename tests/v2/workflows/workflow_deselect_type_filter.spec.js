@@ -48,11 +48,11 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 			.selectOption('cellpose_segmentation');
 		await expect(page.getByText('Total results: 2')).toBeVisible();
 		await expect(page.getByRole('row')).toHaveCount(4);
-		await expectSlimSelectValue(page, 'Selector for type 3D', 'False');
+		await expectSlimSelectValue(page, '3D', 'False');
 	});
 
 	await test.step('Deselect 3D type', async () => {
-		await modal.getByLabel('Selector for type 3D').locator('.ss-deselect').click();
+		await modal.getByRole('combobox', { name: '3D' }).locator('.ss-deselect').click();
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByRole('button', { name: 'Apply' })).not.toBeEnabled();
 		await expect(page.getByText('Total results: 4')).toBeVisible();

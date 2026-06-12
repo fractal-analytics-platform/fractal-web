@@ -63,7 +63,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');
-		await expectSlimSelectValue(page, 'Selector for type 3D', 'True');
+		await expectSlimSelectValue(page, '3D', 'True');
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
@@ -80,7 +80,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate_new.zarr/A/02/0');
-		await expectSlimSelectValue(page, 'Selector for type 3D', 'False');
+		await expectSlimSelectValue(page, '3D', 'False');
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
@@ -116,7 +116,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(4);
 		await expect(modal.getByRole('row').last()).toContainText('my_plate.zarr/A/02/0');
-		await expectSlimSelectValue(page, 'Selector for type 3D', 'True');
+		await expectSlimSelectValue(page, '3D', 'True');
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {

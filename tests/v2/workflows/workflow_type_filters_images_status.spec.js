@@ -48,13 +48,9 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	await test.step('Open cellpose_segmentation images modal', async () => {
 		await page.getByLabel('Done images').nth(0).click();
 		await modal.waitFor();
-		await expect(modal.getByLabel('Selector for type 3D')).toBeEnabled();
+		await expect(modal.getByRole('combobox', { name: '3D' })).toBeEnabled();
 		await expect(modal.getByText('Total results: 4')).toBeVisible();
-		await selectSlimSelect(
-			page,
-			modal.getByRole('combobox', { name: 'Selector for type 3D' }),
-			'False'
-		);
+		await selectSlimSelect(page, modal.getByRole('combobox', { name: '3D' }), 'False');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
@@ -64,8 +60,8 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	await test.step('Open MIP_compound images modal', async () => {
 		await page.getByLabel('Done images').nth(1).click();
 		await modal.waitFor();
-		await expect(modal.getByLabel('Selector for type 3D')).toHaveClass(/ss-disabled/);
+		await expect(modal.getByRole('combobox', { name: '3D' })).toHaveClass(/ss-disabled/);
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
-		await expectSlimSelectValue(page, 'Selector for type 3D', 'True');
+		await expectSlimSelectValue(page, '3D', 'True');
 	});
 });
