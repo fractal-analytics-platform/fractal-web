@@ -24,12 +24,12 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.56.1"
+		"svelte": "^5.56.2"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.61.1",
-		"@sveltejs/package": "^2.5.7",
+		"@sveltejs/package": "^2.5.8",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/svelte": "^5.3.1",
@@ -41,8 +41,8 @@
 		"jsdom": "^29.1.1",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
-		"svelte": "^5.56.1",
-		"svelte-check": "^4.5.0",
+		"svelte": "^5.56.2",
+		"svelte-check": "^4.6.0",
 		"svelte-preprocess": "^6.0.5",
 		"tslib": "^2.8.1",
 		"typescript": "^5.9.3",
@@ -55,7 +55,7 @@
 		"color-hash": "^2.0.2",
 		"dompurify": "^3.4.8",
 		"marked": "^7.0.5",
-		"slim-select": "^3.4.3"
+		"slim-select": "^3.6.0"
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
