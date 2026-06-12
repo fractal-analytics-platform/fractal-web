@@ -432,7 +432,9 @@
 									type="button"
 									class="core-icon-button"
 									aria-label={taskInfo.task.is_core ? 'Make not core' : 'Make core'}
-									title={taskInfo.task.is_core ? 'Make not core' : 'Make core'}
+									title={taskInfo.task.is_core
+										? 'The task is core. Click to make it not core.'
+										: 'The task is not core. Click to make it core.'}
 									onclick={async () => {
 										if (taskInfo.task.is_core) {
 											await makeNotCore(taskInfo.task.id);
