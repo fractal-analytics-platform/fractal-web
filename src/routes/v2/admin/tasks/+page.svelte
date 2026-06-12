@@ -404,18 +404,19 @@
 			<table class="table tasks-table mt-3 mb-4">
 				<colgroup>
 					<col width="60" />
+					<col width="30" />
 					<col width="auto" />
 					<col width="90" />
 					<col width="195" />
 					<col width="120" />
 					<col width="150" />
-					<col width="100" />
+					<col width="120" />
 				</colgroup>
 				<thead>
 					<tr>
 						<th>Id</th>
+						<th></th>
 						<th>Name</th>
-						<th>Core</th>
 						<th>Version</th>
 						<th>Type</th>
 						<th># Workflows</th>
@@ -427,8 +428,30 @@
 					{#each results.items as taskInfo, taskInfoIndex (taskInfoIndex)}
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
 							<td>{taskInfo.task.id}</td>
-							<td>{taskInfo.task.name}</td>
-							<td><BooleanIcon value={taskInfo.task.is_core} /></td>
+							<td class="task-core-col">
+								<button
+									type="button"
+									class="core-icon-button"
+									aria-label={taskInfo.task.is_core ? 'Make not core' : 'Make core'}
+									title={taskInfo.task.is_core ? 'Make not core' : 'Make core'}
+									onclick={async () => {
+										if (taskInfo.task.is_core) {
+											await makeNotCore(taskInfo.task.id);
+										} else {
+											await makeCore(taskInfo.task.id);
+										}
+									}}
+								>
+									<i
+										class={taskInfo.task.is_core
+											? 'bi bi-patch-check-fill verified-core-icon'
+											: 'bi bi-patch-check text-secondary'}
+									></i>
+								</button>
+							</td>
+							<td>
+								{taskInfo.task.name}
+							</td>
 							<td>{taskInfo.task.version || '-'}</td>
 							<td>{taskInfo.task.type}</td>
 							<td>
@@ -462,29 +485,6 @@
 								>
 									<i class="bi bi-info-circle"></i>
 								</button>
-								{#if taskInfo.task.is_core}
-									<button
-										class="btn btn-light"
-										aria-label="Make not core"
-										title="Make not core"
-										onclick={async () => {
-											await makeNotCore(taskInfo.task.id);
-										}}
-									>
-										<i class="bi bi-x-circle"></i>
-									</button>
-								{:else}
-									<button
-										class="btn btn-light"
-										aria-label="Make core"
-										title="Make core"
-										onclick={async () => {
-											await makeCore(taskInfo.task.id);
-										}}
-									>
-										<i class="bi bi-check-circle"></i>
-									</button>
-								{/if}
 							</td>
 						</tr>
 					{/each}
@@ -614,6 +614,10 @@
 </Modal>
 
 <style>
+	.tasks-table tbody td {
+		vertical-align: middle;
+	}
+
 	.tasks-table {
 		table-layout: fixed;
 		min-width: 900px;
@@ -640,5 +644,48 @@
 	}
 	.noborders li:last-child {
 		border-bottom: 0 !important;
+	}
+
+	td.task-core-col {
+		vertical-align: middle;
+		width: 1%;
+		white-space: nowrap;
+		/* padding-right: 0.35rem; */
+		/* margin-bottom: 2rem; */
+	}
+
+	.core-icon-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		padding: 0;
+		margin: 0;
+		border: 0;
+		background: transparent;
+
+		color: inherit;
+		line-height: 1;
+		cursor: pointer;
+		appearance: none;
+	}
+
+	.core-icon-button:hover,
+	.core-icon-button:active,
+	.core-icon-button:focus {
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+	}
+
+	.core-icon-button:focus-visible {
+		outline: 2px solid #1da1f2;
+		outline-offset: 2px;
+		border-radius: 999px;
+	}
+
+	.verified-core-icon {
+		color: #1da1f2;
+		line-height: 1;
 	}
 </style>
