@@ -5,7 +5,6 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { normalizePayload, PropertyDescription } from 'fractal-components';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	let name = $state('');
 	let id = $state('');
