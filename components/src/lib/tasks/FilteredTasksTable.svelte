@@ -97,15 +97,41 @@
 	}
 
 	function filterRows() {
-		filteredRows = allRows
-			.map((row) => {
-				const filteredTasks = row.tasks.filter((t) => filterRow(getSelectedTask(t)));
-				return {
-					...row,
-					tasks: filteredTasks
+		let rows = [];
+		for (let i = 0; i < allRows.length; i++) {
+			let row = {
+				pkg_name: allRows[i].pkg_name,
+				tasks: []
+			};
+
+			for (let j = 0; j < allRows[i].tasks.length; j++) {
+				let task = {
+					selectedVersion: allRows[i].tasks[j].selectedVersion,
+					taskVersions: []
 				};
-			})
-			.filter((r) => r.tasks.length > 0);
+
+				for (let k = 0; k < allRows[i].tasks[j].taskVersions.length; k++) {
+					if (filterRow(allRows[i].tasks[j].taskVersions[k])) {
+						task.taskVersions.push(allRows[i].tasks[j].taskVersions[k]);
+					}
+				}
+
+				if (task.taskVersions.length > 0) {
+					if (
+						!task.taskVersions.some((taskVersion) => taskVersion.version === task.selectedVersion)
+					) {
+						task.selectedVersion = task.taskVersions[0].version;
+					}
+					row.tasks.push(task);
+				}
+			}
+
+			if (row.tasks.length > 0) {
+				rows.push(row);
+			}
+		}
+
+		filteredRows = rows;
 	}
 
 	/**
@@ -118,8 +144,20 @@
 			modalityMatch(row) &&
 			tagMatch(row) &&
 			packageMatch(row) &&
-			inputTypeMatch(row)
+			inputTypeMatch(row) &&
+			onlyCoreMatch(row)
 		);
+	}
+
+	/**
+	 * @param {import('../types/api').TasksTableRow} row
+	 * @returns {boolean}
+	 */
+	function onlyCoreMatch(row) {
+		if (!coreTasksOnly) {
+			return true;
+		}
+		return row.is_core;
 	}
 
 	/**
