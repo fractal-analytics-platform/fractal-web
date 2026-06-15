@@ -70,8 +70,8 @@
 	let workflowSuccessMessage = $state('');
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = $state();
-	/** @type {number|undefined} */
-	let expandedWorkflowTaskId = $state();
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	let expandedWorkflowTask = $state();
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
@@ -349,8 +349,8 @@
 		}
 		if (wft) {
 			selectedWorkflowTask = wft;
-			if (expandedWorkflowTaskId !== wft.id) {
-				expandedWorkflowTaskId = undefined;
+			if (expandedWorkflowTask && expandedWorkflowTask.id !== wft.id) {
+				expandedWorkflowTask = undefined;
 			}
 		}
 		preventedSelectedTaskChange = undefined;
@@ -389,14 +389,17 @@
 	}
 
 	/**
-	 * @param {number} workflowTaskId
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 */
-	async function loadHistoryRunStatuses(workflowTaskId, animate = true) {
+	async function loadHistoryRunStatuses(workflowTask, animate = true) {
+		if (!selectedWorkflowTask || selectedWorkflowTask.id !== workflowTask.id) {
+			await setSelectedWorkflowTask(workflowTask);
+		}
 		historyRunStatuses = [];
-		expandedWorkflowTaskId = workflowTaskId;
+		expandedWorkflowTask = workflowTask;
 		loadingHistoryRunStatuses = animate;
 		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
+			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTask.id}&dataset_id=${selectedDatasetId}`
 		);
 		if (!response.ok) {
 			loadingHistoryRunStatuses = false;
@@ -445,7 +448,7 @@
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = { ...job, task_statuses: {} };
 		selectedHistoryRun = undefined;
-		expandedWorkflowTaskId = undefined;
+		expandedWorkflowTask = undefined;
 		await loadJobsStatus();
 	}
 
@@ -528,7 +531,7 @@
 	let statusWatcherTimer;
 
 	async function selectedDatasetChanged() {
-		expandedWorkflowTaskId = undefined;
+		expandedWorkflowTask = undefined;
 		showMissingStatusesWarning = false;
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
@@ -571,8 +574,8 @@
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 			// reload run statuses, if one task is expanded
-			if (expandedWorkflowTaskId !== undefined) {
-				loadHistoryRunStatuses(expandedWorkflowTaskId, false);
+			if (expandedWorkflowTask !== undefined) {
+				await loadHistoryRunStatuses(expandedWorkflowTask, false);
 			}
 		}
 	}
@@ -1008,86 +1011,98 @@
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 					{:else}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
-							{#each workflow.task_list as workflowTask (workflowTask.id)}
-								<button
-									style="cursor: pointer"
-									class="list-group-item list-group-item-action"
-									class:active={selectedWorkflowTask !== undefined &&
-										selectedWorkflowTask.id === workflowTask.id}
-									data-fs-target={workflowTask.id}
-									onclick={(e) => {
-										e.preventDefault();
-										setSelectedWorkflowTask(workflowTask);
-									}}
-								>
-									{#if statuses[workflowTask.id]}
-										{#if expandedWorkflowTaskId === workflowTask.id && loadingHistoryRunStatuses}
-											<span
-												class="spinner-border spinner-border-sm p-0"
-												role="status"
-												aria-hidden="true"
-											></span>
-										{:else if expandedWorkflowTaskId === workflowTask.id}
-											<!-- svelte-ignore node_invalid_placement_ssr -->
-											<button
-												aria-label="Hide runs"
-												class="btn btn-link p-0 text-white"
-												onclick={() => (expandedWorkflowTaskId = undefined)}
-											>
-												<i class="bi bi-caret-down-fill"></i>
-											</button>
-										{:else}
-											<!-- svelte-ignore node_invalid_placement_ssr -->
-											<button
-												aria-label="Show runs"
-												class="btn btn-link p-0"
-												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
-												onclick={() => loadHistoryRunStatuses(workflowTask.id)}
-											>
-												<i class="bi bi-caret-right-fill"></i>
-											</button>
+							{#each workflow.task_list as workflowTask, i (workflowTask.id)}
+								<div class="wft-item">
+									<div
+										class="list-group-item list-group-item-action border-0 pe-2 clearfix"
+										class:border-top={i > 0}
+										class:rounded-bottom={i === workflow.task_list.length - 1 &&
+											(!expandedWorkflowTask || expandedWorkflowTask.id !== workflowTask.id)}
+										class:active={selectedWorkflowTask !== undefined &&
+											selectedWorkflowTask.id === workflowTask.id}
+									>
+										<button
+											type="button"
+											class="btn py-0 wft-item-btn"
+											data-fs-target={workflowTask.id}
+											onclick={async () => {
+												await setSelectedWorkflowTask(workflowTask);
+											}}
+										>
+											{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
+										</button>
+										<span class="float-end ps-2 status-buttons">
+											{#if selectedDataset}
+												{#if !showMissingStatusesWarning && imagesStatusModal}
+													<ImagesStatus
+														status={statuses[workflowTask.id]}
+														dataset={selectedDataset}
+														{workflowTask}
+														{imagesStatusModal}
+														running={workflowTask.id === runningTaskId}
+													/>
+												{/if}
+											{/if}
+										</span>
+										{#if newVersionsMap[workflowTask.task.id]?.length > 0}
+											<span class="float-end text-info me-1" title="New version available.">
+												<i class="bi bi-arrow-up-circle-fill"></i>
+											</span>
 										{/if}
-									{/if}
-									{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
-									<span class="float-end ps-2">
-										{#if selectedDataset}
-											{#if !showMissingStatusesWarning && imagesStatusModal}
-												<ImagesStatus
-													status={statuses[workflowTask.id]}
-													dataset={selectedDataset}
-													{workflowTask}
-													{imagesStatusModal}
-													running={workflowTask.id === runningTaskId}
-												/>
+										{#if workflowTask.warning}
+											<span class="float-end text-warning me-1" title={workflowTask.warning}>
+												<i class="bi bi-ban-fill"></i>
+											</span>
+										{/if}
+										{#if hasWarnings(statuses[workflowTask.id])}
+											<span class="float-end text-secondary me-1" title="There are warnings.">
+												<i class="bi bi-exclamation-triangle-fill"></i>
+											</span>
+										{/if}
+									</div>
+									<div class="wft-expander">
+										{#if statuses[workflowTask.id]}
+											{#if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id && loadingHistoryRunStatuses}
+												<span
+													class="spinner-border spinner-border-sm p-0"
+													role="status"
+													aria-hidden="true"
+												></span>
+											{:else if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
+												<button
+													aria-label="Hide runs"
+													class="btn btn-link p-0 text-white"
+													onclick={() => (expandedWorkflowTask = undefined)}
+												>
+													<i class="bi bi-caret-down-fill"></i>
+												</button>
+											{:else}
+												<button
+													aria-label="Show runs"
+													class="btn btn-link p-0"
+													class:text-white={selectedWorkflowTask?.id === workflowTask.id}
+													onclick={() => loadHistoryRunStatuses(workflowTask)}
+												>
+													<i class="bi bi-caret-right-fill"></i>
+												</button>
 											{/if}
 										{/if}
-									</span>
-									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
-										<span class="float-end text-info me-1" title="New version available.">
-											<i class="bi bi-arrow-up-circle-fill"></i>
-										</span>
-									{/if}
-									{#if workflowTask.warning}
-										<span class="float-end text-warning me-1" title={workflowTask.warning}>
-											<i class="bi bi-ban-fill"></i>
-										</span>
-									{/if}
-									{#if hasWarnings(statuses[workflowTask.id])}
-										<span class="float-end text-secondary me-1" title="There are warnings.">
-											<i class="bi bi-exclamation-triangle-fill"></i>
-										</span>
-									{/if}
-								</button>
+									</div>
+								</div>
 								{#each historyRunStatuses as status, index (status.id)}
-									{#if !loadingHistoryRunStatuses && expandedWorkflowTaskId === workflowTask.id}
-										<button
+									{#if !loadingHistoryRunStatuses && expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
+										<div
 											transition:slide
-											class="run-item list-group-item list-group-item-action"
+											class="run-item list-group-item list-group-item-action border-top pe-2"
 											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
-											style="padding-left: 38px"
-											onclick={() => selectHistoryRun(status)}
 										>
-											Run {index + 1}
+											<button
+												class="btn run-item-btn"
+												type="button"
+												onclick={() => selectHistoryRun(status)}
+											>
+												Run {index + 1}
+											</button>
 											<span class="float-end ps-2">
 												{#if selectedDataset && runStatusModal}
 													<RunStatus
@@ -1099,7 +1114,7 @@
 													/>
 												{/if}
 											</span>
-										</button>
+										</div>
 									{/if}
 								{/each}
 							{/each}
@@ -1547,11 +1562,80 @@
 <CompareWorkflowTemplateModal bind:this={compareWorkflowToTemplateModal} {workflow} />
 
 <style>
+	.wft-item {
+		position: relative;
+	}
+
+	.wft-item .list-group-item {
+		padding-left: 27px;
+	}
+
+	.wft-item-btn {
+		position: relative;
+		border: 0 !important;
+		z-index: 200;
+		text-align: start;
+		display: contents;
+		word-break: break-word;
+		box-sizing: border-box;
+	}
+	.wft-item-btn::before {
+		content: '';
+		cursor: pointer;
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+	.active .wft-item-btn {
+		color: #fff;
+	}
+
+	.wft-expander {
+		position: absolute;
+		top: calc(50% - 13px);
+		left: 5px;
+		z-index: 300;
+	}
+
+	.status-buttons {
+		position: relative;
+		z-index: 300;
+	}
+
 	.run-item {
+		position: relative;
 		padding-left: 38px;
 	}
 	.run-item.active {
 		background-color: #4e95ff !important;
+	}
+	.run-item.active .run-item-btn {
+		color: #fff;
+	}
+	.run-item-btn {
+		position: relative;
+		border: 0 !important;
+		z-index: 200;
+		text-align: start;
+		display: contents;
+		word-break: break-word;
+		box-sizing: border-box;
+	}
+	.run-item-btn::before {
+		content: '';
+		cursor: pointer;
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+	:global(.status-modal-btn) {
+		z-index: 300;
 	}
 
 	:global(.status-icon) {
