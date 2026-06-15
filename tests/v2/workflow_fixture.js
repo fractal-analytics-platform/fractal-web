@@ -1,4 +1,5 @@
-import { test as baseTest, mergeTests } from '@playwright/test';
+import { mergeTests } from '@playwright/test';
+import { test as baseTest, checkAccessibility } from '../base_fixture';
 import { addTaskToWorkflow, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { createWorkflow, deleteWorkflow } from '../utils/v2/workflow';
 import { PageWithProject } from './project_fixture.js';
@@ -97,17 +98,30 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 }
 
+/**
+ * @typedef {Object} WorkflowFixture
+ * @property {(params: { page: any, makeAxeBuilder: () => {analyze: () => Promise<import('axe-core').AxeResults>} }, use: any) => Promise<void>} workflow
+ */
+
+/**
+ * @type {import('@playwright/test').TestType<
+ *   import('@playwright/test').PlaywrightTestArgs & import('@playwright/test').PlaywrightTestOptions &
+ *     { workflow: PageWithWorkflow },
+ *   import('@playwright/test').PlaywrightWorkerArgs & import('@playwright/test').PlaywrightWorkerOptions
+ * >}
+ */
 const workflowTest = baseTest.extend(
-	/** @type {any} */ ({
-		workflow: async ({ page }, use) => {
+	/** @type {WorkflowFixture} */ ({
+		workflow: async ({ page, makeAxeBuilder }, use) => {
 			const project = await createProject(page);
 			const workflow = await createWorkflow(page, project.id);
 			const p = new PageWithWorkflow(page, project, workflow);
 			await use(p);
 			await p.deleteProject();
+			await checkAccessibility(makeAxeBuilder);
 		}
 	})
 );
 
-export const test = /** @type {any} */ (mergeTests(baseTest, workflowTest));
+export const test = mergeTests(baseTest, workflowTest);
 export const expect = test.expect;
