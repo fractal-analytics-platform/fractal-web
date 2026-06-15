@@ -314,6 +314,11 @@
 		background-color: #eee;
 		border-bottom-width: 3px;
 		border-bottom-style: solid;
+		color: #0a59cc;
+	}
+
+	.nav-link {
+		color: #0769f9;
 	}
 
 	.nav-link.admin-active {
