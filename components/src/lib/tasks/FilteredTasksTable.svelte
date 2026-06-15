@@ -132,10 +132,7 @@
 	 * @returns {boolean}
 	 */
 	function onlyCoreMatch(row) {
-		if (!coreTasksOnly) {
-			return true;
-		}
-		return row.is_core;
+		return coreTasksOnly ? row.is_core : true;
 	}
 
 	/**
