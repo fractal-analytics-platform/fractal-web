@@ -33,6 +33,9 @@
 
 	let processingCsv = $state(false);
 
+	/** @type {number[]}*/
+	let selectedTasks = $state([]);
+
 	function getBaseTasksSearchUrl() {
 		const url = new URL('/api/admin/v2/task', window.location.origin);
 		if (name) {
@@ -62,6 +65,7 @@
 	 */
 	async function searchTasks(selectedPage, selectedPageSize) {
 		searching = true;
+		selectedTasks = [];
 		try {
 			if (searchErrorAlert) {
 				searchErrorAlert.hide();
@@ -90,16 +94,16 @@
 	}
 
 	/**
-	 * @param {number} taskId
+	 * @param {number[]} taskIds
 	 */
-	async function makeCore(taskId) {
+	async function makeCore(taskIds) {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/admin/v2/task/make-core', {
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: normalizePayload([taskId])
+			body: normalizePayload(taskIds)
 		});
 		if (!response.ok) {
 			searchErrorAlert = displayStandardErrorAlert(
@@ -110,7 +114,7 @@
 		} else {
 			if (results) {
 				results.items = results.items.map((item) => {
-					if (item.task.id === taskId) {
+					if (taskIds.includes(item.task.id)) {
 						return {
 							...item,
 							task: {
@@ -126,16 +130,16 @@
 	}
 
 	/**
-	 * @param {number} taskId
+	 * @param {number[]} taskIds
 	 */
-	async function makeNotCore(taskId) {
+	async function makeNotCore(taskIds) {
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/admin/v2/task/make-not-core', {
 			method: 'POST',
 			credentials: 'include',
 			headers,
-			body: normalizePayload([taskId])
+			body: normalizePayload(taskIds)
 		});
 		if (!response.ok) {
 			searchErrorAlert = displayStandardErrorAlert(
@@ -146,7 +150,7 @@
 		} else {
 			if (results) {
 				results.items = results.items.map((item) => {
-					if (item.task.id === taskId) {
+					if (taskIds.includes(item.task.id)) {
 						return {
 							...item,
 							task: {
@@ -176,6 +180,7 @@
 		currentPage = 1;
 		totalCount = 0;
 		pageSize = 50;
+		selectedTasks = [];
 	}
 
 	/**
@@ -256,6 +261,17 @@
 		downloadBlob(csv, 'tasks.csv', 'text/csv;charset=utf-8;');
 
 		processingCsv = false;
+	}
+
+	/**
+	 * @param {number} taskId
+	 */
+	function selectTask(taskId) {
+		if (selectedTasks.includes(taskId)) {
+			selectedTasks = selectedTasks.filter((t) => t !== taskId);
+		} else {
+			selectedTasks = [...selectedTasks, taskId];
+		}
 	}
 </script>
 
@@ -389,6 +405,26 @@
 		{#if results && results.items.length > 0}
 			<div class="d-flex justify-content-end align-items-center mb-3">
 				<div>
+					{#if selectedTasks.length > 0}
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								await makeCore(selectedTasks);
+							}}
+						>
+							<i class="bi bi-patch-check-fill verified-core-icon"></i>
+							Make core
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								await makeNotCore(selectedTasks);
+							}}
+						>
+							<i class="bi bi-patch-check text-secondary"></i>
+							Make not core
+						</button>
+					{/if}
 					<button class="btn btn-outline-secondary" onclick={downloadCSV} disabled={processingCsv}>
 						{#if processingCsv}
 							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
@@ -402,7 +438,8 @@
 			</div>
 			<table class="table tasks-table mt-3 mb-4">
 				<colgroup>
-					<col width="60" />
+					<col width="30" />
+					<col width="50" />
 					<col width="30" />
 					<col width="auto" />
 					<col width="90" />
@@ -413,6 +450,7 @@
 				</colgroup>
 				<thead>
 					<tr>
+						<th></th>
 						<th>Id</th>
 						<th></th>
 						<th>Name</th>
@@ -426,6 +464,15 @@
 				<tbody>
 					{#each results.items as taskInfo, taskInfoIndex (taskInfoIndex)}
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
+							<td>
+								<input
+									id="selector-{taskInfo.task.id}"
+									type="checkbox"
+									class="form-check-input"
+									onchange={() => selectTask(taskInfo.task.id)}
+									checked={selectedTasks.includes(taskInfo.task.id)}
+								/>
+							</td>
 							<td>{taskInfo.task.id}</td>
 							<td class="task-core-col">
 								<button
@@ -437,9 +484,9 @@
 										: 'The task is not core. Click to make it core.'}
 									onclick={async () => {
 										if (taskInfo.task.is_core) {
-											await makeNotCore(taskInfo.task.id);
+											await makeNotCore([taskInfo.task.id]);
 										} else {
-											await makeCore(taskInfo.task.id);
+											await makeCore([taskInfo.task.id]);
 										}
 									}}
 								>
