@@ -109,7 +109,7 @@
 					})
 					.filter((task) => task.taskVersions.length > 0)
 			}))
-			.filter((row) => row.tasks.length > 0);
+			.filter((r) => r.tasks.length > 0);
 	}
 
 	/**
