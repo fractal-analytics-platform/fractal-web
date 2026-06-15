@@ -36,6 +36,15 @@
 	/** @type {number[]}*/
 	let selectedTasks = $state([]);
 
+	let allIds = $derived(results?.items.map((taskInfo) => taskInfo.task.id) ?? []);
+	let allSelected = $derived.by(() => {
+		if (allIds.length !== selectedTasks.length) {
+			return false;
+		}
+		const selectedSet = new Set(selectedTasks);
+		return allIds.every((id) => selectedSet.has(id));
+	});
+
 	function getBaseTasksSearchUrl() {
 		const url = new URL('/api/admin/v2/task', window.location.origin);
 		if (name) {
@@ -450,7 +459,22 @@
 				</colgroup>
 				<thead>
 					<tr>
-						<th></th>
+						<th>
+							<input
+								id="selector-all"
+								type="checkbox"
+								class="form-check-input"
+								onchange={(event) => {
+									if (event.currentTarget.checked) {
+										selectedTasks = allIds;
+									} else {
+										selectedTasks = [];
+									}
+								}}
+								checked={allSelected}
+								title={allSelected ? 'Deselect all' : 'Select all'}
+							/>
+						</th>
 						<th>Id</th>
 						<th></th>
 						<th>Name</th>
