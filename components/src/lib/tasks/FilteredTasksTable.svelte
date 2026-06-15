@@ -112,9 +112,12 @@
 										: taskVersions[0].version,
 									taskVersions
 								}
-							: null;
+							: {
+									selectedVersion: task.selectedVersion,
+									taskVersions: []
+								};
 					})
-					.filter(Boolean)
+					.filter((task) => task.taskVersions.length > 0)
 			}))
 			.filter((row) => row.tasks.length > 0);
 	}
