@@ -97,41 +97,26 @@
 	}
 
 	function filterRows() {
-		let rows = [];
-		for (let i = 0; i < allRows.length; i++) {
-			let row = {
-				pkg_name: allRows[i].pkg_name,
-				tasks: []
-			};
-
-			for (let j = 0; j < allRows[i].tasks.length; j++) {
-				let task = {
-					selectedVersion: allRows[i].tasks[j].selectedVersion,
-					taskVersions: []
-				};
-
-				for (let k = 0; k < allRows[i].tasks[j].taskVersions.length; k++) {
-					if (filterRow(allRows[i].tasks[j].taskVersions[k])) {
-						task.taskVersions.push(allRows[i].tasks[j].taskVersions[k]);
-					}
-				}
-
-				if (task.taskVersions.length > 0) {
-					if (
-						!task.taskVersions.some((taskVersion) => taskVersion.version === task.selectedVersion)
-					) {
-						task.selectedVersion = task.taskVersions[0].version;
-					}
-					row.tasks.push(task);
-				}
-			}
-
-			if (row.tasks.length > 0) {
-				rows.push(row);
-			}
-		}
-
-		filteredRows = rows;
+		filteredRows = allRows
+			.map((row) => ({
+				pkg_name: row.pkg_name,
+				tasks: row.tasks
+					.map((task) => {
+						const taskVersions = task.taskVersions.filter(filterRow);
+						return taskVersions.length > 0
+							? {
+									selectedVersion: taskVersions.some(
+										(taskVersion) => taskVersion.version === task.selectedVersion
+									)
+										? task.selectedVersion
+										: taskVersions[0].version,
+									taskVersions
+								}
+							: null;
+					})
+					.filter(Boolean)
+			}))
+			.filter((row) => row.tasks.length > 0);
 	}
 
 	/**
