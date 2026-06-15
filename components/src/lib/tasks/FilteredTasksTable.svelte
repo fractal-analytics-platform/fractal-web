@@ -103,19 +103,9 @@
 				tasks: row.tasks
 					.map((task) => {
 						const taskVersions = task.taskVersions.filter(filterRow);
-						return taskVersions.length > 0
-							? {
-									selectedVersion: taskVersions.some(
-										(taskVersion) => taskVersion.version === task.selectedVersion
-									)
-										? task.selectedVersion
-										: taskVersions[0].version,
-									taskVersions
-								}
-							: {
-									selectedVersion: task.selectedVersion,
-									taskVersions: []
-								};
+						const selectedVersion =
+							taskVersions.length > 0 ? taskVersions[0].version : task.selectedVersion;
+						return { selectedVersion, taskVersions };
 					})
 					.filter((task) => task.taskVersions.length > 0)
 			}))
