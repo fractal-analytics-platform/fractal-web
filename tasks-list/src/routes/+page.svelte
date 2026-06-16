@@ -4,14 +4,10 @@
 	import { formatMarkdown } from 'fractal-components';
 	import { Modal } from 'bootstrap';
 	import 'slim-select/styles';
-	import { page } from '$app/state';
 
 	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = $state(null);
 	let modalText = $state('');
-
-	/** @type {string} */
-	const showOnlyCoreFiltering = $derived(page.data.showOnlyCoreFiltering);
 
 	/**
 	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
@@ -35,7 +31,7 @@
 	}
 </script>
 
-<FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true} {showOnlyCoreFiltering}>
+<FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true} showOnlyCoreFiltering={false}>
 	{#snippet extraColumnsColgroup()}
 		<col width="60" />
 		<col width="60" />
