@@ -40,12 +40,22 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
+	/**
+	 * @param {KeyboardEvent} event
+	 */
+	function handleKeydown(event) {
+		if (event.key === 'Escape') {
+			getBootstrapModal().hide();
+		}
+	}
+
 	onMount(async () => {
 		const modal = document.getElementById(id);
 		if (modal) {
 			modal.addEventListener('show.bs.modal', () => {
 				hideErrorAlert();
 				onOpen();
+				document.addEventListener('keydown', handleKeydown);
 			});
 			modal.addEventListener('shown.bs.modal', async () => {
 				await tick();
@@ -60,7 +70,10 @@
 					restoreModalFocus();
 				}
 			});
-			modal.addEventListener('hidden.bs.modal', onClose);
+			modal.addEventListener('hidden.bs.modal', () => {
+				onClose();
+				document.removeEventListener('keydown', handleKeydown);
+			});
 		}
 	});
 
@@ -149,7 +162,13 @@
 <!-- (see https://stackoverflow.com/a/12630531) -->
 <!-- Note: data-bs-focus="false" is needed to avoid conflicts with slim-select -->
 <!-- (see https://github.com/brianvoe/slim-select/issues/475#issuecomment-1736440245) -->
-<div class="modal {size ? 'modal-' + size : ''}" {id} tabindex="-1" data-bs-focus={focus}>
+<div
+	class="modal {size ? 'modal-' + size : ''}"
+	{id}
+	tabindex="-1"
+	data-bs-focus={focus}
+	aria-modal="true"
+>
 	<div
 		class="modal-dialog"
 		class:modal-fullscreen={fullscreen}
