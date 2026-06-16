@@ -19,13 +19,13 @@
 		"build"
 	],
 	"peerDependencies": {
-		"svelte": "^5.56.2",
+		"svelte": "^5.56.3",
 		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "^1.13.1"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.63.0",
+		"@sveltejs/kit": "^2.64.0",
 		"@sveltejs/package": "^2.5.8",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@types/bootstrap": "^5.2.11",
@@ -34,7 +34,7 @@
 		"eslint-plugin-svelte": "^3.19.0",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
-		"svelte": "^5.56.2",
+		"svelte": "^5.56.3",
 		"svelte-check": "^4.6.0",
 		"svelte-preprocess": "^6.0.5",
 		"tslib": "^2.8.1",
