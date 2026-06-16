@@ -57,19 +57,14 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
 		// check images and selected filters
-		await expectSlimSelectNotSet(page, 'Selector for attribute a1');
-		await expectSlimSelectValue(page, 'Selector for type t1', 'True');
+		await expectSlimSelectNotSet(page, 'a1');
+		await expectSlimSelectValue(page, 't1', 'True');
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
 		await expect(page.getByText('Total results: 2')).toBeVisible();
 	});
 
 	await test.step('Add a filter and click on Run without clicking Apply', async () => {
-		await selectSlimSelect(
-			page,
-			page.getByRole('combobox', { name: 'Selector for attribute a1' }),
-			'v1',
-			true
-		);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'a1' }), 'v1', true);
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeEnabled();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 	});
@@ -82,8 +77,8 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 
 	await test.step('Click cancel and check that filters have been reset', async () => {
 		await modal.getByRole('button', { name: 'Cancel' }).click();
-		await expectSlimSelectNotSet(page, 'Selector for attribute a1');
-		await expectSlimSelectValue(page, 'Selector for type t1', 'True');
+		await expectSlimSelectNotSet(page, 'a1');
+		await expectSlimSelectValue(page, 't1', 'True');
 		await expect(page.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeDisabled();
 	});

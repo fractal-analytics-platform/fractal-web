@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Remove Node 20 support (\#1166);
+
 # 1.28.1
 
 - Fix bug when opening history unit log files (\#1164).

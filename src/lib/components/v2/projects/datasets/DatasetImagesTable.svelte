@@ -277,8 +277,7 @@
 				showSearch: true,
 				allowDeselect: true,
 				isMultiple: true,
-				closeOnSelect: false,
-				ariaLabel: `Selector for attribute ${key === '__wftask_dataset_image_status__' ? 'Status' : key}`
+				closeOnSelect: false
 			},
 			events: {
 				beforeChange: () => {
@@ -313,8 +312,7 @@
 			settings: {
 				maxValuesShown: 5,
 				showSearch: false,
-				allowDeselect: true,
-				ariaLabel: `Selector for type ${key}`
+				allowDeselect: true
 			},
 			events: {
 				beforeChange: () => {

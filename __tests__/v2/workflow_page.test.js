@@ -44,77 +44,72 @@ vi.mock('$env/dynamic/public', () => {
 // The component to be tested must be imported after the mock setup
 import page from '../../src/routes/v2/projects/[projectId]/workflows/[workflowId]/+page.svelte';
 
-const isNode20 = typeof process !== 'undefined' && process.versions?.node?.startsWith('20.');
-
 describe('Workflow page', () => {
 	beforeEach(() => {
 		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 	});
 
-	it.skipIf(isNode20)(
-		'Display error when submission failed before starting execution of tasks',
-		async () => {
-			/** @type {import('vitest').Mock} */ (fetch).mockImplementation((url) => {
-				return Promise.resolve({
-					ok: true,
-					status: 200,
-					json: async () => {
-						switch (url) {
-							case '/api/v2/project/1/dataset/1':
-								return { id: 1, name: 'test' };
-							case '/api/v2/project/1/workflow/1/job':
-								return [
-									{
-										id: 1,
-										project_id: 1,
-										workflow_id: 1,
-										dataset_id: 1,
-										status: 'failed',
-										log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
-									}
-								];
-							case '/api/v2/project/1/latest-job?workflow_id=1&dataset_id=1':
-								return {
+	it('Display error when submission failed before starting execution of tasks', async () => {
+		/** @type {import('vitest').Mock} */ (fetch).mockImplementation((url) => {
+			return Promise.resolve({
+				ok: true,
+				status: 200,
+				json: async () => {
+					switch (url) {
+						case '/api/v2/project/1/dataset/1':
+							return { id: 1, name: 'test' };
+						case '/api/v2/project/1/workflow/1/job':
+							return [
+								{
 									id: 1,
 									project_id: 1,
 									workflow_id: 1,
 									dataset_id: 1,
 									status: 'failed',
-									log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test',
-									task_statuses: { 1: null } // status is null, since no tasks started
-								};
-							case '/api/auth/current-user':
-								return { slurm_accounts: [] };
-							case '/api/auth/current-user?group_ids_names=true':
-								return {
-									id: 1,
-									email: 'user@example.com',
-									is_active: true,
-									is_superuser: false,
-									is_verified: false,
-									is_guest: true,
-									group_ids_names: [],
-									oauth_accounts: [],
-									profile_id: 1,
-									project_dirs: ['/tmp'],
-									slurm_accounts: []
-								};
-							case '/api/v2/project/1/workflow/1/version-update-candidates':
-								return [];
-							default:
-								throw Error(`Unexpected API call: ${url}`);
-						}
+									log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test'
+								}
+							];
+						case '/api/v2/project/1/latest-job?workflow_id=1&dataset_id=1':
+							return {
+								id: 1,
+								project_id: 1,
+								workflow_id: 1,
+								dataset_id: 1,
+								status: 'failed',
+								log: 'Exception error occurred while creating job folder and subfolders.\nOriginal error: test',
+								task_statuses: { 1: null } // status is null, since no tasks started
+							};
+						case '/api/auth/current-user':
+							return { slurm_accounts: [] };
+						case '/api/auth/current-user?group_ids_names=true':
+							return {
+								id: 1,
+								email: 'user@example.com',
+								is_active: true,
+								is_superuser: false,
+								is_verified: false,
+								is_guest: true,
+								group_ids_names: [],
+								oauth_accounts: [],
+								profile_id: 1,
+								project_dirs: ['/tmp'],
+								slurm_accounts: []
+							};
+						case '/api/v2/project/1/workflow/1/version-update-candidates':
+							return [];
+						default:
+							throw Error(`Unexpected API call: ${url}`);
 					}
-				});
+				}
 			});
+		});
 
-			const result = render(page);
-			expect(
-				await result.findByText(/Exception error occurred while creating job folder and subfolders/)
-			).toBeDefined();
-			expect(
-				await result.findByText(/Some jobs ran for this workflow and dataset, but/)
-			).toBeDefined();
-		}
-	);
+		const result = render(page);
+		expect(
+			await result.findByText(/Exception error occurred while creating job folder and subfolders/)
+		).toBeDefined();
+		expect(
+			await result.findByText(/Some jobs ran for this workflow and dataset, but/)
+		).toBeDefined();
+	});
 });

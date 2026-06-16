@@ -92,38 +92,22 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	});
 
 	await test.step('Filter by string attribute', async () => {
-		await selectSlimSelect(
-			page,
-			page.getByRole('combobox', { name: 'Selector for attribute k1' }),
-			'v1'
-		);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'k1' }), 'v1');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Filter by numeric attribute', async () => {
-		await selectSlimSelect(
-			page,
-			page.getByRole('combobox', { name: 'Selector for attribute k2' }),
-			'42'
-		);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'k2' }), '42');
 		await searchImages(page, 1);
 	});
 
 	await test.step('Filter by false type', async () => {
-		await selectSlimSelect(
-			page,
-			page.getByRole('combobox', { name: 'Selector for type k3' }),
-			'False'
-		);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'k3' }), 'False');
 		await searchImages(page, 4);
 	});
 
 	await test.step('Filter by true type', async () => {
-		await selectSlimSelect(
-			page,
-			page.getByRole('combobox', { name: 'Selector for type k3' }),
-			'True'
-		);
+		await selectSlimSelect(page, page.getByRole('combobox', { name: 'k3' }), 'True');
 		await searchImages(page, 1);
 	});
 

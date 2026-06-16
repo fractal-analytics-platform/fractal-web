@@ -136,7 +136,9 @@ export async function expectSlimSelectValue(page, label, value) {
  * @returns {Promise<void>}
  */
 export async function expectSlimSelectNotSet(page, label, placeholder = 'All') {
-	await expect(page.getByLabel(label).locator('.ss-placeholder')).toHaveText(placeholder);
+	await expect(page.getByRole('combobox', { name: label }).locator('.ss-placeholder')).toHaveText(
+		placeholder
+	);
 }
 
 /**
