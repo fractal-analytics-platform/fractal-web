@@ -17,7 +17,7 @@
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
 	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
-	 * @property {string} showOnlyCoreFiltering
+	 * @property {boolean} showOnlyCoreFiltering
 	 */
 
 	/** @type {Props} */

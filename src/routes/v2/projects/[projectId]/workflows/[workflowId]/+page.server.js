@@ -9,7 +9,7 @@ const logger = getLogger('workflow page [v2]');
 export async function load({ fetch, params }) {
 	logger.trace('Load workflow page');
 
-	const showOnlyCoreFiltering = env.FRACTAL_DISPLAY_CORE_TASK_FILTER;
+	const showOnlyCoreFiltering = env.FRACTAL_DISPLAY_CORE_TASK_FILTER !== 'false';
 
 	const { projectId, workflowId } = params;
 

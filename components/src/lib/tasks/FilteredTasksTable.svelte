@@ -14,7 +14,7 @@
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
 	 * @property {import('svelte').Snippet} [extraColumnsHeader]
 	 * @property {import('svelte').Snippet<[import('../types/api').TasksTableRow]>} [extraColumns]
-	 * @property {string} showOnlyCoreFiltering
+	 * @property {boolean} showOnlyCoreFiltering
 	 */
 
 	/** @type {Props} */
@@ -406,7 +406,7 @@
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
 			</div>
-			{#if showOnlyCoreFiltering === 'true'}
+			{#if showOnlyCoreFiltering}
 				<div class="col-auto">
 					<div class="form-check form-switch">
 						<input

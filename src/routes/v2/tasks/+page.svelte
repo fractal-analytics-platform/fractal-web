@@ -8,7 +8,7 @@
 	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
 	const taskGroups = $derived(page.data.taskGroups || []);
 
-	/** @type {string} */
+	/** @type {boolean} */
 	const showOnlyCoreFiltering = $derived(page.data.showOnlyCoreFiltering);
 
 	/** @type {Modal|undefined} */

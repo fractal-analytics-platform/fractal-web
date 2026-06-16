@@ -31,7 +31,7 @@
 	}
 </script>
 
-<FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true} showOnlyCoreFiltering="false">
+<FilteredTasksTable taskGroups={tasks} showDocLinksInTable={true} showOnlyCoreFiltering={false}>
 	{#snippet extraColumnsColgroup()}
 		<col width="60" />
 		<col width="60" />

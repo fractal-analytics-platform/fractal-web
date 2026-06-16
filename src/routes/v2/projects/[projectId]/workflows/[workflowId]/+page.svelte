@@ -43,7 +43,7 @@
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
 
-	/** @type {string} */
+	/** @type {boolean} */
 	const showOnlyCoreFiltering = $derived(page.data.showOnlyCoreFiltering);
 
 	/** @type {import('fractal-components/types/api').WorkflowV2} */

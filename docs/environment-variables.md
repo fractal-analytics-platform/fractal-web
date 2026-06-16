@@ -28,7 +28,7 @@ The following environment variables can be used to configure fractal-web.
 - `PUBLIC_GUEST_USERNAME`: username for guest user;
 - `PUBLIC_GUEST_PASSWORD`: password for guest user;
 - `FRACTAL_HIDE_BASIC_AUTH`: hides the login form and the "Log in as guest" button; the default value is `false`;
-- `FRACTAL_DISPLAY_CORE_TASK_FILTER`: specifies whether or not to display the "Only core" filter on the user’s tasks page; accepted values: `true`, `false`;
+- `FRACTAL_DISPLAY_CORE_TASK_FILTER`: specifies whether or not to display the "Only core" filter on the user’s tasks page; accepted values: `true` (default), `false`;
 
 When running directly using `node` command these extra variables can also be configured:
 
