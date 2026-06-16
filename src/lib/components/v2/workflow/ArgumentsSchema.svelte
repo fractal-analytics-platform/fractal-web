@@ -315,4 +315,12 @@
 		margin-top: 5px;
 		border-top: 1px solid lightgray;
 	}
+
+	:global(.jschema-controls-bar .btn-outline-primary:not(:hover)) {
+		background-color: #fff;
+	}
+
+	:global(.jschema-controls-bar .btn-outline-primary:disabled) {
+		color: #062f6c;
+	}
 </style>

@@ -118,7 +118,7 @@
 	id="workflowJobLogsModal"
 	fullscreen={true}
 	bind:this={modal}
-	bodyCss="bg-tertiary text-secondary p-0 pt-2"
+	bodyCss="bg-tertiary p-0 pt-2"
 	{onClose}
 >
 	{#snippet header()}

@@ -1031,7 +1031,7 @@
 										>
 											{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
 										</button>
-										<span class="float-end ps-2 status-buttons">
+										<span class="float-end ms-2 status-buttons">
 											{#if selectedDataset}
 												{#if !showMissingStatusesWarning && imagesStatusModal}
 													<ImagesStatus
@@ -1050,14 +1050,28 @@
 											</span>
 										{/if}
 										{#if workflowTask.warning}
-											<span class="float-end text-warning me-1" title={workflowTask.warning}>
+											<button
+												type="button"
+												class="btn btn-link p-0 float-end text-warning me-1 wft-warning"
+												title={workflowTask.warning}
+												onclick={async () => {
+													await setSelectedWorkflowTask(workflowTask);
+												}}
+											>
 												<i class="bi bi-ban-fill"></i>
-											</span>
+											</button>
 										{/if}
 										{#if hasWarnings(statuses[workflowTask.id])}
-											<span class="float-end text-secondary me-1" title="There are warnings.">
+											<button
+												type="button"
+												class="btn btn-link p-0 float-end text-secondary me-1 wft-has-warnings"
+												title="There are warnings"
+												onclick={async () => {
+													await setSelectedWorkflowTask(workflowTask);
+												}}
+											>
 												<i class="bi bi-exclamation-triangle-fill"></i>
-											</span>
+											</button>
 										{/if}
 									</div>
 									<div class="wft-expander">
@@ -1647,11 +1661,28 @@
 	}
 
 	:global(.active .status-wrapper),
-	:global(.active .status-icon) {
+	:global(.active .status-icon),
+	:global(.active .wft-has-warnings) {
 		color: #fff !important;
+	}
+
+	.wft-warning,
+	.wft-has-warnings {
+		position: relative;
+		z-index: 300;
 	}
 
 	:global(.status-modal-btn:hover span) {
 		text-decoration: underline;
+	}
+
+	:global(.card-header .nav-link:not(.active)) {
+		color: #0d6af2;
+	}
+	:global(.alert.bg-light .text-danger) {
+		color: rgb(213, 51, 67) !important;
+	}
+	:global(.alert.bg-light .btn-outline-secondary:not(:hover)) {
+		background-color: #fff;
 	}
 </style>
