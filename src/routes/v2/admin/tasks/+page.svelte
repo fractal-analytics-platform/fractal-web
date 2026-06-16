@@ -370,9 +370,9 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="onlyCoreCheckbox">Only core</label>
+							<label for="onlyCoreCheckbox">Core only</label>
 						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
+						<div class="col-xl-8 col-lg-7 col-9 mt-2">
 							<input
 								id="onlyCoreCheckbox"
 								type="checkbox"

@@ -408,7 +408,7 @@
 			</div>
 			{#if showOnlyCoreFiltering}
 				<div class="col-auto">
-					<div class="form-check form-switch">
+					<div class="form-check form-switch mt-2">
 						<input
 							id="coreTasksOnly"
 							class="form-check-input"
