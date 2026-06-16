@@ -152,10 +152,9 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Wait job failure', async () => {
 		await waitTaskFailure(page);
-		const genericTaskButton = await page.getByRole('button', {
-			name: 'Show runs generic_task Failed'
-		});
-		await expect(genericTaskButton.locator('.bi-exclamation-triangle-fill')).toBeVisible();
+		const genericTaskButton = page.getByRole('button', { name: 'generic_task', exact: true });
+		const parent = genericTaskButton.locator('..');
+		await expect(parent.getByTitle(/There are warnings/)).toBeVisible();
 	});
 
 	await test.step('Open error modal', async () => {
@@ -167,7 +166,8 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: '... (details hidden, click' }).click();
 		const warningLine = page.getByText(/\[generic_task\] START/);
 		await expect(warningLine).toBeVisible();
-		await expect(warningLine).toHaveCSS('background-color', 'rgb(255, 243, 205)');
+		await expect(warningLine).toHaveClass(/warning-highlight/);
+		//await expect(warningLine).toHaveCSS('background-color', 'rgb(255, 243, 205)');
 
 		await modal.getByLabel('Close').click();
 		await waitModalClosed(page);
@@ -339,16 +339,17 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	await test.step('Test log button colors', async () => {
 		await page.goto(workflow.url);
 
-		await page.getByRole('button', { name: 'Show runs generic_task Done' }).click();
+		await page.getByRole('button', { name: 'generic_task', exact: true }).click();
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
 		await page.getByRole('combobox', { name: 'well', exact: true }).getByText('All').click();
 		await page.getByRole('option', { name: 'A01' }).click();
 		await page.getByRole('button', { name: 'Apply' }).click();
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
-		await page.getByRole('button', { name: 'Show runs generic_task Done' }).click();
+		await page.getByRole('button', { name: 'generic_task', exact: true }).click();
 		await page.getByRole('button', { name: 'Failed images', exact: true }).click();
 
 		const logsButtonRed = page.getByRole('button', { name: 'Logs' }).nth(0);
