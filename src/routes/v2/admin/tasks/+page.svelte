@@ -119,7 +119,6 @@
 				await getAlertErrorFromResponse(response),
 				'searchError'
 			);
-			return;
 		} else {
 			if (results) {
 				results.items = results.items.map((item) => {
@@ -155,7 +154,6 @@
 				await getAlertErrorFromResponse(response),
 				'searchError'
 			);
-			return;
 		} else {
 			if (results) {
 				results.items = results.items.map((item) => {
@@ -722,8 +720,6 @@
 		vertical-align: middle;
 		width: 1%;
 		white-space: nowrap;
-		/* padding-right: 0.35rem; */
-		/* margin-bottom: 2rem; */
 	}
 
 	.core-icon-button {
