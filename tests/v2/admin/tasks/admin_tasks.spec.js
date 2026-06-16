@@ -45,7 +45,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 		// Retrieve task id
-		id = await page.getByRole('row').last().getByRole('cell').first().innerText();
+		id = await page.getByRole('row').last().getByRole('cell').nth(1).innerText();
 		await reset(page);
 	});
 
