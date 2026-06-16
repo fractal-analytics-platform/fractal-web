@@ -316,7 +316,7 @@
 		border-top: 1px solid lightgray;
 	}
 
-	:global(.jschema-controls-bar .btn-outline-primary:not(:hover)) {
+	:global(.jschema-controls-bar .btn-outline-primary:not(:hover):not(:focus)) {
 		background-color: #fff;
 	}
 

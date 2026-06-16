@@ -323,6 +323,7 @@
 
 	.nav-link.admin-active {
 		background-color: #eee;
+		color: #0a59cc;
 	}
 
 	.admin-border {
@@ -366,5 +367,13 @@
 	:global(.vizarr-btn) {
 		background-image: url('$lib/assets/logo-vizarr.svg');
 		background-size: 80%;
+	}
+
+	:global(body) {
+		--ss-placeholder-color: #757575;
+	}
+
+	:global(.bg-light .text-danger) {
+		color: #d53343 !important;
 	}
 </style>

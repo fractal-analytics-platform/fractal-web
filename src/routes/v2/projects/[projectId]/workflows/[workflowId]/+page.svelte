@@ -1045,9 +1045,16 @@
 											{/if}
 										</span>
 										{#if newVersionsMap[workflowTask.task.id]?.length > 0}
-											<span class="float-end text-info me-1" title="New version available.">
+											<button
+												type="button"
+												class="btn btn-link p-0 float-end text-info me-1 btn-new-version"
+												onclick={async () => {
+													await setSelectedWorkflowTask(workflowTask);
+												}}
+												title="New version available."
+											>
 												<i class="bi bi-arrow-up-circle-fill"></i>
-											</span>
+											</button>
 										{/if}
 										{#if workflowTask.warning}
 											<button
@@ -1614,7 +1621,8 @@
 		z-index: 300;
 	}
 
-	.status-buttons {
+	.status-buttons,
+	.btn-new-version {
 		position: relative;
 		z-index: 300;
 	}
@@ -1682,7 +1690,7 @@
 	:global(.alert.bg-light .text-danger) {
 		color: rgb(213, 51, 67) !important;
 	}
-	:global(.alert.bg-light .btn-outline-secondary:not(:hover)) {
+	:global(.alert.bg-light .btn-outline-secondary:not(:hover):not(:focus)) {
 		background-color: #fff;
 	}
 </style>

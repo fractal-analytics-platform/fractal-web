@@ -127,11 +127,11 @@
 </script>
 
 <div class="row mt-3 mb-3">
-	<div class="col-md-3 col-lg-2 mt-2">User</div>
+	<div class="col-md-3 col-lg-2 mt-2" id="user-label">User</div>
 	<div class="col-md-9 col-lg-10">
 		<div class="row row-cols-md-auto">
 			<div class="col-12 mt-1">
-				<select class="form-select" bind:value={userId} id="user">
+				<select class="form-select" bind:value={userId} id="user" aria-labelledby="user-label">
 					<option value="">All</option>
 					{#each sortedUsers as user (user.id)}
 						<option value={user.id}>{user.email}</option>
@@ -149,15 +149,39 @@
 			<div class="col-12 mt-1">
 				<div class="input-group">
 					<div class="input-group-text">Min</div>
-					<input type="date" class="form-control" bind:value={dateMin} id="date_min" />
-					<input type="time" class="form-control" bind:value={timeMin} id="time_min" />
+					<input
+						type="date"
+						class="form-control"
+						bind:value={dateMin}
+						id="date_min"
+						aria-label="Date min"
+					/>
+					<input
+						type="time"
+						class="form-control"
+						bind:value={timeMin}
+						id="time_min"
+						aria-label="Time min"
+					/>
 				</div>
 			</div>
 			<div class="col-12 mt-1">
 				<div class="input-group">
 					<div class="input-group-text">Max</div>
-					<input type="date" class="form-control" bind:value={dateMax} id="date_max" />
-					<input type="time" class="form-control" bind:value={timeMax} id="time_max" />
+					<input
+						type="date"
+						class="form-control"
+						bind:value={dateMax}
+						id="date_max"
+						aria-label="Date max"
+					/>
+					<input
+						type="time"
+						class="form-control"
+						bind:value={timeMax}
+						id="time_max"
+						aria-label="Time max"
+					/>
 				</div>
 			</div>
 		</div>

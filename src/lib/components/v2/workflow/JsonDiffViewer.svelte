@@ -49,13 +49,13 @@
 	json-diff-viewer {
 		--add: #15803d;
 		--rem: #b91c1c;
-		--mod: #ca8a04;
+		--mod: #916303;
 		--bg: #f4f4f4;
 		--bg2: #f9fafb;
 		--bdr: #d1d5db;
 		--txt: #030712;
 		--dim: #4b5563;
-		--slider: #d1d5db;
+		--slider: #abb3be;
 		--key: #075985;
 		--str: #6d28d9;
 		--num: #047857;
