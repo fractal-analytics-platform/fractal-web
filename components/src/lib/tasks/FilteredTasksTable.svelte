@@ -468,7 +468,7 @@
 					{#each filteredRows as row, index (index)}
 						<tr class="border-top">
 							{#if selectable}<th></th>{/if}
-							<th>{row.pkg_name}</th>
+							<th colspan={selectable ? 4 : 3}>{row.pkg_name}</th>
 						</tr>
 						{#each row.tasks.map((tr) => getSelectedTask(tr)) as task, index (index)}
 							{#if task}
