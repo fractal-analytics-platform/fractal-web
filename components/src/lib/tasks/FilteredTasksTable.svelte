@@ -14,6 +14,7 @@
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
 	 * @property {import('svelte').Snippet} [extraColumnsHeader]
 	 * @property {import('svelte').Snippet<[import('../types/api').TasksTableRow]>} [extraColumns]
+	 * @property {string} showOnlyCoreFiltering
 	 */
 
 	/** @type {Props} */
@@ -22,6 +23,7 @@
 		showAuthorsInSeparateColumn = true,
 		showDocLinksInTable = false,
 		selectable = false,
+		showOnlyCoreFiltering,
 		selectedTasks = $bindable([]),
 		extraColumnsColgroup,
 		extraColumnsHeader,
@@ -404,20 +406,22 @@
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
 			</div>
-			<div class="col-auto">
-				<div class="form-check form-switch">
-					<input
-						id="coreTasksOnly"
-						class="form-check-input"
-						type="checkbox"
-						bind:checked={coreTasksOnly}
-					/>
-					<label class="form-check-label" for="coreTasksOnly">
-						<i class="bi bi-patch-check-fill verified-core-icon"></i>
-						Core only
-					</label>
+			{#if showOnlyCoreFiltering === 'true'}
+				<div class="col-auto">
+					<div class="form-check form-switch">
+						<input
+							id="coreTasksOnly"
+							class="form-check-input"
+							type="checkbox"
+							bind:checked={coreTasksOnly}
+						/>
+						<label class="form-check-label" for="coreTasksOnly">
+							<i class="bi bi-patch-check-fill verified-core-icon"></i>
+							Core only
+						</label>
+					</div>
 				</div>
-			</div>
+			{/if}
 		</div>
 	</div>
 </div>

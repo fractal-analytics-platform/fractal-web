@@ -8,6 +8,9 @@
 	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
 	const taskGroups = $derived(page.data.taskGroups || []);
 
+	/** @type {string} */
+	const showOnlyCoreFiltering = $derived(page.data.showOnlyCoreFiltering);
+
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
@@ -54,7 +57,7 @@
 {/if}
 
 <div class="container mt-2">
-	<FilteredTasksTable {taskGroups} {showDocLinksInTable}>
+	<FilteredTasksTable {taskGroups} {showDocLinksInTable} {showOnlyCoreFiltering}>
 		{#snippet extraColumnsColgroup()}
 			<col width="60" />
 		{/snippet}

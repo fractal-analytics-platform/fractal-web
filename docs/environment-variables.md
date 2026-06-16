@@ -28,12 +28,13 @@ The following environment variables can be used to configure fractal-web.
 - `PUBLIC_GUEST_USERNAME`: username for guest user;
 - `PUBLIC_GUEST_PASSWORD`: password for guest user;
 - `FRACTAL_HIDE_BASIC_AUTH`: hides the login form and the "Log in as guest" button; the default value is `false`;
+- `FRACTAL_DISPLAY_CORE_TASK_FILTER`: specifies whether or not to display the "Only core" filter on the user’s tasks page; accepted values: `true`, `false`;
 
 When running directly using `node` command these extra variables can also be configured:
 
 - `PORT`: specifies the port where Svelte server will run; the default value is 5173;
 - `ORIGIN` the URL where the app will be served (e.g. http://localhost:5173, or https://subdomain.example.org);
-- `BODY_SIZE_LIMIT`: the maximum request body size accepted in bytes; see [official SvelteKit documentation](https://svelte.dev/docs/kit/adapter-node#Environment-variables-BODY_SIZE_LIMIT).
+- `BODY_SIZE_LIMIT`: the maximum request body size accepted in bytes; see [official SvelteKit documentation](https://svelte.dev/docs/kit/adapter-node#Environment-variables-BODY_SIZE_LIMIT)."
 
 ## Common issues related to environment variables
 
