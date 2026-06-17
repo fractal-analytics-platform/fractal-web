@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../base_fixture';
 import { login, waitPageLoading } from '../utils/utils.js';
 
 // Reset storage state for this file to avoid being authenticated

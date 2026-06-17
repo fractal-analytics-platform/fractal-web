@@ -20,6 +20,7 @@ export const test = base.extend(
 				new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
 
 			await use(makeAxeBuilder);
+			await checkAccessibility(makeAxeBuilder);
 		}
 	})
 );

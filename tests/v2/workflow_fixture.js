@@ -1,5 +1,5 @@
 import { mergeTests } from '@playwright/test';
-import { test as baseTest, checkAccessibility } from '../base_fixture';
+import { test as baseTest } from '../base_fixture';
 import { addTaskToWorkflow, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { createWorkflow, deleteWorkflow } from '../utils/v2/workflow';
 import { PageWithProject } from './project_fixture.js';
@@ -112,13 +112,12 @@ export class PageWithWorkflow extends PageWithProject {
  */
 const workflowTest = baseTest.extend(
 	/** @type {WorkflowFixture} */ ({
-		workflow: async ({ page, makeAxeBuilder }, use) => {
+		workflow: async ({ page }, use) => {
 			const project = await createProject(page);
 			const workflow = await createWorkflow(page, project.id);
 			const p = new PageWithWorkflow(page, project, workflow);
 			await use(p);
 			await p.deleteProject();
-			await checkAccessibility(makeAxeBuilder);
 		}
 	})
 );

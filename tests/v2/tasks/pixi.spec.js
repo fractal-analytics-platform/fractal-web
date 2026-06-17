@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../base_fixture';
 import { waitPageLoading } from '../../utils/utils.js';
 import path from 'path';
 import os from 'os';

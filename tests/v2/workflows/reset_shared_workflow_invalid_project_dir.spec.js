@@ -13,7 +13,8 @@ import { createProject, deleteProject } from '../../utils/v2/project.js';
 import { createTestUser } from '../../utils/v2/user.js';
 import { createWorkflow } from '../../utils/v2/workflow.js';
 import { waitTasksSuccess, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../base_fixture';
 
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });

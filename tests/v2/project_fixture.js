@@ -1,5 +1,5 @@
 import { mergeTests } from '@playwright/test';
-import { test as baseTest, checkAccessibility } from '../base_fixture';
+import { test as baseTest } from '../base_fixture';
 import { createProject, deleteProject as _deleteProject } from '../utils/v2/project';
 
 export class PageWithProject {
@@ -33,12 +33,11 @@ export class PageWithProject {
  */
 const projectTest = baseTest.extend(
 	/** @type {ProjectFixture} */ ({
-		project: async ({ page, makeAxeBuilder }, use) => {
+		project: async ({ page }, use) => {
 			const project = await createProject(page);
 			const p = new PageWithProject(page, project);
 			await use(p);
 			await p.deleteProject();
-			await checkAccessibility(makeAxeBuilder);
 		}
 	})
 );

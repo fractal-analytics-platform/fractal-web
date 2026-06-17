@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../../base_fixture';
 import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import { PageWithWorkflow } from '../../workflow_fixture.js';
 import * as fs from 'fs';
