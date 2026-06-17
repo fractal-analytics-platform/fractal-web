@@ -43,6 +43,9 @@
 	/** @type {number|undefined} */
 	const defaultDatasetId = $derived(page.data.defaultDatasetId);
 
+	/** @type {boolean} */
+	const showOnlyCoreFiltering = $derived(page.data.showOnlyCoreFiltering);
+
 	/** @type {import('fractal-components/types/api').WorkflowV2} */
 	let workflow = $state(page.data.workflow);
 	let project = $derived(workflow.project);
@@ -1346,7 +1349,12 @@
 	</div>
 {/if}
 
-<AddWorkflowTaskModal bind:this={addWorkflowTaskModal} {onWorkflowTaskAdded} {workflow} />
+<AddWorkflowTaskModal
+	bind:this={addWorkflowTaskModal}
+	{onWorkflowTaskAdded}
+	{workflow}
+	{showOnlyCoreFiltering}
+/>
 
 <ImagesStatusModal bind:this={imagesStatusModal} />
 <RunStatusModal bind:this={runStatusModal} />

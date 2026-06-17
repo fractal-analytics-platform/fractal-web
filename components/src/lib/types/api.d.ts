@@ -170,6 +170,7 @@ export type TaskV2 = {
 	name: string;
 	version: string;
 	type: TaskV2Type;
+	is_core: boolean;
 	command_non_parallel: string | null;
 	command_parallel: string | null;
 	input_types: { [key: string]: boolean };
@@ -328,6 +329,7 @@ type TaskV2Minimal = {
 	id: number;
 	name: string;
 	type: string;
+	is_core: boolean;
 	command_non_parallel: string | null;
 	command_parallel: string | null;
 	version: string | null;
@@ -371,6 +373,7 @@ export type TaskGroupV2 = {
 export type TaskSlim = {
 	id: number;
 	name: string;
+	is_core: boolean;
 	category: string | null;
 	modality: string | null;
 	authors: string | null;
@@ -403,6 +406,7 @@ export type TasksTableRowGroup = {
 export type TasksTableRow = {
 	pkg_name: string;
 	task_id: number;
+	is_core: boolean;
 	task_name: string;
 	version: string;
 	category: string | null;
