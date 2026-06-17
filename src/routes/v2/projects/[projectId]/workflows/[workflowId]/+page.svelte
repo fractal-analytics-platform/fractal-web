@@ -1632,10 +1632,13 @@
 		padding-left: 38px;
 	}
 	.run-item.active {
-		background-color: #4e95ff !important;
+		background-color: #c4dcff !important;
 	}
-	.run-item.active .run-item-btn {
-		color: #fff;
+	.run-item.active:hover {
+		color: #000;
+	}
+	.run-item.list-group-item.active {
+		border-color: #9dc4ff;
 	}
 	.run-item-btn {
 		position: relative;
@@ -1656,6 +1659,9 @@
 		width: 100%;
 		height: 100%;
 	}
+	:global(.run-item .status-icon.text-success) {
+		color: #136c43 !important;
+	}
 	:global(.status-modal-btn) {
 		z-index: 300;
 	}
@@ -1668,9 +1674,9 @@
 		display: block;
 	}
 
-	:global(.active .status-wrapper),
-	:global(.active .status-icon),
-	:global(.active .wft-has-warnings) {
+	:global(.wft-item .active .status-wrapper),
+	:global(.wft-item .active .status-icon),
+	:global(.wft-item .active .wft-has-warnings) {
 		color: #fff !important;
 	}
 
