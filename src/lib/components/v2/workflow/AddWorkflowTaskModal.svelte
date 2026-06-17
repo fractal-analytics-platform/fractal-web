@@ -17,10 +17,11 @@
 	 * @typedef {Object} Props
 	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
 	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
+	 * @property {boolean} showOnlyCoreFiltering
 	 */
 
 	/** @type {Props} */
-	let { workflow, onWorkflowTaskAdded } = $props();
+	let { workflow, onWorkflowTaskAdded, showOnlyCoreFiltering } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -225,6 +226,7 @@
 				{taskGroups}
 				showAuthorsInSeparateColumn={false}
 				selectable={true}
+				{showOnlyCoreFiltering}
 				bind:selectedTasks
 			>
 				{#snippet extraColumnsColgroup()}

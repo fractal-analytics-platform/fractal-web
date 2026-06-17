@@ -2,11 +2,14 @@ import { getWorkflow, getWorkflowJobs } from '$lib/server/api/v2/workflow_api';
 import { getProjectDatasets } from '$lib/server/api/v2/project_api';
 import { getDefaultWorkflowDataset } from '$lib/common/workflow_utilities';
 import { getLogger } from '$lib/server/logger.js';
+import { env } from '$env/dynamic/private';
 
 const logger = getLogger('workflow page [v2]');
 
 export async function load({ fetch, params }) {
 	logger.trace('Load workflow page');
+
+	const showOnlyCoreFiltering = env.FRACTAL_DISPLAY_CORE_TASK_FILTER !== 'false';
 
 	const { projectId, workflowId } = params;
 
@@ -19,6 +22,7 @@ export async function load({ fetch, params }) {
 	return {
 		workflow,
 		datasets,
-		defaultDatasetId
+		defaultDatasetId,
+		showOnlyCoreFiltering
 	};
 }

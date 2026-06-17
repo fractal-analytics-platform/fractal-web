@@ -29,7 +29,8 @@ const keys = [
 	'PUBLIC_FRACTAL_VOLE_VIEWER_URL',
 	'PUBLIC_FRACTAL_FEATURE_EXPLORER_URL',
 	'PUBLIC_GUEST_USERNAME',
-	'PUBLIC_GUEST_PASSWORD'
+	'PUBLIC_GUEST_PASSWORD',
+	'FRACTAL_DISPLAY_CORE_TASK_FILTER'
 ];
 
 const logLevels = ['all', 'mark', 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'off'];
@@ -39,6 +40,7 @@ export function checkEnvironmentVariables() {
 	checkServerHost();
 	checkAllowedValues('FRACTAL_DEFAULT_GROUP_NAME', ['All']);
 	checkAllowedValues('AUTH_COOKIE_SECURE', ['true', 'false']);
+	checkAllowedValues('FRACTAL_DISPLAY_CORE_TASK_FILTER', ['true', 'false']);
 	checkAllowedValues('AUTH_COOKIE_SAME_SITE', ['lax', 'strict', 'none']);
 	checkAllowedValues('LOG_LEVEL_FILE', logLevels);
 	checkAllowedValues('LOG_LEVEL_CONSOLE', logLevels);
