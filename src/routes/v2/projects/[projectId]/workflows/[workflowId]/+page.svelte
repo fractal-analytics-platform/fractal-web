@@ -1031,7 +1031,9 @@
 												</button>
 											{:else}
 												<button
-													aria-label="Show runs"
+													aria-label="Show runs for {workflowTask.alias
+														? workflowTask.alias
+														: workflowTask.task.name}"
 													class="btn btn-link p-0"
 													class:text-white={selectedWorkflowTask?.id === workflowTask.id}
 													onclick={() => loadHistoryRunStatuses(workflowTask)}
@@ -1665,6 +1667,7 @@
 	.run-item-btn:focus-visible {
 		box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 	}
+	:global(.status-wrapper.text-success),
 	:global(.run-item .status-icon.text-success) {
 		color: #136c43 !important;
 	}

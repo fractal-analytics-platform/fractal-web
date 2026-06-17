@@ -61,10 +61,10 @@ test('Workflow task runs on task without arguments', async ({ page, workflow }) 
 	});
 
 	await test.step('Check run arguments', async () => {
-		await page.getByLabel('Show runs').click();
-		await page.getByRole('button', { name: 'Run 1' }).click();
+		await page.getByLabel(`Show runs for ${taskName}`).click();
+		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
 		await expect(page.getByRole('textbox', { name: 'Argument value' })).toHaveValue('foo');
-		await page.getByRole('button', { name: 'Run 2' }).click();
+		await page.getByRole('button', { name: 'Run 2', exact: true }).click();
 		await expect(page.getByRole('textbox', { name: 'Argument value' })).toHaveValue('bar');
 	});
 

@@ -143,7 +143,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 			page.getByRole('button', { name: 'Edit workflow task description' })
 		).toBeVisible();
 
-		await page.getByRole('button', { name: 'Run 1' }).click();
+		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
 
 		await expectInfoTexts(page, v1Values, true);
 		await expectInfoTexts(page, v2Values, false);
@@ -153,7 +153,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 			page.getByRole('button', { name: 'Edit workflow task description' })
 		).not.toBeVisible();
 
-		await page.getByRole('button', { name: 'Run 2' }).click();
+		await page.getByRole('button', { name: 'Run 2', exact: true }).click();
 
 		await expectInfoTexts(page, v1Values, false);
 		await expectInfoTexts(page, v2Values, true);
