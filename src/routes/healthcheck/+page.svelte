@@ -140,17 +140,14 @@
 	}
 
 	async function getHealthCheckTask() {
-		const response = await fetch(`/api/v2/task?slim=true`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!response.ok) {
-			throw await getAlertErrorFromResponse(response);
+		const request = await fetch(`/api/v2/task-group?only_active=true&slim=true`);
+		if (!request.ok) {
+			throw await getAlertErrorFromResponse(request);
 		}
-		/** @type {Array<import('fractal-components/types/api').TaskSlim>} */
-		const result = await response.json();
-		const tasks = result.filter((t) => t.name === '__TEST_ECHO_TASK__');
-		return tasks.length > 0 ? tasks[0].id : undefined;
+		/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
+		const result = await request.json();
+		const taskGroups = result.filter(([k, _]) => k === '__TEST_ECHO_TASK__');
+		return taskGroups.length > 0 ? taskGroups[0][1][0].task_list[0].id : undefined;
 	}
 
 	/**
