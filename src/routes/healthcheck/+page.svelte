@@ -146,7 +146,7 @@
 		}
 		/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
 		const result = await request.json();
-		const taskGroups = result.filter(([k, _]) => k === '__TEST_ECHO_TASK__');
+		const taskGroups = result.filter(([k]) => k === '__TEST_ECHO_TASK__');
 		return taskGroups.length > 0 ? taskGroups[0][1][0].task_list[0].id : undefined;
 	}
 
