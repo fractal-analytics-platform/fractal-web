@@ -25,19 +25,23 @@
 		triggerChanges,
 		editable = true
 	} = $props();
+
+	/**
+	 * @param {string} entryId
+	 */
+	async function toggleCollapse(entryId) {
+		const element = document.querySelector(`#accordion-${entryId} .accordion-button`);
+		if (element instanceof HTMLElement) {
+			element.classList.toggle('collapsed');
+		}
+	}
 </script>
 
 {#if entry.type === 'object' || entry.type === 'array'}
-	<div class="accordion mb-2" id="accordion-{entry.id}">
+	<div class="accordion mb-2 form-entry" id="accordion-{entry.id}">
 		<div class="accordion-item">
 			<h2 class="accordion-header">
-				<div
-					class="accordion-button collapsed ps-1 pt-1 pb-1"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapse-{entry.id}"
-					aria-expanded="false"
-					aria-controls="collapse-{entry.id}"
-				>
+				<div class="accordion-button collapsed ps-1 pt-1 pb-1">
 					<div class="input-group w-50 me-3" class:has-validation={entry.error}>
 						{#if 'key' in entry}
 							<input
@@ -67,11 +71,21 @@
 							<div class="invalid-feedback">{entry.error}</div>
 						{/if}
 					</div>
-					{#if entry.type === 'object'}
-						(obj)
-					{:else}
-						(list)
-					{/if}
+					<button
+						class="btn btn-form-entry-toggle"
+						aria-controls="collapse-{entry.id}"
+						aria-expanded="false"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapse-{entry.id}"
+						aria-label={entry.type === 'object' ? 'Toggle object' : 'Toggle list'}
+						onclick={() => toggleCollapse(entry.id)}
+					>
+						{#if entry.type === 'object'}
+							(obj)
+						{:else}
+							(list)
+						{/if}
+					</button>
 				</div>
 			</h2>
 			<div
@@ -138,3 +152,36 @@
 		removeProperty={() => removeProperty(parent, index)}
 	/>
 {/if}
+
+<style>
+	.form-entry .accordion-button {
+		position: relative;
+	}
+
+	.form-entry .input-group {
+		position: relative;
+		z-index: 300;
+	}
+
+	.btn-form-entry-toggle::before {
+		content: '';
+		cursor: pointer;
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 200;
+	}
+
+	.btn-form-entry-toggle:focus-visible::before {
+		box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+		border-top-left-radius: var(--bs-accordion-inner-border-radius);
+		border-top-right-radius: var(--bs-accordion-inner-border-radius);
+	}
+
+	.btn-form-entry-toggle {
+		border: 0 !important;
+	}
+</style>

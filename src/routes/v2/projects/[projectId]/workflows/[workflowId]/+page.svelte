@@ -1013,6 +1013,34 @@
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
 							{#each workflow.task_list as workflowTask, i (workflowTask.id)}
 								<div class="wft-item">
+									<div class="wft-expander ms-1">
+										{#if statuses[workflowTask.id]}
+											{#if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id && loadingHistoryRunStatuses}
+												<span
+													class="spinner-border spinner-border-sm p-0"
+													role="status"
+													aria-hidden="true"
+												></span>
+											{:else if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
+												<button
+													aria-label="Hide runs"
+													class="btn btn-link p-0 text-white"
+													onclick={() => (expandedWorkflowTask = undefined)}
+												>
+													<i class="bi bi-caret-down-fill"></i>
+												</button>
+											{:else}
+												<button
+													aria-label="Show runs"
+													class="btn btn-link p-0"
+													class:text-white={selectedWorkflowTask?.id === workflowTask.id}
+													onclick={() => loadHistoryRunStatuses(workflowTask)}
+												>
+													<i class="bi bi-caret-right-fill"></i>
+												</button>
+											{/if}
+										{/if}
+									</div>
 									<div
 										class="list-group-item list-group-item-action border-0 pe-2 clearfix"
 										class:border-top={i > 0}
@@ -1021,15 +1049,19 @@
 										class:active={selectedWorkflowTask !== undefined &&
 											selectedWorkflowTask.id === workflowTask.id}
 									>
+										<span class="wft-item-label px-2 py-0" id="label-wft-{workflowTask.id}">
+											{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
+										</span>
 										<button
 											type="button"
-											class="btn py-0 wft-item-btn"
+											class="btn p-0 wft-item-btn"
 											data-fs-target={workflowTask.id}
 											onclick={async () => {
 												await setSelectedWorkflowTask(workflowTask);
 											}}
+											aria-labelledby="label-wft-{workflowTask.id}"
 										>
-											{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
+											&nbsp;
 										</button>
 										<span class="float-end ms-2 status-buttons">
 											{#if selectedDataset}
@@ -1081,34 +1113,6 @@
 											</button>
 										{/if}
 									</div>
-									<div class="wft-expander">
-										{#if statuses[workflowTask.id]}
-											{#if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id && loadingHistoryRunStatuses}
-												<span
-													class="spinner-border spinner-border-sm p-0"
-													role="status"
-													aria-hidden="true"
-												></span>
-											{:else if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
-												<button
-													aria-label="Hide runs"
-													class="btn btn-link p-0 text-white"
-													onclick={() => (expandedWorkflowTask = undefined)}
-												>
-													<i class="bi bi-caret-down-fill"></i>
-												</button>
-											{:else}
-												<button
-													aria-label="Show runs"
-													class="btn btn-link p-0"
-													class:text-white={selectedWorkflowTask?.id === workflowTask.id}
-													onclick={() => loadHistoryRunStatuses(workflowTask)}
-												>
-													<i class="bi bi-caret-right-fill"></i>
-												</button>
-											{/if}
-										{/if}
-									</div>
 								</div>
 								{#each historyRunStatuses as status, index (status.id)}
 									{#if !loadingHistoryRunStatuses && expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
@@ -1117,12 +1121,16 @@
 											class="run-item list-group-item list-group-item-action border-top pe-2"
 											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
 										>
+											<span id="run-label-{status.id}">
+												Run {index + 1}
+											</span>
 											<button
 												class="btn run-item-btn"
 												type="button"
 												onclick={() => selectHistoryRun(status)}
+												aria-labelledby="run-label-{status.id}"
 											>
-												Run {index + 1}
+												&nbsp;
 											</button>
 											<span class="float-end ps-2">
 												{#if selectedDataset && runStatusModal}
@@ -1591,17 +1599,15 @@
 		padding-left: 27px;
 	}
 
-	.wft-item-btn {
-		position: relative;
-		border: 0 !important;
-		z-index: 200;
-		text-align: start;
-		display: contents;
-		word-break: break-word;
-		box-sizing: border-box;
+	.wft-item-label {
+		color: #000;
 	}
-	.wft-item-btn::before {
-		content: '';
+	.active .wft-item-label {
+		color: #fff;
+	}
+
+	.wft-item-btn {
+		border: 0 !important;
 		cursor: pointer;
 		display: block;
 		position: absolute;
@@ -1609,9 +1615,10 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
+		z-index: 200;
 	}
-	.active .wft-item-btn {
-		color: #fff;
+	.wft-item-btn:focus-visible {
+		box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 	}
 
 	.wft-expander {
@@ -1619,6 +1626,10 @@
 		top: calc(50% - 13px);
 		left: 5px;
 		z-index: 300;
+	}
+	.wft-expander .btn.text-white:focus-visible,
+	:global(.active .status-modal-btn:focus-visible) {
+		box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.35) !important;
 	}
 
 	.status-buttons,
@@ -1630,6 +1641,7 @@
 	.run-item {
 		position: relative;
 		padding-left: 38px;
+		color: #000;
 	}
 	.run-item.active {
 		background-color: #c4dcff !important;
@@ -1641,23 +1653,17 @@
 		border-color: #9dc4ff;
 	}
 	.run-item-btn {
-		position: relative;
 		border: 0 !important;
 		z-index: 200;
-		text-align: start;
-		display: contents;
-		word-break: break-word;
-		box-sizing: border-box;
-	}
-	.run-item-btn::before {
-		content: '';
-		cursor: pointer;
 		display: block;
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
+	}
+	.run-item-btn:focus-visible {
+		box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 	}
 	:global(.run-item .status-icon.text-success) {
 		color: #136c43 !important;
