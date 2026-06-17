@@ -2,7 +2,8 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
-- Remove Node 20 support (\#1166);
+- Remove Node 20 support (\#1166).
+- Support core-tasks feature (\#1167).
 
 # 1.28.1
 
