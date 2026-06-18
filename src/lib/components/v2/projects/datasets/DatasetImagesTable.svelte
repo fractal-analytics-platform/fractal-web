@@ -156,6 +156,13 @@
 	async function resetSearchFields() {
 		resetBtnActive = false;
 		resetting = true;
+		// Reset selectors to prevent invalid aria-activedescendant values
+		for (const selector of Object.values(attributesSelectors)) {
+			selector.setSelected([]);
+		}
+		for (const selector of Object.values(typesSelectors)) {
+			selector.setSelected([]);
+		}
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
 		await tick();
