@@ -21,7 +21,7 @@ export class PageWithProject {
 
 /**
  * @typedef {Object} ProjectFixture
- * @property {(params: { page: any, makeAxeBuilder: () => {analyze: () => Promise<import('axe-core').AxeResults>} }, use: any) => Promise<void>} project
+ * @property {(params: { page: any }, use: any) => Promise<void>} project
  */
 
 /**

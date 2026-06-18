@@ -100,7 +100,7 @@ export class PageWithWorkflow extends PageWithProject {
 
 /**
  * @typedef {Object} WorkflowFixture
- * @property {(params: { page: any, makeAxeBuilder: () => {analyze: () => Promise<import('axe-core').AxeResults>} }, use: any) => Promise<void>} workflow
+ * @property {(params: { page: any }, use: any) => Promise<void>} workflow
  */
 
 /**
