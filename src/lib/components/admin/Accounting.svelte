@@ -93,7 +93,6 @@
 			{
 				method: 'POST',
 				headers,
-				credentials: 'include',
 				body: normalizePayload(params)
 			}
 		);

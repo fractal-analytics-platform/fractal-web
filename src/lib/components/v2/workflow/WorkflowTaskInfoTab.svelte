@@ -95,7 +95,6 @@
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
-				credentials: 'include',
 				headers,
 				body: normalizePayload(body, { nullifyEmptyStrings: true })
 			}

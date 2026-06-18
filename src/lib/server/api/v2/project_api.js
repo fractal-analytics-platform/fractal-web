@@ -14,10 +14,7 @@ const logger = getLogger('projects API [v2]');
  */
 export async function listProjects(fetch, isOwner) {
 	logger.debug('Fetching the list of projects');
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/v2/project/?is_owner=${isOwner}`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/v2/project/?is_owner=${isOwner}`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch projects list');
@@ -35,10 +32,7 @@ export async function listProjects(fetch, isOwner) {
  */
 export async function getProject(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project [project_id=%d]', projectId);
@@ -56,10 +50,7 @@ export async function getProject(fetch, projectId) {
  */
 export async function getProjectAccess(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project access [project_id=%d]', projectId);
@@ -77,10 +68,7 @@ export async function getProjectAccess(fetch, projectId) {
  */
 export async function getProjectGuests(fetch, projectId) {
 	logger.debug('Fetching project guests [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/guest/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/guest/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project guests [project_id=%d]', projectId);
@@ -97,10 +85,7 @@ export async function getProjectGuests(fetch, projectId) {
  */
 export async function getProjectInvitations(fetch) {
 	logger.debug('Fetching project invitations');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/invitation/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/invitation/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project invitations');
@@ -121,11 +106,7 @@ export async function getProjectInvitations(fetch) {
 export async function getProjectDatasets(fetch, projectId) {
 	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/?history=false`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
+		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/?history=false`
 	);
 
 	if (!response.ok) {
@@ -149,11 +130,7 @@ export async function getProjectDatasets(fetch, projectId) {
 export async function getDataset(fetch, projectId, datasetId) {
 	logger.debug('Retrieving dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/${datasetId}/`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
+		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/${datasetId}/`
 	);
 
 	if (!response.ok) {
@@ -173,10 +150,7 @@ export async function getDataset(fetch, projectId, datasetId) {
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/job/?log=false`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/job/?log=false`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch user jobs');

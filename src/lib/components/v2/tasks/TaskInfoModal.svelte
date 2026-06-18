@@ -23,10 +23,7 @@
 
 		// Retrieving all the fields
 		loading = true;
-		const response = await fetch(`/api/v2/task/${taskId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/task/${taskId}`);
 
 		const result = await response.json();
 

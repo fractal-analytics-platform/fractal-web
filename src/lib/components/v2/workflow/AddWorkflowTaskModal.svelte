@@ -46,10 +46,7 @@
 		loading = true;
 		modal?.hideErrorAlert();
 		modal?.show();
-		const response = await fetch(`/api/v2/task-group?only_active=true&slim=true`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/task-group?only_active=true&slim=true`);
 		loading = false;
 		if (!response.ok) {
 			modal?.displayErrorAlert(await response.json());
@@ -130,7 +127,6 @@
 
 				const workflowTaskResponse = await fetch(url, {
 					method: 'POST',
-					credentials: 'include',
 					headers,
 					body: normalizePayload(payload)
 				});
@@ -142,11 +138,7 @@
 
 				// Get updated workflow with created task
 				const workflowResponse = await fetch(
-					`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}`,
-					{
-						method: 'GET',
-						credentials: 'include'
-					}
+					`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}`
 				);
 
 				if (!workflowResponse.ok) {
@@ -168,10 +160,7 @@
 	 * @returns {Promise<import('fractal-components/types/api').TaskV2>}
 	 */
 	async function getTask(taskId) {
-		const response = await fetch(`/api/v2/task/${taskId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/task/${taskId}`);
 
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);

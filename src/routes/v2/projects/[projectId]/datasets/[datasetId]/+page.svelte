@@ -63,7 +63,6 @@
 			{
 				method: 'POST',
 				headers,
-				credentials: 'include',
 				body: normalizePayload(params)
 			}
 		);
@@ -84,11 +83,7 @@
 
 	async function handleExportDataset() {
 		const response = await fetch(
-			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/export`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
+			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/export`
 		);
 
 		if (!response.ok) {

@@ -110,7 +110,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/admin/v2/task/make-core', {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(taskIds)
 		});
@@ -145,7 +144,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/admin/v2/task/make-not-core', {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(taskIds)
 		});

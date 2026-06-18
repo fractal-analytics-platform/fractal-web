@@ -54,7 +54,6 @@
 
 		const createResponse = await fetch(`/api/auth/register`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});
@@ -68,7 +67,6 @@
 
 		const response = await fetch(`/api/auth/users/${createdUser.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				is_verified: true

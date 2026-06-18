@@ -26,13 +26,11 @@
 	}
 
 	export async function onOpen() {
-		const response = await fetch(`/api/v2/workflow-template/${templateId}`, { method: 'GET' });
+		const response = await fetch(`/api/v2/workflow-template/${templateId}`);
 		if (response.ok) {
 			template = await response.json();
 			if (template?.user_group_id) {
-				const response2 = await fetch(`/api/auth/current-user?group_ids_names=true`, {
-					method: 'GET'
-				});
+				const response2 = await fetch(`/api/auth/current-user?group_ids_names=true`);
 				if (response2.ok) {
 					const res = await response2.json();
 					groupName =

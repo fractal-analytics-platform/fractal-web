@@ -30,10 +30,7 @@
 			return;
 		}
 
-		const response = await fetch(`/api/v2/project/${job.project_dump.id}/job/${job.id}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/project/${job.project_dump.id}/job/${job.id}`);
 
 		if (response.ok) {
 			job = await response.json();

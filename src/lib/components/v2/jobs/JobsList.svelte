@@ -190,10 +190,7 @@
 		let stopJobUrl = admin
 			? `/api/admin/v2/job/${job.id}/stop`
 			: `/api/v2/project/${job.project_id}/job/${job.id}/stop`;
-		const response = await fetch(stopJobUrl, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(stopJobUrl);
 
 		cancellingJobs = cancellingJobs.filter((j) => j !== job.id);
 

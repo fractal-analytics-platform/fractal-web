@@ -283,7 +283,6 @@
 
 				const response = await fetch(`/api/admin/v2/job/${jobId}`, {
 					method: 'PATCH',
-					credentials: 'include',
 					headers,
 					body: normalizePayload({ status: 'failed' })
 				});
@@ -312,10 +311,7 @@
 	}
 
 	onMount(async () => {
-		const response = await fetch(`/api/admin/v2/resource`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/admin/v2/resource`);
 		if (response.ok) {
 			resources = await response.json();
 		}

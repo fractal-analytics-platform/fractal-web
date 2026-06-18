@@ -152,7 +152,6 @@
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
-				credentials: 'include',
 				headers,
 				body: JSON.stringify({
 					args_non_parallel: normalizePayload(payload.args_non_parallel, options),

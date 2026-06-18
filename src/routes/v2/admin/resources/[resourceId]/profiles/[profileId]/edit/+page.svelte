@@ -22,7 +22,6 @@
 
 		return await fetch(`/api/admin/v2/profile/${profile.id}`, {
 			method: 'PUT',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(profile, { nullifyEmptyStrings: true })
 		});

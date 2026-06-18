@@ -68,10 +68,7 @@
 				url.searchParams.append('timestamp_started_min', timestampStartedMin);
 			}
 
-			const response = await fetch(url, {
-				method: 'GET',
-				credentials: 'include'
-			});
+			const response = await fetch(url);
 			if (!response.ok) {
 				errorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),

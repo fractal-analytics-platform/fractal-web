@@ -209,10 +209,7 @@
 			return;
 		}
 
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/export`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/export`);
 
 		if (!response.ok) {
 			console.error(await response.json());
@@ -267,7 +264,6 @@
 
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(
 				{
@@ -310,8 +306,7 @@
 		const response = await fetch(
 			`/api/v2/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
 			{
-				method: 'DELETE',
-				credentials: 'include'
+				method: 'DELETE'
 			}
 		);
 
@@ -326,10 +321,7 @@
 		metaPropertiesForm?.discardChanges();
 
 		// Get updated workflow with deleted task
-		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`);
 
 		if (!workflowResponse.ok) {
 			console.error('Unable to retrieve workflow');
@@ -468,10 +460,7 @@
 			workflowErrorAlert.hide();
 		}
 
-		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`);
 
 		const workflowResult = await workflowResponse.json();
 
@@ -588,10 +577,7 @@
 			return;
 		}
 		const datasetId = selectedDatasetId;
-		const response = await fetch(`/api/v2/project/${project.id}/dataset/${datasetId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/project/${project.id}/dataset/${datasetId}`);
 		const result = await response.json();
 		if (!response.ok) {
 			console.error(result);
@@ -633,11 +619,7 @@
 			workflowErrorAlert.hide();
 		}
 		const response = await fetch(
-			`/api/v2/project/${project.id}/job/${selectedSubmittedJob.id}/stop`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
+			`/api/v2/project/${project.id}/job/${selectedSubmittedJob.id}/stop`
 		);
 		if (response.ok) {
 			jobCancelledMessage = 'Job cancellation request received. The job will stop in a few seconds';
@@ -696,7 +678,6 @@
 			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask?order=${index + 1}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload([
 					{

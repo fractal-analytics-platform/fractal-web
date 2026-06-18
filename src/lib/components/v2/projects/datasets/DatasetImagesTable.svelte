@@ -421,7 +421,6 @@
 				{
 					method: 'POST',
 					headers,
-					credentials: 'include',
 					body: normalizePayload(params)
 				}
 			);
@@ -506,8 +505,7 @@
 				dataset.id
 			}/images?zarr_url=${encodeURIComponent(zarrUrl)}`,
 			{
-				method: 'DELETE',
-				credentials: 'include'
+				method: 'DELETE'
 			}
 		);
 		if (response.ok) {

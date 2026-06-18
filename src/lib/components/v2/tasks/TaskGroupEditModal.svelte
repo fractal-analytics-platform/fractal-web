@@ -56,7 +56,6 @@
 
 				const response = await fetch(`/api/v2/task-group/${taskGroup?.id}`, {
 					method: 'PATCH',
-					credentials: 'include',
 					headers,
 					body: normalizePayload(
 						{

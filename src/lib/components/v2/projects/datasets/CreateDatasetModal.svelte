@@ -111,7 +111,6 @@
 
 		const response = await fetch(`/api/v2/project/${page.params.projectId}/dataset/import`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(datasetData)
 		});
@@ -143,7 +142,6 @@
 		}
 		const response = await fetch(`/api/v2/project/${projectId}/dataset`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(body)
 		});

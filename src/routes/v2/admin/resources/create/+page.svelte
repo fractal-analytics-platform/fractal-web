@@ -51,7 +51,6 @@
 
 			const response = await fetch(`/api/admin/v2/resource`, {
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload(JSON.parse(data))
 			});

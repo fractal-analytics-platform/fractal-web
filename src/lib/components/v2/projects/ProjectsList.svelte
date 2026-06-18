@@ -65,8 +65,6 @@
 
 		const response = await fetch(`/api/v2/project`, {
 			method: 'POST',
-			credentials: 'include',
-			mode: 'cors',
 			headers,
 			body: normalizePayload(payload)
 		});
@@ -102,8 +100,7 @@
 		console.log('Client request project delete');
 
 		const response = await fetch(`/api/v2/project/${projectId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 
 		if (response.ok) {

@@ -28,7 +28,6 @@ export async function getDatasetImages(fetch, projectId, datasetId, page, pageSi
 		{
 			method: 'POST',
 			headers,
-			credentials: 'include',
 			body: normalizePayload(params)
 		}
 	);

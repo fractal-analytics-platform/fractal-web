@@ -45,9 +45,7 @@
 	 */
 	export async function open(template_id) {
 		saving = false;
-		const response = await fetch(`/api/v2/workflow-template/${template_id}`, {
-			method: 'GET'
-		});
+		const response = await fetch(`/api/v2/workflow-template/${template_id}`);
 		if (response.ok) {
 			template = await response.json();
 			if (template) {

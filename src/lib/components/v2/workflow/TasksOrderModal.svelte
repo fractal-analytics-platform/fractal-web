@@ -80,8 +80,6 @@
 
 		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflow.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
-			mode: 'cors',
 			headers,
 			body: normalizePayload(patchData)
 		});

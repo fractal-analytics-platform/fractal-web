@@ -26,11 +26,7 @@
 		modal?.show();
 
 		const response = await fetch(
-			`/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
+			`/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`
 		);
 
 		if (response.ok) {

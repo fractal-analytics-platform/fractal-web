@@ -25,8 +25,7 @@
 	 */
 	async function handleDeleteUser(userId) {
 		const response = await fetch(`/api/auth/users/${userId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);
