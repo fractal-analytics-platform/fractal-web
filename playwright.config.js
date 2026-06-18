@@ -60,7 +60,8 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command:
+				'./tests/start-test-server.sh --branch 3366-remove-redundant-query-parameters-from-get-task-list-endpoint',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
