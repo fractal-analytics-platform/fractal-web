@@ -93,39 +93,42 @@
 	<div class="my-2">
 		<div class="accordion" id="accordion-{formElement.id}">
 			<div class="accordion-item" class:border-danger={hasErrors}>
-				<div class="accordion-header">
+				<div class="accordion-header collapsible-prop-header">
 					<button
 						class="accordion-button"
 						class:collapsed
 						onclick={(event) => toggleCollapse(event)}
 						type="button"
 						disabled={isNull}
+						aria-labelledby="property-label-{formElement.id}"
 					>
+						&nbsp;
+					</button>
+					<div class="collapsible-label">
 						<div class="flex-fill">
 							<PropertyLabel {formElement} {editable} {remove} tag="span" />
 						</div>
-						<!-- svelte-ignore a11y_interactive_supports_focus -->
-						<!-- svelte-ignore a11y_click_events_have_key_events -->
-						<!-- svelte-ignore a11y_missing_attribute -->
-						<div>
-							{#if formElement.nullable}
-								<div class="form-check form-switch">
-									<input
-										class="form-check-input"
-										disabled={!editable}
-										type="checkbox"
-										role="switch"
-										checked={isNull === false}
-										onchange={(event) => toggleNull(event)}
-										aria-label={isNull ? 'Set' : 'Unset'}
-									/>
-								</div>
-							{/if}
-							{#if showResetButton}
-								<a class="btn btn-warning me-3" role="button" onclick={handleReset}>Reset</a>
-							{/if}
-						</div>
-					</button>
+					</div>
+					<div class="collapsible-prop-actions">
+						{#if formElement.nullable}
+							<div class="form-check form-switch">
+								<input
+									class="form-check-input"
+									disabled={!editable}
+									type="checkbox"
+									role="switch"
+									checked={isNull === false}
+									onchange={(event) => toggleNull(event)}
+									aria-label={isNull ? 'Set' : 'Unset'}
+								/>
+							</div>
+						{/if}
+						{#if showResetButton}
+							<button class="btn btn-warning me-3" type="button" onclick={handleReset}>
+								Reset
+							</button>
+						{/if}
+					</div>
 				</div>
 				<div
 					id="collapse-{formElement.id}"
@@ -158,5 +161,41 @@
 
 	.is-null .accordion-button::after {
 		display: none;
+	}
+
+	.collapsible-prop-header {
+		position: relative;
+		z-index: 200;
+	}
+
+	.collapsible-prop-actions {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 40px;
+		z-index: 300;
+	}
+
+	.collapsible-label {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		padding: 16px;
+		z-index: 250;
+		pointer-events: none;
+	}
+
+	:global(.collapsible-label .property-description) {
+		pointer-events: initial;
+	}
+
+	.collapsible-prop-actions .btn-warning {
+		margin-top: 8px;
+	}
+	.collapsible-prop-actions .form-switch {
+		margin-top: 16px;
+		margin-right: 8px;
 	}
 </style>
