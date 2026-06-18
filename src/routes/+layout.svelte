@@ -261,13 +261,13 @@
 	<div class="toast-container position-fixed bottom-0 end-0 p-3">
 		<div
 			id="tokenCopiedToast"
-			class="toast align-items-center text-bg-info border-0"
+			class="toast align-items-center bg-info-subtle border-0"
 			role="alert"
 			aria-live="assertive"
 			aria-atomic="true"
 		>
 			<div class="d-flex">
-				<div class="toast-body">Token copied to clipboard</div>
+				<div class="toast-body text-black">Token copied to clipboard</div>
 				<button
 					type="button"
 					class="btn-close btn-close-white me-2 m-auto"
@@ -375,5 +375,9 @@
 
 	:global(.bg-light .text-danger) {
 		color: #d53343 !important;
+	}
+
+	:global(.alert-danger code) {
+		color: #b32a6e;
 	}
 </style>

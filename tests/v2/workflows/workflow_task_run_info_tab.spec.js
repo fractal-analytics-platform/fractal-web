@@ -122,7 +122,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	await test.step('Check run values in Info tab', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 		await page.getByRole('button', { name: 'Advanced Info' }).click();
-		await page.getByRole('button', { name: 'Show runs', exact: true }).click();
+		await page.getByRole('button', { name: 'Show runs for alias2', exact: true }).click();
 
 		const excludedInRun = [
 			'Docs Link',
