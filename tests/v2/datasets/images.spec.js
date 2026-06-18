@@ -1,3 +1,4 @@
+import { checkAccessibility } from '../../base_fixture.js';
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { expect, test } from '../project_fixture.js';
 
@@ -109,6 +110,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	await test.step('Filter by true type', async () => {
 		await selectSlimSelect(page, page.getByRole('combobox', { name: 'k3' }), 'True');
 		await searchImages(page, 1);
+		await checkAccessibility(page);
 	});
 
 	await test.step('Edit image', async () => {
@@ -124,6 +126,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.getByPlaceholder('Key').nth(1).fill('k2');
 		await modal.getByPlaceholder('Value').nth(1).fill('9999');
 		await modal.getByRole('combobox').nth(1).selectOption('Number');
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 		await page.getByRole('cell', { name: 'v1-mod' }).waitFor();

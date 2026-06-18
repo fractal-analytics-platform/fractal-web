@@ -2,6 +2,7 @@ import { expect, test } from '../workflow_fixture.js';
 import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { createDataset } from '../../utils/v2/dataset.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	let taskName1, taskName2;
@@ -55,6 +56,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await modal.getByPlaceholder('Key').nth(1).fill('k4');
 		await modal.getByRole('switch').check();
 		saveBtn = modal.getByRole('button', { name: 'Save' });
+		await checkAccessibility(page);
 		await saveBtn.click();
 		await waitModalClosed(page);
 	});
@@ -71,6 +73,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Key').fill('3D');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('Filter already present in task.input_types')).toBeVisible();
+		await checkAccessibility(page);
 		await workflow.removeCurrentTask();
 	});
 

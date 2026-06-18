@@ -2,6 +2,7 @@ import { expect, test } from '../workflow_fixture.js';
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow unique types are verified when using status filter', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
@@ -71,6 +72,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(modal.getByText('This job will process 1 image.')).toBeVisible();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await waitTasksSuccess(page);

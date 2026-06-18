@@ -1,5 +1,6 @@
 import { expect, test } from '../workflow_fixture.js';
 import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Change workflow task order', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
@@ -24,6 +25,7 @@ test('Change workflow task order', async ({ page, workflow }) => {
 		await modal.getByRole('button', { name: 'illumination_correction' }).hover();
 		await page.mouse.up();
 
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -173,7 +174,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 	}
 
 	await test.step('Optional array with minItems and maxItems', async () => {
-		await form.getByText('optionalArrayWithMinMaxItems').first().click();
+		await form.getByRole('button', { name: 'optionalArrayWithMinMaxItems' }).first().click();
 		const block = form.locator('.property-block', {
 			has: page.getByText('optionalArrayWithMinMaxItems')
 		});
@@ -236,6 +237,7 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await input.fill('5.12');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByText('must be integer')).toHaveCount(1);
+		await checkAccessibility(page);
 	});
 
 	await test.step('Test second task (default not populated edge case)', async () => {

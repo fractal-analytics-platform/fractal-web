@@ -2,6 +2,7 @@ import { fileURLToPath } from 'url';
 import { waitPageLoading, expectBooleanIcon } from '../../utils/utils.js';
 import { expect, test } from '../project_fixture.js';
 import path from 'path';
+import { checkAccessibility } from '../../base_fixture.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,6 +62,7 @@ test('Import workflow', async ({ page, project }) => {
 				})
 			)
 		});
+		await checkAccessibility(page);
 		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
@@ -175,6 +177,7 @@ test('Import workflow', async ({ page, project }) => {
 
 		// 'Import Workflow' is clickable
 		await expect(importWorkflowBtn).toBeEnabled();
+		await checkAccessibility(page);
 		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);

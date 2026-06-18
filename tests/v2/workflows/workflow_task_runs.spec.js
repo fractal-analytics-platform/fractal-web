@@ -2,6 +2,7 @@ import { expect, test } from '../workflow_fixture.js';
 import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 import { createDataset } from '../../utils/v2/dataset.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task runs', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
@@ -61,6 +62,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await expect(modal.getByText('START cellpose_segmentation task')).toBeVisible();
 		await modal.getByRole('button', { name: 'Back' }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});

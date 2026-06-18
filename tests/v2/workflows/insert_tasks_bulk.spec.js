@@ -1,3 +1,4 @@
+import { checkAccessibility } from '../../base_fixture.js';
 import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { checkTasksOrder } from '../../utils/v2/task.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -11,6 +12,7 @@ test('Bulk workflow tasks insertion', async ({ page, workflow }) => {
 		const modal = await waitModal(page);
 		await modal.getByRole('checkbox', { name: 'generic_task', exact: true }).click();
 		await modal.getByRole('checkbox', { name: 'MIP_compound' }).click();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Add 2 tasks' }).click();
 		await waitModalClosed(page);
 

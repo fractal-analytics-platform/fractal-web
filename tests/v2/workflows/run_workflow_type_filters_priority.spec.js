@@ -1,3 +1,4 @@
+import { checkAccessibility } from '../../base_fixture.js';
 import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
@@ -89,6 +90,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(
 			modal.locator('li').filter({ hasText: '3D:' }).locator('[aria-checked="false"]')
 		).toBeVisible();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);

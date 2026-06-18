@@ -1,6 +1,7 @@
 import { expect, test } from '../workflow_fixture.js';
 import { waitModalClosed } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 	let taskName;
@@ -97,6 +98,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 		await tab.getByLabel('Remove property').nth(8).click();
 		await expect(tab.getByText("Property name can't be empty")).toHaveCount(0);
 		await expect(tab.getByText('Property name "k6" is already used')).toHaveCount(0);
+		await checkAccessibility(page);
 	});
 
 	await test.step('Save changes', async () => {

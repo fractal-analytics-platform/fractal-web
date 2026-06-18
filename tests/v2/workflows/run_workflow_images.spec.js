@@ -1,3 +1,4 @@
+import { checkAccessibility } from '../../base_fixture.js';
 import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createImage } from '../../utils/v2/image.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -21,6 +22,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
 		await modal.getByRole('textbox', { name: 'Zarr subfolder' }).fill(randomZarrSubfolder);
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -52,6 +54,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		);
 		await createImage(page, `${randomPath}/plate1.zarr/B/03/3`, { k3: 'k3v1', k4: 'k4v1' });
 		await createImage(page, `${randomPath}/plate1.zarr/B/03/4`, { k3: 'k3v2', k4: 'k4v2' });
+		await checkAccessibility(page);
 	});
 
 	await test.step('Open workflow page', async () => {
@@ -64,6 +67,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		await modal.waitFor();
 		await expect(modal.getByRole('row')).toHaveCount(7);
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -75,6 +79,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Key').last().fill('t1');
 		await page.getByRole('switch').click();
 		await page.getByRole('button', { name: 'Save' }).click();
+		await checkAccessibility(page);
 		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
 	});
 

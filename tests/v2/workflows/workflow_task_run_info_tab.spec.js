@@ -3,6 +3,7 @@ import { closeModal, waitModal, waitModalClosed } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { waitTaskFailure } from '../../utils/v2/workflowtask.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	test.slow();
@@ -104,6 +105,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 
 		await page.getByRole('button', { name: 'Edit workflow task description' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task description' }).fill('description2');
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Save', exact: true }).click();
 		await expect(
 			page.getByRole('button', { name: 'Edit workflow task description' })

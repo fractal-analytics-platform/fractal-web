@@ -9,8 +9,7 @@ import AxeBuilder from '@axe-core/playwright';
  */
 export const test = base.extend({
 	page: async ({ page }, use) => {
-		const makeAxeBuilder = () =>
-			new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
+		const makeAxeBuilder = getMakeAxeBuilder(page);
 		await use(page);
 		const url = page.url();
 		if (url !== 'about:blank' && !url.includes('/_app')) {
@@ -19,3 +18,20 @@ export const test = base.extend({
 		}
 	}
 });
+
+/**
+ *
+ * @param {import('@playwright/test').Page} page
+ */
+export async function checkAccessibility(page) {
+	const makeAxeBuilder = getMakeAxeBuilder(page);
+	const accessibilityScanResults = await makeAxeBuilder().analyze();
+	expect(accessibilityScanResults.violations).toEqual([]);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+function getMakeAxeBuilder(page) {
+	return () => new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
+}
