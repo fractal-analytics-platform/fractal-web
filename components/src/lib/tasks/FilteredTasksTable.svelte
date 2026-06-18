@@ -14,6 +14,7 @@
 	 * @property {import('svelte').Snippet} [extraColumnsColgroup]
 	 * @property {import('svelte').Snippet} [extraColumnsHeader]
 	 * @property {import('svelte').Snippet<[import('../types/api').TasksTableRow]>} [extraColumns]
+	 * @property {boolean} showOnlyCoreFiltering
 	 */
 
 	/** @type {Props} */
@@ -22,6 +23,7 @@
 		showAuthorsInSeparateColumn = true,
 		showDocLinksInTable = false,
 		selectable = false,
+		showOnlyCoreFiltering,
 		selectedTasks = $bindable([]),
 		extraColumnsColgroup,
 		extraColumnsHeader,
@@ -48,6 +50,7 @@
 	let tagSelector = undefined;
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
+	let coreTasksOnly = $state(false);
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -76,7 +79,8 @@
 			modalityFilter ||
 			packageFilter ||
 			tagFilter ||
-			inputTypeFilter
+			inputTypeFilter ||
+			coreTasksOnly
 		) {
 			filterRows();
 		} else {
@@ -96,13 +100,17 @@
 
 	function filterRows() {
 		filteredRows = allRows
-			.map((row) => {
-				const filteredTasks = row.tasks.filter((t) => filterRow(getSelectedTask(t)));
-				return {
-					...row,
-					tasks: filteredTasks
-				};
-			})
+			.map((row) => ({
+				pkg_name: row.pkg_name,
+				tasks: row.tasks
+					.map((task) => {
+						const taskVersions = task.taskVersions.filter(filterRow);
+						const selectedVersion =
+							taskVersions.length > 0 ? taskVersions[0].version : task.selectedVersion;
+						return { selectedVersion, taskVersions };
+					})
+					.filter((task) => task.taskVersions.length > 0)
+			}))
 			.filter((r) => r.tasks.length > 0);
 	}
 
@@ -116,8 +124,17 @@
 			modalityMatch(row) &&
 			tagMatch(row) &&
 			packageMatch(row) &&
-			inputTypeMatch(row)
+			inputTypeMatch(row) &&
+			onlyCoreMatch(row)
 		);
+	}
+
+	/**
+	 * @param {import('../types/api').TasksTableRow} row
+	 * @returns {boolean}
+	 */
+	function onlyCoreMatch(row) {
+		return coreTasksOnly ? row.is_core : true;
 	}
 
 	/**
@@ -202,6 +219,7 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
+		coreTasksOnly = false;
 	}
 
 	/**
@@ -295,6 +313,7 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
+		coreTasksOnly = false;
 		setup();
 	});
 
@@ -387,6 +406,22 @@
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
 			</div>
+			{#if showOnlyCoreFiltering}
+				<div class="col-auto">
+					<div class="form-check form-switch mt-2">
+						<input
+							id="coreTasksOnly"
+							class="form-check-input"
+							type="checkbox"
+							bind:checked={coreTasksOnly}
+						/>
+						<label class="form-check-label" for="coreTasksOnly">
+							<i class="bi bi-patch-check-fill verified-core-icon"></i>
+							Core only
+						</label>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -403,14 +438,14 @@
 					{#if selectable}
 						<col width="15" />
 					{/if}
-					<col />
-					<col />
-					<col />
-					<col />
+					<col width="250" />
+					<col width="50" />
+					<col width="50" />
+					<col width="150" />
 					{#if showAuthorsInSeparateColumn}
-						<col />
+						<col width="150" />
 					{/if}
-					<col width="120" />
+					<col width="90" />
 					{@render extraColumnsColgroup?.()}
 				</colgroup>
 				<thead>
@@ -432,6 +467,7 @@
 				<tbody>
 					{#each filteredRows as row, index (index)}
 						<tr class="border-top">
+							{#if selectable}<th></th>{/if}
 							<th colspan={selectable ? 4 : 3}>{row.pkg_name}</th>
 						</tr>
 						{#each row.tasks.map((tr) => getSelectedTask(tr)) as task, index (index)}
@@ -457,6 +493,9 @@
 											<label for="selector-{task.task_id}" style="word-wrap: anywhere;">
 												{task.task_name}
 											</label>
+										{/if}
+										{#if task.is_core}
+											<i class="bi bi-patch-check-fill verified-core-icon" title="Core task"></i>
 										{/if}
 									</td>
 									<td>
@@ -535,14 +574,10 @@
 	.metadata-col,
 	.author-col {
 		font-size: 85%;
-		max-width: 150px;
 	}
 
-	.task-name-col {
-		max-width: 180px;
-	}
-
-	.version-col {
-		max-width: 90px;
+	.verified-core-icon {
+		color: #1da1f2;
+		line-height: 1;
 	}
 </style>

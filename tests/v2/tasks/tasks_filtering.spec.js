@@ -4,6 +4,25 @@ import { selectSlimSelect, waitPageLoading } from '../../utils/utils.js';
 const NUM_MOCK_TASKS = 20;
 
 test('Tasks filtering', async ({ page, workflow }) => {
+	await test.step('Set core task', async () => {
+		await page.goto('/v2/admin/tasks');
+
+		await page.getByRole('checkbox', { name: 'Core only' }).check();
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+		await expect(page.getByRole('row')).toHaveCount(0);
+		await page.getByRole('button', { name: 'Reset' }).click();
+
+		await page.getByRole('textbox', { name: 'Name' }).fill('create_ome_zarr_compound');
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+		await page.getByRole('checkbox', { name: 'Select all' }).check();
+		await page.getByRole('button', { name: 'Make all core' }).click();
+
+		await page.getByRole('button', { name: 'Reset' }).click();
+		await page.getByRole('checkbox', { name: 'Core only' }).check();
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+		await expect(page.getByRole('row')).toHaveCount(2);
+	});
+
 	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
@@ -39,9 +58,18 @@ async function testFiltering(page) {
 	await selectSlimSelect(page, categoryFilter, 'Conversion');
 	await expect(rows).toHaveCount(4);
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })).toBeVisible();
+
+	await page.getByRole('checkbox', { name: 'Core only' }).check();
+	await expect(rows).toHaveCount(3);
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
+	await expect(
+		page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })
+	).not.toBeVisible();
 
 	await deselect(modalityFilter);
 	await deselect(categoryFilter);
+	await page.getByRole('checkbox', { name: 'Core only' }).uncheck();
 	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 
 	await selectSlimSelect(page, tagFilter, 'Deep Learning');

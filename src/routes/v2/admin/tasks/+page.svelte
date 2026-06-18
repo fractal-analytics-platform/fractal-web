@@ -4,13 +4,14 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { PropertyDescription } from 'fractal-components';
+	import { normalizePayload, PropertyDescription } from 'fractal-components';
 
 	let name = $state('');
 	let id = $state('');
 	let version = $state('');
 	let resource = $state('');
 	let taskType = $state('');
+	let onlyCore = $state(false);
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	const resources = $derived(page.data.resources || []);
 
@@ -32,6 +33,18 @@
 
 	let processingCsv = $state(false);
 
+	/** @type {number[]}*/
+	let selectedTasks = $state([]);
+
+	let allIds = $derived(results?.items.map((taskInfo) => taskInfo.task.id) ?? []);
+	let allSelected = $derived.by(() => {
+		if (allIds.length !== selectedTasks.length) {
+			return false;
+		}
+		const selectedSet = new Set(selectedTasks);
+		return allIds.every((id) => selectedSet.has(id));
+	});
+
 	function getBaseTasksSearchUrl() {
 		const url = new URL('/api/admin/v2/task', window.location.origin);
 		if (name) {
@@ -49,6 +62,9 @@
 		if (taskType) {
 			url.searchParams.append('task_type', taskType);
 		}
+		if (onlyCore) {
+			url.searchParams.append('only_core', String(onlyCore));
+		}
 		return url;
 	}
 
@@ -58,6 +74,7 @@
 	 */
 	async function searchTasks(selectedPage, selectedPageSize) {
 		searching = true;
+		selectedTasks = [];
 		try {
 			if (searchErrorAlert) {
 				searchErrorAlert.hide();
@@ -85,6 +102,76 @@
 		}
 	}
 
+	/**
+	 * @param {number[]} taskIds
+	 */
+	async function makeCore(taskIds) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/api/admin/v2/task/make-core', {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: normalizePayload(taskIds)
+		});
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+		} else {
+			if (results) {
+				results.items = results.items.map((item) => {
+					if (taskIds.includes(item.task.id)) {
+						return {
+							...item,
+							task: {
+								...item.task,
+								is_core: true
+							}
+						};
+					}
+					return item;
+				});
+			}
+		}
+	}
+
+	/**
+	 * @param {number[]} taskIds
+	 */
+	async function makeNotCore(taskIds) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/api/admin/v2/task/make-not-core', {
+			method: 'POST',
+			credentials: 'include',
+			headers,
+			body: normalizePayload(taskIds)
+		});
+		if (!response.ok) {
+			searchErrorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'searchError'
+			);
+		} else {
+			if (results) {
+				results.items = results.items.map((item) => {
+					if (taskIds.includes(item.task.id)) {
+						return {
+							...item,
+							task: {
+								...item.task,
+								is_core: false
+							}
+						};
+					}
+					return item;
+				});
+			}
+		}
+	}
+
 	function resetSearchFields() {
 		if (searchErrorAlert) {
 			searchErrorAlert.hide();
@@ -94,11 +181,13 @@
 		version = '';
 		resource = '';
 		taskType = '';
+		onlyCore = false;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
 		totalCount = 0;
 		pageSize = 50;
+		selectedTasks = [];
 	}
 
 	/**
@@ -179,6 +268,17 @@
 		downloadBlob(csv, 'tasks.csv', 'text/csv;charset=utf-8;');
 
 		processingCsv = false;
+	}
+
+	/**
+	 * @param {number} taskId
+	 */
+	function selectTask(taskId) {
+		if (selectedTasks.includes(taskId)) {
+			selectedTasks = selectedTasks.filter((t) => t !== taskId);
+		} else {
+			selectedTasks = [...selectedTasks, taskId];
+		}
 	}
 </script>
 
@@ -267,6 +367,21 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="onlyCoreCheckbox">Core only</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9 mt-2">
+							<input
+								id="onlyCoreCheckbox"
+								type="checkbox"
+								class="form-check-input"
+								bind:checked={onlyCore}
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -297,6 +412,28 @@
 		{#if results && results.items.length > 0}
 			<div class="d-flex justify-content-end align-items-center mb-3">
 				<div>
+					{#if selectedTasks.length > 0}
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								await makeCore(selectedTasks);
+							}}
+							aria-label="Make all core"
+						>
+							<i class="bi bi-patch-check-fill verified-core-icon"></i>
+							Make core
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								await makeNotCore(selectedTasks);
+							}}
+							aria-label="Make all not core"
+						>
+							<i class="bi bi-patch-check text-secondary"></i>
+							Make not core
+						</button>
+					{/if}
 					<button class="btn btn-outline-secondary" onclick={downloadCSV} disabled={processingCsv}>
 						{#if processingCsv}
 							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
@@ -310,17 +447,36 @@
 			</div>
 			<table class="table tasks-table mt-3 mb-4">
 				<colgroup>
-					<col width="60" />
+					<col width="30" />
+					<col width="50" />
+					<col width="30" />
 					<col width="auto" />
 					<col width="90" />
 					<col width="195" />
 					<col width="120" />
 					<col width="150" />
-					<col width="100" />
+					<col width="120" />
 				</colgroup>
 				<thead>
 					<tr>
+						<th>
+							<input
+								id="selector-all"
+								type="checkbox"
+								class="form-check-input"
+								onchange={(event) => {
+									if (event.currentTarget.checked) {
+										selectedTasks = allIds;
+									} else {
+										selectedTasks = [];
+									}
+								}}
+								checked={allSelected}
+								title={allSelected ? 'Deselect all' : 'Select all'}
+							/>
+						</th>
 						<th>Id</th>
+						<th></th>
 						<th>Name</th>
 						<th>Version</th>
 						<th>Type</th>
@@ -332,8 +488,42 @@
 				<tbody>
 					{#each results.items as taskInfo, taskInfoIndex (taskInfoIndex)}
 						<tr class:row-grey={taskInfoIndex % 2 === 0}>
+							<td>
+								<input
+									id="selector-{taskInfo.task.id}"
+									type="checkbox"
+									class="form-check-input"
+									onchange={() => selectTask(taskInfo.task.id)}
+									checked={selectedTasks.includes(taskInfo.task.id)}
+								/>
+							</td>
 							<td>{taskInfo.task.id}</td>
-							<td>{taskInfo.task.name}</td>
+							<td class="task-core-col">
+								<button
+									type="button"
+									class="core-icon-button"
+									aria-label={taskInfo.task.is_core ? 'Make not core' : 'Make core'}
+									title={taskInfo.task.is_core
+										? 'The task is core. Click to make it not core.'
+										: 'The task is not core. Click to make it core.'}
+									onclick={async () => {
+										if (taskInfo.task.is_core) {
+											await makeNotCore([taskInfo.task.id]);
+										} else {
+											await makeCore([taskInfo.task.id]);
+										}
+									}}
+								>
+									<i
+										class={taskInfo.task.is_core
+											? 'bi bi-patch-check-fill verified-core-icon'
+											: 'bi bi-patch-check text-secondary'}
+									></i>
+								</button>
+							</td>
+							<td>
+								{taskInfo.task.name}
+							</td>
 							<td>{taskInfo.task.version || '-'}</td>
 							<td>{taskInfo.task.type}</td>
 							<td>
@@ -359,9 +549,13 @@
 								{/if}
 							</td>
 							<td>
-								<button class="btn btn-light" onclick={() => openInfoModal(taskInfo)}>
+								<button
+									class="btn btn-light"
+									aria-label="Info"
+									title="Info"
+									onclick={() => openInfoModal(taskInfo)}
+								>
 									<i class="bi bi-info-circle"></i>
-									Info
 								</button>
 							</td>
 						</tr>
@@ -492,6 +686,10 @@
 </Modal>
 
 <style>
+	.tasks-table tbody td {
+		vertical-align: middle;
+	}
+
 	.tasks-table {
 		table-layout: fixed;
 		min-width: 900px;
@@ -518,5 +716,46 @@
 	}
 	.noborders li:last-child {
 		border-bottom: 0 !important;
+	}
+
+	td.task-core-col {
+		vertical-align: middle;
+		width: 1%;
+		white-space: nowrap;
+	}
+
+	.core-icon-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		padding: 0;
+		margin: 0;
+		border: 0;
+		background: transparent;
+
+		color: inherit;
+		line-height: 1;
+		cursor: pointer;
+		appearance: none;
+	}
+
+	.core-icon-button:hover,
+	.core-icon-button:active,
+	.core-icon-button:focus {
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+	}
+
+	.core-icon-button:focus-visible {
+		outline: 2px solid #1da1f2;
+		outline-offset: 2px;
+		border-radius: 999px;
+	}
+
+	.verified-core-icon {
+		color: #1da1f2;
+		line-height: 1;
 	}
 </style>
