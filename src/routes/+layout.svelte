@@ -269,7 +269,7 @@
 				<div class="toast-body text-black">Token copied to clipboard</div>
 				<button
 					type="button"
-					class="btn-close btn-close-white me-2 m-auto"
+					class="btn-close btn-close-black opacity-75 me-2 m-auto"
 					data-bs-dismiss="toast"
 					aria-label="Close"
 				></button>
