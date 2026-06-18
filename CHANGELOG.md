@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Remove usage of `GET /api/v2/task/` endpoint (\#1180);
+
 # 1.28.2
 
 - Remove Node 20 support (\#1166).
