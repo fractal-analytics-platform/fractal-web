@@ -495,6 +495,7 @@
 									class="form-check-input"
 									onchange={() => selectTask(taskInfo.task.id)}
 									checked={selectedTasks.includes(taskInfo.task.id)}
+									aria-label="Select task {taskInfo.task.name}"
 								/>
 							</td>
 							<td>{taskInfo.task.id}</td>
