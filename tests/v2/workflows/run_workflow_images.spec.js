@@ -53,7 +53,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		);
 		await createImage(page, `${randomPath}/plate1.zarr/B/03/3`, { k3: 'k3v1', k4: 'k4v1' });
 		await createImage(page, `${randomPath}/plate1.zarr/B/03/4`, { k3: 'k3v2', k4: 'k4v2' });
-		await checkAccessibility(page);
+		await checkAccessibility(page, 'table');
 	});
 
 	await test.step('Open workflow page', async () => {

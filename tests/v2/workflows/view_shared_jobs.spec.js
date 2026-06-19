@@ -96,6 +96,7 @@ test('View shared jobs', async ({ page }) => {
 		await expect(page.getByRole('row')).toHaveCount(3);
 		await expect(page.getByRole('row', { name: 'admin@fractal.xy' })).not.toBeVisible();
 		await expect(page.getByRole('row', { name: userEmail })).toBeVisible();
+		await expect(page.locator('.ss-open')).not.toBeVisible();
 	});
 
 	await test.step('Cleanup', async () => {
