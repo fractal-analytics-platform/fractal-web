@@ -49,23 +49,23 @@
 			<div class="row mb-3">
 				<div class="col-12">
 					<p class="lead">Task properties</p>
-					<ul class="list-group">
-						<li class="list-group-item list-group-item-light fw-bold">Name</li>
-						<li class="list-group-item">{task.name}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Version</li>
-						<li class="list-group-item">{taskVersion || '-'}</li>
-						<li class="list-group-item list-group-item-light fw-bold">Type</li>
-						<li class="list-group-item">{task.type}</li>
+					<div class="list-group">
+						<div class="list-group-item list-group-item-light fw-bold">Name</div>
+						<div class="list-group-item">{task.name}</div>
+						<div class="list-group-item list-group-item-light fw-bold">Version</div>
+						<div class="list-group-item">{taskVersion || '-'}</div>
+						<div class="list-group-item list-group-item-light fw-bold">Type</div>
+						<div class="list-group-item">{task.type}</div>
 						{#if task.command_non_parallel !== null}
-							<li class="list-group-item list-group-item-light fw-bold">Command non parallel</li>
-							<li class="list-group-item"><code>{task.command_non_parallel}</code></li>
+							<div class="list-group-item list-group-item-light fw-bold">Command non parallel</div>
+							<div class="list-group-item"><code>{task.command_non_parallel}</code></div>
 						{/if}
 						{#if task.command_parallel !== null}
-							<li class="list-group-item list-group-item-light fw-bold">Command parallel</li>
-							<li class="list-group-item"><code>{task.command_parallel}</code></li>
+							<div class="list-group-item list-group-item-light fw-bold">Command parallel</div>
+							<div class="list-group-item"><code>{task.command_parallel}</code></div>
 						{/if}
-						<li class="list-group-item list-group-item-light fw-bold">Input Types</li>
-						<li class="list-group-item">
+						<div class="list-group-item list-group-item-light fw-bold">Input Types</div>
+						<div class="list-group-item">
 							<table class="table table-borderless mb-0">
 								<tbody>
 									{#each Object.keys(task.input_types) as key (key)}
@@ -76,9 +76,9 @@
 									{/each}
 								</tbody>
 							</table>
-						</li>
-						<li class="list-group-item list-group-item-light fw-bold">Output Types</li>
-						<li class="list-group-item">
+						</div>
+						<div class="list-group-item list-group-item-light fw-bold">Output Types</div>
+						<div class="list-group-item">
 							<table class="table table-borderless mb-0">
 								<tbody>
 									{#each Object.keys(task.output_types) as key (key)}
@@ -89,24 +89,24 @@
 									{/each}
 								</tbody>
 							</table>
-						</li>
-						<li class="list-group-item list-group-item-light fw-bold">Docs Link</li>
-						<li class="list-group-item">
+						</div>
+						<div class="list-group-item list-group-item-light fw-bold">Docs Link</div>
+						<div class="list-group-item">
 							{#if task.docs_link}
 								<a href={task.docs_link} target="_blank">{task?.docs_link}</a>
 							{:else}
 								-
 							{/if}
-						</li>
-						<li class="list-group-item list-group-item-light fw-bold">Docs Info</li>
-						<li class="list-group-item">
+						</div>
+						<div class="list-group-item list-group-item-light fw-bold">Docs Info</div>
+						<div class="list-group-item">
 							{#if task.docs_info}
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								{@html formatMarkdown(task.docs_info)}
 							{:else}
 								-
 							{/if}
-						</li>
+						</div>
 
 						{#if task.command_non_parallel !== null}
 							{#if loading}
@@ -142,8 +142,8 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">Initialisation Meta</li>
-								<li class="list-group-item">-</li>
+								<div class="list-group-item list-group-item-light fw-bold">Initialisation Meta</div>
+								<div class="list-group-item">-</div>
 							{/if}
 						{/if}
 						{#if task.command_parallel !== null}
@@ -180,12 +180,12 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">Compute Meta</li>
-								<li class="list-group-item">-</li>
+								<div class="list-group-item list-group-item-light fw-bold">Compute Meta</div>
+								<div class="list-group-item">-</div>
 							{/if}
 						{/if}
-						<li class="list-group-item list-group-item-light fw-bold">Args Schema Version</li>
-						<li class="list-group-item">{task.args_schema_version || '-'}</li>
+						<div class="list-group-item list-group-item-light fw-bold">Args Schema Version</div>
+						<div class="list-group-item">{task.args_schema_version || '-'}</div>
 						{#if task.command_non_parallel !== null}
 							{#if loading}
 								<div class="spinner-border spinner-border-sm" role="status">
@@ -220,10 +220,10 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">
+								<div class="list-group-item list-group-item-light fw-bold">
 									Args Schema non parallel
-								</li>
-								<li class="list-group-item">-</li>
+								</div>
+								<div class="list-group-item">-</div>
 							{/if}
 						{/if}
 						{#if task.command_parallel !== null}
@@ -260,11 +260,13 @@
 									</div>
 								</div>
 							{:else}
-								<li class="list-group-item list-group-item-light fw-bold">Args Schema parallel</li>
-								<li class="list-group-item">-</li>
+								<div class="list-group-item list-group-item-light fw-bold">
+									Args Schema parallel
+								</div>
+								<div class="list-group-item">-</div>
 							{/if}
 						{/if}
-					</ul>
+					</div>
 				</div>
 			</div>
 		{/if}
