@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createImage } from '../../utils/v2/image.js';
 import { expect, test } from '../workflow_fixture.js';
 
@@ -11,12 +11,11 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 
 	const randomZarrSubfolder = Math.random().toString(36).substring(7);
 	const randomPath = `/tmp/${randomZarrSubfolder}`;
-	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
@@ -40,11 +39,11 @@ test('Type filters flow modal', async ({ page, workflow }) => {
 		await workflow.addTask('illumination_correction');
 	});
 
-	const rows = modal.getByRole('row');
-
 	await test.step('Open type filters flow modal', async () => {
 		await page.getByRole('button', { name: 'Type filters flow' }).click();
+		const modal = await waitModal(page);
 		await modal.waitFor();
+		const rows = modal.getByRole('row');
 		await expect(rows).toHaveCount(4);
 		// First row
 		await expect(rows.nth(1).getByRole('cell').nth(0)).toHaveText('cellpose_segmentation');

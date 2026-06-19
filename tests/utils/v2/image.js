@@ -1,4 +1,4 @@
-import { waitModalClosed } from '../utils';
+import { waitModal, waitModalClosed } from '../utils';
 
 /**
  * @param {import('@playwright/test').Page} page
@@ -10,8 +10,7 @@ export async function createImage(page, zarrUrl, attributes = {}, types = {}) {
 	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
 	await newImageBtn.waitFor();
 	await newImageBtn.click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	const modal = await waitModal(page, false);
 	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(zarrUrl);
 	for (const [key, value] of Object.entries(attributes)) {
 		await modal.getByRole('button', { name: 'Add attribute' }).click();

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
-import { test } from '../../../base_fixture';
-import { waitPageLoading } from '../../../utils/utils.js';
+import { checkAccessibility, test } from '../../../base_fixture';
+import { waitModal, waitPageLoading } from '../../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../../utils/v2/task.js';
 
 test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
@@ -20,11 +20,11 @@ test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 
 	await test.step('Deactivate the task', async () => {
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('The task group is currently active')).toBeVisible();
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 	});
 
@@ -41,8 +41,7 @@ test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Reactivate task group' }).click();
 	});
@@ -60,8 +59,7 @@ test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);

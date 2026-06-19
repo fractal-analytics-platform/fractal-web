@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { test } from '../../../base_fixture';
-import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import { addGroupToUser, verifyChecked } from '../../../utils/v2/user.js';
 import { createTestGroup, deleteGroup } from '../../../utils/group.js';
 
@@ -163,13 +163,12 @@ test('Create and update a user', async ({ page }) => {
 		await expect(page.getByRole('checkbox', { name: 'Guest' })).not.toBeEnabled();
 		await page.getByRole('button', { name: 'Save' }).click();
 
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Confirm action');
-		await expect(page.locator('.modal.show .modal-body')).toContainText(
+		const modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toHaveText('Confirm action');
+		await expect(modal.locator('.modal-body')).toContainText(
 			'Do you really want to grant superuser privilege to this user?'
 		);
-		await page.locator('.modal.show').getByRole('button', { name: 'Confirm' }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});
 
@@ -201,13 +200,12 @@ test('Create and update a user', async ({ page }) => {
 		await page.getByRole('checkbox', { name: 'Superuser' }).uncheck();
 		await page.getByRole('button', { name: 'Save' }).click();
 
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Confirm action');
-		await expect(page.locator('.modal.show .modal-body')).toContainText(
+		const modal = await waitModal(page, false);
+		await expect(modal.locator('.modal-title')).toHaveText('Confirm action');
+		await expect(modal.locator('.modal-body')).toContainText(
 			'Do you really want to revoke superuser privilege to this user?'
 		);
-		await page.locator('.modal.show').getByRole('button', { name: 'Confirm' }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByText('User successfully updated')).toBeVisible();
 	});

@@ -55,7 +55,7 @@ test('View shared jobs', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.getByRole('combobox', { name: 'Dataset' }).selectOption(dataset.name);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitTaskSubmitted(page);

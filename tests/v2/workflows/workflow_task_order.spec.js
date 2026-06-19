@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { checkAccessibility } from '../../base_fixture.js';
 
 test('Change workflow task order', async ({ page, workflow }) => {
@@ -13,8 +13,7 @@ test('Change workflow task order', async ({ page, workflow }) => {
 
 	await test.step('Edit tasks order', async () => {
 		await page.getByRole('button', { name: 'Edit tasks order' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 
 		const buttons = await modal.getByRole('button').all();
 		await expect(buttons[1]).toHaveText(/create_ome_zarr_compound/);
@@ -34,9 +33,7 @@ test('Change workflow task order', async ({ page, workflow }) => {
 		await page.reload();
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Edit tasks order' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-
+		const modal = await waitModal(page);
 		const buttons = await modal.getByRole('button').all();
 		await expect(buttons[1]).toHaveText(/illumination_correction/);
 		await expect(buttons[2]).toHaveText(/create_ome_zarr_compound/);

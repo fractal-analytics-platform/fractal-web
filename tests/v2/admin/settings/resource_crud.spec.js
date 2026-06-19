@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from '../../../base_fixture';
+import { checkAccessibility, test } from '../../../base_fixture';
 import {
 	setUploadFile,
 	waitModal,
@@ -36,6 +36,7 @@ test('Create, update and delete a resource', async ({ page }) => {
 		await expect(page.locator('textarea')).toHaveValue(/{/);
 		const resource = await getResourceConfig(page);
 		await page.locator('textarea').fill(JSON.stringify({ ...resource, name: randomResourceName }));
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Create resource' }).click();
 		await page.waitForURL(/\/v2\/admin\/resources$/);
 		await waitPageLoading(page);
@@ -88,6 +89,7 @@ test('Create, update and delete a resource', async ({ page }) => {
 		await expect(page.getByRole('switch')).toBeEnabled();
 		resource = await getResourceConfig(page);
 		expect(resource.prevent_new_submissions).toEqual(false);
+		await checkAccessibility(page);
 	});
 
 	await test.step('Export the resource to file', async () => {
@@ -111,7 +113,7 @@ test('Create, update and delete a resource', async ({ page }) => {
 			.getByRole('row', { name: `${randomResourceName}-renamed` })
 			.getByRole('button', { name: 'Delete' })
 			.click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(

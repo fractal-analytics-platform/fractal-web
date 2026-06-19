@@ -1,6 +1,6 @@
 import { mergeTests } from '@playwright/test';
 import { test as baseTest } from '../base_fixture';
-import { addTaskToWorkflow, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { addTaskToWorkflow, waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { createWorkflow, deleteWorkflow } from '../utils/v2/workflow';
 import { PageWithProject } from './project_fixture.js';
 import { createProject } from '../utils/v2/project.js';
@@ -21,10 +21,8 @@ export class PageWithWorkflow extends PageWithProject {
 
 	async addFirstCollectedTask() {
 		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
-		let modalTitle = this.page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('New workflow task');
-		const modal = this.page.locator('.modal.show');
+		const modal = await waitModal(this.page, false);
+		await expect(modal.locator('.modal-title')).toHaveText('New workflow task');
 		const selector = modal.getByRole('combobox').first();
 		await selector.click();
 		const firstItem = this.page.getByRole('listbox').locator('[aria-selected="false"]').first();
@@ -87,8 +85,7 @@ export class PageWithWorkflow extends PageWithProject {
 
 	async removeCurrentTask() {
 		await this.page.getByRole('button', { name: 'Delete workflow task' }).click();
-		const modal = this.page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(this.page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(this.page);
 	}

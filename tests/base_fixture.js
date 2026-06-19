@@ -9,29 +9,26 @@ import AxeBuilder from '@axe-core/playwright';
  */
 export const test = base.extend({
 	page: async ({ page }, use) => {
-		const makeAxeBuilder = getMakeAxeBuilder(page);
 		await use(page);
 		const url = page.url();
 		if (url !== 'about:blank' && !url.includes('/_app')) {
-			const accessibilityScanResults = await makeAxeBuilder().analyze();
-			expect(accessibilityScanResults.violations).toEqual([]);
+			await checkAccessibility(page);
 		}
 	}
 });
 
 /**
- *
  * @param {import('@playwright/test').Page} page
+ * @param {string|undefined=} element
  */
-export async function checkAccessibility(page) {
-	const makeAxeBuilder = getMakeAxeBuilder(page);
-	const accessibilityScanResults = await makeAxeBuilder().analyze();
+export async function checkAccessibility(page, element = undefined) {
+	const axeBuilder = new AxeBuilder({ page })
+		.withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+		// excluding slim-select due to aria-activedescendant issue
+		.exclude('.ss-main');
+	if (element) {
+		axeBuilder.include(element);
+	}
+	const accessibilityScanResults = await axeBuilder.analyze();
 	expect(accessibilityScanResults.violations).toEqual([]);
-}
-
-/**
- * @param {import('@playwright/test').Page} page
- */
-function getMakeAxeBuilder(page) {
-	return () => new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
 }

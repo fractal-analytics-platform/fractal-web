@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed } from '../../utils/utils.js';
+import { waitModal, waitModalClosed } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { checkAccessibility } from '../../base_fixture.js';
 
@@ -128,8 +128,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 	await test.step('Trigger the unsaved arguments modal and discard the changes', async () => {
 		await tab.getByLabel('Remove property').first().click();
 		await page.getByRole('button', { name: 'Meta', exact: true }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Discard changes' }).click();
 		await waitModalClosed(page);
 		await page.getByRole('button', { name: 'Meta', exact: true }).click();
@@ -140,8 +139,7 @@ test('Workflow task without JSON Schema [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await tab.getByLabel('Remove property').first().click();
 		await page.getByRole('button', { name: 'Meta', exact: true }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Save changes' }).click();
 		await waitModalClosed(page);
 		await page.getByRole('button', { name: 'Meta', exact: true }).click();

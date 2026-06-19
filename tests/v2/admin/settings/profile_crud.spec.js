@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from '../../../base_fixture';
+import { checkAccessibility, test } from '../../../base_fixture';
 import {
 	setUploadFile,
 	waitModal,
@@ -26,6 +26,7 @@ test('Create, update and delete a profile', async ({ page }) => {
 		const text = await page.locator('textarea').inputValue();
 		const resource = JSON.parse(/**@type {string} */ (text));
 		await page.locator('textarea').fill(JSON.stringify({ ...resource, name: randomResourceName }));
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Create resource' }).click();
 		await page.waitForURL(/\/v2\/admin\/resources$/);
 		await waitPageLoading(page);
@@ -63,6 +64,7 @@ test('Create, update and delete a profile', async ({ page }) => {
 	await test.step('Edit profile', async () => {
 		await page.getByRole('link', { name: 'Edit' }).click();
 		await page.getByRole('textbox', { name: 'Profile name' }).fill(`${randomProfileName}-renamed`);
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('Profile successfully updated')).toBeVisible();
 	});
@@ -75,7 +77,7 @@ test('Create, update and delete a profile', async ({ page }) => {
 			.getByRole('row', { name: `${randomProfileName}-renamed` })
 			.getByRole('button', { name: 'Delete' })
 			.click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByRole('row', { name: `${randomProfileName}-renamed` })).not.toBeVisible();
@@ -89,7 +91,7 @@ test('Create, update and delete a profile', async ({ page }) => {
 			.getByRole('row', { name: randomResourceName })
 			.getByRole('button', { name: 'Delete' })
 			.click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByRole('row', { name: randomResourceName })).not.toBeVisible();

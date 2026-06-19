@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { test } from '../../../base_fixture';
-import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import { PageWithWorkflow } from '../../workflow_fixture.js';
 import * as fs from 'fs';
 import { waitTaskFailure, waitTaskSubmitted } from '../../../utils/v2/workflowtask.js';
@@ -225,12 +225,11 @@ async function runWorkflow(page, dataset) {
 			.selectOption(dataset);
 		const runWorkflowBtn = page.getByRole('button', { name: 'Run workflow' });
 		await runWorkflowBtn.click();
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Run workflow');
-		const runBtn = page.locator('.modal.show').getByRole('button', { name: 'Run' });
+		let modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toHaveText('Run workflow');
+		const runBtn = modal.getByRole('button', { name: 'Run' });
 		await runBtn.click();
-		const confirmBtn = page.locator('.modal.show').getByRole('button', { name: 'Confirm' });
+		const confirmBtn = modal.getByRole('button', { name: 'Confirm' });
 		await confirmBtn.click();
 		await page.getByRole('link', { name: 'List jobs' }).click();
 		await waitPageLoading(page);
@@ -238,8 +237,8 @@ async function runWorkflow(page, dataset) {
 			.getByRole('row', { name: 'submitted' })
 			.getByRole('button', { name: 'Info' })
 			.click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+
+		modal = await waitModal(page, false);
 		const value = await modal.getByRole('listitem').nth(1).textContent();
 		jobId = Number(value?.trim());
 		await modal.getByRole('button', { name: 'Close' }).click();

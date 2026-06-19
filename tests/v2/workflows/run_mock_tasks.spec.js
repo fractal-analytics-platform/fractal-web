@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { closeModal, waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import fs from 'fs';
 import { createDataset } from '../../utils/v2/dataset.js';
 import {
@@ -65,8 +65,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Start the job', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Dataset', exact: true })
@@ -92,8 +91,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Open "Continue workflow" modal', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		await waitModal(page, false);
 		// Check that confirm mode has been reset
 		expect(await page.getByRole('button', { name: 'Run', exact: true }).isVisible()).toEqual(true);
 	});
@@ -139,8 +137,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Start the new job', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		await waitModal(page, false);
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -159,8 +156,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Open error modal', async () => {
 		await page.getByRole('button', { name: 'Show complete log' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByText('This is the error message').waitFor();
 
 		await page.getByRole('button', { name: '... (details hidden, click' }).click();
@@ -181,8 +177,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Continue the workflow from failed task', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Start workflow at' })
@@ -207,8 +202,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Reset the workflow replacing dataset', async () => {
 		await page.getByRole('button', { name: 'Reset workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Start workflow at' })
@@ -239,8 +233,7 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 
 	await test.step('Reset the workflow creating a new dataset', async () => {
 		await page.getByRole('button', { name: 'Reset workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('checkbox', { name: 'Replace existing dataset' }).uncheck();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
@@ -290,11 +283,10 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 	let jobId = null;
 	await test.step('Open Info modal', async () => {
 		await page.locator('table tbody tr').getByRole('button', { name: 'Info' }).first().click();
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toContainText(`Workflow Job #`);
+		const modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toContainText(`Workflow Job #`);
 
-		const items = await page.locator('.modal.show').getByRole('listitem').allInnerTexts();
+		const items = await modal.getByRole('listitem').allInnerTexts();
 		expect(items[0]).toEqual('Id');
 		jobId = items[1];
 		expect(items[2]).toEqual('Workflow');
@@ -331,9 +323,8 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		const logsButton = jobRow?.getByRole('button', { name: 'Logs' });
 		await logsButton.waitFor();
 		await logsButton.click();
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Workflow Job logs');
+		const modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toHaveText('Workflow Job logs');
 	});
 
 	await test.step('Test log button colors', async () => {
@@ -366,11 +357,12 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
  */
 async function getJobId(page, row) {
 	await row.getByRole('button', { name: 'Info' }).click();
-	const modalTitle = page.locator('.modal.show .modal-title');
+	const modal = await waitModal(page, false);
+	const modalTitle = modal.locator('.modal-title');
 	await modalTitle.waitFor();
 	const text = await modalTitle.innerText();
 	const match = text.match('Workflow Job #(\\d+)');
 	expect(match).not.toBeNull();
-	await page.locator('.modal.show .modal-header [aria-label="Close"]').click();
+	await closeModal(page);
 	return /** @type {RegExpMatchArray} */ (match)[1];
 }

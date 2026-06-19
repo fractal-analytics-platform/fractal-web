@@ -1,5 +1,5 @@
 import { checkAccessibility } from '../../base_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createImage } from '../../utils/v2/image.js';
 import { expect, test } from '../workflow_fixture.js';
 
@@ -12,12 +12,11 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 
 	const randomZarrSubfolder = Math.random().toString(36).substring(7);
 	const randomPath = `/tmp/${randomZarrSubfolder}`;
-	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
@@ -65,7 +64,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 
 	await test.step('Check images', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(modal.getByRole('row')).toHaveCount(7);
 		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Close' }).click();
@@ -87,7 +86,7 @@ test('View images in run workflow modal', async ({ page, workflow }) => {
 		await page.waitForURL(workflow.url);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(modal.getByRole('row')).toHaveCount(3);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);

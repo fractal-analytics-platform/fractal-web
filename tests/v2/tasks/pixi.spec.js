@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
-import { test } from '../../base_fixture';
-import { waitPageLoading } from '../../utils/utils.js';
+import { checkAccessibility, test } from '../../base_fixture';
+import { waitModal, waitPageLoading } from '../../utils/utils.js';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
@@ -69,6 +69,7 @@ test('Pixi task collection', async ({ page, request }) => {
 		await expect(
 			page.getByRole('table').nth(1).getByRole('row', { name: taskName }).first()
 		).toBeVisible();
+		await checkAccessibility(page);
 	});
 
 	await test.step('Cleanup temporary file', async () => {
@@ -93,9 +94,9 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByRole('textbox', { name: 'Package name' }).fill(taskName);
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);
 		await page.goBack();
@@ -116,6 +117,7 @@ test('Pixi task collection', async ({ page, request }) => {
 		await page.getByRole('button', { name: 'Proceed' }).click();
 		await modal.waitFor();
 		await expect(modal.getByText('non-reversible')).toBeVisible();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);
 		await waitPageLoading(page);

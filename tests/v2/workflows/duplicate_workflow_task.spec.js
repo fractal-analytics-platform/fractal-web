@@ -58,7 +58,7 @@ test('Duplicate workflow task', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await page.getByRole('textbox', { name: 'Image Dir' }).fill('/tmp1234');
 		await page.getByRole('button', { name: 'Duplicate workflow task' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Save changes' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByRole('textbox', { name: 'Image Dir' })).toHaveValue('/tmp1234');

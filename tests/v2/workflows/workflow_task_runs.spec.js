@@ -1,5 +1,10 @@
 import { expect, test } from '../workflow_fixture.js';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	selectSlimSelect,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { checkAccessibility } from '../../base_fixture.js';
@@ -9,7 +14,6 @@ test('Workflow task runs', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -44,7 +48,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -53,7 +57,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Open logs modal', async () => {
 		await page.getByRole('button', { name: 'Done images of cellpose_segmentation' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('Images')).toBeVisible();
 		await expect(modal.getByText('Total results: 15')).toBeVisible();
 		await modal.getByRole('button', { name: '2' }).click();
@@ -77,7 +81,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Continue workflow', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Start workflow at' })
@@ -111,7 +115,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Open run logs modal', async () => {
 		await page.getByRole('button', { name: `Done images of run 2` }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('Run 2')).toBeVisible();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(3);

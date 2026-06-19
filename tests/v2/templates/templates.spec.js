@@ -72,7 +72,7 @@ test('Use template page', async ({ page }) => {
 
 		// Create template
 		await page.getByRole('button', { name: 'Create template' }).click();
-		const modal2 = await waitModal(page);
+		const modal2 = await waitModal(page, false);
 		await modal.getByText('Template description').fill('This is the template description.');
 		await modal2.getByLabel('User Group').selectOption({ label: 'All' });
 		await modal2.getByRole('button', { name: 'Create template' }).click();
@@ -124,7 +124,7 @@ test('Use template page', async ({ page }) => {
 		await waitModalClosed(page);
 
 		await page.getByRole('button', { name: 'Info' }).click();
-		await waitModal(page);
+		await waitModal(page, false);
 		const values = page.locator('.list-group-item:not(.text-bg-light)');
 		await expect(values.nth(1).locator('span')).toHaveText(newDescription);
 		await expect(values.nth(4).locator('span')).toHaveText('-');
@@ -143,7 +143,7 @@ test('Use template page', async ({ page }) => {
 		await download.saveAs(file);
 
 		await page.getByRole('button', { name: 'Delete' }).click();
-		await waitModal(page);
+		await waitModal(page, false);
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page).toHaveURL(`/v2/templates?template_id=${templateId}`);
@@ -242,7 +242,7 @@ test('Use template page', async ({ page }) => {
 	await test.step('Create a workflow from a template', async () => {
 		await page.goto(`/v2/projects/${project.id}`);
 		await page.getByRole('button', { name: 'Create new workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByLabel('Create from template').check();
 
 		const rows = modal.locator('tbody tr');
@@ -278,7 +278,7 @@ test('Use template page', async ({ page }) => {
 		await waitModalClosed(page);
 
 		await page.getByRole('button', { name: 'Create template' }).click();
-		const modal3 = await waitModal(page);
+		const modal3 = await waitModal(page, false);
 		// default: originalTemplate.name
 		await expect(modal3.getByText('Template name')).toHaveValue(newTemplateName);
 		// default: 2

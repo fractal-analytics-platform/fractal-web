@@ -87,14 +87,14 @@ test('Compare workflow to template', async ({ page, project }) => {
 		await page.getByRole('textbox', { name: 'Suffix' }).fill('newX');
 
 		await page.getByRole('button', { name: 'Compare workflow to template' }).click();
-		const modal1 = await waitModal(page);
+		const modal1 = await waitModal(page, false);
 		await expect(modal1.getByText(/There are argument changes unsaved/)).toBeVisible();
 		await modal1.getByRole('button', { name: 'Save changes' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByText(/Arguments changes saved successfully/)).toBeVisible();
 
 		await page.getByRole('button', { name: 'Compare workflow to template' }).click();
-		const modal2 = await waitModal(page);
+		const modal2 = await waitModal(page, false);
 		await modal2.getByRole('button', { name: 'MIP_compound' }).click();
 		await expect(modal2.getByText('Non-parallel arguments match.')).toHaveCount(1);
 	});

@@ -35,8 +35,7 @@ test('Reset shared workflow with non-shared project directory', async ({ page })
 
 	await test.step('Start the job', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		await waitModal(page);
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);

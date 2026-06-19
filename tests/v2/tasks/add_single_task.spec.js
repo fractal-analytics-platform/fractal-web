@@ -1,9 +1,10 @@
 import { expect } from '@playwright/test';
 import { test } from '../../base_fixture';
 import {
+	closeModal,
 	getRandomName,
 	setUploadFile,
-	waitModalClosed,
+	waitModal,
 	waitPageLoading,
 	waitStopSpinnerIn
 } from '../../utils/utils.js';
@@ -242,11 +243,12 @@ async function openSingleTaskForm(page) {
 async function getCreatedTaskModalData(page, taskName, taskType) {
 	const row = await getCreatedTaskRow(page, taskName);
 	await row.getByRole('button', { name: 'Info' }).click();
-	const modalTitle = page.locator('.modal.show .modal-title');
+	const modal = await waitModal(page);
+	const modalTitle = modal.locator('.modal-title');
 	await modalTitle.waitFor();
 	await expect(modalTitle).toHaveText(`Task ${taskName}`);
 	await waitStopSpinnerIn(page, '.modal.show');
-	const items = await page.locator('.modal.show .modal-body').getByRole('listitem').all();
+	const items = await modal.locator('.list-group-item').all();
 	let task;
 	switch (taskType) {
 		case 'non_parallel':
@@ -261,9 +263,7 @@ async function getCreatedTaskModalData(page, taskName, taskType) {
 		default:
 			throw new Error('Invalid task type');
 	}
-	const closeModalBtn = page.locator('.modal.show').getByRole('button', { name: 'Close' }).first();
-	await closeModalBtn.click();
-	await waitModalClosed(page);
+	await closeModal(page);
 	return task;
 }
 

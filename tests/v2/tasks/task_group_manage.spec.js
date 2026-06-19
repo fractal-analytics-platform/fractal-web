@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { test } from '../../base_fixture';
-import { waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitPageLoading } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 
 test('Task group manage (deactivate / reactivate)', async ({ page }) => {
@@ -15,8 +15,7 @@ test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('The task group is currently active')).toBeVisible();
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
@@ -34,8 +33,7 @@ test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 		await page.goBack();
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Reactivate task group' }).click();
 	});

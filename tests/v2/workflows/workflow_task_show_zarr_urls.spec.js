@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 
@@ -8,7 +8,6 @@ test('Workflow task - Show Zarr URLs button', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -32,7 +31,7 @@ test('Workflow task - Show Zarr URLs button', async ({ page, workflow }) => {
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -42,7 +41,7 @@ test('Workflow task - Show Zarr URLs button', async ({ page, workflow }) => {
 	await test.step('Open MIP_compound run', async () => {
 		await page.getByRole('button', { name: 'Show runs' }).last().click();
 		await page.getByRole('button', { name: 'Done images of run 1' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('Run 1')).toBeVisible();
 		await expect(modal.getByText('Total results: 3')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(5);
@@ -52,6 +51,7 @@ test('Workflow task - Show Zarr URLs button', async ({ page, workflow }) => {
 	});
 
 	await test.step('Show Zarr URLs subpage', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('row').nth(2).getByRole('button', { name: 'Zarr URLs' }).click();
 		await expect(modal.getByRole('row')).toHaveCount(2);
 		await expect(modal.getByRole('row').first()).toContainText('my_plate.zarr/A/01/0_corr');

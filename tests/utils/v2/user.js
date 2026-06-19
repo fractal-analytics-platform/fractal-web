@@ -4,6 +4,7 @@ import {
 	getFractalCookie,
 	getRandomName,
 	selectSlimSelect,
+	waitModal,
 	waitModalClosed,
 	waitPageLoading
 } from '../utils';
@@ -51,8 +52,7 @@ export async function createGuestUser(page, projectDir = '/tmp') {
  */
 export async function addGroupToUser(page, groupName) {
 	await page.getByRole('button', { name: 'Add group' }).click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	const modal = await waitModal(page, false);
 	const selectableGroups = await page.getByRole('option').count();
 	await selectSlimSelect(
 		page,

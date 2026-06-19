@@ -3,6 +3,7 @@ import {
 	expectSlimSelectNotSet,
 	expectSlimSelectValue,
 	selectSlimSelect,
+	waitModal,
 	waitPageLoading
 } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
@@ -11,8 +12,6 @@ import { createImage } from '../../utils/v2/image.js';
 test('Run workflow implicit applies changed filters [#694]', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
 	await waitPageLoading(page);
-
-	const modal = page.locator('.modal.show');
 
 	let datasetName;
 	await test.step('Create test dataset1 and open dataset page', async () => {
@@ -55,7 +54,7 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 
 	await test.step('Open "Run workflow" modal', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		// check images and selected filters
 		await expectSlimSelectNotSet(page, 'a1');
 		await expectSlimSelectValue(page, 't1', 'True');
@@ -65,17 +64,20 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 
 	await test.step('Add a filter and click on Run without clicking Apply', async () => {
 		await selectSlimSelect(page, page.getByRole('combobox', { name: 'a1' }), 'v1', true);
+		const modal = await waitModal(page, false);
 		await expect(modal.getByRole('button', { name: 'Apply' })).toBeEnabled();
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 	});
 
 	await test.step('Check filters have been applied in any case', async () => {
+		const modal = await waitModal(page, false);
 		await expect(modal.getByText('This job will process 1 image')).toBeVisible();
 		await expect(modal.getByRole('listitem').nth(0)).toContainText('v1');
 		await expect(modal.getByRole('listitem').nth(1)).toContainText('t1');
 	});
 
 	await test.step('Click cancel and check that filters have been reset', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await expectSlimSelectNotSet(page, 'a1');
 		await expectSlimSelectValue(page, 't1', 'True');
@@ -84,6 +86,7 @@ test('Run workflow implicit applies changed filters [#694]', async ({ page, work
 	});
 
 	await test.step('Click Run and check', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText('This job will process 2 images')).toBeVisible();
 		await expect(modal.getByRole('listitem')).toContainText('t1');

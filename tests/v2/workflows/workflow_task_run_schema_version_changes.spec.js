@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
@@ -9,8 +9,6 @@ test('Workflow task runs display different versions of arguments schema', async 
 	workflow
 }) => {
 	test.slow();
-
-	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		await createDataset(page, workflow.projectId);
@@ -56,7 +54,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -81,7 +79,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 
 	await test.step('Run workflow again', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption(taskName);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
@@ -111,8 +109,7 @@ test('Workflow task runs display different versions of arguments schema', async 
 		const taskRow = page.getByRole('row', { name: taskName });
 		await taskRow.getByRole('combobox').selectOption('0.0.1');
 		await taskRow.getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Delete task group' }).click();
 		await modal.getByRole('button', { name: 'Confirm delete' }).click();
 		await waitModalClosed(page);

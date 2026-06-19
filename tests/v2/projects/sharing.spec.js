@@ -138,7 +138,7 @@ test('Project sharing', async ({ page }) => {
 		await closeModal(page);
 
 		await acceptedRow2.getByRole('button', { name: 'Info' }).click();
-		const modal2 = await waitModal(page);
+		const modal2 = await waitModal(page, false);
 		await expect(modal2.getByText('admin@fractal.xy')).toBeVisible();
 		await expect(modal2.getByText('Read, Write, Execute')).toBeVisible();
 		await closeModal(page);
@@ -149,7 +149,7 @@ test('Project sharing', async ({ page }) => {
 		await page.waitForURL(/\/v2\/projects\/\d+/);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Info' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await expect(modal.getByText('admin@fractal.xy')).toBeVisible();
 		await closeModal(page);
 	});

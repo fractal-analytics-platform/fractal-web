@@ -1,4 +1,3 @@
-import { checkAccessibility } from '../../base_fixture.js';
 import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { checkTasksOrder } from '../../utils/v2/task.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -12,7 +11,6 @@ test('Bulk workflow tasks insertion', async ({ page, workflow }) => {
 		const modal = await waitModal(page);
 		await modal.getByRole('checkbox', { name: 'generic_task', exact: true }).click();
 		await modal.getByRole('checkbox', { name: 'MIP_compound' }).click();
-		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Add 2 tasks' }).click();
 		await waitModalClosed(page);
 
@@ -30,7 +28,7 @@ test('Bulk workflow tasks insertion', async ({ page, workflow }) => {
 
 	await test.step('Add two tasks in between', async () => {
 		await page.getByRole('button', { name: 'Add task to workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('checkbox', { name: 'out_of_memory' }).click();
 		await modal.getByRole('checkbox', { name: 'illumination_correction', exact: true }).click();
 		await modal.getByRole('combobox', { name: 'Add after' }).selectOption('foo');
@@ -42,7 +40,7 @@ test('Bulk workflow tasks insertion', async ({ page, workflow }) => {
 
 	await test.step('Add 1 task at the end', async () => {
 		await page.getByRole('button', { name: 'Add task to workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('checkbox', { name: 'apply_registration_to_image' }).click();
 		await modal.getByRole('button', { name: 'Add 1 task' }).click();
 		await waitModalClosed(page);

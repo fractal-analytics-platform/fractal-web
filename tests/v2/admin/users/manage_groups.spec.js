@@ -58,8 +58,7 @@ test('Admin groups management', async ({ page }) => {
 
 	await test.step('Reopen modal and check options', async () => {
 		await page.getByRole('button', { name: 'Add group' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		const selectableGroups2 = await page.getByRole('option').count();
 		expect(selectableGroups2).toEqual(selectableGroups1 - 1);
 		await modal.getByRole('button', { name: 'Cancel' }).click();
@@ -74,8 +73,7 @@ test('Admin groups management', async ({ page }) => {
 	let finalCount;
 	await test.step('Reopen modal and group2 again and group3', async () => {
 		await page.getByRole('button', { name: 'Add group' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		const selectableGroups = await page.getByRole('option').allInnerTexts();
 		expect(selectableGroups.length).toEqual(selectableGroups1);
 		for (let group of [group2, group3].sort((g1, g2) => g1.name.localeCompare(g2.name))) {
@@ -110,8 +108,7 @@ test('Admin groups management', async ({ page }) => {
 		await page.goto('/v2/admin/groups');
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Create new group' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('textbox', { name: 'Group name' }).fill(group1.name);
 		await modal.getByRole('button', { name: 'Create' }).click();
 		await expect(modal.getByText('A group with the same name already exists')).toBeVisible();
@@ -137,7 +134,7 @@ test('Admin groups management', async ({ page }) => {
 			.getByRole('row', { name: group1.name })
 			.getByRole('button', { name: 'Delete' })
 			.click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByRole('row', { name: group1.name })).not.toBeVisible();
 	});
