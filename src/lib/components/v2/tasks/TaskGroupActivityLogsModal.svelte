@@ -74,6 +74,7 @@
 	{/snippet}
 	{#snippet body()}
 		<div id="collectionTaskLogsError"></div>
-		<pre>{log}</pre>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<pre tabindex="0">{log}</pre>
 	{/snippet}
 </Modal>

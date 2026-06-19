@@ -369,6 +369,7 @@
 	}
 
 	:global(body) {
+		--ss-primary-color: #0d6efd;
 		--ss-placeholder-color: #757575;
 	}
 
@@ -376,7 +377,12 @@
 		color: #d53343 !important;
 	}
 
-	:global(.alert-danger code) {
+	:global(.alert-danger code, .alert-warning code) {
 		color: #b32a6e;
+	}
+
+	:global(.btn-secondary:disabled) {
+		color: #000;
+		background: #e1e1e1;
 	}
 </style>
