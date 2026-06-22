@@ -48,6 +48,7 @@
 				role="switch"
 				class:is-invalid={errors.length > 0}
 				disabled={!editable}
+				aria-label="set to {!value}"
 			/>
 			{#if value === null}
 				(unset)

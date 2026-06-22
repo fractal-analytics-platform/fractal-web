@@ -50,7 +50,6 @@
 		};
 		const response = await fetch(`/api/auth/current-user`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});

@@ -1,5 +1,6 @@
-import { test as baseTest, mergeTests } from '@playwright/test';
-import { addTaskToWorkflow, waitModalClosed, waitPageLoading } from '../utils/utils.js';
+import { mergeTests } from '@playwright/test';
+import { test as baseTest } from '../base_fixture';
+import { addTaskToWorkflow, waitModal, waitModalClosed, waitPageLoading } from '../utils/utils.js';
 import { createWorkflow, deleteWorkflow } from '../utils/v2/workflow';
 import { PageWithProject } from './project_fixture.js';
 import { createProject } from '../utils/v2/project.js';
@@ -20,10 +21,8 @@ export class PageWithWorkflow extends PageWithProject {
 
 	async addFirstCollectedTask() {
 		await this.page.locator('[data-bs-target="#insertTaskModal"]').click();
-		let modalTitle = this.page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('New workflow task');
-		const modal = this.page.locator('.modal.show');
+		const modal = await waitModal(this.page, false);
+		await expect(modal.locator('.modal-title')).toHaveText('New workflow task');
 		const selector = modal.getByRole('combobox').first();
 		await selector.click();
 		const firstItem = this.page.getByRole('listbox').locator('[aria-selected="false"]').first();
@@ -86,8 +85,7 @@ export class PageWithWorkflow extends PageWithProject {
 
 	async removeCurrentTask() {
 		await this.page.getByRole('button', { name: 'Delete workflow task' }).click();
-		const modal = this.page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(this.page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(this.page);
 	}
@@ -97,8 +95,20 @@ export class PageWithWorkflow extends PageWithProject {
 	}
 }
 
+/**
+ * @typedef {Object} WorkflowFixture
+ * @property {(params: { page: any }, use: any) => Promise<void>} workflow
+ */
+
+/**
+ * @type {import('@playwright/test').TestType<
+ *   import('@playwright/test').PlaywrightTestArgs & import('@playwright/test').PlaywrightTestOptions &
+ *     { workflow: PageWithWorkflow },
+ *   import('@playwright/test').PlaywrightWorkerArgs & import('@playwright/test').PlaywrightWorkerOptions
+ * >}
+ */
 const workflowTest = baseTest.extend(
-	/** @type {any} */ ({
+	/** @type {WorkflowFixture} */ ({
 		workflow: async ({ page }, use) => {
 			const project = await createProject(page);
 			const workflow = await createWorkflow(page, project.id);
@@ -109,5 +119,5 @@ const workflowTest = baseTest.extend(
 	})
 );
 
-export const test = /** @type {any} */ (mergeTests(baseTest, workflowTest));
+export const test = mergeTests(baseTest, workflowTest);
 export const expect = test.expect;

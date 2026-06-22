@@ -134,7 +134,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/admin/v2/task/make-core', {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(taskIds)
 		});
@@ -169,7 +168,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/admin/v2/task/make-not-core', {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(taskIds)
 		});
@@ -591,6 +589,7 @@
 									class="form-check-input"
 									onchange={() => selectTask(taskInfo.task.id)}
 									checked={selectedTasks.includes(taskInfo.task.id)}
+									aria-label="Select task {taskInfo.task.name}"
 								/>
 							</td>
 							<td>{taskInfo.task.id}</td>

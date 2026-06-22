@@ -58,9 +58,16 @@
 			{#if data.outcome !== 'success'}
 				{#if data.available_tasks.some((task) => !data.version || includeOlderVersions || (!includeOlderVersions && !task.older_than_target))}
 					<div class="row row-cols-lg-auto g-3 align-items-center">
-						<div class="col-12">Available versions:</div>
+						<label class="col-12" for="workflow-import-available-versions"
+							>Available versions:</label
+						>
 						<div class="col-12">
-							<select bind:value={selectedVersions[index]} style="width: 15ch" class="form-select">
+							<select
+								bind:value={selectedVersions[index]}
+								style="width: 15ch"
+								class="form-select"
+								id="workflow-import-available-versions"
+							>
 								<option value={undefined}>Select...</option>
 								{#each [...data.available_tasks] as task, i (i)}
 									{#if !data.version || includeOlderVersions || (!includeOlderVersions && !task.older_than_target)}

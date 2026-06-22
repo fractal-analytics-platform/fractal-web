@@ -160,7 +160,6 @@
 			`/api/v2/project/${page.params.projectId}/workflow/${workflowTask.workflow_id}/wftask/replace-task?workflow_task_id=${workflowTask.id}&task_id=${newTaskId}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload(updatedBody)
 			}

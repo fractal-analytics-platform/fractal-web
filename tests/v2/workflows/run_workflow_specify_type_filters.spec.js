@@ -1,4 +1,9 @@
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	selectSlimSelect,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -12,8 +17,6 @@ test('Warning message "You are trying to run a workflow without specifying what 
 
 	await page.goto(`/v2/projects/${workflow.projectId}`);
 	await waitPageLoading(page);
-
-	const modal = page.locator('.modal.show');
 
 	let zarrDir;
 
@@ -36,7 +39,7 @@ test('Warning message "You are trying to run a workflow without specifying what 
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -46,7 +49,7 @@ test('Warning message "You are trying to run a workflow without specifying what 
 
 	await test.step('Trigger type filters warning message', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('cellpose_segmentation');
@@ -58,6 +61,7 @@ test('Warning message "You are trying to run a workflow without specifying what 
 	});
 
 	await test.step('Continue anyway and back', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await expect(modal.getByText('This job will process 4 images.')).toBeVisible();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
@@ -69,6 +73,7 @@ test('Warning message "You are trying to run a workflow without specifying what 
 	});
 
 	await test.step('Select type', async () => {
+		const modal = await waitModal(page, false);
 		await selectSlimSelect(page, modal.getByRole('combobox', { name: '3D' }), 'True');
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();

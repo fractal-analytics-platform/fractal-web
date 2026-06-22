@@ -1,4 +1,5 @@
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { checkAccessibility } from '../../base_fixture.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createImage } from '../../utils/v2/image.js';
 import { waitTaskFailure, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -12,16 +13,16 @@ test('Display not processed images warning', async ({ page, workflow }) => {
 
 	const randomZarrSubfolder = Math.random().toString(36).substring(7);
 	const randomPath = `/tmp/${randomZarrSubfolder}`;
-	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
 		await modal.getByRole('textbox', { name: 'Zarr subfolder' }).fill(randomZarrSubfolder);
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -50,8 +51,7 @@ test('Display not processed images warning', async ({ page, workflow }) => {
 
 	await test.step('Start the new job', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		await waitModal(page, false);
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -71,8 +71,7 @@ test('Display not processed images warning', async ({ page, workflow }) => {
 
 	await test.step('Continue workflow selecting the last task', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('generic_task_parallel');
@@ -82,6 +81,7 @@ test('Display not processed images warning', async ({ page, workflow }) => {
 				'You are trying to run the generic_task_parallel task on images that were not run on the prior generic_task task.'
 			)
 		).toBeVisible();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await expect(modal.getByText('This job will process 2 images.')).toBeVisible();
 	});

@@ -1,14 +1,19 @@
 import { expect, test } from '../workflow_fixture.js';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	selectSlimSelect,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow unique types are verified when using status filter', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -30,7 +35,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -41,7 +46,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await workflow.addTask('cellpose_segmentation');
 		await workflow.selectTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('cellpose_segmentation');
@@ -59,7 +64,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await workflow.addTask('MIP_compound');
 		await workflow.selectTask('MIP_compound');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Start workflow at' })
@@ -71,6 +76,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(modal.getByText('This job will process 1 image.')).toBeVisible();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await waitTasksSuccess(page);
@@ -79,7 +85,7 @@ test('Workflow unique types are verified when using status filter', async ({ pag
 	await test.step('Try to continue running from the second task and verify warning', async () => {
 		await workflow.selectTask('cellpose_segmentation');
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Start workflow at' })

@@ -42,7 +42,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/auth/group/${group.id}/add-user/${addingUser.id}`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: JSON.stringify({})
 		});
@@ -79,7 +78,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/auth/group/${group.id}/remove-user/${userId}`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: JSON.stringify({})
 		});

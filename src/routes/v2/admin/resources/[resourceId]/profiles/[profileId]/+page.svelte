@@ -105,7 +105,7 @@
 								data-bs-toggle="collapse"
 								data-bs-target="#collapse-users"
 								aria-expanded="false"
-								aria-controls="collapseThree"
+								aria-controls="collapse-users"
 							>
 								Users ({users.length})
 							</button>

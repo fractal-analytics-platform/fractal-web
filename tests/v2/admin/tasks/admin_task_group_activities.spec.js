@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitModalClosed, waitPageLoading } from '../../../utils/utils';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils';
 
 test('Admin task-group activities page', async ({ page }) => {
 	await test.step('Open task-group activities page', async () => {
@@ -24,8 +24,7 @@ test('Admin task-group activities page', async ({ page }) => {
 			.getByRole('row', { name: 'fractal-tasks-mock' })
 			.getByRole('button', { name: 'Show activity log' })
 			.click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('DEBUG').first()).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);

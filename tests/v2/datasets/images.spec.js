@@ -1,4 +1,10 @@
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { checkAccessibility } from '../../base_fixture.js';
+import {
+	selectSlimSelect,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { expect, test } from '../project_fixture.js';
 
 test('Dataset images [v2]', async ({ page, project }) => {
@@ -7,12 +13,11 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	const randomZarrSubfolder = Math.random().toString(36).substring(7);
 	const randomPath = `/tmp/${randomZarrSubfolder}`;
-	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project directory' }).selectOption('/tmp');
@@ -66,7 +71,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Attempt to create an image with existing Zarr URL', async () => {
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByRole('textbox', { name: 'Zarr URL' })).toHaveValue(`${randomPath}/`);
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(`${randomPath}/img1`);
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
@@ -78,7 +83,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Attempt to create an image with invalid Zarr URL', async () => {
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('foo');
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
@@ -109,11 +114,12 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	await test.step('Filter by true type', async () => {
 		await selectSlimSelect(page, page.getByRole('combobox', { name: 'k3' }), 'True');
 		await searchImages(page, 1);
+		await checkAccessibility(page);
 	});
 
 	await test.step('Edit image', async () => {
 		await page.getByRole('row', { name: 'img2' }).getByRole('button', { name: 'Edit' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		const zarrUrlInput = modal.getByRole('textbox', { name: 'Zarr URL' });
 		await expect(zarrUrlInput).toHaveValue(`${randomPath}/img2`);
 		await expect(zarrUrlInput).toBeDisabled();
@@ -124,6 +130,7 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.getByPlaceholder('Key').nth(1).fill('k2');
 		await modal.getByPlaceholder('Value').nth(1).fill('9999');
 		await modal.getByRole('combobox').nth(1).selectOption('Number');
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 		await page.getByRole('cell', { name: 'v1-mod' }).waitFor();
@@ -132,8 +139,9 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Delete one image', async () => {
 		await page.getByRole('button', { name: 'Delete' }).first().click();
-		await modal.waitFor();
+		await waitModal(page, false);
 		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitModalClosed(page);
 		await expect(page.getByRole('row')).toHaveCount(6);
 	});
 
@@ -161,8 +169,7 @@ async function createImage(page, zarr_url, filtersFunction = async () => {}) {
 	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
 	await newImageBtn.waitFor();
 	await newImageBtn.click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	const modal = await waitModal(page, false);
 	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(zarr_url);
 	await filtersFunction(modal);
 	await modal.getByRole('button', { name: 'Save' }).click();

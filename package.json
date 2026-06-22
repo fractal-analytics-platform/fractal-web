@@ -1,6 +1,6 @@
 {
 	"name": "fractal-web",
-	"version": "1.28.2",
+	"version": "1.28.3",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -14,6 +14,7 @@
 		"test": "TZ=Europe/Rome LANG='it-IT' vitest"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "^4.11.3",
 		"@eslint/eslintrc": "^3.3.5",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.60.0",

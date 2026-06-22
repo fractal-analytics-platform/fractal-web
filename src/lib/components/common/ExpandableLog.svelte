@@ -1,6 +1,4 @@
 <script>
-	import { onDestroy, onMount } from 'svelte';
-
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<{text: string, highlight: boolean}>} [logParts]
@@ -12,29 +10,6 @@
 
 	/** Show/hide complete stack trace */
 	let showDetails = $state(false);
-
-	function expandDetails() {
-		showDetails = true;
-		restoreModalFocus();
-	}
-
-	/**
-	 * Restore focus on modal, otherwise it will not be possible to close it using the esc key
-	 */
-	function restoreModalFocus() {
-		const modal = document.querySelector('.modal.show');
-		if (modal instanceof HTMLElement) {
-			modal.focus();
-		}
-	}
-
-	onMount(() => {
-		restoreModalFocus();
-	});
-
-	onDestroy(() => {
-		restoreModalFocus();
-	});
 
 	/**
 	 * @param {string} line
@@ -61,7 +36,7 @@
 							class="ps-3 pe-3"
 							class:warning-highlight={isWarningLine(line)}>{line}</div>{/each}{:else}<button
 						class="btn btn-link text-decoration-none details-btn"
-						onclick={expandDetails}>... (details hidden, click here to expand)</button
+						onclick={() => (showDetails = true)}>... (details hidden, click here to expand)</button
 					>{/if}{/each}</pre>
 	{:else}
 		<pre class:highlight>

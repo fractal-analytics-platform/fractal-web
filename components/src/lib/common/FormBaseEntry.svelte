@@ -56,12 +56,19 @@
 			bind:value={entry.value}
 			onchange={triggerChanges}
 			disabled={!editable}
+			aria-label="Boolean value"
 		>
 			<option value={true}>True</option>
 			<option value={false}>False</option>
 		</select>
 	{/if}
-	<select class="form-select" bind:value={entry.type} onchange={changeType} disabled={!editable}>
+	<select
+		class="form-select"
+		bind:value={entry.type}
+		onchange={changeType}
+		disabled={!editable}
+		aria-label="Type"
+	>
 		<option value="string">String</option>
 		<option value="number">Number</option>
 		<option value="boolean">Boolean</option>

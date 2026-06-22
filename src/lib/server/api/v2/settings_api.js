@@ -12,10 +12,7 @@ const logger = getLogger('settings API');
  */
 export async function listSettings(fetch, type) {
 	logger.debug('Fetching the settings');
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/settings/${type}`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/settings/${type}`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch the settings');

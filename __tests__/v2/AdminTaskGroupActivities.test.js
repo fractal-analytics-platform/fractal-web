@@ -95,16 +95,14 @@ describe('AdminTaskGroupActivities', () => {
 		expect(fetch).toHaveBeenLastCalledWith(
 			new URL(
 				'http://localhost:3000/api/admin/v2/task-group/activity?page=1&page_size=10&pkg_name=pkg&status=OK&action=collect&taskgroupv2_id=1&user_id=1'
-			),
-			expect.anything()
+			)
 		);
 
 		await user.click(screen.getByRole('button', { name: /Reset/ }));
 		await user.click(screen.getByRole('button', { name: /Search activities/ }));
 
 		expect(fetch).toHaveBeenLastCalledWith(
-			new URL('http://localhost:3000/api/admin/v2/task-group/activity?page=1&page_size=10'),
-			expect.anything()
+			new URL('http://localhost:3000/api/admin/v2/task-group/activity?page=1&page_size=10')
 		);
 	});
 });

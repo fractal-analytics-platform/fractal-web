@@ -1,4 +1,9 @@
-import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	expectSlimSelectValue,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -9,8 +14,6 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 
 	await page.goto(`/v2/projects/${workflow.projectId}`);
 	await waitPageLoading(page);
-
-	const modal = page.locator('.modal.show');
 
 	let zarrDir;
 
@@ -36,7 +39,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		await waitModal(page);
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -50,12 +53,9 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await waitTasksSuccess(page);
 	});
 
-	await test.step('Open "Continue workflow" modal', async () => {
+	await test.step('Open "Continue workflow" modal and check selected filters for MIP_compound', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
-	});
-
-	await test.step('Check selected filters for MIP_compound', async () => {
+		const modal = await waitModal(page);
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('MIP_compound');
 		await expect(
 			page.getByText('Image list includes multiple values for the following types:')
@@ -67,6 +67,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
 		await expect(modal.getByRole('listitem').locator('[aria-checked="true"]')).toBeVisible();
@@ -74,6 +75,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	});
 
 	await test.step('Check selected filters for illumination_correction', async () => {
+		const modal = await waitModal(page, false);
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('illumination_correction');
@@ -84,6 +86,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
 		await expect(
@@ -104,12 +107,9 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 		await expect(page.getByText('Input filters successfully updated')).toBeVisible();
 	});
 
-	await test.step('Open "Continue workflow" modal', async () => {
+	await test.step('Open "Continue workflow" modal an check selected filters for illumination_correction', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
-	});
-
-	await test.step('Check selected filters for illumination_correction', async () => {
+		const modal = await waitModal(page, false);
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('illumination_correction');
@@ -120,6 +120,7 @@ test('Type filters priority in run workflow modal', async ({ page, workflow }) =
 	});
 
 	await test.step('Click Run and verify confirmed values', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await expect(modal.getByRole('button', { name: 'Confirm' })).toBeVisible();
 		await expect(

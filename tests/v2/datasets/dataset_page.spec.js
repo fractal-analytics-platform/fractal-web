@@ -1,8 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../base_fixture';
 import {
 	login,
 	logout,
 	shareProjectByName,
+	waitModal,
 	waitModalClosed,
 	waitPageLoading
 } from '../../utils/utils';
@@ -22,8 +24,7 @@ async function createImage(page, zarr_url, filtersFunction = async () => {}) {
 	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
 	await newImageBtn.waitFor();
 	await newImageBtn.click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	const modal = await waitModal(page, false);
 	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(zarr_url);
 	await filtersFunction(modal);
 	await modal.getByRole('button', { name: 'Save' }).click();

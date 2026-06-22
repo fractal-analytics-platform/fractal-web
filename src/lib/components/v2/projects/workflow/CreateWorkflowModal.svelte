@@ -134,7 +134,6 @@
 
 		const response = await fetch(`/api/v2/project/${page.params.projectId}/workflow/import`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(workflowMetadata)
 		});
@@ -182,8 +181,6 @@
 
 		const response = await fetch(`/api/v2/project/${projectId}/workflow`, {
 			method: 'POST',
-			credentials: 'include',
-			mode: 'cors',
 			headers,
 			body: normalizePayload({
 				name: workflowName
@@ -213,10 +210,7 @@
 		}
 
 		if (selectedVersions.length > 0) {
-			const response1 = await fetch(`/api/v2/workflow-template/${singleSelectedTemplateId}`, {
-				method: 'GET',
-				credentials: 'include'
-			});
+			const response1 = await fetch(`/api/v2/workflow-template/${singleSelectedTemplateId}`);
 			/** @type {import('fractal-components/types/api').WorkflowTemplate} */
 			const template = await response1.json();
 			const originalVersions = template.data.task_list.map((t) => t.task.version);
@@ -236,7 +230,6 @@
 			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: JSON.stringify(payload)
 			}

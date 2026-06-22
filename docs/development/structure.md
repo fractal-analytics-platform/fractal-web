@@ -109,8 +109,6 @@ Consider the code at `src/lib/server/api/auth_api.js:5`:
 export async function userAuthentication(fetch, data) {
 	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/login', {
 		method: 'POST',
-		credentials: 'include',
-		mode: 'cors',
 		body: data
 	});
 

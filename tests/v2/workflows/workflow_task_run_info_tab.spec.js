@@ -3,6 +3,7 @@ import { closeModal, waitModal, waitModalClosed } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { waitTaskFailure } from '../../utils/v2/workflowtask.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	test.slow();
@@ -70,14 +71,14 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 
 	await test.step('Check edit task order modal', async () => {
 		await page.getByRole('button', { name: 'Edit tasks order' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await expect(modal.getByRole('button', { name: 'alias1' })).toBeVisible();
 		await closeModal(page);
 	});
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -96,23 +97,26 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	await test.step('Update alias and description', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 
+		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+
 		await page.getByRole('button', { name: 'Edit workflow task alias' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task alias' }).fill('alias2');
-		await page.getByRole('button', { name: 'Save', exact: true }).click();
+		await saveBtn.click();
 		await expect(page.getByRole('button', { name: 'Edit workflow task alias' })).not.toBeVisible();
-		await expect(page.getByRole('button', { name: 'Save', exact: true })).not.toBeVisible();
+		await expect(saveBtn).not.toBeVisible();
 
 		await page.getByRole('button', { name: 'Edit workflow task description' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task description' }).fill('description2');
-		await page.getByRole('button', { name: 'Save', exact: true }).click();
+		await saveBtn.click();
 		await expect(
 			page.getByRole('button', { name: 'Edit workflow task description' })
 		).not.toBeVisible();
+		await checkAccessibility(page);
 	});
 
 	await test.step('Run workflow again', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -122,7 +126,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 	await test.step('Check run values in Info tab', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 		await page.getByRole('button', { name: 'Advanced Info' }).click();
-		await page.getByRole('button', { name: 'Show runs', exact: true }).click();
+		await page.getByRole('button', { name: 'Show runs for alias2', exact: true }).click();
 
 		const excludedInRun = [
 			'Docs Link',
@@ -143,7 +147,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 			page.getByRole('button', { name: 'Edit workflow task description' })
 		).toBeVisible();
 
-		await page.getByRole('button', { name: 'Run 1' }).click();
+		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
 
 		await expectInfoTexts(page, v1Values, true);
 		await expectInfoTexts(page, v2Values, false);
@@ -153,7 +157,7 @@ test('Workflow task info tab show run data', async ({ page, workflow }) => {
 			page.getByRole('button', { name: 'Edit workflow task description' })
 		).not.toBeVisible();
 
-		await page.getByRole('button', { name: 'Run 2' }).click();
+		await page.getByRole('button', { name: 'Run 2', exact: true }).click();
 
 		await expectInfoTexts(page, v1Values, false);
 		await expectInfoTexts(page, v2Values, true);

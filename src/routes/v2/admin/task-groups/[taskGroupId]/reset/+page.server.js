@@ -6,11 +6,7 @@ const logger = getLogger('Task Group reset');
 
 export async function load({ fetch, params }) {
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/${params.taskGroupId}`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
+		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/${params.taskGroupId}`
 	);
 
 	if (!response.ok) {

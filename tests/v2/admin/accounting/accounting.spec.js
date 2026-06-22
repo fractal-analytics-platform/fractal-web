@@ -1,5 +1,5 @@
 import { expect, test } from '../../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import { waitTaskSubmitted, waitTasksSuccess } from '../../../utils/v2/workflowtask.js';
 import fs from 'fs';
 import { createDataset } from '../../../utils/v2/dataset.js';
@@ -17,8 +17,7 @@ test('Display accounting page', async ({ page, workflow }) => {
 
 	await test.step('Start the job', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		await waitModal(page, false);
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);

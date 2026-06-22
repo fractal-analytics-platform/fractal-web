@@ -1,6 +1,7 @@
 import { expect, test } from '../../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import { createFakeTask } from '../../../utils/v2/task.js';
+import { checkAccessibility } from '../../../base_fixture.js';
 
 test('Task groups admin page [v2]', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
@@ -40,8 +41,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Open info modal', async () => {
 		await taskRow.getByRole('button', { name: 'Info' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal).toContainText(taskName);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
@@ -51,9 +51,9 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		const groupCell = taskRow.getByRole('cell').nth(4);
 		await expect(groupCell).toHaveText('All');
 		await taskRow.getByRole('button', { name: 'Edit' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByText('Private task').click();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Update' }).click();
 		await waitModalClosed(page);
 		await expect(groupCell).toHaveText('-');
@@ -61,10 +61,10 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Delete task group 0.0.1', async () => {
 		await taskRow.getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal).toContainText('0.0.1');
 		await modal.getByRole('button', { name: 'Delete task group' }).click();
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Confirm delete' }).click();
 		await waitModalClosed(page);
 		await page.waitForURL(/\/v2\/admin\/task-groups\/activities\?activity_id=\d+/);
@@ -83,9 +83,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 	await test.step('Delete task group 0.0.2', async () => {
 		const taskRow2 = page.getByRole('row', { name: taskName });
 		await taskRow2.getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(modal).toContainText('0.0.2');
 		await modal.getByRole('button', { name: 'Delete task group' }).click();
 		await modal.getByRole('button', { name: 'Confirm delete' }).click();

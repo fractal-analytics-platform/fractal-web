@@ -158,7 +158,6 @@
 			`/api/v2/project/${workflow.project_id}/job/submit?workflow_id=${workflow.id}&dataset_id=${selectedDatasetId}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload(requestBody, { stripEmptyStrings: true })
 			}
@@ -217,7 +216,6 @@
 		const { projectDir, zarrSubfolder } = splitZarrDir(zarrDir, page.data.userInfo.project_dirs);
 		const response = await fetch(`/api/v2/project/${workflow.project_id}/dataset`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: datasetName,
@@ -237,8 +235,7 @@
 	 */
 	async function handleDatasetDelete(datasetId) {
 		const response = await fetch(`/api/v2/project/${workflow.project_id}/dataset/${datasetId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 		if (!response.ok) {
 			console.error('Error while deleting dataset:');
@@ -374,7 +371,6 @@
 			{
 				headers,
 				method: 'POST',
-				credentials: 'include',
 				body: normalizePayload(params)
 			}
 		);
@@ -405,7 +401,6 @@
 			{
 				headers,
 				method: 'POST',
-				credentials: 'include',
 				body: normalizePayload(params)
 			}
 		);
@@ -448,10 +443,7 @@
 	}
 
 	async function loadSlurmAccounts() {
-		const response = await fetch(`/api/auth/current-user`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/auth/current-user`);
 		if (response.ok) {
 			/** @type {import('fractal-components/types/api').User} */
 			const user = await response.json();
@@ -487,7 +479,6 @@
 			{
 				method: 'POST',
 				headers,
-				credentials: 'include',
 				body: normalizePayload(initialFilterValues)
 			}
 		);
@@ -509,7 +500,6 @@
 				{
 					method: 'POST',
 					headers,
-					credentials: 'include',
 					body: JSON.stringify({})
 				}
 			);

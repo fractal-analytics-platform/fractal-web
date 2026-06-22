@@ -52,7 +52,6 @@
 				{
 					method: 'POST',
 					headers,
-					credentials: 'include',
 					body: JSON.stringify({})
 				}
 			);
@@ -88,7 +87,6 @@
 			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
-				credentials: 'include',
 				headers,
 				body: normalizePayload({
 					type_filters: form?.getTypes()

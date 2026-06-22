@@ -79,7 +79,7 @@
 		{/if}
 	</label>
 {:else}
-	<span class={`${classValue} align-self-center`}>
+	<span class={`${classValue} align-self-center`} id="property-label-{formElement.id}">
 		{#if title}
 			{title}
 		{:else if defaultTitle}

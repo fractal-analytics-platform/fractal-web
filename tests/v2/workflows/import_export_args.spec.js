@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
@@ -226,8 +226,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 
 	await test.step('Attempt to import a file containing invalid JSON', async () => {
 		await page.getByRole('button', { name: 'Import' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.locator('.modal-title')).toHaveText('Import arguments');
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select arguments file').click();
@@ -276,8 +275,7 @@ async function exportArgs(page, taskName) {
 async function importValidArgs(page, file, data) {
 	fs.writeFileSync(file, JSON.stringify(data));
 	await page.getByRole('button', { name: 'Import' }).click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	await waitModal(page, false);
 	const fileChooserPromise = page.waitForEvent('filechooser');
 	await page.getByText('Select arguments file').click();
 	const fileChooser = await fileChooserPromise;

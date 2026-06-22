@@ -112,7 +112,6 @@
 
 			const response = await fetch(url, {
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload(body, { stripEmptyStrings: true })
 			});

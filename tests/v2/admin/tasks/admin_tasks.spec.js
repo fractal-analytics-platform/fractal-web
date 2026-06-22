@@ -1,5 +1,5 @@
 import { expect, test } from '../../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
 import * as fs from 'fs';
 import { createFakeTask, deleteTask } from '../../../utils/v2/task.js';
 
@@ -73,8 +73,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Open info modal', async () => {
 		await page.getByRole('button', { name: 'Info' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Task properties' }).click();
 		await modal.getByText(taskName).waitFor();
 		await modal.getByRole('button', { name: 'Task properties' }).click();

@@ -90,7 +90,9 @@
 			{/if}
 			{#if 'num_done_images' in status && status.num_done_images > 0}
 				<button
-					aria-label="Done images"
+					aria-label="Done images of {workflowTask.alias
+						? workflowTask.alias
+						: workflowTask.task.name}"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
 					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
@@ -107,7 +109,9 @@
 			{/if}
 			{#if 'num_failed_images' in status && status.num_failed_images > 0}
 				<button
-					aria-label="Failed images"
+					aria-label="Failed images of {workflowTask.alias
+						? workflowTask.alias
+						: workflowTask.task.name}"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
 					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>

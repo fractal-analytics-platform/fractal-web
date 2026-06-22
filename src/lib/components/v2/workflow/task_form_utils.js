@@ -60,7 +60,6 @@ async function updateWorkflowTaskArguments(projectId, workflowId, workflowTaskId
 		`/api/v2/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 		{
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(requestBody)
 		}
@@ -94,7 +93,6 @@ async function updateWorkflowTaskMetadata(projectId, workflowId, workflowTaskId,
 		`/api/v2/project/${projectId}/workflow/${workflowId}/wftask/${workflowTaskId}`,
 		{
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(requestBody)
 		}

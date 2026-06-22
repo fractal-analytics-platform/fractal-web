@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from './base_fixture';
 
 test('Handles not found pages', async ({ page }) => {
 	await page.goto('/foo');

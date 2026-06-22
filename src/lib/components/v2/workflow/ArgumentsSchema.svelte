@@ -152,7 +152,6 @@
 			`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/wftask/${workflowTask.id}`,
 			{
 				method: 'PATCH',
-				credentials: 'include',
 				headers,
 				body: JSON.stringify({
 					args_non_parallel: normalizePayload(payload.args_non_parallel, options),
@@ -314,5 +313,13 @@
 		background-color: whitesmoke;
 		margin-top: 5px;
 		border-top: 1px solid lightgray;
+	}
+
+	:global(.jschema-controls-bar .btn-outline-primary:not(:hover):not(:focus)) {
+		background-color: #fff;
+	}
+
+	:global(.jschema-controls-bar .btn-outline-primary:disabled) {
+		color: #062f6c;
 	}
 </style>

@@ -92,10 +92,7 @@
 				url.searchParams.append('timestamp_started_min', timestampStartedMin);
 			}
 
-			const response = await fetch(url, {
-				method: 'GET',
-				credentials: 'include'
-			});
+			const response = await fetch(url);
 			if (!response.ok) {
 				errorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),
@@ -237,8 +234,20 @@
 	<div class="col-lg-5 mb-3">
 		<div class="input-group">
 			<div class="input-group-text">Timestamp started min</div>
-			<input type="date" class="form-control" bind:value={startDateMin} id="start_date_min" />
-			<input type="time" class="form-control" bind:value={startTimeMin} id="start_time_min" />
+			<input
+				type="date"
+				class="form-control"
+				bind:value={startDateMin}
+				id="start_date_min"
+				aria-label="Start date min"
+			/>
+			<input
+				type="time"
+				class="form-control"
+				bind:value={startTimeMin}
+				id="start_time_min"
+				aria-label="Start time min"
+			/>
 		</div>
 	</div>
 	<div class="col-lg-4 mb-3">

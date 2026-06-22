@@ -1,7 +1,8 @@
 import { fileURLToPath } from 'url';
-import { waitPageLoading, expectBooleanIcon } from '../../utils/utils.js';
+import { waitPageLoading, expectBooleanIcon, waitModal } from '../../utils/utils.js';
 import { expect, test } from '../project_fixture.js';
 import path from 'path';
+import { checkAccessibility } from '../../base_fixture.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,9 +15,8 @@ test('Import workflow', async ({ page, project }) => {
 		const createWorkflowBtn = page.getByRole('button', { name: 'Create new workflow' });
 		await createWorkflowBtn.waitFor();
 		await createWorkflowBtn.click();
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Create new workflow');
+		const modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toHaveText('Create new workflow');
 		expect(await page.getByRole('button', { name: 'Create empty workflow' }).count()).toEqual(1);
 	});
 
@@ -61,6 +61,7 @@ test('Import workflow', async ({ page, project }) => {
 				})
 			)
 		});
+		await checkAccessibility(page);
 		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);
@@ -76,9 +77,8 @@ test('Import workflow', async ({ page, project }) => {
 		const createWorkflowBtn = page.getByRole('button', { name: 'Create new workflow' });
 		await createWorkflowBtn.waitFor();
 		await createWorkflowBtn.click();
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Create new workflow');
+		const modal = await waitModal(page, false);
+		await expect(modal.locator('.modal-title')).toHaveText('Create new workflow');
 		await expect(page.getByRole('button', { name: 'Create empty workflow' })).toBeVisible();
 	});
 
@@ -175,6 +175,7 @@ test('Import workflow', async ({ page, project }) => {
 
 		// 'Import Workflow' is clickable
 		await expect(importWorkflowBtn).toBeEnabled();
+		await checkAccessibility(page);
 		await importWorkflowBtn.click();
 		await page.waitForURL(/\/v2\/projects\/\d+\/workflows\/\d+/);
 		await waitPageLoading(page);

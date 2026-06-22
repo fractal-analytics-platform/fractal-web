@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { expect } from '@playwright/test';
+import { checkAccessibility } from '../base_fixture';
 
 export function getRandomName() {
 	return Math.random().toString(36).substring(7);
@@ -40,11 +41,15 @@ export async function closeModal(page) {
 /**
  * Wait until modal is opened
  * @param {import('@playwright/test').Page} page
+ * @param {boolean} testAccessibility
  * @returns {Promise<import('@playwright/test').Locator>}
  */
-export async function waitModal(page) {
+export async function waitModal(page, testAccessibility = true) {
 	const modal = page.locator('.modal.show');
 	await modal.waitFor();
+	if (testAccessibility) {
+		await checkAccessibility(page, '.modal.show');
+	}
 	return modal;
 }
 
@@ -247,7 +252,7 @@ export async function addTaskToWorkflow(page, taskName, taskVersion = null) {
  * @param {string} taskName
  */
 async function getTaskRow(page, taskName) {
-	const modal = await waitModal(page);
+	const modal = await waitModal(page, false);
 	await expect(modal.locator('.spinner-border')).toHaveCount(0);
 	await modal.getByPlaceholder('Search...').fill(taskName);
 	const taskSelector = page.getByRole('checkbox', { name: taskName, exact: true });

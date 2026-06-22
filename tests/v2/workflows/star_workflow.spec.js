@@ -74,7 +74,7 @@ test('Star/Unstar workflow', async ({ page, project }) => {
  */
 async function createWorkflow(page, projectUrl, workflowName) {
 	await page.getByRole('button', { name: 'Create new workflow' }).click();
-	const modal = await waitModal(page);
+	const modal = await waitModal(page, false);
 	await modal.getByRole('textbox', { name: 'Workflow name' }).fill(workflowName);
 	await modal.getByRole('button', { name: 'Create empty workflow' }).click();
 	await waitModalClosed(page);

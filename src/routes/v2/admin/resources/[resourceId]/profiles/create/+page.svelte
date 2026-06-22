@@ -32,7 +32,6 @@
 
 		return await fetch(`/api/admin/v2/resource/${resource.id}/profile`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({ ...profile, resource_id: undefined }, { nullifyEmptyStrings: true })
 		});

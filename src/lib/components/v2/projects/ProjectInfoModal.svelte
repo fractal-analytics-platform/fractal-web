@@ -20,10 +20,7 @@
 		project = selectedProject;
 		if (project) {
 			datasetErrorAlert?.hide();
-			const response = await fetch(`/api/v2/project/${project.id}/dataset?history=false`, {
-				method: 'GET',
-				credentials: 'include'
-			});
+			const response = await fetch(`/api/v2/project/${project.id}/dataset?history=false`);
 			if (response.ok) {
 				/** @type {import('fractal-components/types/api.js').DatasetV2[]} */
 				const result = await response.json();

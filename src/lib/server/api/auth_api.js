@@ -14,7 +14,6 @@ export async function userAuthentication(fetch, data) {
 	logger.debug('Performing login');
 	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/token/login/', {
 		method: 'POST',
-		credentials: 'include',
 		body: data
 	});
 
@@ -35,10 +34,7 @@ export async function userAuthentication(fetch, data) {
 export async function getCurrentUser(fetch, groupIdsNames = false) {
 	logger.debug('Retrieving current user');
 	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/?group_ids_names=${groupIdsNames}`;
-	const response = await fetch(url, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(url);
 
 	if (!response.ok) {
 		logger.warn('Unable to retrieve the current user');
@@ -57,10 +53,7 @@ export async function getCurrentUser(fetch, groupIdsNames = false) {
 export async function getCurrentUserAllowedViewerPaths(fetch, includeSharedProjects = false) {
 	logger.debug('Retrieving current user viewer paths');
 	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/allowed-viewer-paths/?include_shared_projects=${includeSharedProjects}`;
-	const response = await fetch(url, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(url);
 
 	if (!response.ok) {
 		logger.error('Unable to retrieve the current user allowed viewer paths');
@@ -78,9 +71,7 @@ export async function getCurrentUserAllowedViewerPaths(fetch, includeSharedProje
 export async function logout(fetch) {
 	logger.debug('Performing logout');
 	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/token/logout/', {
-		method: 'POST',
-		credentials: 'include',
-		mode: 'cors'
+		method: 'POST'
 	});
 
 	if (!response.ok) {
@@ -98,10 +89,7 @@ export async function logout(fetch) {
  */
 export async function listUsers(fetch) {
 	logger.debug('Fetching the list of users');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/users/', {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/users/');
 
 	if (!response.ok) {
 		logger.error('Unable to fetch the list of users');
@@ -121,11 +109,7 @@ export async function listUsers(fetch) {
 export async function getUser(fetch, userId, groupIdsNames = true) {
 	logger.debug('Fetching user [user_id=%d]', userId);
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/auth/users/${userId}/?group_ids_names=${groupIdsNames}`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
+		`${env.FRACTAL_SERVER_HOST}/auth/users/${userId}/?group_ids_names=${groupIdsNames}`
 	);
 
 	if (!response.ok) {
@@ -145,10 +129,7 @@ export async function getUser(fetch, userId, groupIdsNames = true) {
 export async function listGroups(fetch, userIds = false) {
 	logger.debug('Fetching groups');
 	const url = `${env.FRACTAL_SERVER_HOST}/auth/group/?user_ids=${userIds}`;
-	const response = await fetch(url, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(url);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch groups');
@@ -167,10 +148,7 @@ export async function listGroups(fetch, userIds = false) {
 export async function getGroup(fetch, groupId) {
 	logger.debug('Fetching group %d', groupId);
 	const url = `${env.FRACTAL_SERVER_HOST}/auth/group/${groupId}/`;
-	const response = await fetch(url, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(url);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch group %d', groupId);
@@ -188,10 +166,7 @@ export async function getGroup(fetch, groupId) {
 export async function getProfileInfo(fetch) {
 	logger.debug('Retrieving current user profile');
 	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/profile-info/`;
-	const response = await fetch(url, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(url);
 
 	if (!response.ok) {
 		logger.error('Unable to retrieve the current user profile');
@@ -208,10 +183,7 @@ export async function getProfileInfo(fetch) {
  */
 export async function getProfileUsers(fetch, profileId) {
 	logger.debug(`Retrieving users of profile ${profileId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/?profile_id=${profileId}`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/?profile_id=${profileId}`);
 
 	if (!response.ok) {
 		await responseError(response);

@@ -41,8 +41,7 @@
 	 */
 	async function handleDeleteWorkflow(workflowId) {
 		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflowId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 
 		if (response.ok) {
@@ -77,10 +76,7 @@
 	 * @param {number} id
 	 */
 	async function exportWorkflow(id) {
-		const response = await fetch(`/api/v2/project/${projectId}/workflow/${id}/export`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/project/${projectId}/workflow/${id}/export`);
 
 		if (!response.ok) {
 			errorAlert = displayStandardErrorAlert(
@@ -103,7 +99,6 @@
 
 		const response = await fetch(`/api/v2/project/${projectId}/workflow/import`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(data)
 		});

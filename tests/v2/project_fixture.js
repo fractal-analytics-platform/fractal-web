@@ -1,4 +1,5 @@
-import { test as baseTest, mergeTests } from '@playwright/test';
+import { mergeTests } from '@playwright/test';
+import { test as baseTest } from '../base_fixture';
 import { createProject, deleteProject as _deleteProject } from '../utils/v2/project';
 
 export class PageWithProject {
@@ -18,8 +19,20 @@ export class PageWithProject {
 	}
 }
 
+/**
+ * @typedef {Object} ProjectFixture
+ * @property {(params: { page: any }, use: any) => Promise<void>} project
+ */
+
+/**
+ * @type {import('@playwright/test').TestType<
+ *   import('@playwright/test').PlaywrightTestArgs & import('@playwright/test').PlaywrightTestOptions &
+ *     { project: PageWithProject },
+ *   import('@playwright/test').PlaywrightWorkerArgs & import('@playwright/test').PlaywrightWorkerOptions
+ * >}
+ */
 const projectTest = baseTest.extend(
-	/** @type {any} */ ({
+	/** @type {ProjectFixture} */ ({
 		project: async ({ page }, use) => {
 			const project = await createProject(page);
 			const p = new PageWithProject(page, project);
@@ -29,5 +42,5 @@ const projectTest = baseTest.extend(
 	})
 );
 
-export const test = /** @type {any} */ (mergeTests(baseTest, projectTest));
+export const test = mergeTests(baseTest, projectTest);
 export const expect = test.expect;

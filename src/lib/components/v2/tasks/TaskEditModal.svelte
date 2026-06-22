@@ -57,7 +57,6 @@
 
 		const response = await fetch(`/api/v2/task/${task?.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(taskProperties, { nullifyEmptyStrings: true })
 		});
@@ -80,10 +79,7 @@
 		modal?.show();
 
 		// Retrieving the args_schema field
-		const response = await fetch(`/api/v2/task/${taskId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/task/${taskId}`);
 
 		const result = await response.json();
 		loading = false;

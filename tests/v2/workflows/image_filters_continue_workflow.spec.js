@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
 import { createImage } from '../../utils/v2/image.js';
@@ -26,8 +26,7 @@ test('Continue workflow displays image lists [#693]', async ({ page, workflow })
 		await workflow.addTask('generic_task');
 		await workflow.selectTask('generic_task');
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByRole('button', { name: 'Image list' })).toBeVisible();
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
@@ -48,8 +47,7 @@ test('Continue workflow displays image lists [#693]', async ({ page, workflow })
 
 	await test.step('Open "Continue workflow" modal', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 		await expect(modal.getByRole('button', { name: 'Image list' })).toBeVisible();
 	});

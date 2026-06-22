@@ -9,11 +9,11 @@
 </script>
 
 {#if value === true}
-	<span class="text-success boolean-icon" aria-checked="true">
+	<span class="text-success boolean-icon" aria-checked="true" role="checkbox" aria-label="true">
 		<i class="bi bi-check"></i>
 	</span>
 {:else if value === false}
-	<span class="text-danger boolean-icon" aria-checked="false">
+	<span class="text-danger boolean-icon" aria-checked="false" role="checkbox" aria-label="false">
 		<i class="bi bi-x"></i>
 	</span>
 {/if}

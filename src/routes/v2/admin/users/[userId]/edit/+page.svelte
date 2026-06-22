@@ -39,7 +39,6 @@
 
 		return await fetch(`/api/auth/users/${user.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});

@@ -93,7 +93,6 @@
 		saving = true;
 		const response = await fetch(`/api/admin/v2/resource/${resource.id}`, {
 			method: 'PUT',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(payload)
 		});
