@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { arrayToCsv, downloadBlob } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { normalizePayload, PropertyDescription } from 'fractal-components';
@@ -12,13 +13,20 @@
 	let resource = $state('');
 	let taskType = $state('');
 	let onlyCore = $state(false);
-	/** @type {Array<import('fractal-components/types/api').Resource>} */
-	const resources = $derived(page.data.resources || []);
+	let userId = $state('');
+	let pkgName = $state('');
+	/** @type {boolean|null} */
+	let privateGroup = $state(null);
+	/** @type {boolean|null} */
+	let activeGroup = $state(null);
 
 	let searched = $state(false);
 	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
+
+	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	const resources = $derived(page.data.resources || []);
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info> | undefined} */
 	let results = $state();
@@ -35,6 +43,9 @@
 
 	/** @type {number[]}*/
 	let selectedTasks = $state([]);
+
+	const currentUserId = $derived(page.data.userInfo.id);
+	const users = $derived(sortDropdownUsers(page.data.users, page.data.userInfo.id));
 
 	let allIds = $derived(results?.items.map((taskInfo) => taskInfo.task.id) ?? []);
 	let allSelected = $derived.by(() => {
@@ -64,6 +75,18 @@
 		}
 		if (onlyCore) {
 			url.searchParams.append('only_core', String(onlyCore));
+		}
+		if (userId) {
+			url.searchParams.append('owner_id', String(userId));
+		}
+		if (pkgName) {
+			url.searchParams.append('task_group_name', pkgName);
+		}
+		if (privateGroup !== null) {
+			url.searchParams.append('private', privateGroup.toString());
+		}
+		if (activeGroup !== null) {
+			url.searchParams.append('active', activeGroup.toString());
 		}
 		return url;
 	}
@@ -379,6 +402,67 @@
 								class="form-check-input"
 								bind:checked={onlyCore}
 							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Owner</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={userId} id="user">
+								<option value="">Select...</option>
+								{#each users as user (user.id)}
+									<option value={user.id}>{user.email}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="pkg-name">Package name</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={pkgName} id="pkg-name" />
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="private">Private</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={privateGroup} id="private">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="private">Active</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={activeGroup} id="active">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
 						</div>
 					</div>
 				</div>
