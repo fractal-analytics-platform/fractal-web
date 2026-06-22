@@ -318,6 +318,22 @@
 	<div class="row">
 		<div class="col-lg-12">
 			<div class="row">
+				<!-- ID -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="id">ID</label>
+							<PropertyDescription
+								description="Only include the task with this <code>id</code> (if any)."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="number" class="form-control" bind:value={id} id="id" />
+						</div>
+					</div>
+				</div>
+				<!-- Name -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -332,52 +348,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="id">Id</label>
-							<PropertyDescription
-								description="Only include the task with this <code>id</code> (if any)."
-								html={true}
-							/>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<input type="number" class="form-control" bind:value={id} id="id" />
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="version">Version</label>
-							<PropertyDescription
-								description="Only include a task if its <code>version</code> matches this value."
-								html={true}
-							/>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<input type="text" class="form-control" bind:value={version} id="version" />
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="row mt-lg-3">
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Resource</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={resource} id="resource">
-								<option value="">Select...</option>
-								{#each resources as resource (resource.id)}
-									<option value={resource.id}>{resource.name}</option>
-								{/each}
-							</select>
-						</div>
-					</div>
-				</div>
+				<!-- Type -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -395,23 +366,36 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="core">Core</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={core} id="core">
-								<option value={null}>Select...</option>
-								<option value={true}>True</option>
-								<option value={false}>False</option>
-							</select>
-						</div>
-					</div>
-				</div>
 			</div>
 
 			<div class="row mt-lg-3">
+				<!-- Group name -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="pkg-name">Group name</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={pkgName} id="pkg-name" />
+						</div>
+					</div>
+				</div>
+				<!-- Version -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="version">Version</label>
+							<PropertyDescription
+								description="Only include a task if its <code>version</code> matches this value."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={version} id="version" />
+						</div>
+					</div>
+				</div>
+				<!-- Owner -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -427,18 +411,25 @@
 						</div>
 					</div>
 				</div>
+			</div>
 
+			<div class="row mt-lg-3">
+				<!-- Core -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="pkg-name">Package name</label>
+							<label for="core">Core</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
-							<input type="text" class="form-control" bind:value={pkgName} id="pkg-name" />
+							<select class="form-select" bind:value={core} id="core">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
 						</div>
 					</div>
 				</div>
-
+				<!-- Private -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -453,9 +444,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="row mt-lg-3">
+				<!-- Active -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -466,6 +455,25 @@
 								<option value={null}>Select...</option>
 								<option value={true}>True</option>
 								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<!-- Resource -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
 							</select>
 						</div>
 					</div>
