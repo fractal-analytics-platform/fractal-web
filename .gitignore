@@ -20,3 +20,4 @@ venv
 site
 *.log
 test-results/
+blob-report/

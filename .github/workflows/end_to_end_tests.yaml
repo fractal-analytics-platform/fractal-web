@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   end_to_end_tests:
-    name: 'E2E tests - Node ${{ matrix.node-version }} - ${{ matrix.browser }}'
+    name: 'E2E tests - Node ${{ matrix.node-version }} - ${{ matrix.browser }} ${{ matrix.shard-index }}'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -34,6 +34,8 @@ jobs:
       matrix:
         node-version: ['24']
         browser: ['chromium', 'firefox']
+        shard-index: [1, 2, 3]
+        shard-total: [3]
       fail-fast: false
 
     services:
@@ -74,12 +76,55 @@ jobs:
         run: npx playwright install --with-deps --only-shell ${{ matrix.browser }}
 
       - name: Run Playwright tests
-        run: npx playwright test --project=${{ matrix.browser }}
+        run: npx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard-index }}/${{ matrix.shard-total }}
 
       - name: Archive test results
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: test-results-folder-node-${{ matrix.node-version }}
+          name: test-results-folder-node-${{ matrix.node-version }}-${{ matrix.browser }}-${{ matrix.shard-index }}
           path: test-results
-          overwrite: true
+          retention-days: 7
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: blob-report-${{ matrix.node-version }}-${{ matrix.browser }}-${{ matrix.shard-index }}
+          path: blob-report
+          retention-days: 1
+
+  merge-reports:
+    # Merge reports after end_to_end_tests, even if some shards have failed
+    if: ${{ !cancelled() }}
+    needs: [end_to_end_tests]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: html-report--attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 7
