@@ -12,9 +12,10 @@
 	let version = $state('');
 	let resource = $state('');
 	let taskType = $state('');
-	let onlyCore = $state(false);
 	let userId = $state('');
 	let pkgName = $state('');
+	/** @type {boolean|null} */
+	let core = $state(null);
 	/** @type {boolean|null} */
 	let privateGroup = $state(null);
 	/** @type {boolean|null} */
@@ -73,8 +74,8 @@
 		if (taskType) {
 			url.searchParams.append('task_type', taskType);
 		}
-		if (onlyCore) {
-			url.searchParams.append('only_core', String(onlyCore));
+		if (core !== null) {
+			url.searchParams.append('core', core.toString());
 		}
 		if (userId) {
 			url.searchParams.append('owner_id', String(userId));
@@ -204,7 +205,11 @@
 		version = '';
 		resource = '';
 		taskType = '';
-		onlyCore = false;
+		core = null;
+		userId = '';
+		pkgName = '';
+		privateGroup = null;
+		activeGroup = null;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
@@ -393,15 +398,14 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="onlyCoreCheckbox">Core only</label>
+							<label for="core">Core</label>
 						</div>
-						<div class="col-xl-8 col-lg-7 col-9 mt-2">
-							<input
-								id="onlyCoreCheckbox"
-								type="checkbox"
-								class="form-check-input"
-								bind:checked={onlyCore}
-							/>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={core} id="core">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
 						</div>
 					</div>
 				</div>
