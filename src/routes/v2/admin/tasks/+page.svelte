@@ -6,6 +6,7 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { normalizePayload, PropertyDescription } from 'fractal-components';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	let name = $state('');
 	let id = $state('');
@@ -45,7 +46,6 @@
 	/** @type {number[]}*/
 	let selectedTasks = $state([]);
 
-	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users, page.data.userInfo.id));
 
 	let allIds = $derived(results?.items.map((taskInfo) => taskInfo.task.id) ?? []);
@@ -81,7 +81,7 @@
 			url.searchParams.append('owner_id', String(userId));
 		}
 		if (pkgName) {
-			url.searchParams.append('task_group_name', pkgName);
+			url.searchParams.append('task_group', pkgName);
 		}
 		if (privateGroup !== null) {
 			url.searchParams.append('private', privateGroup.toString());
@@ -304,6 +304,22 @@
 			selectedTasks = selectedTasks.filter((t) => t !== taskId);
 		} else {
 			selectedTasks = [...selectedTasks, taskId];
+		}
+	}
+
+	/**
+	 * @param {string | null} fullString
+	 * @param {number} maxLength
+	 * @returns {string | null}
+	 */
+	function truncateString(fullString, maxLength) {
+		if (fullString === null) {
+			return null;
+		}
+		if (fullString.length > maxLength) {
+			return fullString.slice(0, maxLength) + '...';
+		} else {
+			return fullString;
 		}
 	}
 </script>
@@ -545,11 +561,15 @@
 					<col width="50" />
 					<col width="30" />
 					<col width="auto" />
+					<col width="200" />
 					<col width="90" />
-					<col width="195" />
-					<col width="120" />
+					<col width="70" />
 					<col width="150" />
-					<col width="120" />
+					<col width="100" />
+					<col width="75" />
+					<col width="63" />
+					<col width="60" />
+					<col width="30" />
 				</colgroup>
 				<thead>
 					<tr>
@@ -569,14 +589,17 @@
 								title={allSelected ? 'Deselect all' : 'Select all'}
 							/>
 						</th>
-						<th>Id</th>
+						<th>ID</th>
 						<th></th>
 						<th>Name</th>
+						<th>Package</th>
 						<th>Version</th>
-						<th>Type</th>
-						<th># Workflows</th>
+						<th>Active</th>
+						<th>Owner</th>
+						<th>Group</th>
 						<th># Users</th>
-						<th>Options</th>
+						<th># WFs</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -619,35 +642,23 @@
 							<td>
 								{taskInfo.task.name}
 							</td>
-							<td>{taskInfo.task.version || '-'}</td>
-							<td>{taskInfo.task.type}</td>
-							<td>
-								{taskInfo.relationships.length || '-'}
+							<td title={taskInfo.task.pkg_name}>
+								{truncateString(taskInfo.task.pkg_name, 20)}
 							</td>
-							<td>
-								{#if getUsers(taskInfo).length > 0}
-									{getUsers(taskInfo).length}
-									<button
-										class="btn btn-link"
-										id="users-list-toggler-{taskInfoIndex}"
-										onclick={() => toggleUsersList(taskInfoIndex)}
-									>
-										Show
-									</button>
-									<div class="d-none" id="users-list-{taskInfoIndex}">
-										{#each getUsers(taskInfo) as user (user)}
-											{user}<br />
-										{/each}
-									</div>
-								{:else}
-									-
-								{/if}
+							<td title={taskInfo.task.version}>
+								{truncateString(taskInfo.task.version, 10) || '-'}
 							</td>
+							<td><BooleanIcon value={taskInfo.task.active}></BooleanIcon></td>
+							<td title={taskInfo.task.owner}>
+								{truncateString(taskInfo.task.owner, 20)}
+							</td>
+							<td>{taskInfo.task.user_group || '-'}</td>
+							<td>{getUsers(taskInfo).length || '-'}</td>
+							<td>{taskInfo.relationships.length || '-'}</td>
 							<td>
 								<button
 									class="btn btn-light"
 									aria-label="Info"
-									title="Info"
 									onclick={() => openInfoModal(taskInfo)}
 								>
 									<i class="bi bi-info-circle"></i>
@@ -711,6 +722,38 @@
 					</div>
 				</div>
 			</div>
+
+			{#if getUsers(selectedTaskInfo).length > 0}
+				<div class="accordion mb-3" id="accordion-relationships">
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapse-xy"
+								aria-expanded="false"
+								aria-controls="collapse-xy"
+							>
+								User list
+							</button>
+						</h2>
+						<div
+							id="collapse-xy"
+							class="accordion-collapse collapse"
+							data-bs-parent="#accordion-relationships"
+						>
+							<div class="accordion-body p-0">
+								<ul class="list-group noborders">
+									{#each getUsers(selectedTaskInfo) as user (user)}
+										<li class="list-group-item">{user}</li>
+									{/each}
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
 
 			<p class="lead">Relationships</p>
 			{#if selectedTaskInfo.relationships.length === 0}

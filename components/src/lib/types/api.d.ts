@@ -333,6 +333,10 @@ type TaskV2Minimal = {
 	command_non_parallel: string | null;
 	command_parallel: string | null;
 	version: string | null;
+	pkg_name: string;
+	active: boolean;
+	owner: string;
+	user_group: string | null;
 };
 
 type TaskV2Relationship = {
