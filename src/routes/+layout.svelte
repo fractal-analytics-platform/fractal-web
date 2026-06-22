@@ -89,8 +89,7 @@
 	async function logout() {
 		sessionStorage.removeItem('userLoggedIn');
 		await fetch(`/auth/token/logout`, {
-			method: 'POST',
-			credentials: 'include'
+			method: 'POST'
 		});
 		await invalidateAll();
 		await goto(resolve('/'));
@@ -261,16 +260,16 @@
 	<div class="toast-container position-fixed bottom-0 end-0 p-3">
 		<div
 			id="tokenCopiedToast"
-			class="toast align-items-center text-bg-info border-0"
+			class="toast align-items-center bg-info-subtle border-0"
 			role="alert"
 			aria-live="assertive"
 			aria-atomic="true"
 		>
 			<div class="d-flex">
-				<div class="toast-body">Token copied to clipboard</div>
+				<div class="toast-body text-black">Token copied to clipboard</div>
 				<button
 					type="button"
-					class="btn-close btn-close-white me-2 m-auto"
+					class="btn-close btn-close-black opacity-75 me-2 m-auto"
 					data-bs-dismiss="toast"
 					aria-label="Close"
 				></button>
@@ -314,10 +313,16 @@
 		background-color: #eee;
 		border-bottom-width: 3px;
 		border-bottom-style: solid;
+		color: #0a59cc;
+	}
+
+	.nav-link {
+		color: #0769f9;
 	}
 
 	.nav-link.admin-active {
 		background-color: #eee;
+		color: #0a59cc;
 	}
 
 	.admin-border {
@@ -361,5 +366,23 @@
 	:global(.vizarr-btn) {
 		background-image: url('$lib/assets/logo-vizarr.svg');
 		background-size: 80%;
+	}
+
+	:global(body) {
+		--ss-primary-color: #0d6efd;
+		--ss-placeholder-color: #757575;
+	}
+
+	:global(.bg-light .text-danger) {
+		color: #d53343 !important;
+	}
+
+	:global(.alert-danger code, .alert-warning code) {
+		color: #b32a6e;
+	}
+
+	:global(.btn-secondary:disabled) {
+		color: #000;
+		background: #e1e1e1;
 	}
 </style>

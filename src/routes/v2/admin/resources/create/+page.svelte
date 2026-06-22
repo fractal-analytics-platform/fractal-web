@@ -51,7 +51,6 @@
 
 			const response = await fetch(`/api/admin/v2/resource`, {
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload(JSON.parse(data))
 			});
@@ -110,7 +109,8 @@
 	</div>
 	<div class="row">
 		<div class="col">
-			<textarea class="form-control mb-3" bind:value={data} rows="15"></textarea>
+			<textarea class="form-control mb-3" bind:value={data} rows="15" aria-label="Resource JSON">
+			</textarea>
 		</div>
 	</div>
 	<div class="row">

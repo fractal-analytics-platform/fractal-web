@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { expect, test } from '../project_fixture.js';
 
 test('View plate and feature explorer link', async ({ page, project }) => {
@@ -11,8 +11,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 	await test.step('Create test dataset', async () => {
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
@@ -69,8 +68,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 			.getByRole('row', { name: 'plate3.zarr' })
 			.getByRole('button', { name: 'Delete' })
 			.click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByRole('combobox', { name: 'Select plate' })).toHaveValue('');
@@ -85,8 +83,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 		await waitPageLoading(page);
 		const createDatasetButton = page.getByRole('button', { name: 'Create new dataset' });
 		await createDatasetButton.click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset-2');
 		await modal.getByRole('button', { name: 'Advanced options' }).click();
 		await modal.getByRole('combobox', { name: 'Project dir' }).selectOption('/tmp');
@@ -117,8 +114,7 @@ async function createImageWithPlate(page, zarrUrl, plate) {
 	const newImageBtn = page.getByRole('button', { name: 'Add an image list entry' });
 	await newImageBtn.waitFor();
 	await newImageBtn.click();
-	const modal = page.locator('.modal.show');
-	await modal.waitFor();
+	const modal = await waitModal(page, false);
 	await modal.getByRole('textbox', { name: 'Zarr URL' }).fill(zarrUrl);
 	await modal.getByRole('button', { name: 'Add attribute' }).click();
 	await modal.getByPlaceholder('Key').fill('plate');

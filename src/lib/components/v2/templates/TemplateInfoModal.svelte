@@ -2,6 +2,7 @@
 	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
+	import { tick } from 'svelte';
 
 	/**
 	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
@@ -26,13 +27,11 @@
 	}
 
 	export async function onOpen() {
-		const response = await fetch(`/api/v2/workflow-template/${templateId}`, { method: 'GET' });
+		const response = await fetch(`/api/v2/workflow-template/${templateId}`);
 		if (response.ok) {
 			template = await response.json();
 			if (template?.user_group_id) {
-				const response2 = await fetch(`/api/auth/current-user?group_ids_names=true`, {
-					method: 'GET'
-				});
+				const response2 = await fetch(`/api/auth/current-user?group_ids_names=true`);
 				if (response2.ok) {
 					const res = await response2.json();
 					groupName =
@@ -49,6 +48,11 @@
 		} else {
 			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));
 		}
+		await tick();
+		const listGroup = document.querySelector('#templateInfoModal .list-group');
+		if (listGroup instanceof HTMLElement) {
+			listGroup.focus();
+		}
 	}
 </script>
 
@@ -59,6 +63,7 @@
 	bind:this={modal}
 	size="lg"
 	{onOpen}
+	onClose={() => (template = undefined)}
 >
 	{#snippet header()}
 		<h5 class="modal-title">Template '{template?.name}'</h5>
@@ -66,7 +71,8 @@
 	{#snippet body()}
 		<div id="errorAlert-templateInfoModal"></div>
 		{#if template}
-			<ul class="list-group">
+			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+			<ul class="list-group" tabindex="0">
 				<li class="list-group-item text-bg-light">
 					<strong>Name</strong>
 				</li>

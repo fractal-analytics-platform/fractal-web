@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { waitPageLoading } from './utils/utils.js';
+import { test } from './base_fixture';
 
 test('User profile', async ({ page }) => {
 	await test.step('Open user profile page', async () => {

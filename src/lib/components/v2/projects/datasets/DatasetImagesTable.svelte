@@ -156,6 +156,13 @@
 	async function resetSearchFields() {
 		resetBtnActive = false;
 		resetting = true;
+		// Reset selectors to prevent invalid aria-activedescendant values
+		for (const selector of Object.values(attributesSelectors)) {
+			selector.setSelected([]);
+		}
+		for (const selector of Object.values(typesSelectors)) {
+			selector.setSelected([]);
+		}
 		attributeFilters = getAttributeFilterBaseValues(imagePage);
 		typeFilters = getTypeFilterBaseValues(imagePage);
 		await tick();
@@ -421,7 +428,6 @@
 				{
 					method: 'POST',
 					headers,
-					credentials: 'include',
 					body: normalizePayload(params)
 				}
 			);
@@ -506,8 +512,7 @@
 				dataset.id
 			}/images?zarr_url=${encodeURIComponent(zarrUrl)}`,
 			{
-				method: 'DELETE',
-				credentials: 'include'
+				method: 'DELETE'
 			}
 		);
 		if (response.ok) {

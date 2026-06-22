@@ -1,5 +1,10 @@
 import { expect, test } from '../workflow_fixture.js';
-import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	expectSlimSelectValue,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess, waitTaskSubmitted } from '../../utils/v2/workflowtask.js';
 import { createImage } from '../../utils/v2/image.js';
@@ -12,7 +17,6 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	await page.goto(workflow.url);
 	await waitPageLoading(page);
-	const modal = page.locator('.modal.show');
 
 	let datasetName1;
 	await test.step('Create test dataset1 and open dataset page', async () => {
@@ -46,7 +50,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 		await workflow.addTask('generic_task');
 		await workflow.selectTask('generic_task');
 		await page.getByRole('button', { name: 'Types', exact: true }).click();
-		await page.getByRole('button', { name: 'Add type filter' }).click();
+		await page.getByRole('button', { name: 'Add type filter', exact: true }).click();
 		await page.getByPlaceholder('Key').fill('d2t1');
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save' }).click();
@@ -55,7 +59,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 
 		// check images and selected filters
 		await expectSlimSelectValue(page, 'd2t1', 'True');
@@ -87,7 +91,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	await test.step('Check Run workflow modal', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(
 			page
 				.getByRole('combobox', { name: 'Start workflow at' })
@@ -116,7 +120,7 @@ test('Switching datasets on continue workflow applies correct filters [#695]', a
 
 	await test.step('Check continue workflow modal', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('generic_task');
 
 		// check images and selected filters

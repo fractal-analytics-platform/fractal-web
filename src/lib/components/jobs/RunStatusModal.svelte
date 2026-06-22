@@ -105,10 +105,7 @@
 		unsetStatusFilterSelector();
 		loadingLogs = true;
 		const response = await fetch(
-			`/api/v2/project/${dataset?.project_id}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}`,
-			{
-				method: 'GET'
-			}
+			`/api/v2/project/${dataset?.project_id}/status/unit-log?history_run_id=${historyRunId}&history_unit_id=${unit.id}&workflowtask_id=${workflowTask?.id}&dataset_id=${dataset?.id}`
 		);
 		if (!response.ok) {
 			modal?.displayErrorAlert(await getAlertErrorFromResponse(response));

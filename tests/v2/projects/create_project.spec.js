@@ -1,5 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../base_fixture';
 import {
+	closeModal,
 	getRandomName,
 	login,
 	logout,
@@ -31,9 +33,8 @@ test('Create and delete a project', async ({ page }) => {
 		await page.getByRole('button', { name: 'Create new project' }).click();
 
 		// Wait modal opening
-		let modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Create new project');
+		const modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toHaveText('Create new project');
 
 		// Fill form and submit
 		const projectNameInput = page.getByLabel('Project name');
@@ -41,7 +42,7 @@ test('Create and delete a project', async ({ page }) => {
 		const projectDescriptionInput = page.getByLabel('Description');
 		const shortDescription = 'This is a short description';
 		await projectDescriptionInput.fill(shortDescription);
-		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
+		const createProjectBtn = modal.getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		// Verify that the user is redirected to the project page
@@ -97,11 +98,9 @@ test('Create and delete a project', async ({ page }) => {
 		await projectRow.getByRole('button', { name: 'Info' }).click();
 
 		// Wait info modal
-		let modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Project ' + randomProjectName);
-		let closeModalBtn = page.locator('.modal.show').getByRole('button', { name: 'Close' });
-		await closeModalBtn.click();
+		const modal = await waitModal(page);
+		await expect(modal.locator('.modal-title')).toHaveText('Project ' + randomProjectName);
+		await closeModal(page);
 	});
 
 	await test.step('Search the project', async () => {
@@ -118,21 +117,21 @@ test('Create and delete a project', async ({ page }) => {
 		await page.getByRole('button', { name: 'Create new project' }).click();
 
 		// Wait modal opening
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		const modalTitle = modal.locator('.modal-title');
 		await expect(modalTitle).toHaveText('Create new project');
 
 		// Fill form and submit
 		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill(randomProjectName);
-		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
+		const createProjectBtn = modal.getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		// Check validation error
 		await expect(modal).toContainText(`Project name (${randomProjectName}) already in use`);
 
 		// Close modal
-		const closeModalBtn = page.locator('.modal.show').getByRole('button', { name: 'Cancel' });
+		const closeModalBtn = modal.getByRole('button', { name: 'Cancel' });
 		await closeModalBtn.click();
 	});
 
@@ -140,14 +139,14 @@ test('Create and delete a project', async ({ page }) => {
 		await page.getByRole('button', { name: 'Create new project' }).click();
 
 		// Wait modal opening
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		const modalTitle = modal.locator('.modal-title');
 		await expect(modalTitle).toHaveText('Create new project');
 
 		// Fill form and submit
 		const projectNameInput = page.getByLabel('Project name');
 		await projectNameInput.fill(randomProjectName2);
-		const createProjectBtn = page.locator('.modal.show').getByRole('button', { name: 'Create' });
+		const createProjectBtn = modal.getByRole('button', { name: 'Create' });
 		await createProjectBtn.click();
 
 		await waitModalClosed(page);
@@ -247,7 +246,7 @@ async function deleteProject(page, projectName) {
 
 	await deleteBtn.click();
 
-	const modal = page.locator('.modal.show');
+	const modal = await waitModal(page, false);
 	const modalTitle = modal.locator('.modal-title');
 
 	await modalTitle.waitFor();

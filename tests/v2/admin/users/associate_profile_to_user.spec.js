@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { checkAccessibility, test } from '../../../base_fixture';
 import {
 	setUploadFile,
 	waitModal,
@@ -66,6 +67,7 @@ test('Associate a profile to a user', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption(randomResourceName);
 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName);
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Save' }).click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 		await waitPageLoading(page);
@@ -77,6 +79,7 @@ test('Associate a profile to a user', async ({ page }) => {
 		await page.getByRole('button', { name: 'Users (1)' }).click();
 		const userLink = page.getByRole('link', { name: randomEmail });
 		await expect(userLink).toBeVisible();
+		await checkAccessibility(page);
 		await userLink.click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+$/);
 		await waitPageLoading(page);
@@ -118,6 +121,7 @@ test('Associate a profile to a user', async ({ page }) => {
 		await page.goto(profileUrl);
 		await waitPageLoading(page);
 		await expect(page.getByText('There are no users associated with this profile')).toBeVisible();
+		await checkAccessibility(page);
 	});
 
 	await test.step('Delete profile', async () => {
@@ -147,7 +151,7 @@ test('Associate a profile to a user', async ({ page }) => {
 			.getByRole('row', { name: randomResourceName })
 			.getByRole('button', { name: 'Delete' })
 			.click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page.getByRole('row', { name: randomResourceName })).not.toBeVisible();

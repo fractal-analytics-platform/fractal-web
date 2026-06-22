@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { checkAccessibility, test } from '../../../base_fixture';
 import {
 	expectBooleanIcon,
 	login,
@@ -49,6 +50,7 @@ test('Admin page for project sharing', async ({ page }) => {
 		await expectBooleanIcon(row.getByRole('cell').nth(2), true);
 		await expectBooleanIcon(row.getByRole('cell').nth(3), false);
 		await expectBooleanIcon(row.getByRole('cell').nth(4), false);
+		await checkAccessibility(page);
 	});
 
 	await test.step('Login as other user and accept project', async () => {
@@ -59,6 +61,7 @@ test('Admin page for project sharing', async ({ page }) => {
 			`User admin@fractal.xy wants to share project "${p1.name}" with you`
 		);
 		await alert1.getByRole('button', { name: 'Accept' }).click();
+		await checkAccessibility(page);
 		await expect(page.locator('.alert')).not.toBeVisible();
 	});
 

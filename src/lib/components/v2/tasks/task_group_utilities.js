@@ -6,10 +6,7 @@ import { getAlertErrorFromResponse } from '$lib/common/errors';
  * @returns {Promise<import('fractal-components/types/api').TaskGroupActivityV2|undefined>}
  */
 async function getTaskActivity(taskGroupActivityId) {
-	const response = await fetch(`/api/v2/task-group/activity/${taskGroupActivityId}`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`/api/v2/task-group/activity/${taskGroupActivityId}`);
 	if (response.ok) {
 		return await response.json();
 	} else {
@@ -30,11 +27,7 @@ async function getTaskActivity(taskGroupActivityId) {
  */
 async function getAdminTaskActivity(taskGroupActivityId) {
 	const response = await fetch(
-		`/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
+		`/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`
 	);
 	if (response.ok) {
 		/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */

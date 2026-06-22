@@ -26,11 +26,7 @@
 		modal?.show();
 
 		const response = await fetch(
-			`/api/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
+			`/api/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`
 		);
 
 		if (response.ok) {
@@ -78,6 +74,7 @@
 	{/snippet}
 	{#snippet body()}
 		<div id="collectionTaskLogsError"></div>
-		<pre>{log}</pre>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<pre tabindex="0">{log}</pre>
 	{/snippet}
 </Modal>

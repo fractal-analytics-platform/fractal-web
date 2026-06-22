@@ -36,7 +36,6 @@
 
 		const response = await fetch(`/api/auth/group`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: newGroupName
@@ -69,8 +68,7 @@
 	 */
 	async function handleGroupDelete(groupId) {
 		const response = await fetch(`/api/auth/group/${groupId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 		if (response.ok) {
 			groups = groups.filter((g) => g.id !== groupId);

@@ -25,10 +25,7 @@
 	let expandedTaskGroupRow = $state();
 
 	async function reloadTaskGroupsList() {
-		const response = await fetch(`/api/v2/task-group?slim=true`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/task-group?slim=true`);
 		const result = await response.json();
 		if (response.ok) {
 			taskGroups = result;

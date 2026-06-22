@@ -39,10 +39,7 @@
 	let modal = $state(undefined);
 
 	onMount(async () => {
-		const response = await fetch(`/api/auth/current-user?group_ids_names=true`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/auth/current-user?group_ids_names=true`);
 
 		if (!response.ok) {
 			throw new Error('Unable to retrieve user groups.');
@@ -54,11 +51,7 @@
 
 	export async function show() {
 		if (workflow.template_id) {
-			const response = await fetch(`/api/v2/workflow-template/${workflow.template_id}`, {
-				method: 'GET',
-				credentials: 'include'
-			});
-
+			const response = await fetch(`/api/v2/workflow-template/${workflow.template_id}`);
 			if (!response.ok) {
 				console.error('Import template failed');
 				const alertError = await getAlertErrorFromResponse(response);
@@ -112,7 +105,6 @@
 
 		const response = await fetch(url, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: templateName,

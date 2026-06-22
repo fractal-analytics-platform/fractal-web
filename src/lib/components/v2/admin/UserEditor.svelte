@@ -260,7 +260,6 @@
 
 		const response = await fetch(`/api/auth/users/${editableUser.id}/set-groups`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				group_ids: userGroups.map((g) => g.id)
@@ -408,7 +407,6 @@
 		headers.set('Content-Type', 'application/json');
 		return await fetch(`/api/admin/v2/resource/${selectedResourceId}/profile`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({ ...profile, resource_id: undefined }, { nullifyEmptyStrings: true })
 		});

@@ -14,8 +14,6 @@ export function createGetProxy(path, forbiddenPaths = []) {
 		try {
 			logger.info('[GET] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
-				method: 'GET',
-				credentials: 'include',
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {
@@ -35,7 +33,6 @@ export function createPostProxy(path, forbiddenPaths = []) {
 			logger.info('[POST] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'POST',
-				credentials: 'include',
 				headers: filterHeaders(request.headers),
 				body: request.body,
 				// To avoid error "RequestInit: duplex option is required when sending a body"
@@ -59,7 +56,6 @@ export function createPutProxy(path, forbiddenPaths = []) {
 			logger.info('[PUT] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'PUT',
-				credentials: 'include',
 				headers: filterHeaders(request.headers),
 				body: request.body,
 				// To avoid error "RequestInit: duplex option is required when sending a body"
@@ -83,7 +79,6 @@ export function createPatchProxy(path, forbiddenPaths = []) {
 			logger.info('[PATCH] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'PATCH',
-				credentials: 'include',
 				headers: filterHeaders(request.headers),
 				body: request.body,
 				// @ts-ignore, not standard, but supported by undici; enable re-streaming of request
@@ -106,7 +101,6 @@ export function createDeleteProxy(path, forbiddenPaths = []) {
 			logger.info('[DELETE] - /%s/%s/%s', path, params.path, url.search);
 			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'DELETE',
-				credentials: 'include',
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {

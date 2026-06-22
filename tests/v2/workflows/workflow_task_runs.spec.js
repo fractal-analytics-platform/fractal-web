@@ -1,14 +1,19 @@
 import { expect, test } from '../workflow_fixture.js';
-import { selectSlimSelect, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	selectSlimSelect,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 import { createDataset } from '../../utils/v2/dataset.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task runs', async ({ page, workflow }) => {
 	await page.goto(workflow.url);
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -43,7 +48,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -51,8 +56,8 @@ test('Workflow task runs', async ({ page, workflow }) => {
 	});
 
 	await test.step('Open logs modal', async () => {
-		await page.locator('[aria-label="Done images"]').last().click();
-		await modal.waitFor();
+		await page.getByRole('button', { name: 'Done images of cellpose_segmentation' }).click();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('Images')).toBeVisible();
 		await expect(modal.getByText('Total results: 15')).toBeVisible();
 		await modal.getByRole('button', { name: '2' }).click();
@@ -61,6 +66,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await expect(modal.getByText('START cellpose_segmentation task')).toBeVisible();
 		await modal.getByRole('button', { name: 'Back' }).click();
 		await expect(modal.getByRole('row')).toHaveCount(7);
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -75,7 +81,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Continue workflow', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(
 			modal
 				.getByRole('combobox', { name: 'Start workflow at' })
@@ -96,20 +102,20 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await expect(page.getByPlaceholder('Argument name')).toHaveValue('k2');
 		await expect(page.getByPlaceholder('Argument value')).toHaveValue('v2');
 		await expect(page.getByRole('button', { name: 'Add property' })).toBeEnabled();
-		await page.locator('[aria-label="Show runs"]').last().click();
-		await page.getByRole('button', { name: 'Run 1' }).click();
+		await page.getByRole('button', { name: 'Show runs for cellpose_segmentation' }).click();
+		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
 		await expect(page.getByPlaceholder('Argument name')).toHaveValue('k1');
 		await expect(page.getByPlaceholder('Argument value')).toHaveValue('v1');
 		await expect(page.getByRole('button', { name: 'Add property' })).not.toBeEnabled();
-		await page.getByRole('button', { name: 'Run 2' }).click();
+		await page.getByRole('button', { name: 'Run 2', exact: true }).click();
 		await expect(page.getByPlaceholder('Argument name')).toHaveValue('k2');
 		await expect(page.getByPlaceholder('Argument value')).toHaveValue('v2');
 		await expect(page.getByRole('button', { name: 'Add property' })).not.toBeEnabled();
 	});
 
 	await test.step('Open run logs modal', async () => {
-		await page.locator('[aria-label="Done images"]').last().click();
-		await modal.waitFor();
+		await page.getByRole('button', { name: `Done images of run 2` }).click();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('Run 2')).toBeVisible();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
 		await expect(modal.getByRole('row')).toHaveCount(3);
@@ -119,15 +125,14 @@ test('Workflow task runs', async ({ page, workflow }) => {
 
 	await test.step('Open runs of second task and check arguments', async () => {
 		await workflow.selectTask('illumination_correction');
-		await expect(page.getByRole('button', { name: 'Run 1' })).not.toBeVisible();
+		await expect(page.getByRole('button', { name: 'Run 1', exact: true })).not.toBeVisible();
 		await page.getByRole('button', { name: 'Arguments', exact: true }).click();
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
 		await expect(page.getByRole('switch')).toBeChecked();
-		await page.locator('[aria-label="Show runs"]').nth(1).click();
-		await page.getByRole('button', { name: 'Run 1' }).click();
-		await expect(page.getByRole('button', { name: 'Run 2' })).not.toBeVisible();
+		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
+		await expect(page.getByRole('button', { name: 'Run 2', exact: true })).not.toBeVisible();
 		await expect(page.getByRole('switch')).not.toBeChecked();
 		await expect(page.getByRole('switch')).not.toBeEditable();
 	});

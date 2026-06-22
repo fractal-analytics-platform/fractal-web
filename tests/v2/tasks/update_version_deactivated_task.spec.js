@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitPageLoading } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 
 test('Update version of deactivated task', async ({ page, workflow }) => {
@@ -55,8 +55,7 @@ test('Update version of deactivated task', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: taskName }).getByRole('combobox').selectOption('0.0.1');
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('The task group is currently active')).toBeVisible();
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
@@ -76,8 +75,7 @@ test('Update version of deactivated task', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: taskName }).getByRole('combobox').selectOption('0.0.3');
 		await page.getByRole('row', { name: taskName }).getByRole('button', { name: 'Manage' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await expect(modal.getByText('The task group is currently active')).toBeVisible();
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();

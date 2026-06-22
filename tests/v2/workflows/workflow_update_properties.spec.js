@@ -30,7 +30,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
 
 	await test.step('Set short workflow description', async () => {
 		await page.getByRole('button', { name: 'Workflow properties' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 
 		await modal
 			.getByRole('textbox', { name: 'Workflow description' })
@@ -59,7 +59,7 @@ test('Update workflow name and description', async ({ page, workflow }) => {
 
 	await test.step('Unset workflow description', async () => {
 		await page.getByRole('button', { name: 'Workflow properties' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 
 		await modal.getByRole('textbox', { name: 'Workflow description' }).fill('');
 		await modal.getByRole('button', { name: 'Save' }).click();

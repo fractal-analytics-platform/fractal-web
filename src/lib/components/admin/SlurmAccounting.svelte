@@ -57,7 +57,6 @@
 		const response = await fetch(`/api/admin/v2/accounting/slurm`, {
 			method: 'POST',
 			headers,
-			credentials: 'include',
 			body: normalizePayload(params)
 		});
 		if (response.ok) {

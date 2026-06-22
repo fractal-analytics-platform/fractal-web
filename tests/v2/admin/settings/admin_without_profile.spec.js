@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { checkAccessibility, test } from '../../../base_fixture';
 import { login, logout, waitModal, waitPageLoading } from '../../../utils/utils.js';
 
 // Reset storage state for this file to avoid being authenticated
@@ -16,6 +17,7 @@ test('Admin without profile', async ({ page }) => {
 		await page.getByRole('textbox', { name: 'Password', exact: true }).fill('1234');
 		await page.getByRole('textbox', { name: 'Confirm password' }).fill('1234');
 		await page.getByRole('textbox', { name: 'Project dir' }).fill('/tmp');
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Save' }).first().click();
 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
 	});

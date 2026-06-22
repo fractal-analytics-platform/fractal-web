@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { selectSlimSelect, waitPageLoading } from '../../utils/utils.js';
+import { selectSlimSelect, waitModal, waitPageLoading } from '../../utils/utils.js';
 
 const NUM_MOCK_TASKS = 20;
 
@@ -28,8 +28,7 @@ test('Tasks filtering', async ({ page, workflow }) => {
 
 	await test.step('Open add task to workflow modal and filter values', async () => {
 		await page.getByRole('button', { name: 'Add task to workflow' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		await waitModal(page);
 		await testFiltering(page);
 	});
 

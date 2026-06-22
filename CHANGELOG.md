@@ -1,8 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.28.3
 
 - Remove usage of `GET /api/v2/task/` endpoint (\#1180);
+- Fix accessibility issues and add accessibility tests (\#1182);
 
 # 1.28.2
 

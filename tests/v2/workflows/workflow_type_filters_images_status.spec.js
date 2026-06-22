@@ -2,6 +2,7 @@ import { expect, test } from '../workflow_fixture.js';
 import {
 	expectSlimSelectValue,
 	selectSlimSelect,
+	waitModal,
 	waitModalClosed,
 	waitPageLoading
 } from '../../utils/utils.js';
@@ -13,7 +14,6 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -38,7 +38,7 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -46,8 +46,8 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	});
 
 	await test.step('Open cellpose_segmentation images modal', async () => {
-		await page.getByLabel('Done images').nth(0).click();
-		await modal.waitFor();
+		await page.getByRole('button', { name: 'Done images of cellpose_segmentation' }).click();
+		const modal = await waitModal(page);
 		await expect(modal.getByRole('combobox', { name: '3D' })).toBeEnabled();
 		await expect(modal.getByText('Total results: 4')).toBeVisible();
 		await selectSlimSelect(page, modal.getByRole('combobox', { name: '3D' }), 'False');
@@ -58,8 +58,8 @@ test('Workflow type filters selection in images status modal', async ({ page, wo
 	});
 
 	await test.step('Open MIP_compound images modal', async () => {
-		await page.getByLabel('Done images').nth(1).click();
-		await modal.waitFor();
+		await page.getByRole('button', { name: 'Done images of MIP_compound' }).click();
+		const modal = await waitModal(page, false);
 		await expect(modal.getByRole('combobox', { name: '3D' })).toHaveClass(/ss-disabled/);
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expectSlimSelectValue(page, '3D', 'True');

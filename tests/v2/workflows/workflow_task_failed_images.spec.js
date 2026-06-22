@@ -1,5 +1,5 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTaskFailure, waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 
@@ -8,7 +8,6 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -31,7 +30,7 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -40,7 +39,7 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 
 	await test.step('Continue workflow causing failure', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption('MIP_compound');
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await expect(modal.getByRole('button', { name: 'Apply' })).not.toBeEnabled();
@@ -50,10 +49,9 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 		await waitTaskFailure(page);
 	});
 
-	await test.step('Open failed logs modal', async () => {
-		await page.locator('[aria-label="Show runs"]').nth(1).click();
-		await page.locator('[aria-label="Failed images"]').first().click();
-		await modal.waitFor();
+	await test.step('Open failed logs modal for image', async () => {
+		await page.getByRole('button', { name: 'Failed images of MIP_compound' }).click();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('Images')).toBeVisible();
 		await expect(modal.getByText('Total results: 2')).toBeVisible();
 		await modal
@@ -61,6 +59,19 @@ test('Workflow task with failed images', async ({ page, workflow }) => {
 			.first()
 			.getByRole('button', { name: 'Logs' })
 			.click();
+		await expect(modal.getByText(/click here to expand/)).toBeVisible();
+		await expect(modal.getByText('FileExistsError')).toBeVisible();
+		await modal.getByRole('button', { name: 'Close' }).click();
+		await waitModalClosed(page);
+	});
+
+	await test.step('Open failed logs modal for run', async () => {
+		await page.getByRole('button', { name: 'Show runs for MIP_compound' }).click();
+		await page.getByRole('button', { name: 'Failed images of run 2' }).click();
+		const modal = await waitModal(page);
+		await expect(modal.getByText('Run 2')).toBeVisible();
+		await expect(modal.getByText('Total results: 1')).toBeVisible();
+		await modal.getByRole('button', { name: 'Logs' }).click();
 		await expect(modal.getByText(/click here to expand/)).toBeVisible();
 		await expect(modal.getByText('FileExistsError')).toBeVisible();
 		await modal.getByRole('button', { name: 'Close' }).click();

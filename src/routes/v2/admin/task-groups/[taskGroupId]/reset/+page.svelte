@@ -81,7 +81,6 @@
 
 		const response = await fetch(url, {
 			method: 'POST',
-			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -142,7 +141,7 @@
 		<div class="mb-2">
 			<div class="row mb-2">
 				<div class="col-md-6 mb-2">
-					<div class="input-group has-validation">
+					<div class="input-group">
 						<div class="input-group-text">
 							<label class="font-monospace" for="pythonVersion">Python Version</label>
 						</div>
@@ -180,7 +179,7 @@
 
 			<div class="row mb-2">
 				<div class="col-md-6 mb-2">
-					<div class="input-group has-validation" class:opacity-50={!includePackageExtras}>
+					<div class="input-group" class:opacity-75={!includePackageExtras}>
 						<div class="input-group-text">
 							<label class="font-monospace" for="packageExtras"> Package extras </label>
 						</div>

@@ -1,7 +1,8 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { createDataset } from '../../utils/v2/dataset.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	let taskName1, taskName2;
@@ -21,8 +22,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await page.goto(`/v2/projects/${workflow.projectId}/datasets/${datasetId}`);
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
-		let modal = page.locator('.modal.show');
-		await modal.waitFor();
+		let modal = await waitModal(page);
 		await modal
 			.getByRole('textbox', { name: 'Zarr URL' })
 			.fill(`/tmp/playwright/datasets/${datasetName}/img1`);
@@ -43,7 +43,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await saveBtn.click();
 		await waitModalClosed(page);
 		await page.getByRole('button', { name: 'Add an image list entry' }).click();
-		modal = page.locator('.modal.show');
+		modal = await waitModal(page, false);
 		await modal.waitFor();
 		await modal
 			.getByRole('textbox', { name: 'Zarr URL' })
@@ -71,6 +71,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		await page.getByPlaceholder('Key').fill('3D');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page.getByText('Filter already present in task.input_types')).toBeVisible();
+		await checkAccessibility(page);
 		await workflow.removeCurrentTask();
 	});
 
@@ -102,7 +103,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 	await test.step('Trigger pending changes modal from changing tab', async () => {
 		await page.getByPlaceholder('Key').fill('key2-mod');
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
-		const modal = page.locator('.modal.show');
+		const modal = await waitModal(page);
 		await modal.waitFor();
 		await page.getByText('There are filter changes unsaved').waitFor();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
@@ -116,7 +117,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 
 	await test.step('Trigger pending changes modal from clicking to "Run workflow" button', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = page.locator('.modal.show');
+		const modal = await waitModal(page, false);
 		await modal.waitFor();
 		await page.getByText('There are filter changes unsaved').waitFor();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
@@ -126,8 +127,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 
 	await test.step('Trigger pending changes modal from navigation', async () => {
 		await page.getByRole('link', { name: 'List jobs' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await page.getByText('There are filter changes unsaved').waitFor();
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
@@ -139,8 +139,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 			taskName1
 		);
 		await workflow.selectTask(taskName2);
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await page.getByText('There are filter changes unsaved').waitFor();
 		await modal.getByRole('button', { name: 'Discard changes' }).click();
 		await waitModalClosed(page);
@@ -157,8 +156,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 		);
 		await page.getByPlaceholder('Key').fill('key2-mod');
 		await workflow.selectTask(taskName2);
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await page.getByText('There are filter changes unsaved').waitFor();
 		await modal.getByRole('button', { name: 'Save changes' }).click();
 		await waitModalClosed(page);
@@ -175,8 +173,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 
 	await test.step('Add type filter from dataset', async () => {
 		await page.getByRole('button', { name: 'Add type filter from dataset' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('combobox', { name: 'Type Key' }).selectOption('k4');
 		await modal.getByRole('button', { name: 'Add' }).click();
 		await waitModalClosed(page);
@@ -187,8 +184,7 @@ test('Workflow task input filters [v2]', async ({ page, workflow }) => {
 
 	await test.step('Add already existing type filter from dataset', async () => {
 		await page.getByRole('button', { name: 'Add type filter from dataset' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('combobox', { name: 'Type Key' }).selectOption('k4');
 		await modal.getByRole('combobox', { name: 'Type Value' }).selectOption('False');
 		await modal.getByRole('button', { name: 'Add' }).click();

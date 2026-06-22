@@ -1,4 +1,4 @@
-import { closeModal, waitPageLoading } from '../../utils/utils.js';
+import { closeModal, waitModal, waitPageLoading } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { createFakeTask } from '../../utils/v2/task.js';
 import { expect, test } from '../workflow_fixture.js';
@@ -54,8 +54,6 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 	await page.goto(`/v2/projects/${workflow.projectId}`);
 	await waitPageLoading(page);
 
-	const modal = page.locator('.modal.show');
-
 	await test.step('Create test dataset', async () => {
 		await createDataset(page, workflow.projectId);
 	});
@@ -80,7 +78,7 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 
 	await test.step('Attempt to run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText(/You cannot run submit this workflow/)).toBeVisible();
 		await expect(modal.getByRole('listitem')).toHaveCount(3);
@@ -100,7 +98,7 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 
 	await test.step('Attempt to run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText(/You cannot run submit this workflow/)).toBeVisible();
 		await expect(modal.getByRole('listitem')).toHaveCount(2);
@@ -118,7 +116,7 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 
 	await test.step('Attempt to run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText(/You cannot run submit this workflow/)).toBeVisible();
 		await expect(modal.getByRole('listitem')).toHaveCount(1);
@@ -136,7 +134,7 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 
 	await test.step('Attempt to run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByText(/You cannot run submit this workflow/)).toBeVisible();
 		await expect(modal.getByRole('listitem')).toHaveCount(1);
@@ -153,7 +151,7 @@ test('Attempt to run a workflow with invalid arguments', async ({ page, workflow
 
 	await test.step('Attempt to run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await expect(modal.getByRole('button', { name: 'Confirm', exact: true })).toBeVisible();
 	});

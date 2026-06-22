@@ -283,7 +283,6 @@
 
 				const response = await fetch(`/api/admin/v2/job/${jobId}`, {
 					method: 'PATCH',
-					credentials: 'include',
 					headers,
 					body: normalizePayload({ status: 'failed' })
 				});
@@ -312,10 +311,7 @@
 	}
 
 	onMount(async () => {
-		const response = await fetch(`/api/admin/v2/resource`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/admin/v2/resource`);
 		if (response.ok) {
 			resources = await response.json();
 		}
@@ -391,15 +387,39 @@
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Min</div>
-						<input type="date" class="form-control" bind:value={startDateMin} id="start_date_min" />
-						<input type="time" class="form-control" bind:value={startTimeMin} id="start_time_min" />
+						<input
+							type="date"
+							class="form-control"
+							bind:value={startDateMin}
+							id="start_date_min"
+							aria-label="Start date min"
+						/>
+						<input
+							type="time"
+							class="form-control"
+							bind:value={startTimeMin}
+							id="start_time_min"
+							aria-label="Start time min"
+						/>
 					</div>
 				</div>
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Max</div>
-						<input type="date" class="form-control" bind:value={startDateMax} id="start_date_max" />
-						<input type="time" class="form-control" bind:value={startTimeMax} id="start_time_max" />
+						<input
+							type="date"
+							class="form-control"
+							bind:value={startDateMax}
+							id="start_date_max"
+							aria-label="Start date max"
+						/>
+						<input
+							type="time"
+							class="form-control"
+							bind:value={startTimeMax}
+							id="start_time_max"
+							aria-label="Start time max"
+						/>
 					</div>
 				</div>
 			</div>
@@ -412,15 +432,39 @@
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Min</div>
-						<input type="date" class="form-control" bind:value={endDateMin} id="end_date_min" />
-						<input type="time" class="form-control" bind:value={endTimeMin} id="end_time_min" />
+						<input
+							type="date"
+							class="form-control"
+							bind:value={endDateMin}
+							id="end_date_min"
+							aria-label="End date min"
+						/>
+						<input
+							type="time"
+							class="form-control"
+							bind:value={endTimeMin}
+							id="end_time_min"
+							aria-label="End time min"
+						/>
 					</div>
 				</div>
 				<div class="col-12 mt-1">
 					<div class="input-group">
 						<div class="input-group-text">Max</div>
-						<input type="date" class="form-control" bind:value={endDateMax} id="end_date_max" />
-						<input type="time" class="form-control" bind:value={endTimeMax} id="end_time_max" />
+						<input
+							type="date"
+							class="form-control"
+							bind:value={endDateMax}
+							id="end_date_max"
+							aria-label="End date max"
+						/>
+						<input
+							type="time"
+							class="form-control"
+							bind:value={endTimeMax}
+							id="end_time_max"
+							aria-label="End time max"
+						/>
 					</div>
 				</div>
 			</div>

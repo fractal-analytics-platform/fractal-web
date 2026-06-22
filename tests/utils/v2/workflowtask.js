@@ -14,9 +14,8 @@ export async function waitTaskSubmitted(page, count = undefined) {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {number|undefined=} count
  */
-export async function waitTasksSuccess(page, count = undefined) {
+export async function waitTasksSuccess(page) {
 	await expect(page.getByRole('button', { name: 'Stop workflow' })).not.toBeVisible({
 		timeout: 24000
 	});
@@ -26,9 +25,6 @@ export async function waitTasksSuccess(page, count = undefined) {
 		console.error(error);
 	}
 	await expect(errorAlert).toHaveCount(0);
-	if (count !== undefined) {
-		await expect(page.getByLabel('Done images')).toHaveCount(count);
-	}
 }
 
 /**

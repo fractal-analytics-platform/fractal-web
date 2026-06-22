@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { checkAccessibility, test } from '../../base_fixture';
 import { waitPageLoading } from '../../utils/utils.js';
 
 test('Execute the job healthcheck', async ({ page }) => {
@@ -8,6 +9,7 @@ test('Execute the job healthcheck', async ({ page }) => {
 	});
 
 	await test.step('Start test', async () => {
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Test' }).click();
 	});
 

@@ -73,8 +73,8 @@
 	let workflowSuccessMessage = $state('');
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = $state();
-	/** @type {number|undefined} */
-	let expandedWorkflowTaskId = $state();
+	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	let expandedWorkflowTask = $state();
 	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = $state();
 	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
@@ -209,10 +209,7 @@
 			return;
 		}
 
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/export`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/export`);
 
 		if (!response.ok) {
 			console.error(await response.json());
@@ -267,7 +264,6 @@
 
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(
 				{
@@ -310,8 +306,7 @@
 		const response = await fetch(
 			`/api/v2/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
 			{
-				method: 'DELETE',
-				credentials: 'include'
+				method: 'DELETE'
 			}
 		);
 
@@ -326,10 +321,7 @@
 		metaPropertiesForm?.discardChanges();
 
 		// Get updated workflow with deleted task
-		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`);
 
 		if (!workflowResponse.ok) {
 			console.error('Unable to retrieve workflow');
@@ -352,8 +344,8 @@
 		}
 		if (wft) {
 			selectedWorkflowTask = wft;
-			if (expandedWorkflowTaskId !== wft.id) {
-				expandedWorkflowTaskId = undefined;
+			if (expandedWorkflowTask && expandedWorkflowTask.id !== wft.id) {
+				expandedWorkflowTask = undefined;
 			}
 		}
 		preventedSelectedTaskChange = undefined;
@@ -392,14 +384,17 @@
 	}
 
 	/**
-	 * @param {number} workflowTaskId
+	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 */
-	async function loadHistoryRunStatuses(workflowTaskId, animate = true) {
+	async function loadHistoryRunStatuses(workflowTask, animate = true) {
+		if (!selectedWorkflowTask || selectedWorkflowTask.id !== workflowTask.id) {
+			await setSelectedWorkflowTask(workflowTask);
+		}
 		historyRunStatuses = [];
-		expandedWorkflowTaskId = workflowTaskId;
+		expandedWorkflowTask = workflowTask;
 		loadingHistoryRunStatuses = animate;
 		const response = await fetch(
-			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTaskId}&dataset_id=${selectedDatasetId}`
+			`/api/v2/project/${workflow.project_id}/status/run?workflowtask_id=${workflowTask.id}&dataset_id=${selectedDatasetId}`
 		);
 		if (!response.ok) {
 			loadingHistoryRunStatuses = false;
@@ -448,7 +443,7 @@
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = { ...job, task_statuses: {} };
 		selectedHistoryRun = undefined;
-		expandedWorkflowTaskId = undefined;
+		expandedWorkflowTask = undefined;
 		await loadJobsStatus();
 	}
 
@@ -465,10 +460,7 @@
 			workflowErrorAlert.hide();
 		}
 
-		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const workflowResponse = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}`);
 
 		const workflowResult = await workflowResponse.json();
 
@@ -531,7 +523,7 @@
 	let statusWatcherTimer;
 
 	async function selectedDatasetChanged() {
-		expandedWorkflowTaskId = undefined;
+		expandedWorkflowTask = undefined;
 		showMissingStatusesWarning = false;
 		await tick();
 		saveSelectedDataset(workflow, selectedDatasetId);
@@ -574,8 +566,8 @@
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
 			// reload run statuses, if one task is expanded
-			if (expandedWorkflowTaskId !== undefined) {
-				loadHistoryRunStatuses(expandedWorkflowTaskId, false);
+			if (expandedWorkflowTask !== undefined) {
+				await loadHistoryRunStatuses(expandedWorkflowTask, false);
 			}
 		}
 	}
@@ -585,10 +577,7 @@
 			return;
 		}
 		const datasetId = selectedDatasetId;
-		const response = await fetch(`/api/v2/project/${project.id}/dataset/${datasetId}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/project/${project.id}/dataset/${datasetId}`);
 		const result = await response.json();
 		if (!response.ok) {
 			console.error(result);
@@ -630,11 +619,7 @@
 			workflowErrorAlert.hide();
 		}
 		const response = await fetch(
-			`/api/v2/project/${project.id}/job/${selectedSubmittedJob.id}/stop`,
-			{
-				method: 'GET',
-				credentials: 'include'
-			}
+			`/api/v2/project/${project.id}/job/${selectedSubmittedJob.id}/stop`
 		);
 		if (response.ok) {
 			jobCancelledMessage = 'Job cancellation request received. The job will stop in a few seconds';
@@ -693,7 +678,6 @@
 			`/api/v2/project/${workflow.project_id}/workflow/${workflow.id}/wftask?order=${index + 1}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload([
 					{
@@ -1011,86 +995,129 @@
 						<p class="text-center mt-3">No workflow tasks yet, add one.</p>
 					{:else}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
-							{#each workflow.task_list as workflowTask (workflowTask.id)}
-								<button
-									style="cursor: pointer"
-									class="list-group-item list-group-item-action"
-									class:active={selectedWorkflowTask !== undefined &&
-										selectedWorkflowTask.id === workflowTask.id}
-									data-fs-target={workflowTask.id}
-									onclick={(e) => {
-										e.preventDefault();
-										setSelectedWorkflowTask(workflowTask);
-									}}
-								>
-									{#if statuses[workflowTask.id]}
-										{#if expandedWorkflowTaskId === workflowTask.id && loadingHistoryRunStatuses}
-											<span
-												class="spinner-border spinner-border-sm p-0"
-												role="status"
-												aria-hidden="true"
-											></span>
-										{:else if expandedWorkflowTaskId === workflowTask.id}
-											<!-- svelte-ignore node_invalid_placement_ssr -->
-											<button
-												aria-label="Hide runs"
-												class="btn btn-link p-0 text-white"
-												onclick={() => (expandedWorkflowTaskId = undefined)}
-											>
-												<i class="bi bi-caret-down-fill"></i>
-											</button>
-										{:else}
-											<!-- svelte-ignore node_invalid_placement_ssr -->
-											<button
-												aria-label="Show runs"
-												class="btn btn-link p-0"
-												class:text-white={selectedWorkflowTask?.id === workflowTask.id}
-												onclick={() => loadHistoryRunStatuses(workflowTask.id)}
-											>
-												<i class="bi bi-caret-right-fill"></i>
-											</button>
-										{/if}
-									{/if}
-									{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
-									<span class="float-end ps-2">
-										{#if selectedDataset}
-											{#if !showMissingStatusesWarning && imagesStatusModal}
-												<ImagesStatus
-													status={statuses[workflowTask.id]}
-													dataset={selectedDataset}
-													{workflowTask}
-													{imagesStatusModal}
-													running={workflowTask.id === runningTaskId}
-												/>
+							{#each workflow.task_list as workflowTask, i (workflowTask.id)}
+								<div class="wft-item">
+									<div class="wft-expander ms-1">
+										{#if statuses[workflowTask.id]}
+											{#if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id && loadingHistoryRunStatuses}
+												<span
+													class="spinner-border spinner-border-sm p-0"
+													role="status"
+													aria-hidden="true"
+												></span>
+											{:else if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
+												<button
+													aria-label="Hide runs"
+													class="btn btn-link p-0 text-white"
+													onclick={() => (expandedWorkflowTask = undefined)}
+												>
+													<i class="bi bi-caret-down-fill"></i>
+												</button>
+											{:else}
+												<button
+													aria-label="Show runs for {workflowTask.alias
+														? workflowTask.alias
+														: workflowTask.task.name}"
+													class="btn btn-link p-0"
+													class:text-white={selectedWorkflowTask?.id === workflowTask.id}
+													onclick={() => loadHistoryRunStatuses(workflowTask)}
+												>
+													<i class="bi bi-caret-right-fill"></i>
+												</button>
 											{/if}
 										{/if}
-									</span>
-									{#if newVersionsMap[workflowTask.task.id]?.length > 0}
-										<span class="float-end text-info me-1" title="New version available.">
-											<i class="bi bi-arrow-up-circle-fill"></i>
+									</div>
+									<div
+										class="list-group-item list-group-item-action border-0 pe-2 clearfix"
+										class:border-top={i > 0}
+										class:rounded-bottom={i === workflow.task_list.length - 1 &&
+											(!expandedWorkflowTask || expandedWorkflowTask.id !== workflowTask.id)}
+										class:active={selectedWorkflowTask !== undefined &&
+											selectedWorkflowTask.id === workflowTask.id}
+									>
+										<span class="wft-item-label px-2 py-0" id="label-wft-{workflowTask.id}">
+											{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
 										</span>
-									{/if}
-									{#if workflowTask.warning}
-										<span class="float-end text-warning me-1" title={workflowTask.warning}>
-											<i class="bi bi-ban-fill"></i>
-										</span>
-									{/if}
-									{#if hasWarnings(statuses[workflowTask.id])}
-										<span class="float-end text-secondary me-1" title="There are warnings.">
-											<i class="bi bi-exclamation-triangle-fill"></i>
-										</span>
-									{/if}
-								</button>
-								{#each historyRunStatuses as status, index (status.id)}
-									{#if !loadingHistoryRunStatuses && expandedWorkflowTaskId === workflowTask.id}
 										<button
-											transition:slide
-											class="run-item list-group-item list-group-item-action"
-											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
-											style="padding-left: 38px"
-											onclick={() => selectHistoryRun(status)}
+											type="button"
+											class="btn p-0 wft-item-btn"
+											data-fs-target={workflowTask.id}
+											onclick={async () => {
+												await setSelectedWorkflowTask(workflowTask);
+											}}
+											aria-labelledby="label-wft-{workflowTask.id}"
 										>
-											Run {index + 1}
+											&nbsp;
+										</button>
+										<span class="float-end ms-2 status-buttons">
+											{#if selectedDataset}
+												{#if !showMissingStatusesWarning && imagesStatusModal}
+													<ImagesStatus
+														status={statuses[workflowTask.id]}
+														dataset={selectedDataset}
+														{workflowTask}
+														{imagesStatusModal}
+														running={workflowTask.id === runningTaskId}
+													/>
+												{/if}
+											{/if}
+										</span>
+										{#if newVersionsMap[workflowTask.task.id]?.length > 0}
+											<button
+												type="button"
+												class="btn btn-link p-0 float-end text-info me-1 btn-new-version"
+												onclick={async () => {
+													await setSelectedWorkflowTask(workflowTask);
+												}}
+												title="New version available."
+											>
+												<i class="bi bi-arrow-up-circle-fill"></i>
+											</button>
+										{/if}
+										{#if workflowTask.warning}
+											<button
+												type="button"
+												class="btn btn-link p-0 float-end text-warning me-1 wft-warning"
+												title={workflowTask.warning}
+												onclick={async () => {
+													await setSelectedWorkflowTask(workflowTask);
+												}}
+											>
+												<i class="bi bi-ban-fill"></i>
+											</button>
+										{/if}
+										{#if hasWarnings(statuses[workflowTask.id])}
+											<button
+												type="button"
+												class="btn btn-link p-0 float-end text-secondary me-1 wft-has-warnings"
+												title="There are warnings"
+												onclick={async () => {
+													await setSelectedWorkflowTask(workflowTask);
+												}}
+											>
+												<i class="bi bi-exclamation-triangle-fill"></i>
+											</button>
+										{/if}
+									</div>
+								</div>
+								{#each historyRunStatuses as status, index (status.id)}
+									{#if !loadingHistoryRunStatuses && expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id}
+										<div
+											transition:slide
+											class="run-item list-group-item list-group-item-action border-top pe-2"
+											class:active={selectedHistoryRun && selectedHistoryRun.id === status.id}
+										>
+											<span id="run-label-{status.id}">
+												Run {index + 1}
+											</span>
+											<button
+												class="btn run-item-btn"
+												type="button"
+												onclick={() => selectHistoryRun(status)}
+												aria-labelledby="run-label-{status.id}"
+											>
+												&nbsp;
+											</button>
 											<span class="float-end ps-2">
 												{#if selectedDataset && runStatusModal}
 													<RunStatus
@@ -1102,7 +1129,7 @@
 													/>
 												{/if}
 											</span>
-										</button>
+										</div>
 									{/if}
 								{/each}
 							{/each}
@@ -1555,11 +1582,86 @@
 <CompareWorkflowTemplateModal bind:this={compareWorkflowToTemplateModal} {workflow} />
 
 <style>
+	.wft-item {
+		position: relative;
+	}
+
+	.wft-item .list-group-item {
+		padding-left: 27px;
+	}
+
+	.wft-item-label {
+		color: #000;
+	}
+	.active .wft-item-label {
+		color: #fff;
+	}
+
+	.wft-item-btn {
+		border: 0 !important;
+		cursor: pointer;
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 200;
+	}
+	.wft-item-btn:focus-visible {
+		box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+	}
+
+	.wft-expander {
+		position: absolute;
+		top: calc(50% - 13px);
+		left: 5px;
+		z-index: 300;
+	}
+	.wft-expander .btn.text-white:focus-visible,
+	:global(.active .status-modal-btn:focus-visible) {
+		box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.35) !important;
+	}
+
+	.status-buttons,
+	.btn-new-version {
+		position: relative;
+		z-index: 300;
+	}
+
 	.run-item {
+		position: relative;
 		padding-left: 38px;
+		color: #000;
 	}
 	.run-item.active {
-		background-color: #4e95ff !important;
+		background-color: #c4dcff !important;
+	}
+	.run-item.active:hover {
+		color: #000;
+	}
+	.run-item.list-group-item.active {
+		border-color: #9dc4ff;
+	}
+	.run-item-btn {
+		border: 0 !important;
+		z-index: 200;
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+	.run-item-btn:focus-visible {
+		box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+	}
+	:global(.status-wrapper.text-success),
+	:global(.run-item .status-icon.text-success) {
+		color: #136c43 !important;
+	}
+	:global(.status-modal-btn) {
+		z-index: 300;
 	}
 
 	:global(.status-icon) {
@@ -1570,12 +1672,29 @@
 		display: block;
 	}
 
-	:global(.active .status-wrapper),
-	:global(.active .status-icon) {
+	:global(.wft-item .active .status-wrapper),
+	:global(.wft-item .active .status-icon),
+	:global(.wft-item .active .wft-has-warnings) {
 		color: #fff !important;
+	}
+
+	.wft-warning,
+	.wft-has-warnings {
+		position: relative;
+		z-index: 300;
 	}
 
 	:global(.status-modal-btn:hover span) {
 		text-decoration: underline;
+	}
+
+	:global(.card-header .nav-link:not(.active)) {
+		color: #0d6af2;
+	}
+	:global(.alert.bg-light .text-danger) {
+		color: rgb(213, 51, 67) !important;
+	}
+	:global(.alert.bg-light .btn-outline-secondary:not(:hover):not(:focus)) {
+		background-color: #fff;
 	}
 </style>

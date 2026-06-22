@@ -134,8 +134,7 @@
 			const response = await fetch(
 				`/api/admin/v2/project/${selectedProject?.id}?user_id=${newOwnerId}`,
 				{
-					method: 'PATCH',
-					credentials: 'include'
+					method: 'PATCH'
 				}
 			);
 			if (!response.ok) {

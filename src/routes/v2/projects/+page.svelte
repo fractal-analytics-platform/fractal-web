@@ -31,9 +31,7 @@
 
 	async function loadSharedProjects() {
 		errorAlert?.hide();
-		const response = await fetch(`/api/v2/project?is_owner=false`, {
-			method: 'GET'
-		});
+		const response = await fetch(`/api/v2/project?is_owner=false`);
 		if (response.ok) {
 			sharedProjects = await response.json();
 		} else {

@@ -25,9 +25,7 @@
 		loading = true;
 		loading = false;
 
-		const response = await fetch(`/api/v2/project/${project.id}/access`, {
-			method: 'GET'
-		});
+		const response = await fetch(`/api/v2/project/${project.id}/access`);
 		if (response.ok) {
 			info = await response.json();
 		} else {

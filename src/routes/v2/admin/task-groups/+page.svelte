@@ -312,12 +312,14 @@
 									class="form-control"
 									bind:value={lastUsedDateMin}
 									id="last_used_date_min"
+									aria-label="Last used date min"
 								/>
 								<input
 									type="time"
 									class="form-control"
 									bind:value={lastUsedTimeMin}
 									id="last_used_time_min"
+									aria-label="Last used time min"
 								/>
 							</div>
 						</div>
@@ -329,12 +331,14 @@
 									class="form-control"
 									bind:value={lastUsedDateMax}
 									id="last_used_date_max"
+									aria-label="Last used date max"
 								/>
 								<input
 									type="time"
 									class="form-control"
 									bind:value={lastUsedTimeMax}
 									id="last_used_time_max"
+									aria-label="Last used time max"
 								/>
 							</div>
 						</div>

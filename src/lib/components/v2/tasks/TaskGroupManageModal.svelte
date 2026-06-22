@@ -53,7 +53,6 @@
 			}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: JSON.stringify({})
 			}
@@ -72,7 +71,6 @@
 			`/api/${admin ? 'admin/' : ''}v2/task-group/${taskGroup?.id}/delete`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: JSON.stringify({})
 			}

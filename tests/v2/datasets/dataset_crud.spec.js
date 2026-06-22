@@ -1,4 +1,4 @@
-import { waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import { closeModal, waitModal, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
 import { expect, test } from '../project_fixture.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -62,23 +62,18 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 
 	await test.step('Open info modal', async () => {
 		await page.getByRole('button', { name: 'Info' }).click();
-		const modal = page.locator('.modal.show');
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await expect(modal.getByText('test-dataset')).toBeVisible();
 		await expect(modal.getByText('/tmp')).toBeVisible();
 	});
 
 	await test.step('Edit dataset name', async () => {
-		const modal = page.locator('.modal.show');
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Edit dataset name' }).click();
 		await modal.getByRole('textbox').fill('test-dataset-renamed');
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await expect(modal.getByRole('textbox')).toHaveCount(0);
-	});
-
-	await test.step('Close info modal', async () => {
-		await page.locator('.modal.show').getByLabel('Close').click();
-		await waitModalClosed(page);
+		await closeModal(page);
 	});
 
 	let exportedDatasetFile;
@@ -98,12 +93,9 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		// Open delete dataset modal
 		await datasetRow.getByRole('button', { name: 'Delete' }).click();
 
-		const modalTitle = page.locator('.modal.show .modal-title');
-		await modalTitle.waitFor();
-		await expect(modalTitle).toHaveText('Confirm action');
-		await expect(page.locator('.modal.show .modal-body')).toContainText(
-			'Delete dataset test-dataset-renamed'
-		);
+		const modal = await waitModal(page, false);
+		await expect(modal.locator('.modal-title')).toHaveText('Confirm action');
+		await expect(modal.locator('.modal-body')).toContainText('Delete dataset test-dataset-renamed');
 
 		// Confirm the deletion
 		await page.getByRole('button', { name: 'Confirm' }).click();
@@ -249,7 +241,6 @@ async function verifyDatasetsCount(page, expectedCount) {
  * @param {string} title
  */
 async function waitDatasetModal(page, title) {
-	const modalTitle = page.locator('.modal.show .modal-title');
-	await modalTitle.waitFor();
-	await expect(modalTitle).toHaveText(title);
+	const modal = await waitModal(page, false);
+	await expect(modal.locator('.modal-title')).toHaveText(title);
 }

@@ -1,13 +1,11 @@
 import { expect, test } from '../workflow_fixture.js';
-import { waitModalClosed } from '../../utils/utils.js';
+import { waitModal, waitModalClosed } from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 
 test('Workflow task runs on task without arguments', async ({ page, workflow }) => {
 	test.slow();
-
-	const modal = page.locator('.modal.show');
 
 	await test.step('Create test dataset', async () => {
 		await createDataset(page, workflow.projectId);
@@ -37,7 +35,7 @@ test('Workflow task runs on task without arguments', async ({ page, workflow }) 
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -52,7 +50,7 @@ test('Workflow task runs on task without arguments', async ({ page, workflow }) 
 
 	await test.step('Run workflow again', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page, false);
 		await modal.getByRole('combobox', { name: 'Start workflow at' }).selectOption(taskName);
 		await modal.getByRole('button', { name: 'Run', exact: true }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
@@ -61,10 +59,10 @@ test('Workflow task runs on task without arguments', async ({ page, workflow }) 
 	});
 
 	await test.step('Check run arguments', async () => {
-		await page.getByLabel('Show runs').click();
-		await page.getByRole('button', { name: 'Run 1' }).click();
+		await page.getByLabel(`Show runs for ${taskName}`).click();
+		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
 		await expect(page.getByRole('textbox', { name: 'Argument value' })).toHaveValue('foo');
-		await page.getByRole('button', { name: 'Run 2' }).click();
+		await page.getByRole('button', { name: 'Run 2', exact: true }).click();
 		await expect(page.getByRole('textbox', { name: 'Argument value' })).toHaveValue('bar');
 	});
 

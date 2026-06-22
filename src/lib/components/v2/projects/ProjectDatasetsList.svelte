@@ -41,8 +41,7 @@
 	 */
 	async function handleDatasetDelete(projectId, datasetId) {
 		const response = await fetch(`/api/v2/project/${projectId}/dataset/${datasetId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 		if (response.ok) {
 			console.log('Dataset deleted');

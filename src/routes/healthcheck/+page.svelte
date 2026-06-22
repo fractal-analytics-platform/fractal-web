@@ -51,7 +51,6 @@
 
 		const response = await fetch(`/api/v2/project`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: randomProjectName
@@ -73,7 +72,6 @@
 
 		const response = await fetch(`/api/v2/project/${projectId}/dataset`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: 'test',
@@ -97,7 +95,6 @@
 
 		const response = await fetch(`/api/v2/project/${projectId}/workflow`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({ name: 'test' })
 		});
@@ -120,7 +117,6 @@
 
 		const response = await fetch(`/api/v2/task?private=true`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: normalizePayload({
 				name: '__TEST_ECHO_TASK__',
@@ -160,7 +156,6 @@
 
 		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflowId}/wftask`, {
 			method: 'POST',
-			credentials: 'include',
 			headers,
 			body: JSON.stringify([{ task_id: taskId }])
 		});
@@ -181,7 +176,6 @@
 			`/api/v2/project/${projectId}/job/submit?workflow_id=${workflowId}&dataset_id=${datasetId}`,
 			{
 				method: 'POST',
-				credentials: 'include',
 				headers,
 				body: normalizePayload({ first_task_index: 0, attribute_filters: {} })
 			}

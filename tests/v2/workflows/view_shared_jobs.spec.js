@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../base_fixture';
 import {
 	addTaskToWorkflow,
 	login,
@@ -54,7 +55,7 @@ test('View shared jobs', async ({ page }) => {
 		await waitPageLoading(page);
 		await page.getByRole('combobox', { name: 'Dataset' }).selectOption(dataset.name);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitTaskSubmitted(page);
@@ -95,6 +96,7 @@ test('View shared jobs', async ({ page }) => {
 		await expect(page.getByRole('row')).toHaveCount(3);
 		await expect(page.getByRole('row', { name: 'admin@fractal.xy' })).not.toBeVisible();
 		await expect(page.getByRole('row', { name: userEmail })).toBeVisible();
+		await expect(page.locator('.ss-open')).not.toBeVisible();
 	});
 
 	await test.step('Cleanup', async () => {

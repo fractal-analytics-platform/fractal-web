@@ -57,7 +57,6 @@
 		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/dataset/${dataset.id}`, {
 			method: 'PATCH',
-			credentials: 'include',
 			headers,
 			body: normalizePayload(body)
 		});

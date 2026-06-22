@@ -48,8 +48,6 @@
 
 				const response = await fetch(`/api/v2/project/${project.id}`, {
 					method: 'PATCH',
-					credentials: 'include',
-					mode: 'cors',
 					headers,
 					body: normalizePayload(
 						{

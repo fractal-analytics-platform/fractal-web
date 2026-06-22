@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { checkAccessibility, test } from '../../base_fixture';
 import {
 	addTaskToWorkflow,
 	closeModal,
@@ -31,6 +32,7 @@ test('Use template page', async ({ page }) => {
 		await modal
 			.getByRole('textbox', { name: 'Workflow description' })
 			.fill('This is the workflow description');
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await waitModalClosed(page);
 	});
@@ -52,6 +54,7 @@ test('Use template page', async ({ page }) => {
 		// Task list is empy
 		await modal.getByRole('button', { name: 'Create template' }).click();
 		await expect(modal.getByText(`Workflow ${workflow.id} has empty \`task_list\`.`)).toBeVisible();
+		await checkAccessibility(page);
 		await closeModal(page);
 
 		// Add task to workflow
@@ -69,7 +72,7 @@ test('Use template page', async ({ page }) => {
 
 		// Create template
 		await page.getByRole('button', { name: 'Create template' }).click();
-		const modal2 = await waitModal(page);
+		const modal2 = await waitModal(page, false);
 		await modal.getByText('Template description').fill('This is the template description.');
 		await modal2.getByLabel('User Group').selectOption({ label: 'All' });
 		await modal2.getByRole('button', { name: 'Create template' }).click();
@@ -104,6 +107,7 @@ test('Use template page', async ({ page }) => {
 			await values.nth(6).locator('span').allInnerTexts()
 		);
 		await expect(values.nth(7).locator('span')).toHaveText(String(templateId));
+		await checkAccessibility(page);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -120,7 +124,7 @@ test('Use template page', async ({ page }) => {
 		await waitModalClosed(page);
 
 		await page.getByRole('button', { name: 'Info' }).click();
-		await waitModal(page);
+		await waitModal(page, false);
 		const values = page.locator('.list-group-item:not(.text-bg-light)');
 		await expect(values.nth(1).locator('span')).toHaveText(newDescription);
 		await expect(values.nth(4).locator('span')).toHaveText('-');
@@ -139,15 +143,15 @@ test('Use template page', async ({ page }) => {
 		await download.saveAs(file);
 
 		await page.getByRole('button', { name: 'Delete' }).click();
-		await waitModal(page);
+		await waitModal(page, false);
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
 		await expect(page).toHaveURL(`/v2/templates?template_id=${templateId}`);
 		await expect(page.getByRole('row')).toHaveCount(1);
 
-		const applyButton = await page.getByRole('button', { name: 'Apply' });
+		const applyButton = page.getByRole('button', { name: 'Apply' });
 		await expect(applyButton).toBeDisabled();
-		const resetButton = await page.getByRole('button', { name: 'Reset' });
+		const resetButton = page.getByRole('button', { name: 'Reset' });
 		await expect(resetButton).toBeEnabled();
 
 		await resetButton.click();
@@ -191,6 +195,7 @@ test('Use template page', async ({ page }) => {
 		).toBeVisible();
 
 		await page.getByLabel('Select a file').setInputFiles(templateFileName);
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await waitModalClosed(page);
 
@@ -229,6 +234,7 @@ test('Use template page', async ({ page }) => {
 		await page.getByRole('button', { name: 'Import' }).click();
 		await page.getByLabel('Select a file').setInputFiles(templateFileName);
 		await page.getByRole('textbox', { name: 'Template name' }).fill(newTemplateName);
+		await checkAccessibility(page);
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
 	});
@@ -236,7 +242,7 @@ test('Use template page', async ({ page }) => {
 	await test.step('Create a workflow from a template', async () => {
 		await page.goto(`/v2/projects/${project.id}`);
 		await page.getByRole('button', { name: 'Create new workflow' }).click();
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await modal.getByLabel('Create from template').check();
 
 		const rows = modal.locator('tbody tr');
@@ -272,7 +278,7 @@ test('Use template page', async ({ page }) => {
 		await waitModalClosed(page);
 
 		await page.getByRole('button', { name: 'Create template' }).click();
-		const modal3 = await waitModal(page);
+		const modal3 = await waitModal(page, false);
 		// default: originalTemplate.name
 		await expect(modal3.getByText('Template name')).toHaveValue(newTemplateName);
 		// default: 2
@@ -281,6 +287,7 @@ test('Use template page', async ({ page }) => {
 		await expect(modal3.getByText('Template description')).toHaveValue(newDescription);
 		// default: null
 		await expect(modal3.getByLabel('User Group')).toHaveValue('');
+		await checkAccessibility(page);
 
 		await closeModal(page);
 	});
@@ -304,6 +311,7 @@ test('Use template page', async ({ page }) => {
 
 		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
 		await expect(page.getByRole('button', { name: 'Import template' })).toBeEnabled();
+		await checkAccessibility(page);
 
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await waitModalClosed(page);

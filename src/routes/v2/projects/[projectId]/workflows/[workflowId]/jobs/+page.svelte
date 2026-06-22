@@ -12,11 +12,7 @@
 	 * @returns {Promise<import('fractal-components/types/api').JobV2[]>}
 	 */
 	async function jobUpdater() {
-		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`, {
-			method: 'GET',
-			credentials: 'include',
-			mode: 'cors'
-		});
+		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`);
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);
 		}

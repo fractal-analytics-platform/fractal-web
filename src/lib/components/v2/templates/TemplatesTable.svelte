@@ -135,9 +135,6 @@
 
 	export async function searchTemplate() {
 		const url = new URL(window.location.href);
-		// Headers
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
 		// Query parametes
 		const params = new URLSearchParams();
 		params.set('page', String(currentPage));
@@ -168,11 +165,7 @@
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		pushState(url, {});
 
-		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`, {
-			method: 'GET',
-			headers,
-			credentials: 'include'
-		});
+		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`);
 		if (response.ok) {
 			templatePage = await response.json();
 			selectedTemplates = templatePage.items.map((item) => item.templates[0]);
@@ -187,10 +180,7 @@
 	 * @returns {Promise<void>}
 	 */
 	async function exportTemplate(templateId) {
-		const response = await fetch(`/api/v2/workflow-template/${templateId}/export`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		const response = await fetch(`/api/v2/workflow-template/${templateId}/export`);
 		if (!response.ok) {
 			console.error(await response.json());
 			return;
@@ -218,8 +208,7 @@
 	 */
 	async function handleDeleteTemplate(templateId) {
 		const response = await fetch(`/api/v2/workflow-template/${templateId}`, {
-			method: 'DELETE',
-			credentials: 'include'
+			method: 'DELETE'
 		});
 
 		if (response.ok) {

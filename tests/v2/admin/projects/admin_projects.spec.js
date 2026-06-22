@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../../../base_fixture';
 import {
 	closeModal,
 	login,
@@ -167,7 +168,7 @@ test('Admin page for projects', async ({ page }) => {
 	await test.step('Pass ownership to User 2', async () => {
 		await page.getByRole('button', { name: 'Change ownership' }).click();
 
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await expect(
 			modal.getByText(`The current owner (${userEmail1}) will loose access to this project.`)
 		).toBeVisible();
@@ -189,7 +190,7 @@ test('Admin page for projects', async ({ page }) => {
 	await test.step('Pass ownership to User 3 and User 4', async () => {
 		await page.getByRole('button', { name: 'Change ownership' }).click();
 
-		const modal = await waitModal(page);
+		const modal = await waitModal(page, false);
 		await expect(
 			modal.getByText(`The current owner (${userEmail2}) will loose access to this project.`)
 		).toBeVisible();

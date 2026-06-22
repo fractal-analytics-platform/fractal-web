@@ -1,5 +1,10 @@
 import { expect, test } from '../workflow_fixture.js';
-import { expectSlimSelectValue, waitModalClosed, waitPageLoading } from '../../utils/utils.js';
+import {
+	expectSlimSelectValue,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createDataset } from '../../utils/v2/dataset.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 
@@ -8,7 +13,6 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 	await waitPageLoading(page);
 
 	test.slow();
-	const modal = page.locator('.modal.show');
 
 	/** @type {string} */
 	let zarrDir;
@@ -33,7 +37,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 
 	await test.step('Run workflow', async () => {
 		await page.getByRole('button', { name: 'Run workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitModalClosed(page);
@@ -42,7 +46,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 
 	await test.step('Open continue workflow modal and select cellpose_segmentation task', async () => {
 		await page.getByRole('button', { name: 'Continue workflow' }).click();
-		await modal.waitFor();
+		const modal = await waitModal(page);
 		await modal
 			.getByRole('combobox', { name: 'Start workflow at' })
 			.selectOption('cellpose_segmentation');
@@ -52,6 +56,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 	});
 
 	await test.step('Deselect 3D type', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('combobox', { name: '3D' }).locator('.ss-deselect').click();
 		await modal.getByRole('button', { name: 'Apply' }).click();
 		await expect(modal.getByRole('button', { name: 'Apply' })).not.toBeEnabled();
@@ -60,6 +65,7 @@ test('Continue workflow deseleting a pre-selected type filter', async ({ page, w
 	});
 
 	await test.step('Click on "Run" and ignore warning. Verify that no filter is applied', async () => {
+		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
 		await modal.getByRole('button', { name: 'Continue anyway' }).click();
 		await expect(modal.getByText('This job will process 4 images.')).toBeVisible();

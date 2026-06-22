@@ -12,10 +12,7 @@ const logger = getLogger('admin API [v2]');
  */
 export async function userImpersonation(fetch, userId) {
 	logger.debug(`Impersonating user ${userId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/impersonate/${userId}/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/impersonate/${userId}/`);
 
 	if (!response.ok) {
 		logger.warn('Impersonation failed');
@@ -31,10 +28,7 @@ export async function userImpersonation(fetch, userId) {
  */
 export async function getResources(fetch) {
 	logger.debug(`Retrieving resources`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/`);
 
 	if (!response.ok) {
 		await responseError(response);
@@ -50,10 +44,7 @@ export async function getResources(fetch) {
  */
 export async function getResource(fetch, resourceId) {
 	logger.debug(`Retrieving resource ${resourceId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/${resourceId}/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/${resourceId}/`);
 
 	if (!response.ok) {
 		await responseError(response);
@@ -68,10 +59,7 @@ export async function getResource(fetch, resourceId) {
  */
 export async function getProfiles(fetch) {
 	logger.debug(`Retrieving profiles`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/`);
 
 	if (!response.ok) {
 		await responseError(response);
@@ -87,10 +75,7 @@ export async function getProfiles(fetch) {
  */
 export async function getProfile(fetch, profileId) {
 	logger.debug(`Retrieving profile ${profileId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}/`, {
-		method: 'GET',
-		credentials: 'include'
-	});
+	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}/`);
 
 	if (!response.ok) {
 		await responseError(response);

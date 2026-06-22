@@ -15,11 +15,7 @@ export async function listTaskGroups(fetch, slim = false, onlyActive = false) {
 	logger.debug('Fetching task groups');
 
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/?slim=${slim}&only_active=${onlyActive}`,
-		{
-			method: 'GET',
-			credentials: 'include'
-		}
+		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/?slim=${slim}&only_active=${onlyActive}`
 	);
 
 	if (!response.ok) {

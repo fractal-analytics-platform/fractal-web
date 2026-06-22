@@ -75,10 +75,7 @@
 		projectName && params.set('project_name', projectName);
 		datasetName && params.set('dataset_name', datasetName);
 
-		let response = await fetch(`/api/v2/dataset?${params.toString()}`, {
-			method: 'GET',
-			credentials: 'include'
-		});
+		let response = await fetch(`/api/v2/dataset?${params.toString()}`);
 		if (response.ok) {
 			datasetPage = await response.json();
 		} else {

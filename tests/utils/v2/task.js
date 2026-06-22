@@ -101,8 +101,8 @@ export async function collapseExpandedRows(page) {
  */
 export async function checkTasksOrder(page, ...expectedNames) {
 	const tasksListContainer = page.getByTestId('workflow-tasks-list');
-	await expect(tasksListContainer.getByRole('button')).toHaveCount(expectedNames.length);
-	const names = await tasksListContainer.getByRole('button').allInnerTexts();
+	await expect(tasksListContainer.locator('.wft-item-label')).toHaveCount(expectedNames.length);
+	const names = await tasksListContainer.locator('.wft-item-label').allInnerTexts();
 	expect(names.length).toEqual(expectedNames.length);
 	for (let i = 0; i < expectedNames.length; i++) {
 		expect(names[i]).toEqual(expectedNames[i]);
