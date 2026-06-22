@@ -1,0 +1,344 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: v2/admin/projects/admin_projects.spec.js >> Admin page for projects
+- Location: tests/v2/admin/projects/admin_projects.spec.js:29:1
+
+# Error details
+
+```
+Test timeout of 60000ms exceeded.
+```
+
+```
+Error: locator.selectOption: Test timeout of 60000ms exceeded.
+Call log:
+  - waiting for getByRole('combobox', { name: 'Select profile' })
+    - locator resolved to <select class="form-select" aria-label="Select profile">…</select>
+  - attempting select option action
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+    - waiting 20ms
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+      - waiting 100ms
+    113 × waiting for element to be visible and enabled
+        - did not find some options
+      - retrying select option action
+        - waiting 500ms
+
+```
+
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "Fractal logo" [ref=e8] [cursor=pointer]:
+            - /url: /
+            - img "Fractal logo" [ref=e9]
+        - listitem [ref=e10]:
+          - link "Projects" [ref=e11] [cursor=pointer]:
+            - /url: /v2/projects
+        - listitem [ref=e12]:
+          - link "Datasets" [ref=e13] [cursor=pointer]:
+            - /url: /v2/datasets
+        - listitem [ref=e14]:
+          - link "Templates" [ref=e15] [cursor=pointer]:
+            - /url: /v2/templates
+        - listitem [ref=e16]:
+          - link "Tasks" [ref=e17] [cursor=pointer]:
+            - /url: /v2/tasks
+        - listitem [ref=e18]:
+          - link "Jobs" [ref=e19] [cursor=pointer]:
+            - /url: /v2/jobs
+        - listitem [ref=e20]:
+          - link "Admin area" [ref=e21] [cursor=pointer]:
+            - /url: /v2/admin
+      - list [ref=e22]:
+        - listitem [ref=e23]:
+          - button " admin@fractal.xy" [ref=e24] [cursor=pointer]:
+            - generic [ref=e25]: 
+            - text: admin@fractal.xy
+  - generic [ref=e27]:
+    - navigation "breadcrumb" [ref=e28]:
+      - list [ref=e29]:
+        - listitem [ref=e30]:
+          - link "Admin area" [ref=e31] [cursor=pointer]:
+            - /url: /v2/admin
+        - listitem [ref=e32]:
+          - text: /
+          - link "Manage users" [ref=e33] [cursor=pointer]:
+            - /url: /v2/admin/users
+        - listitem [ref=e34]: "/ Editing user #8 (ws9vs@example.com)"
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - strong [ref=e39]: Id
+        - textbox "Id" [ref=e41]: "8"
+      - generic [ref=e42]:
+        - strong [ref=e44]: E-mail
+        - textbox "E-mail" [ref=e46]: ws9vs@example.com
+      - generic [ref=e49]:
+        - checkbox "Active" [checked] [ref=e50]
+        - generic [ref=e51]: Active
+      - generic [ref=e54]:
+        - checkbox "Superuser" [ref=e55]
+        - generic [ref=e56]: Superuser
+      - generic [ref=e59]:
+        - checkbox "Verified" [checked] [ref=e60]
+        - generic [ref=e61]: Verified
+      - generic [ref=e64]:
+        - checkbox "Guest" [ref=e65]
+        - generic [ref=e66]: Guest
+      - generic [ref=e67]:
+        - strong [ref=e69]: Password
+        - generic [ref=e70]:
+          - textbox "Password" [ref=e71]
+          - text: Create a new password for this Fractal user
+      - generic [ref=e72]:
+        - strong [ref=e74]: Confirm password
+        - textbox "Confirm password" [ref=e76]
+      - generic [ref=e77]:
+        - strong [ref=e79]: Profile
+        - generic [ref=e81]:
+          - combobox "Select resource" [ref=e83]:
+            - option "Select resource..."
+            - option "Local resource"
+            - option "3nm1pl resource" [selected]
+          - combobox "Select profile" [ref=e85]:
+            - option "Select profile..." [selected]
+            - option "Local profile"
+            - option "xn38ht profile"
+      - generic [ref=e88]:
+        - strong [ref=e90]: Project dirs
+        - generic [ref=e91]:
+          - textbox "Project dir" [ref=e93]: /tmp
+          - generic [ref=e94]:
+            - text: Base folders used for default
+            - code [ref=e95]: zarr_dir
+            - text: paths
+          - button "Add project dir" [ref=e97] [cursor=pointer]
+    - generic [ref=e98]:
+      - generic [ref=e100]:
+        - generic [ref=e101]: Groups
+        - generic [ref=e104]: All
+      - button "Save" [ref=e109] [cursor=pointer]
+  - generic [ref=e114]: fractal-server 2.23.6, fractal-web 1.28.3
+```
+
+# Test source
+
+```ts
+  7   | 	waitModal,
+  8   | 	waitPageLoading
+  9   | } from '../../../utils/utils.js';
+  10  | import path from 'path';
+  11  | import { fileURLToPath } from 'url';
+  12  | import { createProject } from '../../../utils/v2/project.js';
+  13  | import { createDataset } from '../../../utils/v2/dataset.js';
+  14  | import { createTestUser } from '../../../utils/v2/user.js';
+  15  | 
+  16  | // Reset storage state for this file to avoid being authenticated
+  17  | test.use({ storageState: { cookies: [], origins: [] } });
+  18  | 
+  19  | const __filename = fileURLToPath(import.meta.url);
+  20  | const __dirname = path.dirname(__filename);
+  21  | 
+  22  | const resourceFile = path.join(__dirname, '..', '..', '..', 'data', 'resource.json');
+  23  | 
+  24  | const randomResourceName = `${Math.random().toString(36).substring(7)} resource`;
+  25  | const randomProfileName1 = `${Math.random().toString(36).substring(7)} profile`;
+  26  | const randomProfileName2 = `${Math.random().toString(36).substring(7)} profile`;
+  27  | const randomProjectDir = `/${Math.random().toString(36).substring(7)}`;
+  28  | 
+  29  | test('Admin page for projects', async ({ page }) => {
+  30  | 	const adminEmail = 'admin@fractal.xy';
+  31  | 
+  32  | 	await test.step('Login as superuser', async () => {
+  33  | 		await login(page, adminEmail, '1234');
+  34  | 		await waitPageLoading(page);
+  35  | 	});
+  36  | 
+  37  | 	const project = await createProject(page);
+  38  | 	const dataset = await createDataset(page, project.id);
+  39  | 
+  40  | 	await test.step('Create Profile2 for Resource1', async () => {
+  41  | 		await page.goto('/v2/admin/resources');
+  42  | 		await waitPageLoading(page);
+  43  | 		await page
+  44  | 			.getByRole('row', { name: 'Local resource' })
+  45  | 			.getByRole('link', { name: 'Profiles' })
+  46  | 			.click();
+  47  | 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles$/);
+  48  | 		await waitPageLoading(page);
+  49  | 		await page.getByRole('link', { name: 'New profile' }).click();
+  50  | 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles\/create$/);
+  51  | 		await waitPageLoading(page);
+  52  | 		await page.getByRole('textbox', { name: 'Profile name' }).fill(randomProfileName1);
+  53  | 		await page.getByRole('button', { name: 'Save' }).click();
+  54  | 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles$/);
+  55  | 		await waitPageLoading(page);
+  56  | 	});
+  57  | 
+  58  | 	await test.step('Create Resource 2', async () => {
+  59  | 		await page.goto('/v2/admin/resources/create');
+  60  | 		await waitPageLoading(page);
+  61  | 		await setUploadFile(page, 'Load from file', resourceFile);
+  62  | 		await expect(page.locator('textarea')).toHaveValue(/{/);
+  63  | 		const text = await page.locator('textarea').inputValue();
+  64  | 		const resource = JSON.parse(/**@type {string} */ (text));
+  65  | 		await page.locator('textarea').fill(JSON.stringify({ ...resource, name: randomResourceName }));
+  66  | 		await page.getByRole('button', { name: 'Create resource' }).click();
+  67  | 		await page.waitForURL(/\/v2\/admin\/resources$/);
+  68  | 		await waitPageLoading(page);
+  69  | 	});
+  70  | 
+  71  | 	await test.step('Create Profile3 for Resource2', async () => {
+  72  | 		await page.goto('/v2/admin/resources');
+  73  | 		await waitPageLoading(page);
+  74  | 		await page
+  75  | 			.getByRole('row', { name: randomResourceName })
+  76  | 			.getByRole('link', { name: 'Profiles' })
+  77  | 			.click();
+  78  | 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles$/);
+  79  | 		await waitPageLoading(page);
+  80  | 		await page.getByRole('link', { name: 'New profile' }).click();
+  81  | 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles\/create$/);
+  82  | 		await waitPageLoading(page);
+  83  | 		await page.getByRole('textbox', { name: 'Profile name' }).fill(randomProfileName2);
+  84  | 		await page.getByRole('button', { name: 'Save' }).click();
+  85  | 		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles$/);
+  86  | 		await waitPageLoading(page);
+  87  | 	});
+  88  | 
+  89  | 	const { email: userEmail1 } = await createTestUser(page);
+  90  | 	const { email: userEmail2, id: userId2 } = await createTestUser(page);
+  91  | 
+  92  | 	await test.step('Associate User2 to Profile2', async () => {
+  93  | 		await page.goto(`/v2/admin/users/${userId2}/edit`);
+  94  | 		await waitPageLoading(page);
+  95  | 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption('Local resource');
+  96  | 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName1);
+  97  | 		await page.getByRole('button', { name: 'Save' }).click();
+  98  | 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
+  99  | 		await waitPageLoading(page);
+  100 | 	});
+  101 | 
+  102 | 	const { email: userEmail3, id: userId3 } = await createTestUser(page);
+  103 | 	await test.step('Associate User3 to Profile3', async () => {
+  104 | 		await page.goto(`/v2/admin/users/${userId3}/edit`);
+  105 | 		await waitPageLoading(page);
+  106 | 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption(randomResourceName);
+> 107 | 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName2);
+      |                                                                ^ Error: locator.selectOption: Test timeout of 60000ms exceeded.
+  108 | 		await page.getByRole('button', { name: 'Save' }).click();
+  109 | 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
+  110 | 		await waitPageLoading(page);
+  111 | 	});
+  112 | 
+  113 | 	const { email: userEmail4, id: userId4 } = await createTestUser(page, randomProjectDir);
+  114 | 	await test.step('Associate User4 to Profile2', async () => {
+  115 | 		await page.goto(`/v2/admin/users/${userId4}/edit`);
+  116 | 		await waitPageLoading(page);
+  117 | 		await page.getByRole('combobox', { name: 'Select resource' }).selectOption('Local resource');
+  118 | 		await page.getByRole('combobox', { name: 'Select profile' }).selectOption(randomProfileName1);
+  119 | 		await page.getByRole('button', { name: 'Save' }).click();
+  120 | 		await page.waitForURL(/\/v2\/admin\/users\/\d+\/edit/);
+  121 | 		await waitPageLoading(page);
+  122 | 	});
+  123 | 
+  124 | 	await test.step('Open admin project page', async () => {
+  125 | 		await page.goto('/v2/admin');
+  126 | 		await waitPageLoading(page);
+  127 | 		await page.getByRole('link', { name: 'Search projects' }).click();
+  128 | 		await page.waitForURL(/\/v2\/admin\/projects$/);
+  129 | 		await waitPageLoading(page);
+  130 | 
+  131 | 		await page.getByLabel('Name').fill(project.name.toUpperCase());
+  132 | 		await page.getByRole('button', { name: 'Search projects' }).click();
+  133 | 
+  134 | 		await expect(page.getByRole('button', { name: 'Change ownership' })).toHaveCount(1);
+  135 | 	});
+  136 | 
+  137 | 	await test.step('Pass ownership to User 1', async () => {
+  138 | 		await page.getByRole('button', { name: 'Change ownership' }).click();
+  139 | 
+  140 | 		const modal = await waitModal(page);
+  141 | 		await expect(
+  142 | 			modal.getByText(`The current owner (${adminEmail}) will loose access to this project.`)
+  143 | 		).toBeVisible();
+  144 | 
+  145 | 		const changeOwnerButton = modal.getByRole('button', { name: 'Change owner' });
+  146 | 		await expect(changeOwnerButton).toBeDisabled();
+  147 | 
+  148 | 		await page.getByLabel('New owner').selectOption(userEmail1);
+  149 | 		await expect(changeOwnerButton).toBeEnabled();
+  150 | 		await changeOwnerButton.click();
+  151 | 		await expect(
+  152 | 			modal.getByText(`You are about to transfer ownership of Project ${project.id}`)
+  153 | 		).toBeVisible();
+  154 | 		await expect(modal.getByText(adminEmail)).toBeVisible();
+  155 | 		await expect(modal.getByText(userEmail1)).toBeVisible();
+  156 | 
+  157 | 		// No warning about profiles
+  158 | 		await expect(modal.getByText('Users are associated to different profiles.')).not.toBeVisible();
+  159 | 		// OK
+  160 | 		await page.getByRole('button', { name: 'Confirm' }).click();
+  161 | 		await waitPageLoading(page);
+  162 | 
+  163 | 		const row = page.getByRole('row', { name: new RegExp(project.name) });
+  164 | 		await expect(row.getByText(userEmail1)).toBeVisible();
+  165 | 		await expect(row.getByText(adminEmail)).not.toBeVisible();
+  166 | 	});
+  167 | 
+  168 | 	await test.step('Pass ownership to User 2', async () => {
+  169 | 		await page.getByRole('button', { name: 'Change ownership' }).click();
+  170 | 
+  171 | 		const modal = await waitModal(page, false);
+  172 | 		await expect(
+  173 | 			modal.getByText(`The current owner (${userEmail1}) will loose access to this project.`)
+  174 | 		).toBeVisible();
+  175 | 
+  176 | 		await page.getByLabel('New owner').selectOption(userEmail2);
+  177 | 		await modal.getByRole('button', { name: 'Change owner' }).click();
+  178 | 
+  179 | 		// Warning about profiles
+  180 | 		await expect(modal.getByText('Users are associated to different profiles.')).toBeVisible();
+  181 | 		// OK
+  182 | 		await page.getByRole('button', { name: 'Confirm' }).click();
+  183 | 		await waitPageLoading(page);
+  184 | 
+  185 | 		const row = page.getByRole('row', { name: new RegExp(project.name) });
+  186 | 		await expect(row.getByText(userEmail2)).toBeVisible();
+  187 | 		await expect(row.getByText(userEmail1)).not.toBeVisible();
+  188 | 	});
+  189 | 
+  190 | 	await test.step('Pass ownership to User 3 and User 4', async () => {
+  191 | 		await page.getByRole('button', { name: 'Change ownership' }).click();
+  192 | 
+  193 | 		const modal = await waitModal(page, false);
+  194 | 		await expect(
+  195 | 			modal.getByText(`The current owner (${userEmail2}) will loose access to this project.`)
+  196 | 		).toBeVisible();
+  197 | 
+  198 | 		await page.getByLabel('New owner').selectOption(userEmail3);
+  199 | 		await modal.getByRole('button', { name: 'Change owner' }).click();
+  200 | 
+  201 | 		// Warning about profiles
+  202 | 		await expect(modal.getByText('Users are associated to different profiles.')).toBeVisible();
+  203 | 		// FAIL
+  204 | 		await page.getByRole('button', { name: 'Confirm' }).click();
+  205 | 		await expect(
+  206 | 			modal.getByText('Users are associated to different computational resources')
+  207 | 		).toBeVisible();
+```
