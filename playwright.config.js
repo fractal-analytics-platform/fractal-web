@@ -61,7 +61,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch 3371-enrich-admin-task-list',
+			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
