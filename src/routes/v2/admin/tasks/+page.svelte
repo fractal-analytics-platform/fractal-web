@@ -303,8 +303,7 @@
 	function truncateString(fullString, maxLength) {
 		if (fullString === null) {
 			return null;
-		}
-		if (fullString.length > maxLength) {
+		} else if (fullString.length > maxLength) {
 			return fullString.slice(0, maxLength) + '...';
 		} else {
 			return fullString;
