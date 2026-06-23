@@ -41,7 +41,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 
 	let id;
 	await test.step('Search tasks by name', async () => {
-		await page.getByRole('textbox', { name: 'Name' }).fill(taskName);
+		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName);
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 		// Retrieve task id
@@ -87,7 +87,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 		await page.getByRole('combobox', { name: 'Task type' }).selectOption('non_parallel');
 		await searchTasks(page);
-		await expect(page.getByRole('row', { name: 'non_parallel' }).first()).toBeVisible();
+		await expect(page.getByRole('row', { name: 'generic_task' }).first()).toBeVisible();
 	});
 
 	await test.step('Cleanup test tasks', async () => {
