@@ -7,18 +7,18 @@ test('Tasks filtering', async ({ page, workflow }) => {
 	await test.step('Set core task', async () => {
 		await page.goto('/v2/admin/tasks');
 
-		await page.getByRole('checkbox', { name: 'Core only' }).check();
+		await page.getByLabel('Core').selectOption('true');
 		await page.getByRole('button', { name: 'Search tasks' }).click();
 		await expect(page.getByRole('row')).toHaveCount(0);
 		await page.getByRole('button', { name: 'Reset' }).click();
 
-		await page.getByRole('textbox', { name: 'Name' }).fill('create_ome_zarr_compound');
+		await page.getByRole('textbox', { name: 'Name', exact: true }).fill('create_ome_zarr_compound');
 		await page.getByRole('button', { name: 'Search tasks' }).click();
 		await page.getByRole('checkbox', { name: 'Select all' }).check();
 		await page.getByRole('button', { name: 'Make all core' }).click();
 
 		await page.getByRole('button', { name: 'Reset' }).click();
-		await page.getByRole('checkbox', { name: 'Core only' }).check();
+		await page.getByLabel('Core').selectOption('true');
 		await page.getByRole('button', { name: 'Search tasks' }).click();
 		await expect(page.getByRole('row')).toHaveCount(2);
 	});
