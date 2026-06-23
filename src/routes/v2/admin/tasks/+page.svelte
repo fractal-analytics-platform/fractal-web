@@ -542,7 +542,7 @@
 					</button>
 				</div>
 			</div>
-			<table class="table tasks-table mt-3 mb-4">
+			<table class="table tasks-table mt-3 mb-4" style="table-layout: fixed">
 				<colgroup>
 					<col width="30" />
 					<col width="50" />
@@ -629,15 +629,15 @@
 							<td>
 								{taskInfo.task.name}
 							</td>
-							<td title={taskInfo.task.pkg_name}>
-								{truncateString(taskInfo.task.pkg_name, 20)}
+							<td class="text-truncate" title={taskInfo.task.pkg_name}>
+								{taskInfo.task.pkg_name}
 							</td>
-							<td title={taskInfo.task.version}>
-								{truncateString(taskInfo.task.version, 10) || '-'}
+							<td class="text-truncate" title={taskInfo.task.version}>
+								{taskInfo.task.version || '-'}
 							</td>
-							<td><BooleanIcon value={taskInfo.task.active}></BooleanIcon></td>
-							<td title={taskInfo.task.owner}>
-								{truncateString(taskInfo.task.owner, 20)}
+							<td><BooleanIcon value={taskInfo.task.active} /></td>
+							<td class="text-truncate" title={taskInfo.task.owner}>
+								{taskInfo.task.owner}
 							</td>
 							<td>{taskInfo.task.user_group || '-'}</td>
 							<td>{getUsers(taskInfo).length || '-'}</td>
