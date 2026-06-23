@@ -119,6 +119,19 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
+	await test.step('Search by owner', async () => {
+		await page.getByLabel('Owner').selectOption('guest@fractal.xy');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await page.getByLabel('Owner').selectOption('admin@fractal.xy');
+		await searchTasks(page);
+		await expect(page.getByRole('row').first()).toBeVisible();
+		expect(await page.getByRole('row').count()).toBeGreaterThan(0);
+
+		await reset(page);
+	});
+
 	let id;
 	await test.step('Search tasks by name', async () => {
 		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName);
