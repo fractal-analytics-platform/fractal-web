@@ -547,7 +547,7 @@
 					<col width="30" />
 					<col width="50" />
 					<col width="30" />
-					<col width="auto" />
+					<col width="350" />
 					<col width="200" />
 					<col width="90" />
 					<col width="70" />
