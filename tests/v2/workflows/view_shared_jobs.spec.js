@@ -50,10 +50,12 @@ test('View shared jobs', async ({ page }) => {
 	});
 
 	await test.step('Create new dataset and run another job', async () => {
-		const dataset = await createDataset(page, project.id);
+		const newDataset = await createDataset(page, project.id);
 		await page.goto(`/v2/projects/${project.id}/workflows/${workflow.id}`);
 		await waitPageLoading(page);
-		await page.getByRole('combobox', { name: 'Dataset' }).selectOption(dataset.name);
+		await expect(page.getByRole('combobox', { name: 'Dataset' })).toHaveValue(String(dataset.id));
+		await expect(page.getByRole('button', { name: 'Continue workflow' })).toBeEnabled();
+		await page.getByRole('combobox', { name: 'Dataset' }).selectOption(newDataset.name);
 		await page.getByRole('button', { name: 'Run workflow' }).click();
 		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Run' }).click();
@@ -97,6 +99,7 @@ test('View shared jobs', async ({ page }) => {
 		await expect(page.getByRole('row', { name: 'admin@fractal.xy' })).not.toBeVisible();
 		await expect(page.getByRole('row', { name: userEmail })).toBeVisible();
 		await expect(page.locator('.ss-open')).not.toBeVisible();
+		await expect(page.getByRole('option', { name: 'admin@fractal.xy' })).not.toBeVisible();
 	});
 
 	await test.step('Cleanup', async () => {
