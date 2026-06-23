@@ -39,6 +39,27 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
+	await test.step('Search task by core', async () => {
+		await searchTasks(page);
+		await page.getByRole('row', { name: 'MIP_compound' }).getByLabel('Make core').click();
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Make core').click();
+		await reset(page);
+
+		await page.getByLabel('Core').selectOption('true');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(3);
+
+		await expect(page.getByRole('row', { name: 'MIP_compound' })).toBeVisible();
+		await expect(page.getByRole('row', { name: 'Fake Task' })).toBeVisible();
+
+		await page.getByRole('checkbox', { name: 'Select all' }).check();
+		await page.getByRole('button', { name: 'Make all not core' }).click();
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await reset(page);
+	});
+
 	let id;
 	await test.step('Search tasks by name', async () => {
 		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName);
