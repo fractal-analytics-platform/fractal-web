@@ -60,6 +60,35 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
+	await test.step('Search by active', async () => {
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
+		await page.locator('#taskGroupEditModal').getByText('Private task').click();
+		await page.getByRole('button', { name: 'Update' }).click();
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+
+		await page.getByLabel('Private').selectOption('true');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(2);
+
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
+		await page.locator('#taskGroupEditModal').getByText('Shared task').click();
+		await page.getByRole('button', { name: 'Update' }).click();
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByLabel('Private').selectOption('true');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await reset(page);
+	});
+
 	let id;
 	await test.step('Search tasks by name', async () => {
 		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName);
