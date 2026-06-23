@@ -230,18 +230,6 @@
 	}
 
 	/**
-	 * @param {number} index
-	 */
-	function toggleUsersList(index) {
-		const list = document.getElementById(`users-list-${index}`);
-		const toggler = document.getElementById(`users-list-toggler-${index}`);
-		if (list && toggler) {
-			toggler.innerText = list.classList.contains('d-none') ? 'Hide' : 'Show';
-			list.classList.toggle('d-none');
-		}
-	}
-
-	/**
 	 * @param {import('fractal-components/types/api').TaskV2Info} taskInfo
 	 */
 	function getUsers(taskInfo) {
