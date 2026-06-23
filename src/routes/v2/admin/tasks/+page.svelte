@@ -294,21 +294,6 @@
 			selectedTasks = [...selectedTasks, taskId];
 		}
 	}
-
-	/**
-	 * @param {string | null} fullString
-	 * @param {number} maxLength
-	 * @returns {string | null}
-	 */
-	function truncateString(fullString, maxLength) {
-		if (fullString === null) {
-			return null;
-		} else if (fullString.length > maxLength) {
-			return fullString.slice(0, maxLength) + '...';
-		} else {
-			return fullString;
-		}
-	}
 </script>
 
 <div class="container mt-3">
