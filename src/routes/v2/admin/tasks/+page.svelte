@@ -401,7 +401,7 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Owner</label>
+							<label for="user">Owner</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
 							<select class="form-select" bind:value={userId} id="user">
@@ -450,7 +450,7 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="private">Active</label>
+							<label for="active">Active</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
 							<select class="form-select" bind:value={activeGroup} id="active">
