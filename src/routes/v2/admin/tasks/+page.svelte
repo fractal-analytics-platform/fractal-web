@@ -732,7 +732,7 @@
 						>
 							<div class="accordion-body p-0">
 								<ul class="list-group noborders">
-									{#each getUsers(selectedTaskInfo) as user (user)}
+									{#each getUsers(selectedTaskInfo) as user, index (index)}
 										<li class="list-group-item">{user}</li>
 									{/each}
 								</ul>
