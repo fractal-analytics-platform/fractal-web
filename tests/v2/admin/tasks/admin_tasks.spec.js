@@ -60,7 +60,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
-	await test.step('Search by active', async () => {
+	await test.step('Search by private', async () => {
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
 		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
