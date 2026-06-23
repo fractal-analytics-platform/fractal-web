@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Configure sharding on end-to-end tests and fix some test issues (\#1191);
+
 # 1.28.3
 
 - Remove usage of `GET /api/v2/task/` endpoint (\#1180);
