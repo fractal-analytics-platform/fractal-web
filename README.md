@@ -4,6 +4,11 @@
   <img src="https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/projects/fractal_web.png" alt="Fractal web" width="400">
 </p>
 
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Unit tests status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/unit_tests.yaml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/unit_tests.yaml?query=branch%3Amain)
+[![End-to-end tests status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/end_to_end_tests.yaml/badge.svg)](https://fractal-analytics-platform.github.io/fractal-web/playwright-report/)
+[![Documentation status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/documentation.yaml/badge.svg)](https://fractal-analytics-platform.github.io/fractal-web)
+
 [Fractal](https://fractal-analytics-platform.github.io/) is a framework developed at the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.
 
 ![Fractal_overview](https://github.com/user-attachments/assets/666c8797-2594-4b8e-b1d2-b43fca66d1df)
