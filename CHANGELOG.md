@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Configure sharding on end-to-end tests and fix some test issues (\#1191);
+- Enrich admin tasks page (\#1190);
 
 # 1.28.3
 

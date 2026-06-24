@@ -39,9 +39,102 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 	});
 
+	await test.step('Search task by core', async () => {
+		await searchTasks(page);
+		await page.getByRole('row', { name: 'MIP_compound' }).getByLabel('Make core').click();
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Make core').click();
+		await reset(page);
+
+		await page.getByLabel('Core').selectOption('true');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(3);
+
+		await expect(page.getByRole('row', { name: 'MIP_compound' })).toBeVisible();
+		await expect(page.getByRole('row', { name: 'Fake Task' })).toBeVisible();
+
+		await page.getByRole('checkbox', { name: 'Select all' }).check();
+		await page.getByRole('button', { name: 'Make all not core' }).click();
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await reset(page);
+	});
+
+	await test.step('Search by private', async () => {
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
+		await page.locator('#taskGroupEditModal').getByText('Private task').click();
+		await page.getByRole('button', { name: 'Update' }).click();
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+
+		await page.getByLabel('Private').selectOption('true');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(2);
+
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
+		await page.locator('#taskGroupEditModal').getByText('Shared task').click();
+		await page.getByRole('button', { name: 'Update' }).click();
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByLabel('Private').selectOption('true');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await reset(page);
+	});
+
+	await test.step('Search by active', async () => {
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Manage').click();
+		await page.getByRole('button', { name: 'Deactivate task group' }).click();
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await waitPageLoading(page);
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+
+		await page.getByLabel('Active').selectOption('false');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(2);
+
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Manage').click();
+		await page.getByRole('button', { name: 'Reactivate task group' }).click();
+		await waitPageLoading(page);
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByLabel('Active').selectOption('false');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await reset(page);
+	});
+
+	await test.step('Search by owner', async () => {
+		await page.getByLabel('Owner').selectOption('guest@fractal.xy');
+		await searchTasks(page);
+		await expect(page.getByRole('row')).toHaveCount(0);
+
+		await page.getByLabel('Owner').selectOption('admin@fractal.xy');
+		await searchTasks(page);
+		await expect(page.getByRole('row').first()).toBeVisible();
+		expect(await page.getByRole('row').count()).toBeGreaterThan(0);
+
+		await reset(page);
+	});
+
 	let id;
 	await test.step('Search tasks by name', async () => {
-		await page.getByRole('textbox', { name: 'Name' }).fill(taskName);
+		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName);
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 		// Retrieve task id
@@ -87,7 +180,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await reset(page);
 		await page.getByRole('combobox', { name: 'Task type' }).selectOption('non_parallel');
 		await searchTasks(page);
-		await expect(page.getByRole('row', { name: 'non_parallel' }).first()).toBeVisible();
+		await expect(page.getByRole('row', { name: 'generic_task' }).first()).toBeVisible();
 	});
 
 	await test.step('Cleanup test tasks', async () => {

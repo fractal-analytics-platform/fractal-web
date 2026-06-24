@@ -2,23 +2,33 @@
 	import { page } from '$app/state';
 	import { arrayToCsv, downloadBlob } from '$lib/common/component_utilities';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
 	import { normalizePayload, PropertyDescription } from 'fractal-components';
+	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	let name = $state('');
 	let id = $state('');
 	let version = $state('');
 	let resource = $state('');
 	let taskType = $state('');
-	let onlyCore = $state(false);
-	/** @type {Array<import('fractal-components/types/api').Resource>} */
-	const resources = $derived(page.data.resources || []);
+	let userId = $state('');
+	let pkgName = $state('');
+	/** @type {boolean|null} */
+	let core = $state(null);
+	/** @type {boolean|null} */
+	let privateGroup = $state(null);
+	/** @type {boolean|null} */
+	let activeGroup = $state(null);
 
 	let searched = $state(false);
 	let searching = $state(false);
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
+
+	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	const resources = $derived(page.data.resources || []);
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info> | undefined} */
 	let results = $state();
@@ -35,6 +45,8 @@
 
 	/** @type {number[]}*/
 	let selectedTasks = $state([]);
+
+	const users = $derived(sortDropdownUsers(page.data.users, page.data.userInfo.id));
 
 	let allIds = $derived(results?.items.map((taskInfo) => taskInfo.task.id) ?? []);
 	let allSelected = $derived.by(() => {
@@ -62,8 +74,20 @@
 		if (taskType) {
 			url.searchParams.append('task_type', taskType);
 		}
-		if (onlyCore) {
-			url.searchParams.append('only_core', String(onlyCore));
+		if (core !== null) {
+			url.searchParams.append('core', core.toString());
+		}
+		if (userId) {
+			url.searchParams.append('owner_id', String(userId));
+		}
+		if (pkgName) {
+			url.searchParams.append('task_group', pkgName);
+		}
+		if (privateGroup !== null) {
+			url.searchParams.append('private', privateGroup.toString());
+		}
+		if (activeGroup !== null) {
+			url.searchParams.append('active', activeGroup.toString());
 		}
 		return url;
 	}
@@ -179,7 +203,11 @@
 		version = '';
 		resource = '';
 		taskType = '';
-		onlyCore = false;
+		core = null;
+		userId = '';
+		pkgName = '';
+		privateGroup = null;
+		activeGroup = null;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
@@ -199,18 +227,6 @@
 
 	function onInfoModalClose() {
 		selectedTaskInfo = null;
-	}
-
-	/**
-	 * @param {number} index
-	 */
-	function toggleUsersList(index) {
-		const list = document.getElementById(`users-list-${index}`);
-		const toggler = document.getElementById(`users-list-toggler-${index}`);
-		if (list && toggler) {
-			toggler.innerText = list.classList.contains('d-none') ? 'Hide' : 'Show';
-			list.classList.toggle('d-none');
-		}
 	}
 
 	/**
@@ -288,6 +304,22 @@
 	<div class="row">
 		<div class="col-lg-12">
 			<div class="row">
+				<!-- ID -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="id">ID</label>
+							<PropertyDescription
+								description="Only include the task with this <code>id</code> (if any)."
+								html={true}
+							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="number" class="form-control" bind:value={id} id="id" />
+						</div>
+					</div>
+				</div>
+				<!-- Name -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -302,52 +334,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="id">Id</label>
-							<PropertyDescription
-								description="Only include the task with this <code>id</code> (if any)."
-								html={true}
-							/>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<input type="number" class="form-control" bind:value={id} id="id" />
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="version">Version</label>
-							<PropertyDescription
-								description="Only include a task if its <code>version</code> matches this value."
-								html={true}
-							/>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<input type="text" class="form-control" bind:value={version} id="version" />
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="row mt-lg-3">
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Resource</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={resource} id="resource">
-								<option value="">Select...</option>
-								{#each resources as resource (resource.id)}
-									<option value={resource.id}>{resource.name}</option>
-								{/each}
-							</select>
-						</div>
-					</div>
-				</div>
+				<!-- Type -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -365,18 +352,115 @@
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<!-- Group name -->
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="onlyCoreCheckbox">Core only</label>
+							<label for="pkg-name">Group name</label>
 						</div>
-						<div class="col-xl-8 col-lg-7 col-9 mt-2">
-							<input
-								id="onlyCoreCheckbox"
-								type="checkbox"
-								class="form-check-input"
-								bind:checked={onlyCore}
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={pkgName} id="pkg-name" />
+						</div>
+					</div>
+				</div>
+				<!-- Version -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="version">Version</label>
+							<PropertyDescription
+								description="Only include a task if its <code>version</code> matches this value."
+								html={true}
 							/>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<input type="text" class="form-control" bind:value={version} id="version" />
+						</div>
+					</div>
+				</div>
+				<!-- Owner -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="user">Owner</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={userId} id="user">
+								<option value="">Select...</option>
+								{#each users as user (user.id)}
+									<option value={user.id}>{user.email}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<!-- Core -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="core">Core</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={core} id="core">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<!-- Private -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="private">Private</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={privateGroup} id="private">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<!-- Active -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="active">Active</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={activeGroup} id="active">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<!-- Resource -->
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
 						</div>
 					</div>
 				</div>
@@ -443,17 +527,21 @@
 					</button>
 				</div>
 			</div>
-			<table class="table tasks-table mt-3 mb-4">
+			<table class="table tasks-table mt-3 mb-4" style="table-layout: fixed">
 				<colgroup>
 					<col width="30" />
 					<col width="50" />
 					<col width="30" />
-					<col width="auto" />
+					<col width="350" />
+					<col width="200" />
 					<col width="90" />
-					<col width="195" />
-					<col width="120" />
+					<col width="70" />
 					<col width="150" />
-					<col width="120" />
+					<col width="100" />
+					<col width="75" />
+					<col width="63" />
+					<col width="60" />
+					<col width="30" />
 				</colgroup>
 				<thead>
 					<tr>
@@ -473,14 +561,17 @@
 								title={allSelected ? 'Deselect all' : 'Select all'}
 							/>
 						</th>
-						<th>Id</th>
+						<th>ID</th>
 						<th></th>
 						<th>Name</th>
+						<th>Package</th>
 						<th>Version</th>
-						<th>Type</th>
-						<th># Workflows</th>
+						<th>Active</th>
+						<th>Owner</th>
+						<th>Group</th>
 						<th># Users</th>
-						<th>Options</th>
+						<th># WFs</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -523,35 +614,23 @@
 							<td>
 								{taskInfo.task.name}
 							</td>
-							<td>{taskInfo.task.version || '-'}</td>
-							<td>{taskInfo.task.type}</td>
-							<td>
-								{taskInfo.relationships.length || '-'}
+							<td class="text-truncate" title={taskInfo.task.pkg_name}>
+								{taskInfo.task.pkg_name}
 							</td>
-							<td>
-								{#if getUsers(taskInfo).length > 0}
-									{getUsers(taskInfo).length}
-									<button
-										class="btn btn-link"
-										id="users-list-toggler-{taskInfoIndex}"
-										onclick={() => toggleUsersList(taskInfoIndex)}
-									>
-										Show
-									</button>
-									<div class="d-none" id="users-list-{taskInfoIndex}">
-										{#each getUsers(taskInfo) as user (user)}
-											{user}<br />
-										{/each}
-									</div>
-								{:else}
-									-
-								{/if}
+							<td class="text-truncate" title={taskInfo.task.version}>
+								{taskInfo.task.version || '-'}
 							</td>
+							<td><BooleanIcon value={taskInfo.task.active} /></td>
+							<td class="text-truncate" title={taskInfo.task.owner}>
+								{taskInfo.task.owner}
+							</td>
+							<td>{taskInfo.task.user_group || '-'}</td>
+							<td>{getUsers(taskInfo).length || '-'}</td>
+							<td>{taskInfo.relationships.length || '-'}</td>
 							<td>
 								<button
 									class="btn btn-light"
 									aria-label="Info"
-									title="Info"
 									onclick={() => openInfoModal(taskInfo)}
 								>
 									<i class="bi bi-info-circle"></i>
@@ -615,6 +694,38 @@
 					</div>
 				</div>
 			</div>
+
+			{#if getUsers(selectedTaskInfo).length > 0}
+				<div class="accordion mb-3" id="accordion-relationships">
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapse-xy"
+								aria-expanded="false"
+								aria-controls="collapse-xy"
+							>
+								User list
+							</button>
+						</h2>
+						<div
+							id="collapse-xy"
+							class="accordion-collapse collapse"
+							data-bs-parent="#accordion-relationships"
+						>
+							<div class="accordion-body p-0">
+								<ul class="list-group noborders">
+									{#each getUsers(selectedTaskInfo) as user, index (index)}
+										<li class="list-group-item">{user}</li>
+									{/each}
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
 
 			<p class="lead">Relationships</p>
 			{#if selectedTaskInfo.relationships.length === 0}
@@ -717,6 +828,9 @@
 		border-bottom: 0 !important;
 	}
 
+	th {
+		white-space: nowrap;
+	}
 	td.task-core-col {
 		vertical-align: middle;
 		width: 1%;
