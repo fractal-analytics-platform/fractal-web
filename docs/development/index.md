@@ -11,4 +11,3 @@ Here are some useful details for `fractal-web` developments:
 - [Documentation](docs.md)
 - [Precommit](precommit.md)
 - [Release](release.md)
-- [Playwright Report](./playwright-report/)
