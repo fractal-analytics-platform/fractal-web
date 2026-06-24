@@ -828,6 +828,9 @@
 		border-bottom: 0 !important;
 	}
 
+	th {
+		white-space: nowrap;
+	}
 	td.task-core-col {
 		vertical-align: middle;
 		width: 1%;
