@@ -1,11 +1,6 @@
 name: docs
 
-on:
-  workflow_run:
-    workflows: ['End-to-end tests']
-    branches: [main]
-    types:
-      - completed
+on: workflow_call
 
 permissions: {}
 
@@ -48,11 +43,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: playwright-html-report-attempt-${{ github.run_attempt }}
-
-      - name: Extract playwright report
-        run: |
-          unzip playwright-html-report-attempt-*.zip -d playwright-report
-          mv playwright-report site/
+          path: site/playwright-report
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
