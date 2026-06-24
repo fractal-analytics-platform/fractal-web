@@ -56,7 +56,7 @@ export default defineConfig({
 	testDir: 'tests',
 	retries: process.env.CI ? 3 : 0,
 	timeout: 60_000,
-	reporter: 'blob',
+	reporter: [['blob'], ['html']],
 
 	projects: [...commonTests, ...v2Tests],
 

@@ -1,10 +1,11 @@
 name: docs
 
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+  workflow_run:
+    workflows: ['End-to-end tests']
+    branches: [main]
+    types:
+      - completed
 
 permissions: {}
 
@@ -42,6 +43,16 @@ jobs:
           npm run build
       - name: Move sandbox built files in docs site
         run: mv sandbox/build/ site/sandbox
+
+      - name: Download playwright report artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: playwright-html-report-attempt-${{ github.run_attempt }}
+
+      - name: Extract playwright report
+        run: |
+          unzip playwright-html-report-attempt-*.zip -d playwright-report
+          mv playwright-report site/
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
