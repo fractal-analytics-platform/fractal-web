@@ -55,8 +55,8 @@ nav:
   - CHANGELOG: changelog.md
   - OAuth2 integration: oauth2.md
   - Development: development/
-  - Deployment examples: examples.md
   - Sandbox pages: sandbox-pages.md
+  - Playwright report: playwright-report/index.html
 
 plugins:
   - search

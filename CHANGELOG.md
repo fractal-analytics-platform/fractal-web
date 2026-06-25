@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Update CI to add Playwright report to GitHub Pages (\#1194);
+
 # 1.28.4
 
 - Configure sharding on end-to-end tests and fix some test issues (\#1191);

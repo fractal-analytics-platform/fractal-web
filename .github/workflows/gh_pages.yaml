@@ -1,0 +1,19 @@
+name: 'Pages'
+
+on:
+  push:
+    branches: ['main', 'ihb-develop']
+  pull_request:
+    branches: ['main', 'ihb-develop']
+
+permissions: {}
+
+jobs:
+  end_to_end_tests:
+    uses: ./.github/workflows/end_to_end_tests.yaml
+  documentation:
+    needs: end_to_end_tests
+    uses: ./.github/workflows/documentation.yaml
+    permissions:
+      pages: write
+      id-token: write
