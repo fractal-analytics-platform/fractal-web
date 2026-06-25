@@ -239,8 +239,7 @@
 							id="projectDescription"
 							bind:value={newProjectDescription}
 							class="form-control"
-							rows="4"
-						></textarea>
+							rows="4"></textarea>
 					</div>
 				</div>
 			</div>

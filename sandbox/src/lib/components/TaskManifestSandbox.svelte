@@ -269,8 +269,7 @@
 						class="form-control"
 						value={JSON.stringify(selectedSchema, null, 2)}
 						rows="10"
-						disabled
-					></textarea>
+						disabled></textarea>
 				</div>
 			</div>
 			<div class="row has-validation mt-3 mb-2">
@@ -282,8 +281,7 @@
 						bind:value={jsonDataString}
 						oninput={handleDataStringChanged}
 						class:is-invalid={dataError}
-						rows="10"
-					></textarea>
+						rows="10"></textarea>
 					<span class="invalid-feedback">{dataError}</span>
 				</div>
 			</div>
