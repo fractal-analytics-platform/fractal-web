@@ -811,8 +811,7 @@
 							class="form-control font-monospace"
 							rows="5"
 							disabled={checkingConfiguration}
-							bind:value={workerInitControl}
-						></textarea>
+							bind:value={workerInitControl}></textarea>
 					</div>
 					{#if slurmAccounts.length > 0}
 						<div class="mb-3">

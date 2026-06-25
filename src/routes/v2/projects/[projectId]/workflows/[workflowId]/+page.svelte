@@ -1427,8 +1427,7 @@
 						class:is-invalid={$workflowPropsValidationErrors['description']}
 						name="workflowDescription"
 						id="workflowDescription"
-						bind:value={updatedWorkflowDescription}
-					></textarea>
+						bind:value={updatedWorkflowDescription}></textarea>
 					<span class="invalid-feedback">{$workflowPropsValidationErrors['description']}</span>
 				</div>
 			</form>

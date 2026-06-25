@@ -209,8 +209,7 @@
 						bind:value={updatedProjectDescription}
 						class="form-control"
 						name="projectDescription"
-						rows="4"
-					></textarea>
+						rows="4"></textarea>
 				</div>
 			</form>
 		{/if}
