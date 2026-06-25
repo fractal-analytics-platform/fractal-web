@@ -1,5 +1,6 @@
 import { expect, test } from '../workflow_fixture.js';
 import { selectSlimSelect, waitModal, waitPageLoading } from '../../utils/utils.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 const NUM_MOCK_TASKS = 20;
 
@@ -28,7 +29,10 @@ test('Tasks filtering', async ({ page, workflow }) => {
 
 	await test.step('Open add task to workflow modal and filter values', async () => {
 		await page.getByRole('button', { name: 'Add task to workflow' }).click();
-		await waitModal(page);
+		await waitModal(page, false);
+		// wait for coloured badges buttons to be populated
+		await expect(page.getByRole('button', { name: 'Conversion' }).first()).toBeVisible();
+		await checkAccessibility(page, '.modal.show');
 		await testFiltering(page);
 	});
 
