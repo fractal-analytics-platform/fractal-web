@@ -971,14 +971,16 @@
 						<div class="d-flex justify-content-between align-items-center">
 							<span>
 								Workflow sequence
-								<a
-									href={buildHelpLink('/workflow-sequence')}
-									class="ms-2"
-									aria-label="Help page"
-									target="_blank"
-								>
-									<i class="bi bi-question-circle"></i>
-								</a>
+								{#if buildHelpLink('/workflow-sequence')}
+									<a
+										href={buildHelpLink('/workflow-sequence')}
+										class="ms-2"
+										aria-label="Help page"
+										target="_blank"
+									>
+										<i class="bi bi-question-circle"></i>
+									</a>
+								{/if}
 							</span>
 							<div>
 								<button
