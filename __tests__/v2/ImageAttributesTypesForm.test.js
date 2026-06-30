@@ -1,8 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 
 import ImageAttributesTypesForm from '../../src/lib/components/v2/projects/datasets/ImageAttributesTypesForm.svelte';
 import { tick } from 'svelte';
+
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
 
 describe('AttributesTypesForm', () => {
 	it('init with existing values', async () => {
