@@ -23,7 +23,7 @@
 		"@sveltejs/kit": "^2.67.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/svelte": "^5.4.1",
+		"@testing-library/svelte": "^5.4.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/bootstrap": "^5.2.11",
 		"@types/color-hash": "^2.0.0",
