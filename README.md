@@ -5,9 +5,10 @@
 </p>
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Documentation](https://img.shields.io/badge/Documentation-blue)](https://fractal-analytics-platform.github.io/fractal-web)
 [![Unit tests status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/unit_tests.yaml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/unit_tests.yaml?query=branch%3Amain)
-[![End-to-end tests status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/end_to_end_tests.yaml/badge.svg)](https://fractal-analytics-platform.github.io/fractal-web/playwright-report/)
-[![Documentation status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/documentation.yaml/badge.svg)](https://fractal-analytics-platform.github.io/fractal-web)
+[![Pages status](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/gh_pages.yaml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-web/actions/workflows/gh_pages.yaml)
+[![End-to-end tests report](https://img.shields.io/badge/report-blue?label=End-to-end%20tests)](https://fractal-analytics-platform.github.io/fractal-web/playwright-report/)
 
 [Fractal](https://fractal-analytics-platform.github.io/) is a framework developed at the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.
 

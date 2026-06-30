@@ -7,12 +7,16 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	function randomInt() {
 		return Math.floor(Math.random() * 1000);
 	}
-	// Generating a random task version, so that we can filter by version and have exactly one result
+	// Generating a random task version, so that we can filter by version and have exactly 2 results
 	const randomTaskVersion = `${randomInt()}.${randomInt()}.${randomInt()}`;
 
-	let taskName;
+	let taskName1, taskName2;
 	await test.step('Create test tasks', async () => {
-		taskName = await createFakeTask(page, {
+		taskName1 = await createFakeTask(page, {
+			type: 'non_parallel',
+			version: randomTaskVersion
+		});
+		taskName2 = await createFakeTask(page, {
 			type: 'non_parallel',
 			version: randomTaskVersion
 		});
@@ -23,7 +27,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Add task to workflow', async () => {
-		await workflow.addTask(taskName);
+		await workflow.addTask(taskName1);
 	});
 
 	await test.step('Open tasks admin page', async () => {
@@ -40,17 +44,26 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Search task by core', async () => {
+		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
 		await searchTasks(page);
-		await page.getByRole('row', { name: 'MIP_compound' }).getByLabel('Make core').click();
-		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Make core').click();
+		await page
+			.getByRole('row', { name: taskName1 })
+			.getByRole('button', { name: 'Make core' })
+			.click();
+		await page
+			.getByRole('row', { name: taskName2 })
+			.getByRole('button', { name: 'Make core' })
+			.click();
+		await expect(page.getByRole('button', { name: 'Make not core' })).toHaveCount(2);
 		await reset(page);
 
-		await page.getByLabel('Core').selectOption('true');
+		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
+		await page.getByRole('combobox', { name: 'Core' }).selectOption('true');
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(3);
 
-		await expect(page.getByRole('row', { name: 'MIP_compound' })).toBeVisible();
-		await expect(page.getByRole('row', { name: 'Fake Task' })).toBeVisible();
+		await expect(page.getByRole('row', { name: taskName1 })).toBeVisible();
+		await expect(page.getByRole('row', { name: taskName2 })).toBeVisible();
 
 		await page.getByRole('checkbox', { name: 'Select all' }).check();
 		await page.getByRole('button', { name: 'Make all not core' }).click();
@@ -63,20 +76,21 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	await test.step('Search by private', async () => {
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
+		await page.getByRole('row', { name: taskName1 }).getByLabel('Edit').click();
 		await page.locator('#taskGroupEditModal').getByText('Private task').click();
 		await page.getByRole('button', { name: 'Update' }).click();
 
 		await page.goto('/v2/admin/tasks');
 		await waitPageLoading(page);
 
+		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
 		await page.getByLabel('Private').selectOption('true');
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Edit').click();
+		await page.getByRole('row', { name: taskName1 }).getByLabel('Edit').click();
 		await page.locator('#taskGroupEditModal').getByText('Shared task').click();
 		await page.getByRole('button', { name: 'Update' }).click();
 
@@ -92,22 +106,31 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	await test.step('Search by active', async () => {
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Manage').click();
-		await page.getByRole('button', { name: 'Deactivate task group' }).click();
-		await page.getByRole('button', { name: 'Confirm' }).click();
+		await page
+			.getByRole('row', { name: taskName1 })
+			.getByRole('button', { name: 'Manage' })
+			.click();
+		let modal = await waitModal(page);
+		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 		await waitPageLoading(page);
 
 		await page.goto('/v2/admin/tasks');
 		await waitPageLoading(page);
 
+		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
 		await page.getByLabel('Active').selectOption('false');
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
-		await page.getByRole('row', { name: 'Fake Task' }).getByLabel('Manage').click();
-		await page.getByRole('button', { name: 'Reactivate task group' }).click();
+		await page
+			.getByRole('row', { name: taskName1 })
+			.getByRole('button', { name: 'Manage' })
+			.click();
+		modal = await waitModal(page, false);
+		await modal.getByRole('button', { name: 'Reactivate task group' }).click();
 		await waitPageLoading(page);
 
 		await page.goto('/v2/admin/tasks');
@@ -134,7 +157,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 
 	let id;
 	await test.step('Search tasks by name', async () => {
-		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName);
+		await page.getByRole('textbox', { name: 'Name', exact: true }).fill(taskName1);
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 		// Retrieve task id
@@ -152,7 +175,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	await test.step('Search tasks by version', async () => {
 		await page.getByRole('textbox', { name: 'Version' }).fill(randomTaskVersion);
 		await searchTasks(page);
-		await expect(page.getByRole('row')).toHaveCount(2);
+		await expect(page.getByRole('row')).toHaveCount(3);
 	});
 
 	await test.step('Download CSV', async () => {
@@ -165,10 +188,10 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 	});
 
 	await test.step('Open info modal', async () => {
-		await page.getByRole('button', { name: 'Info' }).click();
+		await page.getByRole('row', { name: taskName1 }).getByRole('button', { name: 'Info' }).click();
 		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Task properties' }).click();
-		await modal.getByText(taskName).waitFor();
+		await modal.getByText(taskName1).waitFor();
 		await modal.getByRole('button', { name: 'Task properties' }).click();
 		await modal.getByRole('button', { name: workflow.workflowName }).click();
 		await modal.locator('#collapse-0').getByText(workflow.projectName).waitFor();
@@ -185,7 +208,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 
 	await test.step('Cleanup test tasks', async () => {
 		await workflow.delete();
-		await deleteTask(page, taskName);
+		await deleteTask(page, taskName1);
 	});
 });
 
