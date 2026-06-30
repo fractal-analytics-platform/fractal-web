@@ -32,7 +32,7 @@
 		"@sveltejs/package": "^2.5.8",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/svelte": "^5.4.1",
+		"@testing-library/svelte": "^5.4.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/color-hash": "^2.0.0",
 		"eslint": "^10.5.0",
