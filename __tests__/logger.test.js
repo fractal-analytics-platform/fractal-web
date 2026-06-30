@@ -113,7 +113,9 @@ describe('logger', () => {
 		const configured = mocks.configure.mock.calls[0][0];
 		expect(configured.appenders.filteredConsole.level).toBe('error');
 		expect(configured.appenders.filteredConsole.appender).toBe('console');
-		expect(configured.appenders.console.layout.pattern).toBe('%[%x{timestamp} - (%x{component}) - %p -%] %m');
+		expect(configured.appenders.console.layout.pattern).toBe(
+			'%[%x{timestamp} - (%x{component}) - %p -%] %m'
+		);
 		expect(typeof configured.appenders.console.layout.tokens.timestamp).toBe('function');
 		expect(typeof configured.appenders.console.layout.tokens.component).toBe('function');
 		expect(configured.categories.default.appenders).toEqual(['filteredConsole']);
