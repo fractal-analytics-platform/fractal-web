@@ -52,10 +52,14 @@ export ORIGIN=http://localhost:5173
 export PORT=5173
 export BODY_SIZE_LIMIT=5000000
 
+# Option A: single log file
 export LOG_FILE=fractal-web.log
 # default values for logging levels (uncomment if needed)
 # export LOG_LEVEL_FILE=info
 # export LOG_LEVEL_CONSOLE=warn
+
+# Option B: external config file (overrides LOG_FILE / LOG_LEVEL_* when set)
+# export LOG_CONFIG_FILE=/path/to/logging.json
 
 export FRACTAL_RUNNER_BACKEND=local
 
