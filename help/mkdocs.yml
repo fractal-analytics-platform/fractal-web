@@ -59,9 +59,14 @@ plugins:
   - literate-nav:
       nav_file: SUMMARY.md
   - section-index
+  - macros
 
 extra_css:
   - extra.css
+
+extra:
+  enable_fractal_links: !ENV [ENABLE_FRACTAL_LINKS, true]
+  fractal_links_base_url: !ENV [FRACTAL_LINKS_BASE_URL, '']
 
 copyright: |
   © Copyright 2026
