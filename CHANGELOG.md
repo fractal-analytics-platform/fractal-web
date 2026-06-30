@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+* Add `LOG_CONFIG_FILE` environment variable to load an external JSON log4js configuration file; when set, it is used exclusively and `LOG_FILE` / `LOG_LEVEL_FILE` / `LOG_LEVEL_CONSOLE` are ignored.
+
 # 1.28.4
 
 - Configure sharding on end-to-end tests and fix some test issues (\#1191);
@@ -123,10 +127,6 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 - Implement bulk insertion of workflow tasks at an arbitrary position (\#1038).
 - Reorder template info modal items (\#1045).
 - Harden GitHub Actions with `zizmor` audits (\#1047).
-
-# Unreleased
-
-* Add `LOG_CONFIG_FILE` environment variable to load an external JSON log4js configuration file; when set, it is used exclusively and `LOG_FILE` / `LOG_LEVEL_FILE` / `LOG_LEVEL_CONSOLE` are ignored.
 
 # 1.24.2
 
