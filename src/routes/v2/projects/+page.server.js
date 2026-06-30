@@ -11,6 +11,7 @@ export async function load({ fetch }) {
 
 	return {
 		projects,
-		invitations
+		invitations,
+		helpLink: '/projects'
 	};
 }

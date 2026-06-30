@@ -11,6 +11,7 @@
 	import { onMount } from 'svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
 	import { resolve } from '$app/paths';
+	import { buildHelpLink } from '$lib/common/component_utilities';
 
 	/**
 	 * @typedef {Object} Props
@@ -128,6 +129,7 @@
 	const server = $derived(page.data.serverInfo || {});
 	const warningBanner = $derived(page.data.warningBanner);
 	const userEmail = $derived(userLoggedIn ? page.data.userInfo.email : undefined);
+	const helpLink = $derived(buildHelpLink(page.data.helpLink));
 </script>
 
 <svelte:head>
@@ -171,6 +173,13 @@
 						<li class="nav-item">
 							<a href="/v2/admin" class="nav-link" class:admin-active={selectedSection === 'admin'}>
 								Admin area
+							</a>
+						</li>
+					{/if}
+					{#if helpLink}
+						<li class="nav-item">
+							<a href={helpLink} class="nav-link" aria-label="Help page" target="_blank">
+								<i class="bi bi-question-circle"></i>
 							</a>
 						</li>
 					{/if}
