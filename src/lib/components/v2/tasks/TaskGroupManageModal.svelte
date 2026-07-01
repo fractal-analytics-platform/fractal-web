@@ -102,6 +102,46 @@
 			);
 		}
 	}
+
+	/**
+	 * @param {number} taskGroupId
+	 */
+	async function makeCore(taskGroupId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/admin/v2/task-group/${taskGroupId}/make-core`, {
+			method: 'POST',
+			headers
+		});
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'taskGroupManageError'
+			);
+		} else {
+			modal?.hide();
+		}
+	}
+
+	/**
+	 * @param {number} taskGroupId
+	 */
+	async function makeNotCore(taskGroupId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/admin/v2/task-group/${taskGroupId}/make-not-core`, {
+			method: 'POST',
+			headers
+		});
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'taskGroupManageError'
+			);
+		} else {
+			modal?.hide();
+		}
+	}
 </script>
 
 <Modal id="taskGroupManageModal" bind:this={modal} size="lg">
@@ -192,6 +232,33 @@
 					</button>
 				</div>
 			</div>
+			{#if admin}
+				<div class="row">
+					<div class="col">
+						<hr />
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								await makeCore(taskGroup?.id);
+							}}
+							aria-label="Make all core"
+						>
+							<i class="bi bi-patch-check-fill verified-core-icon"></i>
+							Make core
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								await makeNotCore(taskGroup?.id);
+							}}
+							aria-label="Make all not core"
+						>
+							<i class="bi bi-patch-check"></i>
+							Make not core
+						</button>
+					</div>
+				</div>
+			{/if}
 		{/if}
 		<div id="taskGroupManageError" class="mt-3"></div>
 	{/snippet}
@@ -199,3 +266,10 @@
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	{/snippet}
 </Modal>
+
+<style>
+	.verified-core-icon {
+		color: #1da1f2;
+		line-height: 1;
+	}
+</style>
