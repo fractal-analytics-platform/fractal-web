@@ -36,6 +36,7 @@
 	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
+	import { buildHelpLink } from '$lib/common/component_utilities';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -968,7 +969,19 @@
 				<div class="card">
 					<div class="card-header">
 						<div class="d-flex justify-content-between align-items-center">
-							<span>Workflow sequence</span>
+							<span>
+								Workflow sequence
+								{#if buildHelpLink('/workflow-sequence')}
+									<a
+										href={buildHelpLink('/workflow-sequence')}
+										class="ms-2"
+										aria-label="Help page"
+										target="_blank"
+									>
+										<i class="bi bi-question-circle"></i>
+									</a>
+								{/if}
+							</span>
 							<div>
 								<button
 									class="btn btn-light"

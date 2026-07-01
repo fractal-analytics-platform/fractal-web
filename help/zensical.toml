@@ -1,11 +1,11 @@
 [project]
-site_name = "Fractal Web Client"
+site_name = "Fractal Web User Guide"
 site_url = "https://fractal-analytics-platform.github.io/fractal-web/"
 repo_url = "https://github.com/fractal-analytics-platform/fractal-web"
 repo_name = "fractal-analytics-platform/fractal-web"
 extra_css = ["extra.css"]
 copyright = """
-© Copyright 2022
+© Copyright 2026
 Friedrich Miescher Institute for Biomedical Research and
 University of Zurich
 (see <u><a href="https://github.com/fractal-analytics-platform/fractal-web/blob/main/LICENSE">
@@ -15,15 +15,9 @@ LICENSE
 
 nav = [
     { "Home" = "index.md" },
-    { "Quickstart" = "quickstart.md" },
-    { "User guide" = "help/index.html" },
-    { "Environment variables" = "environment-variables.md" },
-    { "Version compatibility" = "version-compatibility.md" },
-    { "Changelog" = "changelog.md" },
-    { "OAuth2 integration" = "oauth2.md" },
-    { "Development" = "development.md" },
-    { "Sandbox pages" = "sandbox-pages.md" },
-    { "Playwright report" = "playwright-report/index.html" },
+    { "Projects" = "projects.md" },
+    { "Datasets" = "datasets.md" },
+    { "Workflows" = "workflows.md" },
 ]
 
 [project.theme]
@@ -31,7 +25,7 @@ variant = "classic"
 language = "en"
 logo = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_logo.png"
 favicon = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_favicon.png"
-custom_dir = "docs/overrides"
+custom_dir = "overrides"
 navigation = {"expand" = true}
 
 features = [
@@ -77,3 +71,11 @@ toggle.name = "Switch to light mode"
 resolve_closest=true
 
 [project.plugins.section-index]
+
+[project.extra]
+enable_fractal_links = true
+fractal_links_base_url = ""
+
+[project.markdown_extensions.zensical.extensions.macros]
+module_name = "main"
+on_error_fail = true

@@ -4,6 +4,7 @@
 	import logoMedium from '$lib/assets/fractal-logo-medium.png';
 	import { onMount } from 'svelte';
 	import { formatMarkdown } from 'fractal-components/common/utils';
+	import { buildHelpLink } from '$lib/common/component_utilities';
 
 	/** @type {import('fractal-components/types/api').User|undefined} */
 	let userInfo = $derived(page.data.userInfo);
@@ -83,6 +84,11 @@
 		<h3 class="fw-light">Links</h3>
 
 		<ul>
+			{#if buildHelpLink('/')}
+				<li>
+					<a href={buildHelpLink('/')} target="_blank"> User Guide </a>
+				</li>
+			{/if}
 			<li>
 				<a href="https://fractal-analytics-platform.github.io" target="_blank">
 					Home page of the Fractal project
