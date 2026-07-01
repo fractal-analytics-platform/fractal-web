@@ -21,7 +21,7 @@ nav = [
     { "Version compatibility" = "version-compatibility.md" },
     { "Changelog" = "changelog.md" },
     { "OAuth2 integration" = "oauth2.md" },
-    { "Development" = "development/" },
+    { "Development" = "development.md" },
     { "Sandbox pages" = "sandbox-pages.md" },
     { "Playwright report" = "playwright-report/index.html" },
 ]
