@@ -3,10 +3,8 @@
 Here are the instructions to serve the documentation on localhost:8001:
 
 ```bash
-python -m venv venv
-source venv/bin/activate
-python -m pip install -r docs/requirements.txt
-zensical serve --dev-addr localhost:8001
+uv sync --frozen
+uv run zensical serve --dev-addr localhost:8001
 ```
 
 The documentation includes links to the sandbox pages.
