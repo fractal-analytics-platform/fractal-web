@@ -1,10 +1,10 @@
 ## Development setup
 
-#### Install node
+### Install node
 
-Versions 18 or 20 of Node.js are recommended. See the [quickstart](../quickstart.md) for more details about how to install node.
+Version 24 of Node.js is required. See the [quickstart](./quickstart.md) for more details about how to install node.
 
-#### Install fractal-web from git repository
+### Install fractal-web
 
 Clone this repository
 
@@ -28,17 +28,16 @@ cd ..
 npm install
 ```
 
-#### Set environment variables
+### Environment variables
 
-To properly run fractal-web you have to configure some environment variables. The [environment variables page](../environment-variables.md) contains the complete list of supported environment variables and their default values. It also includes some troubleshooting infomation about errors related to environment variables misconfiguration.
+To run `fractal-web` you have to configure some environment variables.
+The [environment variables page](./environment-variables.md) contains the complete list of supported environment variables and their default values.
+It also includes some troubleshooting infomation about errors related to environment variables misconfiguration.
 
-When running the application from the git repository, environment variables are set either in `.env` or `.env.development` files, see
-[vite documentation](https://vitejs.dev/guide/env-and-mode.html#env-files)
-(briefly: `.env.development` is the relevant file when using `npm run dev` and `.env` is the relevant file when using `npm run preview`).
-
+When running the application from the git repository, environment variables are set either in `.env` or `.env.development` files, see [vite documentation](https://vitejs.dev/guide/env-and-mode.html#env-files) (briefly: `.env.development` is the relevant file when using `npm run dev` and `.env` is the relevant file when using `npm run preview`).
 You can also add your customizations in a file named `.env.local` or `.env.development.local` to avoid writing on env files that are under version control.
 
-#### Run fractal-web from git repo
+### Run fractal-web
 
 For development, run the client application via
 
@@ -64,7 +63,7 @@ Also in this case the application runs at `http://localhost:5173`.
 
 ## Coding conventions
 
-#### fetch
+### fetch
 
 Only explicitly specify options when they differ from defaults.
 
@@ -104,7 +103,7 @@ const response = await fetch(`/api/v2/project/${projectId}`, {
 
 This project is based on [svelte kit](https://kit.svelte.dev) and follows its conventions and structure.
 
-#### 1-level folders
+### 1-level folders
 
 By default, the main application folder is located at `/src`.
 The structure of this folder is explained in depth
@@ -140,7 +139,7 @@ fractal server / fractal web interoperability architectures.
 ├ /docs
 ```
 
-#### Application structure
+### Application structure
 
 With reference to `/src/routes` folder, therein are defined svelte kit page components
 that structure the fractal web client.
@@ -162,7 +161,7 @@ The svelte client and fractal server interact through a REST interface.
 
 But how is this interaction implemented in this client?
 
-###### Client server interoperability
+### Client server interoperability
 
 As said, the svelte client communicates with the fractal server through a set of REST APIs.
 
@@ -195,7 +194,7 @@ Summarizing, the frontend code:
 
 Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under `src/lib/server/api/v1`. Here requests are grouped by contexts as `auth_api`, `admin_api`, [...].
 
-###### An example using actions
+### An example using actions
 
 The login is still using the Svelte action approach, in which we have to extract the data from a formData object and then use it to build a JSON payload to be forwarded to fractal-server.
 
@@ -326,7 +325,7 @@ makes when a user sends an HTML from, for completion, the one defined in:
 </div>
 ```
 
-#### Application library
+### Application library
 
 While the `src/routes` is the public-facing side of the client application, `src/lib` contains the client internals.
 
@@ -350,9 +349,9 @@ application.
 
 ## Error handling
 
-This page describes which coding patterns are used by fractal-web to handle various error cases.
+Here we describe which coding patterns are used by fractal-web to handle various error cases.
 
-#### Fractal-server errors structure
+### Fractal-server errors structure
 
 Fractal-server error responses payloads are usually JSON structures having the error under a `detail` key. This is not true for the 500 Internal Server Error, which doesn't provide a JSON payload.
 
@@ -396,7 +395,7 @@ Some validation errors may not be associated with a specific field and in that c
 
 The goal of fractal-web is to extract the error message and display it inside an alert component or directly near the invalid form field, when possible. If an unexpected JSON structure is received, fractal-web will display the error JSON payload as it is, but that should happen rarely, except for the JSON Schema form, whose errors may result in some complex payloads.
 
-#### Error responses in Svelte backend (SSR)
+### Error responses in Svelte backend (SSR)
 
 Files in `src/lib/server/api` provide API calls to fractal-server to be used from Svelte backend. These calls are usually required to be successful in order to properly display the page, since they retrieve the main resources of the page. A failure at this level is usually a 404 error (e.g. attempting to open a project with a non existent id) or something really severe (500 errors). For this reason the API calls errors happening on Svelte backend should usually be directly propagated, in order to display the error code inside the page.
 
@@ -413,9 +412,9 @@ return await response.json();
 
 In this way it is easier to define properly the type of the response using JSDoc annotation.
 
-#### Error responses in Svelte frontend
+### Error responses in Svelte frontend
 
-###### The AlertError class
+#### The AlertError class
 
 The `AlertError` class represents errors handled by fractal-web that has to be displayed somewhere. It has a constructor that receives an object or string representing the error and an optional status code (if the error was originated from an unsuccessful API call).
 
@@ -431,7 +430,7 @@ Most of the time it is used to handle an unsuccessful API response; the status c
 throw await getAlertErrorFromResponse(response);
 ```
 
-###### The standard error alert
+#### The standard error alert
 
 It is possible to use the `displayStandardErrorAlert()` function to display a generic error inside an Bootstrap alert component. The function returns a reference to a `StandardErrorAlert` component, that can be used to hide the error invoking its `hide()` function.
 
@@ -465,7 +464,7 @@ errorAlert?.hide();
 
 Notice that we are using the optional chaining operator (`?.`), since the variable might be undefined if no error happened previously.
 
-###### Form validation errors
+#### Form validation errors
 
 A form usually needs an error alert component to display generic errors and a mechanism to display errors associated with specific form fields. This logic has been incapsulated in the `FormErrorHandler` class.
 
@@ -532,7 +531,7 @@ The request url "/path/to/fractal-web/components/src/lib/index.js" is outside of
 
 > **Important**: When importing js files inside the `components` module it is necessary to use a relative path. The editor might autocomplete the imports using the `$lib` prefix, but that will not work when the module is included in the main application, since it redefines the `$lib` path again.
 
-#### Structure of the code
+### Structure of the code
 
 The `JSchema` Svelte component intializes a class named `FormManager`, that handles the following features:
 
@@ -563,11 +562,11 @@ This structure attempts to achieve a greater separation of concerns, needed to h
 
 ## Testing
 
-#### Unit tests
+### Unit tests
 
 Unit tests are performed via [vitest](https://vitest.dev), via the `test` script defined in `package.json`.
 
-#### End-to-end testing
+### End-to-end tests
 
 E2E tests are done using [Playwright](https://playwright.dev/).
 
@@ -610,7 +609,7 @@ To execute the tests seeing the browser add the `--headed` flag or the `--debug`
 
 To print Svelte webserver log set the environment variable `DEBUG=pw:webserver`.
 
-###### Run the OAuth2 login test
+### Run the OAuth2 login test
 
 OAuth2 test requires a running instance of `dexidp` test image and a fractal-server instance configured to use it.
 
@@ -630,43 +629,9 @@ OAUTH_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/
 OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration
 ```
 
-#### Coverage
+### Local `fractal-server` instance
 
-> Warning: code coverage results are not reliable at the moment
-
-Coverage for the unit tests:
-
-```
-npx vitest --coverage
-```
-
-Warning: coverage takes some time, since we are using the option `{ all: true }`.
-
-###### Local `fractal-server` instance
-
-The `lib/fractal-server` folder includes basic instructions to get a local
-instance of `fractal-server` running.
-
-###### Remote `fractal-server` instance
-
-One could also test a local `fractal-web` instance with a remote `fractal-server` one.
-If SSH access is possible, then a command like
-
-```
-REMOTE_PORT=8010
-LOCAL_PORT=8000
-REMOTE_USER=...
-REMOTE_HOST_IP=...
-
-ssh $REMOTE_USER@$REMOTE_HOST_IP -L $LOCAL_PORT:127.0.0.1:$REMOTE_PORT -N
-```
-
-should work and forward the remote port `REMOTE_PORT` to the `LOCAL_PORT` on
-localhost, so that `fractal-web` can use it from the local machine. Note that
-the required details for the `ssh -L` command may be different in each specific
-case, depending for instance on the `fractal-server` configuration (e.g the
-`--bind` argument of `gunicorn`), or on whether an additional proxy is needed
-to reach the remote host.
+The `lib/fractal-server` folder includes basic instructions to get a local instance of `fractal-server` running.
 
 ## Documentation
 
@@ -681,7 +646,7 @@ The documentation includes links to the sandbox pages.
 These pages are built separately and added to the site folder by the CI before publishing the documentation, so these links will not work when using the `zensical` preview command displayed above.
 If you want to preview the sandbox pages run `npm run dev` inside the sandbox folder.
 
-#### pre-commit setup
+## pre-commit setup
 
 In your local folder, create a file `.git/hooks/pre-commit` with the following content
 
@@ -701,7 +666,7 @@ defined in `package.json`, and points to
 written in `.lintstagedrc.json`, and it lists the checks to perform on each
 kind of file (e.g. `eslint` and then `prettier`).
 
-#### Release
+## Release
 
 Steps to release a new `fractal-web` version:
 
