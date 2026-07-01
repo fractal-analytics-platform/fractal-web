@@ -21,3 +21,4 @@ site
 *.log
 test-results/
 blob-report/
+.vscode
