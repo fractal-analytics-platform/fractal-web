@@ -63,7 +63,7 @@ export async function deleteTask(page, taskName, version = undefined) {
  * @returns {Promise<{id: number}>}
  */
 async function getTaskGroupByName(page, taskName, version = undefined) {
-	const response = await page.request.get(`/api/v2/task-group?slim=true`, {
+	const response = await page.request.get(`/api/v2/task-group`, {
 		headers: { Cookie: await getFractalCookie(page) }
 	});
 	await checkApiError(response, 'Unable to retrieve task groups');

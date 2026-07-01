@@ -136,7 +136,7 @@
 	}
 
 	async function getHealthCheckTask() {
-		const request = await fetch(`/api/v2/task-group?only_active=true&slim=true`);
+		const request = await fetch(`/api/v2/task-group?only_active=true`);
 		if (!request.ok) {
 			throw await getAlertErrorFromResponse(request);
 		}
