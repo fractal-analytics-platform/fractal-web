@@ -62,7 +62,8 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command:
+				'./tests/start-test-server.sh --branch 3297-expose-information-about-task-group-usage-to-users',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
