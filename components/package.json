@@ -24,7 +24,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.56.3"
+		"svelte": "^5.56.4"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
@@ -41,12 +41,12 @@
 		"jsdom": "^29.1.1",
 		"prettier": "^3.8.4",
 		"prettier-plugin-svelte": "^4.1.1",
-		"svelte": "^5.56.3",
-		"svelte-check": "^4.6.0",
+		"svelte": "^5.56.4",
+		"svelte-check": "^4.7.0",
 		"svelte-preprocess": "^6.0.5",
 		"tslib": "^2.8.1",
 		"typescript": "^5.9.3",
-		"vite": "^8.0.16",
+		"vite": "^8.1.0",
 		"vitest": "^4.1.9"
 	},
 	"dependencies": {
