@@ -157,6 +157,6 @@ export function splitZarrDir(zarrDir, projectDirs) {
  */
 export function buildHelpLink(url) {
 	return env.PUBLIC_ENABLE_HELP_LINKS === 'true' && url
-		? (env.PUBLIC_HELP_LINKS_BASE_URL || '/help') + url
+		? `${env.PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
 		: '';
 }

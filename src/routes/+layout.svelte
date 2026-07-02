@@ -9,9 +9,10 @@
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
-	import { navigating, navigationCancelled } from '$lib/stores';
+	import { currentHelpLink, navigating, navigationCancelled } from '$lib/stores';
 	import { resolve } from '$app/paths';
 	import { buildHelpLink } from '$lib/common/component_utilities';
+	import HelpModal from '$lib/components/common/HelpModal.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -178,9 +179,13 @@
 					{/if}
 					{#if helpLink}
 						<li class="nav-item">
-							<a href={helpLink} class="nav-link" aria-label="Help page" target="_blank">
+							<button
+								class="nav-link"
+								aria-label="Help page"
+								onclick={() => currentHelpLink.set(helpLink)}
+							>
 								<i class="bi bi-question-circle"></i>
-							</a>
+							</button>
 						</li>
 					{/if}
 				{/if}
@@ -307,6 +312,7 @@
 			</div>
 		</div>
 	</div>
+	<HelpModal />
 </main>
 
 <style>

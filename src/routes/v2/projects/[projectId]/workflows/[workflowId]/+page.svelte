@@ -29,7 +29,7 @@
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
-	import { navigating, navigationCancelled } from '$lib/stores';
+	import { currentHelpLink, navigating, navigationCancelled } from '$lib/stores';
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
@@ -972,14 +972,13 @@
 							<span>
 								Workflow sequence
 								{#if buildHelpLink('/workflow-sequence')}
-									<a
-										href={buildHelpLink('/workflow-sequence')}
-										class="ms-2"
+									<button
+										class="btn btn-link ms-2"
 										aria-label="Help page"
-										target="_blank"
+										onclick={() => currentHelpLink.set(buildHelpLink('/workflow-sequence'))}
 									>
 										<i class="bi bi-question-circle"></i>
-									</a>
+									</button>
 								{/if}
 							</span>
 							<div>

@@ -84,9 +84,9 @@
 		<h3 class="fw-light">Links</h3>
 
 		<ul>
-			{#if buildHelpLink('/')}
+			{#if env.PUBLIC_ENABLE_HELP_LINKS === 'true'}
 				<li>
-					<a href={buildHelpLink('/')} target="_blank"> User Guide </a>
+					<a href={env.PUBLIC_HELP_LINKS_BASE_URL || '/help'} target="_blank"> User Guide </a>
 				</li>
 			{/if}
 			<li>
