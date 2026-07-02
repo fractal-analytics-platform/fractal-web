@@ -50,8 +50,8 @@ jobs:
 
   deploy:
     name: 'Deploy docs'
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: build
     permissions:
       # https://github.com/actions/deploy-pages?tab=readme-ov-file
@@ -62,5 +62,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
+      - uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
         id: deployment
