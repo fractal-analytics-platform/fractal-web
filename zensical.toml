@@ -11,14 +11,18 @@ Copyright 2026 © BioVisionCenter (University of Zurich) - see
 
 nav = [
     { "Home" = "index.md" },
-    { "Quickstart" = "quickstart.md" },
-    { "Environment variables" = "environment-variables.md" },
-    { "Version compatibility" = "version-compatibility.md" },
+    { "Usage" = [
+        { "Quickstart" = "quickstart.md" },
+        { "Environment variables" = "environment-variables.md" },
+        { "OAuth2 integration" = "oauth2.md" },
+        { "Version compatibility" = "version-compatibility.md" },
+    ] },
     { "Changelog" = "changelog.md" },
-    { "OAuth2 integration" = "oauth2.md" },
-    { "Development" = "development.md" },
     { "Sandbox pages" = "sandbox-pages.md" },
-    { "Playwright report" = "playwright-report/index.html" },
+    { "Development" = [
+        { "Instructions" = "development.md"},
+        { "Playwright report" = "playwright-report/index.html" },
+    ] },
 ]
 
 [project.theme]
