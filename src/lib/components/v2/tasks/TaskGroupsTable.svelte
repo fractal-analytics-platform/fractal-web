@@ -129,13 +129,14 @@
 
 <table class="table align-middle">
 	<colgroup>
-		<col style="width: 25%" />
-		<col style="width: 22%" />
+		<col style="width: 20%" />
+		<col style="width: 18%" />
 		<col style="width: 8%" />
-		<col style="width: 10%" />
+		<col style="width: 8%" />
 		<col style="width: 12%" />
 		<col style="width: 10%" />
-		<col style="width: auto" />
+		<col style="width: 10%" />
+		<col style="width: 20%" />
 	</colgroup>
 	<thead class="table-light">
 		<tr>
