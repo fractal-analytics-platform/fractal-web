@@ -1,0 +1,13 @@
+[project]
+site_name = "Fractal Web User Guide"
+
+[project.theme]
+custom_dir = "overrides-minimal"
+
+[project.extra]
+enable_fractal_links = true
+fractal_links_base_url = ""
+
+[project.markdown_extensions.zensical.extensions.macros]
+module_name = "main"
+on_error_fail = true
