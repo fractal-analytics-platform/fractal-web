@@ -971,11 +971,11 @@
 						<div class="d-flex justify-content-between align-items-center">
 							<span>
 								Workflow sequence
-								{#if buildHelpLink('/workflow-sequence')}
+								{#if buildHelpLink('/workflows/task-list')}
 									<button
 										class="btn btn-link ms-2"
 										aria-label="Help page"
-										onclick={() => currentHelpLink.set(buildHelpLink('/workflow-sequence'))}
+										onclick={() => currentHelpLink.set(buildHelpLink('/workflows/task-list'))}
 									>
 										<i class="bi bi-question-circle"></i>
 									</button>

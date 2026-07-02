@@ -5,19 +5,18 @@ repo_url = "https://github.com/fractal-analytics-platform/fractal-web"
 repo_name = "fractal-analytics-platform/fractal-web"
 extra_css = ["extra.css"]
 copyright = """
-© Copyright 2026
-Friedrich Miescher Institute for Biomedical Research and
-University of Zurich
-(see <u><a href="https://github.com/fractal-analytics-platform/fractal-web/blob/main/LICENSE">
-LICENSE
-</a></u>).
+Copyright 2026 © BioVisionCenter (University of Zurich) - see
+<u><a href="https://github.com/fractal-analytics-platform/fractal-web/blob/main/LICENSE">LICENSE</a></u>.
 """
 
 nav = [
     { "Home" = "index.md" },
     { "Projects" = "projects.md" },
     { "Datasets" = "datasets.md" },
-    { "Workflows" = "workflows.md" },
+    { "Workflows" = [
+      { "Workflow page" = "workflows/index.md" },
+      { "Task list" = "workflows/task-list.md" },
+    ]},
 ]
 
 [project.theme]
