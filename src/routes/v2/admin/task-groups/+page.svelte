@@ -38,14 +38,14 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>|undefined} */
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>|undefined} */
 	let results = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(50);
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
-	/** @type {import('fractal-components/types/api').TaskGroupV2|null} */
+	/** @type {import('fractal-components/types/api').TaskGroupSlim|null} */
 	let selectedTaskGroup = $state(null);
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
@@ -107,7 +107,7 @@
 				return;
 			}
 			searched = true;
-			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>} */
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>} */
 			const data = await response.json();
 			results = data;
 			pageSize = data.page_size;
@@ -141,7 +141,7 @@
 
 	/**
 	 *
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroup
 	 */
 	function openInfoModal(taskGroup) {
 		selectedTaskGroup = taskGroup;
