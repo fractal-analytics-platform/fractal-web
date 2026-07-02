@@ -7,6 +7,7 @@ custom_dir = "overrides-minimal"
 [project.extra]
 enable_fractal_links = true
 fractal_links_base_url = ""
+iframe = true
 
 [project.markdown_extensions.zensical.extensions.macros]
 module_name = "main"

@@ -10,12 +10,28 @@
 	const unsubscribe = currentHelpLink.subscribe(async (link) => {
 		helpLink = link;
 		if (link) {
+			window.addEventListener('message', listenIframeMessage);
 			modal?.show();
+		} else {
+			window.removeEventListener('message', listenIframeMessage);
 		}
 	});
 
 	function onClose() {
 		currentHelpLink.set('');
+	}
+
+	/**
+	 * @param {MessageEvent} event
+	 */
+	function listenIframeMessage(event) {
+		if (event.origin !== location.origin) {
+			console.warn(`Invalid origin: ${event.origin}`);
+			return;
+		}
+		if (event.data.type === 'helpLink') {
+			window.location = event.data.data;
+		}
 	}
 
 	onDestroy(unsubscribe);

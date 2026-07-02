@@ -75,6 +75,7 @@ resolve_closest=true
 [project.extra]
 enable_fractal_links = true
 fractal_links_base_url = ""
+iframe = false
 
 [project.markdown_extensions.zensical.extensions.macros]
 module_name = "main"

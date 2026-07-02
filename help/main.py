@@ -12,9 +12,12 @@ def define_env(env):
             base_url = os.getenv('FRACTAL_LINKS_BASE_URL', extra['fractal_links_base_url'])
             if base_url.endswith('/'):
                 base_url = base_url[:-1]
-            if '"' in base_url or '"' in url:
-                raise Exception('URL must not contain double quotes')
+            if '"' in base_url or '"' in url or "'" in base_url or "'" in url:
+                raise Exception('URL must not contain quotes')
             if '<' in title or '>' in title:
                 raise Exception('Title must not contain the following characters: <>')
-            return f'<a href="{base_url}{url}">{title}</a>'
+            if extra['iframe']:
+              return f'<button class="btn btn-link p-0 fractal-link" onclick="openFractalPage(\'{base_url}{url}\')">{title}</button>'
+            else:
+              return f'<a href="{base_url}{url}">{title}</a>'
         return title

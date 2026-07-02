@@ -4,7 +4,6 @@
 	import logoMedium from '$lib/assets/fractal-logo-medium.png';
 	import { onMount } from 'svelte';
 	import { formatMarkdown } from 'fractal-components/common/utils';
-	import { buildHelpLink } from '$lib/common/component_utilities';
 
 	/** @type {import('fractal-components/types/api').User|undefined} */
 	let userInfo = $derived(page.data.userInfo);
