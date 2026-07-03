@@ -391,6 +391,7 @@ export type TaskSlim = {
 
 export type TaskGroupSlim = Omit<TaskGroupV2, 'task_list'> & {
 	task_list: TaskSlim[];
+	in_use: boolean;
 };
 
 export type WorkflowTasksTableRowGroup = {

@@ -129,19 +129,21 @@
 
 <table class="table align-middle">
 	<colgroup>
-		<col style="width: 25%" />
-		<col style="width: 22%" />
+		<col style="width: 20%" />
+		<col style="width: 18%" />
 		<col style="width: 8%" />
-		<col style="width: 10%" />
+		<col style="width: 8%" />
 		<col style="width: 12%" />
 		<col style="width: 10%" />
-		<col style="width: auto" />
+		<col style="width: 10%" />
+		<col style="width: 20%" />
 	</colgroup>
 	<thead class="table-light">
 		<tr>
 			<th>Package</th>
 			<th>Owner</th>
 			<th>Active</th>
+			<th>In use</th>
 			<th>Group</th>
 			<th>Version</th>
 			<th>Tasks</th>
@@ -156,6 +158,9 @@
 					<td>{selectedGroup.user_email}</td>
 					<td>
 						<BooleanIcon value={selectedGroup.active} />
+					</td>
+					<td>
+						<BooleanIcon value={selectedGroup.in_use} />
 					</td>
 					<td>
 						{getGroupName(selectedGroup)}
