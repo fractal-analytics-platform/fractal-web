@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
+		<meta http-equiv="cache-control" content="no-store" />
 		<title>{{ config.site_name }}</title>
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -10,17 +11,12 @@
 			crossorigin="anonymous"
 		/>
 		<script>
-			window.openFractalPage = function (url) {
+			window.openFractalPage = function (event, url) {
+				event.preventDefault();
+				event.stopPropagation();
 				window.parent.postMessage({ type: 'helpLink', data: url });
 			};
 		</script>
-		<style>
-			.fractal-link {
-				display: inline;
-				line-height: 1;
-				vertical-align: baseline;
-			}
-		</style>
 	</head>
 
 	<body>
