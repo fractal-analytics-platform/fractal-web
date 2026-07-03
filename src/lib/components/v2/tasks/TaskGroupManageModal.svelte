@@ -239,7 +239,9 @@
 						<button
 							class="btn btn-outline-secondary"
 							onclick={async () => {
-								await makeCore(taskGroup?.id);
+								if (taskGroup?.id) {
+									await makeCore(taskGroup?.id);
+								}
 							}}
 							aria-label="Make all core"
 						>
@@ -249,7 +251,9 @@
 						<button
 							class="btn btn-outline-secondary"
 							onclick={async () => {
-								await makeNotCore(taskGroup?.id);
+								if (taskGroup?.id) {
+									await makeNotCore(taskGroup?.id);
+								}
 							}}
 							aria-label="Make all not core"
 						>
