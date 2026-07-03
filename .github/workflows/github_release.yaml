@@ -68,6 +68,21 @@ jobs:
           GH_REF_NAME: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
 
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39
+        with:
+          version: '0.11.14'
+          enable-cache: false
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - name: Build Docs
+        run: ./build-docs.sh
+      - run: tar -czf docs-${GH_REF_NAME}.tar.gz site
+
+      - run: gh release upload "${GH_REF_NAME}" "docs-${GH_REF_NAME}.tar.gz" --clobber
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+
   publish-release:
     runs-on: ubuntu-latest
     permissions:
