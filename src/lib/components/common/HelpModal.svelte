@@ -45,7 +45,7 @@
 	{/snippet}
 	{#snippet body()}
 		{#if helpLink}
-			<iframe title="Help Page" src={helpLink} style="width: 100%; height: 100%"></iframe>
+			<iframe title="Help Page" src={helpLink}></iframe>
 		{/if}
 	{/snippet}
 </Modal>
@@ -53,5 +53,11 @@
 <style>
 	:global(#helpModal .modal-body) {
 		min-height: calc(100vh - 150px);
+		position: relative;
+	}
+	:global(#helpModal iframe) {
+		position: absolute;
+		width: calc(100% - 30px);
+		height: calc(100% - 30px);
 	}
 </style>
