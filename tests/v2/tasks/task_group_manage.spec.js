@@ -67,6 +67,11 @@ test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 
 		const row2 = page.getByRole('row', { name: taskName }).last();
 		await expectBooleanIcon(row2.getByRole('cell').nth(3), true);
+
+		await page.goto(`/v2/projects`);
+		await page.getByRole('row', { name: project.name }).getByLabel('Delete').click();
+		const modal = await waitModal(page);
+		await modal.getByRole('button', { name: 'Confirm' }).click();
 	});
 
 	await test.step('Cleanup', async () => {
