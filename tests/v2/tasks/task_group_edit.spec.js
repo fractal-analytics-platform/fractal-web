@@ -25,14 +25,14 @@ test('Task group edit (change group)', async ({ page }) => {
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);
 		const taskRow = page.getByRole('row', { name: taskName });
-		await expect(taskRow.getByRole('cell').nth(3)).toContainText('All');
+		await expect(taskRow.getByRole('cell').nth(4)).toContainText('All');
 		await expect(taskRow.getByRole('cell').nth(1)).toContainText('admin@fractal.xy');
 		await taskRow.getByRole('button', { name: 'Edit' }).click();
 		const modal = await waitModal(page);
 		await modal.getByText('Private task').click();
 		await modal.getByRole('button', { name: 'Update' }).click();
 		await waitModalClosed(page);
-		await expect(taskRow.getByRole('cell').nth(3)).toContainText('-');
+		await expect(taskRow.getByRole('cell').nth(4)).toContainText('-');
 	});
 
 	await test.step('Set the task to test group', async () => {
@@ -43,7 +43,7 @@ test('Task group edit (change group)', async ({ page }) => {
 		await modal.getByRole('combobox').selectOption(group.name);
 		await modal.getByRole('button', { name: 'Update' }).click();
 		await waitModalClosed(page);
-		await expect(taskRow.getByRole('cell').nth(3)).toContainText(group.name);
+		await expect(taskRow.getByRole('cell').nth(4)).toContainText(group.name);
 	});
 
 	await test.step('Cleanup', async () => {

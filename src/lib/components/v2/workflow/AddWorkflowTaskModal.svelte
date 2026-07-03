@@ -46,7 +46,7 @@
 		loading = true;
 		modal?.hideErrorAlert();
 		modal?.show();
-		const response = await fetch(`/api/v2/task-group?only_active=true&slim=true`);
+		const response = await fetch(`/api/v2/task-group?only_active=true`);
 		loading = false;
 		if (!response.ok) {
 			modal?.displayErrorAlert(await response.json());

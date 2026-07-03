@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/private';
 
 export async function load({ fetch }) {
 	const showOnlyCoreFiltering = env.FRACTAL_DISPLAY_CORE_TASK_FILTER !== 'false';
-	const taskGroups = await listTaskGroups(fetch, true, true);
+	const taskGroups = await listTaskGroups(fetch, true);
 	return {
 		taskGroups,
 		showOnlyCoreFiltering

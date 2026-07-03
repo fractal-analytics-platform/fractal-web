@@ -64,7 +64,7 @@ async function createDefaultFakeTask(page) {
  * @param {string} name
  */
 async function checkForTaskGroup(page, name) {
-	const response = await page.request.get(`/api/v2/task-group/?slim=true&only_active=true`, {
+	const response = await page.request.get(`/api/v2/task-group/?only_active=true`, {
 		headers: { Cookie: await getFractalCookie(page) }
 	});
 	await checkApiError(response, 'Unable to retrieve task-groups');
