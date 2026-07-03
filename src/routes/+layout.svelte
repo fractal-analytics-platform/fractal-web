@@ -9,12 +9,7 @@
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
-	import {
-		currentHelpLink,
-		navigating,
-		navigationCancelled,
-		navigatingFromHelpModal
-	} from '$lib/stores';
+	import { currentHelpLink, navigating, navigationCancelled } from '$lib/stores';
 	import { resolve } from '$app/paths';
 	import { buildHelpLink } from '$lib/common/component_utilities';
 	import HelpModal from '$lib/components/common/HelpModal.svelte';
@@ -44,12 +39,16 @@
 	 * Removes the modals or modal backdrops that remains stuck at page change.
 	 */
 	function cleanupModalBackdrop() {
-		getOpenedModal()?.hide();
-		document.querySelector('.modal-backdrop')?.remove();
-		const body = document.querySelector('body');
-		body?.classList.remove('modal-open');
-		body?.style.removeProperty('overflow');
-		body?.style.removeProperty('padding-right');
+		const modal = getOpenedModal();
+		if (modal) {
+			modal.hide();
+		} else {
+			document.querySelector('.modal-backdrop')?.remove();
+			const body = document.querySelector('body');
+			body?.classList.remove('modal-open');
+			body?.style.removeProperty('overflow');
+			body?.style.removeProperty('padding-right');
+		}
 	}
 
 	if (browser) {
@@ -90,7 +89,7 @@
 
 	beforeNavigate(async (navigation) => {
 		const modal = getOpenedModal();
-		if (modal && !$navigatingFromHelpModal) {
+		if (modal && navigation.delta === -1) {
 			modal.hide();
 			navigation.cancel();
 			return;

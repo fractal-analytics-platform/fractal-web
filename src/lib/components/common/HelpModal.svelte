@@ -1,5 +1,5 @@
 <script>
-	import { currentHelpLink, navigatingFromHelpModal } from '$lib/stores';
+	import { currentHelpLink } from '$lib/stores';
 	import { onDestroy } from 'svelte';
 	import Modal from './Modal.svelte';
 
@@ -31,7 +31,6 @@
 		}
 		if (event.data.type === 'helpLink') {
 			modal?.hide();
-			navigatingFromHelpModal.set(true);
 			window.location = event.data.data;
 		}
 	}
