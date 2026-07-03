@@ -1,7 +1,9 @@
 import { expect } from '@playwright/test';
 import { test } from '../../base_fixture';
-import { waitModal, waitPageLoading } from '../../utils/utils.js';
+import { expectBooleanIcon, waitModal, waitPageLoading } from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
+import { createProject } from '../../utils/v2/project';
+import { createWorkflow } from '../../utils/v2/workflow';
 
 test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 	let taskName;
@@ -43,6 +45,28 @@ test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 		await waitPageLoading(page);
 		await expect(page.getByRole('row')).toHaveCount(2);
 		await expect(page.getByRole('row', { name: taskName })).toContainText('reactivate');
+	});
+
+	await test.step('Test task group in use', async () => {
+		await page.goBack();
+		await waitPageLoading(page);
+		const row = page.getByRole('row', { name: taskName }).last();
+
+		await expectBooleanIcon(row.getByRole('cell').nth(3), false);
+
+		const project = await createProject(page);
+		const workflow = await createWorkflow(page, project.id);
+
+		await page.goto(`/v2/projects/${project.id}/workflows/${workflow.id}`);
+		await page.getByRole('button', { name: 'Add task to workflow' }).click();
+		await page.getByRole('row', { name: taskName }).getByLabel('Add task').click();
+		await waitPageLoading(page);
+
+		await page.goto('/v2/tasks/management');
+		await waitPageLoading(page);
+
+		const row2 = page.getByRole('row', { name: taskName }).last();
+		await expectBooleanIcon(row2.getByRole('cell').nth(3), true);
 	});
 
 	await test.step('Cleanup', async () => {
