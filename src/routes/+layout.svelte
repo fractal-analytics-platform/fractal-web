@@ -9,7 +9,12 @@
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
-	import { currentHelpLink, navigating, navigationCancelled } from '$lib/stores';
+	import {
+		currentHelpLink,
+		navigating,
+		navigationCancelled,
+		navigatingFromHelpModal
+	} from '$lib/stores';
 	import { resolve } from '$app/paths';
 	import { buildHelpLink } from '$lib/common/component_utilities';
 	import HelpModal from '$lib/components/common/HelpModal.svelte';
@@ -85,7 +90,7 @@
 
 	beforeNavigate(async (navigation) => {
 		const modal = getOpenedModal();
-		if (modal) {
+		if (modal && !$navigatingFromHelpModal) {
 			modal.hide();
 			navigation.cancel();
 			return;
