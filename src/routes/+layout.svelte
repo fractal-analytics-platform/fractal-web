@@ -27,9 +27,17 @@
 	let clientVersion = __APP_VERSION__;
 
 	/**
-	 * Removes the modal backdrop that remains stuck at page change.
+	 * Removes the modals or modal backdrops that remains stuck at page change.
 	 */
 	function cleanupModalBackdrop() {
+		const modalElement = document.querySelector('.modal.show');
+		if (modalElement instanceof HTMLElement) {
+			// @ts-ignore
+			// eslint-disable-next-line no-undef
+			const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+			bootstrapModal?.hide();
+		}
+
 		document.querySelector('.modal-backdrop')?.remove();
 		const body = document.querySelector('body');
 		body?.classList.remove('modal-open');
