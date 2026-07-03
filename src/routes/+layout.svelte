@@ -26,18 +26,20 @@
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
 
-	/**
-	 * Removes the modals or modal backdrops that remains stuck at page change.
-	 */
-	function cleanupModalBackdrop() {
+	function getOpenedModal() {
 		const modalElement = document.querySelector('.modal.show');
 		if (modalElement instanceof HTMLElement) {
 			// @ts-ignore
 			// eslint-disable-next-line no-undef
-			const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
-			bootstrapModal?.hide();
+			return bootstrap.Modal.getInstance(modalElement);
 		}
+	}
 
+	/**
+	 * Removes the modals or modal backdrops that remains stuck at page change.
+	 */
+	function cleanupModalBackdrop() {
+		getOpenedModal()?.hide();
 		document.querySelector('.modal-backdrop')?.remove();
 		const body = document.querySelector('body');
 		body?.classList.remove('modal-open');
@@ -81,7 +83,13 @@
 		}
 	});
 
-	beforeNavigate(async () => {
+	beforeNavigate(async (navigation) => {
+		const modal = getOpenedModal();
+		if (modal) {
+			modal.hide();
+			navigation.cancel();
+			return;
+		}
 		if (!$navigationCancelled) {
 			navigating.set(true);
 		}
