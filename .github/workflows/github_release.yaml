@@ -77,6 +77,8 @@ jobs:
       - name: Build Docs
         run: ./build-docs.sh
       - run: tar -czf docs-${GH_REF_NAME}.tar.gz site
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
 
       - run: gh release upload "${GH_REF_NAME}" "docs-${GH_REF_NAME}.tar.gz" --clobber
         env:
