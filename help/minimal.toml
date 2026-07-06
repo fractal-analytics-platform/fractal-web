@@ -1,5 +1,6 @@
 [project]
 site_name = "Fractal Web User Guide"
+extra_css = ["extra-minimal.css"]
 
 [project.theme]
 custom_dir = "overrides-minimal"

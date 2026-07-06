@@ -17,7 +17,7 @@ def define_env(env):
             if '<' in title or '>' in title:
                 raise Exception('Title must not contain the following characters: <>')
             if extra['iframe']:
-              return f'<a onclick="openFractalPage(event, \'{base_url}{url}\')" href="{base_url}{url}" target="_blank">{title}</a>'
+              return f'<a class="fractal-link" href="{base_url}{url}" target="_blank">{title}</a>'
             else:
-              return f'<a href="{base_url}{url}">{title}</a>'
+              return f'<a class="fractal-link" href="{base_url}{url}">{title}</a>'
         return title

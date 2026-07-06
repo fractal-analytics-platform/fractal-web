@@ -10,13 +10,9 @@
 			integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
 			crossorigin="anonymous"
 		/>
-		<script>
-			window.openFractalPage = function (event, url) {
-				event.preventDefault();
-				event.stopPropagation();
-				window.parent.postMessage({ type: 'helpLink', data: url });
-			};
-		</script>
+		{% for path in config.extra_css %}
+		<link rel="stylesheet" href="{{ path | url }}" />
+		{% endfor %}
 	</head>
 
 	<body>

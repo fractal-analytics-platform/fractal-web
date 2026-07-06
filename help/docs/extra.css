@@ -19,3 +19,14 @@ blockquote p {
 blockquote li {
 	color: #333;
 }
+
+.fractal-link::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: url("fractal-logo-link.png");
+  background-position: center;
+  vertical-align: -4px;
+  background-repeat: no-repeat;
+}
