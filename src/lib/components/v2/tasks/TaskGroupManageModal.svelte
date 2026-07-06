@@ -3,15 +3,15 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import Modal from '../../common/Modal.svelte';
 	import { resolve } from '$app/paths';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {boolean} admin
+	 * @property {string} [coreSuccessMessage]
 	 */
 
 	/** @type {Props} */
-	let { admin } = $props();
+	let { admin, coreSuccessMessage = $bindable('') } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -26,7 +26,6 @@
 
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
-	let coreSuccessMessage = $state('');
 
 	/**
 	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
@@ -122,6 +121,7 @@
 			);
 		} else {
 			coreSuccessMessage = `All tasks of task group ${taskGroupId} have been set to core.`;
+			modal?.hide();
 		}
 	}
 
@@ -142,6 +142,7 @@
 			);
 		} else {
 			coreSuccessMessage = `All tasks of task group ${taskGroupId} have been set to not core.`;
+			modal?.hide();
 		}
 	}
 </script>
@@ -264,7 +265,6 @@
 						</button>
 					</div>
 				</div>
-				<StandardDismissableAlert message={coreSuccessMessage} />
 			{/if}
 		{/if}
 		<div id="taskGroupManageError" class="mt-3"></div>
