@@ -110,7 +110,7 @@
 				return;
 			}
 			searched = true;
-			/** @type {import('fractal-compcoreSuccessMessageonents/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>} */
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>} */
 			const data = await response.json();
 			results = data;
 			pageSize = data.page_size;
