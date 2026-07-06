@@ -7,10 +7,19 @@
 	let modal = $state();
 	let helpLink = $state('');
 
+	// @ts-ignore
+	// eslint-disable-next-line no-undef
+	let clientVersion = __APP_VERSION__;
+
 	const unsubscribe = currentHelpLink.subscribe(async (link) => {
-		helpLink = link;
 		if (link) {
+			const url = new URL(link, window.location.origin);
+			// Appending version to prevent browser cache issues
+			url.searchParams.append('v', clientVersion);
+			helpLink = url.toString();
 			modal?.show();
+		} else {
+			helpLink = '';
 		}
 	});
 
