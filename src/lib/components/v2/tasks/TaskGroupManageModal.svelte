@@ -11,7 +11,7 @@
 	 */
 
 	/** @type {Props} */
-	let { admin, coreSuccessMessage = $bindable('') } = $props();
+	let { admin, coreSuccessMessage = $bindable() } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
