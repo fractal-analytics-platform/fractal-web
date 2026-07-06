@@ -11,6 +11,7 @@
 	 */
 
 	/** @type {Props} */
+	// eslint-disable-next-line no-useless-assignment -- value is read by parent via bind:coreSuccessMessage
 	let { admin, coreSuccessMessage = $bindable() } = $props();
 
 	/** @type {Modal|undefined} */
