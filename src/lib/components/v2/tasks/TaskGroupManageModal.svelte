@@ -7,10 +7,12 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {boolean} admin
+	 * @property {string} [coreSuccessMessage]
 	 */
 
 	/** @type {Props} */
-	let { admin } = $props();
+	// eslint-disable-next-line no-useless-assignment -- value is read by parent via bind:coreSuccessMessage
+	let { admin, coreSuccessMessage = $bindable() } = $props();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
@@ -100,6 +102,48 @@
 				await getAlertErrorFromResponse(response),
 				'taskGroupManageError'
 			);
+		}
+	}
+
+	/**
+	 * @param {number} taskGroupId
+	 */
+	async function makeCore(taskGroupId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/admin/v2/task-group/${taskGroupId}/make-core`, {
+			method: 'POST',
+			headers
+		});
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'taskGroupManageError'
+			);
+		} else {
+			coreSuccessMessage = `All tasks of task group ${taskGroupId} have been set to core.`;
+			modal?.hide();
+		}
+	}
+
+	/**
+	 * @param {number} taskGroupId
+	 */
+	async function makeNotCore(taskGroupId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch(`/api/admin/v2/task-group/${taskGroupId}/make-not-core`, {
+			method: 'POST',
+			headers
+		});
+		if (!response.ok) {
+			errorAlert = displayStandardErrorAlert(
+				await getAlertErrorFromResponse(response),
+				'taskGroupManageError'
+			);
+		} else {
+			coreSuccessMessage = `All tasks of task group ${taskGroupId} have been set to not core.`;
+			modal?.hide();
 		}
 	}
 </script>
@@ -192,6 +236,37 @@
 					</button>
 				</div>
 			</div>
+			{#if admin}
+				<div class="row mb-2">
+					<div class="col">
+						<hr />
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								if (taskGroup?.id) {
+									await makeCore(taskGroup?.id);
+								}
+							}}
+							aria-label="Make all core"
+						>
+							<i class="bi bi-patch-check-fill verified-core-icon"></i>
+							Make core
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							onclick={async () => {
+								if (taskGroup?.id) {
+									await makeNotCore(taskGroup?.id);
+								}
+							}}
+							aria-label="Make all not core"
+						>
+							<i class="bi bi-patch-check"></i>
+							Make not core
+						</button>
+					</div>
+				</div>
+			{/if}
 		{/if}
 		<div id="taskGroupManageError" class="mt-3"></div>
 	{/snippet}
@@ -199,3 +274,10 @@
 		<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	{/snippet}
 </Modal>
+
+<style>
+	.verified-core-icon {
+		color: #1da1f2;
+		line-height: 1;
+	}
+</style>

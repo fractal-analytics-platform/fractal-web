@@ -1,11 +1,12 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.29.0
 
 - Update CI to add Playwright report to GitHub Pages (\#1194);
 - Fix indentation for tasks with long names in workflow page (\#1197);
 - Move documentation building from `mkdocs` to `zensical` (\#1205, \#1215);
 - Expose information about task group usage (\#1203);
+- Allow superuser to set entire task-groups core or not-core (\#1213);
 
 # 1.28.4
 
