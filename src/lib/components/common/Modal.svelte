@@ -1,5 +1,6 @@
 <script>
 	import { pushState } from '$app/navigation';
+	import { page } from '$app/state';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onMount, tick } from 'svelte';
 
@@ -79,6 +80,9 @@
 			});
 			modal.addEventListener('hidden.bs.modal', () => {
 				onClose();
+				if ('showModal' in page.state && page.state.showModal) {
+					history.back();
+				}
 				document.removeEventListener('keydown', handleKeydown);
 				window.removeEventListener('popstate', handlePopstate);
 			});
