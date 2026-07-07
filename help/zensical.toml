@@ -8,12 +8,23 @@ Copyright 2026 © BioVisionCenter (University of Zurich) - see
 
 nav = [
     { "Home" = "index.md" },
-    { "Projects" = "projects.md" },
-    { "Datasets" = "datasets.md" },
-    { "Workflows" = [
-      { "Workflow page" = "workflows/index.md" },
-      { "Task list" = "workflows/task-list.md" },
-    ]},
+    { "Concepts" = [
+        { "Datasets" = "concepts/datasets.md" },
+        { "Projects" = "concepts/projects.md" },
+        { "Tasks" = "concepts/tasks.md" },
+        { "Workflows" = "concepts/workflows.md" },
+    ]
+    },
+    { "Reference" = [
+        { "Project overview" = "reference/project-overview.md" },
+        { "Project" = "reference/project.md" },
+        { "Dataset" = "reference/dataset.md" },
+        { "Templates" = "reference/templates.md" },
+        { "Workflow" = "reference/workflow.md" },
+        { "Jobs" = "reference/jobs.md" },
+        { "" = "reference/" },
+    ]
+    },
 ]
 
 [project.theme]
