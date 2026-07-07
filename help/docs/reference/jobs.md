@@ -10,7 +10,7 @@ and lets you inspect their status, logs and results. TODO
 
 !!! info "What is a workflow?"
 
-    --8<-- "concepts/workflows.md"
+    --8<-- "workflows.md"
 
     [Learn more about workflows →](../concepts/workflows.md)
 

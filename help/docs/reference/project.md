@@ -10,7 +10,7 @@ workflows, manage sharing, and adjust project settings. TODO
 
 !!! info "What is a project?"
 
-    --8<-- "concepts/projects.md"
+    --8<-- "projects.md"
 
     [Learn more about projects →](../concepts/projects.md)
 

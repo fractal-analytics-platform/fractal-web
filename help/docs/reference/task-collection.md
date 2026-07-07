@@ -10,7 +10,7 @@ tasks become available to use in [workflows](workflow.md). TODO
 
 !!! info "What is a task?"
 
-    --8<-- "concepts/tasks.md"
+    --8<-- "tasks.md"
 
     [Learn more about tasks →](../concepts/tasks.md)
 

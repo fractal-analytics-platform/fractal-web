@@ -10,9 +10,10 @@ from scratch. TODO
 
 <!-- CONFIRM: are Templates workflow templates or task templates? Swap the box
      below to concepts/tasks.md if these are task-level. -->
+
 !!! info "What is a workflow?"
 
-    --8<-- "concepts/workflows.md"
+    --8<-- "workflows.md"
 
     [Learn more about workflows →](../concepts/workflows.md)
 

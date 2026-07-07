@@ -10,11 +10,12 @@ set their arguments, and run it on a dataset.
 
 !!! info "What is a workflow?"
 
-    --8<-- "concepts/workflows.md"
+    --8<-- "workflows.md"
 
     [Learn more about workflows →](../concepts/workflows.md)
 
 TODO: Figure out how to split this page up into relevant sub-pages that get linked to:
+
 - Task list
 - Task arguments
 - Workflow submission
@@ -38,6 +39,7 @@ TODO — editing arguments; validation.
 meta args
 
 ## Documentation
+
 Task info
 Workflow & task descriptions by the user
 
@@ -50,6 +52,7 @@ TODO — selecting a [dataset](dataset.md);
 Status indicators
 
 ## Log access
+
 Individual logs
 Runs
 Warnings

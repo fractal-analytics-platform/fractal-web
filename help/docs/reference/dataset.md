@@ -7,7 +7,7 @@ description: The dataset page, where you open viewers and the feature explorer.
 
 !!! info "What is a dataset?"
 
-    --8<-- "concepts/datasets.md"
+    --8<-- "datasets.md"
 
     [Learn more about datasets →](../concepts/datasets.md)
 
@@ -27,12 +27,11 @@ TODO — the image list; filtering; what columns mean.
 - **Review your image list** - TODO
 - **Get a zarr_url** - TODO, via fractal data => reference
 
-
 ## Additional actions
+
 - **Download an image list** - TODO
 - **Check dataset metadata** - TODO (change name, see zarr_dir)
 - **Manually edit image list entries** - TODO
-
 
 ## Related
 

@@ -10,7 +10,7 @@ have access to and is the entry point for creating a new one. TODO
 
 !!! info "What is a project?"
 
-    --8<-- "concepts/projects.md"
+    --8<-- "projects.md"
 
     [Learn more about projects →](../concepts/projects.md)
 
