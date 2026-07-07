@@ -91,5 +91,5 @@ on_error_fail = true
 permalink = true   
 
 [project.markdown_extensions.pymdownx.snippets]
-base_path = ["help/docs"]  # so `--8<-- "concepts/x.md"` resolves to help/docs/concepts/x.md
+base_path = ["includes"]                       # so `--8<-- "concepts/x.md"` resolves to includes/concepts/x.md
 check_paths = true         
