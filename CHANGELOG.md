@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.29.0 (unreleased)
 
 - Update CI to add Playwright report to GitHub Pages (\#1194);
 - Fix indentation for tasks with long names in workflow page (\#1197);
