@@ -5,5 +5,5 @@ export async function load({ fetch }) {
 		/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */ (
 			await getCurrentUser(fetch, true)
 		);
-	return { user };
+	return { user, helpLink: '/reference/templates/' };
 }
