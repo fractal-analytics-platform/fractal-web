@@ -87,7 +87,13 @@
 		}
 	});
 
-	beforeNavigate(async () => {
+	beforeNavigate(async (navigation) => {
+		const modal = getOpenedModal();
+		if (modal && navigation.delta === -1) {
+			modal.hide();
+			navigation.cancel();
+			return;
+		}
 		if (!$navigationCancelled) {
 			navigating.set(true);
 		}
