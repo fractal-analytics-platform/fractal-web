@@ -9,10 +9,10 @@
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
-	import { currentHelpLink, navigating, navigationCancelled } from '$lib/stores';
+	import { navigating, navigationCancelled } from '$lib/stores';
 	import { resolve } from '$app/paths';
-	import { buildHelpLink } from '$lib/common/component_utilities';
 	import HelpModal from '$lib/components/common/HelpModal.svelte';
+	import HelpLink from '$lib/components/common/HelpLink.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -150,7 +150,7 @@
 	const server = $derived(page.data.serverInfo || {});
 	const warningBanner = $derived(page.data.warningBanner);
 	const userEmail = $derived(userLoggedIn ? page.data.userInfo.email : undefined);
-	const helpLink = $derived(buildHelpLink(page.data.helpLink));
+	const helpLink = $derived(page.data.helpLink);
 </script>
 
 <svelte:head>
@@ -197,17 +197,7 @@
 							</a>
 						</li>
 					{/if}
-					{#if helpLink}
-						<li class="nav-item">
-							<button
-								class="nav-link"
-								aria-label="Help page"
-								onclick={() => currentHelpLink.set(helpLink)}
-							>
-								<i class="bi bi-question-circle"></i>
-							</button>
-						</li>
-					{/if}
+					<HelpLink url={helpLink} />
 				{/if}
 			</ul>
 			<ul class="nav">
