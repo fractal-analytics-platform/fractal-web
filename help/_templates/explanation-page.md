@@ -10,16 +10,19 @@ description: <One sentence, ~150 chars, describing the concept for search result
 LEDE = the canonical summary, transcluded so it can never drift from the box
 shown on the reference pages. Do NOT rewrite it here; edit the snippet instead.
 -->
+
 --8<-- "concepts/<slug>.md"
 
 ## Why <concept>s exist
 
 <!-- The problem this concept solves, in the user's terms. Approachable, no jargon. -->
+
 TODO
 
 ## How <concept>s fit into Fractal
 
 <!-- Relationships to the other concepts. Link them. This is the "map" section. -->
+
 A <concept> lives inside a [project](projects.md) and …
 TODO
 
