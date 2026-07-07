@@ -1,8 +1,5 @@
 [project]
-site_name = "Fractal Web User Guide"
-site_url = "https://fractal-analytics-platform.github.io/fractal-web/"
-repo_url = "https://github.com/fractal-analytics-platform/fractal-web"
-repo_name = "fractal-analytics-platform/fractal-web"
+site_name = "Fractal User Guide"
 extra_css = ["extra.css"]
 copyright = """
 Copyright 2026 © BioVisionCenter (University of Zurich) - see
@@ -20,7 +17,6 @@ nav = [
 ]
 
 [project.theme]
-variant = "classic"
 language = "en"
 logo = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_logo.png"
 favicon = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_favicon.png"
@@ -51,16 +47,12 @@ features = [
 [[project.theme.palette]]
 media = "(prefers-color-scheme: light)"
 scheme = "default"
-primary = "deep orange"
-accent = "orange"
 toggle.icon = "material/weather-night"
 toggle.name = "Switch to dark mode"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
 scheme = "slate"
-primary = "deep orange"
-accent = "orange"
 toggle.icon = "material/weather-sunny"
 toggle.name = "Switch to light mode"
 
