@@ -1,12 +1,12 @@
 # Fractal User Guide
 
 > 🚧 NOTE: This user guide is a work in progress.
-> You can share suggestions or corrections by [opening a new issue](https://github.com/fractal-analytics-platform/fractal-web/issues/new).
+> You can share suggestions or corrections by <a href="https://github.com/fractal-analytics-platform/fractal-web/issues/new" target="_blank">opening a new issue</a>.
 
 Welcome to the Fractal user guide. The corresponding Fractal instance is available {{ fractal_link('here', '/') }}.
 
-Fractal is a framework developed at the [BioVisionCenter](https://www.biovisioncenter.uzh.ch) to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.
-You can find more information at the [main Fractal project web page](https://fractal-analytics-platform.github.io).
+Fractal is a framework developed at the <a href="https://www.biovisioncenter.uzh.ch" target="_blank">BioVisionCenter</a> to process bioimaging data at scale in the OME-Zarr format and prepare the images for interactive visualization.
+You can find more information at the <a href="https://fractal-analytics-platform.github.io" target="_blank">main Fractal project web page</a>.
 
 A brief demo of Fractal features is available in the video below
 
