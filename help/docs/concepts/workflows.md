@@ -5,7 +5,7 @@ description: What a Fractal workflow is, how it is built from tasks, and how it 
 
 # Workflows
 
---8<-- "concepts/workflows.md"
+--8<-- "workflows.md"
 
 ## Why workflows exist
 

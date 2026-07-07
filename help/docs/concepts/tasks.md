@@ -5,7 +5,7 @@ description: What a Fractal task is, where tasks come from, and how they combine
 
 # Tasks
 
---8<-- "concepts/tasks.md"
+--8<-- "tasks.md"
 
 ## Why tasks exist
 

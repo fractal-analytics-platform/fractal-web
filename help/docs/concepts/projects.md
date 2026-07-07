@@ -5,11 +5,11 @@ description: What a Fractal project is, and how it organises your datasets, work
 
 # Projects
 
---8<-- "concepts/projects.md"
+--8<-- "projects.md"
 
 ## Why projects exist
 
-The {{ fractal_link('projects page', '/v2/projects') }} is the main entrypoint 
+The {{ fractal_link('projects page', '/v2/projects') }} is the main entrypoint
 into running image analysis via Fractal.
 TODO — the organising problem a project solves (grouping related data + analysis,
 scoping access and sharing).
