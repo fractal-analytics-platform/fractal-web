@@ -17,7 +17,7 @@ transcluded (single-sourced); the box styling and the "Learn more" link are loca
 
 !!! info "What is a <concept>?"
 
-    --8<-- "concepts/<slug>.md"
+    --8<-- "<slug>.md"
 
     [Learn more about <concept>s →](../concepts/<slug>.md)
 

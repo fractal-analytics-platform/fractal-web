@@ -11,7 +11,7 @@ LEDE = the canonical summary, transcluded so it can never drift from the box
 shown on the reference pages. Do NOT rewrite it here; edit the snippet instead.
 -->
 
---8<-- "concepts/<slug>.md"
+--8<-- "<slug>.md"
 
 ## Why <concept>s exist
 
