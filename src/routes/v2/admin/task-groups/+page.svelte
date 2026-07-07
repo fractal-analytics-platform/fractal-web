@@ -8,6 +8,7 @@
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User>} */
 	const users = $derived(page.data.users || []);
@@ -52,6 +53,8 @@
 	let taskGroupEditModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
+
+	let coreSuccessMessage = $state('');
 
 	/**
 	 * @param {number} newCurrentPage
@@ -362,6 +365,7 @@
 
 	<div id="searchError" class="mt-3 mb-3"></div>
 
+	<StandardDismissableAlert message={coreSuccessMessage} />
 	{#if results}
 		<div class:d-none={!searched}>
 			<p class="text-center">
@@ -465,7 +469,7 @@
 	updateEditedTaskGroup={() => searchTaskGroups()}
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
 />
-<TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} />
+<TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} bind:coreSuccessMessage />
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
 	{#snippet header()}
