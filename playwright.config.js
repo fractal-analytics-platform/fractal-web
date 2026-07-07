@@ -62,8 +62,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command:
-				'./tests/start-test-server.sh --branch 3386-support-mark-an-entire-task-group-as-core',
+			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
