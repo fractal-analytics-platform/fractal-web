@@ -1,4 +1,5 @@
 <script>
+	import { pushState } from '$app/navigation';
 	import { displayStandardErrorAlert } from '$lib/common/errors';
 	import { onMount, tick } from 'svelte';
 
@@ -49,10 +50,16 @@
 		}
 	}
 
+	function handlePopstate() {
+		hide();
+	}
+
 	onMount(async () => {
 		const modal = document.getElementById(id);
 		if (modal) {
 			modal.addEventListener('show.bs.modal', () => {
+				pushState('', { showModal: true });
+				window.addEventListener('popstate', handlePopstate);
 				hideErrorAlert();
 				onOpen();
 				document.addEventListener('keydown', handleKeydown);
@@ -73,6 +80,7 @@
 			modal.addEventListener('hidden.bs.modal', () => {
 				onClose();
 				document.removeEventListener('keydown', handleKeydown);
+				window.removeEventListener('popstate', handlePopstate);
 			});
 		}
 	});
