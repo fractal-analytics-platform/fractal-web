@@ -62,7 +62,8 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command:
+				'./tests/start-test-server.sh --branch 3398-expose-in_use-also-in-the-admin-task-group-page-including-a-query-parameter-for-filtering-in_usetrue-or-in_usefalse',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
