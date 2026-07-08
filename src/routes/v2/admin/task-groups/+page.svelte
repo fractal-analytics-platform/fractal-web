@@ -29,6 +29,8 @@
 	let privateGroup = $state(null);
 	/** @type {boolean|null} */
 	let active = $state(null);
+	/** @type {boolean|null} */
+	let inUse = $state(null);
 	let lastUsedDateMin = $state();
 	let lastUsedTimeMin = $state('');
 	let lastUsedDateMax = $state('');
@@ -93,6 +95,9 @@
 			if (active !== null) {
 				url.searchParams.append('active', active.toString());
 			}
+			if (inUse !== null) {
+				url.searchParams.append('in_use', inUse.toString());
+			}
 			const lasUsedTimestampMin = getTimestamp(lastUsedDateMin, lastUsedTimeMin);
 			if (lasUsedTimestampMin) {
 				url.searchParams.append('timestamp_last_used_min', lasUsedTimestampMin);
@@ -136,6 +141,7 @@
 		lastUsedTimeMax = '';
 		privateGroup = null;
 		active = null;
+		inUse = null;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
@@ -206,6 +212,22 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="origin">Origin</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={origin} id="origin">
+								<option value="">Select...</option>
+								<option value="pypi">PyPI</option>
+								<option value="wheel-file">Wheel file</option>
+								<option value="pixi">Pixi</option>
+								<option value="other">Other</option>
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<div class="row mt-lg-3">
@@ -242,6 +264,24 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
 							<label for="private">Private</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
@@ -253,9 +293,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -273,30 +310,13 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="origin">Origin</label>
+							<label for="in_use">In use</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={origin} id="origin">
-								<option value="">Select...</option>
-								<option value="pypi">PyPI</option>
-								<option value="wheel-file">Wheel file</option>
-								<option value="pixi">Pixi</option>
-								<option value="other">Other</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Resource</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={resource} id="resource">
-								<option value="">Select...</option>
-								{#each resources as resource (resource.id)}
-									<option value={resource.id}>{resource.name}</option>
-								{/each}
+							<select class="form-select" bind:value={inUse} id="in_use">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
 							</select>
 						</div>
 					</div>
@@ -496,6 +516,10 @@
 				<li class="list-group-item list-group-item-light fw-bold">Active</li>
 				<li class="list-group-item">
 					<BooleanIcon value={selectedTaskGroup.active} />
+				</li>
+				<li class="list-group-item list-group-item-light fw-bold">In use</li>
+				<li class="list-group-item">
+					<BooleanIcon value={selectedTaskGroup.in_use} />
 				</li>
 				<li class="list-group-item list-group-item-light fw-bold">Origin</li>
 				<li class="list-group-item">{selectedTaskGroup.origin || '-'}</li>
