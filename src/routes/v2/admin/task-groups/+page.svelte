@@ -340,7 +340,7 @@
 									type="time"
 									class="form-control"
 									bind:value={lastUsedTimeMax}
-									id="last_used_time_max"
+									id="last_usrc/routes/v2/admin/task-groups/+page.sveltesed_time_max"
 									aria-label="Last used time max"
 								/>
 							</div>
@@ -383,7 +383,8 @@
 							<col width="90" />
 							<col width="190" />
 							<col width="100" />
-							<col width="190" />
+							<col width="150" />
+							<col width="90" />
 							<col width="90" />
 							<col width="90" />
 							<col width="90" />
@@ -398,6 +399,7 @@
 								<th>Group</th>
 								<th>Resource</th>
 								<th>Active</th>
+								<th>In use</th>
 								<th>Origin</th>
 								<th># Tasks</th>
 								<th>Options</th>
@@ -414,6 +416,9 @@
 									<td>{getResourceName(taskGroup.resource_id)}</td>
 									<td>
 										<BooleanIcon value={taskGroup.active} />
+									</td>
+									<td>
+										<BooleanIcon value={taskGroup.in_use} />
 									</td>
 									<td>{taskGroup.origin || '-'}</td>
 									<td>{taskGroup.task_list.length}</td>
