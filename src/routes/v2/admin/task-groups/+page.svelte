@@ -360,7 +360,7 @@
 									type="time"
 									class="form-control"
 									bind:value={lastUsedTimeMax}
-									id="last_usrc/routes/v2/admin/task-groups/+page.sveltesed_time_max"
+									id="last_used_time_max"
 									aria-label="Last used time max"
 								/>
 							</div>
