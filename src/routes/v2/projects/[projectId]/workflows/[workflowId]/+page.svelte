@@ -37,6 +37,7 @@
 	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
 	import { buildHelpLink } from '$lib/common/component_utilities';
+	import HelpLink from '$lib/components/common/HelpLink.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -971,15 +972,7 @@
 						<div class="d-flex justify-content-between align-items-center">
 							<span>
 								Workflow sequence
-								{#if buildHelpLink('/workflows/task-list')}
-									<button
-										class="btn btn-link ms-2"
-										aria-label="Help page"
-										onclick={() => currentHelpLink.set(buildHelpLink('/workflows/task-list'))}
-									>
-										<i class="bi bi-question-circle"></i>
-									</button>
-								{/if}
+								<HelpLink url="/reference/workflow/" />
 							</span>
 							<div>
 								<button

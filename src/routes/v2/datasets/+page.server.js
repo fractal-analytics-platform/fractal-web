@@ -1,5 +1,5 @@
 export async function load() {
 	return {
-		helpLink: '/datasets/'
+		helpLink: '/reference/dataset/'
 	};
 }
