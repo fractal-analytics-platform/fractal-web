@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.29.1 (unreleased)
+
+- Show `In use` on task group admin's page (\#1219).
+
 # 1.29.0
 
 - Update CI to add Playwright report to GitHub Pages (\#1194);
