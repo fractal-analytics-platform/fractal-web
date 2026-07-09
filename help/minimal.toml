@@ -1,18 +1,10 @@
 [project]
-site_name = "Fractal Web User Guide"
+site_name = "Fractal User Guide"
 extra_css = ["extra-minimal.css"]
 
 [project.theme]
 custom_dir = "overrides-minimal"
 
-[project.markdown_extensions.admonition]      # the "!!! info" boxes
-[project.markdown_extensions.pymdownx.details] # the "??? note" collapsible depth
-[project.markdown_extensions.attr_list]
-[project.markdown_extensions.md_in_html]
-
-[project.markdown_extensions.pymdownx.snippets]
-base_path = ["help/snippets"]
-check_paths = true
 
 [project.extra]
 enable_fractal_links = true
@@ -22,3 +14,12 @@ iframe = true
 [project.markdown_extensions.zensical.extensions.macros]
 module_name = "main"
 on_error_fail = true
+
+[project.markdown_extensions.admonition]      # the "!!! info" boxes
+[project.markdown_extensions.pymdownx.details] # the "??? note" collapsible depth
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.md_in_html]
+
+[project.markdown_extensions.pymdownx.snippets]
+base_path = ["help/snippets"]
+check_paths = true
