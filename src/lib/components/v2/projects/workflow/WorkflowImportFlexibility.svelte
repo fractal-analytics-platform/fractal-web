@@ -71,8 +71,13 @@
 								<option value={undefined}>Select...</option>
 								{#each [...data.available_tasks] as task, i (i)}
 									{#if !data.version || includeOlderVersions || (!includeOlderVersions && !task.older_than_target)}
-										<option value={task.version} title={task.active ? '' : 'Not active'}>
-											{task.version}{task.active ? '' : ' ⚠️'}
+										<option
+											value={task.version}
+											title={[task.is_core ? 'Core task' : '', task.active ? '' : 'Not active']
+												.filter(Boolean)
+												.join(' - ')}
+										>
+											{task.version}{task.is_core ? ' ✅' : ''}{task.active ? '' : ' ⚠️'}
 										</option>
 									{/if}
 								{/each}

@@ -323,6 +323,7 @@ type AvailableTask = {
 	version: string;
 	active: boolean;
 	older_than_target: boolean;
+	is_core: boolean;
 };
 
 type TaskV2Minimal = {
