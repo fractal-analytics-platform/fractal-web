@@ -13,25 +13,42 @@ description: The dataset page, where you open viewers and the feature explorer.
 
 ## Overview
 
-TODO screenshot
+![Dataset page](../assets/dataset/dataset.webp)
 
-## Images
+### 1. Image List
 
-TODO — the image list; filtering; what columns mean.
+The dataset image list contains an overview of all the OME-Zarr images belonging to a given dataset. You can see the following parts:
 
-## Common actions
+- The Zarr URL: The ending of the zarr_url relative to the dataset zarr directory
+- Attributes & Types: Metadata about each OME-Zarr image that helps you find the exact image you were looking for. [Learn more about attributes and types](../concepts/datasets.md#what-a-dataset-contains)
+- Additional options (see 2. Image Options)
 
-- **Filter image list entries**
-- **Open an image in a viewer** - TODO
-- **Open the feature explorer** - TODO
-- **Review your image list** - TODO
-- **Get a zarr_url** - TODO, via fractal data => reference
+Typical actions include:
 
-## Additional actions
+- Filter the image list using well & attribute filters. You can combine multiple filters to narrow down your selection.
 
-- **Download an image list** - TODO
-- **Check dataset metadata** - TODO (change name, see zarr_dir)
-- **Manually edit image list entries** - TODO
+![dataset filters](../assets/dataset/dataset_filters.webp)
+
+- Manually add an image to the image list: Typically only done for debugging purposes. Use a converter or the "Import OME-Zarr" task instead as part of your workflows to populate your dataset.
+
+### 2. Image Options
+
+![image options](../assets/dataset/image_options.webp)
+
+For each image, you can:
+
+- Open the image in OME-Zarr viewers
+- Get the full URL to the dataset for the [fractal data service](fractal_data.md)
+- Manually edit an image list entries (only meant to be used for debugging)
+- Delete a dataset entry: This does not delete the on-disk OME-Zarr, it just removes the reference to this OME-Zarr from the image list
+
+### 3. HCS Plate options
+
+If your dataset contains an OME-Zarr HCS plate, you can select a plate to open in a viewer, get the URL for or to open in the Fractal feature explorer.
+
+### 4. Dataset info
+The dataset info allows you to edit the name of your dataset and see the full Zarr directory where Fractal places all OME-Zarrs created in this dataset.
+The dataset download provides you with a json version of your dataset. It contains the base dataset info and the full image list, but not the processing history. The serialised dataset can be downloaded for bulk edits and new datasets can be created based on this download.
 
 ## Related
 
