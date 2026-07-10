@@ -52,6 +52,9 @@
 	let inputTypeFilter = $state('');
 	let coreTasksOnly = $state(false);
 
+	/** @type {'recent' | 'core'} */
+	let preferred = $state('recent');
+
 	let groupByLabels = {
 		pkg_name: 'Task'
 	};
