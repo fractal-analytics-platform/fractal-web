@@ -47,6 +47,7 @@ For each image, you can:
 If your dataset contains an OME-Zarr HCS plate, you can select a plate to open in a viewer, get the URL for or to open in the Fractal feature explorer.
 
 ### 4. Dataset info
+
 The dataset info allows you to edit the name of your dataset and see the full Zarr directory where Fractal places all OME-Zarrs created in this dataset.
 The dataset download provides you with a json version of your dataset. It contains the base dataset info and the full image list, but not the processing history. The serialised dataset can be downloaded for bulk edits and new datasets can be created based on this download.
 
