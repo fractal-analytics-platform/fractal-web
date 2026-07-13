@@ -197,7 +197,9 @@
 							</a>
 						</li>
 					{/if}
-					<HelpLink url={helpLink} />
+					<li class="nav-item">
+						<HelpLink url={helpLink} />
+					</li>
 				{/if}
 			</ul>
 			<ul class="nav">
