@@ -1,5 +1,10 @@
-import { it, expect } from 'vitest';
+import { vi, it, expect } from 'vitest';
 import { removeDuplicatedItems } from '$lib/common/component_utilities.js';
+
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
 
 it('removes duplicated datasets and sort by name', () => {
 	const allDatasets = [

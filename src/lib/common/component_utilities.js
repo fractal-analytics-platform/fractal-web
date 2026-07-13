@@ -1,3 +1,5 @@
+import { env } from '$env/dynamic/public';
+
 export function fieldHasValue(event) {
 	const inputValue = event.target?.value || undefined;
 	return inputValue !== undefined && inputValue !== '';
@@ -148,4 +150,13 @@ export function splitZarrDir(zarrDir, projectDirs) {
 		projectDir,
 		zarrSubfolder: zarrDir.substring(projectDir.length + 1, zarrDir.length)
 	};
+}
+
+/**
+ * @param {string} url
+ */
+export function buildHelpLink(url) {
+	return env.PUBLIC_ENABLE_HELP_LINKS === 'true' && url
+		? `${env.PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
+		: '';
 }

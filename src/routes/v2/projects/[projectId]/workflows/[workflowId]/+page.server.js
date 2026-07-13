@@ -23,6 +23,7 @@ export async function load({ fetch, params }) {
 		workflow,
 		datasets,
 		defaultDatasetId,
-		showOnlyCoreFiltering
+		showOnlyCoreFiltering,
+		helpLink: '/reference/workflow/'
 	};
 }

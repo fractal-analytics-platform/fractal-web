@@ -15,9 +15,13 @@ vi.mock('$app/state', () => {
 				userInfo: {
 					is_guest: false
 				}
-			}
+			},
+			state: { showModal: true }
 		}
 	};
+});
+vi.mock('$app/navigation', () => {
+	return { pushState: vi.fn() };
 });
 
 // The component to be tested must be imported after the mock setup

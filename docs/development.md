@@ -646,6 +646,38 @@ The documentation includes links to the sandbox pages.
 These pages are built separately and added to the site folder by the CI before publishing the documentation, so these links will not work when using the `zensical` preview command displayed above.
 If you want to preview the sandbox pages run `npm run dev` inside the sandbox folder.
 
+### User Guide
+
+The User Guide is built with zensical from the help folder and is referenced by the main documentation. The User Guide is generated both in a complete version (with menu and search bar) and in a minimal version (for embedding in Fractal Web help modals). The minimal version is expected to be served under `/help/minimal`. You can use the `build-docs.sh` script to build all the sites.
+
+When writing Markdown files for the User Guide, use the following rules:
+
+- internal links: use standard Markdown syntax with relative paths (e.g. `[Dataset](../dataset.md)`);
+- external links: use plain HTML and add the `target="_blank"` attribute to open the page in a new tab (e.g. `<a href="https://www.biovisioncenter.uzh.ch" target="_blank">BioVisionCenter</a>`);
+- Fractal Web links: use the `fractal_link` macro (e.g. `{{ fractal_link('Projects page', '/v2/projects') }}`);
+
+To test the documentation locally you can serve the documentation using `zensical serve` on port 8001, as explained above. Vite configuration (`vite.config.js`) is already set up to proxy the URLs starting with `/help` to the port 8001. In this way the help modal documentation embedding should work out of the box.
+
+To test the links going from the documentation to the running Fractal Web development instance, you can run the `build-docs.sh` script while setting the environment variable `FRACTAL_LINKS_BASE_URL=http://localhost:5173`. In this way the `fractal_link` macro will generate the proper URL prefix.
+
+Creating help links in the Fractal Web app depends on where one would display those links.
+
+For help links displayed in the top menu bar, edit the `+page.server.js` file corresponding to the page to document and add a proper `helpLink` property in the returning object. For example:
+
+```js
+export async function load({ fetch }) {
+	return {
+		helpLink: '/reference/project/'
+	};
+}
+```
+
+For help links displayed in other areas of the page, add the following Svelte component:
+
+```svelte
+<HelpLink url="/reference/workflow/" />
+```
+
 ## pre-commit setup
 
 In your local folder, create a file `.git/hooks/pre-commit` with the following content

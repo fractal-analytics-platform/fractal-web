@@ -16,7 +16,9 @@ node_modules
 coverage*/
 .nyc_output
 playwright-report/
+docs/help
 venv
+__pycache__
 site
 *.log
 test-results/

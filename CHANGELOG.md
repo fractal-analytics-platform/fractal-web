@@ -1,5 +1,10 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.29.1
+
+- Add User Guide site and help links (\#1201);
+- Migrate documentation from Mkdos to Zensical (\#1201);
+
 # 1.29.0
 
 - Update CI to add Playwright report to GitHub Pages (\#1194);
