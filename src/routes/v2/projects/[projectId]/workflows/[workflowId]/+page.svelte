@@ -29,14 +29,13 @@
 	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
 	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
 	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
-	import { currentHelpLink, navigating, navigationCancelled } from '$lib/stores';
+	import { navigating, navigationCancelled } from '$lib/stores';
 	import { writable } from 'svelte/store';
 	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
-	import { buildHelpLink } from '$lib/common/component_utilities';
 	import HelpLink from '$lib/components/common/HelpLink.svelte';
 
 	const maxDescriptionLength = 50;
