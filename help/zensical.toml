@@ -56,16 +56,7 @@ features = [
 
 
 [[project.theme.palette]]
-media = "(prefers-color-scheme: light)"
 scheme = "default"
-toggle.icon = "material/weather-night"
-toggle.name = "Switch to dark mode"
-
-[[project.theme.palette]]
-media = "(prefers-color-scheme: dark)"
-scheme = "slate"
-toggle.icon = "material/weather-sunny"
-toggle.name = "Switch to light mode"
 
 [project.plugins.search]
 
