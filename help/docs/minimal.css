@@ -1,0 +1,10 @@
+.md-header,
+.md-sidebar,
+.md-path,
+.md-footer {
+	display: none !important;
+}
+
+.md-grid {
+	margin-top: 0 !important;
+}
