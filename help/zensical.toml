@@ -1,0 +1,86 @@
+[project]
+site_name = "Fractal User Guide"
+extra_css = ["extra.css"]
+copyright = """
+Copyright 2026 © BioVisionCenter (University of Zurich) - see
+<u><a href="https://github.com/fractal-analytics-platform/fractal-web/blob/main/LICENSE">LICENSE</a></u>.
+"""
+
+nav = [
+    { "Home" = "index.md" },
+    { "Concepts" = [
+        { "Datasets" = "concepts/datasets.md" },
+        { "Projects" = "concepts/projects.md" },
+        { "Tasks" = "concepts/tasks.md" },
+        { "Workflows" = "concepts/workflows.md" },
+    ]
+    },
+    { "Reference" = [
+        { "Project overview" = "reference/project-overview.md" },
+        { "Project" = "reference/project.md" },
+        { "Dataset" = "reference/dataset.md" },
+        { "Templates" = "reference/templates.md" },
+        { "Workflow" = "reference/workflow.md" },
+        { "Jobs" = "reference/jobs.md" },
+        { "" = "reference/" },
+    ]
+    },
+]
+
+[project.theme]
+language = "en"
+logo = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_logo.png"
+favicon = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_favicon.png"
+custom_dir = "overrides"
+navigation = {"expand" = true}
+
+features = [
+    "announce.dismiss",
+    "content.code.annotate",
+    "content.code.copy",
+    "content.tabs.link",
+    "content.tooltips",
+    "navigation.footer",
+    "navigation.indexes",
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.instant.progress",
+    "navigation.path",
+    "navigation.sections",
+    "navigation.tabs",
+    "navigation.tabs.sticky",
+    "search.highlight",
+    "toc.follow",
+    "toc.integrate",
+]
+
+
+[[project.theme.palette]]
+scheme = "default"
+
+[project.plugins.search]
+
+[project.plugins.autorefs]
+resolve_closest=true
+
+[project.plugins.section-index]
+
+[project.extra]
+enable_fractal_links = true
+fractal_links_base_url = ""
+fractal_links_target_blank = false
+
+[project.markdown_extensions.zensical.extensions.macros]
+module_name = "main"
+on_error_fail = true
+
+[project.markdown_extensions.admonition]      # the "!!! info" boxes
+[project.markdown_extensions.pymdownx.details] # the "??? note" collapsible depth
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.toc]
+permalink = true   
+
+[project.markdown_extensions.pymdownx.snippets]
+base_path = ["help/snippets"]
+check_paths = true         

@@ -6,6 +6,9 @@ import { mockJob } from '../mock/mock-types';
 vi.mock('$env/dynamic/public', () => {
 	return { env: {} };
 });
+vi.mock('$app/navigation', () => {
+	return { pushState: vi.fn() };
+});
 
 // Mocking fetch
 global.fetch = vi.fn();
@@ -48,15 +51,15 @@ Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/pytho
 TRACEBACK:
 2024-01-29 16:52:02,328; INFO; START create_ome_zarr task
 Traceback (most recent call last):
-  File "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/lib/python3.10/site-packages/fractal_tasks_core/tasks/create_ome_zarr.py", line 470, in <module>
-    run_fractal_task(
-  File "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/lib/python3.10/site-packages/fractal_tasks_core/tasks/_utils.py", line 79, in run_fractal_task
-    metadata_update = task_function(**pars)
-  File "pydantic/decorator.py", line 40, in pydantic.decorator.validate_arguments.validate.wrapper_function
-  File "pydantic/main.py", line 341, in pydantic.main.BaseModel.__init__
+	File "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/lib/python3.10/site-packages/fractal_tasks_core/tasks/create_ome_zarr.py", line 470, in <module>
+		run_fractal_task(
+	File "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/lib/python3.10/site-packages/fractal_tasks_core/tasks/_utils.py", line 79, in run_fractal_task
+		metadata_update = task_function(**pars)
+	File "pydantic/decorator.py", line 40, in pydantic.decorator.validate_arguments.validate.wrapper_function
+	File "pydantic/main.py", line 341, in pydantic.main.BaseModel.__init__
 pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
-  field required (type=value_error.missing)`;
+	field required (type=value_error.missing)`;
 		mockSuccesfulJobFetch({ id: 1, status: 'failed', log: error });
 		await result.component.show(mockJob({ id: 1, status: 'failed', log: null }), true);
 		const pre = /** @type {HTMLElement} */ (result.container.querySelector('pre'));
@@ -70,7 +73,7 @@ allowed_channels
 		expect(divs[1].innerHTML)
 			.eq(`pydantic.error_wrappers.ValidationError: 1 validation error for CreateOmeZarr
 allowed_channels
-  field required (type=value_error.missing)\n`);
+	field required (type=value_error.missing)\n`);
 		expect(pre.querySelectorAll('button').length).eq(1);
 		await fireEvent.click(result.getByRole('button', { name: /details hidden/ }));
 		divs = pre.querySelectorAll('div');

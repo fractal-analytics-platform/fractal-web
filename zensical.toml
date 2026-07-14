@@ -23,6 +23,7 @@ nav = [
         { "Instructions" = "development.md"},
         { "Playwright report" = "playwright-report/index.html" },
     ] },
+    { "User guide" = "help/index.html" },
 ]
 
 [project.theme]

@@ -25,6 +25,7 @@ export async function load({ fetch }) {
 		projects,
 		workflows,
 		datasets,
-		jobs
+		jobs,
+		helpLink: '/reference/jobs/'
 	};
 }
