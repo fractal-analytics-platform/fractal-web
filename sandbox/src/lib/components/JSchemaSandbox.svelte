@@ -178,8 +178,7 @@
 					bind:value={jsonSchemaString}
 					oninput={handleJsonSchemaStringChanged}
 					class:is-invalid={jsonSchemaError}
-					rows="10"
-				></textarea>
+					rows="10"></textarea>
 				<span class="invalid-feedback">{jsonSchemaError}</span>
 			</div>
 		</div>
@@ -192,8 +191,7 @@
 					bind:value={jsonDataString}
 					oninput={handleDataStringChanged}
 					class:is-invalid={dataError}
-					rows="10"
-				></textarea>
+					rows="10"></textarea>
 				<span class="invalid-feedback">{dataError}</span>
 			</div>
 		</div>

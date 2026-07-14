@@ -18,3 +18,5 @@ export const recentActivities = writable([]);
  * This writable is used to store the groups call error and display it after the redirect.
  */
 export const groupsErrorOnUserCreation = writable(null);
+
+export const currentHelpLink = writable('');

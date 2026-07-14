@@ -36,6 +36,7 @@
 	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
+	import HelpLink from '$lib/components/common/HelpLink.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -968,7 +969,10 @@
 				<div class="card">
 					<div class="card-header">
 						<div class="d-flex justify-content-between align-items-center">
-							<span>Workflow sequence</span>
+							<span>
+								Workflow sequence
+								<HelpLink url="/reference/workflow/" />
+							</span>
 							<div>
 								<button
 									class="btn btn-light"
@@ -996,7 +1000,7 @@
 					{:else}
 						<div class="list-group list-group-flush" data-testid="workflow-tasks-list">
 							{#each workflow.task_list as workflowTask, i (workflowTask.id)}
-								<div class="wft-item">
+								<div class="wft-item" class:has-status={Boolean(statuses[workflowTask.id])}>
 									<div class="wft-expander ms-1">
 										{#if statuses[workflowTask.id]}
 											{#if expandedWorkflowTask && expandedWorkflowTask.id === workflowTask.id && loadingHistoryRunStatuses}
@@ -1035,7 +1039,7 @@
 										class:active={selectedWorkflowTask !== undefined &&
 											selectedWorkflowTask.id === workflowTask.id}
 									>
-										<span class="wft-item-label px-2 py-0" id="label-wft-{workflowTask.id}">
+										<span class="wft-item-label" id="label-wft-{workflowTask.id}">
 											{workflowTask.alias ? workflowTask.alias : workflowTask.task.name}
 										</span>
 										<button
@@ -1427,8 +1431,7 @@
 						class:is-invalid={$workflowPropsValidationErrors['description']}
 						name="workflowDescription"
 						id="workflowDescription"
-						bind:value={updatedWorkflowDescription}
-					></textarea>
+						bind:value={updatedWorkflowDescription}></textarea>
 					<span class="invalid-feedback">{$workflowPropsValidationErrors['description']}</span>
 				</div>
 			</form>
@@ -1586,12 +1589,16 @@
 		position: relative;
 	}
 
-	.wft-item .list-group-item {
-		padding-left: 27px;
+	.wft-item.has-status .list-group-item {
+		padding-left: 34px;
 	}
 
 	.wft-item-label {
 		color: #000;
+	}
+	.wft-item.has-status .wft-item-label {
+		box-decoration-break: clone;
+		padding-right: 10px;
 	}
 	.active .wft-item-label {
 		color: #fff;

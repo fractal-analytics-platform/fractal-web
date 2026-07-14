@@ -22,7 +22,7 @@ updates:
       - '/templates-list'
     # Check the npm registry for updates every day (weekdays)
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
     cooldown:
       default-days: 7
     groups:
@@ -39,3 +39,20 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'marked'
         update-types: ['version-update:semver-major']
+
+  - package-ecosystem: 'uv'
+    versioning-strategy: 'lockfile-only'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    cooldown:
+      default-days: 7
+    groups:
+      version-updates:
+        applies-to: version-updates
+        patterns:
+          - '*'
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - '*'

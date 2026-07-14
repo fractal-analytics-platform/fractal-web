@@ -1,20 +1,15 @@
 # Quickstart instructions
 
-> This page describes how to install fractal-web from release packages. If you need to install it from the git repository see the [development setup page](./development/setup.md).
+> This page describes how to install fractal-web from release packages.
+> If you need to install it from the git repository see the [development setup page](./development.md#development-setup).
 
 ## Install node
 
-Versions 18 or 20 of Node.js are recommended (check your version with `node
--v`). Version 16 is known to work, but not recommended.
-
-If these versions are not available via your favorite package installer, you
-can install them from [this link](https://nodejs.org/en/download) for your
-specific platform. Another option is to use
-[nvm](https://github.com/nvm-sh/nvm), e.g. via
+Versions 24 of Node.js is recommended (check your version with `node -v`). You can e.g. install it via [nvm](https://github.com/nvm-sh/nvm), as in
 
 ```bash
-nvm install 18
-nvm alias default 18
+nvm install 24
+nvm alias default 24
 ```
 
 ## Install fractal-web from release packages

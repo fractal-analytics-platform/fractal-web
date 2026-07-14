@@ -63,6 +63,11 @@
 			<a href="/v2/projects" class="btn btn-primary">Projects</a>
 			<a href="/v2/tasks" class="btn btn-primary">Tasks</a>
 			<a href="/v2/jobs" class="btn btn-primary">Jobs</a>
+			{#if env.PUBLIC_ENABLE_HELP_LINKS === 'true'}
+				<a href={env.PUBLIC_HELP_LINKS_BASE_URL || '/help'} target="_blank" class="btn btn-primary">
+					User Guide
+				</a>
+			{/if}
 		</div>
 
 		{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}

@@ -628,8 +628,7 @@
 								id="docs_info"
 								bind:value={docs_info}
 								class:is-invalid={$validationErrors['docs_info']}
-								rows="10"
-							></textarea>
+								rows="10"></textarea>
 						</div>
 					</div>
 					<div class="row">

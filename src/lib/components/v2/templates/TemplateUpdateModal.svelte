@@ -122,8 +122,7 @@
 						class="form-control"
 						bind:value={template.description}
 						id="template-description"
-						rows="6"
-					></textarea>
+						rows="6"></textarea>
 				</div>
 			</div>
 		{/if}

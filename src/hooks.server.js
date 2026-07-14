@@ -96,7 +96,6 @@ const securityHeaders = {
 	'X-Content-Type-Options': 'nosniff',
 	'Referrer-Policy': 'strict-origin-when-cross-origin',
 	'Cross-Origin-Opener-Policy': 'same-origin',
-	'Cross-Origin-Embedder-Policy': 'require-corp',
 	'Cross-Origin-Resource-Policy': 'same-origin',
 	'Permissions-Policy': 'geolocation=(), camera=(), microphone=(), interest-cohort=()',
 	'X-DNS-Prefetch-Control': 'off'

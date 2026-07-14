@@ -197,8 +197,7 @@
 										: null}
 									disabled
 									class="form-control"
-									rows="10"
-								></textarea>
+									rows="10"></textarea>
 							</div>
 						</div>
 					{/if}
@@ -216,8 +215,7 @@
 										: null}
 									disabled
 									class="form-control"
-									rows="10"
-								></textarea>
+									rows="10"></textarea>
 							</div>
 						</div>
 					{/if}
@@ -243,8 +241,7 @@
 								bind:value={task.docs_info}
 								disabled
 								class="form-control"
-								rows="5"
-							></textarea>
+								rows="5"></textarea>
 						</div>
 					</div>
 				</div>
