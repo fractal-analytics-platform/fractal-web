@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# 1.29.2 (unreleased)
+# 1.29.2
 
 - Add `LOG_CONFIG_FILE` environment variable to load an external JSON log4js configuration file; when set, it is used exclusively and `LOG_FILE` / `LOG_LEVEL_FILE` / `LOG_LEVEL_CONSOLE` are ignored. (\#1159).
 
