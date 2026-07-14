@@ -36,6 +36,7 @@
 	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
 	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
+	import HelpLink from '$lib/components/common/HelpLink.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -968,7 +969,10 @@
 				<div class="card">
 					<div class="card-header">
 						<div class="d-flex justify-content-between align-items-center">
-							<span>Workflow sequence</span>
+							<span>
+								Workflow sequence
+								<HelpLink url="/reference/workflow/" />
+							</span>
 							<div>
 								<button
 									class="btn btn-light"

@@ -16,6 +16,7 @@ export async function load({ fetch, params }) {
 		project,
 		projectAccess,
 		datasets,
-		workflows
+		workflows,
+		helpLink: '/reference/project/'
 	};
 }
