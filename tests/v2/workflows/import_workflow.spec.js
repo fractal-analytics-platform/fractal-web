@@ -122,6 +122,15 @@ test('Import workflow', async ({ page, project }) => {
 	});
 
 	await test.step('Import new workflow using flexibility', async () => {
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByRole('textbox', { name: 'Name', exact: true }).fill('generic_task');
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+		await page.getByRole('cell', { name: 'Make core' }).first().click();
+
+		await page.goto(project.url);
+		await waitPageLoading(page);
+
 		const createWorkflowBtn = page.getByRole('button', { name: 'Create new workflow' });
 		await createWorkflowBtn.waitFor();
 		await createWorkflowBtn.click();
@@ -163,7 +172,7 @@ test('Import workflow', async ({ page, project }) => {
 		// not ok, yes combobox
 		await expectBooleanIcon(genericTask, false);
 		await expect(genericTask.getByRole('combobox')).toHaveCount(1);
-		await genericTask.getByRole('combobox').selectOption({ label: '0.0.1' });
+		await genericTask.getByRole('combobox').selectOption({ label: '0.0.1 (core)' });
 		await expectBooleanIcon(genericTask, true);
 		// still ok
 		await expectBooleanIcon(createZarrTask, true);
@@ -182,5 +191,11 @@ test('Import workflow', async ({ page, project }) => {
 		await expect(page.locator('.breadcrumb-item.active')).toContainText(
 			'workflow-with-flexibility'
 		);
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByRole('textbox', { name: 'Name', exact: true }).fill('generic_task');
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+		await page.getByRole('cell', { name: 'Make not core' }).first().click();
 	});
 });
