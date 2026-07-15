@@ -373,6 +373,7 @@ export type TaskGroupV2 = {
 	timestamp_created: string;
 	timestamp_last_used: string;
 	resource_id: number;
+	in_use: boolean;
 };
 
 export type TaskSlim = {
@@ -392,7 +393,6 @@ export type TaskSlim = {
 
 export type TaskGroupSlim = Omit<TaskGroupV2, 'task_list'> & {
 	task_list: TaskSlim[];
-	in_use: boolean;
 };
 
 export type WorkflowTasksTableRowGroup = {
