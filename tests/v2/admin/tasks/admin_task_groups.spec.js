@@ -1,7 +1,6 @@
 import { expect, test } from '../../workflow_fixture.js';
 import {
 	expectBooleanIcon,
-	getRandomName,
 	waitModal,
 	waitModalClosed,
 	waitPageLoading
@@ -173,18 +172,9 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		const row = page.getByRole('row', { name: 'Fake Task' });
 		await expectBooleanIcon(row.getByRole('cell').nth(7), false);
 
-		const name = getRandomName();
-		await page.getByRole('link', { name: 'Projects' }).click();
-		await page.getByRole('button', { name: 'Create new project' }).click();
-		await page.getByRole('textbox', { name: 'Project name' }).fill(name);
-		await page.getByRole('button', { name: 'Create', exact: true }).click();
-		await page.getByRole('button', { name: 'Create new workflow' }).click();
-		await page.getByRole('textbox', { name: 'Workflow name' }).fill(name);
-		await page.getByRole('button', { name: 'Create empty workflow' }).click();
-		await page.getByRole('button', { name: 'Add task to workflow' }).click();
-		const modal = await waitModal(page);
-		await modal.getByRole('row', { name: 'Fake Task' }).getByLabel('Add task').click();
-		await waitModalClosed(page);
+		await page.goto(workflow.url);
+		await waitPageLoading(page);
+		await workflow.addTask('Fake Task');
 
 		await page.goto('/v2/admin/task-groups');
 		await waitPageLoading(page);
@@ -192,11 +182,6 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 
 		const row2 = page.getByRole('row', { name: 'Fake Task' });
 		await expectBooleanIcon(row2.getByRole('cell').nth(7), true);
-
-		await page.getByRole('link', { name: 'Projects' }).click();
-		await page.getByRole('row', { name: name }).getByRole('button', { name: 'Delete' }).click();
-		const modal2 = await waitModal(page);
-		await modal2.getByRole('button', { name: 'Confirm' }).click();
 	});
 });
 
