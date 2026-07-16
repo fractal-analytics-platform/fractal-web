@@ -5,6 +5,11 @@ import userEvent from '@testing-library/user-event';
 // Mocking fetch
 global.fetch = vi.fn();
 
+// Mocking public variables
+vi.mock('$env/dynamic/public', () => {
+	return { env: {} };
+});
+
 // Mocking the page store
 vi.mock('$app/state', () => {
 	return {

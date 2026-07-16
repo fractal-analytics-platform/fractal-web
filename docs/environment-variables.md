@@ -13,9 +13,10 @@ The following environment variables can be used to configure fractal-web.
 - `PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL`: the e-mail address displayed in the home page which can be used to send support requests; if the value is not set nothing is shown;
 - `PUBLIC_UPDATE_JOBS_INTERVAL`: the delay in milliseconds which occurs between two background requests that check for job status updates; the default value is `3000`;
 - `PUBLIC_OAUTH_CLIENT_NAME`: if set, the application enables the external account login via OAuth2; the name is used to create the authorization call sent to fractal-server (see [configuration page](../oauth2/));
-- `LOG_FILE`: the path of the file where logs will be written; by default is unset and no file will be created;
-- `LOG_LEVEL_FILE`: the log level of logs that will be written to the file; the default value is `info`;
-- `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`;
+- `LOG_CONFIG_FILE`: path to a JSON file containing a [log4js configuration object](https://log4js-node.github.io/log4js-node/api.html); when set, this file is used **exclusively** and the `LOG_FILE` / `LOG_LEVEL_FILE` / `LOG_LEVEL_CONSOLE` variables are ignored; it enables multiple rotating log files split by severity level;
+- `LOG_FILE`: the path of the file where logs will be written; by default is unset and no file will be created; ignored when `LOG_CONFIG_FILE` is set;
+- `LOG_LEVEL_FILE`: the log level of logs that will be written to the file; the default value is `info`; ignored when `LOG_CONFIG_FILE` is set;
+- `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`; ignored when `LOG_CONFIG_FILE` is set;
 - `FRACTAL_RUNNER_BACKEND`: specifies which runner backend is used; supported values are: `local`, `slurm`, `slurm_ssh`; setting this variable is mandatory;
 - `PUBLIC_FRACTAL_DATA_URL`: URL to [fractal-data](https://github.com/fractal-analytics-platform/fractal-data) service (e.g. http://localhost:3000/data for testing);
 - `PUBLIC_FRACTAL_VIZARR_VIEWER_URL`: URL to Vizarr viewer (e.g. http://localhost:3000/data/vizarr for testing);
@@ -29,6 +30,8 @@ The following environment variables can be used to configure fractal-web.
 - `PUBLIC_GUEST_PASSWORD`: password for guest user;
 - `FRACTAL_HIDE_BASIC_AUTH`: hides the login form and the "Log in as guest" button; the default value is `false`;
 - `FRACTAL_DISPLAY_CORE_TASK_FILTER`: specifies whether or not to display the "Only core" filter on the user’s tasks page; accepted values: `true` (default), `false`;
+- `PUBLIC_ENABLE_HELP_LINKS`: enable fractal-web User Guide links; default value is `false`;
+- `PUBLIC_HELP_LINKS_BASE_URL`: base URL for fractal-web User Guide site; default value is `/help`;
 
 When running directly using `node` command these extra variables can also be configured:
 

@@ -1,5 +1,19 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.29.3
+
+- Show `In use` on task group admin's page (\#1219).
+- Show whether a task is a core task in import-flexibility (\#1221).
+
+# 1.29.2
+
+- Add `LOG_CONFIG_FILE` environment variable to load an external JSON log4js configuration file; when set, it is used exclusively and `LOG_FILE` / `LOG_LEVEL_FILE` / `LOG_LEVEL_CONSOLE` are ignored. (\#1159).
+
+# 1.29.1
+
+- Add User Guide site and help links (\#1201);
+- Migrate documentation from Mkdos to Zensical (\#1201);
+
 # 1.29.0
 
 - Update CI to add Playwright report to GitHub Pages (\#1194);

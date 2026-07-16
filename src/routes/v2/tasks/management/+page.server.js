@@ -19,6 +19,7 @@ export async function load({ fetch }) {
 	return {
 		user,
 		taskGroups,
-		defaultGroupName
+		defaultGroupName,
+		helpLink: '/reference/task-collection/'
 	};
 }
