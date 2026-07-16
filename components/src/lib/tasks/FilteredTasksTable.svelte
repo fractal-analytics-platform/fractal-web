@@ -444,28 +444,30 @@
 	</div>
 </div>
 
-<div class="d-flex justify-content-end mb-2">
-	<div class="btn-group btn-group-sm mt-1" role="group" aria-label="Preferred version">
-		<input
-			type="radio"
-			class="btn-check"
-			name="preferred"
-			id="preferred-recent"
-			value="recent"
-			bind:group={preferred}
-		/>
-		<label class="btn btn-outline-secondary" for="preferred-recent">Prefer recent</label>
-		<input
-			type="radio"
-			class="btn-check"
-			name="preferred"
-			id="preferred-core"
-			value="core"
-			bind:group={preferred}
-		/>
-		<label class="btn btn-outline-secondary" for="preferred-core">Prefer core</label>
+{#if showOnlyCoreFiltering}
+	<div class="d-flex justify-content-end mb-2">
+		<div class="btn-group btn-group-sm mt-1" role="group" aria-label="Preferred version">
+			<input
+				type="radio"
+				class="btn-check"
+				name="preferred"
+				id="preferred-recent"
+				value="recent"
+				bind:group={preferred}
+			/>
+			<label class="btn btn-outline-secondary" for="preferred-recent">Prefer recent</label>
+			<input
+				type="radio"
+				class="btn-check"
+				name="preferred"
+				id="preferred-core"
+				value="core"
+				bind:group={preferred}
+			/>
+			<label class="btn btn-outline-secondary" for="preferred-core">Prefer core</label>
+		</div>
 	</div>
-</div>
+{/if}
 
 {#if allRows.length === 0}
 	<p class="mt-4">
