@@ -622,4 +622,10 @@
 		color: #1da1f2;
 		line-height: 1;
 	}
+
+	#preferred-core:checked + label {
+		background-color: #1da1f2;
+		border-color: #1da1f2;
+		color: white;
+	}
 </style>
