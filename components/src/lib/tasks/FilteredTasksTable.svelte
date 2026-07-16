@@ -83,7 +83,8 @@
 			packageFilter ||
 			tagFilter ||
 			inputTypeFilter ||
-			coreTasksOnly
+			coreTasksOnly ||
+			preferred === 'core'
 		) {
 			filterRows();
 		} else {
@@ -109,12 +110,26 @@
 					.map((task) => {
 						const taskVersions = task.taskVersions.filter(filterRow);
 						const selectedVersion =
-							taskVersions.length > 0 ? taskVersions[0].version : task.selectedVersion;
+							taskVersions.length > 0 ? getPreferredVersion(taskVersions) : task.selectedVersion;
 						return { selectedVersion, taskVersions };
 					})
 					.filter((task) => task.taskVersions.length > 0)
 			}))
 			.filter((r) => r.tasks.length > 0);
+	}
+
+	/**
+	 * @param {Array<import('../types/api').TasksTableRow>} taskVersions
+	 * @returns {string}
+	 */
+	function getPreferredVersion(taskVersions) {
+		if (preferred === 'core') {
+			const mostRecentCore = taskVersions.find((t) => t.is_core);
+			if (mostRecentCore) {
+				return mostRecentCore.version;
+			}
+		}
+		return taskVersions[0].version;
 	}
 
 	/**
@@ -428,6 +443,30 @@
 		</div>
 	</div>
 </div>
+
+<div class="col-auto mb-2">
+	<div class="btn-group btn-group-sm mt-1" role="group" aria-label="Preferred version">
+		<input
+			type="radio"
+			class="btn-check"
+			name="preferred"
+			id="preferred-recent"
+			value="recent"
+			bind:group={preferred}
+		/>
+		<label class="btn btn-outline-secondary" for="preferred-recent">Prefer recent</label>
+		<input
+			type="radio"
+			class="btn-check"
+			name="preferred"
+			id="preferred-core"
+			value="core"
+			bind:group={preferred}
+		/>
+		<label class="btn btn-outline-secondary" for="preferred-core">Prefer core</label>
+	</div>
+</div>
+
 {#if allRows.length === 0}
 	<p class="mt-4">
 		There are no available tasks. You can add new tasks on the
