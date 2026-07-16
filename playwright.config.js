@@ -62,8 +62,7 @@ export default defineConfig({
 
 	webServer: [
 		{
-			command:
-				'./tests/start-test-server.sh --branch 3400-include-is_core-in-availabletask-for-workflow-import',
+			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
 			waitForPort: true,
 			stdout: 'pipe',
