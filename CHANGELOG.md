@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# 1.29.3 (unreleased)
+# 1.29.3
 
 - Show `In use` on task group admin's page (\#1219).
 - Show whether a task is a core task in import-flexibility (\#1221).
