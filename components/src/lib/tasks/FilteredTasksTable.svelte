@@ -444,7 +444,7 @@
 	</div>
 </div>
 
-<div class="col-auto mb-2">
+<div class="d-flex justify-content-end mb-2">
 	<div class="btn-group btn-group-sm mt-1" role="group" aria-label="Preferred version">
 		<input
 			type="radio"
