@@ -14,12 +14,26 @@
 		modal?.hideErrorAlert();
 		const response = await fetch(`/api/v2/job/squeue?scope=${scope}`);
 		if (response.ok) {
-			output = await response.text();
+			output = trimInitialSpaces(await response.text());
 		} else {
 			const error = await getAlertErrorFromResponse(response);
 			modal?.displayErrorAlert(error);
 		}
 		loading = false;
+	}
+
+	/**
+	 * @param {string} output
+	 */
+	function trimInitialSpaces(output) {
+		const lines = output.split('\n');
+		if (lines.length > 0) {
+			const match = lines[0].match(/^ */);
+			if (match) {
+				return lines.map((l) => l.substring(match[0].length)).join('\n');
+			}
+		}
+		return output;
 	}
 </script>
 
@@ -40,7 +54,7 @@
 						bind:group={scope}
 						onchange={() => getSqueue()}
 					/>
-					<label class="form-check-label" for="scopeAllSelector">all</label>
+					<label class="form-check-label" for="scopeAllSelector">All</label>
 				</div>
 				<div class="form-check form-check-inline">
 					<input
@@ -52,7 +66,7 @@
 						bind:group={scope}
 						onchange={() => getSqueue()}
 					/>
-					<label class="form-check-label" for="scopeUserSelector">user</label>
+					<label class="form-check-label" for="scopeUserSelector">My Slurm user</label>
 				</div>
 				<div class="form-check form-check-inline">
 					<input
@@ -64,7 +78,7 @@
 						bind:group={scope}
 						onchange={() => getSqueue()}
 					/>
-					<label class="form-check-label" for="scopeAccountsSelector">accounts</label>
+					<label class="form-check-label" for="scopeAccountsSelector">My Slurm accounts</label>
 				</div>
 			</div>
 		</div>

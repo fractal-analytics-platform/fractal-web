@@ -26,7 +26,7 @@ describe('SqueueModal', () => {
 		const user = userEvent.setup();
 		const mockApi = mockSqueueCallSuccess();
 		render(SqueueModal);
-		await user.click(screen.getByRole('radio', { name: 'user' }));
+		await user.click(screen.getByRole('radio', { name: 'My Slurm user' }));
 		expect(mockApi).toHaveBeenCalledWith(expect.stringContaining('?scope=user'));
 		expect(screen.getByText(/fake-command-output/)).toBeVisible();
 	});
@@ -35,7 +35,7 @@ describe('SqueueModal', () => {
 		const user = userEvent.setup();
 		const mockApi = mockSqueueCallSuccess();
 		render(SqueueModal);
-		await user.click(screen.getByRole('radio', { name: 'accounts' }));
+		await user.click(screen.getByRole('radio', { name: 'My Slurm accounts' }));
 		expect(mockApi).toHaveBeenCalledWith(expect.stringContaining('?scope=accounts'));
 		expect(screen.getByText(/fake-command-output/)).toBeVisible();
 	});
@@ -44,7 +44,7 @@ describe('SqueueModal', () => {
 		const user = userEvent.setup();
 		const mockApi = mockSqueueCallError();
 		render(SqueueModal);
-		await user.click(screen.getByRole('radio', { name: 'accounts' }));
+		await user.click(screen.getByRole('radio', { name: 'My Slurm accounts' }));
 		expect(mockApi).toHaveBeenCalledWith(expect.stringContaining('?scope=accounts'));
 		expect(screen.getByText(/squeue error/)).toBeVisible();
 	});
