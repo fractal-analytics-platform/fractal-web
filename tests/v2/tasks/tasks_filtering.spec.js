@@ -63,6 +63,11 @@ async function testFiltering(page) {
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })).toBeVisible();
 
+	await selectVersionPreference(page, 'Prefer core');
+	await expect(rows).toHaveCount(4);
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })).toBeVisible();
+
 	await selectVersionPreference(page, 'Core only');
 	await expect(rows).toHaveCount(3);
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
