@@ -50,10 +50,9 @@
 	let tagSelector = undefined;
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
-	let coreTasksOnly = $state(false);
 
-	/** @type {'recent' | 'core'} */
-	let preferred = $state('recent');
+	/** @type {'recent' | 'core' | 'core-only'} */
+	let versionPreference = $state('recent');
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -83,8 +82,8 @@
 			packageFilter ||
 			tagFilter ||
 			inputTypeFilter ||
-			coreTasksOnly ||
-			preferred === 'core'
+			versionPreference === 'core' ||
+			versionPreference === 'core-only'
 		) {
 			filterRows();
 		} else {
@@ -110,7 +109,7 @@
 					.map((task) => {
 						const taskVersions = task.taskVersions.filter(filterRow);
 						const selectedVersion =
-							taskVersions.length > 0 ? getPreferredVersion(taskVersions) : task.selectedVersion;
+							taskVersions.length > 0 ? getRecentVersion(taskVersions) : task.selectedVersion;
 						return { selectedVersion, taskVersions };
 					})
 					.filter((task) => task.taskVersions.length > 0)
@@ -122,8 +121,8 @@
 	 * @param {Array<import('../types/api').TasksTableRow>} taskVersions
 	 * @returns {string}
 	 */
-	function getPreferredVersion(taskVersions) {
-		if (preferred === 'core') {
+	function getRecentVersion(taskVersions) {
+		if (versionPreference === 'core') {
 			const mostRecentCore = taskVersions.find((t) => t.is_core);
 			if (mostRecentCore) {
 				return mostRecentCore.version;
@@ -152,7 +151,7 @@
 	 * @returns {boolean}
 	 */
 	function onlyCoreMatch(row) {
-		return coreTasksOnly ? row.is_core : true;
+		return versionPreference === 'core-only' ? row.is_core : true;
 	}
 
 	/**
@@ -237,7 +236,7 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
-		coreTasksOnly = false;
+		versionPreference = 'recent';
 	}
 
 	/**
@@ -319,6 +318,7 @@
 	}
 
 	onMount(() => {
+		versionPreference = 'recent';
 		categorySelector = setSlimSelect('category-filter', 'Select category', 'Category', (value) => {
 			categoryFilter = value;
 		});
@@ -331,7 +331,6 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
-		coreTasksOnly = false;
 		setup();
 	});
 
@@ -424,22 +423,6 @@
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
 			</div>
-			{#if showOnlyCoreFiltering}
-				<div class="col-auto">
-					<div class="form-check form-switch mt-2">
-						<input
-							id="coreTasksOnly"
-							class="form-check-input"
-							type="checkbox"
-							bind:checked={coreTasksOnly}
-						/>
-						<label class="form-check-label" for="coreTasksOnly">
-							<i class="bi bi-patch-check-fill verified-core-icon"></i>
-							Core only
-						</label>
-					</div>
-				</div>
-			{/if}
 		</div>
 	</div>
 </div>
@@ -450,21 +433,33 @@
 			<input
 				type="radio"
 				class="btn-check"
-				name="preferred"
-				id="preferred-recent"
+				name="version-preference"
+				id="version-preference-recent"
 				value="recent"
-				bind:group={preferred}
+				autocomplete="off"
+				bind:group={versionPreference}
 			/>
-			<label class="btn btn-outline-secondary" for="preferred-recent">Prefer recent</label>
+			<label class="btn btn-outline-secondary" for="version-preference-recent">Prefer recent</label>
 			<input
 				type="radio"
 				class="btn-check"
-				name="preferred"
-				id="preferred-core"
+				name="version-preference"
+				id="version-preference-core"
 				value="core"
-				bind:group={preferred}
+				autocomplete="off"
+				bind:group={versionPreference}
 			/>
-			<label class="btn btn-outline-secondary" for="preferred-core">Prefer core</label>
+			<label class="btn btn-outline-secondary" for="version-preference-core">Prefer core</label>
+			<input
+				type="radio"
+				class="btn-check"
+				name="version-preference"
+				id="version-preference-core-only"
+				value="core-only"
+				autocomplete="off"
+				bind:group={versionPreference}
+			/>
+			<label class="btn btn-outline-secondary" for="version-preference-core-only">Core only</label>
 		</div>
 	</div>
 {/if}
@@ -623,11 +618,5 @@
 	.verified-core-icon {
 		color: #1da1f2;
 		line-height: 1;
-	}
-
-	#preferred-core:checked + label {
-		background-color: #1da1f2;
-		border-color: #1da1f2;
-		color: white;
 	}
 </style>
