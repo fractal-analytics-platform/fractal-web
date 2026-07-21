@@ -10,10 +10,12 @@
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
 	import SlimSelect from 'slim-select';
+	import SqueueModal from './SqueueModal.svelte';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {() => Promise<import('fractal-components/types/api').JobV2[]>} jobUpdater
+	 * @property {string} runnerBackend
 	 * @property {Array<string>} [columnsToHide]
 	 * @property {boolean} [admin]
 	 * @property {import('svelte').Snippet} [buttons]
@@ -24,6 +26,7 @@
 	/** @type {Props} */
 	let {
 		jobUpdater,
+		runnerBackend,
 		columnsToHide = [],
 		admin = false,
 		buttons = undefined,
@@ -431,6 +434,11 @@
 
 <div class="d-flex justify-content-end align-items-center mb-3">
 	<div>
+		{#if runnerBackend === 'slurm_ssh' || runnerBackend === 'slurm_sudo'}
+			<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#squeueModal">
+				View cluster queue
+			</button>
+		{/if}
 		{#if !admin}
 			<button class="btn btn-warning" onclick={clearFilters}>
 				<i class="bi-x-square"></i>
@@ -637,6 +645,7 @@
 
 <JobInfoModal bind:this={jobInfoModal} />
 <JobLogsModal bind:this={jobLogsModal} />
+<SqueueModal />
 
 <style>
 	.jobs-table {

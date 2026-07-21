@@ -43,6 +43,11 @@
 	</div>
 
 	<div class="container">
-		<JobsList columnsToHide={['project', 'workflow', 'id']} {jobUpdater} {selectedDataset} />
+		<JobsList
+			columnsToHide={['project', 'workflow', 'id']}
+			{jobUpdater}
+			{selectedDataset}
+			runnerBackend={page.data.runnerBackend}
+		/>
 	</div>
 {/if}
