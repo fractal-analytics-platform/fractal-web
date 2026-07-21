@@ -63,7 +63,7 @@ async function testFiltering(page) {
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })).toBeVisible();
 
-	await page.getByRole('checkbox', { name: 'Core only' }).check();
+	await selectVersionPreference(page, 'Core only');
 	await expect(rows).toHaveCount(3);
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
 	await expect(
@@ -72,7 +72,7 @@ async function testFiltering(page) {
 
 	await deselect(modalityFilter);
 	await deselect(categoryFilter);
-	await page.getByRole('checkbox', { name: 'Core only' }).uncheck();
+	await selectVersionPreference(page, 'Prefer recent');
 	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 
 	await selectSlimSelect(page, tagFilter, 'Deep Learning');
@@ -95,6 +95,15 @@ async function testFiltering(page) {
  */
 async function deselect(selector) {
 	await selector.locator('.ss-deselect').click();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {'Prefer recent' | 'Prefer core' | 'Core only'} label
+ */
+async function selectVersionPreference(page, label) {
+	await page.getByText(label, { exact: true }).click();
+	await expect(page.getByRole('radio', { name: label })).toBeChecked();
 }
 
 /**
