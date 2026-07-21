@@ -35,7 +35,7 @@ describe('JobsList', () => {
 	it('display, filter and sort jobs', async () => {
 		const user = userEvent.setup();
 		const result = render(JobsList, {
-			props: { jobUpdater: vi.fn() }
+			props: { jobUpdater: vi.fn(), runnerBackend: 'slurm_ssh' }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
@@ -113,7 +113,7 @@ describe('JobsList', () => {
 
 	it('cancel job', async () => {
 		const result = render(JobsList, {
-			props: { jobUpdater: vi.fn() }
+			props: { jobUpdater: vi.fn(), runnerBackend: 'slurm_ssh' }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
@@ -130,7 +130,7 @@ describe('JobsList', () => {
 
 	it('error while cancelling job', async () => {
 		const result = render(JobsList, {
-			props: { jobUpdater: vi.fn() }
+			props: { jobUpdater: vi.fn(), runnerBackend: 'slurm_ssh' }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(3);
@@ -157,7 +157,7 @@ describe('JobsList', () => {
 				return data.jobs.map((j) => (j.status === 'submitted' ? { ...j, status: 'done' } : j));
 			};
 			const result = render(JobsList, {
-				props: { jobUpdater }
+				props: { jobUpdater, runnerBackend: 'slurm_ssh' }
 			});
 			let table = result.getByRole('table');
 			expect(table.querySelectorAll('tbody tr').length).eq(3);
@@ -183,7 +183,7 @@ describe('JobsList', () => {
 
 	it('pre-select dataset', async () => {
 		const result = render(JobsList, {
-			props: { jobUpdater: vi.fn(), selectedDataset: '2' }
+			props: { jobUpdater: vi.fn(), selectedDataset: '2', runnerBackend: 'slurm_ssh' }
 		});
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
