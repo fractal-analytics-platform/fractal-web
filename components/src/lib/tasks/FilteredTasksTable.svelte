@@ -236,7 +236,6 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
-		versionPreference = 'recent';
 	}
 
 	/**
