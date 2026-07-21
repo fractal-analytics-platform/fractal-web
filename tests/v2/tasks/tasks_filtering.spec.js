@@ -77,7 +77,7 @@ async function testFiltering(page) {
 
 	await deselect(modalityFilter);
 	await deselect(categoryFilter);
-	await selectVersionPreference(page, 'Prefer recent');
+	await selectVersionPreference(page, 'Show all');
 	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 
 	await selectSlimSelect(page, tagFilter, 'Deep Learning');
@@ -104,7 +104,7 @@ async function deselect(selector) {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {'Prefer recent' | 'Prefer core' | 'Core only'} label
+ * @param {'Show all' | 'Prefer core' | 'Core only'} label
  */
 async function selectVersionPreference(page, label) {
 	await page.getByText(label, { exact: true }).click();

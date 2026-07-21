@@ -51,8 +51,8 @@
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
 
-	/** @type {'recent' | 'core' | 'core-only'} */
-	let versionPreference = $state('recent');
+	/** @type {'show-all' | 'core' | 'core-only'} */
+	let versionPreference = $state('show-all');
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -317,7 +317,7 @@
 	}
 
 	onMount(() => {
-		versionPreference = 'recent';
+		versionPreference = 'show-all';
 		categorySelector = setSlimSelect('category-filter', 'Select category', 'Category', (value) => {
 			categoryFilter = value;
 		});
@@ -433,12 +433,12 @@
 				type="radio"
 				class="btn-check"
 				name="version-preference"
-				id="version-preference-recent"
-				value="recent"
+				id="version-show-all"
+				value="show-all"
 				autocomplete="off"
 				bind:group={versionPreference}
 			/>
-			<label class="btn btn-outline-secondary" for="version-preference-recent">Prefer recent</label>
+			<label class="btn btn-outline-secondary" for="version-show-all">Show all</label>
 			<input
 				type="radio"
 				class="btn-check"
