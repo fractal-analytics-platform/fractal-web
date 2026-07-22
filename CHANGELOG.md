@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# 1.29.4 (unreleased)
+
+- Expose core-related filtering/ordering options in task list (\#1225).
+
 # 1.29.3
 
 - Show `In use` on task group admin's page (\#1219).
