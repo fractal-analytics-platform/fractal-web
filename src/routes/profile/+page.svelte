@@ -23,10 +23,14 @@
 	/** @type {string[]} */
 	let slurmAccounts = $state([]);
 	let slurmAccountsError = $state('');
+	/** @type {string[]} */
+	let slurmAccountsErrors = $state([]);
 
 	let userUpdatedMessage = $state('');
 
 	function addSlurmAccount() {
+		slurmAccountsErrors = [];
+		slurmAccountsError = '';
 		slurmAccounts = [...slurmAccounts, ''];
 	}
 
@@ -34,6 +38,8 @@
 	 * @param {number} index
 	 */
 	function removeSlurmAccount(index) {
+		slurmAccountsErrors = [];
+		slurmAccountsError = '';
 		slurmAccounts = slurmAccounts.filter((_, i) => i !== index);
 	}
 
@@ -43,6 +49,7 @@
 		}
 		userUpdatedMessage = '';
 		slurmAccountsError = '';
+		slurmAccountsErrors = [];
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 		const payload = {
@@ -62,7 +69,11 @@
 			let errorShown = false;
 			if (errorMap) {
 				if ('slurm_accounts' in errorMap) {
-					slurmAccountsError = /** @type {string} */ (errorMap['slurm_accounts']);
+					if (Array.isArray(errorMap['slurm_accounts'])) {
+						slurmAccountsErrors = errorMap['slurm_accounts'];
+					} else {
+						slurmAccountsError = errorMap['slurm_accounts'];
+					}
 					errorShown = true;
 				}
 			}
@@ -185,16 +196,19 @@
 							<th>SLURM accounts</th>
 							<td>
 								<div class="row">
-									<div class="col has-validation">
+									<div class="col">
 										<!-- eslint-disable-next-line no-unused-vars -->
 										{#each slurmAccounts as _, i (i)}
-											<div class="input-group mb-2" class:is-invalid={slurmAccountsError}>
+											<div
+												class="input-group has-validation mb-2"
+												class:is-invalid={slurmAccountsError || slurmAccountsErrors.length > 0}
+											>
 												<input
 													type="text"
 													class="form-control"
 													id={`slurmAccount-${i}`}
 													bind:value={slurmAccounts[i]}
-													class:is-invalid={slurmAccountsError}
+													class:is-invalid={slurmAccountsError || slurmAccountsErrors[i]}
 													aria-label="SLURM account {i + 1}"
 													required
 												/>
@@ -207,6 +221,9 @@
 												>
 													<i class="bi bi-trash"></i>
 												</button>
+												<span class="invalid-feedback" class:mb-2={slurmAccountsErrors[i]}>
+													{slurmAccountsErrors[i]}
+												</span>
 											</div>
 										{/each}
 										<span class="invalid-feedback mb-2">{slurmAccountsError}</span>
