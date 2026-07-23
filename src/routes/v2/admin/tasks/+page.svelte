@@ -512,7 +512,7 @@
 							}}
 							aria-label="Make all not core"
 						>
-							<i class="bi bi-patch-check text-secondary"></i>
+							<i class="bi bi-patch-check"></i>
 							Make not core
 						</button>
 					{/if}

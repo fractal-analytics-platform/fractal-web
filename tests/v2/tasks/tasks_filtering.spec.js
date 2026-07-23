@@ -1,5 +1,6 @@
 import { expect, test } from '../workflow_fixture.js';
 import { selectSlimSelect, waitModal, waitPageLoading } from '../../utils/utils.js';
+import { checkAccessibility } from '../../base_fixture.js';
 
 const NUM_MOCK_TASKS = 20;
 
@@ -28,7 +29,10 @@ test('Tasks filtering', async ({ page, workflow }) => {
 
 	await test.step('Open add task to workflow modal and filter values', async () => {
 		await page.getByRole('button', { name: 'Add task to workflow' }).click();
-		await waitModal(page);
+		await waitModal(page, false);
+		// wait for coloured badges buttons to be populated
+		await expect(page.getByRole('button', { name: 'Conversion' }).first()).toBeVisible();
+		await checkAccessibility(page, '.modal.show');
 		await testFiltering(page);
 	});
 
@@ -59,7 +63,12 @@ async function testFiltering(page) {
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })).toBeVisible();
 
-	await page.getByRole('checkbox', { name: 'Core only' }).check();
+	await selectVersionPreference(page, 'Prefer core');
+	await expect(rows).toHaveCount(4);
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
+	await expect(page.getByRole('row', { name: 'create_ome_zarr_multiplex_compound' })).toBeVisible();
+
+	await selectVersionPreference(page, 'Core only');
 	await expect(rows).toHaveCount(3);
 	await expect(page.getByRole('row', { name: 'create_ome_zarr_compound' })).toBeVisible();
 	await expect(
@@ -68,7 +77,7 @@ async function testFiltering(page) {
 
 	await deselect(modalityFilter);
 	await deselect(categoryFilter);
-	await page.getByRole('checkbox', { name: 'Core only' }).uncheck();
+	await selectVersionPreference(page, 'Show all');
 	await expect(rows).toHaveCount(NUM_MOCK_TASKS);
 
 	await selectSlimSelect(page, tagFilter, 'Deep Learning');
@@ -91,6 +100,15 @@ async function testFiltering(page) {
  */
 async function deselect(selector) {
 	await selector.locator('.ss-deselect').click();
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {'Show all' | 'Prefer core' | 'Core only'} label
+ */
+async function selectVersionPreference(page, label) {
+	await page.getByText(label, { exact: true }).click();
+	await expect(page.getByRole('radio', { name: label })).toBeChecked();
 }
 
 /**

@@ -50,7 +50,9 @@
 	let tagSelector = undefined;
 	let tagFilter = $state('');
 	let inputTypeFilter = $state('');
-	let coreTasksOnly = $state(false);
+
+	/** @type {'show-all' | 'core' | 'core-only'} */
+	let versionPreference = $state('show-all');
 
 	let groupByLabels = {
 		pkg_name: 'Task'
@@ -80,7 +82,8 @@
 			packageFilter ||
 			tagFilter ||
 			inputTypeFilter ||
-			coreTasksOnly
+			versionPreference === 'core' ||
+			versionPreference === 'core-only'
 		) {
 			filterRows();
 		} else {
@@ -106,12 +109,26 @@
 					.map((task) => {
 						const taskVersions = task.taskVersions.filter(filterRow);
 						const selectedVersion =
-							taskVersions.length > 0 ? taskVersions[0].version : task.selectedVersion;
+							taskVersions.length > 0 ? getRecentVersion(taskVersions) : task.selectedVersion;
 						return { selectedVersion, taskVersions };
 					})
 					.filter((task) => task.taskVersions.length > 0)
 			}))
 			.filter((r) => r.tasks.length > 0);
+	}
+
+	/**
+	 * @param {Array<import('../types/api').TasksTableRow>} taskVersions
+	 * @returns {string}
+	 */
+	function getRecentVersion(taskVersions) {
+		if (versionPreference === 'core') {
+			const mostRecentCore = taskVersions.find((t) => t.is_core);
+			if (mostRecentCore) {
+				return mostRecentCore.version;
+			}
+		}
+		return taskVersions[0].version;
 	}
 
 	/**
@@ -134,7 +151,7 @@
 	 * @returns {boolean}
 	 */
 	function onlyCoreMatch(row) {
-		return coreTasksOnly ? row.is_core : true;
+		return versionPreference === 'core-only' ? row.is_core : true;
 	}
 
 	/**
@@ -219,7 +236,6 @@
 		modalitySelector?.setSelected('');
 		packageSelector?.setSelected('');
 		tagSelector?.setSelected('');
-		coreTasksOnly = false;
 	}
 
 	/**
@@ -301,6 +317,7 @@
 	}
 
 	onMount(() => {
+		versionPreference = 'show-all';
 		categorySelector = setSlimSelect('category-filter', 'Select category', 'Category', (value) => {
 			categoryFilter = value;
 		});
@@ -313,7 +330,6 @@
 		tagSelector = setSlimSelect('tag-filter', 'Select tag', 'Tag', (value) => {
 			tagFilter = value;
 		});
-		coreTasksOnly = false;
 		setup();
 	});
 
@@ -406,25 +422,47 @@
 			<div class="col">
 				<select id="tag-filter" class="invisible"></select>
 			</div>
-			{#if showOnlyCoreFiltering}
-				<div class="col-auto">
-					<div class="form-check form-switch mt-2">
-						<input
-							id="coreTasksOnly"
-							class="form-check-input"
-							type="checkbox"
-							bind:checked={coreTasksOnly}
-						/>
-						<label class="form-check-label" for="coreTasksOnly">
-							<i class="bi bi-patch-check-fill verified-core-icon"></i>
-							Core only
-						</label>
-					</div>
-				</div>
-			{/if}
 		</div>
 	</div>
 </div>
+
+{#if showOnlyCoreFiltering}
+	<div class="d-flex justify-content-end mb-2">
+		<div class="btn-group btn-group-sm mt-1" role="group" aria-label="Preferred version">
+			<input
+				type="radio"
+				class="btn-check"
+				name="version-preference"
+				id="version-show-all"
+				value="show-all"
+				autocomplete="off"
+				bind:group={versionPreference}
+			/>
+			<label class="btn btn-outline-secondary" for="version-show-all">Show all</label>
+			<input
+				type="radio"
+				class="btn-check"
+				name="version-preference"
+				id="version-preference-core"
+				value="core"
+				autocomplete="off"
+				bind:group={versionPreference}
+			/>
+			<label class="btn btn-outline-secondary" for="version-preference-core">Prefer core</label>
+			<input
+				type="radio"
+				class="btn-check"
+				name="version-preference"
+				id="version-preference-core-only"
+				value="core-only"
+				autocomplete="off"
+				bind:group={versionPreference}
+			/>
+			<label class="btn btn-outline-secondary" for="version-preference-core-only">Core only</label>
+		</div>
+	</div>
+{/if}
+
 {#if allRows.length === 0}
 	<p class="mt-4">
 		There are no available tasks. You can add new tasks on the

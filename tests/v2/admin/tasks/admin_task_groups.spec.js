@@ -1,5 +1,10 @@
 import { expect, test } from '../../workflow_fixture.js';
-import { waitModal, waitModalClosed, waitPageLoading } from '../../../utils/utils.js';
+import {
+	expectBooleanIcon,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../../utils/utils.js';
 import { createFakeTask } from '../../../utils/v2/task.js';
 import { checkAccessibility } from '../../../base_fixture.js';
 
@@ -114,6 +119,69 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await expect(page.locator('#last_used_time_min')).toHaveValue('');
 		await expect(page.locator('#last_used_date_max')).toHaveValue('');
 		await expect(page.locator('#last_used_time_max')).toHaveValue('');
+	});
+
+	await test.step('Task group core', async () => {
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByLabel('Core').selectOption('true');
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+
+		await expect(page.getByText('The query returned 0 matching')).toBeVisible();
+
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await page.getByRole('row', { name: 'fractal-tasks-mock' }).getByLabel('Manage').click();
+		await page.getByRole('button', { name: 'Make all core' }).click();
+
+		await expect(
+			page.getByText(/All tasks of task group \d+ have been set to core\./)
+		).toBeVisible();
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByLabel('Core').selectOption('true');
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+
+		await expect(page.getByText('Total results: 18')).toBeVisible();
+
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+		await page.getByRole('row', { name: 'fractal-tasks-mock' }).getByLabel('Manage').click();
+		await page.getByRole('button', { name: 'Make all not core' }).click();
+
+		await expect(
+			page.getByText(/All tasks of task group \d+ have been set to not core\./)
+		).toBeVisible();
+
+		await page.goto('/v2/admin/tasks');
+		await waitPageLoading(page);
+		await page.getByLabel('Core').selectOption('true');
+		await page.getByRole('button', { name: 'Search tasks' }).click();
+
+		await expect(page.getByText('The query returned 0 matching')).toBeVisible();
+	});
+
+	await test.step('Task group in use', async () => {
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+
+		const row = page.getByRole('row', { name: 'Fake Task' });
+		await expectBooleanIcon(row.getByRole('cell').nth(7), false);
+
+		await page.goto(workflow.url);
+		await waitPageLoading(page);
+		await workflow.addTask('Fake Task');
+
+		await page.goto('/v2/admin/task-groups');
+		await waitPageLoading(page);
+		await page.getByRole('button', { name: 'Search task groups' }).click();
+
+		const row2 = page.getByRole('row', { name: 'Fake Task' });
+		await expectBooleanIcon(row2.getByRole('cell').nth(7), true);
 	});
 });
 

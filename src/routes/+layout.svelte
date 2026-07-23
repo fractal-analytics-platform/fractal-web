@@ -11,6 +11,8 @@
 	import { onMount } from 'svelte';
 	import { navigating, navigationCancelled } from '$lib/stores';
 	import { resolve } from '$app/paths';
+	import HelpModal from '$lib/components/common/HelpModal.svelte';
+	import HelpLink from '$lib/components/common/HelpLink.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -24,15 +26,29 @@
 	// eslint-disable-next-line no-undef
 	let clientVersion = __APP_VERSION__;
 
+	function getOpenedModal() {
+		const modalElement = document.querySelector('.modal.show');
+		if (modalElement instanceof HTMLElement) {
+			// @ts-ignore
+			// eslint-disable-next-line no-undef
+			return bootstrap.Modal.getInstance(modalElement);
+		}
+	}
+
 	/**
-	 * Removes the modal backdrop that remains stuck at page change.
+	 * Removes the modals or modal backdrops that remains stuck at page change.
 	 */
 	function cleanupModalBackdrop() {
-		document.querySelector('.modal-backdrop')?.remove();
-		const body = document.querySelector('body');
-		body?.classList.remove('modal-open');
-		body?.style.removeProperty('overflow');
-		body?.style.removeProperty('padding-right');
+		const modal = getOpenedModal();
+		if (modal) {
+			modal.hide();
+		} else {
+			document.querySelector('.modal-backdrop')?.remove();
+			const body = document.querySelector('body');
+			body?.classList.remove('modal-open');
+			body?.style.removeProperty('overflow');
+			body?.style.removeProperty('padding-right');
+		}
 	}
 
 	if (browser) {
@@ -71,7 +87,13 @@
 		}
 	});
 
-	beforeNavigate(async () => {
+	beforeNavigate(async (navigation) => {
+		const modal = getOpenedModal();
+		if (modal && navigation.delta === -1) {
+			modal.hide();
+			navigation.cancel();
+			return;
+		}
 		if (!$navigationCancelled) {
 			navigating.set(true);
 		}
@@ -128,6 +150,7 @@
 	const server = $derived(page.data.serverInfo || {});
 	const warningBanner = $derived(page.data.warningBanner);
 	const userEmail = $derived(userLoggedIn ? page.data.userInfo.email : undefined);
+	const helpLink = $derived(page.data.helpLink);
 </script>
 
 <svelte:head>
@@ -174,6 +197,9 @@
 							</a>
 						</li>
 					{/if}
+					<li class="nav-item">
+						<HelpLink url={helpLink} />
+					</li>
 				{/if}
 			</ul>
 			<ul class="nav">
@@ -298,6 +324,7 @@
 			</div>
 		</div>
 	</div>
+	<HelpModal />
 </main>
 
 <style>

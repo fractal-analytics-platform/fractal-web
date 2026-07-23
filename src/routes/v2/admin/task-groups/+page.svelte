@@ -8,6 +8,7 @@
 	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
 	import Paginator from '$lib/components/common/Paginator.svelte';
+	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User>} */
 	const users = $derived(page.data.users || []);
@@ -28,6 +29,8 @@
 	let privateGroup = $state(null);
 	/** @type {boolean|null} */
 	let active = $state(null);
+	/** @type {boolean|null} */
+	let inUse = $state(null);
 	let lastUsedDateMin = $state();
 	let lastUsedTimeMin = $state('');
 	let lastUsedDateMax = $state('');
@@ -38,20 +41,22 @@
 	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>|undefined} */
+	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>|undefined} */
 	let results = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(50);
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
-	/** @type {import('fractal-components/types/api').TaskGroupV2|null} */
+	/** @type {import('fractal-components/types/api').TaskGroupSlim|null} */
 	let selectedTaskGroup = $state(null);
 
 	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
 	let taskGroupEditModal = $state();
 	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
+
+	let coreSuccessMessage = $state('');
 
 	/**
 	 * @param {number} newCurrentPage
@@ -90,6 +95,9 @@
 			if (active !== null) {
 				url.searchParams.append('active', active.toString());
 			}
+			if (inUse !== null) {
+				url.searchParams.append('in_use', inUse.toString());
+			}
 			const lasUsedTimestampMin = getTimestamp(lastUsedDateMin, lastUsedTimeMin);
 			if (lasUsedTimestampMin) {
 				url.searchParams.append('timestamp_last_used_min', lasUsedTimestampMin);
@@ -107,7 +115,7 @@
 				return;
 			}
 			searched = true;
-			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupV2>} */
+			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>} */
 			const data = await response.json();
 			results = data;
 			pageSize = data.page_size;
@@ -133,6 +141,7 @@
 		lastUsedTimeMax = '';
 		privateGroup = null;
 		active = null;
+		inUse = null;
 		searched = false;
 		results = undefined;
 		currentPage = 1;
@@ -141,7 +150,7 @@
 
 	/**
 	 *
-	 * @param {import('fractal-components/types/api').TaskGroupV2} taskGroup
+	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroup
 	 */
 	function openInfoModal(taskGroup) {
 		selectedTaskGroup = taskGroup;
@@ -203,6 +212,22 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="origin">Origin</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={origin} id="origin">
+								<option value="">Select...</option>
+								<option value="pypi">PyPI</option>
+								<option value="wheel-file">Wheel file</option>
+								<option value="pixi">Pixi</option>
+								<option value="other">Other</option>
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<div class="row mt-lg-3">
@@ -239,6 +264,24 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
+							<label for="resource">Resource</label>
+						</div>
+						<div class="col-xl-8 col-lg-7 col-9">
+							<select class="form-select" bind:value={resource} id="resource">
+								<option value="">Select...</option>
+								{#each resources as resource (resource.id)}
+									<option value={resource.id}>{resource.name}</option>
+								{/each}
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-lg-3">
+				<div class="col-lg-4 pe-5">
+					<div class="row mt-1">
+						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
 							<label for="private">Private</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
@@ -250,9 +293,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="row mt-lg-3">
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
@@ -270,30 +310,13 @@
 				<div class="col-lg-4 pe-5">
 					<div class="row mt-1">
 						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="origin">Origin</label>
+							<label for="in_use">In use</label>
 						</div>
 						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={origin} id="origin">
-								<option value="">Select...</option>
-								<option value="pypi">PyPI</option>
-								<option value="wheel-file">Wheel file</option>
-								<option value="pixi">Pixi</option>
-								<option value="other">Other</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pe-5">
-					<div class="row mt-1">
-						<div class="col-xl-4 col-lg-5 col-3 col-form-label">
-							<label for="resource">Resource</label>
-						</div>
-						<div class="col-xl-8 col-lg-7 col-9">
-							<select class="form-select" bind:value={resource} id="resource">
-								<option value="">Select...</option>
-								{#each resources as resource (resource.id)}
-									<option value={resource.id}>{resource.name}</option>
-								{/each}
+							<select class="form-select" bind:value={inUse} id="in_use">
+								<option value={null}>Select...</option>
+								<option value={true}>True</option>
+								<option value={false}>False</option>
 							</select>
 						</div>
 					</div>
@@ -362,6 +385,7 @@
 
 	<div id="searchError" class="mt-3 mb-3"></div>
 
+	<StandardDismissableAlert message={coreSuccessMessage} />
 	{#if results}
 		<div class:d-none={!searched}>
 			<p class="text-center">
@@ -379,7 +403,8 @@
 							<col width="90" />
 							<col width="190" />
 							<col width="100" />
-							<col width="190" />
+							<col width="150" />
+							<col width="90" />
 							<col width="90" />
 							<col width="90" />
 							<col width="90" />
@@ -394,6 +419,7 @@
 								<th>Group</th>
 								<th>Resource</th>
 								<th>Active</th>
+								<th>In use</th>
 								<th>Origin</th>
 								<th># Tasks</th>
 								<th>Options</th>
@@ -410,6 +436,9 @@
 									<td>{getResourceName(taskGroup.resource_id)}</td>
 									<td>
 										<BooleanIcon value={taskGroup.active} />
+									</td>
+									<td>
+										<BooleanIcon value={taskGroup.in_use} />
 									</td>
 									<td>{taskGroup.origin || '-'}</td>
 									<td>{taskGroup.task_list.length}</td>
@@ -465,7 +494,7 @@
 	updateEditedTaskGroup={() => searchTaskGroups()}
 	groupIdsNames={groups.map((g) => [g.id, g.name])}
 />
-<TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} />
+<TaskGroupManageModal bind:this={taskGroupManageModal} admin={true} bind:coreSuccessMessage />
 
 <Modal id="taskInfoModal" bind:this={infoModal} size="xl" onClose={onInfoModalClose}>
 	{#snippet header()}
@@ -487,6 +516,10 @@
 				<li class="list-group-item list-group-item-light fw-bold">Active</li>
 				<li class="list-group-item">
 					<BooleanIcon value={selectedTaskGroup.active} />
+				</li>
+				<li class="list-group-item list-group-item-light fw-bold">In use</li>
+				<li class="list-group-item">
+					<BooleanIcon value={selectedTaskGroup.in_use} />
 				</li>
 				<li class="list-group-item list-group-item-light fw-bold">Origin</li>
 				<li class="list-group-item">{selectedTaskGroup.origin || '-'}</li>

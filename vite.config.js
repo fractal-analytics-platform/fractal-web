@@ -39,6 +39,12 @@ const config = defineConfig({
 	server: {
 		fs: {
 			allow: ['./components/src/lib']
+		},
+		proxy: {
+			'/help': {
+				target: 'http://localhost:8001',
+				changeOrigin: true
+			}
 		}
 	},
 	optimizeDeps: {

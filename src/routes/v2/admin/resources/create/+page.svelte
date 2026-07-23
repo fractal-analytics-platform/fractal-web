@@ -109,8 +109,8 @@
 	</div>
 	<div class="row">
 		<div class="col">
-			<textarea class="form-control mb-3" bind:value={data} rows="15" aria-label="Resource JSON">
-			</textarea>
+			<textarea class="form-control mb-3" bind:value={data} rows="15" aria-label="Resource JSON"
+			></textarea>
 		</div>
 	</div>
 	<div class="row">

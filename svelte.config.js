@@ -44,8 +44,10 @@ const config = {
 				'font-src': ['self'],
 				// Restrict form submissions to self
 				'form-action': ['self'],
-				// Forbid frames
+				// Forbid embedding in frames
 				'frame-ancestors': ['none'],
+				// Allow only frames loading from self
+				'frame-src': ['self'],
 				// Forbid <object> and <embed> tag
 				'object-src': ['none'],
 				// Forbid uri in <base> tag

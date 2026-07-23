@@ -17,7 +17,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - run: gh release create "${GH_REF_NAME}" --draft --title "${GH_REF_NAME}"
@@ -36,7 +36,7 @@ jobs:
         node-version: ['24']
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
@@ -68,13 +68,30 @@ jobs:
           GH_REF_NAME: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
 
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39
+        with:
+          version: '0.11.14'
+          enable-cache: false
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - name: Build Docs
+        run: ./build-docs.sh
+      - run: tar -czf docs-${GH_REF_NAME}.tar.gz site
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
+
+      - run: gh release upload "${GH_REF_NAME}" "docs-${GH_REF_NAME}.tar.gz" --clobber
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+
   publish-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     needs: [build]
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - run: gh release edit "${GH_REF_NAME}" --draft=false
