@@ -40,6 +40,15 @@ describe('SqueueModal', () => {
 		expect(screen.getByText(/fake-command-output/)).toBeVisible();
 	});
 
+	it('Refresh', async () => {
+		const user = userEvent.setup();
+		const mockApi = mockSqueueCallSuccess();
+		render(SqueueModal);
+		await user.click(screen.getByRole('button', { name: 'Refresh' }));
+		expect(mockApi).toHaveBeenCalledWith(expect.stringContaining('?scope=all'));
+		expect(screen.getByText(/fake-command-output/)).toBeVisible();
+	});
+
 	it('Error', async () => {
 		const user = userEvent.setup();
 		const mockApi = mockSqueueCallError();

@@ -56,6 +56,7 @@
 <Modal id="squeueModal" size="xl" bind:this={modal} onOpen={getSqueue} fullscreen={true}>
 	{#snippet header()}
 		<h1 class="modal-title fs-5">Cluster queue</h1>
+		<button class="btn btn-primary ms-5" onclick={getSqueue}> Refresh </button>
 	{/snippet}
 	{#snippet body()}
 		<div class="row mb-3">
