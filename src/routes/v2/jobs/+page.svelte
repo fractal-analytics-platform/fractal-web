@@ -1,6 +1,7 @@
 <script>
 	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
 	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { page } from '$app/state';
 
 	/**
 	 * @returns {Promise<import('fractal-components/types/api').JobV2[]>}
@@ -15,5 +16,5 @@
 </script>
 
 <div class="container mt-3">
-	<JobsList {jobUpdater} columnsToHide={['id']} />
+	<JobsList {jobUpdater} columnsToHide={['id']} runnerBackend={page.data.runnerBackend} />
 </div>

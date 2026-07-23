@@ -469,6 +469,7 @@
 
 	function addSlurmAccount() {
 		if (editableUser) {
+			userFormErrorHandler.removeValidationError('slurm_accounts');
 			editableUser.slurm_accounts = [...editableUser.slurm_accounts, ''];
 		}
 	}
@@ -478,6 +479,7 @@
 	 */
 	function removeSlurmAccount(index) {
 		if (editableUser) {
+			userFormErrorHandler.removeValidationError('slurm_accounts');
 			editableUser.slurm_accounts = editableUser.slurm_accounts.filter((_, i) => i !== index);
 		}
 	}
@@ -845,11 +847,11 @@
 					<label for="slurmAccount-0" class="col-sm-3 col-form-label text-end">
 						<strong>SLURM accounts</strong>
 					</label>
-					<div class="col-sm-9 has-validation">
+					<div class="col-sm-9">
 						<!-- eslint-disable-next-line no-unused-vars -->
 						{#each editableUser.slurm_accounts as _, i (i)}
 							<div
-								class="input-group mb-2"
+								class="input-group has-validation mb-2"
 								class:is-invalid={userFormSubmitted && $userValidationErrors['slurm_accounts']}
 							>
 								<input
@@ -858,7 +860,10 @@
 									id={`slurmAccount-${i}`}
 									bind:value={editableUser.slurm_accounts[i]}
 									aria-label={`SLURM account #${i + 1}`}
-									class:is-invalid={userFormSubmitted && $userValidationErrors['slurm_accounts']}
+									class:is-invalid={userFormSubmitted &&
+										(typeof $userValidationErrors['slurm_accounts'] === 'string' ||
+											(Array.isArray($userValidationErrors['slurm_accounts']) &&
+												$userValidationErrors['slurm_accounts'][i]))}
 									required
 								/>
 								<button
@@ -870,11 +875,23 @@
 								>
 									<i class="bi bi-trash"></i>
 								</button>
+								<span
+									class="invalid-feedback"
+									class:mb-2={userFormSubmitted &&
+										Array.isArray($userValidationErrors['slurm_accounts']) &&
+										$userValidationErrors['slurm_accounts'][i]}
+								>
+									{Array.isArray($userValidationErrors['slurm_accounts'])
+										? $userValidationErrors['slurm_accounts'][i]
+										: ''}
+								</span>
 							</div>
 						{/each}
-						<span class="invalid-feedback mb-2"
-							>{userFormSubmitted && $userValidationErrors['slurm_accounts']}</span
-						>
+						{#if userFormSubmitted && typeof $userValidationErrors['slurm_accounts'] === 'string' && $userValidationErrors['slurm_accounts']}
+							<span class="invalid-feedback mb-2">
+								{$userValidationErrors['slurm_accounts']}
+							</span>
+						{/if}
 						<button class="btn btn-light" type="button" onclick={addSlurmAccount}>
 							<i class="bi bi-plus-circle"></i>
 							Add SLURM account
