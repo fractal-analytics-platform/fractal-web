@@ -28,16 +28,32 @@
 	function trimInitialSpaces(output) {
 		const lines = output.split('\n');
 		if (lines.length > 0) {
-			const match = lines[0].match(/^ */);
-			if (match) {
-				return lines.map((l) => l.substring(match[0].length)).join('\n');
+			let spaces = null;
+			for (const line of lines) {
+				if (line.trim() === '') {
+					continue;
+				}
+				const match = line.match(/^ */);
+				if (match) {
+					const length = match[0].length;
+					if (spaces === null) {
+						spaces = length;
+					} else if (spaces > length) {
+						spaces = length;
+					}
+				} else {
+					spaces = 0;
+				}
+			}
+			if (spaces) {
+				return lines.map((l) => l.substring(spaces)).join('\n');
 			}
 		}
 		return output;
 	}
 </script>
 
-<Modal id="squeueModal" size="xl" bind:this={modal} onOpen={getSqueue}>
+<Modal id="squeueModal" size="xl" bind:this={modal} onOpen={getSqueue} fullscreen={true}>
 	{#snippet header()}
 		<h1 class="modal-title fs-5">Cluster queue</h1>
 	{/snippet}
