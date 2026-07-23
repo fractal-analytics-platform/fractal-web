@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.29.5
 
 - Add modal to retrieve Slurm cluster queue using the `/job/squeue/` endpoint (\#1227).
 
