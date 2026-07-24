@@ -137,7 +137,7 @@
 	async function getTokenPromise() {
 		const response = await fetch(`/profile/token`);
 		if (response.ok) {
-			const { token } = await response.json();
+			const token = await response.text();
 			// Chrome only accept a promise returning Blob type, with proper content type.
 			return new Blob([token], { type: 'text/plain' });
 		}
