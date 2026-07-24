@@ -1,6 +1,7 @@
 import { removeDuplicatedItems } from '$lib/common/component_utilities';
 import { getUserJobs, listProjects } from '$lib/server/api/v2/project_api';
 import { getLogger } from '$lib/server/logger.js';
+import { env } from '$env/dynamic/private';
 
 const logger = getLogger('jobs page [v2]');
 
@@ -26,6 +27,7 @@ export async function load({ fetch }) {
 		workflows,
 		datasets,
 		jobs,
-		helpLink: '/reference/jobs/'
+		helpLink: '/reference/jobs/',
+		runnerBackend: env.FRACTAL_RUNNER_BACKEND
 	};
 }

@@ -533,7 +533,12 @@
 		{#if jobs && jobs.total_count === 0}
 			<p class="text-center">The query returned 0 matching jobs</p>
 		{/if}
-		<JobsList {jobUpdater} bind:this={jobsListComponent} admin={true}>
+		<JobsList
+			{jobUpdater}
+			bind:this={jobsListComponent}
+			admin={true}
+			runnerBackend={page.data.runnerBackend}
+		>
 			{#snippet buttons()}
 				<button class="btn btn-outline-secondary" onclick={downloadCSV} disabled={processingCsv}>
 					{#if processingCsv}
