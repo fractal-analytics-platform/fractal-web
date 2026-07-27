@@ -108,8 +108,8 @@
 
 {#if formElement.additionalProperties}
 	<div class="d-flex justify-content-center">
-		<form class="row row-cols-auto g-3 align-items-center p-2 flex-grow-1">
-			<div class="col-lg-6 offset-lg-3 mb-1">
+		<form class="row row-cols-auto align-items-center my-2 flex-grow-1">
+			<div class="col-lg-6 offset-lg-3">
 				<div class="input-group" class:has-validation={addPropertyError}>
 					<input
 						type="text"

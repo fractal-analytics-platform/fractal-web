@@ -57,7 +57,7 @@
 
 {#if remove !== null && formElement.removable}
 	<button
-		class="btn btn-danger me-3"
+		class="btn btn-danger me-3 btn-remove-property"
 		type="button"
 		onclick={handleRemove}
 		disabled={!editable}
