@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { screen, fireEvent } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/svelte';
 import {
 	checkBold,
 	renderSchemaWithSingleProperty,
@@ -45,6 +46,7 @@ describe('Enum properties', () => {
 	});
 
 	it('EnumProperty referenced', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithReferencedProperty(
 			{
 				enum: ['option1', 'option2'],
@@ -60,11 +62,12 @@ describe('Enum properties', () => {
 		expect(options[2].value).eq('option2');
 		expect(component.getArguments()).deep.eq({ testProp: null });
 
-		await fireEvent.change(combobox, { target: { value: 'option2' } });
+		await user.selectOptions(combobox, 'option2');
 		expect(onChange).toHaveBeenCalledWith({ testProp: 'option2' });
 	});
 
 	it('enum without type', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'TaskFunction2',
@@ -99,7 +102,7 @@ describe('Enum properties', () => {
 
 		expect(component.getArguments()).deep.eq({ arg2: null });
 
-		await fireEvent.change(dropdown, { target: { value: '1' } });
+		await user.selectOptions(dropdown, '1');
 		expect(onChange).toHaveBeenCalledWith({ arg2: 1 });
 	});
 

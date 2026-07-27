@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { fireEvent, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/svelte';
 import { renderSchemaWithSingleProperty } from './property_test_utils';
 
 describe('Reset properties to their default values', async () => {
 	it('Reset object with default value on top-level property', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				type: 'object',
@@ -15,13 +17,15 @@ describe('Reset properties to their default values', async () => {
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: { key1: { key2: 'foo' } } });
-		await fireEvent.input(screen.getByRole('textbox'), { target: { value: 'bar' } });
+		await user.clear(screen.getByRole('textbox'));
+		await user.type(screen.getByRole('textbox'), 'bar');
 		expect(onChange).toHaveBeenCalledWith({ testProp: { key1: { key2: 'bar' } } });
-		await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+		await user.click(screen.getByRole('button', { name: 'Reset' }));
 		expect(onChange).toHaveBeenCalledWith({ testProp: { key1: { key2: 'foo' } } });
 	});
 
 	it('Object with default on nested object does not have the Reset button', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				type: 'object',
@@ -38,12 +42,14 @@ describe('Reset properties to their default values', async () => {
 			true
 		);
 		expect(component.getArguments()).deep.eq({ testProp: { key1: { key2: 'foo' } } });
-		await fireEvent.input(screen.getByRole('textbox'), { target: { value: 'bar' } });
+		await user.clear(screen.getByRole('textbox'));
+		await user.type(screen.getByRole('textbox'), 'bar');
 		expect(onChange).toHaveBeenCalledWith({ testProp: { key1: { key2: 'bar' } } });
 		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
 	});
 
 	it('Reset tuple with default value on top-level property', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				type: 'array',
@@ -59,13 +65,15 @@ describe('Reset properties to their default values', async () => {
 		const [input1, input2] = screen.getAllByRole('textbox');
 		expect(input1).toHaveValue('1');
 		expect(input2).toHaveValue('2');
-		await fireEvent.input(input1, { target: { value: '3' } });
+		await user.clear(input1);
+		await user.type(input1, '3');
 		expect(onChange).toHaveBeenCalledWith({ testProp: [3, 2] });
-		await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+		await user.click(screen.getByRole('button', { name: 'Reset' }));
 		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 2] });
 	});
 
 	it('Tuple with default on nested items does not have the Reset button', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				type: 'array',
@@ -83,12 +91,14 @@ describe('Reset properties to their default values', async () => {
 		const [input1, input2] = screen.getAllByRole('textbox');
 		expect(input1).toHaveValue('1');
 		expect(input2).toHaveValue('2');
-		await fireEvent.input(input1, { target: { value: '3' } });
+		await user.clear(input1);
+		await user.type(input1, '3');
 		expect(onChange).toHaveBeenCalledWith({ testProp: [3, 2] });
 		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
 	});
 
 	it('Reset array with default value on top-level property', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				type: 'array',
@@ -102,13 +112,15 @@ describe('Reset properties to their default values', async () => {
 		const [input1, input2] = screen.getAllByRole('textbox');
 		expect(input1).toHaveValue('a');
 		expect(input2).toHaveValue('b');
-		await fireEvent.input(input1, { target: { value: 'x' } });
+		await user.clear(input1);
+		await user.type(input1, 'x');
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['x', 'b'] });
-		await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+		await user.click(screen.getByRole('button', { name: 'Reset' }));
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['a', 'b'] });
 	});
 
 	it('Array with default on nested items does not have the Reset button', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				type: 'array',
@@ -122,7 +134,8 @@ describe('Reset properties to their default values', async () => {
 		const [input1, input2] = screen.getAllByRole('textbox');
 		expect(input1).toHaveValue('a');
 		expect(input2).toHaveValue('a');
-		await fireEvent.input(input1, { target: { value: 'x' } });
+		await user.clear(input1);
+		await user.type(input1, 'x');
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['x', 'a'] });
 		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
 	});

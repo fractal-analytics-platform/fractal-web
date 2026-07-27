@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, render } from '@testing-library/svelte';
+import { render } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
 
 import ImageAttributesTypesForm from '../../src/lib/components/v2/projects/datasets/ImageAttributesTypesForm.svelte';
 import { tick } from 'svelte';
@@ -38,139 +39,144 @@ describe('AttributesTypesForm', () => {
 	});
 
 	it('add and remove attribute', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(1);
-		await fireEvent.click(result.getByRole('button', { name: 'Remove attribute' }));
+		await user.click(result.getByRole('button', { name: 'Remove attribute' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
 	});
 
 	it('add and remove type', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
-		await fireEvent.click(result.getByRole('button', { name: 'Add type' }));
+		await user.click(result.getByRole('button', { name: 'Add type' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(1);
-		await fireEvent.click(result.getByRole('button', { name: 'Remove type' }));
+		await user.click(result.getByRole('button', { name: 'Remove type' }));
 		expect(result.queryAllByPlaceholderText('Key').length).eq(0);
 	});
 
 	it('validate missing attribute key', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
 		result.component.init({}, {});
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Key is required')).toBeDefined();
 	});
 
 	it('validate missing attribute value', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
 		result.component.init({}, {});
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Value is required')).toBeDefined();
 	});
 
 	it('validate invalid number', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.selectOptions(result.getByLabelText('Type'), 'number');
+		await user.type(result.getByPlaceholderText('Value'), 'foo');
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Invalid number')).toBeDefined();
 	});
 
 	it('switch to number attribute from string containing a numeric value (number is preserved)', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: '42' } });
-		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.type(result.getByPlaceholderText('Value'), '42');
+		await user.selectOptions(result.getByLabelText('Type'), 'number');
 		expect(result.getByPlaceholderText('Value')).toHaveValue('42');
 		expect(result.component.validateFields()).true;
 	});
 
 	it('switch to number attribute from string containing text (number is reset)', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
-		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'number' } });
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.type(result.getByPlaceholderText('Value'), 'foo');
+		await user.selectOptions(result.getByLabelText('Type'), 'number');
 		expect(result.getByPlaceholderText('Value')).toHaveValue('');
 		expect(result.component.validateFields()).false;
 	});
 
 	it('switch to boolean attribute, default to false', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.selectOptions(result.getByLabelText('Type'), 'boolean');
 		expect(result.getByLabelText('Value')).toHaveValue('false');
 		expect(result.component.validateFields()).true;
 	});
 
 	it('switch to boolean attribute from string equals to "true", true is set', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'true' } });
-		await fireEvent.change(result.getByLabelText('Type'), { target: { value: 'boolean' } });
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.type(result.getByPlaceholderText('Value'), 'true');
+		await user.selectOptions(result.getByLabelText('Type'), 'boolean');
 		expect(result.getByLabelText('Value')).toHaveValue('true');
 		expect(result.component.validateFields()).true;
 	});
 
 	it('validate duplicated attribute key', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.queryAllByPlaceholderText('Key')[1], {
-			target: { value: 'my-key' }
-		});
-		await fireEvent.input(result.queryAllByPlaceholderText('Value')[1], {
-			target: { value: 'bar' }
-		});
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.type(result.getByPlaceholderText('Value'), 'foo');
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.queryAllByPlaceholderText('Key')[1], 'my-key');
+		await user.type(result.queryAllByPlaceholderText('Value')[1], 'bar');
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Duplicated key')).toBeDefined();
 	});
 
 	it('allow same key for attribute and type', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
-		await fireEvent.click(result.getByRole('button', { name: 'Add attribute' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.input(result.getByPlaceholderText('Value'), { target: { value: 'foo' } });
-		await fireEvent.click(result.getByRole('button', { name: 'Add type' }));
-		await fireEvent.input(result.queryAllByPlaceholderText('Key')[1], {
-			target: { value: 'my-key' }
-		});
+		await user.click(result.getByRole('button', { name: 'Add attribute' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.type(result.getByPlaceholderText('Value'), 'foo');
+		await user.click(result.getByRole('button', { name: 'Add type' }));
+		await user.type(result.queryAllByPlaceholderText('Key')[1], 'my-key');
 		expect(result.component.validateFields()).true;
 	});
 
 	it('validate missing type key', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
 		result.component.init({}, {});
-		await fireEvent.click(result.getByRole('button', { name: 'Add type' }));
+		await user.click(result.getByRole('button', { name: 'Add type' }));
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Key is required')).toBeDefined();
 	});
 
 	it('validate duplicated type key', async () => {
+		const user = userEvent.setup();
 		const result = render(ImageAttributesTypesForm);
 		result.component.init({}, {});
-		await fireEvent.click(result.getByRole('button', { name: 'Add type' }));
-		await fireEvent.input(result.getByPlaceholderText('Key'), { target: { value: 'my-key' } });
-		await fireEvent.click(result.getByRole('button', { name: 'Add type' }));
-		await fireEvent.input(result.queryAllByPlaceholderText('Key')[1], {
-			target: { value: 'my-key' }
-		});
+		await user.click(result.getByRole('button', { name: 'Add type' }));
+		await user.type(result.getByPlaceholderText('Key'), 'my-key');
+		await user.click(result.getByRole('button', { name: 'Add type' }));
+		await user.type(result.queryAllByPlaceholderText('Key')[1], 'my-key');
 		expect(result.component.validateFields()).false;
 		await tick();
 		expect(result.getByText('Duplicated key')).toBeDefined();

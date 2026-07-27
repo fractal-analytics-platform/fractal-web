@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, render } from '@testing-library/svelte';
+import { render } from '@testing-library/svelte';
 
 import Paginator from '../src/lib/components/common/Paginator.svelte';
+import userEvent from '@testing-library/user-event';
 
 describe('Paginator', () => {
 	it('display without ellipsis', () => {
@@ -55,28 +56,31 @@ describe('Paginator', () => {
 		expect(getPageItems(result)).toEqual(['«', '1', '2', '3', '4', '5', '6', '7', '»']);
 	});
 	it('go to previous page', async () => {
+		const user = userEvent.setup();
 		const onPageChange = vi.fn();
 		const result = render(Paginator, {
 			props: { pageSize: 10, totalCount: 100, currentPage: 3, onPageChange }
 		});
-		await fireEvent.click(result.getByLabelText('Previous'));
+		await user.click(result.getByLabelText('Previous'));
 		expect(onPageChange).toHaveBeenCalledWith(2, 10);
 	});
 	it('go to next page', async () => {
+		const user = userEvent.setup();
 		const onPageChange = vi.fn();
 		const result = render(Paginator, {
 			props: { pageSize: 10, totalCount: 100, currentPage: 3, onPageChange }
 		});
-		await fireEvent.click(result.getByLabelText('Next'));
+		await user.click(result.getByLabelText('Next'));
 		expect(onPageChange).toHaveBeenCalledWith(4, 10);
 	});
 	it('change page size', async () => {
+		const user = userEvent.setup();
 		const onPageChange = vi.fn();
 		const result = render(Paginator, {
 			props: { pageSize: 10, totalCount: 100, currentPage: 3, onPageChange }
 		});
-		await fireEvent.change(result.getByRole('combobox'), { target: { value: '50' } });
-		await fireEvent.click(result.getByLabelText('Next'));
+		await user.selectOptions(result.getByRole('combobox'), '50');
+		await user.click(result.getByLabelText('Next'));
 		expect(onPageChange).toHaveBeenCalledWith(1, 50);
 	});
 	it('hide pages if total results is zero', async () => {

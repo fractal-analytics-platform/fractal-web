@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { checkBold, renderSchema, renderSchemaWithReferencedProperty } from './property_test_utils';
-import { fireEvent, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
 describe('Tuple properties', () => {
 	it('optional tuple with default values', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -40,24 +41,26 @@ describe('Tuple properties', () => {
 		expect(inputs[0]).toHaveValue('1300');
 		expect(inputs[1]).toHaveValue('foo');
 		expect(inputs[2]).toHaveValue('1');
-		await fireEvent.input(inputs[0], { target: { value: '500' } });
+		await user.clear(inputs[0]);
+		await user.type(inputs[0], '500');
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [500, 'foo', 1] });
 		expect(inputs[0]).toHaveValue('500');
 		const removeTupleBtn = screen.getByRole('button', { name: 'Remove tuple' });
-		await fireEvent.click(removeTupleBtn);
+		await user.click(removeTupleBtn);
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [] });
 
 		expect(screen.queryAllByRole('spinbutton').length).eq(0);
 		expect(screen.queryAllByRole('textbox').length).eq(0);
 		const addTupleBtn = screen.getByRole('button', { name: 'Add tuple' });
-		await fireEvent.click(addTupleBtn);
+		await user.click(addTupleBtn);
 
 		// verify that value has been reset to default
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [1300, 'foo', 1] });
 	});
 
 	it('optional tuple without default values', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -85,7 +88,7 @@ describe('Tuple properties', () => {
 		expect(component.getArguments()).deep.eq({ patch_size: [] });
 
 		expect(screen.queryAllByRole('textbox').length).eq(0);
-		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
 		let inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
 		expect(inputs[0]).toHaveValue('');
@@ -93,18 +96,18 @@ describe('Tuple properties', () => {
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [null, null] });
 
-		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
+		await user.type(inputs[0], 'foo');
 		expect(inputs[0]).toHaveValue('foo');
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: ['foo', null] });
 
 		const removeTupleBtn = screen.getByRole('button', { name: 'Remove tuple' });
-		await fireEvent.click(removeTupleBtn);
+		await user.click(removeTupleBtn);
 		expect(screen.queryAllByRole('textbox').length).eq(0);
 
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [] });
 
-		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
 		inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
 		expect(inputs[0]).toHaveValue(''); // verify that value has been reset
@@ -114,6 +117,7 @@ describe('Tuple properties', () => {
 	});
 
 	it('required tuple with default values', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -151,13 +155,16 @@ describe('Tuple properties', () => {
 		expect(inputs[1]).toHaveValue('1500');
 		expect(inputs[2]).toHaveValue('1');
 		expect(screen.queryAllByRole('button', { name: 'Remove tuple' }).length).eq(0);
-		await fireEvent.input(screen.getAllByRole('textbox')[0], { target: { value: 10 } });
+		const input1 = screen.getAllByRole('textbox')[0];
+		await user.clear(input1);
+		await user.type(input1, '10');
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [10, 1500, 1] });
-		await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+		await user.click(screen.getByRole('button', { name: 'Reset' }));
 		expect(onChange).toHaveBeenCalledWith({ patch_size: [1300, 1500, 1] });
 	});
 
 	it('required tuple without default values', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -190,13 +197,14 @@ describe('Tuple properties', () => {
 		expect(inputs[0]).toHaveValue('');
 		expect(inputs[1]).toHaveValue('');
 		expect(screen.queryAllByRole('button', { name: 'Remove tuple' }).length).eq(0);
-		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
+		await user.type(inputs[0], 'foo');
 		expect(inputs[0]).toHaveValue('foo');
 		expect(onChange).toHaveBeenCalledWith({ patch_size: ['foo', null] });
 		expect(screen.queryAllByRole('button', { name: 'Reset' })).toHaveLength(0);
 	});
 
 	it('nested tuple', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'TaskFunction',
@@ -235,18 +243,19 @@ describe('Tuple properties', () => {
 
 		expect(component.getArguments()).deep.eq({ arg_A: [[]] });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(onChange).toHaveBeenCalledWith({ arg_A: [[[]]] });
 		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(screen.getAllByRole('button', { name: 'Remove tuple' }).length).toEqual(1);
-		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(onChange).toHaveBeenCalledWith({ arg_A: [[[null]]] });
 		expect(screen.getAllByRole('button', { name: 'Remove tuple' }).length).toEqual(2);
-		await fireEvent.input(screen.getByRole('textbox'), { target: { value: 'foo' } });
+		await user.type(screen.getByRole('textbox'), 'foo');
 		expect(onChange).toHaveBeenCalledWith({ arg_A: [[['foo']]] });
 	});
 
 	it('referenced tuple', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithReferencedProperty(
 			{
 				type: 'array',
@@ -266,15 +275,16 @@ describe('Tuple properties', () => {
 
 		expect(component.getArguments()).deep.eq({ testProp: [] });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(onChange).toHaveBeenCalledWith({ testProp: [[]] });
-		await fireEvent.click(screen.getByRole('button', { name: 'Add tuple' }));
+		await user.click(screen.getByRole('button', { name: 'Add tuple' }));
 		expect(onChange).toHaveBeenCalledWith({ testProp: [[null, null]] });
 		expect(screen.getAllByRole('textbox').length).eq(2);
 	});
 
 	it('tuple with prefixItems (pydantic_v2)', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -297,19 +307,20 @@ describe('Tuple properties', () => {
 		expect(component.hasUnsavedChanges()).toEqual(false);
 
 		const addTupleBtn = screen.getByRole('button', { name: 'Add tuple' });
-		await fireEvent.click(addTupleBtn);
+		await user.click(addTupleBtn);
 
 		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 1] });
 		expect(component.hasUnsavedChanges()).toEqual(true);
 		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(2);
 
-		await fireEvent.input(inputs[0], { target: { value: '10' } });
+		await user.clear(inputs[0]);
+		await user.type(inputs[0], '10');
 		expect(onChange).toHaveBeenCalledWith({ testProp: [10, 1] });
 
 		const removeTupleBtn = screen.getByRole('button', { name: 'Remove tuple' });
-		await fireEvent.click(removeTupleBtn);
-		await fireEvent.click(addTupleBtn);
+		await user.click(removeTupleBtn);
+		await user.click(addTupleBtn);
 
 		// verify that value has been reset to default
 		expect(onChange).toHaveBeenCalledWith({ testProp: [1, 1] });
@@ -438,7 +449,7 @@ describe('Tuple properties', () => {
 			tuple_or_None_with_default: null
 		});
 
-		await fireEvent.click(screen.getByRole('switch', { name: 'Set' }));
+		await user.click(screen.getByRole('switch', { name: 'Set' }));
 
 		expect(component.getArguments()).deep.eq({
 			tuple_or_None: ['foo', 'bar'],

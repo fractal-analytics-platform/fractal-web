@@ -105,13 +105,15 @@ describe('JobsList', () => {
 	});
 
 	async function clearFilters(result) {
+		const user = userEvent.setup();
 		const clearFiltersBtn = result.getByRole('button', { name: 'Clear filters' });
-		await fireEvent.click(clearFiltersBtn);
+		await user.click(clearFiltersBtn);
 		const table = result.getByRole('table');
 		await waitFor(() => expect(table.querySelectorAll('tbody tr').length).eq(3));
 	}
 
 	it('cancel job', async () => {
+		const user = userEvent.setup();
 		const result = render(JobsList, {
 			props: { jobUpdater: vi.fn(), runnerBackend: 'slurm_ssh' }
 		});
@@ -121,7 +123,7 @@ describe('JobsList', () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({ ok: true });
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });
-		await fireEvent.click(cancelButton);
+		await user.click(cancelButton);
 		await new Promise((resolve) => setTimeout(resolve));
 
 		const message = result.getByText(/Job cancellation request received/);
@@ -129,6 +131,7 @@ describe('JobsList', () => {
 	});
 
 	it('error while cancelling job', async () => {
+		const user = userEvent.setup();
 		const result = render(JobsList, {
 			props: { jobUpdater: vi.fn(), runnerBackend: 'slurm_ssh' }
 		});
@@ -143,7 +146,7 @@ describe('JobsList', () => {
 		});
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });
-		await fireEvent.click(cancelButton);
+		await user.click(cancelButton);
 		await new Promise((resolve) => setTimeout(resolve));
 
 		expect(result.queryAllByRole('alert').length).eq(1);
