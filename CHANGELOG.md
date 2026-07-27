@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Use `text/plain` response in `/profile/token` route (\#1230).
+- Fix JSON Schema Form remove property button misaligned and not working (\#1232).
 
 # 1.29.5
 
