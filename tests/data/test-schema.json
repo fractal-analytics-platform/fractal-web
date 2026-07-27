@@ -100,6 +100,16 @@
 				}
 			},
 			"required": ["requiredNestedString", "referencedRequiredNestedObject"]
+		},
+		"objectWithAdditionalProperties": {
+			"title": "Object with additional properties",
+			"type": "object",
+			"additionalProperties": {
+				"type": "object",
+				"properties": {
+					"foo": { "type": "string" }
+				}
+			}
 		}
 	},
 	"required": [
