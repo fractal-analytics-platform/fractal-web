@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { screen, fireEvent } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/svelte';
 import {
 	checkBold,
 	renderSchema,
@@ -9,6 +10,7 @@ import {
 
 describe('Boolean properties', () => {
 	it('Required BooleanProperty with title', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				title: 'Boolean title',
@@ -24,13 +26,14 @@ describe('Boolean properties', () => {
 		expect(switcher).toBeDefined();
 		expect(component.getArguments()).deep.eq({ testProp: null });
 
-		await fireEvent.click(switcher);
+		await user.click(switcher);
 		expect(onChange).toHaveBeenCalledWith({ testProp: true });
-		await fireEvent.click(switcher);
+		await user.click(switcher);
 		expect(onChange).toHaveBeenCalledWith({ testProp: false });
 	});
 
 	it('BooleanProperty without title', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{ type: 'boolean' },
 			'pydantic_v1',
@@ -43,13 +46,14 @@ describe('Boolean properties', () => {
 		expect(switcher).toBeDefined();
 		expect(component.getArguments()).deep.eq({ testProp: null });
 
-		await fireEvent.click(switcher);
+		await user.click(switcher);
 		expect(onChange).toHaveBeenCalledWith({ testProp: true });
-		await fireEvent.click(switcher);
+		await user.click(switcher);
 		expect(onChange).toHaveBeenCalledWith({ testProp: false });
 	});
 
 	it('BooleanProperty referenced', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithReferencedProperty(
 			{ type: 'boolean' },
 			'pydantic_v2'
@@ -61,9 +65,9 @@ describe('Boolean properties', () => {
 		expect(switcher).toBeDefined();
 		expect(component.getArguments()).deep.eq({ testProp: null });
 
-		await fireEvent.click(switcher);
+		await user.click(switcher);
 		expect(onChange).toHaveBeenCalledWith({ testProp: true });
-		await fireEvent.click(switcher);
+		await user.click(switcher);
 		expect(onChange).toHaveBeenCalledWith({ testProp: false });
 	});
 

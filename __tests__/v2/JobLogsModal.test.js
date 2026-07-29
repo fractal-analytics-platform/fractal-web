@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/svelte';
 import { mockJob } from '../mock/mock-types';
 
 // Mocking public variables
@@ -46,6 +47,7 @@ Command "/tmp/FRACTAL_TASKS_DIR/.fractal/fractal-tasks-core0.14.1/venv/bin/pytho
 	});
 
 	it('display log with highlighting and hidden details', async () => {
+		const user = userEvent.setup();
 		const result = render(JobLogsModal);
 		const error = `TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:
@@ -75,7 +77,7 @@ allowed_channels
 allowed_channels
 	field required (type=value_error.missing)\n`);
 		expect(pre.querySelectorAll('button').length).eq(1);
-		await fireEvent.click(result.getByRole('button', { name: /details hidden/ }));
+		await user.click(result.getByRole('button', { name: /details hidden/ }));
 		divs = pre.querySelectorAll('div');
 		const highlightedDivs = Array.from(divs).filter((div) => div.classList.contains('highlight'));
 

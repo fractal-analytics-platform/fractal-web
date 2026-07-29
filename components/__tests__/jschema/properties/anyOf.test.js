@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import { renderSchema } from './property_test_utils';
-import { fireEvent, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 
 describe('anyOf properties', () => {
 	it('Nullable object', async () => {
+		const user = userEvent.setup();
 		const { component } = renderSchema(
 			{
 				$defs: {
@@ -39,7 +41,7 @@ describe('anyOf properties', () => {
 			'<p>Type hint SimpleModel | None = None</p>'
 		);
 
-		await fireEvent.click(screen.getByRole('switch', { name: 'Set' }));
+		await user.click(screen.getByRole('switch', { name: 'Set' }));
 
 		expect(component.getArguments()).deep.eq({
 			nullable_arg_with_null_default: { foo: null }

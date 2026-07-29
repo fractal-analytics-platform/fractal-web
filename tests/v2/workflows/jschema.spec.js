@@ -240,6 +240,18 @@ test('JSON Schema validation', async ({ page, workflow }) => {
 		await checkAccessibility(page);
 	});
 
+	await test.step('Test additional object property', async () => {
+		await page.getByRole('button', { name: 'Object with additional properties' }).click();
+		await page.getByPlaceholder('Key').fill('newProperty');
+		await page.getByRole('button', { name: 'Add property' }).click();
+		await page.getByRole('button', { name: 'newProperty' }).click();
+		await page.getByRole('textbox', { name: 'foo' }).fill('xxx');
+		await page.getByRole('button', { name: 'Remove Property Block' }).click();
+		await expect(page.getByRole('textbox', { name: 'foo' })).not.toBeVisible();
+		await page.getByRole('button', { name: 'Discard changes' }).click();
+		await expect(page.getByRole('button', { name: 'Discard changes' })).toBeDisabled();
+	});
+
 	await test.step('Test second task (default not populated edge case)', async () => {
 		await workflow.selectTask(randomTaskName2);
 		await expect(page.getByRole('combobox', { name: 'Mode' })).toHaveValue('label');

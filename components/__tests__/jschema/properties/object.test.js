@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { screen, fireEvent } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import { checkBold, renderSchema } from './property_test_utils';
 import userEvent from '@testing-library/user-event';
 
 describe('Object properties', () => {
 	it('Required nested objects', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'Args',
@@ -88,7 +89,7 @@ describe('Object properties', () => {
 
 		// Insert element into first array
 		let addBtn = screen.getAllByRole('button', { name: 'Add argument to list' })[0];
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 
 		expect(onChange).toHaveBeenCalledWith({
 			requiredReferencedProperty: {
@@ -101,7 +102,7 @@ describe('Object properties', () => {
 
 		// Insert element into optional array
 		addBtn = screen.getAllByRole('button', { name: 'Add argument to list' })[1];
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 
 		expect(onChange).toHaveBeenCalledWith({
 			requiredReferencedProperty: {
@@ -124,6 +125,7 @@ describe('Object properties', () => {
 	});
 
 	it('add object property', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -148,16 +150,15 @@ describe('Object properties', () => {
 
 		expect(component.getArguments()).deep.eq({ test: {} });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.input(screen.getByPlaceholderText('Key'), {
-			target: { value: 'key1' }
-		});
-		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getByPlaceholderText('Key'), 'key1');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
 		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(onChange).toHaveBeenCalledWith({ test: { key1: { prop1: null } } });
 	});
 
 	it('remove default additional object property', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -185,12 +186,13 @@ describe('Object properties', () => {
 
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.click(screen.getByRole('button', { name: 'Remove Property Block' }));
+		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(onChange).toHaveBeenCalledWith({ test: {} });
 		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
 
 	it('add and remove additional object property', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -215,21 +217,18 @@ describe('Object properties', () => {
 
 		expect(component.getArguments()).deep.eq({ test: {} });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.input(screen.getByPlaceholderText('Key'), {
-			target: { value: 'key1' }
-		});
-		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getByPlaceholderText('Key'), 'key1');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(component.hasUnsavedChanges()).toEqual(true);
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: null } } });
-		await fireEvent.input(screen.getAllByRole('textbox')[0], {
-			target: { value: 'foo' }
-		});
+		await user.type(screen.getAllByRole('textbox')[0], 'foo');
 		expect(component.getArguments()).deep.eq({ test: { key1: { prop1: 'foo' } } });
-		await fireEvent.click(screen.getByRole('button', { name: 'Remove Property Block' }));
+		await user.click(screen.getByRole('button', { name: 'Remove Property Block' }));
 		expect(onChange).toHaveBeenCalledWith({ test: {} });
 	});
 
 	it('Object with additional properties and default value', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -248,10 +247,8 @@ describe('Object properties', () => {
 		);
 
 		expect(component.getArguments()).deep.eq({ test: { key1: 'foo' } });
-		await fireEvent.input(screen.getByPlaceholderText('Key'), {
-			target: { value: 'key2' }
-		});
-		await fireEvent.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getByPlaceholderText('Key'), 'key2');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(onChange).toHaveBeenCalledWith({ test: { key1: 'foo', key2: null } });
 		const inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(3);

@@ -136,7 +136,7 @@
 					class:collapse={collapsed}
 					class:show={!collapsed}
 				>
-					<div class="accordion-body p-1">
+					<div class="accordion-body p-0">
 						{#if showErrors}
 							{#each errors as error, index (index)}
 								<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
@@ -187,6 +187,10 @@
 		pointer-events: none;
 	}
 
+	.collapsible-label .flex-fill {
+		margin-top: -2px;
+	}
+
 	:global(.collapsible-label .property-description) {
 		pointer-events: initial;
 	}
@@ -197,5 +201,11 @@
 	.collapsible-prop-actions .form-switch {
 		margin-top: 16px;
 		margin-right: 8px;
+	}
+
+	:global(.collapsible-prop-header .btn-remove-property) {
+		pointer-events: auto;
+		margin-top: -5px;
+		margin-left: -6px;
 	}
 </style>

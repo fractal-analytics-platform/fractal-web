@@ -1,6 +1,6 @@
 /// <reference path="../../vitest-setup.d.ts" />
 import { describe, it, afterEach, beforeEach, expect, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { mockUser } from '../mock/mock-types';
 
@@ -96,6 +96,7 @@ describe('TaskCollection', () => {
 	});
 
 	it('collect tasks with pinned package versions', async () => {
+		const user = userEvent.setup();
 		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
 				ok: true,
@@ -117,34 +118,34 @@ describe('TaskCollection', () => {
 		expect(screen.getAllByRole('textbox').length).eq(3);
 
 		// add ppv
-		await fireEvent.click(addPpvBtn);
+		await user.click(addPpvBtn);
 		expect(screen.getAllByRole('textbox').length).eq(5);
-		await fireEvent.click(addPpvBtn);
-		await fireEvent.click(addPpvBtn);
+		await user.click(addPpvBtn);
+		await user.click(addPpvBtn);
 		expect(screen.getAllByRole('textbox').length).eq(9);
 
 		// remove ppv
 		const removePpvBtn = screen.getAllByRole('button', {
 			name: 'Remove pinned package version'
 		})[1];
-		await fireEvent.click(removePpvBtn);
+		await user.click(removePpvBtn);
 		expect(screen.getAllByRole('textbox').length).eq(7);
 
 		const [key1, key2] = screen.getAllByRole('textbox', { name: 'Name' });
 		const [value1, value2] = screen.getAllByRole('textbox', { name: 'Version' });
 		const [pre1] = screen.getAllByRole('radio', { name: 'Pre' });
 
-		await fireEvent.input(key1, { target: { value: 'package1' } });
-		await fireEvent.input(value1, { target: { value: '1.2.3' } });
-		await fireEvent.input(key2, { target: { value: 'package2' } });
-		await fireEvent.input(value2, { target: { value: '0.0.8' } });
-		await fireEvent.click(pre1);
+		await user.type(key1, 'package1');
+		await user.type(value1, '1.2.3');
+		await user.type(key2, 'package2');
+		await user.type(value2, '0.0.8');
+		await user.click(pre1);
 
 		const packageInput = screen.getByRole('textbox', { name: 'Package' });
-		await fireEvent.input(packageInput, { target: { value: 'main-package' } });
+		await user.type(packageInput, 'main-package');
 
 		const collectBtn = screen.getByRole('button', { name: 'Collect' });
-		await fireEvent.click(collectBtn);
+		await user.click(collectBtn);
 
 		expect(fetch).toHaveBeenCalledWith(
 			'/api/v2/task/collect/pip?private=false&user_group_id=1',
