@@ -4,6 +4,7 @@ The following table shows which `fractal-server` versions are compatible with wh
 
 | fractal-web | fractal-server |
 | ----------- | -------------- |
+| 1.29.6      | 2.24.2         |
 | 1.29.5      | 2.24.2         |
 | 1.29.4      | 2.24.1         |
 | 1.29.3      | 2.24.1         |
