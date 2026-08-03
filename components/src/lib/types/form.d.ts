@@ -28,10 +28,7 @@ export type FormElement = (
 };
 
 export type CollapsibleFormElement =
-	| ObjectFormElement
-	| ArrayFormElement
-	| TupleFormElement
-	| ValueFormElement;
+	ObjectFormElement | ArrayFormElement | TupleFormElement | ValueFormElement;
 
 export type BaseFormElementFields = {
 	manager: FormManager;
