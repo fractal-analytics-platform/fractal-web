@@ -236,7 +236,7 @@
 								<div class="row mt-2">
 									<div class="col">
 										<div id="userUpdate-error"></div>
-										<StandardDismissableAlert message={userUpdatedMessage} />
+										<StandardDismissableAlert bind:message={userUpdatedMessage} />
 										<button class="btn btn-primary" onclick={save}> Save </button>
 									</div>
 								</div>

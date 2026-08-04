@@ -917,8 +917,8 @@
 
 {#if workflow}
 	<div class="container">
-		<StandardDismissableAlert message={jobCancelledMessage} />
-		<StandardDismissableAlert message={workflowSuccessMessage} />
+		<StandardDismissableAlert bind:message={jobCancelledMessage} />
+		<StandardDismissableAlert bind:message={workflowSuccessMessage} />
 
 		<div id="workflowErrorAlert"></div>
 

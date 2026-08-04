@@ -13,16 +13,31 @@
 
 	export function hide() {
 		message = '';
+		previousMessage = '';
+		if (timeout) {
+			clearTimeout(timeout);
+		}
 	}
 
 	/** @type {string|undefined} */
 	let previousMessage = $state('');
 
-	$effect(() => {
-		if (message !== previousMessage) {
-			previousMessage = message;
-			setupTimeout();
+	/**
+	 * @param {string} newMessage
+	 */
+	function handleMessageChange(newMessage) {
+		if (newMessage !== previousMessage) {
+			previousMessage = newMessage;
+			if (newMessage === '') {
+				hide();
+			} else {
+				setupTimeout();
+			}
 		}
+	}
+
+	$effect(() => {
+		handleMessageChange(message);
 	});
 
 	function setupTimeout() {
@@ -45,6 +60,6 @@
 			<i class="bi bi-exclamation-triangle"></i>
 		{/if}
 		{message}
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		<button type="button" class="btn-close" aria-label="Close" onclick={hide}> </button>
 	</div>
 {/if}

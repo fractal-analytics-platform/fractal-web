@@ -145,7 +145,7 @@
 	for production setups.
 </div>
 
-<StandardDismissableAlert message={successMessage} />
+<StandardDismissableAlert bind:message={successMessage} />
 
 <form
 	onsubmit={async (e) => {
