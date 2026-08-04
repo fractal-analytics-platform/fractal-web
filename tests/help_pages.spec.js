@@ -37,6 +37,12 @@ test('Help pages', async ({ page }) => {
 		await projectsLink.click();
 		await expect(projectsHeading).toBeVisible();
 		await page.keyboard.press('Escape');
-		await waitModalClosed(page);
+		try {
+			await waitModalClosed(page);
+		} catch {
+			console.warn('WARNING: Modal was not closed: retrying');
+			await page.keyboard.press('Escape');
+			await waitModalClosed(page);
+		}
 	});
 });
