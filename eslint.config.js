@@ -31,7 +31,10 @@ export default [
 			'**/pnpm-lock.yaml',
 			'**/package-lock.json',
 			'**/yarn.lock',
-			'local'
+			'local',
+			'.venv',
+			'docs/help/assets/javascripts',
+			'docs/help/minimal/assets/javascripts'
 		]
 	},
 	js.configs.recommended,
