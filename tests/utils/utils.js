@@ -63,14 +63,10 @@ export async function waitModalClosed(page) {
 
 /**
  * Wait until spinner inside selected element disappears
- * @param {import('@playwright/test').Page} page
- * @param {string} selector
+ * @param {import('@playwright/test').Locator} locator
  */
-export async function waitStopSpinnerIn(page, selector) {
-	await page.waitForFunction((selector) => {
-		const element = /** @type {HTMLElement} */ (document.querySelector(selector));
-		return element.querySelectorAll('.spinner-border').length === 0;
-	}, selector);
+export async function waitStopSpinnerIn(locator) {
+	await expect(locator.locator('.spinner-border')).toHaveCount(0);
 }
 
 /**

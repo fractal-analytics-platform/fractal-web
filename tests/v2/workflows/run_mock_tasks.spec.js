@@ -107,6 +107,11 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 	});
 
+	await test.step('Add and select generic_task', async () => {
+		await workflow.addTask('generic_task');
+		await workflow.selectTask('generic_task');
+	});
+
 	await test.step('Verify that the dataset used in the last job has been automatically selected', async () => {
 		await expect(
 			page
@@ -122,11 +127,6 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 			datasetDropdown.getByRole('option', { name: datasetName2, includeHidden: true })
 		).toBeHidden();
 		await datasetDropdown.selectOption(datasetName2);
-	});
-
-	await test.step('Add and select generic_task', async () => {
-		await workflow.addTask('generic_task');
-		await workflow.selectTask('generic_task');
 	});
 
 	await test.step('Fill generic_task arguments, set "Raise Error" to true', async () => {

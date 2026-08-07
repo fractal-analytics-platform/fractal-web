@@ -385,7 +385,7 @@
 
 	<div id="searchError" class="mt-3 mb-3"></div>
 
-	<StandardDismissableAlert message={coreSuccessMessage} />
+	<StandardDismissableAlert bind:message={coreSuccessMessage} />
 	{#if results}
 		<div class:d-none={!searched}>
 			<p class="text-center">

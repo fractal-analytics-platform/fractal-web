@@ -48,12 +48,10 @@ export async function createGuestUser(page, projectDir = '/tmp') {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} groupName
- * @returns {Promise<number>} the number of selectable groups
  */
 export async function addGroupToUser(page, groupName) {
 	await page.getByRole('button', { name: 'Add group' }).click();
 	const modal = await waitModal(page, false);
-	const selectableGroups = await page.getByRole('option').count();
 	await selectSlimSelect(
 		page,
 		page.getByRole('combobox', { name: 'Select groups' }),
@@ -69,7 +67,6 @@ export async function addGroupToUser(page, groupName) {
 	}
 	await waitModalClosed(page);
 	await expect(page.getByRole('button', { name: `Remove group ${groupName}` })).toBeVisible();
-	return selectableGroups;
 }
 
 /**

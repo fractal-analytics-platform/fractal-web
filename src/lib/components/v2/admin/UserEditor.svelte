@@ -949,7 +949,7 @@
 			<div class="col-lg-7">
 				<div class="row mb-3 mt-2">
 					<div class="col-sm-9 offset-sm-3">
-						<StandardDismissableAlert message={userUpdatedMessage} />
+						<StandardDismissableAlert bind:message={userUpdatedMessage} />
 						<div id="genericUserError"></div>
 						<button
 							type="button"

@@ -219,7 +219,7 @@
 					<textarea class="form-control mb-3" bind:value={data} rows="20"></textarea>
 
 					<div id="saveError"></div>
-					<StandardDismissableAlert message={resourceUpdatedMessage} autoDismiss={true} />
+					<StandardDismissableAlert bind:message={resourceUpdatedMessage} autoDismiss={true} />
 
 					<button class="btn btn-primary" onclick={saveResource} disabled={saving}>
 						{#if saving}

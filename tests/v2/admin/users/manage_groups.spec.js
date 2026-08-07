@@ -50,17 +50,16 @@ test('Admin groups management', async ({ page }) => {
 		expect(currentGroups.includes(group1.name)).toBeTruthy();
 	});
 
-	let selectableGroups1;
 	await test.step('Select group2 from "Add group" modal', async () => {
-		selectableGroups1 = await addGroupToUser(page, group2.name);
+		await addGroupToUser(page, group2.name);
 		await expect(groupBadges).toHaveCount(initialGroupBadgesCount + 1);
 	});
 
 	await test.step('Reopen modal and check options', async () => {
 		await page.getByRole('button', { name: 'Add group' }).click();
 		const modal = await waitModal(page);
-		const selectableGroups2 = await page.getByRole('option').count();
-		expect(selectableGroups2).toEqual(selectableGroups1 - 1);
+		const selectableGroups = await getSelectableGroups(page);
+		expect(selectableGroups.includes(group2.name)).toEqual(false);
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});
@@ -74,8 +73,8 @@ test('Admin groups management', async ({ page }) => {
 	await test.step('Reopen modal and group2 again and group3', async () => {
 		await page.getByRole('button', { name: 'Add group' }).click();
 		const modal = await waitModal(page, false);
-		const selectableGroups = await page.getByRole('option').allInnerTexts();
-		expect(selectableGroups.length).toEqual(selectableGroups1);
+		const selectableGroups = await getSelectableGroups(page);
+		expect(selectableGroups.includes(group2.name)).toEqual(true);
 		for (let group of [group2, group3].sort((g1, g2) => g1.name.localeCompare(g2.name))) {
 			await selectSlimSelect(
 				page,
@@ -144,3 +143,15 @@ test('Admin groups management', async ({ page }) => {
 		await deleteGroup(page, group3.id);
 	});
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @return {Promise<string[]>}
+ */
+async function getSelectableGroups(page) {
+	const elements = await page
+		.getByRole('listbox', { name: 'Select groups' })
+		.getByRole('option')
+		.allInnerTexts();
+	return elements.map((o) => o.trim());
+}
