@@ -3,7 +3,8 @@ import {
 	selectSlimSelect,
 	waitModal,
 	waitModalClosed,
-	waitPageLoading
+	waitPageLoading,
+	waitStopSpinnerIn
 } from '../../utils/utils.js';
 import { waitTasksSuccess } from '../../utils/v2/workflowtask.js';
 import { createDataset } from '../../utils/v2/dataset.js';
@@ -42,8 +43,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Add property' }).click();
 		await page.getByPlaceholder('Argument name').fill('k1');
 		await page.getByPlaceholder('Argument value').fill('v1');
-		await page.getByRole('button', { name: 'Save changes' }).click();
-		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await saveMetaChanges(page);
 	});
 
 	await test.step('Run workflow', async () => {
@@ -75,8 +75,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Meta', exact: true }).click();
 		await page.getByPlaceholder('Argument name').fill('k2');
 		await page.getByPlaceholder('Argument value').fill('v2');
-		await page.getByRole('button', { name: 'Save changes' }).click();
-		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await saveMetaChanges(page);
 	});
 
 	await test.step('Continue workflow', async () => {
@@ -130,6 +129,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await page.getByRole('switch').check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+		await expect(page.getByText('Arguments changes saved successfully')).toBeVisible();
 		await expect(page.getByRole('switch')).toBeChecked();
 		await page.getByRole('button', { name: 'Run 1', exact: true }).click();
 		await expect(page.getByRole('button', { name: 'Run 2', exact: true })).not.toBeVisible();
@@ -137,3 +137,13 @@ test('Workflow task runs', async ({ page, workflow }) => {
 		await expect(page.getByRole('switch')).not.toBeEditable();
 	});
 });
+
+/**
+ * @param {import('@playwright/test').Page} page
+ */
+async function saveMetaChanges(page) {
+	const saveChangesButton = page.getByRole('button', { name: 'Save changes' });
+	await saveChangesButton.click();
+	await waitStopSpinnerIn(saveChangesButton);
+	await expect(saveChangesButton).toBeDisabled();
+}

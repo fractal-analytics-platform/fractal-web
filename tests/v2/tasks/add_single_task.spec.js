@@ -247,7 +247,7 @@ async function getCreatedTaskModalData(page, taskName, taskType) {
 	const modalTitle = modal.locator('.modal-title');
 	await modalTitle.waitFor();
 	await expect(modalTitle).toHaveText(`Task ${taskName}`);
-	await waitStopSpinnerIn(page, '.modal.show');
+	await waitStopSpinnerIn(modal);
 	const items = await modal.locator('.list-group-item').all();
 	let task;
 	switch (taskType) {
