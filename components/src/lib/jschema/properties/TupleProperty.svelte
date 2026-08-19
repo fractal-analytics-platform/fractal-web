@@ -8,6 +8,7 @@
 	 * @property {import("../form_element.js").TupleFormElement} formElement
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {null|((oldKey: string, newKey: string) => void)} renameKey function passed by the parent that renames a key of this element
 	 * @property {any} [children]
 	 * @property {null|(() => void)} [reset]
 	 * @property {null|(() => void)} [init]
@@ -18,6 +19,7 @@
 		formElement,
 		editable,
 		remove,
+		renameKey,
 		children = $bindable([]),
 		reset = null,
 		init = null
@@ -53,7 +55,7 @@
 	}
 </script>
 
-<CollapsibleProperty {formElement} {reset} {editable} {remove} init={initTuple}>
+<CollapsibleProperty {formElement} {reset} {editable} {remove} {renameKey} init={initTuple}>
 	{#if !formElement.required && init === null}
 		<div class="d-flex justify-content-center p-2">
 			{#if children.length > 0}

@@ -1242,7 +1242,7 @@
 							<div id="args-tab" class="tab-pane show active">
 								<div class="card-body p-0">
 									{#if argsChangesSaved}
-										<div class="alert alert-success m-3" role="alert">
+										<div class="alert alert-success m-2" role="alert">
 											Arguments changes saved successfully
 										</div>
 									{/if}

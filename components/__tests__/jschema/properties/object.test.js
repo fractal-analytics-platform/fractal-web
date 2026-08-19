@@ -366,4 +366,114 @@ describe('Object properties', () => {
 		await user.click(screen.getByRole('button', { name: 'Add property' }));
 		expect(screen.getByRole('textbox')).toHaveValue('');
 	});
+
+	it('Rename key of simple object', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				properties: {
+					object_arg: {
+						additionalProperties: {
+							type: 'number'
+						},
+						type: 'object'
+					}
+				},
+				type: 'object'
+			},
+			'pydantic_v2'
+		);
+
+		expect(component.getArguments()).deep.eq({ object_arg: {} });
+
+		await user.type(screen.getByRole('textbox'), 'x');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getAllByRole('textbox')[0], '1');
+		expect(component.getArguments()).deep.eq({ object_arg: { x: 1 } });
+
+		await user.type(screen.getAllByRole('textbox')[1], 'y');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		await user.type(screen.getAllByRole('textbox')[1], '2');
+		expect(component.getArguments()).deep.eq({ object_arg: { x: 1, y: 2 } });
+
+		await user.click(screen.getAllByRole('button', { name: 'Edit key' })[0]);
+		await user.clear(screen.getAllByPlaceholderText('Key')[0]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		expect(screen.getByText('Schema property has no name')).toBeVisible();
+
+		await user.type(screen.getAllByPlaceholderText('Key')[0], 'y');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		expect(
+			screen.getByText('Schema property already has a property with the same name')
+		).toBeVisible();
+
+		await user.type(screen.getAllByPlaceholderText('Key')[0], 'z');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+
+		expect(component.getArguments()).deep.eq({ object_arg: { yz: 1, y: 2 } });
+	});
+
+	it('Rename key of nested object', async function () {
+		const user = userEvent.setup();
+		const { component } = renderSchema(
+			{
+				properties: {
+					object_arg: {
+						additionalProperties: {
+							type: 'object',
+							additionalProperties: {
+								additionalProperties: {
+									type: 'integer'
+								},
+								type: 'object'
+							}
+						},
+						type: 'object'
+					}
+				},
+				type: 'object'
+			},
+			'fractal_schema_v1'
+		);
+
+		expect(component.getArguments()).deep.eq({ object_arg: {} });
+
+		await user.type(screen.getByRole('textbox'), 'a');
+		await user.click(screen.getByRole('button', { name: 'Add property' }));
+		expect(component.getArguments()).deep.eq({ object_arg: { a: {} } });
+
+		await user.type(screen.getAllByRole('textbox')[0], 'b');
+		await user.click(screen.getAllByRole('button', { name: 'Add property' })[0]);
+		expect(component.getArguments()).deep.eq({ object_arg: { a: { b: {} } } });
+
+		await user.type(screen.getAllByRole('textbox')[0], 'c');
+		await user.click(screen.getAllByRole('button', { name: 'Add property' })[0]);
+		expect(component.getArguments()).deep.eq({ object_arg: { a: { b: { c: null } } } });
+
+		expect(screen.getByText('must be integer')).toBeVisible();
+
+		await user.click(screen.getAllByRole('button', { name: 'Edit key' })[0]);
+		await user.clear(screen.getAllByPlaceholderText('Key')[0]);
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		expect(screen.getByText('Schema property has no name')).toBeVisible();
+
+		await user.type(screen.getAllByPlaceholderText('Key')[0], 'a2');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		expect(component.getArguments()).deep.eq({ object_arg: { a2: { b: { c: null } } } });
+
+		// check that nested error message is still visible (paths rename is working)
+		expect(screen.getByText('must be integer')).toBeVisible();
+
+		await user.click(screen.getAllByRole('button', { name: 'Edit key' })[1]);
+		await user.type(screen.getAllByPlaceholderText('Key')[0], '2');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		expect(component.getArguments()).deep.eq({ object_arg: { a2: { b2: { c: null } } } });
+		expect(screen.getByText('must be integer')).toBeVisible();
+
+		await user.click(screen.getAllByRole('button', { name: 'Edit key' })[2]);
+		await user.type(screen.getAllByPlaceholderText('Key')[0], '2');
+		await user.click(screen.getByRole('button', { name: 'Save' }));
+		expect(component.getArguments()).deep.eq({ object_arg: { a2: { b2: { c2: null } } } });
+		expect(screen.getByText('must be integer')).toBeVisible();
+	});
 });

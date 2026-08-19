@@ -6,6 +6,7 @@
 	 * @typedef {Object} Props
 	 * @property {import("../../types/form").CollapsibleFormElement} formElement
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {null|((oldKey: string, newKey: string) => void)} renameKey function passed by the parent that renames a key of this element
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
@@ -18,6 +19,7 @@
 	let {
 		formElement = $bindable(),
 		remove,
+		renameKey,
 		editable,
 		children,
 		reset = null,
@@ -27,13 +29,14 @@
 	} = $props();
 
 	/** @type {boolean} */
-	let collapsed = $derived(formElement.collapsed);
+	let collapsed = $state(true);
 	/** @type {boolean} */
 	let hasErrors = $state(false);
 	formElement.hasErrors.subscribe((v) => (hasErrors = v));
 	/** @type {string[]} */
 	let errors = $state([]);
 	formElement.errors.subscribe((v) => (errors = v));
+	formElement.collapsed.subscribe((c) => (collapsed = c));
 
 	let isNull = $state(false);
 
@@ -51,8 +54,7 @@
 			// prevent collapse when we are clicking on a property description
 			return;
 		}
-		collapsed = !collapsed;
-		formElement.collapsed = collapsed;
+		formElement.collapsed.update((oldValue) => !oldValue);
 	}
 
 	/**
@@ -78,8 +80,7 @@
 		} else if (!value && 'setToNull' in formElement) {
 			formElement.setToNull();
 		}
-		formElement.collapsed = !value;
-		collapsed = formElement.collapsed;
+		formElement.collapsed.update(() => !value);
 	}
 
 	const showResetButton = $derived(
@@ -106,7 +107,7 @@
 					</button>
 					<div class="collapsible-label">
 						<div class="flex-fill">
-							<PropertyLabel {formElement} {editable} {remove} tag="span" />
+							<PropertyLabel {formElement} {editable} {remove} {renameKey} tag="span" />
 						</div>
 					</div>
 					<div class="collapsible-prop-actions">
@@ -182,13 +183,15 @@
 		bottom: 0;
 		right: 0;
 		left: 0;
-		padding: 16px;
+		padding: 0 16px;
 		z-index: 250;
 		pointer-events: none;
 	}
 
 	.collapsible-label .flex-fill {
-		margin-top: -2px;
+		display: flex;
+		align-items: center;
+		height: 100%;
 	}
 
 	:global(.collapsible-label .property-description) {
@@ -204,8 +207,22 @@
 	}
 
 	:global(.collapsible-prop-header .btn-remove-property) {
-		pointer-events: auto;
-		margin-top: -5px;
 		margin-left: -6px;
+	}
+
+	:global(.collapsible-prop-header button),
+	:global(.collapsible-prop-header input) {
+		pointer-events: auto;
+	}
+
+	:global(.collapsible-prop-header .edit-key-input-wrapper) {
+		width: calc(100% - 120px);
+		display: inline-block;
+		background-color: white;
+		border-radius: var(--bs-border-radius);
+	}
+
+	:global(.collapsible-prop-header .invalid-feedback) {
+		display: none;
 	}
 </style>

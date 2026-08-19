@@ -72,6 +72,26 @@
 		formElement.fixInvalidChild(index);
 		children = formElement.children;
 	}
+
+	/**
+	 * @param {string} oldKey
+	 * @param {string} newKey
+	 */
+	function renameKey(oldKey, newKey) {
+		formElement.renameChildKey(oldKey, newKey);
+		children = formElement.children;
+	}
+
+	/**
+	 * @param {KeyboardEvent} event
+	 */
+	function handleAddPropertyKeydown(event) {
+		addPropertyError = '';
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			addProperty();
+		}
+	}
 </script>
 
 {#key children}
@@ -94,6 +114,7 @@
 					reset={isRoot ? () => resetChild(index) : null}
 					init={child.nullable ? () => initChild(index) : null}
 					remove={child.removable ? () => removeProperty(/**@type {string}*/ (child.key)) : null}
+					{renameKey}
 				/>
 			</div>
 		</div>
@@ -118,7 +139,7 @@
 						class="form-control"
 						class:is-invalid={addPropertyError}
 						disabled={!editable}
-						oninput={() => (addPropertyError = '')}
+						onkeydown={handleAddPropertyKeydown}
 					/>
 					<button class="btn btn-primary" type="button" onclick={addProperty} disabled={!editable}>
 						Add property

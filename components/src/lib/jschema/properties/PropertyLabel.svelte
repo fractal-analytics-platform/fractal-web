@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import PropertyDescription from './PropertyDescription.svelte';
 	import { formatMarkdown } from '../../common/utils';
 
@@ -10,15 +10,21 @@
 	 * @property {string} [defaultTitle]
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {null|((oldKey: string, newKey: string) => void)} renameKey function passed by the parent that renames a key of this element
 	 */
 
 	/** @type {Props} */
-	let { formElement, tag = 'label', defaultTitle = '', editable, remove } = $props();
+	let { formElement, tag = 'label', defaultTitle = '', editable, remove, renameKey } = $props();
 
 	let title = $state('');
 	onMount(() => {
 		formElement.title.subscribe((t) => (title = t));
 	});
+
+	let keyInEditing = $state(false);
+	let newKey = $state('');
+	let invalidKey = $state(false);
+	let renameKeyError = $state('');
 
 	let classValue = $derived(
 		formElement.required
@@ -53,6 +59,46 @@
 			remove();
 		}
 	}
+
+	async function editKey() {
+		invalidKey = false;
+		renameKeyError = '';
+		newKey = title;
+		keyInEditing = true;
+		await tick();
+		const input = document.getElementById(`edit-key-${formElement.id}`);
+		input?.focus();
+	}
+
+	function saveKey() {
+		try {
+			if (renameKey) {
+				renameKey(title, newKey.trim());
+			}
+			keyInEditing = false;
+		} catch (err) {
+			invalidKey = true;
+			const errorMessage = /** @type {Error} */ (err).message;
+			if ('collapsed' in formElement) {
+				/** @type {import('svelte/store').Writable<boolean>} */ (formElement.collapsed).set(false);
+				formElement.addError(errorMessage);
+			} else {
+				renameKeyError = errorMessage;
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param {KeyboardEvent} event
+	 */
+	function handleEditKeyKeydown(event) {
+		renameKeyError = '';
+		invalidKey = false;
+		if (event.key === 'Enter') {
+			saveKey();
+		}
+	}
 </script>
 
 {#if remove !== null && formElement.removable}
@@ -73,7 +119,9 @@
 		for={tag === 'label' ? `property-${formElement.id}` : undefined}
 	>
 		{#if title}
-			{title}
+			{#if !keyInEditing}
+				{title}
+			{/if}
 		{:else if defaultTitle}
 			<span class="visually-hidden">{defaultTitle}</span>
 		{/if}
@@ -81,11 +129,47 @@
 {:else}
 	<span class={`${classValue} align-self-center`} id="property-label-{formElement.id}">
 		{#if title}
-			{title}
+			{#if !keyInEditing}
+				{title}
+			{/if}
 		{:else if defaultTitle}
 			<span class="visually-hidden">{defaultTitle}</span>
 		{/if}
 	</span>
 {/if}
 
+{#if editable && remove !== null && formElement.removable}
+	{#if keyInEditing}
+		<div class="edit-key-input-wrapper">
+			<div class="input-group" class:has-validation={renameKeyError}>
+				<input
+					type="text"
+					class="form-control"
+					placeholder="Key"
+					bind:value={newKey}
+					class:is-invalid={invalidKey}
+					id="edit-key-{formElement.id}"
+					onkeydown={handleEditKeyKeydown}
+				/>
+				<button class="btn btn-outline-secondary" type="button" aria-label="Save" onclick={saveKey}>
+					<i class="bi bi-check2"></i>
+				</button>
+				{#if renameKeyError}
+					<span class="invalid-feedback">{renameKeyError}</span>
+				{/if}
+			</div>
+		</div>
+	{:else}
+		<button type="button" class="btn btn-link pt-1" aria-label="Edit key" onclick={editKey}>
+			<i class="bi bi-pencil"></i>
+		</button>
+	{/if}
+{/if}
+
 <PropertyDescription {description} html={true} />
+
+<style>
+	.btn-remove-property {
+		max-height: 38px;
+	}
+</style>

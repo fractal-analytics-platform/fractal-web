@@ -7,10 +7,11 @@
 	 * @property {import('../form_element.js').NumberFormElement} formElement
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {null|((oldKey: string, newKey: string) => void)} renameKey function passed by the parent that renames a key of this element
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable, remove } = $props();
+	let { formElement = $bindable(), editable, remove, renameKey } = $props();
 
 	let value = $state();
 	formElement.value.subscribe((v) => (value = v));
@@ -36,9 +37,9 @@
 	}
 </script>
 
-<div class="d-flex align-items-center p-2">
+<div class="d-flex p-2">
 	<div class="property-metadata d-flex flex-row align-self-center w-50">
-		<PropertyLabel {formElement} {editable} {remove} defaultTitle="Number argument" />
+		<PropertyLabel {formElement} {editable} {remove} {renameKey} defaultTitle="Number argument" />
 	</div>
 	<div class="property-input ms-auto w-50 has-validation">
 		<input
