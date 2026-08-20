@@ -684,7 +684,11 @@
 					{
 						task_id: selectedWorkflowTask.task_id,
 						args_non_parallel: selectedWorkflowTask.args_non_parallel,
-						args_parallel: selectedWorkflowTask.args_parallel
+						args_parallel: selectedWorkflowTask.args_parallel,
+						meta_non_parallel: selectedWorkflowTask.meta_non_parallel,
+						meta_parallel: selectedWorkflowTask.meta_parallel,
+						alias: selectedWorkflowTask.alias,
+						description: selectedWorkflowTask.description
 					}
 				])
 			}
