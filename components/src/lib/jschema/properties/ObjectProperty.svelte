@@ -139,6 +139,7 @@
 						class="form-control"
 						class:is-invalid={addPropertyError}
 						disabled={!editable}
+						oninput={() => (addPropertyError = '')}
 						onkeydown={handleAddPropertyKeydown}
 					/>
 					<button class="btn btn-primary" type="button" onclick={addProperty} disabled={!editable}>

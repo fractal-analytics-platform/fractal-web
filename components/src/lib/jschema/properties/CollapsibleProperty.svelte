@@ -29,14 +29,14 @@
 	} = $props();
 
 	/** @type {boolean} */
-	let collapsed = $state(true);
+	let collapsed = $state(false);
 	/** @type {boolean} */
 	let hasErrors = $state(false);
 	formElement.hasErrors.subscribe((v) => (hasErrors = v));
 	/** @type {string[]} */
 	let errors = $state([]);
 	formElement.errors.subscribe((v) => (errors = v));
-	formElement.collapsed.subscribe((c) => (collapsed = c));
+	formElement.collapsed?.subscribe((c) => (collapsed = c));
 
 	let isNull = $state(false);
 
@@ -54,7 +54,11 @@
 			// prevent collapse when we are clicking on a property description
 			return;
 		}
-		formElement.collapsed.update((oldValue) => !oldValue);
+		if (formElement.collapsed) {
+			formElement.collapsed.update((oldValue) => !oldValue);
+		} else {
+			collapsed = !collapsed;
+		}
 	}
 
 	/**
