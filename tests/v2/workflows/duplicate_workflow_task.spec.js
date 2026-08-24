@@ -12,8 +12,21 @@ test('Duplicate workflow task', async ({ page, workflow }) => {
 		await workflow.addTask('MIP_compound');
 	});
 
-	await test.step('Set alias to first task', async () => {
+	await test.step('Add meta to first task', async () => {
 		await workflow.selectTask('create_ome_zarr_compound');
+		await page.getByRole('button', { name: 'Meta', exact: true }).click();
+		await expect(page.getByText(/Initialisation Meta/)).toBeVisible();
+		await page.getByRole('button', { name: 'Add property', exact: true }).first().click();
+		await page.getByPlaceholder('Argument name').nth(1).fill('abc');
+		await page.getByPlaceholder('Argument value').nth(1).fill('xyz');
+		await page.getByRole('button', { name: 'Add property', exact: true }).nth(1).click();
+		await page.getByPlaceholder('Argument name').nth(3).fill('def');
+		await page.getByPlaceholder('Argument value').nth(3).fill('qwe');
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(page.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+	});
+
+	await test.step('Set alias to first task', async () => {
 		await page.getByRole('button', { name: 'Info', exact: true }).click();
 		await page.getByRole('button', { name: 'Edit workflow task alias' }).click();
 		await page.getByRole('textbox', { name: 'Workflow task alias' }).fill('foo');
@@ -30,7 +43,7 @@ test('Duplicate workflow task', async ({ page, workflow }) => {
 
 	await test.step('Duplicate workflow task', async () => {
 		await page.getByRole('button', { name: 'Duplicate workflow task' }).click();
-		await checkTasksOrder(page, 'foo', 'create_ome_zarr_compound', 'MIP_compound');
+		await checkTasksOrder(page, 'foo', 'foo', 'MIP_compound');
 		await expect(page.getByRole('textbox', { name: 'Image Dir' })).toHaveValue('/tmp');
 	});
 
@@ -67,7 +80,16 @@ test('Duplicate workflow task', async ({ page, workflow }) => {
 
 	await test.step('Duplicate second workflow task', async () => {
 		await page.getByRole('button', { name: 'Duplicate workflow task' }).click();
-		await checkTasksOrder(page, 'foo', 'foo2', 'create_ome_zarr_compound', 'MIP_compound');
+		await checkTasksOrder(page, 'foo', 'foo2', 'foo2', 'MIP_compound');
 		await expect(page.getByRole('textbox', { name: 'Image Dir' })).toHaveValue('/tmp1234');
+	});
+
+	await test.step('Check that meta is duplicated too', async () => {
+		await page.getByRole('button', { name: 'Meta', exact: true }).click();
+		await expect(page.getByText(/Initialisation Meta/)).toBeVisible();
+		await expect(page.getByPlaceholder('Argument name').nth(1)).toHaveValue('abc');
+		await expect(page.getByPlaceholder('Argument value').nth(1)).toHaveValue('xyz');
+		await expect(page.getByPlaceholder('Argument name').nth(3)).toHaveValue('def');
+		await expect(page.getByPlaceholder('Argument value').nth(3)).toHaveValue('qwe');
 	});
 });

@@ -17,32 +17,40 @@
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 * @property {null|(() => void)} [remove] function passed by the parent that removes this element
 	 * @property {null|(() => void)} [init] - Function passed by the parent that initializes a nullable element
+	 * @property {null|((oldKey: string, newKey: string) => void)} [renameKey] function passed by the parent that renames a key of an element
 	 */
 
 	/** @type {Props} */
-	let { formElement, editable = true, reset = null, remove = null, init = null } = $props();
+	let {
+		formElement,
+		editable = true,
+		reset = null,
+		remove = null,
+		renameKey = null,
+		init = null
+	} = $props();
 </script>
 
 {#if formElement.type === 'string'}
-	<StringProperty {formElement} {editable} {remove} />
+	<StringProperty {formElement} {editable} {remove} {renameKey} />
 {:else if formElement.type === 'number'}
-	<NumberProperty {formElement} {editable} {remove} />
+	<NumberProperty {formElement} {editable} {remove} {renameKey} />
 {:else if formElement.type === 'boolean'}
-	<BooleanProperty {formElement} {editable} {remove} />
+	<BooleanProperty {formElement} {editable} {remove} {renameKey} />
 {:else if formElement.type === 'enum'}
-	<EnumProperty {formElement} {editable} {remove} />
+	<EnumProperty {formElement} {editable} {remove} {renameKey} />
 {:else if formElement.type === 'object'}
-	<CollapsibleProperty {formElement} {reset} {remove} {editable} {init}>
+	<CollapsibleProperty {formElement} {reset} {remove} {editable} {init} {renameKey}>
 		<ObjectProperty {formElement} {editable} showErrors={false} />
 	</CollapsibleProperty>
 {:else if formElement.type === 'array'}
-	<ArrayProperty {formElement} {editable} {reset} {remove} {init} />
+	<ArrayProperty {formElement} {editable} {reset} {remove} {renameKey} {init} />
 {:else if formElement.type === 'tuple'}
-	<TupleProperty {formElement} {editable} {reset} {remove} {init} />
+	<TupleProperty {formElement} {editable} {reset} {remove} {renameKey} {init} />
 {:else if formElement.type === 'conditional'}
-	<ConditionalProperty {formElement} {editable} {reset} {remove} />
+	<ConditionalProperty {formElement} {editable} {reset} {remove} {renameKey} />
 {:else if formElement.type === 'unexpected' || formElement.type === 'invalid'}
-	<UnexpectedProperty {formElement} {editable} {remove} />
+	<UnexpectedProperty {formElement} {editable} {remove} {renameKey} />
 {:else}
 	<alert class="alert alert-danger my-1">Unsupported property type {formElement.type}</alert>
 {/if}
