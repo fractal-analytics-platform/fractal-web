@@ -76,4 +76,42 @@ describe('Error utility functions', () => {
 
 		expect(error).toEqual('Input should be a valid string');
 	});
+
+	it('strip function-after and remove duplicates', () => {
+		const errorMap = getValidationMessagesMap(
+			{
+				detail: [
+					{
+						type: 'string_too_short',
+						loc: [
+							'body',
+							'project_dirs',
+							1,
+							'function-after[val_os_path_normpath(), function-after[val_no_dotdot_in_path(), function-after[val_absolute_path(), constrained-str]]]'
+						],
+						msg: 'String should have at least 1 character',
+						input: '',
+						ctx: {
+							min_length: 1
+						}
+					},
+					{
+						type: 'string_too_short',
+						loc: ['body', 'project_dirs', 1, 'function-after[val_s3_url(), constrained-str]'],
+						msg: 'String should have at least 1 character',
+						input: '',
+						ctx: {
+							min_length: 1
+						}
+					}
+				]
+			},
+			422
+		);
+
+		/** @type {string} */
+		const error = /** @type {string} */ (errorMap && errorMap['project_dirs'][1]);
+
+		expect(error).toEqual('String should have at least 1 character');
+	});
 });

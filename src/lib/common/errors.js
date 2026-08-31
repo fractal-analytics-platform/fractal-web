@@ -157,6 +157,13 @@ export function getValidationMessagesMap(reason, statusCode, errorLocPrefix = ['
 		if (!hasValidationErrorPayload(error)) {
 			return null;
 		}
+		if (
+			error.loc.length > 0 &&
+			typeof error.loc[error.loc.length - 1] === 'string' &&
+			error.loc[error.loc.length - 1].startsWith('function-after[')
+		) {
+			error.loc = error.loc.splice(0, error.loc.length - 1);
+		}
 		if (error.loc.length <= errorLocPrefix.length) {
 			return null;
 		}
