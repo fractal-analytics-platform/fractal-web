@@ -1,6 +1,6 @@
 import { deepCopy } from '../common/utils';
 import { getPropertyData } from './jschema_initial_data';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 /**
  * Base class for representing data associated with a form element.
@@ -191,7 +191,8 @@ export class ObjectFormElement extends NullableFormElement {
 		 */
 		this.additionalProperties = fields.additionalProperties;
 		this.children = fields.children;
-		this.collapsed = !fields.required || fields.isNull;
+		/** @type {import('svelte/store').Writable<boolean>} */
+		this.collapsed = writable(!fields.required || fields.isNull);
 	}
 
 	/**
@@ -288,7 +289,7 @@ export class ObjectFormElement extends NullableFormElement {
 		);
 		const newChild = this.createChildElement(child, value);
 		newChild.isNull.set(false);
-		newChild.collapsed = false;
+		newChild.collapsed.set(false);
 		this.children[index] = newChild;
 		this.notifyChange();
 	}
@@ -310,7 +311,9 @@ export class ObjectFormElement extends NullableFormElement {
 			parentProperty: this.property,
 			titleType: this.titleType
 		});
-		newChild.collapsed = child.collapsed;
+		if (child.collapsed) {
+			newChild.collapsed = writable(get(child.collapsed));
+		}
 		return newChild;
 	}
 
@@ -343,6 +346,45 @@ export class ObjectFormElement extends NullableFormElement {
 		this.isNull.set(false);
 		this.notifyChange();
 	}
+
+	/**
+	 * @param {string} oldKey
+	 * @param {string} newKey
+	 */
+	renameChildKey(oldKey, newKey) {
+		if (oldKey === newKey) {
+			return;
+		}
+		if (newKey === '') {
+			throw new Error('Schema property has no name');
+		}
+		const allKeys = this.children.map((c) => c.key);
+		if (allKeys.includes(newKey)) {
+			throw new Error('Schema property already has a property with the same name');
+		}
+		const child = this.children.find((c) => c.key === oldKey);
+		if (!child) {
+			return;
+		}
+		child.key = newKey;
+		adaptPaths(child, child.path, `${this.path}/${newKey}`);
+		child.title.set(newKey);
+		this.notifyChange();
+	}
+}
+
+/**
+ * @param {import('../types/form').FormElement} parent
+ * @param {string} oldPath
+ * @param {string} newPath
+ */
+function adaptPaths(parent, oldPath, newPath) {
+	parent.path = newPath + parent.path.substring(oldPath.length);
+	if ('children' in parent) {
+		for (const child of parent.children) {
+			adaptPaths(child, oldPath, newPath);
+		}
+	}
 }
 
 export class ArrayFormElement extends NullableFormElement {
@@ -355,7 +397,8 @@ export class ArrayFormElement extends NullableFormElement {
 		this.items = fields.items;
 		this.minItems = fields.minItems;
 		this.maxItems = fields.maxItems;
-		this.collapsed = !fields.required || fields.isNull;
+		/** @type {import('svelte/store').Writable<boolean>} */
+		this.collapsed = writable(!fields.required || fields.isNull);
 	}
 
 	addChild() {
@@ -444,7 +487,8 @@ export class TupleFormElement extends NullableFormElement {
 		super(fields);
 		this.children = fields.children;
 		this.items = fields.items;
-		this.collapsed = !fields.required || fields.isNull;
+		/** @type {import('svelte/store').Writable<boolean>} */
+		this.collapsed = writable(!fields.required || fields.isNull);
 	}
 
 	addTuple() {
@@ -508,6 +552,8 @@ export class ConditionalFormElement extends BaseFormElement {
 		this.discriminator = fields.discriminator;
 		this.unexpectedChildren = fields.unexpectedChildren;
 		this.originalProperty = fields.originalProperty;
+		/** @type {import('svelte/store').Writable<boolean>} */
+		this.collapsed = writable(!fields.required);
 	}
 
 	/**

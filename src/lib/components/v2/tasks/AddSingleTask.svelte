@@ -356,7 +356,7 @@
 	}
 </script>
 
-<StandardDismissableAlert message={taskSuccessMessage} />
+<StandardDismissableAlert bind:message={taskSuccessMessage} />
 
 <form
 	onsubmit={(e) => {

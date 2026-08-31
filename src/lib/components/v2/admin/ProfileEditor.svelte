@@ -228,7 +228,7 @@
 			<div class="col-lg-7">
 				<div class="row mb-3 mt-2">
 					<div class="col-sm-9 offset-sm-3">
-						<StandardDismissableAlert message={profileUpdatedMessage} />
+						<StandardDismissableAlert bind:message={profileUpdatedMessage} />
 						<div id="genericProfileError"></div>
 						{#if showSaveButton}
 							<button type="button" onclick={handleSave} class="btn btn-primary" disabled={saving}>

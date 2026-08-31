@@ -693,10 +693,14 @@
 				"$defs": {
 					"ModelDependentRequired": {
 						"additionalProperties": false,
-						"dependentRequired": {
-							"advanced_path": ["advanced_1", "advanced_2"]
-						},
 						"description": "Model demonstrating dependentRequired constraints.",
+						"if": {
+							"properties": {
+								"advanced_path": {
+									"type": "string"
+								}
+							}
+						},
 						"properties": {
 							"advanced_path": {
 								"anyOf": [
@@ -712,10 +716,17 @@
 								"title": "Advanced Path"
 							},
 							"advanced_1": {
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "null"
+									}
+								],
 								"default": "default",
 								"description": "Advanced 1 description.",
-								"title": "Advanced 1",
-								"type": "string"
+								"title": "Advanced 1"
 							},
 							"advanced_2": {
 								"anyOf": [
@@ -729,6 +740,16 @@
 								"default": null,
 								"description": "Advanced 1 description.",
 								"title": "Advanced 2"
+							}
+						},
+						"then": {
+							"properties": {
+								"advanced_1": {
+									"type": "string"
+								},
+								"advanced_2": {
+									"type": "integer"
+								}
 							}
 						},
 						"title": "ModelDependentRequired",

@@ -164,7 +164,7 @@
 		</div>
 	{/if}
 
-	<StandardDismissableAlert message={projectUpdatesSuccessMessage} />
+	<StandardDismissableAlert bind:message={projectUpdatesSuccessMessage} />
 </div>
 
 <ProjectDatasetsList {datasets} {project} />

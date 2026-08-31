@@ -224,22 +224,51 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		);
 	});
 
-	await test.step('Attempt to import a file containing invalid JSON', async () => {
+	await test.step('Attempt to import a full workflow export', async () => {
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByRole('button', { name: 'Export workflow' }).click();
+		const download = await downloadPromise;
+		const file = path.join(os.tmpdir(), download.suggestedFilename());
+		await download.saveAs(file);
+
 		await page.getByRole('button', { name: 'Import' }).click();
 		const modal = await waitModal(page);
 		await expect(modal.locator('.modal-title')).toHaveText('Import arguments');
 		const fileChooserPromise = page.waitForEvent('filechooser');
 		await page.getByText('Select arguments file').click();
 		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(file);
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await expect(
+			page.getByText(/Task argument import does not support importing full workflows/)
+		).toBeVisible();
+	});
+
+	await test.step('Attempt to import a file containing invalid JSON', async () => {
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'broken.json'));
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await expect(page.getByText("File doesn't contain valid JSON")).toBeVisible();
+	});
+
+	await test.step('Attempt to import a file without arguments fields', async () => {
+		const fileChooserPromise = page.waitForEvent('filechooser');
+		await page.getByText('Select arguments file').click();
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'meta.json'));
+		await page.getByRole('button', { name: 'Confirm' }).click();
+		await expect(
+			page.getByText(/File does not contain a valid workflow parameter definition/)
+		).toBeVisible();
+		const modal = await waitModal(page);
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
-		await workflow.removeCurrentTask();
 	});
 
 	await test.step('Cleanup test tasks', async () => {
+		await workflow.removeCurrentTask();
 		await deleteTask(page, nonParallelTaskWithoutArgsSchema);
 		await deleteTask(page, parallelTaskWithoutArgsSchema);
 		await deleteTask(page, compoundTaskWithoutArgsSchema);

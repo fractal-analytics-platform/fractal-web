@@ -46,6 +46,18 @@
 			importArgsError = "File doesn't contain valid JSON";
 			return;
 		}
+
+		if ('task_list' in json) {
+			importArgsError = 'Task argument import does not support importing full workflows';
+			return;
+		}
+
+		if (!('args_parallel' in json) && !('args_non_parallel' in json)) {
+			importArgsError =
+				'File does not contain a valid workflow parameter definition (must contain top-level args_parallel or args_non_parallel)';
+			return;
+		}
+
 		importArgsModal?.confirmAndHide(async function () {
 			await onImport(json);
 		});

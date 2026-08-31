@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, screen } from '@testing-library/svelte';
+import { screen } from '@testing-library/svelte';
 import { checkBold, renderSchemaWithSingleProperty, renderSchema } from './property_test_utils';
 import { FormManager } from '../../../src/lib/jschema/form_manager';
 import userEvent from '@testing-library/user-event';
@@ -25,6 +25,7 @@ describe('Array properties', () => {
 	});
 
 	it('Required ArrayProperty with minItems and maxItems', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				title: 'ArrayProperty',
@@ -41,14 +42,14 @@ describe('Array properties', () => {
 		expect(inputs.length).eq(3);
 		expect(screen.queryAllByRole('button', { name: 'Remove' })).toHaveLength(0);
 		expect(component.getArguments()).deep.eq({ testProp: [null, null, null] });
-		await fireEvent.input(inputs[0], { target: { value: 'foo' } });
+		await user.type(inputs[0], 'foo');
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['foo', null, null] });
 		const addBtn = screen.getByRole('button', { name: 'Add argument to list' });
 		expect(addBtn).not.toBeDisabled();
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: ['foo', null, null, null] });
 		expect(screen.getAllByRole('button', { name: 'Remove' }).length).eq(4);
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 		inputs = screen.getAllByRole('textbox');
 		expect(inputs.length).eq(5);
 		expect(onChange).toHaveBeenCalledWith({
@@ -58,6 +59,7 @@ describe('Array properties', () => {
 	});
 
 	it('Optional ArrayProperty with minItems and maxItems', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchemaWithSingleProperty(
 			{
 				title: 'ArrayProperty',
@@ -74,20 +76,21 @@ describe('Array properties', () => {
 		expect(inputs.length).eq(0);
 		expect(component.getArguments()).deep.eq({ testProp: [] });
 		const addBtn = screen.getByRole('button', { name: 'Add argument to list' });
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: [null] });
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: [null, null] });
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: [null, null, null] });
 		expect(addBtn).toBeDisabled();
-		await fireEvent.click(addBtn);
+		await user.click(addBtn);
 		inputs = screen.queryAllByRole('textbox');
 		expect(inputs.length).eq(3);
 		expect(component.getArguments()).deep.eq({ testProp: [null, null, null] });
 	});
 
 	it('Object with additional array property', async () => {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'Object with additionalProperties',
@@ -126,34 +129,35 @@ describe('Array properties', () => {
 		);
 		expect(component.getArguments()).deep.eq({ testProp: {} });
 		const input = screen.getByRole('textbox');
-		await fireEvent.input(input, { target: { value: 'my-key' } });
+		await user.type(input, 'my-key');
 		const addPropertyBtn = screen.getByRole('button', { name: 'Add property' });
-		await fireEvent.click(addPropertyBtn);
+		await user.click(addPropertyBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: { 'my-key': [] } });
 		expect(screen.queryByText('my-key')).not.null;
 		const accordionBtn1 = screen.getByRole('button', { name: 'my-key' });
-		await fireEvent.click(accordionBtn1);
+		await user.click(accordionBtn1);
 		const addArgumentBtn = screen.getByRole('button', { name: 'Add argument to list' });
-		await fireEvent.click(addArgumentBtn);
+		await user.click(addArgumentBtn);
 		expect(onChange).toHaveBeenCalledWith({
 			testProp: { 'my-key': [{ required_string: null, optional_number: null }] }
 		});
 		const accordionBtn2 = screen.getByRole('button', { name: 'argument' });
-		await fireEvent.click(accordionBtn2);
+		await user.click(accordionBtn2);
 		expect(screen.queryByText('Required String')).not.null;
 		checkBold(screen.getByText('Required String'), true);
 		checkBold(screen.getByText('Optional Number'), false);
 		const removeArgumentBtn = screen.getByRole('button', { name: 'Remove' });
-		await fireEvent.click(removeArgumentBtn);
+		await user.click(removeArgumentBtn);
 		expect(onChange).toHaveBeenCalledWith({ testProp: { 'my-key': [] } });
 		expect(screen.queryByText('Required String')).null;
 		const removePropertyBtn = screen.getByRole('button', { name: 'Remove Property Block' });
-		await fireEvent.click(removePropertyBtn);
+		await user.click(removePropertyBtn);
 		expect(screen.queryByText('my-key')).null;
 		expect(onChange).toHaveBeenCalledWith({ testProp: {} });
 	});
 
 	it('add array element', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -173,12 +177,13 @@ describe('Array properties', () => {
 
 		expect(component.getArguments()).deep.eq({ test: [] });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.click(screen.getByRole('button', { name: 'Add argument to list' }));
+		await user.click(screen.getByRole('button', { name: 'Add argument to list' }));
 		expect(onChange).toHaveBeenCalledWith({ test: [null] });
 		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
 
 	it('remove array element', async function () {
+		const user = userEvent.setup();
 		const { component, onChange } = renderSchema(
 			{
 				title: 'test',
@@ -199,7 +204,7 @@ describe('Array properties', () => {
 
 		expect(component.getArguments()).deep.eq({ test: ['foo'] });
 		expect(component.hasUnsavedChanges()).toEqual(false);
-		await fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+		await user.click(screen.getByRole('button', { name: 'Remove' }));
 		expect(onChange).toHaveBeenCalledWith({ test: [] });
 		expect(component.hasUnsavedChanges()).toEqual(true);
 	});
@@ -516,7 +521,7 @@ describe('Array properties', () => {
 			array_or_None_with_default: null
 		});
 
-		await fireEvent.click(screen.getByRole('switch', { name: 'Set' }));
+		await user.click(screen.getByRole('switch', { name: 'Set' }));
 
 		expect(component.getArguments()).deep.eq({
 			array_or_None: [42],

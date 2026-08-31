@@ -1,6 +1,11 @@
 import { expect } from '@playwright/test';
 import { test } from '../../base_fixture';
-import { expectBooleanIcon, waitModal, waitPageLoading } from '../../utils/utils.js';
+import {
+	expectBooleanIcon,
+	waitModal,
+	waitModalClosed,
+	waitPageLoading
+} from '../../utils/utils.js';
 import { createFakeTask, deleteTask } from '../../utils/v2/task.js';
 import { createProject } from '../../utils/v2/project';
 import { createWorkflow } from '../../utils/v2/workflow';
@@ -60,7 +65,8 @@ test('Task group manage (deactivate / reactivate)', async ({ page }) => {
 		await page.goto(`/v2/projects/${project.id}/workflows/${workflow.id}`);
 		await page.getByRole('button', { name: 'Add task to workflow' }).click();
 		await page.getByRole('row', { name: taskName }).getByLabel('Add task').click();
-		await waitPageLoading(page);
+		await waitModalClosed(page);
+		await expect(page.getByText(/Workflow task created/)).toBeVisible();
 
 		await page.goto('/v2/tasks/management');
 		await waitPageLoading(page);

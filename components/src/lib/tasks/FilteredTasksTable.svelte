@@ -426,7 +426,7 @@
 	</div>
 </div>
 
-{#if showOnlyCoreFiltering}
+{#if showOnlyCoreFiltering && allRows.length > 0}
 	<div class="d-flex justify-content-end mb-2">
 		<div class="btn-group btn-group-sm mt-1" role="group" aria-label="Preferred version">
 			<input

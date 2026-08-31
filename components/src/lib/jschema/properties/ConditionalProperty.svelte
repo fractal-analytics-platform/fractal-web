@@ -11,11 +11,12 @@
 	 * @property {import("../form_element.js").ConditionalFormElement} formElement
 	 * @property {boolean} editable
 	 * @property {null|(() => void)} remove function passed by the parent that removes this element
+	 * @property {null|((oldKey: string, newKey: string) => void)} renameKey function passed by the parent that renames a key of this element
 	 * @property {null|(() => void)} [reset] function passed by the parent that resets this element to its default value (used only on top-level objects)
 	 */
 
 	/** @type {Props} */
-	let { formElement = $bindable(), editable, remove, reset = null } = $props();
+	let { formElement = $bindable(), editable, remove, renameKey, reset = null } = $props();
 
 	/** @type {string[]} */
 	let errors = $state([]);
@@ -68,7 +69,7 @@
 
 {#if formElement.discriminator}
 	{#key selectedItem}
-		<CollapsibleProperty {formElement} {editable} {reset} {remove} showErrors={false}>
+		<CollapsibleProperty {formElement} {editable} {reset} {remove} {renameKey} showErrors={false}>
 			<div class="mx-2">
 				{#each errors as error, index (index)}
 					<div class="alert alert-danger mb-1 py-1 px-2">{error}</div>
@@ -86,7 +87,7 @@
 							html={true}
 						/>
 					</div>
-					<div class="property-input ms-auto w-50 has-validation">
+					<div class="property-input ms-auto w-50 has-validation mb-2">
 						<select
 							class="form-select"
 							bind:value={selectedIndex}

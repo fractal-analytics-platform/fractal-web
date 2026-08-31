@@ -1,8 +1,16 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.29.7
+
+- JSON schema form: support additional properties keys rename (\#1245).
+- Include also task meta, alias and description during task duplication (\#1245).
+- Improve error handling of workflow task arguments import (\#1245).
+
+# 1.29.6
 
 - Use `text/plain` response in `/profile/token` route (\#1230).
+- Fix JSON Schema Form remove property button misaligned and not working (\#1232).
+- Propagate Escape key from help page to help modal (\#1232).
 
 # 1.29.5
 

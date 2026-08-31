@@ -302,7 +302,9 @@ export class FormManager {
 							: value[childKey],
 					parentProperty: property,
 					titleType: removable ? 'key' : 'prefer_title',
-					schemaPath: `${schemaPath}/properties/${childKey}`
+					schemaPath: removable
+						? `${schemaPath}/additionalProperties`
+						: `${schemaPath}/properties/${childKey}`
 				});
 				children.push(childElement);
 			}

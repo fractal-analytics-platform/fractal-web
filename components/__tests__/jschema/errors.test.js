@@ -566,4 +566,28 @@ describe('JSchema form errors', () => {
 		expect(get(formManager.root.children[1].hasErrors)).eq(true);
 		expect(get(formManager.root.children[1].children[0].errors)).deep.eq(['must be integer']);
 	});
+
+	it('error in additionalProperties', () => {
+		const formManager = new FormManager(
+			{
+				type: 'object',
+				properties: {
+					foo: {
+						type: 'object',
+						additionalProperties: {
+							type: 'string'
+						}
+					}
+				}
+			},
+			vi.fn(),
+			'fractal_schema_v1',
+			[],
+			{
+				foo: { x: null }
+			}
+		);
+		const errors = get(formManager.root.children[0].children[0].errors);
+		expect(errors).deep.eq(['must be string']);
+	});
 });

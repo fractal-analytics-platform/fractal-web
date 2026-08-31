@@ -11,6 +11,7 @@ import {
 	ConditionalFormElement
 } from '../jschema/form_element.js';
 import type { JSONSchemaProperty } from './jschema.js';
+import { Writable } from 'svelte/store';
 
 export type TitleType = 'key' | 'prefer_title' | 'title_only' | 'inner_title';
 
@@ -24,14 +25,11 @@ export type FormElement = (
 	| TupleFormElement
 	| ConditionalFormElement
 ) & {
-	collapsed?: boolean;
+	collapsed?: Writable<boolean>;
 };
 
 export type CollapsibleFormElement =
-	| ObjectFormElement
-	| ArrayFormElement
-	| TupleFormElement
-	| ValueFormElement;
+	ObjectFormElement | ArrayFormElement | TupleFormElement | ValueFormElement;
 
 export type BaseFormElementFields = {
 	manager: FormManager;

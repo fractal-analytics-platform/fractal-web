@@ -85,7 +85,7 @@
 </script>
 
 <div class="container mt-2">
-	<StandardDismissableAlert message={datasetCreatedMessage} autoDismiss={false} />
+	<StandardDismissableAlert bind:message={datasetCreatedMessage} autoDismiss={false} />
 
 	<div class="row align-items-center mb-2">
 		<div class="col-2">

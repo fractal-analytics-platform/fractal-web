@@ -23,14 +23,32 @@
 		}
 	});
 
+	function onOpen() {
+		window.addEventListener('message', listenIframeMessage);
+	}
+
 	function onClose() {
 		currentHelpLink.set('');
+		window.removeEventListener('message', listenIframeMessage);
+	}
+
+	/**
+	 * @param {MessageEvent} event
+	 */
+	function listenIframeMessage(event) {
+		if (event.origin !== location.origin) {
+			console.warn(`Invalid origin: ${event.origin}`);
+			return;
+		}
+		if (event.data.type === 'closeModal') {
+			modal?.hide();
+		}
 	}
 
 	onDestroy(unsubscribe);
 </script>
 
-<Modal id="helpModal" size="xl" bind:this={modal} {onClose}>
+<Modal id="helpModal" size="xl" bind:this={modal} {onOpen} {onClose}>
 	{#snippet header()}
 		Help
 	{/snippet}

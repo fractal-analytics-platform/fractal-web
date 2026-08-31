@@ -430,7 +430,7 @@
 	});
 </script>
 
-<StandardDismissableAlert message={jobCancelledMessage} />
+<StandardDismissableAlert bind:message={jobCancelledMessage} />
 
 <div class="d-flex justify-content-end align-items-center mb-3">
 	<div>
