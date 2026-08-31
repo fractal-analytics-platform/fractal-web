@@ -114,4 +114,40 @@ describe('Error utility functions', () => {
 
 		expect(error).toEqual('String should have at least 1 character');
 	});
+
+	it('strip function-after and join messages', () => {
+		const errorMap = getValidationMessagesMap(
+			{
+				detail: [
+					{
+						type: 'value_error',
+						loc: [
+							'body',
+							'project_dirs',
+							0,
+							'function-after[val_os_path_normpath(), function-after[val_no_dotdot_in_path(), function-after[val_absolute_path(), constrained-str]]]'
+						],
+						msg: "Value error, String must be an absolute path (given 'sdfsd').",
+						input: 'sdfsd',
+						ctx: { error: {} }
+					},
+					{
+						type: 'value_error',
+						loc: ['body', 'project_dirs', 0, 'function-after[val_s3_url(), constrained-str]'],
+						msg: "Value error, S3 URL must match pattern 's3://bucket/key' (given 'sdfsd')",
+						input: 'sdfsd',
+						ctx: { error: {} }
+					}
+				]
+			},
+			422
+		);
+
+		/** @type {string} */
+		const error = /** @type {string} */ (errorMap && errorMap['project_dirs'][0]);
+
+		expect(error).toEqual(
+			"Value error, String must be an absolute path (given 'sdfsd'). Value error, S3 URL must match pattern 's3://bucket/key' (given 'sdfsd')"
+		);
+	});
 });

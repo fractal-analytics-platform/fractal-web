@@ -151,7 +151,7 @@ export function getValidationMessagesMap(reason, statusCode, errorLocPrefix = ['
 	if (!Array.isArray(reason.detail) || reason.detail.length === 0) {
 		return null;
 	}
-	/** @type {{[key: string]: string | string[]}} */
+	/** @type {{[key: string]: string[] | string[][]}} */
 	const map = {};
 	for (const error of reason.detail) {
 		if (!hasValidationErrorPayload(error)) {
@@ -175,17 +175,46 @@ export function getValidationMessagesMap(reason, statusCode, errorLocPrefix = ['
 		}
 		const loc = error.loc.slice(errorLocPrefix.length);
 		if (loc.length === 1) {
-			map[loc[0]] = error.msg;
+			if (Array.isArray(map[loc[0]])) {
+				appendMessage(/** @type {string[]} */ (map[loc[0]]), error.msg);
+			} else {
+				map[loc[0]] = [error.msg];
+			}
 		} else if (loc.length === 2 && typeof loc[1] === 'number') {
 			if (!(loc[0] in map)) {
 				map[loc[0]] = [];
 			}
-			/** @type {string[]} */ (map[loc[0]])[loc[1]] = error.msg;
+			if (Array.isArray(map[loc[0]][loc[1]])) {
+				appendMessage(/** @type {string[][]} */ (map[loc[0]])[loc[1]], error.msg);
+			} else {
+				map[loc[0]][loc[1]] = [error.msg];
+			}
 		} else {
 			return null;
 		}
 	}
-	return map;
+	/** @type {{[key: string]: string | string[]}} */
+	return Object.fromEntries(
+		Object.entries(map).map(([k, v]) => [
+			k,
+			v.length === 0
+				? ''
+				: v.find((i) => Array.isArray(i))
+					? v.map((i) => (Array.isArray(i) ? i.join(' ') : i))
+					: v.join(' ')
+		])
+	);
+}
+
+/**
+ * @param {string[]} values
+ * @param {string} message
+ */
+function appendMessage(values, message) {
+	if (!values.includes(message)) {
+		values.push(message);
+	}
+	return values;
 }
 
 /**
