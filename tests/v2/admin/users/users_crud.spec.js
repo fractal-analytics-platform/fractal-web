@@ -95,12 +95,20 @@ test('Create and update a user', async ({ page }) => {
 		await page.waitForURL(/\/v2\/admin\/users\/\d+/);
 	});
 
-	await test.step('Test project dir validation error', async () => {
+	await test.step('Test project dir validation errors', async () => {
+		await page.getByLabel('Project dir').clear();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('String should have at least 1 character')).toHaveClass(
+			/invalid-feedback/
+		);
+
 		await page.getByLabel('Project dir').fill('foo');
 		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(
-			page.getByText("Value error, String must be an absolute path (given 'foo')")
-		).toBeVisible();
+			page.getByText(
+				/Value error, String must be an absolute path \(given 'foo'\)\. Value error, S3 URL must match pattern 's3:\/\/bucket\/key' \(given 'foo'\)/
+			)
+		).toHaveClass(/invalid-feedback/);
 		await page.getByLabel('Project dir').fill('/tmp/test/project-dir');
 	});
 

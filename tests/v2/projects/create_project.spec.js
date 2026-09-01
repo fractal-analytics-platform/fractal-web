@@ -128,7 +128,9 @@ test('Create and delete a project', async ({ page }) => {
 		await createProjectBtn.click();
 
 		// Check validation error
-		await expect(modal).toContainText(`Project name (${randomProjectName}) already in use`);
+		await expect(modal.getByText(`Project name (${randomProjectName}) already in use`)).toHaveClass(
+			/invalid-feedback/
+		);
 
 		// Close modal
 		const closeModalBtn = modal.getByRole('button', { name: 'Cancel' });
