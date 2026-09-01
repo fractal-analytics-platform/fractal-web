@@ -1,5 +1,9 @@
 <script>
-	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
+	import {
+		FormErrorHandler,
+		getAlertErrorFromResponse,
+		getValidationMessagesMap
+	} from '$lib/common/errors';
 	import { page } from '$app/state';
 	import Modal from '../../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
@@ -50,6 +54,11 @@
 	/** @type {number|undefined} */
 	let singleSelectedTemplateId = $state();
 
+	const createWorkflowErrorHandler = new FormErrorHandler('errorAlert-createWorkflowModal', [
+		'name'
+	]);
+	const createWorkflowValidationErrors = createWorkflowErrorHandler.getValidationErrorStore();
+
 	$effect(() => {
 		includeOlderVersions;
 		if (!workflowImportErrorData) {
@@ -77,45 +86,51 @@
 		selectedVersions = [];
 		includeOlderVersions = false;
 		mode = 'new';
-		modal?.hideErrorAlert();
+		createWorkflowErrorHandler.clearErrors();
 	}
 
-	function handleImportWorkflow() {
-		modal?.confirmAndHide(
-			async () => {
-				creating = true;
-				await _handleImportWorkflow();
-			},
-			() => {
-				creating = false;
+	async function handleImportWorkflow() {
+		try {
+			creating = true;
+			if (await _handleImportWorkflow()) {
+				modal?.hide();
 			}
-		);
+		} finally {
+			creating = false;
+		}
 	}
 
-	function handleCreateWorkflow() {
-		modal?.confirmAndHide(
-			async () => {
-				creating = true;
-				await _handleCreateWorkflow();
-			},
-			() => {
-				creating = false;
+	async function handleCreateWorkflow() {
+		try {
+			creating = true;
+			if (await _handleCreateWorkflow()) {
+				modal?.hide();
 			}
-		);
+		} finally {
+			creating = false;
+		}
 	}
 
 	async function _handleImportWorkflow() {
+		createWorkflowErrorHandler.clearErrors();
+
 		if (!workflowImportErrorData) {
 			const workflowFile = /** @type {FileList} */ (files)[0];
 			try {
 				workflowMetadata = JSON.parse(await workflowFile.text());
 			} catch (err) {
 				console.error(err);
-				throw new AlertError('The workflow file is not a valid JSON file');
+				createWorkflowErrorHandler.setGenericError('The workflow file is not a valid JSON file');
+				return false;
 			}
 		}
 
 		if (workflowMetadata) {
+			if (!('task_list' in workflowMetadata)) {
+				createWorkflowErrorHandler.setGenericError('Task list not found in JSON file');
+				return false;
+			}
+
 			workflowMetadata.task_list.forEach((item, index) => {
 				const version = selectedVersions[index];
 				if (version !== undefined) {
@@ -152,28 +167,20 @@
 			await tick();
 
 			handleWorkflowImported(workflow);
+			return true;
 		} else {
 			console.error('Import workflow failed');
-
-			const alertError = await getAlertErrorFromResponse(response);
-			const result = alertError.reason;
-
-			if (
-				typeof result === 'object' &&
-				'detail' in result &&
-				result.detail.includes('HAS_ERROR_DATA')
-			) {
-				workflowImportErrorData = result.data;
-				throw new Error();
-			}
-
-			throw alertError;
+			await handleWorkflowImportError(response);
 		}
+
+		return false;
 	}
 
 	async function _handleCreateWorkflow() {
+		createWorkflowErrorHandler.clearErrors();
+
 		if (!workflowName) {
-			return;
+			return false;
 		}
 
 		const headers = new Headers();
@@ -196,13 +203,16 @@
 					workflowId: String(result.id)
 				})
 			);
+			return true;
 		} else {
-			throw await getAlertErrorFromResponse(response);
+			await createWorkflowErrorHandler.handleErrorResponse(response);
 		}
+
+		return false;
 	}
 
 	async function handleSelect() {
-		modal?.hideErrorAlert();
+		createWorkflowErrorHandler.clearErrors();
 
 		const payload = {};
 		if (workflowName) {
@@ -226,7 +236,7 @@
 		const headers = new Headers();
 		headers.set('Content-Type', 'application/json');
 
-		const response2 = await fetch(
+		const response = await fetch(
 			`/api/v2/project/${page.params.projectId}/workflow/import-from-template?template_id=${singleSelectedTemplateId}`,
 			{
 				method: 'POST',
@@ -235,7 +245,7 @@
 			}
 		);
 
-		if (response2.ok) {
+		if (response.ok) {
 			// Return a workflow item
 			importSuccess = true;
 			setTimeout(() => {
@@ -244,24 +254,39 @@
 			reset();
 
 			/** @type {import('fractal-components/types/api').WorkflowV2} */
-			const workflow = await response2.json();
+			const workflow = await response.json();
 
 			await tick();
 
 			handleWorkflowImported(workflow);
+			return true;
 		} else {
 			console.error('Import workflow failed');
-			const alertError = await getAlertErrorFromResponse(response2);
-			const result = alertError.reason;
-			if (
-				typeof result === 'object' &&
-				'detail' in result &&
-				result.detail.includes('HAS_ERROR_DATA')
-			) {
+			await handleWorkflowImportError(response);
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param {Response} response
+	 */
+	async function handleWorkflowImportError(response) {
+		const alertError = await getAlertErrorFromResponse(response);
+		const result = alertError.reason;
+
+		if (typeof result === 'object' && 'detail' in result) {
+			if (result.detail.includes('HAS_ERROR_DATA')) {
 				workflowImportErrorData = result.data;
-				throw new Error();
+			} else {
+				const errors = getValidationMessagesMap(result, response.status);
+				if (errors && 'name' in errors && typeof errors['name'] === 'string') {
+					createWorkflowErrorHandler.addValidationError('name', errors['name']);
+					document.getElementById('workflowName')?.focus();
+				} else {
+					createWorkflowErrorHandler.setGenericError(result);
+				}
 			}
-			modal?.displayErrorAlert(alertError);
 		}
 	}
 </script>
@@ -316,9 +341,9 @@
 						onclick={reset}
 						bind:group={mode}
 					/>
-					<label class="form-check-label" for="createWorkflowModeTemplate"
-						>Create from template</label
-					>
+					<label class="form-check-label" for="createWorkflowModeTemplate">
+						Create from template
+					</label>
 				</div>
 			</div>
 		</div>
@@ -329,7 +354,7 @@
 					handleCreateWorkflow();
 				}}
 			>
-				<div class="mb-2">
+				<div class="mb-2 has-validation">
 					<label for="workflowName" class="form-label">Workflow name</label>
 					<input
 						id="workflowName"
@@ -337,7 +362,10 @@
 						type="text"
 						bind:value={workflowName}
 						class="form-control"
+						class:is-invalid={$createWorkflowValidationErrors['name']}
+						oninput={() => createWorkflowErrorHandler.removeValidationError('name')}
 					/>
+					<span class="invalid-feedback">{$createWorkflowValidationErrors['name']}</span>
 				</div>
 				<button class="btn btn-primary mt-2" disabled={!workflowName || creating}>
 					{#if creating}
@@ -354,7 +382,7 @@
 					handleImportWorkflow();
 				}}
 			>
-				<div class="mb-2">
+				<div class="mb-2 has-validation">
 					<label for="workflowName" class="form-label">Workflow name</label>
 					<input
 						id="workflowName"
@@ -362,7 +390,10 @@
 						type="text"
 						bind:value={workflowName}
 						class="form-control"
+						class:is-invalid={$createWorkflowValidationErrors['name']}
+						oninput={() => createWorkflowErrorHandler.removeValidationError('name')}
 					/>
+					<span class="invalid-feedback">{$createWorkflowValidationErrors['name']}</span>
 				</div>
 
 				{#if !workflowImportErrorData}
@@ -380,8 +411,8 @@
 					</div>
 					<button class="btn btn-primary mt-2" disabled={!workflowFileSelected || creating}>
 						{#if creating}
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-							></span>
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+							</span>
 						{/if}
 						Import workflow
 					</button>
@@ -400,7 +431,7 @@
 				<p class="alert alert-primary mt-3">Workflow imported successfully</p>
 			{/if}
 		{:else}
-			<div class="mb-2">
+			<div class="mb-2 has-validation">
 				<label for="workflowName" class="form-label">Workflow name</label>
 				<input
 					id="workflowName"
@@ -408,7 +439,10 @@
 					type="text"
 					bind:value={workflowName}
 					class="form-control"
+					class:is-invalid={$createWorkflowValidationErrors['name']}
+					oninput={() => createWorkflowErrorHandler.removeValidationError('name')}
 				/>
+				<span class="invalid-feedback">{$createWorkflowValidationErrors['name']}</span>
 			</div>
 			<div class="mt-2" id="errorAlert-createWorkflowModal"></div>
 			{#if !workflowImportErrorData}
