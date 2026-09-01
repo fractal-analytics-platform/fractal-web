@@ -609,6 +609,20 @@ To execute the tests seeing the browser add the `--headed` flag or the `--debug`
 
 To print Svelte webserver log set the environment variable `DEBUG=pw:webserver`.
 
+### Test for validation errors
+
+Validation errors associated with specific form fields are usually displayed near the fields. If the parsing of the error message doesn't return a valid field, the logic performs a fallback to a generic error alert. In some cases, this may be a regression, caused for example by a payload change in the backend.
+
+In order to automatically detect these regressions, it is suggested to add an explicit check for the `invalid-feedback` CSS class, e.g.:
+
+```js
+await expect(page.getByText(/String should have at least 1 character/)).toHaveClass(
+	/invalid-feedback/
+);
+```
+
+In this way we can ensure that the text is displayed near the field and not in the generic error alert.
+
 ### Run the OAuth2 login test
 
 OAuth2 test requires a running instance of `dexidp` test image and a fractal-server instance configured to use it.
