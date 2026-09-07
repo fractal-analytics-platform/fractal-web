@@ -91,7 +91,7 @@
 		if (!oldValue) {
 			return false;
 		}
-		return JSON.stringify($state.snapshot(oldValue)) !== newValue;
+		return JSON.stringify($state.snapshot(oldValue)) !== JSON.stringify($state.snapshot(newValue));
 	}
 
 	export function hasUnsavedChanges() {
