@@ -51,7 +51,27 @@ test('Create, update and delete a profile', async ({ page }) => {
 		await waitPageLoading(page);
 	});
 
+	await test.step('Attempt to create profile with the same name', async () => {
+		await page.getByRole('link', { name: 'New profile' }).click();
+		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles\/create$/);
+		await waitPageLoading(page);
+		await page.getByRole('textbox', { name: 'Profile name' }).fill(randomProfileName);
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(
+			page.getByText(`Profile with name '${randomProfileName}' already exists.`)
+		).toBeVisible();
+	});
+
+	await test.step('Test empty profile name validation', async () => {
+		await page.getByRole('textbox', { name: 'Profile name' }).clear();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText(/Input should be a valid string/)).toHaveClass(/invalid-feedback/);
+	});
+
 	await test.step('Open profile page', async () => {
+		await page.getByRole('link', { name: 'Profiles' }).click();
+		await page.waitForURL(/\/v2\/admin\/resources\/\d+\/profiles$/);
+		await waitPageLoading(page);
 		await page
 			.getByRole('row', { name: randomProfileName })
 			.getByRole('link', { name: 'Info' })

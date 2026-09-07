@@ -20,6 +20,12 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 		await waitDatasetModal(page, 'Create new dataset');
 	});
 
+	await test.step('Test validation error', async () => {
+		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('/');
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText(/String should match pattern/)).toHaveClass(/invalid-feedback/);
+	});
+
 	await test.step('Fill dataset mandatory values', async () => {
 		await page.getByRole('textbox', { name: 'Dataset Name' }).fill('test-dataset');
 		await page.getByRole('button', { name: 'Advanced options' }).click();
@@ -70,6 +76,12 @@ test('Create, update and delete a dataset [v2]', async ({ page, project }) => {
 	await test.step('Edit dataset name', async () => {
 		const modal = await waitModal(page, false);
 		await modal.getByRole('button', { name: 'Edit dataset name' }).click();
+
+		// Test field validation
+		await modal.getByRole('textbox').fill('/');
+		await modal.getByRole('button', { name: 'Save' }).click();
+		await expect(modal.getByText(/String should match pattern/)).toHaveClass(/invalid-feedback/);
+
 		await modal.getByRole('textbox').fill('test-dataset-renamed');
 		await modal.getByRole('button', { name: 'Save' }).click();
 		await expect(modal.getByRole('textbox')).toHaveCount(0);

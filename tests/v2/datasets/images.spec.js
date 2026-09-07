@@ -87,7 +87,9 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('foo');
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
-		await expect(modal.getByText(`URLs must begin with '/' or 's3://'`)).toBeVisible();
+		await expect(modal.getByText(`URLs must begin with '/' or 's3://'`)).toHaveClass(
+			/invalid-feedback/
+		);
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});
