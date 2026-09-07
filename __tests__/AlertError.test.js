@@ -4,12 +4,12 @@ import { AlertError } from '../src/lib/common/errors';
 describe('AlertError class', () => {
 	it('Extract string detail for generic error', () => {
 		const error = new AlertError({ detail: 'error message' }, 422);
-		expect(error.getSimpleValidationMessage()).eq('error message');
+		expect(error.errorData).eq('error message');
 	});
 
 	it('Extract array detail for generic error', () => {
 		const error = new AlertError({ detail: ['error message'] }, 422);
-		expect(error.getSimpleValidationMessage()).eq('error message');
+		expect(error.errorData).eq('error message');
 	});
 
 	it('Extract __root__ generic error', () => {
@@ -25,7 +25,7 @@ describe('AlertError class', () => {
 			},
 			422
 		);
-		expect(error.getSimpleValidationMessage()).eq('error message');
+		expect(error.errorData).eq('error message');
 	});
 
 	it('Extract field error', () => {
@@ -41,11 +41,11 @@ describe('AlertError class', () => {
 			},
 			422
 		);
-		expect(error.getSimpleValidationMessage('zarr_url')).eq('error message');
+		expect(error.errorData).eq('error message');
 	});
 
-	it('Extract field error', () => {
+	it('Extract 413 error', () => {
 		const error = new AlertError({ message: 'Payload Too Large' }, 413);
-		expect(error.getSimpleValidationMessage()).eq('Payload Too Large');
+		expect(error.errorData).eq('Payload Too Large');
 	});
 });

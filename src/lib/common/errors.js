@@ -5,7 +5,7 @@ import { mount } from 'svelte';
 /**
  * @param {Response} response
  */
-async function parseErrorResponse(response) {
+export async function parseErrorResponse(response) {
 	try {
 		return await response.json();
 	} catch {
@@ -32,17 +32,20 @@ export class AlertError extends Error {
 	 */
 	constructor(reason, statusCode = null) {
 		super();
-		this.reason = reason;
-		/** @type {null | { loc: string[], msg: string } | string} */
-		this.simpleValidationMessage = getSimpleValidationMessage(reason, statusCode);
-	}
-
-	/**
-	 * @param {string[]} loc expected location of the validation message
-	 * @returns {string | null} the validation message, if found
-	 */
-	getSimpleValidationMessage(...loc) {
-		return extractFieldValidationError(this.simpleValidationMessage, loc);
+		this.errorData = (() => {
+			const simpleMessage = getSimpleValidationMessage(reason, statusCode);
+			if (simpleMessage) {
+				return typeof simpleMessage === 'string' ? simpleMessage : simpleMessage.msg;
+			}
+			if (typeof reason === 'string') {
+				return reason;
+			}
+			const errorDetail = extractErrorDetail(reason);
+			if (typeof errorDetail === 'string') {
+				return errorDetail;
+			}
+			return reason;
+		})();
 	}
 }
 
@@ -339,7 +342,7 @@ export class FormErrorHandler {
 	/**
 	 * @private
 	 * Returns true if all the keys of the error map are handled by the current page or component.
-	 * Used to decide if it possible to show user friendly validation messages
+	 * Used to decide if it is possible to show user friendly validation messages
 	 * or if it is necessary to display a generic error message.
 	 * @param {{[key:string]: string | string[] }} errorsMap
 	 * @return {boolean}

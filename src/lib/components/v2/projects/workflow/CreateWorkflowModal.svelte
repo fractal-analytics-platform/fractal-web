@@ -1,8 +1,8 @@
 <script>
 	import {
 		FormErrorHandler,
-		getAlertErrorFromResponse,
-		getValidationMessagesMap
+		getValidationMessagesMap,
+		parseErrorResponse
 	} from '$lib/common/errors';
 	import { page } from '$app/state';
 	import Modal from '../../../common/Modal.svelte';
@@ -272,8 +272,7 @@
 	 * @param {Response} response
 	 */
 	async function handleWorkflowImportError(response) {
-		const alertError = await getAlertErrorFromResponse(response);
-		const result = alertError.reason;
+		const result = await parseErrorResponse(response);
 
 		if (typeof result === 'object' && 'detail' in result) {
 			if (result.detail.includes('HAS_ERROR_DATA')) {
