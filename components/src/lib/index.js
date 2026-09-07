@@ -9,15 +9,7 @@ import {
 	nullifyEmptyStrings,
 	formatMarkdown
 } from './common/utils';
-import {
-	isCompoundType,
-	isNonParallelType,
-	isParallelType,
-	hasComputeArguments,
-	hasInitialisationArguments,
-	hasNonParallelArguments,
-	hasParallelArguments
-} from './common/workflow_task_utils';
+import { isCompoundType, isNonParallelType, isParallelType } from './common/workflow_task_utils';
 import { getPropertiesToIgnore } from './jschema/property_utils';
 import { JsonSchemaDataError } from './jschema/form_manager';
 import { stripDiscriminator, stripIgnoredProperties } from './jschema/jschema_adapter';
@@ -43,10 +35,6 @@ export {
 	isCompoundType,
 	isNonParallelType,
 	isParallelType,
-	hasComputeArguments,
-	hasInitialisationArguments,
-	hasNonParallelArguments,
-	hasParallelArguments,
 	normalizePayload,
 	nullifyEmptyStrings,
 	stripDiscriminator,

@@ -5,15 +5,7 @@
 	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
 	import { onMount } from 'svelte';
-	import {
-		isCompoundType,
-		hasComputeArguments,
-		hasInitialisationArguments,
-		hasNonParallelArguments,
-		isNonParallelType,
-		hasParallelArguments,
-		isParallelType
-	} from 'fractal-components';
+	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
 	import { deepCopy, normalizePayload } from 'fractal-components/common/utils';
 	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
 
@@ -183,6 +175,12 @@
 	let isSchemaValid = $derived(isValidArgsSchemaVersion(workflowTask.task.args_schema_version));
 	let schemaVersion = $derived(workflowTask.task.args_schema_version);
 	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
+	let hasBothArguments = $derived(
+		workflowTask.args_non_parallel &&
+			Object.keys(workflowTask.args_non_parallel).length > 0 &&
+			workflowTask.args_parallel &&
+			Object.keys(workflowTask.args_parallel).length > 0
+	);
 
 	onMount(() => {
 		if (argsSchemaNonParallel && isSchemaValid) {
@@ -207,7 +205,7 @@
 		<div class="alert alert-danger m-2">Data is not valid</div>
 	{/if}
 	{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
-		{#if hasInitialisationArguments(workflowTask)}
+		{#if hasBothArguments}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
 		{#if argsSchemaNonParallel && isSchemaValid}
@@ -233,11 +231,11 @@
 			</div>
 		{/if}
 	{/if}
-	{#if hasInitialisationArguments(workflowTask) && hasComputeArguments(workflowTask)}
+	{#if hasBothArguments}
 		<hr />
 	{/if}
 	{#if isParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
-		{#if hasComputeArguments(workflowTask)}
+		{#if hasBothArguments}
 			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
@@ -263,7 +261,7 @@
 			</div>
 		{/if}
 	{/if}
-	{#if !hasNonParallelArguments(workflowTask) && !hasParallelArguments(workflowTask) && (argsSchemaParallel || argsSchemaNonParallel)}
+	{#if (!workflowTask.args_non_parallel || Object.keys(workflowTask.args_non_parallel).length === 0) && (!workflowTask.args_parallel || Object.keys(workflowTask.args_parallel).length === 0) && (argsSchemaParallel || argsSchemaNonParallel)}
 		<p class="mt-3 ps-3">No arguments</p>
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
