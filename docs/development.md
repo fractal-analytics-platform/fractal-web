@@ -464,6 +464,16 @@ errorAlert?.hide();
 
 Notice that we are using the optional chaining operator (`?.`), since the variable might be undefined if no error happened previously.
 
+#### Handling of 500 Internal Server Errors
+
+Errors having status code equals to 500 don't have a JSON response payload. So, the following code produces an unhandled error in these cases:
+
+```javascript
+const result = await response.json();
+```
+
+Remember to always use `await parseErrorResponse(response)` or `await getAlertErrorFromResponse(response)` to properly handle the 500 error case.
+
 #### Form validation errors
 
 A form usually needs an error alert component to display generic errors and a mechanism to display errors associated with specific form fields. This logic has been incapsulated in the `FormErrorHandler` class.
