@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
 	import ImportExportArgs from './ImportExportArgs.svelte';
-	import { JSchema, getPropertiesToIgnore } from 'fractal-components';
+	import { JSchema, getPropertiesToIgnore, stripIgnoredProperties } from 'fractal-components';
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
 	import { onMount } from 'svelte';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
@@ -166,20 +166,55 @@
 		savingChanges = false;
 	}
 
-	let unsavedChanges = $derived(
+	const unsavedChanges = $derived(
 		unsavedChangesParallel ||
 			unsavedChangesNonParallel ||
 			unsavedChangesFormBuilderParallel ||
 			unsavedChangesFormBuilderNonParallel
 	);
-	let isSchemaValid = $derived(isValidArgsSchemaVersion(workflowTask.task.args_schema_version));
-	let schemaVersion = $derived(workflowTask.task.args_schema_version);
-	let propertiesToIgnore = $derived(getPropertiesToIgnore(false));
-	let hasBothArguments = $derived(
-		workflowTask.args_non_parallel &&
-			Object.keys(workflowTask.args_non_parallel).length > 0 &&
-			workflowTask.args_parallel &&
-			Object.keys(workflowTask.args_parallel).length > 0
+	const isSchemaValid = $derived(isValidArgsSchemaVersion(workflowTask.task.args_schema_version));
+	const schemaVersion = $derived(workflowTask.task.args_schema_version);
+	const propertiesToIgnore = $derived(getPropertiesToIgnore(false));
+
+	const hasNonParallelArgs =
+		workflowTask.args_non_parallel && Object.keys(workflowTask.args_non_parallel).length > 0;
+	const hasParallelArgs =
+		workflowTask.args_parallel && Object.keys(workflowTask.args_parallel).length > 0;
+
+	const hasNonParallelSchemaProperties = $derived(
+		workflowTask.task.args_schema_non_parallel &&
+			Object.keys(
+				stripIgnoredProperties(workflowTask.task.args_schema_non_parallel, propertiesToIgnore)
+					.properties
+			).length > 0
+	);
+
+	const hasParallelSchemaProperties = $derived(
+		workflowTask.task.args_schema_parallel &&
+			Object.keys(
+				stripIgnoredProperties(workflowTask.task.args_schema_parallel, propertiesToIgnore)
+					.properties
+			).length > 0
+	);
+
+	const isCompoundWithoutSchemas = $derived(
+		isCompoundType(workflowTask.task_type) &&
+			!workflowTask.task.args_schema_non_parallel &&
+			!workflowTask.task.args_schema_parallel
+	);
+
+	const displayArgumentsTitles = $derived(
+		(hasNonParallelArgs && hasParallelArgs) ||
+			(hasNonParallelSchemaProperties && hasParallelSchemaProperties) ||
+			isCompoundWithoutSchemas
+	);
+
+	const hasNoArguments = $derived(
+		(workflowTask.task.args_schema_non_parallel || workflowTask.task.args_schema_parallel) &&
+			!hasNonParallelArgs &&
+			!hasParallelArgs &&
+			!hasNonParallelSchemaProperties &&
+			!hasParallelSchemaProperties
 	);
 
 	onMount(() => {
@@ -205,7 +240,7 @@
 		<div class="alert alert-danger m-2">Data is not valid</div>
 	{/if}
 	{#if isNonParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
-		{#if hasBothArguments}
+		{#if displayArgumentsTitles}
 			<h5 class="ps-2 mt-3">Initialisation Arguments</h5>
 		{/if}
 		{#if argsSchemaNonParallel && isSchemaValid}
@@ -231,11 +266,11 @@
 			</div>
 		{/if}
 	{/if}
-	{#if hasBothArguments}
+	{#if displayArgumentsTitles}
 		<hr />
 	{/if}
 	{#if isParallelType(workflowTask.task_type) || isCompoundType(workflowTask.task_type)}
-		{#if hasBothArguments}
+		{#if displayArgumentsTitles}
 			<h5 class="ps-2 mt-3">Compute Arguments</h5>
 		{/if}
 		{#if argsSchemaParallel && isSchemaValid}
@@ -261,7 +296,7 @@
 			</div>
 		{/if}
 	{/if}
-	{#if (!workflowTask.args_non_parallel || Object.keys(workflowTask.args_non_parallel).length === 0) && (!workflowTask.args_parallel || Object.keys(workflowTask.args_parallel).length === 0) && (argsSchemaParallel || argsSchemaNonParallel)}
+	{#if hasNoArguments}
 		<p class="mt-3 ps-3">No arguments</p>
 	{/if}
 	<div class="d-flex jschema-controls-bar p-3">
