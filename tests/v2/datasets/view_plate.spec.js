@@ -43,10 +43,9 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 	await test.step('Select plates', async () => {
 		for (let i = 1; i <= 3; i++) {
 			await page.getByRole('combobox', { name: 'Select plate' }).selectOption(`plate${i}`);
-			const plateUrlRegExp = new RegExp(`\\/plate${i}\\.zarr$`);
 			await expect(page.getByRole('link', { name: 'View plate with Vizarr' })).toHaveAttribute(
 				'href',
-				plateUrlRegExp
+				new RegExp(`\\/plate${i}\\.zarr&roi=1$`)
 			);
 			await expect(page.getByRole('link', { name: 'Open in Feature Explorer' })).toHaveAttribute(
 				'href',
@@ -56,7 +55,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 			const clipboardContent = await page.evaluate(async () => {
 				return await navigator.clipboard.readText();
 			});
-			expect(clipboardContent).toMatch(plateUrlRegExp);
+			expect(clipboardContent).toMatch(new RegExp(`\\/plate${i}\\.zarr$`));
 			await expect(page.getByRole('combobox', { name: 'Select plate' })).toHaveValue(`plate${i}`);
 		}
 	});

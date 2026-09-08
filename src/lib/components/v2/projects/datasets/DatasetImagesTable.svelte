@@ -737,7 +737,7 @@
 											class="btn btn-info viewer-btn vizarr-btn"
 											href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
 												image.zarr_url
-											)}"
+											)}&roi=1"
 											target="_blank"
 											aria-label="View with Vizarr"
 										>

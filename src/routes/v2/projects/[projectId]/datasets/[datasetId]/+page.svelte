@@ -181,7 +181,9 @@
 				{#if platePath}
 					{#if vizarrViewerUrl}
 						<a
-							href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(platePath)}"
+							href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
+								platePath
+							)}&roi=1"
 							class="btn btn-info me-2 viewer-btn vizarr-btn"
 							target="_blank"
 							class:disabled={platePathLoading}
