@@ -35,6 +35,11 @@ test('Dataset images [v2]', async ({ page, project }) => {
 
 	await test.step('Create an image without filters', async () => {
 		await createImage(page, `${randomPath}/img1`, async function () {});
+		// Check Vizarr URL
+		await expect(page.getByRole('link', { name: 'View with Vizarr' })).toHaveAttribute(
+			'href',
+			new RegExp(`${randomPath}/img1&roi=1$`)
+		);
 	});
 
 	await test.step('Create an image with string attribute filter', async () => {
@@ -87,7 +92,9 @@ test('Dataset images [v2]', async ({ page, project }) => {
 		await modal.getByRole('textbox', { name: 'Zarr URL' }).fill('foo');
 		const saveBtn = modal.getByRole('button', { name: 'Save' });
 		await saveBtn.click();
-		await expect(modal.getByText(`URLs must begin with '/' or 's3://'`)).toBeVisible();
+		await expect(modal.getByText(`URLs must begin with '/' or 's3://'`)).toHaveClass(
+			/invalid-feedback/
+		);
 		await modal.getByRole('button', { name: 'Cancel' }).click();
 		await waitModalClosed(page);
 	});

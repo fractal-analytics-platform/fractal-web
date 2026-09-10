@@ -110,6 +110,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await test.step('Non parallel task without args schema', async () => {
 		await workflow.addTask(nonParallelTaskWithoutArgsSchema);
 		await workflow.selectTask(nonParallelTaskWithoutArgsSchema);
+		await checkArgumentsLabels(page, false);
 		await page.getByRole('button', { name: 'Add property' }).click();
 		await page.getByPlaceholder('Argument name').click();
 		await page.getByPlaceholder('Argument name').fill('key_non_parallel');
@@ -128,6 +129,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await test.step('Parallel task without args schema', async () => {
 		await workflow.addTask(parallelTaskWithoutArgsSchema);
 		await workflow.selectTask(parallelTaskWithoutArgsSchema);
+		await checkArgumentsLabels(page, false);
 		await page.getByRole('button', { name: 'Add property' }).click();
 		await page.getByPlaceholder('Argument name').click();
 		await page.getByPlaceholder('Argument name').fill('key_parallel');
@@ -147,6 +149,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await test.step('Compound task without args schema', async () => {
 		await workflow.addTask(compoundTaskWithoutArgsSchema);
 		await workflow.selectTask(compoundTaskWithoutArgsSchema);
+		await checkArgumentsLabels(page, true);
 		await page.getByRole('button', { name: 'Add property' }).first().click();
 		await page.getByPlaceholder('Argument name').fill('key_non_parallel');
 		await page.getByPlaceholder('Argument value').fill('value_non_parallel');
@@ -173,6 +176,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await test.step('Non parallel task with args schema', async () => {
 		await workflow.addTask(nonParallelTaskWithArgsSchema);
 		await workflow.selectTask(nonParallelTaskWithArgsSchema);
+		await checkArgumentsLabels(page, false);
 		await page.getByRole('textbox', { name: 'test_non_parallel' }).fill('value_non_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		const { file, data } = await exportArgs(page, nonParallelTaskWithoutArgsSchema);
@@ -189,6 +193,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await test.step('Parallel task with args schema', async () => {
 		await workflow.addTask(parallelTaskWithArgsSchema);
 		await workflow.selectTask(parallelTaskWithArgsSchema);
+		await checkArgumentsLabels(page, false);
 		await page.getByRole('textbox', { name: 'test_parallel' }).fill('value_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		const { file, data } = await exportArgs(page, parallelTaskWithArgsSchema);
@@ -205,6 +210,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 	await test.step('Compound task with args schema', async () => {
 		await workflow.addTask(compoundTaskWithArgsSchema);
 		await workflow.selectTask(compoundTaskWithArgsSchema);
+		await checkArgumentsLabels(page, true);
 		await page.getByRole('textbox', { name: 'test_non_parallel' }).fill('value_non_parallel');
 		await page.getByRole('textbox', { name: 'test_parallel' }).fill('value_parallel');
 		await page.getByRole('button', { name: 'Save changes' }).click();
@@ -241,7 +247,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await expect(
 			page.getByText(/Task argument import does not support importing full workflows/)
-		).toBeVisible();
+		).toHaveClass(/invalid-feedback/);
 	});
 
 	await test.step('Attempt to import a file containing invalid JSON', async () => {
@@ -250,7 +256,7 @@ test('Import/export arguments [v2]', async ({ page, workflow }) => {
 		const fileChooser = await fileChooserPromise;
 		await fileChooser.setFiles(path.join(__dirname, '..', '..', 'data', 'broken.json'));
 		await page.getByRole('button', { name: 'Confirm' }).click();
-		await expect(page.getByText("File doesn't contain valid JSON")).toBeVisible();
+		await expect(page.getByText("File doesn't contain valid JSON")).toHaveClass(/invalid-feedback/);
 	});
 
 	await test.step('Attempt to import a file without arguments fields', async () => {
@@ -312,4 +318,13 @@ async function importValidArgs(page, file, data) {
 	await page.getByRole('button', { name: 'Confirm' }).click();
 	await waitModalClosed(page);
 	fs.rmSync(file);
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {boolean} visible
+ */
+async function checkArgumentsLabels(page, visible) {
+	await expect(page.getByText(/Initialisation Arguments/)).toBeVisible({ visible });
+	await expect(page.getByText(/Compute Arguments/)).toBeVisible({ visible });
 }

@@ -1,5 +1,12 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Improve handling of form errors (\#1251).
+- Fix bug on workflow task arguments import (\#1251).
+- Fix logger timezone issue (\#1251).
+- Add `roi=1` query parameter to vizarr URLs (\#1251).
+
 # 1.29.7
 
 - JSON schema form: support additional properties keys rename (\#1245).

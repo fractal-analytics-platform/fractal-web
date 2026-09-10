@@ -9,7 +9,11 @@ const logLevelConsole = env.LOG_LEVEL_CONSOLE || 'warn';
  * @returns {string}
  */
 export function formatDate(date) {
-	return date.toISOString().replace('T', ' ').replace('Z', '').replace('.', ',');
+	return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+		.toISOString()
+		.replace('T', ' ')
+		.replace('Z', '')
+		.replace('.', ',');
 }
 
 /**

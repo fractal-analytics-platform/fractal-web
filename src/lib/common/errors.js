@@ -5,7 +5,7 @@ import { mount } from 'svelte';
 /**
  * @param {Response} response
  */
-async function parseErrorResponse(response) {
+export async function parseErrorResponse(response) {
 	try {
 		return await response.json();
 	} catch {
@@ -32,17 +32,20 @@ export class AlertError extends Error {
 	 */
 	constructor(reason, statusCode = null) {
 		super();
-		this.reason = reason;
-		/** @type {null | { loc: string[], msg: string } | string} */
-		this.simpleValidationMessage = getSimpleValidationMessage(reason, statusCode);
-	}
-
-	/**
-	 * @param {string[]} loc expected location of the validation message
-	 * @returns {string | null} the validation message, if found
-	 */
-	getSimpleValidationMessage(...loc) {
-		return extractFieldValidationError(this.simpleValidationMessage, loc);
+		this.errorData = (() => {
+			const simpleMessage = getSimpleValidationMessage(reason, statusCode);
+			if (simpleMessage) {
+				return typeof simpleMessage === 'string' ? simpleMessage : simpleMessage.msg;
+			}
+			if (typeof reason === 'string') {
+				return reason;
+			}
+			const errorDetail = extractErrorDetail(reason);
+			if (typeof errorDetail === 'string') {
+				return errorDetail;
+			}
+			return reason;
+		})();
 	}
 }
 
@@ -151,11 +154,18 @@ export function getValidationMessagesMap(reason, statusCode, errorLocPrefix = ['
 	if (!Array.isArray(reason.detail) || reason.detail.length === 0) {
 		return null;
 	}
-	/** @type {{[key: string]: string | string[]}} */
+	/** @type {{[key: string]: string[] | string[][]}} */
 	const map = {};
 	for (const error of reason.detail) {
 		if (!hasValidationErrorPayload(error)) {
 			return null;
+		}
+		if (
+			error.loc.length > 0 &&
+			typeof error.loc[error.loc.length - 1] === 'string' &&
+			error.loc[error.loc.length - 1].startsWith('function-after[')
+		) {
+			error.loc = error.loc.splice(0, error.loc.length - 1);
 		}
 		if (error.loc.length <= errorLocPrefix.length) {
 			return null;
@@ -168,17 +178,46 @@ export function getValidationMessagesMap(reason, statusCode, errorLocPrefix = ['
 		}
 		const loc = error.loc.slice(errorLocPrefix.length);
 		if (loc.length === 1) {
-			map[loc[0]] = error.msg;
+			if (Array.isArray(map[loc[0]])) {
+				appendMessage(/** @type {string[]} */ (map[loc[0]]), error.msg);
+			} else {
+				map[loc[0]] = [error.msg];
+			}
 		} else if (loc.length === 2 && typeof loc[1] === 'number') {
 			if (!(loc[0] in map)) {
 				map[loc[0]] = [];
 			}
-			/** @type {string[]} */ (map[loc[0]])[loc[1]] = error.msg;
+			if (Array.isArray(map[loc[0]][loc[1]])) {
+				appendMessage(/** @type {string[][]} */ (map[loc[0]])[loc[1]], error.msg);
+			} else {
+				map[loc[0]][loc[1]] = [error.msg];
+			}
 		} else {
 			return null;
 		}
 	}
-	return map;
+	/** @type {{[key: string]: string | string[]}} */
+	return Object.fromEntries(
+		Object.entries(map).map(([k, v]) => [
+			k,
+			v.length === 0
+				? ''
+				: v.find((i) => Array.isArray(i))
+					? v.map((i) => (Array.isArray(i) ? i.join(' ') : i))
+					: v.join(' ')
+		])
+	);
+}
+
+/**
+ * @param {string[]} values
+ * @param {string} message
+ */
+function appendMessage(values, message) {
+	if (!values.includes(message)) {
+		values.push(message);
+	}
+	return values;
 }
 
 /**
@@ -303,7 +342,7 @@ export class FormErrorHandler {
 	/**
 	 * @private
 	 * Returns true if all the keys of the error map are handled by the current page or component.
-	 * Used to decide if it possible to show user friendly validation messages
+	 * Used to decide if it is possible to show user friendly validation messages
 	 * or if it is necessary to display a generic error message.
 	 * @param {{[key:string]: string | string[] }} errorsMap
 	 * @return {boolean}

@@ -3,7 +3,8 @@
 	import {
 		AlertError,
 		displayStandardErrorAlert,
-		getValidationMessagesMap
+		getValidationMessagesMap,
+		parseErrorResponse
 	} from '$lib/common/errors';
 	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
@@ -60,11 +61,12 @@
 			headers,
 			body: normalizePayload(payload, { nullifyEmptyStrings: true })
 		});
-		const result = await response.json();
 		if (response.ok) {
+			const result = await response.json();
 			initFields(result);
 			userUpdatedMessage = 'User successfully updated';
 		} else {
+			const result = await parseErrorResponse(response);
 			const errorMap = getValidationMessagesMap(result, response.status);
 			let errorShown = false;
 			if (errorMap) {
