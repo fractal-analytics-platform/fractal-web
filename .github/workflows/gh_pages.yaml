@@ -10,11 +10,11 @@ permissions: {}
 
 jobs:
   end_to_end_tests:
-    uses: ./.github/workflows/end_to_end_tests.yaml
+    uses: $/.github/workflows/end_to_end_tests.yaml
   documentation:
     if: ${{ always() }}
     needs: end_to_end_tests
-    uses: ./.github/workflows/documentation.yaml
+    uses: $/.github/workflows/documentation.yaml
     permissions:
       pages: write
       id-token: write
