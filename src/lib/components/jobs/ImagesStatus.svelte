@@ -85,8 +85,17 @@
 						</div>
 					</span>
 				</button>
-			{:else if status.status === 'submitted' && !running}
-				<i class="bi bi-hourglass"></i>
+			{:else if status.status === 'submitted'}
+				{#if running}
+					<div
+						class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
+						role="status"
+					>
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				{:else}
+					<i class="bi bi-hourglass"></i>
+				{/if}
 			{/if}
 			{#if 'num_done_images' in status && status.num_done_images > 0}
 				<button
