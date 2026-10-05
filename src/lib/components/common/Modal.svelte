@@ -168,6 +168,7 @@
 	tabindex="-1"
 	data-bs-focus={focus}
 	aria-modal="true"
+	data-testid={id}
 >
 	<div
 		class="modal-dialog"
