@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -47,6 +47,10 @@ function mockFetch() {
 }
 
 describe('CreateDatasetModal', () => {
+	beforeEach(async () => {
+		global.window.bootstrap = await import('bootstrap');
+	});
+
 	it('validate missing name', async () => {
 		const user = userEvent.setup();
 		mockFetch();
