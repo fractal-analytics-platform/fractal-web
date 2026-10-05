@@ -42,7 +42,7 @@
 	});
 </script>
 
-<json-diff-viewer {left} {right} {id} test-id={id}></json-diff-viewer>
+<json-diff-viewer {left} {right} {id} data-testid={id}></json-diff-viewer>
 
 <style>
 	/** light theme */
