@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -460,10 +460,6 @@ function getMockedWorkflowTask() {
 }
 
 describe('VersionUpdate', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('update task with compatible arguments', async () => {
 		const user = userEvent.setup();
 		const task = getTask('My Task', '1.2.3');

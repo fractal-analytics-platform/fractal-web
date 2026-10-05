@@ -1,4 +1,4 @@
-import { describe, beforeEach, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -58,10 +58,6 @@ function mockTaskGroups() {
 }
 
 describe('Admin task-groups page', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('Search without filters', async () => {
 		const mockRequest = mockTaskGroups();
 

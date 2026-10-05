@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -23,10 +23,6 @@ vi.mock('$app/state', () => {
 import AdminTaskGroupActivities from '../../src/lib/components/v2/tasks/AdminTaskGroupActivities.svelte';
 
 describe('AdminTaskGroupActivities', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('Update ongoing activity in background - admin', async () => {
 		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({

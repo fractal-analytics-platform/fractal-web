@@ -59,7 +59,6 @@ import RunWorkflowModal from '../../src/lib/components/v2/workflow/RunWorkflowMo
 
 describe('RunWorkflowModal', () => {
 	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 		mockOnMountCalls();
 	});
 

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/svelte';
 
 // Mocking fetch
@@ -22,10 +22,6 @@ vi.mock('$app/state', () => {
 import TaskGroupActivities from '../../src/lib/components/v2/tasks/TaskGroupActivities.svelte';
 
 describe('TaskGroupActivities', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('Update ongoing activity in background - standard user', async () => {
 		/** @type {import('vitest').Mock} */ (fetch)
 			.mockResolvedValueOnce({
