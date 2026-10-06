@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.29.9
 
 - Fix task for continuing workflow not updated after task reordering (\#1259).
 - Fix task running status not displayed in certain cases (\#1259).
