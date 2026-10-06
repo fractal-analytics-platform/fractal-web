@@ -24,7 +24,6 @@ import UserEditor from '../../src/lib/components/v2/admin/UserEditor.svelte';
 
 describe('UserEditor', () => {
 	beforeEach(async () => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 		mockResourcesAndProfiles();
 		global.window.bootstrap = await import('bootstrap');
 	});

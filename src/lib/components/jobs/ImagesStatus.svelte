@@ -49,9 +49,10 @@
 	{#if handleAsConverter(workflowTask, status)}
 		<span class="d-flex">
 			{#if status.status === 'done'}
-				<i class="status-icon bi bi-check text-success pe-1"></i>
+				<i class="status-icon bi bi-check text-success pe-1" role="img" aria-label={status.status}
+				></i>
 			{:else if status.status === 'failed'}
-				<i class="status-icon bi bi-x text-danger pe-1"></i>
+				<i class="status-icon bi bi-x text-danger pe-1" role="img" aria-label={status.status}></i>
 			{:else if status.status === 'submitted'}
 				{#if running}
 					<div
@@ -61,7 +62,7 @@
 						<span class="visually-hidden">Loading...</span>
 					</div>
 				{:else}
-					<i class="bi bi-hourglass"></i>
+					<i class="bi bi-hourglass" role="img" aria-label={status.status}></i>
 				{/if}
 			{/if}
 		</span>
@@ -85,8 +86,17 @@
 						</div>
 					</span>
 				</button>
-			{:else if status.status === 'submitted' && !running}
-				<i class="bi bi-hourglass"></i>
+			{:else if status.status === 'submitted'}
+				{#if running}
+					<div
+						class="mt-1 pe-1 spinner-border spinner-border-sm text-primary status-wrapper"
+						role="status"
+					>
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				{:else}
+					<i class="bi bi-hourglass" role="img" aria-label={status.status}></i>
+				{/if}
 			{/if}
 			{#if 'num_done_images' in status && status.num_done_images > 0}
 				<button

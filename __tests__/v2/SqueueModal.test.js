@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -9,10 +9,6 @@ global.fetch = vi.fn();
 import SqueueModal from '../../src/lib/components/v2/jobs/SqueueModal.svelte';
 
 describe('SqueueModal', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('Scope all', async () => {
 		const mockApi = mockSqueueCallSuccess();
 		render(SqueueModal);

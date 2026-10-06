@@ -24,7 +24,6 @@ import TaskCollection from '../../src/lib/components/v2/tasks/TaskCollection.sve
 
 describe('TaskCollection', () => {
 	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
 		vi.useFakeTimers({ shouldAdvanceTime: true });
 	});
 

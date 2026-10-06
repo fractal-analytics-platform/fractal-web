@@ -44,14 +44,6 @@ describe('logger', () => {
 		for (const key of Object.keys(mocks.env)) {
 			delete mocks.env[key];
 		}
-		mocks.existsSync.mockReset();
-		mocks.readFileSync.mockReset();
-		mocks.configure.mockReset();
-		mocks.getLogger.mockClear();
-		mocks.logger.addContext.mockClear();
-		mocks.logger.debug.mockClear();
-		mocks.logger.warn.mockClear();
-		mocks.logger.fatal.mockClear();
 	});
 
 	it('uses LOG_CONFIG_FILE when the file exists', async () => {

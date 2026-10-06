@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
@@ -17,10 +17,6 @@ import AddSingleTask from '../../src/lib/components/v2/tasks/AddSingleTask.svelt
 import { mockUser } from '../mock/mock-types';
 
 describe('AddSingleTask', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('Add single task associated with specific group', async () => {
 		const user = userEvent.setup();
 

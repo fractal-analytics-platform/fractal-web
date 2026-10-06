@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/svelte';
 
 // Mocking fetch
@@ -26,10 +26,6 @@ vi.mock('$app/state', () => {
 import page from '../../src/routes/v2/admin/groups/[groupId]/edit/+page.svelte';
 
 describe('Admin group edit page', () => {
-	beforeEach(() => {
-		/** @type {import('vitest').Mock} */ (fetch).mockClear();
-	});
-
 	it('User is added successfully', async () => {
 		const result = render(page);
 

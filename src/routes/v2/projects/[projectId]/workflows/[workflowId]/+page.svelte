@@ -722,6 +722,17 @@
 		return imageStatus && 'has_warnings' in imageStatus && imageStatus.has_warnings;
 	}
 
+	/**
+	 * @param {import('fractal-components/types/api').WorkflowV2} updated
+	 */
+	function onWorkflowUpdated(updated) {
+		workflow = updated;
+		if (selectedWorkflowTask) {
+			const updatedSelectedWft = updated.task_list.find((t) => t.id === selectedWorkflowTask?.id);
+			selectedWorkflowTask = updatedSelectedWft;
+		}
+	}
+
 	onDestroy(() => {
 		clearTimeout(statusWatcherTimer);
 	});
@@ -1455,7 +1466,7 @@
 <TasksOrderModal
 	projectId={project.id}
 	{workflow}
-	workflowUpdater={(updated) => (workflow = updated)}
+	workflowUpdater={onWorkflowUpdated}
 	bind:this={editTasksOrderModal}
 />
 
