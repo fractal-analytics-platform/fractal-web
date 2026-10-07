@@ -1,9 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { PropertyDescription } from 'fractal-components';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { resolve } from '$app/paths';
 
 	let errorAlert = undefined;
@@ -90,7 +90,8 @@
 			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
-			await goto(resolve(`/v2/admin/task-groups/activities?activity_id=${result.id}`));
+
+			await goto(resolve(`v2/admin/task-groups/activities?activity_id=${result.id}`));
 		} else {
 			errorAlert = displayStandardErrorAlert(
 				await getAlertErrorFromResponse(response),

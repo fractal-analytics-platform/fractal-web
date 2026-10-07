@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
-	import Accounting from '$lib/components/admin/Accounting.svelte';
-	import SlurmAccounting from '$lib/components/admin/SlurmAccounting.svelte';
+	import Accounting from '#lib/components/admin/Accounting.svelte';
+	import SlurmAccounting from '#lib/components/admin/SlurmAccounting.svelte';
 
 	/** @type {'accounting'|'slurmAccounting'} */
 	let selectedTab = $state('accounting');

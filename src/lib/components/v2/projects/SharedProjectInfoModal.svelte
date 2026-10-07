@@ -1,5 +1,5 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '../../common/Modal.svelte';
 
 	/** @type {Modal|undefined}*/

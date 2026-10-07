@@ -1,10 +1,10 @@
 <script>
-	import { projectInfoModalV2 } from '$lib/stores';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
+	import { projectInfoModalV2 } from '#lib/stores.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import { getAlertErrorFromResponse, getFieldValidationError } from '#lib/common/errors.js';
 	import { goto } from '$app/navigation';
 	import Modal from '../../common/Modal.svelte';
-	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
+	import { deleteDatasetSelectionsForProject } from '#lib/common/workflow_utilities.js';
 	import { normalizePayload } from 'fractal-components';
 	import { resolve } from '$app/paths';
 

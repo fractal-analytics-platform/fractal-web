@@ -1,7 +1,7 @@
-import { getCurrentUser } from '$lib/server/api/auth_api.js';
-import { listTaskGroups } from '$lib/server/api/v2/task_api';
-import { getLogger } from '$lib/server/logger';
-import { env } from '$env/dynamic/private';
+import { getCurrentUser } from '#lib/server/api/auth_api.js';
+import { listTaskGroups } from '#lib/server/api/v2/task_api.js';
+import { getLogger } from '#lib/server/logger.js';
+import { FRACTAL_DEFAULT_GROUP_NAME } from '$app/env/private';
 
 const logger = getLogger('tasks management page');
 
@@ -14,7 +14,7 @@ export async function load({ fetch }) {
 		);
 	const taskGroups = await listTaskGroups(fetch, false);
 
-	const defaultGroupName = env.FRACTAL_DEFAULT_GROUP_NAME ?? null;
+	const defaultGroupName = FRACTAL_DEFAULT_GROUP_NAME ?? null;
 
 	return {
 		user,

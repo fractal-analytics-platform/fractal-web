@@ -1,6 +1,6 @@
 <script>
-	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import JobsList from '#lib/components/v2/jobs/JobsList.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { page } from '$app/state';
 
 	/**

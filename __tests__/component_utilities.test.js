@@ -1,5 +1,5 @@
 import { vi, it, expect } from 'vitest';
-import { removeDuplicatedItems } from '$lib/common/component_utilities.js';
+import { removeDuplicatedItems } from '#lib/common/component_utilities.js';
 
 // Mocking public variables
 vi.mock('$env/dynamic/public', () => {

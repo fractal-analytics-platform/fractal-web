@@ -1,6 +1,6 @@
-import { getProfileUsers } from '$lib/server/api/auth_api';
-import { getProfile, getResource } from '$lib/server/api/v2/admin_api';
-import { getLogger } from '$lib/server/logger.js';
+import { getProfileUsers } from '#lib/server/api/auth_api.js';
+import { getProfile, getResource } from '#lib/server/api/v2/admin_api.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('admin view profile page');
 

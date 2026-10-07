@@ -1,11 +1,11 @@
 <script>
 	import { page } from '$app/state';
-	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortUsers } from '$lib/components/admin/user_utilities';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
-	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
+	import { arrayToCsv, downloadBlob, getTimestamp } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortUsers } from '#lib/components/admin/user_utilities.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import Paginator from '#lib/components/common/Paginator.svelte';
+	import JobsList from '#lib/components/v2/jobs/JobsList.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
@@ -15,7 +15,7 @@
 	let searched = $state(false);
 	let searching = $state(false);
 	let processingCsv = $state(false);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {JobsList|undefined} */

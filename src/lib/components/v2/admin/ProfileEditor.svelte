@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { FormErrorHandler } from '$lib/common/errors';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import { deepCopy } from 'fractal-components';
 	import { resolve } from '$app/paths';
 

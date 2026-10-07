@@ -1,5 +1,5 @@
-import { listUsers } from '$lib/server/api/auth_api.js';
-import { getLogger } from '$lib/server/logger.js';
+import { listUsers } from '#lib/server/api/auth_api.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('admin projects page [v2]');
 

@@ -1,5 +1,5 @@
 <script>
-	import { displayStandardErrorAlert } from '$lib/common/errors';
+	import { displayStandardErrorAlert } from '#lib/common/errors.js';
 	import { onMount, tick } from 'svelte';
 
 	// Set to false to avoid issues in modals containing slim-select dropdowns
@@ -37,7 +37,7 @@
 		body,
 		footer
 	} = $props();
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	/**

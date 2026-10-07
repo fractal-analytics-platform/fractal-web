@@ -1,5 +1,5 @@
-import { getLogger } from '$lib/server/logger.js';
-import { env } from '$env/dynamic/private';
+import { getLogger } from '#lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
 
 const logger = getLogger('server alive API');
 
@@ -11,7 +11,7 @@ export async function getServerInfo(fetch) {
 	let serverInfo = { alive: false, version: null };
 
 	try {
-		const serverInfoResponse = await fetch(env.FRACTAL_SERVER_HOST + '/api/alive/');
+		const serverInfoResponse = await fetch(FRACTAL_SERVER_HOST + '/api/alive/');
 		if (serverInfoResponse.ok) {
 			serverInfo = await serverInfoResponse.json();
 			logger.debug('Server info loaded: Alive %s - %s', serverInfo.alive, serverInfo.version);

@@ -6,15 +6,15 @@
 		displayStandardErrorAlert,
 		FormErrorHandler,
 		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	} from '#lib/common/errors.js';
 	import { onMount, tick } from 'svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import { getSortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import { getSortGroupByNameAllFirstComparator } from '#lib/components/admin/user_utilities.js';
 	import SlimSelect from 'slim-select';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
 	import ProfileEditor from './ProfileEditor.svelte';
-	import { groupsErrorOnUserCreation } from '$lib/stores';
+	import { groupsErrorOnUserCreation } from '#lib/stores.js';
 	import { resolve } from '$app/paths';
 
 	/**
@@ -39,9 +39,9 @@
 
 	const currentUserId = $derived(page.data.userInfo?.id);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let profilesErrorAlert = undefined;
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
@@ -71,7 +71,7 @@
 	let profiles = $state([]);
 	/** @type {Omit<import('fractal-components/types/api').Profile, 'id'>|undefined} */
 	let newProfile = $state();
-	/** @type {import('$lib/components/v2/admin/ProfileEditor.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/admin/ProfileEditor.svelte').default|undefined} */
 	let profileEditor = $state();
 
 	let saving = $state(false);

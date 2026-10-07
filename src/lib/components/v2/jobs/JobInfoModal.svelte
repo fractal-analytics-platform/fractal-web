@@ -1,6 +1,6 @@
 <script>
-	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import StatusBadge from '#lib/components/jobs/StatusBadge.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { page } from '$app/state';
 	import Modal from '../../common/Modal.svelte';
 

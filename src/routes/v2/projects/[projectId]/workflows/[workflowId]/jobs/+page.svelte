@@ -1,7 +1,7 @@
 <script>
-	import JobsList from '$lib/components/v2/jobs/JobsList.svelte';
+	import JobsList from '#lib/components/v2/jobs/JobsList.svelte';
 	import { page } from '$app/state';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 
 	/** @type {import('fractal-components/types/api').ProjectV2} */
 	const project = $derived(page.data.project);

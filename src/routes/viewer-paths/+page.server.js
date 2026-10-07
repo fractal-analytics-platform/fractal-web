@@ -1,5 +1,5 @@
-import { getCurrentUserAllowedViewerPaths } from '$lib/server/api/auth_api.js';
-import { getLogger } from '$lib/server/logger.js';
+import { getCurrentUserAllowedViewerPaths } from '#lib/server/api/auth_api.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('viewer paths page');
 

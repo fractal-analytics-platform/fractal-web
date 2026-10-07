@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { getSortGroupByNameAllFirstComparator } from '$lib/components/admin/user_utilities.js';
+	import { getSortGroupByNameAllFirstComparator } from '#lib/components/admin/user_utilities.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */

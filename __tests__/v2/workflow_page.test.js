@@ -55,7 +55,7 @@ vi.mock('$env/dynamic/public', () => {
 });
 
 import TasksOrderModal from '../mock/MockTasksOrderModal.svelte';
-vi.mock('$lib/components/v2/workflow/TasksOrderModal.svelte', () => {
+vi.mock('#lib/components/v2/workflow/TasksOrderModal.svelte', () => {
 	return {
 		default: TasksOrderModal
 	};

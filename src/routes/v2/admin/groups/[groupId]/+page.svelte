@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
+	import { sortUserByEmailComparator } from '#lib/common/user_utilities.js';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
 	let group = $derived(page.data.group);

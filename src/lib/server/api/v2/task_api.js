@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('task API [v2]');
 
@@ -14,7 +14,7 @@ export async function listTaskGroups(fetch, onlyActive = false) {
 	logger.debug('Fetching task groups');
 
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/?only_active=${onlyActive}`
+		`${FRACTAL_SERVER_HOST}/api/v2/task-group/?only_active=${onlyActive}`
 	);
 
 	if (!response.ok) {

@@ -1,12 +1,12 @@
 <script>
 	import { page } from '$app/state';
-	import ProjectDatasetsList from '$lib/components/v2/projects/ProjectDatasetsList.svelte';
-	import WorkflowsList from '$lib/components/v2/projects/workflow/WorkflowsList.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import ProjectDatasetsList from '#lib/components/v2/projects/ProjectDatasetsList.svelte';
+	import WorkflowsList from '#lib/components/v2/projects/workflow/WorkflowsList.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { normalizePayload } from 'fractal-components';
-	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
+	import SharedProjectInfoModal from '#lib/components/v2/projects/SharedProjectInfoModal.svelte';
 	import { tick } from 'svelte';
 
 	const maxDescriptionLength = 50;

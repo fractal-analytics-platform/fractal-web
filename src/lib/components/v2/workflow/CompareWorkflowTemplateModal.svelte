@@ -1,6 +1,6 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { onMount } from 'svelte';
 	import JsonDiffViewer from './JsonDiffViewer.svelte';
 

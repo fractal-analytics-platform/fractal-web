@@ -1,6 +1,6 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import ImageAttributesTypesForm from './ImageAttributesTypesForm.svelte';
 

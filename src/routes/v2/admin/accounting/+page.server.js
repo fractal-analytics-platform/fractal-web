@@ -1,6 +1,6 @@
-import { listUsers } from '$lib/server/api/auth_api.js';
-import { getLogger } from '$lib/server/logger.js';
-import { env } from '$env/dynamic/private';
+import { listUsers } from '#lib/server/api/auth_api.js';
+import { getLogger } from '#lib/server/logger.js';
+import { FRACTAL_RUNNER_BACKEND } from '$app/env/private';
 
 const logger = getLogger('admin accounting page [v2]');
 
@@ -9,8 +9,5 @@ export async function load({ fetch }) {
 
 	const users = await listUsers(fetch);
 
-	return {
-		users,
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
-	};
+	return { users, runnerBackend: FRACTAL_RUNNER_BACKEND };
 }

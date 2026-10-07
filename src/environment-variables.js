@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
-import { getLogger } from '$lib/server/logger';
+import { getLogger } from '#lib/server/logger.js';
 import { exit } from 'process';
 
 const logger = getLogger('environment');
@@ -69,6 +69,7 @@ function checkRunnerBackend() {
  * @param {string[]} values
  */
 function checkAllowedValues(key, values) {
+	// @migration-task Rewrite dynamic env lookup manually.
 	const value = env[key];
 	if (value) {
 		for (const v of values) {
@@ -131,8 +132,11 @@ function printEnvironmentVariables() {
  */
 function getValue(key) {
 	if (key.startsWith('PUBLIC_')) {
+		// @migration-task Rewrite dynamic env lookup manually.
 		return publicEnv[key];
 	}
+
+	// @migration-task Rewrite dynamic env lookup manually.
 	return env[key];
 }
 

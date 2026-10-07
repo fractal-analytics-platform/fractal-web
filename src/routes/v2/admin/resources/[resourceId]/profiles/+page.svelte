@@ -1,6 +1,6 @@
 <script>
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 
@@ -9,7 +9,7 @@
 
 	/** @type {Array<import('fractal-components/types/api').Profile>} */
 	let profiles = $state([]);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	async function loadProfiles() {

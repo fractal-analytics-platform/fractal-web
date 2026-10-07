@@ -1,9 +1,9 @@
-import { env } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+import { FRACTAL_HIDE_BASIC_AUTH, LOGIN_INVITE_PATH } from '$app/env/private';
+import { PUBLIC_GUEST_USERNAME } from '$app/env/public';
 import { fail, isHttpError, redirect } from '@sveltejs/kit';
-import { userAuthentication } from '$lib/server/api/auth_api';
+import { userAuthentication } from '#lib/server/api/auth_api.js';
 import { setCookieFromToken } from './cookie';
-import { getLogger } from '$lib/server/logger.js';
+import { getLogger } from '#lib/server/logger.js';
 import fs from 'fs/promises';
 
 const logger = getLogger('page /auth/login');
@@ -22,7 +22,7 @@ export const actions = {
 		} catch (error) {
 			logger.debug(error);
 			const errorMessage = getLoginErrorMessage(error);
-			const guestUsername = publicEnv.PUBLIC_GUEST_USERNAME;
+			const guestUsername = PUBLIC_GUEST_USERNAME;
 			if (guestUsername && formData.get('username') === guestUsername) {
 				return fail(400, { invalidGuestMessage: errorMessage, invalid: true });
 			} else {
@@ -51,28 +51,26 @@ function getLoginErrorMessage(error) {
 
 export async function load() {
 	const loginInvite = await getLoginInvite();
-	const hideBasicAuth = env.FRACTAL_HIDE_BASIC_AUTH === 'true';
-	return {
-		loginInvite,
-		hideBasicAuth
-	};
+	const hideBasicAuth = FRACTAL_HIDE_BASIC_AUTH === 'true';
+
+	return { loginInvite, hideBasicAuth };
 }
 
 async function getLoginInvite() {
-	if (!env.LOGIN_INVITE_PATH) {
+	if (!LOGIN_INVITE_PATH) {
 		return null;
 	}
 	try {
 		try {
-			await fs.stat(env.LOGIN_INVITE_PATH);
+			await fs.stat(LOGIN_INVITE_PATH);
 		} catch {
-			logger.error("Login invite file %s doesn't exist", env.LOGIN_INVITE_PATH);
+			logger.error("Login invite file %s doesn't exist", LOGIN_INVITE_PATH);
 			return null;
 		}
-		const inviteData = await fs.readFile(env.LOGIN_INVITE_PATH, { encoding: 'utf-8' });
+		const inviteData = await fs.readFile(LOGIN_INVITE_PATH, { encoding: 'utf-8' });
 		return inviteData.trim();
 	} catch (err) {
-		logger.error('An error happened reading login invite file %s', env.LOGIN_INVITE_PATH, err);
+		logger.error('An error happened reading login invite file %s', LOGIN_INVITE_PATH, err);
 		return null;
 	}
 }

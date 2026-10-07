@@ -1,14 +1,14 @@
 <script>
 	import { page } from '$app/state';
-	import { getTimestamp } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getTimestamp } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
-	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
-	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import TimestampCell from '#lib/components/jobs/TimestampCell.svelte';
+	import TaskGroupEditModal from '#lib/components/v2/tasks/TaskGroupEditModal.svelte';
+	import TaskGroupManageModal from '#lib/components/v2/tasks/TaskGroupManageModal.svelte';
+	import Paginator from '#lib/components/common/Paginator.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 
 	/** @type {Array<import('fractal-components/types/api').User>} */
 	const users = $derived(page.data.users || []);
@@ -38,7 +38,7 @@
 
 	let searched = $state(false);
 	let searching = $state(false);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupSlim>|undefined} */
@@ -51,9 +51,9 @@
 	/** @type {import('fractal-components/types/api').TaskGroupSlim|null} */
 	let selectedTaskGroup = $state(null);
 
-	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
 	let taskGroupEditModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
 
 	let coreSuccessMessage = $state('');

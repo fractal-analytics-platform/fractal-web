@@ -1,16 +1,16 @@
 <script>
 	import { goto } from '$app/navigation';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
-	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
+	import { saveSelectedDataset } from '#lib/common/workflow_utilities.js';
 	import { normalizePayload } from 'fractal-components';
 	import { resolve } from '$app/paths';
 
 	// The list of workflows
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let starWorkflowErrorAlert;
 
 	/**
@@ -31,7 +31,7 @@
 	/** @type {CreateWorkflowModal|undefined} */
 	let createWorkflowModal = $state();
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**

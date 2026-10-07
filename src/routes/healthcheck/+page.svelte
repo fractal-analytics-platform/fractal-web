@@ -1,8 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import StandardErrorAlert from '#lib/components/common/StandardErrorAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';

@@ -1,8 +1,8 @@
 <script>
 	import { page } from '$app/state';
-	import { FormErrorHandler, getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { FormErrorHandler, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 

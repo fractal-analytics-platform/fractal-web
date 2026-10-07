@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortUserByEmailComparator } from '$lib/common/user_utilities';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortUserByEmailComparator } from '#lib/common/user_utilities.js';
 
 	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
 	let group = $state(page.data.group);
@@ -20,7 +20,7 @@
 	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToRemove = $state(null);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**

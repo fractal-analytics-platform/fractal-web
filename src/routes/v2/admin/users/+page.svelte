@@ -1,9 +1,9 @@
 <script>
 	import { page } from '$app/state';
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortUsers } from '$lib/components/admin/user_utilities';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortUsers } from '#lib/components/admin/user_utilities.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
 	const currentUserId = $derived(page.data.userInfo?.id);

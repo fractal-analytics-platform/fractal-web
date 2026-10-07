@@ -1,12 +1,12 @@
 <script>
-	import { downloadBlob } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { downloadBlob } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
 	/** @type {Array<import('fractal-components/types/api').Resource>} */
 	let resources = $state([]);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let resourcesErrorAlert;
 
 	async function loadResources() {

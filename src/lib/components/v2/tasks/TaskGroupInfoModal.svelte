@@ -1,6 +1,6 @@
 <script>
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
+	import TimestampCell from '#lib/components/jobs/TimestampCell.svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	/**

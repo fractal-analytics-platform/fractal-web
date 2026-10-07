@@ -1,12 +1,12 @@
 <script>
 	import { page } from '$app/state';
-	import ProjectsList from '$lib/components/v2/projects/ProjectsList.svelte';
-	import ProjectInfoModal from '$lib/components/v2/projects/ProjectInfoModal.svelte';
-	import InvitationNotification from '$lib/components/v2/projects/InvitationNotification.svelte';
+	import ProjectsList from '#lib/components/v2/projects/ProjectsList.svelte';
+	import ProjectInfoModal from '#lib/components/v2/projects/ProjectInfoModal.svelte';
+	import InvitationNotification from '#lib/components/v2/projects/InvitationNotification.svelte';
 	import { onMount } from 'svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import SharedProjectInfoModal from '#lib/components/v2/projects/SharedProjectInfoModal.svelte';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 
 	/** @type {import('fractal-components/types/api').ProjectV2[]} */
 	let projects = $state([]);
@@ -21,12 +21,12 @@
 	/** @type {'my_projects'|'shared_projects'} */
 	let selectedTab = $state(page.data.userInfo.is_guest ? 'shared_projects' : 'my_projects');
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	let projectSearch = $state('');
 
-	/** @type {import('$lib/components/common/Modal.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/Modal.svelte').default|undefined} */
 	let newProjectModal = $state();
 
 	async function loadSharedProjects() {

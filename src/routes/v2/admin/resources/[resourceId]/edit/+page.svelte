@@ -1,8 +1,8 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 
@@ -22,7 +22,7 @@
 	let active = $state(true);
 	/** @type {Modal|undefined} */
 	let modal = $state();
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let activeErrorAlert;
 
 	async function loadFromFile() {
@@ -54,7 +54,7 @@
 		active = !resource.prevent_new_submissions;
 	});
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let saveErrorAlert;
 	let saving = $state(false);
 

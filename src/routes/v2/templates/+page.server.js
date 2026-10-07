@@ -1,4 +1,4 @@
-import { getCurrentUser } from '$lib/server/api/auth_api';
+import { getCurrentUser } from '#lib/server/api/auth_api.js';
 
 export async function load({ fetch }) {
 	const user =

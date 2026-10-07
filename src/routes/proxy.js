@@ -1,5 +1,5 @@
-import { env } from '$env/dynamic/private';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { getLogger } from '#lib/server/logger.js';
 import { error } from '@sveltejs/kit';
 
 const logger = getLogger('proxy');
@@ -13,7 +13,8 @@ export function createGetProxy(path, forbiddenPaths = []) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[GET] - /%s/%s/%s', path, params.path, url.search);
-			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
+
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				headers: filterHeaders(request.headers)
 			});
 		} catch (err) {
@@ -31,7 +32,7 @@ export function createPostProxy(path, forbiddenPaths = []) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[POST] - /%s/%s/%s', path, params.path, url.search);
-			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'POST',
 				headers: filterHeaders(request.headers),
 				body: request.body,
@@ -54,7 +55,7 @@ export function createPutProxy(path, forbiddenPaths = []) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[PUT] - /%s/%s/%s', path, params.path, url.search);
-			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'PUT',
 				headers: filterHeaders(request.headers),
 				body: request.body,
@@ -77,7 +78,7 @@ export function createPatchProxy(path, forbiddenPaths = []) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[PATCH] - /%s/%s/%s', path, params.path, url.search);
-			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'PATCH',
 				headers: filterHeaders(request.headers),
 				body: request.body,
@@ -99,7 +100,8 @@ export function createDeleteProxy(path, forbiddenPaths = []) {
 		checkForbiddenPaths(params.path, forbiddenPaths);
 		try {
 			logger.info('[DELETE] - /%s/%s/%s', path, params.path, url.search);
-			return await fetch(`${env.FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
+
+			return await fetch(`${FRACTAL_SERVER_HOST}/${path}/${params.path}/${url.search}`, {
 				method: 'DELETE',
 				headers: filterHeaders(request.headers)
 			});

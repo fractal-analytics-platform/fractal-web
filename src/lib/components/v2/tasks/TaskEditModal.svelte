@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 	import TypesEditor from './TypesEditor.svelte';

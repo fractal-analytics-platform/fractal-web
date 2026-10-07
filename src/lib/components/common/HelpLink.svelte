@@ -1,6 +1,6 @@
 <script>
-	import { buildHelpLink } from '$lib/common/component_utilities';
-	import { currentHelpLink } from '$lib/stores';
+	import { buildHelpLink } from '#lib/common/component_utilities.js';
+	import { currentHelpLink } from '#lib/stores.js';
 
 	/**
 	 * @typedef {Object} Props

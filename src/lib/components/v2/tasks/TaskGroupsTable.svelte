@@ -4,9 +4,9 @@
 	import TaskInfoModal from './TaskInfoModal.svelte';
 	import TaskEditModal from './TaskEditModal.svelte';
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
-	import TaskGroupEditModal from '$lib/components/v2/tasks/TaskGroupEditModal.svelte';
+	import TaskGroupEditModal from '#lib/components/v2/tasks/TaskGroupEditModal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import TaskGroupManageModal from '$lib/components/v2/tasks/TaskGroupManageModal.svelte';
+	import TaskGroupManageModal from '#lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -26,15 +26,15 @@
 		defaultGroupName
 	} = $props();
 
-	/** @type {import('$lib/components/v2/tasks/TaskGroupInfoModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskGroupInfoModal.svelte').default|undefined} */
 	let taskGroupInfoModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskGroupEditModal.svelte').default|undefined} */
 	let taskGroupEditModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskGroupManageModal.svelte').default|undefined} */
 	let taskGroupManageModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskInfoModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskInfoModal.svelte').default|undefined} */
 	let taskInfoModal = $state();
-	/** @type {import('$lib/components/v2/tasks/TaskEditModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskEditModal.svelte').default|undefined} */
 	let taskEditModal = $state();
 
 	/**

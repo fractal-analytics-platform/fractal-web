@@ -1,6 +1,6 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
 	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
 	import { tick } from 'svelte';

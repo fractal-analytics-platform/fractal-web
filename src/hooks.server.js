@@ -1,7 +1,7 @@
-import { env } from '$env/dynamic/private';
-import { formatDate, getLogger } from '$lib/server/logger.js';
-import { getServerInfo } from '$lib/server/api/alive';
-import { getCurrentUser } from '$lib/server/api/auth_api';
+import { AUTH_COOKIE_NAME, FRACTAL_SERVER_HOST } from '$app/env/private';
+import { formatDate, getLogger } from '#lib/server/logger.js';
+import { getServerInfo } from '#lib/server/api/alive.js';
+import { getCurrentUser } from '#lib/server/api/auth_api.js';
 import { error, redirect } from '@sveltejs/kit';
 import { checkEnvironmentVariables } from './environment-variables';
 
@@ -36,7 +36,7 @@ export async function handle({ event, resolve }) {
 	const serverInfo = await getServerInfo(event.fetch);
 
 	// Check if auth cookie is present
-	const fastApiUsersAuth = event.cookies.get(env.AUTH_COOKIE_NAME || 'fastapiusersauth');
+	const fastApiUsersAuth = event.cookies.get(AUTH_COOKIE_NAME || 'fastapiusersauth');
 	if (!fastApiUsersAuth) {
 		logger.debug('No auth cookie found');
 	}
@@ -81,7 +81,7 @@ export async function handle({ event, resolve }) {
 
 	// Admin area check
 	if (event.url.pathname.startsWith('/v2/admin')) {
-		if (!(/** @type {import('fractal-components/types/api').User} */ (userInfo).is_superuser)) {
+		if (!(/** @type {import('fractal-components/types/api').User} */ (userInfo.is_superuser))) {
 			error(403, `Only superusers can access the admin area`);
 		}
 	}
@@ -105,20 +105,20 @@ function setSecurityHeaders(response) {
 	Object.entries(securityHeaders).forEach(([header, value]) => response.headers.set(header, value));
 }
 
-/** @type {import('@sveltejs/kit').HandleFetch} */
+/** @type {import('@sveltejs/kit/hooks').HandleFetch} */
 export async function handleFetch({ event, request, fetch }) {
 	/*
 	See:
 	1. https://github.com/fractal-analytics-platform/fractal-web/issues/274
 	2. https://kit.svelte.dev/docs/hooks#server-hooks-handlefetch
 	*/
-	if (request.url.startsWith(env.FRACTAL_SERVER_HOST)) {
+	if (request.url.startsWith(FRACTAL_SERVER_HOST)) {
 		logger.trace('Including cookie into request to %s, via handleFetch', request.url);
 		const cookie = event.request.headers.get('cookie');
 		if (cookie) {
 			const cookies = cookie.split(';').map((c) => c.trim());
 			const apiCookie = cookies.find(
-				(c) => c.split('=')[0] === (env.AUTH_COOKIE_NAME || 'fastapiusersauth')
+				(c) => c.split('=')[0] === (AUTH_COOKIE_NAME || 'fastapiusersauth')
 			);
 			const cookiesToForward = [];
 			if (apiCookie) {

@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import TypesEditor from './TypesEditor.svelte';

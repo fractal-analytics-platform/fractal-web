@@ -1,5 +1,5 @@
-import { getProject, getProjectGuests } from '$lib/server/api/v2/project_api';
-import { getLogger } from '$lib/server/logger.js';
+import { getProject, getProjectGuests } from '#lib/server/api/v2/project_api.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('project sharing page [v2]');
 

@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { PUBLIC_ENABLE_HELP_LINKS, PUBLIC_HELP_LINKS_BASE_URL } from '$app/env/public';
 
 export function fieldHasValue(event) {
 	const inputValue = event.target?.value || undefined;
@@ -156,7 +156,7 @@ export function splitZarrDir(zarrDir, projectDirs) {
  * @param {string} url
  */
 export function buildHelpLink(url) {
-	return env.PUBLIC_ENABLE_HELP_LINKS === 'true' && url
-		? `${env.PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
+	return PUBLIC_ENABLE_HELP_LINKS === 'true' && url
+		? `${PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
 		: '';
 }

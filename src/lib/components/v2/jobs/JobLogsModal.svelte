@@ -1,9 +1,9 @@
 <script>
-	import { env } from '$env/dynamic/public';
-	import { extractJobErrorParts, showExecutorErrorLog } from '$lib/common/job_utilities';
+	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
+	import { extractJobErrorParts, showExecutorErrorLog } from '#lib/common/job_utilities.js';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
-	import ExpandableLog from '$lib/components/common/ExpandableLog.svelte';
+	import ExpandableLog from '#lib/components/common/ExpandableLog.svelte';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = $state([]);
@@ -18,9 +18,10 @@
 	/** @type {'main'|'slurm'} */
 	let selectedTab = $state('main');
 
-	const updateJobInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+	const updateJobInterval = PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
+
 	/** @type {NodeJS.Timeout|undefined} */
 	let updateJobTimeout = undefined;
 

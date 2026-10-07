@@ -1,6 +1,6 @@
-import { listUsers, logout } from '$lib/server/api/auth_api.js';
-import { userImpersonation } from '$lib/server/api/v2/admin_api';
-import { getLogger } from '$lib/server/logger.js';
+import { listUsers, logout } from '#lib/server/api/auth_api.js';
+import { userImpersonation } from '#lib/server/api/v2/admin_api.js';
+import { getLogger } from '#lib/server/logger.js';
 import { fail, isHttpError, redirect } from '@sveltejs/kit';
 import { setCookieFromToken } from '../../../auth/login/cookie';
 

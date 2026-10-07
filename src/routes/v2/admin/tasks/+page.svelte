@@ -1,10 +1,10 @@
 <script>
 	import { page } from '$app/state';
-	import { arrayToCsv, downloadBlob } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { arrayToCsv, downloadBlob } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import Paginator from '#lib/components/common/Paginator.svelte';
 	import { normalizePayload, PropertyDescription } from 'fractal-components';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
@@ -24,7 +24,7 @@
 
 	let searched = $state(false);
 	let searching = $state(false);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {Array<import('fractal-components/types/api').Resource>} */

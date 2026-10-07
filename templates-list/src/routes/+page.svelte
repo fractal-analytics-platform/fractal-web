@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import TemplatesList from '../lib/TemplatesList.svelte';
 
-	/** @type {import('$lib/types').TemplateEntry[]} */
+	/** @type {import('#lib/types').TemplateEntry[]} */
 	let templates = $state([]);
 
 	let templateIdMap = $state({});

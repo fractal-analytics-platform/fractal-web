@@ -1,8 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 	import InputFiltersTypesForm from '../projects/datasets/InputFiltersTypesForm.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import { normalizePayload } from 'fractal-components';
 
@@ -29,7 +29,7 @@
 	let selectedDatasetTypeKey = $state('');
 	let selectedDatasetTypeValue = $state(true);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	onMount(() => {

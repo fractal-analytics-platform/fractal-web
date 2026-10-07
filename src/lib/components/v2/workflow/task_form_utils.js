@@ -1,4 +1,4 @@
-import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
+import { AlertError, getAlertErrorFromResponse } from '#lib/common/errors.js';
 import { normalizePayload } from 'fractal-components';
 
 /**

@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { normalizePayload } from 'fractal-components';
 	import { resolve } from '$app/paths';
 
@@ -13,7 +13,7 @@
 
 	let fileError = $state('');
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let saveErrorAlert;
 	let saving = $state(false);
 
@@ -56,7 +56,7 @@
 			});
 
 			if (response.ok) {
-				await goto(resolve(`/v2/admin/resources`));
+				await goto(resolve(`v2/admin/resources`));
 			} else {
 				saveErrorAlert = displayStandardErrorAlert(
 					await getAlertErrorFromResponse(response),
@@ -90,7 +90,8 @@
 		<div class="col mb-3">
 			<div class="input-group has-validation">
 				<label for="resourceFile" class="input-group-text">
-					<i class="bi bi-file-earmark-arrow-up"></i> &nbsp; Load from file
+					<i class="bi bi-file-earmark-arrow-up"></i>
+					Load from file
 				</label>
 				<input
 					class="form-control schemaFile"
@@ -113,11 +114,9 @@
 			></textarea>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col">
-			<div id="saveError"></div>
-		</div>
-	</div>
+
+	<div class="row"><div class="col"><div id="saveError"></div></div></div>
+
 	<div class="row">
 		<div class="col">
 			<button class="btn btn-primary" onclick={createResource} disabled={saving}>

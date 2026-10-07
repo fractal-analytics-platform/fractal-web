@@ -1,13 +1,13 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import TemplateUpdateModal from '$lib/components/v2/templates/TemplateUpdateModal.svelte';
-	import TemplateInfoModal from '$lib/components/v2/templates/TemplateInfoModal.svelte';
-	import TemplateImportModal from '$lib/components/v2/templates/TemplateImportModal.svelte';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import TemplateUpdateModal from '#lib/components/v2/templates/TemplateUpdateModal.svelte';
+	import TemplateInfoModal from '#lib/components/v2/templates/TemplateInfoModal.svelte';
+	import TemplateImportModal from '#lib/components/v2/templates/TemplateImportModal.svelte';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import Paginator from '#lib/components/common/Paginator.svelte';
 	import { page } from '$app/state';
 	import { onMount, tick } from 'svelte';
-	import { pushState } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	/**
 	 * @typedef {Object} Props
@@ -106,7 +106,6 @@
 			templateName === undefined &&
 			templateVersion === undefined
 	);
-
 	const isDirtyFromApplied = $derived(
 		currentState.templateId != lastAppliedState.templateId ||
 			currentState.isOwner !== lastAppliedState.isOwner ||
@@ -115,7 +114,6 @@
 				!(currentState.templateName === '' && lastAppliedState.templateName === undefined)) ||
 			currentState.templateVersion != lastAppliedState.templateVersion
 	);
-
 	const applyClass = $derived(isDirtyFromApplied ? 'btn-primary' : 'btn-secondary');
 	const resetClass = $derived(!isDefault ? 'btn-warning' : 'btn-secondary');
 
@@ -163,7 +161,7 @@
 		}
 		await tick();
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		pushState(url, {});
+		goto(url, { shallow: true });
 
 		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`);
 		if (response.ok) {

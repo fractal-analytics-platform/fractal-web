@@ -1,8 +1,8 @@
-import { listTaskGroups } from '$lib/server/api/v2/task_api';
-import { env } from '$env/dynamic/private';
+import { listTaskGroups } from '#lib/server/api/v2/task_api.js';
+import { FRACTAL_DISPLAY_CORE_TASK_FILTER } from '$app/env/private';
 
 export async function load({ fetch }) {
-	const showOnlyCoreFiltering = env.FRACTAL_DISPLAY_CORE_TASK_FILTER !== 'false';
+	const showOnlyCoreFiltering = FRACTAL_DISPLAY_CORE_TASK_FILTER !== 'false';
 	const taskGroups = await listTaskGroups(fetch, true);
 	return {
 		taskGroups,

@@ -1,11 +1,11 @@
 <script>
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
 	import { onDestroy, onMount } from 'svelte';
-	import { sortActivitiesByTimestampStarted } from '$lib/common/task_utilities';
+	import { sortActivitiesByTimestampStarted } from '#lib/common/task_utilities.js';
 	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
 	import { getTaskGroupActivitiesToUpdate } from './task_group_utilities';
-	import TaskGroupActivityLogsModal from '$lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
-	import { recentActivities } from '$lib/stores';
+	import TaskGroupActivityLogsModal from '#lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
+	import { recentActivities } from '#lib/stores.js';
 
 	// This component automatically fecthes updates for task recent activities
 	// in pending and ongoing status
@@ -86,8 +86,8 @@
 		return [];
 	}
 
-	const updateTasksActivitiesInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+	const updateTasksActivitiesInterval = PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
 	let updateTasksActivitiesTimeout = undefined;
 
@@ -136,14 +136,14 @@
 				{#each sortedRecentActivities as taskGroupActivity (taskGroupActivity.id)}
 					<tr>
 						<td>{taskGroupActivity.pkg_name}</td>
+						<td><code>{taskGroupActivity.version || 'Unspecified'}</code></td>
+
 						<td>
-							<code>{taskGroupActivity.version || 'Unspecified'}</code>
+							<span class="badge {getTaskActivityStatusBadgeClass(taskGroupActivity.status)}"
+								>{taskGroupActivity.status}</span
+							>
 						</td>
-						<td>
-							<span class="badge {getTaskActivityStatusBadgeClass(taskGroupActivity.status)}">
-								{taskGroupActivity.status}
-							</span>
-						</td>
+
 						<td>{new Date(taskGroupActivity.timestamp_started).toLocaleString()}</td>
 						<td>
 							{taskGroupActivity.timestamp_ended

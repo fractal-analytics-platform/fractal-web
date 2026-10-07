@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '../../common/Modal.svelte';
 	import { resolve } from '$app/paths';
 
@@ -25,7 +25,7 @@
 	let askConfirmForDeactivate = $state(false);
 	let askConfirmForDelete = $state(false);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**

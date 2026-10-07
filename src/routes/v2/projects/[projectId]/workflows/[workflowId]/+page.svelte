@@ -1,42 +1,45 @@
 <script>
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
-	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import MetaPropertiesForm from '#lib/components/v2/workflow/MetaPropertiesForm.svelte';
+	import ArgumentsSchema from '#lib/components/v2/workflow/ArgumentsSchema.svelte';
 	import {
 		displayStandardErrorAlert,
 		FormErrorHandler,
 		getAlertErrorFromResponse
-	} from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
-	import ImagesStatus from '$lib/components/jobs/ImagesStatus.svelte';
-	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
-	import { extractRelevantJobError, showExecutorErrorLog } from '$lib/common/job_utilities';
-	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import WorkflowTaskInfoTab from '$lib/components/v2/workflow/WorkflowTaskInfoTab.svelte';
-	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
-	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
-	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
-	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
-	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
+	} from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
+	import VersionUpdate from '#lib/components/v2/workflow/VersionUpdate.svelte';
+	import ImagesStatus from '#lib/components/jobs/ImagesStatus.svelte';
+	import TasksOrderModal from '#lib/components/v2/workflow/TasksOrderModal.svelte';
+	import { extractRelevantJobError, showExecutorErrorLog } from '#lib/common/job_utilities.js';
+	import JobLogsModal from '#lib/components/v2/jobs/JobLogsModal.svelte';
+	import WorkflowTaskInfoTab from '#lib/components/v2/workflow/WorkflowTaskInfoTab.svelte';
+	import InputFiltersTab from '#lib/components/v2/workflow/InputFiltersTab.svelte';
+	import RunWorkflowModal from '#lib/components/v2/workflow/RunWorkflowModal.svelte';
+	import {
+		getSelectedWorkflowDataset,
+		saveSelectedDataset
+	} from '#lib/common/workflow_utilities.js';
+	import AddWorkflowTaskModal from '#lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
+	import TypeFiltersFlowModal from '#lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 	import { slide } from 'svelte/transition';
-	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
-	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
-	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
-	import { navigating, navigationCancelled } from '$lib/stores';
+	import ImagesStatusModal from '#lib/components/jobs/ImagesStatusModal.svelte';
+	import RunStatus from '#lib/components/jobs/RunStatus.svelte';
+	import RunStatusModal from '#lib/components/jobs/RunStatusModal.svelte';
+	import { navigating, navigationCancelled } from '#lib/stores.js';
 	import { writable } from 'svelte/store';
-	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
+	import TimestampCell from '#lib/components/jobs/TimestampCell.svelte';
 	import { normalizePayload } from 'fractal-components';
-	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
-	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
+	import TemplateCreateModal from '#lib/components/v2/templates/TemplateCreateModal.svelte';
+	import CompareWorkflowTemplateModal from '#lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
-	import HelpLink from '$lib/components/common/HelpLink.svelte';
+	import HelpLink from '#lib/components/common/HelpLink.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -67,7 +70,7 @@
 	/** @type {CompareWorkflowTemplateModal|undefined} */
 	let compareWorkflowToTemplateModal = $state();
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let workflowErrorAlert = undefined;
 
 	let workflowTabContextId = $state(0);
@@ -113,7 +116,7 @@
 	let metaPropertiesUnsavedChangesModal = $state();
 	/** @type {RunWorkflowModal|undefined} */
 	let runWorkflowModal = $state();
-	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/workflow/TasksOrderModal.svelte').default|undefined} */
 	let editTasksOrderModal = $state();
 	/** @type {AddWorkflowTaskModal|undefined} */
 	let addWorkflowTaskModal = $state();
@@ -140,13 +143,11 @@
 	const workflowPropsValidationErrors = workflowPropsErrorHandler.getValidationErrorStore();
 
 	let updatableWorkflowList = $derived(workflow.task_list || []);
-
 	let sortedDatasets = $derived(
 		[...datasets].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
 	);
-
-	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
+	const updateJobsInterval = PUBLIC_UPDATE_JOBS_INTERVAL
+		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
 		: 3000;
 
 	onMount(async () => {
@@ -156,6 +157,8 @@
 	});
 
 	beforeNavigate(async (navigation) => {
+		if (navigation.shallow && navigation.type === 'goto') return;
+
 		if (argsSchemaForm?.hasUnsavedChanges()) {
 			preventNavigation(navigation);
 			toggleArgsUnsavedChangesModal();
@@ -174,7 +177,7 @@
 
 	/**
 	 *
-	 * @param {import('@sveltejs/kit').BeforeNavigate} navigation
+	 * @param {import('$app/navigation').BeforeNavigate} navigation
 	 */
 	function preventNavigation(navigation) {
 		navigation.cancel();
@@ -635,7 +638,7 @@
 	}
 
 	async function gotoLinkedTemplate() {
-		await goto(resolve(`/v2/templates?template_id=${workflow.template_id}`));
+		await goto(resolve(`v2/templates?template_id=${workflow.template_id}`));
 	}
 
 	/**
@@ -771,17 +774,13 @@
 				{#if expandWorkflowDescription}
 					<button
 						class="btn btn-link fw-light p-0 mb-2"
-						onclick={() => (expandWorkflowDescription = false)}
+						onclick={() => (expandWorkflowDescription = false)}>Show less</button
 					>
-						Show less
-					</button>
 				{:else}
 					<button
 						class="btn btn-link fw-light p-0 mb-2"
-						onclick={() => (expandWorkflowDescription = true)}
+						onclick={() => (expandWorkflowDescription = true)}>Show more</button
 					>
-						Show more
-					</button>
 				{/if}
 			{:else}
 				{workflow.description}
@@ -1029,9 +1028,8 @@
 													aria-label="Hide runs"
 													class="btn btn-link p-0 text-white"
 													onclick={() => (expandedWorkflowTask = undefined)}
+													><i class="bi bi-caret-down-fill"></i></button
 												>
-													<i class="bi bi-caret-down-fill"></i>
-												</button>
 											{:else}
 												<button
 													aria-label="Show runs for {workflowTask.alias
@@ -1065,9 +1063,8 @@
 												await setSelectedWorkflowTask(workflowTask);
 											}}
 											aria-labelledby="label-wft-{workflowTask.id}"
-										>
-											&nbsp;
-										</button>
+										></button>
+
 										<span class="float-end ms-2 status-buttons">
 											{#if selectedDataset}
 												{#if !showMissingStatusesWarning && imagesStatusModal}
@@ -1134,9 +1131,8 @@
 												type="button"
 												onclick={() => selectHistoryRun(status)}
 												aria-labelledby="run-label-{status.id}"
-											>
-												&nbsp;
-											</button>
+											></button>
+
 											<span class="float-end ps-2">
 												{#if selectedDataset && runStatusModal}
 													<RunStatus
@@ -1495,6 +1491,7 @@
 	{/snippet}
 	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 		<button
 			type="button"
 			class="btn btn-warning"
@@ -1531,6 +1528,7 @@
 	{/snippet}
 	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 		<button
 			type="button"
 			class="btn btn-warning"
@@ -1568,6 +1566,7 @@
 	{/snippet}
 	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 		<button
 			type="button"
 			class="btn btn-warning"

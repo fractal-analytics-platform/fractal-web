@@ -1,8 +1,8 @@
 <script>
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 
 	// ProjectInfoModal component
-	import { projectInfoModalV2 } from '$lib/stores';
+	import { projectInfoModalV2 } from '#lib/stores.js';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
@@ -10,7 +10,7 @@
 	/** @type {import('fractal-components/types/api').ProjectV2|undefined} */
 	let project = $state();
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let datasetErrorAlert;
 
 	// Subscription to modalProject store to update project property with respect

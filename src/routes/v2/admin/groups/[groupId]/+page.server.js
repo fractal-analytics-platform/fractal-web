@@ -1,5 +1,5 @@
-import { getGroup, listUsers } from '$lib/server/api/auth_api';
-import { getLogger } from '$lib/server/logger.js';
+import { getGroup, listUsers } from '#lib/server/api/auth_api.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('admin group page');
 

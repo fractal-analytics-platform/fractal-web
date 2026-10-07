@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import ProfileEditor from '$lib/components/v2/admin/ProfileEditor.svelte';
+	import ProfileEditor from '#lib/components/v2/admin/ProfileEditor.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 

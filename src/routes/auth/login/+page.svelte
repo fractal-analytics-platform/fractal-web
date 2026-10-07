@@ -1,7 +1,13 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors.js';
-	import { env } from '$env/dynamic/public';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+
+	import {
+		PUBLIC_OAUTH_CLIENT_NAME,
+		PUBLIC_GUEST_USERNAME,
+		PUBLIC_GUEST_PASSWORD
+	} from '$app/env/public';
+
 	import { onMount } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 
@@ -10,13 +16,12 @@
 	let userLoggedIn = $derived(!!page.data.userInfo);
 	let hideBasicAuth = $derived(page.data.hideBasicAuth);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;
 
-	const oauth2Provider = env.PUBLIC_OAUTH_CLIENT_NAME;
-
-	const guestUsername = env.PUBLIC_GUEST_USERNAME;
-	const guestPassword = env.PUBLIC_GUEST_PASSWORD;
+	const oauth2Provider = PUBLIC_OAUTH_CLIENT_NAME;
+	const guestUsername = PUBLIC_GUEST_USERNAME;
+	const guestPassword = PUBLIC_GUEST_PASSWORD;
 
 	async function oauth2Login() {
 		if (externalLoginErrorAlert) {

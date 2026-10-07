@@ -1,16 +1,22 @@
 <script>
 	import { page } from '$app/state';
-	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
-	import { env } from '$env/dynamic/public';
-	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
+	import DatasetInfoModal from '#lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
+
+	import {
+		PUBLIC_FRACTAL_DATA_URL,
+		PUBLIC_FRACTAL_VIZARR_VIEWER_URL,
+		PUBLIC_FRACTAL_FEATURE_EXPLORER_URL
+	} from '$app/env/public';
+
+	import DatasetImagesTable from '#lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
-	import { addFinalSlash, encodePathForUrl } from '$lib/common/component_utilities';
-	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
+	import { addFinalSlash, encodePathForUrl } from '#lib/common/component_utilities.js';
+	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
 	import { normalizePayload } from 'fractal-components';
 
-	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
-	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
-	const featureExplorerUrl = addFinalSlash(env.PUBLIC_FRACTAL_FEATURE_EXPLORER_URL);
+	const fractalDataUrl = addFinalSlash(PUBLIC_FRACTAL_DATA_URL);
+	const vizarrViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
+	const featureExplorerUrl = addFinalSlash(PUBLIC_FRACTAL_FEATURE_EXPLORER_URL);
 
 	let projectId = page.params.projectId;
 
@@ -143,9 +149,10 @@
 		</ol>
 	</nav>
 	<div>
-		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal">
-			Info
-		</button>
+		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal"
+			>Info</button
+		>
+
 		<button
 			class="btn btn-light"
 			onclick={(event) => {
@@ -188,9 +195,7 @@
 							target="_blank"
 							class:disabled={platePathLoading}
 							aria-label="View plate with Vizarr"
-						>
-							&nbsp;
-						</a>
+						></a>
 					{/if}
 					{#if featureExplorerUrl}
 						<a

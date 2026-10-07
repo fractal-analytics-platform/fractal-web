@@ -1,8 +1,8 @@
 <script>
-	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
-	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { arrayToCsv, downloadBlob, getTimestamp } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
+	import Paginator from '#lib/components/common/Paginator.svelte';
 	import { normalizePayload } from 'fractal-components/common/utils';
 	import TimestampCell from '../jobs/TimestampCell.svelte';
 
@@ -30,7 +30,7 @@
 	/** @type {import('fractal-components/types/api').Accounting|undefined} */
 	let accounting = $state(undefined);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**

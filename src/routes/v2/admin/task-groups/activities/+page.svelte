@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import AdminTaskGroupActivities from '$lib/components/v2/tasks/AdminTaskGroupActivities.svelte';
+	import AdminTaskGroupActivities from '#lib/components/v2/tasks/AdminTaskGroupActivities.svelte';
 
 	const users = $derived(page.data.users || []);
 </script>

@@ -1,13 +1,11 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('Task Group reset');
 
 export async function load({ fetch, params }) {
-	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/api/v2/task-group/${params.taskGroupId}`
-	);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/api/v2/task-group/${params.taskGroupId}`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch task groups');

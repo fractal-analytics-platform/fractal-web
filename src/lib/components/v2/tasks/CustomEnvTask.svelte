@@ -1,9 +1,9 @@
 <script>
-	import DragAndDropUploader from '$lib/components/common/DragAndDropUploader.svelte';
+	import DragAndDropUploader from '#lib/components/common/DragAndDropUploader.svelte';
 	import { normalizePayload, SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
-	import { FormErrorHandler } from '$lib/common/errors';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
 

@@ -1,11 +1,11 @@
 <script>
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '$lib/common/errors';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '#lib/common/errors.js';
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let starDatasetErrorAlert;
 
 	/**

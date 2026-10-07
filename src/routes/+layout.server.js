@@ -1,5 +1,5 @@
-import { env } from '$env/dynamic/private';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_RUNNER_BACKEND, WARNING_BANNER_PATH } from '$app/env/private';
+import { getLogger } from '#lib/server/logger.js';
 import fs from 'fs/promises';
 
 const logger = getLogger('page layout');
@@ -22,25 +22,25 @@ export async function load({ locals, request, url }) {
 	return {
 		...pageInfo,
 		warningBanner,
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
+		runnerBackend: FRACTAL_RUNNER_BACKEND
 	};
 }
 
 async function getWarningBanner() {
-	if (!env.WARNING_BANNER_PATH) {
+	if (!WARNING_BANNER_PATH) {
 		return null;
 	}
 	try {
 		try {
-			await fs.stat(env.WARNING_BANNER_PATH);
+			await fs.stat(WARNING_BANNER_PATH);
 		} catch {
-			logger.error("Warning banner file %s doesn't exist", env.WARNING_BANNER_PATH);
+			logger.error("Warning banner file %s doesn't exist", WARNING_BANNER_PATH);
 			return null;
 		}
-		const bannerData = await fs.readFile(env.WARNING_BANNER_PATH, { encoding: 'utf-8' });
+		const bannerData = await fs.readFile(WARNING_BANNER_PATH, { encoding: 'utf-8' });
 		return bannerData.trim();
 	} catch (err) {
-		logger.error('An error happened reading warning banner file %s', env.WARNING_BANNER_PATH, err);
+		logger.error('An error happened reading warning banner file %s', WARNING_BANNER_PATH, err);
 		return null;
 	}
 }

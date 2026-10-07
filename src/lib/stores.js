@@ -13,7 +13,7 @@ export const navigationCancelled = writable(false);
 export const recentActivities = writable([]);
 
 /**
- * @type {import('svelte/store').Writable<import('$lib/common/errors').AlertError|null>}
+ * @type {import('svelte/store').Writable<import('#lib/common/errors.js').AlertError|null>}
  * Groups can be added during user creation. In that case, 2 API calls are performed.
  * This writable is used to store the groups call error and display it after the redirect.
  */

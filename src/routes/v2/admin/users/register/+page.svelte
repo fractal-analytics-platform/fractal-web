@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import UserEditor from '$lib/components/v2/admin/UserEditor.svelte';
+	import UserEditor from '#lib/components/v2/admin/UserEditor.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { onMount } from 'svelte';
 

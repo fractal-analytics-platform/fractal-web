@@ -8,7 +8,7 @@
 	// The form should be structured in multiple levels of depth, and support complex structure.
 	import { page } from '$app/state';
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import {
 		isCompoundType,
 		isNonParallelType,

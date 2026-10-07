@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('admin API [v2]');
 
@@ -12,7 +12,7 @@ const logger = getLogger('admin API [v2]');
  */
 export async function userImpersonation(fetch, userId) {
 	logger.debug(`Impersonating user ${userId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/impersonate/${userId}/`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/admin/v2/impersonate/${userId}/`);
 
 	if (!response.ok) {
 		logger.warn('Impersonation failed');
@@ -28,7 +28,7 @@ export async function userImpersonation(fetch, userId) {
  */
 export async function getResources(fetch) {
 	logger.debug(`Retrieving resources`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/admin/v2/resource/`);
 
 	if (!response.ok) {
 		await responseError(response);
@@ -44,7 +44,7 @@ export async function getResources(fetch) {
  */
 export async function getResource(fetch, resourceId) {
 	logger.debug(`Retrieving resource ${resourceId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/resource/${resourceId}/`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/admin/v2/resource/${resourceId}/`);
 
 	if (!response.ok) {
 		await responseError(response);
@@ -59,7 +59,7 @@ export async function getResource(fetch, resourceId) {
  */
 export async function getProfiles(fetch) {
 	logger.debug(`Retrieving profiles`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/admin/v2/profile/`);
 
 	if (!response.ok) {
 		await responseError(response);
@@ -75,7 +75,7 @@ export async function getProfiles(fetch) {
  */
 export async function getProfile(fetch, profileId) {
 	logger.debug(`Retrieving profile ${profileId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}/`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/admin/v2/profile/${profileId}/`);
 
 	if (!response.ok) {
 		await responseError(response);

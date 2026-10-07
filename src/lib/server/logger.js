@@ -1,8 +1,8 @@
-import { env } from '$env/dynamic/private';
+import { LOG_LEVEL_CONSOLE, LOG_LEVEL_FILE, LOG_FILE, LOG_CONFIG_FILE } from '$app/env/private';
 import { existsSync, readFileSync } from 'fs';
 import log4js from 'log4js';
 
-const logLevelConsole = env.LOG_LEVEL_CONSOLE || 'warn';
+const logLevelConsole = LOG_LEVEL_CONSOLE || 'warn';
 
 /**
  * @param {Date} date
@@ -48,14 +48,14 @@ function configureDefaultLogger() {
 	};
 
 	let appendersList = ['filteredConsole'];
+	const logLevelFile = LOG_LEVEL_FILE || 'info';
 
-	const logLevelFile = env.LOG_LEVEL_FILE || 'info';
-	if (env.LOG_FILE) {
+	if (LOG_FILE) {
 		appenders = {
 			...appenders,
 			file: {
 				type: 'file',
-				filename: env.LOG_FILE,
+				filename: LOG_FILE,
 				layout: getLayout('%x{timestamp} - (%x{component}) - %p - %m')
 			},
 			filteredFile: {
@@ -79,7 +79,7 @@ function configureDefaultLogger() {
 }
 
 function initializeLoggerConfiguration() {
-	const configuredLogConfigFile = env.LOG_CONFIG_FILE;
+	const configuredLogConfigFile = LOG_CONFIG_FILE;
 	let warning;
 
 	if (configuredLogConfigFile) {
@@ -125,9 +125,9 @@ function logStartupConfiguration(logger, startupState) {
 		logger.debug('LOG_CONFIG_FILE=%s', startupState.configuredLogConfigFile);
 	} else {
 		logger.debug('LOG_LEVEL_CONSOLE=%s', logLevelConsole);
-		if (env.LOG_FILE) {
-			logger.debug('LOG_FILE=%s', env.LOG_FILE);
-			logger.debug('LOG_LEVEL_FILE=%s', env.LOG_LEVEL_FILE || 'info');
+		if (LOG_FILE) {
+			logger.debug('LOG_FILE=%s', LOG_FILE);
+			logger.debug('LOG_LEVEL_FILE=%s', LOG_LEVEL_FILE || 'info');
 		}
 	}
 }

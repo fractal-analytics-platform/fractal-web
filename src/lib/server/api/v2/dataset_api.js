@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 import { normalizePayload } from 'fractal-components';
 
 const logger = getLogger('dataset API [v2]');
@@ -23,13 +23,9 @@ export async function getDatasetImages(fetch, projectId, datasetId, page, pageSi
 	headers.set('Content-Type', 'application/json');
 
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST +
+		FRACTAL_SERVER_HOST +
 			`/api/v2/project/${projectId}/dataset/${datasetId}/images/query/?page=${page}&page_size=${pageSize}`,
-		{
-			method: 'POST',
-			headers,
-			body: normalizePayload(params)
-		}
+		{ method: 'POST', headers, body: normalizePayload(params) }
 	);
 
 	if (!response.ok) {

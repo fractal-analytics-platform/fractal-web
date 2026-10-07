@@ -3,16 +3,22 @@
 	import 'bootstrap-icons/font/bootstrap-icons.css';
 	import slimSelectCss from 'slim-select/styles?url';
 
-	import logoSmall from '$lib/assets/fractal-logo-small.png';
-	import { browser } from '$app/environment';
+	import logoSmall from '#lib/assets/fractal-logo-small.png';
+	import { browser } from '$app/env';
 	import { afterNavigate, beforeNavigate, goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import { env } from '$env/dynamic/public';
+
+	import {
+		PUBLIC_FRACTAL_DATA_URL,
+		PUBLIC_FRACTAL_VIZARR_VIEWER_URL,
+		PUBLIC_FRACTAL_VOLE_VIEWER_URL
+	} from '$app/env/public';
+
 	import { onMount } from 'svelte';
-	import { navigating, navigationCancelled } from '$lib/stores';
+	import { navigating, navigationCancelled } from '#lib/stores.js';
 	import { resolve } from '$app/paths';
-	import HelpModal from '$lib/components/common/HelpModal.svelte';
-	import HelpLink from '$lib/components/common/HelpLink.svelte';
+	import HelpModal from '#lib/components/common/HelpModal.svelte';
+	import HelpLink from '#lib/components/common/HelpLink.svelte';
 
 	/**
 	 * @typedef {Object} Props
@@ -88,6 +94,8 @@
 	});
 
 	beforeNavigate(async (navigation) => {
+		if (navigation.shallow && navigation.type === 'goto') return;
+
 		const modal = getOpenedModal();
 		if (modal && navigation.delta === -1) {
 			modal.hide();
@@ -100,7 +108,9 @@
 		navigationCancelled.set(false);
 	});
 
-	afterNavigate(async () => {
+	afterNavigate(async ({ shallow, type }) => {
+		if (shallow && type === 'goto') return;
+
 		navigating.set(false);
 		if (location.href.includes('invalidate=true')) {
 			await invalidateAll();
@@ -217,7 +227,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/profile">My profile</a></li>
-							{#if env.PUBLIC_FRACTAL_DATA_URL && (env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL || env.PUBLIC_FRACTAL_VOLE_VIEWER_URL)}
+							{#if PUBLIC_FRACTAL_DATA_URL && (PUBLIC_FRACTAL_VIZARR_VIEWER_URL || PUBLIC_FRACTAL_VOLE_VIEWER_URL)}
 								<li><a class="dropdown-item" href="/viewer-paths">Viewer paths</a></li>
 							{/if}
 							<li><a class="dropdown-item" href="/healthcheck">Test job submission</a></li>
@@ -391,7 +401,7 @@
 	}
 
 	:global(.vizarr-btn) {
-		background-image: url('$lib/assets/logo-vizarr.svg');
+		background-image: url('../lib/assets/logo-vizarr.svg');
 		background-size: 80%;
 	}
 

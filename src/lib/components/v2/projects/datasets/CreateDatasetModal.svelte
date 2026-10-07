@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
 	import { normalizePayload, PropertyDescription } from 'fractal-components';

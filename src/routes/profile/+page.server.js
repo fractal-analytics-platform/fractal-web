@@ -1,6 +1,6 @@
-import { getCurrentUser, getProfileInfo } from '$lib/server/api/auth_api.js';
-import { env } from '$env/dynamic/private';
-import { getLogger } from '$lib/server/logger.js';
+import { getCurrentUser, getProfileInfo } from '#lib/server/api/auth_api.js';
+import { FRACTAL_RUNNER_BACKEND } from '$app/env/private';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('profile page');
 
@@ -10,9 +10,5 @@ export async function load({ fetch }) {
 	const user = await getCurrentUser(fetch, true);
 	const profile = await getProfileInfo(fetch);
 
-	return {
-		user,
-		profile,
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
-	};
+	return { user, profile, runnerBackend: FRACTAL_RUNNER_BACKEND };
 }

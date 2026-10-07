@@ -4,7 +4,7 @@ import {
 	getDefaultWorkflowDataset,
 	getSelectedWorkflowDataset,
 	saveSelectedDataset
-} from '$lib/common/workflow_utilities.js';
+} from '#lib/common/workflow_utilities.js';
 
 describe('Workflow Utilities', () => {
 	it('Default dataset is taken from most recent job', () => {

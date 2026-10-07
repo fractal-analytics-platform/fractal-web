@@ -1,12 +1,12 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import { extractJobErrorParts } from '$lib/common/job_utilities';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { extractJobErrorParts } from '#lib/common/job_utilities.js';
 	import SlimSelect from 'slim-select';
 	import ExpandableLog from '../common/ExpandableLog.svelte';
 	import Modal from '../common/Modal.svelte';
 	import Paginator from '../common/Paginator.svelte';
 	import { tick } from 'svelte';
-	import { getRelativeZarrPath } from '$lib/common/workflow_utilities';
+	import { getRelativeZarrPath } from '#lib/common/workflow_utilities.js';
 
 	let loading = $state(false);
 	let page = $state(1);

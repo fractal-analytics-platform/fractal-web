@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import { normalizePayload } from 'fractal-components';
 	import { formatMarkdown } from 'fractal-components/common/utils';
 	import { tick } from 'svelte';

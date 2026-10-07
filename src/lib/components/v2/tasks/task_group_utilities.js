@@ -1,4 +1,4 @@
-import { getAlertErrorFromResponse } from '$lib/common/errors';
+import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 
 /**
  * Fetches a task collection from the server

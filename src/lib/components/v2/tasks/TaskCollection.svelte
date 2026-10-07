@@ -1,7 +1,7 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
-	import { recentActivities } from '$lib/stores';
+	import { recentActivities } from '#lib/stores.js';
 	import { PropertyDescription } from 'fractal-components';
 
 	/**

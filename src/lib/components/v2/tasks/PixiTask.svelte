@@ -1,6 +1,6 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
-	import { recentActivities } from '$lib/stores';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import { recentActivities } from '#lib/stores.js';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	/**

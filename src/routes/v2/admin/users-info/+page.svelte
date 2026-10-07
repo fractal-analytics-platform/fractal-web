@@ -1,5 +1,5 @@
 <script>
-	import { getTimestamp } from '$lib/common/component_utilities';
+	import { getTimestamp } from '#lib/common/component_utilities.js';
 
 	let excludeZeroJobs = $state(false);
 

@@ -3,7 +3,7 @@
 		FormErrorHandler,
 		getValidationMessagesMap,
 		parseErrorResponse
-	} from '$lib/common/errors';
+	} from '#lib/common/errors.js';
 	import { page } from '$app/state';
 	import Modal from '../../../common/Modal.svelte';
 	import { goto } from '$app/navigation';

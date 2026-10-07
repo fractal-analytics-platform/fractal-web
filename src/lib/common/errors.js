@@ -1,4 +1,4 @@
-import StandardErrorAlert from '$lib/components/common/StandardErrorAlert.svelte';
+import StandardErrorAlert from '#lib/components/common/StandardErrorAlert.svelte';
 import { writable } from 'svelte/store';
 import { mount } from 'svelte';
 
@@ -273,7 +273,7 @@ export class FormErrorHandler {
 	 */
 	constructor(errorAlertId, handledErrorKeys, errorLoc = ['body']) {
 		this.validationErrors = writable({});
-		/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+		/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 		this.errorAlert = undefined;
 		this.errorAlertId = errorAlertId;
 		this.handledErrorKeys = handledErrorKeys;

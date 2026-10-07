@@ -443,7 +443,7 @@ Inside the page we have to add a div for the alert component, with a defined id:
 Then we have to define a variable for the alert component:
 
 ```javascript
-/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 let errorAlert = undefined;
 ```
 
@@ -539,7 +539,7 @@ Moreover, the path to components module has been added as `server.fs.allow` Vite
 The request url "/path/to/fractal-web/components/src/lib/index.js" is outside of Vite serving allow list.
 ```
 
-> **Important**: When importing js files inside the `components` module it is necessary to use a relative path. The editor might autocomplete the imports using the `$lib` prefix, but that will not work when the module is included in the main application, since it redefines the `$lib` path again.
+> **Important**: When importing js files inside the `components` module it is necessary to use a relative path. The editor might autocomplete the imports using the `#lib` prefix, but that will not work when the module is included in the main application, since it redefines the `#lib` path again.
 
 ### Structure of the code
 

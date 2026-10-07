@@ -1,11 +1,11 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import {
 		generateNewUniqueDatasetName,
 		getFirstTaskIndexForContinuingWorkflow
-	} from '$lib/common/job_utilities';
+	} from '#lib/common/job_utilities.js';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
 	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
@@ -13,7 +13,7 @@
 		getRelativeZarrPath,
 		getTypeFilterValues,
 		STATUS_KEY
-	} from '$lib/common/workflow_utilities';
+	} from '#lib/common/workflow_utilities.js';
 	import {
 		getPropertiesToIgnore,
 		normalizePayload,
@@ -21,7 +21,7 @@
 		stripDiscriminator,
 		stripNullAndEmptyObjectsAndArrays
 	} from 'fractal-components';
-	import { splitZarrDir } from '$lib/common/component_utilities';
+	import { splitZarrDir } from '#lib/common/component_utilities.js';
 	import { page } from '$app/state';
 	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
 

@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
+	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
 
 	let { form } = $props();
 	let userId = $state('');

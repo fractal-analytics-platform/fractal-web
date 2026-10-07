@@ -1,10 +1,10 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import Paginator from '#lib/components/common/Paginator.svelte';
 	import { PropertyDescription } from 'fractal-components';
-	import { sortUsers } from '$lib/components/admin/user_utilities';
+	import { sortUsers } from '#lib/components/admin/user_utilities.js';
 
 	const currentUserId = $derived(page.data.userInfo.id);
 	const users = $derived(sortDropdownUsers(page.data.users));
@@ -29,7 +29,7 @@
 	let searched = $state(false);
 	let searching = $state(false);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ProjectSuperuser> | undefined} */

@@ -3,7 +3,7 @@
 		AlertError,
 		displayStandardErrorAlert,
 		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	} from '#lib/common/errors.js';
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 

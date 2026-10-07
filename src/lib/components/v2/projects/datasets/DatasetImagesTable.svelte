@@ -1,26 +1,31 @@
 <script>
-	import { env } from '$env/dynamic/public';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import CreateUpdateImageModal from '$lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
+	import {
+		PUBLIC_FRACTAL_DATA_URL,
+		PUBLIC_FRACTAL_VIZARR_VIEWER_URL,
+		PUBLIC_FRACTAL_VOLE_VIEWER_URL
+	} from '$app/env/public';
+
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import CreateUpdateImageModal from '#lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import {
 		addFinalSlash,
 		encodePathForUrl,
 		hideAllTooltips,
 		objectChanged
-	} from '$lib/common/component_utilities';
+	} from '#lib/common/component_utilities.js';
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
-	import Paginator from '$lib/components/common/Paginator.svelte';
+	import Paginator from '#lib/components/common/Paginator.svelte';
 	import { deepCopy, normalizePayload } from 'fractal-components';
-	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
-	import { browser } from '$app/environment';
-	import { getRelativeZarrPath, STATUS_KEY } from '$lib/common/workflow_utilities';
+	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
+	import { browser } from '$app/env';
+	import { getRelativeZarrPath, STATUS_KEY } from '#lib/common/workflow_utilities.js';
 
-	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
-	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
-	const voleViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VOLE_VIEWER_URL);
+	const fractalDataUrl = addFinalSlash(PUBLIC_FRACTAL_DATA_URL);
+	const vizarrViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
+	const voleViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VOLE_VIEWER_URL);
 
 	/**
 	 * @typedef {Object} Props
@@ -74,7 +79,7 @@
 
 	/** @type {{ [key: string]: boolean | null }}} */
 	let typeFilters = $state({});
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/** @type {{[key: string]: SlimSelect}} */
@@ -740,9 +745,7 @@
 											)}&roi=1"
 											target="_blank"
 											aria-label="View with Vizarr"
-										>
-											&nbsp;
-										</a>
+										></a>
 									{/if}
 									{#if voleViewerUrl}
 										<a

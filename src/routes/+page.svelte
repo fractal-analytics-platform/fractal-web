@@ -1,7 +1,12 @@
 <script>
-	import { env } from '$env/dynamic/public';
+	import {
+		PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL,
+		PUBLIC_ENABLE_HELP_LINKS,
+		PUBLIC_HELP_LINKS_BASE_URL
+	} from '$app/env/public';
+
 	import { page } from '$app/state';
-	import logoMedium from '$lib/assets/fractal-logo-medium.png';
+	import logoMedium from '#lib/assets/fractal-logo-medium.png';
 	import { onMount } from 'svelte';
 	import { formatMarkdown } from 'fractal-components/common/utils';
 
@@ -26,7 +31,7 @@
 	{#if userInfo && !userInfo.is_superuser && (userInfo.profile_id === null || !userInfo.is_verified)}
 		<div class="alert alert-warning">
 			<i class="bi bi-exclamation-triangle"></i>
-			This user is not authorized to use this Fractal instance - please contact {env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}.
+			This user is not authorized to use this Fractal instance - please contact {PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}.
 		</div>
 	{/if}
 
@@ -63,19 +68,20 @@
 			<a href="/v2/projects" class="btn btn-primary">Projects</a>
 			<a href="/v2/tasks" class="btn btn-primary">Tasks</a>
 			<a href="/v2/jobs" class="btn btn-primary">Jobs</a>
-			{#if env.PUBLIC_ENABLE_HELP_LINKS === 'true'}
-				<a href={env.PUBLIC_HELP_LINKS_BASE_URL || '/help'} target="_blank" class="btn btn-primary">
-					User Guide
-				</a>
+
+			{#if PUBLIC_ENABLE_HELP_LINKS === 'true'}
+				<a href={PUBLIC_HELP_LINKS_BASE_URL || '/help'} target="_blank" class="btn btn-primary"
+					>User Guide</a
+				>
 			{/if}
 		</div>
 
-		{#if env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
+		{#if PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
 			<h3 class="fw-light">Where to get support</h3>
 			<p>
-				<a href="mailto:{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}">
-					{env.PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}
-				</a>
+				<a href="mailto:{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}"
+					>{PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}</a
+				>
 			</p>
 		{/if}
 

@@ -3,7 +3,7 @@
 		AlertError,
 		displayStandardErrorAlert,
 		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	} from '#lib/common/errors.js';
 	import { page } from '$app/state';
 	import {
 		getPropertiesToIgnore,
@@ -30,7 +30,7 @@
 	let updateCandidate = $state();
 	let dataValid = $state(true);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	function setup() {

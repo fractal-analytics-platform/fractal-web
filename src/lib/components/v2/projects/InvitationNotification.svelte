@@ -1,5 +1,5 @@
 <script>
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 
 	/**
 	 * @typedef {Object} Props
@@ -12,7 +12,7 @@
 
 	let display = $state(true);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	async function acceptInvitation() {

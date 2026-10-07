@@ -1,8 +1,8 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
-	import Paginator from '$lib/components/common/Paginator.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
+	import Paginator from '#lib/components/common/Paginator.svelte';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 
 	const currentUserId = $derived(page.data.userInfo.id);
@@ -10,7 +10,7 @@
 
 	let searched = $state(false);
 	let searching = $state(false);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let genericErrorAlert;
 
 	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').LinkUserProjectRead> | undefined} */

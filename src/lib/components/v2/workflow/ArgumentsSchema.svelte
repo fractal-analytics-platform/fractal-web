@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import ImportExportArgs from './ImportExportArgs.svelte';
 	import { JSchema, getPropertiesToIgnore, stripIgnoredProperties } from 'fractal-components';
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';

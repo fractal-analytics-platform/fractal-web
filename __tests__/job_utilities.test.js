@@ -5,7 +5,7 @@ import {
 	generateNewUniqueDatasetName,
 	getFirstTaskIndexForContinuingWorkflow,
 	showExecutorErrorLog
-} from '$lib/common/job_utilities.js';
+} from '#lib/common/job_utilities.js';
 
 const completeTracebackError = `TASK ERROR:Task id: 15 (Create OME-Zarr structure), e.workflow_task_order=0
 TRACEBACK:

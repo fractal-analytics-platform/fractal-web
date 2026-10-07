@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import { normalizePayload } from 'fractal-components';
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';

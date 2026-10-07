@@ -5,8 +5,8 @@
 		displayStandardErrorAlert,
 		getValidationMessagesMap,
 		parseErrorResponse
-	} from '$lib/common/errors';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	} from '#lib/common/errors.js';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
 	import { onMount } from 'svelte';
@@ -18,7 +18,7 @@
 
 	const runnerBackend = $derived(page.data.runnerBackend);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/** @type {string[]} */

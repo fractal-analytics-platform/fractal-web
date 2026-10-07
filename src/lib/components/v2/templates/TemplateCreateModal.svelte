@@ -1,5 +1,5 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '../../common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { page } from '$app/state';
@@ -119,7 +119,7 @@
 			throw alertError;
 		} else {
 			let newTemplate = await response.json();
-			await goto(resolve(`/v2/templates?template_id=${newTemplate.id}`));
+			await goto(resolve(`v2/templates?template_id=${newTemplate.id}`));
 		}
 	}
 </script>

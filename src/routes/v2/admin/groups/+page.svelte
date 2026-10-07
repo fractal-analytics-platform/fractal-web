@@ -1,9 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { getAlertErrorFromResponse, getFieldValidationError } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { normalizePayload } from 'fractal-components';
 	import { resolve } from '$app/paths';
 
