@@ -9,5 +9,5 @@
 			"#fractal-components/*": ["./components/src/lib/*"]
 		}
 	},
-	"include": ["src", "vite.config.js", "playwright.config.js", "tests"]
+	"include": ["src", "vite.config.js", "playwright.config.js", "tests", "__tests__"]
 }

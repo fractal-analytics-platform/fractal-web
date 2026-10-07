@@ -13,20 +13,6 @@ const pkg = JSON.parse(packageJsonData.toString());
 	plugins: [
 		sveltekit({
 			adapter: adapter(),
-			alias: { '#fractal-components': './components/src/lib' },
-			// @migration-task `typescript.config` is deprecated; configure TypeScript in tsconfig.json directly
-			typescript: {
-				// Customize generated .svelte-kit/tsconfig.json
-				config /** @type {Record<string, any>} */: (cfg) => {
-					// Add __tests__ folder to includes list
-					cfg.include.push('../__tests__/**/*.js');
-
-					// Add extra matchers to Assertion<HTMLElement>
-					cfg.compilerOptions.types = ['@testing-library/jest-dom'];
-
-					return cfg;
-				}
-			},
 			csp: {
 				directives: {
 					'script-src': [
