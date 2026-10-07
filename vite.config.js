@@ -71,13 +71,6 @@ const pkg = JSON.parse(packageJsonData.toString());
 			include: ['src']
 		}
 	},
-	resolve: {
-		alias: {
-			'#fractal-components': fileURLToPath(
-				new URL('./components/src/lib/index.js', import.meta.url)
-			)
-		}
-	},
 	// Tells Vite to allow serving files from the components folder when running npm run dev
 	server: {
 		fs: {
