@@ -4,11 +4,11 @@
 	import { onDestroy } from 'svelte';
 	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
 	import { sortDropdownUsers } from './user_utilities';
-	import { normalizePayload } from 'fractal-components/common/utils';
+	import { normalizePayload } from '#fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Array<import('fractal-components/types/api').User>} [users]
+	 * @property {Array<import('#fractal-components/types/api').User>} [users]
 	 * @property {number} currentUserId
 	 */
 

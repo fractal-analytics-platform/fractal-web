@@ -529,7 +529,7 @@ The class also provides a `clearErrors()` function and some functions to manuall
 
 ## JSON Schema form module
 
-The `components` folder on this repository contains a Svelte project that provides the JSON Schema form component (`JSchema.svelte`) and its related functions and classes. The file `index.js` contains the list of components and functions that are exported for public usage, so that they can be included using `from 'fractal-components'` from the main project.
+The `components` folder on this repository contains a Svelte project that provides the JSON Schema form component (`JSchema.svelte`) and its related functions and classes. The file `index.js` contains the list of components and functions that are exported for public usage, so that they can be included using `from '#fractal-components'` from the main project.
 
 The main project defines `fractal-components` in `vite.config.js`, as an alias pointing to `components/src/lib/index.js`. In this way the components module is automatically built when the main project is built and the Hot Module Reload feature still works.
 

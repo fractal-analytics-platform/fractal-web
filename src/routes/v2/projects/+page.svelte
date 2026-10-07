@@ -8,12 +8,12 @@
 	import SharedProjectInfoModal from '#lib/components/v2/projects/SharedProjectInfoModal.svelte';
 	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 
-	/** @type {import('fractal-components/types/api').ProjectV2[]} */
+	/** @type {import('#fractal-components/types/api').ProjectV2[]} */
 	let projects = $state([]);
-	/** @type {import('fractal-components/types/api').ProjectInvitation[]} */
+	/** @type {import('#fractal-components/types/api').ProjectInvitation[]} */
 	let invitations = $state([]);
 
-	/** @type {import('fractal-components/types/api').ProjectV2[]} */
+	/** @type {import('#fractal-components/types/api').ProjectV2[]} */
 	let sharedProjects = $state([]);
 	/** @type {SharedProjectInfoModal|undefined} */
 	let sharedProjectInfoModal = $state();
@@ -43,7 +43,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectV2} project
+	 * @param {import('#fractal-components/types/api').ProjectV2} project
 	 */
 	async function showSharedProjectInfo(project) {
 		await sharedProjectInfoModal?.open(project);
@@ -66,7 +66,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectV2} project
+	 * @param {import('#fractal-components/types/api').ProjectV2} project
 	 */
 	async function toggleStarredSharedProject(project) {
 		errorAlert?.hide();

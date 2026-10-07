@@ -1,23 +1,23 @@
 <script>
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import TimestampCell from '#lib/components/jobs/TimestampCell.svelte';
 	import Modal from '../../common/Modal.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').User} user
+	 * @property {import('#fractal-components/types/api').User} user
 	 */
 
 	/** @type {Props} */
 	let { user } = $props();
-	/** @type {import('fractal-components/types/api').TaskGroupSlim|undefined} */
+	/** @type {import('#fractal-components/types/api').TaskGroupSlim|undefined} */
 	let taskGroup = $state();
 
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToLoad
+	 * @param {import('#fractal-components/types/api').TaskGroupSlim} taskGroupToLoad
 	 */
 	export async function open(taskGroupToLoad) {
 		taskGroup = taskGroupToLoad;
@@ -25,7 +25,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroup
+	 * @param {import('#fractal-components/types/api').TaskGroupSlim} taskGroup
 	 */
 	function getGroupName(taskGroup) {
 		const group = user.group_ids_names?.find((i) => i[0] === taskGroup?.user_group_id);

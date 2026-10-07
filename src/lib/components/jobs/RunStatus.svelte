@@ -1,11 +1,11 @@
 <script>
-	import { isParallelType } from 'fractal-components';
+	import { isParallelType } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').DatasetV2} dataset
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
-	 * @property {import('fractal-components/types/api').HistoryRunAggregated} run
+	 * @property {import('#fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('#fractal-components/types/api').HistoryRunAggregated} run
 	 * @property {number} index
 	 * @property {import('./RunStatusModal.svelte').default} runStatusModal
 	 */

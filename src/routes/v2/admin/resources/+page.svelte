@@ -4,7 +4,7 @@
 	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	/** @type {Array<import('#fractal-components/types/api').Resource>} */
 	let resources = $state([]);
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let resourcesErrorAlert;
@@ -44,7 +44,7 @@
 	async function exportToFile(resourceId) {
 		const response = await fetch(`/api/admin/v2/resource/${resourceId}`);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').Resource} */
+			/** @type {import('#fractal-components/types/api').Resource} */
 			const resource = await response.json();
 			downloadBlob(JSON.stringify(resource, null, 2), `${resource.name}.json`, 'application/json');
 		} else {

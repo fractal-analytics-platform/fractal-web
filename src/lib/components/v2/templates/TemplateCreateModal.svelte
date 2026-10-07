@@ -1,7 +1,7 @@
 <script>
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '../../common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -9,7 +9,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {import('#fractal-components/types/api').WorkflowV2} workflow
 	 */
 
 	/** @type {Props} */
@@ -31,7 +31,7 @@
 	let groups = $state([]);
 
 	/**
-	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
+	 * @type {import('#fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
 	let originaleTemplate = $state();
 

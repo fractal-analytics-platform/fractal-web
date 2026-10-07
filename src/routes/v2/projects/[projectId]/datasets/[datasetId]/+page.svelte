@@ -12,7 +12,7 @@
 	import { onMount } from 'svelte';
 	import { addFinalSlash, encodePathForUrl } from '#lib/common/component_utilities.js';
 	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 
 	const fractalDataUrl = addFinalSlash(PUBLIC_FRACTAL_DATA_URL);
 	const vizarrViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
@@ -20,9 +20,9 @@
 
 	let projectId = page.params.projectId;
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
+	/** @type {import('#fractal-components/types/api').DatasetV2} */
 	let dataset = $state(page.data.dataset);
-	/** @type {import('fractal-components/types/api').ImagePage} */
+	/** @type {import('#fractal-components/types/api').ImagePage} */
 	let imagePage = $state(page.data.imagePage);
 
 	/** @type {DatasetImagesTable|undefined} */
@@ -58,7 +58,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').Image|undefined>}
+	 * @returns {Promise<import('#fractal-components/types/api').Image|undefined>}
 	 */
 	async function loadImageForSelectedPlate() {
 		const params = { attribute_filters: { plate: [selectedPlate] } };
@@ -76,7 +76,7 @@
 			console.error(`Unable to load image for plate ${selectedPlate}`);
 			return undefined;
 		}
-		/** @type {import('fractal-components/types/api').ImagePage}*/
+		/** @type {import('#fractal-components/types/api').ImagePage}*/
 		const result = await response.json();
 		if (result.items.length === 0) {
 			console.error(

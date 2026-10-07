@@ -3,21 +3,21 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { sortUserByEmailComparator } from '#lib/common/user_utilities.js';
 
-	/** @type {import('fractal-components/types/api').Group & {user_ids: number[]}} */
+	/** @type {import('#fractal-components/types/api').Group & {user_ids: number[]}} */
 	let group = $state(page.data.group);
-	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
+	/** @type {Array<import('#fractal-components/types/api').User & {id: number}>} */
 	const users = $derived(page.data.users);
 	/** @type {string|null} */
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
-	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
+	/** @type {import('#fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToAdd = $state(null);
-	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
+	/** @type {import('#fractal-components/types/api').User & {id: number}|null} */
 	let addingUser = $state(null);
 	let addUserHovering = $state(false);
 	let userFilter = $state('');
 
-	/** @type {import('fractal-components/types/api').User & {id: number}|null} */
+	/** @type {import('#fractal-components/types/api').User & {id: number}|null} */
 	let draggedUserToRemove = $state(null);
 
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */

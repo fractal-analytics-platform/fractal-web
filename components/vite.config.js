@@ -9,7 +9,7 @@ const config = defineConfig({
 		outDir: './build',
 		emptyOutDir: true,
 		lib: {
-			name: 'fractal-components',
+			name: '#fractal-components',
 			entry: './src/lib/index.js'
 		}
 	},

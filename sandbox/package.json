@@ -54,5 +54,9 @@
 		"bootstrap-icons",
 		"dompurify",
 		"marked"
-	]
+	],
+	"imports": {
+		"#lib/*": "./src/lib/*",
+		"#fractal-components/*": "../components/src/lib/*"
+	}
 }

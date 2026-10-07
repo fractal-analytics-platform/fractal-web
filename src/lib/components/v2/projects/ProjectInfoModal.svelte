@@ -7,7 +7,7 @@
 	import Modal from '../../common/Modal.svelte';
 
 	// Project to be displayed
-	/** @type {import('fractal-components/types/api').ProjectV2|undefined} */
+	/** @type {import('#fractal-components/types/api').ProjectV2|undefined} */
 	let project = $state();
 
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
@@ -22,7 +22,7 @@
 			datasetErrorAlert?.hide();
 			const response = await fetch(`/api/v2/project/${project.id}/dataset?history=false`);
 			if (response.ok) {
-				/** @type {import('fractal-components/types/api.js').DatasetV2[]} */
+				/** @type {import('#fractal-components/types/api.js').DatasetV2[]} */
 				const result = await response.json();
 				result.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 			} else {

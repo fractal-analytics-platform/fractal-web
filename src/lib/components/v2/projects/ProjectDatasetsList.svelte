@@ -10,8 +10,8 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ProjectV2} project
-	 * @property {import('fractal-components/types/api').DatasetV2[]} [datasets]
+	 * @property {import('#fractal-components/types/api').ProjectV2} project
+	 * @property {import('#fractal-components/types/api').DatasetV2[]} [datasets]
 	 */
 
 	/** @type {Props} */
@@ -25,7 +25,7 @@
 	);
 
 	function createDatasetCallback(
-		/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset
+		/** @type {import('#fractal-components/types/api').DatasetV2} */ newDataset
 	) {
 		datasetCreatedMessage = `Created new dataset with Zarr dir ${newDataset.zarr_dir}`;
 		datasets = [...datasets, newDataset].sort((a, b) =>
@@ -56,7 +56,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 * @param {import('#fractal-components/types/api').DatasetV2} dataset
 	 */
 	async function toggleStarredDataset(dataset) {
 		starDatasetErrorAlert?.hide();

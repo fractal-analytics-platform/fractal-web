@@ -3,11 +3,11 @@
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 	import TypesEditor from './TypesEditor.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 
 	let { updateEditedTask } = $props();
 
-	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').TaskV2|undefined} */
 	let task = $state();
 
 	/** @type {Modal|undefined} */
@@ -85,7 +85,7 @@
 		loading = false;
 
 		if (response.ok) {
-			task = /** @type {import('fractal-components/types/api').TaskV2} */ (result);
+			task = /** @type {import('#fractal-components/types/api').TaskV2} */ (result);
 			command_parallel = task.command_parallel;
 			command_non_parallel = task.command_non_parallel;
 			// wait the typesEditor element rendering, that happens after task is defined

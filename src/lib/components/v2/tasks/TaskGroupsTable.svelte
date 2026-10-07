@@ -1,19 +1,19 @@
 <script>
 	import { onMount } from 'svelte';
-	import { buildTaskTableRows } from 'fractal-components/tasks/task_group_utilities';
+	import { buildTaskTableRows } from '#fractal-components/tasks/task_group_utilities';
 	import TaskInfoModal from './TaskInfoModal.svelte';
 	import TaskEditModal from './TaskEditModal.svelte';
 	import TaskGroupInfoModal from './TaskGroupInfoModal.svelte';
 	import TaskGroupEditModal from '#lib/components/v2/tasks/TaskGroupEditModal.svelte';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import TaskGroupManageModal from '#lib/components/v2/tasks/TaskGroupManageModal.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').User} user
-	 * @property {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} taskGroups
+	 * @property {import('#fractal-components/types/api').User} user
+	 * @property {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} taskGroups
 	 * @property {string|undefined} expandedTaskGroupRow
-	 * @property {(updatedGroups: Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>) => void} updateTaskGroups
+	 * @property {(updatedGroups: Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>) => void} updateTaskGroups
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -38,7 +38,7 @@
 	let taskEditModal = $state();
 
 	/**
-	 * @type {import('fractal-components/types/api').TasksTableRowGroup[]}
+	 * @type {import('#fractal-components/types/api').TasksTableRowGroup[]}
 	 */
 	let taskGroupRows = $state([]);
 
@@ -80,7 +80,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupSlim} updatedGroup
+	 * @param {import('#fractal-components/types/api').TaskGroupSlim} updatedGroup
 	 */
 	function updateEditedTaskGroup(updatedGroup) {
 		updateTaskGroups(
@@ -93,7 +93,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskSlim} editedTask
+	 * @param {import('#fractal-components/types/api').TaskSlim} editedTask
 	 */
 	function updateEditedTask(editedTask) {
 		updateTaskGroups(
@@ -108,7 +108,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroup
+	 * @param {import('#fractal-components/types/api').TaskGroupSlim} taskGroup
 	 */
 	function getGroupName(taskGroup) {
 		const group = user.group_ids_names?.find((i) => i[0] === taskGroup?.user_group_id);
@@ -119,8 +119,8 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TasksTableRowGroup} taskGroupRow
-	 * @returns {import('fractal-components/types/api').TaskGroupSlim | undefined}
+	 * @param {import('#fractal-components/types/api').TasksTableRowGroup} taskGroupRow
+	 * @returns {import('#fractal-components/types/api').TaskGroupSlim | undefined}
 	 */
 	function getSelectedGroup(taskGroupRow) {
 		return taskGroupRow.groups.find((g) => g.version === taskGroupRow.selectedVersion);

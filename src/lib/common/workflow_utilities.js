@@ -1,8 +1,8 @@
 export const STATUS_KEY = '__wftask_dataset_image_status__';
 
 /**
- * @param {Array<import("fractal-components/types/api").DatasetV2>} datasets
- * @param {Array<import("fractal-components/types/api").JobV2>} jobs
+ * @param {Array<import("#fractal-components/types/api").DatasetV2>} datasets
+ * @param {Array<import("#fractal-components/types/api").JobV2>} jobs
  * @returns {number|undefined}
  */
 export function getDefaultWorkflowDataset(datasets, jobs) {
@@ -19,8 +19,8 @@ export function getDefaultWorkflowDataset(datasets, jobs) {
 }
 
 /**
- * @param {import("fractal-components/types/api").WorkflowV2} workflow
- * @param {Array<import("fractal-components/types/api").DatasetV2>} datasets
+ * @param {import("#fractal-components/types/api").WorkflowV2} workflow
+ * @param {Array<import("#fractal-components/types/api").DatasetV2>} datasets
  * @param {number|undefined} defaultDatasetId
  * @returns {number|undefined}
  */
@@ -40,7 +40,7 @@ export function getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId)
 const LOCAL_STORAGE_SELECTED_DATASETS = 'SelectedDatasets';
 
 /**
- * @param {import("fractal-components/types/api").WorkflowV2} workflow
+ * @param {import("#fractal-components/types/api").WorkflowV2} workflow
  * @param {number|undefined} datasetId
  */
 export function saveSelectedDataset(workflow, datasetId) {
@@ -76,7 +76,7 @@ export function deleteDatasetSelectionsForProject(projectId) {
 }
 
 /**
- * @param {import("fractal-components/types/api").WorkflowV2} workflow
+ * @param {import("#fractal-components/types/api").WorkflowV2} workflow
  * @returns {number|undefined}
  */
 function getDatasetIdFromLocalStorage(workflow) {
@@ -109,7 +109,7 @@ function getDatasetSelectionsFromLocalStorage() {
 }
 
 /**
- * @param {import("fractal-components/types/api").DatasetV2} dataset
+ * @param {import("#fractal-components/types/api").DatasetV2} dataset
  * @param {string} zarrUrl
  * @returns {string}
  */
@@ -126,7 +126,7 @@ export function getRelativeZarrPath(dataset, zarrUrl) {
 
 /**
  * @param {number} projectId
- * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @param {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
  * @returns {Promise<{ [key: string]: boolean }>}
  */
 export async function getTypeFilterValues(projectId, workflowTask) {
@@ -136,7 +136,7 @@ export async function getTypeFilterValues(projectId, workflowTask) {
 		`/api/v2/project/${projectId}/workflow/${workflowTask.workflow_id}/type-filters-flow`
 	);
 	if (response.ok) {
-		/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
+		/** @type {Array<import("#fractal-components/types/api").TypeFiltersFlow>} */
 		const typeFiltersFlow = await response.json();
 		const selectedTypeFiltersFlow = typeFiltersFlow.find(
 			(t) => t.workflowtask_id === workflowTask.id

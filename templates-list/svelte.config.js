@@ -18,7 +18,7 @@ const config = {
 			base: '/templates-table'
 		},
 		alias: {
-			'fractal-components': '../components/src/lib'
+			'#fractal-components': '../components/src/lib'
 		}
 	}
 };

@@ -1,7 +1,7 @@
 <script>
 	import { FormErrorHandler } from '#lib/common/errors.js';
 	import Modal from '#lib/components/common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -15,7 +15,7 @@
 	let modal = $state();
 
 	/**
-	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
+	 * @type {import('#fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
 	let template = $state();
 	/**

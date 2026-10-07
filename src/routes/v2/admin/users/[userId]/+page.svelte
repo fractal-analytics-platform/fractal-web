@@ -1,13 +1,13 @@
 <script>
 	import { page } from '$app/state';
 	import { getSortGroupByNameAllFirstComparator } from '#lib/components/admin/user_utilities.js';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user || []);
-	/** @type {import('fractal-components/types/api').Profile | undefined} */
+	/** @type {import('#fractal-components/types/api').Profile | undefined} */
 	const profile = $derived(page.data.profile);
-	/** @type {Array<import('fractal-components/types/api').Group>} */
+	/** @type {Array<import('#fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups || []);
 	/** @type {string} */
 	const runnerBackend = $derived(page.data.runnerBackend);

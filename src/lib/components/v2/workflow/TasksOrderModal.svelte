@@ -1,13 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {number} projectId
-	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
-	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} workflowUpdater
+	 * @property {import('#fractal-components/types/api').WorkflowV2} workflow
+	 * @property {(workflow: import('#fractal-components/types/api').WorkflowV2) => void} workflowUpdater
 	 */
 
 	/** @type {Props} */
@@ -23,7 +23,7 @@
 	let transparentImage;
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2[]} originalTasksList
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2[]} originalTasksList
 	 */
 	export function show(originalTasksList) {
 		editableTasksList = originalTasksList.map((wt) => ({

@@ -1,16 +1,16 @@
 <script>
 	import { page } from '$app/state';
 	import UserEditor from '#lib/components/v2/admin/UserEditor.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { onMount } from 'svelte';
 
 	const runnerBackend = $derived(page.data.runnerBackend);
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
-	/** @type {Array<import('fractal-components/types/api').Group>} */
+	/** @type {Array<import('#fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups);
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	let user = {
 		email: '',
 		is_active: true,
@@ -31,7 +31,7 @@
 	let verified = $state();
 
 	/**
-	 * @param {import('fractal-components/types/api').User} user
+	 * @param {import('#fractal-components/types/api').User} user
 	 * @returns {Promise<Response>}
 	 */
 	async function save(user) {

@@ -6,7 +6,7 @@ global.fetch = vi.fn();
 
 import CompareWorkflowTemplateModal from '../../src/lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 
-const workflow = /** @type {import('fractal-components/types/api').WorkflowV2} */ ({
+const workflow = /** @type {import('#fractal-components/types/api').WorkflowV2} */ ({
 	id: 1,
 	project_id: 1,
 	template_id: 1

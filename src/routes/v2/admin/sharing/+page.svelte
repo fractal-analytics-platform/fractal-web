@@ -3,7 +3,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
 	import Paginator from '#lib/components/common/Paginator.svelte';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
 	const currentUserId = $derived(page.data.userInfo.id);
 	const sortedUsers = $derived(sortDropdownUsers([...page.data.users], currentUserId));
@@ -13,7 +13,7 @@
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let genericErrorAlert;
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').LinkUserProjectRead> | undefined} */
+	/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').LinkUserProjectRead> | undefined} */
 	let results = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(50);

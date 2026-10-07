@@ -1,12 +1,12 @@
 <script>
 	import { FormErrorHandler } from '#lib/common/errors.js';
 	import Modal from '#lib/components/common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import ImageAttributesTypesForm from './ImageAttributesTypesForm.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('#fractal-components/types/api').DatasetV2} dataset
 	 * @property {() => Promise<void>} onImageSave
 	 */
 
@@ -42,7 +42,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').Image} image
+	 * @param {import('#fractal-components/types/api').Image} image
 	 */
 	export function openForEditing(image) {
 		isNew = false;

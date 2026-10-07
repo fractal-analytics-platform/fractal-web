@@ -3,10 +3,10 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '#lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { onMount } from 'svelte';
 
-	/** @type {import('fractal-components/types/api').Resource} */
+	/** @type {import('#fractal-components/types/api').Resource} */
 	let resource = $state(page.data.resource);
 
 	let data = $state('');

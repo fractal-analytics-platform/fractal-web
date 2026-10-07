@@ -1,22 +1,22 @@
 <script>
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '#lib/components/common/Modal.svelte';
-	import PropertyDescription from 'fractal-components/jschema/properties/PropertyDescription.svelte';
-	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import PropertyDescription from '#fractal-components/jschema/properties/PropertyDescription.svelte';
+	import FilteredTasksTable from '#fractal-components/tasks/FilteredTasksTable.svelte';
 	import { tick } from 'svelte';
-	import { getJsonSchemaData } from 'fractal-components/jschema/jschema_initial_data';
+	import { getJsonSchemaData } from '#fractal-components/jschema/jschema_initial_data';
 	import {
 		getPropertiesToIgnore,
 		normalizePayload,
 		stripNullAndEmptyObjectsAndArrays
-	} from 'fractal-components';
-	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
-	import { formatMarkdown } from 'fractal-components/common/utils';
+	} from '#fractal-components';
+	import { adaptJsonSchema } from '#fractal-components/jschema/jschema_adapter';
+	import { formatMarkdown } from '#fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
-	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
+	 * @property {import('#fractal-components/types/api').WorkflowV2} workflow
+	 * @property {(workflow: import('#fractal-components/types/api').WorkflowV2) => Promise<void>} onWorkflowTaskAdded
 	 * @property {boolean} showOnlyCoreFiltering
 	 */
 
@@ -30,7 +30,7 @@
 	let addingTask = $state(false);
 	let showDocLinksInTable = false;
 
-	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
+	/** @type {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} */
 	let taskGroups = $state([]);
 
 	/** @type {number[]} */
@@ -157,7 +157,7 @@
 
 	/**
 	 * @param {number} taskId
-	 * @returns {Promise<import('fractal-components/types/api').TaskV2>}
+	 * @returns {Promise<import('#fractal-components/types/api').TaskV2>}
 	 */
 	async function getTask(taskId) {
 		const response = await fetch(`/api/v2/task/${taskId}`);
@@ -170,14 +170,14 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 * @param {import('#fractal-components/types/api').TasksTableRow} taskRow
 	 */
 	function showTaskInfoButton(taskRow) {
 		return taskRow.docs_info || (!showDocLinksInTable && taskRow.docs_link);
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 * @param {import('#fractal-components/types/api').TasksTableRow} taskRow
 	 */
 	function getTaskInfo(taskRow) {
 		let info = '';

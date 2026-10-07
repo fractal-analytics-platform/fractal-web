@@ -1,16 +1,16 @@
 <script>
 	import tasks from '../tasks.json';
-	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
-	import { formatMarkdown } from 'fractal-components';
+	import FilteredTasksTable from '#fractal-components/tasks/FilteredTasksTable.svelte';
+	import { formatMarkdown } from '#fractal-components';
 	import { Modal } from 'bootstrap';
 	import 'slim-select/styles';
 
-	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
+	/** @type {import('#fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = $state(null);
 	let modalText = $state('');
 
 	/**
-	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 * @param {import('#fractal-components/types/api').TasksTableRow} taskRow
 	 */
 	function showSelectedTaskModal(taskRow, text) {
 		selectedTaskRow = taskRow;

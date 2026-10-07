@@ -256,7 +256,7 @@ describe('get first task index for continuing workflow', () => {
 
 	it('should return the selected task order if selected task has a status', () => {
 		const selectedWorkflowTask = dummyTasks[0];
-		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		/** @type {{ [key: number]: import('#fractal-components/types/api').ImagesStatus }} */
 		const statuses = { 1: createImageStatus('failed', 2, 0, 2) };
 
 		const result = getFirstTaskIndexForContinuingWorkflow(
@@ -268,7 +268,7 @@ describe('get first task index for continuing workflow', () => {
 	});
 
 	it('should return the task order if previous task has been run successfully on at least one image (done)', () => {
-		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		/** @type {{ [key: number]: import('#fractal-components/types/api').ImagesStatus }} */
 		const statuses = { 1: createImageStatus('done', 2, 2, 0) };
 		const selectedWorkflowTask = dummyTasks[1];
 
@@ -281,7 +281,7 @@ describe('get first task index for continuing workflow', () => {
 	});
 
 	it('should return the task order if previous task has been run successfully on at least one image (partial)', () => {
-		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		/** @type {{ [key: number]: import('#fractal-components/types/api').ImagesStatus }} */
 		const statuses = { 1: createImageStatus('failed', 2, 1, 1) };
 		const selectedWorkflowTask = dummyTasks[1];
 
@@ -294,7 +294,7 @@ describe('get first task index for continuing workflow', () => {
 	});
 
 	it('should return undefined if selected workflow task is not in statuses and previous task status is not done/partial', () => {
-		/** @type {{ [key: number]: import('fractal-components/types/api').ImagesStatus }} */
+		/** @type {{ [key: number]: import('#fractal-components/types/api').ImagesStatus }} */
 		const statuses = { 1: createImageStatus('failed', 2, 0, 2) };
 		const selectedWorkflowTask = dummyTasks[1];
 
@@ -314,7 +314,7 @@ describe('get first task index for continuing workflow', () => {
 });
 
 it('should handle executor_error_log', () => {
-	const job = /** @type {import('fractal-components/types/api').JobV2} */ ({});
+	const job = /** @type {import('#fractal-components/types/api').JobV2} */ ({});
 	expect(showExecutorErrorLog({ ...job, status: 'done', executor_error_log: null })).toBeFalsy();
 	expect(showExecutorErrorLog({ ...job, status: 'failed', executor_error_log: null })).toBeFalsy();
 	expect(
@@ -346,7 +346,7 @@ it('should handle executor_error_log', () => {
  */
 function getMockedDatasets(names) {
 	return names.map((name, index) => {
-		return /** @type {import('fractal-components/types/api').DatasetV2} */ ({
+		return /** @type {import('#fractal-components/types/api').DatasetV2} */ ({
 			id: index + 1,
 			name
 		});
@@ -354,11 +354,11 @@ function getMockedDatasets(names) {
 }
 
 /**
- * @param {import('fractal-components/types/api').JobStatus} status
+ * @param {import('#fractal-components/types/api').JobStatus} status
  * @param {number} submitted
  * @param {number} done
  * @param {number} failed
- * @returns {import('fractal-components/types/api').ImagesStatus}
+ * @returns {import('#fractal-components/types/api').ImagesStatus}
  */
 function createImageStatus(status, submitted, done, failed) {
 	return {
@@ -372,10 +372,10 @@ function createImageStatus(status, submitted, done, failed) {
 
 /**
  * @param {number} order
- * @returns {import('fractal-components/types/api').WorkflowTaskV2}
+ * @returns {import('#fractal-components/types/api').WorkflowTaskV2}
  */
 function getDummyTask(order) {
-	return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ ({
+	return /** @type {import('#fractal-components/types/api').WorkflowTaskV2} */ ({
 		id: order + 1,
 		order: order
 	});

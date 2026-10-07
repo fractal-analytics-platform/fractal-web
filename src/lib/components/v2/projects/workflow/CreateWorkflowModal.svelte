@@ -8,14 +8,14 @@
 	import Modal from '../../../common/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import TemplatesTable from '../../templates/TemplatesTable.svelte';
 	import WorkflowImportFlexibility from './WorkflowImportFlexibility.svelte';
 	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {(workflow: import('fractal-components/types/api').WorkflowV2) => void} handleWorkflowImported
+	 * @property {(workflow: import('#fractal-components/types/api').WorkflowV2) => void} handleWorkflowImported
 	 */
 
 	/** @type {Props} */
@@ -41,12 +41,12 @@
 	/** @type {'new'|'import'|'template'} */
 	let mode = $state('new');
 
-	/** @type {import('fractal-components/types/api').WorkflowImportErrorData[]|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowImportErrorData[]|undefined} */
 	let workflowImportErrorData = $state(undefined);
 	/** @type {(string|undefined)[]} */
 	let selectedVersions = $state([]);
 
-	/** @type {import('fractal-components/types/api').WorkflowImport|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowImport|undefined} */
 	let workflowMetadata = $state(undefined);
 
 	let includeOlderVersions = $state(false);
@@ -161,7 +161,7 @@
 			}, 3000);
 			reset();
 
-			/** @type {import('fractal-components/types/api').WorkflowV2} */
+			/** @type {import('#fractal-components/types/api').WorkflowV2} */
 			const workflow = await response.json();
 
 			await tick();
@@ -221,7 +221,7 @@
 
 		if (selectedVersions.length > 0) {
 			const response1 = await fetch(`/api/v2/workflow-template/${singleSelectedTemplateId}`);
-			/** @type {import('fractal-components/types/api').WorkflowTemplate} */
+			/** @type {import('#fractal-components/types/api').WorkflowTemplate} */
 			const template = await response1.json();
 			const originalVersions = template.data.task_list.map((t) => t.task.version);
 			payload.override_versions = Object.fromEntries(
@@ -253,7 +253,7 @@
 			}, 3000);
 			reset();
 
-			/** @type {import('fractal-components/types/api').WorkflowV2} */
+			/** @type {import('#fractal-components/types/api').WorkflowV2} */
 			const workflow = await response.json();
 
 			await tick();

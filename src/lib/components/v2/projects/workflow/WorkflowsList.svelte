@@ -5,7 +5,7 @@
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
 	import { saveSelectedDataset } from '#lib/common/workflow_utilities.js';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { resolve } from '$app/paths';
 
 	// The list of workflows
@@ -15,7 +15,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
+	 * @property {import('#fractal-components/types/api').WorkflowV2[]} [workflows]
 	 * @property {any} [projectId] - Set the projectId prop to reference a specific project for each workflow
 	 */
 
@@ -56,7 +56,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowV2} importedWorkflow
+	 * @param {import('#fractal-components/types/api').WorkflowV2} importedWorkflow
 	 * @param {boolean} redirect
 	 */
 	async function handleWorkflowImported(importedWorkflow, redirect = true) {

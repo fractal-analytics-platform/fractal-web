@@ -5,7 +5,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').User} user
+	 * @property {import('#fractal-components/types/api').User} user
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -70,7 +70,7 @@
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
+			const result = /** @type {import('#fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
 			recentActivities.set([...$recentActivities, result]);

@@ -3,13 +3,13 @@
 	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 
-	/** @type {import('fractal-components/types/api').ProjectV2} */
+	/** @type {import('#fractal-components/types/api').ProjectV2} */
 	const project = $derived(page.data.project);
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
+	/** @type {import('#fractal-components/types/api').WorkflowV2} */
 	const workflow = $derived(page.data.workflow);
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').JobV2[]>}
+	 * @returns {Promise<import('#fractal-components/types/api').JobV2[]>}
 	 */
 	async function jobUpdater() {
 		const response = await fetch(`/api/v2/project/${project.id}/workflow/${workflow.id}/job`);

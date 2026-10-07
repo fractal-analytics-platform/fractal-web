@@ -8,7 +8,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import CreateUpdateImageModal from '#lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import {
 		addFinalSlash,
 		encodePathForUrl,
@@ -18,7 +18,7 @@
 	import SlimSelect from 'slim-select';
 	import { onDestroy, tick } from 'svelte';
 	import Paginator from '#lib/components/common/Paginator.svelte';
-	import { deepCopy, normalizePayload } from 'fractal-components';
+	import { deepCopy, normalizePayload } from '#fractal-components';
 	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/env';
 	import { getRelativeZarrPath, STATUS_KEY } from '#lib/common/workflow_utilities.js';
@@ -29,8 +29,8 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').DatasetV2} dataset
-	 * @property {import('fractal-components/types/api').ImagePage} imagePage
+	 * @property {import('#fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('#fractal-components/types/api').ImagePage} imagePage
 	 * @property {Array<string>} [extraTypes] Types not included in the the image page result
 	 * @property {boolean} [runWorkflowModal] Set to true if the table is displayed inside the "Run workflow" modal. Used to disable some buttons.
 	 * @property {{ attribute_filters: { [key: string]: Array<string | number | boolean> | null }, type_filters: { [key: string]: boolean | null }} | null} [initialFilterValues]
@@ -39,7 +39,7 @@
 	 * @property {Array<string>} [highlightedTypes]
 	 * @property {boolean} [imagesStatusModal] Set to true if the table is displayed inside the "Images status" modal.
 	 * @property {string} [queryUrl]
-	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').Image]>} [extraButtons]
+	 * @property {import('svelte').Snippet<[import('#fractal-components/types/api').Image]>} [extraButtons]
 	 */
 
 	/** @type {Props} */
@@ -113,19 +113,19 @@
 		return value === true || value === false ? value : null;
 	}
 
-	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
+	/** @param {import('#fractal-components/types/api').ImagePage} imagePage */
 	function getAttributeFilterBaseValues(imagePage) {
 		return Object.fromEntries(
 			Object.keys(imagePage.attributes).map((k) => [k, getInitialAttributeFilterValue(k)])
 		);
 	}
 
-	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
+	/** @param {import('#fractal-components/types/api').ImagePage} imagePage */
 	function getTypeFilterBaseValues(imagePage) {
 		return Object.fromEntries(getTypeKeys(imagePage).map((k) => [k, getInitialTypeFilterValue(k)]));
 	}
 
-	/** @param {import('fractal-components/types/api').ImagePage} imagePage */
+	/** @param {import('#fractal-components/types/api').ImagePage} imagePage */
 	function getTypeKeys(imagePage) {
 		return [...imagePage.types, ...extraTypes];
 	}
@@ -364,7 +364,7 @@
 	/**
 	 * Reload the attribute filters according to the received imagePage
 	 * preserving the values selected by the user
-	 * @param {import('fractal-components/types/api').ImagePage} imagePage
+	 * @param {import('#fractal-components/types/api').ImagePage} imagePage
 	 */
 	function reloadAttributeFilters(imagePage) {
 		attributeFilters = Object.fromEntries(
@@ -490,7 +490,7 @@
 	/**
 	 * Reload the type filters according to the received imagePage
 	 * preserving the values selected by the user
-	 * @param {import('fractal-components/types/api').ImagePage} imagePage
+	 * @param {import('#fractal-components/types/api').ImagePage} imagePage
 	 */
 	function reloadTypeFilters(imagePage) {
 		typeFilters = Object.fromEntries(

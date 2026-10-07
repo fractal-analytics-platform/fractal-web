@@ -12,16 +12,16 @@
 	import { getSortGroupByNameAllFirstComparator } from '#lib/components/admin/user_utilities.js';
 	import SlimSelect from 'slim-select';
 	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
-	import { deepCopy, normalizePayload, nullifyEmptyStrings } from 'fractal-components';
+	import { deepCopy, normalizePayload, nullifyEmptyStrings } from '#fractal-components';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import { groupsErrorOnUserCreation } from '#lib/stores.js';
 	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
-	 * @property {Array<import('fractal-components/types/api').Group>} [groups]
-	 * @property {(user: import('fractal-components/types/api').User) => Promise<Response>} saveUser
+	 * @property {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} user
+	 * @property {Array<import('#fractal-components/types/api').Group>} [groups]
+	 * @property {(user: import('#fractal-components/types/api').User) => Promise<Response>} saveUser
 	 * @property {string} runnerBackend
 	 * @property {string|null} defaultGroupName
 	 */
@@ -29,7 +29,7 @@
 	/** @type {Props} */
 	let { user = $bindable(), groups = [], saveUser, runnerBackend, defaultGroupName } = $props();
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
+	/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	// eslint-disable-next-line svelte/prefer-writable-derived
 	let editableUser = $state();
 
@@ -44,7 +44,7 @@
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let profilesErrorAlert = undefined;
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
+	/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}|undefined} */
 	let originalUser = $state();
 	const userPendingChanges = $derived(
 		editableUser &&
@@ -52,24 +52,24 @@
 				JSON.stringify(nullifyEmptyStrings($state.snapshot(editableUser)))
 	);
 
-	/** @type {Array<import('fractal-components/types/api').Group>} */
+	/** @type {Array<import('#fractal-components/types/api').Group>} */
 	let userGroups = $state([]);
 
 	let password = $state('');
 	let confirmPassword = $state('');
 
-	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	/** @type {Array<import('#fractal-components/types/api').Resource>} */
 	let resources = $state([]);
 	/** @type {number|undefined} */
 	let selectedResourceId = $state();
-	/** @type {import('fractal-components/types/api').Resource|undefined} */
+	/** @type {import('#fractal-components/types/api').Resource|undefined} */
 	let selectedResource = $state();
 
 	/** @type {'create_new'|'use_existing'} */
 	let profileOption = $state('use_existing');
-	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	/** @type {Array<import('#fractal-components/types/api').Profile>} */
 	let profiles = $state([]);
-	/** @type {Omit<import('fractal-components/types/api').Profile, 'id'>|undefined} */
+	/** @type {Omit<import('#fractal-components/types/api').Profile, 'id'>|undefined} */
 	let newProfile = $state();
 	/** @type {import('#lib/components/v2/admin/ProfileEditor.svelte').default|undefined} */
 	let profileEditor = $state();
@@ -140,7 +140,7 @@
 					await userFormErrorHandler.handleErrorResponse(response);
 					return;
 				}
-				/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
+				/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 				const result = await response.json();
 				editableUser.id = result.id;
 				if (existing) {
@@ -333,7 +333,7 @@
 		}
 		const response = await fetch(`/api/admin/v2/profile/${editableUser.profile_id}`);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').Profile} */
+			/** @type {import('#fractal-components/types/api').Profile} */
 			const profile = await response.json();
 			selectedResourceId = profile.resource_id;
 		} else {
@@ -400,7 +400,7 @@
 	}
 
 	/**
-	 * @param {Omit<import('fractal-components/types/api').Profile, 'id'>} profile
+	 * @param {Omit<import('#fractal-components/types/api').Profile, 'id'>} profile
 	 */
 	async function createProfile(profile) {
 		const headers = new Headers();

@@ -3,12 +3,12 @@
 	import { FormErrorHandler, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import Modal from '#lib/components/common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import { normalizePayload } from '#fractal-components';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
-	/** @type {import('fractal-components/types/api').ProjectV2} */
+	/** @type {import('#fractal-components/types/api').ProjectV2} */
 	let project = $state(page.data.project);
-	/** @type {import('fractal-components/types/api').ProjectGuest[]} */
+	/** @type {import('#fractal-components/types/api').ProjectGuest[]} */
 	let guests = $state(page.data.guests);
 
 	let email = $state('');
@@ -46,7 +46,7 @@
 
 	let sortedGuests = $derived([...guests].sort((g1, g2) => g1.email.localeCompare(g2.email)));
 
-	/** @type {import('fractal-components/types/api').ProjectGuest|undefined} */
+	/** @type {import('#fractal-components/types/api').ProjectGuest|undefined} */
 	let guestToEdit = $state();
 	/** @type {Modal|undefined} */
 	let editGuestModal = $state();
@@ -55,7 +55,7 @@
 	let saving = $state(false);
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectGuest} guest
+	 * @param {import('#fractal-components/types/api').ProjectGuest} guest
 	 */
 	function openeditGuestModal(guest) {
 		guestToEdit = guest;

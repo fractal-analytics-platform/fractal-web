@@ -1,12 +1,12 @@
 <script>
 	import { page } from '$app/state';
 	import UserEditor from '#lib/components/v2/admin/UserEditor.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user);
 
-	/** @type {Array<import('fractal-components/types/api').Group>} */
+	/** @type {Array<import('#fractal-components/types/api').Group>} */
 	const groups = $derived(page.data.groups);
 
 	/** @type {string|null} */
@@ -15,7 +15,7 @@
 	const runnerBackend = $derived(page.data.runnerBackend);
 
 	/**
-	 * @param {import('fractal-components/types/api').User} user
+	 * @param {import('#fractal-components/types/api').User} user
 	 * @returns {Promise<Response>}
 	 */
 	async function save(user) {

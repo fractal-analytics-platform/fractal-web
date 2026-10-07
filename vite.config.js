@@ -13,7 +13,7 @@ const pkg = JSON.parse(packageJsonData.toString());
 	plugins: [
 		sveltekit({
 			adapter: adapter(),
-			alias: { 'fractal-components': './components/src/lib' },
+			alias: { '#fractal-components': './components/src/lib' },
 			// @migration-task `typescript.config` is deprecated; configure TypeScript in tsconfig.json directly
 			typescript: {
 				// Customize generated .svelte-kit/tsconfig.json
@@ -87,7 +87,9 @@ const pkg = JSON.parse(packageJsonData.toString());
 	},
 	resolve: {
 		alias: {
-			'fractal-components': fileURLToPath(new URL('./components/src/lib/index.js', import.meta.url))
+			'#fractal-components': fileURLToPath(
+				new URL('./components/src/lib/index.js', import.meta.url)
+			)
 		}
 	},
 	// Tells Vite to allow serving files from the components folder when running npm run dev

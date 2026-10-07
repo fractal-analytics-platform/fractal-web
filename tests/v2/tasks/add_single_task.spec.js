@@ -238,7 +238,7 @@ async function openSingleTaskForm(page) {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} taskName
- * @param {import('fractal-components/types/api.js').TaskV2Type} taskType
+ * @param {import('#fractal-components/types/api.js').TaskV2Type} taskType
  */
 async function getCreatedTaskModalData(page, taskName, taskType) {
 	const row = await getCreatedTaskRow(page, taskName);

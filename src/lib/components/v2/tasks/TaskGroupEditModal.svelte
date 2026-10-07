@@ -1,13 +1,13 @@
 <script>
 	import { FormErrorHandler } from '#lib/common/errors.js';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import Modal from '../../common/Modal.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {Array<[number, string]>} groupIdsNames
-	 * @property {(updatedGroups: import('fractal-components/types/api').TaskGroupSlim) => void} updateEditedTaskGroup
+	 * @property {(updatedGroups: import('#fractal-components/types/api').TaskGroupSlim) => void} updateEditedTaskGroup
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -17,7 +17,7 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {import('fractal-components/types/api').TaskGroupSlim|undefined} */
+	/** @type {import('#fractal-components/types/api').TaskGroupSlim|undefined} */
 	let taskGroup = $state();
 
 	let privateTask = $state(false);
@@ -33,7 +33,7 @@
 	const validationErrors = formErrorHandler.getValidationErrorStore();
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
+	 * @param {import('#fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
 	 */
 	export async function open(taskGroupToEdit) {
 		taskGroup = taskGroupToEdit;

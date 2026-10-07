@@ -1,18 +1,18 @@
 <script>
-	import { deepCopy, getPropertiesToIgnore, JSchema, SchemaValidator } from 'fractal-components';
+	import { deepCopy, getPropertiesToIgnore, JSchema, SchemaValidator } from '#fractal-components';
 	import manifestSchema from './manifest_v2.json';
-	import { adaptJsonSchema, stripDiscriminator } from 'fractal-components/jschema/jschema_adapter';
+	import { adaptJsonSchema, stripDiscriminator } from '#fractal-components/jschema/jschema_adapter';
 	import { tick } from 'svelte';
 	import DragAndDropUploader from './DragAndDropUploader.svelte';
 	import example from './example-task-manifest.json';
-	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
+	import { isValidArgsSchemaVersion } from '#fractal-components/jschema/jschema_validation';
 
 	let manifest = $state();
 	/** @type {string[]} */
 	let tasks = $state([]);
 	let selectedTaskName = $state('');
 	let selectedSchema = $state();
-	/** @type {import("fractal-components/types/jschema").ArgsSchemaVersion} */
+	/** @type {import("#fractal-components/types/jschema").ArgsSchemaVersion} */
 	let schemaVersion = $state('pydantic_v2');
 	/** @type {'parallel'|'non_parallel'} */
 	let selectedSchemaType = $state('non_parallel');

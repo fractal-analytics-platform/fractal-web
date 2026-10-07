@@ -7,7 +7,7 @@
 		SchemaValidator,
 		stripDiscriminator,
 		stripNullAndEmptyObjectsAndArrays
-	} from 'fractal-components';
+	} from '#fractal-components';
 	import { tick } from 'svelte';
 	import example from './example.json';
 
@@ -20,7 +20,7 @@
 	let jsonSchemaError = $state('');
 	let dataError = $state('');
 
-	/** @type {import("fractal-components/types/jschema").ArgsSchemaVersion} */
+	/** @type {import("#fractal-components/types/jschema").ArgsSchemaVersion} */
 	let schemaVersion = $state('pydantic_v2');
 
 	/** @type {JSchema|undefined} */

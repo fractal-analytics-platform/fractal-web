@@ -155,7 +155,7 @@ describe('JobsList', () => {
 	it('updates jobs in background', async () => {
 		vi.useFakeTimers();
 		try {
-			/** @type {() => Promise<import('fractal-components/types/api').JobV2[]>} */
+			/** @type {() => Promise<import('#fractal-components/types/api').JobV2[]>} */
 			const jobUpdater = async function () {
 				return data.jobs.map((j) => (j.status === 'submitted' ? { ...j, status: 'done' } : j));
 			};

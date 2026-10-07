@@ -3,7 +3,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '#lib/components/common/Modal.svelte';
 	import Paginator from '#lib/components/common/Paginator.svelte';
-	import { PropertyDescription } from 'fractal-components';
+	import { PropertyDescription } from '#fractal-components';
 	import { sortUsers } from '#lib/components/admin/user_utilities.js';
 
 	const currentUserId = $derived(page.data.userInfo.id);
@@ -17,11 +17,13 @@
 	let searchUserEmail = $derived(users.find((u) => String(u.id) === String(searchUserId))?.email);
 
 	/**
-	 * @param {import('fractal-components/types/api').User[]} users
+	 * @param {import('#fractal-components/types/api').User[]} users
 	 */
 	function sortDropdownUsers(users) {
 		const usersCopy =
-			/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
+			/** @type {Array<import('#fractal-components/types/api').User & {id: number}>} */ ([
+				...users
+			]);
 		sortUsers(usersCopy, currentUserId, false);
 		return usersCopy;
 	}
@@ -32,7 +34,7 @@
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').ProjectSuperuser> | undefined} */
+	/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').ProjectSuperuser> | undefined} */
 	let results = $state();
 
 	let currentPage = $state(1);
@@ -41,7 +43,7 @@
 
 	/** @type {Modal|undefined} */
 	let changeOwnershipModal = $state();
-	/** @type {import('fractal-components/types/api').ProjectSuperuser|null} */
+	/** @type {import('#fractal-components/types/api').ProjectSuperuser|null} */
 	let selectedProject = $state(null);
 	/** @type {string|undefined} */
 	let newOwnerId = $state(undefined);
@@ -55,7 +57,7 @@
 	let confirmation = $state(false);
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectSuperuser} project
+	 * @param {import('#fractal-components/types/api').ProjectSuperuser} project
 	 */
 	function openChangeOwnershipModal(project) {
 		selectedProject = project;

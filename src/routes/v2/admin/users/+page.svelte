@@ -2,18 +2,18 @@
 	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { sortUsers } from '#lib/components/admin/user_utilities.js';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
 	const currentUserId = $derived(page.data.userInfo?.id);
 	const currentUserEmail = $derived(page.data.userInfo?.email);
-	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	/** @type {Array<import('#fractal-components/types/api').Profile>} */
 	const profiles = $derived(page.data.profiles);
 
-	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
+	/** @type {Array<import('#fractal-components/types/api').User & {id: number}>} */
 	let users = $state([]);
-	/** @type {Record<string, import('fractal-components/types/api').Profile | undefined>} */
+	/** @type {Record<string, import('#fractal-components/types/api').Profile | undefined>} */
 	const userProfiles = $derived(
 		Object.fromEntries(users.map((u) => [u.id, profiles.find((p) => p.id === u.profile_id)]))
 	);

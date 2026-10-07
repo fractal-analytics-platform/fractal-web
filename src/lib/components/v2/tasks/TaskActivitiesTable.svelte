@@ -2,7 +2,7 @@
 	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
 	import { onDestroy, onMount } from 'svelte';
 	import { sortActivitiesByTimestampStarted } from '#lib/common/task_utilities.js';
-	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
+	import { getTaskActivityStatusBadgeClass } from '#fractal-components/tasks/task_group_utilities';
 	import { getTaskGroupActivitiesToUpdate } from './task_group_utilities';
 	import TaskGroupActivityLogsModal from '#lib/components/v2/tasks/TaskGroupActivityLogsModal.svelte';
 	import { recentActivities } from '#lib/stores.js';
@@ -29,7 +29,7 @@
 	let taskGroupActivitiesLogsModal = $state();
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
+	 * @param {import('#fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
 	async function updateTaskActivitiesState(activitiesToUpdate) {
 		recentActivities.set(

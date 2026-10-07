@@ -4,7 +4,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import("fractal-components/types/api").TaskV2} task
+	 * @property {import("#fractal-components/types/api").TaskV2} task
 	 */
 
 	/** @type {Props} */

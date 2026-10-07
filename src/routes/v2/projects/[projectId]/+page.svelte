@@ -5,7 +5,7 @@
 	import Modal from '#lib/components/common/Modal.svelte';
 	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import SharedProjectInfoModal from '#lib/components/v2/projects/SharedProjectInfoModal.svelte';
 	import { tick } from 'svelte';
 
@@ -13,13 +13,13 @@
 	const descriptionLengthOffset = 10;
 	let expandProjectDescription = $state(false);
 
-	/** @type {import('fractal-components/types/api').ProjectV2} */
+	/** @type {import('#fractal-components/types/api').ProjectV2} */
 	let project = $state(page.data.project);
-	/** @type {import('fractal-components/types/api').ProjectAccessRead} */
+	/** @type {import('#fractal-components/types/api').ProjectAccessRead} */
 	const projectAccess = $derived(page.data.projectAccess);
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
+	/** @type {import('#fractal-components/types/api').DatasetV2[]} */
 	const datasets = $derived(page.data.datasets);
-	/** @type {import('fractal-components/types/api').WorkflowV2[]} */
+	/** @type {import('#fractal-components/types/api').WorkflowV2[]} */
 	const workflows = $derived(page.data.workflows);
 
 	/** @type {SharedProjectInfoModal|undefined} */

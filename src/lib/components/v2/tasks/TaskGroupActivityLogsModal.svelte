@@ -30,7 +30,7 @@
 		);
 
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */
+			/** @type {import('#fractal-components/types/api').TaskGroupActivityV2[]} */
 			const activities = await response.json();
 			if (activities.length === 0) {
 				errorAlert = displayStandardErrorAlert(

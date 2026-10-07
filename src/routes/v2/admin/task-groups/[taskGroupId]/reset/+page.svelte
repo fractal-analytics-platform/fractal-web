@@ -2,13 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
-	import { PropertyDescription } from 'fractal-components';
+	import { PropertyDescription } from '#fractal-components';
 	import Modal from '#lib/components/common/Modal.svelte';
 	import { resolve } from '$app/paths';
 
 	let errorAlert = undefined;
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2} */
+	/** @type {import('#fractal-components/types/api').TaskGroupV2} */
 	const taskGroup = $derived(page.data.taskGroup);
 
 	let pythonVersion = $state('');
@@ -87,7 +87,7 @@
 			body: JSON.stringify(payload)
 		});
 		if (response.ok) {
-			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
+			const result = /** @type {import('#fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
 

@@ -36,7 +36,7 @@
 		handleSelect
 	} = $props();
 
-	/** @type {import('fractal-components/types/api').TemplatePage} */
+	/** @type {import('#fractal-components/types/api').TemplatePage} */
 	let templatePage = $state({
 		current_page: 1,
 		page_size: 10,
@@ -47,7 +47,7 @@
 	/** @type {Array<string|null>} */
 	let descriptions = $state([]);
 
-	/** @type {import('fractal-components/types/api').WorkflowTemplateGroupMember []}*/
+	/** @type {import('#fractal-components/types/api').WorkflowTemplateGroupMember []}*/
 	let selectedTemplates = $state([]);
 
 	/** @type {TemplateImportModal|undefined} */

@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { resolve } from '$app/paths';
 
 	let data = $state('');

@@ -1,7 +1,7 @@
 import { FRACTAL_SERVER_HOST } from '$app/env/private';
 import { responseError } from '#lib/common/errors.server.js';
 import { getLogger } from '#lib/server/logger.js';
-import { normalizePayload } from 'fractal-components';
+import { normalizePayload } from '#fractal-components';
 
 const logger = getLogger('dataset API [v2]');
 
@@ -13,7 +13,7 @@ const logger = getLogger('dataset API [v2]');
  * @param {number} page
  * @param {number} pageSize
  * @param {object} params
- * @returns {Promise<import('fractal-components/types/api').ImagePage>}
+ * @returns {Promise<import('#fractal-components/types/api').ImagePage>}
  */
 export async function getDatasetImages(fetch, projectId, datasetId, page, pageSize, params) {
 	logger.debug(

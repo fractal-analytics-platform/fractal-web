@@ -3,7 +3,7 @@ import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 /**
  * Fetches a task collection from the server
  * @param {number} taskGroupActivityId
- * @returns {Promise<import('fractal-components/types/api').TaskGroupActivityV2|undefined>}
+ * @returns {Promise<import('#fractal-components/types/api').TaskGroupActivityV2|undefined>}
  */
 async function getTaskActivity(taskGroupActivityId) {
 	const response = await fetch(`/api/v2/task-group/activity/${taskGroupActivityId}`);
@@ -23,14 +23,14 @@ async function getTaskActivity(taskGroupActivityId) {
 /**
  * Fetches a task collection from the server
  * @param {number} taskGroupActivityId
- * @returns {Promise<import('fractal-components/types/api').TaskGroupActivityV2|undefined>}
+ * @returns {Promise<import('#fractal-components/types/api').TaskGroupActivityV2|undefined>}
  */
 async function getAdminTaskActivity(taskGroupActivityId) {
 	const response = await fetch(
 		`/api/admin/v2/task-group/activity?task_group_activity_id=${taskGroupActivityId}`
 	);
 	if (response.ok) {
-		/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */
+		/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').TaskGroupActivityV2>} */
 		const activities = await response.json();
 		if (activities.items.length === 0) {
 			return undefined;
@@ -42,9 +42,9 @@ async function getAdminTaskActivity(taskGroupActivityId) {
 }
 
 /**
- * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activities
+ * @param {import('#fractal-components/types/api').TaskGroupActivityV2[]} activities
  * @param {boolean} admin
- * @returns {Promise<import('fractal-components/types/api').TaskGroupActivityV2[]>}
+ * @returns {Promise<import('#fractal-components/types/api').TaskGroupActivityV2[]>}
  */
 export async function getTaskGroupActivitiesToUpdate(activities, admin) {
 	const activitiesToCheck = activities.filter((a) => a.status !== 'OK' && a.status !== 'failed');
@@ -64,13 +64,13 @@ export async function getTaskGroupActivitiesToUpdate(activities, admin) {
 	}
 
 	const successfulUpdates =
-		/** @type {PromiseFulfilledResult<import('fractal-components/types/api').TaskGroupActivityV2|undefined>[]} */ (
+		/** @type {PromiseFulfilledResult<import('#fractal-components/types/api').TaskGroupActivityV2|undefined>[]} */ (
 			updates.filter((u) => u.status === 'fulfilled')
 		)
 			.map((u) => u.value)
 			.filter((u) => u !== undefined);
 
-	return /** @type {import('fractal-components/types/api').TaskGroupActivityV2[]} */ (
+	return /** @type {import('#fractal-components/types/api').TaskGroupActivityV2[]} */ (
 		successfulUpdates
 	);
 }

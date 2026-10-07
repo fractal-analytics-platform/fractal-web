@@ -5,8 +5,8 @@
 	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
 	import Modal from '#lib/components/common/Modal.svelte';
 	import Paginator from '#lib/components/common/Paginator.svelte';
-	import { normalizePayload, PropertyDescription } from 'fractal-components';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import { normalizePayload, PropertyDescription } from '#fractal-components';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
 	let name = $state('');
 	let id = $state('');
@@ -27,10 +27,10 @@
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
-	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	/** @type {Array<import('#fractal-components/types/api').Resource>} */
 	const resources = $derived(page.data.resources || []);
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info> | undefined} */
+	/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').TaskV2Info> | undefined} */
 	let results = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(50);
@@ -38,7 +38,7 @@
 
 	/** @type {Modal|undefined} */
 	let infoModal = $state();
-	/** @type {import('fractal-components/types/api').TaskV2Info|null} */
+	/** @type {import('#fractal-components/types/api').TaskV2Info|null} */
 	let selectedTaskInfo = $state(null);
 
 	let processingCsv = $state(false);
@@ -218,7 +218,7 @@
 
 	/**
 	 *
-	 * @param {import('fractal-components/types/api').TaskV2Info} taskInfo
+	 * @param {import('#fractal-components/types/api').TaskV2Info} taskInfo
 	 */
 	function openInfoModal(taskInfo) {
 		selectedTaskInfo = taskInfo;
@@ -230,7 +230,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskV2Info} taskInfo
+	 * @param {import('#fractal-components/types/api').TaskV2Info} taskInfo
 	 */
 	function getUsers(taskInfo) {
 		const allEntries = /** @type {string[]} */ (
@@ -265,7 +265,7 @@
 		}
 
 		const { items } =
-			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskV2Info>} */ (
+			/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').TaskV2Info>} */ (
 				await response.json()
 			);
 

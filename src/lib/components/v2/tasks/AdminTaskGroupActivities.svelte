@@ -3,7 +3,7 @@
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { onDestroy, onMount } from 'svelte';
 	import { getTaskGroupActivitiesToUpdate } from './task_group_utilities';
-	import { getTaskActivityStatusBadgeClass } from 'fractal-components/tasks/task_group_utilities';
+	import { getTaskActivityStatusBadgeClass } from '#fractal-components/tasks/task_group_utilities';
 	import AdminTaskGroupActivityLogsModal from './AdminTaskGroupActivityLogsModal.svelte';
 	import { getTimestamp } from '#lib/common/component_utilities.js';
 	import { page } from '$app/state';
@@ -12,15 +12,15 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Array<import('fractal-components/types/api').User & {id: number}>} [users]
+	 * @property {Array<import('#fractal-components/types/api').User & {id: number}>} [users]
 	 */
 
 	/** @type {Props} */
 	let { users = [] } = $props();
-	/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */
+	/** @type {Array<import('#fractal-components/types/api').User & {id: number}>} */
 	const sortedUsers = $derived([...users].sort(sortUserByEmailComparator));
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>|undefined} */
+	/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').TaskGroupActivityV2>|undefined} */
 	let results = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(10);
@@ -100,7 +100,7 @@
 				);
 				return;
 			}
-			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */
+			/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').TaskGroupActivityV2>} */
 			const activities = await response.json();
 			results = activities;
 			pageSize = results.page_size;
@@ -131,7 +131,7 @@
 	let updateTasksCollectionTimeout = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
+	 * @param {import('#fractal-components/types/api').TaskGroupActivityV2[]} activitiesToUpdate
 	 */
 	async function updateTaskCollectionsState(activitiesToUpdate) {
 		if (!results) {

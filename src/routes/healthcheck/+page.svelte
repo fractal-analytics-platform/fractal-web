@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import StandardErrorAlert from '#lib/components/common/StandardErrorAlert.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
 
@@ -140,7 +140,7 @@
 		if (!request.ok) {
 			throw await getAlertErrorFromResponse(request);
 		}
-		/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
+		/** @type {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} */
 		const result = await request.json();
 		const taskGroups = result.filter(([k]) => k === '__TEST_ECHO_TASK__');
 		return taskGroups.length > 0 ? taskGroups[0][1][0].task_list[0].id : undefined;

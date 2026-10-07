@@ -4,10 +4,10 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 
-	/** @type {import('fractal-components/types/api').Resource} */
+	/** @type {import('#fractal-components/types/api').Resource} */
 	const resource = $derived(page.data.resource);
 
-	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	/** @type {Array<import('#fractal-components/types/api').Profile>} */
 	let profiles = $state([]);
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;

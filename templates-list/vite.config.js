@@ -6,7 +6,7 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	resolve: {
 		alias: {
-			'fractal-components': fileURLToPath(
+			'#fractal-components': fileURLToPath(
 				new URL('../components/src/lib/index.js', import.meta.url)
 			)
 		}

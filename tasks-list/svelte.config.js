@@ -18,7 +18,7 @@ const config = {
 			base: '/task-table'
 		},
 		alias: {
-			'fractal-components': '../components/src/lib'
+			'#fractal-components': '../components/src/lib'
 		}
 	}
 };

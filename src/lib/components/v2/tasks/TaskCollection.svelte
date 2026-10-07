@@ -2,12 +2,12 @@
 	import { FormErrorHandler } from '#lib/common/errors.js';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import { recentActivities } from '#lib/stores.js';
-	import { PropertyDescription } from 'fractal-components';
+	import { PropertyDescription } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {'pypi'|'local'} [packageType]
-	 * @property {import('fractal-components/types/api').User} user
+	 * @property {import('#fractal-components/types/api').User} user
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -106,7 +106,7 @@
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
+			const result = /** @type {import('#fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
 			recentActivities.set([...$recentActivities, result]);

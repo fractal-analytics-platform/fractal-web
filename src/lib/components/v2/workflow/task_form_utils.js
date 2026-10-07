@@ -1,5 +1,5 @@
 import { AlertError, getAlertErrorFromResponse } from '#lib/common/errors.js';
-import { normalizePayload } from 'fractal-components';
+import { normalizePayload } from '#fractal-components';
 
 /**
  * Updates the workflow task properties.

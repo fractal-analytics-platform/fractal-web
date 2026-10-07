@@ -4,7 +4,10 @@
 		"sourceMap": true,
 		"strict": true,
 		"noImplicitAny": false,
-		"types": ["$app/types", "@testing-library/jest-dom/vitest"]
+		"types": ["$app/types", "@testing-library/jest-dom/vitest"],
+		"paths": {
+			"#fractal-components/*": ["./components/src/lib/*"]
+		}
 	},
 	"include": ["src", "vite.config.js", "playwright.config.js", "tests"]
 }

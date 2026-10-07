@@ -1,5 +1,5 @@
 /**
- * @param {Array<import('fractal-components/types/api').User & {id: number}>} users
+ * @param {Array<import('#fractal-components/types/api').User & {id: number}>} users
  * @param {number} currentAdminId
  * @param {boolean|true=} prioritizeSuperusers
  */
@@ -32,8 +32,8 @@ export function sortUsers(users, currentAdminId, prioritizeSuperusers = true) {
 export function getSortGroupByNameAllFirstComparator(defaultGroupName) {
 	/**
 	 * Sort groups by name, but keeping the All group first.
-	 * @param {import('fractal-components/types/api').Group} g1
-	 * @param {import('fractal-components/types/api').Group} g2
+	 * @param {import('#fractal-components/types/api').Group} g1
+	 * @param {import('#fractal-components/types/api').Group} g2
 	 */
 	return function (g1, g2) {
 		return g1.name === defaultGroupName
@@ -45,9 +45,9 @@ export function getSortGroupByNameAllFirstComparator(defaultGroupName) {
 }
 
 /**
- * @param {Array<import('fractal-components/types/api').User & {id: number}>} users
+ * @param {Array<import('#fractal-components/types/api').User & {id: number}>} users
  * @param {number[]} desiredGroups
- * @param {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} allGroups
+ * @param {Array<import('#fractal-components/types/api').Group & {user_ids: number[]}>} allGroups
  * @returns
  */
 export const sortUserToImportSettings = function (users, desiredGroups, allGroups) {
@@ -70,12 +70,12 @@ export const sortUserToImportSettings = function (users, desiredGroups, allGroup
 };
 
 /**
- * @param {import('fractal-components/types/api').User[]} users
+ * @param {import('#fractal-components/types/api').User[]} users
  * @param {number} currentUserId
  */
 export function sortDropdownUsers(users, currentUserId) {
 	const usersCopy =
-		/** @type {Array<import('fractal-components/types/api').User & {id: number}>} */ ([...users]);
+		/** @type {Array<import('#fractal-components/types/api').User & {id: number}>} */ ([...users]);
 	sortUsers(usersCopy, currentUserId, false);
 	return usersCopy;
 }

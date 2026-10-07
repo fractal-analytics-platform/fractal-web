@@ -2,11 +2,11 @@
 	import { page } from '$app/state';
 	import { sortUserByEmailComparator } from '#lib/common/user_utilities.js';
 
-	/** @type {import('fractal-components/types/api').Resource} */
+	/** @type {import('#fractal-components/types/api').Resource} */
 	const resource = $derived(page.data.resource);
-	/** @type {import('fractal-components/types/api').Profile} */
+	/** @type {import('#fractal-components/types/api').Profile} */
 	const profile = $derived(page.data.profile);
-	/** @type {Array<import('fractal-components/types/api').User>} */
+	/** @type {Array<import('#fractal-components/types/api').User>} */
 	const users = $derived(page.data.users.sort(sortUserByEmailComparator));
 </script>
 

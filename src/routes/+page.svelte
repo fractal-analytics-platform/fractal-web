@@ -8,9 +8,9 @@
 	import { page } from '$app/state';
 	import logoMedium from '#lib/assets/fractal-logo-medium.png';
 	import { onMount } from 'svelte';
-	import { formatMarkdown } from 'fractal-components/common/utils';
+	import { formatMarkdown } from '#fractal-components/common/utils';
 
-	/** @type {import('fractal-components/types/api').User|undefined} */
+	/** @type {import('#fractal-components/types/api').User|undefined} */
 	let userInfo = $derived(page.data.userInfo);
 	let news = $derived(page.data.news);
 

@@ -6,7 +6,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {import('#fractal-components/types/api').WorkflowV2} workflow
 	 */
 
 	/** @type {Props} */
@@ -16,7 +16,7 @@
 	let modal = $state();
 	let loading = $state(false);
 
-	/** @type {Array<{match: boolean, argsMatch: boolean, title: string, templateTask: import('fractal-components/types/api').WorkflowTaskExport|undefined, workflowTask: import('fractal-components/types/api').WorkflowTaskExport|undefined}>} */
+	/** @type {Array<{match: boolean, argsMatch: boolean, title: string, templateTask: import('#fractal-components/types/api').WorkflowTaskExport|undefined, workflowTask: import('#fractal-components/types/api').WorkflowTaskExport|undefined}>} */
 	let comparison = $state([]);
 
 	export async function show() {
@@ -43,7 +43,7 @@
 	}
 
 	/**
-	 * @returns {Promise<Array<import('fractal-components/types/api').WorkflowTaskExport>>}
+	 * @returns {Promise<Array<import('#fractal-components/types/api').WorkflowTaskExport>>}
 	 */
 	async function loadTemplateTaskList() {
 		const response = await fetch(`/api/v2/workflow-template/${workflow.template_id}`);
@@ -55,7 +55,7 @@
 	}
 
 	/**
-	 * @returns {Promise<Array<import('fractal-components/types/api').WorkflowTaskExport>>}
+	 * @returns {Promise<Array<import('#fractal-components/types/api').WorkflowTaskExport>>}
 	 */
 	async function loadWorkflowTaskList() {
 		const response = await fetch(
@@ -69,8 +69,8 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskExport|undefined} templateTask
-	 * @param {import('fractal-components/types/api').WorkflowTaskExport|undefined} workflowTask
+	 * @param {import('#fractal-components/types/api').WorkflowTaskExport|undefined} templateTask
+	 * @param {import('#fractal-components/types/api').WorkflowTaskExport|undefined} workflowTask
 	 */
 	function compare(templateTask, workflowTask) {
 		const match =

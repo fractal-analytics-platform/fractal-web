@@ -15,9 +15,9 @@
 
 	/** @type {number} */
 	let historyRunId;
-	/** @type {import('fractal-components/types/api').DatasetV2|undefined} */
+	/** @type {import('#fractal-components/types/api').DatasetV2|undefined} */
 	let dataset = $state();
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let workflowTask;
 	/** @type {number|undefined} */
 	let historyRunIndex = $state();
@@ -25,10 +25,10 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {(import('fractal-components/types/api').Pagination<import('fractal-components/types/api').HistoryUnit>)|undefined} */
+	/** @type {(import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').HistoryUnit>)|undefined} */
 	let data = $state();
 
-	/** @type {import('fractal-components/types/api').HistoryUnit|undefined} */
+	/** @type {import('#fractal-components/types/api').HistoryUnit|undefined} */
 	let selectedUnit = $state(undefined);
 
 	let loadingLogs = $state(false);
@@ -45,8 +45,8 @@
 
 	/**
 	 * @param {number} _historyRunId
-	 * @param {import('fractal-components/types/api').DatasetV2} _dataset
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} _workflowTask
+	 * @param {import('#fractal-components/types/api').DatasetV2} _dataset
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2} _workflowTask
 	 * @param {number} _historyRunIndex
 	 */
 	export async function open(_historyRunId, _dataset, _workflowTask, _historyRunIndex) {
@@ -99,7 +99,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').HistoryUnit} unit
+	 * @param {import('#fractal-components/types/api').HistoryUnit} unit
 	 */
 	async function loadLogs(unit) {
 		unsetStatusFilterSelector();
@@ -125,7 +125,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').HistoryUnit} unit
+	 * @param {import('#fractal-components/types/api').HistoryUnit} unit
 	 */
 	async function displayZarrUrls(unit) {
 		unsetStatusFilterSelector();

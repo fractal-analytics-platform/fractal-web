@@ -6,17 +6,17 @@
 	let modal = $state();
 
 	/**
-	 * @type {import('fractal-components/types/api').ProjectV2|undefined}
+	 * @type {import('#fractal-components/types/api').ProjectV2|undefined}
 	 */
 	let project = $state();
 	let loading = $state(false);
 	/**
-	 * @type {import('fractal-components/types/api').ProjectAccessRead|undefined}
+	 * @type {import('#fractal-components/types/api').ProjectAccessRead|undefined}
 	 */
 	let info = $state();
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectV2} p
+	 * @param {import('#fractal-components/types/api').ProjectV2} p
 	 */
 	export async function open(p) {
 		modal?.show();

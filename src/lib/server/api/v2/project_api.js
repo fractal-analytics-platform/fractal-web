@@ -10,7 +10,7 @@ const logger = getLogger('projects API [v2]');
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
  * @param {boolean} isOwner
- * @returns {Promise<import('fractal-components/types/api').ProjectV2[]>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectV2[]>}
  */
 export async function listProjects(fetch, isOwner) {
 	logger.debug('Fetching the list of projects');
@@ -28,7 +28,7 @@ export async function listProjects(fetch, isOwner) {
  * Fetches a project from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('fractal-components/types/api').ProjectV2>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectV2>}
  */
 export async function getProject(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
@@ -46,7 +46,7 @@ export async function getProject(fetch, projectId) {
  * Fetches a project access
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('fractal-components/types/api').ProjectAccessRead>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectAccessRead>}
  */
 export async function getProjectAccess(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
@@ -64,7 +64,7 @@ export async function getProjectAccess(fetch, projectId) {
  * Fetches project guests from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('fractal-components/types/api').ProjectGuest>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectGuest>}
  */
 export async function getProjectGuests(fetch, projectId) {
 	logger.debug('Fetching project guests [project_id=%d]', projectId);
@@ -81,7 +81,7 @@ export async function getProjectGuests(fetch, projectId) {
 /**
  * Fetches project invitations from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<import('fractal-components/types/api').ProjectInvitation>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectInvitation>}
  */
 export async function getProjectInvitations(fetch) {
 	logger.debug('Fetching project invitations');
@@ -101,7 +101,7 @@ export async function getProjectInvitations(fetch) {
  * Fetches all the project's datasets from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
- * @returns {Promise<Array<import('fractal-components/types/api').DatasetV2>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').DatasetV2>>}
  */
 export async function getProjectDatasets(fetch, projectId) {
 	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
@@ -115,7 +115,7 @@ export async function getProjectDatasets(fetch, projectId) {
 		await responseError(response);
 	}
 
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
+	/** @type {import('#fractal-components/types/api').DatasetV2[]} */
 	const datasets = await response.json();
 
 	return datasets;
@@ -126,7 +126,7 @@ export async function getProjectDatasets(fetch, projectId) {
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
  * @param {number|string} datasetId
- * @returns {Promise<import('fractal-components/types/api').DatasetV2>}
+ * @returns {Promise<import('#fractal-components/types/api').DatasetV2>}
  */
 export async function getDataset(fetch, projectId, datasetId) {
 	logger.debug('Retrieving dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
@@ -148,7 +148,7 @@ export async function getDataset(fetch, projectId, datasetId) {
 /**
  * Fetches the list of all the jobs belonging to the current user
  * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('fractal-components/types/api').JobV2>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').JobV2>>}
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');

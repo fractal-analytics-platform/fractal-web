@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
 
-	/** @type {import('fractal-components/types/api').Resource} */
+	/** @type {import('#fractal-components/types/api').Resource} */
 	const resource = $derived(page.data.resource);
 </script>
 

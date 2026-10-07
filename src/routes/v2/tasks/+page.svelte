@@ -1,11 +1,11 @@
 <script>
 	import { page } from '$app/state';
 	import Modal from '#lib/components/common/Modal.svelte';
-	import { formatMarkdown } from 'fractal-components/common/utils';
-	import FilteredTasksTable from 'fractal-components/tasks/FilteredTasksTable.svelte';
+	import { formatMarkdown } from '#fractal-components/common/utils';
+	import FilteredTasksTable from '#fractal-components/tasks/FilteredTasksTable.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
+	/** @type {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} */
 	const taskGroups = $derived(page.data.taskGroups || []);
 
 	/** @type {boolean} */
@@ -14,12 +14,12 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {import('fractal-components/types/api').TasksTableRow|null} */
+	/** @type {import('#fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = $state(null);
 	let showDocLinksInTable = false;
 
 	/**
-	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 * @param {import('#fractal-components/types/api').TasksTableRow} taskRow
 	 */
 	function showDocsInfoModal(taskRow) {
 		selectedTaskRow = taskRow;
@@ -27,7 +27,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').TasksTableRow} taskRow
+	 * @param {import('#fractal-components/types/api').TasksTableRow} taskRow
 	 */
 	function showInfoButton(taskRow) {
 		return taskRow.docs_info || (!showDocLinksInTable && taskRow.docs_link);

@@ -3,7 +3,7 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ProjectInvitation} invitation
+	 * @property {import('#fractal-components/types/api').ProjectInvitation} invitation
 	 * @property {() => Promise<void>} onAccept
 	 */
 

@@ -1,15 +1,15 @@
 <script>
 	import { FormErrorHandler } from '#lib/common/errors.js';
-	import { normalizePayload } from 'fractal-components';
-	import { formatMarkdown } from 'fractal-components/common/utils';
+	import { normalizePayload } from '#fractal-components';
+	import { formatMarkdown } from '#fractal-components/common/utils';
 	import { tick } from 'svelte';
 
 	/**
 	 * @typedef {Object} Props
 	 * @property {number} projectId
-	 * @property {import("fractal-components/types/api").WorkflowTaskV2} workflowTask
+	 * @property {import("#fractal-components/types/api").WorkflowTaskV2} workflowTask
 	 * @property {boolean} editable
-	 * @property {(dataset: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowTaskCallback
+	 * @property {(dataset: import('#fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowTaskCallback
 	 */
 
 	/** @type {Props} */

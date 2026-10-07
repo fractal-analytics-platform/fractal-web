@@ -1,16 +1,16 @@
 <script>
 	import DragAndDropUploader from '#lib/components/common/DragAndDropUploader.svelte';
-	import { normalizePayload, SchemaValidator } from 'fractal-components';
+	import { normalizePayload, SchemaValidator } from '#fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { FormErrorHandler } from '#lib/common/errors.js';
 	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
-	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
+	import { isValidArgsSchemaVersion } from '#fractal-components/jschema/jschema_validation';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
-	 * @property {import('fractal-components/types/api').User} user
+	 * @property {(task: import('#fractal-components/types/api').TaskV2[]) => void} addNewTasks
+	 * @property {import('#fractal-components/types/api').User} user
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -66,7 +66,7 @@
 
 	/**
 	 * @param {object} data
-	 * @param {import("fractal-components/types/jschema").ArgsSchemaVersion} argsSchemaVersion
+	 * @param {import("#fractal-components/types/jschema").ArgsSchemaVersion} argsSchemaVersion
 	 */
 	function isManifestValid(data, argsSchemaVersion) {
 		const validator = new SchemaValidator(argsSchemaVersion);

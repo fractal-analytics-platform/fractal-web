@@ -30,7 +30,7 @@ export async function userAuthentication(fetch, data) {
  * Fetches user identity
  * @param {typeof fetch} fetch
  * @param {boolean} groupIdsNames indicates whether to load the list of group IDs and names.
- * @returns {Promise<import('fractal-components/types/api').User|null>}
+ * @returns {Promise<import('#fractal-components/types/api').User|null>}
  */
 export async function getCurrentUser(fetch, groupIdsNames = false) {
 	logger.debug('Retrieving current user');
@@ -85,7 +85,7 @@ export async function logout(fetch) {
 /**
  * Fetches the list of users from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('fractal-components/types/api').User>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').User>>}
  */
 export async function listUsers(fetch) {
 	logger.debug('Fetching the list of users');
@@ -104,7 +104,7 @@ export async function listUsers(fetch) {
  * @param {typeof fetch} fetch
  * @param {number|string} userId
  * @param {boolean} groupIdsNames indicates whether to load the list of group IDs and names.
- * @returns {Promise<import('fractal-components/types/api').User>}
+ * @returns {Promise<import('#fractal-components/types/api').User>}
  */
 export async function getUser(fetch, userId, groupIdsNames = true) {
 	logger.debug('Fetching user [user_id=%d]', userId);
@@ -125,7 +125,7 @@ export async function getUser(fetch, userId, groupIdsNames = true) {
  * Fetches the list of groups from the server
  * @param {typeof fetch} fetch
  * @param {boolean} userIds indicates whether to load the list of user IDs.
- * @returns {Promise<Array<import('fractal-components/types/api').Group>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').Group>>}
  */
 export async function listGroups(fetch, userIds = false) {
 	logger.debug('Fetching groups');
@@ -144,7 +144,7 @@ export async function listGroups(fetch, userIds = false) {
  * Fetches a group from the server
  * @param {typeof fetch} fetch
  * @param {number|string} groupId
- * @returns {Promise<Array<import('fractal-components/types/api').Group>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').Group>>}
  */
 export async function getGroup(fetch, groupId) {
 	logger.debug('Fetching group %d', groupId);
@@ -162,7 +162,7 @@ export async function getGroup(fetch, groupId) {
 /**
  * Fetches user settings
  * @param {typeof fetch} fetch
- * @returns {Promise<import('fractal-components/types/api').ProfileInfo>}
+ * @returns {Promise<import('#fractal-components/types/api').ProfileInfo>}
  */
 export async function getProfileInfo(fetch) {
 	logger.debug('Retrieving current user profile');
@@ -180,7 +180,7 @@ export async function getProfileInfo(fetch) {
 /**
  * @param {typeof fetch} fetch
  * @param {number} profileId
- * @returns {Promise<Array<import('fractal-components/types/api').User>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').User>>}
  */
 export async function getProfileUsers(fetch, profileId) {
 	logger.debug(`Retrieving users of profile ${profileId}`);

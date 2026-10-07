@@ -4,7 +4,7 @@ import ImagesStatus from '../src/lib/components/jobs/ImagesStatus.svelte';
 
 describe('ImagesStatus', () => {
 	const baseProps = {
-		dataset: /** @type {import('fractal-components/types/api').DatasetV2} */ ({ id: 1 }),
+		dataset: /** @type {import('#fractal-components/types/api').DatasetV2} */ ({ id: 1 }),
 		imagesStatusModal: /** @type {any} */ ({})
 	};
 
@@ -179,14 +179,14 @@ describe('ImagesStatus', () => {
 });
 
 /**
- * @param {import('fractal-components/types/api').TaskV2Type} taskType
- * @returns {import('fractal-components/types/api').WorkflowTaskV2}
+ * @param {import('#fractal-components/types/api').TaskV2Type} taskType
+ * @returns {import('#fractal-components/types/api').WorkflowTaskV2}
  */
 function getMockedWorkflowTask(taskType) {
-	return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ ({
+	return /** @type {import('#fractal-components/types/api').WorkflowTaskV2} */ ({
 		task_type: taskType,
 		alias: null,
-		task: /** @type {import('fractal-components/types/api').TaskV2} */ ({
+		task: /** @type {import('#fractal-components/types/api').TaskV2} */ ({
 			name: 'test'
 		})
 	});

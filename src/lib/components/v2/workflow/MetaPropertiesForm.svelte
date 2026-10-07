@@ -7,19 +7,19 @@
 	// This component also manages the overall form structure of meta properties.
 	// The form should be structured in multiple levels of depth, and support complex structure.
 	import { page } from '$app/state';
-	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
+	import FormBuilder from '#fractal-components/common/FormBuilder.svelte';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import {
 		isCompoundType,
 		isNonParallelType,
 		isParallelType,
 		normalizePayload
-	} from 'fractal-components';
+	} from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
-	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
+	 * @property {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {(wft: import('#fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
 	 * @property {boolean} [editable]
 	 * @property {any} [metaNonParallel]
 	 * @property {any} [metaParallel]

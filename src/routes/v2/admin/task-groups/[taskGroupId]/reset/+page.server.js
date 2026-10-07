@@ -12,7 +12,7 @@ export async function load({ fetch, params }) {
 		await responseError(response);
 	}
 
-	/** @type {import('fractal-components/types/api').TaskGroupV2} */
+	/** @type {import('#fractal-components/types/api').TaskGroupV2} */
 	const taskGroup = await response.json();
 
 	return { taskGroup };

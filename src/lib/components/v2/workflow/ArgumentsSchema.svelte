@@ -2,21 +2,21 @@
 	import { page } from '$app/state';
 	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import ImportExportArgs from './ImportExportArgs.svelte';
-	import { JSchema, getPropertiesToIgnore, stripIgnoredProperties } from 'fractal-components';
-	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
+	import { JSchema, getPropertiesToIgnore, stripIgnoredProperties } from '#fractal-components';
+	import FormBuilder from '#fractal-components/common/FormBuilder.svelte';
 	import { onMount } from 'svelte';
-	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
-	import { deepCopy, normalizePayload } from 'fractal-components/common/utils';
-	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
+	import { isCompoundType, isNonParallelType, isParallelType } from '#fractal-components';
+	import { deepCopy, normalizePayload } from '#fractal-components/common/utils';
+	import { isValidArgsSchemaVersion } from '#fractal-components/jschema/jschema_validation';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
-	 * @property {(wft: import('fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
+	 * @property {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {(wft: import('#fractal-components/types/api').WorkflowTaskV2) => void} onWorkflowTaskUpdated
 	 * @property {string} taskName
 	 * @property {boolean} [editable]
-	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaNonParallel
-	 * @property {import('fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaParallel
+	 * @property {import('#fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaNonParallel
+	 * @property {import('#fractal-components/types/jschema').JSONSchemaObjectProperty|null} argsSchemaParallel
 	 * @property {object|undefined} [argsNonParallel]
 	 * @property {object|undefined} [argsParallel]
 	 */

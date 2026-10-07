@@ -11,14 +11,14 @@
 		normalizePayload,
 		SchemaValidator,
 		stripDiscriminator
-	} from 'fractal-components';
-	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
+	} from '#fractal-components';
+	import { adaptJsonSchema } from '#fractal-components/jschema/jschema_adapter';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {Array<{ task_id: number, version: string }>} updateCandidates
-	 * @property {(workflowTask: import('fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowCallback
+	 * @property {(workflowTask: import('#fractal-components/types/api').WorkflowTaskV2) => void} updateWorkflowCallback
 	 * @property {import('svelte/store').Writable<number>} newVersionsCount
 	 */
 
@@ -26,7 +26,7 @@
 	let { workflowTask, updateCandidates, updateWorkflowCallback, newVersionsCount } = $props();
 
 	let selectedUpdateVersion = $state('');
-	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').TaskV2|undefined} */
 	let updateCandidate = $state();
 	let dataValid = $state(true);
 
@@ -90,7 +90,7 @@
 
 	/**
 	 * @param {any} schema
-	 * @param {import("fractal-components/types/jschema").ArgsSchemaVersion} version
+	 * @param {import("#fractal-components/types/jschema").ArgsSchemaVersion} version
 	 * @param {any} data
 	 */
 	function isDataValid(schema, version, data) {

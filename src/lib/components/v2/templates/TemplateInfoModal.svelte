@@ -5,7 +5,7 @@
 	import { tick } from 'svelte';
 
 	/**
-	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
+	 * @type {import('#fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
 	let template = $state();
 

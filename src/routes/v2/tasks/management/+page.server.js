@@ -9,7 +9,7 @@ export async function load({ fetch }) {
 	logger.trace('Load tasks management page');
 
 	const user =
-		/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */ (
+		/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */ (
 			await getCurrentUser(fetch, true)
 		);
 	const taskGroups = await listTaskGroups(fetch, false);

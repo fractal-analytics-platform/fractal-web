@@ -7,7 +7,7 @@
 	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let fetchErrorAlert;
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').DatasetV2Expanded>} */
+	/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').DatasetV2Expanded>} */
 	let datasetPage = $state({
 		current_page: 1,
 		page_size: 10,
@@ -87,7 +87,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 * @param {import('#fractal-components/types/api').DatasetV2} dataset
 	 */
 	async function toggleStarredDataset(dataset) {
 		fetchErrorAlert?.hide();

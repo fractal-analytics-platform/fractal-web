@@ -1,5 +1,5 @@
 <script>
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
 	/**
 	 * @typedef {Object} Props

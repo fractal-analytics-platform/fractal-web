@@ -1,13 +1,13 @@
 <script>
 	import { page } from '$app/state';
 	import ProfileEditor from '#lib/components/v2/admin/ProfileEditor.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 	import { onMount } from 'svelte';
 
-	/** @type {import('fractal-components/types/api').Resource} */
+	/** @type {import('#fractal-components/types/api').Resource} */
 	const resource = $derived(page.data.resource);
 
-	/** @type {Omit<import('fractal-components/types/api').Profile, 'id'> | undefined} */
+	/** @type {Omit<import('#fractal-components/types/api').Profile, 'id'> | undefined} */
 	let profile = $state();
 
 	onMount(() => {
@@ -24,7 +24,7 @@
 	});
 
 	/**
-	 * @param {Omit<import('fractal-components/types/api').Profile, 'id'>} profile
+	 * @param {Omit<import('#fractal-components/types/api').Profile, 'id'>} profile
 	 */
 	async function saveProfile(profile) {
 		const headers = new Headers();

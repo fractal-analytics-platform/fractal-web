@@ -1,7 +1,7 @@
 <script>
 	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '../../common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { normalizePayload } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
@@ -20,8 +20,8 @@
 	let fileInput = $state(undefined);
 
 	/**
-	 * @typedef {import('fractal-components/types/api').WorkflowImport} WorkflowImport
-	 * @typedef {import('fractal-components/types/api').WorkflowTemplateImport} WorkflowTemplateImport
+	 * @typedef {import('#fractal-components/types/api').WorkflowImport} WorkflowImport
+	 * @typedef {import('#fractal-components/types/api').WorkflowTemplateImport} WorkflowTemplateImport
 	 */
 
 	/**
