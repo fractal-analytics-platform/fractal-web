@@ -1,17 +1,12 @@
 {
-	"extends": "./.svelte-kit/tsconfig.json",
+	"extends": "$app/tsconfig",
 	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
 		"noImplicitAny": false,
 		"paths": {
 			"#fractal-components/*": ["../components/src/lib/*"]
 		}
-	}
+	},
+	"include": ["src", "vite.config.js"]
 }
