@@ -680,6 +680,14 @@ When writing Markdown files for the User Guide, use the following rules:
 - external links: use plain HTML and add the `target="_blank"` attribute to open the page in a new tab (e.g. `<a href="https://www.biovisioncenter.uzh.ch" target="_blank">BioVisionCenter</a>`);
 - Fractal Web links: use the `fractal_link` macro (e.g. `{{ fractal_link('Projects page', '/v2/projects') }}`);
 
+To embed YouTube videos in a GDPR compliant way use the following macro:
+
+```
+{{ youtube_video('video_id', 'Video title') }}
+```
+
+The first parameter is the video id/handle (the `v` query parameter in YouTube URLs). The macro creates a YouTube facade that loads the video iframe only when the user clicks on the play button. It also adds a message informing the user that the page is going to retrieve the data from an external site.
+
 To test the documentation locally you can serve the documentation using `zensical serve` on port 8001, as explained above. Vite configuration (`vite.config.js`) is already set up to proxy the URLs starting with `/help` to the port 8001. In this way the help modal documentation embedding should work out of the box.
 
 To test the links going from the documentation to the running Fractal Web development instance, you can run the `build-docs.sh` script while setting the environment variable `FRACTAL_LINKS_BASE_URL=http://localhost:5173`. In this way the `fractal_link` macro will generate the proper URL prefix.
