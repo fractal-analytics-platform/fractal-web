@@ -3,7 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Improve privacy laws compliance in documentation pages (\#1262).
-- Added Node 26 in CI configuration (\#XXXX).
+- Added Node 26 in CI configuration (\#1265).
 
 # 1.29.9
 
