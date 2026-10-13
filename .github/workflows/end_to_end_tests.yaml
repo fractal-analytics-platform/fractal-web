@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['24']
+        node-version: ['24', '26']
         browser: ['chromium', 'firefox']
         shard-index: [1, 2, 3]
         shard-total: [3]
