@@ -21,7 +21,10 @@ nav = [
     { "Sandbox pages" = "sandbox-pages.md" },
     { "Development" = [
         { "Instructions" = "development.md"},
-        { "Playwright report" = "playwright-report/index.html" },
+        { "Playwright reports" = [
+          { "Node 24" = "playwright-report-24/index.html" },
+          { "Node 26" = "playwright-report-26/index.html" },
+        ] },
     ] },
     { "User guide" = "help/index.html" },
 ]
