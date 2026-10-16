@@ -1,22 +1,16 @@
 <script>
 	import { page } from '$app/state';
 	import DatasetInfoModal from '#lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
-
 	import {
 		PUBLIC_FRACTAL_DATA_URL,
 		PUBLIC_FRACTAL_VIZARR_VIEWER_URL,
 		PUBLIC_FRACTAL_FEATURE_EXPLORER_URL
 	} from '$app/env/public';
-
 	import DatasetImagesTable from '#lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
-	import { addFinalSlash, encodePathForUrl } from '#lib/common/component_utilities.js';
+	import { encodePathForUrl } from '#lib/common/component_utilities.js';
 	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
 	import { normalizePayload } from '#fractal-components';
-
-	const fractalDataUrl = addFinalSlash(PUBLIC_FRACTAL_DATA_URL);
-	const vizarrViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
-	const featureExplorerUrl = addFinalSlash(PUBLIC_FRACTAL_FEATURE_EXPLORER_URL);
 
 	let projectId = page.params.projectId;
 
@@ -167,7 +161,7 @@
 	</div>
 </div>
 
-{#if fractalDataUrl && (vizarrViewerUrl || featureExplorerUrl) && plates.length > 0}
+{#if PUBLIC_FRACTAL_DATA_URL && (PUBLIC_FRACTAL_VIZARR_VIEWER_URL || PUBLIC_FRACTAL_FEATURE_EXPLORER_URL) && plates.length > 0}
 	<div class="container border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
@@ -186,9 +180,9 @@
 			</div>
 			<div class="col-12">
 				{#if platePath}
-					{#if vizarrViewerUrl}
+					{#if PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 						<a
-							href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
+							href="{PUBLIC_FRACTAL_VIZARR_VIEWER_URL}?source={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 								platePath
 							)}&roi=1"
 							class="btn btn-info me-2 viewer-btn vizarr-btn"
@@ -197,9 +191,9 @@
 							aria-label="View plate with Vizarr"
 						></a>
 					{/if}
-					{#if featureExplorerUrl}
+					{#if PUBLIC_FRACTAL_FEATURE_EXPLORER_URL}
 						<a
-							href="{featureExplorerUrl}?zarr_url={fractalDataUrl}files{encodePathForUrl(
+							href="{PUBLIC_FRACTAL_FEATURE_EXPLORER_URL}?zarr_url={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 								platePath
 							)}&setup_mode=Plates"
 							class="btn btn-info me-2"
@@ -210,10 +204,10 @@
 							Open in Feature Explorer
 						</a>
 					{/if}
-					{#if vizarrViewerUrl}
+					{#if PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 						<CopyToClipboardButton
 							btnClass="light btn-outline-secondary"
-							clipboardText="{fractalDataUrl}files{encodePathForUrl(platePath)}"
+							clipboardText="{PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(platePath)}"
 							text="Get URL"
 							id="get-plate-url"
 						/>

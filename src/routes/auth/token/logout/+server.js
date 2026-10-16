@@ -14,10 +14,10 @@ export async function POST({ fetch, request, cookies }) {
 	// Set the fastapiusersauth cookie to expire in the past
 	// This will delete the cookie
 	const cookieOptions = {
-		path: `${AUTH_COOKIE_PATH || '/'}`,
+		path: AUTH_COOKIE_PATH,
 		expires: new Date(0),
-		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${AUTH_COOKIE_SAME_SITE || 'lax'}`),
-		secure: `${AUTH_COOKIE_SECURE}` !== 'false',
+		sameSite: AUTH_COOKIE_SAME_SITE,
+		secure: AUTH_COOKIE_SECURE,
 		httpOnly: true
 	};
 
@@ -25,7 +25,7 @@ export async function POST({ fetch, request, cookies }) {
 		cookieOptions.domain = `${AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`;
 	}
 
-	cookies.set(AUTH_COOKIE_NAME || 'fastapiusersauth', '', cookieOptions);
+	cookies.set(AUTH_COOKIE_NAME, '', cookieOptions);
 
 	return new Response(null, { status: 204 });
 }

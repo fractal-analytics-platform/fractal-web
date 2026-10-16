@@ -125,9 +125,6 @@
 		pageSize = 10;
 	}
 
-	const updateTasksCollectionInterval = PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 	let updateTasksCollectionTimeout = undefined;
 
 	/**
@@ -159,7 +156,7 @@
 		clearTimeout(updateTasksCollectionTimeout);
 		updateTasksCollectionTimeout = setTimeout(
 			updateTaskCollectionsInBackground,
-			updateTasksCollectionInterval
+			PUBLIC_UPDATE_JOBS_INTERVAL
 		);
 	}
 
@@ -180,7 +177,7 @@
 		}
 		updateTasksCollectionTimeout = setTimeout(
 			updateTaskCollectionsInBackground,
-			updateTasksCollectionInterval
+			PUBLIC_UPDATE_JOBS_INTERVAL
 		);
 	});
 

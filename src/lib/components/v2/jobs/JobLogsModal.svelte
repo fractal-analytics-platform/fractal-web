@@ -18,10 +18,6 @@
 	/** @type {'main'|'slurm'} */
 	let selectedTab = $state('main');
 
-	const updateJobInterval = PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
-
 	/** @type {NodeJS.Timeout|undefined} */
 	let updateJobTimeout = undefined;
 
@@ -47,7 +43,7 @@
 			} else {
 				logParts = [{ text: log, highlight: false }];
 				if (job.status === 'submitted') {
-					updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
+					updateJobTimeout = setTimeout(updateJobLogInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 				}
 			}
 		} finally {
@@ -60,7 +56,7 @@
 		if (job?.status === 'submitted') {
 			await loadJobLog();
 			logParts = [{ text: log, highlight: false }];
-			updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
+			updateJobTimeout = setTimeout(updateJobLogInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 		} else if (job?.status === 'failed') {
 			logParts = extractJobErrorParts(log, true);
 		} else {

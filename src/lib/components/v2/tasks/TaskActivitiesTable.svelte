@@ -68,7 +68,7 @@
 		clearTimeout(updateTasksActivitiesTimeout);
 		updateTasksActivitiesTimeout = setTimeout(
 			updateTasksActivitiesInBackground,
-			updateTasksActivitiesInterval
+			PUBLIC_UPDATE_JOBS_INTERVAL
 		);
 	}
 
@@ -86,16 +86,13 @@
 		return [];
 	}
 
-	const updateTasksActivitiesInterval = PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 	let updateTasksActivitiesTimeout = undefined;
 
 	onMount(async () => {
 		recentActivities.set(await loadRecentTaskActivities());
 		updateTasksActivitiesTimeout = setTimeout(
 			updateTasksActivitiesInBackground,
-			updateTasksActivitiesInterval
+			PUBLIC_UPDATE_JOBS_INTERVAL
 		);
 	});
 

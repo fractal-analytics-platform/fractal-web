@@ -69,7 +69,7 @@
 			<a href="/v2/tasks" class="btn btn-primary">Tasks</a>
 			<a href="/v2/jobs" class="btn btn-primary">Jobs</a>
 
-			{#if PUBLIC_ENABLE_HELP_LINKS === 'true'}
+			{#if PUBLIC_ENABLE_HELP_LINKS}
 				<a href={PUBLIC_HELP_LINKS_BASE_URL || '/help'} target="_blank" class="btn btn-primary"
 					>User Guide</a
 				>

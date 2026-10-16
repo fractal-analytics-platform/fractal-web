@@ -2,8 +2,6 @@ import { LOG_LEVEL_CONSOLE, LOG_LEVEL_FILE, LOG_FILE, LOG_CONFIG_FILE } from '$a
 import { existsSync, readFileSync } from 'fs';
 import log4js from 'log4js';
 
-const logLevelConsole = LOG_LEVEL_CONSOLE || 'warn';
-
 /**
  * @param {Date} date
  * @returns {string}
@@ -42,13 +40,12 @@ function configureDefaultLogger() {
 		},
 		filteredConsole: {
 			type: 'logLevelFilter',
-			level: logLevelConsole,
+			level: LOG_LEVEL_CONSOLE,
 			appender: 'console'
 		}
 	};
 
 	let appendersList = ['filteredConsole'];
-	const logLevelFile = LOG_LEVEL_FILE || 'info';
 
 	if (LOG_FILE) {
 		appenders = {
@@ -60,7 +57,7 @@ function configureDefaultLogger() {
 			},
 			filteredFile: {
 				type: 'logLevelFilter',
-				level: logLevelFile,
+				level: LOG_LEVEL_FILE,
 				appender: 'file'
 			}
 		};
@@ -124,10 +121,10 @@ function logStartupConfiguration(logger, startupState) {
 	if (startupState.configuredLogConfigFile) {
 		logger.debug('LOG_CONFIG_FILE=%s', startupState.configuredLogConfigFile);
 	} else {
-		logger.debug('LOG_LEVEL_CONSOLE=%s', logLevelConsole);
+		logger.debug('LOG_LEVEL_CONSOLE=%s', LOG_LEVEL_CONSOLE);
 		if (LOG_FILE) {
 			logger.debug('LOG_FILE=%s', LOG_FILE);
-			logger.debug('LOG_LEVEL_FILE=%s', LOG_LEVEL_FILE || 'info');
+			logger.debug('LOG_LEVEL_FILE=%s', LOG_LEVEL_FILE);
 		}
 	}
 }

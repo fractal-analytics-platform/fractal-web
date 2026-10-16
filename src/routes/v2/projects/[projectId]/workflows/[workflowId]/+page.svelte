@@ -146,9 +146,6 @@
 	let sortedDatasets = $derived(
 		[...datasets].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
 	);
-	const updateJobsInterval = PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 
 	onMount(async () => {
 		selectedDatasetId = getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId);
@@ -565,7 +562,10 @@
 			const allCompleted =
 				Object.entries(receivedStatuses).length === Object.values(statuses).length &&
 				submitted.length === 0;
-			statusWatcherTimer = window.setTimeout(loadJobsStatus, allCompleted ? 0 : updateJobsInterval);
+			statusWatcherTimer = window.setTimeout(
+				loadJobsStatus,
+				allCompleted ? 0 : PUBLIC_UPDATE_JOBS_INTERVAL
+			);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;

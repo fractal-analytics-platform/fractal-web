@@ -51,9 +51,7 @@ function getLoginErrorMessage(error) {
 
 export async function load() {
 	const loginInvite = await getLoginInvite();
-	const hideBasicAuth = FRACTAL_HIDE_BASIC_AUTH === 'true';
-
-	return { loginInvite, hideBasicAuth };
+	return { loginInvite, hideBasicAuth: FRACTAL_HIDE_BASIC_AUTH };
 }
 
 async function getLoginInvite() {

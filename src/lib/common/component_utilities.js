@@ -125,17 +125,6 @@ export function encodePathForUrl(zarrUrl) {
 }
 
 /**
- * Add a slash to the end of the URL, if needed.
- * @param {string|undefined} url
- */
-export function addFinalSlash(url) {
-	if (!url) {
-		return undefined;
-	}
-	return url.replace(/\/$|$/, '/');
-}
-
-/**
  * @param {string} zarrDir
  * @param {string[]} projectDirs
  */
@@ -156,7 +145,7 @@ export function splitZarrDir(zarrDir, projectDirs) {
  * @param {string} url
  */
 export function buildHelpLink(url) {
-	return PUBLIC_ENABLE_HELP_LINKS === 'true' && url
+	return PUBLIC_ENABLE_HELP_LINKS && url
 		? `${PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
 		: '';
 }

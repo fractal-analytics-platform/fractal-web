@@ -208,9 +208,6 @@
 		}
 	}
 
-	const updateJobsInterval = PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 	let updateJobsTimeout = undefined;
 
 	async function updateJobsInBackground() {
@@ -219,7 +216,7 @@
 			setJobs(await jobUpdater());
 		}
 		clearTimeout(updateJobsTimeout);
-		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+		updateJobsTimeout = setTimeout(updateJobsInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 	}
 
 	/**
@@ -252,7 +249,7 @@
 		datasets = page.data.datasets;
 		setJobs(page.data.jobs || []);
 
-		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+		updateJobsTimeout = setTimeout(updateJobsInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 
 		if (admin) {
 			return;

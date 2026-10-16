@@ -19,10 +19,10 @@ export function setCookieFromToken(request, cookies, accessToken) {
 
 	// Set the authentication cookie
 	const cookieOptions = {
-		path: `${AUTH_COOKIE_PATH || '/'}`,
-		expires: new Date(/** @type {number} */ (tokenClaims.exp * 1000)),
-		sameSite: /** @type {'lax' | 'strict' | 'none'} */ (`${AUTH_COOKIE_SAME_SITE || 'lax'}`),
-		secure: `${AUTH_COOKIE_SECURE}` !== 'false',
+		path: AUTH_COOKIE_PATH,
+		expires: new Date(/** @type {number} */ (tokenClaims.exp) * 1000),
+		sameSite: AUTH_COOKIE_SAME_SITE,
+		secure: AUTH_COOKIE_SECURE,
 		httpOnly: true
 	};
 
@@ -30,5 +30,5 @@ export function setCookieFromToken(request, cookies, accessToken) {
 		cookieOptions.domain = `${AUTH_COOKIE_DOMAIN || new URL(request.url).hostname}`;
 	}
 
-	cookies.set(AUTH_COOKIE_NAME || 'fastapiusersauth', accessToken, cookieOptions);
+	cookies.set(AUTH_COOKIE_NAME, accessToken, cookieOptions);
 }

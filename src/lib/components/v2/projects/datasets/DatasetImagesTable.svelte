@@ -10,7 +10,6 @@
 	import CreateUpdateImageModal from '#lib/components/v2/projects/datasets/CreateUpdateImageModal.svelte';
 	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import {
-		addFinalSlash,
 		encodePathForUrl,
 		hideAllTooltips,
 		objectChanged
@@ -22,10 +21,6 @@
 	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
 	import { browser } from '$app/env';
 	import { getRelativeZarrPath, STATUS_KEY } from '#lib/common/workflow_utilities.js';
-
-	const fractalDataUrl = addFinalSlash(PUBLIC_FRACTAL_DATA_URL);
-	const vizarrViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
-	const voleViewerUrl = addFinalSlash(PUBLIC_FRACTAL_VOLE_VIEWER_URL);
 
 	/**
 	 * @typedef {Object} Props
@@ -600,7 +595,7 @@
 	 * @param {string} zarrUrl
 	 */
 	function getUrl(zarrUrl) {
-		return `${fractalDataUrl}files${encodePathForUrl(zarrUrl)}`;
+		return `${PUBLIC_FRACTAL_DATA_URL}files${encodePathForUrl(zarrUrl)}`;
 	}
 
 	onDestroy(() => {
@@ -736,21 +731,21 @@
 								<td><BooleanIcon value={image.types[typeKey]} /></td>
 							{/each}
 							<td class="col-2">
-								{#if fractalDataUrl && (vizarrViewerUrl || voleViewerUrl)}
-									{#if vizarrViewerUrl}
+								{#if PUBLIC_FRACTAL_DATA_URL && (PUBLIC_FRACTAL_VIZARR_VIEWER_URL || PUBLIC_FRACTAL_VOLE_VIEWER_URL)}
+									{#if PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 										<a
 											class="btn btn-info viewer-btn vizarr-btn"
-											href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
+											href="{PUBLIC_FRACTAL_VIZARR_VIEWER_URL}?source={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 												image.zarr_url
 											)}&roi=1"
 											target="_blank"
 											aria-label="View with Vizarr"
 										></a>
 									{/if}
-									{#if voleViewerUrl}
+									{#if PUBLIC_FRACTAL_VOLE_VIEWER_URL}
 										<a
 											class="btn btn-info"
-											href="{voleViewerUrl}viewer?url={fractalDataUrl}files{encodePathForUrl(
+											href="{PUBLIC_FRACTAL_VOLE_VIEWER_URL}viewer?url={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 												image.zarr_url
 											)}"
 											target="_blank"
