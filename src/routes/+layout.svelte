@@ -120,8 +120,11 @@
 
 	async function logout() {
 		sessionStorage.removeItem('userLoggedIn');
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		await fetch(`/auth/token/logout`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		await refreshAll();
 		await goto(resolve('/'));
