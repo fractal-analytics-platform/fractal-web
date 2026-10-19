@@ -97,7 +97,7 @@
 		if (navigation.shallow && navigation.type === 'goto') return;
 
 		const modal = getOpenedModal();
-		if (modal && navigation.delta === -1) {
+		if (modal && 'delta' in navigation && navigation.delta === -1) {
 			modal.hide();
 			navigation.cancel();
 			return;
