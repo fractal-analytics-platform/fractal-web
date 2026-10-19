@@ -24,7 +24,7 @@
 			try {
 				const result = await response.json();
 				invalidMessage = result.invalidMessage || '';
-			} catch (err) {
+			} catch {
 				invalidMessage = 'Unexpected error';
 			}
 		}

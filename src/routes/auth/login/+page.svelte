@@ -64,7 +64,7 @@
 				const result = await response.json();
 				invalidMessage = result.invalidMessage || '';
 				invalidGuestMessage = result.invalidGuestMessage || '';
-			} catch (err) {
+			} catch {
 				invalidMessage = 'Unexpected error';
 				invalidGuestMessage = 'Unexpected error';
 			}
