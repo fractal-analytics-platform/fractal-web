@@ -161,7 +161,7 @@
 		}
 		await tick();
 
-		goto(url, { shallow: true });
+		await goto(url, { shallow: true });
 
 		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`);
 		if (response.ok) {

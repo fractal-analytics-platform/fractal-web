@@ -6,11 +6,11 @@ import { setCookieFromToken } from '../cookie';
 export async function load({ request, fetch, cookies }) {
 	const queryStringIndex = request.url.indexOf('?');
 	if (queryStringIndex === -1) {
-		error(400, { message: 'Missing query string' });
+		error(400, 'Missing query string');
 	}
 
 	if (!PUBLIC_OAUTH_CLIENT_NAME) {
-		error(500, { message: 'Undefined OAuth2 client name' });
+		error(500, 'Undefined OAuth2 client name');
 	}
 
 	const response = await fetch(
@@ -22,7 +22,7 @@ export async function load({ request, fetch, cookies }) {
 		if ('detail' in result) {
 			return { message: result.detail };
 		}
-		error(400, { message: JSON.stringify(result) });
+		error(400, JSON.stringify(result));
 	}
 
 	const receivedCookies = response.headers.getSetCookie();
@@ -36,9 +36,7 @@ export async function load({ request, fetch, cookies }) {
 	}
 
 	if (fastApiToken === null) {
-		return error(400, {
-			message: 'FastAPI token not found in response cookies'
-		});
+		return error(400, 'FastAPI token not found in response cookies');
 	}
 
 	setCookieFromToken(request, cookies, fastApiToken);

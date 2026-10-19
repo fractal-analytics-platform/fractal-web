@@ -97,5 +97,6 @@ test('Compare workflow to template', async ({ page, project }) => {
 		const modal2 = await waitModal(page, false);
 		await modal2.getByRole('button', { name: 'MIP_compound' }).click();
 		await expect(modal2.getByText('Non-parallel arguments match.')).toHaveCount(1);
+		await closeModal(page);
 	});
 });
