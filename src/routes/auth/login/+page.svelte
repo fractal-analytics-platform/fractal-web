@@ -9,7 +9,7 @@
 	} from '$app/env/public';
 
 	import { onMount } from 'svelte';
-	import { invalidateAll } from '$app/navigation';
+	import { refreshAll } from '$app/navigation';
 
 	let { form } = $props();
 
@@ -42,7 +42,7 @@
 	let showSessionExpiredMessage = $state(false);
 	onMount(async () => {
 		if (location.href.includes('invalidate=true')) {
-			await invalidateAll();
+			await refreshAll();
 		}
 		if (!userLoggedIn && sessionStorage && sessionStorage.getItem('userLoggedIn') === 'true') {
 			showSessionExpiredMessage = true;

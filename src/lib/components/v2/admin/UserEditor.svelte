@@ -1,5 +1,5 @@
 <script>
-	import { invalidateAll, goto } from '$app/navigation';
+	import { refreshAll, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { get } from 'svelte/store';
 	import {
@@ -156,7 +156,7 @@
 			if (needsUserEdit) {
 				if (editableUser.id === currentUserId) {
 					// If the user modifies their own account the userInfo cached in the store has to be reloaded
-					await invalidateAll();
+					await refreshAll();
 				}
 				password = '';
 				confirmPassword = '';

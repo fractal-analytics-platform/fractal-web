@@ -5,7 +5,7 @@
 
 	import logoSmall from '#lib/assets/fractal-logo-small.png';
 	import { browser } from '$app/env';
-	import { afterNavigate, beforeNavigate, goto, invalidateAll } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto, refreshAll } from '$app/navigation';
 	import { page } from '$app/state';
 
 	import {
@@ -113,7 +113,7 @@
 
 		navigating.set(false);
 		if (location.href.includes('invalidate=true')) {
-			await invalidateAll();
+			await refreshAll();
 		}
 		cleanupModalBackdrop();
 	});
@@ -123,7 +123,7 @@
 		await fetch(`/auth/token/logout`, {
 			method: 'POST'
 		});
-		await invalidateAll();
+		await refreshAll();
 		await goto(resolve('/'));
 	}
 
