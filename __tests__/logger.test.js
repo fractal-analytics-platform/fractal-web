@@ -8,8 +8,15 @@ const mocks = vi.hoisted(() => {
 		fatal: vi.fn()
 	};
 
+	const defaultEnvMock = {
+		LOG_CONFIG_FILE: '',
+		LOG_LEVEL_CONSOLE: 'warn',
+		LOG_FILE: ''
+	};
+
 	return {
-		env: {},
+		defaultEnv: defaultEnvMock,
+		env: { ...defaultEnvMock },
 		existsSync: vi.fn(),
 		readFileSync: vi.fn(),
 		configure: vi.fn(),
@@ -18,7 +25,7 @@ const mocks = vi.hoisted(() => {
 	};
 });
 
-vi.mock('$env/dynamic/private', () => ({ env: mocks.env }));
+vi.mock('$app/env/private', () => mocks.env);
 vi.mock('fs', () => ({
 	existsSync: mocks.existsSync,
 	readFileSync: mocks.readFileSync,
@@ -41,8 +48,8 @@ async function loadLoggerModule() {
 
 describe('logger', () => {
 	beforeEach(() => {
-		for (const key of Object.keys(mocks.env)) {
-			delete mocks.env[key];
+		for (const key of Object.keys(mocks.defaultEnv)) {
+			mocks.env[key] = mocks.defaultEnv[key];
 		}
 	});
 

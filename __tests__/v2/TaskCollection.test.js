@@ -8,8 +8,8 @@ import { mockUser } from '../mock/mock-types';
 global.fetch = vi.fn();
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: {} };
+vi.mock('$app/env/public', () => {
+	return {};
 });
 
 const mockedUser = mockUser({

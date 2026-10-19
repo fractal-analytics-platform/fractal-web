@@ -50,8 +50,8 @@ vi.mock('$app/state', () => {
 });
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: {} };
+vi.mock('$app/env/public', () => {
+	return { PUBLIC_ENABLE_HELP_LINKS: false };
 });
 
 import TasksOrderModal from '../mock/MockTasksOrderModal.svelte';
