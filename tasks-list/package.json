@@ -47,7 +47,6 @@
 	"types": "./build/index.d.ts",
 	"type": "module",
 	"bundleDependencies": [
-		"slim-select",
 		"dompurify",
 		"marked",
 		"bootstrap",
@@ -56,5 +55,8 @@
 	"imports": {
 		"#lib": "./src/lib/index.js",
 		"#lib/*": "./src/lib/*"
+	},
+	"dependencies": {
+		"slim-select": "^4.4.0"
 	}
 }

@@ -1,11 +1,16 @@
 <script>
-	import { deepCopy, getPropertiesToIgnore, JSchema, SchemaValidator } from '#fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { adaptJsonSchema, stripDiscriminator } from '#fractal-components/jschema/jschema_adapter';
 	import { tick } from 'svelte';
 	import DragAndDropUploader from './DragAndDropUploader.svelte';
 	import example from './example-task-manifest.json';
-	import { isValidArgsSchemaVersion } from '#fractal-components/jschema/jschema_validation';
+	import {
+		isValidArgsSchemaVersion,
+		SchemaValidator
+	} from '#fractal-components/jschema/jschema_validation';
+	import JSchema from '#fractal-components/jschema/JSchema.svelte';
+	import { deepCopy } from '#fractal-components/common/utils.js';
+	import { getPropertiesToIgnore } from '#fractal-components/jschema/property_utils.js';
 
 	let manifest = $state();
 	/** @type {string[]} */

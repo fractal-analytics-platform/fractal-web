@@ -3,7 +3,6 @@
 	import FilteredTasksTable from '#fractal-components/tasks/FilteredTasksTable.svelte';
 	import { formatMarkdown } from '#fractal-components';
 	import { Modal } from 'bootstrap';
-	import 'slim-select/styles';
 
 	/** @type {import('#fractal-components/types/api').TasksTableRow|null} */
 	let selectedTaskRow = $state(null);

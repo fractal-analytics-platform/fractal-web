@@ -51,7 +51,7 @@
 		"color-hash": "^2.0.2",
 		"dompurify": "^3.4.8",
 		"marked": "^7.0.5",
-		"slim-select": "^3.4.3"
+		"slim-select": "^4.4.0"
 	},
 	"dependencies": {
 		"bootstrap": "^5.3.8",

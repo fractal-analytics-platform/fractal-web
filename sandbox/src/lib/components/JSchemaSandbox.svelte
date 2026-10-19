@@ -1,15 +1,14 @@
 <script>
-	import {
-		JSchema,
-		deepCopy,
-		getPropertiesToIgnore,
-		detectSchemaVersion,
-		SchemaValidator,
-		stripDiscriminator,
-		stripNullAndEmptyObjectsAndArrays
-	} from '#fractal-components';
 	import { tick } from 'svelte';
 	import example from './example.json';
+	import { deepCopy, stripNullAndEmptyObjectsAndArrays } from '#fractal-components/common/utils.js';
+	import {
+		detectSchemaVersion,
+		SchemaValidator
+	} from '#fractal-components/jschema/jschema_validation.js';
+	import { stripDiscriminator } from '#fractal-components/jschema/jschema_adapter.js';
+	import { getPropertiesToIgnore } from '#fractal-components/jschema/property_utils.js';
+	import JSchema from '#fractal-components/jschema/JSchema.svelte';
 
 	let schema = $state();
 	let schemaData = $state();
