@@ -4,6 +4,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 - Improve privacy laws compliance in documentation pages (\#1262).
 - Do not log 403 backend responses as errors (\#1264).
+- Fix stuck save/discard issue (\#1268).
 
 # 1.29.9
 
