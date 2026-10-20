@@ -6,7 +6,7 @@
 	import FormBuilder from 'fractal-components/common/FormBuilder.svelte';
 	import { onMount } from 'svelte';
 	import { isCompoundType, isNonParallelType, isParallelType } from 'fractal-components';
-	import { deepCopy, normalizePayload } from 'fractal-components/common/utils';
+	import { deepCopy, deepEquals, normalizePayload } from 'fractal-components/common/utils';
 	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
 
 	/**
@@ -83,17 +83,7 @@
 		if (!oldValue) {
 			return false;
 		}
-		// sort the object keys to guarantee the same JSON.stringify output for deeply equal objects
-		const replacer = (_, v) =>
-			typeof v !== 'object' || v === null || Array.isArray(v)
-				? v
-				: Object.fromEntries(
-						Object.entries(v).sort(([ka], [kb]) => (ka < kb ? -1 : ka > kb ? 1 : 0))
-					);
-		return (
-			JSON.stringify($state.snapshot(oldValue), replacer) !==
-			JSON.stringify($state.snapshot(newValue), replacer)
-		);
+		return !deepEquals($state.snapshot(oldValue), $state.snapshot(newValue));
 	}
 
 	export function hasUnsavedChanges() {

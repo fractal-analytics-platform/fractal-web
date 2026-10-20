@@ -16,6 +16,7 @@
 	import ProfileEditor from './ProfileEditor.svelte';
 	import { groupsErrorOnUserCreation } from '$lib/stores';
 	import { resolve } from '$app/paths';
+	import { deepEquals } from 'fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props
@@ -48,8 +49,7 @@
 	let originalUser = $state();
 	const userPendingChanges = $derived(
 		editableUser &&
-			JSON.stringify($state.snapshot(originalUser)) !==
-				JSON.stringify(nullifyEmptyStrings($state.snapshot(editableUser)))
+			!deepEquals($state.snapshot(originalUser), nullifyEmptyStrings($state.snapshot(editableUser)))
 	);
 
 	/** @type {Array<import('fractal-components/types/api').Group>} */

@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import JSchema from '../../src/lib/jschema/JSchema.svelte';
+	import { deepEquals } from '../../src/lib/common/utils';
 
 	/**
 	 * @typedef {Object} Props
@@ -29,7 +30,7 @@
 	 * @param {any} data
 	 */
 	function innerOnChange(data) {
-		if (schemaData !== undefined && JSON.stringify(schemaData) !== JSON.stringify(data)) {
+		if (schemaData !== undefined && !deepEquals(schemaData, data)) {
 			unsavedChanges = true;
 			onChange(data);
 		}
