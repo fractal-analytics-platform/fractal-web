@@ -83,7 +83,17 @@
 		if (!oldValue) {
 			return false;
 		}
-		return JSON.stringify($state.snapshot(oldValue)) !== JSON.stringify($state.snapshot(newValue));
+		// sort the object keys to guarantee the same JSON.stringify output for deeply equal objects
+		const replacer = (_, v) =>
+			typeof v !== 'object' || v === null || Array.isArray(v)
+				? v
+				: Object.fromEntries(
+						Object.entries(v).sort(([ka], [kb]) => (ka < kb ? -1 : ka > kb ? 1 : 0))
+					);
+		return (
+			JSON.stringify($state.snapshot(oldValue), replacer) !==
+			JSON.stringify($state.snapshot(newValue), replacer)
+		);
 	}
 
 	export function hasUnsavedChanges() {
