@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.29.10
 
 - Improve privacy laws compliance in documentation pages (\#1262).
 - Do not log 403 backend responses as errors (\#1264).
