@@ -43,7 +43,7 @@ test('View plate and feature explorer link', async ({ page, project }) => {
 	await test.step('Select plates', async () => {
 		for (let i = 1; i <= 3; i++) {
 			await page.getByRole('combobox', { name: 'Select plate' }).selectOption(`plate${i}`);
-			await expect(page.getByRole('link', { name: 'View plate with Vizarr' })).toHaveAttribute(
+			await expect(page.getByRole('link', { name: 'View plate in Vizarr' })).toHaveAttribute(
 				'href',
 				new RegExp(`\\/plate${i}\\.zarr&roi=1$`)
 			);

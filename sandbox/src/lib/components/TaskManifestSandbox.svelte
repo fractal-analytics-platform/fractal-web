@@ -1,11 +1,12 @@
 <script>
-	import { deepCopy, getPropertiesToIgnore, JSchema, SchemaValidator } from 'fractal-components';
+	import { getPropertiesToIgnore, JSchema, SchemaValidator } from 'fractal-components';
 	import manifestSchema from './manifest_v2.json';
 	import { adaptJsonSchema, stripDiscriminator } from 'fractal-components/jschema/jschema_adapter';
 	import { tick } from 'svelte';
 	import DragAndDropUploader from './DragAndDropUploader.svelte';
 	import example from './example-task-manifest.json';
 	import { isValidArgsSchemaVersion } from 'fractal-components/jschema/jschema_validation';
+	import { deepEquals } from 'fractal-components/common/utils';
 
 	let manifest = $state();
 	/** @type {string[]} */
@@ -170,11 +171,9 @@
 		if (!newData) {
 			return;
 		}
-		const newDataCopy = deepCopy(newData);
-		const updatedOldData = JSON.stringify(newDataCopy, null, 2);
 		// Update the data only if something is changed, to avoid triggering uneccessary events
-		if (updatedOldData !== jsonDataString) {
-			jsonDataString = updatedOldData;
+		if (jsonDataString === '' || !deepEquals(newData, JSON.parse(jsonDataString))) {
+			jsonDataString = JSON.stringify(newData, null, 2);
 			dataError = '';
 			schemaData = JSON.parse(jsonDataString);
 		}
