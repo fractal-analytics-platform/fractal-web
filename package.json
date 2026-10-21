@@ -58,7 +58,8 @@
 		"bootstrap-icons": "^1.13.1",
 		"jose": "^6.2.12",
 		"json-diff-viewer-component": "^0.6.4",
-		"log4js": "^6.9.1"
+		"log4js": "^6.9.1",
+		"undici": "^8.12.3"
 	},
 	"files": [
 		"build"
