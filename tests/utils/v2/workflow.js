@@ -25,7 +25,10 @@ export async function deleteWorkflow(page, projectId, workflowId) {
 	const response = await page.request.delete(
 		`/api/v2/project/${projectId}/workflow/${workflowId}`,
 		{
-			headers: { Cookie: await getFractalCookie(page) }
+			headers: {
+				Cookie: await getFractalCookie(page),
+				'Content-Type': 'application/json'
+			}
 		}
 	);
 	await checkApiError(response, 'Unable to delete workflow');

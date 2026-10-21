@@ -1,4 +1,3 @@
-/// <reference path="../../vitest-setup.d.ts" />
 import { describe, it, afterEach, beforeEach, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -56,9 +55,14 @@ describe('TaskCollection', () => {
 		await user.click(screen.getByRole('button', { name: 'Collect' }));
 
 		expect(fetch).toHaveBeenCalledWith(
-			'/api/v2/task/collect/pip?private=false&user_group_id=2',
+			'/api/v2/task/collect/pip',
 			expect.objectContaining({
-				body: expect.toBeFormDataWith({ package: 'test-task' })
+				body: JSON.stringify({
+					packageType: 'pypi',
+					private: false,
+					package: 'test-task',
+					user_group_id: 2
+				})
 			})
 		);
 	});
@@ -87,9 +91,13 @@ describe('TaskCollection', () => {
 		await user.click(screen.getByRole('button', { name: 'Collect' }));
 
 		expect(fetch).toHaveBeenCalledWith(
-			'/api/v2/task/collect/pip?private=true',
+			'/api/v2/task/collect/pip',
 			expect.objectContaining({
-				body: expect.toBeFormDataWith({ package: 'test-task' })
+				body: JSON.stringify({
+					packageType: 'pypi',
+					private: true,
+					package: 'test-task'
+				})
 			})
 		);
 	});
@@ -147,16 +155,15 @@ describe('TaskCollection', () => {
 		await user.click(collectBtn);
 
 		expect(fetch).toHaveBeenCalledWith(
-			'/api/v2/task/collect/pip?private=false&user_group_id=1',
+			'/api/v2/task/collect/pip',
 			expect.objectContaining({
-				body: expect.toBeFormDataWith({
+				body: JSON.stringify({
+					packageType: 'pypi',
+					private: false,
 					package: 'main-package',
-					pinned_package_versions_pre: JSON.stringify({
-						package1: '1.2.3'
-					}),
-					pinned_package_versions_post: JSON.stringify({
-						package2: '0.0.8'
-					})
+					pinned_package_versions_pre: { package1: '1.2.3' },
+					pinned_package_versions_post: { package2: '0.0.8' },
+					user_group_id: 1
 				})
 			})
 		);
