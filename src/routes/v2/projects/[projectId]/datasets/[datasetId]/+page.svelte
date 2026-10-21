@@ -143,10 +143,9 @@
 		</ol>
 	</nav>
 	<div>
-		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal"
-			>Info</button
-		>
-
+		<button class="btn btn-light" data-bs-target="#datasetInfoModal" data-bs-toggle="modal">
+			Info
+		</button>
 		<button
 			class="btn btn-light"
 			onclick={(event) => {
@@ -188,8 +187,11 @@
 							class="btn btn-info me-2 viewer-btn vizarr-btn"
 							target="_blank"
 							class:disabled={platePathLoading}
-							aria-label="View plate with Vizarr"
-						></a>
+							aria-label="View plate in Vizarr"
+							title="View plate in Vizarr"
+						>
+							&nbsp;
+						</a>
 					{/if}
 					{#if PUBLIC_FRACTAL_FEATURE_EXPLORER_URL}
 						<a

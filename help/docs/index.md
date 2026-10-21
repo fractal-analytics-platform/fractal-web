@@ -10,5 +10,4 @@ You can find more information at the <a href="https://fractal-analytics-platform
 
 A brief demo of Fractal features is available in the video below
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/uhv4rSc_6gs?si=K8wueHbpGkPFmbkK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen credentialless>
-</iframe>
+{{ youtube_video('uhv4rSc_6gs', 'Fractal web: Accessible workflow building & OME-Zarr data interaction') }}

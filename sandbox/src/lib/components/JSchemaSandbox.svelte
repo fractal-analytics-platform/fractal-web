@@ -9,6 +9,7 @@
 	import { stripDiscriminator } from '#fractal-components/jschema/jschema_adapter.js';
 	import { getPropertiesToIgnore } from '#fractal-components/jschema/property_utils.js';
 	import JSchema from '#fractal-components/jschema/JSchema.svelte';
+	import { deepEquals } from '#fractal-components/common/utils';
 
 	let schema = $state();
 	let schemaData = $state();
@@ -106,12 +107,12 @@
 
 		const updatedOldData =
 			schemaVersion === 'fractal_schema_v1'
-				? JSON.stringify(newDataCopy, null, 2)
-				: JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
+				? newDataCopy
+				: stripNullAndEmptyObjectsAndArrays(newDataCopy);
 
 		// Update the data only if something is changed, to avoid triggering uneccessary events
-		if (updatedOldData !== jsonDataString) {
-			jsonDataString = updatedOldData;
+		if (jsonDataString === '' || !deepEquals(updatedOldData, JSON.parse(jsonDataString))) {
+			jsonDataString = JSON.stringify(updatedOldData, null, 2);
 			dataError = '';
 			schemaData = JSON.parse(jsonDataString);
 		}

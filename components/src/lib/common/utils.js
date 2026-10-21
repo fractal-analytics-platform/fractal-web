@@ -13,6 +13,21 @@ export function deepCopy(value) {
 }
 
 /**
+ * @param {object} a
+ * @param {object} b
+ */
+export function deepEquals(a, b) {
+	// sort the object keys to guarantee the same JSON.stringify output for deeply equal objects
+	const replacer = (_, v) =>
+		typeof v !== 'object' || v === null || Array.isArray(v)
+			? v
+			: Object.fromEntries(
+					Object.entries(v).sort(([ka], [kb]) => (ka < kb ? -1 : ka > kb ? 1 : 0))
+				);
+	return JSON.stringify(a, replacer) === JSON.stringify(b, replacer);
+}
+
+/**
  * @param {any} value
  */
 export function undefinedToNull(value) {

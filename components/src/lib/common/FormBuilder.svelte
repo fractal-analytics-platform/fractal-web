@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import FormEntry from './FormEntry.svelte';
+	import { deepEquals } from './utils';
 
 	/**
 	 * @typedef {Object} Props
@@ -53,7 +54,9 @@
 	}
 
 	$effect(() => {
-		unsavedChanges = savedEditableArgs !== JSON.stringify($state.snapshot(editableArgs));
+		unsavedChanges =
+			savedEditableArgs !== '' &&
+			!deepEquals(JSON.parse(savedEditableArgs), $state.snapshot(editableArgs));
 	});
 
 	/**

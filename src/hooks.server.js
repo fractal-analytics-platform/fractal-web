@@ -135,7 +135,10 @@ export async function handleFetch({ event, request, fetch }) {
 	const response = await fetch(request);
 	if (!response.ok) {
 		const logLevel =
-			response.status === 404 || response.status === 422 || response.status == 401
+			response.status === 404 ||
+			response.status === 422 ||
+			response.status == 401 ||
+			response.status == 403
 				? 'info'
 				: 'error';
 		logger.log(

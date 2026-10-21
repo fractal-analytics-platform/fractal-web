@@ -739,8 +739,11 @@
 												image.zarr_url
 											)}&roi=1"
 											target="_blank"
-											aria-label="View with Vizarr"
-										></a>
+											aria-label="View in Vizarr"
+											title="View in Vizarr"
+										>
+											&nbsp;
+										</a>
 									{/if}
 									{#if PUBLIC_FRACTAL_VOLE_VIEWER_URL}
 										<a
@@ -749,7 +752,8 @@
 												image.zarr_url
 											)}"
 											target="_blank"
-											aria-label="View with Vol-E viewer"
+											aria-label="View in Vol-E"
+											title="View in Vol-E"
 										>
 											<i class="bi bi-flask"></i>
 										</a>

@@ -36,9 +36,14 @@ test('Dataset images [v2]', async ({ page, project }) => {
 	await test.step('Create an image without filters', async () => {
 		await createImage(page, `${randomPath}/img1`, async function () {});
 		// Check Vizarr URL
-		await expect(page.getByRole('link', { name: 'View with Vizarr' })).toHaveAttribute(
+		await expect(page.getByRole('link', { name: 'View in Vizarr' })).toHaveAttribute(
 			'href',
 			new RegExp(`${randomPath}/img1&roi=1$`)
+		);
+		// Check Vol-E URL
+		await expect(page.getByRole('link', { name: 'View in Vol-E' })).toHaveAttribute(
+			'href',
+			new RegExp(`${randomPath}/img1`)
 		);
 	});
 

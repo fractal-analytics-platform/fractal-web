@@ -1,19 +1,23 @@
 /* Custom style for blockquotes */
 blockquote {
-	background-color: #ffffff; /* Light gray background */
-	border: 1px solid #000000; /* Black border */
+	background-color: #ffffff;
+	/* Light gray background */
+	border: 1px solid #000000;
+	/* Black border */
 	padding: 10px;
 	margin: 20px 0;
 	border-radius: 4px;
 	font-size: 16px;
 	line-height: 1.6;
-	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+	/* Optional: Add a subtle shadow */
 }
 
 /* Style the text inside blockquotes */
 blockquote p {
 	margin: 0;
-	color: #333; /* Dark text color */
+	color: #333;
+	/* Dark text color */
 }
 
 blockquote li {
@@ -29,4 +33,52 @@ blockquote li {
 	background-position: center;
 	vertical-align: -4px;
 	background-repeat: no-repeat;
+}
+
+.youtube-facade {
+	width: 560px;
+	height: 315px;
+	border: 1px #ddd solid;
+	border-radius: 3px;
+	position: relative;
+	margin: 10px 0;
+}
+
+.youtube-facade .video-title {
+	font-size: 0.8rem;
+	font-weight: 500;
+	padding: 5px 15px;
+}
+
+.youtube-facade .player-icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	display: flex;
+}
+
+.youtube-facade .player-icon svg {
+	margin: 0 auto;
+}
+
+.youtube-facade button {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	cursor: pointer;
+}
+
+.youtube-facade .consent-text {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	text-align: center;
+	background: #eee;
+	padding: 10px;
+	font-weight: 500;
 }
