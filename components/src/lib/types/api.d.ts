@@ -501,3 +501,32 @@ export type Profile = {
 	tasks_remote_dir: string | null;
 	pixi_cache_dir: string | null;
 };
+
+export type PipCollectionRequest = {
+	packageType: string;
+	package?: string;
+	file?: {
+		data: string;
+		fileName: string;
+		contentType: string;
+	};
+	python_version?: string;
+	package_extras?: string;
+	package_version?: string;
+	pinned_package_versions_pre?: object;
+	pinned_package_versions_post?: object;
+	private: boolean;
+	user_group_id?: number;
+};
+
+export type PixiCollectionRequest = {
+	pixi_version?: string;
+	file?: {
+		data: string;
+		fileName: string;
+		contentType: string;
+	};
+	use_pixi_lockfile: boolean;
+	private: boolean;
+	user_group_id?: number;
+};

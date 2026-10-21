@@ -3,6 +3,7 @@
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import { recentActivities } from '#lib/stores.js';
 	import { PropertyDescription } from '#fractal-components';
+	import { fileToBase64 } from '../../../common/component_utilities';
 
 	/**
 	 * @typedef {Object} Props
@@ -21,6 +22,7 @@
 	/** @type {Array<{key: string, value: string, type: 'pre' | 'post'}>} */
 	let pinnedPackageVersions = $state([]);
 	let privateTask = $state(false);
+	/** @type {number|null} */
 	let selectedGroup = $state(null);
 	/** @type {TaskGroupSelector|undefined} */
 	let taskGroupSelector = $state();
@@ -63,44 +65,55 @@
 			return;
 		}
 
-		const formData = new FormData();
+		/** @type {import('#fractal-components/types/api').PipCollectionRequest} */
+		const body = {
+			packageType,
+			private: privateTask
+		};
 
 		if (packageType === 'pypi') {
-			formData.append('package', python_package);
+			body.package = python_package;
+			if (package_version) {
+				body.package_version = package_version;
+			}
 		} else if (wheelFiles?.length === 1) {
-			formData.append('file', wheelFiles[0]);
+			const file = wheelFiles[0];
+			body.file = {
+				data: await fileToBase64(file),
+				fileName: file.name,
+				contentType: file.type
+			};
 		}
 
 		if (python_version) {
-			formData.append('python_version', python_version);
+			body.python_version = python_version;
 		}
 
 		if (package_extras) {
-			formData.append('package_extras', package_extras);
-		}
-
-		if (packageType === 'pypi' && package_version) {
-			formData.append('package_version', package_version);
+			body.package_extras = package_extras;
 		}
 
 		const ppvPre = getPinnedPackageVersionsMap('pre');
 		if (ppvPre) {
-			formData.append('pinned_package_versions_pre', JSON.stringify(ppvPre));
+			body.pinned_package_versions_pre = ppvPre;
 		}
 		const ppvPost = getPinnedPackageVersionsMap('post');
 		if (ppvPost) {
-			formData.append('pinned_package_versions_post', JSON.stringify(ppvPost));
+			body.pinned_package_versions_post = ppvPost;
 		}
 
-		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
 		if (!privateTask && selectedGroup) {
-			url += `&user_group_id=${selectedGroup}`;
+			body.user_group_id = selectedGroup;
 		}
 
 		taskCollectionInProgress = true;
-		const response = await fetch(url, {
+
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/api/v2/task/collect/pip', {
 			method: 'POST',
-			body: formData
+			headers,
+			body: JSON.stringify(body)
 		});
 
 		taskCollectionInProgress = false;
