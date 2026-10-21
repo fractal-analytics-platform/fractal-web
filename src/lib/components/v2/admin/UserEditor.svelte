@@ -16,7 +16,7 @@
 	import ProfileEditor from './ProfileEditor.svelte';
 	import { groupsErrorOnUserCreation } from '#lib/stores.js';
 	import { resolve } from '$app/paths';
-	import { deepEquals } from 'fractal-components/common/utils';
+	import { deepEquals } from '#fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props

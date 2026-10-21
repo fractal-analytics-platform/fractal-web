@@ -9,8 +9,6 @@ const logger = getLogger('workflow page [v2]');
 export async function load({ fetch, params }) {
 	logger.trace('Load workflow page');
 
-	const showOnlyCoreFiltering = FRACTAL_DISPLAY_CORE_TASK_FILTER !== 'false';
-
 	const { projectId, workflowId } = params;
 
 	const workflow = await getWorkflow(fetch, projectId, workflowId);
@@ -23,7 +21,7 @@ export async function load({ fetch, params }) {
 		workflow,
 		datasets,
 		defaultDatasetId,
-		showOnlyCoreFiltering,
+		showOnlyCoreFiltering: FRACTAL_DISPLAY_CORE_TASK_FILTER,
 		helpLink: '/reference/workflow/'
 	};
 }
