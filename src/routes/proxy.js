@@ -126,11 +126,6 @@ function checkForbiddenPaths(path, forbiddenPaths) {
  */
 function handleError(err) {
 	if (err instanceof Error && err.cause instanceof Error) {
-		// FIXME: Do we need to handle this differently on Node26?
-		// FIXME: Workaround for Undici+Node24 issue
-		if (err instanceof TypeError && err.cause.message === 'expected non-null body source') {
-			error(401, 'Unauthorized');
-		}
 		// Underlying cause might be a Svelte Kit error
 		error(500, err.cause.message);
 	} else if (err instanceof Error) {
