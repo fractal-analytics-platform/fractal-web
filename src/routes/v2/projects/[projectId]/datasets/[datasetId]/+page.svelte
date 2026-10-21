@@ -187,7 +187,8 @@
 							class="btn btn-info me-2 viewer-btn vizarr-btn"
 							target="_blank"
 							class:disabled={platePathLoading}
-							aria-label="View plate with Vizarr"
+							aria-label="View plate in Vizarr"
+							title="View plate in Vizarr"
 						>
 							&nbsp;
 						</a>
