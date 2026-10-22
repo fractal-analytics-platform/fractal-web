@@ -1,5 +1,11 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+> WARNING: This release deprecates the `ORIGIN` environment variable. It can be removed and no further action should be necessary.
+
+- Migration to Svelte Kit v3 (\#1260).
+
 # 1.29.10
 
 - Improve privacy laws compliance in documentation pages (\#1262).

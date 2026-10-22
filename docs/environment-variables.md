@@ -36,18 +36,11 @@ The following environment variables can be used to configure fractal-web.
 When running directly using `node` command these extra variables can also be configured:
 
 - `PORT`: specifies the port where Svelte server will run; the default value is 5173;
-- `ORIGIN` the URL where the app will be served (e.g. http://localhost:5173, or https://subdomain.example.org);
 - `BODY_SIZE_LIMIT`: the maximum request body size accepted in bytes; see [official SvelteKit documentation](https://svelte.dev/docs/kit/adapter-node#Environment-variables-BODY_SIZE_LIMIT)."
 
 ## Common issues related to environment variables
 
-The `node` command relies on some extra environment variables, and especially on `ORIGIN`:
-
-> HTTP doesn't give SvelteKit a reliable way to know the URL that is currently
-> being requested. The simplest way to tell SvelteKit where the app is being
-> served is to set the `ORIGIN` environment variable
-> (see [SvelteKit node servers documentation](https://kit.svelte.dev/docs/adapter-node#environment-variables-origin-protocolheader-hostheader-and-port-header)).
-> A wrong origin value will result in the error message "Cross-site POST form submissions are forbidden".
+The `node` command relies on some extra environment variables.
 
 Unexpected behaviors can be related to wrong values of the `AUTH_COOKIE_DOMAIN` variable:
 
