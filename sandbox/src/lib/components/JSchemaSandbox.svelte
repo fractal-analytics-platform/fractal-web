@@ -10,6 +10,7 @@
 	} from 'fractal-components';
 	import { tick } from 'svelte';
 	import example from './example.json';
+	import { deepEquals } from 'fractal-components/common/utils';
 
 	let schema = $state();
 	let schemaData = $state();
@@ -107,12 +108,12 @@
 
 		const updatedOldData =
 			schemaVersion === 'fractal_schema_v1'
-				? JSON.stringify(newDataCopy, null, 2)
-				: JSON.stringify(stripNullAndEmptyObjectsAndArrays(newDataCopy), null, 2);
+				? newDataCopy
+				: stripNullAndEmptyObjectsAndArrays(newDataCopy);
 
 		// Update the data only if something is changed, to avoid triggering uneccessary events
-		if (updatedOldData !== jsonDataString) {
-			jsonDataString = updatedOldData;
+		if (jsonDataString === '' || !deepEquals(updatedOldData, JSON.parse(jsonDataString))) {
+			jsonDataString = JSON.stringify(updatedOldData, null, 2);
 			dataError = '';
 			schemaData = JSON.parse(jsonDataString);
 		}
