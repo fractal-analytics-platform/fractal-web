@@ -27,8 +27,11 @@
 	 * @param {number} id
 	 */
 	async function handleDeleteResource(id) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/admin/v2/resource/${id}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {

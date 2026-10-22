@@ -90,10 +90,13 @@
 	 * @param {number} projectId
 	 */
 	async function verifyGuestInvitation(guestUserId, projectId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/admin/v2/linkuserproject/verify/?guest_user_id=${guestUserId}&project_id=${projectId}`,
 			{
-				method: 'POST'
+				method: 'POST',
+				headers
 			}
 		);
 		if (response.ok) {

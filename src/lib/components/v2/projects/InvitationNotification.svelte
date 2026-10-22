@@ -17,8 +17,11 @@
 
 	async function acceptInvitation() {
 		errorAlert?.hide();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${invitation.project_id}/access/accept`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		if (response.ok) {
 			display = false;
@@ -33,8 +36,11 @@
 
 	async function rejectInvitation() {
 		errorAlert?.hide();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${invitation.project_id}/access`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			display = false;

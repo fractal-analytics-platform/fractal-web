@@ -304,10 +304,13 @@
 		if (!workflow || !selectedWorkflowTask) {
 			return;
 		}
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
 			{
-				method: 'DELETE'
+				method: 'DELETE',
+				headers
 			}
 		);
 

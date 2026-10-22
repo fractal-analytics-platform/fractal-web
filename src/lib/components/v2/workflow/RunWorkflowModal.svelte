@@ -233,8 +233,11 @@
 	 * @param {number} datasetId
 	 */
 	async function handleDatasetDelete(datasetId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${workflow.project_id}/dataset/${datasetId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (!response.ok) {
 			console.error('Error while deleting dataset:');

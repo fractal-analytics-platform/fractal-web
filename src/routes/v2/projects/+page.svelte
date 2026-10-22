@@ -53,8 +53,11 @@
 	 * @param {number} projectId
 	 */
 	async function handleLeaveProject(projectId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/access/`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			sharedProjects = sharedProjects.filter((p) => {

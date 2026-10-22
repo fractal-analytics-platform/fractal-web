@@ -24,8 +24,11 @@
 	 * @param {number} userId
 	 */
 	async function handleDeleteUser(userId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/auth/users/${userId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);

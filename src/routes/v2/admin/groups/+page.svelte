@@ -67,8 +67,11 @@
 	 * @param {number} groupId
 	 */
 	async function handleGroupDelete(groupId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/auth/group/${groupId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			groups = groups.filter((g) => g.id !== groupId);

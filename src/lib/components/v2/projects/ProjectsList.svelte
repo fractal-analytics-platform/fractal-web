@@ -99,8 +99,11 @@
 	async function handleDeleteProject(projectId) {
 		console.log('Client request project delete');
 
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {

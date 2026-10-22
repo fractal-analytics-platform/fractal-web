@@ -507,12 +507,15 @@
 	 * @param {string} zarrUrl
 	 */
 	async function handleDeleteImage(zarrUrl) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${
 				dataset.id
 			}/images?zarr_url=${encodeURIComponent(zarrUrl)}`,
 			{
-				method: 'DELETE'
+				method: 'DELETE',
+				headers
 			}
 		);
 		if (response.ok) {

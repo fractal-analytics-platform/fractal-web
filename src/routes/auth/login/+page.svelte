@@ -58,6 +58,9 @@
 			})
 		});
 		if (response.ok) {
+			if (sessionStorage) {
+				sessionStorage.setItem('userLoggedIn', 'true');
+			}
 			await goto(resolve(`/v2/projects`));
 		} else {
 			try {

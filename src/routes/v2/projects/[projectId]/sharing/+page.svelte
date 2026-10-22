@@ -99,10 +99,13 @@
 	 * @param {string} email
 	 */
 	async function handleRevokeGuestAccess(email) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${project.id}/guest/?email=${encodeURIComponent(email)}`,
 			{
-				method: 'DELETE'
+				method: 'DELETE',
+				headers
 			}
 		);
 		if (response.ok) {

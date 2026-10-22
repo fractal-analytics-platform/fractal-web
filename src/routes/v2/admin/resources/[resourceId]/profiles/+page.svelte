@@ -30,8 +30,11 @@
 	 * @param {number} id
 	 */
 	async function handleDeleteProfile(id) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/admin/v2/profile/${id}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {

@@ -40,8 +40,11 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDeleteWorkflow(workflowId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflowId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {
