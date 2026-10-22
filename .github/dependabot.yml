@@ -16,10 +16,8 @@ updates:
     # Look for `package.json` and `lock` files in the following directories
     directories:
       - '/'
-      - '/components'
-      - '/sandbox'
-      - '/tasks-list'
-      - '/templates-list'
+      - '/electron'
+      - '/src/frontend/'
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: 'monthly'
@@ -39,20 +37,3 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'marked'
         update-types: ['version-update:semver-major']
-
-  - package-ecosystem: 'uv'
-    versioning-strategy: 'lockfile-only'
-    directory: '/'
-    schedule:
-      interval: 'monthly'
-    cooldown:
-      default-days: 7
-    groups:
-      version-updates:
-        applies-to: version-updates
-        patterns:
-          - '*'
-      security-updates:
-        applies-to: security-updates
-        patterns:
-          - '*'
