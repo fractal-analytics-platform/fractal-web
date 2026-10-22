@@ -1,7 +1,7 @@
 <script>
 	import tasks from '../tasks.json';
 	import FilteredTasksTable from '#fractal-components/tasks/FilteredTasksTable.svelte';
-	import { formatMarkdown } from '#fractal-components';
+	import { formatMarkdown } from '#fractal-components/common/utils';
 	import { Modal } from 'bootstrap';
 
 	/** @type {import('#fractal-components/types/api').TasksTableRow|null} */

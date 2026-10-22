@@ -3,7 +3,10 @@
 	"compilerOptions": {
 		"sourceMap": true,
 		"strict": true,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"paths": {
+			"#fractal-components/*": ["../components/src/lib/*"]
+		}
 	},
 	"include": ["src", "vite.config.js"]
 }

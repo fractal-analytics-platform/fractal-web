@@ -1,7 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import { sveltePreprocess } from 'svelte-preprocess';
 import { defineConfig } from 'vite';
-import { fileURLToPath } from 'url';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
@@ -15,17 +14,9 @@ export default defineConfig({
 			// If your environment is not supported or you settled on a specific environment, switch out the adapter.
 			// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 			adapter: adapter({ fallback: 'index.html' }),
-			paths: { base: '/fractal-web/sandbox' },
-			alias: { '#fractal-components': '../components/src/lib' }
+			paths: { base: '/fractal-web/sandbox' }
 		})
 	],
-	resolve: {
-		alias: {
-			'#fractal-components': fileURLToPath(
-				new URL('../components/src/lib/index.js', import.meta.url)
-			)
-		}
-	},
 	optimizeDeps: {
 		// The dependencies to be optimized are explicitly listed, to avoid the reloads triggered by their automatic detection
 		include: ['ajv-formats', 'bootstrap', 'bootstrap-icons']
