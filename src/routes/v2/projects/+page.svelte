@@ -74,8 +74,11 @@
 	async function toggleStarredSharedProject(project) {
 		errorAlert?.hide();
 		const endpoint = project.is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${project.id}/${endpoint}`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		if (!response.ok) {
 			errorAlert = displayStandardErrorAlert(

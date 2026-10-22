@@ -92,10 +92,13 @@
 	async function toggleStarredDataset(dataset) {
 		fetchErrorAlert?.hide();
 		const endpoint = dataset.is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
 			{
-				method: 'POST'
+				method: 'POST',
+				headers
 			}
 		);
 		if (!response.ok) {

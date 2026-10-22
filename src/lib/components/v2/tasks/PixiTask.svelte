@@ -70,8 +70,11 @@
 		}
 
 		taskCollectionInProgress = true;
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch('/api/v2/task/collect/pixi', {
 			method: 'POST',
+			headers,
 			body: JSON.stringify(body)
 		});
 

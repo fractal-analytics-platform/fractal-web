@@ -123,8 +123,11 @@
 	 */
 	async function toggleStarredProject(project_id, is_starred) {
 		const endpoint = is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${project_id}/${endpoint}`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);

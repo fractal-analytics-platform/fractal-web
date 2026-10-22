@@ -133,10 +133,13 @@
 
 	async function handleChangeOwner() {
 		changeOwnershipModal?.confirmAndHide(async () => {
+			const headers = new Headers();
+			headers.set('Content-Type', 'application/json');
 			const response = await fetch(
 				`/api/admin/v2/project/${selectedProject?.id}?user_id=${newOwnerId}`,
 				{
-					method: 'PATCH'
+					method: 'PATCH',
+					headers
 				}
 			);
 			if (!response.ok) {
