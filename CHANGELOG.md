@@ -5,6 +5,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 > WARNING: This release deprecates the `ORIGIN` environment variable. It can be removed and no further action should be necessary.
 
 - Migration to Svelte Kit v3 (\#1260).
+- Added Node 26 in CI configuration (\#1265).
 
 # 1.29.10
 
