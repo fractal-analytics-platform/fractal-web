@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Added Node 26 in CI configuration (\#1265).
+- Bump `pixi` version used in tests and set `DO_NOT_TRACK` (\#1275).
 
 # 1.29.10
 
