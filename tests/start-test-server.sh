@@ -39,6 +39,10 @@ if [ ! -d "$fractal_server_test_path" ]; then
     echo "OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
   fi
 
+  if [ -z "$POSTGRES_HOST" ]; then
+    echo "POSTGRES_HOST=$POSTGRES_HOST" >> "${fractal_server_test_path}/.fractal_server.env"
+  fi
+
   cd "$fractal_server_test_path"
 
   # Virtualenv, dependencies and db

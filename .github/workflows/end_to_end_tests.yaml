@@ -33,6 +33,7 @@ jobs:
       FRACTAL_ENABLE_TASK_GROUP_RESET: true
       PUBLIC_GUEST_USERNAME: guest@fractal.xy
       PUBLIC_GUEST_PASSWORD: guest
+      POSTGRES_HOST: postgres
 
     strategy:
       matrix:
