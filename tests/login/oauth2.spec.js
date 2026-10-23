@@ -5,6 +5,17 @@ import { test } from '../base_fixture';
 // Reset storage state for this file to avoid being authenticated
 test.use({ storageState: { cookies: [], origins: [] } });
 
+test.beforeEach(async ({ context }) => {
+	// Proxying oauth2 test service in container
+	const oauthEndpoint = process.env.OAUTH_OIDC_CONFIG_ENDPOINT;
+	if (oauthEndpoint && oauthEndpoint.includes('oauth2:5556')) {
+		await context.route(/http:\/\/127.0.0.1:5556/, async (route) => {
+			const url = route.request().url();
+			await route.continue({ url: url.replace('127.0.0.1', 'oauth2') });
+		});
+	}
+});
+
 test('OAuth2 account', async ({ page }) => {
 	if (process.env.SKIP_OAUTH_TEST === 'true') {
 		console.warn(
