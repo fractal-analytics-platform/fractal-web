@@ -91,12 +91,12 @@ jobs:
         id: install_playwright_2
         timeout-minutes: 3
         continue-on-error: true
-        run: npx playwright install --with-deps --only-shell ${{ matrix.browser }}
+        run: (sudo killall apt apt-get || true) && npx playwright install --with-deps --only-shell ${{ matrix.browser }}
 
       - name: Install Playwright Browsers (attempt 3)
         if: steps.install_playwright_2.outcome=='failure'
         timeout-minutes: 3
-        run: npx playwright install --with-deps --only-shell ${{ matrix.browser }}
+        run: (sudo killall apt apt-get || true) && npx playwright install --with-deps --only-shell ${{ matrix.browser }}
 
       - name: Run Playwright tests
         run: npx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard-index }}/${{ matrix.shard-total }}
