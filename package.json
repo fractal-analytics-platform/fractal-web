@@ -75,7 +75,8 @@
 		"slim-select",
 		"json-diff-viewer-component",
 		"bootstrap",
-		"bootstrap-icons"
+		"bootstrap-icons",
+		"undici"
 	],
 	"imports": {
 		"#lib": "./src/lib/index.js",
