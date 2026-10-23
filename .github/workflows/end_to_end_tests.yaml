@@ -12,6 +12,9 @@ jobs:
   end_to_end_tests:
     name: 'E2E tests - Node ${{ matrix.node-version }} - ${{ matrix.browser }} ${{ matrix.shard-index }}'
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001
     timeout-minutes: 20
 
     env:
@@ -79,24 +82,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Playwright Browsers
-        id: install_playwright_1
-        timeout-minutes: 3
-        continue-on-error: true
-        run: npx playwright install --with-deps --only-shell ${{ matrix.browser }}
-
-      - name: Install Playwright Browsers (attempt 2)
-        if: steps.install_playwright_1.outcome=='failure'
-        id: install_playwright_2
-        timeout-minutes: 3
-        continue-on-error: true
-        run: (sudo killall apt apt-get || true) && npx playwright install --with-deps --only-shell ${{ matrix.browser }}
-
-      - name: Install Playwright Browsers (attempt 3)
-        if: steps.install_playwright_2.outcome=='failure'
-        timeout-minutes: 3
-        run: (sudo killall apt apt-get || true) && npx playwright install --with-deps --only-shell ${{ matrix.browser }}
 
       - name: Run Playwright tests
         run: npx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard-index }}/${{ matrix.shard-total }}
