@@ -81,7 +81,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Browsers
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: npx playwright install --with-deps --only-shell ${{ matrix.browser }}
 
       - name: Run Playwright tests
