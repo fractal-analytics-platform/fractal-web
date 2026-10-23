@@ -6,8 +6,8 @@ import userEvent from '@testing-library/user-event';
 global.fetch = vi.fn();
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: { PUBLIC_UPDATE_JOBS_INTERVAL: 500 } };
+vi.mock('$app/env/public', () => {
+	return { PUBLIC_UPDATE_JOBS_INTERVAL: 500 };
 });
 
 // Mocking the page store

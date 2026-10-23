@@ -1,39 +1,39 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import {
 		generateNewUniqueDatasetName,
 		getFirstTaskIndexForContinuingWorkflow
-	} from '$lib/common/job_utilities';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
+	} from '#lib/common/job_utilities.js';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import { onMount, tick } from 'svelte';
 	import DatasetImagesTable from '../projects/datasets/DatasetImagesTable.svelte';
-	import { isConverterType } from 'fractal-components/common/workflow_task_utils';
+	import { isConverterType } from '#fractal-components/common/workflow_task_utils';
 	import {
 		getRelativeZarrPath,
 		getTypeFilterValues,
 		STATUS_KEY
-	} from '$lib/common/workflow_utilities';
+	} from '#lib/common/workflow_utilities.js';
 	import {
 		getPropertiesToIgnore,
 		normalizePayload,
 		SchemaValidator,
 		stripDiscriminator,
 		stripNullAndEmptyObjectsAndArrays
-	} from 'fractal-components';
-	import { splitZarrDir } from '$lib/common/component_utilities';
+	} from '#fractal-components';
+	import { splitZarrDir } from '#lib/common/component_utilities.js';
 	import { page } from '$app/state';
-	import { adaptJsonSchema } from 'fractal-components/jschema/jschema_adapter';
+	import { adaptJsonSchema } from '#fractal-components/jschema/jschema_adapter';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').DatasetV2[]} datasets
-	 * @property {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @property {import('#fractal-components/types/api').DatasetV2[]} datasets
+	 * @property {import('#fractal-components/types/api').WorkflowV2} workflow
 	 * @property {number|undefined} selectedDatasetId
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2|undefined} selectedWorkflowTask
-	 * @property {(job: import('fractal-components/types/api').JobV2) => Promise<void>} onJobSubmitted
-	 * @property {(updatedDatasets: import('fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
-	 * @property {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
+	 * @property {import('#fractal-components/types/api').WorkflowTaskV2|undefined} selectedWorkflowTask
+	 * @property {(job: import('#fractal-components/types/api').JobV2) => Promise<void>} onJobSubmitted
+	 * @property {(updatedDatasets: import('#fractal-components/types/api').DatasetV2[], newSelectedDatasetId: number) => void} onDatasetsUpdated
+	 * @property {{[key: number]: import('#fractal-components/types/api').ImagesStatus}} statuses
 	 */
 
 	/** @type {Props} */
@@ -78,7 +78,7 @@
 
 	let newDatasetName = $state('');
 
-	/** @type {import('fractal-components/types/api').ImagePage|null} */
+	/** @type {import('#fractal-components/types/api').ImagePage|null} */
 	let imagePage = $state(null);
 	/** @type {string[]} */
 	let extraTypes = $state([]);
@@ -179,9 +179,8 @@
 	}
 
 	async function replaceDataset() {
-		const { id, name, zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (
-			selectedDataset
-		);
+		const { id, name, zarr_dir } =
+			/** @type {import('#fractal-components/types/api').DatasetV2} */ (selectedDataset);
 
 		const { projectDir } = splitZarrDir(zarr_dir, page.data.userInfo.project_dirs);
 		if (projectDir === '') {
@@ -198,7 +197,7 @@
 	}
 
 	async function createNewDataset() {
-		const { zarr_dir } = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+		const { zarr_dir } = /** @type {import('#fractal-components/types/api').DatasetV2} */ (
 			selectedDataset
 		);
 		const newDataset = await handleDatasetCreate(newDatasetName, zarr_dir);
@@ -208,7 +207,7 @@
 	/**
 	 * @param {string} datasetName
 	 * @param {string} zarrDir
-	 * @returns {Promise<import('fractal-components/types/api').DatasetV2>}
+	 * @returns {Promise<import('#fractal-components/types/api').DatasetV2>}
 	 */
 	async function handleDatasetCreate(datasetName, zarrDir) {
 		const headers = new Headers();
@@ -234,8 +233,11 @@
 	 * @param {number} datasetId
 	 */
 	async function handleDatasetDelete(datasetId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${workflow.project_id}/dataset/${datasetId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (!response.ok) {
 			console.error('Error while deleting dataset:');
@@ -436,7 +438,7 @@
 	}
 
 	function computeNewDatasetName() {
-		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+		const dataset = /** @type {import('#fractal-components/types/api').DatasetV2} */ (
 			selectedDataset
 		);
 		newDatasetName = generateNewUniqueDatasetName(datasets, dataset.name);
@@ -445,7 +447,7 @@
 	async function loadSlurmAccounts() {
 		const response = await fetch(`/api/auth/current-user`);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').User} */
+			/** @type {import('#fractal-components/types/api').User} */
 			const user = await response.json();
 			slurmAccounts = user.slurm_accounts;
 			slurmAccount = slurmAccounts.length === 0 ? '' : slurmAccounts[0];
@@ -462,7 +464,7 @@
 		datasetImagesLoading = true;
 		const workflowTask = workflow.task_list[firstTaskIndex];
 
-		const dataset = /** @type {import('fractal-components/types/api').DatasetV2} */ (
+		const dataset = /** @type {import('#fractal-components/types/api').DatasetV2} */ (
 			selectedDataset
 		);
 
@@ -487,7 +489,7 @@
 			datasetImagesLoading = false;
 			return;
 		}
-		const result = /** @type {import('fractal-components/types/api').ImagePage} */ (
+		const result = /** @type {import('#fractal-components/types/api').ImagePage} */ (
 			await response.json()
 		);
 		extraTypes = Object.keys(initialTypeFilters).filter((x) => !result.types.includes(x));
@@ -508,7 +510,7 @@
 				datasetImagesLoading = false;
 				return;
 			}
-			/** @type {import('fractal-components/types/api').ImagePage} */
+			/** @type {import('#fractal-components/types/api').ImagePage} */
 			const result = await response.json();
 			hasImages = result.total_count > 0;
 		}

@@ -1,17 +1,17 @@
 <script>
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '$lib/common/errors';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import { getAlertErrorFromResponse, displayStandardErrorAlert } from '#lib/common/errors.js';
 	import CreateDatasetModal from './datasets/CreateDatasetModal.svelte';
 	import { onMount } from 'svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let starDatasetErrorAlert;
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ProjectV2} project
-	 * @property {import('fractal-components/types/api').DatasetV2[]} [datasets]
+	 * @property {import('#fractal-components/types/api').ProjectV2} project
+	 * @property {import('#fractal-components/types/api').DatasetV2[]} [datasets]
 	 */
 
 	/** @type {Props} */
@@ -25,7 +25,7 @@
 	);
 
 	function createDatasetCallback(
-		/** @type {import('fractal-components/types/api').DatasetV2} */ newDataset
+		/** @type {import('#fractal-components/types/api').DatasetV2} */ newDataset
 	) {
 		datasetCreatedMessage = `Created new dataset with Zarr dir ${newDataset.zarr_dir}`;
 		datasets = [...datasets, newDataset].sort((a, b) =>
@@ -40,8 +40,11 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDatasetDelete(projectId, datasetId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/dataset/${datasetId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			console.log('Dataset deleted');
@@ -56,15 +59,18 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} dataset
+	 * @param {import('#fractal-components/types/api').DatasetV2} dataset
 	 */
 	async function toggleStarredDataset(dataset) {
 		starDatasetErrorAlert?.hide();
 		const endpoint = dataset.is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${dataset.project_id}/dataset/${dataset.id}/${endpoint}`,
 			{
-				method: 'POST'
+				method: 'POST',
+				headers
 			}
 		);
 		if (!response.ok) {

@@ -1,6 +1,6 @@
 <script>
-	import { downloadBlob } from '$lib/common/component_utilities';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { downloadBlob } from '#lib/common/component_utilities.js';
+	import Modal from '#lib/components/common/Modal.svelte';
 
 	/**
 	 * @typedef {Object} Props

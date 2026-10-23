@@ -77,7 +77,11 @@ const response = await fetch('/api/admin/v2/resource');
 const response = await fetch('/api/admin/v2/resource', { method: 'GET' });
 ```
 
-Add Content-Type headers only when there is a body.
+Always add Content-Type headers, even if there is no body, for all HTTP methods except `GET`.
+
+Adding the `application/json` content type header also for `DELETE` and other requests with empty body is needed in SvelteKit 3 to avoid CSRF issues, since the `ORIGIN` variable has been deprecated.
+
+Forgetting to set this header will result in the error message "Cross-site POST form submissions are forbidden". Notice that this message will be visible only with the production build and not during development (server started with `npm run dev`).
 
 Examples:
 
@@ -94,24 +98,23 @@ const response = await fetch(`/api/v2/project`, {
 
 // ❌ Bad
 const response = await fetch(`/api/v2/project/${projectId}`, {
-	method: 'DELETE',
-	headers
+	method: 'DELETE'
 });
 ```
 
 ## Code-base structure
 
-This project is based on [svelte kit](https://kit.svelte.dev) and follows its conventions and structure.
+This project is based on [Svelte Kit](https://kit.svelte.dev) and follows its conventions and structure.
 
 ### 1-level folders
 
 By default, the main application folder is located at `/src`.
 The structure of this folder is explained in depth
-in [svelte kit docs](https://kit.svelte.dev/docs/project-structure#project-files)
+in [Svelte Kit docs](https://kit.svelte.dev/docs/project-structure#project-files)
 
 `/static` is a folder related to static files that will be served by the client server.
 More on this could be found in
-the [svelte kit docs](https://kit.svelte.dev/docs/project-structure#project-files-static).
+the [Svelte Kit docs](https://kit.svelte.dev/docs/project-structure#project-files-static).
 
 The `/lib` folder contains files and sources that enable correct instrumentation and testing of this client application.
 Currently, within this folder are present files to support the project's unit tests arrangements and other
@@ -141,13 +144,13 @@ fractal server / fractal web interoperability architectures.
 
 ### Application structure
 
-With reference to `/src/routes` folder, therein are defined svelte kit page components
+With reference to `/src/routes` folder, therein are defined Svelte Kit page components
 that structure the fractal web client.
 
 > It is important to mention that, this client application
 > is [server-side rendered](https://kit.svelte.dev/docs/glossary#ssr).
 > By default, this is the default behaviour
-> of [svelte kit](https://kit.svelte.dev/docs/introduction#sveltekit-vs-svelte).
+> of [Svelte Kit](https://kit.svelte.dev/docs/introduction#sveltekit-vs-svelte).
 
 > Before proceeding, it is important to understand the distinction of files terminating with the suffix `+[.]server.js`.
 > Those files are explicitly processed by the client's server.
@@ -157,23 +160,23 @@ server.
 Through the browser interface, the svelte application enable users to build HTTP requests that will be sent to the
 fractal server.
 
-The svelte client and fractal server interact through a REST interface.
+The Svelte client and fractal server interact through a REST interface.
 
 But how is this interaction implemented in this client?
 
 ### Client server interoperability
 
-As said, the svelte client communicates with the fractal server through a set of REST APIs.
+As said, the Svelte client communicates with the fractal server through a set of REST APIs.
 
-In this client, every request to the fractal server is sent by the _nodejs server that is serving the svelte
+In this client, every request to the fractal server is sent by the _Node.js server that is serving the Svelte
 application_.
 
-> It is important to understand that these requests are made in the server context of the svelte client.
+> It is important to understand that these requests are made in the server context of the Svelte client.
 > No request to the fractal server is sent directly by the browser of the user.
 
-The fact that every request on behalf of a user is sent through a common backend nodejs server, implies a proxy
+The fact that every request on behalf of a user is sent through a common backend Node.js server, implies a proxy
 architecture.
-The way this works is the following: the svelte client in the browser sends a HTTP request to the nodejs server that
+The way this works is the following: the Svelte client in the browser sends a HTTP request to the Node.js server that
 is serving the application. This request, with the attached cookies, is then used to compose a new request to be sent to the fractal server.
 
 > Note that the authentication context is kept thanks to cookies that establish user sessions.
@@ -194,136 +197,30 @@ Summarizing, the frontend code:
 
 Other than the AJAX calls, there are also some calls to fractal-server API done by Svelte SSR, while generating the HTML page. These requests are defined in files under `src/lib/server/api/v1`. Here requests are grouped by contexts as `auth_api`, `admin_api`, [...].
 
-### An example using actions
+#### Special form data cases
 
-The login is still using the Svelte action approach, in which we have to extract the data from a formData object and then use it to build a JSON payload to be forwarded to fractal-server.
+Starting from Svelte Kit 3, the `ORIGIN` environment variable has been deprecated and replaced with a build-time configuration. We used this variable to specify the trusted [origin](https://developer.mozilla.org/en-US/docs/Glossary/Origin) for the requests, to avoid the error "Cross-site POST form submissions are forbidden".
 
-Consider the code at `src/lib/server/api/auth_api.js:5`:
+Notice that the check on origin is performed only for form data submissions and not for AJAX calls using the `application/json` content type. Indeed, CSRF vulnerability is related to `application/x-www-form-urlencoded`, `multipart/form-data` or `text/plain` content types (see also [OWASP CSRF Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#disallowing-simple-content-types)). The general idea is that an attacker can trick the user to submit a form inside a malicious web page, but there is no way to force a cross-domain AJAX call using JSON content type (because in that case CORS errors will occur).
 
-```javascript
-/**
- * Request to authenticate user
- * @param fetch
- * @param data
- * @returns {Promise<*>}
- */
-export async function userAuthentication(fetch, data) {
-	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/login', {
-		method: 'POST',
-		body: data
-	});
+Without a way to configure this option at runtime, we decided to avoid the form data usage completely. This was feasible because we used form data just for a few endpoints. In these special cases we are doing the following:
 
-	if (!response.ok) {
-		throw new Error('Authentication failed');
-	}
-
-	return await response.json();
-}
+```
+┌─────────┐             ┌────────────────┐                 ┌────────────┐
+│ Browser │─── JSON ───>│ Svelte Backend │─── FormData ───>│ Python API │
+└─────────┘             └────────────────┘                 └────────────┘
 ```
 
-This code is responsible to call the `/auth/token/login` REST api endpoint of the fractal server.
-The request is made by the svelte client application in a backend context within the nodejs server.
+The browser sends to the Svelte backend an AJAX request containing a JSON payload, then Svelte rearrange the content inside a `FormData` object and sends it to the Python Backend.
 
-The client will, if the request succeeds, handle the fractal server response in
-a [form action](https://kit.svelte.dev/docs/form-actions).
+Notice that this could potentally create some issues if we use this to send large files, since the whole file needs to be stored for a while in browser memory. For the moment we have a few MB limit, so it shouldn't be a big problem.
 
-```javascript
-// src/routes/auth/login/+page.server.js
+Here the list of Svelte endpoints handling these special cases:
 
-export const actions = {
-	// Default page action / Handles POST requests
-	default: async ({ request, cookies, fetch }) => {
-		// TODO: Handle login request
-		console.log('Login action');
-
-		// Get form data
-		const formData = await request.formData();
-		// Set auth data
-		let authData;
-		try {
-			authData = await userAuthentication(fetch, formData);
-		} catch (error) {
-			console.error(error);
-			return fail(400, { invalidMessage: 'Invalid credentials', invalid: true });
-		}
-		const authToken = authData.access_token;
-		// Decode JWT token claims
-		const tokenClaims = jose.decodeJwt(authToken);
-
-		// Set the authentication cookie
-		const cookieOptions = {
-			domain: `${AUTH_COOKIE_DOMAIN}`,
-			path: `${AUTH_COOKIE_PATH}`,
-			expires: new Date(tokenClaims.exp * 1000),
-			sameSite: `${AUTH_COOKIE_SAME_SITE}`,
-			secure: `${AUTH_COOKIE_SECURE}` === 'true',
-			httpOnly: `${AUTH_COOKIE_HTTP_ONLY}` === 'true'
-		};
-		console.log(cookieOptions);
-		cookies.set(AUTH_COOKIE_NAME, authData.access_token, cookieOptions);
-
-		redirect(302, '/');
-	}
-};
-```
-
-The previous code is executed in the backend (as one could understand by the name of the file) and it basically provides
-a form action that allows a user to login.
-
-This kind of pattern, form actions, is widely used within the client application, as it enables the browser-side client
-application to request different actions the server-side should take.
-
-In this case, we briefly described the authentication flow of the svelte client application.
-
-> Notice that the authentication and session of a user is managed through cookies. The client application requests a
-> authentication token to the fractal server, which data is used to create another cookie that the nodejs server of the
-> client application sends to the browser.
-
-The default action within the `+page.server.js` is requested through an HTTP request that the browser-side client app
-makes when a user sends an HTML from, for completion, the one defined in:
-
-```html
-<!-- src/routes/auth/login/+page.svelte -->
-
-<script>
-	export let form;
-	let loginError = false;
-
-	if (form?.invalid) {
-		loginError = true;
-	}
-</script>
-
-<div class="container">
-	<div class="row">
-		<h1>Login</h1>
-	</div>
-	<div class="row">
-		<div class="col-md-4">
-			<form method="POST">
-				<div class="mb-3">
-					<label for="userEmail" class="form-label">Email address</label>
-					<input
-						name="username"
-						type="email"
-						class="form-control {loginError ? 'is-invalid' : ''}"
-						id="userEmail"
-						aria-describedby="emailHelp"
-						required
-					/>
-					<div id="emailHelp" class="form-text">The email you provided to the IT manager</div>
-					<div class="invalid-feedback">{form?.invalidMessage}</div>
-				</div>
-				<div class="mb-3">
-					<label for="userPassword" class="form-label">Password</label>
-					<input name="password" type="password" class="form-control" id="userPassword" required />
-				</div>
-				<button class="btn btn-primary">Submit</button>
-			</form>
-		</div>
-	</div>
-</div>
-```
+- `src/routes/auth/login/+server.js`
+- `src/routes/v2/admin/impersonate/+server.js`
+- `src/routes/api/v2/task/collect/pip/+server.js`
+- `src/routes/api/v2/task/collect/pixi/+server.js`
 
 ### Application library
 
@@ -443,7 +340,7 @@ Inside the page we have to add a div for the alert component, with a defined id:
 Then we have to define a variable for the alert component:
 
 ```javascript
-/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 let errorAlert = undefined;
 ```
 
@@ -529,7 +426,7 @@ The class also provides a `clearErrors()` function and some functions to manuall
 
 ## JSON Schema form module
 
-The `components` folder on this repository contains a Svelte project that provides the JSON Schema form component (`JSchema.svelte`) and its related functions and classes. The file `index.js` contains the list of components and functions that are exported for public usage, so that they can be included using `from 'fractal-components'` from the main project.
+The `components` folder on this repository contains a Svelte project that provides the JSON Schema form component (`JSchema.svelte`) and its related functions and classes. The file `index.js` contains the list of components and functions that are exported for public usage, so that they can be included using `from '#fractal-components'` from the main project.
 
 The main project defines `fractal-components` in `vite.config.js`, as an alias pointing to `components/src/lib/index.js`. In this way the components module is automatically built when the main project is built and the Hot Module Reload feature still works.
 
@@ -539,7 +436,7 @@ Moreover, the path to components module has been added as `server.fs.allow` Vite
 The request url "/path/to/fractal-web/components/src/lib/index.js" is outside of Vite serving allow list.
 ```
 
-> **Important**: When importing js files inside the `components` module it is necessary to use a relative path. The editor might autocomplete the imports using the `$lib` prefix, but that will not work when the module is included in the main application, since it redefines the `$lib` path again.
+> **Important**: When importing js files inside the `components` module it is necessary to use a relative path. The editor might autocomplete the imports using the `#lib` prefix, but that will not work when the module is included in the main application, since it redefines the `#lib` path again.
 
 ### Structure of the code
 

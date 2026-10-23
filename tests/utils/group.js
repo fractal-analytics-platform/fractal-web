@@ -38,7 +38,10 @@ export async function addUserToGroup(page, userEmail) {
  */
 export async function deleteGroup(page, groupId) {
 	const response = await page.request.delete(`/api/auth/group/${groupId}`, {
-		headers: { Cookie: await getFractalCookie(page) }
+		headers: {
+			Cookie: await getFractalCookie(page),
+			'Content-Type': 'application/json'
+		}
 	});
 	await checkApiError(response, 'Unable to delete group');
 }

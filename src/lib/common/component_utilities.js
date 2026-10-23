@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { PUBLIC_ENABLE_HELP_LINKS, PUBLIC_HELP_LINKS_BASE_URL } from '$app/env/public';
 
 export function fieldHasValue(event) {
 	const inputValue = event.target?.value || undefined;
@@ -125,17 +125,6 @@ export function encodePathForUrl(zarrUrl) {
 }
 
 /**
- * Add a slash to the end of the URL, if needed.
- * @param {string|undefined} url
- */
-export function addFinalSlash(url) {
-	if (!url) {
-		return undefined;
-	}
-	return url.replace(/\/$|$/, '/');
-}
-
-/**
  * @param {string} zarrDir
  * @param {string[]} projectDirs
  */
@@ -156,7 +145,14 @@ export function splitZarrDir(zarrDir, projectDirs) {
  * @param {string} url
  */
 export function buildHelpLink(url) {
-	return env.PUBLIC_ENABLE_HELP_LINKS === 'true' && url
-		? `${env.PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
+	return PUBLIC_ENABLE_HELP_LINKS && url
+		? `${PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
 		: '';
+}
+
+/**
+ * @param {File} file
+ */
+export async function fileToBase64(file) {
+	return await file.arrayBuffer().then((buf) => btoa(String.fromCharCode(...new Uint8Array(buf))));
 }

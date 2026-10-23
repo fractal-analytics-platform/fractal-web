@@ -1,5 +1,5 @@
 <script>
-	import { AlertError, extractErrorDetail } from '$lib/common/errors';
+	import { AlertError, extractErrorDetail } from '#lib/common/errors.js';
 
 	/**
 	 * @typedef {Object} Props

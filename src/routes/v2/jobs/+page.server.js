@@ -1,7 +1,7 @@
-import { removeDuplicatedItems } from '$lib/common/component_utilities';
-import { getUserJobs, listProjects } from '$lib/server/api/v2/project_api';
-import { getLogger } from '$lib/server/logger.js';
-import { env } from '$env/dynamic/private';
+import { removeDuplicatedItems } from '#lib/common/component_utilities.js';
+import { getUserJobs, listProjects } from '#lib/server/api/v2/project_api.js';
+import { getLogger } from '#lib/server/logger.js';
+import { FRACTAL_RUNNER_BACKEND } from '$app/env/private';
 
 const logger = getLogger('jobs page [v2]');
 
@@ -28,6 +28,6 @@ export async function load({ fetch }) {
 		datasets,
 		jobs,
 		helpLink: '/reference/jobs/',
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
+		runnerBackend: FRACTAL_RUNNER_BACKEND
 	};
 }

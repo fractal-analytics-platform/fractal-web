@@ -1,5 +1,5 @@
-import { listSettings } from '$lib/server/api/v2/settings_api';
-import { getLogger } from '$lib/server/logger.js';
+import { listSettings } from '#lib/server/api/v2/settings_api.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('admin settings page');
 

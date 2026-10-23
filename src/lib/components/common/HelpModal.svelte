@@ -1,5 +1,5 @@
 <script>
-	import { currentHelpLink } from '$lib/stores';
+	import { currentHelpLink } from '#lib/stores.js';
 	import { onDestroy } from 'svelte';
 	import Modal from './Modal.svelte';
 

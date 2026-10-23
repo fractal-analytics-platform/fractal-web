@@ -1,4 +1,4 @@
-import { getLogger } from '$lib/server/logger';
+import { getLogger } from '#lib/server/logger.js';
 import { error } from '@sveltejs/kit';
 
 const logger = getLogger('errors');

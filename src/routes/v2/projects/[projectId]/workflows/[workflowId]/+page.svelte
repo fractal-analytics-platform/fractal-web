@@ -1,42 +1,45 @@
 <script>
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import MetaPropertiesForm from '$lib/components/v2/workflow/MetaPropertiesForm.svelte';
-	import ArgumentsSchema from '$lib/components/v2/workflow/ArgumentsSchema.svelte';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import MetaPropertiesForm from '#lib/components/v2/workflow/MetaPropertiesForm.svelte';
+	import ArgumentsSchema from '#lib/components/v2/workflow/ArgumentsSchema.svelte';
 	import {
 		displayStandardErrorAlert,
 		FormErrorHandler,
 		getAlertErrorFromResponse
-	} from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import VersionUpdate from '$lib/components/v2/workflow/VersionUpdate.svelte';
-	import ImagesStatus from '$lib/components/jobs/ImagesStatus.svelte';
-	import TasksOrderModal from '$lib/components/v2/workflow/TasksOrderModal.svelte';
-	import { extractRelevantJobError, showExecutorErrorLog } from '$lib/common/job_utilities';
-	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import WorkflowTaskInfoTab from '$lib/components/v2/workflow/WorkflowTaskInfoTab.svelte';
-	import InputFiltersTab from '$lib/components/v2/workflow/InputFiltersTab.svelte';
-	import RunWorkflowModal from '$lib/components/v2/workflow/RunWorkflowModal.svelte';
-	import { getSelectedWorkflowDataset, saveSelectedDataset } from '$lib/common/workflow_utilities';
-	import AddWorkflowTaskModal from '$lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
-	import TypeFiltersFlowModal from '$lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
+	} from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
+	import VersionUpdate from '#lib/components/v2/workflow/VersionUpdate.svelte';
+	import ImagesStatus from '#lib/components/jobs/ImagesStatus.svelte';
+	import TasksOrderModal from '#lib/components/v2/workflow/TasksOrderModal.svelte';
+	import { extractRelevantJobError, showExecutorErrorLog } from '#lib/common/job_utilities.js';
+	import JobLogsModal from '#lib/components/v2/jobs/JobLogsModal.svelte';
+	import WorkflowTaskInfoTab from '#lib/components/v2/workflow/WorkflowTaskInfoTab.svelte';
+	import InputFiltersTab from '#lib/components/v2/workflow/InputFiltersTab.svelte';
+	import RunWorkflowModal from '#lib/components/v2/workflow/RunWorkflowModal.svelte';
+	import {
+		getSelectedWorkflowDataset,
+		saveSelectedDataset
+	} from '#lib/common/workflow_utilities.js';
+	import AddWorkflowTaskModal from '#lib/components/v2/workflow/AddWorkflowTaskModal.svelte';
+	import TypeFiltersFlowModal from '#lib/components/v2/workflow/TypeFiltersFlowModal.svelte';
 	import { slide } from 'svelte/transition';
-	import ImagesStatusModal from '$lib/components/jobs/ImagesStatusModal.svelte';
-	import RunStatus from '$lib/components/jobs/RunStatus.svelte';
-	import RunStatusModal from '$lib/components/jobs/RunStatusModal.svelte';
-	import { navigating, navigationCancelled } from '$lib/stores';
+	import ImagesStatusModal from '#lib/components/jobs/ImagesStatusModal.svelte';
+	import RunStatus from '#lib/components/jobs/RunStatus.svelte';
+	import RunStatusModal from '#lib/components/jobs/RunStatusModal.svelte';
+	import { navigating, navigationCancelled } from '#lib/stores.js';
 	import { writable } from 'svelte/store';
-	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
-	import { normalizePayload } from 'fractal-components';
-	import TemplateCreateModal from '$lib/components/v2/templates/TemplateCreateModal.svelte';
-	import CompareWorkflowTemplateModal from '$lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
+	import TimestampCell from '#lib/components/jobs/TimestampCell.svelte';
+	import { normalizePayload } from '#fractal-components';
+	import TemplateCreateModal from '#lib/components/v2/templates/TemplateCreateModal.svelte';
+	import CompareWorkflowTemplateModal from '#lib/components/v2/workflow/CompareWorkflowTemplateModal.svelte';
 	import { resolve } from '$app/paths';
-	import HelpLink from '$lib/components/common/HelpLink.svelte';
+	import HelpLink from '#lib/components/common/HelpLink.svelte';
 
 	const maxDescriptionLength = 50;
 	const descriptionLengthOffset = 10;
@@ -47,10 +50,10 @@
 	/** @type {boolean} */
 	const showOnlyCoreFiltering = $derived(page.data.showOnlyCoreFiltering);
 
-	/** @type {import('fractal-components/types/api').WorkflowV2} */
+	/** @type {import('#fractal-components/types/api').WorkflowV2} */
 	let workflow = $state(page.data.workflow);
 	let project = $derived(workflow.project);
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
+	/** @type {import('#fractal-components/types/api').DatasetV2[]} */
 	let datasets = $state(page.data.datasets);
 
 	/** @type {number|undefined} */
@@ -60,34 +63,34 @@
 	let showMissingStatusesWarning = $state(false);
 
 	let jobError = $state('');
-	/** @type {import('fractal-components/types/api').JobV2|undefined} */
+	/** @type {import('#fractal-components/types/api').JobV2|undefined} */
 	let failedJob = $state();
 	/** @type {JobLogsModal|undefined} */
 	let jobLogsModal = $state();
 	/** @type {CompareWorkflowTemplateModal|undefined} */
 	let compareWorkflowToTemplateModal = $state();
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let workflowErrorAlert = undefined;
 
 	let workflowTabContextId = $state(0);
 	let workflowSuccessMessage = $state('');
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let selectedWorkflowTask = $state();
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let expandedWorkflowTask = $state();
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let preventedSelectedTaskChange = $state();
-	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
+	/** @type {import('#fractal-components/types/api').HistoryRunAggregated|undefined} */
 	let preventedHistoryRunChange = $state();
-	/** @type {import('fractal-components/types/api').HistoryRunAggregated[]} */
+	/** @type {import('#fractal-components/types/api').HistoryRunAggregated[]} */
 	let historyRunStatuses = $state([]);
 	let loadingHistoryRunStatuses = $state(false);
 	/** @type {ImagesStatusModal|undefined} */
 	let imagesStatusModal = $state();
 	/** @type {RunStatusModal|undefined} */
 	let runStatusModal = $state();
-	/** @type {import('fractal-components/types/api').HistoryRunAggregated|undefined} */
+	/** @type {import('#fractal-components/types/api').HistoryRunAggregated|undefined} */
 	let selectedHistoryRun = $state();
 
 	/** @type {ArgumentsSchema|undefined} */
@@ -113,7 +116,7 @@
 	let metaPropertiesUnsavedChangesModal = $state();
 	/** @type {RunWorkflowModal|undefined} */
 	let runWorkflowModal = $state();
-	/** @type {import('$lib/components/v2/workflow/TasksOrderModal.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/workflow/TasksOrderModal.svelte').default|undefined} */
 	let editTasksOrderModal = $state();
 	/** @type {AddWorkflowTaskModal|undefined} */
 	let addWorkflowTaskModal = $state();
@@ -127,7 +130,7 @@
 	/** @type {{ [id: string]: Array<{ task_id: number, version: string }> }} */
 	let newVersionsMap = $state({});
 
-	/** @type {import('fractal-components/types/api').JobWithTaskStatuses|undefined} */
+	/** @type {import('#fractal-components/types/api').JobWithTaskStatuses|undefined} */
 	let selectedSubmittedJob = $state();
 	let jobCancelledMessage = $state('');
 
@@ -140,14 +143,9 @@
 	const workflowPropsValidationErrors = workflowPropsErrorHandler.getValidationErrorStore();
 
 	let updatableWorkflowList = $derived(workflow.task_list || []);
-
 	let sortedDatasets = $derived(
 		[...datasets].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
 	);
-
-	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 
 	onMount(async () => {
 		selectedDatasetId = getSelectedWorkflowDataset(workflow, datasets, defaultDatasetId);
@@ -156,6 +154,8 @@
 	});
 
 	beforeNavigate(async (navigation) => {
+		if (navigation.shallow && navigation.type === 'goto') return;
+
 		if (argsSchemaForm?.hasUnsavedChanges()) {
 			preventNavigation(navigation);
 			toggleArgsUnsavedChangesModal();
@@ -174,7 +174,7 @@
 
 	/**
 	 *
-	 * @param {import('@sveltejs/kit').BeforeNavigate} navigation
+	 * @param {import('$app/navigation').BeforeNavigate} navigation
 	 */
 	function preventNavigation(navigation) {
 		navigation.cancel();
@@ -288,7 +288,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowV2} updatedWorkflow
+	 * @param {import('#fractal-components/types/api').WorkflowV2} updatedWorkflow
 	 */
 	async function onWorkflowTaskAdded(updatedWorkflow) {
 		workflow = updatedWorkflow;
@@ -304,10 +304,13 @@
 		if (!workflow || !selectedWorkflowTask) {
 			return;
 		}
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${project.id}/workflow/${workflow.id}/wftask/${selectedWorkflowTask.id}`,
 			{
-				method: 'DELETE'
+				method: 'DELETE',
+				headers
 			}
 		);
 
@@ -335,7 +338,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2|undefined} wft
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2|undefined} wft
 	 */
 	async function setSelectedWorkflowTask(wft) {
 		await tick();
@@ -356,7 +359,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').HistoryRunAggregated|undefined} historyRun
+	 * @param {import('#fractal-components/types/api').HistoryRunAggregated|undefined} historyRun
 	 */
 	async function selectHistoryRun(historyRun) {
 		await tick();
@@ -385,7 +388,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 */
 	async function loadHistoryRunStatuses(workflowTask, animate = true) {
 		if (!selectedWorkflowTask || selectedWorkflowTask.id !== workflowTask.id) {
@@ -439,7 +442,7 @@
 
 	/**
 	 *
-	 * @param {import('fractal-components/types/api').JobV2} job
+	 * @param {import('#fractal-components/types/api').JobV2} job
 	 */
 	async function onJobSubmitted(job) {
 		selectedSubmittedJob = { ...job, task_statuses: {} };
@@ -450,7 +453,7 @@
 
 	/**
 	 * Called by VersionUpdate component at the end of the update to reload the workflow.
-	 * @param workflowTask {import('fractal-components/types/api').WorkflowTaskV2}
+	 * @param workflowTask {import('#fractal-components/types/api').WorkflowTaskV2}
 	 */
 	async function taskUpdated(workflowTask) {
 		if (!workflow) {
@@ -487,7 +490,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowV2} workflow
+	 * @param {import('#fractal-components/types/api').WorkflowV2} workflow
 	 * @returns {Promise<{ [id: string]: Array<{ task_id: number, version: string }> }>}
 	 */
 	async function getNewVersionsForWorkflow(workflow) {
@@ -511,7 +514,7 @@
 
 	const newVersionsCount = writable(0);
 
-	/** @type {{[key: number]: import('fractal-components/types/api').ImagesStatus}} */
+	/** @type {{[key: number]: import('#fractal-components/types/api').ImagesStatus}} */
 	let statuses = $state({});
 
 	let hasAnyJobRun = $derived(Object.keys(statuses).length > 0);
@@ -562,7 +565,10 @@
 			const allCompleted =
 				Object.entries(receivedStatuses).length === Object.values(statuses).length &&
 				submitted.length === 0;
-			statusWatcherTimer = window.setTimeout(loadJobsStatus, allCompleted ? 0 : updateJobsInterval);
+			statusWatcherTimer = window.setTimeout(
+				loadJobsStatus,
+				allCompleted ? 0 : PUBLIC_UPDATE_JOBS_INTERVAL
+			);
 		} else {
 			await reloadSelectedDataset();
 			selectedSubmittedJob = undefined;
@@ -596,14 +602,14 @@
 
 	/**
 	 * @param {number} datasetId
-	 * @return {Promise<import('fractal-components/types/api').JobWithTaskStatuses|undefined>}
+	 * @return {Promise<import('#fractal-components/types/api').JobWithTaskStatuses|undefined>}
 	 */
 	async function getSelectedJob(datasetId) {
 		const response = await fetch(
 			`/api/v2/project/${project.id}/latest-job?workflow_id=${workflow.id}&dataset_id=${datasetId}`
 		);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').JobWithTaskStatuses} */
+			/** @type {import('#fractal-components/types/api').JobWithTaskStatuses} */
 			return await response.json();
 		} else if (response.status !== 404) {
 			console.error('Unable to load latest job');
@@ -635,11 +641,11 @@
 	}
 
 	async function gotoLinkedTemplate() {
-		await goto(resolve(`/v2/templates?template_id=${workflow.template_id}`));
+		await goto(resolve(`v2/templates?template_id=${workflow.template_id}`));
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
 	async function onWorkflowTaskUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
@@ -652,7 +658,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} updatedWft
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2} updatedWft
 	 */
 	function onInputFiltersUpdated(updatedWft) {
 		selectedWorkflowTask = updatedWft;
@@ -716,14 +722,14 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').ImagesStatus|undefined} imageStatus
+	 * @param {import('#fractal-components/types/api').ImagesStatus|undefined} imageStatus
 	 */
 	function hasWarnings(imageStatus) {
 		return imageStatus && 'has_warnings' in imageStatus && imageStatus.has_warnings;
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowV2} updated
+	 * @param {import('#fractal-components/types/api').WorkflowV2} updated
 	 */
 	function onWorkflowUpdated(updated) {
 		workflow = updated;
@@ -771,17 +777,13 @@
 				{#if expandWorkflowDescription}
 					<button
 						class="btn btn-link fw-light p-0 mb-2"
-						onclick={() => (expandWorkflowDescription = false)}
+						onclick={() => (expandWorkflowDescription = false)}>Show less</button
 					>
-						Show less
-					</button>
 				{:else}
 					<button
 						class="btn btn-link fw-light p-0 mb-2"
-						onclick={() => (expandWorkflowDescription = true)}
+						onclick={() => (expandWorkflowDescription = true)}>Show more</button
 					>
-						Show more
-					</button>
 				{/if}
 			{:else}
 				{workflow.description}
@@ -1029,9 +1031,8 @@
 													aria-label="Hide runs"
 													class="btn btn-link p-0 text-white"
 													onclick={() => (expandedWorkflowTask = undefined)}
+													><i class="bi bi-caret-down-fill"></i></button
 												>
-													<i class="bi bi-caret-down-fill"></i>
-												</button>
 											{:else}
 												<button
 													aria-label="Show runs for {workflowTask.alias
@@ -1065,9 +1066,8 @@
 												await setSelectedWorkflowTask(workflowTask);
 											}}
 											aria-labelledby="label-wft-{workflowTask.id}"
-										>
-											&nbsp;
-										</button>
+										></button>
+
 										<span class="float-end ms-2 status-buttons">
 											{#if selectedDataset}
 												{#if !showMissingStatusesWarning && imagesStatusModal}
@@ -1134,9 +1134,8 @@
 												type="button"
 												onclick={() => selectHistoryRun(status)}
 												aria-labelledby="run-label-{status.id}"
-											>
-												&nbsp;
-											</button>
+											></button>
+
 											<span class="float-end ps-2">
 												{#if selectedDataset && runStatusModal}
 													<RunStatus
@@ -1495,6 +1494,7 @@
 	{/snippet}
 	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 		<button
 			type="button"
 			class="btn btn-warning"
@@ -1531,6 +1531,7 @@
 	{/snippet}
 	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 		<button
 			type="button"
 			class="btn btn-warning"
@@ -1568,6 +1569,7 @@
 	{/snippet}
 	{#snippet footer()}
 		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 		<button
 			type="button"
 			class="btn btn-warning"

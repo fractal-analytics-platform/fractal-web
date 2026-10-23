@@ -1,12 +1,12 @@
 <script>
-	import { downloadBlob } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { downloadBlob } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {Array<import('fractal-components/types/api').Resource>} */
+	/** @type {Array<import('#fractal-components/types/api').Resource>} */
 	let resources = $state([]);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let resourcesErrorAlert;
 
 	async function loadResources() {
@@ -27,8 +27,11 @@
 	 * @param {number} id
 	 */
 	async function handleDeleteResource(id) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/admin/v2/resource/${id}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {
@@ -44,7 +47,7 @@
 	async function exportToFile(resourceId) {
 		const response = await fetch(`/api/admin/v2/resource/${resourceId}`);
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').Resource} */
+			/** @type {import('#fractal-components/types/api').Resource} */
 			const resource = await response.json();
 			downloadBlob(JSON.stringify(resource, null, 2), `${resource.name}.json`, 'application/json');
 		} else {

@@ -1,12 +1,12 @@
 <script>
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
 	import { page } from '$app/state';
-	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
-	import JobInfoModal from '$lib/components/v2/jobs/JobInfoModal.svelte';
-	import JobLogsModal from '$lib/components/v2/jobs/JobLogsModal.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import StatusBadge from '#lib/components/jobs/StatusBadge.svelte';
+	import JobInfoModal from '#lib/components/v2/jobs/JobInfoModal.svelte';
+	import JobLogsModal from '#lib/components/v2/jobs/JobLogsModal.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { onDestroy, onMount } from 'svelte';
-	import { removeDuplicatedItems } from '$lib/common/component_utilities';
+	import { removeDuplicatedItems } from '#lib/common/component_utilities.js';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TimestampCell from '../../jobs/TimestampCell.svelte';
 	import SlimSelect from 'slim-select';
@@ -14,12 +14,12 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {() => Promise<import('fractal-components/types/api').JobV2[]>} jobUpdater
+	 * @property {() => Promise<import('#fractal-components/types/api').JobV2[]>} jobUpdater
 	 * @property {string} runnerBackend
 	 * @property {Array<string>} [columnsToHide]
 	 * @property {boolean} [admin]
 	 * @property {import('svelte').Snippet} [buttons]
-	 * @property {import('svelte').Snippet<[import('fractal-components/types/api').JobV2]>} [editStatus]
+	 * @property {import('svelte').Snippet<[import('#fractal-components/types/api').JobV2]>} [editStatus]
 	 * @property {string} [selectedDataset]
 	 */
 
@@ -41,18 +41,18 @@
 
 	const currentUserEmail = $derived(page.data.userInfo?.email);
 
-	/** @type {Array<import('fractal-components/types/api').ProjectV2>} */
+	/** @type {Array<import('#fractal-components/types/api').ProjectV2>} */
 	const projects = $derived(page.data.projects || []);
 	/** @type {{id: number, name: string}[]} */
 	let workflows = $state([]);
-	/** @type {Array<import('fractal-components/types/api').JobV2>} */
+	/** @type {Array<import('#fractal-components/types/api').JobV2>} */
 	let jobs = [];
 	/** @type {{ id: number, name: string }[]} */
 	let datasets = $state([]);
 	/** @type {{ id: string, name: string }[]} */
 	let userEmails = $state([]);
 
-	/** @type {Array<import('fractal-components/types/api').JobV2>} */
+	/** @type {Array<import('#fractal-components/types/api').JobV2>} */
 	let rows = $state(jobs);
 
 	// Selectors
@@ -75,7 +75,7 @@
 	let userFilter = '';
 
 	/**
-	 * @typedef {{ key: string, label: string, direction?: 'asc'|'desc', priority?: number, field?: (j: import('fractal-components/types/api').JobV2) => number | string | null}} SortField
+	 * @typedef {{ key: string, label: string, direction?: 'asc'|'desc', priority?: number, field?: (j: import('#fractal-components/types/api').JobV2) => number | string | null}} SortField
 	 */
 
 	/**
@@ -106,11 +106,11 @@
 		updateRows();
 	}
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').JobV2[]} newJobs
+	 * @param {import('#fractal-components/types/api').JobV2[]} newJobs
 	 */
 	export function setJobs(newJobs) {
 		jobs = newJobs;
@@ -133,7 +133,6 @@
 		}
 
 		updateUserEmails();
-
 		rows = getSortedJobs(
 			jobs
 				.filter((j) => (statusFilter ? j.status === statusFilter : j))
@@ -142,12 +141,11 @@
 				.filter((j) => (datasetFilter ? j.dataset_dump.id.toString() === datasetFilter : j))
 				.filter((j) => (userFilter ? j.user_email === userFilter : j))
 		);
-
 		rebuildSlimSelectOptions(rows);
 	}
 
 	/**
-	 * @param {Array<import('fractal-components/types/api').JobV2>} jobs
+	 * @param {Array<import('#fractal-components/types/api').JobV2>} jobs
 	 */
 	function getSortedJobs(jobs) {
 		if (admin) {
@@ -157,7 +155,9 @@
 		const sortColumns = columns.filter(
 			(c) => c.direction !== undefined && c.priority !== undefined && c.field
 		);
+
 		sortColumns.sort((c1, c2) => (Number(c1.priority) > Number(c2.priority) ? 1 : -1));
+
 		for (const sortField of sortColumns) {
 			sortedRows.sort((a, b) => {
 				const field = sortField.field;
@@ -177,7 +177,7 @@
 
 	/**
 	 * Requests the server to stop a job execution
-	 * @param {import('fractal-components/types/api').JobV2} job
+	 * @param {import('#fractal-components/types/api').JobV2} job
 	 * @returns {Promise<void>}
 	 */
 	async function handleJobCancel(job) {
@@ -208,9 +208,6 @@
 		}
 	}
 
-	const updateJobsInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 	let updateJobsTimeout = undefined;
 
 	async function updateJobsInBackground() {
@@ -219,11 +216,11 @@
 			setJobs(await jobUpdater());
 		}
 		clearTimeout(updateJobsTimeout);
-		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+		updateJobsTimeout = setTimeout(updateJobsInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').JobV2} row
+	 * @param {import('#fractal-components/types/api').JobV2} row
 	 */
 	function getDownloadUrl(row) {
 		if (admin) {
@@ -252,7 +249,7 @@
 		datasets = page.data.datasets;
 		setJobs(page.data.jobs || []);
 
-		updateJobsTimeout = setTimeout(updateJobsInBackground, updateJobsInterval);
+		updateJobsTimeout = setTimeout(updateJobsInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 
 		if (admin) {
 			return;
@@ -370,7 +367,7 @@
 	/**
 	 * Rebuilds valid slim-select options according to the visible rows.
 	 * Example: if a project filter is selected the user can select only the workflows belonging to that project.
-	 * @param {import('fractal-components/types/api').JobV2[]} rows
+	 * @param {import('#fractal-components/types/api').JobV2[]} rows
 	 */
 	function rebuildSlimSelectOptions(rows) {
 		setValidSlimSelectOptions(

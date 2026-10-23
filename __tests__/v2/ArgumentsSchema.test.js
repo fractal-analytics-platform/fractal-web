@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: {} };
+vi.mock('$app/env/public', () => {
+	return {};
 });
 
 // The component to be tested must be imported after the mock setup
@@ -280,13 +280,13 @@ describe('ArgumentsSchema', () => {
 });
 
 /**
- * @param {Partial<Omit<import("fractal-components/types/api").WorkflowTaskV2, 'task'>> & { task: Partial<import("fractal-components/types/api").TaskV2> }} workflowTask
+ * @param {Partial<Omit<import("#fractal-components/types/api").WorkflowTaskV2, 'task'>> & { task: Partial<import("#fractal-components/types/api").TaskV2> }} workflowTask
  * @returns
  */
 function getArgumentsSchemaProps(workflowTask) {
 	return {
 		taskName: 'test',
-		workflowTask: /** @type {import("fractal-components/types/api").WorkflowTaskV2} */ (
+		workflowTask: /** @type {import("#fractal-components/types/api").WorkflowTaskV2} */ (
 			workflowTask
 		),
 		argsSchemaParallel: workflowTask.task?.args_schema_parallel,

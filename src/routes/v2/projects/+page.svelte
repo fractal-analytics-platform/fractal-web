@@ -1,19 +1,19 @@
 <script>
 	import { page } from '$app/state';
-	import ProjectsList from '$lib/components/v2/projects/ProjectsList.svelte';
-	import ProjectInfoModal from '$lib/components/v2/projects/ProjectInfoModal.svelte';
-	import InvitationNotification from '$lib/components/v2/projects/InvitationNotification.svelte';
+	import ProjectsList from '#lib/components/v2/projects/ProjectsList.svelte';
+	import ProjectInfoModal from '#lib/components/v2/projects/ProjectInfoModal.svelte';
+	import InvitationNotification from '#lib/components/v2/projects/InvitationNotification.svelte';
 	import { onMount } from 'svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import SharedProjectInfoModal from '$lib/components/v2/projects/SharedProjectInfoModal.svelte';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import SharedProjectInfoModal from '#lib/components/v2/projects/SharedProjectInfoModal.svelte';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 
-	/** @type {import('fractal-components/types/api').ProjectV2[]} */
+	/** @type {import('#fractal-components/types/api').ProjectV2[]} */
 	let projects = $state([]);
-	/** @type {import('fractal-components/types/api').ProjectInvitation[]} */
+	/** @type {import('#fractal-components/types/api').ProjectInvitation[]} */
 	let invitations = $state([]);
 
-	/** @type {import('fractal-components/types/api').ProjectV2[]} */
+	/** @type {import('#fractal-components/types/api').ProjectV2[]} */
 	let sharedProjects = $state([]);
 	/** @type {SharedProjectInfoModal|undefined} */
 	let sharedProjectInfoModal = $state();
@@ -21,12 +21,12 @@
 	/** @type {'my_projects'|'shared_projects'} */
 	let selectedTab = $state(page.data.userInfo.is_guest ? 'shared_projects' : 'my_projects');
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	let projectSearch = $state('');
 
-	/** @type {import('$lib/components/common/Modal.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/Modal.svelte').default|undefined} */
 	let newProjectModal = $state();
 
 	async function loadSharedProjects() {
@@ -43,7 +43,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectV2} project
+	 * @param {import('#fractal-components/types/api').ProjectV2} project
 	 */
 	async function showSharedProjectInfo(project) {
 		await sharedProjectInfoModal?.open(project);
@@ -53,8 +53,11 @@
 	 * @param {number} projectId
 	 */
 	async function handleLeaveProject(projectId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/access/`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			sharedProjects = sharedProjects.filter((p) => {
@@ -66,13 +69,16 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').ProjectV2} project
+	 * @param {import('#fractal-components/types/api').ProjectV2} project
 	 */
 	async function toggleStarredSharedProject(project) {
 		errorAlert?.hide();
 		const endpoint = project.is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${project.id}/${endpoint}`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		if (!response.ok) {
 			errorAlert = displayStandardErrorAlert(

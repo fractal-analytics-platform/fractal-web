@@ -1,13 +1,13 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { getAlertErrorFromResponse, getFieldValidationError } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import { normalizePayload } from '#fractal-components';
 	import { resolve } from '$app/paths';
 
-	/** @type {Array<import('fractal-components/types/api').Group & {user_ids: number[]}>} */
+	/** @type {Array<import('#fractal-components/types/api').Group & {user_ids: number[]}>} */
 	let groups = $derived(page.data.groups);
 	/** @type {string|undefined} */
 	let defaultGroupName = $derived(page.data.defaultGroupName);
@@ -67,8 +67,11 @@
 	 * @param {number} groupId
 	 */
 	async function handleGroupDelete(groupId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/auth/group/${groupId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			groups = groups.filter((g) => g.id !== groupId);

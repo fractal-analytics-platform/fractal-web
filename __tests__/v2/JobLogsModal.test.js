@@ -4,8 +4,8 @@ import { render } from '@testing-library/svelte';
 import { mockJob } from '../mock/mock-types';
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: {} };
+vi.mock('$app/env/public', () => {
+	return {};
 });
 vi.mock('$app/navigation', () => {
 	return { pushState: vi.fn() };

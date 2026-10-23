@@ -1,4 +1,4 @@
-import { getServerInfo } from '$lib/server/api/alive';
+import { getServerInfo } from '#lib/server/api/alive.js';
 
 export async function GET({ fetch }) {
 	// @ts-ignore

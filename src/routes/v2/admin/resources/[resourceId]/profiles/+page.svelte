@@ -1,15 +1,15 @@
 <script>
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 
-	/** @type {import('fractal-components/types/api').Resource} */
+	/** @type {import('#fractal-components/types/api').Resource} */
 	const resource = $derived(page.data.resource);
 
-	/** @type {Array<import('fractal-components/types/api').Profile>} */
+	/** @type {Array<import('#fractal-components/types/api').Profile>} */
 	let profiles = $state([]);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let searchErrorAlert;
 
 	async function loadProfiles() {
@@ -30,8 +30,11 @@
 	 * @param {number} id
 	 */
 	async function handleDeleteProfile(id) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/admin/v2/profile/${id}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {

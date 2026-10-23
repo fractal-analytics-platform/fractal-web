@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import Modal from '../../common/Modal.svelte';
 	import { resolve } from '$app/paths';
 
@@ -17,7 +17,7 @@
 	/** @type {Modal|undefined} */
 	let modal = $state();
 
-	/** @type {import('fractal-components/types/api').TaskGroupSlim|undefined} */
+	/** @type {import('#fractal-components/types/api').TaskGroupSlim|undefined} */
 	let taskGroup = $state(undefined);
 	let originalActive = $state(true);
 
@@ -25,11 +25,11 @@
 	let askConfirmForDeactivate = $state(false);
 	let askConfirmForDelete = $state(false);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
+	 * @param {import('#fractal-components/types/api').TaskGroupSlim} taskGroupToEdit
 	 */
 	export async function open(taskGroupToEdit) {
 		taskGroup = taskGroupToEdit;

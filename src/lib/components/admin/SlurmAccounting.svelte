@@ -1,14 +1,14 @@
 <script>
-	import { getTimestamp, hideAllTooltips } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { getTimestamp, hideAllTooltips } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { onDestroy } from 'svelte';
 	import CopyToClipboardButton from '../common/CopyToClipboardButton.svelte';
 	import { sortDropdownUsers } from './user_utilities';
-	import { normalizePayload } from 'fractal-components/common/utils';
+	import { normalizePayload } from '#fractal-components/common/utils';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Array<import('fractal-components/types/api').User>} [users]
+	 * @property {Array<import('#fractal-components/types/api').User>} [users]
 	 * @property {number} currentUserId
 	 */
 
@@ -25,7 +25,7 @@
 	let userId = $state('');
 	let fractalJobId = $state('');
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/** @type {number[]} */

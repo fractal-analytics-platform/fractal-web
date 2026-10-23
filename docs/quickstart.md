@@ -43,7 +43,6 @@ export PUBLIC_OAUTH_CLIENT_NAME=
 # remember to set this in production (e.g. subdomain.example.org)
 export AUTH_COOKIE_DOMAIN=
 
-export ORIGIN=http://localhost:5173
 export PORT=5173
 export BODY_SIZE_LIMIT=5000000
 

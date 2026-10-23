@@ -37,7 +37,15 @@ if [ ! -d "$fractal_server_test_path" ]; then
     echo "OAUTH_CLIENT_ID=client_test_web_id" >> "${fractal_server_test_path}/.fractal_server.env"
     echo "OAUTH_CLIENT_SECRET=client_test_web_secret" >> "${fractal_server_test_path}/.fractal_server.env"
     echo "OAUTH_REDIRECT_URL=http://localhost:5173/auth/login/oauth2/" >> "${fractal_server_test_path}/.fractal_server.env"
-    echo "OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
+    if [ -z "$OAUTH_OIDC_CONFIG_ENDPOINT" ]; then
+      echo "OAUTH_OIDC_CONFIG_ENDPOINT=$OAUTH_OIDC_CONFIG_ENDPOINT" >> "${fractal_server_test_path}/.fractal_server.env"
+    else
+      echo "OAUTH_OIDC_CONFIG_ENDPOINT=http://127.0.0.1:5556/dex/.well-known/openid-configuration" >> "${fractal_server_test_path}/.fractal_server.env"
+    fi
+  fi
+
+  if [ -z "$POSTGRES_HOST" ]; then
+    echo "POSTGRES_HOST=$POSTGRES_HOST" >> "${fractal_server_test_path}/.fractal_server.env"
   fi
 
   cd "$fractal_server_test_path"

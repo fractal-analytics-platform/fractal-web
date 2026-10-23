@@ -1,6 +1,6 @@
 /**
- * @param {Partial<import('fractal-components/types/api').User & { id: number } & { group_ids_names: [number, string][]}>} fields
- * @returns {import('fractal-components/types/api').User & { id: number } & { group_ids_names: [number, string][]}}
+ * @param {Partial<import('#fractal-components/types/api').User & { id: number } & { group_ids_names: [number, string][]}>} fields
+ * @returns {import('#fractal-components/types/api').User & { id: number } & { group_ids_names: [number, string][]}}
  */
 export function mockUser(fields = {}) {
 	return {
@@ -20,34 +20,34 @@ export function mockUser(fields = {}) {
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').Group & { user_ids: number[] }>} fields
- * @returns {import('fractal-components/types/api').Group & { user_ids: number[] }}}
+ * @param {Partial<import('#fractal-components/types/api').Group & { user_ids: number[] }>} fields
+ * @returns {import('#fractal-components/types/api').Group & { user_ids: number[] }}}
  */
 export function mockGroup(fields = {}) {
 	const group = /** @type {unknown} */ ({
 		id: 1,
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').Group & { user_ids: number[] }} */ (
+	return /** @type {import('#fractal-components/types/api').Group & { user_ids: number[] }} */ (
 		group
 	);
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').TaskV2>} fields
- * @returns {import('fractal-components/types/api').TaskV2}
+ * @param {Partial<import('#fractal-components/types/api').TaskV2>} fields
+ * @returns {import('#fractal-components/types/api').TaskV2}
  */
 export function mockTask(fields = {}) {
 	const task = /** @type {unknown} */ ({
 		id: 1,
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').TaskV2} */ (task);
+	return /** @type {import('#fractal-components/types/api').TaskV2} */ (task);
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').WorkflowV2>} fields
- * @returns {import('fractal-components/types/api').WorkflowV2}
+ * @param {Partial<import('#fractal-components/types/api').WorkflowV2>} fields
+ * @returns {import('#fractal-components/types/api').WorkflowV2}
  */
 export function mockWorkflow(fields = {}) {
 	const workflow = /** @type {unknown} */ ({
@@ -55,12 +55,12 @@ export function mockWorkflow(fields = {}) {
 		task_list: [],
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').WorkflowV2} */ (workflow);
+	return /** @type {import('#fractal-components/types/api').WorkflowV2} */ (workflow);
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').WorkflowTaskV2>} fields
- * @returns {import('fractal-components/types/api').WorkflowTaskV2}
+ * @param {Partial<import('#fractal-components/types/api').WorkflowTaskV2>} fields
+ * @returns {import('#fractal-components/types/api').WorkflowTaskV2}
  */
 export function mockWorkflowTask(fields = {}) {
 	const workflowTask = /** @type {unknown} */ ({
@@ -68,29 +68,29 @@ export function mockWorkflowTask(fields = {}) {
 		task_list: [],
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ (workflowTask);
+	return /** @type {import('#fractal-components/types/api').WorkflowTaskV2} */ (workflowTask);
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').DatasetV2>} fields
- * @returns {import('fractal-components/types/api').DatasetV2}
+ * @param {Partial<import('#fractal-components/types/api').DatasetV2>} fields
+ * @returns {import('#fractal-components/types/api').DatasetV2}
  */
 export function mockDataset(fields = {}) {
 	const dataset = /** @type {unknown} */ ({
 		id: 1,
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').DatasetV2} */ (dataset);
+	return /** @type {import('#fractal-components/types/api').DatasetV2} */ (dataset);
 }
 
 /**
- * @param {Partial<import('fractal-components/types/api').JobV2>} fields
- * @returns {import('fractal-components/types/api').JobV2}
+ * @param {Partial<import('#fractal-components/types/api').JobV2>} fields
+ * @returns {import('#fractal-components/types/api').JobV2}
  */
 export function mockJob(fields = {}) {
 	const job = /** @type {unknown} */ ({
 		id: 1,
 		...fields
 	});
-	return /** @type {import('fractal-components/types/api').JobV2} */ (job);
+	return /** @type {import('#fractal-components/types/api').JobV2} */ (job);
 }

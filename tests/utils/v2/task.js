@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {Partial<import('fractal-components/types/api').TaskV2 & { version: string | null }>} task
+ * @param {Partial<import('#fractal-components/types/api').TaskV2 & { version: string | null }>} task
  * @returns {Promise<string>} the name of the created task
  */
 export async function createFakeTask(page, task) {
@@ -51,7 +51,10 @@ export async function createFakeTask(page, task) {
 export async function deleteTask(page, taskName, version = undefined) {
 	const { id } = await getTaskGroupByName(page, taskName, version);
 	const response = await page.request.post(`/api/v2/task-group/${id}/delete`, {
-		headers: { Cookie: await getFractalCookie(page) }
+		headers: {
+			Cookie: await getFractalCookie(page),
+			'Content-Type': 'application/json'
+		}
 	});
 	await checkApiError(response, 'Unable to delete task group');
 }

@@ -1,10 +1,10 @@
 <script>
-	import { objectChanged } from '$lib/common/component_utilities';
+	import { objectChanged } from '#lib/common/component_utilities.js';
 	import { tick } from 'svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import("fractal-components/types/api").TaskV2} task
+	 * @property {import("#fractal-components/types/api").TaskV2} task
 	 */
 
 	/** @type {Props} */

@@ -7,7 +7,7 @@
 	 * @property {string} id
 	 * @property {string|null} defaultGroupName
 	 * @property {boolean} [privateTask]
-	 * @property {any} [selectedGroup]
+	 * @property {number|null} [selectedGroup]
 	 * @property {string} [wrapperClass]
 	 */
 

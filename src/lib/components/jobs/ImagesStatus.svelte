@@ -1,12 +1,12 @@
 <script>
-	import { isConverterType, isParallelType } from 'fractal-components/common/workflow_task_utils';
+	import { isConverterType, isParallelType } from '#fractal-components/common/workflow_task_utils';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ImagesStatus|undefined} status
+	 * @property {import('#fractal-components/types/api').ImagesStatus|undefined} status
 	 * @property {boolean} running
-	 * @property {import('fractal-components/types/api').DatasetV2} dataset
-	 * @property {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @property {import('#fractal-components/types/api').DatasetV2} dataset
+	 * @property {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
 	 * @property {import('./ImagesStatusModal.svelte').default} imagesStatusModal
 	 */
 
@@ -24,8 +24,8 @@
 	let partial = $derived(status && !fullyDone && !fullyFailed);
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
-	 * @param {import('fractal-components/types/api').ImagesStatus} status
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
+	 * @param {import('#fractal-components/types/api').ImagesStatus} status
 	 * @returns {boolean}
 	 */
 	function handleAsConverter(workflowTask, status) {

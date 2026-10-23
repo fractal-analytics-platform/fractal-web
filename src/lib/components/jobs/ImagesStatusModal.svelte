@@ -1,21 +1,21 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import { extractJobErrorParts } from '$lib/common/job_utilities';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { extractJobErrorParts } from '#lib/common/job_utilities.js';
 	import ExpandableLog from '../common/ExpandableLog.svelte';
 	import Modal from '../common/Modal.svelte';
 	import DatasetImagesTable from '../v2/projects/datasets/DatasetImagesTable.svelte';
 	import { tick } from 'svelte';
-	import { hideAllTooltips } from '$lib/common/component_utilities';
-	import { getTypeFilterValues, STATUS_KEY } from '$lib/common/workflow_utilities';
-	import { normalizePayload } from 'fractal-components/common/utils';
+	import { hideAllTooltips } from '#lib/common/component_utilities.js';
+	import { getTypeFilterValues, STATUS_KEY } from '#lib/common/workflow_utilities.js';
+	import { normalizePayload } from '#fractal-components/common/utils';
 
-	/** @type {import('fractal-components/types/api').ImagePage|null} */
+	/** @type {import('#fractal-components/types/api').ImagePage|null} */
 	let imagePage = $state(null);
 	let loading = $state(false);
 
-	/** @type {import('fractal-components/types/api').DatasetV2|undefined} */
+	/** @type {import('#fractal-components/types/api').DatasetV2|undefined} */
 	let dataset = $state();
-	/** @type {import('fractal-components/types/api').WorkflowTaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').WorkflowTaskV2|undefined} */
 	let workflowTask = $state();
 	/** @type {{ [key: string]: boolean }} */
 	let frozenTypes = $state({});
@@ -36,8 +36,8 @@
 	let initialFilterValues = $state(null);
 
 	/**
-	 * @param {import('fractal-components/types/api').DatasetV2} _dataset
-	 * @param {import('fractal-components/types/api').WorkflowTaskV2} _workflowTask
+	 * @param {import('#fractal-components/types/api').DatasetV2} _dataset
+	 * @param {import('#fractal-components/types/api').WorkflowTaskV2} _workflowTask
 	 */
 	export async function open(_dataset, _workflowTask) {
 		loading = true;
@@ -86,7 +86,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').Image} image
+	 * @param {import('#fractal-components/types/api').Image} image
 	 */
 	async function loadLogs(image) {
 		hideAllTooltips();
@@ -123,7 +123,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').Image} image
+	 * @param {import('#fractal-components/types/api').Image} image
 	 * @returns {string}
 	 */
 	function getImageStatus(image) {

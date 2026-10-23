@@ -5,20 +5,20 @@
 		displayStandardErrorAlert,
 		getValidationMessagesMap,
 		parseErrorResponse
-	} from '$lib/common/errors';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import { normalizePayload } from 'fractal-components';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	} from '#lib/common/errors.js';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
+	import { normalizePayload } from '#fractal-components';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import { onMount } from 'svelte';
 
-	/** @type {import('fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
+	/** @type {import('#fractal-components/types/api').User & {group_ids_names: Array<[number, string]>}} */
 	const user = $derived(page.data.user);
-	/** @type {import('fractal-components/types/api').ProfileInfo} */
+	/** @type {import('#fractal-components/types/api').ProfileInfo} */
 	const profile = $derived(page.data.profile);
 
 	const runnerBackend = $derived(page.data.runnerBackend);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/** @type {string[]} */
@@ -89,7 +89,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').User} user
+	 * @param {import('#fractal-components/types/api').User} user
 	 */
 	function initFields(user) {
 		slurmAccounts = user.slurm_accounts;

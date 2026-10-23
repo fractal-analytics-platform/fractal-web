@@ -1,5 +1,5 @@
 <script>
-	import TaskGroupActivities from '$lib/components/v2/tasks/TaskGroupActivities.svelte';
+	import TaskGroupActivities from '#lib/components/v2/tasks/TaskGroupActivities.svelte';
 </script>
 
 <div class="container mt-3">

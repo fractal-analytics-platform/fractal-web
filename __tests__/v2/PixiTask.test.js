@@ -1,11 +1,15 @@
-/// <reference path="../../vitest-setup.d.ts" />
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
-import { mockUser } from '../mock/mock-types';
 import userEvent from '@testing-library/user-event';
+import { mockUser } from '../mock/mock-types';
 
 // Mocking fetch
 global.fetch = vi.fn();
+
+// Mocking public variables
+vi.mock('$app/env/public', () => {
+	return {};
+});
 
 const mockedUser = mockUser({ group_ids_names: [[1, 'All']] });
 
@@ -30,11 +34,13 @@ describe('PixiTask', () => {
 		await user.click(screen.getByRole('button', { name: 'Collect' }));
 
 		expect(fetch).toHaveBeenCalledWith(
-			'/api/v2/task/collect/pixi?private=false&user_group_id=1',
+			'/api/v2/task/collect/pixi',
 			expect.objectContaining({
-				body: expect.toBeFormDataWith({
-					use_pixi_lockfile: 'true',
-					pixi_version: '0.50.0'
+				body: JSON.stringify({
+					private: false,
+					use_pixi_lockfile: true,
+					pixi_version: '0.50.0',
+					user_group_id: 1
 				})
 			})
 		);
@@ -58,9 +64,12 @@ describe('PixiTask', () => {
 		await user.click(screen.getByRole('button', { name: 'Collect' }));
 
 		expect(fetch).toHaveBeenCalledWith(
-			'/api/v2/task/collect/pixi?private=true',
+			'/api/v2/task/collect/pixi',
 			expect.objectContaining({
-				body: expect.toBeFormDataWith({ use_pixi_lockfile: 'false' })
+				body: JSON.stringify({
+					private: true,
+					use_pixi_lockfile: false
+				})
 			})
 		);
 	});

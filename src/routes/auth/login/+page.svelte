@@ -1,22 +1,29 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors.js';
-	import { env } from '$env/dynamic/public';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { resolve } from '$app/paths';
+	import {
+		PUBLIC_OAUTH_CLIENT_NAME,
+		PUBLIC_GUEST_USERNAME,
+		PUBLIC_GUEST_PASSWORD
+	} from '$app/env/public';
 	import { onMount } from 'svelte';
-	import { invalidateAll } from '$app/navigation';
-
-	let { form } = $props();
+	import { goto, refreshAll } from '$app/navigation';
 
 	let userLoggedIn = $derived(!!page.data.userInfo);
 	let hideBasicAuth = $derived(page.data.hideBasicAuth);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	let username = $state('');
+	let password = $state('');
+	let invalidMessage = $state('');
+	let invalidGuestMessage = $state('');
+
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let externalLoginErrorAlert = undefined;
 
-	const oauth2Provider = env.PUBLIC_OAUTH_CLIENT_NAME;
-
-	const guestUsername = env.PUBLIC_GUEST_USERNAME;
-	const guestPassword = env.PUBLIC_GUEST_PASSWORD;
+	const oauth2Provider = PUBLIC_OAUTH_CLIENT_NAME;
+	const guestUsername = PUBLIC_GUEST_USERNAME;
+	const guestPassword = PUBLIC_GUEST_PASSWORD;
 
 	async function oauth2Login() {
 		if (externalLoginErrorAlert) {
@@ -34,10 +41,43 @@
 		window.location.replace(result.authorization_url);
 	}
 
+	/**
+	 * @param {boolean} guest
+	 */
+	async function login(guest = false) {
+		invalidMessage = '';
+		invalidGuestMessage = '';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/auth/login', {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				username: guest ? guestUsername : username,
+				password: guest ? guestPassword : password
+			})
+		});
+		if (response.ok) {
+			if (sessionStorage) {
+				sessionStorage.setItem('userLoggedIn', 'true');
+			}
+			await goto(resolve(`/v2/projects`));
+		} else {
+			try {
+				const result = await response.json();
+				invalidMessage = result.invalidMessage || '';
+				invalidGuestMessage = result.invalidGuestMessage || '';
+			} catch {
+				invalidMessage = 'Unexpected error';
+				invalidGuestMessage = 'Unexpected error';
+			}
+		}
+	}
+
 	let showSessionExpiredMessage = $state(false);
 	onMount(async () => {
 		if (location.href.includes('invalidate=true')) {
-			await invalidateAll();
+			await refreshAll();
 		}
 		if (!userLoggedIn && sessionStorage && sessionStorage.getItem('userLoggedIn') === 'true') {
 			showSessionExpiredMessage = true;
@@ -74,14 +114,18 @@
 				<div class="col-xl-4 col-lg-7 col-md-9 mb-4">
 					<h3 class="fw-light">Guest login</h3>
 					<div id="guestLoginError"></div>
-					<form method="POST" class="mb-3">
-						<input type="hidden" name="username" value={guestUsername} />
-						<input type="hidden" name="password" value={guestPassword} />
+					<form
+						class="mb-3"
+						onsubmit={(e) => {
+							e.preventDefault();
+							login(true);
+						}}
+					>
 						<button class="btn btn-primary">Log in as guest</button>
 					</form>
-					{#if form?.invalidGuestMessage}
+					{#if invalidGuestMessage}
 						<div class="alert alert-danger">
-							{form?.invalidGuestMessage}
+							{invalidGuestMessage}
 						</div>
 					{/if}
 				</div>
@@ -120,7 +164,7 @@
 										data-bs-target="#localLoginCollapse"
 										aria-expanded="false"
 										aria-controls="localLoginCollapse"
-										class:collapsed={!form?.invalidMessage}
+										class:collapsed={!invalidMessage}
 									>
 										Log in with username & password
 									</button>
@@ -129,10 +173,15 @@
 							<div
 								id="localLoginCollapse"
 								class="accordion-collapse collapse"
-								class:show={!oauth2Provider || form?.invalidMessage}
+								class:show={!oauth2Provider || invalidMessage}
 							>
 								<div class="accordion-body">
-									<form method="POST">
+									<form
+										onsubmit={(e) => {
+											e.preventDefault();
+											login();
+										}}
+									>
 										<div class="mb-3">
 											<p class="fw-light">
 												Log in with Fractal specific email & password provided to you by the Fractal
@@ -142,12 +191,13 @@
 											<input
 												name="username"
 												type="email"
-												class="form-control {form?.invalidMessage ? 'is-invalid' : ''}"
+												class="form-control {invalidMessage ? 'is-invalid' : ''}"
 												id="userEmail"
+												bind:value={username}
 												required
 											/>
 											<div class="invalid-feedback">
-												{form?.invalidMessage}
+												{invalidMessage}
 											</div>
 										</div>
 										<div class="mb-3">
@@ -157,6 +207,7 @@
 												type="password"
 												class="form-control"
 												id="userPassword"
+												bind:value={password}
 												required
 											/>
 										</div>

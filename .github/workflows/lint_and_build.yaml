@@ -37,6 +37,21 @@ jobs:
           cd components
           npm ci
 
+      - name: Install sandbox dependencies
+        run: |
+          cd sandbox
+          npm ci
+
+      - name: Install tasks-list dependencies
+        run: |
+          cd tasks-list
+          npm ci
+
+      - name: Install templates-list dependencies
+        run: |
+          cd templates-list
+          npm ci
+
       - name: Run static code analysis
         # Run prettier and eslint on all projects
         run: npm run lint
@@ -56,11 +71,6 @@ jobs:
           PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL:
         run: npm run build
 
-      - name: Install sandbox dependencies
-        run: |
-          cd sandbox
-          npm ci
-
       - name: Run svelte-check on sandbox
         run: |
           cd sandbox
@@ -71,11 +81,6 @@ jobs:
           cd sandbox
           npm run build
 
-      - name: Install tasks-list dependencies
-        run: |
-          cd tasks-list
-          npm ci
-
       - name: Run svelte-check on tasks-list
         run: |
           cd tasks-list
@@ -85,11 +90,6 @@ jobs:
         run: |
           cd tasks-list
           npm run build
-
-      - name: Install templates-list dependencies
-        run: |
-          cd templates-list
-          npm ci
 
       - name: Run svelte-check on templates-list
         run: |

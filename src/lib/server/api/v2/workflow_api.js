@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('workflow API [v2]');
 
@@ -8,11 +8,11 @@ const logger = getLogger('workflow API [v2]');
  * Fetches the list of workflows of a project from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
- * @returns {Promise<Array<import('fractal-components/types/api').WorkflowV2>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').WorkflowV2>>}
  */
 export async function getWorkflows(fetch, projectId) {
 	logger.debug('Fetching project workflows [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/`);
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project workflows [project_id=%d]', projectId);
@@ -27,12 +27,13 @@ export async function getWorkflows(fetch, projectId) {
  * @param {typeof fetch} fetch
  * @param {string} projectId
  * @param {string} workflowId
- * @returns {Promise<import('fractal-components/types/api').WorkflowV2>}
+ * @returns {Promise<import('#fractal-components/types/api').WorkflowV2>}
  */
 export async function getWorkflow(fetch, projectId, workflowId) {
 	logger.debug('Fetching workflow [workflow_id=%d] [project_id=%d]', workflowId, projectId);
+
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/${workflowId}/`
+		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/${workflowId}/`
 	);
 
 	if (!response.ok) {
@@ -52,12 +53,13 @@ export async function getWorkflow(fetch, projectId, workflowId) {
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
  * @param {number|string} workflowId
- * @returns {Promise<Array<import('fractal-components/types/api').JobV2>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').JobV2>>}
  */
 export async function getWorkflowJobs(fetch, projectId, workflowId) {
 	logger.debug('Fetching workflow jobs [workflow_id=%d] [project_id=%d]', workflowId, projectId);
+
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/${workflowId}/job/`
+		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/workflow/${workflowId}/job/`
 	);
 
 	if (!response.ok) {

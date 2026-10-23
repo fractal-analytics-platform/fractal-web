@@ -125,7 +125,7 @@ export function extractRelevantJobError(completeJobError = null, maxLines = unde
 }
 
 /**
- * @param {import("fractal-components/types/api").DatasetV2[]} datasets
+ * @param {import("#fractal-components/types/api").DatasetV2[]} datasets
  * @param {string} selectedDatasetName
  * @returns {string}
  */
@@ -144,9 +144,9 @@ export function generateNewUniqueDatasetName(datasets, selectedDatasetName) {
 }
 
 /**
- * @param {Array<import("fractal-components/types/api").WorkflowTaskV2>} workflowTasks
- * @param {import('fractal-components/types/api').WorkflowTaskV2|undefined} selectedWorkflowTask
- * @param {{[key: number]: import('fractal-components/types/api').ImagesStatus}} statuses
+ * @param {Array<import("#fractal-components/types/api").WorkflowTaskV2>} workflowTasks
+ * @param {import('#fractal-components/types/api').WorkflowTaskV2|undefined} selectedWorkflowTask
+ * @param {{[key: number]: import('#fractal-components/types/api').ImagesStatus}} statuses
  * @returns {number|undefined}
  */
 export function getFirstTaskIndexForContinuingWorkflow(
@@ -184,7 +184,7 @@ export function getFirstTaskIndexForContinuingWorkflow(
 }
 
 /**
- * @param {import('fractal-components/types/api').JobV2} job
+ * @param {import('#fractal-components/types/api').JobV2} job
  */
 export function showExecutorErrorLog(job) {
 	if (job.status !== 'failed' || !job.executor_error_log) {
