@@ -75,6 +75,12 @@ export default defineConfig({
 			reuseExistingServer: !process.env.CI
 		},
 		{
+			command: 'node ./tests/proxy-oauth2.js',
+			port: 5556,
+			stdout: 'pipe',
+			reuseExistingServer: !process.env.CI
+		},
+		{
 			command: 'uv run zensical serve --dev-addr 127.0.0.1:8001',
 			port: 8001,
 			stdout: 'pipe',
