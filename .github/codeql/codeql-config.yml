@@ -1,5 +1,6 @@
 name: 'CodeQL config'
 paths-ignore:
-  - '**/node_modules'
-  - '**/build'
-  - '**/tests'
+  - '**/node_modules/**'
+  - '**/build/**'
+  - '**/tests/**'
+  - 'tests/proxy-oauth2.js'

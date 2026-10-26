@@ -1,12 +1,12 @@
 <script>
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowImportErrorData[]|undefined} workflowImportErrorData
+	 * @property {import('#fractal-components/types/api').WorkflowImportErrorData[]|undefined} workflowImportErrorData
 	 * @property {(string|undefined)[]} selectedVersions
 	 * @property {boolean} includeOlderVersions
-	 * @property {import('fractal-components/types/api').WorkflowImport|undefined} workflowMetadata
+	 * @property {import('#fractal-components/types/api').WorkflowImport|undefined} workflowMetadata
 	 * @property {boolean} creating
 	 */
 

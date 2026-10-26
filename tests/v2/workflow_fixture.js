@@ -51,7 +51,7 @@ export class PageWithWorkflow extends PageWithProject {
 
 	/**
 	 * @param {number} jobId
-	 * @param {import('fractal-components/types/api.js').JobStatus} status
+	 * @param {import('#fractal-components/types/api.js').JobStatus} status
 	 */
 	async setTaskStatus(jobId, status) {
 		const response = await this.page.request.put(

@@ -1,13 +1,13 @@
 <script>
 	import { page } from '$app/state';
-	import { FormErrorHandler } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import { normalizePayload } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').DatasetV2} dataset
-	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} updateDatasetCallback
+	 * @property {import('#fractal-components/types/api').DatasetV2} dataset
+	 * @property {(dataset: import('#fractal-components/types/api').DatasetV2) => void} updateDatasetCallback
 	 */
 
 	/** @type {Props} */

@@ -19,16 +19,16 @@
 		"build"
 	],
 	"peerDependencies": {
-		"svelte": "^5.57.1",
 		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "^1.13.1",
 		"dompurify": "^3.4.8",
-		"marked": "^7.0.5"
+		"marked": "^7.0.5",
+		"svelte": "^5.57.1"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
-		"@sveltejs/package": "^2.5.8",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.0.1",
+		"@sveltejs/package": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@types/bootstrap": "^5.2.11",
 		"eslint": "^10.11.0",
@@ -40,8 +40,8 @@
 		"svelte-check": "^4.7.6",
 		"svelte-preprocess": "^6.0.5",
 		"tslib": "^2.8.1",
-		"typescript": "^5.9.3",
-		"vite": "^8.3.0"
+		"typescript": "^6.0.0",
+		"vite": "^8.3.4"
 	},
 	"svelte": "./build/index.js",
 	"types": "./build/index.d.ts",
@@ -54,5 +54,11 @@
 		"bootstrap-icons",
 		"dompurify",
 		"marked"
-	]
+	],
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*",
+		"#fractal-components": "../components/src/lib/index.js",
+		"#fractal-components/*": "../components/src/lib/*"
+	}
 }

@@ -1,24 +1,24 @@
 <script>
 	import { page } from '$app/state';
-	import TaskCollection from '$lib/components/v2/tasks/TaskCollection.svelte';
-	import { displayStandardErrorAlert } from '$lib/common/errors';
-	import AddSingleTask from '$lib/components/v2/tasks/AddSingleTask.svelte';
-	import CustomEnvTask from '$lib/components/v2/tasks/CustomEnvTask.svelte';
-	import TaskGroupsTable from '$lib/components/v2/tasks/TaskGroupsTable.svelte';
-	import PixiTask from '$lib/components/v2/tasks/PixiTask.svelte';
-	import TaskActivitiesTable from '$lib/components/v2/tasks/TaskActivitiesTable.svelte';
+	import TaskCollection from '#lib/components/v2/tasks/TaskCollection.svelte';
+	import { displayStandardErrorAlert } from '#lib/common/errors.js';
+	import AddSingleTask from '#lib/components/v2/tasks/AddSingleTask.svelte';
+	import CustomEnvTask from '#lib/components/v2/tasks/CustomEnvTask.svelte';
+	import TaskGroupsTable from '#lib/components/v2/tasks/TaskGroupsTable.svelte';
+	import PixiTask from '#lib/components/v2/tasks/PixiTask.svelte';
+	import TaskActivitiesTable from '#lib/components/v2/tasks/TaskActivitiesTable.svelte';
 
 	const user = $derived(page.data.user);
 	/** @type {string|null} */
 	const defaultGroupName = $derived(page.data.defaultGroupName);
 
-	/** @type {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} */
+	/** @type {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} */
 	let taskGroups = $state(page.data.taskGroups || []);
 
 	/** @type {'pypi'|'local'|'single'|'custom_env'|'pixi'} */
 	let packageType = $state('pypi');
 
-	/** @type {import('$lib/components/v2/tasks/TaskCollection.svelte').default|undefined} */
+	/** @type {import('#lib/components/v2/tasks/TaskCollection.svelte').default|undefined} */
 	let taskCollectionComponent = $state();
 
 	/** @type {string|undefined} */
@@ -35,7 +35,7 @@
 	}
 
 	/**
-	 * @param {Array<[ string, Array<import('fractal-components/types/api').TaskGroupSlim> ]>} updatedGroups
+	 * @param {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} updatedGroups
 	 */
 	function updateTaskGroups(updatedGroups) {
 		taskGroups = updatedGroups;

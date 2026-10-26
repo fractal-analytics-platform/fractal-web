@@ -25,7 +25,7 @@ import CreateDatasetModal from '../../src/lib/components/v2/projects/datasets/Cr
 
 const defaultProps = {
 	props: {
-		project: /** @type {import("fractal-components/types/api").ProjectV2} */ ({
+		project: /** @type {import("#fractal-components/types/api").ProjectV2} */ ({
 			id: 1,
 			name: 'My Project'
 		}),

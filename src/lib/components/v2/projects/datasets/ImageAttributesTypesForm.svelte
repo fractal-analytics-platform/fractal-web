@@ -1,5 +1,5 @@
 <script>
-	import { objectChanged } from '$lib/common/component_utilities';
+	import { objectChanged } from '#lib/common/component_utilities.js';
 	import { tick } from 'svelte';
 
 	/** @type {{ [key: string]: string | number | boolean }} */

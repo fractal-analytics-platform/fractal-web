@@ -1,11 +1,12 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
-	import { recentActivities } from '$lib/stores';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import { recentActivities } from '#lib/stores.js';
+	import { fileToBase64 } from '../../../common/component_utilities';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').User} user
+	 * @property {import('#fractal-components/types/api').User} user
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -46,31 +47,41 @@
 	async function handlePixiCollection() {
 		formErrorHandler.clearErrors();
 
-		const formData = new FormData();
+		/** @type {import('#fractal-components/types/api').PixiCollectionRequest} */
+		const body = {
+			private: privateTask,
+			use_pixi_lockfile: useLockfile
+		};
 
 		if (tarFiles !== null && tarFiles.length === 1) {
-			formData.append('file', tarFiles[0]);
+			const file = tarFiles[0];
+			body.file = {
+				data: await fileToBase64(file),
+				fileName: file.name,
+				contentType: file.type
+			};
 		}
 		if (version) {
-			formData.append('pixi_version', version);
+			body.pixi_version = version;
 		}
-		formData.append('use_pixi_lockfile', useLockfile.toString());
 
-		let url = `/api/v2/task/collect/pixi?private=${privateTask}`;
 		if (!privateTask && selectedGroup) {
-			url += `&user_group_id=${selectedGroup}`;
+			body.user_group_id = selectedGroup;
 		}
 
 		taskCollectionInProgress = true;
-		const response = await fetch(url, {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
+		const response = await fetch('/api/v2/task/collect/pixi', {
 			method: 'POST',
-			body: formData
+			headers,
+			body: JSON.stringify(body)
 		});
 
 		taskCollectionInProgress = false;
 
 		if (response.ok) {
-			const result = /** @type {import('fractal-components/types/api').TaskGroupActivityV2} */ (
+			const result = /** @type {import('#fractal-components/types/api').TaskGroupActivityV2} */ (
 				await response.json()
 			);
 			recentActivities.set([...$recentActivities, result]);

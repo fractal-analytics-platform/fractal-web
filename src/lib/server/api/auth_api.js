@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('auth API');
 
@@ -12,7 +12,8 @@ const logger = getLogger('auth API');
  */
 export async function userAuthentication(fetch, data) {
 	logger.debug('Performing login');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/token/login/', {
+
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/login/', {
 		method: 'POST',
 		body: data
 	});
@@ -29,11 +30,11 @@ export async function userAuthentication(fetch, data) {
  * Fetches user identity
  * @param {typeof fetch} fetch
  * @param {boolean} groupIdsNames indicates whether to load the list of group IDs and names.
- * @returns {Promise<import('fractal-components/types/api').User|null>}
+ * @returns {Promise<import('#fractal-components/types/api').User|null>}
  */
 export async function getCurrentUser(fetch, groupIdsNames = false) {
 	logger.debug('Retrieving current user');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/?group_ids_names=${groupIdsNames}`;
+	const url = `${FRACTAL_SERVER_HOST}/auth/current-user/?group_ids_names=${groupIdsNames}`;
 	const response = await fetch(url);
 
 	if (!response.ok) {
@@ -52,7 +53,7 @@ export async function getCurrentUser(fetch, groupIdsNames = false) {
  */
 export async function getCurrentUserAllowedViewerPaths(fetch, includeSharedProjects = false) {
 	logger.debug('Retrieving current user viewer paths');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/allowed-viewer-paths/?include_shared_projects=${includeSharedProjects}`;
+	const url = `${FRACTAL_SERVER_HOST}/auth/current-user/allowed-viewer-paths/?include_shared_projects=${includeSharedProjects}`;
 	const response = await fetch(url);
 
 	if (!response.ok) {
@@ -70,9 +71,8 @@ export async function getCurrentUserAllowedViewerPaths(fetch, includeSharedProje
  */
 export async function logout(fetch) {
 	logger.debug('Performing logout');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/token/logout/', {
-		method: 'POST'
-	});
+
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/token/logout/', { method: 'POST' });
 
 	if (!response.ok) {
 		logger.error('Logout failed');
@@ -85,11 +85,11 @@ export async function logout(fetch) {
 /**
  * Fetches the list of users from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('fractal-components/types/api').User>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').User>>}
  */
 export async function listUsers(fetch) {
 	logger.debug('Fetching the list of users');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + '/auth/users/');
+	const response = await fetch(FRACTAL_SERVER_HOST + '/auth/users/');
 
 	if (!response.ok) {
 		logger.error('Unable to fetch the list of users');
@@ -104,12 +104,13 @@ export async function listUsers(fetch) {
  * @param {typeof fetch} fetch
  * @param {number|string} userId
  * @param {boolean} groupIdsNames indicates whether to load the list of group IDs and names.
- * @returns {Promise<import('fractal-components/types/api').User>}
+ * @returns {Promise<import('#fractal-components/types/api').User>}
  */
 export async function getUser(fetch, userId, groupIdsNames = true) {
 	logger.debug('Fetching user [user_id=%d]', userId);
+
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/auth/users/${userId}/?group_ids_names=${groupIdsNames}`
+		`${FRACTAL_SERVER_HOST}/auth/users/${userId}/?group_ids_names=${groupIdsNames}`
 	);
 
 	if (!response.ok) {
@@ -124,11 +125,11 @@ export async function getUser(fetch, userId, groupIdsNames = true) {
  * Fetches the list of groups from the server
  * @param {typeof fetch} fetch
  * @param {boolean} userIds indicates whether to load the list of user IDs.
- * @returns {Promise<Array<import('fractal-components/types/api').Group>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').Group>>}
  */
 export async function listGroups(fetch, userIds = false) {
 	logger.debug('Fetching groups');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/group/?user_ids=${userIds}`;
+	const url = `${FRACTAL_SERVER_HOST}/auth/group/?user_ids=${userIds}`;
 	const response = await fetch(url);
 
 	if (!response.ok) {
@@ -143,11 +144,11 @@ export async function listGroups(fetch, userIds = false) {
  * Fetches a group from the server
  * @param {typeof fetch} fetch
  * @param {number|string} groupId
- * @returns {Promise<Array<import('fractal-components/types/api').Group>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').Group>>}
  */
 export async function getGroup(fetch, groupId) {
 	logger.debug('Fetching group %d', groupId);
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/group/${groupId}/`;
+	const url = `${FRACTAL_SERVER_HOST}/auth/group/${groupId}/`;
 	const response = await fetch(url);
 
 	if (!response.ok) {
@@ -161,11 +162,11 @@ export async function getGroup(fetch, groupId) {
 /**
  * Fetches user settings
  * @param {typeof fetch} fetch
- * @returns {Promise<import('fractal-components/types/api').ProfileInfo>}
+ * @returns {Promise<import('#fractal-components/types/api').ProfileInfo>}
  */
 export async function getProfileInfo(fetch) {
 	logger.debug('Retrieving current user profile');
-	const url = `${env.FRACTAL_SERVER_HOST}/auth/current-user/profile-info/`;
+	const url = `${FRACTAL_SERVER_HOST}/auth/current-user/profile-info/`;
 	const response = await fetch(url);
 
 	if (!response.ok) {
@@ -179,11 +180,11 @@ export async function getProfileInfo(fetch) {
 /**
  * @param {typeof fetch} fetch
  * @param {number} profileId
- * @returns {Promise<Array<import('fractal-components/types/api').User>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').User>>}
  */
 export async function getProfileUsers(fetch, profileId) {
 	logger.debug(`Retrieving users of profile ${profileId}`);
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/auth/users/?profile_id=${profileId}`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/auth/users/?profile_id=${profileId}`);
 
 	if (!response.ok) {
 		await responseError(response);

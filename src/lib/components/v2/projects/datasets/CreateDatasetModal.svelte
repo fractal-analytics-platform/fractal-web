@@ -1,14 +1,14 @@
 <script>
 	import { page } from '$app/state';
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import { onMount } from 'svelte';
 	import Modal from '../../../common/Modal.svelte';
-	import { normalizePayload, PropertyDescription } from 'fractal-components';
+	import { normalizePayload, PropertyDescription } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ProjectV2} project
-	 * @property {(dataset: import('fractal-components/types/api').DatasetV2) => void} createDatasetCallback
+	 * @property {import('#fractal-components/types/api').ProjectV2} project
+	 * @property {(dataset: import('#fractal-components/types/api').DatasetV2) => void} createDatasetCallback
 	 */
 
 	/** @type {Props} */
@@ -127,7 +127,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').DatasetV2|null>}
+	 * @returns {Promise<import('#fractal-components/types/api').DatasetV2|null>}
 	 */
 	async function callCreateDataset() {
 		const projectId = page.params.projectId;

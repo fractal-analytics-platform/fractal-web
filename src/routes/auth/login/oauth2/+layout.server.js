@@ -1,22 +1,20 @@
-import { env as publicEnv } from '$env/dynamic/public';
-import { env } from '$env/dynamic/private';
+import { PUBLIC_OAUTH_CLIENT_NAME } from '$app/env/public';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
 import { error, redirect } from '@sveltejs/kit';
 import { setCookieFromToken } from '../cookie';
 
 export async function load({ request, fetch, cookies }) {
 	const queryStringIndex = request.url.indexOf('?');
 	if (queryStringIndex === -1) {
-		error(400, { message: 'Missing query string' });
+		error(400, 'Missing query string');
 	}
 
-	if (!publicEnv.PUBLIC_OAUTH_CLIENT_NAME) {
-		error(500, { message: 'Undefined OAuth2 client name' });
+	if (!PUBLIC_OAUTH_CLIENT_NAME) {
+		error(500, 'Undefined OAuth2 client name');
 	}
 
 	const response = await fetch(
-		`${env.FRACTAL_SERVER_HOST}/auth/${publicEnv.PUBLIC_OAUTH_CLIENT_NAME}/callback/${request.url.substring(
-			queryStringIndex
-		)}`
+		`${FRACTAL_SERVER_HOST}/auth/${PUBLIC_OAUTH_CLIENT_NAME}/callback/${request.url.substring(queryStringIndex)}`
 	);
 
 	if (!response.ok) {
@@ -24,7 +22,7 @@ export async function load({ request, fetch, cookies }) {
 		if ('detail' in result) {
 			return { message: result.detail };
 		}
-		error(400, { message: JSON.stringify(result) });
+		error(400, JSON.stringify(result));
 	}
 
 	const receivedCookies = response.headers.getSetCookie();
@@ -38,9 +36,7 @@ export async function load({ request, fetch, cookies }) {
 	}
 
 	if (fastApiToken === null) {
-		return error(400, {
-			message: 'FastAPI token not found in response cookies'
-		});
+		return error(400, 'FastAPI token not found in response cookies');
 	}
 
 	setCookieFromToken(request, cookies, fastApiToken);

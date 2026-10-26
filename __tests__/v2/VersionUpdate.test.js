@@ -42,7 +42,7 @@ const newArgsSchema = {
 	additionalProperties: false
 };
 
-const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2[]} */ ([
+const taskGroups = /** @type {import('#fractal-components/types/api').TaskGroupV2[]} */ ([
 	{
 		id: 1,
 		pkg_name: 'group1',
@@ -428,7 +428,7 @@ const taskGroups = /** @type {import('fractal-components/types/api').TaskGroupV2
 ]);
 
 /**
- * @param {import('fractal-components/types/api').TaskV2} task
+ * @param {import('#fractal-components/types/api').TaskV2} task
  */
 function mockTaskRequest(task) {
 	/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue(createFetchResponse(task));
@@ -437,14 +437,14 @@ function mockTaskRequest(task) {
 /**
  * @param {string} name
  * @param {string|null} version
- * @returns {import('fractal-components/types/api').TaskV2}
+ * @returns {import('#fractal-components/types/api').TaskV2}
  */
 function getTask(name, version) {
 	const taskGroup = taskGroups.find(
 		(tg) => tg.version === version && tg.task_list.find((t) => t.name === name)
 	);
-	return /** @type {import('fractal-components/types/api').TaskV2} */ (
-		/** @type {import('fractal-components/types/api').TaskGroupV2} */ (taskGroup).task_list.find(
+	return /** @type {import('#fractal-components/types/api').TaskV2} */ (
+		/** @type {import('#fractal-components/types/api').TaskGroupV2} */ (taskGroup).task_list.find(
 			(t) => t.name === name
 		)
 	);
@@ -456,7 +456,7 @@ function getMockedWorkflowTask() {
 		args_non_parallel: null,
 		args_parallel: null
 	};
-	return /** @type {import('fractal-components/types/api').WorkflowTaskV2} */ (wft);
+	return /** @type {import('#fractal-components/types/api').WorkflowTaskV2} */ (wft);
 }
 
 describe('VersionUpdate', () => {
@@ -687,9 +687,9 @@ describe('VersionUpdate', () => {
 });
 
 /**
- * @param {import('fractal-components/types/api').TaskV2} task
+ * @param {import('#fractal-components/types/api').TaskV2} task
  * @param {number} expectedCount
- * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @param {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
  * @param {Array<{ task_id: number, version: string }>} updateCandidates
  * @returns {Promise<string[]|undefined>}
  */
@@ -711,8 +711,8 @@ async function checkVersions(task, expectedCount, workflowTask, updateCandidates
 }
 
 /**
- * @param {import('fractal-components/types/api').TaskV2} task
- * @param {import('fractal-components/types/api').WorkflowTaskV2} workflowTask
+ * @param {import('#fractal-components/types/api').TaskV2} task
+ * @param {import('#fractal-components/types/api').WorkflowTaskV2} workflowTask
  * @param {Array<{ task_id: number, version: string }>} updateCandidates
  * @returns
  */

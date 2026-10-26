@@ -3,7 +3,7 @@ import {
 	sortUsers,
 	getSortGroupByNameAllFirstComparator,
 	sortUserToImportSettings
-} from '$lib/components/admin/user_utilities';
+} from '#lib/components/admin/user_utilities.js';
 import { mockGroup, mockUser } from './mock/mock-types';
 
 it('should sort user by current superuser, then by superuser, then by email', () => {

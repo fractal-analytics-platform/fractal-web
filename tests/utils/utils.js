@@ -100,25 +100,37 @@ export async function uploadFile(page, selectorText, fileName, data, parentFolde
  */
 export async function selectSlimSelect(page, selector, optionValue, multiple = false) {
 	await selector.click();
-	const dataId = await selector.getAttribute('data-id');
-	const items = await page.locator(`.ss-content[data-id="${dataId}"]`).getByRole('option').all();
-	let selectedItem = null;
-	for (const item of items.reverse()) {
-		const itemText = await item.innerText();
-		if (itemText === optionValue) {
-			selectedItem = item;
-			break;
-		}
+	await expect
+		.poll(async () => await getSlimSelectSelectedItem(page, selector, optionValue))
+		.not.toBeNull();
+	const selectedItem = await getSlimSelectSelectedItem(page, selector, optionValue);
+	if (selectedItem === null) {
+		throw new Error('expect.poll assertion failed');
 	}
-	expect(selectedItem).not.toBeNull();
-	const item = /** @type {import('@playwright/test').Locator} */ (selectedItem);
-	await item.click();
+	await selectedItem.click();
 	if (multiple) {
 		await expect(selector).toHaveText(new RegExp(`(${optionValue}$)|(^\\d+ selected$)`));
 	} else {
 		await expect(selector).toHaveText(optionValue);
 	}
-	await expect(item).toHaveAttribute('aria-selected', 'true');
+	await expect(selectedItem).toHaveAttribute('aria-selected', 'true');
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} selector
+ * @param {string} optionValue
+ */
+async function getSlimSelectSelectedItem(page, selector, optionValue) {
+	const dataId = await selector.getAttribute('data-id');
+	const items = await page.locator(`.ss-content[data-id="${dataId}"]`).getByRole('option').all();
+	for (const item of items.reverse()) {
+		const itemText = await item.innerText();
+		if (itemText === optionValue) {
+			return item;
+		}
+	}
+	return null;
 }
 
 /**

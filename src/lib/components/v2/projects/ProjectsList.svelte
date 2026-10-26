@@ -1,18 +1,18 @@
 <script>
-	import { projectInfoModalV2 } from '$lib/stores';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { getAlertErrorFromResponse, getFieldValidationError } from '$lib/common/errors';
+	import { projectInfoModalV2 } from '#lib/stores.js';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import { getAlertErrorFromResponse, getFieldValidationError } from '#lib/common/errors.js';
 	import { goto } from '$app/navigation';
 	import Modal from '../../common/Modal.svelte';
-	import { deleteDatasetSelectionsForProject } from '$lib/common/workflow_utilities';
-	import { normalizePayload } from 'fractal-components';
+	import { deleteDatasetSelectionsForProject } from '#lib/common/workflow_utilities.js';
+	import { normalizePayload } from '#fractal-components';
 	import { resolve } from '$app/paths';
 
 	// List of projects to be displayed
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ProjectV2[]} [projects]
+	 * @property {import('#fractal-components/types/api').ProjectV2[]} [projects]
 	 * @property {string} [projectSearch]
 	 * @property {Modal|undefined} [newProjectModal]
 	 *
@@ -40,7 +40,7 @@
 	 * @param {number} projectId
 	 */
 	function setProjectInfoModal(projectId) {
-		/** @type {import('fractal-components/types/api').ProjectV2} */
+		/** @type {import('#fractal-components/types/api').ProjectV2} */
 		const project = projects.filter((p) => p.id === projectId)[0];
 		projectInfoModalV2.set(project);
 	}
@@ -99,8 +99,11 @@
 	async function handleDeleteProject(projectId) {
 		console.log('Client request project delete');
 
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {
@@ -120,8 +123,11 @@
 	 */
 	async function toggleStarredProject(project_id, is_starred) {
 		const endpoint = is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${project_id}/${endpoint}`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		if (!response.ok) {
 			throw await getAlertErrorFromResponse(response);

@@ -1,15 +1,15 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { FormErrorHandler } from '$lib/common/errors';
-	import StandardDismissableAlert from '$lib/components/common/StandardDismissableAlert.svelte';
-	import { deepCopy } from 'fractal-components';
+	import { FormErrorHandler } from '#lib/common/errors.js';
+	import StandardDismissableAlert from '#lib/components/common/StandardDismissableAlert.svelte';
+	import { deepCopy } from '#fractal-components';
 	import { resolve } from '$app/paths';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').Profile | Omit<import('fractal-components/types/api').Profile, 'id'>} profile
-	 * @property {import('fractal-components/types/api').Resource} resource
-	 * @property {(user: import('fractal-components/types/api').Profile & { id: number | undefined }) => Promise<Response>} saveProfile
+	 * @property {import('#fractal-components/types/api').Profile | Omit<import('#fractal-components/types/api').Profile, 'id'>} profile
+	 * @property {import('#fractal-components/types/api').Resource} resource
+	 * @property {(user: import('#fractal-components/types/api').Profile & { id: number | undefined }) => Promise<Response>} saveProfile
 	 * @property {boolean} [showSaveButton]
 	 */
 
@@ -21,7 +21,7 @@
 		showSaveButton = true
 	} = $props();
 
-	/** @type {import('fractal-components/types/api').Profile | undefined} */
+	/** @type {import('#fractal-components/types/api').Profile | undefined} */
 	// eslint-disable-next-line svelte/prefer-writable-derived
 	let editableProfile = $state();
 	let profileFormSubmitted = $state(false);

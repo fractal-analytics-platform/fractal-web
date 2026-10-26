@@ -3,7 +3,7 @@
 		AlertError,
 		displayStandardErrorAlert,
 		getAlertErrorFromResponse
-	} from '$lib/common/errors';
+	} from '#lib/common/errors.js';
 	import { tick } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
 
@@ -30,7 +30,7 @@
 		);
 
 		if (response.ok) {
-			/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').TaskGroupActivityV2>} */
+			/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').TaskGroupActivityV2>} */
 			const activities = await response.json();
 			if (activities.items.length === 0) {
 				errorAlert = displayStandardErrorAlert(

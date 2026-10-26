@@ -1,7 +1,7 @@
-import { removeDuplicatedItems } from '$lib/common/component_utilities';
-import { getProject } from '$lib/server/api/v2/project_api';
-import { getWorkflow, getWorkflowJobs } from '$lib/server/api/v2/workflow_api';
-import { env } from '$env/dynamic/private';
+import { removeDuplicatedItems } from '#lib/common/component_utilities.js';
+import { getProject } from '#lib/server/api/v2/project_api.js';
+import { getWorkflow, getWorkflowJobs } from '#lib/server/api/v2/workflow_api.js';
+import { FRACTAL_RUNNER_BACKEND } from '$app/env/private';
 
 export async function load({ fetch, params }) {
 	const { projectId, workflowId } = params;
@@ -28,12 +28,12 @@ export async function load({ fetch, params }) {
 	);
 
 	return {
-		project: project,
+		project,
 		projects: [project],
 		workflow,
 		workflows,
 		datasets,
 		jobs,
-		runnerBackend: env.FRACTAL_RUNNER_BACKEND
+		runnerBackend: FRACTAL_RUNNER_BACKEND
 	};
 }

@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import ProfileEditor from '../../src/lib/components/v2/admin/ProfileEditor.svelte';
 
 describe('ProfileEditor', () => {
-	const mockedResource = /** @type {import('fractal-components/types/api').Resource} */ ({
+	const mockedResource = /** @type {import('#fractal-components/types/api').Resource} */ ({
 		id: 1,
 		type: 'slurm_ssh'
 	});
@@ -28,7 +28,7 @@ describe('ProfileEditor', () => {
 		render(ProfileEditor, {
 			props: {
 				resource: mockedResource,
-				profile: /** @type {import('fractal-components/types/api').Profile} */ ({
+				profile: /** @type {import('#fractal-components/types/api').Profile} */ ({
 					id: 1,
 					resource_id: 1,
 					resource_type: 'slurm_ssh'

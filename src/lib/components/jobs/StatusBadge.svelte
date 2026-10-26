@@ -1,14 +1,14 @@
 <script>
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').JobStatus|null} [status]
+	 * @property {import('#fractal-components/types/api').JobStatus|null} [status]
 	 */
 
 	/** @type {Props} */
 	let { status = null } = $props();
 
 	/**
-	 * @param {import('fractal-components/types/api').JobStatus|null} status
+	 * @param {import('#fractal-components/types/api').JobStatus|null} status
 	 */
 	function getLabelStyle(status) {
 		switch (status) {

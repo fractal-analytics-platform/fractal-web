@@ -62,9 +62,14 @@ export default defineConfig({
 
 	webServer: [
 		{
+			command: 'node ./tests/proxy-oauth2.js',
+			port: 5556,
+			stdout: 'pipe',
+			reuseExistingServer: !process.env.CI
+		},
+		{
 			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
-			waitForPort: true,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI,
 			timeout: 120000
@@ -72,20 +77,18 @@ export default defineConfig({
 		{
 			command: 'node ./tests/fake-job-server.js',
 			port: 8080,
-			waitForPort: true,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI
 		},
 		{
 			command: 'uv run zensical serve --dev-addr 127.0.0.1:8001',
 			port: 8001,
-			waitForPort: true,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI
 		},
 		{
 			command:
-				'npm run build && LOG_LEVEL_CONSOLE=debug ORIGIN=http://localhost:5173 PORT=5173 FRACTAL_RUNNER_BACKEND=local node build',
+				'npm run build && LOG_LEVEL_CONSOLE=debug PORT=5173 FRACTAL_RUNNER_BACKEND=local node build',
 			port: 5173,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI

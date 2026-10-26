@@ -1,16 +1,16 @@
 <script>
-	import { env } from '$env/dynamic/public';
-	import { extractJobErrorParts, showExecutorErrorLog } from '$lib/common/job_utilities';
+	import { PUBLIC_UPDATE_JOBS_INTERVAL } from '$app/env/public';
+	import { extractJobErrorParts, showExecutorErrorLog } from '#lib/common/job_utilities.js';
 	import { onDestroy } from 'svelte';
 	import Modal from '../../common/Modal.svelte';
-	import ExpandableLog from '$lib/components/common/ExpandableLog.svelte';
+	import ExpandableLog from '#lib/components/common/ExpandableLog.svelte';
 
 	/** @type {Array<{text: string, highlight: boolean}>} */
 	let logParts = $state([]);
 	let errorAlert = undefined;
 	/** @type {Modal|undefined} */
 	let modal = $state();
-	/** @type {import('fractal-components/types/api').JobV2|undefined} */
+	/** @type {import('#fractal-components/types/api').JobV2|undefined} */
 	let job = $state();
 	let admin = false;
 	let log = '';
@@ -18,14 +18,11 @@
 	/** @type {'main'|'slurm'} */
 	let selectedTab = $state('main');
 
-	const updateJobInterval = env.PUBLIC_UPDATE_JOBS_INTERVAL
-		? parseInt(env.PUBLIC_UPDATE_JOBS_INTERVAL)
-		: 3000;
 	/** @type {NodeJS.Timeout|undefined} */
 	let updateJobTimeout = undefined;
 
 	/**
-	 * @param {import('fractal-components/types/api').JobV2} selectedJob
+	 * @param {import('#fractal-components/types/api').JobV2} selectedJob
 	 * @param {boolean} isAdminPage
 	 */
 	export async function show(selectedJob, isAdminPage) {
@@ -46,7 +43,7 @@
 			} else {
 				logParts = [{ text: log, highlight: false }];
 				if (job.status === 'submitted') {
-					updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
+					updateJobTimeout = setTimeout(updateJobLogInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 				}
 			}
 		} finally {
@@ -59,7 +56,7 @@
 		if (job?.status === 'submitted') {
 			await loadJobLog();
 			logParts = [{ text: log, highlight: false }];
-			updateJobTimeout = setTimeout(updateJobLogInBackground, updateJobInterval);
+			updateJobTimeout = setTimeout(updateJobLogInBackground, PUBLIC_UPDATE_JOBS_INTERVAL);
 		} else if (job?.status === 'failed') {
 			logParts = extractJobErrorParts(log, true);
 		} else {

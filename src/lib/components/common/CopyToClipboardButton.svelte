@@ -1,5 +1,5 @@
 <script>
-	import { hideAllTooltips } from '$lib/common/component_utilities';
+	import { hideAllTooltips } from '#lib/common/component_utilities.js';
 	import { onDestroy } from 'svelte';
 
 	/**

@@ -1,9 +1,9 @@
 <script>
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').ProjectInvitation} invitation
+	 * @property {import('#fractal-components/types/api').ProjectInvitation} invitation
 	 * @property {() => Promise<void>} onAccept
 	 */
 
@@ -12,13 +12,16 @@
 
 	let display = $state(true);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	async function acceptInvitation() {
 		errorAlert?.hide();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${invitation.project_id}/access/accept`, {
-			method: 'POST'
+			method: 'POST',
+			headers
 		});
 		if (response.ok) {
 			display = false;
@@ -33,8 +36,11 @@
 
 	async function rejectInvitation() {
 		errorAlert?.hide();
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${invitation.project_id}/access`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 		if (response.ok) {
 			display = false;

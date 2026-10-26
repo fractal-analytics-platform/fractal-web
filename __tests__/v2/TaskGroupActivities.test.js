@@ -5,8 +5,8 @@ import { render, screen, within, waitFor } from '@testing-library/svelte';
 global.fetch = vi.fn();
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: { PUBLIC_UPDATE_JOBS_INTERVAL: 90 } };
+vi.mock('$app/env/public', () => {
+	return { PUBLIC_UPDATE_JOBS_INTERVAL: 90 };
 });
 
 // Mocking the page store

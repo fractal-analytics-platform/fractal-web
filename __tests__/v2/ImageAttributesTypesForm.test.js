@@ -6,8 +6,8 @@ import ImageAttributesTypesForm from '../../src/lib/components/v2/projects/datas
 import { tick } from 'svelte';
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: {} };
+vi.mock('$app/env/public', () => {
+	return {};
 });
 
 describe('AttributesTypesForm', () => {

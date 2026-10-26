@@ -1,5 +1,5 @@
 <script>
-	import { FormErrorHandler } from '$lib/common/errors';
+	import { FormErrorHandler } from '#lib/common/errors.js';
 	import StandardDismissableAlert from '../../common/StandardDismissableAlert.svelte';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import TypesEditor from './TypesEditor.svelte';
@@ -11,12 +11,12 @@
 		normalizePayload,
 		SchemaValidator,
 		stripDiscriminator
-	} from 'fractal-components';
+	} from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {(task: import('fractal-components/types/api').TaskV2[]) => void} addNewTasks
-	 * @property {import('fractal-components/types/api').User} user
+	 * @property {(task: import('#fractal-components/types/api').TaskV2[]) => void} addNewTasks
+	 * @property {import('#fractal-components/types/api').User} user
 	 * @property {string|null} defaultGroupName
 	 */
 
@@ -32,9 +32,9 @@
 	let version = $state('');
 	let docs_info = $state('');
 	let docs_link = $state('');
-	/** @type {import("fractal-components/types/jschema").ArgsSchemaVersion} */
+	/** @type {import("#fractal-components/types/jschema").ArgsSchemaVersion} */
 	let args_schema_version = $state('pydantic_v2');
-	/** @type {import('fractal-components/types/api').TaskV2Type} */
+	/** @type {import('#fractal-components/types/api').TaskV2Type} */
 	let taskType = $state('non_parallel');
 	let privateTask = $state(false);
 	let selectedGroup = $state(null);

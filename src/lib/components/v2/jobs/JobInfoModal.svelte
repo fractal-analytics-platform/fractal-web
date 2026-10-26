@@ -1,10 +1,10 @@
 <script>
-	import StatusBadge from '$lib/components/jobs/StatusBadge.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import StatusBadge from '#lib/components/jobs/StatusBadge.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import { page } from '$app/state';
 	import Modal from '../../common/Modal.svelte';
 
-	/** @type {import('fractal-components/types/api').JobV2|undefined} */
+	/** @type {import('#fractal-components/types/api').JobV2|undefined} */
 	let job = $state();
 
 	let errorAlert = undefined;
@@ -14,7 +14,7 @@
 	const currentUserEmail = $derived(page.data.userInfo?.email);
 
 	/**
-	 * @param jobToDisplay {import('fractal-components/types/api').JobV2}
+	 * @param jobToDisplay {import('#fractal-components/types/api').JobV2}
 	 */
 	export async function show(jobToDisplay) {
 		job = jobToDisplay;

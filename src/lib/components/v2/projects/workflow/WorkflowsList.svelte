@@ -1,21 +1,21 @@
 <script>
 	import { goto } from '$app/navigation';
-	import ConfirmActionButton from '$lib/components/common/ConfirmActionButton.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
+	import ConfirmActionButton from '#lib/components/common/ConfirmActionButton.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
 	import CreateWorkflowModal from './CreateWorkflowModal.svelte';
 	import { onMount } from 'svelte';
-	import { saveSelectedDataset } from '$lib/common/workflow_utilities';
-	import { normalizePayload } from 'fractal-components';
+	import { saveSelectedDataset } from '#lib/common/workflow_utilities.js';
+	import { normalizePayload } from '#fractal-components';
 	import { resolve } from '$app/paths';
 
 	// The list of workflows
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let starWorkflowErrorAlert;
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import('fractal-components/types/api').WorkflowV2[]} [workflows]
+	 * @property {import('#fractal-components/types/api').WorkflowV2[]} [workflows]
 	 * @property {any} [projectId] - Set the projectId prop to reference a specific project for each workflow
 	 */
 
@@ -31,7 +31,7 @@
 	/** @type {CreateWorkflowModal|undefined} */
 	let createWorkflowModal = $state();
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**
@@ -40,8 +40,11 @@
 	 * @returns {Promise<*>}
 	 */
 	async function handleDeleteWorkflow(workflowId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(`/api/v2/project/${projectId}/workflow/${workflowId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers
 		});
 
 		if (response.ok) {
@@ -56,7 +59,7 @@
 	}
 
 	/**
-	 * @param {import('fractal-components/types/api').WorkflowV2} importedWorkflow
+	 * @param {import('#fractal-components/types/api').WorkflowV2} importedWorkflow
 	 * @param {boolean} redirect
 	 */
 	async function handleWorkflowImported(importedWorkflow, redirect = true) {
@@ -165,10 +168,13 @@
 	async function toggleStarredWorkflow(project_id, workflow_id, is_starred) {
 		starWorkflowErrorAlert?.hide();
 		const endpoint = is_starred ? 'unstar' : 'star';
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/v2/project/${project_id}/workflow/${workflow_id}/${endpoint}`,
 			{
-				method: 'POST'
+				method: 'POST',
+				headers
 			}
 		);
 		if (!response.ok) {

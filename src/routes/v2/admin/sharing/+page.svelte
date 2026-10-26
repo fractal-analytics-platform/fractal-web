@@ -1,19 +1,19 @@
 <script>
 	import { page } from '$app/state';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
-	import Paginator from '$lib/components/common/Paginator.svelte';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
+	import Paginator from '#lib/components/common/Paginator.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 
 	const currentUserId = $derived(page.data.userInfo.id);
 	const sortedUsers = $derived(sortDropdownUsers([...page.data.users], currentUserId));
 
 	let searched = $state(false);
 	let searching = $state(false);
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let genericErrorAlert;
 
-	/** @type {import('fractal-components/types/api').Pagination<import('fractal-components/types/api').LinkUserProjectRead> | undefined} */
+	/** @type {import('#fractal-components/types/api').Pagination<import('#fractal-components/types/api').LinkUserProjectRead> | undefined} */
 	let results = $state();
 	let currentPage = $state(1);
 	let pageSize = $state(50);
@@ -90,10 +90,13 @@
 	 * @param {number} projectId
 	 */
 	async function verifyGuestInvitation(guestUserId, projectId) {
+		const headers = new Headers();
+		headers.set('Content-Type', 'application/json');
 		const response = await fetch(
 			`/api/admin/v2/linkuserproject/verify/?guest_user_id=${guestUserId}&project_id=${projectId}`,
 			{
-				method: 'POST'
+				method: 'POST',
+				headers
 			}
 		);
 		if (response.ok) {

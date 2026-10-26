@@ -21,8 +21,8 @@ vi.mock('$app/state', () => {
 });
 
 // Mocking public variables
-vi.mock('$env/dynamic/public', () => {
-	return { env: {} };
+vi.mock('$app/env/public', () => {
+	return { PUBLIC_UPDATE_JOBS_INTERVAL: 3000 };
 });
 
 // Mocking fetch

@@ -2,8 +2,7 @@ import { defineConfig } from 'vitest/config';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { svelteTesting } from '@testing-library/svelte/vite';
 
-/** @type {import('vite').UserConfigExport} */
-const config = defineConfig({
+/** @type {import('vite').UserConfigExport} */ const config = defineConfig({
 	plugins: [svelte(), svelteTesting()],
 	build: {
 		outDir: './build',

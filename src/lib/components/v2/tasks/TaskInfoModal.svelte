@@ -1,9 +1,9 @@
 <script>
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
 	import Modal from '../../common/Modal.svelte';
-	import { formatMarkdown } from 'fractal-components/common/utils';
+	import { formatMarkdown } from '#fractal-components/common/utils';
 
-	/** @type {import('fractal-components/types/api').TaskV2|undefined} */
+	/** @type {import('#fractal-components/types/api').TaskV2|undefined} */
 	let task = $state();
 	/** @type {string|undefined} */
 	let taskVersion = $state();

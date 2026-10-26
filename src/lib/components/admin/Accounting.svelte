@@ -1,14 +1,14 @@
 <script>
-	import { arrayToCsv, downloadBlob, getTimestamp } from '$lib/common/component_utilities';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import { sortDropdownUsers } from '$lib/components/admin/user_utilities';
-	import Paginator from '$lib/components/common/Paginator.svelte';
-	import { normalizePayload } from 'fractal-components/common/utils';
+	import { arrayToCsv, downloadBlob, getTimestamp } from '#lib/common/component_utilities.js';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import { sortDropdownUsers } from '#lib/components/admin/user_utilities.js';
+	import Paginator from '#lib/components/common/Paginator.svelte';
+	import { normalizePayload } from '#fractal-components/common/utils';
 	import TimestampCell from '../jobs/TimestampCell.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {Array<import('fractal-components/types/api').User>} [users]
+	 * @property {Array<import('#fractal-components/types/api').User>} [users]
 	 * @property {number} currentUserId
 	 */
 
@@ -27,10 +27,10 @@
 	let currentPage = $state(1);
 	let pageSize = $state(10);
 
-	/** @type {import('fractal-components/types/api').Accounting|undefined} */
+	/** @type {import('#fractal-components/types/api').Accounting|undefined} */
 	let accounting = $state(undefined);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert = undefined;
 
 	/**
@@ -70,7 +70,7 @@
 	/**
 	 * @param {number} newCurrentPage
 	 * @param {number} newPageSize
-	 * @returns {Promise<import('fractal-components/types/api').Accounting|undefined>}
+	 * @returns {Promise<import('#fractal-components/types/api').Accounting|undefined>}
 	 */
 	async function accountingQuery(newCurrentPage, newPageSize) {
 		errorAlert?.hide();

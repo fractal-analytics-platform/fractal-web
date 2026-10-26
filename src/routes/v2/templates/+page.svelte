@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import TemplatesTable from '$lib/components/v2/templates/TemplatesTable.svelte';
+	import TemplatesTable from '#lib/components/v2/templates/TemplatesTable.svelte';
 
 	/** @type {Array<[number, string]>} */
 	const groups = $derived(page.data.user.group_ids_names || []);

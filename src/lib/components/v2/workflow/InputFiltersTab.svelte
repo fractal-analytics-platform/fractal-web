@@ -1,17 +1,17 @@
 <script>
 	import { onMount } from 'svelte';
 	import InputFiltersTypesForm from '../projects/datasets/InputFiltersTypesForm.svelte';
-	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import BooleanIcon from 'fractal-components/common/BooleanIcon.svelte';
-	import { normalizePayload } from 'fractal-components';
+	import { displayStandardErrorAlert, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import BooleanIcon from '#fractal-components/common/BooleanIcon.svelte';
+	import { normalizePayload } from '#fractal-components';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
-	 * @property {import("fractal-components/types/api").WorkflowTaskV2} workflowTask
+	 * @property {import("#fractal-components/types/api").WorkflowV2} workflow
+	 * @property {import("#fractal-components/types/api").WorkflowTaskV2} workflowTask
 	 * @property {number|undefined} selectedDatasetId
-	 * @property {(wft: import("fractal-components/types/api").WorkflowTaskV2) => void} updateWorkflowTaskCallback
+	 * @property {(wft: import("#fractal-components/types/api").WorkflowTaskV2) => void} updateWorkflowTaskCallback
 	 */
 
 	/** @type {Props} */
@@ -29,7 +29,7 @@
 	let selectedDatasetTypeKey = $state('');
 	let selectedDatasetTypeValue = $state(true);
 
-	/** @type {import('$lib/components/common/StandardErrorAlert.svelte').default|undefined} */
+	/** @type {import('#lib/components/common/StandardErrorAlert.svelte').default|undefined} */
 	let errorAlert;
 
 	onMount(() => {
@@ -56,7 +56,7 @@
 				}
 			);
 			if (response.ok) {
-				/** @type {import('fractal-components/types/api').ImagePage} */
+				/** @type {import('#fractal-components/types/api').ImagePage} */
 				const imagePage = await response.json();
 				datasetTypes = imagePage.types;
 			} else {

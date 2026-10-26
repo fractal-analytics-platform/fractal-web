@@ -1,11 +1,11 @@
 <script>
-	import { AlertError, getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
-	import TimestampCell from '$lib/components/jobs/TimestampCell.svelte';
+	import { AlertError, getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
+	import TimestampCell from '#lib/components/jobs/TimestampCell.svelte';
 	import { tick } from 'svelte';
 
 	/**
-	 * @type {import('fractal-components/types/api').WorkflowTemplate|undefined}
+	 * @type {import('#fractal-components/types/api').WorkflowTemplate|undefined}
 	 */
 	let template = $state();
 

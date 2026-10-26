@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
-import { responseError } from '$lib/common/errors.server';
-import { getLogger } from '$lib/server/logger.js';
+import { FRACTAL_SERVER_HOST } from '$app/env/private';
+import { responseError } from '#lib/common/errors.server.js';
+import { getLogger } from '#lib/server/logger.js';
 
 const logger = getLogger('projects API [v2]');
 
@@ -10,11 +10,11 @@ const logger = getLogger('projects API [v2]');
  * Fetches the list of projects from the server
  * @param {typeof fetch} fetch
  * @param {boolean} isOwner
- * @returns {Promise<import('fractal-components/types/api').ProjectV2[]>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectV2[]>}
  */
 export async function listProjects(fetch, isOwner) {
 	logger.debug('Fetching the list of projects');
-	const response = await fetch(`${env.FRACTAL_SERVER_HOST}/api/v2/project/?is_owner=${isOwner}`);
+	const response = await fetch(`${FRACTAL_SERVER_HOST}/api/v2/project/?is_owner=${isOwner}`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch projects list');
@@ -28,11 +28,11 @@ export async function listProjects(fetch, isOwner) {
  * Fetches a project from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('fractal-components/types/api').ProjectV2>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectV2>}
  */
 export async function getProject(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/`);
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project [project_id=%d]', projectId);
@@ -46,11 +46,11 @@ export async function getProject(fetch, projectId) {
  * Fetches a project access
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('fractal-components/types/api').ProjectAccessRead>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectAccessRead>}
  */
 export async function getProjectAccess(fetch, projectId) {
 	logger.debug('Fetching project [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access/`);
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/access/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project access [project_id=%d]', projectId);
@@ -64,11 +64,11 @@ export async function getProjectAccess(fetch, projectId) {
  * Fetches project guests from the server
  * @param {typeof fetch} fetch
  * @param {string} projectId
- * @returns {Promise<import('fractal-components/types/api').ProjectGuest>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectGuest>}
  */
 export async function getProjectGuests(fetch, projectId) {
 	logger.debug('Fetching project guests [project_id=%d]', projectId);
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/guest/`);
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/guest/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project guests [project_id=%d]', projectId);
@@ -81,11 +81,11 @@ export async function getProjectGuests(fetch, projectId) {
 /**
  * Fetches project invitations from the server
  * @param {typeof fetch} fetch
- * @returns {Promise<import('fractal-components/types/api').ProjectInvitation>}
+ * @returns {Promise<import('#fractal-components/types/api').ProjectInvitation>}
  */
 export async function getProjectInvitations(fetch) {
 	logger.debug('Fetching project invitations');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/project/invitation/`);
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/project/invitation/`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch project invitations');
@@ -101,12 +101,13 @@ export async function getProjectInvitations(fetch) {
  * Fetches all the project's datasets from the server
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
- * @returns {Promise<Array<import('fractal-components/types/api').DatasetV2>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').DatasetV2>>}
  */
 export async function getProjectDatasets(fetch, projectId) {
 	logger.debug('Retrieving project datasets [project_id=%d]', projectId);
+
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/?history=false`
+		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/?history=false`
 	);
 
 	if (!response.ok) {
@@ -114,7 +115,7 @@ export async function getProjectDatasets(fetch, projectId) {
 		await responseError(response);
 	}
 
-	/** @type {import('fractal-components/types/api').DatasetV2[]} */
+	/** @type {import('#fractal-components/types/api').DatasetV2[]} */
 	const datasets = await response.json();
 
 	return datasets;
@@ -125,12 +126,13 @@ export async function getProjectDatasets(fetch, projectId) {
  * @param {typeof fetch} fetch
  * @param {number|string} projectId
  * @param {number|string} datasetId
- * @returns {Promise<import('fractal-components/types/api').DatasetV2>}
+ * @returns {Promise<import('#fractal-components/types/api').DatasetV2>}
  */
 export async function getDataset(fetch, projectId, datasetId) {
 	logger.debug('Retrieving dataset [dataset_id=%d] [project_id=%d]', datasetId, projectId);
+
 	const response = await fetch(
-		env.FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/${datasetId}/`
+		FRACTAL_SERVER_HOST + `/api/v2/project/${projectId}/dataset/${datasetId}/`
 	);
 
 	if (!response.ok) {
@@ -146,11 +148,11 @@ export async function getDataset(fetch, projectId, datasetId) {
 /**
  * Fetches the list of all the jobs belonging to the current user
  * @param {typeof fetch} fetch
- * @returns {Promise<Array<import('fractal-components/types/api').JobV2>>}
+ * @returns {Promise<Array<import('#fractal-components/types/api').JobV2>>}
  */
 export async function getUserJobs(fetch) {
 	logger.debug('Fetching user jobs');
-	const response = await fetch(env.FRACTAL_SERVER_HOST + `/api/v2/job/?log=false`);
+	const response = await fetch(FRACTAL_SERVER_HOST + `/api/v2/job/?log=false`);
 
 	if (!response.ok) {
 		logger.error('Unable to fetch user jobs');

@@ -1,22 +1,22 @@
 <script>
 	import { page } from '$app/state';
-	import DatasetInfoModal from '$lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
-	import { env } from '$env/dynamic/public';
-	import DatasetImagesTable from '$lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
+	import DatasetInfoModal from '#lib/components/v2/projects/datasets/DatasetInfoModal.svelte';
+	import {
+		PUBLIC_FRACTAL_DATA_URL,
+		PUBLIC_FRACTAL_VIZARR_VIEWER_URL,
+		PUBLIC_FRACTAL_FEATURE_EXPLORER_URL
+	} from '$app/env/public';
+	import DatasetImagesTable from '#lib/components/v2/projects/datasets/DatasetImagesTable.svelte';
 	import { onMount } from 'svelte';
-	import { addFinalSlash, encodePathForUrl } from '$lib/common/component_utilities';
-	import CopyToClipboardButton from '$lib/components/common/CopyToClipboardButton.svelte';
-	import { normalizePayload } from 'fractal-components';
-
-	const fractalDataUrl = addFinalSlash(env.PUBLIC_FRACTAL_DATA_URL);
-	const vizarrViewerUrl = addFinalSlash(env.PUBLIC_FRACTAL_VIZARR_VIEWER_URL);
-	const featureExplorerUrl = addFinalSlash(env.PUBLIC_FRACTAL_FEATURE_EXPLORER_URL);
+	import { encodePathForUrl } from '#lib/common/component_utilities.js';
+	import CopyToClipboardButton from '#lib/components/common/CopyToClipboardButton.svelte';
+	import { normalizePayload } from '#fractal-components';
 
 	let projectId = page.params.projectId;
 
-	/** @type {import('fractal-components/types/api').DatasetV2} */
+	/** @type {import('#fractal-components/types/api').DatasetV2} */
 	let dataset = $state(page.data.dataset);
-	/** @type {import('fractal-components/types/api').ImagePage} */
+	/** @type {import('#fractal-components/types/api').ImagePage} */
 	let imagePage = $state(page.data.imagePage);
 
 	/** @type {DatasetImagesTable|undefined} */
@@ -52,7 +52,7 @@
 	}
 
 	/**
-	 * @returns {Promise<import('fractal-components/types/api').Image|undefined>}
+	 * @returns {Promise<import('#fractal-components/types/api').Image|undefined>}
 	 */
 	async function loadImageForSelectedPlate() {
 		const params = { attribute_filters: { plate: [selectedPlate] } };
@@ -70,7 +70,7 @@
 			console.error(`Unable to load image for plate ${selectedPlate}`);
 			return undefined;
 		}
-		/** @type {import('fractal-components/types/api').ImagePage}*/
+		/** @type {import('#fractal-components/types/api').ImagePage}*/
 		const result = await response.json();
 		if (result.items.length === 0) {
 			console.error(
@@ -160,7 +160,7 @@
 	</div>
 </div>
 
-{#if fractalDataUrl && (vizarrViewerUrl || featureExplorerUrl) && plates.length > 0}
+{#if PUBLIC_FRACTAL_DATA_URL && (PUBLIC_FRACTAL_VIZARR_VIEWER_URL || PUBLIC_FRACTAL_FEATURE_EXPLORER_URL) && plates.length > 0}
 	<div class="container border border-info rounded bg-light p-3 mt-2">
 		<div class="row mb-2">
 			<div class="col">
@@ -179,9 +179,9 @@
 			</div>
 			<div class="col-12">
 				{#if platePath}
-					{#if vizarrViewerUrl}
+					{#if PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 						<a
-							href="{vizarrViewerUrl}?source={fractalDataUrl}files{encodePathForUrl(
+							href="{PUBLIC_FRACTAL_VIZARR_VIEWER_URL}?source={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 								platePath
 							)}&roi=1"
 							class="btn btn-info me-2 viewer-btn vizarr-btn"
@@ -193,9 +193,9 @@
 							&nbsp;
 						</a>
 					{/if}
-					{#if featureExplorerUrl}
+					{#if PUBLIC_FRACTAL_FEATURE_EXPLORER_URL}
 						<a
-							href="{featureExplorerUrl}?zarr_url={fractalDataUrl}files{encodePathForUrl(
+							href="{PUBLIC_FRACTAL_FEATURE_EXPLORER_URL}?zarr_url={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 								platePath
 							)}&setup_mode=Plates"
 							class="btn btn-info me-2"
@@ -206,10 +206,10 @@
 							Open in Feature Explorer
 						</a>
 					{/if}
-					{#if vizarrViewerUrl}
+					{#if PUBLIC_FRACTAL_VIZARR_VIEWER_URL}
 						<CopyToClipboardButton
 							btnClass="light btn-outline-secondary"
-							clipboardText="{fractalDataUrl}files{encodePathForUrl(platePath)}"
+							clipboardText="{PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(platePath)}"
 							text="Get URL"
 							id="get-plate-url"
 						/>

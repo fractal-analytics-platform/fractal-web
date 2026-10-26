@@ -1,11 +1,11 @@
 <script>
-	import { getAlertErrorFromResponse } from '$lib/common/errors';
-	import Modal from '$lib/components/common/Modal.svelte';
+	import { getAlertErrorFromResponse } from '#lib/common/errors.js';
+	import Modal from '#lib/components/common/Modal.svelte';
 	import TypeFiltersCell from './TypeFiltersCell.svelte';
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {import("fractal-components/types/api").WorkflowV2} workflow
+	 * @property {import("#fractal-components/types/api").WorkflowV2} workflow
 	 */
 
 	/** @type {Props} */
@@ -15,7 +15,7 @@
 	let modal = $state();
 	let loading = $state(false);
 
-	/** @type {Array<import("fractal-components/types/api").TypeFiltersFlow>} */
+	/** @type {Array<import("#fractal-components/types/api").TypeFiltersFlow>} */
 	let typeFiltersFlow = $state([]);
 
 	export async function open() {
