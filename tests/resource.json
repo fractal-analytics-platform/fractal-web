@@ -10,9 +10,9 @@
 	"tasks_local_dir": "/tmp/fractal-test-server/data-tasks",
 	"tasks_python_config": {
 		"versions": {
-			"3.12": "/tmp/fractal-test-server/venv/bin/python"
+			"3.13": "/tmp/fractal-test-server/venv/bin/python"
 		},
-		"default_version": "3.12"
+		"default_version": "3.13"
 	},
 	"tasks_pixi_config": {
 		"default_version": "0.83.0",
