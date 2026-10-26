@@ -3,3 +3,4 @@ paths-ignore:
   - '**/node_modules/**'
   - '**/build/**'
   - '**/tests/**'
+  - 'tests/proxy-oauth2.js'
