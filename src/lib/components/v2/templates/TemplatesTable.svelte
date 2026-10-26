@@ -7,7 +7,6 @@
 	import Paginator from '#lib/components/common/Paginator.svelte';
 	import { page } from '$app/state';
 	import { onMount, tick } from 'svelte';
-	import { goto } from '$app/navigation';
 
 	/**
 	 * @typedef {Object} Props
@@ -161,9 +160,9 @@
 		}
 		await tick();
 
-		await goto(url, { shallow: true });
+		window.history.pushState({ path: url.toString() }, '', url.toString());
 
-		let response = await fetch(`/api/v2/workflow-template?${params.toString()}`);
+		const response = await fetch(`/api/v2/workflow-template?${params.toString()}`);
 		if (response.ok) {
 			templatePage = await response.json();
 			selectedTemplates = templatePage.items.map((item) => item.templates[0]);
@@ -251,7 +250,6 @@
 			<div class="col-2">
 				<button
 					class="btn btn-outline-primary"
-					aria-label="Import"
 					onclick={() => {
 						importTemplateModal?.show();
 					}}

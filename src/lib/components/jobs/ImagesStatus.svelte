@@ -70,7 +70,7 @@
 		<span class="d-flex">
 			{#if 'num_submitted_images' in status && status.num_submitted_images > 0}
 				<button
-					aria-label="Submitted images"
+					aria-label="Submitted images: {status.num_submitted_images}"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
 					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
@@ -102,7 +102,7 @@
 				<button
 					aria-label="Done images of {workflowTask.alias
 						? workflowTask.alias
-						: workflowTask.task.name}"
+						: workflowTask.task.name}: {status.num_done_images}"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
 					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>
@@ -121,7 +121,7 @@
 				<button
 					aria-label="Failed images of {workflowTask.alias
 						? workflowTask.alias
-						: workflowTask.task.name}"
+						: workflowTask.task.name}: {status.num_failed_images}"
 					class="status-modal-btn btn btn-link text-decoration-none p-0"
 					onclick={() => imagesStatusModal.open(dataset, workflowTask)}
 				>

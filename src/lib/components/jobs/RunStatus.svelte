@@ -67,7 +67,7 @@
 		{/if}
 		{#if run.num_done_units > 0}
 			<button
-				aria-label="Done images of run {index}"
+				aria-label="{run.num_done_units} done images in run {index}"
 				class="status-modal-btn btn btn-link text-decoration-none p-0"
 				onclick={openModal}
 			>

@@ -133,7 +133,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await page.getByRole('row', { name: 'fractal-tasks-mock' }).getByLabel('Manage').click();
-		await page.getByRole('button', { name: 'Make all core' }).click();
+		await page.getByRole('button', { name: 'Make core - all' }).click();
 
 		await expect(
 			page.getByText(/All tasks of task group \d+ have been set to core\./)
@@ -150,7 +150,7 @@ test('Task groups admin page [v2]', async ({ page, workflow }) => {
 		await waitPageLoading(page);
 		await page.getByRole('button', { name: 'Search task groups' }).click();
 		await page.getByRole('row', { name: 'fractal-tasks-mock' }).getByLabel('Manage').click();
-		await page.getByRole('button', { name: 'Make all not core' }).click();
+		await page.getByRole('button', { name: 'Make not core - all' }).click();
 
 		await expect(
 			page.getByText(/All tasks of task group \d+ have been set to not core\./)

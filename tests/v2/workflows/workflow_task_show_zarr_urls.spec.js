@@ -40,7 +40,7 @@ test('Workflow task - Show Zarr URLs button', async ({ page, workflow }) => {
 
 	await test.step('Open MIP_compound run', async () => {
 		await page.getByRole('button', { name: 'Show runs' }).last().click();
-		await page.getByRole('button', { name: 'Done images of run 1' }).click();
+		await page.getByRole('button', { name: '3 done images in run 1' }).click();
 		const modal = await waitModal(page);
 		await expect(modal.getByText('Run 1')).toBeVisible();
 		await expect(modal.getByText('Total results: 3')).toBeVisible();

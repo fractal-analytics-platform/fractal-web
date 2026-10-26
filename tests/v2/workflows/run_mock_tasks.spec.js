@@ -341,7 +341,9 @@ test('Run mock tasks [v2]', async ({ page, workflow }) => {
 		await page.getByRole('button', { name: 'Run', exact: true }).click();
 		await page.getByRole('button', { name: 'Confirm' }).click();
 		await page.getByRole('button', { name: 'generic_task', exact: true }).click();
-		await page.getByRole('button', { name: 'Failed images of generic_task', exact: true }).click();
+		await page
+			.getByRole('button', { name: 'Failed images of generic_task: 1', exact: true })
+			.click();
 
 		const logsButtonRed = page.getByRole('button', { name: 'Logs' }).nth(0);
 		const logsButtonYellow = page.getByRole('button', { name: 'Logs' }).nth(1);

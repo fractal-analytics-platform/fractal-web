@@ -500,7 +500,7 @@
 							onclick={async () => {
 								await makeCore(selectedTasks);
 							}}
-							aria-label="Make all core"
+							aria-label="Make core - all"
 						>
 							<i class="bi bi-patch-check-fill verified-core-icon"></i>
 							Make core
@@ -510,7 +510,7 @@
 							onclick={async () => {
 								await makeNotCore(selectedTasks);
 							}}
-							aria-label="Make all not core"
+							aria-label="Make not core - all"
 						>
 							<i class="bi bi-patch-check"></i>
 							Make not core

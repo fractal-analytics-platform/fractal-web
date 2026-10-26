@@ -133,8 +133,8 @@ describe('ImagesStatus', () => {
 			}
 		});
 		expect(component.baseElement).toHaveTextContent('4 / 6 / 10');
-		expect(screen.getByRole('button', { name: 'Done images of test' })).toHaveTextContent('4');
-		expect(screen.getByRole('button', { name: 'Failed images of test' })).toHaveTextContent('6');
+		expect(screen.getByRole('button', { name: 'Done images of test: 4' })).toHaveTextContent('4');
+		expect(screen.getByRole('button', { name: 'Failed images of test: 6' })).toHaveTextContent('6');
 	});
 
 	it('compound - success', () => {
@@ -153,7 +153,7 @@ describe('ImagesStatus', () => {
 			}
 		});
 		expect(component.baseElement).toHaveTextContent('10');
-		expect(screen.getByRole('button', { name: 'Done images of test' })).toHaveTextContent('10');
+		expect(screen.getByRole('button', { name: 'Done images of test: 10' })).toHaveTextContent('10');
 	});
 
 	it('parallel - running, partial done, partial failed', () => {
@@ -173,8 +173,8 @@ describe('ImagesStatus', () => {
 		});
 		expect(component.baseElement).toHaveTextContent(/3 .* 2 \/ 5 \/ 10/);
 		expect(screen.getByRole('status')).toHaveTextContent(/Loading/);
-		expect(screen.getByRole('button', { name: 'Done images of test' })).toHaveTextContent('2');
-		expect(screen.getByRole('button', { name: 'Failed images of test' })).toHaveTextContent('5');
+		expect(screen.getByRole('button', { name: 'Done images of test: 2' })).toHaveTextContent('2');
+		expect(screen.getByRole('button', { name: 'Failed images of test: 5' })).toHaveTextContent('5');
 	});
 });
 

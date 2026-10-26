@@ -247,7 +247,7 @@
 									await makeCore(taskGroup?.id);
 								}
 							}}
-							aria-label="Make all core"
+							aria-label="Make core - all"
 						>
 							<i class="bi bi-patch-check-fill verified-core-icon"></i>
 							Make core
@@ -259,7 +259,7 @@
 									await makeNotCore(taskGroup?.id);
 								}
 							}}
-							aria-label="Make all not core"
+							aria-label="Make not core - all"
 						>
 							<i class="bi bi-patch-check"></i>
 							Make not core

@@ -73,8 +73,12 @@ test('Admin groups management', async ({ page }) => {
 	await test.step('Reopen modal and group2 again and group3', async () => {
 		await page.getByRole('button', { name: 'Add group' }).click();
 		const modal = await waitModal(page, false);
-		const selectableGroups = await getSelectableGroups(page);
-		expect(selectableGroups.includes(group2.name)).toEqual(true);
+		await expect
+			.poll(async () => {
+				const selectableGroups = await getSelectableGroups(page);
+				return selectableGroups.includes(group2.name);
+			})
+			.toEqual(true);
 		for (let group of [group2, group3].sort((g1, g2) => g1.name.localeCompare(g2.name))) {
 			await selectSlimSelect(
 				page,
