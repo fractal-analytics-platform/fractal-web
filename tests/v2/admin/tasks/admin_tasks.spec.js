@@ -66,7 +66,7 @@ test('Tasks admin page [v2]', async ({ page, workflow }) => {
 		await expect(page.getByRole('row', { name: taskName2 })).toBeVisible();
 
 		await page.getByRole('checkbox', { name: 'Select all' }).check();
-		await page.getByRole('button', { name: 'Make all not core' }).click();
+		await page.getByRole('button', { name: 'Make not core - all' }).click();
 		await searchTasks(page);
 		await expect(page.getByRole('row')).toHaveCount(0);
 

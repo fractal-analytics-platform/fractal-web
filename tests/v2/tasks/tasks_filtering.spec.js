@@ -16,7 +16,7 @@ test('Tasks filtering', async ({ page, workflow }) => {
 		await page.getByRole('textbox', { name: 'Name', exact: true }).fill('create_ome_zarr_compound');
 		await page.getByRole('button', { name: 'Search tasks' }).click();
 		await page.getByRole('checkbox', { name: 'Select all' }).check();
-		await page.getByRole('button', { name: 'Make all core' }).click();
+		await page.getByRole('button', { name: 'Make core - all' }).click();
 
 		await page.getByRole('button', { name: 'Reset' }).click();
 		await page.getByLabel('Core').selectOption('true');

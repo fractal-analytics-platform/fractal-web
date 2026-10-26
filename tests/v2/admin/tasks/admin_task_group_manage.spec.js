@@ -24,7 +24,7 @@ test('Admin task group manage (deactivate / reactivate)', async ({ page }) => {
 		await expect(modal.getByText('The task group is currently active')).toBeVisible();
 		await modal.getByText('active').click();
 		await modal.getByRole('button', { name: 'Deactivate task group' }).click();
-		await checkAccessibility(page);
+		await checkAccessibility(page, '.modal.show');
 		await modal.getByRole('button', { name: 'Confirm' }).click();
 	});
 

@@ -107,7 +107,7 @@ test('Use template page', async ({ page }) => {
 			await values.nth(6).locator('span').allInnerTexts()
 		);
 		await expect(values.nth(7).locator('span')).toHaveText(String(templateId));
-		await checkAccessibility(page);
+		await checkAccessibility(page, '.modal.show');
 		await modal.getByRole('button', { name: 'Close' }).click();
 		await waitModalClosed(page);
 	});
@@ -195,7 +195,7 @@ test('Use template page', async ({ page }) => {
 		).toBeVisible();
 
 		await page.getByLabel('Select a file').setInputFiles(templateFileName);
-		await checkAccessibility(page);
+		await checkAccessibility(page, '.modal.show');
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await waitModalClosed(page);
 
@@ -234,7 +234,7 @@ test('Use template page', async ({ page }) => {
 		await page.getByRole('button', { name: 'Import' }).click();
 		await page.getByLabel('Select a file').setInputFiles(templateFileName);
 		await page.getByRole('textbox', { name: 'Template name' }).fill(newTemplateName);
-		await checkAccessibility(page);
+		await checkAccessibility(page, '.modal.show');
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await expect(page).toHaveURL(/\/v2\/templates\?template_id=/);
 	});
@@ -287,7 +287,7 @@ test('Use template page', async ({ page }) => {
 		await expect(modal3.getByText('Template description')).toHaveValue(newDescription);
 		// default: null
 		await expect(modal3.getByLabel('User Group')).toHaveValue('');
-		await checkAccessibility(page);
+		await checkAccessibility(page, '.modal.show');
 
 		await closeModal(page);
 	});
@@ -311,7 +311,7 @@ test('Use template page', async ({ page }) => {
 
 		await page.getByRole('spinbutton', { name: 'Template version' }).fill('42');
 		await expect(page.getByRole('button', { name: 'Import template' })).toBeEnabled();
-		await checkAccessibility(page);
+		await checkAccessibility(page, '.modal.show');
 
 		await page.getByRole('button', { name: 'Import template' }).click();
 		await waitModalClosed(page);

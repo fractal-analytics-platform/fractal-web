@@ -113,7 +113,7 @@ test('Workflow task runs', async ({ page, workflow }) => {
 	});
 
 	await test.step('Open run logs modal', async () => {
-		await page.getByRole('button', { name: `Done images of run 2` }).click();
+		await page.getByRole('button', { name: `1 done images in run 2` }).click();
 		const modal = await waitModal(page);
 		await expect(modal.getByText('Run 2')).toBeVisible();
 		await expect(modal.getByText('Total results: 1')).toBeVisible();
