@@ -103,7 +103,7 @@
 							id="template-user-group-id"
 							bind:value={template.user_group_id}
 						>
-							<option value={null}>Select...</option>
+							<option value={null}>None (only me)</option>
 							{#each groups as group, index (index)}
 								<option value={group[0]}>{group[1]}</option>
 							{/each}
