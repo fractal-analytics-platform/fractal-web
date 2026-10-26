@@ -62,6 +62,12 @@ export default defineConfig({
 
 	webServer: [
 		{
+			command: 'node ./tests/proxy-oauth2.js',
+			port: 5556,
+			stdout: 'pipe',
+			reuseExistingServer: !process.env.CI
+		},
+		{
 			command: './tests/start-test-server.sh --branch main',
 			port: 8000,
 			stdout: 'pipe',
@@ -71,12 +77,6 @@ export default defineConfig({
 		{
 			command: 'node ./tests/fake-job-server.js',
 			port: 8080,
-			stdout: 'pipe',
-			reuseExistingServer: !process.env.CI
-		},
-		{
-			command: 'node ./tests/proxy-oauth2.js',
-			port: 5556,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI
 		},

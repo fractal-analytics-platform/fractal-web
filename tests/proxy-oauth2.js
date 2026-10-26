@@ -22,3 +22,5 @@ http
 		});
 	})
 	.listen(5556, '127.0.0.1');
+
+console.log('OAuth2 proxy started');
