@@ -30,11 +30,10 @@ nav = [
 
 [project.theme]
 language = "en"
-logo = "assets/fractal-logo.png"
-favicon = "assets/favicon.png"
+logo = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_logo.png"
+favicon = "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/refs/heads/main/common/fractal_favicon.png"
 custom_dir = "overrides"
 navigation = {"expand" = true}
-font = false
 
 features = [
     "announce.dismiss",
@@ -67,6 +66,9 @@ resolve_closest=true
 
 [project.plugins.section-index]
 
+[project.plugins.privacy]
+log_level = "info"
+
 [project.extra]
 enable_fractal_links = true
 fractal_links_base_url = ""
@@ -85,4 +87,4 @@ permalink = true
 
 [project.markdown_extensions.pymdownx.snippets]
 base_path = ["help/snippets"]
-check_paths = true         
+check_paths = true
