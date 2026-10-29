@@ -29,9 +29,10 @@ jobs:
       - name: Upload help pages
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: docs-help-attempt-${{ github.run_attempt }}
+          name: docs-help
           path: docs/help
           retention-days: 1
+          overwrite: true
 
   end_to_end_tests:
     needs: [build_docs]
@@ -106,7 +107,7 @@ jobs:
       - name: Download help pages
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: docs-help-attempt-${{ github.run_attempt }}
+          name: docs-help
           path: docs/help
 
       - name: Set up node
