@@ -153,12 +153,11 @@
 							bind:value={pythonVersion}
 						>
 							<option value="">Select...</option>
-							<option value="3.9">3.9</option>
-							<option value="3.10">3.10</option>
 							<option value="3.11">3.11</option>
 							<option value="3.12">3.12</option>
 							<option value="3.13">3.13</option>
 							<option value="3.14">3.14</option>
+							<option value="3.15">3.15</option>
 						</select>
 					</div>
 				</div>
