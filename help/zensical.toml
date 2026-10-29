@@ -67,6 +67,9 @@ resolve_closest=true
 
 [project.plugins.section-index]
 
+[project.plugins.privacy]
+log_level = "info"
+
 [project.extra]
 enable_fractal_links = true
 fractal_links_base_url = ""
@@ -85,4 +88,4 @@ permalink = true
 
 [project.markdown_extensions.pymdownx.snippets]
 base_path = ["help/snippets"]
-check_paths = true         
+check_paths = true
