@@ -530,3 +530,8 @@ export type PixiCollectionRequest = {
 	private: boolean;
 	user_group_id?: number;
 };
+
+export type OAuth2ErrorMessage = {
+	error_msg: string;
+	params: Array<{ text: string } & ({ url: string } | { email: string })>;
+};

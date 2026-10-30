@@ -68,7 +68,8 @@ export default defineConfig({
 			reuseExistingServer: !process.env.CI
 		},
 		{
-			command: './tests/start-test-server.sh --branch main',
+			command:
+				'./tests/start-test-server.sh --branch 3471-customize-message-on-oauth-login-of-new-user',
 			port: 8000,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI,
