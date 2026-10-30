@@ -23,9 +23,7 @@ test('OAuth2 account', async ({ page }) => {
 
 		await page.getByText('Log in with institutional account').click();
 		await expect(
-			page.getByText(
-				'Thank you for registering for the Fractal service. Administrators have been informed to configure your account and will get back to you.'
-			)
+			page.getByText('To get your Fractal account set up, please contact an administrator.')
 		).toBeVisible();
 	});
 });

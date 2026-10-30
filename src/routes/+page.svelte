@@ -16,13 +16,17 @@
 
 	let mounted = $state(false);
 
-	let temporaryMessage = $state('');
+	/** @type {import('#fractal-components/types/api').OAuth2ErrorMessage|undefined} */
+	let temporaryMessage = $state();
 
 	onMount(() => {
 		mounted = true;
-		if (sessionStorage && sessionStorage.getItem('temporary-message')) {
-			temporaryMessage = sessionStorage.getItem('temporary-message') || '';
-			sessionStorage.removeItem('temporary-message');
+		if (sessionStorage) {
+			const message = sessionStorage.getItem('temporary-message');
+			if (message) {
+				temporaryMessage = JSON.parse(message);
+				sessionStorage.removeItem('temporary-message');
+			}
 		}
 	});
 </script>
@@ -37,7 +41,20 @@
 
 	{#if temporaryMessage}
 		<div class="alert alert-info">
-			{temporaryMessage}
+			{#each temporaryMessage.error_msg.split('%s') as part, index (index)}
+				{part}
+				{#if temporaryMessage.params[index]}
+					{#if 'url' in temporaryMessage.params[index]}
+						<a href={temporaryMessage.params[index].url}>
+							{temporaryMessage.params[index].text}
+						</a>
+					{:else}
+						<a href="mailto:{temporaryMessage.params[index].email}">
+							{temporaryMessage.params[index].text}
+						</a>
+					{/if}
+				{/if}
+			{/each}
 		</div>
 	{/if}
 

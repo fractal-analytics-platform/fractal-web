@@ -19,8 +19,16 @@ export async function load({ request, fetch, cookies }) {
 
 	if (!response.ok) {
 		const result = await response.json();
-		if ('detail' in result) {
-			return { message: result.detail };
+		if (
+			'data' in result &&
+			'error_msg' in result.data &&
+			'params' in result.data &&
+			Array.isArray(result.data.params)
+		) {
+			return { message: result.data };
+		}
+		if ('detail' in result && typeof result.detail === 'string') {
+			return { message: { error_msg: result.detail, params: [] } };
 		}
 		error(400, JSON.stringify(result));
 	}

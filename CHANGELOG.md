@@ -1,13 +1,19 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.30.0 (Unreleased)
 
-> WARNING: This release deprecates the `ORIGIN` environment variable. It can be removed and no further action should be necessary.
+> **NOTE**: When upgrading to this version, you should also upgrade
+> `fractal-server` to version 2.27.0 (or more recent) - to make sure that
+> self-registration error responses are handled properly.
+
+> **NOTE**: This release deprecates the `ORIGIN` environment variable.
+> It can be removed and no further action should be necessary.
 
 - Migration to Svelte Kit v3 (\#1260).
 - Added Node 26 in CI configuration (\#1265).
 - Bump `pixi` version used in tests and set `DO_NOT_TRACK` (\#1275).
 - Documentation: bump `zensical` to 0.0.72 and enable privacy plugin (\#1284).
+- Handle custom OAuth2 registration message (\#1289).
 
 # 1.29.10
 
