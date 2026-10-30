@@ -41,7 +41,7 @@
 
 	{#if temporaryMessage}
 		<div class="alert alert-info">
-			{#each temporaryMessage.error_msg.split('%s') as part, index}
+			{#each temporaryMessage.error_msg.split('%s') as part, index (index)}
 				{part}
 				{#if temporaryMessage.params[index]}
 					{#if 'url' in temporaryMessage.params[index]}

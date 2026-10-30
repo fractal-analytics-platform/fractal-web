@@ -8,6 +8,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 - Added Node 26 in CI configuration (\#1265).
 - Bump `pixi` version used in tests and set `DO_NOT_TRACK` (\#1275).
 - Documentation: bump `zensical` to 0.0.72 and enable privacy plugin (\#1284).
+- Handle custom OAuth2 registration message (\#1289).
 
 # 1.29.10
 

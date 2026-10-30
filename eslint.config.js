@@ -36,7 +36,11 @@ export default [
 			'local',
 			'.venv',
 			'docs/help/assets/javascripts',
-			'docs/help/minimal/assets/javascripts'
+			'docs/help/assets/external',
+			'docs/help/minimal/assets/javascripts',
+			'docs/help/minimal/assets/external',
+			'.cache',
+			'help/.cache'
 		]
 	},
 	js.configs.recommended,
