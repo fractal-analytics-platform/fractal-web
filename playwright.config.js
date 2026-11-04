@@ -81,7 +81,7 @@ export default defineConfig({
 			reuseExistingServer: !process.env.CI
 		},
 		{
-			command: 'python3 -m http.server 8001 --bind 127.0.0.1 --directory docs',
+			command: 'uv run zensical serve --dev-addr 127.0.0.1:8001',
 			port: 8001,
 			stdout: 'pipe',
 			reuseExistingServer: !process.env.CI
