@@ -52,7 +52,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   cd "$fractal_server_test_path"
 
   # Virtualenv, dependencies and db
-  python3 -m venv venv
+  python3.14 -m venv venv
   . venv/bin/activate
   python3 -m pip install pip --upgrade
   python3 -m pip install "$pip_arg"
