@@ -159,11 +159,7 @@ export type TemplatePage = Pagination<WorkflowTemplateGroup> & {
 };
 
 export type TaskV2Type =
-	| 'non_parallel'
-	| 'parallel'
-	| 'compound'
-	| 'converter_non_parallel'
-	| 'converter_compound';
+	'non_parallel' | 'parallel' | 'compound' | 'converter_non_parallel' | 'converter_compound';
 
 export type TaskV2 = {
 	id: number;
