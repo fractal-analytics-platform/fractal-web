@@ -9,7 +9,7 @@
 	onMount(async () => {
 		if (message) {
 			if (sessionStorage) {
-				sessionStorage.setItem('temporary-message', message);
+				sessionStorage.setItem('temporary-message', JSON.stringify(message));
 			}
 			await goto(resolve('/'));
 		}
