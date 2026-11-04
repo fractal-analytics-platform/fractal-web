@@ -265,12 +265,11 @@
 						class:is-invalid={$validationErrors['python_version']}
 					>
 						<option value="">Select...</option>
-						<option>3.9</option>
-						<option>3.10</option>
 						<option>3.11</option>
 						<option>3.12</option>
 						<option>3.13</option>
 						<option>3.14</option>
+						<option>3.15</option>
 					</select>
 					<span class="invalid-feedback">{$validationErrors['python_version']}</span>
 				</div>
