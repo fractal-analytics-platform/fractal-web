@@ -16,6 +16,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 - Handle custom OAuth2 registration message (\#1289).
 - Pin GitHub Actions to use `ubuntu-24.04` and python 3.14 (\#1291).
 - Bump zensical to 0.0.74 (\#1291).
+- Remove `3.9` and `3.10` from supported Python versions and add `3.15` (\#1285).
 
 # 1.29.10
 
