@@ -37,7 +37,7 @@ jobs:
   end_to_end_tests:
     needs: [build_docs]
     name: 'E2E tests - Node ${{ matrix.node-version }} - ${{ matrix.browser }} ${{ matrix.shard-index }}'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --user 1001
@@ -95,13 +95,13 @@ jobs:
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.14'
 
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
         with:
           version: 'latest-known'
           enable-cache: false
-          python-version: '3.13'
+          python-version: '3.14'
       - run: uv sync --frozen
 
       - name: Download help pages
@@ -148,7 +148,7 @@ jobs:
       matrix:
         node-version: ['24', '26']
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
