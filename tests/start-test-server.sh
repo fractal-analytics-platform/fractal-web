@@ -55,6 +55,7 @@ if [ ! -d "$fractal_server_test_path" ]; then
   python3 -m venv venv
   . venv/bin/activate
   python3 -m pip install pip --upgrade
+  python3 -m pip install ssl
   python3 -m pip install "$pip_arg"
   fractalctl set-db
   fractalctl init-db-data --resource resource.json --profile default --admin-email admin@fractal.xy --admin-pwd 1234  --admin-project-dir /tmp
