@@ -16,11 +16,10 @@ fi
 fractal_server_test_path="/tmp/fractal-test-server"
 
 PIXI_VERSION="0.83.0"
-DO_NOT_TRACK=1
 
 if [ "$SKIP_PIXI_TEST" != "true" ] && [ ! -d "/tmp/pixi/${PIXI_VERSION}" ]; then
   mkdir -p "/tmp/pixi/${PIXI_VERSION}/bin"
-  curl -fsSL https://pixi.sh/install.sh | PIXI_VERSION="v${PIXI_VERSION}" bash
+  curl -fsSL https://pixi.sh/install.sh | DO_NOT_TRACK=1 PIXI_VERSION="v${PIXI_VERSION}" bash
   cp ~/.pixi/bin/pixi "/tmp/pixi/${PIXI_VERSION}/bin"
 fi
 
@@ -53,7 +52,8 @@ if [ ! -d "$fractal_server_test_path" ]; then
   # Virtualenv, dependencies and db
   python3 -m venv venv
   . venv/bin/activate
-  pip install "$pip_arg"
+  python3 -m pip install pip --upgrade
+  python3 -m pip install "$pip_arg"
   fractalctl set-db
   fractalctl init-db-data --resource resource.json --profile default --admin-email admin@fractal.xy --admin-pwd 1234  --admin-project-dir /tmp
 else
