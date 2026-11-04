@@ -17,6 +17,7 @@ fractal_server_test_path="/tmp/fractal-test-server"
 
 PIXI_VERSION="0.83.0"
 DO_NOT_TRACK=1
+PIXI_NO_TELEMETRY=1
 
 if [ "$SKIP_PIXI_TEST" != "true" ] && [ ! -d "/tmp/pixi/${PIXI_VERSION}" ]; then
   mkdir -p "/tmp/pixi/${PIXI_VERSION}/bin"
