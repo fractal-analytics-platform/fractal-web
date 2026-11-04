@@ -159,7 +159,11 @@ export type TemplatePage = Pagination<WorkflowTemplateGroup> & {
 };
 
 export type TaskV2Type =
-	'non_parallel' | 'parallel' | 'compound' | 'converter_non_parallel' | 'converter_compound';
+	| 'non_parallel'
+	| 'parallel'
+	| 'compound'
+	| 'converter_non_parallel'
+	| 'converter_compound';
 
 export type TaskV2 = {
 	id: number;
@@ -529,4 +533,9 @@ export type PixiCollectionRequest = {
 	use_pixi_lockfile: boolean;
 	private: boolean;
 	user_group_id?: number;
+};
+
+export type OAuth2ErrorMessage = {
+	error_msg: string;
+	params: Array<{ text: string } & ({ url: string } | { email: string })>;
 };
