@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# 1.30.0 (Unreleased)
+# 1.30.0
 
 > **NOTE**: When upgrading to this version, you should also upgrade
 > `fractal-server` to version 2.27.0 (or more recent) - to make sure that
@@ -8,6 +8,8 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 > **NOTE**: This release deprecates the `ORIGIN` environment variable.
 > It can be removed and no further action should be necessary.
+> This change may be reverted in a future release, as tracked at
+> https://github.com/fractal-analytics-platform/fractal-web/issues/1292
 
 - Migration to Svelte Kit v3 (\#1260).
 - Added Node 26 in CI configuration (\#1265).
