@@ -1,5 +1,9 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
+# Unreleased
+
+- Use ubuntu-26.04 in CI (\#1296).
+
 # 1.30.0
 
 > **NOTE**: When upgrading to this version, you should also upgrade
