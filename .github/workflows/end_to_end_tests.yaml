@@ -37,9 +37,9 @@ jobs:
   end_to_end_tests:
     needs: [build_docs]
     name: 'E2E tests - Node ${{ matrix.node-version }} - ${{ matrix.browser }} ${{ matrix.shard-index }}'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
-      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      image: mcr.microsoft.com/playwright:v1.64.1-resolute
       options: --user 1001
     timeout-minutes: 20
 
@@ -149,7 +149,7 @@ jobs:
       matrix:
         node-version: ['24', '26']
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
