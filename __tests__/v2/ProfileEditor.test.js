@@ -157,4 +157,33 @@ describe('ProfileEditor', () => {
 			resource_type: 'slurm_ssh'
 		});
 	});
+
+	// slurm_rest shares the slurm_ssh save/validation path (tested above); only check rendering
+	it('SLURM REST profile - renders SSH fields', () => {
+		render(ProfileEditor, {
+			props: {
+				resource: /** @type {import('fractal-components/types/api').Resource} */ ({
+					id: 1,
+					type: 'slurm_rest'
+				}),
+				profile: /** @type {import('fractal-components/types/api').Profile} */ ({
+					id: 1,
+					resource_id: 1,
+					resource_type: 'slurm_rest'
+				}),
+				saveProfile: vi.fn()
+			}
+		});
+
+		for (const name of [
+			'Username',
+			'SSH key path',
+			'Jobs remote dir',
+			'Tasks remote dir',
+			'Pixi cache dir'
+		]) {
+			expect(screen.getByRole('textbox', { name })).toBeVisible();
+		}
+		expect(screen.getByText(/SLURM jobs run as the Fractal user's SSO account/)).toBeVisible();
+	});
 });
