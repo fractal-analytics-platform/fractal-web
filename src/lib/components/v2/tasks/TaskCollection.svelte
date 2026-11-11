@@ -3,7 +3,6 @@
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 	import { recentActivities } from '#lib/stores.js';
 	import { PropertyDescription } from '#fractal-components';
-	import { fileToBase64 } from '../../../common/component_utilities';
 
 	/**
 	 * @typedef {Object} Props
@@ -65,55 +64,44 @@
 			return;
 		}
 
-		/** @type {import('#fractal-components/types/api').PipCollectionRequest} */
-		const body = {
-			packageType,
-			private: privateTask
-		};
+		const formData = new FormData();
 
 		if (packageType === 'pypi') {
-			body.package = python_package;
-			if (package_version) {
-				body.package_version = package_version;
-			}
+			formData.append('package', python_package);
 		} else if (wheelFiles?.length === 1) {
-			const file = wheelFiles[0];
-			body.file = {
-				data: await fileToBase64(file),
-				fileName: file.name,
-				contentType: file.type
-			};
+			formData.append('file', wheelFiles[0]);
 		}
 
 		if (python_version) {
-			body.python_version = python_version;
+			formData.append('python_version', python_version);
 		}
 
 		if (package_extras) {
-			body.package_extras = package_extras;
+			formData.append('package_extras', package_extras);
+		}
+
+		if (packageType === 'pypi' && package_version) {
+			formData.append('package_version', package_version);
 		}
 
 		const ppvPre = getPinnedPackageVersionsMap('pre');
 		if (ppvPre) {
-			body.pinned_package_versions_pre = ppvPre;
+			formData.append('pinned_package_versions_pre', JSON.stringify(ppvPre));
 		}
 		const ppvPost = getPinnedPackageVersionsMap('post');
 		if (ppvPost) {
-			body.pinned_package_versions_post = ppvPost;
+			formData.append('pinned_package_versions_post', JSON.stringify(ppvPost));
 		}
 
+		let url = `/api/v2/task/collect/pip?private=${privateTask}`;
 		if (!privateTask && selectedGroup) {
-			body.user_group_id = selectedGroup;
+			url += `&user_group_id=${selectedGroup}`;
 		}
 
 		taskCollectionInProgress = true;
-
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch('/api/v2/task/collect/pip', {
+		const response = await fetch(url, {
 			method: 'POST',
-			headers,
-			body: JSON.stringify(body)
+			body: formData
 		});
 
 		taskCollectionInProgress = false;

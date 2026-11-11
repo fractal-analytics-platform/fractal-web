@@ -79,7 +79,7 @@ const response = await fetch('/api/admin/v2/resource', { method: 'GET' });
 
 Always add Content-Type headers, even if there is no body, for all HTTP methods except `GET`.
 
-Adding the `application/json` content type header also for `DELETE` and other requests with empty body is needed in SvelteKit 3 to avoid CSRF issues, since the `ORIGIN` variable has been deprecated.
+Adding the `application/json` content type header also for `DELETE` and other requests with empty body is preferred to avoid CSRF issues, since in that case the call does not depend by the `ORIGIN` variable.
 
 Forgetting to set this header will result in the error message "Cross-site POST form submissions are forbidden". Notice that this message will be visible only with the production build and not during development (server started with `npm run dev`).
 
@@ -199,11 +199,9 @@ Other than the AJAX calls, there are also some calls to fractal-server API done 
 
 #### Special form data cases
 
-Starting from Svelte Kit 3, the `ORIGIN` environment variable has been deprecated and replaced with a build-time configuration. We used this variable to specify the trusted [origin](https://developer.mozilla.org/en-US/docs/Glossary/Origin) for the requests, to avoid the error "Cross-site POST form submissions are forbidden".
+In Svelte Kit 3, some changes affected the `ORIGIN` environment variable (it was deprecated and then re-introduced). This variable is used to specify the trusted [origin](https://developer.mozilla.org/en-US/docs/Glossary/Origin) for the requests, to avoid the error "Cross-site POST form submissions are forbidden". Notice that the check on origin is performed only for form data submissions and not for AJAX calls using the `application/json` content type. Indeed, CSRF vulnerability is related to `application/x-www-form-urlencoded`, `multipart/form-data` or `text/plain` content types (see also [OWASP CSRF Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#disallowing-simple-content-types)). The general idea is that an attacker can trick the user to submit a form inside a malicious web page, but there is no way to force a cross-domain AJAX call using JSON content type (because in that case CORS errors will occur).
 
-Notice that the check on origin is performed only for form data submissions and not for AJAX calls using the `application/json` content type. Indeed, CSRF vulnerability is related to `application/x-www-form-urlencoded`, `multipart/form-data` or `text/plain` content types (see also [OWASP CSRF Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#disallowing-simple-content-types)). The general idea is that an attacker can trick the user to submit a form inside a malicious web page, but there is no way to force a cross-domain AJAX call using JSON content type (because in that case CORS errors will occur).
-
-Without a way to configure this option at runtime, we decided to avoid the form data usage completely. This was feasible because we used form data just for a few endpoints. In these special cases we are doing the following:
+Since this caused many issues we tried to avoid form data usage when possible. In some special cases we are doing the following:
 
 ```
 ┌─────────┐             ┌────────────────┐                 ┌────────────┐
@@ -213,14 +211,17 @@ Without a way to configure this option at runtime, we decided to avoid the form 
 
 The browser sends to the Svelte backend an AJAX request containing a JSON payload, then Svelte rearrange the content inside a `FormData` object and sends it to the Python Backend.
 
-Notice that this could potentally create some issues if we use this to send large files, since the whole file needs to be stored for a while in browser memory. For the moment we have a few MB limit, so it shouldn't be a big problem.
-
 Here the list of Svelte endpoints handling these special cases:
 
 - `src/routes/auth/login/+server.js`
 - `src/routes/v2/admin/impersonate/+server.js`
-- `src/routes/api/v2/task/collect/pip/+server.js`
-- `src/routes/api/v2/task/collect/pixi/+server.js`
+
+For form submissions involving potentially large files we are still using the `FormData` in the frontend, to avoid storing the whole file in the JSON payload, which affects browser memory usage.
+
+The following frontend components are using `FormData` directly:
+
+- `src/lib/components/v2/tasks/PixiTask.svelte`
+- `src/lib/components/v2/tasks/TaskCollection.svelte`
 
 ### Application library
 

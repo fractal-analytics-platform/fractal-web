@@ -6,9 +6,13 @@ import { mount } from 'svelte';
  * @param {Response} response
  */
 export async function parseErrorResponse(response) {
+	const errorText = await response.text();
 	try {
-		return await response.json();
+		return JSON.parse(errorText);
 	} catch {
+		if (errorText === 'Cross-site POST form submissions are forbidden') {
+			return `${errorText}. Please check the ORIGIN environment variable.`;
+		}
 		return `Invalid JSON response. Response status is ${response.status}.`;
 	}
 }

@@ -1,7 +1,6 @@
 <script>
 	import { FormErrorHandler } from '#lib/common/errors.js';
 	import { recentActivities } from '#lib/stores.js';
-	import { fileToBase64 } from '../../../common/component_utilities';
 	import TaskGroupSelector from './TaskGroupSelector.svelte';
 
 	/**
@@ -47,35 +46,25 @@
 	async function handlePixiCollection() {
 		formErrorHandler.clearErrors();
 
-		/** @type {import('#fractal-components/types/api').PixiCollectionRequest} */
-		const body = {
-			private: privateTask,
-			use_pixi_lockfile: useLockfile
-		};
+		const formData = new FormData();
 
 		if (tarFiles !== null && tarFiles.length === 1) {
-			const file = tarFiles[0];
-			body.file = {
-				data: await fileToBase64(file),
-				fileName: file.name,
-				contentType: file.type
-			};
+			formData.append('file', tarFiles[0]);
 		}
 		if (version) {
-			body.pixi_version = version;
+			formData.append('pixi_version', version);
 		}
+		formData.append('use_pixi_lockfile', useLockfile.toString());
 
+		let url = `/api/v2/task/collect/pixi?private=${privateTask}`;
 		if (!privateTask && selectedGroup) {
-			body.user_group_id = selectedGroup;
+			url += `&user_group_id=${selectedGroup}`;
 		}
 
 		taskCollectionInProgress = true;
-		const headers = new Headers();
-		headers.set('Content-Type', 'application/json');
-		const response = await fetch('/api/v2/task/collect/pixi', {
+		const response = await fetch(url, {
 			method: 'POST',
-			headers,
-			body: JSON.stringify(body)
+			body: formData
 		});
 
 		taskCollectionInProgress = false;

@@ -70,42 +70,44 @@ describe('ProfileEditor', () => {
 				/** @type {Response} */ ({
 					ok: false,
 					status: 422,
-					json: () =>
+					text: () =>
 						new Promise((resolve) =>
-							resolve({
-								detail: [
-									{
-										loc: ['body', 'slurm_ssh', 'name'],
-										msg: 'mocked_error_name',
-										type: 'value_error'
-									},
-									{
-										loc: ['body', 'slurm_ssh', 'username'],
-										msg: 'mocked_error_username',
-										type: 'value_error'
-									},
-									{
-										loc: ['body', 'slurm_ssh', 'ssh_key_path'],
-										msg: 'mocked_error_ssh_key_path',
-										type: 'value_error'
-									},
-									{
-										loc: ['body', 'slurm_ssh', 'jobs_remote_dir'],
-										msg: 'mocked_error_jobs_remote_dir',
-										type: 'value_error'
-									},
-									{
-										loc: ['body', 'slurm_ssh', 'tasks_remote_dir'],
-										msg: 'mocked_error_tasks_remote_dir',
-										type: 'value_error'
-									},
-									{
-										loc: ['body', 'slurm_ssh', 'pixi_cache_dir'],
-										msg: 'mocked_error_pixi_cache_dir',
-										type: 'value_error'
-									}
-								]
-							})
+							resolve(
+								JSON.stringify({
+									detail: [
+										{
+											loc: ['body', 'slurm_ssh', 'name'],
+											msg: 'mocked_error_name',
+											type: 'value_error'
+										},
+										{
+											loc: ['body', 'slurm_ssh', 'username'],
+											msg: 'mocked_error_username',
+											type: 'value_error'
+										},
+										{
+											loc: ['body', 'slurm_ssh', 'ssh_key_path'],
+											msg: 'mocked_error_ssh_key_path',
+											type: 'value_error'
+										},
+										{
+											loc: ['body', 'slurm_ssh', 'jobs_remote_dir'],
+											msg: 'mocked_error_jobs_remote_dir',
+											type: 'value_error'
+										},
+										{
+											loc: ['body', 'slurm_ssh', 'tasks_remote_dir'],
+											msg: 'mocked_error_tasks_remote_dir',
+											type: 'value_error'
+										},
+										{
+											loc: ['body', 'slurm_ssh', 'pixi_cache_dir'],
+											msg: 'mocked_error_pixi_cache_dir',
+											type: 'value_error'
+										}
+									]
+								})
+							)
 						)
 				})
 		);

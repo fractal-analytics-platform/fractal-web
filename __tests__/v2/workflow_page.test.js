@@ -100,7 +100,8 @@ describe('Workflow page', () => {
 			} else {
 				return Promise.resolve({
 					ok: false,
-					status: 404
+					status: 404,
+					text: async () => 'not found'
 				});
 			}
 		});

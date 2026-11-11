@@ -170,7 +170,8 @@ describe('CompareWorkflowTemplateModal', () => {
 		const { component } = render(CompareWorkflowTemplateModal, { props: { workflow } });
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValueOnce({
 			ok: false,
-			json: () => new Promise((resolve) => resolve({ detail: 'error loading template' }))
+			text: () =>
+				new Promise((resolve) => resolve(JSON.stringify({ detail: 'error loading template' })))
 		});
 		await component.loadTemplate();
 		expect(screen.getByText(/error loading template/)).toBeVisible();
@@ -193,7 +194,8 @@ describe('CompareWorkflowTemplateModal', () => {
 
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValueOnce({
 			ok: false,
-			json: () => new Promise((resolve) => resolve({ detail: 'error loading workflow' }))
+			text: () =>
+				new Promise((resolve) => resolve(JSON.stringify({ detail: 'error loading workflow' })))
 		});
 
 		await component.loadTemplate();

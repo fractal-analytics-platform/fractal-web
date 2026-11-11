@@ -751,7 +751,7 @@
 									{#if PUBLIC_FRACTAL_VOLE_VIEWER_URL}
 										<a
 											class="btn btn-info"
-											href="{PUBLIC_FRACTAL_VOLE_VIEWER_URL}viewer?url={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
+											href="{PUBLIC_FRACTAL_VOLE_VIEWER_URL}?url={PUBLIC_FRACTAL_DATA_URL}files{encodePathForUrl(
 												image.zarr_url
 											)}"
 											target="_blank"
