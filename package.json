@@ -58,8 +58,7 @@
 		"bootstrap-icons": "^1.13.2",
 		"jose": "^6.2.13",
 		"json-diff-viewer-component": "^0.6.4",
-		"log4js": "^6.9.1",
-		"undici": "^8.12.3"
+		"log4js": "^6.9.1"
 	},
 	"files": [
 		"build"
@@ -75,8 +74,7 @@
 		"slim-select",
 		"json-diff-viewer-component",
 		"bootstrap",
-		"bootstrap-icons",
-		"undici"
+		"bootstrap-icons"
 	],
 	"imports": {
 		"#lib": "./src/lib/index.js",
