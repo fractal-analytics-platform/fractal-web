@@ -3,6 +3,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 # Unreleased
 
 - Replace https://github.com/hms-dbmi/vizarr link with https://github.com/BioNGFF/vizarr (\#1298).
+- Replace https://github.com/allen-cell-animated/vole-app with https://github.com/AllenCell/vole-app (\#1298).
 
 # 1.30.1
 

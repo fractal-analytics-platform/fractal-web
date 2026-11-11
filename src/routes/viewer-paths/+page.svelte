@@ -24,7 +24,7 @@
 		{/if}
 		{#if PUBLIC_FRACTAL_VOLE_VIEWER_URL}
 			an online viewer for OME-Zarrs, based on
-			<a href="https://github.com/allen-cell-animated/vole-app" target="_blank">Vol-E</a>
+			<a href="https://github.com/AllenCell/vole-app" target="_blank">Vol-E</a>
 		{/if}. Browse to a dataset page, and you will find links to view the available images in the
 		browser.
 	</p>
