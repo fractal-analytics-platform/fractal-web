@@ -36,6 +36,7 @@ const logger = getLogger('environment');
 
 export function checkEnvironmentVariables() {
 	checkCookieVariables();
+	checkOriginVariable();
 	printEnvironmentVariables();
 }
 
@@ -56,6 +57,7 @@ function printEnvironmentVariables() {
 	logger.info(`LOG_FILE: ${LOG_FILE}`);
 	logger.info(`LOG_LEVEL_FILE: ${LOG_LEVEL_FILE}`);
 	logger.info(`LOG_LEVEL_CONSOLE: ${LOG_LEVEL_CONSOLE}`);
+	logger.info(`ORIGIN: ${process.env.ORIGIN || ''}`);
 	logger.info(`BODY_SIZE_LIMIT: ${process.env.BODY_SIZE_LIMIT || ''}`);
 	logger.info(`PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL: ${PUBLIC_FRACTAL_ADMIN_SUPPORT_EMAIL}`);
 	logger.info(`PUBLIC_UPDATE_JOBS_INTERVAL: ${PUBLIC_UPDATE_JOBS_INTERVAL}`);
@@ -90,8 +92,19 @@ function checkCookieVariables() {
 			exit(2);
 		}
 	} else {
-		if (!AUTH_COOKIE_DOMAIN && (!process.env.NODE_ENV || process.env.NODE_ENV === 'production')) {
+		if (!AUTH_COOKIE_DOMAIN && isProduction()) {
 			logger.warn('AUTH_COOKIE_DOMAIN must be set when running in production');
 		}
 	}
+}
+
+function checkOriginVariable() {
+	if (!process.env.ORIGIN && isProduction()) {
+		logger.error('ORIGIN must be set when running in production');
+		exit(2);
+	}
+}
+
+function isProduction() {
+	return !process.env.NODE_ENV || process.env.NODE_ENV === 'production';
 }
