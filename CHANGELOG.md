@@ -6,6 +6,7 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 - Restore usage of ORIGIN environment variable (\#1297).
 - Use ubuntu-26.04 in CI (\#1296).
+- Remove `/viewer` from vole-viewer link (\#1297).
 
 # 1.30.0
 
