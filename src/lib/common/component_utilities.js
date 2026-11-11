@@ -149,10 +149,3 @@ export function buildHelpLink(url) {
 		? `${PUBLIC_HELP_LINKS_BASE_URL || '/help'}/minimal${url}`
 		: '';
 }
-
-/**
- * @param {File} file
- */
-export async function fileToBase64(file) {
-	return await file.arrayBuffer().then((buf) => btoa(String.fromCharCode(...new Uint8Array(buf))));
-}
