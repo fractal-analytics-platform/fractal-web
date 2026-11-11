@@ -142,7 +142,7 @@ describe('JobsList', () => {
 
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
-			json: () => new Promise((resolve) => resolve({ error: 'not implemented' }))
+			text: () => new Promise((resolve) => resolve(JSON.stringify({ error: 'not implemented' })))
 		});
 
 		const cancelButton = result.getByRole('button', { name: 'Cancel' });

@@ -144,25 +144,26 @@ describe('CreateDatasetModal', () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValueOnce({
 			ok: false,
 			status: 422,
-			json: async () => ({
-				detail: [
-					{
-						loc: ['body', 'name'],
-						msg: 'validation error 1',
-						type: 'value_error'
-					},
-					{
-						loc: ['body', 'project_dir'],
-						msg: 'validation error 2',
-						type: 'value_error'
-					},
-					{
-						loc: ['body', 'zarr_subfolder'],
-						msg: 'validation error 3',
-						type: 'value_error'
-					}
-				]
-			})
+			text: async () =>
+				JSON.stringify({
+					detail: [
+						{
+							loc: ['body', 'name'],
+							msg: 'validation error 1',
+							type: 'value_error'
+						},
+						{
+							loc: ['body', 'project_dir'],
+							msg: 'validation error 2',
+							type: 'value_error'
+						},
+						{
+							loc: ['body', 'zarr_subfolder'],
+							msg: 'validation error 3',
+							type: 'value_error'
+						}
+					]
+				})
 		});
 
 		const result = render(CreateDatasetModal, defaultProps);

@@ -47,7 +47,7 @@ describe('Admin group edit page', () => {
 		/** @type {import('vitest').Mock} */ (fetch).mockResolvedValue({
 			ok: false,
 			status: 422,
-			json: async () => ({ detail: 'An error happened' })
+			text: async () => JSON.stringify({ detail: 'An error happened' })
 		});
 
 		fireEvent.dragStart(result.getByRole('button', { name: 'mario@fractal.xy' }));

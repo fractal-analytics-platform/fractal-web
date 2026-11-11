@@ -73,17 +73,19 @@ describe('UserEditor', () => {
 			return /** @type {Response} */ ({
 				ok: false,
 				status: 422,
-				json: () =>
+				text: () =>
 					new Promise((resolve) =>
-						resolve({
-							detail: [
-								{
-									loc: ['body', 'project_dirs', 0],
-									msg: 'mocked_error',
-									type: 'value_error'
-								}
-							]
-						})
+						resolve(
+							JSON.stringify({
+								detail: [
+									{
+										loc: ['body', 'project_dirs', 0],
+										msg: 'mocked_error',
+										type: 'value_error'
+									}
+								]
+							})
+						)
 					)
 			});
 		});
