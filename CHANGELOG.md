@@ -2,6 +2,9 @@ _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web rep
 
 # Unreleased
 
+> WARNING: This release re-enable the `ORIGIN` environment variable.
+
+- Restore usage of ORIGIN environment variable (\#1297).
 - Use ubuntu-26.04 in CI (\#1296).
 
 # 1.30.0
