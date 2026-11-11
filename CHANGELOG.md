@@ -1,6 +1,6 @@
 _Note: Numbers like (\#123) point to closed Pull Requests on the fractal-web repository._
 
-# Unreleased
+# 1.30.1
 
 > WARNING: This release re-enable the `ORIGIN` environment variable.
 
