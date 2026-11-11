@@ -59,31 +59,31 @@
 						<th>Resource Type</th>
 						<td>{profile.resource_type}</td>
 					</tr>
-					{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
+					{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 						<tr>
 							<th>Username</th>
 							<td>{profile.username || '-'}</td>
 						</tr>
 					{/if}
-					{#if resource.type === 'slurm_ssh'}
+					{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 						<tr>
 							<th>SSH key path</th>
 							<td>{profile.ssh_key_path || '-'}</td>
 						</tr>
 					{/if}
-					{#if resource.type === 'slurm_ssh'}
+					{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 						<tr>
 							<th>Jobs remote dir</th>
 							<td>{profile.jobs_remote_dir || '-'}</td>
 						</tr>
 					{/if}
-					{#if resource.type === 'slurm_ssh'}
+					{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 						<tr>
 							<th>Tasks remote dir</th>
 							<td>{profile.tasks_remote_dir || '-'}</td>
 						</tr>
 					{/if}
-					{#if resource.type === 'slurm_ssh'}
+					{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 						<tr>
 							<th>Pixi cache dir</th>
 							<td>{profile.pixi_cache_dir || '-'}</td>

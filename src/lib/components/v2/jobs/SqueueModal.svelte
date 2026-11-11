@@ -105,7 +105,7 @@
 		{#if loading}
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"> </span>
 		{:else if output}
-			<p>Output of <code>squeue</code> command:</p>
+			<p>Cluster queue:</p>
 			<div>
 				<pre>{output}</pre>
 			</div>

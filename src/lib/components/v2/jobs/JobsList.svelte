@@ -434,7 +434,7 @@
 
 <div class="d-flex justify-content-end align-items-center mb-3">
 	<div>
-		{#if runnerBackend === 'slurm_ssh' || runnerBackend === 'slurm_sudo'}
+		{#if runnerBackend === 'slurm_ssh' || runnerBackend === 'slurm_sudo' || runnerBackend === 'slurm_rest'}
 			<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#squeueModal">
 				View cluster queue
 			</button>
