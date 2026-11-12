@@ -77,7 +77,7 @@
 				<tr>
 					<th>Id</th>
 					<th>Name</th>
-					{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
+					{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 						<th>Username</th>
 					{/if}
 					<th>Actions</th>
@@ -88,7 +88,7 @@
 					<tr>
 						<td>{profile.id}</td>
 						<td>{profile.name}</td>
-						{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
+						{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 							<td>{profile.username || '-'}</td>
 						{/if}
 						<td>

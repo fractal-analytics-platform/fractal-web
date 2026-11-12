@@ -113,7 +113,7 @@
 					<span class="invalid-feedback">{$profileValidationErrors['name']}</span>
 				</div>
 			</div>
-			{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh'}
+			{#if resource.type === 'slurm_sudo' || resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 				<div class="row mb-3 has-validation">
 					<label for="username" class="col-sm-3 col-form-label text-end">
 						<strong>Username</strong>
@@ -133,6 +133,11 @@
 								The user on the local SLURM cluster who will be impersonated by Fractal through
 								<code>sudo -u</code>
 							</div>
+						{:else if resource.type === 'slurm_rest'}
+							<div class="form-text">
+								The user on the remote SLURM cluster used by Fractal through <code>ssh</code>
+								(folders, task collection, outputs). SLURM jobs run as the Fractal user's SSO account.
+							</div>
 						{:else}
 							<div class="form-text">
 								The user on the remote SLURM cluster who will be impersonated by Fractal through
@@ -143,7 +148,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if resource.type === 'slurm_ssh'}
+			{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 				<div class="row mb-3 has-validation">
 					<label for="ssh_key_path" class="col-sm-3 col-form-label text-end">
 						<strong>SSH key path</strong>
@@ -165,7 +170,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if resource.type === 'slurm_ssh'}
+			{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 				<div class="row mb-3 has-validation">
 					<label for="jobs_remote_dir" class="col-sm-3 col-form-label text-end">
 						<strong>Jobs remote dir</strong>
@@ -184,7 +189,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if resource.type === 'slurm_ssh'}
+			{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 				<div class="row mb-3 has-validation">
 					<label for="tasks_remote_dir" class="col-sm-3 col-form-label text-end">
 						<strong>Tasks remote dir</strong>
@@ -204,7 +209,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if resource.type === 'slurm_ssh'}
+			{#if resource.type === 'slurm_ssh' || resource.type === 'slurm_rest'}
 				<div class="row mb-3 has-validation">
 					<label for="pixi_cache_dir" class="col-sm-3 col-form-label text-end">
 						<strong>Pixi cache dir</strong>

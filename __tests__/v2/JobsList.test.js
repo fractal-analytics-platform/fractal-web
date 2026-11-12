@@ -188,6 +188,19 @@ describe('JobsList', () => {
 		let table = result.getByRole('table');
 		expect(table.querySelectorAll('tbody tr').length).eq(1);
 	});
+
+	it.each([
+		['slurm_sudo', true],
+		['slurm_ssh', true],
+		['slurm_rest', true],
+		['local', false]
+	])('View cluster queue button with %s backend', (runnerBackend, visible) => {
+		const result = render(JobsList, {
+			props: { jobUpdater: vi.fn(), runnerBackend }
+		});
+		const button = result.queryByRole('button', { name: 'View cluster queue' });
+		expect(button !== null).eq(visible);
+	});
 });
 
 function verifyOptions(element, expectedOptions) {

@@ -17,7 +17,7 @@ The following environment variables can be used to configure fractal-web.
 - `LOG_FILE`: the path of the file where logs will be written; by default is unset and no file will be created; ignored when `LOG_CONFIG_FILE` is set;
 - `LOG_LEVEL_FILE`: the log level of logs that will be written to the file; the default value is `info`; ignored when `LOG_CONFIG_FILE` is set;
 - `LOG_LEVEL_CONSOLE`: the log level of logs that will be written to the console; the default value is `warn`; ignored when `LOG_CONFIG_FILE` is set;
-- `FRACTAL_RUNNER_BACKEND`: specifies which runner backend is used; supported values are: `local`, `slurm`, `slurm_ssh`; setting this variable is mandatory;
+- `FRACTAL_RUNNER_BACKEND`: specifies which runner backend is used; supported values are: `local`, `slurm_sudo`, `slurm_ssh`, `slurm_rest`; setting this variable is mandatory;
 - `PUBLIC_FRACTAL_DATA_URL`: URL to [fractal-data](https://github.com/fractal-analytics-platform/fractal-data) service (e.g. http://localhost:3000/data for testing);
 - `PUBLIC_FRACTAL_VIZARR_VIEWER_URL`: URL to Vizarr viewer (e.g. http://localhost:3000/data/vizarr for testing);
 - `PUBLIC_FRACTAL_VOLE_VIEWER_URL`: URL to Vol-E viewer (e.g. http://localhost/vole-viewer for testing);

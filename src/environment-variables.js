@@ -61,7 +61,7 @@ function checkRunnerBackend() {
 		logger.error('Environment variable FRACTAL_RUNNER_BACKEND is mandatory');
 		exit(2);
 	}
-	checkAllowedValues('FRACTAL_RUNNER_BACKEND', ['local', 'slurm_sudo', 'slurm_ssh']);
+	checkAllowedValues('FRACTAL_RUNNER_BACKEND', ['local', 'slurm_sudo', 'slurm_ssh', 'slurm_rest']);
 }
 
 /**
