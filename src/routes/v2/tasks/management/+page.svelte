@@ -7,6 +7,7 @@
 	import TaskGroupsTable from '#lib/components/v2/tasks/TaskGroupsTable.svelte';
 	import PixiTask from '#lib/components/v2/tasks/PixiTask.svelte';
 	import TaskActivitiesTable from '#lib/components/v2/tasks/TaskActivitiesTable.svelte';
+	import ApptainerTask from '#lib/components/v2/tasks/ApptainerTask.svelte';
 
 	const user = $derived(page.data.user);
 	/** @type {string|null} */
@@ -15,7 +16,7 @@
 	/** @type {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} */
 	let taskGroups = $state(page.data.taskGroups || []);
 
-	/** @type {'pypi'|'local'|'single'|'custom_env'|'pixi'} */
+	/** @type {'pypi'|'local'|'single'|'custom_env'|'pixi'|'apptainer'} */
 	let packageType = $state('pypi');
 
 	/** @type {import('#lib/components/v2/tasks/TaskCollection.svelte').default|undefined} */
@@ -84,6 +85,16 @@
 	<input
 		class="btn-check"
 		type="radio"
+		name="apptainer"
+		id="apptainer"
+		value="apptainer"
+		bind:group={packageType}
+	/>
+	<label class="btn btn-outline-secondary" for="apptainer"> Apptainer </label>
+
+	<input
+		class="btn-check"
+		type="radio"
 		name="custom_env"
 		id="custom_env"
 		value="custom_env"
@@ -110,6 +121,8 @@
 			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {defaultGroupName} {user} />
 		{:else if packageType === 'pixi'}
 			<PixiTask {user} {defaultGroupName} />
+		{:else if packageType === 'apptainer'}
+			<ApptainerTask {user} {defaultGroupName} />
 		{/if}
 	</div>
 
