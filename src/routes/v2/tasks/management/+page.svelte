@@ -12,6 +12,8 @@
 	const user = $derived(page.data.user);
 	/** @type {string|null} */
 	const defaultGroupName = $derived(page.data.defaultGroupName);
+	/** @type {boolean} */
+	const showApptainer = $derived(page.data.showApptainer);
 
 	/** @type {Array<[ string, Array<import('#fractal-components/types/api').TaskGroupSlim> ]>} */
 	let taskGroups = $state(page.data.taskGroups || []);
@@ -82,15 +84,17 @@
 	/>
 	<label class="btn btn-outline-secondary" for="pixi"> Pixi </label>
 
-	<input
-		class="btn-check"
-		type="radio"
-		name="apptainer"
-		id="apptainer"
-		value="apptainer"
-		bind:group={packageType}
-	/>
-	<label class="btn btn-outline-secondary" for="apptainer"> Apptainer </label>
+	{#if showApptainer}
+		<input
+			class="btn-check"
+			type="radio"
+			name="apptainer"
+			id="apptainer"
+			value="apptainer"
+			bind:group={packageType}
+		/>
+		<label class="btn btn-outline-secondary" for="apptainer"> Apptainer </label>
+	{/if}
 
 	<input
 		class="btn-check"
@@ -121,7 +125,7 @@
 			<CustomEnvTask addNewTasks={reloadTaskGroupsList} {defaultGroupName} {user} />
 		{:else if packageType === 'pixi'}
 			<PixiTask {user} {defaultGroupName} />
-		{:else if packageType === 'apptainer'}
+		{:else if packageType === 'apptainer' && showApptainer}
 			<ApptainerTask {user} {defaultGroupName} />
 		{/if}
 	</div>

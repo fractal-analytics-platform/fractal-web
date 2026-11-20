@@ -78,6 +78,12 @@ export const variables = defineEnvVars({
 			return input !== 'false';
 		}
 	},
+	FRACTAL_SHOW_APPTAINER: {
+		schema: (input) => {
+			checkAllowedValues('FRACTAL_SHOW_APPTAINER', input, ['true', 'false']);
+			return input === 'true';
+		}
+	},
 	FRACTAL_DEFAULT_GROUP_NAME: {
 		schema: (input) => {
 			checkAllowedValues('FRACTAL_DEFAULT_GROUP_NAME', input, ['All']);
