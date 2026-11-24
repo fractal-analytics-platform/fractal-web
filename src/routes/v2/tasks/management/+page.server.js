@@ -1,7 +1,7 @@
 import { getCurrentUser } from '#lib/server/api/auth_api.js';
 import { listTaskGroups } from '#lib/server/api/v2/task_api.js';
 import { getLogger } from '#lib/server/logger.js';
-import { FRACTAL_DEFAULT_GROUP_NAME, FRACTAL_SHOW_APPTAINER } from '$app/env/private';
+import { FRACTAL_DEFAULT_GROUP_NAME } from '$app/env/private';
 
 const logger = getLogger('tasks management page');
 
@@ -20,7 +20,6 @@ export async function load({ fetch }) {
 		user,
 		taskGroups,
 		defaultGroupName,
-		showApptainer: FRACTAL_SHOW_APPTAINER,
 		helpLink: '/reference/task-collection/'
 	};
 }
