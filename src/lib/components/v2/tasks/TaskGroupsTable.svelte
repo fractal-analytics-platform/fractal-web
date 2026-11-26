@@ -216,16 +216,14 @@
 						>
 							<i class="bi bi-pencil"></i>
 						</button>
-						{#if selectedGroup.origin !== 'apptainer'}
-							<button
-								class="btn btn-info"
-								aria-label="Manage"
-								title="Manage"
-								onclick={() => taskGroupManageModal?.open(selectedGroup)}
-							>
-								<i class="bi bi-gear"></i>
-							</button>
-						{/if}
+						<button
+							class="btn btn-info"
+							aria-label="Manage"
+							title="Manage"
+							onclick={() => taskGroupManageModal?.open(selectedGroup)}
+						>
+							<i class="bi bi-gear"></i>
+						</button>
 					</td>
 				</tr>
 
